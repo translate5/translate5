@@ -73,10 +73,11 @@ Ext.define('Editor.controller.SearchReplace', {
         controller:{
             '#Editor': {
                 beforeKeyMapUsage: 'handleEditorKeyMapUsage',
+                prepareTrackChangesForSaving: 'handleTrackChangesForSaving'
             },
             '#Editor.$application': {
                 editorViewportClosed: 'onEditorViewportClosed'
-            },
+            }
         }
     },
     
@@ -94,8 +95,8 @@ Ext.define('Editor.controller.SearchReplace', {
     searchFields:[],
     replaceFields:[],
     activeColumnDataIndex:'',
-    DEFAULT_COLUMN_DATA_INDEX:'targetEdit',
     
+    DEFAULT_COLUMN_DATA_INDEX:'targetEdit',
 
     /***
      * Flag for if the search or replace is clicked(so we know if we only move the index, or we also replace the currently active value)
@@ -122,6 +123,21 @@ Ext.define('Editor.controller.SearchReplace', {
         matchCount:0
     },
     
+    /***
+     * Pointer to the array index of replace ranges
+     */
+    replaceArrayPointer:0,
+
+    /***
+     * Trackchanges editor instance class
+     */
+    utilRangeClass:null,
+    
+    /***
+     * Serialized ranges for replacement
+     */
+    replaceRanges:[],
+    
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
         comboFieldLabel:'#UT#Ersetzen',
@@ -140,6 +156,7 @@ Ext.define('Editor.controller.SearchReplace', {
     initConfig:function(){
         this.callParent(arguments);
         this.resetActiveColumnDataIndex();
+        this.utilRangeClass=Editor.app.getController('Editor.plugins.TrackChanges.controller.Editor');
     },
     
     /***
@@ -147,6 +164,15 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     onEditorViewportClosed:function(){
         this.destroySearchWindow();
+    },
+    
+    /***
+     * Event handler
+     */
+    handleTrackChangesForSaving:function(){
+        var me=this;
+        me.utilRangeClass.cleanMarkTags();
+        me.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
     },
     
     /***
@@ -200,6 +226,7 @@ Ext.define('Editor.controller.SearchReplace', {
     onSegmentGridEdit:function(){
         this.activeSegment.matchIndex=0;
         this.activeSegment.matchCount=0;
+        this.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
     },
     
     /***
@@ -336,13 +363,40 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            vm=activeTab.getViewModel(),
-            result=vm.get('result');
+            replaceCombo=activeTab.down('#replaceCombo'),
+            replaceText=replaceCombo.getRawValue();
         
-        me.isSearchPressed = false;
-        if(result.length>0){
+        me.utilRangeClass.isSearchReplaceRange=true;
+
+        //jump to next segment check
+        if(me.replaceArrayPointer >= me.replaceRanges.length){
+            me.utilRangeClass.isSearchReplaceRange=false;
+            me.replaceArrayPointer=0;
             me.handleRowSelection();
+            return;
         }
+        
+        //remove/mark the hit result string/nodes
+        var range = rangy.createRange();
+        range.moveToBookmark(me.replaceRanges[me.replaceArrayPointer]);
+        me.utilRangeClass.handleReplaceDelete(range);
+        delete range;
+        
+    
+        //apply the replacement
+        var range = rangy.createRange();
+        range.moveToBookmark(me.replaceRanges[me.replaceArrayPointer]);
+        me.utilRangeClass.insertReplaceNode(range,replaceText);
+        delete range;
+        
+        //clean the mark tags from the editor
+        me.utilRangeClass.cleanMarkTags();
+        
+        //run the search once again
+        me.findMatches(true);
+        
+        //disable the flag
+        me.utilRangeClass.isSearchReplaceRange=false;
     },
     
     onReplaceAllButtonClick:function(){
@@ -390,11 +444,7 @@ Ext.define('Editor.controller.SearchReplace', {
         if(!me.getSearchReplaceWindow()){
             return;
         }
-        //delay so the roweditor is loaded
-        var task = new Ext.util.DelayedTask(function(){
-            me.selectOrReplaceText();
-        });
-        task.delay(100);
+        me.selectMatches();
     },
     
     /***
@@ -634,23 +684,28 @@ Ext.define('Editor.controller.SearchReplace', {
             me.findEditorSegment(plug);
             return;
         }
-        me.selectOrReplaceText();
+        me.selectMatches();
         //FIXME find first in grid (the function from Thomas)
         //so the starting point is definded
     },
-    
-    selectOrReplaceText:function(){
-        var me=this;
-        
-        rangy.init();
-        var task = new Ext.util.DelayedTask(function(){
-            me.doRengySearch();
-        });
 
+
+    /***
+     * Triggers the findMatches function with delay.
+     */
+    selectMatches:function(){
+        var me=this;
+        //delay so the roweditor is loaded
+        var task = new Ext.util.DelayedTask(function(){
+            me.findMatches();
+        });
         task.delay(500);
     },
     
-    doRengySearch:function(){
+    /***
+     * Search and mark the hits in the current open segment in editor
+     */
+    findMatches:function(replaceCall){
         var me=this,
             iframeDocument = me.getSegmentIframeDocument(),
             tabPanel=me.getTabPanel(),
@@ -659,190 +714,99 @@ Ext.define('Editor.controller.SearchReplace', {
             searchComboRawValue=searchCombo.getRawValue(),
             replaceCombo=activeTab.down('#replaceCombo'),
             searchType=activeTab.down('radiofield').getGroupValue(),
-            //searchValue ='(?!<.*?)(?![^<>]*?>)'+searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
-            searchValue =searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
-            //<del[^>]*>(.*|\n?)<\/del>
-            searchRegExp=null,
-            caseSensitive=true;//FIXME fix the case sensetive
-        // Enable buttons
-        var classApplierModule = rangy.modules.ClassApplier;
+            matchCase=activeTab.down('#matchCase').checked,
+            searchValue=searchComboRawValue;
+        
+        var classApplierModule = rangy.modules.ClassApplier,
+            searchResultApplier=null;
+        
+        me.replaceRanges=[];
+            
         if (rangy.supported && classApplierModule && classApplierModule.supported) {
-            searchResultApplier = rangy.createClassApplier("searchResult");
-
-            //var searchBox = gEBI("search"),
-                //regexCheckBox = gEBI("regex"),
-                //caseSensitiveCheckBox = gEBI("caseSensitive"),
-                //wholeWordsOnlyCheckBox = gEBI("wholeWordsOnly"),
-                //timer;
+            searchResultApplier = rangy.createClassApplier("searchResult",{
+                elementTagName:me.utilRangeClass.self.NODE_NAME_MARK
+            });
+            
+            searchResultApplier._OVERRIDDENisIgnorableWhiteSpaceNode = searchResultApplier.isIgnorableWhiteSpaceNode;
+            
+            //The point of this overide is - do not apply mark tags to delete tags.
+            //This fix is available only for the current object
+            searchResultApplier.isIgnorableWhiteSpaceNode=function(node) {
+                if(node.parentElement && node.parentElement.nodeName.toLowerCase() === me.utilRangeClass.self.NODE_NAME_DEL){
+                    return true;
+                }
+                return this._OVERRIDDENisIgnorableWhiteSpaceNode.call(this,node);
+            };
 
             // Remove existing highlights
-            var range = rangy.createRange();
-            var caseSensitive = false;
-            var searchScopeRange = rangy.createRange();
+            var range = rangy.createRange(),
+                caseSensitive = false,
+                searchScopeRange = rangy.createRange();
+            
             searchScopeRange.selectNodeContents(iframeDocument);
 
             var options = {
                 caseSensitive: caseSensitive,
-                wholeWordsOnly: false,
+                wholeWordsOnly: matchCase,
                 withinRange: searchScopeRange,
-                direction: "forward", // This is redundant because "forward" is the default,
-                wordOptions:{
-                    wordRegex: /[a-z0-9]+('[a-z0-9]+)*/gi,
-                    includeTrailingSpace: false,
-                    tokenizer:function(chars, wordOptions){
-                        debugger;
-                        var word = chars.join(""), result, tokenRanges = [];
-
-                        function createTokenRange(start, end, isWord) {
-                            tokenRanges.push( { start: start, end: end, isWord: isWord } );
-                        }
-
-                        // Match words and mark characters
-                        var lastWordEnd = 0, wordStart, wordEnd;
-                        while ( (result = wordOptions.wordRegex.exec(word)) ) {
-                            wordStart = result.index;
-                            wordEnd = wordStart + result[0].length;
-
-                            // Create token for non-word characters preceding this word
-                            if (wordStart > lastWordEnd) {
-                                createTokenRange(lastWordEnd, wordStart, false);
-                            }
-
-                            // Get trailing space characters for word
-                            if (wordOptions.includeTrailingSpace) {
-                                while ( nonLineBreakWhiteSpaceRegex.test(chars[wordEnd]) ) {
-                                    ++wordEnd;
-                                }
-                            }
-                            createTokenRange(wordStart, wordEnd, true);
-                            lastWordEnd = wordEnd;
-                        }
-
-                        // Create token for trailing non-word characters, if any exist
-                        if (lastWordEnd < chars.length) {
-                            createTokenRange(lastWordEnd, chars.length, false);
-                        }
-
-                        return tokenRanges;
-                    }
-                }
+                direction: "forward" // This is redundant because "forward" is the default,
             };
 
+            
             range.selectNodeContents(iframeDocument.body);
             searchResultApplier.undoToRange(range);
 
+            //add display none to all del nodes, with this thay are ignored as searchable
+            me.utilRangeClass.prepareDelNodeForSearch('none');
+            
             // Create search term
             var searchTerm =searchComboRawValue; //searchBox.value;
 
-            if (searchTerm !== "") {
-                if (false) {
-                    searchTerm = new RegExp(searchTerm, caseSensitive ? "g" : "gi");
+            if (searchTerm === "") {
+                me.utilRangeClass.prepareDelNodeForSearch(null);
+                return
+            }
+
+            //TODO: the regular expression javascript-mysql match
+            if (searchType==="regularExpressionSearch" ) {
+                var match = searchTerm.match(new RegExp('^/(.*?)/([gimy]*)$'));
+                // sanity check here
+                if(!match){
+                    searchTerm = new RegExp(searchTerm, "gi");   
+                }else{
+                    var regex = new RegExp(match[1], match[2]);
+                    searchTerm = new RegExp(regex);
                 }
-                debugger;
+            }
+            
+            if (searchType==="wildcardsSearch" ) {
                 
-                var utilRangeClass=Editor.app.getController('Editor.plugins.TrackChanges.controller.Editor');
-                // Iterate over matches
-                while (range.findText(searchTerm, options)) {
-                    //if the selection does not contains an del tag, create a selection
-                    if(!utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,'del')){
-                        searchResultApplier.applyToRange(range);
-                    }
+                function globStringToRegex(str) {
+                    return new RegExp(preg_quote(str).replace(/\\\*/g, '.*').replace(/\\\?/g, '.'), 'gi');
+                }
+                function preg_quote (str, delimiter) {
+                    return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
+                }
+                searchTerm=globStringToRegex(searchTerm);
+                //searchTerm=searchTerm.replace("*", "(.*?)")
+                //searchTerm = new RegExp(searchTerm, caseSensitive ? "g" : "gi");
+            }
+            
+            // Iterate over matches
+            while (range.findText(searchTerm, options)) {
+                //if the selection does not contains an del tag, create a selection, and it is not an allready replaced match
+                if(!me.utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,me.utilRangeClass.self.NODE_NAME_DEL) && !me.utilRangeClass.hasReplacedIns(range)){
+                    //apply to range, this will select the text
+                    searchResultApplier.applyToRange(range);
                     
-                    range.collapse(false);
-                    //var savedSel = rangy.saveSelection();
-                    console.log(range);
-                    // Collapse the range to the position immediately after the match
+                    //save the range for later replace usage
+                    me.replaceRanges.push(range.getBookmark());
                 }
-                //
+                // Collapse the range to the position immediately after the match
+                range.collapse(false);
             }
+            me.utilRangeClass.prepareDelNodeForSearch(null);
         }
-    },
-    
-    //TODO replace text
-    XXXselectOrReplaceText:function(){
-        var me=this,
-            iframeDocument = me.getSegmentIframeDocument(),
-            count = 0,
-            tabPanel=me.getTabPanel(),
-            activeTab=tabPanel.getActiveTab(),
-            searchCombo=activeTab.down('#searchCombo'),
-            searchInCombo=activeTab.down('#searchInCombo'),
-            searchComboRawValue=searchCombo.getRawValue(),
-            replaceCombo=activeTab.down('#replaceCombo'),
-            searchType=activeTab.down('radiofield').getGroupValue(),
-            searchValue ='(?!<.*?)(?![^<>]*?>)'+searchComboRawValue,///<\/?[^>]+(>|$)/g+(searchCombo.getRawValue());
-            searchRegExp=null,
-            caseSensitive=true;//FIXME fix the case sensetive
-
-        if(!iframeDocument){
-            return;
-        }
-        
-        if(searchComboRawValue===null || searchComboRawValue===""){
-            return;
-        }
-        
-        //if we are searchin in non editable field, do not select in the iframe
-        if(!me.isContentEditableField(searchInCombo.value)){
-            return;
-        }
-        
-        searchRegExp = new RegExp(searchValue, 'g' + (caseSensitive ? '' : 'i'));
-
-        //me.store.each(function(record, idx) {
-        var cell, matches, cellHTML,
-            cell = Ext.get(iframeDocument.body);
-
-            //var searchClass=Ext.create('Editor.controller.searchandreplace.SearchSegment');
-            //searchClass.search(cell.dom.innerHTML,searchComboRawValue);
-            //return;
-            
-            //matches = cell.dom.innerHTML.match(me.tagsRe);
-            //cellHTML = cell.dom.innerHTML.replace(me.tagsRe, me.tagsProtect);
-        
-            //clear the html tags from the string
-            if(!me.isSearchPressed){
-                cellHTML = cell.dom.innerHTML.replace(/<mark[^>]*>+|<\/mark>/g, "");
-            }else{
-                cellHTML = cell.dom.innerHTML;
-            }
-            //cellHTML = cell.dom.innerHTML.replace(/<\/?[^>]+(>|$)/g, "");
-            
-            matches = cellHTML.match(searchRegExp);
-        
-            if(!matches){
-                return;
-            }
-
-            me.activeSegment.matchCount=matches.length;
-            // populate indexes array, set matchIndex, and replace wrap matched string in a span
-            cellHTML = cellHTML.replace(searchRegExp, function(m) {
-                //if (me.activeSegment.matchIndex === null) {
-                //    me.activeSegment.matchIndex = 1;
-                //}
-                //if(me.activeSegment.matchIndex === count){
-                if(!me.isSearchPressed){
-                    me.activeSegment.matchIndex = me.activeSegment.matchIndex-1;
-                    me.activeSegment.matchIndex = Math.max(me.activeSegment.matchIndex,0);
-                    if(me.activeSegment.matchIndex === count){
-                        count++;
-                        return replaceCombo.getRawValue();
-                    }
-                }
-                if(me.activeSegment.matchIndex===count){
-                    count++;
-                    return '<mark style="background-color:red;">' + m + '</mark>';
-                }
-                count++;
-                return '<mark>' + m + '</mark>';
-               //return '<span style="background-color:yellow;">' + m + '</span>';
-               //return '<mark>' + m + '</mark>';
-            });
-            
-            if(matches.length > 0){
-                me.activeSegment.matchIndex++;
-            }
-            cell.dom.innerHTML = cellHTML;
     },
     
     /***
@@ -1010,7 +974,7 @@ Ext.define('Editor.controller.SearchReplace', {
             editor = plug.getEditPlugin().editor,
             iframeDocument=null;
         try {
-            iframeDocument = editor.mainEditor.iframeEl.dom.contentDocument || iFrame.getWin().document;
+            iframeDocument = editor.mainEditor.iframeEl.dom.contentDocument || editor.mainEditor.iframeEl.getWin().document;
         } catch(error) {
             return false;
         }
@@ -1102,34 +1066,11 @@ Ext.define('Editor.controller.SearchReplace', {
         }
     },
     
-    escapeRegExp:function(str) {
-        return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-    },
-
-    //FIXME this works but somehow destroys the content inside the segment!!
-    testSearch:function(text){
-        var testWindow=Ext.getWin().dom,
-            testDocument=testWindow.document;
-        
-        if (testWindow.find && testWindow.getSelection) {
-            testDocument.designMode = "on";
-            var sel = testWindow.getSelection();
-            sel.collapse(testDocument.body, 0);
-
-            while (testWindow.find(text)) {
-                testDocument.execCommand("HiliteColor", false, "yellow");
-                sel.collapseToEnd();
-            }
-            testDocument.designMode = "off";
-        } else if (testDocument.body.createTextRange) {
-            var textRange = testDocument.body.createTextRange();
-            while (textRange.findText(text)) {
-                textRange.execCommand("BackColor", false, "yellow");
-                textRange.collapse(false);
-            }
-        }
-    },
-
+    /***
+     * Return visible row indexes in segment grid
+     * @param {Object} segment grid
+     * @returns {Object} { top:topIndex, bottom:bottomIndex }
+     */
     getVisibleRowIndexBoundaries:function(grid){
         var view=grid.getView(),
             vTop = view.el.getTop(),
@@ -1150,6 +1091,6 @@ Ext.define('Editor.controller.SearchReplace', {
             top:top,
             bottom:bottom,
         };
-    },
+    }
 });
     
