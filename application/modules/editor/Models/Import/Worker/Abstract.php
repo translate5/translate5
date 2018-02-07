@@ -64,4 +64,16 @@ abstract class editor_Models_Import_Worker_Abstract extends ZfExtended_Worker_Ab
         }
         return $parentsOk;
     }
+    
+    /**
+     * basicly sets the task to be imported to state error when a fatal error happens after the work method
+     */
+    protected function registerShutdown() {
+        register_shutdown_function(function($task) {
+            $error = error_get_last();
+            if(!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
+                $task->setErroneous();
+            }
+        }, $this->task);
+    }
 }

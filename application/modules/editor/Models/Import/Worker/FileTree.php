@@ -27,10 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Contains the Import Worker (the scheduling parts)
- * The import process itself is encapsulated in editor_Models_Import_Worker_Import
+ * Encapsulates the part of the import which looks for the files to be imported
  */
-class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_Abstract {
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -38,10 +37,6 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
     protected function validateParameters($parameters = array()) {
         if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration) {
             throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
-        }
-        
-        if(empty($parameters['dataProvider']) || !$parameters['dataProvider'] instanceof editor_Models_Import_DataProvider_Abstract) {
-            throw new ZfExtended_Exception('missing or wrong parameter dataProvider, must be if instance editor_Models_Import_DataProvider_Abstract');
         }
         return true;
     }
@@ -61,17 +56,45 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events 
         $parameters = $this->workerModel->getParameters();
+        $importConfig = $parameters['config'];
+        /* @var $importConfig editor_Models_Import_Configuration */
+        
+        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
+        $events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         
         try {
-            $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
-            /* @var $import editor_Models_Import_Worker_Import */
-            $import->import($task, $parameters['config']);
+            $metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($importConfig));
+            /* @var $metaDataImporter editor_Models_Import_MetaData */
+            $metaDataImporter->import($this->task);
+//FIXME die bindings zu diesem Event!
+            $events->trigger("beforeDirectoryParsing", $this,[
+                    'importFolder'=>$importConfig->importFolder,
+                    'task' => $this->task,
+            ]);
             
-            // externalImport just triggers the event aferImport!
-            //@see editor_Models_Import::triggerAfterImport
-            $externalImport = ZfExtended_Factory::get('editor_Models_Import');
-            /* @var $externalImport editor_Models_Import */
-            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $parameters['config']);
+            $filelistInstance = ZfExtended_Factory::get('editor_Models_Import_FileList', [
+                    $importConfig,
+                    $this->task
+            ]);
+            /* @var $filelistInstance editor_Models_Import_FileList */
+            $filelist = $filelistInstance->processProofreadAndReferenceFiles($importConfig->getProofReadDir());
+//FIXME die bindings zu diesem Event!
+            $events->trigger("afterDirectoryParsing", $this,[
+                    'task'=>$this->task,
+                    'importFolder'=>$importConfig->importFolder,
+                    'filelist'=>$filelist
+            ]);
+            
+            $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+            /* @var $fileFilter editor_Models_File_FilterManager */
+            $fileFilter->initImport($this->task, $importConfig);
+            
+            foreach ($filelist as $fileId => $path) {
+//FIXME parameter anpassen!
+                //$fileFilter->applyImportFilters($params[0], $params[2], $filelist);
+            }
+            
+            $this->task->save();
             return true;
         } catch (Exception $e) {
             $task->setErroneous();

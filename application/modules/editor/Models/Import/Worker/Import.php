@@ -46,11 +46,6 @@ class editor_Models_Import_Worker_Import {
     protected $gh;
 
     /**
-     * @var editor_Models_Import_MetaData
-     */
-    protected $metaDataImporter;
-    
-    /**
      * shared instance over all parse objects of the segment field manager
      * @var editor_Models_SegmentFieldManager
      */
@@ -130,14 +125,8 @@ class editor_Models_Import_Worker_Import {
         //should errors stop the import, or should they be logged:
         Zend_Registry::set('errorCollect', $this->importConfig->isCheckRun);
         
-        $this->importMetaData();
-        $this->events->trigger("beforeDirectoryParsing", $this,[
-                'importFolder'=>$this->importConfig->importFolder,
-                'task' => $this->task,
-        ]);
         $this->importFiles();
         $this->syncFileOrder();
-        $this->removeMetaDataTmpFiles();
         $this->importRelaisFiles();
         $this->updateSegmentFieldViews();
         $this->calculateEmptyTargets();
@@ -156,38 +145,14 @@ class editor_Models_Import_Worker_Import {
     }
     
     /**
-     * Methode zum Anstoßen verschiedener Meta Daten Imports zum Laufenende Import
-     */
-    protected function importMetaData() {
-        $this->metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($this->importConfig));
-        /* @var $this->metaDataImporter editor_Models_Import_MetaData */
-        $this->metaDataImporter->import($this->task);
-    }
-
-    /**
-     * Löscht temporär während des Imports erzeugte Metadaten
-     */
-    protected function removeMetaDataTmpFiles() {
-        $this->metaDataImporter->cleanup();
-    }
-
-    /**
      * Importiert die Dateien und erzeugt die Taggrafiken
      */
     protected function importFiles(){
-        $filelist = $this->filelist->processProofreadAndReferenceFiles($this->importConfig->getProofReadDir());
-        $this->events->trigger("afterDirectoryParsing", $this,[
-                'task'=>$this->task,
-                'importFolder'=>$this->importConfig->importFolder,
-                'filelist'=>$filelist
-        ]);
-        
-        //FIXME split import worker in two parts, the directory parsing in one worker and the import in other workers.
-        // Then other workers affecting the files can be started in between!
-        
-        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-        /* @var $fileFilter editor_Models_File_FilterManager */
-        $fileFilter->initImport($this->task, $this->importConfig);
+
+        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        /* @var $treeDb editor_Models_Foldertree */
+        $filelist = $treeDb->getPaths($this->task->getTaskGuid(),'file');
+        error_log(print_r($filelist,1));
         
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
@@ -198,9 +163,6 @@ class editor_Models_Import_Worker_Import {
                 trigger_error('Check of File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
             }
             $params = $this->getFileparserParams($path, $fileId);
-            $fileFilter->applyImportFilters($params[0], $params[2], $filelist);
-            //filepath could be changed by the file filter, so reset:
-            $params[0] = $filelist[$fileId]; 
             $parser = $this->getFileParser($params[0], $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename

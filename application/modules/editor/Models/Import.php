@@ -111,7 +111,17 @@ class editor_Models_Import {
                 'task' => $this->task,
                 'importFolder'=>$this->importConfig->importFolder
         ));
-        /*
+        /**
+         * Queue FileTree Worker
+         */
+        $fileTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_FileTree');
+        /* @var $importWorker editor_Models_Import_Worker */
+        $fileTreeWorker->init($this->task->getTaskGuid(), array(
+                'config' => $this->importConfig
+        ));
+        $fileTreeWorker->queue(0, NULL, false);
+        
+        /**
          * Queue Import Worker
          */
         $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');

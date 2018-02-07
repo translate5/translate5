@@ -91,6 +91,8 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
      * handler for event: editor_Models_Import#afterImport
      */
     public function handleTransitImportCleanup(Zend_EventManager_Event $event) {
+        $params = $event->getParams();
+        $this->importFolder = $params['importConfig']->importFolder;
         $this->renameTargetFiles('cleanup');
     }
     
