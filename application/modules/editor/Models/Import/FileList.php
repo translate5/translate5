@@ -48,10 +48,14 @@ class editor_Models_Import_FileList {
     protected $task;
     
     /**
-     * 
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig;
+    
+    /**
+     * @var editor_Models_Foldertree
+     */
+    protected $treeDb;
     
     public function __construct(editor_Models_Import_Configuration $importConfig, editor_Models_Task $task) {
         $this->importConfig = $importConfig;
@@ -65,25 +69,29 @@ class editor_Models_Import_FileList {
      * @param string $proofreadDir
      */
     public function processProofreadAndReferenceFiles() {
-        $config = $this->importConfig;
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
         $tree = $parser->parse($this->importConfig->getProofReadDir());
         
-        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
-        $treeDb->setTree($tree);
-        if($this->hasReferenceFiles() && !$config->isCheckRun){
-            $treeDb->setReferenceFileTree($this->getReferenceFileTree());
+        $this->treeDb->setTree($tree);
+        if($this->hasReferenceFiles()){
+            $this->treeDb->setReferenceFileTree($this->getReferenceFileTree());
         }
-        $treeDb->setTaskGuid($this->task->getTaskGuid());
-        $params = array($treeDb,$config->getLanguageId('source'),$config->getLanguageId('target'), $config->getLanguageId('relais'));
+        $this->treeDb->setTaskGuid($this->task->getTaskGuid());
+        $this->saveAndSyncFileTree();
+        
+        return $this->treeDb->getPaths($this->task->getTaskGuid(),'file');
+    }
+    
+    public function saveAndSyncFileTree() {
+        $config = $this->importConfig;
+        $params = array($this->treeDb, $config->getLanguageId('source'), $config->getLanguageId('target'), $config->getLanguageId('relais'));
         $sync = ZfExtended_Factory::get('editor_Models_Foldertree_SyncToFiles', $params);
         /* @var $sync editor_Models_Foldertree_SyncToFiles */
         $sync->recursiveSync();
-        
-        $treeDb->save();
-        return $treeDb->getPaths($this->task->getTaskGuid(),'file');
+        $this->treeDb->save();
     }
     
     /**

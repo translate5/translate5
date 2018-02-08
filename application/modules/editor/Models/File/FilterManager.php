@@ -90,12 +90,13 @@ class editor_Models_File_FilterManager {
     }
     
     /**
+     * returns the filename of the affected file (could be changed by the filters due conversion)
      * @param string $path
      * @param integer $fileId
+     * @return string
      */
     public function applyImportFilters($path, $fileId, array &$filelist) {
-        $filelist[$fileId] = $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
-        
+        return $filelist[$fileId] = $this->applyFilters(self::TYPE_IMPORT, $path, $fileId);
     }
     
     /**

@@ -66,7 +66,6 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
             $metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($importConfig));
             /* @var $metaDataImporter editor_Models_Import_MetaData */
             $metaDataImporter->import($this->task);
-//FIXME die bindings zu diesem Event!
             $events->trigger("beforeDirectoryParsing", $this,[
                     'importFolder'=>$importConfig->importFolder,
                     'task' => $this->task,
@@ -84,15 +83,6 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
                     'importFolder'=>$importConfig->importFolder,
                     'filelist'=>$filelist
             ]);
-            
-            $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
-            /* @var $fileFilter editor_Models_File_FilterManager */
-            $fileFilter->initImport($this->task, $importConfig);
-            
-            foreach ($filelist as $fileId => $path) {
-//FIXME parameter anpassen!
-                //$fileFilter->applyImportFilters($params[0], $params[2], $filelist);
-            }
             
             $this->task->save();
             return true;

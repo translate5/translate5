@@ -41,11 +41,6 @@ class editor_Models_Import_Worker_Import {
     protected $_localEncoded;
 
     /**
-     * @var ZfExtended_Controller_Helper_General
-     */
-    protected $gh;
-
-    /**
      * shared instance over all parse objects of the segment field manager
      * @var editor_Models_SegmentFieldManager
      */
@@ -75,7 +70,6 @@ class editor_Models_Import_Worker_Import {
 
     
     public function __construct() {
-        $this->gh = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('General');
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
@@ -152,16 +146,17 @@ class editor_Models_Import_Worker_Import {
         $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
         $filelist = $treeDb->getPaths($this->task->getTaskGuid(),'file');
-        error_log(print_r($filelist,1));
         
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
+        $fileFilter->initImport($this->task, $this->importConfig);
+            
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->importConfig));
         /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
         foreach ($filelist as $fileId => $path) {
-            if($this->importConfig->isCheckRun){
-                trigger_error('Check of File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
-            }
+            $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
             $params = $this->getFileparserParams($path, $fileId);
             $parser = $this->getFileParser($params[0], $params);
             /* @var $parser editor_Models_Import_FileParser */
@@ -258,7 +253,7 @@ class editor_Models_Import_Worker_Import {
     protected function getFileparserParams($path, $fileId) {
         return array(
             $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
-            $this->gh->basenameLocaleIndependent($path),
+            basename($path),
             $fileId, 
             $this->task,
         );
