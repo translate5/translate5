@@ -855,6 +855,7 @@ abstract class editor_Workflow_Abstract {
         $config->oldTask = $this->oldTask;
         $config->task = $this->newTask;
         $config->importConfig = $this->importConfig;
+        $config->authenticatedUser = $this->authenticatedUserModel;
         return $config;
     }
     

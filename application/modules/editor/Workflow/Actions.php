@@ -189,17 +189,11 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $s = $db->select()
         ->from(array('tua' => 'LEK_taskUserAssoc'))
         ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
-        ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
-        ->where('t.state = ?', self::STATE_OPEN)
+        ->where('tua.role = ?', $workflow::ROLE_LECTOR)
+        ->where('tua.state != ?', $workflow::STATE_FINISH)
+        ->where('t.state = ?', $workflow::STATE_OPEN)
         ->where('targetDeliveryDate < CURRENT_DATE');
         $taskRows = $db->fetchAll($s);
-        
-        //FIXME: see BEOSPHERE-111
-        //FIXME $taskRows contains the same task multiple times (once per tua!)
-        //re enable it in a better way for beo
-        //$acl = ZfExtended_Acl::getInstance();
-        //$acl->allow('noRights', 'editorconnect_Models_WsdlWrapper', 'sendToUser');
         
         //affected user:
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
@@ -215,7 +209,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $workflow->triggerBeforeEvents($tua, $tuaNew);
             $tuaNew->save();
             $workflow->doWithUserAssoc($tua, $tuaNew);
-            editor_Models_LogTask::create($row['taskGuid'], $workflow::STATE_FINISH, $this->authenticatedUserModel, $user);
+            editor_Models_LogTask::create($row['taskGuid'], $workflow::STATE_FINISH, $this->config->authenticatedUser, $user);
         }
     }
     

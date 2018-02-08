@@ -26,40 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Workflow Action Configuration Struct 
+/* * #@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
  */
-class editor_Workflow_Actions_Config {
-    /**
-     * @var editor_Workflow_Abstract 
-     */
-    public $workflow;
-    
-    /**
-     * Task instance before task was changed
-     * @var editor_Models_Task 
-     */
-    public $oldTask;
-    
-    /**
-     * current task instance, with changes done by the current request
-     * @var editor_Models_Task 
-     */
-    public $task;
 
-    /**
-     * @var editor_Models_TaskUserAssoc
-     */
-    public $newTua;
+/**
+ * Just an empty class since default XLF export can be used for Zend XLF
+ */
+class editor_Models_Export_FileParser_XlfZend extends editor_Models_Export_FileParser_Xlf {
 
-    /**
-     * only available for import actions
-     * @var editor_Models_Import_Configuration
-     */
-    public $importConfig;
-    
-    /**
-     * @var ZfExtended_Models_User
-     */
-    public $authenticatedUser;
 }

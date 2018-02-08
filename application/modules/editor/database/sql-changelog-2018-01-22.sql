@@ -1,3 +1,4 @@
+
 -- /*
 -- START LICENSE AND COPYRIGHT
 -- 
@@ -24,9 +25,6 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES 
-('editor', 'pm', 'frontend', 'editorEditTaskTaskName'),
-('editor', 'pm', 'frontend', 'editorEditTaskDeliveryDate'),
-('editor', 'pm', 'frontend', 'editorEditTaskRealDeliveryDate'),
-('editor', 'pm', 'frontend', 'editorEditTaskPm'),
-('editor', 'pm', 'frontend', 'editorEditTaskOrderDate');
+
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2018-01-22', 'TRANSLATE-1076', 'bugfix', 'windows only: install-and-update-batch overwrites path to mysql executable – fix config in installation.ini', 'If your windows server is affected (on each update the mysql_bin path had to be changed manually) check the installation.ini and change resource.db.params.executable to resource.db.executable!', '8'),
+('2018-01-22', 'TRANSLATE-1103', 'bugfix', 'TrackChanges Plug-In only: Open segment for editing leads to an error in IE11', 'On editing a segment in IE 11 with activated TrackChanges Plug-In an error in the front-end was triggered. This was fixed.', '14');
