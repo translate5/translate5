@@ -381,6 +381,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['id']);
         unset($data['taskGuid']);
         unset($data['state']);
+        unset($data['workflowStep']);
         unset($data['locked']);
         unset($data['lockingUser']);
         $this->entity->init($data);
