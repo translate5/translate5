@@ -223,15 +223,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function buildSearchString($searchInCombo,$queryString,$searchType,$matchCase){
         //search type regular expression
         if($searchType==='regularExpressionSearch'){
-            $patern='#'.$queryString.'#';
             //simples way to test if the regular expression is valid
-            try {
-                @preg_match($patern, 'Test string');
-            } catch (Exception $e) {
-                return false;
+            //try {
+                //@preg_match($patern, 'Test string');
+            //} catch (Exception $e) {
+            //    return false;
+            //}
+            if(!$matchCase){
+                return $searchInCombo.' REGEXP '.$this->db->getAdapter()->quote($queryString);
             }
-            $outSql=$searchInCombo.' REGEXP '.$this->db->getAdapter()->quote($queryString);
-            return $outSql;
+            return $searchInCombo.' REGEXP BINARY '.$this->db->getAdapter()->quote($queryString);
         }
         //search type regular wildcard
         if($searchType==='wildcardsSearch'){
@@ -269,6 +270,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 $searchString=' REGEXP "[[:<:]]'.$searchString.'[[:>:]]"';
                 break;
             case 'regularExpressionSearch':
+                if($matchCase){
+                    return ' REGEXP BINARY "'.$queryString.'"';
+                }
                 $outSql=' REGEXP "'.$queryString.'"';
                 return $outSql;
                 break;
@@ -318,7 +322,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function set($name, $value) {
         $loc = $this->segmentFieldManager->getDataLocationByKey($name);
         if($loc !== false) {
-            error_log("call");
             if(empty($this->segmentdata[$loc['field']])) {
                 $this->segmentdata[$loc['field']] = $this->createData($loc['field']);
             }
