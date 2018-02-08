@@ -35,8 +35,7 @@ Ext.define('Editor.controller.SearchReplace', {
     extend : 'Ext.app.Controller',
     
     requires:[
-        'Editor.view.searchandreplace.SearchReplaceWindow',
-        'Editor.controller.searchandreplace.SearchSegment'
+        'Editor.view.searchandreplace.SearchReplaceWindow'
     ],
     
     listen:{
@@ -419,6 +418,10 @@ Ext.define('Editor.controller.SearchReplace', {
         if(!ed.editing){
             return;
         }
+
+        //find matches once again, the content can be changed between replaces
+        me.utilRangeClass.cleanMarkTags();
+        me.findMatches();
         
         me.utilRangeClass.isSearchReplaceRange=true;
         
@@ -1094,7 +1097,18 @@ Ext.define('Editor.controller.SearchReplace', {
             }
             
             if(me.isContentEditableField()){
-                ed.startEdit(sel[0], null, ed.self.STARTEDIT_SCROLLUNDER);
+                var tabPanel=me.getTabPanel(),
+                    activeTab=tabPanel.getActiveTab(),
+                    replaceCombo=activeTab.down('#searchInCombo'),
+                    dataIndex=replaceCombo.getSelection().get('id'),
+                    theColum=Ext.ComponentQuery.query('#segmentgrid gridcolumn[dataIndex="'+dataIndex+'"]'),
+                    editableColumn=null;
+                
+                if(theColum.length>0){
+                    editableColumn=theColum[0];
+                }
+                
+                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_SCROLLUNDER);
             }else{
                 var gridCell=grid.getView().getCell(sel[0], 3);
                 me.findMatchesGrid(gridCell);

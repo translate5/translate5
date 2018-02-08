@@ -46,14 +46,19 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
      */
     onTabPanelTabChange:function(tabpanel,newCard,oldCard,eOpts){
         var me=this,
-            viewModel=me.getView().getViewModel(),
+            tabViewModel=me.getView().getViewModel(),
             searchReplaceWindow=me.getView().up('window'),
             searchCombo=newCard.down('#searchCombo'),
             isSearchTab=newCard.xtype == 'searchTab';
         
+        searchCombo.setValue("");
         searchCombo.focus();
+        
         //set the search view flag
-        viewModel.set('searchView',isSearchTab);
+        tabViewModel.set('searchView',isSearchTab);
+        
+        newCard.getController().resetSearchParametars();
+        
     }
 });
 

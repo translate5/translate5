@@ -84,6 +84,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     displayField:'value',
                     valueField:'id',
                     forceSelection:true,
+                    allowBlank:false,
                     listeners:{
                         select:'resetSearchParametars'
                     }

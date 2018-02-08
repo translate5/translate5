@@ -43,6 +43,13 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
         helpButtonTooltip:'#UT#Info zum Suchen und Ersetzen'
     },
     
+    listeners:{
+        show:function(win,eOpts){
+            win.setX(10);
+            win.setY(10);
+        }
+    },
+    
     initConfig : function(instanceConfig) {
         var me = this,
             config = {
