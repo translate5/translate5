@@ -582,3 +582,5 @@ tr.customeState td div {font-style: italic;}
 /*
     END MESSAGEBOX STYLES
 */
+
+.searchreplace-hide-element {display: none !important;}
