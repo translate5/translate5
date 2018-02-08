@@ -84,5 +84,7 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
         searchReplaceController.activeSegment.nextSegmentIndex=0;
         searchReplaceController.activeSegment.currentSegmentIndex=0;
         searchReplaceController.activeSegment.matchCount=0;
+        
+        searchReplaceController.searchRequired=true;
     }
 });

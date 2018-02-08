@@ -56,6 +56,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
       regularExpressionSearch:'#UT#Regulärer Ausdruck',
       saveCurrentOpen:'#UT#Segment beim Schließen speichern',//Save segment on close
       invalidRegularExpression:'#UT#Ungültiger Regulärer Ausdruck',
+      unsupportedRegularExpression:'#UT#Dieser reguläre Ausdruck wird nicht unterstützt',
       segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:'
     },
     
@@ -145,8 +146,50 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
         return me.callParent([config]);
     },
     
+    /***
+     * Regex not supported by mysql
+     */
+    blackListRegex:[
+        /\\x[a-fA-F0-9]{2}/g,//Hexadecimal escape | \xFF where FF are 2 hexadecimal digits | Matches the character at the specified position in the code page  |  \xA9 matches © when using the Latin-1 code page
+        /\\n/g,//Character escape
+        /\\r/g,//Character escape
+        /\\t/g,//Character escape
+        /\\f/g,//Character escape
+        /\\v/g,//Character escape
+        /\\c[a-zA-Z]/g,//Control character escape \cA through \cZ Match an ASCII character Control+A through Control+Z, equivalent to \x01 through \x1A   \cM\cJ matches a Windows CRLF line break
+        //Control character escape \ca through \cz Match an ASCII character Control+A through Control+Z, equivalent to \x01 through \x1A   \cm\cj matches a Windows CRLF line break
+        /\\0/g,//NULL escape
+        /\\(?:[1-7][0-7]{0,2}|[0-7]{2,3})/g,//Octal escape
+        /(.*)\|(.*)/g,//javascript: a|ab matches a in ab | In POSIX ERE: a|ab matches ab in ab
+        /\\[\^\]\-]/g,//\ (backslash) followed by any of ^-]\
+        /\\b/g,//javascript: [\b\t] matches a backspace or a tab character.
+        /\\B/g,//javascript: \B. matches b, c, e, and f in abc def
+        /\\d/g,//Shorthand Character Classes
+        /\\D/g,//Shorthand Character Classes
+        /\\s/g,//Shorthand Character Classes
+        /\\S/g,//Shorthand Character Classes
+        /\\w/g,//Shorthand Character Classes
+        /\\W/g,//Shorthand Character Classes
+        /\\h/g,//Shorthand Character Classes
+        /\?\?/g,//abc?? matches ab or abc
+        /\*\?/g,//".*?" matches "def" and "ghi" in abc "def" "ghi" jkl
+        /\+\?/g,//".+?" matches "def" and "ghi" in abc "def" "ghi" jkl
+        /{[0-9],[0-9]}\?/g,
+        /{[0-9],}\?/g,
+        /\\u[a-fA-F0-9]{4}/g,//Matches a specific Unicode code point.
+        /\(\?\:.*?\)/g,//Non-capturing parentheses group the regex so you can apply regex operators, but do not capture anything.
+        /\(.*?\)=\\[0-9]/g,//(abc|def)=\1 matches abc=abc or def=def, but not abc=def or def=abc.
+        /\(\?\=.*?\)/g,//Matches at a position where the pattern inside the lookahead can be matched. Matches only the position. It does not consume any characters or expand the match. In a pattern like one(?=two)three, both two and three have to match at the position where the match of one ends.
+        /\(\?\!.*?\)/g,//Similar to positive lookahead, except that negative lookahead only succeeds if the regex inside the lookahead fails to match.
+        /\[\:(.*)\:\]/g,
+    ],
+    
+    /***
+     * Search field validator
+     */
     validateSearchField:function(val){
         var tabPanel=this.up('#searchreplacetabpanel'),
+            searchTab=tabPanel.down('#searchTab'),
             activeTab=tabPanel.getActiveTab(),
             tabPanelviewModel=tabPanel.getViewModel(),
             activeTab=tabPanel.getActiveTab(),
@@ -159,9 +202,45 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                 tabPanelviewModel.set('disableSearchButton',true);
                 return activeTab.strings.invalidRegularExpression;
             }
+            
+            if(val!==""){
+                var blArray=searchTab.blackListRegex,
+                arrLength=blArray.length;
+                
+                for (i = 0; i < arrLength; i++){
+                    var arrayRegex=blArray[i];
+                    if(searchTab.isRegexMatch(arrayRegex,val)){
+                        tabPanelviewModel.set('disableSearchButton',true);
+                        return activeTab.strings.unsupportedRegularExpression;
+                    }
+                }
+            }
         }
         tabPanelviewModel.set('disableSearchButton',val===null || val==="");
-        return retval=val!=null || val!=="";
+        return val!=null || val!=="";
+    },
+    
+    /***
+     * Check if given regex will match in the input string
+     */
+    isRegexMatch:function(arrayRegex,inputString){
+        let regex=arrayRegex,
+            m,
+            isMatch=false;
+
+        while ((m = regex.exec(inputString)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+            
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                isMatch=true;
+            });
+        }
+        
+        return isMatch;
     }
     
 });
