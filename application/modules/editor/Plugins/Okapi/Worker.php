@@ -27,49 +27,142 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
-    
-
+    const TYPE_IMPORT = 'import';
+    const TYPE_EXPORT = 'export';
+    const OKAPI_REL_DATA_DIR = 'okapi-data';
     /**
-     * @var editor_Plugins_Okapi_Connector
+     * filename template for storing the manifest files
+     * @var string
      */
-    protected $api;
-    
+    const MANIFEST_FILE = 'manifest-%s.rkm';
+    /**
+     * filename template for storing the original files
+     * @var string
+     */
+    const ORIGINAL_FILE = 'original-%s.%s';
+
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
+        if(empty($parameters['type']) 
+                || !($parameters['type'] == self::TYPE_IMPORT || $parameters['type'] == self::TYPE_EXPORT)){
+            return false;
+        }
         return true;
     } 
     
     /**
-     * Uploads one file to Okapi to convert it to an XLIFF file importable by translate5
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
         $params = $this->workerModel->getParameters();
-        $file=$params['file'];
-        $refFolder=$params['refFolder'];
-        $proofReadFolder=$params['proofReadFolder'];
-        $taskGuid=$params['taskGuid'];
+        if($params['type'] == self::TYPE_IMPORT) {
+            return $this->doImport();
+        }
+        return $this->doExport();
+    }
+
+    /**
+     * Uploads one file to Okapi to convert it to an XLIFF file importable by translate5
+     */
+    protected function doImport() {
+        $params = $this->workerModel->getParameters();
         
-        $this->api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
-        $this->api->setBconfFilePath($params['bconfFilePath']);
+        $file = new SplFileInfo($params['file']);
+        $suffix = $file->getExtension();
+        $fileId = $params['fileId'];
+        $fileName = sprintf(self::ORIGINAL_FILE, $fileId, $suffix);
+        $manifestFile = sprintf(self::MANIFEST_FILE, $fileId);
+        $okapiDataDir = $this->getDataDir();
         
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
         
-        $this->api->setSourceLang($language->loadLangRfc5646($this->task->getSourceLang()));
-        $this->api->setTargetLang($language->loadLangRfc5646($this->task->getTargetLang()));
-        $this->api->setInputFile($file);
+        $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
+        $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
         
         try {
-            $this->api->createProject();
-            $this->api->uploadOkapiConfig();
-            $this->api->uploadSourceFile();
-            $this->api->executeTask();
-            $this->api->downloadFile();
+            $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+            /* @var $api editor_Plugins_Okapi_Connector */
+            $api->createProject();
+            $api->uploadOkapiConfig($params['bconfFilePath']);
+            $api->uploadSourceFile($fileName, $file);
+            $api->executeTask($sourceLang, $targetLang);
+            $convertedFile = $api->downloadFile($fileName, $manifestFile, $okapiDataDir);
+
+            $this->copyOriginalAsReference();
+            copy($convertedFile, $file.$api::OUTPUT_FILE_EXTENSION);
+            
+            //add okapi export file filter for that file 
+            $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+            /* @var $fileFilter editor_Models_File_FilterManager */
+            $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
+            $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
+        }catch (Exception $e){
+            // in case of an exception we just ignore that file, log it, and proceed with the import
+            $debug = [
+                'fileId' => $fileId,
+                'file' => $file->__toString(),
+            ];
+            $this->log->logError('Okapi Error: Error on converting a file. Task: '.$this->taskGuid.'; File: '.print_r($debug, 1).'; Error was: '.$e);
+        }finally {
+            $api->removeProject();
+        }
+        return true;
+    }
+    
+    /**
+     * @return boolean
+     */
+    protected function doExport() {
+        error_log("WORKER STARTED");
+        
+        /*
+          #!/usr/bin/env python
+import requests
+from xml.dom import minidom
+
+url = 'http://localhost:8080/okapi-longhorn/'
+
+r = requests.post(url+'projects/new')
+print r.text
+
+r = requests.get(url+'projects/')
+xmlstring = minidom.parseString(r.text)
+itemlist = xmlstring.getElementsByTagName('e')
+lastproject = len(itemlist)
+
+payload = open('/home/marcstandard/Downloads/okapi-test-rueckweg/work/Schnittstellen _ Across.html.xlf', 'rb')
+r = requests.post(url+'projects/'+str(lastproject)+'/inputFiles/work/Schnittstellen _ Across.html.xlf', files=dict(inputFile=payload))
+         * */
+        
+        $params = $this->workerModel->getParameters();
+        error_log(print_r($params,1));
+        
+        $pm = Zend_Registry::get('PluginManager');
+        /* @var $pm ZfExtended_Plugin_Manager */
+        $plugin = $pm->get($pm->classToName(get_class($this)));
+        
+        $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
+        $api->setBconfFilePath($plugin->getExportBconf());
+        return true;
+        
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        
+        $api->setSourceLang($language->loadLangRfc5646($this->task->getSourceLang()));
+        $api->setTargetLang($language->loadLangRfc5646($this->task->getTargetLang()));
+        $api->setInputFile($file);
+        
+        try {
+            $api->createProject();
+            $api->uploadOkapiConfig();
+            $api->uploadSourceFile();
+            $api->executeTask();
+            $api->downloadFile();
 
             //move the original files in the referenceFiles dir, in the same filestrucutre
             //as thay were durring the import
@@ -88,8 +181,48 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         }catch (Exception $e){
             $this->log->logError('Okapi Error: Error on converting a file. Task: '.$taskGuid.'; File: '.print_r($file, 1).'; Error was: '.$e);
         }finally {
-            $this->api->removeProject();
+            $api->removeProject();
         }
         return true;
+    }
+    
+    /**
+     * copy the original files from proofRead folder to the referenceFiles folder,
+     * keep original file and directory structure
+     */
+    protected function copyOriginalAsReference() {
+        $params = $this->workerModel->getParameters();
+        $import = Zend_Registry::get('config')->runtimeOptions->import;
+        
+        $realFile = $params['file'];
+        $refFolder = $params['importFolder'].'/'.$import->referenceDirectory;
+        $proofReadFolder = $params['importFolder'].'/'.$import->proofReadDirectory;
+        
+        //cut off proofread folder from realfile:
+        $relRealFile = str_replace('#'.realpath($proofReadFolder), '', '#'.realpath($realFile));
+        $absRefFile = $refFolder.'/'.$relRealFile;
+        $absRefDir = dirname($absRefFile);
+        
+        //create directory if needed
+        if (!is_dir($absRefDir)) {
+            mkdir($absRefDir, 0777, true);
+        }
+        
+        //we copy the file and keep the original file via fileId addressable for export (TRANSLATE-1138)
+        rename($realFile, $absRefFile);
+    }
+    
+    /**
+     * returns the path to the okapi data dir
+     */
+    protected function getDataDir() {
+        $okapiDataDir = new SplFileInfo($this->task->getAbsoluteTaskDataPath().'/'.self::OKAPI_REL_DATA_DIR);
+        if(!$okapiDataDir->isDir()) {
+            mkdir((string) $okapiDataDir, 0777, true);
+        }
+        if(!$okapiDataDir->isWritable()) {
+            throw new editor_Plugins_Okapi_Exception("Okapi Data dir not writeable: ".$okapiDataDir);
+        }
+        return $okapiDataDir;
     }
 }
