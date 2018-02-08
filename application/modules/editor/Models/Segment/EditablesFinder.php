@@ -159,6 +159,10 @@ class editor_Models_Segment_EditablesFinder {
         return (int) $res['cnt'];
     }
     
+    public function search(){
+        
+    }
+    
     /**
      * gets the segment position (grid index) to the given segmentId and the configured filters
      * returns null if the segment is not in the filtered list 

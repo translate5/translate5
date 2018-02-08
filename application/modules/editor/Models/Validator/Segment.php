@@ -51,8 +51,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         foreach($toValidate as $edit => $toSort) {
             //edited = string, ohne längenbegrenzung. Daher kein Validator nötig / möglich 
             $this->addDontValidateField($edit);
-            $length = editor_Models_Segment::TOSORT_LENGTH;
-            $this->addValidator($toSort, 'stringLength', array('min' => 0, 'max' => $length)); //es wird kein assoc Array benötigt, aber so ist besser lesbar; stringlenght auf 300 statt 100 um auch Multibyte-Strings prüfen zu können ohne iconv_set_encoding('internal_encoding', 'UTF-8'); setzen zu müssen
+            //the 4294967295 is the colum size of mysql longtext
+            $this->addValidator($toSort,'stringLength', array('min' => 0, 'max' => 4294967295));
         }
     
         $this->addValidator('userGuid', 'guid');

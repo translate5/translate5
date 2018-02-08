@@ -2102,10 +2102,133 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <br />
 {footer}</target>
 </trans-unit>
-<trans-unit id='w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy'>
+
+<trans-unit id="RGllIFN1Y2hlIHdpcmQgbnVyIGF1ZiBkZW4gZ2VmaWx0ZXJ0ZW4gU2VnbWVudGVuIGR1cmNoZ2Vmw7xocnQ=">
+    <source>Die Suche wird nur auf den gefilterten Segmenten durchgeführt</source>
+    <target>The search will be performed only on the filtered segments</target>
+</trans-unit>
+
+ <trans-unit id="RXJzZXR6ZW4=">
+    <source>Ersetzen</source>
+    <target>Replace</target>
+</trans-unit>
+
+<trans-unit id="w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy">
     <source>Übergeordneter Benutzer</source>
     <target>Parent User</target>
 </trans-unit>
+
+<trans-unit id="S2VpbmUgRXJnZWJuaXNzZSBmw7xyIGRpZSBha3R1ZWxsZSBTdWNoZSE=">
+    <source>Keine Ergebnisse für die aktuelle Suche!</source>
+    <target>No results for the current search!</target>
+</trans-unit>
+
+<trans-unit id="QWxsZSBFcmdlYm5pc3NlIGVyc2V0emVu">
+    <source>Alle Ergebnisse ersetzen</source>
+    <target>Replace all results</target>
+</trans-unit>
+
+<trans-unit id="RXJnZWJuaXNzZSBlcnNldHplbg==">
+    <source>Ergebnisse ersetzen</source>
+    <target>Replace results</target>
+</trans-unit>
+
+<trans-unit id="w7xiZXJlaW5zdGltbXVuZ2VuIGdlZnVuZGVuLiBXb2xsZW4gU2llIHdpcmtsaWNoIGFsbGUgZXJzZXR6ZW4/IEFsbGUgZ2VmdW5kZW5lbiBTZWdtZW50ZSB3ZXJkZW4gaW5rbHVzaXZlIEF1dG8tU3RhdHVzIHVuZCBsZXR6dGVtIEVkaXRvciBnZcOkbmRlcnQ=">
+    <source>übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert</source>
+    <target>matches found. Do you really want to replace all of them? All found segments will be changed including auto-status and last editor</target>
+</trans-unit>
+
+<trans-unit id="RGVyIFN1Y2hzdHJpbmcgaXN0IHp1IGdyb8Of">
+    <source>Der Suchstring ist zu groß</source>
+    <target>The search string is too big</target>
+</trans-unit>
+
+<trans-unit id="RGFzIFNlZ21lbnQgaXN0IGluIElocmVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgbmljaHQgZW50aGFsdGVuLg==">
+    <source>Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.</source>
+    <target>The segment is not included in your current filtering.</target>
+</trans-unit>
+
+<trans-unit id="U3VjaGVuIHVuZCBlcnNldHplbg==">
+    <source>Suchen und ersetzen</source>
+    <target>Search and replace</target>
+</trans-unit>
+
+
+<trans-unit id="SW5mbyB6dW0gU3VjaGVuIHVuZCBFcnNldHplbg==">
+    <source>Info zum Suchen und Ersetzen</source>
+    <target>Info about the search and replace</target>
+</trans-unit>
+
+<trans-unit id="U3VjaGVuIG5hY2g=">
+    <source>Suchen nach</source>
+    <target>Search for</target>
+</trans-unit>
+
+<trans-unit id="U3VjaGVuIGlu">
+    <source>Suchen in</source>
+    <target>Search in</target>
+</trans-unit>
+
+<trans-unit id="R3Jvw58vS2xlaW5zY2hyZWlidW5nIGJlYWNodGVu">
+    <source>Groß/Kleinschreibung beachten</source>
+    <target>Match case</target>
+</trans-unit>
+
+<trans-unit id="TmFjaCBvYmVuIHN1Y2hlbg==">
+    <source>Nach oben suchen</source>
+    <target>Search towards the top</target>
+</trans-unit>
+
+<trans-unit id="QmVpIGRlciBTdWNoZSB2ZXJ3ZW5kZW4=">
+    <source>Bei der Suche verwenden</source>
+    <target>Use for search</target>
+</trans-unit>
+
+<trans-unit id="Tm9ybWFsIChTdGFuZGFyZCk=">
+    <source>Normal (Standard)</source>
+    <target>Normal (default)</target>
+</trans-unit>
+
+<trans-unit id="UmVndWzDpHJlciBBdXNkcnVjaw==">
+    <source>Regulärer Ausdruck</source>
+    <target>Regular expression</target>
+</trans-unit>
+
+<trans-unit id="V2lsZGNhcmRzICgqIHVuZCA/KQ==">
+    <source>Wildcards (* und ?)</source>
+    <target>Wildcards (* and ?)</target>
+</trans-unit>
+
+<trans-unit id="U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gc3BlaWNoZXJu">
+    <source>Segment beim Schließen speichern</source>
+    <target>Save segment on close</target>
+</trans-unit>
+
+<trans-unit id="VW5nw7xsdGlnZXIgUmVndWzDpHJlciBBdXNkcnVjaw==">
+    <source>Ungültiger Regulärer Ausdruck</source>
+    <target>Invalid regular expression</target>
+</trans-unit>
+
+<trans-unit id="RGllc2VyIHJlZ3Vsw6RyZSBBdXNkcnVjayB3aXJkIG5pY2h0IHVudGVyc3TDvHR6dA==">
+    <source>Dieser reguläre Ausdruck wird nicht unterstützt</source>
+    <target>This regular expression is not supported</target>
+</trans-unit>
+            
+<trans-unit id="U3VjaGVu">
+    <source>Suchen</source>
+    <target>Search</target>
+</trans-unit>
+
+<trans-unit id="QWxsZXMgZXJzZXR6ZW4=">
+    <source>Alles ersetzen</source>
+    <target>Replace all</target>
+</trans-unit>
+
+<trans-unit id="U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg==">
+    <source>Segmente mit Suchtreffer:</source>
+    <target>Segments with search hits:</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>

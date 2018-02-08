@@ -39,6 +39,7 @@ class editor_Models_SegmentFieldManager {
     
     const _MAP_DELIM = '#';
     const _EDIT_PREFIX = 'Edit';
+    const _TOSORT_PREFIX = 'ToSort';
     
     /**
      * @var array
