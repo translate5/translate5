@@ -178,12 +178,18 @@ Ext.define('Editor.controller.SearchReplace', {
         searchAndReplaceMenuItem:'#UT#Suchen und ersetzen'
     },
     
+    constructor:function(){
+        if(!Editor.plugins.TrackChanges){
+            return;
+        }  
+        this.callParent(arguments);;
+    },
     
     initConfig:function(){
         var me=this;
         me.callParent(arguments);
         me.resetActiveColumnDataIndex();
-        me.utilRangeClass=Editor.app.getController('Editor.plugins.TrackChanges.controller.Editor');
+        me.utilRangeClass=Editor.app.getController('Editor.plugins.TrackChanges.controller.Editor')
     },
     
     /**
