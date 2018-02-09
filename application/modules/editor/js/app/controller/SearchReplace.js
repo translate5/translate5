@@ -165,6 +165,9 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     oldSerchedCell:null,
     
+    
+    activeTrackChanges:true,
+    
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
         comboFieldLabel:'#UT#Ersetzen',
@@ -429,6 +432,7 @@ Ext.define('Editor.controller.SearchReplace', {
         me.utilRangeClass.cleanMarkTags();
         me.findMatches();
         
+        
         me.utilRangeClass.isSearchReplaceRange=true;
         
         //check if we jupm to the next segment
@@ -455,14 +459,20 @@ Ext.define('Editor.controller.SearchReplace', {
         //remove/mark the hit result string/nodes
         var range = rangy.createRange();
         range.moveToBookmark(me.replaceRanges[me.activeSegment.matchIndex]);
-        me.utilRangeClass.handleReplaceDelete(range);
-        delete range;
         
-        //apply the replacement
-        var range = rangy.createRange();
-        range.moveToBookmark(me.replaceRanges[me.activeSegment.matchIndex]);
-        me.utilRangeClass.insertReplaceNode(range,replaceText);
-        delete range;
+        //check the type of replace, if it is without track changes we should not apply any del ins tags
+        if(!me.activeTrackChanges){
+            me.pureReplace(range,replaceText);
+        }else{
+            me.utilRangeClass.handleReplaceDelete(range);
+            delete range;
+            
+            //apply the replacement
+            var range = rangy.createRange();
+            range.moveToBookmark(me.replaceRanges[me.activeSegment.matchIndex]);
+            me.utilRangeClass.insertReplaceNode(range,replaceText);
+            delete range;
+        }
         
         //clean the mark tags from the editor
         me.utilRangeClass.cleanMarkTags();
@@ -711,6 +721,46 @@ Ext.define('Editor.controller.SearchReplace', {
         });
     },
     
+    /***
+     * Replace the text only, without ins, dell tags
+     */
+    pureReplace:function(rangeForDel,replaceText){
+        var me=this,
+            allImagesInNode=[],
+            collectedNodesForDel,
+            iframeDocument = me.getSegmentIframeDocument(),
+        
+        //collect all images in the range
+        collectedNodesForDel = rangeForDel.getNodes([1,3], function(node) {
+            if(node.nodeType == 1 && node.nodeName.toLowerCase() == 'img') {
+                allImagesInNode.push(node.cloneNode());
+            }
+            return true;
+        });
+
+        //remove the content between the range
+        me.utilRangeClass.rangeDeleteContents(rangeForDel);
+
+        var tmpImgNode=null;
+        
+        allImagesInNode.reverse();
+        
+        //add the removed images, if there are some
+        for(var i=0;i<allImagesInNode.length;i++){
+            tmpImgNode=allImagesInNode[i];
+            rangeForDel.insertNode(tmpImgNode);
+        }
+        
+        //add the replace node
+        var replaceNode=Ext.DomHelper.createDom({
+            tag: 'span',
+            cls: me.utilRangeClass.self.CSS_CLASSNAME_REPLACED_INS
+        });
+        replaceNode.innerHTML = replaceText;
+        rangeForDel.insertNode(replaceNode);
+    },
+    
+    
     replaceAll:function(){
         var me=this,
             tabPanel=me.getTabPanel(),
@@ -874,7 +924,7 @@ Ext.define('Editor.controller.SearchReplace', {
             // Iterate over matches
             while (range.findText(searchTerm, options)) {
                 //if the selection does not contains an del tag, create a selection, and it is not an allready replaced match
-                if(!me.utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,me.utilRangeClass.self.NODE_NAME_DEL) && !me.utilRangeClass.hasReplacedIns(range)){
+                if(!me.utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,me.utilRangeClass.self.NODE_NAME_DEL) && !me.utilRangeClass.hasReplacedClass(range)){
 
                     //apply to range, this will select the text
                     searchResultApplier.applyToRange(range);
@@ -1315,7 +1365,7 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         
         return searchTerm;
-    },
+    }
     
 });
     
