@@ -790,7 +790,7 @@ class editor_TaskController extends ZfExtended_RestController {
 
         $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
         /* @var $worker editor_Models_Export_Worker */
-        $zipFile = $worker->initZipExport($this->entity, $diff);
+        $exportFolder = $worker->initExport($this->entity, $diff);
         $workerId = $worker->queue();
         
         //FIXME multiple problems here
@@ -805,7 +805,8 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
         /* @var $worker editor_Models_Export_ExportedWorker */
-        $worker->init($this->entity->getTaskGuid(), ['zipFile' => $zipFile]);
+        $zipFile = $worker->initZip($this->entity->getTaskGuid(), $exportFolder);
+        
         //TODO for the API usage of translate5 blocking on export makes no sense
         // better would be a URL to fetch the latest export or so (perhaps using state 202?)
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
