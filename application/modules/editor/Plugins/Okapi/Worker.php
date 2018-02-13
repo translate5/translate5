@@ -126,6 +126,14 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $fileId = $params['fileId'];
         $workFile = new SplFileInfo($params['file']);
         
+        $manifestFile = new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId));
+        //if we don't have a manifest.rkm file, the import was before we changed the export, 
+        // so use tikal export there again
+        if(!$manifestFile->isFile()) {
+            $this->doTikalFallback($workFile); //should be removed in the future
+            return true;
+        }
+        
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
         $plugin = $pm->get($pm->classToName(get_class($this)));
@@ -143,9 +151,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $api->createProject();
             $api->uploadOkapiConfig([$plugin->getExportBconf()]);
             
-//FIXME check ob manifest.rkm exisitert, wenn nein, dann tikal export!
-            
-            $api->uploadInputFile('manifest.rkm', new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId)));
+            $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);
             $api->uploadOriginalFile($originalFile, new SplFileInfo($this->getDataDir().'/'.$originalFile));
             $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workFile);
@@ -164,7 +170,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         }
         $api->removeProject();
         return $result; 
-//FIXME Mit Tikal hatten wir separaten Output. Wie verhält sich das hier?
     }
     
     /**
@@ -225,5 +230,18 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             throw new editor_Plugins_Okapi_Exception("Okapi Data dir not writeable: ".$okapiDataDir);
         }
         return $okapiDataDir;
+    }
+    
+    /**
+     * uses tikal export / merge as fallback for imports started before the okapi export usage
+     * @param SplFileInfo $workfile
+     */
+    protected function doTikalFallback(SplFileInfo $workfile) {
+        if(strtolower($workfile->getExtension()) !== 'xlf') {
+            throw new editor_Plugins_Okapi_Exception('Okapi tikal fallback can not be used, workfile does not contain the XLF suffix: '.$workfile);
+        }
+        $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$task]);
+        /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
+        $tikal->merge($workfile->__toString());
     }
 }
