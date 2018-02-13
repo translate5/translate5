@@ -31,6 +31,11 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_Worker_Import {
     /**
+     * @var string
+     */
+    const TASK_TEMPLATE = 'task-template.xml';
+    
+    /**
      * @var editor_Models_Task
      */
     protected $task;
@@ -86,6 +91,7 @@ class editor_Models_Import_Worker_Import {
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->task = $task;
         $this->importConfig = $importConfig;
+        $this->importTaskTemplateXml();
         
         $importConfig->isValid($task->getTaskGuid());
         $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
@@ -173,6 +179,37 @@ class editor_Models_Import_Worker_Import {
         $mqmProc->handleErrors();
         
         $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
+    }
+    
+    /**
+     * import task-template.xml file
+     * if exist save it to Zend_Registry::get('taskTemplate');
+     */
+    protected function importTaskTemplateXml() {
+        Zend_Registry::set('taskTemplate', array());
+        $templateFilename = $this->importConfig->importFolder.'/'.self::TASK_TEMPLATE;
+        
+        if (file_exists($templateFilename)) {
+            try {
+                $config = new Zend_Config_Xml($templateFilename);
+                Zend_Registry::set('taskTemplate', $config);
+            }
+            catch (Exception $e) {
+                throw new Exception('.. invalid '.self::TASK_TEMPLATE.' detected at '.__CLASS__.' -> '.__FUNCTION__);
+            }
+            //WARNING: this is NOT the implementation of TRANSLATE-471!
+            // This code is just a "schmalspur" solution to enable the idea behind TRANSLATE-471 for our API testing  
+            if(isset($config->runtimeOptions)) {
+                $origConfig = Zend_Registry::get('config');
+                /* @var $origConfig Zend_Config */
+                $newConfig = new Zend_Config([], true);
+                $newConfig->merge($origConfig);
+                $newConfig->runtimeOptions = [];
+                $newConfig->runtimeOptions->merge($config->runtimeOptions);
+                $newConfig->setReadOnly();
+                Zend_Registry::set('config', $newConfig);
+            }
+        }
     }
     
     protected function calculateEmptyTargets() {

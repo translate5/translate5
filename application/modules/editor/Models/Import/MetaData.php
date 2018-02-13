@@ -65,11 +65,6 @@ class editor_Models_Import_MetaData {
     protected $cache = array();
     
     /**
-     * @var string
-     */
-    public $filenameTaskTemplate = 'task-template.xml';
-    
-    /**
      * contains a key for each imported meta data
      * @var array
      */
@@ -107,8 +102,6 @@ class editor_Models_Import_MetaData {
      */
     public function import(editor_Models_Task $task) {
         $this->task = $task;
-        
-        $this->importTaskTemplateXml();
         
         $events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
         /* @var $events ZfExtended_EventManager */
@@ -158,37 +151,6 @@ class editor_Models_Import_MetaData {
     }
 
     /**
-     * import task-template.xml file
-     * if exist save it to Zend_Registry::get('taskTemplate');
-     */
-    protected function importTaskTemplateXml() {
-        Zend_Registry::set('taskTemplate', array());
-        $templateFilename = $this->config->importFolder.'/'.$this->filenameTaskTemplate;
-        
-        if (file_exists($templateFilename)) {
-            try {
-                $config = new Zend_Config_Xml($templateFilename);
-                Zend_Registry::set('taskTemplate', $config);
-            }
-            catch (Exception $e) {
-                throw new Exception('.. invalid '.$this->filenameTaskTemplate.' detected at '.__CLASS__.' -> '.__FUNCTION__);
-            }
-            //WARNING: this is NOT the implementation of TRANSLATE-471!
-            // This code is just a "schmalspur" solution to enable the idea behind TRANSLATE-471 for our API testing  
-            if(isset($config->runtimeOptions)) {
-                $origConfig = Zend_Registry::get('config');
-                /* @var $origConfig Zend_Config */
-                $newConfig = new Zend_Config([], true);
-                $newConfig->merge($origConfig);
-                $newConfig->runtimeOptions = [];
-                $newConfig->runtimeOptions->merge($config->runtimeOptions);
-                $newConfig->setReadOnly();
-                Zend_Registry::set('config', $newConfig);
-            }
-        }
-    }
-
-     /**
      * adds a given importer to the internal importer list for further standardized processing
      * @param editor_Models_Import_IMetaDataImporter $importer
      */
