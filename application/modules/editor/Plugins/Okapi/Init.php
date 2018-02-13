@@ -235,6 +235,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $importFolder = $params['importFolder'];
         $task = $params['task'];
         $bconfFilePath = $this->getBconfFiles($importFolder);
+        $workerParentId = $params['workerParentId'];
         
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
@@ -252,7 +253,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        $worker->queue($params['workerParentId']);
+        $worker->queue($workerParentId);
     }
     
     /**

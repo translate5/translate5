@@ -127,7 +127,7 @@ class editor_Models_File_FilterManager {
         foreach($filters as $filter) {
             $filterInstance = ZfExtended_Factory::get($filter->filter);
             /* @var $filterInstance editor_Models_File_IFilter */
-            $filterInstance->initFilter($this, $this->importConfig, $this->parentWorkerId);
+            $filterInstance->initFilter($this, $this->parentWorkerId, $this->importConfig);
             if($type == self::TYPE_EXPORT) {
                 $filterInstance->applyExportFilter($this->task, $fileId, $path, $filter->parameters);
             }
