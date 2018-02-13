@@ -32,13 +32,16 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
     protected $manager;
     protected $importConfig;
+    protected $parentWorkerId;
+    
     /**
      * {@inheritDoc}
      * @see editor_Models_File_IFilter::initFilter()
      */
-    public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_Import_Configuration $importConfig = null) {
+    public function initFilter(editor_Models_File_FilterManager $manager, $parentWorkerId, editor_Models_Import_Configuration $importConfig = null) {
         $this->manager = $manager;
         $this->importConfig = $importConfig;
+        $this->parentWorkerId = $parentWorkerId;
     }
     
     /**
@@ -69,7 +72,6 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
             $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        //FIXME macht beim export die parentId auch Sinn?
-        $worker->queue(null);
+        $worker->queue($this->parentWorkerId);
     }
 }

@@ -36,7 +36,7 @@ class editor_Plugins_Okapi_Tikal_Filter implements editor_Models_File_IFilter {
      * {@inheritDoc}
      * @see editor_Models_File_IFilter::initFilter()
      */
-    public function initFilter(editor_Models_File_FilterManager $manager, editor_Models_Import_Configuration $importConfig = null) {
+    public function initFilter(editor_Models_File_FilterManager $manager, $parentWorkerId, editor_Models_Import_Configuration $importConfig = null) {
         $this->manager = $manager;
         $this->importConfig = $importConfig;
     }

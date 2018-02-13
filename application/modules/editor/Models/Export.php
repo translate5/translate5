@@ -67,8 +67,9 @@ class editor_Models_Export {
     /**
      * exports a task
      * @param string $exportRootFolder
+     * @param integer $workerId
      */
-    public function export(string $exportRootFolder) {
+    public function export(string $exportRootFolder, $workerId) {
         umask(0); // needed for samba access
         if(is_dir($exportRootFolder)) {
             $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
@@ -93,7 +94,7 @@ class editor_Models_Export {
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
-        $fileFilter->initExport($this->task);
+        $fileFilter->initExport($this->task, $workerId);
         
         sort($dirPaths);
         foreach ($dirPaths as $path) {

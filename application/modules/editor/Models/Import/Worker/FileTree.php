@@ -66,9 +66,10 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
             $metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($importConfig));
             /* @var $metaDataImporter editor_Models_Import_MetaData */
             $metaDataImporter->import($this->task);
-            $events->trigger("beforeDirectoryParsing", $this,[
-                    'importFolder'=>$importConfig->importFolder,
+            $events->trigger("beforeDirectoryParsing", $this, [
+                    'importFolder' => $importConfig->importFolder,
                     'task' => $this->task,
+                    'workerParentId' => $this->workerModel->getParentId(),
             ]);
             
             $filelistInstance = ZfExtended_Factory::get('editor_Models_Import_FileList', [
@@ -78,10 +79,11 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
             /* @var $filelistInstance editor_Models_Import_FileList */
             $filelist = $filelistInstance->processProofreadAndReferenceFiles($importConfig->getProofReadDir());
 //FIXME die bindings zu diesem Event!
-            $events->trigger("afterDirectoryParsing", $this,[
-                    'task'=>$this->task,
-                    'importFolder'=>$importConfig->importFolder,
-                    'filelist'=>$filelist
+            $events->trigger("afterDirectoryParsing", $this, [
+                    'task' => $this->task,
+                    'importFolder' => $importConfig->importFolder,
+                    'filelist' => $filelist,
+                    'workerParentId' => $this->workerModel->getParentId(),
             ]);
             
             $this->task->save();

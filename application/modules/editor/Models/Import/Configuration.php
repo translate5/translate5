@@ -94,6 +94,12 @@ class editor_Models_Import_Configuration {
     public $userName;
     
     /**
+     * Worker Id of the import worker, usable as parentId for subsequent workers
+     * @var integer
+     */
+    public $workerId; 
+    
+    /**
      * needed internally for de/serialization 
      * @var string
      */

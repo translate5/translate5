@@ -44,7 +44,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      */
     private $okapiFileTypes = array(
             
-            //FIXME WARNING: MimeTypes ware not needed anymore, since check was deactivated in UploadProcessor
+            //FIXME WARNING: Only suffixes are used. MimeTypes are not needed anymore, since mimetype check was deactivated in UploadProcessor
             // but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
             
             'okapi' => ['application/xml'], //currently needed, see TRANSLATE-1019
@@ -157,13 +157,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $params = $event->getParams();
         $filelist = $params['filelist'];
         $importFolder = $params['importFolder'];
-        $bconfFilePath = $this->getBconfFiles($importFolder);
         foreach($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder.'/'.ZfExtended_Utils::filesystemEncode($filePath));
             if(!$this->isProcessable($fileInfo)) {
                 continue;
             }
-            $this->queueWorker($fileId, $fileInfo, $bconfFilePath, $params);
+            $this->queueWorker($fileId, $fileInfo, $params);
         }
     }
     
@@ -222,16 +221,20 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         return in_array($extension,array_keys($this->okapiFileTypes));
     }
     
-    /***
+    /**
      * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the
      * result
      *
+     * @param integer $fileId
+     * @param SplFileInfo $file
+     * @param array $params
      * @return boolean
      */
-    protected function queueWorker($fileId, SplFileInfo $file, $bconfFilePath, array $params){
+    protected function queueWorker($fileId, SplFileInfo $file, array $params){
         $filelist = $params['filelist'];
         $importFolder = $params['importFolder'];
         $task = $params['task'];
+        $bconfFilePath = $this->getBconfFiles($importFolder);
         
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
@@ -249,7 +252,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
-        $worker->queue(null);
+        $worker->queue($params['workerParentId']);
     }
     
     /**

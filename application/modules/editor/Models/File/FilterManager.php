@@ -55,20 +55,29 @@ class editor_Models_File_FilterManager {
     protected $filters;
     
     /**
+     * contains the worker id of the parent worker
+     * @var integer
+     */
+    protected $parentWorkerId;
+    
+    /**
      * loads all file filters for a given task
      * @param editor_Models_Task $task
      * @param editor_Models_Import_Configuration $importConfig
      */
     public function initImport(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->importConfig = $importConfig;
+        $this->parentWorkerId = $importConfig->workerId;
         $this->init($task, self::TYPE_IMPORT);
     }
     
     /**
      * loads all file filters for a given task
      * @param editor_Models_Task $task
+     * @param integer $workerId
      */
-    public function initExport(editor_Models_Task $task) {
+    public function initExport(editor_Models_Task $task, $workerId) {
+        $this->parentWorkerId = $workerId;
         $this->init($task, self::TYPE_EXPORT);
     }
     
@@ -118,7 +127,7 @@ class editor_Models_File_FilterManager {
         foreach($filters as $filter) {
             $filterInstance = ZfExtended_Factory::get($filter->filter);
             /* @var $filterInstance editor_Models_File_IFilter */
-            $filterInstance->initFilter($this, $this->importConfig);
+            $filterInstance->initFilter($this, $this->importConfig, $this->parentWorkerId);
             if($type == self::TYPE_EXPORT) {
                 $filterInstance->applyExportFilter($this->task, $fileId, $path, $filter->parameters);
             }

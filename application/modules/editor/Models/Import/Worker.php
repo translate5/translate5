@@ -61,17 +61,20 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events 
         $parameters = $this->workerModel->getParameters();
+        $importConfig = $parameters['config'];
+        /* @var $importConfig editor_Models_Import_Configuration */
+        $importConfig->workerId = $this->workerModel->getId();
         
         try {
             $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
             /* @var $import editor_Models_Import_Worker_Import */
-            $import->import($task, $parameters['config']);
+            $import->import($task, $importConfig);
             
             // externalImport just triggers the event aferImport!
             //@see editor_Models_Import::triggerAfterImport
             $externalImport = ZfExtended_Factory::get('editor_Models_Import');
             /* @var $externalImport editor_Models_Import */
-            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $parameters['config']);
+            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $importConfig);
             return true;
         } catch (Exception $e) {
             $task->setErroneous();

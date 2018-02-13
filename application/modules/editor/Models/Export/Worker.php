@@ -103,7 +103,7 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         $export = ZfExtended_Factory::get($exportClass);
         /* @var $export editor_Models_Export */
         $export->setTaskToExport($task, $parameters['diff']);
-        $export->export($parameters['exportToFolder']);
+        $export->export($parameters['exportToFolder'], $this->workerModel->getId());
         
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array($exportClass));
