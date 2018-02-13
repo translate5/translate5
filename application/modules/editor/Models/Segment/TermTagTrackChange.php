@@ -56,8 +56,10 @@ class editor_Models_Segment_TermTagTrackChange {
      * For fetching/searching the TrackChanges and TermTags:
      */
     const REGEX_DEL     = '/<del[^>]*>.*?<\/del>/i';    // del-Tag:  including their content!
-    const REGEX_INS     = '/<\/?ins[^>]*>/i';           // ins-Tag:  only the tags without their content
+    const REGEX_INS     = '/<ins[^>]*>.*?<\/ins>/i';           // ins-Tag:  only the tags without their content
     const REGEX_TERMTAG = '/<\/?div[^>]*>/i';           // term-Tag: only the tags without their content (all other divs have been masked already) // TODO: get regex from from editor_Models_Segment_TermTag
+    
+    const REGEX_REPLACE = '/<mark[^>]*>.*?<\/mark>/i';
     
     /**
      * For the process of decoding a given text:
@@ -106,7 +108,6 @@ class editor_Models_Segment_TermTagTrackChange {
         $text = $this->internalTagHelper->protect($text);
         $this->fetchTrackChangeNodes($text, $textId);
     }
-    
     /**
      * Re-insert the stored TrackChange-Nodes at the stored positions in the text (that now includes - only! - the TermTags).
      * @param string $text
@@ -131,6 +132,7 @@ class editor_Models_Segment_TermTagTrackChange {
         }
         
         $this->text = $text;
+       
         $this->text = $this->internalTagHelper->protect($this->text);
         
         $this->debugText = "\n-----------\n" . $text . "\n";
@@ -147,13 +149,6 @@ class editor_Models_Segment_TermTagTrackChange {
             $foundTermTag = array_key_exists($this->posInText, $this->arrTermTagsInText);
             $foundTrackChangeMarkup = array_key_exists($this->posInText, $this->arrTrackChangeNodesInText);
             switch (true) {
-                case ($foundTermTag && $foundTrackChangeMarkup && $this->trackChangeNodeStatus == 'open'):
-                    // If a TrackChange-Node ist still open and both a TrackChange-Node AND a TermTag are found,
-                    // we will close the TrackChange-Node first. The next loop then will recognize the other item from the TermTags.
-                    $this->debugText .= "\n" . $this->posInText .": foundTermTag && foundTrackChangeMarkup";
-                    $posEnd += $this->handleTrackChangeNodeInText();
-                    $this->debugText .= "\n- weiter bis: " . $posEnd . "\n\n";
-                    break;
                 case $foundTermTag:
                     $this->debugText .= "\n" . $this->posInText .": foundTermTag";
                     $posEnd += $this->handleTermTagInText();
@@ -220,7 +215,7 @@ class editor_Models_Segment_TermTagTrackChange {
      */
     private function fetchTermTags($text) {
         $allTermTagsInText = array();
-        preg_match_all(self::REGEX_TERMTAG, $text, $tempMatchesTermTags, PREG_OFFSET_CAPTURE);
+        preg_match_all(self::REGEX_REPLACE, $text, $tempMatchesTermTags, PREG_OFFSET_CAPTURE);
         foreach ($tempMatchesTermTags[0] as $match) {
             $allTermTagsInText[$match[1]] = $match[0];
         }
@@ -242,7 +237,7 @@ class editor_Models_Segment_TermTagTrackChange {
         $openingTrackChangeNode = null;
         $closingTrackChangeNode = null;
         $textLengthIncreased = 0;
-        $termTagInText = $this->arrTermTagsInText[$this->posInText];
+        $termTagInText = isset($this->arrTermTagsInText[$this->posInText]) ? $this->arrTermTagsInText[$this->posInText] : "";
         if ($this->trackChangeNodeStatus == 'open') {
             $openingTrackChangeNode = $this->getThresholdItemInArray($this->arrTrackChangeNodesInText, $this->posInText, 'before');
             $closingTrackChangeNode = $this->getThresholdItemInArray($this->arrTrackChangeNodesInText, $this->posInText, 'next');
@@ -255,8 +250,14 @@ class editor_Models_Segment_TermTagTrackChange {
             $textLengthIncreased += $this->insertTextAtCurrentPos($closingTrackChangeNode);
         }
         $length = strlen($termTagInText);
+        $length = $length === 0 ? 1 : $length;
+        //FIXME: here smart logic
+        //- what if curent replacement, removes the ins/del tags in the trackChanges array
         $this->arrTrackChangeNodesInText = $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length, $this->posInText);
         $this->posInText += $length;
+        
+        $this->initColectRange($termTagInText);
+        
         $this->debugText .= "\n" . $this->posInText .": vorgefunden: " . $termTagInText.  "\n- length:" . $length . "\n- weiter bei: " . $this->posInText;
         if ($openingTrackChangeNode != null) {
             $length = strlen($openingTrackChangeNode);
@@ -283,9 +284,9 @@ class editor_Models_Segment_TermTagTrackChange {
         $length = strlen($trackChangeNodeInText);
         $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length, $this->posInText);
         $textLengthIncreased += $this->insertTextAtCurrentPos($trackChangeNodeInText);
-        if (!preg_match_all(self::REGEX_DEL, $trackChangeNodeInText)) {
-            $this->trackChangeNodeStatus = ($this->trackChangeNodeStatus == 'open') ? 'close' : 'open'; // start was null and the first step must go to 'open'
-        }
+        //if (!preg_match_all(self::REGEX_DEL, $trackChangeNodeInText)) {
+        //    $this->trackChangeNodeStatus = ($this->trackChangeNodeStatus == 'open') ? 'close' : 'open'; // start was null and the first step must go to 'open'
+        //}
         return $textLengthIncreased;
     }
     
@@ -356,5 +357,16 @@ class editor_Models_Segment_TermTagTrackChange {
             error_log($name);
             return;
         }
+    }
+    
+    /***
+     * 
+     * @param string $replaceTag
+     */
+    private $collectRange;
+    private function initColectRange($replaceTag){
+        $this->collectRange=0;
+        
+        
     }
 }
