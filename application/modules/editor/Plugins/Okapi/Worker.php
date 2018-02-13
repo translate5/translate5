@@ -75,7 +75,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $suffix = $file->getExtension();
         $fileId = $params['fileId'];
         $fileName = sprintf(self::ORIGINAL_FILE, $fileId, $suffix);
-        $manifestFile = sprintf(self::MANIFEST_FILE, $fileId);
+        $manifestFile = $this->getManifestFile($fileId);
         $okapiDataDir = $this->getDataDir();
         
         $language = ZfExtended_Factory::get('editor_Models_Languages');
@@ -89,11 +89,15 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
             $api->uploadOkapiConfig($params['bconfFilePath']);
-            $api->uploadSourceFile($fileName, $file);
+            $api->uploadInputFile($fileName, $file);
             $api->executeTask($sourceLang, $targetLang);
             $convertedFile = $api->downloadFile($fileName, $manifestFile, $okapiDataDir);
 
+            //copy original into data dir for export
+            copy($file, $okapiDataDir.'/'.$fileName);
+            //copy original to reference files
             $this->copyOriginalAsReference();
+            //copy generated XLF into importFolder
             copy($convertedFile, $file.$api::OUTPUT_FILE_EXTENSION);
             
             //add okapi export file filter for that file 
@@ -118,72 +122,69 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      * @return boolean
      */
     protected function doExport() {
-        error_log("WORKER STARTED");
-        
-        /*
-          #!/usr/bin/env python
-import requests
-from xml.dom import minidom
-
-url = 'http://localhost:8080/okapi-longhorn/'
-
-r = requests.post(url+'projects/new')
-print r.text
-
-r = requests.get(url+'projects/')
-xmlstring = minidom.parseString(r.text)
-itemlist = xmlstring.getElementsByTagName('e')
-lastproject = len(itemlist)
-
-payload = open('/home/marcstandard/Downloads/okapi-test-rueckweg/work/Schnittstellen _ Across.html.xlf', 'rb')
-r = requests.post(url+'projects/'+str(lastproject)+'/inputFiles/work/Schnittstellen _ Across.html.xlf', files=dict(inputFile=payload))
-         * */
-        
         $params = $this->workerModel->getParameters();
-        error_log(print_r($params,1));
+        $fileId = $params['fileId'];
+        $workFile = new SplFileInfo($params['file']);
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
         $plugin = $pm->get($pm->classToName(get_class($this)));
         
         $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
-        $api->setBconfFilePath($plugin->getExportBconf());
-        return true;
         
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
         
-        $api->setSourceLang($language->loadLangRfc5646($this->task->getSourceLang()));
-        $api->setTargetLang($language->loadLangRfc5646($this->task->getTargetLang()));
-        $api->setInputFile($file);
+        $sourceLang = $language->loadLangRfc5646($this->task->getSourceLang());
+        $targetLang = $language->loadLangRfc5646($this->task->getTargetLang());
+        $result = false;
         
         try {
             $api->createProject();
-            $api->uploadOkapiConfig();
-            $api->uploadSourceFile();
-            $api->executeTask();
-            $api->downloadFile();
-
-            //move the original files in the referenceFiles dir, in the same filestrucutre
-            //as thay were durring the import
-            $fileDir=dirname($file['filePath']);
-            $folders=str_replace($proofReadFolder,"",$fileDir);
-            if(!empty($folders)){
-                $refFolder=$refFolder.$folders;
-            }
+            $api->uploadOkapiConfig([$plugin->getExportBconf()]);
             
-            if (!is_dir($refFolder)) {
-                mkdir($refFolder, 0777, true);
-            }
-            $originalFile = $file['filePath'];
-            $referenceFile = $refFolder.'/'.$file['fileName'];
-            rename($originalFile, $referenceFile);
-        }catch (Exception $e){
-            $this->log->logError('Okapi Error: Error on converting a file. Task: '.$taskGuid.'; File: '.print_r($file, 1).'; Error was: '.$e);
-        }finally {
-            $api->removeProject();
+//FIXME check ob manifest.rkm exisitert, wenn nein, dann tikal export!
+            
+            $api->uploadInputFile('manifest.rkm', new SplFileInfo($this->getDataDir().'/'.$this->getManifestFile($fileId)));
+            $originalFile = $this->findOriginalFile($fileId);
+            $api->uploadOriginalFile($originalFile, new SplFileInfo($this->getDataDir().'/'.$originalFile));
+            $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workFile);
+            $api->executeTask($sourceLang, $targetLang);
+            //the exported work file (containing xlf) must be renamed so that 
+            // the merged file can be saved under the original file name 
+            rename($workFile, $workFile.$api::OUTPUT_FILE_EXTENSION);
+            $api->downloadMergedFile($originalFile, $workFile);
+            $result = true;
+        } catch (Exception $e){
+            $debug = [
+                'fileId' => $fileId,
+                'file' => $file->__toString(),
+            ];
+            $this->log->logError('Okapi Error: Error on converting a file. Task: '.$this->taskGuid.'; File: '.print_r($debug, 1).'; Error was: '.$e);
         }
-        return true;
+        $api->removeProject();
+        return $result; 
+//FIXME Mit Tikal hatten wir separaten Output. Wie verhält sich das hier?
+    }
+    
+    /**
+     * returns the manifest.rkm file for a stored file
+     * @param integer $fileId
+     * @return string
+     */
+    protected function getManifestFile($fileId) {
+        return sprintf(self::MANIFEST_FILE, $fileId);
+    }
+    
+    /**
+     * returns the original file for a stored file (stored in the okapi data dir)
+     * @param integer $fileId
+     * @return string
+     */
+    protected function findOriginalFile($fileId) {
+        $regex = '/'.sprintf(self::ORIGINAL_FILE, $fileId.'\\', '.*$/');
+        $files = preg_grep($regex, scandir($this->getDataDir()));
+        return reset($files);
     }
     
     /**

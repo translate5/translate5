@@ -61,7 +61,7 @@ class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
         $params=[
                 'type' => editor_Plugins_Okapi_Worker::TYPE_EXPORT,
                 'fileId'=>$fileId,
-                'filePath'=>$filePath
+                'file'=>$filePath
         ];
         
         // init worker and queue it

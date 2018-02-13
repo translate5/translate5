@@ -52,6 +52,14 @@ class editor_Plugins_Okapi_Connector {
     const OKAPI_FILE_EXTENSION='.okapi';
     
     /**
+     * The input types used as path part in the Okapi upload URL
+     * @var string
+     */
+    const INPUT_TYPE_DEFAULT = ''; //needed for importing all files, export: the manifest.rkm
+    const INPUT_TYPE_ORIGINAL = 'original'; //needed for export, place for the original (html) files
+    const INPUT_TYPE_WORK = 'work';  //needed for export, place for the work (xlf) files
+    
+    /**
      * The url for connecting the Okapi api
      * 
      * @var string
@@ -162,10 +170,42 @@ class editor_Plugins_Okapi_Connector {
      * @param string $fileName file name to be used in okapi
      * @param SplFileInfo $realFilePath path to the file to be uploaded
      */
-    public function uploadSourceFile($fileName, SplFileInfo $realFilePath){
+    public function uploadInputFile($fileName, SplFileInfo $realFilePath){
+        $this->uploadFile($fileName, $realFilePath, self::INPUT_TYPE_DEFAULT);
+    }
+    
+    /**
+     * Upload the original file for merging the XLF data into
+     * @param string $fileName file name to be used in okapi
+     * @param SplFileInfo $realFilePath path to the file to be uploaded
+     */
+    public function uploadOriginalFile($fileName, SplFileInfo $realFilePath){
+        $this->uploadFile($fileName, $realFilePath, self::INPUT_TYPE_ORIGINAL);
+    }
+    
+    /**
+     * Upload the work file (XLF) to be merged into the original file
+     * @param string $fileName file name to be used in okapi
+     * @param SplFileInfo $realFilePath path to the file to be uploaded
+     */
+    public function uploadWorkFile($fileName, SplFileInfo $realFilePath){
+        $this->uploadFile($fileName, $realFilePath, self::INPUT_TYPE_WORK);
+    }
+    
+    /**
+     * Upload the source file(the file which will be converted)
+     * @param string $fileName
+     * @param SplFileInfo $realFilePath
+     * @param string $type
+     */
+    protected function uploadFile($fileName, SplFileInfo $realFilePath, $type){
         //PUT http://{host}/okapi-longhorn/projects/1/inputFiles/help.html
         //Ex.: Uploads a file that will have the name 'help.html'
         
+        if(!empty($type)) {
+            //add the upload type to the URL
+            $fileName = $type.'/'.$fileName;
+        }
         $url=$this->projectUrl.'/inputFiles/'.$fileName;
         $http = $this->getHttpClient($url);
         $http->setFileUpload($realFilePath,'inputFile');
@@ -212,21 +252,31 @@ class editor_Plugins_Okapi_Connector {
      */
     public function downloadFile($fileName, $manifestFile, SplFileInfo $dataDir){
         $downloadedFile = $dataDir.'/'.$fileName.self::OUTPUT_FILE_EXTENSION;
-        //we encode the filename, because the okapi api does not support whitespace in files
         $url=$this->projectUrl.'/outputFiles/pack1/work/'.$fileName.self::OUTPUT_FILE_EXTENSION;
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
         $responseFile=$this->processResponse($response);
-        //create the file in the proffRead folder, with the okapi extension so we know who generate this file
         file_put_contents($downloadedFile, $responseFile);
         
         //additionaly we save the manifest.rkm file to the disk, needed for export
         $url = $this->projectUrl.'/outputFiles/pack1/manifest.rkm';
         $http = $this->getHttpClient($url);
         $response = $http->request('GET');
-        //create the file in the proffRead folder, with the okapi extension so we know who generate this file
         file_put_contents($dataDir.'/'.$manifestFile, $this->processResponse($response));
         
         return $downloadedFile;
+    }
+    
+    /**
+     * Download the converted file from okapi, and save the file on the disk.
+     * @param string $fileName filename in okapi to get the file
+     * @param string $manifestFile
+     * @param SplFileInfo $originalFile
+     * @return string the path to the downloaded data file
+     */
+    public function downloadMergedFile($fileName, SplFileInfo $targetFile){
+        $http = $this->getHttpClient($this->projectUrl.'/outputFiles/'.$fileName);
+        $response = $http->request('GET');
+        file_put_contents($targetFile, $this->processResponse($response));
     }
 }
