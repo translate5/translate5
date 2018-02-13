@@ -666,7 +666,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           params: {
               format: 'jsontext'
           },
-          
+          timeout: 3600,
           url: Editor.data.restpath+'task',
           scope: this,
           success: function(form, submit) {
