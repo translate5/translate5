@@ -3,6 +3,30 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.22] - 2018-02-13
+###Added
+TRANSLATE-32: Search and Replace in translate5 editor
+TRANSLATE-1116: Clone a already imported task
+TRANSLATE-1109: Enable import of invalid XLIFF used for internal translations
+TRANSLATE-1107: VisualReview converter server wrapper
+
+###Changed
+TRANSLATE-1019: Improve File Handling Architecture in the import process
+T5DEV-218: Enhance visualReview matching algorithm
+TRANSLATE-1017: Use Okapi longhorn for merging files back instead tikal
+TRANSLATE-1121: Several minor improvement in the installer
+TRANSLATE-667: GUI cancels task POST requests longer than 60 seconds
+
+###Bugfixes
+TRANSLATE-1131: Internet Explorer compatibility mode results in non starting application
+TRANSLATE-1122: TrackChanges: saving content to an attached matchresource (openTM2) saves also the <del> content
+TRANSLATE-1108: VisualReview: absolute paths for CSS and embedded fonts are not working on installations with a modified APPLICATION_RUNDIR
+TRANSLATE-1138: Okapi Export does not work with files moved internally in translate5
+TRANSLATE-1112: Across XML parser has problems with single tags in the comment XML
+TRANSLATE-1110: Missing and wrong translated user roles in the notifyAllAssociatedUsers e-mail
+TRANSLATE-1117: In IE Edge in the HtmlEditor the cursor cannot be moved by mouse only by keyboard
+TRANSLATE-1141: TrackChanges: Del-tags are not ignored when the characters are counted in min/max length
+
 ## [2.6.21] - 2018-01-22
 ###Bugfixes
 TRANSLATE-1076: Windows Only: install-and-update-batch overwrites path to mysql executable
