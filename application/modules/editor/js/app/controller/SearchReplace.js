@@ -219,6 +219,7 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     handleTrackChangesForSaving:function(){
         var me=this;
+        //FIXME: those classes are in clean dom, and can be moved
         me.utilRangeClass.cleanMarkTags();
         me.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
     },
@@ -274,6 +275,7 @@ Ext.define('Editor.controller.SearchReplace', {
     onSegmentGridEdit:function(){
         this.activeSegment.matchIndex=0;
         this.activeSegment.matchCount=0;
+        //FIXME: clandom, can be moved
         this.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
     },
     
@@ -429,10 +431,11 @@ Ext.define('Editor.controller.SearchReplace', {
         }
 
         //find matches once again, the content can be changed between replaces
+        //FIXME: clandom, can be moved
         me.utilRangeClass.cleanMarkTags();
         me.findMatches();
         
-        
+        //FIXME: What do we do with this flag
         me.utilRangeClass.isSearchReplaceRange=true;
         
         //check if we jupm to the next segment
@@ -443,6 +446,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 if(saveCurrentOpen && me.activeSegment.currentSegmentIndex===me.activeSegment.nextSegmentIndex){
                     editor.save();
                 }else{
+                  //FIXME: What do we do with this flag
                     me.utilRangeClass.isSearchReplaceRange=false;
                     me.handleRowSelection();
                 }
@@ -464,22 +468,26 @@ Ext.define('Editor.controller.SearchReplace', {
         if(!me.activeTrackChanges){
             me.pureReplace(range,replaceText);
         }else{
+            //FIXME dependency, it is called in Editor, than the handleDelition in UtilDellition is called
             me.utilRangeClass.handleReplaceDelete(range);
             delete range;
             
             //apply the replacement
             var range = rangy.createRange();
             range.moveToBookmark(me.replaceRanges[me.activeSegment.matchIndex]);
+            //FIXME dependency, it is called in Editor, then uses multiple tc function
             me.utilRangeClass.insertReplaceNode(range,replaceText);
             delete range;
         }
         
+        //FIXME can be moved
         //clean the mark tags from the editor
         me.utilRangeClass.cleanMarkTags();
         
         //run the search once again
         me.findMatches();
         
+        //FIXME the flag
         //disable the flag
         me.utilRangeClass.isSearchReplaceRange=false;
 
@@ -738,6 +746,7 @@ Ext.define('Editor.controller.SearchReplace', {
             return true;
         });
 
+        //FIXME this uses tc function for remove content, can be moved in my code for example
         //remove the content between the range
         me.utilRangeClass.rangeDeleteContents(rangeForDel);
 
@@ -815,6 +824,7 @@ Ext.define('Editor.controller.SearchReplace', {
             me.findEditorSegment(plug);
             return;
         }
+        //FIXME can be moved
         //clean the mark tags from the editor
         me.utilRangeClass.cleanMarkTags();
         
@@ -909,10 +919,12 @@ Ext.define('Editor.controller.SearchReplace', {
             range.selectNodeContents(iframeDocument.body);
             searchResultApplier.undoToRange(range);
 
+            //FIXME can be moved
             //add display none to all del nodes, with this thay are ignored as searchable
             me.utilRangeClass.prepareDelNodeForSearch(true);
             
             if (searchTerm === "") {
+              //FIXME can be moved
                 me.utilRangeClass.prepareDelNodeForSearch(false);
                 return
             }
@@ -923,9 +935,9 @@ Ext.define('Editor.controller.SearchReplace', {
             me.activeSegment.matchCount=0;
             // Iterate over matches
             while (range.findText(searchTerm, options)) {
+                //FIXME dependencyes 
                 //if the selection does not contains an del tag, create a selection, and it is not an allready replaced match
                 if(!me.utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,me.utilRangeClass.self.NODE_NAME_DEL) && !me.utilRangeClass.hasReplacedClass(range)){
-
                     //apply to range, this will select the text
                     searchResultApplier.applyToRange(range);
 
@@ -937,7 +949,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 // Collapse the range to the position immediately after the match
                 range.collapse(false);
             }
-            
+            //FIXME can be moved
             me.utilRangeClass.prepareDelNodeForSearch(false);
             
         }
@@ -1027,6 +1039,7 @@ Ext.define('Editor.controller.SearchReplace', {
             
             // Iterate over matches
             while (range.findText(searchTerm, options)) {
+                //FIXME dependencyes
                 //if the selection does not contains an del tag, create a selection, and it is not an allready replaced match
                 if(!me.utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,me.utilRangeClass.self.NODE_NAME_DEL)){
                     //apply to range, this will select the text
@@ -1114,6 +1127,7 @@ Ext.define('Editor.controller.SearchReplace', {
         
         //go to segment and open it for editing
         callback=function(indexToGo){
+            //FIXME can be moved
             me.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
             me.goToSegment(indexToGo,plug,saveCurrentOpen,activeTabViewModel);
             me.activeSegment.currentSegmentIndex=me.activeSegment.nextSegmentIndex;
