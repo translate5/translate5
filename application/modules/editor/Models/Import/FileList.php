@@ -48,10 +48,14 @@ class editor_Models_Import_FileList {
     protected $task;
     
     /**
-     * 
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig;
+    
+    /**
+     * @var editor_Models_Foldertree
+     */
+    protected $treeDb;
     
     public function __construct(editor_Models_Import_Configuration $importConfig, editor_Models_Task $task) {
         $this->importConfig = $importConfig;
@@ -59,31 +63,49 @@ class editor_Models_Import_FileList {
     }
     
     /**
-     * Find all proofread and reference files and stores them as foldertree, 
+     * Find all proofread files and stores them as foldertree, 
      * syncs the proofread files then as plain file entities
      * returns a file list with files to be imported
      * @param string $proofreadDir
      */
-    public function processProofreadAndReferenceFiles() {
-        $config = $this->importConfig;
+    public function processProofreadFiles() {
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
         $tree = $parser->parse($this->importConfig->getProofReadDir());
         
-        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
-        $treeDb->setTree($tree);
-        if($this->hasReferenceFiles() && !$config->isCheckRun){
-            $treeDb->setReferenceFileTree($this->getReferenceFileTree());
+        $this->treeDb->setTree($tree);
+        $this->treeDb->setTaskGuid($this->task->getTaskGuid());
+        $this->saveAndSyncFileTree();
+        
+        return $this->treeDb->getPaths($this->task->getTaskGuid(),'file');
+    }
+    
+    /**
+     * Find all reference files and stores them as foldertree, 
+     */
+    public function processReferenceFiles() {
+        if(!$this->hasReferenceFiles()){
+            return;
         }
-        $treeDb->setTaskGuid($this->task->getTaskGuid());
-        $params = array($treeDb,$config->getLanguageId('source'),$config->getLanguageId('target'), $config->getLanguageId('relais'));
+        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
+        $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        $this->treeDb->loadByTaskGuid($this->task->getTaskGuid());
+        $this->treeDb->setReferenceFileTree($this->getReferenceFileTree());
+        $this->treeDb->save();
+    }
+    
+    /**
+     * saves the file tree and syncs the filetree to the file table
+     */
+    public function saveAndSyncFileTree() {
+        $config = $this->importConfig;
+        $params = array($this->treeDb, $config->getLanguageId('source'), $config->getLanguageId('target'), $config->getLanguageId('relais'));
         $sync = ZfExtended_Factory::get('editor_Models_Foldertree_SyncToFiles', $params);
         /* @var $sync editor_Models_Foldertree_SyncToFiles */
         $sync->recursiveSync();
-        
-        $treeDb->save();
-        return $treeDb->getPaths($this->task->getTaskGuid(),'file');
+        $this->treeDb->save();
     }
     
     /**

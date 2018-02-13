@@ -127,12 +127,13 @@ abstract class editor_Models_Import_FileParser {
     protected $usedParser;
     
     /**
+     * FIXME change first Parameter to SplFileInfo!
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
      * @param integer $fileId
      * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName,integer $fileId, editor_Models_Task $task){
+    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
         $this->config = Zend_Registry::get('config');
         $this->_origFile = file_get_contents($path);
         $this->_path = $path;

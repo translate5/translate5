@@ -195,13 +195,4 @@ class editor_Models_Import_MetaData {
     public function addImporter(editor_Models_Import_IMetaDataImporter $importer) {
         $this->importers[] = $importer;
     }
-
-    /**
-     * Räumt nach den abgeschlossenen Importvorgängen auf.
-     */
-    public function cleanup() {
-        foreach($this->importers as $importer){
-            $importer->cleanup();
-        }
-    }
 }

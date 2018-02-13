@@ -26,16 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * Editor specific language class
+ * Okapi Exception
  */
-class editor_Models_Languages extends ZfExtended_Languages {
-    protected $dbInstanceClass = 'editor_Models_Db_Languages';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_Language';
+class editor_Plugins_Okapi_Exception extends ZfExtended_Exception {
 }

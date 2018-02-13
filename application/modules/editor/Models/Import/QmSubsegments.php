@@ -130,11 +130,4 @@ END LICENSE AND COPYRIGHT
     public function hasTaskSpecific() {
         return $this->hasTaskSpecific;
     }
-    
-    /**
-     * has to exist due to editor_Models_Import_MetaData-logic
-     */
-    public function cleanup() {
-        return;
-    }
 }
