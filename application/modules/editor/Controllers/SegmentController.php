@@ -270,14 +270,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
         
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
-        $updateToSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
+        $updateSearchAndSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
         $this->sanitizeEditedContent($allowedAlternatesToChange);
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        foreach($updateToSort as $toSort) {
-            $this->entity->updateToSort($toSort);
+        foreach($updateSearchAndSort as $field) {
+            $this->entity->updateToSort($field);
+            //FIXME how do we update the new fields, mysql trigger or here in php
+            //$this->entity->updateSearchField($field);
         }
 
+        
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
         $this->entity->restoreNotModfied();
@@ -301,7 +304,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 $this->entity->updateQmSubSegments($field);
             }
         }
-        
+        //FIXME check who use this event so we klnow do we trigger this on replace all or not
         $this->events->trigger("beforePutSave", $this, array(
                 'entity' => $this->entity,
                 'model' => $this->entity, //FIXME model usage is deprecated and should be removed in future (today 2016-08-10) 
@@ -314,6 +317,44 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->setTimestamp(null); //see TRANSLATE-922
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
+    }
+    
+    public function searchAction(){
+        //check here also if the max allowed character number it is in his limit
+        $searchCombo=$this->getParam('searchCombo');
+        $length=strlen(utf8_decode($searchCombo));
+        if($length>1024){
+            $retval['success']=false;
+            $retval['error']="The search string is to big.";
+            $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
+            echo $retval;
+            exit();
+        }
+        
+        $result=$this->entity->search($this);
+        
+        if(!is_array($result)){
+            $retval['success']=false;
+            $retval['error']=$result;
+            $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
+            echo $retval;
+            exit();
+        }
+        
+        $retval['success']=true;
+        $retval['rows']=$result;
+        $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
+        echo $retval;
+        exit();
+    }
+    
+    public function replaceallAction(){
+        $retval=$this->entity->rellaceAll($this);
+        
+        $retval['success']=true;
+        $retval['rows']=$result;
+        $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
+        echo $retval;
     }
     
     /**

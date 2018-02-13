@@ -137,6 +137,7 @@ class editor_Models_Segment_MaterializedView {
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
         $baseCols = $sfm->getBaseColumns();
         
+        
         //define the add column states based on the field type stored in the DB
         $addColTpl = array();
         foreach($baseCols as $v) {
@@ -161,7 +162,7 @@ class editor_Models_Segment_MaterializedView {
         
         //loop over all available segment fields for this task and create the SQL for
         $walker = function($name, $suffix, $realCol) use ($addColTpl) {
-            return sprintf($addColTpl[$realCol], $name, $suffix);
+            return sprintf($addColTpl[$realCol],$name, $suffix);
         };
         
         $addColSql = $sfm->walkFields($walker);
