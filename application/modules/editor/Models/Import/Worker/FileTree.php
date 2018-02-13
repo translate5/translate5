@@ -84,6 +84,7 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
             $filelistInstance->processReferenceFiles();
             
             $this->triggerAfter($importConfig, $filelist);
+            $this->task->save(); //needed to save modifications done via the meta data importers
             return true;
         } catch (Exception $e) {
             $task->setErroneous();

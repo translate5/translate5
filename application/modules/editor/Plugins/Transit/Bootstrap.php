@@ -63,7 +63,8 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function init() {
         $config = Zend_Registry::get('config');
         // event-listeners
-        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
+        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', array($this, 'handleTransitImportPreparation'));
+        $this->eventManager->attach('editor_Models_Import_Worker', 'beforeWork', array($this, 'handleBeforeImport'));
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleTransitImportCleanup'), -10);
         // end of event-listeners
         $this->proofReadDirName = $config->runtimeOptions->import->proofReadDirectory;
@@ -72,19 +73,40 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
         $meta->addMeta('transitLockedForRefMat', $meta::META_TYPE_BOOLEAN, false, 'Is set to true if segment is locked for reference material in transit file');
     }
     
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeImport(Zend_EventManager_Event $event) {
+        $worker = $event->getParam('worker');
+        /* @var $worker editor_Models_Import_Worker */
+        $params = $worker->getModel()->getParameters();
+        $this->importFolder = $params['config']->importFolder;
+        $this->initTransitConfig();
+    }
     
     /**
      * handler for event: editor_Models_Import#beforeDirectoryParsing
+     * @param Zend_EventManager_Event $event
      */
     public function handleTransitImportPreparation(Zend_EventManager_Event $event) {
         $params = $event->getParams();
         $this->importFolder = $params['importFolder'];
+        if($this->initTransitConfig()) {
+            $this->renameTargetFiles('preparation');
+        }
+    }
+    
+    /**
+     * inits the transit config 
+     * @return boolean returns false if there is no or an invalid transitConfig
+     */
+    protected function initTransitConfig() {
         $transitConfig = $this->getTransitConfigFile();
         if(is_bool($transitConfig)){
-            return;
+            return false;
         }
-        $langInfo = $this->setTransitLangInfo($transitConfig);
-        $this->renameTargetFiles('preparation');
+        $this->setTransitLangInfo($transitConfig);
+        return true;
     }
     
     /**

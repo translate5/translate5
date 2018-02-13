@@ -110,7 +110,7 @@ class editor_Models_Import {
                 'importFolder'=>$this->importConfig->importFolder
         ));
         
-        $this->queueImportWorkers();
+        $this->queueImportWorkers($dataProvider);
     }
     
     /**
@@ -206,8 +206,9 @@ class editor_Models_Import {
     
     /**
      * add and run all the needed import workers
+     * @param editor_Models_Import_DataProvider_Abstract $dataProvider
      */
-    protected function queueImportWorkers() {
+    protected function queueImportWorkers(editor_Models_Import_DataProvider_Abstract $dataProvider) {
         $taskGuid = $this->task->getTaskGuid();
         $params = ['config' => $this->importConfig];
         /**

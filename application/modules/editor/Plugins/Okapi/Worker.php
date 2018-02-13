@@ -240,7 +240,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         if(strtolower($workfile->getExtension()) !== 'xlf') {
             throw new editor_Plugins_Okapi_Exception('Okapi tikal fallback can not be used, workfile does not contain the XLF suffix: '.$workfile);
         }
-        $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$task]);
+        $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$this->task]);
         /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
         $tikal->merge($workfile->__toString());
     }
