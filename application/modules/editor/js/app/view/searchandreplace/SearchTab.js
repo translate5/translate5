@@ -230,15 +230,13 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
             isMatch=false;
 
         while ((m = regex.exec(inputString)) !== null) {
+            // The result can be accessed through the `m`-variable.
+
             // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
             }
-            
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                isMatch=true;
-            });
+            isMatch=true;
         }
         
         return isMatch;
