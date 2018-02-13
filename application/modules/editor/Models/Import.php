@@ -105,50 +105,12 @@ class editor_Models_Import {
         }
         $this->task->lock(NOW_ISO, true); //locks the task
         
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        /* @var $eventManager ZfExtended_EventManager */
-        $eventManager->trigger('beforeImport', $this, array(
+        $this->events->trigger('beforeImport', $this, array(
                 'task' => $this->task,
                 'importFolder'=>$this->importConfig->importFolder
         ));
-        /**
-         * Queue FileTree Worker
-         */
-        $fileTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_FileTree');
-        /* @var $fileTreeWorker editor_Models_Import_Worker_FileTree */
-        $fileTreeWorker->init($this->task->getTaskGuid(), array(
-                'config' => $this->importConfig
-        ));
-        $fileTreeWorker->queue(0, NULL, false);
         
-        /**
-         * Queue Import Worker
-         */
-        $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
-        /* @var $importWorker editor_Models_Import_Worker */
-        $importWorker->init($this->task->getTaskGuid(), array(
-                'config' => $this->importConfig,
-                'dataProvider' => $dataProvider
-        ));
-
-        //prevent the importWorker to be started here. 
-        $parentId = $importWorker->queue(0, NULL, false);
-
-        //since none of the above workers are started yet, we can safely update the fileTreeWorkers parentId
-        $fileTreeWorker->getModel()->setParentId($parentId);
-        $fileTreeWorker->getModel()->save();
-
-        //sometimes it is not possbile for additional import workers to be invoked in afterImport, 
-        // for that reason this event exists:
-        $this->events->trigger('importWorkerQueued', $this, ['task' => $this->task, 'workerId' => $parentId]);
-        
-        $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
-        /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
-        
-        //queuing this worker when task has errors make no sense, init checks this.
-        if($worker->init($this->task->getTaskGuid())) {
-            $worker->queue($parentId); 
-        }
+        $this->queueImportWorkers();
     }
     
     /**
@@ -156,9 +118,7 @@ class editor_Models_Import {
      * @param editor_Models_Task $task
      */
     public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId, editor_Models_Import_Configuration $importConfig) {
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        /* @var $eventManager ZfExtended_EventManager */
-        $eventManager->trigger('afterImport', $this, [
+        $this->events->trigger('afterImport', $this, [
                 'task' => $task, 
                 'parentWorkerId' => $parentWorkerId,
                 'importConfig' => $importConfig
@@ -242,5 +202,54 @@ class editor_Models_Import {
      */
     public function setLanguages($source, $target, $relais, $type = editor_Models_Languages::LANG_TYPE_RFC5646) {
         $this->importConfig->setLanguages($source, $target, $relais, $type);
+    }
+    
+    /**
+     * add and run all the needed import workers
+     */
+    protected function queueImportWorkers() {
+        $taskGuid = $this->task->getTaskGuid();
+        $params = ['config' => $this->importConfig];
+        /**
+         * Queue FileTree and RefFileTree Worker
+         */
+        $fileTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_FileTree');
+        /* @var $fileTreeWorker editor_Models_Import_Worker_FileTree */
+        $fileTreeWorker->init($taskGuid, $params);
+        $fileTreeWorker->queue(0, NULL, false);
+        
+        $refTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_ReferenceFileTree');
+        /* @var $refTreeWorker editor_Models_Import_Worker_ReferenceFileTree */
+        $refTreeWorker->init($taskGuid, $params);
+        $refTreeWorker->queue(0, NULL, false);
+        
+        /**
+         * Queue Import Worker
+         */
+        $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
+        /* @var $importWorker editor_Models_Import_Worker */
+        $params['dataProvider'] = $dataProvider;
+        $importWorker->init($taskGuid, $params);
+
+        //prevent the importWorker to be started here. 
+        $parentId = $importWorker->queue(0, NULL, false);
+
+        //since none of the above workers are started yet, we can safely update the fileTreeWorkers parentId
+        $fileTreeWorker->getModel()->setParentId($parentId);
+        $fileTreeWorker->getModel()->save();
+        $refTreeWorker->getModel()->setParentId($parentId);
+        $refTreeWorker->getModel()->save();
+
+        //sometimes it is not possbile for additional import workers to be invoked in afterImport, 
+        // for that reason this event exists:
+        $this->events->trigger('importWorkerQueued', $this, ['task' => $this->task, 'workerId' => $parentId]);
+        
+        $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
+        /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
+        
+        //queuing this worker when task has errors make no sense, init checks this.
+        if($worker->init($taskGuid)) {
+            $worker->queue($parentId); 
+        }
     }
 }

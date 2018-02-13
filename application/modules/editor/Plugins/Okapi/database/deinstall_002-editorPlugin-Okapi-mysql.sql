@@ -25,5 +25,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-delete from `Zf_worker_dependencies` where `worker` =  'editor_Plugins_Okapi_Worker' AND `dependency` = 'editor_Models_Export_Worker';
-delete from `Zf_worker_dependencies` where `worker` =  'editor_Models_Export_Worker' AND `dependency` = 'editor_Plugins_Okapi_Worker';
+delete from `Zf_worker_dependencies` where `worker` =  'editor_Plugins_Okapi_Worker' OR `dependency` = 'editor_Plugins_Okapi_Worker';

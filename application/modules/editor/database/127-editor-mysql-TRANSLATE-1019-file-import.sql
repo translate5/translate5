@@ -26,8 +26,14 @@
 -- */
 
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
-('editor_Models_Import_Worker',  'editor_Models_Import_Worker_FileTree');
+('editor_Models_Import_Worker',  'editor_Models_Import_Worker_FileTree'),
+('editor_Models_Import_Worker',  'editor_Models_Import_Worker_ReferenceFileTree'),
+('editor_Models_Import_Worker_ReferenceFileTree',  'editor_Models_Import_Worker_FileTree');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
 ('runtimeOptions.worker.editor_Models_Import_Worker_FileTree.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running import filetree workers');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES
+('runtimeOptions.worker.editor_Models_Import_Worker_ReferenceFileTree.maxParallelWorkers', 1, 'editor', 'worker', 3, 3, '', 'integer', 'Max parallel running import filetree workers');
