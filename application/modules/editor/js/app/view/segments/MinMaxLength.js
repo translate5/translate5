@@ -39,7 +39,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     tpl: '<div class="{0}" data-qtip="{1}">{2}</div>',
     hidden:true,
     strings:{
-        minText:'#UT#{0} (Mindest. {1})',
+        minText:'#UT#{0} (Min. {1})',
         maxText:'#UT#{0} von {1}',
         segmentBellowLimit:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
         segmentOverLimit:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
