@@ -1996,8 +1996,8 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 </source><target>The role <i>{previousRole}</i> was not part of workflow, so no users were notified.<br />
 <br />
 </target></trans-unit>
-  <trans-unit id='ezB9IChNaW5kZXN0LiB7MX0p'>
-    <source>{0} (Mindest. {1})</source>
+  <trans-unit id='ezB9IChNaW4uIHsxfSk='>
+    <source>{0} (Min. {1})</source>
     <target>{0} (Min. {1})</target>
   </trans-unit>
   <trans-unit id='ezB9IHZvbiB7MX0='>
