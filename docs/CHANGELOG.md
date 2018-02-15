@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.23] - 2018-02-15
+###Changed
+TRANSLATE-1142: Task DB migration tracker
+T5DEV-228: VisualReview: aliased segments get a tooltip now
+
+###Bugfixes
+TRANSLATE-1096: Changelog model produce unneeded error log
+
 ## [2.6.22] - 2018-02-13
 ###Added
 TRANSLATE-32: Search and Replace in translate5 editor
