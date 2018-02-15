@@ -57,11 +57,7 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
         
         //set the search view flag
         tabViewModel.set('searchView',isSearchTab);
-        
         newCard.getController().resetSearchParametars();
         
     }
 });
-
-
-

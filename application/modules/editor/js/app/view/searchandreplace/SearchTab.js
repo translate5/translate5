@@ -140,6 +140,9 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     xtype:'checkbox',
                     itemId:'saveCurrentOpen',
                     name:'saveCurrentOpen',
+                    bind:{
+                        value:'{!isSearchView}'
+                    },
                     boxLabel:me.strings.saveCurrentOpen
                 }]
         };

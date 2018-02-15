@@ -1151,7 +1151,11 @@ Ext.define('Editor.controller.SearchReplace', {
         
         //if no index is found, use the initial one -> 0
         if(goToIndex===null){
-            //goToIndex=parseInt(results[me.activeSegment.nextSegmentIndex].row_number);
+            //if the search top is checked before the search is triggered, it will be in value of -1, which means the last record
+            //in that case call updatesegmentindex so we get the right index
+            if(me.activeSegment.nextSegmentIndex<0 && results.length>0){
+                me.updateSegmentIndex(searchTopChekbox);
+            }
             goToIndex=me.getSegmentRowNumber(results[me.activeSegment.nextSegmentIndex]);
         }
 
