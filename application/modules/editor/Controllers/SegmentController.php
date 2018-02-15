@@ -276,8 +276,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
         foreach($updateSearchAndSort as $field) {
             $this->entity->updateToSort($field);
-            //FIXME how do we update the new fields, mysql trigger or here in php
-            //$this->entity->updateSearchField($field);
         }
 
         
