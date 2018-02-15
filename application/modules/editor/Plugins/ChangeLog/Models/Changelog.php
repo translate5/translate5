@@ -158,8 +158,10 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     protected function checkGroups() {
         $configured = ZfExtended_Acl::getInstance()->getRoles();
         $used = array_keys($this->aclRoleValue);
+        sort($used);
+        sort($configured);
         foreach($used as $role) {
-            if(!defined('ACL_ROLE_'.$role)){
+            if(!defined('ACL_ROLE_'.strtoupper($role))){
                 error_log('In DB available roles ('.join(';', $configured).') does not contain all roles configured in Changelog Model ('.join(';', $used).')');
             }
         }
