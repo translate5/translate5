@@ -71,6 +71,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     maxLength:1024,
                     name:'searchCombo',
                     focusable:true,
+                    enableKeyEvents:true,
                     fieldLabel:me.strings.comboFieldLabel,
                     validator:me.validateSearchField,
                     listeners:{
@@ -85,6 +86,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     valueField:'id',
                     forceSelection:true,
                     allowBlank:false,
+                    enableKeyEvents:true,
                     listeners:{
                         select:'resetSearchParametars'
                     }

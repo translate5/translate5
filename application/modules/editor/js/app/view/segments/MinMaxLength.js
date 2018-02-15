@@ -59,6 +59,7 @@ Ext.define('Editor.view.segments.MinMaxLength', {
         var me=this,
             config = {};
         me.htmlEditor=instanceConfig.htmlEditor;
+
         me.htmlEditor.on({
             change:{
                 fn:me.onHtmlEditorChange,
@@ -89,10 +90,26 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Handler for html editor initializer, the function is called after the iframe is initialized
      */
     onHtmlEditorInitialize:function(htmlEditor,eOpts){
-        var me=this;
+        var me=this,
+            editorBody=htmlEditor.getEditorBody();
+        
         if(me.isVisible()){
             me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(htmlEditor.getValue()));
         }
+
+        if(!Editor.controller.SearchReplace){
+            return;
+        }
+
+        var searchReplace=Editor.app.getController('SearchReplace');
+
+        //listen to the editorTextReplaced evend from search and replace
+        //so the character count is triggered when text is replaced with search and replace
+        searchReplace.on({
+            editorTextReplaced:function(newInnerHtml){
+                me.onHtmlEditorChange(null,newInnerHtml);
+            }
+        });
     },
 
     /**

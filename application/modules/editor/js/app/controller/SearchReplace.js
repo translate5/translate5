@@ -54,7 +54,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 destroy:'onSearchReplaceWindowDestroy'
             },
             '#searchreplacetabpanel #searchButton':{
-                click:'onSearchButtonClick'
+                click:'triggerSearch'
             },
             '#searchreplacetabpanel #replaceButton':{
                 click:'onReplaceButtonClick'
@@ -69,7 +69,11 @@ Ext.define('Editor.controller.SearchReplace', {
                 change:'onSearchTopChange'
             },
             '#searchCombo':{
-                change:'onSearchComboChange'
+                change:'onSearchComboChange',
+                keyup:'triggerSearchOnEnter'
+            },
+            '#searchInCombo':{
+                keyup:'triggerSearchOnEnter'
             },
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
@@ -272,9 +276,10 @@ Ext.define('Editor.controller.SearchReplace', {
      * Reset the active segment match index and match count
      */
     onSegmentGridEdit:function(){
-        this.activeSegment.matchIndex=0;
-        this.activeSegment.matchCount=0;
-        this.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
+        var me=this;
+        me.activeSegment.matchIndex=0;
+        me.activeSegment.matchCount=0;
+        me.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
     },
     
     /***
@@ -305,7 +310,7 @@ Ext.define('Editor.controller.SearchReplace', {
     onSearchComboChange:function(){
         this.searchRequired=true;
     },
-    
+
     /***
      * Add keymap for search and replace
      */
@@ -396,16 +401,28 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     /***
-     * Handler for search button
+     * Handler for search
      */
-    onSearchButtonClick:function(button){
+    triggerSearch:function(field,ev,eOpts){
         var me=this;
         
+        //set the current field from where the search is triggered
+        me.searchFieldTrigger=field;
+
         if(me.isSearchRequired()){
             me.search();
             return;
         }
         me.handleRowSelection();
+    },
+
+    /**
+     * Search handler for field on enter pressed
+     */
+    triggerSearchOnEnter:function(field,ev,eOpts){
+        if(ev.getKey() == ev.ENTER){
+            this.triggerSearch(field,ev,eOpts);
+        }
     },
     
     /***
@@ -413,6 +430,7 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     onReplaceButtonClick:function(){
         var me=this,
+            iframeDocument = me.getSegmentIframeDocument(),
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             replaceCombo=activeTab.down('#replaceCombo'),
@@ -483,6 +501,9 @@ Ext.define('Editor.controller.SearchReplace', {
         //disable the flag
         me.utilRangeClass.isSearchReplaceRange=false;
 
+        //fire event when the replace is done
+        me.fireEvent('editorTextReplaced',iframeDocument.body.innerHTML);
+
         if(switchSegment()){
             return;
         }
@@ -526,7 +547,7 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     /***
-     * Delay the text selection in the iframe (the iframe is not initialized)
+     * When the editor is shown, select the matches if exist
      */
     onRowEditorShow:function(){
         var me=this;
@@ -664,7 +685,7 @@ Ext.define('Editor.controller.SearchReplace', {
         });
         return dataArray;
     },
-    
+
     /***
      * Search the givven imput string
      */
@@ -857,6 +878,8 @@ Ext.define('Editor.controller.SearchReplace', {
         
         me.replaceRanges=[];
             
+        rangy.init();
+
         if (rangy.supported && classApplierModule && classApplierModule.supported) {
             
             searchResultApplier = rangy.createClassApplier("searchResult",{
@@ -940,6 +963,8 @@ Ext.define('Editor.controller.SearchReplace', {
             
             me.utilRangeClass.prepareDelNodeForSearch(false);
             
+            //focus the search trigger field
+            me.searchFieldTrigger && me.searchFieldTrigger.focus();
         }
     },
     
@@ -1043,6 +1068,9 @@ Ext.define('Editor.controller.SearchReplace', {
                     node.classList.remove(me.utilRangeClass.self.CSS_CLASSNAME_HIDE_ELEMENT);
                 }
             }
+
+            //focus the search trigger field
+            me.searchFieldTrigger && me.searchFieldTrigger.focus();
         }
     },
     
@@ -1142,7 +1170,11 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             grid = plug.getSegmentGrid(),
             selModel=grid.getSelectionModel(),
-            ed=grid.editingPlugin;
+            ed=grid.editingPlugin,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            replaceCombo=activeTab.down('#searchInCombo'),
+            selectedColumnDataIndex=replaceCombo.getSelection().get('id');
 
         callback = function() {
             grid.selectOrFocus(goToIndex);
@@ -1153,11 +1185,7 @@ Ext.define('Editor.controller.SearchReplace', {
             }
             
             if(me.isContentEditableField()){
-                var tabPanel=me.getTabPanel(),
-                    activeTab=tabPanel.getActiveTab(),
-                    replaceCombo=activeTab.down('#searchInCombo'),
-                    dataIndex=replaceCombo.getSelection().get('id'),
-                    theColum=Ext.ComponentQuery.query('#segmentgrid gridcolumn[dataIndex="'+dataIndex+'"]'),
+                var theColum=grid.query('gridcolumn[dataIndex="'+selectedColumnDataIndex+'"]'),
                     editableColumn=null;
                 
                 if(theColum.length>0){
@@ -1166,7 +1194,18 @@ Ext.define('Editor.controller.SearchReplace', {
                 
                 ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_SCROLLUNDER);
             }else{
-                var gridCell=grid.getView().getCell(sel[0], 3);
+                var visibleColumns=grid.query('gridcolumn:not([hidden])'),
+                    cellIndex=0;
+
+                //find the index of the searched column
+                for(var i=0;i<visibleColumns.length;i++){
+                    if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
+                        cellIndex=i;
+                        break;
+                    }
+                }
+                //get searched cell in the selected row
+                var gridCell=grid.getView().getCell(sel[0], cellIndex);
                 me.findMatchesGrid(gridCell);
             }
         };
