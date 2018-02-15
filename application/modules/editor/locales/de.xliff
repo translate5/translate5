@@ -1172,7 +1172,6 @@ Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRo
 </source><target>Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />
 <br />
 </target></trans-unit>
-
 <trans-unit id='QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q='><source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source><target>Benutzer wurden erfolgreich per E-Mail benachrichtigt</target></trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='><source>Eigenschaften</source><target>Eigenschaften</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0'><source>Die Aufgabe wurde erfolgreich aktualisiert</source><target>Die Aufgabe wurde erfolgreich aktualisiert</target></trans-unit>
@@ -1215,6 +1214,36 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <br />
 {footer}</target></trans-unit>
 <trans-unit id='w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy'><source>Übergeordneter Benutzer</source><target>Übergeordneter Benutzer</target></trans-unit>
+<trans-unit id='ezB9IChNaW5kZXN0LiB7MX0p'><source>{0} (Mindest. {1})</source><target>{0} (Mindest. {1})</target></trans-unit>
+<trans-unit id='ezB9IHZvbiB7MX0='><source>{0} von {1}</source><target>{0} von {1}</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSBrbG9uZW4='><source>Aufgabe klonen</source><target>Aufgabe klonen</target></trans-unit>
+<trans-unit id='RGllIFN1Y2hlIHdpcmQgbnVyIGF1ZiBkZW4gZ2VmaWx0ZXJ0ZW4gU2VnbWVudGVuIGR1cmNoZ2Vmw7xocnQ='><source>Die Suche wird nur auf den gefilterten Segmenten durchgeführt</source><target>Die Suche wird nur auf den gefilterten Segmenten durchgeführt</target></trans-unit>
+<trans-unit id='RXJzZXR6ZW4='><source>Ersetzen</source><target>Ersetzen</target></trans-unit>
+<trans-unit id='S2VpbmUgRXJnZWJuaXNzZSBmw7xyIGRpZSBha3R1ZWxsZSBTdWNoZSE='><source>Keine Ergebnisse für die aktuelle Suche!</source><target>Keine Ergebnisse für die aktuelle Suche!</target></trans-unit>
+<trans-unit id='QWxsZSBFcmdlYm5pc3NlIGVyc2V0emVu'><source>Alle Ergebnisse ersetzen</source><target>Alle Ergebnisse ersetzen</target></trans-unit>
+<trans-unit id='RXJnZWJuaXNzZSBlcnNldHplbg=='><source>Ergebnisse ersetzen</source><target>Ergebnisse ersetzen</target></trans-unit>
+<trans-unit id='w7xiZXJlaW5zdGltbXVuZ2VuIGdlZnVuZGVuLiBXb2xsZW4gU2llIHdpcmtsaWNoIGFsbGUgZXJzZXR6ZW4/IEFsbGUgZ2VmdW5kZW5lbiBTZWdtZW50ZSB3ZXJkZW4gaW5rbHVzaXZlIEF1dG8tU3RhdHVzIHVuZCBsZXR6dGVtIEVkaXRvciBnZcOkbmRlcnQ='><source>übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert</source><target>übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert</target></trans-unit>
+<trans-unit id='RGVyIFN1Y2hzdHJpbmcgaXN0IHp1IGdyb8Of'><source>Der Suchstring ist zu groß</source><target>Der Suchstring ist zu groß</target></trans-unit>
+<trans-unit id='RGFzIFNlZ21lbnQgaXN0IGluIElocmVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgbmljaHQgZW50aGFsdGVuLg=='><source>Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.</source><target>Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.</target></trans-unit>
+<trans-unit id='U3VjaGVuIHVuZCBlcnNldHplbg=='><source>Suchen und ersetzen</source><target>Suchen und ersetzen</target></trans-unit>
+<trans-unit id='SW5mbyB6dW0gU3VjaGVuIHVuZCBFcnNldHplbg=='><source>Info zum Suchen und Ersetzen</source><target>Info zum Suchen und Ersetzen</target></trans-unit>
+<trans-unit id='U3VjaGVuIG5hY2g='><source>Suchen nach</source><target>Suchen nach</target></trans-unit>
+<trans-unit id='U3VjaGVuIGlu'><source>Suchen in</source><target>Suchen in</target></trans-unit>
+<trans-unit id='R3Jvw58vS2xlaW5zY2hyZWlidW5nIGJlYWNodGVu'><source>Groß/Kleinschreibung beachten</source><target>Groß/Kleinschreibung beachten</target></trans-unit>
+<trans-unit id='TmFjaCBvYmVuIHN1Y2hlbg=='><source>Nach oben suchen</source><target>Nach oben suchen</target></trans-unit>
+<trans-unit id='QmVpIGRlciBTdWNoZSB2ZXJ3ZW5kZW4='><source>Bei der Suche verwenden</source><target>Bei der Suche verwenden</target></trans-unit>
+<trans-unit id='Tm9ybWFsIChTdGFuZGFyZCk='><source>Normal (Standard)</source><target>Normal (Standard)</target></trans-unit>
+<trans-unit id='V2lsZGNhcmRzICgqIHVuZCA/KQ=='><source>Wildcards (* und ?)</source><target>Wildcards (* und ?)</target></trans-unit>
+<trans-unit id='UmVndWzDpHJlciBBdXNkcnVjaw=='><source>Regulärer Ausdruck</source><target>Regulärer Ausdruck</target></trans-unit>
+<trans-unit id='U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gc3BlaWNoZXJu'><source>Segment beim Schließen speichern</source><target>Segment beim Schließen speichern</target></trans-unit>
+<trans-unit id='VW5nw7xsdGlnZXIgUmVndWzDpHJlciBBdXNkcnVjaw=='><source>Ungültiger Regulärer Ausdruck</source><target>Ungültiger Regulärer Ausdruck</target></trans-unit>
+<trans-unit id='RGllc2VyIHJlZ3Vsw6RyZSBBdXNkcnVjayB3aXJkIG5pY2h0IHVudGVyc3TDvHR6dA=='><source>Dieser reguläre Ausdruck wird nicht unterstützt</source><target>Dieser reguläre Ausdruck wird nicht unterstützt</target></trans-unit>
+<trans-unit id='U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg=='><source>Segmente mit Suchtreffer:</source><target>Segmente mit Suchtreffer:</target></trans-unit>
+<trans-unit id='U3VjaGVu'><source>Suchen</source><target>Suchen</target></trans-unit>
+<trans-unit id='QWxsZXMgZXJzZXR6ZW4='><source>Alles ersetzen</source><target>Alles ersetzen</target></trans-unit>
+<trans-unit id='QmVudXR6ZXJzcHJhY2hl'><source>Benutzersprache</source><target>Benutzersprache</target></trans-unit>
+<trans-unit id='ezB9IChNaW4uIHsxfSk='><source>{0} (Min. {1})</source><target>{0} (Min. {1})</target></trans-unit>
+<trans-unit id='TWVocmZhY2ggcmVmZXJlbnppZXJ0ZXMgU2VnbWVudDogSW0gTGF5b3V0IG1laHJmYWNoIHZvcmhhbmRlbiwgaW4gZGVyIExpc3RlIGRlciBTZWdtZW50ZSBudXIgZWlubWFsLg=='><source>Mehrfach referenziertes Segment: Im Layout mehrfach vorhanden, in der Liste der Segmente nur einmal.</source><target>Mehrfach referenziertes Segment: Im Layout mehrfach vorhanden, in der Liste der Segmente nur einmal.</target></trans-unit>
   </body>
  </file>
 </xliff>
