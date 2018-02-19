@@ -591,7 +591,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
-              foundIds.push(img.id);
+              if(img.parentNode.nodeName.toLowerCase()!=="del") {
+                  foundIds.push(img.id);
+              }
           }
       });
       Ext.Object.each(this.markupImages, function(key, item){
