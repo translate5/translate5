@@ -239,10 +239,11 @@ Ext.define('Editor.controller.SearchReplace', {
     handleAfterPush: function(editor) {
         var me=this;
         me.initEditorContent(editor);
-        if(!me.getSearchReplaceWindow()){
+        //if the search replace window exist, try to find matches
+        if(me.getSearchReplaceWindow()){
+            me.findMatchesDelay();
             return;
         }
-        me.findMatchesDelay();
     },
 
     /**
