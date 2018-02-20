@@ -66,9 +66,6 @@ Ext.define('Editor.controller.SearchReplace', {
             '#searchreplacetabpanel #replaceAllButton':{
                 click:'onReplaceAllButtonClick'
             },
-            '#roweditor':{
-                show:'onRowEditorShow'
-            },
             '#searchTopChekbox':{
                 change:'onSearchTopChange'
             },
@@ -242,6 +239,10 @@ Ext.define('Editor.controller.SearchReplace', {
     handleAfterPush: function(editor) {
         var me=this;
         me.initEditorContent(editor);
+        if(!me.getSearchReplaceWindow()){
+            return;
+        }
+        me.findMatchesDelay();
     },
 
     /**
@@ -269,8 +270,8 @@ Ext.define('Editor.controller.SearchReplace', {
             return me.editor.editorBody;
         }
         //reinit the editor body
-        me.editor.editorBody=me.editor.getEditorBody();
-        return me.editor.editorBody;
+        me.editorBody=me.editor.getEditorBody();
+        return me.editorBody;
     },
 
     /***
@@ -614,17 +615,7 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         return false
     },
-    
-    /***
-     * When the editor is shown, select the matches if exist
-     */
-    onRowEditorShow:function(){
-        var me=this;
-        if(!me.getSearchReplaceWindow()){
-            return;
-        }
-        me.selectMatches();
-    },
+
     
     /***
      * Show the search replace window based on if the hotkey is used
@@ -911,7 +902,7 @@ Ext.define('Editor.controller.SearchReplace', {
         //clean the mark tags from the editor
         me.cleanMarkTags();
         
-        me.selectMatches();
+        me.findMatchesDelay();
         me.activeSegment.matchIndex++;
     },
 
@@ -919,7 +910,7 @@ Ext.define('Editor.controller.SearchReplace', {
     /***
      * Triggers the findMatches function with delay.
      */
-    selectMatches:function(){
+    findMatchesDelay:function(){
         var me=this;
         //delay so the roweditor is loaded
         var task = new Ext.util.DelayedTask(function(){
@@ -928,6 +919,7 @@ Ext.define('Editor.controller.SearchReplace', {
             }
             
         });
+
         task.delay(300);
     },
     
@@ -1281,7 +1273,11 @@ Ext.define('Editor.controller.SearchReplace', {
                 }
                 
                 ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_SCROLLUNDER);
-                me.findMatches();
+                
+                //clean the mark tags from the editor
+                me.cleanMarkTags();
+                //find matches 
+                me.findMatchesDelay();
             }else{
                 var visibleColumns=grid.query('gridcolumn:not([hidden])'),
                     cellIndex=0;

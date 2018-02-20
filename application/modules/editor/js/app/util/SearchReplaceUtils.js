@@ -63,16 +63,16 @@ Ext.define('Editor.util.SearchReplaceUtils', {
     */
     removeReplaceClass:function(){
         var me = this;
-        if(!me.editorBodyExtDomElement && !me.getEditorBodyExtDomElement()){
+        if(!me.getEditorBodyExtDomElement()){
             return;
         }
-        
+
         var insNodes=me.editorBodyExtDomElement.query(me.NODE_NAME_INS),
             arrLength=insNodes.length;
         
         for (i = 0; i < arrLength; i++){
             node = insNodes[i];
-            node.classList.remove(me.CSS_CLASSNAME_REPLACED_INS);
+            me.removeClass(node,me.CSS_CLASSNAME_REPLACED_INS);
         }
  
     },
@@ -83,9 +83,10 @@ Ext.define('Editor.util.SearchReplaceUtils', {
      */
     prepareDelNodeForSearch:function(addClass){
         var me = this;
-        if(!me.editorBodyExtDomElement && !me.getEditorBodyExtDomElement()){
+        if(!me.getEditorBodyExtDomElement()){
             return;
         }
+        
         var delNodes=me.editorBodyExtDomElement.query(me.NODE_NAME_DEL),
             arrLength = delNodes.length; 
         
@@ -93,9 +94,9 @@ Ext.define('Editor.util.SearchReplaceUtils', {
             node = delNodes[i];
             //node.style.display=displayValue;
             if(addClass){
-                node.classList.add(me.CSS_CLASSNAME_HIDE_ELEMENT);
+                me.addClass(node,me.CSS_CLASSNAME_HIDE_ELEMENT);
             }else{
-                node.classList.remove(me.CSS_CLASSNAME_HIDE_ELEMENT);
+                me.removeClass(node,me.CSS_CLASSNAME_HIDE_ELEMENT);
             }
         }
     },
@@ -107,7 +108,7 @@ Ext.define('Editor.util.SearchReplaceUtils', {
         var me = this,
             nodes;
         nodes = range.getNodes([1,3], function(node) {
-            if(node.parentElement.classList.contains(me.CSS_CLASSNAME_REPLACED_INS)){
+            if(me.hasClass(node.parentNode,me.CSS_CLASSNAME_REPLACED_INS)){
                 return node;
             }
             return false;
@@ -131,15 +132,52 @@ Ext.define('Editor.util.SearchReplaceUtils', {
 
         range.getNodes([1,3], function(node) {
             if(node.nodeName.toLowerCase()===me.NODE_NAME_MARK){
-                node.classList.add(me.CSS_CLASSNAME_ACTIVE_MATCH);
+                me.addClass(node,me.CSS_CLASSNAME_ACTIVE_MATCH);
                 return;
             }
-            if(node.parentElement.nodeName.toLowerCase()===me.NODE_NAME_MARK){
-                node.parentElement.classList.add(me.CSS_CLASSNAME_ACTIVE_MATCH);
+            if(node.parentNode.nodeName.toLowerCase()===me.NODE_NAME_MARK){
+                me.addClass(node.parentNode,me.CSS_CLASSNAME_ACTIVE_MATCH);
             }
         });
 
         delete range;
-    }
+    },
     
+    /**
+	 * Method that checks whether cls is present in element object.
+	 * @param  {Object} ele DOM element which needs to be checked
+	 * @param  {Object} cls Classname is tested
+	 * @return {Boolean} True if cls is present, false otherwise.
+	 */
+	hasClass:function(ele, cls) {
+	    return ele.getAttribute('class').indexOf(cls) > -1;
+	},
+
+	/**
+	 * Method that adds a class to given element.
+	 * @param  {Object} ele DOM element where class needs to be added
+	 * @param  {Object} cls Classname which is to be added
+	 * @return {null} nothing is returned.
+	 */
+	addClass:function(ele, cls) {
+	    if (ele.classList) {
+		    ele.classList.add(cls);
+	    } else if (!hasClass(ele, cls)) {
+		    ele.setAttribute('class', ele.getAttribute('class') + ' ' + cls);
+	    }
+	},
+
+	/**
+	 * Method that does a check to ensure that class is removed from element.
+	 * @param  {Object} ele DOM element where class needs to be removed
+	 * @param  {Object} cls Classname which is to be removed
+	 * @return {null} Null nothing is returned.
+	 */
+	removeClass:function(ele, cls) {
+	    if (ele.classList) {
+		    ele.classList.remove(cls);
+	    } else if (hasClass(ele, cls)) {
+		    ele.setAttribute('class', ele.getAttribute('class').replace(cls, ' '));
+	    }
+	}
 });
