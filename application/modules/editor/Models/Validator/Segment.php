@@ -52,7 +52,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
             //edited = string, ohne längenbegrenzung. Daher kein Validator nötig / möglich 
             $this->addDontValidateField($edit);
             //the 4294967295 is the colum size of mysql longtext
-            $this->addValidator($toSort,'stringLength', array('min' => 0, 'max' => 4294967295));
+            $this->addValidator($toSort,'stringLength', array('min' => 0, 'max' =>PHP_INT_MAX));
         }
     
         $this->addValidator('userGuid', 'guid');
