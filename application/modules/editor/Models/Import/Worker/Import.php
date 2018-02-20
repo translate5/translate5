@@ -31,6 +31,11 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_Worker_Import {
     /**
+     * @var string
+     */
+    const TASK_TEMPLATE = 'task-template.xml';
+    
+    /**
      * @var editor_Models_Task
      */
     protected $task;
@@ -40,16 +45,6 @@ class editor_Models_Import_Worker_Import {
      */
     protected $_localEncoded;
 
-    /**
-     * @var ZfExtended_Controller_Helper_General
-     */
-    protected $gh;
-
-    /**
-     * @var editor_Models_Import_MetaData
-     */
-    protected $metaDataImporter;
-    
     /**
      * shared instance over all parse objects of the segment field manager
      * @var editor_Models_SegmentFieldManager
@@ -80,7 +75,6 @@ class editor_Models_Import_Worker_Import {
 
     
     public function __construct() {
-        $this->gh = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('General');
         $this->_localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
@@ -97,6 +91,7 @@ class editor_Models_Import_Worker_Import {
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->task = $task;
         $this->importConfig = $importConfig;
+        $this->importTaskTemplateXml();
         
         $importConfig->isValid($task->getTaskGuid());
         $this->filelist = ZfExtended_Factory::get('editor_Models_Import_FileList', array($this->importConfig, $this->task));
@@ -130,14 +125,8 @@ class editor_Models_Import_Worker_Import {
         //should errors stop the import, or should they be logged:
         Zend_Registry::set('errorCollect', $this->importConfig->isCheckRun);
         
-        $this->importMetaData();
-        $this->events->trigger("beforeDirectoryParsing", $this,[
-                'importFolder'=>$this->importConfig->importFolder,
-                'task' => $this->task,
-        ]);
         $this->importFiles();
         $this->syncFileOrder();
-        $this->removeMetaDataTmpFiles();
         $this->importRelaisFiles();
         $this->updateSegmentFieldViews();
         $this->calculateEmptyTargets();
@@ -156,51 +145,25 @@ class editor_Models_Import_Worker_Import {
     }
     
     /**
-     * Methode zum Anstoßen verschiedener Meta Daten Imports zum Laufenende Import
-     */
-    protected function importMetaData() {
-        $this->metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($this->importConfig));
-        /* @var $this->metaDataImporter editor_Models_Import_MetaData */
-        $this->metaDataImporter->import($this->task);
-    }
-
-    /**
-     * Löscht temporär während des Imports erzeugte Metadaten
-     */
-    protected function removeMetaDataTmpFiles() {
-        $this->metaDataImporter->cleanup();
-    }
-
-    /**
      * Importiert die Dateien und erzeugt die Taggrafiken
      */
     protected function importFiles(){
-        $filelist = $this->filelist->processProofreadAndReferenceFiles($this->importConfig->getProofReadDir());
-        $this->events->trigger("afterDirectoryParsing", $this,[
-                'task'=>$this->task,
-                'importFolder'=>$this->importConfig->importFolder,
-                'filelist'=>$filelist
-        ]);
-        
-        //FIXME split import worker in two parts, the directory parsing in one worker and the import in other workers.
-        // Then other workers affecting the files can be started in between!
+
+        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        /* @var $treeDb editor_Models_Foldertree */
+        $filelist = $treeDb->getPaths($this->task->getTaskGuid(),'file');
         
         $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
         /* @var $fileFilter editor_Models_File_FilterManager */
         $fileFilter->initImport($this->task, $this->importConfig);
-        
+            
         $mqmProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_MqmParser', array($this->task, $this->segmentFieldManager));
         $repHash = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_RepetitionHash', array($this->task, $this->segmentFieldManager));
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_ProofRead', array($this->task, $this->importConfig));
         /* @var $segProc editor_Models_Import_SegmentProcessor_ProofRead */
         foreach ($filelist as $fileId => $path) {
-            if($this->importConfig->isCheckRun){
-                trigger_error('Check of File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
-            }
+            $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
             $params = $this->getFileparserParams($path, $fileId);
-            $fileFilter->applyImportFilters($params[0], $params[2], $filelist);
-            //filepath could be changed by the file filter, so reset:
-            $params[0] = $filelist[$fileId]; 
             $parser = $this->getFileParser($params[0], $params);
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
@@ -216,6 +179,37 @@ class editor_Models_Import_Worker_Import {
         $mqmProc->handleErrors();
         
         $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
+    }
+    
+    /**
+     * import task-template.xml file
+     * if exist save it to Zend_Registry::get('taskTemplate');
+     */
+    protected function importTaskTemplateXml() {
+        Zend_Registry::set('taskTemplate', array());
+        $templateFilename = $this->importConfig->importFolder.'/'.self::TASK_TEMPLATE;
+        
+        if (file_exists($templateFilename)) {
+            try {
+                $config = new Zend_Config_Xml($templateFilename);
+                Zend_Registry::set('taskTemplate', $config);
+            }
+            catch (Exception $e) {
+                throw new Exception('.. invalid '.self::TASK_TEMPLATE.' detected at '.__CLASS__.' -> '.__FUNCTION__);
+            }
+            //WARNING: this is NOT the implementation of TRANSLATE-471!
+            // This code is just a "schmalspur" solution to enable the idea behind TRANSLATE-471 for our API testing  
+            if(isset($config->runtimeOptions)) {
+                $origConfig = Zend_Registry::get('config');
+                /* @var $origConfig Zend_Config */
+                $newConfig = new Zend_Config([], true);
+                $newConfig->merge($origConfig);
+                $newConfig->runtimeOptions = [];
+                $newConfig->runtimeOptions->merge($config->runtimeOptions);
+                $newConfig->setReadOnly();
+                Zend_Registry::set('config', $newConfig);
+            }
+        }
     }
     
     protected function calculateEmptyTargets() {
@@ -296,7 +290,7 @@ class editor_Models_Import_Worker_Import {
     protected function getFileparserParams($path, $fileId) {
         return array(
             $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$this->_localEncoded->encode($path),
-            $this->gh->basenameLocaleIndependent($path),
+            basename($path),
             $fileId, 
             $this->task,
         );

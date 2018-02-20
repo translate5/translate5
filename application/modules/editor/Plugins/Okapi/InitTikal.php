@@ -27,17 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * FileManager Test Plugin
+ * Use Okapi via Tikal
  */
 class editor_Plugins_Okapi_InitTikal extends ZfExtended_Plugin_Abstract {
     
-    private $okapyFileTypes = array(
-            'html',
-            'odt'
-    );
-    
     public function init() {
-        $this->eventManager->attach('editor_Models_Import_Worker_Import', 'afterDirectoryParsing', array($this, 'handleBeforeImport'));
+        throw new Exception("Not tested this plugin since refactored the file import!");
+        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', array($this, 'handleBeforeImport'));
     }
     
     public function handleBeforeImport(Zend_EventManager_Event $event) {

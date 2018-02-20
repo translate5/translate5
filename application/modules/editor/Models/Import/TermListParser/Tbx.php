@@ -613,10 +613,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $log->logError($msg);
     }
     
-    public function cleanup() {
-        //nothing to do
-    }
-    
     /**
      * Generates a unic id for a termEntry-element.
      * If autoIds is set to false and there is an id in the tbx-file this id is used

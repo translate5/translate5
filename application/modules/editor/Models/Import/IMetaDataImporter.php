@@ -37,11 +37,6 @@ END LICENSE AND COPYRIGHT
  */
 interface editor_Models_Import_IMetaDataImporter {
     /**
-     * calls internal clean up stuff
-     */
-    public function cleanup();
-    
-    /**
      * calls the internal import mechanisim
      * @param editor_Models_Task $task
      * @param editor_Models_Import_MetaData $meta

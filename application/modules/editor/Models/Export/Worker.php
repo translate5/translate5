@@ -44,7 +44,6 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         if(!isset($parameters['diff']) || !is_bool($parameters['diff'])) {
             return false;
         }
-        // $parameters['zipFile'] has not to be checked since set internally in this class
         if(isset($parameters['exportToFolder']) && (!is_dir($parameters['exportToFolder']) || !is_writable($parameters['exportToFolder']))){
             $this->log->logError('Export folder not found or not write able: '.$parameters['exportToFolder']);
             return false;
@@ -53,19 +52,16 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
     }
     
     /**
-     * inits a export to a ZIP file (path to destination export.zip is returned by this method)
+     * inits a export to the default directory
      * @param string $taskGuid
      * @param bool $diff
-     * @return string
+     * @return string the folder which receives the exported data
      */
-    public function initZipExport(editor_Models_Task $task, bool $diff) {
-        
-        $parameter = [
-                'diff' => $diff,
-                'zipFile' => tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_')
-        ];
-        $this->init($task->getTaskGuid(), $parameter);
-        return $parameter['zipFile'];
+    public function initExport(editor_Models_Task $task, bool $diff) {
+        //if no explicit exportToFolder is given, we use the default (taskGuid)
+        $default = $task->getAbsoluteTaskDataPath().DIRECTORY_SEPARATOR.$task->getTaskGuid();
+        is_dir($default) || @mkdir($default); //we create it if it does not exist
+        return $this->initFolderExport($task, $diff, $default);
     }
     
     /**
@@ -73,12 +69,15 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
      * @param string $taskGuid
      * @param bool $diff
      * @param string $exportFolder
-     * @return string
+     * @return string the folder which receives the exported data
      */
     public function initFolderExport(editor_Models_Task $task, bool $diff, string $exportFolder) {
-        $parameter = ['diff' => $diff, 'exportToFolder' => $exportFolder];
+        $parameter = [
+                'diff' => $diff,
+                'exportToFolder' => $exportFolder
+        ];
         $this->init($task->getTaskGuid(), $parameter);
-        return $exportFolder; //just to be compatible with initZipExport
+        return $exportFolder;
     }
     
     /**
@@ -104,12 +103,8 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         $export = ZfExtended_Factory::get($exportClass);
         /* @var $export editor_Models_Export */
         $export->setTaskToExport($task, $parameters['diff']);
-        if(isset($parameters['exportToFolder'])) {
-            $export->exportToFolder($parameters['exportToFolder']);
-        }
-        else {
-            $export->exportToZip($parameters['zipFile']);
-        }
+        $export->export($parameters['exportToFolder'], $this->workerModel->getId());
+        
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array($exportClass));
         $eventManager->trigger('afterExport', $this, array('task' => $task, 'parentWorkerId' => $this->workerModel->getId()));

@@ -131,13 +131,13 @@ class editor_Plugins_Okapi_Tikal_Connector {
             error_log('Okapi Tikal error: could not merge file '.$path.' message was: '.print_r($output, 1));
             return false;
         }
-        return true;
         
         //code needed if trying to merge files extracted nativly with tikal
         if(substr($path, -4) != '.xlf') {
             //file was created with the tikal import filter and filename from the DB does not contain XLF suffix then, so lets rename it
             rename($path, $path.'.xlf');
         }
+        return true;
     }
     
     /**

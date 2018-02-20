@@ -27,11 +27,13 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * File Filter to for invoking Okapi Tikal to pre/post process files on import/export
+ * File Filter to for invoking Okapi post process files on export
  */
-class editor_Plugins_Okapi_Tikal_Filter implements editor_Models_File_IFilter {
+class editor_Plugins_Okapi_FileFilter implements editor_Models_File_IFilter {
     protected $manager;
     protected $importConfig;
+    protected $parentWorkerId;
+    
     /**
      * {@inheritDoc}
      * @see editor_Models_File_IFilter::initFilter()
@@ -39,29 +41,16 @@ class editor_Plugins_Okapi_Tikal_Filter implements editor_Models_File_IFilter {
     public function initFilter(editor_Models_File_FilterManager $manager, $parentWorkerId, editor_Models_Import_Configuration $importConfig = null) {
         $this->manager = $manager;
         $this->importConfig = $importConfig;
+        $this->parentWorkerId = $parentWorkerId;
     }
     
     /**
-     * The problem of the tikal import filter is, that it runs after all files are already registered in LEK_files table, 
-     * so changing names etc are not reflected in the LEK_files table then. 
-     * This is problematic by design, fixing this would touch everything file related: The clumsy tree storage, missing path in the files table etc. 
-     * FIXME: 
-     *  remove filetree storage, just save files and their paths in the LEK_files table, then they could be easily renamed
-     *  The trees are not read so often, so creating a tree from a given path list is also no problem.
-     *  
-     *  
      * {@inheritDoc}
      * @see editor_Models_File_IFilter::applyImportFilter()
      */
     public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters){
-        $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$task, $this->importConfig]);
-        /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
-        if($tikal->extract($filePath)) {
-            $m = $this->manager;
-            $this->manager->addFilter($m::TYPE_EXPORT, $task, $fileId, get_class($this));
-            return $filePath.'.xlf';
-        }
-        return $filePath;
+        //renames the original file to original.xlf so that our fileparsers can import them 
+        return $filePath.editor_Plugins_Okapi_Connector::OUTPUT_FILE_EXTENSION;
     }
     
     /**
@@ -69,8 +58,20 @@ class editor_Plugins_Okapi_Tikal_Filter implements editor_Models_File_IFilter {
      * @see editor_Models_File_IFilter::applyExportFilter()
      */
     public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters){
-        $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$task]);
-        /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
-        $tikal->merge($filePath);
+        $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
+        /* @var $worker editor_Plugins_Okapi_Worker */
+        
+        $params=[
+                'type' => editor_Plugins_Okapi_Worker::TYPE_EXPORT,
+                'fileId'=>$fileId,
+                'file'=>$filePath
+        ];
+        
+        // init worker and queue it
+        if (!$worker->init($task->getTaskGuid(), $params)) {
+            $this->log->logError('Okapi-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        $worker->queue($this->parentWorkerId);
     }
 }

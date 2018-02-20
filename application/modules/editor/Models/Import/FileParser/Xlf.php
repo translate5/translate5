@@ -633,7 +633,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
-            $this->importComments((integer) $segmentId);
+            //only with a segmentId (in case of ProofProcessor) we can save comments
+            if($segmentId !== false && is_numeric($segmentId)) {
+                $this->importComments((integer) $segmentId);
+            }
             $placeHolders[$mid] = $leadingTags.$this->getFieldPlaceholder($segmentId, $targetName).$trailingTags;
         }
         

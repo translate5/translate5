@@ -27,10 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Contains the Import Worker (the scheduling parts)
- * The import process itself is encapsulated in editor_Models_Import_Worker_Import
+ * Encapsulates the part of the import which looks for the files to be imported
  */
-class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_Abstract {
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events;
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -38,10 +43,6 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
     protected function validateParameters($parameters = array()) {
         if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration) {
             throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
-        }
-        
-        if(empty($parameters['dataProvider']) || !$parameters['dataProvider'] instanceof editor_Models_Import_DataProvider_Abstract) {
-            throw new ZfExtended_Exception('missing or wrong parameter dataProvider, must be if instance editor_Models_Import_DataProvider_Abstract');
         }
         return true;
     }
@@ -63,22 +64,57 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
         $parameters = $this->workerModel->getParameters();
         $importConfig = $parameters['config'];
         /* @var $importConfig editor_Models_Import_Configuration */
-        $importConfig->workerId = $this->workerModel->getId();
+        
+        //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         
         try {
-            $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
-            /* @var $import editor_Models_Import_Worker_Import */
-            $import->import($task, $importConfig);
+            $metaDataImporter = ZfExtended_Factory::get('editor_Models_Import_MetaData', array($importConfig));
+            /* @var $metaDataImporter editor_Models_Import_MetaData */
+            $metaDataImporter->import($this->task);
             
-            // externalImport just triggers the event aferImport!
-            //@see editor_Models_Import::triggerAfterImport
-            $externalImport = ZfExtended_Factory::get('editor_Models_Import');
-            /* @var $externalImport editor_Models_Import */
-            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $importConfig);
+            $this->triggerBefore($importConfig);
+            
+            $filelistInstance = ZfExtended_Factory::get('editor_Models_Import_FileList', [
+                $importConfig,
+                $this->task
+            ]);
+            /* @var $filelistInstance editor_Models_Import_FileList */
+            $filelist = $filelistInstance->processProofreadFiles();
+            $filelistInstance->processReferenceFiles();
+            
+            $this->triggerAfter($importConfig, $filelist);
+            $this->task->save(); //needed to save modifications done via the meta data importers
             return true;
         } catch (Exception $e) {
             $task->setErroneous();
             throw $e; 
         }
+    }
+    
+    /**
+     * trigger beforeDirectoryParsing event
+     * @param editor_Models_Import_Configuration $importConfig
+     */
+    protected function triggerBefore(editor_Models_Import_Configuration $importConfig) {
+        $this->events->trigger("beforeDirectoryParsing", $this, [
+                'importFolder' => $importConfig->importFolder,
+                'task' => $this->task,
+                'workerParentId' => $this->workerModel->getParentId(),
+        ]);
+    }
+    
+    /**
+     * trigger beforeDirectoryParsing event
+     * @param editor_Models_Import_Configuration $importConfig
+     * @param array $filelist
+     */
+    protected function triggerAfter(editor_Models_Import_Configuration $importConfig, array $filelist) {
+        $this->events->trigger("afterDirectoryParsing", $this, [
+                'task' => $this->task,
+                'importFolder' => $importConfig->importFolder,
+                'filelist' => $filelist,
+                'workerParentId' => $this->workerModel->getParentId(),
+        ]);
     }
 }

@@ -27,10 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Contains the Import Worker (the scheduling parts)
- * The import process itself is encapsulated in editor_Models_Import_Worker_Import
+ * Encapsulates the part of the import which looks for the files to be imported
  */
-class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Models_Import_Worker_ReferenceFileTree extends editor_Models_Import_Worker_Abstract {
+    
+    /**
+     * @var ZfExtended_EventManager
+     */
+    protected $events;
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -38,10 +43,6 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
     protected function validateParameters($parameters = array()) {
         if(empty($parameters['config']) || !$parameters['config'] instanceof editor_Models_Import_Configuration) {
             throw new ZfExtended_Exception('missing or wrong parameter config, must be if instance editor_Models_Import_Configuration');
-        }
-        
-        if(empty($parameters['dataProvider']) || !$parameters['dataProvider'] instanceof editor_Models_Import_DataProvider_Abstract) {
-            throw new ZfExtended_Exception('missing or wrong parameter dataProvider, must be if instance editor_Models_Import_DataProvider_Abstract');
         }
         return true;
     }
@@ -63,18 +64,13 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
         $parameters = $this->workerModel->getParameters();
         $importConfig = $parameters['config'];
         /* @var $importConfig editor_Models_Import_Configuration */
-        $importConfig->workerId = $this->workerModel->getId();
         
         try {
-            $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
-            /* @var $import editor_Models_Import_Worker_Import */
-            $import->import($task, $importConfig);
-            
-            // externalImport just triggers the event aferImport!
-            //@see editor_Models_Import::triggerAfterImport
-            $externalImport = ZfExtended_Factory::get('editor_Models_Import');
-            /* @var $externalImport editor_Models_Import */
-            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $importConfig);
+            $filelistInstance = ZfExtended_Factory::get('editor_Models_Import_FileList', [
+                $importConfig,
+                $this->task
+            ]);
+            $filelistInstance->processReferenceFiles();
             return true;
         } catch (Exception $e) {
             $task->setErroneous();

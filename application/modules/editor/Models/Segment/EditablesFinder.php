@@ -112,7 +112,7 @@ class editor_Models_Segment_EditablesFinder {
         $this->sortParameter = $this->segment->getFilter()->getSort();
         $this->fieldsToSelect = array();
         foreach($this->sortParameter as $id => $sort) {
-            $this->fieldsToSelect[] = $sort->property;
+            $this->fieldsToSelect[] = $this->getSortProperty($sort);
             if($sort->property === 'id'){
                 unset($this->sortParameter[$id]); 
             }

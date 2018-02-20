@@ -29,16 +29,15 @@ END LICENSE AND COPYRIGHT
 
 /**
   README:
-    changes the data structure of the internal tags of translate5
-    TRANSLATE-818: internal tag replace id usage with data-originalid and data-filename
-    
-    Single task processing, fill the $taskGuid array below with the desired taskGuids!
+    - all toSort fields of each segment of each task will be modified
+    - the script is designed that it can be called multiple times, until all tasks are converted
+    - a single task processing is also possible, fill the $tasks array below (line 66) with the desired taskGuids!
  */
 set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
-$this->doNotSavePhpForDebugging = false;
-
+//$this->doNotSavePhpForDebugging = false;
+define('SCRIPT_IDENTIFIER', '115-editor-mysql-TRANSLATE-32.php'); //should be not __FILE__ in the case of wanted restarts / renamings etc
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
@@ -56,9 +55,25 @@ $dbname = $conf['dbname'];
 $res = $db->query('show tables from `'.$dbname.'` like "%LEK_segment_view_%";');
 $views = $res->fetchAll(Zend_Db::FETCH_COLUMN);
 
-$res = $db->query('select taskGuid from LEK_task;');
+$sql = 'select taskGuid from LEK_task where taskGuid not in (select taskGuid from LEK_task_migration where filename = ?)';
+$res = $db->query($sql, SCRIPT_IDENTIFIER);
+
 $tasks = $res->fetchAll(Zend_Db::FETCH_COLUMN);
+
+/*
+ * The tasks array can also be filled manually): 
+ */
 //$tasks = ['{a10a2af3-c69f-490e-885a-770225090766}'];
+
+/*
+ * If tasks are chosen manually, set doNotSavePhpForDebugging = false so that the script can be called multiple times! 
+ */
+//$this->doNotSavePhpForDebugging = false
+
+$taskCount = count($tasks);
+$tasksDone = 1;
+error_log('Tasks to be converted: '.$taskCount."\n");
+
 $existingViews = [];
 foreach($tasks as $task) {
     $view = 'LEK_segment_view_'.md5($task);
@@ -79,7 +94,7 @@ foreach ($tasks as $task) {
               WHERE taskGuid = \''.$task.'\'');
 
     $count = $res->rowCount();
-    error_log('Task '.$task.': '.$count.' datasets to be changed by '.basename(__FILE__));
+    error_log('  Task '.$task.': '.$count.' datasets to be changed by '.basename(__FILE__));
 
     //prepare update statement
     $stmt = $db->prepare('UPDATE LEK_segment_data set originalToSort = :originalToSort, editedToSort = :editedToSort where id = :id');
@@ -126,11 +141,13 @@ foreach ($tasks as $task) {
         $percent = 10 * floor(++$done / $count * 10);
         if($percent % 10 == 0 && empty($percentShown[$percent])) {
             $percentShown[$percent] = true;
-            error_log('Task '.$task.': '.$percent.'% done ('.$done.' datasets)'); 
+            error_log('  Task '.$task.': '.$percent.'% done ('.$done.' datasets)'); 
         }
     }
 
-    error_log('Task '.$task.': '.$count." toSort fields updated with no tags in segment data.\n");
-
+    error_log('  Task '.$task.': '.$count." toSort fields updated with no tags in segment data.\n");
+    error_log('Task '.($tasksDone++).' of '.$taskCount." done.\n");
+    $stmt = $db->prepare('UPDATE LEK_segment_data set originalToSort = :originalToSort, editedToSort = :editedToSort where id = :id');
     usleep(10);
+    $res = $db->query('INSERT INTO LEK_task_migration (`taskGuid`, `filename`) VALUES (?,?)', [$task, SCRIPT_IDENTIFIER]);
 }

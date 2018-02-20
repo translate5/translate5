@@ -17,14 +17,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>should be <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preserved.",
         "sourceMd5": "d7fba0c21ec1352e346b58c213383b79",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace -  should be  preserved.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
         "targetMd5": "c79a0ae58235311dbca232b6c9cb3cf9",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
+        "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false,
         "isFirstofFile": true
     },
     {
@@ -45,14 +45,14 @@
         "workflowStep": null,
         "source": "Multi <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Space",
         "sourceMd5": "f5a981f9a07184d7de86fcfe6f75d209",
-        "sourceToSort": "Multi &lt;1\/&gt;&lt;space\/&gt;",
+        "sourceToSort": "Multi Space",
         "target": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
         "targetMd5": "3b92d45badc66bb66c5e054ece124cc3",
-        "targetToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
+        "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
-        "targetEditToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Multiz Spacez",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "50",
@@ -72,14 +72,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>should be <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preserved.",
         "sourceMd5": "d7fba0c21ec1352e346b58c213383b79",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace -  should be  preserved.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
         "targetMd5": "c79a0ae58235311dbca232b6c9cb3cf9",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "51",
@@ -99,14 +99,14 @@
         "workflowStep": null,
         "source": "Multi <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Space",
         "sourceMd5": "f5a981f9a07184d7de86fcfe6f75d209",
-        "sourceToSort": "Multi &lt;1\/&gt;&lt;space\/&gt;",
+        "sourceToSort": "Multi Space",
         "target": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
         "targetMd5": "3b92d45badc66bb66c5e054ece124cc3",
-        "targetToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
+        "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
-        "targetEditToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Multiz Spacez",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "52",
@@ -126,14 +126,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - should be like config.",
         "sourceMd5": "ff95ebed6e8de94ea87b00ca98aa1bd5",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace - should be like config.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetMd5": "3fba74c4b66e0edcbb421872db608758",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "53",
@@ -159,8 +159,8 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "54",
@@ -180,14 +180,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - should be like config.",
         "sourceMd5": "ff95ebed6e8de94ea87b00ca98aa1bd5",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace - should be like config.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetMd5": "3fba74c4b66e0edcbb421872db608758",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "55",
@@ -213,8 +213,8 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "56",
@@ -234,14 +234,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>should be <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preserved.",
         "sourceMd5": "d7fba0c21ec1352e346b58c213383b79",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace -  should be  preserved.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
         "targetMd5": "c79a0ae58235311dbca232b6c9cb3cf9",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "57",
@@ -261,14 +261,14 @@
         "workflowStep": null,
         "source": "Multi <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Space",
         "sourceMd5": "f5a981f9a07184d7de86fcfe6f75d209",
-        "sourceToSort": "Multi &lt;1\/&gt;&lt;space\/&gt;",
+        "sourceToSort": "Multi Space",
         "target": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
         "targetMd5": "3b92d45badc66bb66c5e054ece124cc3",
-        "targetToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
+        "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
-        "targetEditToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Multiz Spacez",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "58",
@@ -288,14 +288,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - should be like config.",
         "sourceMd5": "ff95ebed6e8de94ea87b00ca98aa1bd5",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace - should be like config.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetMd5": "3fba74c4b66e0edcbb421872db608758",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "59",
@@ -321,8 +321,8 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "60",
@@ -342,14 +342,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - should be like config.",
         "sourceMd5": "ff95ebed6e8de94ea87b00ca98aa1bd5",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace - should be like config.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetMd5": "3fba74c4b66e0edcbb421872db608758",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "61",
@@ -375,8 +375,8 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "62",
@@ -396,14 +396,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>should be <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preserved.",
         "sourceMd5": "d7fba0c21ec1352e346b58c213383b79",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace -  should be  preserved.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
         "targetMd5": "c79a0ae58235311dbca232b6c9cb3cf9",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div><div class=\"single 73706163652074733d223039222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f\"><span title=\"&lt;softReturn\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-filename=\"ade8d1cbd33e857beb4d78d48543468b\" class=\"full\">&lt;softReturn\/&gt;<\/span><\/div> <div class=\"single 73706163652074733d2232303230323032303230323032303230323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>preservedz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "63",
@@ -423,14 +423,14 @@
         "workflowStep": null,
         "source": "Multi <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Space",
         "sourceMd5": "f5a981f9a07184d7de86fcfe6f75d209",
-        "sourceToSort": "Multi &lt;1\/&gt;&lt;space\/&gt;",
+        "sourceToSort": "Multi Space",
         "target": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
         "targetMd5": "3b92d45badc66bb66c5e054ece124cc3",
-        "targetToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
+        "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d22323032303230222f\"><span title=\"&lt;space\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-filename=\"b31345d64a8594d0e7b79852d022c7f2\" class=\"full\">&lt;space\/&gt;<\/span><\/div>Spacez",
-        "targetEditToSort": "Multiz &lt;1\/&gt;&lt;space\/&gt",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Multiz Spacez",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "64",
@@ -450,14 +450,14 @@
         "workflowStep": null,
         "source": "Test preserve <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74692020202053706163653c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"109cfede452f820826e12fcbd7236082\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multi    Space&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespace - should be like config.",
         "sourceMd5": "ff95ebed6e8de94ea87b00ca98aa1bd5",
-        "sourceToSort": "Test preserve &lt;1\/&gt;&lt;ph",
+        "sourceToSort": "Test preserve Whitespace - should be like config.",
         "target": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetMd5": "3fba74c4b66e0edcbb421872db608758",
-        "targetToSort": "Testz preservez &lt;1\/&gt;&lt;",
+        "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-filename=\"3d6dce78235dfcb078ecb19a8ed907ce\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
-        "targetEditToSort": "Testz preservez &lt;1\/&gt;&lt;",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     },
     {
         "segmentNrInTask": "65",
@@ -483,7 +483,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "isWatched": false,
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}"
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "isWatched": false
     }
 ]
