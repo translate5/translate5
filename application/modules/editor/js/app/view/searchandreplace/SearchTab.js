@@ -71,6 +71,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     maxLength:1024,
                     name:'searchCombo',
                     focusable:true,
+                    enableKeyEvents:true,
                     fieldLabel:me.strings.comboFieldLabel,
                     validator:me.validateSearchField,
                     listeners:{
@@ -85,6 +86,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     valueField:'id',
                     forceSelection:true,
                     allowBlank:false,
+                    enableKeyEvents:true,
                     listeners:{
                         select:'resetSearchParametars'
                     }
@@ -138,6 +140,9 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     xtype:'checkbox',
                     itemId:'saveCurrentOpen',
                     name:'saveCurrentOpen',
+                    bind:{
+                        value:'{!isSearchView}'
+                    },
                     boxLabel:me.strings.saveCurrentOpen
                 }]
         };
@@ -230,15 +235,13 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
             isMatch=false;
 
         while ((m = regex.exec(inputString)) !== null) {
+            // The result can be accessed through the `m`-variable.
+
             // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
             }
-            
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                isMatch=true;
-            });
+            isMatch=true;
         }
         
         return isMatch;

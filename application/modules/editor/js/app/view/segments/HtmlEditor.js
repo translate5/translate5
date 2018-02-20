@@ -187,7 +187,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     	result,
     	body = me.getEditorBody();
     me.checkTags(body);
-    me.setSegmentLengthInRange(body.textContent || body.innerText || "");
+    me.setSegmentLengthInRange(body.innerHTML || "");
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
     return result;
@@ -591,7 +591,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
-              foundIds.push(img.id);
+              if(img.parentNode.nodeName.toLowerCase()!=="del") {
+                  foundIds.push(img.id);
+              }
           }
       });
       Ext.Object.each(this.markupImages, function(key, item){

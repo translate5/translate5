@@ -38,6 +38,10 @@ Ext.define('Editor.controller.SearchReplace', {
         'Editor.view.searchandreplace.SearchReplaceWindow'
     ],
     
+    mixins: [
+        'Editor.util.SearchReplaceUtils'
+    ],
+
     listen:{
         component:{
             '#segmentgrid':{
@@ -54,7 +58,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 destroy:'onSearchReplaceWindowDestroy'
             },
             '#searchreplacetabpanel #searchButton':{
-                click:'onSearchButtonClick'
+                click:'triggerSearch'
             },
             '#searchreplacetabpanel #replaceButton':{
                 click:'onReplaceButtonClick'
@@ -62,17 +66,19 @@ Ext.define('Editor.controller.SearchReplace', {
             '#searchreplacetabpanel #replaceAllButton':{
                 click:'onReplaceAllButtonClick'
             },
-            '#roweditor':{
-                show:'onRowEditorShow'
-            },
             '#searchTopChekbox':{
                 change:'onSearchTopChange'
             },
             '#searchCombo':{
-                change:'onSearchComboChange'
+                change:'onSearchComboChange',
+                keyup:'triggerSearchOnEnter'
+            },
+            '#searchInCombo':{
+                keyup:'triggerSearchOnEnter'
             },
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
+                push: 'handleAfterPush'
             }
         },
         controller:{
@@ -81,7 +87,11 @@ Ext.define('Editor.controller.SearchReplace', {
                 prepareTrackChangesForSaving: 'handleTrackChangesForSaving'
             },
             '#Editor.$application': {
-                editorViewportClosed: 'onEditorViewportClosed'
+                editorViewportClosed: 'onEditorViewportClosed',
+                editorViewportOpened:'onEditorViewportOpened'
+            },
+            '#Editor.plugins.TrackChanges.controller.Editor':{
+                deleteAndReplaceFinished:'onDeleteAndReplaceFinished'
             }
         }
     },
@@ -145,11 +155,6 @@ Ext.define('Editor.controller.SearchReplace', {
     replaceArrayPointer:0,
 
     /***
-     * Trackchanges editor instance class
-     */
-    utilRangeClass:null,
-    
-    /***
      * Serialized ranges for replacement
      */
     replaceRanges:[],
@@ -166,7 +171,30 @@ Ext.define('Editor.controller.SearchReplace', {
     oldSerchedCell:null,
     
     
+    /***
+     * Flag so we know if the track changes are active or not
+     */
     activeTrackChanges:true,
+
+    /***
+     * The segment's Editor (Editor.view.segments.HtmlEditor) 
+     */
+    editor: null,
+
+    /***
+     * Segment's Editor: HTMLDocument
+     */
+    editorDoc: null,
+
+    /***
+     * Segment's Editor: HTMLBodyElement
+     */
+    editorBody: null,
+    
+    /***
+     * Segment's Editor: Ext.dom.Element
+     */
+    editorBodyExtDomElement: null,
     
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
@@ -182,9 +210,6 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     constructor:function(){
-        if(!Editor.plugins.TrackChanges){
-            return;
-        }  
         this.callParent(arguments);;
     },
     
@@ -192,7 +217,6 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this;
         me.callParent(arguments);
         me.resetActiveColumnDataIndex();
-        me.utilRangeClass=Editor.app.getController('Editor.plugins.TrackChanges.controller.Editor')
     },
     
     /**
@@ -205,6 +229,67 @@ Ext.define('Editor.controller.SearchReplace', {
             '.searchreplace-active-match {background-color: rgb(255, 0, 0) !important;}'+
             '.searchreplace-hide-element {display: none !important;}'//this class exist also in t5 main css. It is used also by the segment grid
         );
+
+        me.editor = editor;
+    },
+
+    /**
+     * Handle push-Even
+     */
+    handleAfterPush: function(editor) {
+        var me=this;
+        me.initEditorContent(editor);
+        //if the search replace window exist, try to find matches
+        if(me.getSearchReplaceWindow()){
+            me.findMatchesDelay();
+            return;
+        }
+    },
+
+    /**
+     * Init the editor document, body and ext body objects
+     */
+    initEditorContent: function(editor) {
+        var me = this;
+        if (me.editorBodyExtDomElement == null || me.editor == null) {
+            me.initEditor(editor);
+        }
+        me.editorDoc = me.editor.getDoc();
+        me.editorBody = me.editor.getEditorBody();
+        me.editorBodyExtDomElement = Ext.get(me.editorBody);
+    },
+
+    /***
+     * Use this function to get the editor
+     */
+    getEditorBody:function(){
+        var me=this;
+        if(!me.editor){
+            return false;
+        }
+        if(me.editor.editorBody){
+            return me.editor.editorBody;
+        }
+        //reinit the editor body
+        me.editorBody=me.editor.getEditorBody();
+        return me.editorBody;
+    },
+
+    /***
+     * Use this function to get the editor ext document element
+     */
+    getEditorBodyExtDomElement:function(){
+        var me=this;
+        me.editorBodyExtDomElement=Ext.get(me.getEditorBody());
+        return me.editorBodyExtDomElement;
+    },
+
+    /**
+     * Fire event so the internal flag isSearchReplaceRange in trackchanges class is set
+     * That is used to enable/disable some of the trackchanges functionality needed for the search and replace
+     */
+    setTrackChangesInternalFlag:function(isSearchReplaceRange){
+        this.fireEvent('isSearchReplaceRangeChange',isSearchReplaceRange);
     },
     
     /***
@@ -214,14 +299,20 @@ Ext.define('Editor.controller.SearchReplace', {
         this.destroySearchWindow();
     },
     
+    /**
+     * On editor view port opened handler
+     */
+    onEditorViewportOpened:function(){
+        this.isActiveTrackChanges();
+    },
+
     /***
      * Event handler
      */
     handleTrackChangesForSaving:function(){
         var me=this;
-        //FIXME: those classes are in clean dom, and can be moved
-        me.utilRangeClass.cleanMarkTags();
-        me.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
+        me.cleanMarkTags();
+        me.removeReplaceClass();
     },
     
     /***
@@ -273,10 +364,10 @@ Ext.define('Editor.controller.SearchReplace', {
      * Reset the active segment match index and match count
      */
     onSegmentGridEdit:function(){
-        this.activeSegment.matchIndex=0;
-        this.activeSegment.matchCount=0;
-        //FIXME: clandom, can be moved
-        this.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
+        var me=this;
+        me.activeSegment.matchIndex=0;
+        me.activeSegment.matchCount=0;
+        me.removeReplaceClass();
     },
     
     /***
@@ -307,7 +398,29 @@ Ext.define('Editor.controller.SearchReplace', {
     onSearchComboChange:function(){
         this.searchRequired=true;
     },
-    
+
+    /**
+     * After the delete and replace is finished handler
+     */
+    onDeleteAndReplaceFinished:function(){
+        var me=this,
+            iframeDocument = me.getSegmentIframeDocument();
+
+        //clean the mark tags from the editor
+        me.cleanMarkTags();
+        
+        //run the search once again
+        me.findMatches();
+        
+        //disable the flag
+        me.setTrackChangesInternalFlag(false);
+
+        //fire event when the replace is done
+        me.fireEvent('editorTextReplaced',iframeDocument.body.innerHTML);
+
+        me.jumpToNextSegment();
+    },
+
     /***
      * Add keymap for search and replace
      */
@@ -398,31 +511,41 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     /***
-     * Handler for search button
+     * Handler for search
      */
-    onSearchButtonClick:function(button){
+    triggerSearch:function(field,ev,eOpts){
         var me=this;
         
+        //set the current field from where the search is triggered
+        me.searchFieldTrigger=field;
+
         if(me.isSearchRequired()){
             me.search();
             return;
         }
         me.handleRowSelection();
     },
+
+    /**
+     * Search handler for field on enter pressed
+     */
+    triggerSearchOnEnter:function(field,ev,eOpts){
+        if(ev.getKey() == ev.ENTER){
+            this.triggerSearch(field,ev,eOpts);
+        }
+    },
     
     /***
      * Handler for replace all
      */
-    onReplaceButtonClick:function(){
+    onReplaceButtonClick:function(field){
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             replaceCombo=activeTab.down('#replaceCombo'),
-            saveCurrentOpen=activeTab.down('#saveCurrentOpen').checked,
             replaceText=replaceCombo.getRawValue(),
             editor=Editor.app.getController('Editor'),
             grid = editor.getSegmentGrid(),
-            selModel=grid.getSelectionModel(),
             ed=grid.editingPlugin;
         
         
@@ -430,70 +553,31 @@ Ext.define('Editor.controller.SearchReplace', {
             return;
         }
 
-        //find matches once again, the content can be changed between replaces
-        //FIXME: clandom, can be moved
-        me.utilRangeClass.cleanMarkTags();
-        me.findMatches();
-        
-        //FIXME: What do we do with this flag
-        me.utilRangeClass.isSearchReplaceRange=true;
-        
-        //check if we jupm to the next segment
-        switchSegment=function(){
-            if(me.activeSegment.matchCount === 0 || me.activeSegment.matchIndex > me.activeSegment.matchCount-1){
-                
-                //if there is only one match, and the save current open is active -> save the segment
-                if(saveCurrentOpen && me.activeSegment.currentSegmentIndex===me.activeSegment.nextSegmentIndex){
-                    editor.save();
-                }else{
-                  //FIXME: What do we do with this flag
-                    me.utilRangeClass.isSearchReplaceRange=false;
-                    me.handleRowSelection();
-                }
-                //TODO: make the if nest better
-                return true;
-            }
-            return false;
-        };
-        
-        if(switchSegment()){
-            return;
-        }
-        
-        //remove/mark the hit result string/nodes
-        var range = rangy.createRange();
-        range.moveToBookmark(me.replaceRanges[me.activeSegment.matchIndex]);
-        
-        //check the type of replace, if it is without track changes we should not apply any del ins tags
-        if(!me.activeTrackChanges){
-            me.pureReplace(range,replaceText);
-        }else{
-            //FIXME dependency, it is called in Editor, than the handleDelition in UtilDellition is called
-            me.utilRangeClass.handleReplaceDelete(range);
-            delete range;
-            
-            //apply the replacement
-            var range = rangy.createRange();
-            range.moveToBookmark(me.replaceRanges[me.activeSegment.matchIndex]);
-            //FIXME dependency, it is called in Editor, then uses multiple tc function
-            me.utilRangeClass.insertReplaceNode(range,replaceText);
-            delete range;
-        }
-        
-        //FIXME can be moved
-        //clean the mark tags from the editor
-        me.utilRangeClass.cleanMarkTags();
-        
-        //run the search once again
-        me.findMatches();
-        
-        //FIXME the flag
-        //disable the flag
-        me.utilRangeClass.isSearchReplaceRange=false;
+        //set the feild for focus
+        me.searchFieldTrigger=field;
 
-        if(switchSegment()){
+        //find matches once again, the content can be changed between replaces
+        me.cleanMarkTags();
+
+        me.findMatches();
+        
+        
+        me.setTrackChangesInternalFlag(true);
+        
+        if(me.jumpToNextSegment()){
             return;
         }
+        
+        if(!me.activeTrackChanges){
+            me.pureReplace(me.replaceRanges[me.activeSegment.matchIndex],replaceText);
+            me.onDeleteAndReplaceFinished();
+            return;
+        }
+
+        me.fireEvent('deleteAndReplace',
+            me.replaceRanges[me.activeSegment.matchIndex],
+            replaceText
+        );
     },
     
     onReplaceAllButtonClick:function(){
@@ -532,17 +616,7 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         return false
     },
-    
-    /***
-     * Delay the text selection in the iframe (the iframe is not initialized)
-     */
-    onRowEditorShow:function(){
-        var me=this;
-        if(!me.getSearchReplaceWindow()){
-            return;
-        }
-        me.selectMatches();
-    },
+
     
     /***
      * Show the search replace window based on if the hotkey is used
@@ -672,7 +746,7 @@ Ext.define('Editor.controller.SearchReplace', {
         });
         return dataArray;
     },
-    
+
     /***
      * Search the givven imput string
      */
@@ -732,14 +806,17 @@ Ext.define('Editor.controller.SearchReplace', {
     /***
      * Replace the text only, without ins, dell tags
      */
-    pureReplace:function(rangeForDel,replaceText){
+    pureReplace:function(bookmarkRangeForDel,replaceText){
         var me=this,
             allImagesInNode=[],
             collectedNodesForDel,
             iframeDocument = me.getSegmentIframeDocument(),
+            range = rangy.createRange();
+        
+        range.moveToBookmark(bookmarkRangeForDel);
         
         //collect all images in the range
-        collectedNodesForDel = rangeForDel.getNodes([1,3], function(node) {
+        collectedNodesForDel = range.getNodes([1,3], function(node) {
             if(node.nodeType == 1 && node.nodeName.toLowerCase() == 'img') {
                 allImagesInNode.push(node.cloneNode());
             }
@@ -748,7 +825,7 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //FIXME this uses tc function for remove content, can be moved in my code for example
         //remove the content between the range
-        me.utilRangeClass.rangeDeleteContents(rangeForDel);
+        range.deleteContents();
 
         var tmpImgNode=null;
         
@@ -757,16 +834,16 @@ Ext.define('Editor.controller.SearchReplace', {
         //add the removed images, if there are some
         for(var i=0;i<allImagesInNode.length;i++){
             tmpImgNode=allImagesInNode[i];
-            rangeForDel.insertNode(tmpImgNode);
+            range.insertNode(tmpImgNode);
         }
         
         //add the replace node
         var replaceNode=Ext.DomHelper.createDom({
             tag: 'span',
-            cls: me.utilRangeClass.self.CSS_CLASSNAME_REPLACED_INS
+            cls: me.CSS_CLASSNAME_REPLACED_INS
         });
         replaceNode.innerHTML = replaceText;
-        rangeForDel.insertNode(replaceNode);
+        range.insertNode(replaceNode);
     },
     
     
@@ -826,9 +903,9 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         //FIXME can be moved
         //clean the mark tags from the editor
-        me.utilRangeClass.cleanMarkTags();
+        me.cleanMarkTags();
         
-        me.selectMatches();
+        me.findMatchesDelay();
         me.activeSegment.matchIndex++;
     },
 
@@ -836,7 +913,7 @@ Ext.define('Editor.controller.SearchReplace', {
     /***
      * Triggers the findMatches function with delay.
      */
-    selectMatches:function(){
+    findMatchesDelay:function(){
         var me=this;
         //delay so the roweditor is loaded
         var task = new Ext.util.DelayedTask(function(){
@@ -845,6 +922,7 @@ Ext.define('Editor.controller.SearchReplace', {
             }
             
         });
+
         task.delay(300);
     },
     
@@ -863,20 +941,23 @@ Ext.define('Editor.controller.SearchReplace', {
             matchCase=activeTab.down('#matchCase').checked;
         
         var classApplierModule = rangy.modules.ClassApplier,
-            searchResultApplier=null;
+            searchResultApplier=null,
+            applyFirstMatchCss=false;
         
         me.replaceRanges=[];
             
+        rangy.init();
+
         if (rangy.supported && classApplierModule && classApplierModule.supported) {
             
             searchResultApplier = rangy.createClassApplier("searchResult",{
-                elementTagName:me.utilRangeClass.self.NODE_NAME_MARK,
+                elementTagName:me.NODE_NAME_MARK,
                 onElementCreate:function(element){
-                    
-                    if(me.activeSegment.matchCount === me.activeSegment.matchIndex){
-                        //change the color
-                        element.classList.add("searchreplace-active-match");
-                    }
+                    //if(!applyFirstMatchCss){
+                    //    return;
+                    //}
+                    //change the color
+                    //element.classList.add("searchreplace-active-match");
                 }
             });
             
@@ -885,7 +966,7 @@ Ext.define('Editor.controller.SearchReplace', {
             //The point of this overide is - do not apply mark tags to delete tags.
             //This fix is available only for the current object
             searchResultApplier.isIgnorableWhiteSpaceNode=function(node) {
-                if(node.parentElement && node.parentElement.nodeName.toLowerCase() === me.utilRangeClass.self.NODE_NAME_DEL){
+                if(node.parentElement && node.parentElement.nodeName.toLowerCase() === me.NODE_NAME_DEL){
                     return true;
                 }
                 return this._OVERRIDDENisIgnorableWhiteSpaceNode.call(this,node);
@@ -919,15 +1000,13 @@ Ext.define('Editor.controller.SearchReplace', {
             range.selectNodeContents(iframeDocument.body);
             searchResultApplier.undoToRange(range);
 
-            //FIXME can be moved
-            //add display none to all del nodes, with this thay are ignored as searchable
-            me.utilRangeClass.prepareDelNodeForSearch(true);
             
             if (searchTerm === "") {
-              //FIXME can be moved
-                me.utilRangeClass.prepareDelNodeForSearch(false);
                 return
             }
+
+            //add display none to all del nodes, with this thay are ignored as searchable
+            me.prepareDelNodeForSearch(true);
 
             //build the search term before search
             searchTerm=me.handleSearchType(searchTerm,searchType,matchCase);
@@ -935,13 +1014,20 @@ Ext.define('Editor.controller.SearchReplace', {
             me.activeSegment.matchCount=0;
             // Iterate over matches
             while (range.findText(searchTerm, options)) {
-                //FIXME dependencyes 
-                //if the selection does not contains an del tag, create a selection, and it is not an allready replaced match
-                if(!me.utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,me.utilRangeClass.self.NODE_NAME_DEL) && !me.utilRangeClass.hasReplacedClass(range)){
+                
+                applyFirstMatchCss=false;
+                
+                //is not an allready replaced match
+                if(!me.hasReplacedClass(range)){
+
+                    me.activeSegment.matchCount++;
+                    
+                    //check if the current hit should be marked
+                    //applyFirstMatchCss=me.activeSegment.matchCount==(me.activeSegment.matchIndex+1);
+                    
                     //apply to range, this will select the text
                     searchResultApplier.applyToRange(range);
 
-                    me.activeSegment.matchCount++;
                     
                     //save the range for later replace usage
                     me.replaceRanges.push(range.getBookmark());
@@ -949,9 +1035,15 @@ Ext.define('Editor.controller.SearchReplace', {
                 // Collapse the range to the position immediately after the match
                 range.collapse(false);
             }
-            //FIXME can be moved
-            me.utilRangeClass.prepareDelNodeForSearch(false);
             
+            //set the dell nodes visible again
+            me.prepareDelNodeForSearch(false);
+
+            //set active class to all mark tags in the current active range
+            me.setActiveMatchClass(me.replaceRanges[me.activeSegment.matchIndex]);
+            
+            //focus the search trigger field
+            me.searchFieldTrigger && me.searchFieldTrigger.focus();
         }
     },
     
@@ -975,7 +1067,7 @@ Ext.define('Editor.controller.SearchReplace', {
         if (rangy.supported && classApplierModule && classApplierModule.supported) {
             
             searchResultApplier = rangy.createClassApplier("searchResult",{
-                elementTagName:me.utilRangeClass.self.NODE_NAME_MARK
+                elementTagName:me.NODE_NAME_MARK
             });
             
             searchResultApplier._OVERRIDDENisIgnorableWhiteSpaceNode = searchResultApplier.isIgnorableWhiteSpaceNode;
@@ -983,7 +1075,7 @@ Ext.define('Editor.controller.SearchReplace', {
             //The point of this overide is - do not apply mark tags to delete tags.
             //This fix is available only for the current object
             searchResultApplier.isIgnorableWhiteSpaceNode=function(node) {
-                if(node.parentElement && node.parentElement.nodeName.toLowerCase() === me.utilRangeClass.self.NODE_NAME_DEL){
+                if(node.parentElement && node.parentElement.nodeName.toLowerCase() === me.self.NODE_NAME_DEL){
                     return true;
                 }
                 return this._OVERRIDDENisIgnorableWhiteSpaceNode.call(this,node);
@@ -1026,7 +1118,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 
                 for (i = 0; i < arrLength; i++){
                     node = divNodesToHide[i];
-                    node.classList.add(me.utilRangeClass.self.CSS_CLASSNAME_HIDE_ELEMENT);
+                    node.classList.add(me.CSS_CLASSNAME_HIDE_ELEMENT);
                 }
             }
             
@@ -1039,12 +1131,8 @@ Ext.define('Editor.controller.SearchReplace', {
             
             // Iterate over matches
             while (range.findText(searchTerm, options)) {
-                //FIXME dependencyes
-                //if the selection does not contains an del tag, create a selection, and it is not an allready replaced match
-                if(!me.utilRangeClass.getTrackchangeNodeThatContainsTheRange(range,me.utilRangeClass.self.NODE_NAME_DEL)){
-                    //apply to range, this will select the text
-                    searchResultApplier.applyToRange(range);
-                }
+                //apply to range, this will select the text
+                searchResultApplier.applyToRange(range);
                 // Collapse the range to the position immediately after the match
                 range.collapse(false);
             }
@@ -1053,9 +1141,12 @@ Ext.define('Editor.controller.SearchReplace', {
                 //set the hidden divs back to visible
                 for (i = 0; i < arrLength; i++){
                     node = divNodesToHide[i];
-                    node.classList.remove(me.utilRangeClass.self.CSS_CLASSNAME_HIDE_ELEMENT);
+                    node.classList.remove(me.CSS_CLASSNAME_HIDE_ELEMENT);
                 }
             }
+
+            //focus the search trigger field
+            me.searchFieldTrigger && me.searchFieldTrigger.focus();
         }
     },
     
@@ -1083,6 +1174,9 @@ Ext.define('Editor.controller.SearchReplace', {
             return;
         }
         
+        //check if the track changes are active, and set the internal flag
+        me.isActiveTrackChanges();
+
         //check if all search segment parametars are 0(this is the initial state of the search)
         isSearchStart=function(){
             return me.activeSegment.matchIndex===0 &&
@@ -1127,8 +1221,7 @@ Ext.define('Editor.controller.SearchReplace', {
         
         //go to segment and open it for editing
         callback=function(indexToGo){
-            //FIXME can be moved
-            me.utilRangeClass.removeReplaceClassFromTrachChangesInsNodes();
+            me.removeReplaceClass();
             me.goToSegment(indexToGo,plug,saveCurrentOpen,activeTabViewModel);
             me.activeSegment.currentSegmentIndex=me.activeSegment.nextSegmentIndex;
             //update the segment indexes
@@ -1137,7 +1230,11 @@ Ext.define('Editor.controller.SearchReplace', {
         
         //if no index is found, use the initial one -> 0
         if(goToIndex===null){
-            //goToIndex=parseInt(results[me.activeSegment.nextSegmentIndex].row_number);
+            //if the search top is checked before the search is triggered, it will be in value of -1, which means the last record
+            //in that case call updatesegmentindex so we get the right index
+            if(me.activeSegment.nextSegmentIndex<0 && results.length>0){
+                me.updateSegmentIndex(searchTopChekbox);
+            }
             goToIndex=me.getSegmentRowNumber(results[me.activeSegment.nextSegmentIndex]);
         }
 
@@ -1156,7 +1253,11 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             grid = plug.getSegmentGrid(),
             selModel=grid.getSelectionModel(),
-            ed=grid.editingPlugin;
+            ed=grid.editingPlugin,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            replaceCombo=activeTab.down('#searchInCombo'),
+            selectedColumnDataIndex=replaceCombo.getSelection().get('id');
 
         callback = function() {
             grid.selectOrFocus(goToIndex);
@@ -1167,11 +1268,7 @@ Ext.define('Editor.controller.SearchReplace', {
             }
             
             if(me.isContentEditableField()){
-                var tabPanel=me.getTabPanel(),
-                    activeTab=tabPanel.getActiveTab(),
-                    replaceCombo=activeTab.down('#searchInCombo'),
-                    dataIndex=replaceCombo.getSelection().get('id'),
-                    theColum=Ext.ComponentQuery.query('#segmentgrid gridcolumn[dataIndex="'+dataIndex+'"]'),
+                var theColum=grid.query('gridcolumn[dataIndex="'+selectedColumnDataIndex+'"]'),
                     editableColumn=null;
                 
                 if(theColum.length>0){
@@ -1179,8 +1276,24 @@ Ext.define('Editor.controller.SearchReplace', {
                 }
                 
                 ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_SCROLLUNDER);
+                
+                //clean the mark tags from the editor
+                me.cleanMarkTags();
+                //find matches 
+                me.findMatchesDelay();
             }else{
-                var gridCell=grid.getView().getCell(sel[0], 3);
+                var visibleColumns=grid.query('gridcolumn:not([hidden])'),
+                    cellIndex=0;
+
+                //find the index of the searched column
+                for(var i=0;i<visibleColumns.length;i++){
+                    if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
+                        cellIndex=i;
+                        break;
+                    }
+                }
+                //get searched cell in the selected row
+                var gridCell=grid.getView().getCell(sel[0], cellIndex);
                 me.findMatchesGrid(gridCell);
             }
         };
@@ -1379,6 +1492,47 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         
         return searchTerm;
+    },
+
+    /***
+     * Move to the next segment if needed.
+     * Returns true if the segment is saved or new segment selection is needed
+     * Return false if next segment selection is not needed 
+     */
+    jumpToNextSegment:function(){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            saveCurrentOpen=activeTab.down('#saveCurrentOpen').checked,
+            editor=Editor.app.getController('Editor');
+
+        if(me.activeSegment.matchCount === 0 || me.activeSegment.matchIndex > me.activeSegment.matchCount-1){
+                
+            //if there is only one match, and the save current open is active -> save the segment
+            if(saveCurrentOpen && me.activeSegment.currentSegmentIndex===me.activeSegment.nextSegmentIndex){
+                editor.save();
+            }else{
+                me.setTrackChangesInternalFlag(false);
+                me.handleRowSelection();
+            }
+            //TODO: make the if nest better
+            return true;
+        }
+        return false;
+    },
+
+    /**
+     * Check if the trackchanges are active. The function will also initialize the 
+     * activeTrackChanges internal flag
+     */
+    isActiveTrackChanges:function(){
+        //check if the trackchanges are active
+        if(!Editor.plugins.TrackChanges){
+            this.activeTrackChanges=false;
+            return;
+        }
+        this.activeTrackChanges=!(Editor.data.task.get('workflowStepName')  == 'translation'
+                                && Editor.data.task.get('workflowStep') =='1');
     }
     
 });
