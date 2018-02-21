@@ -79,6 +79,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           },
           '#ViewModes':{
               viewModeChanged:'viewModeChangeEvent'
+          },
+          '#Editor.plugins.TrackChanges.controller.Editor':{
+              setMatchResourceValueForEditor:'setMatchResourceValueForEditor'
           }
       }
   },
@@ -88,6 +91,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
+  matchResourceValueForEditor: null,
   afterInitEditor: function() {
       var task = Editor.data.task;
       if(!task.get('defaultSegmentLayout')){
@@ -135,7 +139,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           editor = plug.editor,
           task = Editor.data.task,
           rec = plug.context.record,
-          sc, contentTags,
+          contentTags,
           matchrate = matchRecord.get('matchrate');
 
       if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
@@ -149,8 +153,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
-          sc = new Editor.util.SegmentContent(rec.get('source'));
-          editor.mainEditor.setValueAndMarkup(matchRecord.get('target'), rec.get('id'), editor.columnToEdit);
+          me.setMatchResourceValueForEditor(matchRecord.get('target'));
+          me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target'), rec.get('id')); // if TrackChanges are activated, DEL- and INS-markups are added now
+          editor.mainEditor.setValueAndMarkup(me.matchResourceValueForEditor, rec.get('id'), editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
@@ -159,6 +164,10 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       } 
+  },
+  setMatchResourceValueForEditor: function(value) {
+      var me = this;
+      me.matchResourceValueForEditor = value;
   },
   viewModeChangeEvent: function(controller){
       var me = this,
