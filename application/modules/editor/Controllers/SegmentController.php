@@ -564,9 +564,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         $text='Viel<del>en</del><ins>EN</ins> Dank !!!';
 
+        $text='VielENAC<del>E</del> Dank !!!';
+        
         error_log("Initial: ".$text);
         
-        $text2='Viel<mark><del>EN</del><ins>en</ins></mark> <mark><del>Dank</del><ins>Dankeschön</ins></mark> !!!';
+        $text2='Viel<mark><del>EN</del><ins>en</ins></mark>AC <mark><del>Dank</del><ins>Dankeschön</ins></mark> !!!';
         
         error_log("Replace: ".$text2);
         

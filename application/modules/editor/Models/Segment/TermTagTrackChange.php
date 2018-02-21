@@ -160,6 +160,11 @@ class editor_Models_Segment_TermTagTrackChange {
                     $this->debugText .= "\n- weiter bis: " . $posEnd . "\n\n";
                     break;
             }
+            
+            if(!$foundTermTag && !$foundTrackChangeMarkup){
+                $this->collectRange=abs($this->collectRange--);
+            }
+            
             if ($this->posInText == $posAtTheBeginningOfThisStep) { // if we increase $pos after it has already been increased in the current step we will skip the current $pos
                 $this->posInText++;
             }
@@ -281,8 +286,32 @@ class editor_Models_Segment_TermTagTrackChange {
     private function handleTrackChangeNodeInText() {
         $textLengthIncreased = 0;
         $trackChangeNodeInText = $this->arrTrackChangeNodesInText[$this->posInText];
+
         $length = strlen($trackChangeNodeInText);
-        $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length, $this->posInText);
+        
+        //if it is a dell tag, and the collectCount is >0 -> remove the dell tag,
+        //substruckt the size of all nodes from this pointer till the end
+        if($this->collectRange>0 && strpos($trackChangeNodeInText, '<del') === 0){
+            $this->arrTrackChangeNodesInText[$this->posInText]='';
+            $length*=-1;
+            $trackChangeNodeInText="";
+            $this->arrTrackChangeNodesInText= $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length+1, $this->posInText);
+        }
+        
+        if($this->collectRange>0 && strpos($trackChangeNodeInText, '<ins') === 0){
+            $cleanContent=strip_tags($trackChangeNodeInText);
+            $contentLength=strlen($cleanContent);
+            if($contentLength<=$this->collectRange){
+                $this->arrTrackChangeNodesInText[$this->posInText]='';
+                
+                $this->collectRange=abs(($this->collectRange-$length));
+                $length*=-1;
+                $trackChangeNodeInText="";
+                $this->arrTrackChangeNodesInText= $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length+1, $this->posInText);
+            }
+        }
+        
+        $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length+1, $this->posInText);
         $textLengthIncreased += $this->insertTextAtCurrentPos($trackChangeNodeInText);
         //if (!preg_match_all(self::REGEX_DEL, $trackChangeNodeInText)) {
         //    $this->trackChangeNodeStatus = ($this->trackChangeNodeStatus == 'open') ? 'close' : 'open'; // start was null and the first step must go to 'open'
@@ -366,7 +395,18 @@ class editor_Models_Segment_TermTagTrackChange {
     private $collectRange;
     private function initColectRange($replaceTag){
         $this->collectRange=0;
-        
-        
+        $insContent=preg_match(self::REGEX_INS, $replaceTag,$matches);
+        $insContent=$matches[0];
+        $cleanInsContent=strip_tags($insContent);
+        $this->collectRange=strlen($cleanInsContent);
     }
+
+    private function collectTags($foundTag){
+        
+        abs($this->collectRange--);
+    }
+    
+    
+    
+    
 }
