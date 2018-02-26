@@ -372,6 +372,12 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             return false;
         }
         
+        // In case of TrackChanges:
+        // (1) remove DEL-Tags and their content
+        cleanValue = cleanValue.replace(/<del[^>]*>.*?<\/del>/ig,'');
+        // (2) remove INS-Tags and keep their content:
+        cleanValue = cleanValue.replace(/<ins[^>]*>/ig, '').replace(/<\/ins>/ig, '');
+        
         if(cleanValue.length == 0 && record.get(me.columnToEdit).length > 0) {
             Editor.MessageBox.addError(me.messages.cantSaveEmptySegment);
             return false;
