@@ -318,9 +318,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     public function searchAction(){
-        $this->abracadabra("");
-        return;
-        
         //check here also if the max allowed character number it is in his limit
         $searchCombo=$this->getParam('searchCombo');
         $length=strlen(utf8_decode($searchCombo));
@@ -350,7 +347,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     public function replaceallAction(){
-        $retval=$this->entity->rellaceAll($this);
+        $retval=$this->entity->replaceAll($this);
+        return;
         
         $retval['success']=true;
         $retval['rows']=$result;
@@ -558,55 +556,4 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         echo Zend_Json::encode($db->fetchAll($sql)->toArray(), Zend_Json::TYPE_ARRAY);
     }
-    
-    
-    public function abracadabra($theText){
-        
-        $text='Viel<del>en</del><ins>EN</ins> Dank !!!';
-
-        $text='VielENAC<del>E</del> Dank !!!';
-        
-        error_log("Initial: ".$text);
-        
-        $text2='Viel<mark><del>EN</del><ins>en</ins></mark>AC <mark><del>Dank</del><ins>Dankeschön</ins></mark> !!!';
-        
-        error_log("Replace: ".$text2);
-        
-        $algo=ZfExtended_Factory::get('editor_Models_Segment_TermTagTrackChange');
-        /* @var $algo editor_Models_Segment_TermTagTrackChange */
-        
-        $algo->storeNodes($text, "1");
-        $retVal = $algo->restoreNodes($text2,"1");
-        
-        error_log("Final text: ".$retVal);
-        
-        
-        return;
-        preg_match_all('/(<[^>]+>)/', $text, $matches, PREG_OFFSET_CAPTURE);
-
-        $textWithoutTags=strip_tags($text);
-        preg_match_all('/e/', $textWithoutTags, $matchesSearch, PREG_OFFSET_CAPTURE);
-        
-        
-        $matchesSearch=$matchesSearch[0];
-        $matches=$matches[0];
-        
-        foreach ($matchesSearch as $singleMatch=>$value){
-            //value[0] -> march text
-            //value[1] -> march offset
-            $offsetSearch=$value[1];
-            foreach ($matches as $singleMatch2=>$value2){
-                //$value2[0] -> march text
-                //$value2[1] -> march offset
-                $matchOffset=$value2[1];
-                $offsetMatchCalc=$matchOffset+1;
-                if($offsetSearch > $matchOffset && $offsetSearch < $offsetMatchCalc){
-                    
-                }
-            }
-        }
-        
-    }
-    
-    
 }

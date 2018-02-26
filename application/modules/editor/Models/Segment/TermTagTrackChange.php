@@ -1,46 +1,46 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
+ START LICENSE AND COPYRIGHT
+ 
  This file is part of translate5
  
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
+ 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
+ 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+ 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+ 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 
 /**
  * Segment TermTagTrackChange Helper Class
- * 
+ *
  * Helper for removing and re-inserting TrackChange-Nodes in Term-tagged texts.
  * Needed before and after texts are sent to the TermTag-Server that finds the terms.
  * - First step (before): Store all TrackChange-Nodes and their positions; then remove them from the text.
  * - Second step (after): Re-insert the stored TrackChange-Nodes at the stored positions in the text that now includes the TermTags, too.
- * 
- * Nothing in here really relates to TrackChange-Stuff itself, only the regular expressions for finding the nodes. 
+ *
+ * Nothing in here really relates to TrackChange-Stuff itself, only the regular expressions for finding the nodes.
  * Feel free to rename it for general use and extend it to other nodes.
- * 
- * The Service Class of Plugin "TermTagger" (editor_Plugins_TermTagger_Service) uses these methods 
- * no matter if the TrackChange-Plugin is activated or not. 
+ *
+ * The Service Class of Plugin "TermTagger" (editor_Plugins_TermTagger_Service) uses these methods
+ * no matter if the TrackChange-Plugin is activated or not.
  * That's why we need this in the core-Code, not in the Plugin-Code.
- * 
+ *
  */
 class editor_Models_Segment_TermTagTrackChange {
     
@@ -56,10 +56,8 @@ class editor_Models_Segment_TermTagTrackChange {
      * For fetching/searching the TrackChanges and TermTags:
      */
     const REGEX_DEL     = '/<del[^>]*>.*?<\/del>/i';    // del-Tag:  including their content!
-    const REGEX_INS     = '/<ins[^>]*>.*?<\/ins>/i';           // ins-Tag:  only the tags without their content
+    const REGEX_INS     = '/<\/?ins[^>]*>/i';           // ins-Tag:  only the tags without their content
     const REGEX_TERMTAG = '/<\/?div[^>]*>/i';           // term-Tag: only the tags without their content (all other divs have been masked already) // TODO: get regex from from editor_Models_Segment_TermTag
-    
-    const REGEX_REPLACE = '/<mark[^>]*>.*?<\/mark>/i';
     
     /**
      * For the process of decoding a given text:
@@ -97,7 +95,7 @@ class editor_Models_Segment_TermTagTrackChange {
     
     /**
      * Store all TrackChange-Nodes and their positions; then remove them from the text.
-     * This arry must be stored even if it includes no Nodes; that there are NO nodes is exactly 
+     * This arry must be stored even if it includes no Nodes; that there are NO nodes is exactly
      * an information we will need later on when it comes to (not) re-inserting the (not) found nodes.
      * @param string $text
      * @param string $textId
@@ -108,6 +106,7 @@ class editor_Models_Segment_TermTagTrackChange {
         $text = $this->internalTagHelper->protect($text);
         $this->fetchTrackChangeNodes($text, $textId);
     }
+    
     /**
      * Re-insert the stored TrackChange-Nodes at the stored positions in the text (that now includes - only! - the TermTags).
      * @param string $text
@@ -123,7 +122,7 @@ class editor_Models_Segment_TermTagTrackChange {
             return $text;
         }
         
-        // At this point, we cannot check for ins- and del-Nodes in the text 
+        // At this point, we cannot check for ins- and del-Nodes in the text
         // because the text that the TermTagger has returned does not include them anyway!
         // (It is OUR task HERE to re-include them if there have been any.)
         if (count($this->arrTrackChangeNodes[$textId]) == 0) {
@@ -132,7 +131,6 @@ class editor_Models_Segment_TermTagTrackChange {
         }
         
         $this->text = $text;
-       
         $this->text = $this->internalTagHelper->protect($this->text);
         
         $this->debugText = "\n-----------\n" . $text . "\n";
@@ -149,6 +147,13 @@ class editor_Models_Segment_TermTagTrackChange {
             $foundTermTag = array_key_exists($this->posInText, $this->arrTermTagsInText);
             $foundTrackChangeMarkup = array_key_exists($this->posInText, $this->arrTrackChangeNodesInText);
             switch (true) {
+                case ($foundTermTag && $foundTrackChangeMarkup && $this->trackChangeNodeStatus == 'open'):
+                    // If a TrackChange-Node ist still open and both a TrackChange-Node AND a TermTag are found,
+                    // we will close the TrackChange-Node first. The next loop then will recognize the other item from the TermTags.
+                    $this->debugText .= "\n" . $this->posInText .": foundTermTag && foundTrackChangeMarkup";
+                    $posEnd += $this->handleTrackChangeNodeInText();
+                    $this->debugText .= "\n- weiter bis: " . $posEnd . "\n\n";
+                    break;
                 case $foundTermTag:
                     $this->debugText .= "\n" . $this->posInText .": foundTermTag";
                     $posEnd += $this->handleTermTagInText();
@@ -160,11 +165,6 @@ class editor_Models_Segment_TermTagTrackChange {
                     $this->debugText .= "\n- weiter bis: " . $posEnd . "\n\n";
                     break;
             }
-            
-            if(!$foundTermTag && !$foundTrackChangeMarkup){
-                $this->collectRange=abs($this->collectRange--);
-            }
-            
             if ($this->posInText == $posAtTheBeginningOfThisStep) { // if we increase $pos after it has already been increased in the current step we will skip the current $pos
                 $this->posInText++;
             }
@@ -220,7 +220,7 @@ class editor_Models_Segment_TermTagTrackChange {
      */
     private function fetchTermTags($text) {
         $allTermTagsInText = array();
-        preg_match_all(self::REGEX_REPLACE, $text, $tempMatchesTermTags, PREG_OFFSET_CAPTURE);
+        preg_match_all(self::REGEX_TERMTAG, $text, $tempMatchesTermTags, PREG_OFFSET_CAPTURE);
         foreach ($tempMatchesTermTags[0] as $match) {
             $allTermTagsInText[$match[1]] = $match[0];
         }
@@ -242,7 +242,7 @@ class editor_Models_Segment_TermTagTrackChange {
         $openingTrackChangeNode = null;
         $closingTrackChangeNode = null;
         $textLengthIncreased = 0;
-        $termTagInText = isset($this->arrTermTagsInText[$this->posInText]) ? $this->arrTermTagsInText[$this->posInText] : "";
+        $termTagInText = $this->arrTermTagsInText[$this->posInText];
         if ($this->trackChangeNodeStatus == 'open') {
             $openingTrackChangeNode = $this->getThresholdItemInArray($this->arrTrackChangeNodesInText, $this->posInText, 'before');
             $closingTrackChangeNode = $this->getThresholdItemInArray($this->arrTrackChangeNodesInText, $this->posInText, 'next');
@@ -255,14 +255,8 @@ class editor_Models_Segment_TermTagTrackChange {
             $textLengthIncreased += $this->insertTextAtCurrentPos($closingTrackChangeNode);
         }
         $length = strlen($termTagInText);
-        $length = $length === 0 ? 1 : $length;
-        //FIXME: here smart logic
-        //- what if curent replacement, removes the ins/del tags in the trackChanges array
         $this->arrTrackChangeNodesInText = $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length, $this->posInText);
         $this->posInText += $length;
-        
-        $this->initColectRange($termTagInText);
-        
         $this->debugText .= "\n" . $this->posInText .": vorgefunden: " . $termTagInText.  "\n- length:" . $length . "\n- weiter bei: " . $this->posInText;
         if ($openingTrackChangeNode != null) {
             $length = strlen($openingTrackChangeNode);
@@ -286,36 +280,12 @@ class editor_Models_Segment_TermTagTrackChange {
     private function handleTrackChangeNodeInText() {
         $textLengthIncreased = 0;
         $trackChangeNodeInText = $this->arrTrackChangeNodesInText[$this->posInText];
-
         $length = strlen($trackChangeNodeInText);
-        
-        //if it is a dell tag, and the collectCount is >0 -> remove the dell tag,
-        //substruckt the size of all nodes from this pointer till the end
-        if($this->collectRange>0 && strpos($trackChangeNodeInText, '<del') === 0){
-            $this->arrTrackChangeNodesInText[$this->posInText]='';
-            $length*=-1;
-            $trackChangeNodeInText="";
-            $this->arrTrackChangeNodesInText= $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length+1, $this->posInText);
-        }
-        
-        if($this->collectRange>0 && strpos($trackChangeNodeInText, '<ins') === 0){
-            $cleanContent=strip_tags($trackChangeNodeInText);
-            $contentLength=strlen($cleanContent);
-            if($contentLength<=$this->collectRange){
-                $this->arrTrackChangeNodesInText[$this->posInText]='';
-                
-                $this->collectRange=abs(($this->collectRange-$length));
-                $length*=-1;
-                $trackChangeNodeInText="";
-                $this->arrTrackChangeNodesInText= $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length+1, $this->posInText);
-            }
-        }
-        
-        $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length+1, $this->posInText);
+        $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length, $this->posInText);
         $textLengthIncreased += $this->insertTextAtCurrentPos($trackChangeNodeInText);
-        //if (!preg_match_all(self::REGEX_DEL, $trackChangeNodeInText)) {
-        //    $this->trackChangeNodeStatus = ($this->trackChangeNodeStatus == 'open') ? 'close' : 'open'; // start was null and the first step must go to 'open'
-        //}
+        if (!preg_match_all(self::REGEX_DEL, $trackChangeNodeInText)) {
+            $this->trackChangeNodeStatus = ($this->trackChangeNodeStatus == 'open') ? 'close' : 'open'; // start was null and the first step must go to 'open'
+        }
         return $textLengthIncreased;
     }
     
@@ -371,7 +341,7 @@ class editor_Models_Segment_TermTagTrackChange {
                 return $oldKey + $number;
             }
         }, $arrOldKeys);
-        return array_combine($arrNewKeys, $arrOldValues);
+            return array_combine($arrNewKeys, $arrOldValues);
     }
     
     /**
@@ -387,26 +357,4 @@ class editor_Models_Segment_TermTagTrackChange {
             return;
         }
     }
-    
-    /***
-     * 
-     * @param string $replaceTag
-     */
-    private $collectRange;
-    private function initColectRange($replaceTag){
-        $this->collectRange=0;
-        $insContent=preg_match(self::REGEX_INS, $replaceTag,$matches);
-        $insContent=$matches[0];
-        $cleanInsContent=strip_tags($insContent);
-        $this->collectRange=strlen($cleanInsContent);
-    }
-
-    private function collectTags($foundTag){
-        
-        abs($this->collectRange--);
-    }
-    
-    
-    
-    
 }

@@ -191,7 +191,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return $result;
     }
     
-    //FIXME impruve the error handling!!!!!
     public function replaceAll($request){
         $result=$this->search($request,true);
         
@@ -199,15 +198,36 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $searchInCombo=$request->getParam('searchInCombo');
         $searchType=$request->getParam('searchType');
         $matchCase=$request->getParam('matchCase');
+        $replaceValue=$request->getParam('replaceComboValue');
+        $isActiveTrackChanges=$request->getParam('isActiveTrackChanges');
         
         if(!$result || empty($result)){
             return;
         }
-        $result=json_decode($result);
+        
+        $newQueryString='/'.$queryString.'/i';
+        if($matchCase){
+            $newQueryString='/^'.$queryString.'$/';
+        }
         
         foreach ($result as $res){
-            $value=$res->{$searchInCombo};
-            //REPLACE THE
+            $replace=ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment',[
+                    $res[$searchInCombo], 
+                    $searchInCombo,
+                    $res['id']
+            ]);
+            /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
+            
+            if($isActiveTrackChanges){
+                $replace->attributeWorkflowstep=$request->getParam('attributeWorkflowstep');
+                $replace->userColorNr=$request->getParam('userColorNr');
+                $replace->isActiveTrackChanges=$request->getParam('isActiveTrackChanges');
+            }
+            
+            $replace->replaceText($queryString, $replaceValue);
+            
+            $replace->save();
+            break;
         }
     }
     
