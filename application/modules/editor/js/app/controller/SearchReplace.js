@@ -851,17 +851,25 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
+            replaceComboValue=activeTab.down('#replaceCombo').getValue(),
             activeTabViewModel=activeTab.getViewModel(),
             form=activeTab.getForm(),
             params = {};
-        
+
+        params['replaceComboValue']=replaceComboValue;
         params['taskGuid']=Editor.data.task.get('taskGuid');
-        params['result']=JSON.stringify(activeTabViewModel.get('result'));
+
+        if(me.isActiveTrackChanges()){
+            params['isActiveTrackChanges']=true;
+            params['attributeWorkflowstep']=Editor.data.task.get('workflowStepName')+Editor.data.task.get('workflowStep');
+            params['userColorNr']=Editor.data.task.get('userColorNr');
+        }
         
+
         form.submit({
             url: Editor.data.restpath+'segment/replaceall',
             params:params,
-            method:'GET',
+            method:'POST',
             success: function(form, submit){
                 if(!submit.result || !submit.result.rows){
                     return;
@@ -1529,10 +1537,11 @@ Ext.define('Editor.controller.SearchReplace', {
         //check if the trackchanges are active
         if(!Editor.plugins.TrackChanges){
             this.activeTrackChanges=false;
-            return;
+        }else{
+            this.activeTrackChanges=!(Editor.data.task.get('workflowStepName')  == 'translation'
+                                    && Editor.data.task.get('workflowStep') =='1');
         }
-        this.activeTrackChanges=!(Editor.data.task.get('workflowStepName')  == 'translation'
-                                && Editor.data.task.get('workflowStep') =='1');
+        return this.activeTrackChanges;
     }
     
 });

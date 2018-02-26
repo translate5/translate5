@@ -88,12 +88,11 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
                     },{ 
                         xtype: 'button',
                         itemId:'replaceAllButton',
-                        //TODO: it is temporary disabled, because the replace all is not implemented yet. Enable me after the replace all is done
                         hidden:true,
-                        //bind:{
-                        //    visible:'{!isSearchView}',
-                        //    disabled:'{!isSearchPerformed}'
-                        //},
+                        bind:{
+                            visible:'{!isSearchView}',
+                            disabled:'{!isSearchPerformed}'
+                        },
                         text: me.strings.replaceAllButton
                     },{ 
                         xtype: 'button',
