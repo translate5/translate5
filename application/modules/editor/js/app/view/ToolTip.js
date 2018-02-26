@@ -44,7 +44,7 @@ Ext.define('Editor.view.ToolTip', {
     delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
     cls : 't5ttip',
-    strings: {
+    messages: {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
         history: '#UT#HISTORY',
@@ -97,7 +97,7 @@ Ext.define('Editor.view.ToolTip', {
         var me = this, 
             qmtype,
             cache = Editor.qmFlagTypeCache,
-            meta = {sevTitle: me.strings.severity};
+            meta = {sevTitle: me.messages.severity};
         qmtype = node.className.match(/qmflag-([0-9]+)/);
         if(qmtype && qmtype.length > 1) {
             meta.cls = node.className.split(' ');
@@ -153,9 +153,9 @@ Ext.define('Editor.view.ToolTip', {
             nodeHistory = '';
         // What has been done (INS/DEL)?
         if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_INS) {
-            nodeAction = me.strings.insertedby;
+            nodeAction = me.messages.insertedby;
         } else if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_DEL) {
-            nodeAction = me.strings.deletedby;
+            nodeAction = me.messages.deletedby;
         } else {
             return;
         }
@@ -171,7 +171,7 @@ Ext.define('Editor.view.ToolTip', {
         }
         // History
         if (node.hasAttribute(attrnameHistorylist)) {
-            nodeHistory += '<hr><b>'+me.strings.history+':</b><hr>';
+            nodeHistory += '<hr><b>'+me.messages.history+':</b><hr>';
             var historyItems = node.getAttribute(attrnameHistorylist).split(",");
             for(var i=0, len=historyItems.length; i < len; i++){
                 var historyItemTimestamp = historyItems[i],
@@ -179,9 +179,9 @@ Ext.define('Editor.view.ToolTip', {
                     historyItemUser   = node.getAttribute(attrnameHistoryUsernamePrefix + historyItemTimestamp),
                     historyItemDate   = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
                 if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_INS) {
-                    historyItemAction = me.strings.insertedby;
+                    historyItemAction = me.messages.insertedby;
                 } else if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_DEL) {
-                    historyItemAction = me.strings.deletedby;
+                    historyItemAction = me.messages.deletedby;
                 }
                 nodeHistory += '<b>'+historyItemAction+'</b><br>'+historyItemUser+'<br>'+historyItemDate+'<hr>';
             }
