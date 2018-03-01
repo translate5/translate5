@@ -44,6 +44,7 @@ Ext.define('Editor.view.ToolTip', {
     delegate : '.ownttip', // accepts only simple selectors (no commas) so
     // define a own tooltip class
     cls : 't5ttip',
+    targetIframe: null, //target iframe which should be used for offset calculation
     messages: {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
@@ -73,6 +74,13 @@ Ext.define('Editor.view.ToolTip', {
     onTargetOver: function(e) {
         e.preventDefault(); //prevent title tags to be shown in IE
         this.callParent(arguments);
+    },
+    getAlignRegion: function() {
+        //add the iframes offset, if we are configured to be relative to an iframe
+        if(this.targetIframe) {
+            this.targetOffset = this.targetIframe.getXY();
+        }
+        return this.callParent(arguments);
     },
     
     handleQmFlag: function(t, tip) {
