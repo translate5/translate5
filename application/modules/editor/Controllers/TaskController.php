@@ -585,17 +585,21 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function openAndLock() {
         $session = new Zend_Session_Namespace();
+        $task = $this->entity;
         if($this->isOpenTaskRequest(true)){
-            if(!$this->entity->lock($this->now)){
-                $workflow = $this->workflow;
+            $workflow = $this->workflow;
+            if(!$task->lock($this->now)){
+                $this->data->userState = $workflow::STATE_VIEW;
+            }
+            if($task->getState() == $task::STATE_UNCONFIRMED) {
                 $this->data->userState = $workflow::STATE_VIEW;
             }
         }
         if($this->isOpenTaskRequest()){
-            $this->entity->createMaterializedView();
-            $this->entity->registerInSession($this->data->userState);
+            $task->createMaterializedView();
+            $task->registerInSession($this->data->userState);
             $this->events->trigger("afterTaskOpen", $this, array(
-                'task' => $this->entity, 
+                'task' => $task, 
                 'view' => $this->view, 
                 'openState' => $this->data->userState)
             );
