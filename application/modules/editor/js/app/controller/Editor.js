@@ -78,7 +78,8 @@ Ext.define('Editor.controller.Editor', {
     listen: {
         controller: {
             '#Editor.$application': {
-                editorViewportClosed: 'clearKeyMaps'
+                editorViewportClosed: 'onCloseEditorViewport',
+                editorViewportOpened: 'onOpenEditorViewport'
             }
         },
         component: {
@@ -415,6 +416,55 @@ Ext.define('Editor.controller.Editor', {
                 targetIframe: editor.iframeEl
             });
         }
+    },
+    onOpenEditorViewport: function(app, task) {
+        if(! task.isUnconfirmed()) {
+            return;
+        }
+        this.taskConfirmation = Ext.create('Ext.window.Window', {
+            closeAction: 'destroy',
+            title: "Aufgabe bestätigen?",
+            closable: false,
+            modal: false,
+            resizable: false,
+            layout: {
+                type: 'vbox',
+                align: 'stretch'
+            },
+            border: false,
+            y: '5%',
+            onEsc: Ext.emptyFn,
+            titleCollapse: true,
+            collapsible: true,
+            items: [{
+                xtype: 'container',
+                padding: 10,
+                html: "Möchten Sie die Aufgabe bestätigen? <br> Ohne Bestätigung kann diese nicht bearbeitet werden. TODOS:<ul><li>Übersetzungen</li><li>Das Window in eine eigene Klasse auslagern</li><li>Den Handler definieren und die Task neu laden Geschichte</li><li>Stempel Icon in den Button</li><li>Die Popup Position in Kombination mit dem VisRev Popup testen</li><li>destroy des Popup bei Task Wechsel</li><li>restliche TODOs aus dem Issue</li><li>LESEMODUS Beschriftungen anpassen wenn unconfirmed</li></ul>"
+            }],
+            dockedItems: [{
+                xtype: 'toolbar',
+                ui: 'footer',
+                dock: 'bottom',
+                enableFocusableContainer: false,
+                ariaRole: null,
+                layout: {
+                    pack: 'center'
+                },
+                items: [{
+                    text: 'bestätigen',
+                    handler: function() {
+                        console.log("BAR", arguments);
+                    }
+                }]
+            }]
+        }).show();
+    },
+    /**
+     * Cleanup stuff in the editor view port
+     */
+    onCloseEditorViewport: function() {
+        this.clearKeyMaps();
+        this.taskConfirmation && this.taskConfirmation.destroy();
     },
     clearKeyMaps: function() {
         var me = this;

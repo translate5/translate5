@@ -620,7 +620,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleTaskShowexportmenu: function(task, event) {
       var me = this,
           hasQm = task.hasQmSub(),
-          exportAllowed = me.isAllowed('editorExportTask'),
+          exportAllowed = me.isAllowed('editorExportTask', task),
           menu;
       
       menu = Ext.widget('adminExportMenu', {
