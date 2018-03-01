@@ -982,6 +982,22 @@
 	<source>Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.</source>
 	<target>The task contains alternate translations. The repetition editor was deactivated therefore.</target>
       </trans-unit>
+    <trans-unit id='RGVsZXRlZCBieQ=='>
+        <source>Deleted by</source>
+        <target>Deleted by</target>
+    </trans-unit>
+    <trans-unit id='SW5zZXJ0ZWQgYnk='>
+        <source>Inserted by</source>
+        <target>Inserted by</target>
+    </trans-unit>
+    <trans-unit id='SElTVE9SWQ=='>
+        <source>HISTORY</source>
+        <target>HISTORY</target>
+    </trans-unit>
+    <trans-unit id='R2V3aWNodHVuZw=='>
+        <source>Gewichtung</source>
+        <target>Severity</target>
+    </trans-unit>
       <trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='>
 	<source>Kommentare zum aktuellen Segment</source>
 	<target>Comments for the current segment</target>

@@ -124,6 +124,9 @@
 <trans-unit id='RmVobGVydHlw'><source>Fehlertyp</source><target>Fehlertyp</target></trans-unit>
 <trans-unit id='R2VzYW10'><source>Gesamt</source><target>Gesamt</target></trans-unit>
 <trans-unit id='U3VtbWU='><source>Summe</source><target>Summe</target></trans-unit>
+<trans-unit id='RGVsZXRlZCBieQ=='><source>Deleted by</source><target>Gelöscht von</target></trans-unit>
+<trans-unit id='SW5zZXJ0ZWQgYnk='><source>Inserted by</source><target>Eingefügt von</target></trans-unit>
+<trans-unit id='SElTVE9SWQ=='><source>HISTORY</source><target>HISTORY</target></trans-unit>
 <trans-unit id='R2V3aWNodHVuZw=='><source>Gewichtung</source><target>Gewichtung</target></trans-unit>
 <trans-unit id='S29tbWVudGFy'><source>Kommentar</source><target>Kommentar</target></trans-unit>
 <trans-unit id='TVFNIGhpbnp1ZsO8Z2Vu'><source>MQM hinzufügen</source><target>MQM hinzufügen</target></trans-unit>

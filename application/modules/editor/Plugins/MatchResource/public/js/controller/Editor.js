@@ -154,7 +154,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           me.setMatchResourceValueForEditor(matchRecord.get('target'));
-          me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target'), rec.get('id')); // if TrackChanges are activated, DEL- and INS-markups are added now
+          me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added now
           editor.mainEditor.setValueAndMarkup(me.matchResourceValueForEditor, rec.get('id'), editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
