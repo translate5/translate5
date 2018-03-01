@@ -98,6 +98,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_END = 'end';
     const STATE_IMPORT = 'import';
     const STATE_ERROR = 'error';
+    const STATE_UNCONFIRMED = 'unconfirmed';
     
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
