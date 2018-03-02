@@ -48,12 +48,12 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewController', {
         var me=this,
             tabViewModel=me.getView().getViewModel(),
             searchReplaceWindow=me.getView().up('window'),
-            newSearchCombo=newCard.down('#searchCombo'),
-            oldSearchCombo=oldCard.down('#searchCombo'),
+            newSearchField=newCard.down('#searchField'),
+            oldSearchField=oldCard.down('#searchField'),
             isSearchTab=newCard.xtype == 'searchTab';
         
-        newSearchCombo.setValue(oldSearchCombo.getRawValue());
-        newSearchCombo.focus();
+        newSearchField.setValue(oldSearchField.getRawValue());
+        newSearchField.focus();
         
         //set the search view flag
         tabViewModel.set('searchView',isSearchTab);

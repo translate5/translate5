@@ -55,6 +55,7 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
         replaceAllButton:'#UT#Alles ersetzen',
         searchButton:'#UT#Suchen',
         replaceButton:'#UT#Ersetzen',
+        mqmNotSupporterTooltip:'#Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt'
     },
     
     initConfig : function(instanceConfig) {
@@ -82,16 +83,21 @@ Ext.define('Editor.view.searchandreplace.TabPanel', {
                         itemId:'replaceButton',
                         bind:{
                             visible:'{!isSearchView}',
-                            disabled:'{!isSearchPerformed}'
+                            disabled:'{!isSearchResultsFound}'
                         },
                         text: me.strings.replaceButton 
                     },{ 
                         xtype: 'button',
                         itemId:'replaceAllButton',
                         hidden:true,
+                        style: {
+                            //https://www.sencha.com/forum/showthread.php?310184-Show-Tooltip-on-disabled-Button
+                            pointerEvents: 'all'
+                        },
                         bind:{
                             visible:'{!isSearchView}',
-                            disabled:'{!isSearchPerformed}'
+                            disabled:'{isDisableReplaceButton}',
+                            tooltip:'{isMqmTooltip}'
                         },
                         text: me.strings.replaceAllButton
                     },{ 

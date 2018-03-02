@@ -35,16 +35,26 @@ Ext.define('Editor.view.searchandreplace.TabPanelViewModel', {
     
     data:{
         searchView:true,
-        searchPerformed:false,
+        searchResultsFound:false,
         disableSearchButton:true,
+        hasMqm:false
     },
     
     formulas:{
+        isMqmTooltip:function(get){
+            if(!get('hasMqm')){
+                return null;
+            }
+            return this.getView().strings.mqmNotSupporterTooltip;
+        },
         isSearchView:function(get){
             return get('searchView');
         },
-        isSearchPerformed:function(get){
-            return get('searchPerformed');
+        isSearchResultsFound:function(get){
+            return get('searchResultsFound');
+        },
+        isDisableReplaceButton:function(get){
+            return !get('searchResultsFound') || get('hasMqm');
         },
         isDisableSearchButton:function(get){
             return get('disableSearchButton');

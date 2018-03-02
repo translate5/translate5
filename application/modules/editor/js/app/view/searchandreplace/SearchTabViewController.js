@@ -51,13 +51,13 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
         var me=this,
             tabPanel=me.getView().up('#searchreplacetabpanel'),
             activeTab=tabPanel.getActiveTab(),
-            searchCombo=activeTab.down('#searchCombo');
+            searchField=activeTab.down('#searchField');
 
         this.resetSearchParametars();
         
         var task = new Ext.util.DelayedTask(function(){
             //reset the search value
-            searchCombo.validate();
+            searchField.validate();
         }).delay(0);
     },
 
@@ -74,7 +74,8 @@ Ext.define('Editor.view.searchandreplace.SearchTabViewController', {
             searchReplaceController=Editor.app.getController('SearchReplace');
         
         //reset the viewmodel variables
-        tabPanelviewModel.set('searchPerformed',false);
+        tabPanelviewModel.set('searchResultsFound',false);
+        tabPanelviewModel.set('hasMqm',false);
         vm.set('result',[]);
         vm.set('resultsCount',0);
         vm.set('showResultsLabel',false);
