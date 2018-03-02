@@ -887,24 +887,32 @@ abstract class editor_Workflow_Abstract {
         $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
         /* @var $msg ZfExtended_Models_Messages */
         
+        $matchingSteps = [];
         foreach($this->validStates as $step => $roleStates) {
             if(!$areTuasSubset($roleStates)) {
                 continue;
             }
-            if($step == $task->getWorkflowStepName()) {
-                return;
-            }
-            $task->updateWorkflowStep($step, false);
-            $log = ZfExtended_Factory::get('editor_Workflow_Log');
-            /* @var $log editor_Workflow_Log */
-            $log->log($task, $this->authenticatedUser->userGuid);
-            //set $step as new workflow step if different to before!
-            $labels = $this->getLabels();
-            $steps = $this->getSteps();
-            $step = $labels[array_search($step, $steps)];
-            $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
+            $matchingSteps[] = $step;
+        }
+        
+        //if the current step is one of the possible steps for the tua configuration
+        // then everything is OK, 
+        // or if no valid configuration is found, then we also could not change the step
+        if(empty($matchingSteps) || in_array($task->getWorkflowStepName(), $matchingSteps)) {
             return;
         }
+        //set the first found valid step to the current workflow step
+        $step = reset($matchingSteps);
+        $task->updateWorkflowStep($step, false);
+        $log = ZfExtended_Factory::get('editor_Workflow_Log');
+        /* @var $log editor_Workflow_Log */
+        $log->log($task, $this->authenticatedUser->userGuid);
+        //set $step as new workflow step if different to before!
+        $labels = $this->getLabels();
+        $steps = $this->getSteps();
+        $step = $labels[array_search($step, $steps)];
+        $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
+        return;
     }
     
     /**

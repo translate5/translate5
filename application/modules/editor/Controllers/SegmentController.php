@@ -145,7 +145,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //$this->checkTaskGuidAndEditable();
         $index = $this->entity->getIndex();
         if($index === null) {
-            throw new ZfExtended_NotFoundException();
+            $e = new ZfExtended_NotFoundException("Segment is not contained in the segment filter");
+            $e->setLogging(false); //a wanted exception, disable logging for that
+            throw $e;
         }
         $this->view->segmentNrInTask= $segmentNrInTask;
         

@@ -25,21 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
--- we had to rename this file after it was deployed, so the DB updater would execute the content twice 
--- on systems already applied the SQL with the old name. 
--- so we have to ensure that this does not happen with the INSERT SELECT syntax here:
 
-INSERT INTO `LEK_workflow_action` (`workflow`,`trigger`,`inStep`,`byRole`,`userState`,`actionClass`,`action`,`parameters`,`position`)
-SELECT * FROM (SELECT 'default' `workflow`, 'doCronDaily' `trigger`, null `inStep`, null `byRole`, null `userState`, 'editor_Workflow_Actions' `actionClass`, 'finishOverduedTasks' `action`, null `parameters`, 0 `position`) AS tmp
-WHERE NOT EXISTS (
-    SELECT * FROM LEK_workflow_action 
-    WHERE `workflow` = 'default' 
-    AND `trigger` = 'doCronDaily'
-    AND (`inStep` is null OR `inStep` = '')
-    AND (`byRole` is null OR `byRole` = '')
-    AND (`userState` is null OR `userState` = '')
-    AND `actionClass` = 'editor_Workflow_Actions'
-    AND `action` = 'finishOverduedTasks'
-    AND (`parameters` is null OR `parameters` = '')
-    AND `position` = 0
-) LIMIT 1;
+UPDATE `Zf_configuration` SET `value`='100' WHERE `name`='runtimeOptions.taskLifetimeDays';
+

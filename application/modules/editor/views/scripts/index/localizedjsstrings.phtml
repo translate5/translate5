@@ -228,11 +228,6 @@ Ext.define('Editor.controller.Localizer', {
     };
     <?php } ?>
     
-    Ext.define("Editor.locale.de.view.ToolTip", {
-        override: "Editor.view.ToolTip",
-        severity: '<?php echo $this->translate->_('Gewichtung');?>'
-    });
-  	
   	Editor.view.preferences.Window.prototype.item_radiogroup_fieldLabel = '<?php echo $this->translate->_('Verhalten des Wiederholungseditor');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
@@ -262,7 +257,6 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.segments.MetaPanelNavi.prototype.item_nextFiltered = '<?php echo $this->translate->_('Nicht speichern und nächstes Segment im Workflow öffnen (ALT + Bild ↓)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prev = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment öffnen (STRG + ALT + ↑)');?>';
     Editor.view.segments.MetaPanelNavi.prototype.item_prevFiltered = '<?php echo $this->translate->_('Nicht speichern und vorheriges Segment im Workflow öffnen (ALT + Bild ↑)');?>';
-    
    
     Ext.define("Editor.locale.de.controller.Editor", {
         override: "Editor.controller.Editor",
@@ -700,6 +694,16 @@ Ext.define('Editor.controller.Localizer', {
             searchButton: '<?php echo $this->translate->_('Suchen');?>',
             replaceButton: '<?php echo $this->translate->_('Ersetzen');?>',
             mqmNotSupporterTooltip: '<?php echo $this->translate->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.ToolTip", {
+        override: "Editor.view.ToolTip",
+        messages: {
+            deletedby: '<?php echo $this->translate->_('Deleted by');?>',
+            insertedby: '<?php echo $this->translate->_('Inserted by');?>',
+            history: '<?php echo $this->translate->_('HISTORY');?>',
+            severity: '<?php echo $this->translate->_('Gewichtung');?>'
         }
     });
     
