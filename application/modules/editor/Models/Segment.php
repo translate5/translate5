@@ -142,35 +142,42 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * Search the matirialized view for given search field,search string and match case.
      * Only hits in the editable fields will be returned
      * 
-     * @param unknown $request
+     * @param array $parametars
      * @return string|array
      */
-    public function search($request){
-        $queryString=$request->getParam('searchCombo');
-        $searchInCombo=$request->getParam('searchInCombo').editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
-        $matchCase=$request->getParam('matchCase');
-        $searchType=$request->getParam('searchType');
+    public function search(array $parametars){
         $session = new Zend_Session_Namespace();
         $taskGuid=$session->taskGuid;
-        if ($session->taskGuid !== $request->getParam('taskGuid')) {
+        if ($session->taskGuid !== $parametars['taskGuid']) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
-        //$mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        if(!isset($parametars['searchInField']) || !isset($parametars['searchField']) || !isset($parametars['searchType'])){
+            $msg=array();
+            $msg['message']="Missing search parametar. Required parametars:searchInField,searchField,searchType";
+            $msg=Zend_Json::encode((object)$msg, Zend_Json::TYPE_OBJECT);
+            throw new ZfExtended_Exception($msg);
+        }
+        
+        $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView  */
-        //$mv->setTaskGuid($taskGuid);
-        //$viewName=$mv->getName();
+        $mv->setTaskGuid($taskGuid);
+        $viewName=$mv->getName();
         
         $this->reInitDb($taskGuid);
         $this->segmentFieldManager->initFields($taskGuid);
-        $searchQuery=$this->buildSearchString($searchInCombo,$queryString, $searchType, $matchCase);
         
-        if(!$searchQuery){
-            return "Invalid search string.";
-        }
+        $searchQuery=$this->buildSearchString($parametars);
         
         $select= $this->db->select()
+        ->from($viewName, 
+                array('id',
+                'segmentNrInTask',
+                $parametars['searchInField'],
+                $parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX,
+                'editable'
+                ))
         ->where($searchQuery)
         ->where('editable = 1');
         
@@ -188,59 +195,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             WHERE targetEditToSort  REGEXP '[0-9]';
          */
         $result = $this->loadFilterdCustom($select);
+        
         return $result;
-    }
-    
-    public function replaceAll($request){
-        $result=$this->search($request,true);
-        
-        $queryString=$request->getParam('searchCombo');
-        $searchInCombo=$request->getParam('searchInCombo');
-        $searchType=$request->getParam('searchType');
-        $matchCase=$request->getParam('matchCase');
-        $replaceValue=$request->getParam('replaceComboValue');
-        $isActiveTrackChanges=$request->getParam('isActiveTrackChanges');
-        
-        if(!$result || empty($result)){
-            return;
-        }
-        
-        $newQueryString='/'.$queryString.'/i';
-        if($matchCase){
-            $newQueryString='/^'.$queryString.'$/';
-        }
-        
-        foreach ($result as $res){
-            $replace=ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment',[
-                    $res[$searchInCombo], 
-                    $searchInCombo,
-                    $res['id']
-            ]);
-            /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
-            
-            if($isActiveTrackChanges){
-                $replace->attributeWorkflowstep=$request->getParam('attributeWorkflowstep');
-                $replace->userColorNr=$request->getParam('userColorNr');
-                $replace->isActiveTrackChanges=$request->getParam('isActiveTrackChanges');
-            }
-            
-            $replace->replaceText($queryString, $replaceValue);
-            
-            $replace->save();
-            break;
-        }
     }
     
     /***
      * Buld search sql string for given field based on the search type
      * 
-     * @param string $searchInCombo
-     * @param string $queryString
-     * @param string $searchType
-     * @param boolean $matchCase
+     * @param array $parametars
      * @return boolean|string
      */
-    public function buildSearchString($searchInCombo,$queryString,$searchType,$matchCase){
+    public function buildSearchString($parametars){
+        $searchInField=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $queryString=$parametars['searchField'];
+        $searchType=$parametars['searchType'];
+        $matchCase=isset($parametars['matchCase']) ? $parametars['matchCase'] : null;
+        
         //search type regular expression
         if($searchType==='regularExpressionSearch'){
             //simples way to test if the regular expression is valid
@@ -250,9 +220,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             //    return false;
             //}
             if(!$matchCase){
-                return $searchInCombo.' REGEXP '.$this->db->getAdapter()->quote($queryString);
+                return $searchInField.' REGEXP '.$this->db->getAdapter()->quote($queryString);
             }
-            return $searchInCombo.' REGEXP BINARY '.$this->db->getAdapter()->quote($queryString);
+            return $searchInField.' REGEXP BINARY '.$this->db->getAdapter()->quote($queryString);
         }
         //search type regular wildcard
         if($searchType==='wildcardsSearch'){
@@ -261,44 +231,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //if match case, search without lower function
         if($matchCase){
-            return $searchInCombo.' like '.$this->db->getAdapter()->quote('%'.$queryString.'%').' COLLATE utf8_bin';
+            return $searchInField.' like '.$this->db->getAdapter()->quote('%'.$queryString.'%').' COLLATE utf8_bin';
         }
-        return 'lower('.$searchInCombo.') like lower('.$this->db->getAdapter()->quote('%'.$queryString.'%').') COLLATE utf8_bin';
-    }
-    
-    //TODO here also the ins and delete segments should be added
-    public function replaceSearchString($searchString,$queryString,$searchType){
-        
-       // This must be done by the INS/DEL plugin, since the correct attributes for the tags must be added
-       // $queryString = '<del>'.$searchString.'</del><ins>'.$queryString.'</ins>';
-        
-        //"/^PHP$/"
-        switch ($searchType) {
-            case 'normalSearch':
-                $searchString='/'.$queryString.'/';
-                if(!$matchCase){
-                    break;
-                }
-                $searchString='/^'.$queryString.'$/';
-                break;
-            case 'wildcardsSearch':
-                $searchString=str_replace("*","%",$queryString);
-                $searchString=str_replace("?","_",$queryString);
-                if(!$matchCase){
-                    return $searchString;
-                }
-                $searchString=' REGEXP "[[:<:]]'.$searchString.'[[:>:]]"';
-                break;
-            case 'regularExpressionSearch':
-                if($matchCase){
-                    return ' REGEXP BINARY "'.$queryString.'"';
-                }
-                $outSql=' REGEXP "'.$queryString.'"';
-                return $outSql;
-                break;
-        }
-        
-        return $searchString;
+        return 'lower('.$searchInField.') like lower('.$this->db->getAdapter()->quote('%'.$queryString.'%').') COLLATE utf8_bin';
     }
     
     /**

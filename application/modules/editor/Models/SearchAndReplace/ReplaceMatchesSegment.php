@@ -28,16 +28,28 @@
 
 class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
 
-    const REGEX_DEL     = '/<del[^>]*>.*?<\/del>/i';    // del-Tag:  including their content!
-    const REGEX_INS     = '/<\/?ins[^>]*>/i';           // ins-Tag:  only the tags without their content
+    // del-Tag:  including their content!
+    const REGEX_DEL     = '/<del[^>]*>.*?<\/del>/i';
+    
+    // ins-Tag:  only the tags without their content
+    const REGEX_INS     = '/<\/?ins[^>]*>/i';
+    
+    //del protected tag regex
     const REGEX_PROTECTED_DEL='/<segment:del[^>]+((id="([^"]*)"[^>]))[^>]*>/';
+    
+    //internal protected tag regex
     const REGEX_PROTECTED_INTERNAL='/<translate5:escaped[^>]+((id="([^"]*)"[^>]))[^>]*>/';
     
-    
+    //delete node name
     const NODE_NAME_DEL='del';
+    
+    //insert node name
     const NODE_NAME_INS='ins';
     
+    //insert tag css class
     const CSS_CLASSNAME_INS='trackchanges ownttip';
+    
+    //delete tag css class
     const CSS_CLASSNAME_DEL='trackchanges ownttip deleted';
     
     // Attributes for the trackchange-Node
@@ -46,11 +58,9 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
     const ATTRIBUTE_USERCSSNR='data-usercssnr';
     const ATTRIBUTE_WORKFLOWSTEP='data-workflowstep';
     const ATTRIBUTE_TIMESTAMP='data-timestamp';
-    
     const ATTRIBUTE_HISTORYLIST='data-historylist';
     const ATTRIBUTE_HISTORY_SUFFIX='_history_';
     const ATTRIBUTE_ACTION='data-action';
-    
     const ATTRIBUTE_USERCSSNR_VALUE_PREFIX='usernr';
     
     
@@ -77,29 +87,21 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
      * The initial segment text
      * @var string
      */
-    protected $segmentText;
+    public $segmentText;
     
     
     /***
      * Segment id
      * @var int
      */
-    protected $segmentId;
+    public $segmentId;
     
     
     /***
      * Replace field
      * @var string
      */
-    protected $replaceTarget;
-    
-    
-    /***
-     * Protected dell tags array
-     * 
-     * @var array
-     */
-    protected $originalDelTags;
+    public $replaceTarget;
     
     
     /***
@@ -115,6 +117,7 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
      */
     private $internalTagHelper;
     
+    
     public function __construct($text, $target, $id){
         $this->segmentText=$text;
         $this->replaceTarget=$target;
@@ -125,24 +128,32 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
     }
     
     
-    public function replaceText($queryString, $replaceText,$isRegex=false){
+    /***
+     * Find and replace the matches in the segment text
+     *   
+     * @param string $queryString
+     * @param string $replaceText
+     * @param string $searchType
+     * @param boolean $matchCase
+     */
+    public function replaceText($queryString, $replaceText,$searchType,$matchCase=false){
         
         //protect the tags and remove the terms
         $this->protectTags();
         
-        
         //find matches in the segment
         $html = new editor_Models_SearchAndReplace_FindMatchesHtml($this->segmentText);
-        $replaceRanges = $html->findContent($queryString,$isRegex);
+        $html->matchCase=$matchCase;
+        
+        //find match ranges in the original segment text
+        $replaceRanges = $html->findContent($queryString,$searchType);
         
         //merge the replace string in the segment
         $this->assembleReplaceContent($replaceRanges, $replaceText);
         
-        
         //unprotect the tags
         $this->unprotectTags();
         
-        error_log($this->segmentText);
     }
     
     
@@ -164,7 +175,8 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
             //handle delete tags in range
             preg_match_all(self::REGEX_PROTECTED_DEL, $range['text'], $tempMatchesProtectedDel, PREG_OFFSET_CAPTURE);
             foreach ($tempMatchesProtectedDel[0] as $match) {
-                $this->originalDelTags[$match[0]]="";
+                //remove the protected del tag conteng from the array if matches
+                $this->internalTagHelper->getOriginalTags()[$match[0]]="";
             }
             
             $stackEnd=[];
@@ -174,13 +186,15 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
                 $stackEnd[]=$match[0];
             }
             
-            $tmpText=$range['text'];
+            //open insert tag is found
             $insOpen=false;
+            //insert tag at end of the text
             $insAtEnd="";
+            //all tags to be placed at the beginning of the string
             $stackStart=[];
             
             //merge the insert tags in the replace range
-            //remove pair tags
+            //remove pair tags (start and end ins in the range)
             //move unpaired end tags at the beggining of the replace string
             //move unpaired start tags at the end of the replace string
             $rangePiece=preg_replace_callback(self::REGEX_INS, function($match) use (&$insOpen,&$stackStart,&$insAtEnd){
@@ -212,13 +226,14 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
             //create the replace ins part
             $insertPart=$this->createTrackChangesNode('ins',$replaceText.implode('', $stackEnd)).$insAtEnd;
             
-            $returnValue=$deletePart.$insertPart;
+            $str=$deletePart.$insertPart;
             
             //calculate the offset
-            $this->rangesOffset+=strlen($returnValue)-$range['length'];
+            $this->rangesOffset+=strlen($str)-$range['length'];
             
             //insert the text at the position
-            $this->segmentText=$this->insertTextAtPosition($returnValue, $range['start'], $range['end']);
+            $this->segmentText=$this->insertTextAtRange($str, $range['start'], $range['end']);
+            
         }
         
     }
@@ -236,8 +251,15 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
         
         //protect the internal tags
         $this->segmentText= $this->internalTagHelper->protect($this->segmentText);
+        
+        //set new placeholder template
+        $this->internalTagHelper->setPlaceholderTemplate('<segment:del id="%s" />');
+
+        //set new replacer regex
+        $this->internalTagHelper->setReplacerRegex(self::REGEX_DEL);
+        
         //protect the del tags
-        $this->segmentText= $this->protect($this->segmentText);
+        $this->segmentText=$this->internalTagHelper->protect($this->segmentText,true);
     }
     
     /***
@@ -245,14 +267,17 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
      */
     private function unprotectTags(){
         $this->segmentText= $this->internalTagHelper->unprotect($this->segmentText);
-        $this->segmentText=$this->unprotect($this->segmentText);
     }
     
-    public function save(){
-        //TODO use the segment post method for seaveing the replaced segment text
-    }
-    
-    private function insertTextAtPosition($text, $startIndex, $endIndex){
+    /***
+     * Insert the text at range and return the result
+     * 
+     * @param string $text        - text to be inserted
+     * @param integer $startIndex - start index 
+     * @param integer $endIndex   - end index
+     * @return string
+     */
+    private function insertTextAtRange($text, $startIndex, $endIndex){
         $partOne=substr($this->segmentText, 0, $startIndex);
         $partTwo=substr($this->segmentText, $endIndex);
         return $partOne.$text.$partTwo;
@@ -274,33 +299,6 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
         }
         return preg_replace(self::REGEX_DEL, $replacer, $segment, $limit, $count);
     }
-    
-    /**
-     * protects the delete of one segment
-     * @param string $segment
-     * @return string
-     */
-    public function protect(string $segment) {
-        $id = 1;
-        $this->originalDelTags= array();
-        return $this->replace($segment, function($match) use (&$id) {
-            $placeholder = '<segment:del id="'.$id++.'" />';
-            $this->originalDelTags[$placeholder] = $match[0];
-            return $placeholder;
-        });
-    }
-    
-    
-    
-    /**
-     * unprotects / restores the content tags
-     * @param string $segment
-     * @return string
-     */
-    public function unprotect(string $segment) {
-        return str_replace(array_keys($this->originalDelTags), array_values($this->originalDelTags), $segment);
-    }
-    
     
     /***
      * Create trackchanges node

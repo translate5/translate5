@@ -57,7 +57,7 @@ class editor_Models_SearchAndReplace_FindMatchesHtml{
      * Case insensitive search
      * @var string
      */
-    const MATCH_CASE_INSENSITIVE=true;
+    public $matchCase=false;
     
     public function __construct($html){
         $this->setHtml($html);
@@ -83,27 +83,30 @@ class editor_Models_SearchAndReplace_FindMatchesHtml{
             $tag['sum_length'    ] = $sum_length += strlen($tag[0]);
         }
         
-        //zero length dummy tagMapping to mark start/end position of strings not beginning/ending with a tag
+        //zero length dummy tag to mark start/end position of strings not beginning/ending with a tag
         array_unshift($this->tagMapping , [0 => '', 1 => 0, 'pos_in_content' => 0, 'sum_length' => 0 ]); 
         array_push($this->tagMapping , [0 => '', 1 => strlen($html)-1]); 
     }
 
     /***
      * Find the real pisition in the html text based on the match position from the text without html tags
+     * 
      * @param integer $contentPosition
+     * @param boolean $isEnd - search for end index
      * @return integer
      */
-    public function findPosition($contentPosition){
+    public function findPosition($contentPosition,$isEnd=false){
         //binary search
         $idx = [true => 0, false => count($this->tagMapping)-1];
-        while(1 < $idx[false] - $idx[true]){ 
+        while(1 < $idx[false] - $idx[true]){
             // integer half of both array indexes
             $i = ($idx[true] + $idx[false]) >>1;
 
-            //$idx[$this->tagMapping[$i]['pos_in_content'] <= $contentPosition] = $i;
-            // hold one index less and the other greater
-            $idx[$this->tagMapping[$i]['pos_in_content'] < $contentPosition] = $i;
-            
+            if($isEnd){
+                $idx[$this->tagMapping[$i]['pos_in_content'] < $contentPosition] = $i;
+            }else{
+                $idx[$this->tagMapping[$i]['pos_in_content'] <= $contentPosition] = $i;
+            }
         }
         
         $this->currentTagIdx = $idx[true];
@@ -122,24 +125,49 @@ class editor_Models_SearchAndReplace_FindMatchesHtml{
      * @param boolean $isRegex is a regular expression search
      * @return array 
      */
-    public function findContent($searchQuery,$isRegex=false){
+    public function findContent($searchQuery,$searchType){
+        
+        $isRegex = ($searchType === "regularExpressionSearch" || $searchType === "wildcardsSearch");
+        if($searchType === "wildcardsSearch"){
+
+            //posible search special characters special characters
+            $special_chars = "\.+^$[]()|{}/'#";
+            $special_chars = str_split($special_chars);
+            $escape = array();
+            foreach ($special_chars as $char){
+                $escape[$char] = "\\$char";
+            } 
+            
+            //escape the special chars if there are some
+            $searchQuery= strtr($searchQuery, $escape);
+            $searchQuery= strtr($searchQuery, array(
+                    '*' => '.*', // 0 or more (lazy) - asterisk (*)
+                    '?' => '.', // 1 character - question mark (?)
+            ));
+        }
         
         if(!$isRegex){
             $searchQuery= preg_quote($searchQuery, '~');
         }
         
-        $icase = self::MATCH_CASE_INSENSITIVE ? 'i' : '';
+        $inCase = $this->matchCase ? '' : 'i';
         
-        $searchPattern=$isRegex ? "#".$searchQuery.'#' : "~{$searchQuery}.*?~su$icase";
+        //create the search patern
+        $searchPattern=$isRegex ? "#".$searchQuery.'#'.$inCase : "~{$searchQuery}.*?~su$inCase";
 
         //find matches in the text without html in it
         preg_match_all($searchPattern, $this->cleanText, $matches, PREG_PATTERN_ORDER | PREG_OFFSET_CAPTURE);
         
         $collectedValues=[];
+        //for each match, find the start and end ingex in the original segment text
         foreach($matches[0] as &$match){
+            //get the start position index
             $posStart = $this->findPosition($match[1]);
-            $posEnd   = $this->findPosition($match[1] + strlen($match[0]));
+            
+            //get the end position ingex
+            $posEnd   = $this->findPosition($match[1] + strlen($match[0]),true);
         
+            //substrakt the range piece from the original text
             $text =substr($this->html, $posStart, $posEnd- $posStart);
             
             $collectedValues[]=[

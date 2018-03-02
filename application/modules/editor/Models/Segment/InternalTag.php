@@ -54,8 +54,22 @@ class editor_Models_Segment_InternalTag {
      */
     protected $originalTags;
     
+    /***
+     * The default tepmplate for placeholder replacer
+     * 
+     * @var string
+     */
+    private $placeholderTemplate;
+    
+    /***
+     * The replacer regex used in the replace function
+     *  
+     * @var regexp
+     */
+    private $replacerRegex;
+    
     /**
-     * replaces internal tags with either the callback or the given scalar
+     * replaces tags with either the callback or the given scalar
      * @see preg_replace
      * @see preg_replace_callback
      * @param string $segment
@@ -66,9 +80,9 @@ class editor_Models_Segment_InternalTag {
      */
     public function replace($segment, $replacer, $limit = -1, &$count = null) {
         if(!is_string($replacer) && is_callable($replacer)) {
-            return preg_replace_callback(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
+            return preg_replace_callback($this->getReplacerRegex(), $replacer, $segment, $limit, $count);
         }
-        return preg_replace(self::REGEX_INTERNAL_TAGS, $replacer, $segment, $limit, $count);
+        return preg_replace($this->getReplacerRegex(), $replacer, $segment, $limit, $count);
     }
     
     /**
@@ -353,13 +367,16 @@ class editor_Models_Segment_InternalTag {
     /**
      * protects the internal tags of one segment
      * @param string $segment
+     * @param boolean $keepOld - keep the old tags in the array, defalut no
      * @return string
      */
-    public function protect(string $segment) {
+    public function protect(string $segment,boolean $keepOld=null) {
         $id = 1;
-        $this->originalTags = array();
+        if(!$keepOld){
+            $this->originalTags = array();
+        }
         return $this->replace($segment, function($match) use (&$id) {
-            $placeholder = '<translate5:escaped id="'.$id++.'" />';
+            $placeholder = $this->getPlaceholderTemplate($id++);
             $this->originalTags[$placeholder] = $match[0];
             return $placeholder;
         });
@@ -373,4 +390,58 @@ class editor_Models_Segment_InternalTag {
     public function unprotect(string $segment) {
         return str_replace(array_keys($this->originalTags), array_values($this->originalTags), $segment);
     }
+    
+    /***
+     * Set the placeholder template
+     * @param string $template
+     */
+    public function setPlaceholderTemplate(string $template){
+        $this->placeholderTemplate=$template;
+    }
+    
+    /***
+     * Return the placeholder template with id 
+     * 
+     * @param integer $id
+     * @return string
+     */
+    public function getPlaceholderTemplate($id){
+        //if is not set, set the default placeholder template
+        if(!$this->placeholderTemplate){
+            $this->placeholderTemplate='<translate5:escaped id="%s" />';
+        }
+        return sprintf($this->placeholderTemplate, $id);
+    }
+    
+    /***
+     * Set the replacer regex used in replace function
+     * 
+     * @param string $replacerRegex
+     */
+    public function setReplacerRegex(string $replacerRegex){
+        $this->replacerRegex=$replacerRegex;
+    }
+    
+    /***
+     * Get the replace regex used in the replace function
+     * 
+     * @return regexp
+     */
+    public function getReplacerRegex(){
+        //if it is not set, set the default regex
+        if(!$this->replacerRegex){
+            $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
+        }
+        return $this->replacerRegex;
+    }
+    
+    /***
+     * Return the original tags
+     * 
+     * @return array
+     */
+    public function getOriginalTags(){
+        return $this->originalTags;
+    }
+    
 }
