@@ -155,7 +155,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       //check tag is needed for the checkplausibilityofput feature on server side 
       var me = this,
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
-      
+      if (Ext.isGecko && value=="") {
+          // TRANSLATE-1042: Workaround Firefox
+          // - add invisible placeholder, otherwise Firefox might not be able to detect selections correctly (= html instead of the body)
+          // - will be removed on saving anyway (or even before during clean-up of the TrackChanges)
+          value = "&#8203;"; 
+      }
       me.setValue(me.markupForEditor(value)+checkTag);
   },
   /**

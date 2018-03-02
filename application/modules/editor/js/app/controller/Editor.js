@@ -90,9 +90,7 @@ Ext.define('Editor.controller.Editor', {
                 contentErrors: 'handleSaveWithErrors'
             },
             'roweditor': {
-                destroy: 'handleDestroyRoweditor',
-                repositioned: 'repositionEditor',
-                dragend: 'handleEditorDragend'
+                destroy: 'handleDestroyRoweditor'
             },
             'roweditor displayfield[isContentColumn!=true]': {
                 afterrender: 'initMoveToolTip'
@@ -113,7 +111,7 @@ Ext.define('Editor.controller.Editor', {
         });
         
         //set the default config
-        //(when editing this, pls also check eventIsTranslate5() in Editor.plugins.TrackChanges.controller.Editor) 
+        //'xyz': [key(s), {ctrl, alt, shift}, fn, defaultEventAction==stopEvent]
         me.keyMapConfig = {
             'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
@@ -133,11 +131,15 @@ Ext.define('Editor.controller.Editor', {
             'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
             'ctrl-comma':     [188,{ctrl: true, alt: false, shift: false}, me.handleDigitPreparation(me.handleInsertTag), true],
             'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
-            'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
-            'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
             'ctrl-insert':    [Ext.EventObjectImpl.INSERT,{ctrl: true, alt: false}, me.copySourceToTarget],
-            'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget] //Mac Alternative key code
+            'ctrl-dot':       [190,{ctrl: true, alt: false}, me.copySourceToTarget], //Mac Alternative key code,
+            // DEC_DIGITS:
+            // (If you change the setting for a defaultEventAction for DEC_DIGITS,
+            // please check if eventIsTranslate5() still works as expected 
+            // in Editor.plugins.TrackChanges.controller.UtilEvent).
+            'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
+            'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit]
         };
         
         //FIXME let me come from the server out of AutoStates.php
@@ -398,10 +400,11 @@ Ext.define('Editor.controller.Editor', {
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
-        me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
+        editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: docEl,
             binding: me.getKeyMapConfig()
         });
+        editor.DEC_DIGITS = me.DEC_DIGITS;
         docEl.on('paste', function(e){
             e.stopPropagation();
             e.preventDefault();
@@ -409,24 +412,14 @@ Ext.define('Editor.controller.Editor', {
         }, me, {delegated: false});
         if(me.editorTooltip){
             me.editorTooltip.setTarget(editor.getEditorBody());
-            me.editorTooltip.targetOffset = offset;
+            me.editorTooltip.targetIframe = editor.iframeEl;
         }
         else {
             me.editorTooltip = Ext.create('Editor.view.ToolTip', {
                 target: editor.getDoc(),
-                targetOffset: offset
+                targetIframe: editor.iframeEl
             });
         }
-    },
-    repositionEditor: function(editor) {
-        if(this.editorTooltip){
-            var offset = editor.mainEditor.iframeEl.getXY();
-            this.editorTooltip.targetOffset = offset;
-        }
-    },
-    handleEditorDragend: function(moved, event){
-        var comp = (moved.proxy && !moved.comp.liveDrag) ? moved.proxy : moved.comp;
-        this.repositionEditor(comp);
     },
     clearKeyMaps: function() {
         var me = this;
