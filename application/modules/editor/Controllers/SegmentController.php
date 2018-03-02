@@ -402,7 +402,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $ob=new stdClass();
             $ob->$searchInField=$replace->segmentText;
             $ob->autoStateId=999;
-            $ob->durations=$parametars['durations'];
+            
+            //create duration for modefied field
+            $duration=new stdClass();
+            $duration->$searchInField=$parametars['durations'];
+            
+            $ob->durations=$duration;
             
             $this->getRequest()->setParam('data',null);
             $this->getRequest()->setParam('data',json_encode((array)$ob));
