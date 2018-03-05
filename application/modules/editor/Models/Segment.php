@@ -153,13 +153,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
-        if(!isset($parametars['searchInField']) || !isset($parametars['searchField']) || !isset($parametars['searchType'])){
-            $msg=array();
-            $msg['message']="Missing search parametar. Required parametars:searchInField,searchField,searchType";
-            $msg=Zend_Json::encode((object)$msg, Zend_Json::TYPE_OBJECT);
-            throw new ZfExtended_Exception($msg);
-        }
-        
         $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView  */
         $mv->setTaskGuid($taskGuid);
@@ -175,7 +168,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 array('id',
                 'segmentNrInTask',
                 $parametars['searchInField'],
-                $parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX,
+                $parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX,//to sort field
                 'editable'
                 ))
         ->where($searchQuery)
@@ -208,8 +201,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function buildSearchString($parametars){
         $searchInField=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
         $queryString=$parametars['searchField'];
-        $searchType=$parametars['searchType'];
-        $matchCase=isset($parametars['matchCase']) ? $parametars['matchCase'] : null;
+        $searchType=isset($parametars['searchType']) ? $parametars['searchType'] : null;
+        $matchCase=isset($parametars['matchCase']) ? (strtolower($parametars['matchCase'])=='true'): false;
         
         //search type regular expression
         if($searchType==='regularExpressionSearch'){

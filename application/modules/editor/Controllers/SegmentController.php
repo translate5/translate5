@@ -324,18 +324,29 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      */
     public function searchAction(){
         
-        //check here also if the max allowed character number it is in his limit
-        $this->checkSearchStringLength();        
+        //check character number limit
+        if(!$this->checkSearchStringLength()){
+            return;
+        }
+        
+        //check if the required search parametars are in the request
+        if(!$this->checkRequiredSearchParametars($this->getAllParams())){
+            return;
+        }
         
         //find all segments for the search parametars
         $result=$this->entity->search($this->getAllParams());
         
-        //return the results
-        $this->setupResponse([
-                'success'=>true,
-                'rows'=>$result,
-                'hasMqm'=>$this->isMqmTask($this->getParam('taskGuid'))
-        ]);
+        if(!$result|| empty($result)){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
+            return;
+        }
+        
+        $this->view->rows = $result;
+        $this->view->total=count($result);
+        $this->view->hasMqm=$this->isMqmTask($this->getParam('taskGuid'));
     }
     
     /***
@@ -350,29 +361,30 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
         if($this->isMqmTask($parametars['taskGuid'])){
-            $msg =$t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
-            $this->setupResponse([
-                    'success'=>true,
-                    'hasMqm'=>true,
-                    'message'=>$msg
-            ]);
+            $this->view->message= $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
+            $this->view->hasMqm=true;
+            return;
         }
         
-        //check here also if the max allowed character number it is in his limit
-        $this->checkSearchStringLength();
+        //check character number limit
+        if(!$this->checkSearchStringLength()){
+            return;
+        }
+        
+        //check if the required search parametars are in the request
+        if(!$this->checkRequiredSearchParametars($this->getAllParams())){
+            return;
+        }
         
         //find all segments for the search parametars
         $results=$this->entity->search($parametars);
         
         $searchInField=$parametars['searchInField'];
-        $matchCase=isset($parametars['matchCase']) ? $parametars['matchCase'] : false;
+        $searchType=isset($parametars['searchType']) ? $parametars['searchType'] : null;
+        $matchCase=isset($parametars['matchCase']) ? (strtolower($parametars['matchCase'])=='true'): false;
         
         if(!$results || empty($results)){
-            $msg =$t->_('Keine Ergebnisse für die aktuelle Suche!');
-            $this->setupResponse([
-                    'success'=>true,
-                    'message'=>$msg
-            ]);
+            $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
             return;
         }
         
@@ -392,7 +404,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             }
             
             //find matches in the html text and replace them
-            $replace->replaceText($parametars['searchField'], $parametars['replaceFieldValue'],$parametars['searchType'],$matchCase);
+            $replace->replaceText($parametars['searchField'], $parametars['replaceField'],$searchType,$matchCase);
             
             //init the entity
             $this->entity = ZfExtended_Factory::get($this->entityClass);
@@ -422,13 +434,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             
             //trigger the after put action
             $this->afterActionEvent('put');
+            
+            //do not return the segment text, it will be loaded by the segments store
+            $result[$searchInField]='';
         }
         
         //return the modefied segments
-        $this->setupResponse([
-                'success'=>true,
-                'rows'=>$results
-        ]);
+        $this->view->rows = $results;
+        $this->view->total=count($results);
     }
     
     /**
@@ -638,38 +651,48 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     private function checkSearchStringLength(){
         
         $searchField=$this->getParam('searchField');
+        $isValid=true;
         if(!$searchField){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+            
+            $errors = array('searchField' => $t->_('Das Suchfeld ist leer.'));
             $e = new ZfExtended_ValidateException();
-            $msg=array();
-            $msg['searchField']='Das Suchfeld ist leer.';
-            $e->setMessage(Zend_Json::encode((object)$msg, Zend_Json::TYPE_OBJECT));
-            throw $e;
+            $e->setErrors($errors);
+            $this->handleValidateException($e);
+            $isValid=false;
         }
         
         $length=strlen(utf8_decode($searchField));
         if($length>1024){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            
+            $errors = array('searchField' => $t->_('Der Suchbegriff ist zu groß.'));
             $e = new ZfExtended_ValidateException();
-            $msg=array();
-            $msg['searchField']='Der Suchbegriff ist zu groß.';
-            $e->setMessage(Zend_Json::encode((object)$msg, Zend_Json::TYPE_OBJECT));
-            throw $e;
+            $e->setErrors($errors);
+            $this->handleValidateException($e);
+            $isValid=false;
         }
+        
+        return $isValid;
     }
     
     /***
-     * Setup the response message,success and rows
-     * Expected parametars:
-     * 
-     *  success => boolean (was the request successful)
-     *  message => string  (info message for the response)
-     *  rows    => array   (result array)
-     *  hasMqm  => boolean (the current task has mqms)
+     * Check if the required search parametars are provided
      * 
      * @param array $parametars
+     * @return boolean
      */
-    private function setupResponse($parametars){
-        echo Zend_Json::encode((object)$parametars, Zend_Json::TYPE_OBJECT);
-        exit();
+    private function checkRequiredSearchParametars(array $parametars){
+        if(!isset($parametars['searchInField']) || !isset($parametars['searchField']) || !isset($parametars['searchType'])){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            $e = new ZfExtended_ValidateException();
+            $e->setMessage($t->_('Missing search parametar. Required parametars:searchInField,searchField,searchType.'));
+            throw $e;
+        }
+        return true;
     }
     
     /***
