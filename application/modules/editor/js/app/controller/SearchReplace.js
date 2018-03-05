@@ -758,43 +758,43 @@ Ext.define('Editor.controller.SearchReplace', {
     },
 
     /***
-     * Search the givven imput string
+     * Search for the matches in the database.
+     * If matches are found, set the viewmodels and open the first segment where the matches are found
      */
     search:function(){
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             activeTabViewModel=activeTab.getViewModel(),
-            form=activeTab.getForm(),
-            segmentGrid = me.getSegmentGrid(),
-            segmentStore=segmentGrid.editingPlugin.grid.store,
-            proxy = segmentStore.getProxy(),
             params = {};
-        
-        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
-        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
-        params['taskGuid']=Editor.data.task.get('taskGuid');
+
 
         me.searchRequired=false;
-        
-        form.submit({
+
+        //get the search parametars (with filter and sort included)
+        params=me.getSearchReplaceParams();
+
+        Ext.Ajax.request({
             url: Editor.data.restpath+'segment/search',
             params:params,
             method:'GET',
-            success: function(form, submit){
-                if(!submit.result){
+            success: function(response){
+                var responseData = JSON.parse(response.responseText);
+                if(!responseData){
                     return;
                 }
-                var foundSegments = submit.result.rows,
-                    message=submit.result.message,
+                var foundSegments = responseData.rows,
+                    message=responseData.message,
                     tabPanelviewModel=tabPanel.getViewModel();
 
+                tabPanelviewModel.set('hasMqm',responseData.hasMqm ? true : false);
+                
                 if(!foundSegments && message){
                     Editor.MessageBox.addInfo(message);
+                    return;
                 }
 
                 tabPanelviewModel.set('searchResultsFound',foundSegments.length > 0);
-                tabPanelviewModel.set('hasMqm',submit.result.hasMqm);
                 
                 activeTabViewModel.set('resultsCount',foundSegments.length);
                 
@@ -804,17 +804,8 @@ Ext.define('Editor.controller.SearchReplace', {
 
                 me.startTimeTracking();
             },
-            failure: function(form, submit){
-                var response = submit.response;
-                if(response.status==400 && response.responseText) {
-                    try{
-                        var obj = JSON.parse(response.responseText);
-                        form.markInvalid(obj);
-                        return;
-                    }catch(error){
-                    }
-                }
-                Editor.app.getController('ServerException').handleException(submit.response);
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
             }
         });
     },
@@ -869,61 +860,46 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            replaceFieldValue=activeTab.down('#replaceField').getValue(),
             activeTabViewModel=activeTab.getViewModel(),
-            form=activeTab.getForm(),
             params = {},
-            editingPlugin=me.getSegmentGrid().editingPlugin,
-            segmentStore=editingPlugin.grid.store,
-            proxy = segmentStore.getProxy();
+            editingPlugin=me.getSegmentGrid().editingPlugin;
 
         //colose the row editor if is opened
         if(editingPlugin.editing){
             editingPlugin.cancelEdit();
         }
 
-        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
-        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
-
-        params['replaceFieldValue']=replaceFieldValue;
-        params['taskGuid']=Editor.data.task.get('taskGuid');
-
         //stop the time tracking
         me.stopTimeTracking();
-        params['durations']=me.timeTracking;
-
-        //if track changes are active, set the trackchanges flag and parametars
-        if(me.isActiveTrackChanges()){
-            params['isActiveTrackChanges']=true;
-            params['attributeWorkflowstep']=Editor.data.task.get('workflowStepName')+Editor.data.task.get('workflowStep');
-            params['userColorNr']=Editor.data.task.get('userColorNr');
-        }
-        
         //setup segment grid autostate before replace all is called
         me.segmentGridOnReplaceAll(activeTabViewModel.get('result'));
 
+        //show the loading mask on the search window and on the segment grid
         me.showReplaceAllLoading(true);
 
-        form.submit({
+        //get the search parametars
+        params=me.getSearchReplaceParams(true);
+
+        Ext.Ajax.request({
             url: Editor.data.restpath+'segment/replaceall',
             params:params,
             method:'POST',
-            success: function(form, submit){
-                
+            success: function(response){
                 //stop the loading
                 me.showReplaceAllLoading(false);
-
-                if(!submit.result){
+                var responseData = JSON.parse(response.responseText);
+                if(!responseData){
                     return;
                 }
 
-                var replacedSegments = submit.result.rows,
-                    message=submit.result.message,
+                var replacedSegments = responseData.rows,
+                    message=responseData.message,
                     tabPanelviewModel=tabPanel.getViewModel();
 
+                //display the message if there are no results
                 if(!replacedSegments && message){
                     Editor.MessageBox.addInfo(message);
-                    tabPanelviewModel.set('hasMqm',submit.result.hasMqm);
+                    tabPanelviewModel.set('hasMqm',responseData.hasMqm);
                     return;
                 }
                 tabPanelviewModel.set('hasMqm',false);
@@ -934,19 +910,14 @@ Ext.define('Editor.controller.SearchReplace', {
                 //reset some of the viewmodels properties (clean the search results)
                 me.resetSearchParametars();
             },
-            failure: function(form, submit){
+            failure: function(response){
                 //stop the loading
                 me.showReplaceAllLoading(false);
-                var response = submit.response;
-                if(response.status==400 && response.responseText) {
-                    try{
-                        var obj = JSON.parse(response.responseText);
-                        form.markInvalid(obj);
-                        return;
-                    }catch(error){
-                    }
-                }
-                Editor.app.getController('ServerException').handleException(submit.response);
+                
+                //reload the requested segments
+                me.segmentGridOnReplaceAll(activeTabViewModel.get('result'),true);
+
+                Editor.app.getController('ServerException').handleException(response);
             }
         });
     },
@@ -1581,6 +1552,46 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     /***
+     * Get the search parametar from the search form.
+     */
+    getSearchReplaceParams:function(isReplace){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            form=activeTab.getForm(),
+            formFields=form.getFields().items,
+            segmentGrid = me.getSegmentGrid(),
+            segmentStore=segmentGrid.editingPlugin.grid.store,
+            proxy = segmentStore.getProxy(),
+            params = {};
+
+        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
+        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
+        params['taskGuid']=Editor.data.task.get('taskGuid');
+        params['searchType']=activeTab.down('radiofield').getGroupValue();
+
+        //set the form values as parametars
+        for(var i=0;i<formFields.length;i++){
+            if(formFields[i].itemId){
+                params[formFields[i].itemId]=formFields[i].getValue();
+            }
+        }
+
+        if(isReplace){
+            params['durations']=me.timeTracking;
+        }
+
+        //if track changes are active, set the trackchanges flag and parametars
+        if(me.isActiveTrackChanges()){
+            params['isActiveTrackChanges']=true;
+            params['attributeWorkflowstep']=Editor.data.task.get('workflowStepName')+Editor.data.task.get('workflowStep');
+            params['userColorNr']=Editor.data.task.get('userColorNr');
+        }
+
+        return params;
+    },
+
+    /***
      * Return the search term for given type
      */
     handleSearchType:function(searchTerm,searchType,matchCase){
@@ -1659,7 +1670,7 @@ Ext.define('Editor.controller.SearchReplace', {
      * Start the replace all time tracking
      */
     startTimeTracking:function(){
-        var me = this;
+        var me = this; 
         me.timeTracking = new Date();
     },
 
