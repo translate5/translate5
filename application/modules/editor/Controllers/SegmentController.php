@@ -266,7 +266,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->decodePutData();
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
-        $this->entity->setTimeTrackData($this->data->durations);
+        $this->entity->setTimeTrackData($this->data->durations,isset($this->data->durationsDivisor) ? $this->data->durationsDivisor : 1);
         $this->convertQmId();
 
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
@@ -387,7 +387,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
             return;
         }
-        
+        $resultsCount=count($results);
         foreach ($results as $result){
             $replace=ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment',[
                     $result[$searchInField],//text to be replaced
@@ -420,8 +420,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //create duration for modefied field
             $duration=new stdClass();
             $duration->$searchInField=$parametars['durations'];
-            
             $ob->durations=$duration;
+            
+            //set the duration devisor to the number of the results so the duration is splitted equally for each replaced result
+            $ob->durationsDivisor=$resultsCount;
             
             $this->getRequest()->setParam('data',null);
             $this->getRequest()->setParam('data',json_encode((array)$ob));
