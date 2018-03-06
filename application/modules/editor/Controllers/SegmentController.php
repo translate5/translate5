@@ -60,6 +60,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected $events = false;
     
     
+    /***
+     * Number to divide the segment duration
+     * 
+     * @var integer
+     */
+    public $durationsDivisor=1;
+    
     /**
      * Initialize event-trigger.
      * 
@@ -266,7 +273,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->decodePutData();
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
-        $this->entity->setTimeTrackData($this->data->durations,isset($this->data->durationsDivisor) ? $this->data->durationsDivisor : 1);
+        $this->entity->setTimeTrackData($this->data->durations,$this->durationsDivisor);
         $this->convertQmId();
 
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
@@ -423,7 +430,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $ob->durations=$duration;
             
             //set the duration devisor to the number of the results so the duration is splitted equally for each replaced result
-            $ob->durationsDivisor=$resultsCount;
+            $this->durationsDivisor=$resultsCount;
             
             $this->getRequest()->setParam('data',null);
             $this->getRequest()->setParam('data',json_encode((array)$ob));
