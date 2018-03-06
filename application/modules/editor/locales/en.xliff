@@ -2252,25 +2252,25 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='IC0gW0FVRkdBQkUgVU5CRVNUw4RUSUdUXQ=='>
     <source> - [AUFGABE UNBESTÄTIGT]</source>
-    <target> - [AUFGABE UNBESTÄTIGT]</target>
+    <target> - [TASK UNCONFIRMED]</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSB3dXJkZSBiZXN0w6R0aWd0IHVuZCB6dW0gQmVhcmJlaXRlbiBmcmVpZ2VnZWJlbi4='>
     <source>Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.</source>
-    <target>Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.</target>
+    <target>Task was confirmed and can be edited now.</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIGJlc3TDpHRpZ3QuLi4='>
     <source>Aufgabe wird bestätigt...</source>
-    <target>Aufgabe wird bestätigt...</target>
+    <target>Task is in confirmation...</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBiZXN0w6R0aWdlbj8='>
     <source>Aufgabe bestätigen?</source>
-    <target>Aufgabe bestätigen?</target>
+    <target>Confirm task?</target>
 </trans-unit>
-<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlc3TDpHRpZ2VuPyA8YnI+IE9obmUgQmVzdMOkdGlndW5nIGthbm4gZGllc2UgbmljaHQgYmVhcmJlaXRldCB3ZXJkZW4u'>
-    <source>Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.</source>
-    <target>Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.</target>
+
+<trans-unit id='YmVzdMOkdGlnZW4='>
+    <source>bestätigen</source>
+    <target>confirm</target>
 </trans-unit>
-<trans-unit id='YmVzdMOkdGlnZW4='><source>bestätigen</source><target>bestätigen</target></trans-unit>
 
     </body>
   </file>
