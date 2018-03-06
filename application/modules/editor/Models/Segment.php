@@ -161,16 +161,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->reInitDb($taskGuid);
         $this->segmentFieldManager->initFields($taskGuid);
         
+        //get the search sql string
         $searchQuery=$this->buildSearchString($parametars);
         
+        //the field where the search will be performed (toSort field)
+        $searchInToSort=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        
         $select= $this->db->select()
-        ->from($viewName, 
-                array('id',
-                'segmentNrInTask',
-                $parametars['searchInField'],
-                $parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX,//to sort field
-                'editable'
-                ))
+        ->from($viewName,array('id','segmentNrInTask',$parametars['searchInField'],$searchInToSort,'editable'))
         ->where($searchQuery)
         ->where('editable = 1');
         
@@ -199,8 +197,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return boolean|string
      */
     public function buildSearchString($parametars){
-        $searchInField=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $adapter=$this->db->getAdapter();
+
         $queryString=$parametars['searchField'];
+        $searchInField=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
         $searchType=isset($parametars['searchType']) ? $parametars['searchType'] : null;
         $matchCase=isset($parametars['matchCase']) ? (strtolower($parametars['matchCase'])=='true'): false;
         
@@ -213,9 +213,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             //    return false;
             //}
             if(!$matchCase){
-                return $searchInField.' REGEXP '.$this->db->getAdapter()->quote($queryString);
+                return $adapter->quoteIdentifier($searchInField).' REGEXP '.$adapter->quote($queryString);
             }
-            return $searchInField.' REGEXP BINARY '.$this->db->getAdapter()->quote($queryString);
+            return $adapter->quoteIdentifier($searchInField).' REGEXP BINARY '.$adapter->quote($queryString);
         }
         //search type regular wildcard
         if($searchType==='wildcardsSearch'){
@@ -224,9 +224,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //if match case, search without lower function
         if($matchCase){
-            return $searchInField.' like '.$this->db->getAdapter()->quote('%'.$queryString.'%').' COLLATE utf8_bin';
+            return $adapter->quoteIdentifier($searchInField).' like '.$adapter->quote('%'.$queryString.'%').' COLLATE utf8_bin';
         }
-        return 'lower('.$searchInField.') like lower('.$this->db->getAdapter()->quote('%'.$queryString.'%').') COLLATE utf8_bin';
+        return 'lower('.$adapter->quoteIdentifier($searchInField).') like lower('.$adapter->quote('%'.$queryString.'%').') COLLATE utf8_bin';
     }
     
     /**

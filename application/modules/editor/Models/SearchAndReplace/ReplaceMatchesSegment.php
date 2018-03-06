@@ -26,6 +26,14 @@
  END LICENSE AND COPYRIGHT
  */
 
+/***
+ * This class is used to replace the content between two ranges(the ranges are provided by editor_Models_SearchAndReplace_FindMatchesHtml)/indexes (start and end index) 
+ * in string/segment with or without html tags in it.
+ * Unneded content betwen those ranges will be removed or moved after the replace string(see assembleReplaceContent function)
+ * 
+ * @author aleksandar
+ *
+ */
 class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
 
     // del-Tag:  including their content!
@@ -176,7 +184,7 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
             preg_match_all(self::REGEX_PROTECTED_DEL, $range['text'], $tempMatchesProtectedDel, PREG_OFFSET_CAPTURE);
             foreach ($tempMatchesProtectedDel[0] as $match) {
                 //remove the protected del tag conteng from the array if matches
-                $this->internalTagHelper->getOriginalTags()[$match[0]]="";
+                $this->internalTagHelper->updateOriginalTagValue($match[0],"");
             }
             
             $stackEnd=[];

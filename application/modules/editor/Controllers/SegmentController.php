@@ -331,18 +331,20 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      */
     public function searchAction(){
         
-        //check character number limit
-        if(!$this->checkSearchStringLength()){
+        $parametars=$this->getAllParams();
+        
+        //check if the required search parametars are in the request
+        if(!$this->checkRequiredSearchParametars($parametars)){
             return;
         }
         
-        //check if the required search parametars are in the request
-        if(!$this->checkRequiredSearchParametars($this->getAllParams())){
+        //check character number limit
+        if(!$this->checkSearchStringLength($parametars['searchField'])){
             return;
         }
         
         //find all segments for the search parametars
-        $result=$this->entity->search($this->getAllParams());
+        $result=$this->entity->search($parametars);
         
         if(!$result|| empty($result)){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
@@ -353,7 +355,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         $this->view->rows = $result;
         $this->view->total=count($result);
-        $this->view->hasMqm=$this->isMqmTask($this->getParam('taskGuid'));
+        $this->view->hasMqm=$this->isMqmTask($parametars['taskGuid']);
     }
     
     /***
@@ -365,6 +367,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */;
         
+        //check if the required search parametars are in the request
+        if(!$this->checkRequiredSearchParametars($parametars)){
+            return;
+        }
+        
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
         if($this->isMqmTask($parametars['taskGuid'])){
@@ -374,12 +381,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         }
         
         //check character number limit
-        if(!$this->checkSearchStringLength()){
-            return;
-        }
-        
-        //check if the required search parametars are in the request
-        if(!$this->checkRequiredSearchParametars($this->getAllParams())){
+        if(!$this->checkSearchStringLength($parametars['searchField'])){
             return;
         }
         
@@ -657,9 +659,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     /***
      * Check if the search string length is in between 0 and 1024 characters long
      */
-    private function checkSearchStringLength(){
+    private function checkSearchStringLength($searchField){
         
-        $searchField=$this->getParam('searchField');
         $isValid=true;
         if(!$searchField){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();

@@ -26,6 +26,14 @@
  END LICENSE AND COPYRIGHT
  */
 
+/***
+ * This class is used to find matches in the original segment text(html tags included) and return there start and end index.
+ * The start and end index can be used as replace range.
+ * The findContent function will return also the range content and the range content character length.
+ * 
+ * @author aleksandar
+ *
+ */
 class editor_Models_SearchAndReplace_FindMatchesHtml{
     
     /***

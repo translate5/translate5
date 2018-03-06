@@ -444,4 +444,18 @@ class editor_Models_Segment_InternalTag {
         return $this->originalTags;
     }
     
+    /***
+     * Update the protected tag value by given key
+     * @param mixed $key
+     * @param mixed $value
+     * @return boolean
+     */
+    public function updateOriginalTagValue($key,$value){
+        if(isset($this->originalTags[$key])){
+            $this->originalTags[$key]=$value;
+            return true;
+        }
+        return false;
+    }
+    
 }
