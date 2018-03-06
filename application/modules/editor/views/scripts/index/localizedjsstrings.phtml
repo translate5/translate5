@@ -126,6 +126,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
+  	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
@@ -626,10 +627,21 @@ Ext.define('Editor.controller.Localizer', {
             confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
             confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
             taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
+            taskConfirmed: '<?php echo $this->translate->_('Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.');?>',
             taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
             taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
+            taskConfirming: '<?php echo $this->translate->_('Aufgabe wird bestätigt...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
-            saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>',
+            saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.task.ConfirmationWindow", {
+        override: "Editor.view.task.ConfirmationWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('Aufgabe bestätigen?');?>', 
+            confirmMsg: '<?php echo $this->translate->_('Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.');?>', 
+            confirmBtn: '<?php echo $this->translate->_('bestätigen');?>' 
         }
     });
     
