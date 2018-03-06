@@ -481,18 +481,18 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @returns {String}
    */
   imgNodeToString: function(imgNode, markup) {
-	  var id = '', 
-	  	  src = imgNode.src.replace(/^.*\/\/[^\/]+/, ''),
-	  	  img = Ext.fly(imgNode),
-	  	  comment = img.getAttribute('data-comment');
-	  	  seq = img.getAttribute('data-seq');
-	  if(markup) { //on markup an id is needed for remove orphaned tags
-		  //qm-image-open-#
-		  //qm-image-close-#
-		  id = (/open/.test(imgNode.className) ? 'open' : 'close');
-		  id = 'id="qm-image-'+id+'-'+seq+'"';
-	  }
-	  return Ext.String.format('<img {0} class="{1}" data-seq="{2}" data-comment="{3}" src="{4}" />', id, imgNode.className, seq, comment ? comment : '', src);
+      var id = '', 
+          src = imgNode.src.replace(/^.*\/\/[^\/]+/, ''),
+          img = Ext.fly(imgNode),
+          comment = img.getAttribute('data-comment');
+      seq = img.getAttribute('data-seq');
+      if(markup) { //on markup an id is needed for remove orphaned tags
+          //qm-image-open-#
+          //qm-image-close-#
+          id = (/open/.test(imgNode.className) ? 'open' : 'close');
+          id = ' id="qm-image-'+id+'-'+seq+'"';
+      }
+      return Ext.String.format('<img{0} class="{1}" data-seq="{2}" data-comment="{3}" src="{4}" />', id, imgNode.className, seq, comment ? comment : '', src);
   },
   /**
    * returns a IMG tag with a segment identifier for "checkplausibilityofput" check in PHP
