@@ -62,7 +62,7 @@ Ext.define('Editor.view.searchandreplace.SearchReplaceWindow', {
                     type:'help',
                     tooltip:me.strings.helpButtonTooltip,
                     handler:function(){
-                        window.open('https://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts','_blank');
+                        window.open('https://confluence.translate5.net/display/BUS/Search+and+replace','_blank');
                     }
                 }]
         };
