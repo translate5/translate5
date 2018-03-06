@@ -199,9 +199,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $on, array());
         }
         else {
-            $s->join(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
+            $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
             ->where($alias.'.userGuid = ? OR t.pmGuid = ?', $userGuid);
-        }        
+        }
         return $s;
     }
     
