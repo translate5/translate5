@@ -140,9 +140,12 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         //workflow-step:
         $node[]=self::ATTRIBUTE_WORKFLOWSTEP.'="'.$this->attributeWorkflowstep.'"';
         
-        $date = new DateTime();
+        //create 13 digit unix timestamp used by trackchanges tooltip
+        list($usec, $sec) = explode(" ", microtime());
+        $time13 = sprintf('%d%03d', $sec, $usec/1000);
+        
         // timestamp af the change:
-        $node[]=self::ATTRIBUTE_TIMESTAMP.'="'.$date->getTimestamp().'"';
+        $node[]=self::ATTRIBUTE_TIMESTAMP.'="'.$time13.'"';
         
         $node[]='>'.$nodeText.'</'.$nodeName.'>';
         
