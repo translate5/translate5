@@ -2247,29 +2247,34 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='bmljaHQgYmVzdMOkdGlndA=='>
     <source>nicht bestätigt</source>
-    <target>unconfirmed</target>
+    <target>not approved</target>
 </trans-unit>
 
 <trans-unit id='IC0gW0FVRkdBQkUgVU5CRVNUw4RUSUdUXQ=='>
     <source> - [AUFGABE UNBESTÄTIGT]</source>
-    <target> - [TASK UNCONFIRMED]</target>
+    <target> - [TASK NOT APPROVED]</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSB3dXJkZSBiZXN0w6R0aWd0IHVuZCB6dW0gQmVhcmJlaXRlbiBmcmVpZ2VnZWJlbi4='>
     <source>Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.</source>
-    <target>Task was confirmed and can be edited now.</target>
+    <target>Task was approved and can be edited now.</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSB3aXJkIGJlc3TDpHRpZ3QuLi4='>
     <source>Aufgabe wird bestätigt...</source>
-    <target>Task is in confirmation...</target>
+    <target>Approving task...</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBiZXN0w6R0aWdlbj8='>
     <source>Aufgabe bestätigen?</source>
-    <target>Confirm task?</target>
+    <target>Approve task?</target>
 </trans-unit>
 
 <trans-unit id='YmVzdMOkdGlnZW4='>
     <source>bestätigen</source>
-    <target>confirm</target>
+    <target>approve</target>
+</trans-unit>
+
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlc3TDpHRpZ2VuPyA8YnIvPiBPaG5lIEJlc3TDpHRpZ3VuZyBrYW5uIGRpZXNlIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLg=='>
+    <source>Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.</source>
+    <target>Do you want to approve the task? <br/> Only an approved task can be edited.</target>
 </trans-unit>
 
     </body>
