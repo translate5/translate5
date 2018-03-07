@@ -79,7 +79,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       user_state_finished: '#UT#abgeschlossen',
       task_state_end: '#UT#beendet',
       task_state_unconfirmed: '#UT#nicht bestätigt',
-      task_state_import: '#UT#beendet',
+      task_state_import: '#UT#import',
       locked: '#UT#in Arbeit',
       forMe: '#UT#für mich '
   },
@@ -257,6 +257,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   if(rec.isLocked() && rec.isCustomState()) {
                       meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedSystem, rec.get('state'))+'"';
                       return me.strings.locked;
+                  }
+                  if(rec.isLocked() && rec.isUnconfirmed()) {
+                      meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
+                      return me.strings.locked;
+                  }
+                  if(rec.isUnconfirmed()) {
+                      meta.tdAttr = 'data-qtip="' + me.states.task_state_unconfirmed+'"';
+                      return me.states.task_state_unconfirmed;
                   }
                   if(rec.isLocked()) {
                       meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';

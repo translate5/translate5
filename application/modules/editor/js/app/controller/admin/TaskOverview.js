@@ -339,11 +339,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       app.mask(me.strings.taskOpening, task.get('taskName'));
       task.save({
           success: function(rec, op) {
-              if(rec && initialState == task.USER_STATE_EDIT && rec.get('userState') == task.USER_STATE_VIEW) {
+              var confirmed = !task.isUnconfirmed();
+              if(rec && initialState == task.USER_STATE_EDIT && rec.get('userState') == task.USER_STATE_VIEW && confirmed) {
                   Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, rec.get('lockingUsername')));
               }
               app.unmask();
-              Editor.app.openEditor(rec, readonly);
+              Editor.app.openEditor(rec);
           },
           failure: app.unmask
       });

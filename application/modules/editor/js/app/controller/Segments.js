@@ -193,9 +193,14 @@ Ext.define('Editor.controller.Segments', {
           task = Editor.data.task,
           isEditor = Editor.app.authenticatedUser.isAllowed('editorEditTask', task),
           readOnly = task.isReadOnly() || !isEditor,
+          title = readOnly ? grid.title_readonly : grid.title,
           store = grid.store,
           proxy = store.getProxy(),
           initialGridFilters = Editor.data.initialGridFilters;
+      
+      if(task.isUnconfirmed()) {
+          title = title + grid.title_addition_unconfirmed;
+      }
       
       grid.lookupViewModel().set('taskIsReadonly', readOnly);
       vm && vm.editMode(readOnly);
@@ -205,7 +210,7 @@ Ext.define('Editor.controller.Segments', {
       
       initialGridFilters = initialGridFilters && initialGridFilters.segmentgrid;
 
-      grid.setTitle(readOnly ? grid.title_readonly : grid.title);
+      grid.setTitle(title);
       me.styleResetFilterButton(grid.store.filters);
       grid.store.on('load', me.afterStoreLoad, me);
       grid.store.on('filterchange', me.handleFilterChange, me);

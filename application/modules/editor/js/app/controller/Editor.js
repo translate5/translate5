@@ -41,7 +41,8 @@ Ext.define('Editor.controller.Editor', {
     extend : 'Ext.app.Controller',
     requires: [
         'Editor.view.segments.EditorKeyMap',
-        'Editor.controller.editor.PrevNextSegment'
+        'Editor.controller.editor.PrevNextSegment',
+        'Editor.view.task.ConfirmationWindow'
     ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
@@ -99,8 +100,11 @@ Ext.define('Editor.controller.Editor', {
             '#segmentgrid': {
                 afterrender: 'initEditPluginHandler'
             },
-            '#showReferenceFilesButton':{
+            '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
+            },
+            'taskConfirmationWindow button': {
+                click:'taskConfirm'
             }
         }
     },
@@ -421,43 +425,7 @@ Ext.define('Editor.controller.Editor', {
         if(! task.isUnconfirmed()) {
             return;
         }
-        this.taskConfirmation = Ext.create('Ext.window.Window', {
-            closeAction: 'destroy',
-            title: "Aufgabe bestätigen?",
-            closable: false,
-            modal: false,
-            resizable: false,
-            layout: {
-                type: 'vbox',
-                align: 'stretch'
-            },
-            border: false,
-            y: '5%',
-            onEsc: Ext.emptyFn,
-            titleCollapse: true,
-            collapsible: true,
-            items: [{
-                xtype: 'container',
-                padding: 10,
-                html: "Möchten Sie die Aufgabe bestätigen? <br> Ohne Bestätigung kann diese nicht bearbeitet werden. TODOS:<ul><li>Übersetzungen</li><li>Das Window in eine eigene Klasse auslagern</li><li>Den Handler definieren und die Task neu laden Geschichte</li><li>Stempel Icon in den Button</li><li>Die Popup Position in Kombination mit dem VisRev Popup testen</li><li>destroy des Popup bei Task Wechsel</li><li>restliche TODOs aus dem Issue</li><li>LESEMODUS Beschriftungen anpassen wenn unconfirmed</li></ul>"
-            }],
-            dockedItems: [{
-                xtype: 'toolbar',
-                ui: 'footer',
-                dock: 'bottom',
-                enableFocusableContainer: false,
-                ariaRole: null,
-                layout: {
-                    pack: 'center'
-                },
-                items: [{
-                    text: 'bestätigen',
-                    handler: function() {
-                        console.log("BAR", arguments);
-                    }
-                }]
-            }]
-        }).show();
+        this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
     },
     /**
      * Cleanup stuff in the editor view port
@@ -1106,5 +1074,15 @@ Ext.define('Editor.controller.Editor', {
         var filePanel =this.getFilepanel(); 
         filePanel.expand();
         filePanel.down('referenceFileTree').expand();
+    },
+    /**
+     * Confirm the current task
+     */
+    taskConfirm: function () {
+        Editor.util.TaskActions.confirm(function(task, app, strings){
+            app.unmask();
+            Editor.app.openEditor(task);
+            Editor.MessageBox.addSuccess(strings.taskConfirmed);
+        });
     }
 });

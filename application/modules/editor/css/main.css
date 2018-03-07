@@ -476,6 +476,11 @@ tr.customState td div {font-style: italic;}
 
 #segment-grid .first-in-file td  {border-top-style: solid; border-top-width: 3px; border-top-color: #99BCE8;}
 
+/* task confirmation */
+a.x-btn span.task-confirmation {
+    background-image: url(../images/stamp.png) !important;
+}
+
 /* Fix T5DEV-147 */
 .x-form-file-wrap .x-form-trigger-wrap-default.x-form-trigger-wrap-invalid .x-form-text {
     border-color: #cf4c35;

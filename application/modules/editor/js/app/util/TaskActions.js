@@ -45,8 +45,10 @@ Ext.define('Editor.util.TaskActions', {
         confirmFinish: "#UT#Aufgabe abschließen?",
         confirmFinishMsg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?",
         taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
+        taskConfirmed: '#UT#Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.',
         taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',
         taskClosing: '#UT#Aufgabe wird verlassen...',
+        taskConfirming: '#UT#Aufgabe wird bestätigt...',
         taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
         saveSegmentFirst: '#UT#Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.',
     },
@@ -66,6 +68,16 @@ Ext.define('Editor.util.TaskActions', {
          */
         finish: function(callback) {
             (new this()).finish(callback);
+            return;
+        },
+        /**
+         * Confirms the task (if unconfirmed) and calls the given callback only if a confirmation was done, parameters are:
+         * {Editor.models.admin.Task} task
+         * {Ext.controller.Application} app
+         * {Object} strings Object containing default translations
+         */
+        confirm: function(callback) {
+            (new this()).confirm(callback);
             return;
         }
     },
@@ -88,7 +100,9 @@ Ext.define('Editor.util.TaskActions', {
         if(me.isEditing()) {
             return;
         }
-        me.modifyTask(callback, 'open', me.strings.taskClosing);
+        me.modifyTask(callback, {
+            userState: 'open'
+        }, me.strings.taskClosing);
     },
     /**
      * finishes the current task
@@ -103,14 +117,29 @@ Ext.define('Editor.util.TaskActions', {
         }
         Ext.Msg.confirm(me.strings.confirmFinish, me.strings.confirmFinishMsg, function(btn){
             if(btn == 'yes') {
-                me.modifyTask(callback, 'finished', me.strings.taskFinishing);
+                me.modifyTask(callback, {
+                    userState: 'finished'
+                }, me.strings.taskFinishing);
             }
         });
     },
     /**
+     * confirms the current task
+     */
+    confirm: function(callback) {
+        var me = this;
+        if(me.isEditing()) {
+            return;
+        }
+        me.modifyTask(callback, {
+            state: 'open', 
+            userState: 'edit'
+        }, me.strings.taskConfirming);
+    },
+    /**
      * internal method to modify the task with the given values
      */
-    modifyTask: function(callback, state, maskingText) {
+    modifyTask: function(callback, data, maskingText) {
         var me = this,
             task = Editor.data.task,
             app = Editor.app;
@@ -122,7 +151,7 @@ Ext.define('Editor.util.TaskActions', {
         
         callback = callback || Ext.emptyFn;
         app.mask(maskingText, task.get('taskName'));
-        task.set('userState',state);
+        task.set(data);
         task.save({
             success: function(rec) {
                 callback(task, app, me.strings);

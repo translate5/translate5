@@ -81,6 +81,7 @@ Ext.define('Editor.view.segments.Grid', {
     ],
     
     title_readonly: '#UT#Segmentliste und Editor - [LESEMODUS]',
+    title_addition_unconfirmed: '#UT# - [AUFGABE UNBESTÄTIGT]',
     column_edited: '#UT#bearbeibar',    
     target_original: '#UT# (zur Importzeit)',    
     column_edited_icon: '{0} <img src="{1}" class="icon-editable" alt="{2}" title="{3}">',

@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.ViewPortEditor', {
     extend: 'Ext.container.Viewport',
     itemId: 'editorViewport',
+    isEditorViewport: true,
     requires: [
         'Editor.view.ViewPortEditorViewModel',
         'Editor.view.fileorder.Tree',

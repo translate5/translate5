@@ -134,16 +134,16 @@ Ext.application({
    * opens the editor with the given Task
    * firing the adminViewportClosed event
    * @param {Editor.model.admin.Task} task
-   * @param {Boolean} readonly optional to open the task readonly
    */
-  openEditor: function(task, readonly) {
+  openEditor: function(task) {
       var me = this,
-          languages = Ext.getStore('admin.Languages');
+          languages = Ext.getStore('admin.Languages'),
+          closeEvent;
+      
       if(! (task instanceof Editor.model.admin.Task)) {
           me.openTaskDirect();
           return;
       }
-      readonly = (readonly === true || task.isReadOnly());
       Editor.data.task = task;
       Editor.model.Segment.redefine(task.segmentFields());
       
@@ -154,8 +154,10 @@ Ext.application({
       }
       
       if(me.viewport){
+          //trigger closeEvent depending on which viewport was open
+          closeEvent = me.viewport.isEditorViewport ? 'editorViewportClosed' : 'adminViewportClosed';
           me.viewport.destroy();
-          me.fireEvent('adminViewportClosed');
+          me.fireEvent(closeEvent);
       }
       else {
           Ext.getBody().removeCls('loading');
