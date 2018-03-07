@@ -42,6 +42,8 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.TaskActions', {
     strings: {
+        taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
+        forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
         confirmFinish: "#UT#Aufgabe abschließen?",
         confirmFinishMsg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?",
         taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
@@ -78,6 +80,15 @@ Ext.define('Editor.util.TaskActions', {
          */
         confirm: function(callback) {
             (new this()).confirm(callback);
+            return;
+        },
+        /**
+         * Opens the given task for editing or viewing (readonly = true)
+         * @param {Editor.models.admin.Task} task
+         * @param {boolean} readonly
+         */
+        openTask: function(task, readonly) {
+            (new this()).openTask(task, readonly);
             return;
         }
     },
@@ -155,6 +166,27 @@ Ext.define('Editor.util.TaskActions', {
         task.save({
             success: function(rec) {
                 callback(task, app, me.strings);
+            },
+            failure: app.unmask
+        });
+    },
+    openTask: function(task, readonly) {
+        var me = this,
+            initialState,
+            app = Editor.app;
+        
+        readonly = (readonly === true || task.isReadOnly());
+        initialState = readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
+        task.set('userState', initialState);
+        app.mask(me.strings.taskOpening, task.get('taskName'));
+        task.save({
+            success: function(rec, op) {
+                var confirmed = !task.isUnconfirmed();
+                if(rec && initialState == task.USER_STATE_EDIT && rec.get('userState') == task.USER_STATE_VIEW && confirmed) {
+                    Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, rec.get('lockingUsername')));
+                }
+                app.unmask();
+                Editor.app.openEditor(rec);
             },
             failure: app.unmask
         });
