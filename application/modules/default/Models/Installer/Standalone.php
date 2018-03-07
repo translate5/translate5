@@ -472,7 +472,7 @@ class Models_Installer_Standalone {
         $content[] = 'resources.db.params.password = "'.$this->dbCredentials['password'].'"';
         $content[] = 'resources.db.params.dbname = "'.$this->dbCredentials['database'].'"';
         if(!empty($this->dbCredentials['executable'])) {
-            $content[] = 'resources.db.params.executable = "'.$this->dbCredentials['executable'].'"';
+            $content[] = 'resources.db.executable = "'.$this->dbCredentials['executable'].'"';
         }
         $content[] = '';
         $content[] = 'resources.mail.defaultFrom.email = support@translate5.net';
@@ -529,7 +529,9 @@ class Models_Installer_Standalone {
         
         //set the hostname to the configured one:
         $config = Zend_Registry::get('config');
-        $this->hostname = $config->runtimeOptions->server->name;
+        if(!$this->isInstallation){
+            $this->hostname = $config->runtimeOptions->server->name;
+        }
     }
     
     protected function done() {

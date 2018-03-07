@@ -3,6 +3,65 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.23] - 2018-02-15
+###Changed
+TRANSLATE-1142: Task DB migration tracker
+T5DEV-228: VisualReview: aliased segments get a tooltip now
+
+###Bugfixes
+TRANSLATE-1096: Changelog model produce unneeded error log
+
+## [2.6.22] - 2018-02-13
+###Added
+TRANSLATE-32: Search and Replace in translate5 editor
+TRANSLATE-1116: Clone a already imported task
+TRANSLATE-1109: Enable import of invalid XLIFF used for internal translations
+TRANSLATE-1107: VisualReview converter server wrapper
+
+###Changed
+TRANSLATE-1019: Improve File Handling Architecture in the import process
+T5DEV-218: Enhance visualReview matching algorithm
+TRANSLATE-1017: Use Okapi longhorn for merging files back instead tikal
+TRANSLATE-1121: Several minor improvement in the installer
+TRANSLATE-667: GUI cancels task POST requests longer than 60 seconds
+
+###Bugfixes
+TRANSLATE-1131: Internet Explorer compatibility mode results in non starting application
+TRANSLATE-1122: TrackChanges: saving content to an attached matchresource (openTM2) saves also the <del> content
+TRANSLATE-1108: VisualReview: absolute paths for CSS and embedded fonts are not working on installations with a modified APPLICATION_RUNDIR
+TRANSLATE-1138: Okapi Export does not work with files moved internally in translate5
+TRANSLATE-1112: Across XML parser has problems with single tags in the comment XML
+TRANSLATE-1110: Missing and wrong translated user roles in the notifyAllAssociatedUsers e-mail
+TRANSLATE-1117: In IE Edge in the HtmlEditor the cursor cannot be moved by mouse only by keyboard
+TRANSLATE-1141: TrackChanges: Del-tags are not ignored when the characters are counted in min/max length
+
+## [2.6.21] - 2018-01-22
+###Bugfixes
+TRANSLATE-1076: Windows Only: install-and-update-batch overwrites path to mysql executable
+TRANSLATE-1103: TrackChanges Plug-In: Open segment for editing leads to an error in IE11
+
+## [2.6.20] - 2018-01-18
+###Bugfixes
+TRANSLATE-1097: Current release produces SQL error on installation
+
+## [2.6.18] - 2018-01-17
+###Added
+TRANSLATE-950: Implement a user hierarchy for user listing and editing
+TRANSLATE-1089: Create segment history entry when set autostatus untouched, auto-set and reset username on unfinish
+TRANSLATE-1099: Exclude framing internal tags from xliff import
+TRANSLATE-941: New front-end rights
+TRANSLATE-942: New task attributes tab in task properties window
+TRANSLATE-1090: A user without setaclrole for a specific role can revoke such already granted roles
+
+###Changed
+Integrate segmentation rules for EN in Okapi default bconf-file
+TRANSLATE-1091: Rename "language" field/column in user grid / user add window
+
+###Bugfixes
+TRANSLATE-1101: Using Translate5 in internet explorer leads sometimes to logouts while application load
+TRANSLATE-1086: Leave visualReview task leads to error in IE 11
+T5DEV-219: Subsegment img found on saving some segments with tags and enabled track changes
+
 ## [2.6.16] - 2017-12-14
 ###Changed
 TRANSLATE-1084: refactor internal translation mechanism
