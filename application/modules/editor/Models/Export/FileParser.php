@@ -290,7 +290,10 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = (string) $segment->getFieldEdited($field);
         
-        $edited = $this->tagHelper->removeTrackChanges($edited);
+        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
+        
+        $edited= $trackChange->removeTrackChanges($edited);
         
         $before = $edited;
         $edited = $this->tagHelper->protect($edited);

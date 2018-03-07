@@ -407,8 +407,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             
             //if the trackchanges are active, setup some trackchanges parametars
             if(isset($parametars['isActiveTrackChanges']) && $parametars['isActiveTrackChanges']){
-                $replace->attributeWorkflowstep=$parametars['attributeWorkflowstep'];
-                $replace->userColorNr=$parametars['userColorNr'];
+                $replace->trackChangeTag->attributeWorkflowstep=$parametars['attributeWorkflowstep'];
+                $replace->trackChangeTag->userColorNr=$parametars['userColorNr'];
                 $replace->isActiveTrackChanges=$parametars['isActiveTrackChanges'];
             }
             

@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * TO BE COMPLETED: There are several more places in translate5 which can make use of this class
  * 
  */
-class editor_Models_Segment_InternalTag {
+class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstract{
     
     /**
      * match 0: as usual the whole string
@@ -48,52 +48,16 @@ class editor_Models_Segment_InternalTag {
     const REGEX_STARTTAG = '#^<div class="open.+class="short">&lt;([0-9]+)&gt;</span>.+</div>$#';
     const REGEX_ENDTAG = '#^<div class="close.+class="short">&lt;/([0-9]+)&gt;</span>.+</div>$#';
     
-    /**
-     * container for the original tags of the internal tag protection
-     * @var array
-     */
-    protected $originalTags;
-    
     /***
-     * The default tepmplate for placeholder replacer
-     * 
+     * Internal tag placeholder template
      * @var string
      */
-    private $placeholderTemplate;
+    const PLACEHOLDER_TEMPLATE='<translate5:escaped id="%s" />';
     
-    /***
-     * The replacer regex used in the replace function
-     *  
-     * @var regexp
-     */
-    private $replacerRegex;
     
-    /**
-     * replaces tags with either the callback or the given scalar
-     * @see preg_replace
-     * @see preg_replace_callback
-     * @param string $segment
-     * @param Closure|string $replacer
-     * @param int $limit optional
-     * @param int $count optional, returns the replace count
-     * @return mixed 
-     */
-    public function replace($segment, $replacer, $limit = -1, &$count = null) {
-        if(!is_string($replacer) && is_callable($replacer)) {
-            return preg_replace_callback($this->getReplacerRegex(), $replacer, $segment, $limit, $count);
-        }
-        return preg_replace($this->getReplacerRegex(), $replacer, $segment, $limit, $count);
-    }
-    
-    /**
-     * removes TrackChanges-Tags:
-     * - DEL => markup-Tag AND content inbetween is removed
-     * - INS => markup-Tag ONLY is removed
-     */
-    public function removeTrackChanges(string $segment) {
-    	$segment= preg_replace('/<del[^>]*>.*?<\/del>/i', '', $segment);
-    	$segment= preg_replace('/<\/?ins[^>]*>/i', '', $segment);
-    	return $segment;
+    public function __construct(){
+        $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
+        $this->placeholderTemplate=self::PLACEHOLDER_TEMPLATE;
     }
     
     /**
@@ -362,100 +326,6 @@ class editor_Models_Segment_InternalTag {
             }
         }
         return $result;
-    }
-    
-    /**
-     * protects the internal tags of one segment
-     * @param string $segment
-     * @param boolean $keepOld - keep the old tags in the array, defalut no
-     * @return string
-     */
-    public function protect(string $segment,boolean $keepOld=null) {
-        $id = 1;
-        if(!$keepOld){
-            $this->originalTags = array();
-        }
-        return $this->replace($segment, function($match) use (&$id) {
-            $placeholder = $this->getPlaceholderTemplate($id++);
-            $this->originalTags[$placeholder] = $match[0];
-            return $placeholder;
-        });
-    }
-    
-    /**
-     * unprotects / restores the content tags
-     * @param string $segment
-     * @return string
-     */
-    public function unprotect(string $segment) {
-        return str_replace(array_keys($this->originalTags), array_values($this->originalTags), $segment);
-    }
-    
-    /***
-     * Set the placeholder template
-     * @param string $template
-     */
-    public function setPlaceholderTemplate(string $template){
-        $this->placeholderTemplate=$template;
-    }
-    
-    /***
-     * Return the placeholder template with id 
-     * 
-     * @param integer $id
-     * @return string
-     */
-    public function getPlaceholderTemplate($id){
-        //if is not set, set the default placeholder template
-        if(!$this->placeholderTemplate){
-            $this->placeholderTemplate='<translate5:escaped id="%s" />';
-        }
-        return sprintf($this->placeholderTemplate, $id);
-    }
-    
-    /***
-     * Set the replacer regex used in replace function
-     * 
-     * @param string $replacerRegex
-     */
-    public function setReplacerRegex(string $replacerRegex){
-        $this->replacerRegex=$replacerRegex;
-    }
-    
-    /***
-     * Get the replace regex used in the replace function
-     * 
-     * @return regexp
-     */
-    public function getReplacerRegex(){
-        //if it is not set, set the default regex
-        if(!$this->replacerRegex){
-            $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
-        }
-        return $this->replacerRegex;
-    }
-    
-    /***
-     * Return the original tags
-     * 
-     * @return array
-     */
-    public function getOriginalTags(){
-        return $this->originalTags;
-    }
-    
-    /***
-     * Update the protected tag value by given key
-     * @param mixed $key
-     * @param mixed $value
-     * @return boolean
-     */
-    public function updateOriginalTagValue($key,$value){
-        if(isset($this->originalTags[$key])){
-            $this->originalTags[$key]=$value;
-            return true;
-        }
-        return false;
     }
     
 }

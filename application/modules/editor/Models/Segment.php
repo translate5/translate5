@@ -387,7 +387,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return string $segmentContent
      */
     public function stripTags($segmentContent) {
-        $segmentContent = preg_replace('/<del[^>]*>.*?<\/del>/i', '', $segmentContent);
+        $segmentContent = preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_DEL, '', $segmentContent);
         return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#','',$segmentContent));
     }
     
@@ -440,7 +440,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     'convert_from_encoding' => 'utf-8',
                     'ignore_parser_warnings' => true,
             );
-            $segmentContent= $this->tagHelper->removeTrackChanges($segmentContent);
+            $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+            /* @var $trackChange editor_Models_Segment_TrackChangeTag */
+            $segmentContent= $trackChange->removeTrackChanges($segmentContent);
+            
             $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, $options);
             /* @var $seg QueryPath\\DOMQuery */
             //advise libxml not to throw exceptions, but collect warnings and errors internally:

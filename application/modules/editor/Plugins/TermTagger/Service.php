@@ -337,7 +337,9 @@ class editor_Plugins_TermTagger_Service {
         $textId = $this->renderTextId($text, $segmentId, $segmentPlace);
         $this->termTagTrackChangeHelper->storeNodes($text, $textId);
         // (2) Now remove the stored TrackChange-Nodes from the text:
-        $text = $this->internalTagHelper->removeTrackChanges($text);
+        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
+        $text= $trackChange->removeTrackChanges($text);
         
         return $text;
     }
@@ -369,7 +371,10 @@ class editor_Plugins_TermTagger_Service {
      */
     private function renderTextId ($text, $segmentId, $segmentPlace) {
         // Remove all Tags first; they will be different before and after sending the text to the TermTagger!
-        $cleanText1 = $this->internalTagHelper->removeTrackChanges($text);
+        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
+        $cleanText1= $trackChange->removeTrackChanges($text);
+        
         $cleanText2 = $this->termTagHelper->remove($cleanText1);
         return $segmentId . '-' . $segmentPlace. '-' . md5($cleanText2);
     }
