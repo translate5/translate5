@@ -401,14 +401,12 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" bereit.');?>',
             taskError: '<?php echo $this->translate->_('Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!');?>',
-            taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
             taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
             taskReopen: '<?php echo $this->translate->_('Aufgabe wird wieder eröffnet...');?>',
             taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
             taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
-            forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
             openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
             loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>'
         },
@@ -624,6 +622,8 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.util.TaskActions", {
         override: "Editor.util.TaskActions",
         strings: {
+            taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
+            forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
             confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
             confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
             taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',

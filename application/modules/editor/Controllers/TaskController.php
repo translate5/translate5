@@ -588,10 +588,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $task = $this->entity;
         if($this->isOpenTaskRequest(true)){
             $workflow = $this->workflow;
-            if(!$task->lock($this->now)){
-                $this->data->userState = $workflow::STATE_VIEW;
-            }
-            if($task->getState() == $task::STATE_UNCONFIRMED) {
+            $unconfirmed = $task->getState() == $task::STATE_UNCONFIRMED;
+            //first check for confirmation, if unconfirmed, don't lock just set to view mode!
+            if($unconfirmed || !$task->lock($this->now)){
                 $this->data->userState = $workflow::STATE_VIEW;
             }
         }
