@@ -138,13 +138,21 @@ Ext.define('Editor.util.TaskActions', {
      * confirms the current task
      */
     confirm: function(callback) {
-        var me = this;
+        var me = this,
+            readonly = false, //confirm request should go to edit mode if possible
+            innerCallback = function(task, app, strings){
+                //call given callback
+                callback(task, app, strings);
+                //call additional callback for confirmation
+                me.onOpenTask(task, readonly);
+            };
+            
         if(me.isEditing()) {
             return;
         }
         me.modifyTask(callback, {
             state: 'open', 
-            userState: 'edit'
+            userState: me.getInitialState(Editor.data.task, readonly)
         }, me.strings.taskConfirming);
     },
     /**
@@ -175,20 +183,38 @@ Ext.define('Editor.util.TaskActions', {
             initialState,
             app = Editor.app;
         
-        readonly = (readonly === true || task.isReadOnly());
-        initialState = readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
+        initialState = me.getInitialState(task, readonly);
         task.set('userState', initialState);
         app.mask(me.strings.taskOpening, task.get('taskName'));
         task.save({
             success: function(rec, op) {
-                var confirmed = !task.isUnconfirmed();
-                if(rec && initialState == task.USER_STATE_EDIT && rec.get('userState') == task.USER_STATE_VIEW && confirmed) {
-                    Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, rec.get('lockingUsername')));
-                }
-                app.unmask();
-                Editor.app.openEditor(rec);
+                me.onOpenTask(rec, readonly);
             },
             failure: app.unmask
         });
+    },
+    /**
+     * calculates the initial userState for a task for open requests
+     * @param {Editor.models.Task} task
+     * @param {Boolean} readonly
+     */
+    getInitialState(task, readonly) {
+        readonly = (readonly === true || task.isReadOnly());
+        initialState = readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
+    },
+    /**
+     * Generic handler to be called on success handlers of task open calls
+     * @param {Editor.models.Task} task
+     * @param {Boolean} readonly
+     */
+    onOpenTask: function(task, readonly) {
+        var me = this,
+            app = Editor.app,
+            confirmed = !task.isUnconfirmed();
+        if(task && me.getInitialState(task, readonly) == task.USER_STATE_EDIT && task.get('userState') == task.USER_STATE_VIEW && confirmed) {
+            Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, task.get('lockingUsername')));
+        }
+        app.unmask();
+        app.openEditor(task);
     }
 });
