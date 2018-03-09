@@ -318,8 +318,6 @@ class editor_Plugins_TermTagger_Service {
     }
     
     private function encodeText($text, $segmentId, $segmentPlace='') {
-        $text = $this->prepareTextForStoringAndReassigningNodes($text);
-        
         $matchContentRegExp = '/<div[^>]+class="(open|close|single).*?".*?\/div>/is';
         
         preg_match_all($matchContentRegExp, $text, $tempMatches);
@@ -345,8 +343,6 @@ class editor_Plugins_TermTagger_Service {
     }
     
     private function decodeText($text, $segmentId, $segmentPlace='') {
-        $text = $this->prepareTextForStoringAndReassigningNodes($text);
-        
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
@@ -365,21 +361,6 @@ class editor_Plugins_TermTagger_Service {
         
         return $text;
     }
-    
-    /**
-     * The text before storing the TrackChange-Nodes and before reassiging them must be EXACTLY THE SAME.
-     * Having different numbers of repeated whitespace cannot be handled.
-     * (Storing and reassigning the TrackChange-Nodes does not use the DOM, but a string!...)
-     * @param string $text
-     * @return string
-     */
-    private function prepareTextForStoringAndReassigningNodes ($text) {
-        // (see /public/modules/editor/js/app/controller/Segments.js line 501:)
-        // - record.data.targetEdit before ed.completeEdit(): <img class="critical qmflag ...
-        // - record.data.targetEdit after ed.completeEdit():  <img  class="critical qmflag ...
-        return preg_replace('/\s+/', ' ', $text);
-    }
-    
     
     /**
      * @param string $text
