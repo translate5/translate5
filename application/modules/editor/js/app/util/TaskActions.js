@@ -42,11 +42,15 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.TaskActions', {
     strings: {
+        taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
+        forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
         confirmFinish: "#UT#Aufgabe abschließen?",
         confirmFinishMsg: "#UT#Wollen Sie die Aufgabe wirklich abschließen?",
         taskClosed: '#UT#Aufgabe wurde erfolgreich verlassen.',
+        taskConfirmed: '#UT#Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.',
         taskFinished: '#UT#Aufgabe wurde erfolgreich abgeschlossen.',
         taskClosing: '#UT#Aufgabe wird verlassen...',
+        taskConfirming: '#UT#Aufgabe wird bestätigt...',
         taskFinishing: '#UT#Aufgabe wird abgeschlossen und verlassen...',
         saveSegmentFirst: '#UT#Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.',
     },
@@ -66,6 +70,25 @@ Ext.define('Editor.util.TaskActions', {
          */
         finish: function(callback) {
             (new this()).finish(callback);
+            return;
+        },
+        /**
+         * Confirms the task (if unconfirmed) and calls the given callback only if a confirmation was done, parameters are:
+         * {Editor.models.admin.Task} task
+         * {Ext.controller.Application} app
+         * {Object} strings Object containing default translations
+         */
+        confirm: function(callback) {
+            (new this()).confirm(callback);
+            return;
+        },
+        /**
+         * Opens the given task for editing or viewing (readonly = true)
+         * @param {Editor.models.admin.Task} task
+         * @param {boolean} readonly
+         */
+        openTask: function(task, readonly) {
+            (new this()).openTask(task, readonly);
             return;
         }
     },
@@ -88,7 +111,9 @@ Ext.define('Editor.util.TaskActions', {
         if(me.isEditing()) {
             return;
         }
-        me.modifyTask(callback, 'open', me.strings.taskClosing);
+        me.modifyTask(callback, {
+            userState: 'open'
+        }, me.strings.taskClosing);
     },
     /**
      * finishes the current task
@@ -103,14 +128,37 @@ Ext.define('Editor.util.TaskActions', {
         }
         Ext.Msg.confirm(me.strings.confirmFinish, me.strings.confirmFinishMsg, function(btn){
             if(btn == 'yes') {
-                me.modifyTask(callback, 'finished', me.strings.taskFinishing);
+                me.modifyTask(callback, {
+                    userState: 'finished'
+                }, me.strings.taskFinishing);
             }
         });
     },
     /**
+     * confirms the current task
+     */
+    confirm: function(callback) {
+        var me = this,
+            initialState = Editor.data.task.USER_STATE_EDIT, //confirm request should go to edit mode if possible
+            innerCallback = function(task, app, strings){
+                //call given callback
+                callback(task, app, strings);
+                //call additional callback for confirmation
+                me.onOpenTask(task, initialState);
+            };
+            
+        if(me.isEditing()) {
+            return;
+        }
+        me.modifyTask(innerCallback, {
+            state: 'open', 
+            userState: initialState
+        }, me.strings.taskConfirming);
+    },
+    /**
      * internal method to modify the task with the given values
      */
-    modifyTask: function(callback, state, maskingText) {
+    modifyTask: function(callback, data, maskingText) {
         var me = this,
             task = Editor.data.task,
             app = Editor.app;
@@ -122,12 +170,51 @@ Ext.define('Editor.util.TaskActions', {
         
         callback = callback || Ext.emptyFn;
         app.mask(maskingText, task.get('taskName'));
-        task.set('userState',state);
+        task.set(data);
         task.save({
             success: function(rec) {
                 callback(task, app, me.strings);
             },
             failure: app.unmask
         });
+    },
+    openTask: function(task, readonly) {
+        var me = this,
+            initialState,
+            app = Editor.app;
+        
+        initialState = me.getInitialState(task, readonly);
+        task.set('userState', initialState);
+        app.mask(me.strings.taskOpening, task.get('taskName'));
+        task.save({
+            success: function(rec, op) {
+                me.onOpenTask(rec, initialState);
+            },
+            failure: app.unmask
+        });
+    },
+    /**
+     * calculates the initial userState for a task for open requests
+     * @param {Editor.models.Task} task
+     * @param {Boolean} readonly
+     */
+    getInitialState(task, readonly) {
+        readonly = (readonly === true || task.isReadOnly());
+        return readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
+    },
+    /**
+     * Generic handler to be called on success handlers of task open calls
+     * @param {Editor.models.Task} task
+     * @param {String} initialState
+     */
+    onOpenTask: function(task, initialState) {
+        var me = this,
+            app = Editor.app,
+            confirmed = !task.isUnconfirmed();
+        if(task && initialState == task.USER_STATE_EDIT && task.get('userState') == task.USER_STATE_VIEW && confirmed) {
+            Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, task.get('lockingUsername')));
+        }
+        app.unmask();
+        app.openEditor(task);
     }
 });

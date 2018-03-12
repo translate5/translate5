@@ -36,17 +36,5 @@ Ext.define('Editor.view.HelpWindow', {
     autoHeight: true,
     autoScroll: true,
     modal : true,
-    layout:'fit',
-    initComponent: function() {
-        var me = this;
-        me.callParent(arguments);
-    },
-    initConfig : function(instanceConfig) {
-        var me = this,
-        config = {};
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
-    }
+    layout:'fit'
 });

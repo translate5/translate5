@@ -41,7 +41,8 @@ Ext.define('Editor.controller.Editor', {
     extend : 'Ext.app.Controller',
     requires: [
         'Editor.view.segments.EditorKeyMap',
-        'Editor.controller.editor.PrevNextSegment'
+        'Editor.controller.editor.PrevNextSegment',
+        'Editor.view.task.ConfirmationWindow'
     ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
@@ -78,7 +79,8 @@ Ext.define('Editor.controller.Editor', {
     listen: {
         controller: {
             '#Editor.$application': {
-                editorViewportClosed: 'clearKeyMaps'
+                editorViewportClosed: 'onCloseEditorViewport',
+                editorViewportOpened: 'onOpenEditorViewport'
             }
         },
         component: {
@@ -98,8 +100,11 @@ Ext.define('Editor.controller.Editor', {
             '#segmentgrid': {
                 afterrender: 'initEditPluginHandler'
             },
-            '#showReferenceFilesButton':{
+            '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
+            },
+            'taskConfirmationWindow button': {
+                click:'taskConfirm'
             }
         }
     },
@@ -420,6 +425,19 @@ Ext.define('Editor.controller.Editor', {
                 targetIframe: editor.iframeEl
             });
         }
+    },
+    onOpenEditorViewport: function(app, task) {
+        if(! task.isUnconfirmed()) {
+            return;
+        }
+        this.taskConfirmation = Ext.widget('taskConfirmationWindow').show();
+    },
+    /**
+     * Cleanup stuff in the editor view port
+     */
+    onCloseEditorViewport: function() {
+        this.clearKeyMaps();
+        this.taskConfirmation && this.taskConfirmation.destroy();
     },
     clearKeyMaps: function() {
         var me = this;
@@ -1061,5 +1079,13 @@ Ext.define('Editor.controller.Editor', {
         var filePanel =this.getFilepanel(); 
         filePanel.expand();
         filePanel.down('referenceFileTree').expand();
+    },
+    /**
+     * Confirm the current task
+     */
+    taskConfirm: function () {
+        Editor.util.TaskActions.confirm(function(task, app, strings){
+            Editor.MessageBox.addSuccess(strings.taskConfirmed);
+        });
     }
 });

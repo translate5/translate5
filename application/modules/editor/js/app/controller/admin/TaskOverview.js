@@ -78,14 +78,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   strings: {
       taskImported: '#UT#Aufgabe "{0}" bereit.',
       taskError: '#UT#Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!',
-      taskOpening: '#UT#Aufgabe wird im Editor geöffnet...',
       taskFinishing: '#UT#Aufgabe wird abgeschlossen...',
       taskUnFinishing: '#UT#Aufgabe wird abgeschlossen...',
       taskReopen: '#UT#Aufgabe wird wieder eröffnet...',
       taskEnding: '#UT#Aufgabe wird beendet...',
       taskDestroy: '#UT#Aufgabe wird gelöscht...',
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
-      forcedReadOnly: '#UT#Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht",
       loadingWindowMessage:"#UT#Dateien werden hochgeladen",
   },
@@ -330,26 +328,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * @param {Boolean} readonly (optional)
    */
   openTaskRequest: function(task, readonly) {
-      var me = this,
-          initialState,
-          app = Editor.app;
+      var me = this;
       if(!me.isAllowed('editorOpenTask', task) && !me.isAllowed('editorEditTask', task)){
           return;
       }
-      readonly = (readonly === true || task.isReadOnly());
-      initialState = readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
-      task.set('userState', initialState);
-      app.mask(me.strings.taskOpening, task.get('taskName'));
-      task.save({
-          success: function(rec, op) {
-              if(rec && initialState == task.USER_STATE_EDIT && rec.get('userState') == task.USER_STATE_VIEW) {
-                  Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, rec.get('lockingUsername')));
-              }
-              app.unmask();
-              Editor.app.openEditor(rec, readonly);
-          },
-          failure: app.unmask
-      });
+      Editor.util.TaskActions.openTask(task, readonly);
   },
   handleTaskCancel: function() {
       this.getTaskAddForm().getForm().reset();
@@ -623,7 +606,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleTaskShowexportmenu: function(task, event) {
       var me = this,
           hasQm = task.hasQmSub(),
-          exportAllowed = me.isAllowed('editorExportTask'),
+          exportAllowed = me.isAllowed('editorExportTask', task),
           menu;
       
       menu = Ext.widget('adminExportMenu', {
