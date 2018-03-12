@@ -155,6 +155,7 @@ class editor_TaskController extends ZfExtended_RestController {
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
         $filter = $this->entity->getFilter();
+        /* @var $filter editor_Models_Filter_TaskSpecific */
         $filter->convertStates($isAllowedToLoadAll);
         $assocFilter = $filter->isUserAssocNeeded();
         if(!$assocFilter && $isAllowedToLoadAll) {

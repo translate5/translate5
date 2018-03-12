@@ -371,6 +371,9 @@ class editor_Plugins_TermTagger_Service {
         // Remove all Tags first; they will be different before and after sending the text to the TermTagger!
         $cleanText1 = $this->internalTagHelper->removeTrackChanges($text);
         $cleanText2 = $this->termTagHelper->remove($cleanText1);
+        // The rest of the text must be EXACTLY THE SAME before storing the TrackChangeNodes and before reassiging them.
+        // In oder to prevent assigning TrackChange-Nodes to a different text than we have used for storing the TrackChange-Nodes,
+        // the text itself (without changing anything in it!) is used for rendering the referencing-ID:
         return $segmentId . '-' . $segmentPlace. '-' . md5($cleanText2);
     }
     
