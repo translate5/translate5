@@ -126,6 +126,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.ViewPortEditor.prototype.items_west_title = '<?php echo $this->translate->_('Dateien');?>';
   	Editor.view.segments.Grid.prototype.title = '<?php echo $this->translate->_('Segmentliste und Editor');?>';
   	Editor.view.segments.Grid.prototype.title_readonly = '<?php echo $this->translate->_('Segmentliste und Editor - [LESEMODUS]');?>';
+  	Editor.view.segments.Grid.prototype.title_addition_unconfirmed = '<?php echo $this->translate->_(' - [AUFGABE UNBESTÄTIGT]');?>';
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
@@ -400,14 +401,12 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             taskImported: '<?php echo $this->translate->_('Aufgabe "{0}" bereit.');?>',
             taskError: '<?php echo $this->translate->_('Die Aufgabe konnte aufgrund von Fehlern nicht importiert werden!');?>',
-            taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
             taskUnFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen...');?>',
             taskReopen: '<?php echo $this->translate->_('Aufgabe wird wieder eröffnet...');?>',
             taskEnding: '<?php echo $this->translate->_('Aufgabe wird beendet...');?>',
             taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
-            forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
             openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
             loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>'
         },
@@ -431,6 +430,7 @@ Ext.define('Editor.controller.Localizer', {
             user_state_waiting: '<?php echo $this->translate->_('wartend');?>',
             user_state_finished: '<?php echo $this->translate->_('abgeschlossen');?>',
             task_state_end: '<?php echo $this->translate->_('beendet');?>',
+            task_state_unconfirmed: '<?php echo $this->translate->_('nicht bestätigt');?>',
             task_state_import: '<?php echo $this->translate->_('import');?>',
             forMe: '<?php echo $this->translate->_('für mich ');?>'
         },
@@ -622,13 +622,26 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.util.TaskActions", {
         override: "Editor.util.TaskActions",
         strings: {
+            taskOpening: '<?php echo $this->translate->_('Aufgabe wird im Editor geöffnet...');?>',
+            forcedReadOnly: '<?php echo $this->translate->_('Aufgabe wird durch Benutzer "{0}" bearbeitet und ist daher schreibgeschützt!');?>',
             confirmFinish: '<?php echo $this->translate->_('Aufgabe abschließen?');?>', 
             confirmFinishMsg: '<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>',
             taskClosed: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich verlassen.');?>',
+            taskConfirmed: '<?php echo $this->translate->_('Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.');?>',
             taskFinished: '<?php echo $this->translate->_('Aufgabe wurde erfolgreich abgeschlossen.');?>',
             taskClosing: '<?php echo $this->translate->_('Aufgabe wird verlassen...');?>',
+            taskConfirming: '<?php echo $this->translate->_('Aufgabe wird bestätigt...');?>',
             taskFinishing: '<?php echo $this->translate->_('Aufgabe wird abgeschlossen und verlassen...');?>',
-            saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>',
+            saveSegmentFirst: '<?php echo $this->translate->_('Die gewünschte Aktion kann nicht durchgeführt werden! Das aktuell geöffnete Segment muss zunächst gespeichert bzw. geschlossen werden.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.task.ConfirmationWindow", {
+        override: "Editor.view.task.ConfirmationWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('Aufgabe bestätigen?');?>', 
+            confirmMsg: '<?php echo $this->translate->_('Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.');?>', 
+            confirmBtn: '<?php echo $this->translate->_('bestätigen');?>' 
         }
     });
     

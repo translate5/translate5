@@ -98,6 +98,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_END = 'end';
     const STATE_IMPORT = 'import';
     const STATE_ERROR = 'error';
+    const STATE_UNCONFIRMED = 'unconfirmed';
     
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
@@ -152,26 +153,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads all Entities out of DB associated to the user (filtered by the TaskUserAssoc table)
-     * if $leftOuterJoin is true, load all tasks, user infos joined only where possible,
+     * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $leftOuterJoin optional, per default false 
+     * @param boolean $loadAll optional, per default false 
      * @return array
      */
-    public function loadListByUserAssoc(string $userGuid, $leftOuterJoin = false) {
-        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $leftOuterJoin));
+    public function loadListByUserAssoc(string $userGuid, $loadAll = false) {
+        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $loadAll));
     }
     
     /**
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
-     * if $leftOuterJoin is true, load all tasks, user infos joined only where possible,
+     * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $leftOuterJoin
+     * @param boolean $loadAll
      * @return number
      */
-    public function getTotalCountByUserAssoc(string $userGuid, $leftOuterJoin = false) {
-        $s = $this->getSelectByUserAssocSql($userGuid, array('numrows' => 'count(*)'), $leftOuterJoin);
+    public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false) {
+        $s = $this->getSelectByUserAssocSql($userGuid, array('numrows' => 'count(*)'), $loadAll);
         if(!empty($this->filter)) {
             $this->filter->applyToSelect($s, false);
         }
@@ -180,21 +181,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns the SQL to retrieve the tasks of an user oder of all users joined with the users assoc infos
-     * if $leftOuterJoin is true, load all tasks, user infos joined only where possible,
+     * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks to the user
      * @param string $userGuid
      * @param string $cols column definition
-     * @param boolean $leftOuterJoin 
+     * @param boolean $loadAll 
      * @return Zend_Db_Table_Select
      */
-    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $leftOuterJoin = false) {
+    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
         $alias = self::ASSOC_TABLE_ALIAS;
         $s = $this->db->select()
         ->from(array('t' => 'LEK_task'), $cols);
         if(!empty($this->filter)) {
             $this->filter->setDefaultTable('t');
         }
-        if($leftOuterJoin) {
+        if($loadAll) {
             $on = $alias.'.taskGuid = t.taskGuid AND '.$alias.'.userGuid = '.$s->getAdapter()->quote($userGuid);
             $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $on, array());
         }
@@ -570,7 +571,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function isExclusiveState() {
-        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_OPEN);
+        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED);
         return !in_array($this->getState(), $nonExclusiveStates);
     }
     

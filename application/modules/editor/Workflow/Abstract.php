@@ -731,10 +731,17 @@ abstract class editor_Workflow_Abstract {
                     $this->doReopen();
                     $this->events->trigger("doReopen", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
                 }
+                if($oldState == $newTask::STATE_UNCONFIRMED) {
+                    $this->doConfirm();
+                    $this->events->trigger("doConfirm", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                }
                 break;
             case $newTask::STATE_END:
                 $this->doEnd();
                 $this->events->trigger("doEnd", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                break;
+            case $newTask::STATE_UNCONFIRMED:
+                //doing currently nothing 
                 break;
         }
     }
@@ -1069,6 +1076,12 @@ abstract class editor_Workflow_Abstract {
      * is called when a task assoc state gets OPEN
      */
     protected function doOpen() {
+    }
+    
+    /**
+     * is called when a task is opened coming from state unconfirmed
+     */
+    protected function doConfirm() {
     }
     
     /**
