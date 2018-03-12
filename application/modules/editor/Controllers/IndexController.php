@@ -265,6 +265,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //default state configuration for frontend components(grid)
       $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
       
+      $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
+      
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
       
