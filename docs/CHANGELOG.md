@@ -3,6 +3,31 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.25] - 2018-03-12
+###Added
+TRANSLATE-1166: task-status-unconfirmed
+TRANSLATE-1070: Make initial values of checkboxes in task add window configurable
+TRANSLATE-949: delete old tasks by cron job (config sql file)
+
+###Changed
+TRANSLATE-1144: Disable translate5 update popup for non admin users
+PMs without loadAllTasks should be able to see their tasks, even without a task assoc.
+TRANSLATE-1114: TrackChanges: fast replacing selected content triggers debugger statement
+TRANSLATE-1145: Using TrackChanges and MatchResources
+TRANSLATE-1143: The text in the tooltips with ins-del tags is not readable in visualReview layout
+T5DEV-234 TrackChanges: reproduce handleDigitPreparation for Keyboard-Events
+
+###Bugfixes
+TRANSLATE-1178: if there are only directories and not files in proofRead, this results in "no importable files in the task"
+TRANSLATE-1078: visualReview: Upload of PDF in wizard does not work
+TRANSLATE-1164: VisualReview throws an exception with disabled headpanel
+TRANSLATE-1155: Adding a translation check user to a proofreading task changes workflow step to translation
+TRANSLATE-1153: Find Editor after opening another Task
+TRANSLATE-1148: Maximum characters allowed in toSort column is over the limit
+TRANSLATE-969: Calculation of next editable segment fails when sorting and filtering for a content column
+TRANSLATE-1147: #UT messages still inside of trackChanges tooltip
+TRANSLATE-1042: copy source to target is not working in firefox
+
 ## [2.6.23] - 2018-02-15
 ###Changed
 TRANSLATE-1142: Task DB migration tracker
