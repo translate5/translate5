@@ -139,20 +139,20 @@ Ext.define('Editor.util.TaskActions', {
      */
     confirm: function(callback) {
         var me = this,
-            readonly = false, //confirm request should go to edit mode if possible
+            initialState = Editor.data.task.USER_STATE_EDIT, //confirm request should go to edit mode if possible
             innerCallback = function(task, app, strings){
                 //call given callback
                 callback(task, app, strings);
                 //call additional callback for confirmation
-                me.onOpenTask(task, readonly);
+                me.onOpenTask(task, initialState);
             };
             
         if(me.isEditing()) {
             return;
         }
-        me.modifyTask(callback, {
+        me.modifyTask(innerCallback, {
             state: 'open', 
-            userState: me.getInitialState(Editor.data.task, readonly)
+            userState: initialState
         }, me.strings.taskConfirming);
     },
     /**
@@ -188,7 +188,7 @@ Ext.define('Editor.util.TaskActions', {
         app.mask(me.strings.taskOpening, task.get('taskName'));
         task.save({
             success: function(rec, op) {
-                me.onOpenTask(rec, readonly);
+                me.onOpenTask(rec, initialState);
             },
             failure: app.unmask
         });
@@ -200,18 +200,18 @@ Ext.define('Editor.util.TaskActions', {
      */
     getInitialState(task, readonly) {
         readonly = (readonly === true || task.isReadOnly());
-        initialState = readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
+        return readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
     },
     /**
      * Generic handler to be called on success handlers of task open calls
      * @param {Editor.models.Task} task
-     * @param {Boolean} readonly
+     * @param {String} initialState
      */
-    onOpenTask: function(task, readonly) {
+    onOpenTask: function(task, initialState) {
         var me = this,
             app = Editor.app,
             confirmed = !task.isUnconfirmed();
-        if(task && me.getInitialState(task, readonly) == task.USER_STATE_EDIT && task.get('userState') == task.USER_STATE_VIEW && confirmed) {
+        if(task && initialState == task.USER_STATE_EDIT && task.get('userState') == task.USER_STATE_VIEW && confirmed) {
             Editor.MessageBox.addInfo(Ext.String.format(me.strings.forcedReadOnly, task.get('lockingUsername')));
         }
         app.unmask();

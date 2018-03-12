@@ -1080,8 +1080,6 @@ Ext.define('Editor.controller.Editor', {
      */
     taskConfirm: function () {
         Editor.util.TaskActions.confirm(function(task, app, strings){
-            app.unmask();
-            Editor.app.openEditor(task);
             Editor.MessageBox.addSuccess(strings.taskConfirmed);
         });
     }
