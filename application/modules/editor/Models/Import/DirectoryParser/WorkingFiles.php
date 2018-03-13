@@ -57,19 +57,9 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    */
   protected $rootNode;
   
-  /**
-   * contains DirectoryIterator directories for sorting
-   * @var array
-   */
-  protected $directories = array();
-  
-  /**
-   * contains DirectoryIterator files for sorting
-   * @var array
-   */
-  protected $filenames = array();
-  
   protected $exceptionOnNoFilesFound = true;
+  
+  static protected $filesFound = false;
   
   public function __construct() {
       $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
@@ -84,7 +74,11 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    */
   public function parse($directoryPath){
       $rootNode = $this->getInitialRootNode();
+      self::$filesFound = false;
       $this->iterateThrough($rootNode, $directoryPath);
+      if($this->exceptionOnNoFilesFound && !self::$filesFound) {
+          throw new ZfExtended_Exception("There are no importable files in the Task. The following file extensions can be imported: .".join(', .', $this->_importExtensionList));
+      }
       return $rootNode->children;
   }
   
@@ -107,6 +101,8 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
     $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'LocalEncoded'
         );
+    $filenames = [];
+    $directories = [];
     $iterator = new DirectoryIterator($directoryPath);
     /* @var $fileinfo DirectoryIterator */
     foreach ($iterator as $fileinfo) {
@@ -115,32 +111,31 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
       }
       $fileName = $localEncoded->decode($fileinfo->getFilename());
       if($fileinfo->isFile()) {
-        $this->filenames[$fileName] = $fileinfo->getPathname();
+          if(!self::$filesFound){
+              self::$filesFound = true;
+          }
+        $filenames[$fileName] = $fileinfo->getPathname();
       }
       if($fileinfo->isDir()) {
-        $this->directories[$fileName] = $fileinfo->getPathname();
+        $directories[$fileName] = $fileinfo->getPathname();
       }
     }
-
-    
-    $this->sortItems();
-    $this->buildRecursiveTree();
-    if($this->exceptionOnNoFilesFound && empty($this->filenames)) {
-        throw new ZfExtended_Exception("There are no importable files in the Task. The following file extensions can be imported: .".join(', .', $this->_importExtensionList));
-    }
+    $this->buildRecursiveTree($filenames, $directories);
   }
   
-  protected function sortItems() {
-    ksort($this->filenames);
-    ksort($this->directories);
-  }
-  
-  protected function buildRecursiveTree() {
-    foreach($this->directories as $directory => $path) {
-      $this->rootNode->children[] = $this->getDirectoryNodeAndIterate($directory);
+  /**
+   * Sorts files and directories and builds then a recursive tree
+   * @param array $filenames
+   * @param array $directories
+   */
+  protected function buildRecursiveTree(array $filenames, array $directories) {
+    ksort($filenames);
+    ksort($directories);
+    foreach($directories as $directory => $path) {
+      $this->rootNode->children[] = $this->getDirectoryNodeAndIterate($directory, $path);
     }
-    foreach($this->filenames as $filename => $filepath) {
-      $this->rootNode->children[] = $this->getFileNode($filename);
+    foreach($filenames as $filename => $filepath) {
+      $this->rootNode->children[] = $this->getFileNode($filename, $filepath);
     }
   }
   
@@ -170,9 +165,10 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
   /**
    * Creates a FileNode out of given $file
    * @param string $filename
+   * @param string $filepath
    * @return stdClass
    */
-  protected function getFileNode($filename) {
+  protected function getFileNode($filename, $filepath) {
     $node = new stdClass();
     $node->id = 0; // from save to DB
     $node->parentId = 0;//from first sync to files call;
@@ -189,7 +185,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
     /* @var $eventManager ZfExtended_EventManager */
     $eventManager->trigger('beforeFileNodeCreate', $this, array(
             'node' => $node,
-            'filePath'=>$this->filenames[$node->filename]
+            'filePath'=>$filepath
     ));
     
     return $node;
@@ -200,10 +196,10 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * @param string $directory
    * @return stdClass
    */
-  protected function getDirectoryNodeAndIterate($directory) {
+  protected function getDirectoryNodeAndIterate($directory, $path) {
     $node = $this->getDirectoryNode($directory);
     $iteration = new static;
-    $iteration->iterateThrough($node, $this->directories[$directory]);    
+    $iteration->iterateThrough($node, $path);
     return $node;
   }
   /**

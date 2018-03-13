@@ -56,10 +56,11 @@ class editor_Models_Import_DirectoryParser_ReferenceFiles extends editor_Models_
     /**
      * Adds reference file specific infos to the tree node 
      * @param string $filename
+     * @param string $filepath
      * @return stdClass
      */
-    protected function getFileNode($filename) {
-        $node = parent::getFileNode($filename);
+    protected function getFileNode($filename, $filepath) {
+        $node = parent::getFileNode($filename, $filepath);
         if($node->isFile) {
             $node->href = $node->path.$node->filename;
             $node->hrefTarget = '_blank';
