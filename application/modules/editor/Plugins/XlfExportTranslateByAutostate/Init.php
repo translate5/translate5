@@ -30,25 +30,24 @@ END LICENSE AND COPYRIGHT
  * Initial Class of Plugin "XlfExportTranslateByAutostate"
  * This Plugin is for Across Connection where we have to abuse trans-units 
  * translate="yes/no" for filtering changed segments coming from translate5
+ * 
+ * All segments modified are getting translate = yes
+ * Modified means with a reviewed autostate, and real changed content or new comments. 
  */
 class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugin_Abstract {
     
     /**
-     * All non review states and reviewd_untouched are making translate no,
-     * so the rest makes translate yes:
+     * Regarding the autostates all review states where content was really modified are making translate yes,
+     * so all other makes translate no then.
      * @var array
      */
     protected $translateYesStates = [
             editor_Models_Segment_AutoStates::REVIEWED,
             editor_Models_Segment_AutoStates::REVIEWED_AUTO,
-            editor_Models_Segment_AutoStates::REVIEWED_UNCHANGED,
-            editor_Models_Segment_AutoStates::REVIEWED_UNCHANGED_AUTO,
             editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR,
             editor_Models_Segment_AutoStates::REVIEWED_TRANSLATOR_AUTO,
             editor_Models_Segment_AutoStates::REVIEWED_PM,
             editor_Models_Segment_AutoStates::REVIEWED_PM_AUTO,
-            editor_Models_Segment_AutoStates::REVIEWED_PM_UNCHANGED,
-            editor_Models_Segment_AutoStates::REVIEWED_PM_UNCHANGED_AUTO,
     ];
     
     public function init() {
@@ -72,17 +71,43 @@ class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugi
             $autoStates[] = $segment->getAutoStateId();
         }
         $autoStates = array_unique($autoStates);
-        
-        $foundStates = array_intersect($this->translateYesStates, $autoStates);
+        $usedTranslateYesStates = array_intersect($this->translateYesStates, $autoStates);
 
-        //if there are some yes states its yes, so if the foundStates is empty, its no
-        $translateNo = empty($foundStates);
+        //if there are no translateYes states used and no new comments, then it is translateNo
+        $translateYes = $this->hasNewComments($segments) || !empty($usedTranslateYesStates);
         
         $attributes = $event->getParam('attributes');
         settype($attributes, 'array');
-        $attributes['translate'] = $translateNo ? 'no' : 'yes';
-        //setting back the attrbiutes in the event for further handlers, 
+        $attributes['translate'] = $translateYes ? 'yes' : 'no';
+        //setting back the attributes in the event for further handlers, 
         // and the transunit attributes are generated from that array 
         $event->setParam('attributes', $attributes);
+    }
+    
+    /**
+     * returns true if there were made some new comments in the segments
+     * @param array $segments
+     * @return boolean 
+     */
+    protected function hasNewComments(array $segments) {
+        $comment = ZfExtended_Factory::get('editor_Models_Comment');
+        $nonImportedComments = function($item) {
+            return $item['userGuid'] != editor_Models_Import_FileParser_Xlf_AcrossNamespace::USERGUID;
+        };
+        /* @var $comment editor_Models_Comment */
+        foreach($segments as $segment) {
+            /* @var $segment editor_Models_Segment */
+            $commentsRendered = $segment->getComments();
+            if(empty($commentsRendered)) {
+                continue;
+            }
+            $comments = $comment->loadBySegmentAndTaskPlain((integer) $segment->getId(), $segment->getTaskGuid());
+            //filter out the imported comments and consider only newly written comments
+            $comments = array_filter($comments, $nonImportedComments);
+            if(!empty($comments)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
