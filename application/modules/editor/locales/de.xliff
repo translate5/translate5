@@ -1254,6 +1254,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QXVmZ2FiZSBiZXN0w6R0aWdlbj8='><source>Aufgabe bestätigen?</source><target>Aufgabe bestätigen?</target></trans-unit>
 <trans-unit id='YmVzdMOkdGlnZW4='><source>bestätigen</source><target>bestätigen</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlc3TDpHRpZ2VuPyA8YnIvPiBPaG5lIEJlc3TDpHRpZ3VuZyBrYW5uIGRpZXNlIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLg=='><source>Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.</source><target>Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.</target></trans-unit>
+<trans-unit id='U2llIGhhYmVuIGtlaW5lIEF1ZmdhYmUgKG1laHIpIGdlw7ZmZm5ldC4gRXZlbnR1ZWxsIHd1cmRlIGRpZSBBdWZnYWJlIGluIGVpbmVtIGFuZGVyZW4gRmVuc3RlciBnZXNjaGxvc3Nlbi4='><source>Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.</source><target>Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.</target></trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgendpc2NoZW56ZWl0bGljaCBpbSBudXIgTGVzZW1vZHVzIGdlw7ZmZm5ldC4='><source>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</source><target>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</target></trans-unit>
   </body>
  </file>
 </xliff>
