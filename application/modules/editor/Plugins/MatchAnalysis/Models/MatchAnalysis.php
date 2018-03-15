@@ -26,39 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Abstract {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
-        return true;
-    } 
-    
-    /**
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work() {
-        $params = $this->workerModel->getParameters();
-        return $this->doWork();
-    }
-    
-    
-    /**
-     * @return boolean
-     */
-    protected function doWork() {
-        $params = $this->workerModel->getParameters();
-        $this->runAnalysis($this->taskGuid);
-        return true; 
-    }
-    
-    private function runAnalysis($taskGuid){
-        $service=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Service');
-        /* @var $service editor_Plugins_MatchAnalysis_Service */
-        $service->setTaskGuid($taskGuid);
-        $service->calculateMatchrate();
-        
-    }
+/**
+ * MatchAnalysis Entity Object
+ * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * 
+ * @method string getTaskGuid() getTaskGuid()
+ * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * 
+ * @method integer getSegmentId() getSegmentId()
+ * @method void setSegmentId() setSegmentId(integer $segmentId)
+ * 
+ * @method integer getSegmentNrInTask() getSegmentNrInTask()
+ * @method void setSegmentNrInTask() setSegmentNrInTask(integer $segmentNrInTask)
+ * 
+ * @method integer getTmmtId() getTmmtId()
+ * @method void setTmmtId() setTmmtId(integer $tmmtid)
+ * 
+ * @method integer getMatchRate() getMatchRate()
+ * @method void setMatchRate() setMatchRate(integer $matchrate)
+ * 
+ */
+class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
+    protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
 }

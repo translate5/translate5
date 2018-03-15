@@ -26,39 +26,18 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Abstract {
+class editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis extends ZfExtended_Models_Validator_Abstract {
+
     /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
+     * Validators for MatchAnalysis Entity
+     * 
      */
-    protected function validateParameters($parameters = array()) {
-        return true;
-    } 
-    
-    /**
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work() {
-        $params = $this->workerModel->getParameters();
-        return $this->doWork();
-    }
-    
-    
-    /**
-     * @return boolean
-     */
-    protected function doWork() {
-        $params = $this->workerModel->getParameters();
-        $this->runAnalysis($this->taskGuid);
-        return true; 
-    }
-    
-    private function runAnalysis($taskGuid){
-        $service=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Service');
-        /* @var $service editor_Plugins_MatchAnalysis_Service */
-        $service->setTaskGuid($taskGuid);
-        $service->calculateMatchrate();
-        
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('taskGuid', 'guid');
+        $this->addValidator('segmentId', 'int');
+        $this->addValidator('segmentNrInTask', 'int');
+        $this->addValidator('tmmtid', 'int');
+        $this->addValidator('matchRate', 'int');
     }
 }

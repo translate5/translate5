@@ -26,39 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Abstract {
-    /**
-     * (non-PHPdoc)
-     * @see ZfExtended_Worker_Abstract::validateParameters()
-     */
-    protected function validateParameters($parameters = array()) {
-        return true;
-    } 
-    
-    /**
-     * {@inheritDoc}
-     * @see ZfExtended_Worker_Abstract::work()
-     */
-    public function work() {
-        $params = $this->workerModel->getParameters();
-        return $this->doWork();
-    }
-    
-    
-    /**
-     * @return boolean
-     */
-    protected function doWork() {
-        $params = $this->workerModel->getParameters();
-        $this->runAnalysis($this->taskGuid);
-        return true; 
-    }
-    
-    private function runAnalysis($taskGuid){
-        $service=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Service');
-        /* @var $service editor_Plugins_MatchAnalysis_Service */
-        $service->setTaskGuid($taskGuid);
-        $service->calculateMatchrate();
-        
-    }
+/**
+ * DB Access for MatchAnalysis Entity
+ */
+class editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_match_analysis';
+    public $_primary = 'id';
 }
