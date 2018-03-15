@@ -230,7 +230,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
      * Check if given regex will match in the input string
      */
     isRegexMatch:function(arrayRegex,inputString){
-        let regex=arrayRegex,
+        var regex=arrayRegex,
             m,
             isMatch=false;
 
