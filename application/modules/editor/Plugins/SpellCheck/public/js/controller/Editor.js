@@ -37,11 +37,11 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.SpellCheck.controller.Editor
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
+Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     extend: 'Ext.app.Controller',
 
     requires: ['Editor.util.SegmentContent'],
-    mixins: ['Editor.plugins.SpellChecker.controller.UtilLanguageTool'],
+    mixins: ['Editor.plugins.SpellCheck.controller.UtilLanguageTool'],
     refs:[{
         ref: 'segmentGrid',
         selector:'#segmentgrid'
@@ -59,9 +59,9 @@ Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
 
     // =========================================================================
 
-    editor: null,                       // = the segment's Editor (Editor.view.segments.HtmlEditor)
+    editor: null,
     
-    USE_CONSOLE: true,                 // (true|false): use true for developing using the browser's console, otherwise use false
+    USE_CONSOLE: true, // (true|false): use true for developing using the browser's console, otherwise use false
     
     // =========================================================================
     // Init
@@ -73,7 +73,7 @@ Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
     init: function(){
         var me = this;
         this.callParent(arguments);
-        me.consoleLog('0.1 init Editor.plugins.SpellChecker.controller.Editor');
+        me.consoleLog('0.1 init Editor.plugins.SpellCheck.controller.Editor');
     },
     /**
      * 
@@ -92,15 +92,8 @@ Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
         var me = this,
             plug = me.getSegmentGrid().editingPlugin,
             editor = plug.editor; // → this is the row editor component
-       
+        me.consoleLog('initEditor');
         me.editor = editor.mainEditor; // → this is the HtmlEditor
-        
-        if(me.editor.isSourceEditing()) {
-            debugger;
-            //so we are in source editing mode (you checked before if source language is supported)
-            return;
-        }
-        debugger;
     },
     /**
      * 
@@ -109,33 +102,12 @@ Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
         var me = this;
         me.consoleLog('*** initSpellCheck ***');
 
+        me.initEditor();
+        
         if (!me.isSupportedLanguage()) {
             me.consoleLog('SpellChecker stopped; language is not supported.');
             return;
         }
-        me.consoleLog('SpellChecker...');
-        return;
-        // TODO: Auslagern
-        Ext.Ajax.request({
-            url:url,
-            method:'GET',
-            params: {
-                pages:pages.join(',')
-            },
-            success: function(response){
-                var responseData = JSON.parse(response.responseText);
-                if(!responseData){
-                    return;
-                }
-                me.loadData(responseData.rows,true);
-                me.fireEvent('pagesLoaded',pages,responseData.rows);
-            },
-            failure: function(response){
-                //remove requested pages from loadedPages
-                Ext.Array.remove(me.loadedPages,pages);
-                Editor.app.getController('ServerException').handleException(response);
-            }
-        });
         
     },
 
@@ -148,8 +120,9 @@ Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
      * @returns Boolean
      */
     isSupportedLanguage: function() {
-        var me = this;
-        console.log("Get a list of supported languages etc.");
+        var me = this,
+            supportedLanguages = me.getSupportedLanguages();
+        console.dir(supportedLanguages);
         return true;
     },
     
@@ -177,5 +150,4 @@ Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
             console.clear();
         }
     }
-});
 });
