@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.27] - 2018-03-15
+###Changed
+T5DEV-236; visualReview: Matching-Algorithm: added some more "special spaces"
+
+###Bugfixes
+TRANSLATE-1183: Error in TaskActions.js using IE11
+TRANSLATE-1182: VisualReview - JS Error: Cannot read property 'getIframeBody' of undefined
+
 ## [2.6.26] - 2018-03-15
 ###Added
 T5DEV-213: XlfExportTranslateByAutostate Plug-In
