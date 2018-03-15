@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.26] - 2018-03-15
+###Added
+T5DEV-213: XlfExportTranslateByAutostate Plug-In
+
+###Changed
+TRANSLATE-1180: improve logging and enduser communication in case of ZfExtended_NoAccessException exceptions
+TRANSLATE-1179: HEAD and OPTIONS request should not create a log entry
+
 ## [2.6.25] - 2018-03-12
 ###Added
 TRANSLATE-1166: task-status-unconfirmed
