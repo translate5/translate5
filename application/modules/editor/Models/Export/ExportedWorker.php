@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -43,7 +42,16 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        //can contain mixed content
+        if(isset($parameters['folderToBeZipped'])) {
+            if(!is_dir($parameters['folderToBeZipped'])){
+                $this->log->logError('Export folder not be found and therefore not zipped: '.$parameters['folderToBeZipped']);
+                return false;
+            }
+            if(empty($parameters['zipFile'])){
+                $this->log->logError('No Parameter zipFile given for worker: '.__CLASS__);
+                return false;
+            }
+        }
         return true;
     }
     
@@ -56,10 +64,59 @@ class editor_Models_Export_ExportedWorker extends ZfExtended_Worker_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
         
-        //no unlocking or so here, since task locking on export and should be reworked so that a lockjing is not necessary anymore.
+        //creates an export.zip if necessary
+        $this->exportToZip();
         
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('exportCompleted', $this, array('task' => $task, 'parameters' => $this->workerModel->getParameters()));
         return true;
+    }
+    
+    /**
+     * Inits the worker in a way to create an export.zip, returns the temp zip name
+     * @param string $taskGuid
+     * @param string $exportFolder the folder which contains the data to be zipped
+     * @return string returns the temp name of the target zip file
+     */
+    public function initZip($taskGuid, $exportFolder) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $zipFile = tempnam($task->getAbsoluteTaskDataPath(), 'taskExport_');
+        $this->init($taskGuid, [
+                'folderToBeZipped' => $exportFolder,
+                'zipFile' => $zipFile,
+        ]);
+        return $zipFile;
+    }
+    
+    /**
+     * exports the task as zipfile export.zip in the taskData if configured
+     * @return string
+     */
+    protected function exportToZip() {
+        $params = $this->workerModel->getParameters();
+        if(empty($params['folderToBeZipped'])){
+            return;
+        }
+        
+        $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
+            array(
+                    'adapter' => 'Zip',
+                    'options' => array(
+                        'archive' => $params['zipFile']
+                    )
+                )
+            )
+        );
+        /* @var $filter Zend_Filter_Compress */
+        if(!$filter->filter($params['folderToBeZipped'])){
+            throw new Zend_Exception('Could not create export-zip of task '.$this->taskGuid.'.');
+        }
+        
+        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+            'Recursivedircleaner'
+        );
+        $recursivedircleaner->delete($params['folderToBeZipped']);
     }
 }

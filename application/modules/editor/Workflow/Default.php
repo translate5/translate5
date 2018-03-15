@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -37,8 +36,6 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     const WORKFLOW_ID = 'default';
     
-    protected $isCron = false;
-    
     public function __construct() {
         parent::__construct();
         $this->events->addIdentifiers(__CLASS__);
@@ -49,12 +46,22 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleImport()
      */
     protected function handleImport(){
-        $log = ZfExtended_Factory::get('editor_Workflow_Log');
-        /* @var $log editor_Workflow_Log */
-        $log->log($this->newTask->getTaskGuid(), $this->authenticatedUser->userGuid,  self::STEP_LECTORING);
         $this->doDebug(__FUNCTION__);
+        $stepName = (bool) $this->newTask->getEmptyTargets() ? self::STEP_TRANSLATION : self::STEP_LECTORING;
+        $this->initWorkflowStep($this->newTask, $stepName);
+        $this->newTask->load($this->newTask->getId()); //reload task with new workflowStepName and new calculated workflowStepNr
+        $this->callActions(__FUNCTION__, $stepName);
     }
     
+    /**
+     * {@inheritDoc}
+     * @see editor_Workflow_Abstract::handleBeforeImport()
+     */
+    protected function handleBeforeImport(){
+        $this->doDebug(__FUNCTION__);
+        $this->callActions(__FUNCTION__);
+    }
+
     /**
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleAllFinishOfARole()
@@ -67,26 +74,23 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
+        $oldStep = $task->getWorkflowStepName();
         
-        $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
-        /* @var $actions editor_Workflow_Actions */
-        //@todo this needs to be adjusted to check for the workflowstep instead of the role
-        //when the workflowsystem is extended or based on a workflow engine
-        if($newTua->getRole() == self::ROLE_LECTOR) {
-            $actions->openRole(self::ROLE_TRANSLATOR, $newTua);
-            $log = ZfExtended_Factory::get('editor_Workflow_Log');
-            /* @var $log editor_Workflow_Log */
-            $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
-            $log->log($taskGuid, $userGuid,  $nextStep);
-            $actions->updateAutoStates($taskGuid,'setUntouchedState');
-            $task->setRealDeliveryDate(date('Y-m-d', $_SERVER['REQUEST_TIME']));
-            $task->save();
+        //this remains as default behaviour
+        $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
+        if($nextStep) {
+            //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
+            $this->setNextStep($task, $nextStep);
+            $nextRole = $this->getRoleOfStep($nextStep);
+            if($nextRole) {
+                $newTua->setStateForRoleAndTask(self::STATE_OPEN, $nextRole);
+            }
         }
-        $notifier = ZfExtended_Factory::get('editor_Workflow_Notification', array($task, $this));
-        /* @var $notifier editor_Workflow_Notification */
-        $notifier->notifyAllFinishOfARole($newTua->getRole(), $this->isCron); 
+        
+        //provide here oldStep, since this was the triggering one. The new step is given to handleNextStep trigger
+        $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
     }
-
+    
     /**
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleFinish()
@@ -145,35 +149,13 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleUnfinish()
      */
     protected function handleUnfinish(){
+        $this->doDebug(__FUNCTION__);
         $newTua = $this->newTaskUserAssoc;
         /* @var $actions editor_Workflow_Actions */
-        //@todo this needs to be adjusted to check for the workflowstep instead of the role
-        //when the workflowsystem is extended or based on a workflow engine
-        if($newTua->getRole() == self::ROLE_LECTOR) {
-            $actions = ZfExtended_Factory::get('editor_Workflow_Actions',array($this));
-            $actions->updateAutoStates($newTua->getTaskGuid(),'setInitialStates');
-        }
-        $this->doDebug(__FUNCTION__);
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $newTua->getRole(), $newTua->getState());
     }
     
         
-    /**
-     * Loads all not finished, lector Assocs where the task is open and the targetDeliveryDate was overdued yesterday or older
-     */
-    protected function loadTasksByPastDeliveryDate() {
-        //select tua.*,t.targetDeliveryDate from LEK_taskUserAssoc tua, LEK_task t where t.taskGuid = tua.taskGuid and role = 'lector' and targetDeliveryDate < CURRENT_DATE;
-        //$s = $this->db->getAdapter()->select()
-        $db = Zend_Registry::get('db');
-        $s = $db->select()
-        ->from(array('tua' => 'LEK_taskUserAssoc'))
-        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
-        ->where('tua.role = ?', self::ROLE_LECTOR)
-        ->where('tua.state != ?', self::STATE_FINISH)
-        ->where('t.state = ?', editor_Models_Task::STATE_OPEN)
-        ->where('targetDeliveryDate < CURRENT_DATE');
-        return $db->fetchAll($s);
-    }
-    
     /**
      * checks the delivery dates, if a task is overdue, it'll be finished for all lectors, triggers normal workflow handlers if needed.
      * (non-PHPdoc)
@@ -181,30 +163,22 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      */
     public function doCronDaily() {
         $this->isCron = true;
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        
-        $list = $this->loadTasksByPastDeliveryDate();
-        $acl = ZfExtended_Acl::getInstance();
-        $acl->allow('noRights', 'editorconnect_Models_WsdlWrapper', 'sendToUser');
-        //affected user:
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        foreach($list as $instance) {
-            $task->loadByTaskGuid($instance['taskGuid']);
-            //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
-            $tua->load($instance['id']);
-            $user->loadByGuid($instance['userGuid']);
-            $this->doWithTask($task, $task); //nothing changed on task directly, but call is needed
-            $tuaNew = clone $tua;
-            $tuaNew->setState(self::STATE_FINISH);
-            $tuaNew->validate();
-            $this->triggerBeforeEvents($tua, $tuaNew);
-            $tuaNew->save();
-            $this->doWithUserAssoc($tua, $tuaNew);
-            editor_Models_LogTask::create($instance['taskGuid'], self::STATE_FINISH, $this->authenticatedUserModel, $user);
-        }
+        //no info about tasks, tuas are possible in cron call, so set nothing here
+        $this->callActions(__FUNCTION__);
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Workflow_Abstract::handleUserAssociationAdded()
+     */
+    protected function handleUserAssociationAdded() {
+        $this->doDebug(__FUNCTION__);
+        $tua = $this->newTaskUserAssoc;
+        if(empty($this->newTask)) {
+            $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
+            $this->newTask->loadByTaskGuid($tua->getTaskGuid());
+        }
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
+    }
+
 }

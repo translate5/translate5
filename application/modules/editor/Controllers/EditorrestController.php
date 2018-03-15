@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -43,13 +42,20 @@ abstract class editor_Controllers_EditorrestController extends ZfExtended_RestCo
      * @throws ZfExtended_NotAuthenticatedException
      */
     public function init() {
-      $this->session = new Zend_Session_Namespace();
-      $guid = new ZfExtended_Validate_Guid();
-      if(!$guid->isValid($this->session->taskGuid)) {
-        throw new ZfExtended_NotAuthenticatedException();
-      }
-      $this->afterTaskGuidCheck();
-      parent::init();
+        $this->session = new Zend_Session_Namespace();
+        parent::init();
+    }
+    
+    public function preDispatch(){
+        $guid = new ZfExtended_Validate_Guid();
+        if(!$guid->isValid($this->session->taskGuid)) {
+            $e = new ZfExtended_NoAccessException();
+            $e->setMessage("Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.", true);
+            $e->setLogging(false); //TODO loglevel info
+            throw $e;
+        }
+        $this->afterTaskGuidCheck();
+        parent::preDispatch();
     }
     
     protected function afterTaskGuidCheck() {

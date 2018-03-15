@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -68,19 +67,15 @@ class editor_Models_Export {
     /**
      * exports a task
      * @param string $exportRootFolder
+     * @param integer $workerId
      */
-    public function exportToFolder(string $exportRootFolder) {
-        $this->_exportToFolder($exportRootFolder);
-    }
-    
-    /**
-     * internal method to export a task to a folder
-     * @param string $exportRootFolder
-     */
-    protected function _exportToFolder(string $exportRootFolder) {
+    public function export(string $exportRootFolder, $workerId) {
         umask(0); // needed for samba access
         if(is_dir($exportRootFolder)) {
-            $this->cleaner($exportRootFolder);
+            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                'Recursivedircleaner'
+            );
+            $recursivedircleaner->delete($exportRootFolder);
         }
         
         if(!file_exists($exportRootFolder) && !@mkdir($exportRootFolder, 0777, true)){
@@ -96,6 +91,11 @@ class editor_Models_Export {
         $localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'LocalEncoded'
         );
+        
+        $fileFilter = ZfExtended_Factory::get('editor_Models_File_FilterManager');
+        /* @var $fileFilter editor_Models_File_FilterManager */
+        $fileFilter->initExport($this->task, $workerId);
+        
         sort($dirPaths);
         foreach ($dirPaths as $path) {
             $path = $localEncoded->encode($path);
@@ -108,6 +108,8 @@ class editor_Models_Export {
             $parser = $this->getFileParser((int)$fileId, $path);
             /* @var $parser editor_Models_Export_FileParser */
             $parser->saveFile();
+            
+            $fileFilter->applyExportFilters($path, $fileId);
         }
     }
     
@@ -125,38 +127,5 @@ class editor_Models_Export {
         $file->load($fileId);
         $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
         return ZfExtended_Factory::get($exportParser, array($fileId, $this->optionDiff,  $this->task, $path));
-    }
-    
-    /**
-     * exports the task as zipfile export.zip in the taskData
-     * returns the path to the generated Zip File
-     * @return string
-     */
-    public function exportToZip(string $zipFile) {
-        $taskRoot = $this->task->getAbsoluteTaskDataPath();
-        $exportRoot = $taskRoot.DIRECTORY_SEPARATOR.$this->taskGuid;
-        
-        $this->_exportToFolder($exportRoot,false);
-        $filter = ZfExtended_Factory::get('Zend_Filter_Compress',array(
-            array(
-                    'adapter' => 'Zip',
-                    'options' => array(
-                        'archive' => $zipFile
-                    )
-                )
-            )
-        );
-        /* @var $filter Zend_Filter_Compress */
-        if(!$filter->filter($exportRoot)){
-            throw new Zend_Exception('Could not create export-zip of task '.$this->taskGuid.'.');
-        }
-        $this->cleaner($exportRoot);
-    }
-    
-    protected function cleaner($directory) {
-        $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-            'Recursivedircleaner'
-        );
-        $recursivedircleaner->delete($directory);
     }
 }

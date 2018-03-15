@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -27,11 +26,15 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+//FIXME add manifest here if we implement better caching
+//FIXME set lang to the lang of the users GUI
 ?><!DOCTYPE HTML>
-<html manifest="" lang="en-US">
+<html lang="en-US">
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="msapplication-config" content="none"/>
     <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
     <title><?php echo $this->translate->_('translate5'); ?></title>
     
@@ -54,5 +57,9 @@ END LICENSE AND COPYRIGHT
     ?>
 </head>
 <body class="loading">
+    <div class="loading">
+        loading application:
+        <div id="loading-indicator-text"></div>
+    </div>
 </body>
 </html>

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -49,8 +48,9 @@ abstract class editor_Models_Import_DataProvider_Abstract {
 
     /**
      * DataProvider specific method to create the import archive
+     * @param $filename optional, provide a different archive file name
      */
-    abstract public function archiveImportedData();
+    abstract public function archiveImportedData($filename = null);
     
     /**
      * returns the the absolute import path, mainly used by the import class
@@ -112,10 +112,14 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     
     /**
      * returns the fix defined (=> final) archiveZipPath
+     * @param $filename optional, provide a different filename as the default
      * @return string
      */
-    protected final function getZipArchivePath() {
-        return $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_ARCHIV_ZIP_NAME;
+    protected final function getZipArchivePath($filename = null) {
+        if(empty($filename)){
+            return $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_ARCHIV_ZIP_NAME;
+        }
+        return $this->taskPath.DIRECTORY_SEPARATOR.$filename;
     }
     
     /**

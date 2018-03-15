@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -33,9 +32,6 @@ class editor_Models_Validator_SegmentUserAssoc extends ZfExtended_Models_Validat
      * Validators for Segment User Assoc Entity
      */
     protected function defineValidators() {
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
-        /* @var $workflow editor_Workflow_Abstract */
-        //comment = string, without length contrain. No validator needed / possible
         $this->addValidator('id', 'int');
         $this->addValidator('segmentId', 'int');
         $this->addValidator('userGuid', 'guid');

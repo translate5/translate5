@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -37,14 +36,16 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('id', 'int');
     $this->addValidator('taskGuid', 'guid');
     $this->addValidator('taskNr', 'stringLength', array('min' => 0, 'max' => 120));
+    $this->addValidator('foreignId', 'stringLength', array('min' => 0, 'max' => 120));
     $this->addValidator('taskName', 'stringLength', array('min' => 0, 'max' => 255));
+    $this->addValidator('foreignName', 'stringLength', array('min' => 0, 'max' => 255));
     $this->addValidator('sourceLang', 'int');
     $this->addValidator('targetLang', 'int');
     $this->addValidator('relaisLang', 'int');
     $this->addDontValidateField('lockedInternalSessionUniqId');
     $this->addValidator('locked', 'date', array('Y-m-d H:i:s'));
     $this->addValidator('lockingUser', 'guid');
-    $this->addValidator('state', 'inArray', array(array(editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_END)));
+    $this->addValidator('state', 'inArray', array(array(editor_Models_Task::STATE_OPEN, editor_Models_Task::STATE_END, editor_Models_Task::STATE_UNCONFIRMED)));
     $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
     /* @var $wfm editor_Workflow_Manager */
     $this->addValidator('workflow', 'inArray', array(array_keys($wfm->getWorkflows())));
@@ -52,11 +53,11 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('pmGuid', 'guid');
     $this->addValidator('pmName', 'stringLength', array('min' => 0, 'max' => 512));
     $this->addValidator('wordCount', 'int');
-    $this->addValidator('targetDeliveryDate', 'date', array('Y-m-d H:i:s'));
-    $this->addValidator('realDeliveryDate', 'date', array('Y-m-d H:i:s'));
+    $this->addValidator('targetDeliveryDate', 'date', array('Y-m-d H:i:s'),true);
+    $this->addValidator('realDeliveryDate', 'date', array('Y-m-d H:i:s'),true);
+    $this->addValidator('orderdate', 'date', array('Y-m-d H:i:s'),true);
     $this->addValidator('referenceFiles', 'int');
     $this->addValidator('terminologie', 'int');
-    $this->addValidator('orderdate', 'date', array('Y-m-d H:i:s'));
     $this->addValidator('edit100PercentMatch', 'int');
     $this->addValidator('lockLocked', 'int');
     $this->addValidator('enableSourceEditing', 'int');

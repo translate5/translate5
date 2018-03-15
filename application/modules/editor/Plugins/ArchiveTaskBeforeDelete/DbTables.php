@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -56,6 +55,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_files' => 'taskGuid',
+            'LEK_file_filter' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
             'LEK_languages' => false,
             // matchresource plugin tables disabled for archiving, since task data is not depending from them, and plugin must not be installed at all
@@ -76,9 +76,13 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_taskUserAssoc' => 'taskGuid',
             'LEK_task_log' => 'taskGuid',
             'LEK_task_meta' => 'taskGuid',
+            'LEK_task_migration' => 'taskGuid',
             'LEK_terms' => 'taskGuid',
             'LEK_user_changelog_info' => false,
+            'LEK_visualreview_files' => 'taskGuid',
+            'LEK_visualreview_segmentmapping' => 'taskGuid',
             'LEK_workflow_log' => 'taskGuid',
+            'LEK_workflow_action' => false,
             'LEK_workflow_userpref' => 'taskGuid',
             'Zf_dbversion' => true,
     );

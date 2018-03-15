@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -612,10 +611,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         /* @var $log ZfExtended_Log */
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         $log->logError($msg);
-    }
-    
-    public function cleanup() {
-        //nothing to do
     }
     
     /**

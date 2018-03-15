@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -113,7 +112,7 @@ class editor_Models_Segment_EditablesFinder {
         $this->sortParameter = $this->segment->getFilter()->getSort();
         $this->fieldsToSelect = array();
         foreach($this->sortParameter as $id => $sort) {
-            $this->fieldsToSelect[] = $sort->property;
+            $this->fieldsToSelect[] = $this->getSortProperty($sort);
             if($sort->property === 'id'){
                 unset($this->sortParameter[$id]); 
             }
@@ -158,6 +157,10 @@ class editor_Models_Segment_EditablesFinder {
             return null;
         }
         return (int) $res['cnt'];
+    }
+    
+    public function search(){
+        
     }
     
     /**

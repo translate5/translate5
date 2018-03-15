@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -147,11 +146,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'x':
             case 'ph':
             case 'it':
+            case 'bx':
+            case 'ex':
                 $type = '_singleTag';
                 $rid = 0;
                 break;
             case 'bpt':
-            case 'bx':
                 //the tagNr depends here on the existence of an entry with the same RID 
                 // if yes, take this value
                 // if no, increase and set the new value as new tagNr to that RID
@@ -163,7 +163,6 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
                 //g-close tag is just a hack to distinguish between open and close
                 $tag = 'g'; 
             case 'ept':
-            case 'ex':
                 $type = '_rightTag';
                 break;
             default:
@@ -250,9 +249,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     }
     
     /**
-     * parses the given chunks containing segment source, seg-source or target content
-     * seg-source / target can be segmented into multiple mrk mtype="seg" which is one segment on our side
-     * Therefore we return a list of segments here
+     * parses the given chunks containing segment source, seg-source or target content, or their child elements content like sub or mrk mtype="seg"
+     * the result is not returned as string but as array for post processing of the generated chunks
+     * 
      * @param array $chunks
      * @param boolean $source
      * @param boolean $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
@@ -273,11 +272,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
         $this->preserveWhitespace = $preserveWhitespace; 
         $this->xmlparser->parseList($chunks);
-        $result = $this->xmlparser->join($this->result);
-        if(!$this->preserveWhitespace) {
-            return trim($result);
+        
+        if(!empty($this->result) && !$this->preserveWhitespace) {
+            $lastIdx = count($this->result) - 1;
+            $this->result[0] = ltrim($this->result[0]);
+            $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
         }
-        return $result;
+        return $this->result;
     }
     
     /**
@@ -316,6 +317,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         if(!empty($single)) {
             $this->result[] = $single;
             return;
+        }
+        //hack so that we can replace original tags with <x> tag internally 
+        // and here we restore then the original content to be visible in the frontend  
+        // (<ph>orig</ph> tag would be correcter instead <x>, but can not be used due index shifting of the xml chunks then) 
+        if($originalTagData = $this->xmlparser->getAttribute($opener['attributes'], 'translate5OriginalContent')) {
+            $chunk = htmlspecialchars_decode($originalTagData);
         }
         $rid = $this->getRid($opener);
         $this->result[] = $this->createTag($rid, $tag, $chunk);

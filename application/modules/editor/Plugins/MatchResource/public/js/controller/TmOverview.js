@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -78,9 +77,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     },{
         ref: 'TmWindow',
         selector: '#addTmWindow'
-    },{
-        ref : 'topMenu',
-        selector : 'headPanel #top-menu'
     }],
     listen: {
         controller: {
@@ -128,7 +124,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             '#tmOverviewPanel #btnRefresh':{
                 click:'handleButtonRefreshClick'
             },
-            'headPanel': {
+            'headPanel toolbar#top-menu': {
                 afterrender: 'handleRenderHeadPanel'
             },
             '#adminTaskGrid': {
@@ -191,9 +187,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
     showButtonTmOverview : function(){
         this.getHeadToolBar() && this.getHeadToolBar().down('#btnTmOverviewWindow').show();
     },
-    handleRenderHeadPanel: function() {
-        var pos = this.getTopMenu().items.length - 2;
-        this.getTopMenu().insert(pos, {
+    handleRenderHeadPanel: function(toolbar) {
+        var pos = toolbar.items.length - 2;
+        toolbar.insert(pos, {
             xtype: 'button',
             itemId: 'btnTmOverviewWindow',
             text: this.strings.matchresource

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -47,7 +46,8 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
         "basic"=>1,
         "editor"=>2,
         "pm"=>4,
-        "admin"=>8
+        "admin"=>8,
+        "api"=>0, //for the API role we assume just no rights for changelog reading.
     );
 
     /**
@@ -138,6 +138,8 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     }
     /**
      * Generates usergroup bit map based on the aclRoles of the user
+     * If the user has a role not configured here, this has no influence on the bit map
+     * 
      * @param stdClass $userData
      * @return integer
      */
@@ -154,13 +156,14 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     }
     
     protected function checkGroups() {
-        $aclConfig = ZfExtended_Acl::getInstance()->_aclConfigObject->toArray();
-        $configured = array_values($aclConfig['roles']);
+        $configured = ZfExtended_Acl::getInstance()->getRoles();
         $used = array_keys($this->aclRoleValue);
         sort($used);
         sort($configured);
-        if($used != $configured) {
-            throw new ZfExtended_Exception('In aclConfig.ini configured roles ('.join(';', $configured).') are not equal to the roles configured in Changelog Model ('.join(';', $used).')');
+        foreach($used as $role) {
+            if(!defined('ACL_ROLE_'.strtoupper($role))){
+                error_log('In DB available roles ('.join(';', $configured).') does not contain all roles configured in Changelog Model ('.join(';', $used).')');
+            }
         }
     }
 }

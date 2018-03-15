@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -52,8 +51,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         foreach($toValidate as $edit => $toSort) {
             //edited = string, ohne längenbegrenzung. Daher kein Validator nötig / möglich 
             $this->addDontValidateField($edit);
-            $length = editor_Models_Segment::TOSORT_LENGTH;
-            $this->addValidator($toSort, 'stringLength', array('min' => 0, 'max' => $length)); //es wird kein assoc Array benötigt, aber so ist besser lesbar; stringlenght auf 300 statt 100 um auch Multibyte-Strings prüfen zu können ohne iconv_set_encoding('internal_encoding', 'UTF-8'); setzen zu müssen
+            //the 4294967295 is the colum size of mysql longtext
+            $this->addValidator($toSort,'stringLength', array('min' => 0, 'max' =>PHP_INT_MAX));
         }
     
         $this->addValidator('userGuid', 'guid');
@@ -63,7 +62,9 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         $this->addValidator('matchRateType', 'stringLength', array('min' => 0, 'max' => 60));
         $this->addValidator('workflowStepNr', 'int');
         
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive();
+        /* simplest way to get the correct workflow here: */
+        $session = new Zend_Session_Namespace();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($session->taskGuid);
         /* @var $workflow editor_Workflow_Abstract */
         $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         

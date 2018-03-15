@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -282,7 +281,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             targetMsg = '',
             result = {},
             store = me.getView().getStore('editorquery'),
-            json = null;
+            json = null,
+            segment;
         if(segmentId == me.editedSegmentId){
             //removing by index is working as array only!
             store.remove([store.findExact('tmmtid',tmmtid)]);
@@ -316,8 +316,11 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
             tmmtid: tmmtid,
             state: strState
         }];
-        me.cachedResults.get(segmentId).add(tmmtid, result);
-        me.loadCachedDataIntoGrid(segmentId,tmmtid);
-        me.cachedResults.get(segmentId).removeAtKey(tmmtid);
+        segment = me.cachedResults.get(segmentId);
+        if(segment) {
+            segment.add(tmmtid, result);
+            me.loadCachedDataIntoGrid(segmentId,tmmtid);
+            segment.removeAtKey(tmmtid);
+        }
     }
 });

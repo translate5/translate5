@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -48,7 +47,6 @@ class editor_Models_Import {
     protected $events;
     
     /**
-     * 
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig;
@@ -106,49 +104,25 @@ class editor_Models_Import {
             throw $e;
         }
         $this->task->lock(NOW_ISO, true); //locks the task
-
         
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        /* @var $eventManager ZfExtended_EventManager */
-        $eventManager->trigger('beforeImport', $this, array(
+        $this->events->trigger('beforeImport', $this, array(
                 'task' => $this->task,
                 'importFolder'=>$this->importConfig->importFolder
         ));
         
-        /*
-         * Queue Import Worker
-         */
-        $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
-        /* @var $worker editor_Models_Import_Worker */
-        $importWorker->init($this->task->getTaskGuid(), array(
-                'config' => $this->importConfig,
-                'dataProvider' => $dataProvider
-        ));
-
-        //prevent the importWorker to be started here. 
-        $parentId = $importWorker->queue(0, NULL, false);
-        
-        //sometimes it is not possbile for additional import workers to be invoked in afterImport, 
-        // for that reason this event exists:
-        $this->events->trigger('importWorkerQueued', $this, ['task' => $this->task, 'workerId' => $parentId]);
-        
-        $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
-        /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
-        
-        //queuing this worker when task has errors make no sense, init checks this.
-        if($worker->init($this->task->getTaskGuid())) {
-            $worker->queue($parentId); 
-        }
+        $this->queueImportWorkers($dataProvider);
     }
     
     /**
      * Using this proxy method for triggering the event to keep the legacy code bound to this class instead to the new worker class
      * @param editor_Models_Task $task
      */
-    public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId) {
-        $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
-        /* @var $eventManager ZfExtended_EventManager */
-        $eventManager->trigger('afterImport', $this, array('task' => $task, 'parentWorkerId' => $parentWorkerId));
+    public function triggerAfterImport(editor_Models_Task $task, int $parentWorkerId, editor_Models_Import_Configuration $importConfig) {
+        $this->events->trigger('afterImport', $this, [
+                'task' => $task, 
+                'parentWorkerId' => $parentWorkerId,
+                'importConfig' => $importConfig
+        ]);
     }
     
     /**
@@ -228,5 +202,55 @@ class editor_Models_Import {
      */
     public function setLanguages($source, $target, $relais, $type = editor_Models_Languages::LANG_TYPE_RFC5646) {
         $this->importConfig->setLanguages($source, $target, $relais, $type);
+    }
+    
+    /**
+     * add and run all the needed import workers
+     * @param editor_Models_Import_DataProvider_Abstract $dataProvider
+     */
+    protected function queueImportWorkers(editor_Models_Import_DataProvider_Abstract $dataProvider) {
+        $taskGuid = $this->task->getTaskGuid();
+        $params = ['config' => $this->importConfig];
+        /**
+         * Queue FileTree and RefFileTree Worker
+         */
+        $fileTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_FileTree');
+        /* @var $fileTreeWorker editor_Models_Import_Worker_FileTree */
+        $fileTreeWorker->init($taskGuid, $params);
+        $fileTreeWorker->queue(0, NULL, false);
+        
+        $refTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_ReferenceFileTree');
+        /* @var $refTreeWorker editor_Models_Import_Worker_ReferenceFileTree */
+        $refTreeWorker->init($taskGuid, $params);
+        $refTreeWorker->queue(0, NULL, false);
+        
+        /**
+         * Queue Import Worker
+         */
+        $importWorker = ZfExtended_Factory::get('editor_Models_Import_Worker');
+        /* @var $importWorker editor_Models_Import_Worker */
+        $params['dataProvider'] = $dataProvider;
+        $importWorker->init($taskGuid, $params);
+
+        //prevent the importWorker to be started here. 
+        $parentId = $importWorker->queue(0, NULL, false);
+
+        //since none of the above workers are started yet, we can safely update the fileTreeWorkers parentId
+        $fileTreeWorker->getModel()->setParentId($parentId);
+        $fileTreeWorker->getModel()->save();
+        $refTreeWorker->getModel()->setParentId($parentId);
+        $refTreeWorker->getModel()->save();
+
+        //sometimes it is not possbile for additional import workers to be invoked in afterImport, 
+        // for that reason this event exists:
+        $this->events->trigger('importWorkerQueued', $this, ['task' => $this->task, 'workerId' => $parentId]);
+        
+        $worker = ZfExtended_Factory::get('editor_Models_Import_Worker_SetTaskToOpen');
+        /* @var $worker editor_Models_Import_Worker_SetTaskToOpen */
+        
+        //queuing this worker when task has errors make no sense, init checks this.
+        if($worker->init($taskGuid)) {
+            $worker->queue($parentId); 
+        }
     }
 }

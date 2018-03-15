@@ -186,7 +186,7 @@
     </trans-unit>
     <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIFRNIGhpbnp1ZsO8Z2Vu'>
         <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
-        <target>Import additional TM data as TMX file and add the data to the TM</target>
+        <target>Import TMX to TM</target>
     </trans-unit>
     <trans-unit id='VE1YLURhdGVp'>
         <source>TMX-Datei</source>

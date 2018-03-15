@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -41,8 +40,12 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method string getTaskNr() getTaskNr()
  * @method void setTaskNr() setTaskNr(string $nr)
+ * @method string getForeignId() getForeignId()
+ * @method void setForeignId() setForeignId(string $id)
  * @method string getTaskName() getTaskName()
  * @method void setTaskName() setTaskName(string $name)
+ * @method string getForeignName() getForeignName()
+ * @method void setForeignName() setForeignName(string $name)
  * @method integer getSourceLang() getSourceLang()
  * @method void setSourceLang() setSourceLang(integer $id)
  * @method integer getTargetLang() getTargetLang()
@@ -64,6 +67,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflow() setWorkflow(string $workflow)
  * @method integer getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(integer $stepNr)
+ * @method string getWorkflowStepName() getWorkflowStepName()
+ * @method void setWorkflowStepName() setWorkflowStepName(string $stepName)
  * @method integer getWordCount() getWordCount()
  * @method void setWordCount() setWordCount(integer $wordcount)
  * @method string getTargetDeliveryDate() getTargetDeliveryDate()
@@ -93,6 +98,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_END = 'end';
     const STATE_IMPORT = 'import';
     const STATE_ERROR = 'error';
+    const STATE_UNCONFIRMED = 'unconfirmed';
     
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
@@ -147,26 +153,26 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads all Entities out of DB associated to the user (filtered by the TaskUserAssoc table)
-     * if $leftOuterJoin is true, load all tasks, user infos joined only where possible,
+     * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $leftOuterJoin optional, per default false 
+     * @param boolean $loadAll optional, per default false 
      * @return array
      */
-    public function loadListByUserAssoc(string $userGuid, $leftOuterJoin = false) {
-        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $leftOuterJoin));
+    public function loadListByUserAssoc(string $userGuid, $loadAll = false) {
+        return parent::loadFilterdCustom($this->getSelectByUserAssocSql($userGuid, '*', $loadAll));
     }
     
     /**
      * gets the total count of all tasks associated to the user (filtered by the TaskUserAssoc table)
-     * if $leftOuterJoin is true, load all tasks, user infos joined only where possible,
+     * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $leftOuterJoin
+     * @param boolean $loadAll
      * @return number
      */
-    public function getTotalCountByUserAssoc(string $userGuid, $leftOuterJoin = false) {
-        $s = $this->getSelectByUserAssocSql($userGuid, array('numrows' => 'count(*)'), $leftOuterJoin);
+    public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false) {
+        $s = $this->getSelectByUserAssocSql($userGuid, array('numrows' => 'count(*)'), $loadAll);
         if(!empty($this->filter)) {
             $this->filter->applyToSelect($s, false);
         }
@@ -175,24 +181,27 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns the SQL to retrieve the tasks of an user oder of all users joined with the users assoc infos
-     * if $leftOuterJoin is true, load all tasks, user infos joined only where possible,
+     * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks to the user
      * @param string $userGuid
      * @param string $cols column definition
-     * @param boolean $leftOuterJoin 
+     * @param boolean $loadAll 
      * @return Zend_Db_Table_Select
      */
-    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $leftOuterJoin = false) {
+    protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
         $alias = self::ASSOC_TABLE_ALIAS;
         $s = $this->db->select()
         ->from(array('t' => 'LEK_task'), $cols);
-        if($leftOuterJoin) {
+        if(!empty($this->filter)) {
+            $this->filter->setDefaultTable('t');
+        }
+        if($loadAll) {
             $on = $alias.'.taskGuid = t.taskGuid AND '.$alias.'.userGuid = '.$s->getAdapter()->quote($userGuid);
             $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $on, array());
         }
         else {
-            $s->join(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
-            ->where($alias.'.userGuid = ?', $userGuid);
+            $s->joinLeft(array($alias => 'LEK_taskUserAssoc'), $alias.'.taskGuid = t.taskGuid', array())
+            ->where($alias.'.userGuid = ? OR t.pmGuid = ?', $userGuid);
         }
         return $s;
     }
@@ -382,13 +391,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * update the workflowStep of a specific task 
-     * @param string $taskGuid
-     * @param integer $step
+     * @param string $stepName
+     * @param boolean $increaseStep optional, by default true, increases then the workflow step nr
      */
-    public function updateWorkflowStep(string $taskGuid, integer $step) {
-        $this->db->update(array('workflowStep' => $step), array(
-                      'taskGuid = ?' => $taskGuid)
-        );
+    public function updateWorkflowStep(string $stepName, $increaseStep = true) {
+        $data = [
+                'workflowStepName' => $stepName,
+        ];
+        if($increaseStep) {
+            $data['workflowStep'] =  new Zend_Db_Expr('`workflowStep` + 1');
+            //step nr is not updated in task entity!
+        }
+        $this->setWorkflowStepName($stepName);
+        $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
     }
     
     /**
@@ -405,6 +420,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $session->taskOpenState = $openState;
         $session->taskWorkflow = $this->getWorkflow();
         $session->taskWorkflowStepNr = $this->getWorkflowStep();
+        $session->taskWorkflowStepName = $this->getWorkflowStepName();
     }
     
     /**
@@ -555,7 +571,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function isExclusiveState() {
-        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_OPEN);
+        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED);
         return !in_array($this->getState(), $nonExclusiveStates);
     }
     
@@ -617,4 +633,86 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->meta;
     }
+    
+    /**
+     * Check if the current task status allows this action
+     * 
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    public function checkStateAllowsActions() {
+        if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
+            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
+            $e->setErrors([
+                    'task' => $this->getTaskGuid(),
+                    'taskState' => $this->getState(),
+                    'isLocked' => $this->isLocked($this->getTaskGuid()),
+                    'isErroneous' => $this->isErroneous(),
+                    'isExclusiveState' => $this->isExclusiveState(),
+            ]);
+            throw $e;
+        }
+    }
+    
+    /***
+     * Remove all ended task from the database and from the disk when there is no 
+     * change since (taskLifetimeDays)config days in lek_task_log
+     */
+    public function removeOldTasks() {
+        $config = Zend_Registry::get('config');
+        $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
+
+        
+        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : 100;
+        
+        if(!$daysOffset){
+            throw new Zend_Exception('No task taskLifetimeDays configuration defined.');
+            return;
+        }
+        
+        /**
+         * SELECT `t`.taskGuid,`t`.taskName, t.id 
+         * FROM LEK_task AS `t`  
+         * LEFT JOIN `LEK_task_log` AS `tl` ON   
+         * WHERE `t`.`state` = 'end' AND `tl`.id IS NULL;
+         */
+        
+        $daysOffset = (int)$daysOffset; //ensure that it is plain integer, which can be savely given to DB without binding 
+        //find all ended tasks which are not modified in the last X days
+        // which are not modified → get all modified and make a left join with id = null (faster as not exists)
+        $s = $this->db->select()
+             ->setIntegrityCheck(false)
+             ->from(['t' => 'LEK_task'],'t.id AS id')
+             ->joinLeft(['tl' => 'LEK_task_log'], 
+                 '`t`.`taskGuid` = `tl`.`taskGuid` AND `tl`.`created` > CURRENT_DATE - INTERVAL '.$daysOffset.' DAY','')
+            ->where('`t`.`state`=?',self::STATE_END)
+            ->where('`tl`.id IS NULL');
+        $tasks = $this->db->getAdapter()->fetchAll($s);
+
+        if(empty($tasks)){
+            return;
+        }
+        
+        $taskEntity=null;
+        $removedTasks=[];
+        //foreach task task, check the deletable, and delete it
+        foreach ($tasks as $task){
+            $taskEntity=ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $taskEntity editor_Models_Task */
+            $taskEntity->load($task['id']);
+            
+            if(!$taskEntity->isErroneous()){
+                $taskEntity->checkStateAllowsActions();
+            }
+            
+            //no need for entity version check, since field loaded from db will always have one
+            
+            $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($taskEntity));
+            /* @var $remover editor_Models_Task_Remover */
+            $removedTasks[]=$taskEntity->getTaskName();
+            $remover->remove();
+        }
+        error_log("Number of tasks removed: ".count($removedTasks));
+        error_log("Tasks removed by taskname: ".implode(',', $removedTasks));
+    }
+    
 }

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -95,6 +94,12 @@ class editor_Models_Import_Configuration {
     public $userName;
     
     /**
+     * Worker Id of the import worker, usable as parentId for subsequent workers
+     * @var integer
+     */
+    public $workerId; 
+    
+    /**
      * needed internally for de/serialization 
      * @var string
      */
@@ -159,6 +164,17 @@ class editor_Models_Import_Configuration {
         $prefix = $this->importFolder;
         $proofReadDir = $config->runtimeOptions->import->proofReadDirectory;
         return $proofReadDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$proofReadDir; 
+    }
+    
+    /**
+     * returns the absolute path (incl. import root) to the reference files 
+     * @return string
+     */
+    public function getReferenceFilesDir() {
+        $config = Zend_Registry::get('config');
+        $prefix = $this->importFolder;
+        $refDir = $config->runtimeOptions->import->referenceDirectory;
+        return $refDir == '' ? $prefix : $prefix.DIRECTORY_SEPARATOR.$refDir; 
     }
     
     /**

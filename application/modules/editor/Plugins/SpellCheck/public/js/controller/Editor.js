@@ -37,59 +37,145 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.SpellCheck.controller.Editor
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
-  extend: 'Ext.app.Controller',
-  
-  //to include more/own Util files add it here in the array:
-  requires: ['Editor.util.SegmentContent'],
-  refs:[{
-      ref: 'segmentGrid',
-      selector:'#segmentgrid'
-  },{
-      ref: 'editorPanel',
-      selector:'#SpellCheckEditorPanel'
-  }],
-  listen: {
-      controller: {
-          '#Editor': {
-              beforeKeyMapUsage: 'handleEditorKeyMapUsage'
-          }
-      }
-  },
-  strings: {
-  },
-  init: function(){
-      console.log('Hello World');
-      this.callParent(arguments);
-  },
-  handleEditorKeyMapUsage: function(conf, area, mapOverwrite) {
-      var me = this,
-          ev = Ext.event.Event;
-      /*
-      conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
-          
-          console.log("Implement Here the space handler!");
-          
-      }, true];
-      
-      conf.keyMapConfig['anotherKey'] = [ev.UP,{ctrl: false, alt: false},function(key) {
-          
-          console.log("Implement Here the anotherKey handler!");
-          
-      }, true];
-      */
-      
-  },
-  howToAccessTheEditor: function() {
-      var me = this,
-          plug = me.getSegmentGrid().editingPlugin,
-          editor = plug.editor; // → this is the row editor component
-     
-      editor.mainEditor; // → this is the HtmlEditor
-      
-      if(editor.isSourceEditing()) {
-          //so we are in source editing mode (you checked before if source language is supported)
-          return;
-      }
-  }
+Ext.define('Editor.plugins.SpellChecker.controller.Editor', {
+    extend: 'Ext.app.Controller',
+
+    requires: ['Editor.util.SegmentContent'],
+    mixins: ['Editor.plugins.SpellChecker.controller.UtilLanguageTool'],
+    refs:[{
+        ref: 'segmentGrid',
+        selector:'#segmentgrid'
+    },{
+        ref: 'editorPanel',
+        selector:'#SpellCheckEditorPanel'
+    }],
+    listen: {
+        controller: {
+            '#Editor': {
+                beforeKeyMapUsage: 'handleEditorKeyMapUsage'
+            }
+        }
+    },
+
+    // =========================================================================
+
+    editor: null,                       // = the segment's Editor (Editor.view.segments.HtmlEditor)
+    
+    USE_CONSOLE: true,                 // (true|false): use true for developing using the browser's console, otherwise use false
+    
+    // =========================================================================
+    // Init
+    // =========================================================================
+    
+    /**
+     * 
+     */
+    init: function(){
+        var me = this;
+        this.callParent(arguments);
+        me.consoleLog('0.1 init Editor.plugins.SpellChecker.controller.Editor');
+    },
+    /**
+     * 
+     */
+    handleEditorKeyMapUsage: function(conf, area, mapOverwrite) {
+        var me = this,
+            ev = Ext.event.Event;
+        conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
+            me.initSpellCheck();
+        }, true];
+    },
+    /**
+     * 
+     */
+    initEditor: function() {
+        var me = this,
+            plug = me.getSegmentGrid().editingPlugin,
+            editor = plug.editor; // → this is the row editor component
+       
+        me.editor = editor.mainEditor; // → this is the HtmlEditor
+        
+        if(me.editor.isSourceEditing()) {
+            debugger;
+            //so we are in source editing mode (you checked before if source language is supported)
+            return;
+        }
+        debugger;
+    },
+    /**
+     * 
+     */
+    initSpellCheck: function(event) {
+        var me = this;
+        me.consoleLog('*** initSpellCheck ***');
+
+        if (!me.isSupportedLanguage()) {
+            me.consoleLog('SpellChecker stopped; language is not supported.');
+            return;
+        }
+        me.consoleLog('SpellChecker...');
+        return;
+        // TODO: Auslagern
+        Ext.Ajax.request({
+            url:url,
+            method:'GET',
+            params: {
+                pages:pages.join(',')
+            },
+            success: function(response){
+                var responseData = JSON.parse(response.responseText);
+                if(!responseData){
+                    return;
+                }
+                me.loadData(responseData.rows,true);
+                me.fireEvent('pagesLoaded',pages,responseData.rows);
+            },
+            failure: function(response){
+                //remove requested pages from loadedPages
+                Ext.Array.remove(me.loadedPages,pages);
+                Editor.app.getController('ServerException').handleException(response);
+            }
+        });
+        
+    },
+
+    // =========================================================================
+    // SpellChecker: generic layer for integrating specific tools
+    // =========================================================================
+    
+    /**
+     * Is the language supported by the tool(s) we use)?
+     * @returns Boolean
+     */
+    isSupportedLanguage: function() {
+        var me = this;
+        console.log("Get a list of supported languages etc.");
+        return true;
+    },
+    
+    // =========================================================================
+    // Development
+    // =========================================================================
+    
+    /**
+     * Write into the browser console depending on the setting of me.USE_CONSOLE.
+     * @param {(String|Object)} outputForConsole
+     */
+    consoleLog: function(outputForConsole) {
+        var me = this;
+        if (me.USE_CONSOLE) {
+            if (typeof outputForConsole === 'string' || outputForConsole instanceof String) {
+                console.log(outputForConsole);
+            } else {
+                console.dir(outputForConsole);
+            }
+        }
+    },
+    consoleClear: function() {
+        var me = this;
+        if (me.USE_CONSOLE) {
+            console.clear();
+        }
+    }
+});
 });

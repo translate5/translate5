@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -62,33 +61,24 @@ class editor_Models_Import_Worker extends editor_Models_Import_Worker_Abstract {
         //also containing an instance of the initial dataprovider.
         // The Dataprovider can itself hook on to several import events 
         $parameters = $this->workerModel->getParameters();
+        $importConfig = $parameters['config'];
+        /* @var $importConfig editor_Models_Import_Configuration */
+        $importConfig->workerId = $this->workerModel->getId();
         
         try {
             $import = ZfExtended_Factory::get('editor_Models_Import_Worker_Import');
             /* @var $import editor_Models_Import_Worker_Import */
-            $import->import($task, $parameters['config']);
+            $import->import($task, $importConfig);
             
             // externalImport just triggers the event aferImport!
             //@see editor_Models_Import::triggerAfterImport
             $externalImport = ZfExtended_Factory::get('editor_Models_Import');
             /* @var $externalImport editor_Models_Import */
-            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId());
+            $externalImport->triggerAfterImport($task, (int) $this->workerModel->getId(), $importConfig);
             return true;
         } catch (Exception $e) {
             $task->setErroneous();
             throw $e; 
         }
-    }
-    
-    /**
-     * basicly sets the task to be imported to state error when a fatal error happens after the work method
-     */
-    protected function registerShutdown() {
-        register_shutdown_function(function($task) {
-            $error = error_get_last();
-            if(!is_null($error) && ($error['type'] & FATAL_ERRORS_TO_HANDLE)) {
-                $task->setErroneous();
-            }
-        }, $this->task);
     }
 }

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -66,7 +65,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
         $this->eventManager->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
-        $this->eventManager->attach('Editor_IndexController', 'afterApplicationstateAction', array($this, 'termtaggerStateHandler'));
+        $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
     }
     
@@ -260,8 +259,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     }
     
     public function termtaggerStateHandler(Zend_EventManager_Event $event) {
-        $view = $event->getParam('view');
-        $view->applicationstate->termtagger = $this->termtaggerState();
+        $applicationState = $event->getParam('applicationState');
+        $applicationState->termtagger = $this->termtaggerState();
     }
     
     public function termtaggerState() {

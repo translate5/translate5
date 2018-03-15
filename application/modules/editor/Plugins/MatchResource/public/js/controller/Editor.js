@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -80,6 +79,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           },
           '#ViewModes':{
               viewModeChanged:'viewModeChangeEvent'
+          },
+          '#Editor.plugins.TrackChanges.controller.Editor':{
+              setMatchResourceValueForEditor:'setMatchResourceValueForEditor'
           }
       }
   },
@@ -89,6 +91,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
+  matchResourceValueForEditor: null,
   afterInitEditor: function() {
       var task = Editor.data.task;
       if(!task.get('defaultSegmentLayout')){
@@ -136,9 +139,8 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           editor = plug.editor,
           task = Editor.data.task,
           rec = plug.context.record,
-          sc, contentTags,
-          matchrate = matchRecord.get('matchrate'),
-          matchTarget;
+          contentTags,
+          matchrate = matchRecord.get('matchrate');
 
       if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
@@ -151,10 +153,9 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
-          sc = new Editor.util.SegmentContent(rec.get('source'));
-          matchTarget = matchRecord.get('target');
-          matchTarget = matchTarget.replace(/<div class="single replaceThisTagWhenInsertingInSegment"><span title="<AdditionalTagFromTM\/>" class="short">&lt;\d+\/&gt;<\/span><span data-originalid="ph" data-filename="irrelevant" class="full">&lt;AdditionalTagFromTM\/&gt;<\/span><\/div>/gi, "");
-          editor.mainEditor.setValueAndMarkup(matchTarget, rec.get('id'), editor.columnToEdit);
+          me.setMatchResourceValueForEditor(matchRecord.get('target'));
+          me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added now
+          editor.mainEditor.setValueAndMarkup(me.matchResourceValueForEditor, rec.get('id'), editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
@@ -163,6 +164,10 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       } 
+  },
+  setMatchResourceValueForEditor: function(value) {
+      var me = this;
+      me.matchResourceValueForEditor = value;
   },
   viewModeChangeEvent: function(controller){
       var me = this,

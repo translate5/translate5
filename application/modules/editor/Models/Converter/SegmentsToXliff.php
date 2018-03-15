@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -32,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * 
  * TODO: MQM and Terminology markup export is missing! 
  */
-class editor_Models_Converter_SegmentsToXliff {
+class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_SegmentsToXliffAbstract{
     /**
      * includeDiff                = boolean, enable or disable diff generation, defaults to false
      * @var string
@@ -81,37 +80,6 @@ class editor_Models_Converter_SegmentsToXliff {
      */
     const CONFIG_ADD_TERMINOLOGY = 'addTerminology';
     
-    /**
-     * @var editor_Models_Task
-     */
-    protected $task;
-    
-    /**
-     * @var editor_Models_Export_FileParser_Sdlxliff
-     */
-    protected $exportParser;
-    
-    /**
-     * @var editor_Models_Comment
-     */
-    protected $comment;
-    
-    /**
-     * resulting XML buffer
-     * @var array
-     */
-    protected $result = array();
-    
-    /**
-     * different data needed while converting to XML
-     * @var array
-     */
-    protected $data = array();
-    
-    /**
-     * @var editor_Models_SegmentFieldManager
-     */
-    protected $sfm;
     
     /**
      * @var editor_Models_Export_DiffTagger_Sdlxliff
@@ -123,31 +91,6 @@ class editor_Models_Converter_SegmentsToXliff {
      */
     protected $segmentUtility;
     
-    /**
-     * @var array
-     */
-    protected $options;
-    
-    /**
-     * contains a list of the included namespaces in the header
-     * @var array
-     */
-    protected $enabledNamespaces = [];
-    
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $taghelperInternal;
-    
-    /**
-     * @var editor_Models_Segment_TermTag
-     */
-    protected $taghelperTerm;
-    
-    /**
-     * @var editor_Models_Segment_QmSubsegments
-     */
-    protected $taghelperMqm;
     
     /**
      * @var current tag map of replaced internal tags with g/x/bx/ex tags
@@ -161,36 +104,12 @@ class editor_Models_Converter_SegmentsToXliff {
     protected $tagId = 1;
     
     /**
-     * Constructor
-     * 
-     * Supported parameters for $config are
-     * - includeDiff                = boolean, enable or disable diff generation, defaults to false
-     * - plainInternalTags          = boolean, exports internal tags plain content, 
-     *                                currently only needed for BEO export, defaults to false
-     * - addRelaisLanguage          = boolean, add relais language target as alt trans (if available), defaults to true
-     * - addComments                = boolean, add comments, defaults to true
-     * - addStateAndQm              = boolean, add segment state and QM, defaults to true
-     * - addAlternatives            = boolean, add target alternatives as alt trans, defaults to false
-     * - addPreviousVersion         = boolean, add target original as alt trans, defaults to true
-     * - addDisclaimer              = boolean, add disclaimer that format is not 100% xliff 1.2, defaults to true
-     * 
-     * @param array $config
-     */
-    public function __construct(array $config = []){
-        $this->setOptions($config);
-        
-        $this->comment = ZfExtended_Factory::get('editor_Models_Comment');
-        $this->segmentUtility = ZfExtended_Factory::get('editor_Models_Segment_Utility');
-        $this->differ = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Sdlxliff');
-    }
-    
-    /**
      * For the options see the constructor
      * @see self::__construct
      * @param array $config
      */
     public function setOptions(array $config) {
-        $this->options = $config;
+        parent::setOptions($config);
         
         //flags defaulting to false
         $defaultsToFalse = [
@@ -248,48 +167,6 @@ class editor_Models_Converter_SegmentsToXliff {
         $xml = join("\n", $this->result);
 
         return $xml;
-    }
-    
-    /**
-     * initializes internally needed data for convertion
-     */
-    protected function initConvertionData() {
-        $task = $this->task;
-        
-        /**
-         * define autostates
-         */
-        $autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-        $refl = new ReflectionClass($autoStates);
-        $this->data['autostates'] = array_map('strtolower', array_flip($refl->getConstants()));
-        
-        /**
-         * define languages
-         */
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
-        $lang->load($task->getSourceLang());
-        $this->data['sourceLang'] = $lang->getRfc5646();
-        $lang->load($task->getTargetLang());
-        $this->data['targetLang'] = $lang->getRfc5646();
-        
-        $this->data['relaisLang'] = $task->getRelaisLang();
-        //disable relais export by setting relais lang to false
-        if(empty($this->data['relaisLang']) || !$this->options[self::CONFIG_ADD_RELAIS_LANGUAGE]){
-            $this->data['relaisLang'] = false;
-        }
-        else {
-            $lang->load($task->getRelaisLang());
-            $this->data['relaisLang'] = $lang->getRfc5646();
-        }
-        
-        /**
-         * define first soruce and target fields
-         */
-        $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
-        //both getFirst calls throw an exception if no corresponding field is given, that should not be, so uncatched is OK.
-        $this->data['firstTarget'] = $this->sfm->getFirstTargetName();
-        $this->data['firstSource'] = $this->sfm->getFirstSourceName();
     }
     
     /**
@@ -357,20 +234,6 @@ class editor_Models_Converter_SegmentsToXliff {
         
         $this->result[] = '</body>';
         $this->result[] = '</file>';
-    }
-    
-    /**
-     * returns the export fileparser of the affected file
-     * @param integer $fileId
-     * @param string $filename
-     * @return mixed|object
-     */
-    protected function getExportFileparser($fileId, $filename) {
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
-        $file->load($fileId);
-        $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
-        return ZfExtended_Factory::get($exportParser, array(0, false,  $this->task, $filename));
     }
     
     /**
@@ -556,26 +419,6 @@ class editor_Models_Converter_SegmentsToXliff {
     }
     
     /**
-     * converts a 1D array in a 2D array, where the original filenames containing the segments are the keys of the first dimension.
-     * returns: array('FILENAME_1' => array(seg1, seg2), 'FILENAME_2' => array(seg3, seg4)
-     * 
-     * @param array $segments
-     * @return array
-     */
-    protected function reorderByFilename(array $segments) {
-        $foldertree = ZfExtended_Factory::get('editor_Models_Foldertree');
-        /* @var $foldertree editor_Models_Foldertree */
-        $foldertree->setPathPrefix('');
-        $paths = $foldertree->getPaths($this->task->getTaskGuid(), 'file');
-        $result = array_fill_keys($paths, array());
-        foreach($segments as $segment) {
-            $file = $paths[$segment['fileId']];
-            $result[$file][] = $segment;
-        }
-        return $result;
-    }
-    
-    /**
      * prepares segment text parts for xml
      * @param string $text
      * @return string
@@ -625,17 +468,5 @@ class editor_Models_Converter_SegmentsToXliff {
             }
             return '<mrk mtype="term" translate5:status="'.$status.'"'.$translation.'>';
         }, '</mrk>', $protectInternalTags);
-    }
-    
-    protected function initTagHelper() {
-        if(empty($this->taghelperInternal)) {
-            $this->taghelperInternal = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        }
-        if(empty($this->taghelperTerm)) {
-            $this->taghelperTerm = ZfExtended_Factory::get('editor_Models_Segment_TermTag',[$this->taghelperInternal]);
-        }
-        if(empty($this->taghelperMqm)) {
-            $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
-        }
     }
 }

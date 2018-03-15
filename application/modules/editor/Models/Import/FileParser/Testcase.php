@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -59,8 +58,6 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
      */
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
-
-        $this->protectUnicodeSpecialChars();
     }
 
     /**
@@ -68,7 +65,7 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
      * @see editor_Models_Import_FileParser::parse()
      */
     protected function parse() {
-        $this->_skeletonFile = $this->_origFileUnicodeProtected;
+        $this->_skeletonFile = $this->_origFile;
         $this->qp = qp($this->_skeletonFile, ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
         $this->parseSegmentAttributes('fake - not needed, except for declaration');
         $this->extractSegment('fake - not needed, except for declaration');

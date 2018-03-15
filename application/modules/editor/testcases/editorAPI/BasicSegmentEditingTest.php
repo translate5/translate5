@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -69,25 +68,25 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         //get segment list
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
         
-        $this->assertCount(11, $segments);
+        $this->assertCount(13, $segments);
         
         //bulk check of all pretrans fields
         $pretrans = array_map(function($item){
             return $item->pretrans;
         }, $segments);
-        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0,0), $pretrans);
+        $this->assertEquals(array(1,1,1,1,1,1,0,0,0,0,0,0,0), $pretrans);
         
         //bulk check of all pretrans fields
         $matchRates = array_map(function($item){
             return $item->matchRate;
         }, $segments);
-        $this->assertEquals(array('100','100','100','100','100','100','0','0','0','0','0'), $matchRates);
+        $this->assertEquals(array('100','100','100','100','100','100','0','0','0','0','0','0','0'), $matchRates);
         
         //bulk check of all pretrans fields
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4','0'), $autoStateIds);
+        $this->assertEquals(array('0','0','0','3','0','0','4','4','4','4','0','4','4'), $autoStateIds);
         
         foreach($segments as $segment) {
             $this->assertEquals('{00000000-0000-0000-C100-CCDDEE000001}', $segment->userGuid);
@@ -114,9 +113,9 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         
         $this->assertEquals('This file is <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_0000003_001_en_001_0000006">a</div> based on <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_0000003_001_en_001_0000006">a</div> part of the php-online-Documentation. It\'s translation is done by <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_0000003_001_en_001_0000006">a</div> pretranslation based on <div title="" class="term preferredTerm exact transNotFound" data-tbxid="term_0000003_001_en_001_0000006">a</div> very fast winalign-Project and is not at all state of the translation art. It\'s only purpose is the generation of demo-data for translate5.', $firstSegment->source);
         $this->assertEquals('da37e24323d2953c3b48c82cd6e50d71', $firstSegment->sourceMd5);
-        $this->assertEquals('This file is a based on a part', $firstSegment->sourceToSort);
+        $this->assertEquals("This file is a based on a part of the php-online-Documentation. It's translation is done by a pretranslation based on a very fast winalign-Project and is not at all state of the translation art. It's only purpose is the generation of demo-data for translate5.", $firstSegment->sourceToSort);
         $this->assertEquals('Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ',$firstSegment->target);
-        $this->assertEquals('Diese Datei ist Teil der php-o', $firstSegment->targetToSort);
+        $this->assertEquals("Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ", $firstSegment->targetToSort);
         $this->assertEquals($firstSegment->target, $firstSegment->targetEdit);
         $this->assertEquals($firstSegment->targetToSort, $firstSegment->targetEditToSort);
         $this->assertEquals('74d85bd308aa69f558af1a3a9f1f2dae', $firstSegment->targetMd5);
@@ -138,16 +137,16 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         
         $this->assertEquals('Test multiple <div class="single 73706163652074733d2232303230222f"><span title="&lt;space/&gt;" class="short">&lt;1/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Spaces<div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;2/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>and<div class="single 73706163652074733d2230393039222f"><span title="&lt;space/&gt;" class="short">&lt;3/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>tabs <div class="single 73706163652074733d223230222f"><span title="&lt;space/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>in <div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>different combinations!', $spaceTestSegment->source);
         $this->assertEquals('393faa1c977d8ed48fad2941cccd0ec4', $spaceTestSegment->sourceMd5);
-        $this->assertEquals('Test multiple &lt;1/&gt;&lt;sp', $spaceTestSegment->sourceToSort);
+        $this->assertEquals('Test multiple Spacesandtabs in different combinations!', $spaceTestSegment->sourceToSort);
         $this->assertEquals('Teste mehrere <div class="single 73706163652074733d2232303230222f"><span title="&lt;space/&gt;" class="short">&lt;1/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Leerzeichen<div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;2/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>und<div class="single 73706163652074733d2230393039222f"><span title="&lt;space/&gt;" class="short">&lt;3/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Tabulatoren <div class="single 73706163652074733d223230222f"><span title="&lt;space/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>in <div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>verschiedenen Kombinationen!', $spaceTestSegment->target);
-        $this->assertEquals('Teste mehrere &lt;1/&gt;&lt;sp', $spaceTestSegment->targetToSort);
+        $this->assertEquals('Teste mehrere LeerzeichenundTabulatoren in verschiedenen Kombinationen!', $spaceTestSegment->targetToSort);
         $this->assertEquals('Teste mehrere <div class="single 73706163652074733d2232303230222f"><span title="&lt;space/&gt;" class="short">&lt;1/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Leerzeichen<div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;2/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>und<div class="single 73706163652074733d2230393039222f"><span title="&lt;space/&gt;" class="short">&lt;3/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>Tabulatoren <div class="single 73706163652074733d223230222f"><span title="&lt;space/&gt;" class="short">&lt;4/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>in <div class="single 73706163652074733d223039222f"><span title="&lt;space/&gt;" class="short">&lt;5/&gt;</span><span data-originalid="space" data-filename="b31345d64a8594d0e7b79852d022c7f2" class="full">&lt;space/&gt;</span></div>verschiedenen Kombinationen!', $spaceTestSegment->targetEdit);
-        $this->assertEquals('Teste mehrere &lt;1/&gt;&lt;sp', $spaceTestSegment->targetEditToSort);
+        $this->assertEquals('Teste mehrere LeerzeichenundTabulatoren in verschiedenen Kombinationen!', $spaceTestSegment->targetEditToSort);
         $this->assertEquals('ad22aff833942adca222e82201e5fcd9', $spaceTestSegment->targetMd5);
         
         $lastSegment = end($segments);
-        $this->assertEquals(11, $lastSegment->segmentNrInTask);
-        $this->assertEquals(11, $lastSegment->mid);
+        $this->assertEquals(13, $lastSegment->segmentNrInTask);
+        $this->assertEquals(13, $lastSegment->mid);
     }
     
     public function testSegmentEditing() {
@@ -221,19 +220,19 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $autoStateIds = array_map(function($item){
             return $item->autoStateId;
         }, $segments);
-        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4','0'), $autoStateIds);
+        $this->assertEquals(array('0','0','1','3','0','0','1','1','1','4','0','4','4'), $autoStateIds);
         
         //bulk check of all workflowStepNr fields
         $workflowStepNr = array_map(function($item){
             return $item->workflowStepNr;
         }, $segments);
-        $this->assertEquals(array('0','0','1','0','0','0','1','1','1','0','0'), $workflowStepNr);
+        $this->assertEquals(array('0','0','1','0','0','0','1','1','1','0','0','0','0'), $workflowStepNr);
         
         //bulk check of all workflowStep fields
         $workflowStep = array_map(function($item){
             return $item->workflowStep;
         }, $segments);
-        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring','',''), $workflowStep);
+        $this->assertEquals(array('','','lectoring','','','','lectoring','lectoring','lectoring','','','',''), $workflowStep);
     }
     
     /**

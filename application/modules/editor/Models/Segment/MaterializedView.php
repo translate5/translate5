@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -138,6 +137,7 @@ class editor_Models_Segment_MaterializedView {
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
         $baseCols = $sfm->getBaseColumns();
         
+        
         //define the add column states based on the field type stored in the DB
         $addColTpl = array();
         foreach($baseCols as $v) {
@@ -162,10 +162,11 @@ class editor_Models_Segment_MaterializedView {
         
         //loop over all available segment fields for this task and create the SQL for
         $walker = function($name, $suffix, $realCol) use ($addColTpl) {
-            return sprintf($addColTpl[$realCol], $name, $suffix);
+            return sprintf($addColTpl[$realCol],$name, $suffix);
         };
         
         $addColSql = $sfm->walkFields($walker);
+        $addColSql[] = 'ADD COLUMN `metaCache` longText NOT NULL';
         
         $sql = 'ALTER TABLE `'.$this->viewName.'` '.join(', ', $addColSql).';';
         $db->query($sql);
@@ -204,8 +205,12 @@ class editor_Models_Segment_MaterializedView {
         };
         //loop over all available segment fields for this task and create SQL for
         $sfm->walkFields($walker);
-        $selectSql = join(',', $selectSql);
+        $selectSql = join(',', $selectSql).', ';
+        
+        //build up the segment meta cache, currently only the min and max width 
+        $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), \'}\') metaCache ';
         $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
+        $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id';
         $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
         $selectSql .= ' GROUP BY d.segmentId';
         
@@ -226,6 +231,20 @@ class editor_Models_Segment_MaterializedView {
         unset($data->isWatched);
         unset($data->segmentUserAssocId);
         $db->update((array) $data, array('id = ?' => $id));
+    }
+    
+    /**
+     * returns boolean if the materialized view exists in the DB or not
+     * @return boolean
+     */
+    public function exists() {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        try{
+            $result = $db->describeTable($this->viewName);
+            return ! empty($result);
+        }catch(Exception $e){
+            return false;
+        }
     }
     
     /**

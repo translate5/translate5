@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -74,7 +73,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         
         //FIXME get task and test wordcount!!!
         //get segment list (just the ones of the first file for that tests)
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=47');
         
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
@@ -86,7 +85,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      * Needs $this->config->runtimeOptions->import->xlf->preserveWhitespace to be false!
      */
     public function testPreserveWhitespace() {
-        $segments = $this->api()->requestJson('editor/segment?start=41&limit=200');
+        $segments = $this->api()->requestJson('editor/segment?start=47&limit=200');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfImportTest/expectedSegmentsPreserveWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsPreserveWhitespace.json'), $data, 'Imported segments are not as expected!');

@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -49,10 +48,14 @@ class editor_Models_Import_FileList {
     protected $task;
     
     /**
-     * 
      * @var editor_Models_Import_Configuration
      */
     protected $importConfig;
+    
+    /**
+     * @var editor_Models_Foldertree
+     */
+    protected $treeDb;
     
     public function __construct(editor_Models_Import_Configuration $importConfig, editor_Models_Task $task) {
         $this->importConfig = $importConfig;
@@ -60,31 +63,49 @@ class editor_Models_Import_FileList {
     }
     
     /**
-     * Find all proofread and reference files and stores them as foldertree, 
+     * Find all proofread files and stores them as foldertree, 
      * syncs the proofread files then as plain file entities
      * returns a file list with files to be imported
      * @param string $proofreadDir
      */
-    public function processProofreadAndReferenceFiles() {
-        $config = $this->importConfig;
+    public function processProofreadFiles() {
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
         $tree = $parser->parse($this->importConfig->getProofReadDir());
         
-        $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
-        $treeDb->setTree($tree);
-        if($this->hasReferenceFiles() && !$config->isCheckRun){
-            $treeDb->setReferenceFileTree($this->getReferenceFileTree());
+        $this->treeDb->setTree($tree);
+        $this->treeDb->setTaskGuid($this->task->getTaskGuid());
+        $this->saveAndSyncFileTree();
+        
+        return $this->treeDb->getPaths($this->task->getTaskGuid(),'file');
+    }
+    
+    /**
+     * Find all reference files and stores them as foldertree, 
+     */
+    public function processReferenceFiles() {
+        if(!$this->hasReferenceFiles()){
+            return;
         }
-        $treeDb->setTaskGuid($this->task->getTaskGuid());
-        $params = array($treeDb,$config->getLanguageId('source'),$config->getLanguageId('target'), $config->getLanguageId('relais'));
+        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
+        $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
+        $this->treeDb->loadByTaskGuid($this->task->getTaskGuid());
+        $this->treeDb->setReferenceFileTree($this->getReferenceFileTree());
+        $this->treeDb->save();
+    }
+    
+    /**
+     * saves the file tree and syncs the filetree to the file table
+     */
+    public function saveAndSyncFileTree() {
+        $config = $this->importConfig;
+        $params = array($this->treeDb, $config->getLanguageId('source'), $config->getLanguageId('target'), $config->getLanguageId('relais'));
         $sync = ZfExtended_Factory::get('editor_Models_Foldertree_SyncToFiles', $params);
         /* @var $sync editor_Models_Foldertree_SyncToFiles */
         $sync->recursiveSync();
-        
-        $treeDb->save();
-        return $treeDb->getPaths($this->task->getTaskGuid(),'file');
+        $this->treeDb->save();
     }
     
     /**
@@ -97,34 +118,11 @@ class editor_Models_Import_FileList {
         $refTarget = $this->getAbsReferencePath();
         $refDir = $config->runtimeOptions->import->referenceDirectory;
         $refAbsDir = $this->importConfig->importFolder.DIRECTORY_SEPARATOR.$refDir;
-        $this->recurseCopy($refAbsDir, $refTarget);
+        ZfExtended_Utils::recursiveCopy($refAbsDir, $refTarget);
     
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_ReferenceFiles');
         /* @var $parser editor_Models_Import_DirectoryParser_ReferenceFiles */
         return $parser->parse($refTarget);
-    }
-    
-    /**
-     * does a recursive copy of the given directory
-     * @param string $src Source Directory
-     * @param string $dst Destination Directory
-     */
-    protected function recurseCopy(string $src, string $dst) {
-        $dir = opendir($src);
-        @mkdir($dst);
-        $SEP = DIRECTORY_SEPARATOR;
-        while(false !== ( $file = readdir($dir)) ) {
-            if ($file == '.' || $file == '..') {
-                continue;
-            }
-            if (is_dir($src.$SEP.$file)) {
-                $this->recurseCopy($src.$SEP.$file, $dst.$SEP.$file);
-            }
-            else {
-                copy($src.$SEP.$file, $dst.$SEP.$file);
-            }
-        }
-        closedir($dir);
     }
     
     /**

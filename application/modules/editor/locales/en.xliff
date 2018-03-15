@@ -804,7 +804,7 @@
       </trans-unit>
       <trans-unit id='QXVmZ2FiZW5zcGV6aWZpc2NoZSBFaW5zdGVsbHVuZ2Vu'>
         <source>Aufgabenspezifische Einstellungen</source>
-        <target>Taskspecific properties</target>
+        <target>Task properties</target>
       </trans-unit>
       <trans-unit id='RWluc3RlbGx1bmdlbiB6dSBBdWZnYWJlICJ7MH0i'>
         <source>Einstellungen zu Aufgabe "{0}"</source>
@@ -882,9 +882,9 @@
         <source>nicht vorhanden</source>
         <target>Not available</target>
       </trans-unit>
-      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQXVmZ2FiZQ=='>
-        <source>Einstellungen zur Aufgabe</source>
-        <target>Task-properties</target>
+      <trans-unit id='RWluc3RlbGx1bmdlbiB6dXIgQWJsYXVmcGxhbg=='>
+        <source>Einstellungen zur Ablaufplan</source>
+        <target>Workflow-properties</target>
       </trans-unit>
       <trans-unit id='V29ya2Zsb3c='>
         <source>Workflow</source>
@@ -982,6 +982,22 @@
 	<source>Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.</source>
 	<target>The task contains alternate translations. The repetition editor was deactivated therefore.</target>
       </trans-unit>
+    <trans-unit id='RGVsZXRlZCBieQ=='>
+        <source>Deleted by</source>
+        <target>Deleted by</target>
+    </trans-unit>
+    <trans-unit id='SW5zZXJ0ZWQgYnk='>
+        <source>Inserted by</source>
+        <target>Inserted by</target>
+    </trans-unit>
+    <trans-unit id='SElTVE9SWQ=='>
+        <source>HISTORY</source>
+        <target>HISTORY</target>
+    </trans-unit>
+    <trans-unit id='R2V3aWNodHVuZw=='>
+        <source>Gewichtung</source>
+        <target>Severity</target>
+    </trans-unit>
       <trans-unit id='S29tbWVudGFyZSB6dW0gYWt0dWVsbGVuIFNlZ21lbnQ='>
 	<source>Kommentare zum aktuellen Segment</source>
 	<target>Comments for the current segment</target>
@@ -1073,10 +1089,10 @@
 	  <source>Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.</source>
 	  <target> The query over the Internet to the server took too long. This may be because of your internet connection or a server overload. Please try again.</target>
 	</trans-unit>
-	<trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gYmVpbSBFZGl0aWVyZW4gZ2Vsw7ZzY2h0LCBkYXMgU2VnbWVudCBrYW5uIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbi4gPGJyIC8+VmVyc3VjaGVuIFNpZSBtaXQgZGVyIFLDvGNrZ8OkbmdpZ2Z1bmt0aW9uIFNUUkctWiBkaWUgVGFncyB3aWVkZXJoZXJ6dXN0ZWxsZW4uIDxiciAvPkFsdGVybmF0aXYga8O2bm5lbiBTaWUgYXVjaCBkaWUgQmVhcmJlaXR1bmcgZGVzIFNlZ21lbnRzIGR1cmNoIEtsaWNrIGF1ZiAiQWJicmVjaGVuIiAoPGltZyBzcmM9Ii4uL21vZHVsZXMvZWRpdG9yL2ltYWdlcy9jcm9zcy5wbmciIC8+IGltIHJlY2h0ZW4gTWVuw7wpIGJlZW5kZW4gdW5kIGRhcyBTZWdtZW50IG5ldSB6dXIgQmVhcmJlaXR1bmcgw7ZmZm5lbi48YnIgLz5GZWhsZW5kZSBUYWdzOg=='>
-	  <source>Die nachfolgenden Tags wurden beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br />Versuchen Sie mit der Rückgängigfunktion STRG-Z die Tags wiederherzustellen. <br />Alternativ können Sie auch die Bearbeitung des Segments durch Klick auf "Abbrechen" (<img src="../modules/editor/images/cross.png" /> im rechten Menü) beenden und das Segment neu zur Bearbeitung öffnen.<br />Fehlende Tags:</source>
-	  <target>The following tags have been deleted during editing, the segment can not be saved. <br />Try to restore the tags by using the Undo function CTRL-Z. <br /> Alternatively, you can also stop the processing of the segment by clicking on "Cancel" (<img src="../modules/editor/images/cross.png" /> in the menu on the right) and reopen the segment for processing. <br /> Missing Tags:</target>
-	</trans-unit>
+    <trans-unit id='RGllIG5hY2hmb2xnZW5kZW4gVGFncyB3dXJkZW4gbm9jaCBuaWNodCBoaW56dWdlZsO8Z3Qgb2RlciBiZWltIEVkaXRpZXJlbiBnZWzDtnNjaHQsIGRhcyBTZWdtZW50IGthbm4gbmljaHQgZ2VzcGVpY2hlcnQgd2VyZGVuLiA8YnIgLz48YnIgLz5EaWUgVGFzdGVua29tYmluYXRpb248YnIgLz48dWw+PGxpPlNUUkcgKyBFSU5GRyAoYWx0ZXJuYXRpdiBTVFJHICsgLiAoUHVua3QpKSBmw7xndCBkZW4ga29tcGxldHRlbiBRdWVsbHRleHQgaW4gZGVuIFppZWx0ZXh0IGVpbi48L2xpPjxsaT5TVFJHICsgLCAoS29tbWEpICsgJmd0O051bW1lciZsdDsgZsO8Z3QgZGVuIGVudHNwcmVjaGVuZGVuIFRhZyBpbiBkZW4gWmllbHRleHQgKE51bGwgZW50c3ByaWNodCBUYWcgTnIuIDEwKSBlaW4uPC9saT48bGk+U1RSRyArIFNISUZUICsgLCAoS29tbWEpICsgJmd0O051bW1lciZsdDsgZsO8Z3QgZGllIFRhZ3MgbWl0IGRlbiBOdW1tZXJuIDExIGJpcyAyMCBpbiBkZW4gWmllbHRleHQgZWluLjwvbGk+PC91bD5GZWhsZW5kZSBUYWdzOg=='>
+        <source>Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:</source>
+        <target>The following tags were not added at all or deleted on editing, the segment can not be saved.<br />The keyboard short-cuts<ul><li>CTRL + INS (alternatively CTRL + . (period)) inserts source to target.</li><li>CTRL + , (comma) + &gt;number&lt; inserts the corresponding tag tp target (zero equals number 10) ein.</li><li>CTRL + SHIFT + , (comma) + &gt;number&lt; inserts tag numbers 11 to 20 to target.</li></ul>Missing tags:</target>
+    </trans-unit>
 	<trans-unit id='RmVobGVyIGJlaGViZW4='>
 	  <source>Fehler beheben</source>
 	  <target>Correct errors</target>
@@ -1563,7 +1579,7 @@
 </trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgLSBhbGxlIHppZWxzcHJhY2hsaWNoZW4gU2VnbWVudGUgYmVpbSBJbXBvcnQgbGVlciAobmljaHQgYW5nZWhha3QgYmVkZXV0ZXQgUmV2aWV3YXVmZ2FiZSku'>
     <source>Übersetzungsaufgabe - alle zielsprachlichen Segmente beim Import leer (nicht angehakt bedeutet Reviewaufgabe).</source>
-    <target>Translation job - all target elements of the  segments have been empty at impoort time (not checked means this is a review job)</target>
+    <target>Translation job - all target elements of the  segments have been empty at import time (not checked means this is a review job)</target>
 </trans-unit>
 <trans-unit id='w5xiZXJzZXR6dW5nc2F1ZmdhYmUgKGtlaW4gUmV2aWV3KQ=='>
     <source>Übersetzungsaufgabe (kein Review)</source>
@@ -1582,49 +1598,29 @@
     <target>add MQM</target>
 </trans-unit>
 
-<trans-unit id='JTEkcyAlMiRzLAoKU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYgJTMkcyBuZXUgYW5nZWxlZ3Qgb2RlciBJaHIgUGFzc3dvcnQgenVyw7xja2dlc2V0enQgd3VyZGUuIAoKSWhyIEJlbnV0emVybmFtZToKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiU2JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpXZW5uIFNpZSBJaHIgS29udG8ga8O8bmZ0aWcgbnV0emVuIG3DtmNodGVuLCBkYW5uIGZvcmRlcm4gU2llIHVudGVyIGRlciBmb2xnZW5kZW4KQWRyZXNzZSBlaW5lIExpbmsgYW4sIHVtIElociBQYXNzd29ydCBuZXUgc2V0emVuIHp1IGvDtm5uZW4uCgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KJTMkcyU0JHMKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTUkcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwu'>
-    <source>%1$s %2$s,
+<trans-unit id='UmVmZXJlbnotRGF0ZWllbg=='>
+    <source>Referenz-Dateien</source>
+    <target>Reference files</target>
+</trans-unit>
 
-Sie erhalten diese Email, weil Ihr Konto auf %3$s neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+<trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='>
+    <source>Referenzdateien vorhanden</source>
+    <target>Reference files exist</target>
+</trans-unit>
 
-Ihr Benutzername:
-------------------------------
-%6$s
-------------------------------
+<trans-unit id='TGlzdGUgw7ZmZm5lbg=='>
+    <source>Liste öffnen</source>
+    <target>Open list</target>
+</trans-unit>
 
-Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
-Adresse eine Link an, um Ihr Passwort neu setzen zu können.
 
-------------------------------
-%3$s%4$s
-------------------------------
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-%5$s
-
-Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</source>
-<target>%1$s %2$s,
-
-You have received this email, because your account on %3$s was created or your password was reset. 
-
-Your username:
-------------------------------
-%6$s
-------------------------------
-
-If you want to use your account in the future, then please request a link
-to reset your password from the following address.
-
-------------------------------
-%3$s%4$s
-------------------------------
-
-Many thanks and best regards,
-The Project Management team
-%5$s
-
-This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+<trans-unit id='U2VociBnZWVocnRlciBIZXJy'>
+<source>Sehr geehrter Herr</source>
+    <target>Dear Mr.</target>
+</trans-unit>
+<trans-unit id='U2VociBnZWVocnRlIEZyYXU='>
+    <source>Sehr geehrte Frau</source>
+    <target>Dear Mrs.</target>
 </trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZnJlaWdlZ2ViZW4='>
     <source>Translate5 - Aufgabe freigegeben</source>
@@ -1636,65 +1632,15 @@ This e-mail has been generated automatically. Please do not reply to this e-mail
     <target>Translate5 - task finished</target>
 </trans-unit>
 
-<trans-unit id='SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBkdXJjaCBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=='>
-    <source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> durch alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></source>
-    <target>The task <b>%1$s - %2$s</b> was finished by all users of the role <i>%3$s</i> in the task-portal Translate5.<br /></target>
-</trans-unit>
-
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
     <source>Translate5 - Aufgabe automatisch abgeschlossen</source>
     <target>Translate5 - task finished automatically</target>
-</trans-unit>
-
-<trans-unit id='SW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiUxJHMgLSAlMiRzPC9iPiBhdWZncnVuZCBlaW5lciBUZXJtaW7DvGJlcnNjaHJlaXR1bmcgYXV0b21hdGlzY2ggZsO8ciBhbGxlIEJlbnV0emVyIGRlciBSb2xsZSA8aT4lMyRzPC9pPiBhYmdlc2NobG9zc2VuLjxiciAvPg=='>
-    <source>Im Projektportal Translate5 wurde die Aufgabe <b>%1$s - %2$s</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>%3$s</i> abgeschlossen.<br /></source>
-    <target>The task <b>%1$s - %2$s</b> was finished due a missed deadline automatically for all users of the role <i>%3$s</i> in the task-portal Translate5.<br /></target>
-</trans-unit>
-
-<trans-unit id='PGJyIC8+CjxiciAvPgpTaWUgZXJyZWljaGVuIGRhcyBQb3J0YWwgdW50ZXI6IDxhIGhyZWY9IiUxJHMiPiUxJHM8L2E+PGJyIC8+CjxiciAvPgo8YnIgLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyIC8+SWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KPGJyIC8+JTIkcwo8YnIgLz4KPGJyIC8+RGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'>
-    <source><br />
-<br />
-Sie erreichen das Portal unter: <a href="%1$s">%1$s</a><br />
-<br />
-<br />Vielen Dank und viele Grüße,
-<br />Ihr Projektmanagement Team
-<br />%2$s
-<br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
-<target><br />
-<br />
-You can access the portal at: <a href="%1$s">%1$s</a><br />
-<br />
-<br />Many thanks and best regards,
-<br />The Project Management team
-<br />%2$s
-<br />
-<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
 </trans-unit>
 
     <trans-unit id='U2VociBnZWVocnRlciBIZXJy'>
         <source>Sehr geehrter Herr</source>
         <target>Dear Mr.</target>
     </trans-unit>
-
-<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KJTMkczxiciAvPgolNCRzPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxiPiU1JHM8L2I+OjxiciAvPgolNiRzCjxociAvPgolNyRz'>
-    <source>%1$s %2$s,<br />
-<br />
-%3$s<br />
-%4$s<br />
-Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <b>%5$s</b>:<br />
-%6$s
-<hr />
-%7$s</source>
-<target>%1$s %2$s,<br />
-<br />
-%3$s<br />
-%4$s<br />
-The changes made by the formerly active user of the role <b>%5$s</b> are listed below:<br />
-%6$s
-<hr />
-%7$s</target>
-</trans-unit>
 
 <trans-unit id='JXMgLSBiZWFyYmVpdGV0'>
     <source>%s - bearbeitet</source>
@@ -1704,67 +1650,638 @@ The changes made by the formerly active user of the role <b>%5$s</b> are listed 
     <source>AutoStatus</source>
     <target>AutoStatus</target>
 </trans-unit>
-<trans-unit id='JTEkcyAlMiRzLAoKSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlICU1JHMgLSAlNiRzIGbDvHIgU2llIGZyZWlnZWdlYmVuLgoKU2llIGVycmVpY2hlbiBkYXMgUG9ydGFsIHVudGVyOiAlMyRzCgpWaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKSWhyIFByb2pla3RtYW5hZ2VtZW50IFRlYW0KJTckcwoKRGllc2UgRW1haWwgd3VyZGUgYXV0b21hdGlzY2ggZ2VuZXJpZXJ0LiBCaXR0ZSBhbnR3b3J0ZW4gU2llIG5pY2h0IGF1ZiBkaWVzZSBFLU1haWwh'>
-    <source>%1$s %2$s,
 
-Im Projektportal Translate5 wurde die Aufgabe %5$s - %6$s für Sie freigegeben.
-
-Sie erreichen das Portal unter: %3$s
-
-Vielen Dank und viele Grüße,
-Ihr Projektmanagement Team
-%7$s
-
-Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
-<target>%1$s %2$s,
-
-The task %5$s - %6$s was opened for you in the task-portal Translate5.
-
-You can access the portal at: %3$s
-
-Many thanks and best regards,
-The Project Management team
-%7$s
-
-This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+<trans-unit id='UGFzc3dvcnQgc2V0emVu'>
+  <source>Passwort setzen</source>
+  <target>Reset password</target>
 </trans-unit>
 
-<trans-unit id='JTEkcyAlMiRzLDxiciAvPgo8YnIgLz4KSW0gUHJvamVrdHBvcnRhbCBUcmFuc2xhdGU1IHd1cmRlIGRpZSBBdWZnYWJlIDxiPiU1JHMgLSAlNiRzPC9iPiBmw7xyIFNpZSBmcmVpZ2VnZWJlbi48YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHZvcmhlcmdlaGVuZGVuIExla3RvcmVuOjxiciAvPgolNCRzCjxociAvPgo8YnIgLz4KPGJyIC8+ClNpZSBlcnJlaWNoZW4gZGFzIFBvcnRhbCB1bnRlcjogJTMkczxiciAvPgo8YnIgLz4KPGJyIC8+VmllbGVuIERhbmsgdW5kIHZpZWxlIEdyw7zDn2UsCjxiciAvPklociBQcm9qZWt0bWFuYWdlbWVudCBUZWFtCjxiciAvPiU3JHMKPGJyIC8+CjxiciAvPkRpZXNlIEVtYWlsIHd1cmRlIGF1dG9tYXRpc2NoIGdlbmVyaWVydC4gQml0dGUgYW50d29ydGVuIFNpZSBuaWNodCBhdWYgZGllc2UgRS1NYWlsIQ=='>
-    <source>%1$s %2$s,<br />
-<br />
-Im Projektportal Translate5 wurde die Aufgabe <b>%5$s - %6$s</b> für Sie freigegeben.<br />
-<br />
-Im folgenden die getätigten Änderungen der vorhergehenden Lektoren:<br />
-%4$s
-<hr />
-<br />
-<br />
-Sie erreichen das Portal unter: %3$s<br />
-<br />
-<br />Vielen Dank und viele Grüße,
-<br />Ihr Projektmanagement Team
-<br />%7$s
-<br />
-<br />Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source>
-<target>%1$s %2$s,<br />
-<br />
-The task <b>%5$s - %6$s</b> was opened for You in the task-portal Translate5.<br />
+<trans-unit id='w5xiZXJzZXR6ZXIgKMOcYmVycHLDvGZ1bmcp'>
+    <source>Übersetzer (Überprüfung)</source>
+    <target>translator (check)</target>
+</trans-unit>
+<trans-unit id='w5xiZXJzZXR6dW5n'>
+    <source>Übersetzung</source>
+    <target>translation</target>
+</trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
 
+<trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
+      <trans-unit id='WnVnZW9yZG5ldGUgU3ByYWNoZW4='>
+        <source>Zugeordnete Sprachen</source>
+        <target>Associated languages</target>
+      </trans-unit>
+      <trans-unit id='UXVlbGxzcHJhY2hlKG4p'>
+        <source>Quellsprache(n)</source>
+        <target>Source language(s)</target>
+      </trans-unit>
+      <trans-unit id='WmllbHNwcmFjaGUobik='>
+        <source>Zielsprache(n)</source>
+        <target>Target language(s)</target>
+      </trans-unit>
+      <trans-unit id='QmVpbSBJbXBvcnQgdm9uIEF1ZmdhYmVuIHdlcmRlbiAiRWRpdG9yIiBCZW51dHplciBtaXQgZGVuIHBhc3NlbmRlbiBTcHJhY2hlbiA8YSBocmVmPSJodHRwOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9wYWdlcy92aWV3cGFnZS5hY3Rpb24/cGFnZUlkPTU1NzE2NCIgdGFyZ2V0PSJfYmxhbmsiIHRpdGxlPSJtZWhyIEluZm8iPmF1dG9tYXRpc2NoIGRlciBBdWZnYWJlIHp1Z2V3aWVzZW48L2E+Lg=='>
+          <source>Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.</source>
+          <target>On importing a task, users with the role "editor" and matching languages <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">are automatically added to the task</a>.</target>
+      </trans-unit>
+
+      <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0'>
+          <source>Die Aufgabe wurde erfolgreich aktualisiert</source>
+          <target>The task was updated successfully</target>
+      </trans-unit>
+<trans-unit id='UG9ydHVnaWVzaXNjaCAoQnJhc2lsaWVuKQ=='><source>Portugiesisch (Brasilien)</source><target>Portuguese (Brazil)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbik='><source>Aserbaidschanisch (Latein)</source><target>Azerbaijani (Latin)</target></trans-unit>
+<trans-unit id='S2htZXI='><source>Khmer</source><target>Khmer</target></trans-unit>
+<trans-unit id='TWFsYXlzaXNjaA=='><source>Malaysisch</source><target>Malaysian</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbik='><source>Serbisch (Latein)</source><target>Serbian (Latin)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChMYXRlaW4p'><source>Usbekisch (Latein)</source><target>Uzbek (Latin)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAow5ZzdGVycmVpY2gp'><source>Deutsch (Österreich)</source><target>German (Austria)</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaCAoTnlub3Jzayk='><source>Norwegisch (Nynorsk)</source><target>Norwegian (Nynorsk)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gp'><source>Serbisch (Kyrillisch)</source><target>Serbian (Cyrillic)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChLeXJpbGxpc2NoKQ=='><source>Usbekisch (Kyrillisch)</source><target>Uzbek (Cyrillic)</target></trans-unit>
+<trans-unit id='QWZyaWthYW5zIChTw7xkYWZyaWthKQ=='><source>Afrikaans (Südafrika)</source><target>Afrikaans (South Africa)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFZlcmVpbmlndGUgQXJhYmlzY2hlIEVtaXJhdGUp'><source>Arabisch (Vereinigte Arabische Emirate)</source><target>Arabic (United Arab Emirates)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEJhaHJhaW4p'><source>Arabisch (Bahrain)</source><target>Arabic (Bahrain)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEFsZ2VyaWVuKQ=='><source>Arabisch (Algerien)</source><target>Arabic (Algeria)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKMOEZ3lwdGVuKQ=='><source>Arabisch (Ägypten)</source><target>Arabic (Egypt)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKElyYWsp'><source>Arabisch (Irak)</source><target>Arabic (Iraq)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEpvcmRhbmllbik='><source>Arabisch (Jordanien)</source><target>Arabic (Jordan)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEt1d2FpdCk='><source>Arabisch (Kuwait)</source><target>Arabic (Kuwait)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKExpYmFub24p'><source>Arabisch (Libanon)</source><target>Arabic (Lebanon)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKExpYnllbik='><source>Arabisch (Libyen)</source><target>Arabic (Libya)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKE1hcm9ra28p'><source>Arabisch (Marokko)</source><target>Arabic (Morocco)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKE9tYW4p'><source>Arabisch (Oman)</source><target>Arabic (Oman)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEthdGFyKQ=='><source>Arabisch (Katar)</source><target>Arabic (Qatar)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFNhdWRpLUFyYWJpZW4p'><source>Arabisch (Saudi-Arabien)</source><target>Arabic (Saudi Arabia)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFN5cmllbik='><source>Arabisch (Syrien)</source><target>Arabic (Syria)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKFR1bmVzaWVuKQ=='><source>Arabisch (Tunesien)</source><target>Arabic (Tunisia)</target></trans-unit>
+<trans-unit id='QXJhYmlzY2ggKEplbWVuKQ=='><source>Arabisch (Jemen)</source><target>Arabic (Yemen)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKEt5cmlsbGlzY2gp'><source>Aserbaidschanisch (Kyrillisch)</source><target>Azerbaijani (Cyrillic)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKExhdGVpbikgKEFzZXJiYWlkc2NoYW4p'><source>Aserbaidschanisch (Latein) (Aserbaidschan)</source><target>Azerbaijani (Latin) (Azerbaijan)</target></trans-unit>
+<trans-unit id='QXNlcmJhaWRzY2hhbmlzY2ggKEt5cmlsbGlzY2gpIChBc2VyYmFpZHNjaGFuKQ=='><source>Aserbaidschanisch (Kyrillisch) (Aserbaidschan)</source><target>Azerbaijani (Cyrillic) (Azerbaijan)</target></trans-unit>
+<trans-unit id='V2Vpw59ydXNzaXNjaCAoV2Vpw59ydXNzbGFuZCk='><source>Weißrussisch (Weißrussland)</source><target>Belorussian (Belarus)</target></trans-unit>
+<trans-unit id='QnVsZ2FyaXNjaCAoQnVsZ2FyaWVuKQ=='><source>Bulgarisch (Bulgarien)</source><target>Bulgarian (Bulgaria)</target></trans-unit>
+<trans-unit id='Qm9zbmlzY2ggKEJvc25pZW4gdW5kIEhlcnplZ293aW5hKQ=='><source>Bosnisch (Bosnien und Herzegowina)</source><target>Bosnian (Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='S2F0YWxhbmlzY2ggKFNwYW5pZW4p'><source>Katalanisch (Spanien)</source><target>Catalan (Spain)</target></trans-unit>
+<trans-unit id='VHNjaGVjaGlzY2ggKFRzY2hlY2hpZW4p'><source>Tschechisch (Tschechien)</source><target>Czech (Czech Republic)</target></trans-unit>
+<trans-unit id='V2FsaXNpc2No'><source>Walisisch</source><target>Welsh</target></trans-unit>
+<trans-unit id='V2FsaXNpc2NoIChVSyk='><source>Walisisch (UK)</source><target>Welsh (UK)</target></trans-unit>
+<trans-unit id='RMOkbmlzY2ggKETDpG5lbWFyayk='><source>Dänisch (Dänemark)</source><target>Danish (Denmark)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoU2Nod2Vpeik='><source>Deutsch (Schweiz)</source><target>German (Switzerland)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoRGV1dHNjaGxhbmQp'><source>Deutsch (Deutschland)</source><target>German Germany)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoTGllY2h0ZW5zdGVpbik='><source>Deutsch (Liechtenstein)</source><target>German (Liechtenstein)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoTHV4ZW1idXJnKQ=='><source>Deutsch (Luxemburg)</source><target>German (Luxembourg)</target></trans-unit>
+<trans-unit id='RGhpdmVoaQ=='><source>Dhivehi</source><target>Dhivehi</target></trans-unit>
+<trans-unit id='RGhpdmVoaSAoTWFsZWRpdmVuKQ=='><source>Dhivehi (Malediven)</source><target>Dhivehi (Maldives)</target></trans-unit>
+<trans-unit id='R3JpZWNoaXNjaCAoR3JpZWNoZW5sYW5kKQ=='><source>Griechisch (Griechenland)</source><target>Greek (Greece)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEF1c3RyYWxpZW4p'><source>Englisch (Australien)</source><target>English (Australia)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEJlbGl6ZSk='><source>Englisch (Belize)</source><target>English (Belize)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEthbmFkYSk='><source>Englisch (Kanada)</source><target>English (Canada)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEthcmliaWsp'><source>Englisch (Karibik)</source><target>English (Caribbean)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKElybGFuZCk='><source>Englisch (Irland)</source><target>English (Ireland)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKEphbWFpa2Ep'><source>Englisch (Jamaika)</source><target>English (Jamaica)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKE5ldXNlZWxhbmQp'><source>Englisch (Neuseeland)</source><target>English (New Zealand)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFBoaWxpcHBpbmVuKQ=='><source>Englisch (Philippinen)</source><target>English (Philippines)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFRyaW5pZGFkIHVuZCBUb2JlZ28p'><source>Englisch (Trinidad und Tobego)</source><target>English (Trinidad and Tobego)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFPDvGRhZnJpa2Ep'><source>Englisch (Südafrika)</source><target>English (South Africa)</target></trans-unit>
+<trans-unit id='RW5nbGlzY2ggKFNpbWJhYndlKQ=='><source>Englisch (Simbabwe)</source><target>English (Zimbabwe)</target></trans-unit>
+<trans-unit id='RXNwZXJhbnRv'><source>Esperanto</source><target>Esperanto</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEFyZ2VudGluaWVuKQ=='><source>Spanisch (Argentinien)</source><target>Spanish (Argentina)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEJvbGl2aWVuKQ=='><source>Spanisch (Bolivien)</source><target>Spanish (Bolivia)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKENoaWxlKQ=='><source>Spanisch (Chile)</source><target>Spanish (Chile)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKENvc3RhIFJpY2Ep'><source>Spanisch (Costa Rica)</source><target>Spanish (Costa Rica)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKERvbWluaWthbmlzY2hlIFJlcHVibGlrKQ=='><source>Spanisch (Dominikanische Republik)</source><target>Spanish (Dominican Republic)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEVjdWFkb3Ip'><source>Spanisch (Ecuador)</source><target>Spanish (Ecuador)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFNwYW5pZW4p'><source>Spanisch (Spanien)</source><target>Spanish (Spain)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEd1YXRlbWFsYSk='><source>Spanisch (Guatemala)</source><target>Spanish (Guatemala)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEhvbmR1cmFzKQ=='><source>Spanisch (Honduras)</source><target>Spanish (Honduras)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKE5pY2FyYWd1YSk='><source>Spanisch (Nicaragua)</source><target>Spanish (Nicaragua)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFBhbmFtYSk='><source>Spanisch (Panama)</source><target>Spanish (Panama)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFBlcnUp'><source>Spanisch (Peru)</source><target>Spanish (Peru)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFB1ZXJ0byBSaWNvKQ=='><source>Spanisch (Puerto Rico)</source><target>Spanish (Puerto Rico)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFBhcmFndWF5KQ=='><source>Spanisch (Paraguay)</source><target>Spanish (Paraguay)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKEVsIFNhbHZhZG9yKQ=='><source>Spanisch (El Salvador)</source><target>Spanish (El Salvador)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFVydWd1YXkp'><source>Spanisch (Uruguay)</source><target>Spanish (Uruguay)</target></trans-unit>
+<trans-unit id='U3BhbmlzY2ggKFZlbmV6dWVsYSk='><source>Spanisch (Venezuela)</source><target>Spanish (Venezuela)</target></trans-unit>
+<trans-unit id='RXN0bmlzY2ggKEVzdGxhbmQp'><source>Estnisch (Estland)</source><target>Estonian (Estonia)</target></trans-unit>
+<trans-unit id='QmFza2lzY2g='><source>Baskisch</source><target>Basque</target></trans-unit>
+<trans-unit id='QmFza2lzY2ggKFNwYW5pZW4p'><source>Baskisch (Spanien)</source><target>Basque (Spain)</target></trans-unit>
+<trans-unit id='UGVyc2lzY2ggKElyYW4p'><source>Persisch (Iran)</source><target>Persian (Iran)</target></trans-unit>
+<trans-unit id='RmlubmlzY2ggKEZpbm5sYW5kKQ=='><source>Finnisch (Finnland)</source><target>Finnish (Finland)</target></trans-unit>
+<trans-unit id='RsOkcsO2aXNjaA=='><source>Färöisch</source><target>Faroese</target></trans-unit>
+<trans-unit id='RsOkcsO2aXNjaCAoRsOkcsO2ZXIp'><source>Färöisch (Färöer)</source><target>Faroese (Faroe Islands)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChLYW5hZGEp'><source>Französisch (Kanada)</source><target>French (Canada)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChTY2h3ZWl6KQ=='><source>Französisch (Schweiz)</source><target>French (Switzerland)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChGcmFua3JlaWNoKQ=='><source>Französisch (Frankreich)</source><target>French (France)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChMdXhlbWJ1cmcp'><source>Französisch (Luxemburg)</source><target>French (Luxembourg)</target></trans-unit>
+<trans-unit id='RnJhbnrDtnNpc2NoIChNb25hY28p'><source>Französisch (Monaco)</source><target>French (Monaco)</target></trans-unit>
+<trans-unit id='R2FsaWNpc2No'><source>Galicisch</source><target>Galician</target></trans-unit>
+<trans-unit id='R2FsaWNpc2NoIChTcGFuaWVuKQ=='><source>Galicisch (Spanien)</source><target>Galician (Spain)</target></trans-unit>
+<trans-unit id='R3VqYXJhdGkgKEluZGllbik='><source>Gujarati (Indien)</source><target>Gujarati (India)</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaGU='><source>Hebräische</source><target>Hebrew</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaGUgKElzcmFlbCk='><source>Hebräische (Israel)</source><target>Hebrew (Israel)</target></trans-unit>
+<trans-unit id='SGluZGkgKEluZGllbik='><source>Hindi (Indien)</source><target>Hindi (India)</target></trans-unit>
+<trans-unit id='S3JvYXRpc2NoIChCb3NuaWVuIHVuZCBIZXJ6ZWdvbWluYSk='><source>Kroatisch (Bosnien und Herzegomina)</source><target>Croatian (Bosnia and Herzegomina)</target></trans-unit>
+<trans-unit id='S3JvYXRpc2NoIChLcm9hdGllbik='><source>Kroatisch (Kroatien)</source><target>Croatian (Croatia)</target></trans-unit>
+<trans-unit id='VW5nYXJpc2NoIChVbmdhcm4p'><source>Ungarisch (Ungarn)</source><target>Hungarian (Hungary)</target></trans-unit>
+<trans-unit id='QXJtZW5pc2NoIChBcm1lbmllbik='><source>Armenisch (Armenien)</source><target>Armenian (Armenia)</target></trans-unit>
+<trans-unit id='SW5kb25lc2lzY2ggKEluZG9uZXNpZW4p'><source>Indonesisch (Indonesien)</source><target>Indonesian (Indonesia)</target></trans-unit>
+<trans-unit id='SXNsw6RuZGlzY2ggKElzbGFuZCk='><source>Isländisch (Island)</source><target>Icelandic (Iceland)</target></trans-unit>
+<trans-unit id='SXRhbGllbmlzY2ggKFNjaHdlaXop'><source>Italienisch (Schweiz)</source><target>Italian (Switzerland)</target></trans-unit>
+<trans-unit id='SXRhbGllbmlzY2ggKEl0YWxpZW4p'><source>Italienisch (Italien)</source><target>Italian (Italy)</target></trans-unit>
+<trans-unit id='SmFwYW5pc2NoIChKYXBhbik='><source>Japanisch (Japan)</source><target>Japanese (Japan)</target></trans-unit>
+<trans-unit id='R2Vvcmdpc2NoIChHZW9yaWdpZW4p'><source>Georgisch (Georigien)</source><target>Georgian (Georigia)</target></trans-unit>
+<trans-unit id='S2FzYWNoaXNjaCAoS2FzYWNoc3Rhbik='><source>Kasachisch (Kasachstan)</source><target>Kazakh (Kazakhstan)</target></trans-unit>
+<trans-unit id='S2FubmFkYSAoSW5kaWVuKQ=='><source>Kannada (Indien)</source><target>Kannada (India)</target></trans-unit>
+<trans-unit id='S29yZWFuaXNjaCAoS29yZWEp'><source>Koreanisch (Korea)</source><target>Korean (Korea)</target></trans-unit>
+<trans-unit id='S29ua2FuaQ=='><source>Konkani</source><target>Konkani</target></trans-unit>
+<trans-unit id='S29ua2FuaSAoSW5kaWVuKQ=='><source>Konkani (Indien)</source><target>Konkani (India)</target></trans-unit>
+<trans-unit id='S2lyZ2lzaXNjaCAoS2lyZ2lzaXN0YW4p'><source>Kirgisisch (Kirgisistan)</source><target>Kyrgyz (Kyrgyzstan)</target></trans-unit>
+<trans-unit id='TGl0YXVpc2NoIChMaXRhdWVuKQ=='><source>Litauisch (Litauen)</source><target>Lithuanian (Lithuania)</target></trans-unit>
+<trans-unit id='TGV0dGlzY2ggKExldHRsYW5kKQ=='><source>Lettisch (Lettland)</source><target>Latvian (Latvia)</target></trans-unit>
+<trans-unit id='TcSBb3Jp'><source>Māori</source><target>Māori</target></trans-unit>
+<trans-unit id='TcSBb3JpIChOZXVzZWVsYW5kKQ=='><source>Māori (Neuseeland)</source><target>Māori (New Zealand)</target></trans-unit>
+<trans-unit id='TWF6ZWRvbmlzY2ggKE1hemVkb25pZW4p'><source>Mazedonisch (Mazedonien)</source><target>Macedonian (Macedonia)</target></trans-unit>
+<trans-unit id='TW9uZ29saXNjaA=='><source>Mongolisch</source><target>Mongolian</target></trans-unit>
+<trans-unit id='TW9uZ29saXNjaCAoTW9uZ29sZWkp'><source>Mongolisch (Mongolei)</source><target>Mongolian (Mongolia)</target></trans-unit>
+<trans-unit id='TWFyYXRoaSAoSW5kaWVuKQ=='><source>Marathi (Indien)</source><target>Marathi (India)</target></trans-unit>
+<trans-unit id='TWFsYXlzaXNjaCAoQnJ1bmVpKQ=='><source>Malaysisch (Brunei)</source><target>Malaysian (Brunei)</target></trans-unit>
+<trans-unit id='TWFsYXlzaXNjaCAoTWFsYXlzaWEp'><source>Malaysisch (Malaysia)</source><target>Malaysian (Malaysia)</target></trans-unit>
+<trans-unit id='TWFsdGVzaXNjaCAoTWFsdGEp'><source>Maltesisch (Malta)</source><target>Maltese (Malta)</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaCAoQm9rbWFsKSAoTm9yd2VnZW4p'><source>Norwegisch (Bokmal) (Norwegen)</source><target>Norwegian (bokmal) (Norway)</target></trans-unit>
+<trans-unit id='TmllZGVybMOkbmRpc2NoIChOaWVkZXJsYW5kZSk='><source>Niederländisch (Niederlande)</source><target>Dutch (Netherlands)</target></trans-unit>
+<trans-unit id='Tm9yd2VnaXNjaCAoTnlub3JzaykgKE5vcndlZ2VuKQ=='><source>Norwegisch (Nynorsk) (Norwegen)</source><target>Norwegian (Nynorsk) (Norway)</target></trans-unit>
+<trans-unit id='Tm9yZC1Tb3Robw=='><source>Nord-Sotho</source><target>Northern Sotho</target></trans-unit>
+<trans-unit id='Tm9yZC1Tb3RobyAoU8O8ZGFmcmlrYSk='><source>Nord-Sotho (Südafrika)</source><target>North Sotho (South Africa)</target></trans-unit>
+<trans-unit id='UGFuamFiaSAoSW5kaWVuKQ=='><source>Panjabi (Indien)</source><target>Panjabi (India)</target></trans-unit>
+<trans-unit id='UG9sbmlzY2ggKFBvbGVuKQ=='><source>Polnisch (Polen)</source><target>Polish (Poland)</target></trans-unit>
+<trans-unit id='UGFzY2h0dSAoQWZnaGFuaXN0YW4p'><source>Paschtu (Afghanistan)</source><target>Pashto (Afghanistan)</target></trans-unit>
+<trans-unit id='UG9ydHVnaWVzaXNjaCAoUG9ydHVnYWwp'><source>Portugiesisch (Portugal)</source><target>Portuguese (Portugal)</target></trans-unit>
+<trans-unit id='UXVlY2h1YQ=='><source>Quechua</source><target>Quechua</target></trans-unit>
+<trans-unit id='UXVlY2h1YSAoQm9saXZpZW4p'><source>Quechua (Bolivien)</source><target>Quechua (Bolivia)</target></trans-unit>
+<trans-unit id='UXVlY2h1YSAoRWN1YWRvcik='><source>Quechua (Ecuador)</source><target>Quechua (Ecuador)</target></trans-unit>
+<trans-unit id='UXVlY2h1YSAoUGVydSk='><source>Quechua (Peru)</source><target>Quechua (Peru)</target></trans-unit>
+<trans-unit id='UnVtw6RuaXNjaCAoUnVtw6RuaWVuKQ=='><source>Rumänisch (Rumänien)</source><target>Romanian (Romania)</target></trans-unit>
+<trans-unit id='UnVzc2lzY2ggKFJ1c3NsYW5kKQ=='><source>Russisch (Russland)</source><target>Russian (Russia)</target></trans-unit>
+<trans-unit id='U2Fuc2tyaXQ='><source>Sanskrit</source><target>Sanskrit</target></trans-unit>
+<trans-unit id='U2Fuc2tyaXQgKEluZGllbik='><source>Sanskrit (Indien)</source><target>Sanskrit (India)</target></trans-unit>
+<trans-unit id='U2FtaXNjaA=='><source>Samisch</source><target>Sami</target></trans-unit>
+<trans-unit id='U2FtaXNjaCAoRmlubmxhbmQp'><source>Samisch (Finnland)</source><target>Sami (Finland)</target></trans-unit>
+<trans-unit id='U2FtaXNjaCAoTm9yd2VnZW4p'><source>Samisch (Norwegen)</source><target>Sami (Norway)</target></trans-unit>
+<trans-unit id='U2FtaXNjaCAoU2Nod2VkZW4p'><source>Samisch (Schweden)</source><target>Sami (Sweden)</target></trans-unit>
+<trans-unit id='U2xvd2FraXNjaCAoU2xvd2FrZWkp'><source>Slowakisch (Slowakei)</source><target>Slovak (Slovakia)</target></trans-unit>
+<trans-unit id='U2xvd2VuaXNjaCAoU2xvd2VuaWVuKQ=='><source>Slowenisch (Slowenien)</source><target>Slovenian (Slovenia)</target></trans-unit>
+<trans-unit id='QWxiYW5pc2NoIChBbGJhbmllbik='><source>Albanisch (Albanien)</source><target>Albanian (Albania)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKEJvc25pZW4gdW5kIEhlcnplZ293aW5hKQ=='><source>Serbisch (Latein) (Bosnien und Herzegowina)</source><target>Serbian (Latin) (Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChCb3NuaWVuIHVuZCBIZXJ6ZWdvd2luYSk='><source>Serbisch (Kyrillisch) (Bosnien und Herzegowina)</source><target>Serbian (Cyrillic) (Bosnia and Herzegovina)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4gdW5kIE1vbnRlbmVncm8p'><source>Serbisch (Latein) (Serbien und Montenegro)</source><target>Serbian (Latin) (Serbia and Montenegro)</target></trans-unit>
+<trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuIHVuZCBNb250ZW5lZ3JvKQ=='><source>Serbisch (Kyrillisch) (Serbien und Montenegro)</source><target>Serbian (Cyrillic) (Serbia and Montenegro)</target></trans-unit>
+<trans-unit id='U2Nod2VkaXNjaCAoRmlubmxhbmQp'><source>Schwedisch (Finnland)</source><target>Swedish (Finland)</target></trans-unit>
+<trans-unit id='U2Nod2VkaXNjaCAoU2Nod2VkZW4p'><source>Schwedisch (Schweden)</source><target>Swedish (Sweden)</target></trans-unit>
+<trans-unit id='U3VhaGVsaSAoS2VuaWEp'><source>Suaheli (Kenia)</source><target>Swahili (Kenya)</target></trans-unit>
+<trans-unit id='U3lyaXNjaA=='><source>Syrisch</source><target>Syrian</target></trans-unit>
+<trans-unit id='U3lyaXNjaCAoU3lyaWVuKQ=='><source>Syrisch (Syrien)</source><target>Syriac (Syria)</target></trans-unit>
+<trans-unit id='VGFtaWxpc2NoIChJbmRpZW4p'><source>Tamilisch (Indien)</source><target>Tamil (India)</target></trans-unit>
+<trans-unit id='VGVsdWd1IChJbmRpZW4p'><source>Telugu (Indien)</source><target>Telugu (India)</target></trans-unit>
+<trans-unit id='VGhhaSAoVGhhaWxhbmQp'><source>Thai (Thailand)</source><target>Thai (Thailand)</target></trans-unit>
+<trans-unit id='VGFnYWxvZyAoUGhpbGlwcGluZW4p'><source>Tagalog (Philippinen)</source><target>Tagalog (Philippines)</target></trans-unit>
+<trans-unit id='VHN3YW5hIChTw7xkYWZyaWthKQ=='><source>Tswana (Südafrika)</source><target>Tswana (South Africa)</target></trans-unit>
+<trans-unit id='VMO8cmtpc2NoIChUw7xya2VpKQ=='><source>Türkisch (Türkei)</source><target>Turkish (Turkey)</target></trans-unit>
+<trans-unit id='VGF0YXJpc2No'><source>Tatarisch</source><target>Tatar</target></trans-unit>
+<trans-unit id='VGF0YXJpc2NoIChSdXNzbGFuZCk='><source>Tatarisch (Russland)</source><target>Tatar (Russia)</target></trans-unit>
+<trans-unit id='VHNvbmdh'><source>Tsonga</source><target>Tsonga</target></trans-unit>
+<trans-unit id='VWtyYWluaXNjaCAoVWtyYWluZSk='><source>Ukrainisch (Ukraine)</source><target>Ukrainian (Ukraine)</target></trans-unit>
+<trans-unit id='VXJkdSAoUGFraXN0YW4p'><source>Urdu (Pakistan)</source><target>Urdu (Pakistan)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChMYXRlaW4pIChVc2Jla2lzdGFuKQ=='><source>Usbekisch (Latein) (Usbekistan)</source><target>Uzbek (Latin) (Uzbekistan)</target></trans-unit>
+<trans-unit id='VXNiZWtpc2NoIChLeXJpbGxpc2NoKSAoVXNiZWtpc3Rhbik='><source>Usbekisch (Kyrillisch) (Usbekistan)</source><target>Uzbek (Cyrillic) (Uzbekistan)</target></trans-unit>
+<trans-unit id='VmlldG5hbWVzaXNjaCAoVmlldG5hbSk='><source>Vietnamesisch (Vietnam)</source><target>Vietnamese (Vietnam)</target></trans-unit>
+<trans-unit id='WGhvc2EgKFPDvGRhZnJpa2Ep'><source>Xhosa (Südafrika)</source><target>Xhosa (South Africa)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoSG9uZyBLb25nKQ=='><source>Chinesisch (Hong Kong)</source><target>Chinese (Hong Kong)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoTWFjYXUp'><source>Chinesisch (Macau)</source><target>Chinese (Macao)</target></trans-unit>
+<trans-unit id='Q2hpbmVzaXNjaCAoU2luZ2FwdXIp'><source>Chinesisch (Singapur)</source><target>Chinese (Singapore)</target></trans-unit>
+<trans-unit id='WnVsdSAoU8O8ZGFmcmlrYSk='><source>Zulu (Südafrika)</source><target>Zulu (South Africa)</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaCAoSXNyYWVsKQ=='><source>Hebräisch (Israel)</source><target>Hebrew (Israel)</target></trans-unit>
+<trans-unit id='S3VyZGlzY2g='><source>Kurdisch</source><target>Kurdish</target></trans-unit>
+<trans-unit id='QXBp'><source>API</source><target>API</target></trans-unit>
+<trans-unit id='SGVicsOkaXNjaA=='><source>Hebräisch</source><target>Hebrew</target></trans-unit>
+<trans-unit id='UmVmZXJlbnpkYXRlaWVuIHZvcmhhbmRlbg=='><source>Referenzdateien vorhanden</source><target>Reference files exist</target></trans-unit>
+<trans-unit id='TGlzdGUgw7ZmZm5lbg=='><source>Liste öffnen</source><target>Open list</target></trans-unit>
+<trans-unit id='UG0='><source>PM</source><target>PM</target></trans-unit>
+<trans-unit id='TG9rYWxpc2llcnVuZw==='><source>Lokalisierung</source><target>Localization</target></trans-unit>
+<trans-unit id='QmVudXR6ZXJzcHJhY2hl'><source>Benutzersprache</source><target>User GUI language</target></trans-unit>
+  <trans-unit id='TWluaW1hbGUgTMOkbmdlOiB7MH07'>
+    <source>Minimale Länge: {0};</source>
+    <target>Minimum length: {0};</target>
+  </trans-unit>
+  <trans-unit id='TWF4aW1hbGUgTMOkbmdlOiB7MH07'>
+    <source>Maximale Länge: {0};</source>
+    <target>Maximum length: {0};</target>
+  </trans-unit>
+ <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGt1cnohIE1pbmRlc3RlbnMgezB9IFplaWNoZW4gbcO8c3NlbiB2b3JoYW5kZW4gc2Vpbi4='>
+    <source>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</source>
+    <target>The segment content is too short! At least {0} characters must exist.</target>
+  </trans-unit>
+  <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGxhbmchIE1heGltYWwgezB9IFplaWNoZW4gc2luZCBlcmxhdWJ0Lg=='>
+    <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
+    <target>The segment content is too long! Maximum {0} characters are allowed.</target>
+  </trans-unit>
+  <trans-unit id='U3ByYWNoZQ=='>
+      <source>Sprache</source>
+      <target>Language</target>
+  </trans-unit>
+<trans-unit id="TGVrdG9yZW4gYmVuYWNocmljaHRpZ2Vu">
+    <source>Lektoren benachrichtigen</source>
+    <target>Notify Proofreaders</target>
+</trans-unit>
+<trans-unit id="QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg==">
+    <source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source>
+    <target>Notify all users about the association to the task</target>
+</trans-unit>
+<trans-unit id="QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q=">
+    <source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source>
+    <target>Users were successfully notified by email</target>
+</trans-unit>
+  
+<trans-unit id='e3NhbHV0YXRpb259IHtzdXJOYW1lfSw8YnIvPgo8YnIvPg=='><source>{salutation} {surName},<br/>
+<br/></source><target>{salutation} {surName},<br/>
+<br/></target></trans-unit>
+<trans-unit id='PGJyLz4KPGJyLz5WaWVsZW4gRGFuayB1bmQgdmllbGUgR3LDvMOfZSwKPGJyLz5JaHIgUHJvamVrdG1hbmFnZW1lbnQgVGVhbQo8YnIvPntjb21wYW55TmFtZX0KPGJyLz4KPGJyLz5EaWVzZSBFbWFpbCB3dXJkZSBhdXRvbWF0aXNjaCBnZW5lcmllcnQuIEJpdHRlIGFudHdvcnRlbiBTaWUgbmljaHQgYXVmIGRpZXNlIEUtTWFpbCE='><source><br/>
+<br/>Vielen Dank und viele Grüße,
+<br/>Ihr Projektmanagement Team
+<br/>{companyName}
+<br/>
+<br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!</source><target><br/>
+<br/>Many thanks and best regards,
+<br/>The Project Management team
+<br/>{companyName}
+<br/>
+<br/>This e-mail has been generated automatically. Please do not reply to this e-mail.</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KU2llIGVyaGFsdGVuIGRpZXNlIEVtYWlsLCB3ZWlsIElociBLb250byBhdWYge3BvcnRhbFVybH0gbmV1IGFuZ2VsZWd0IG9kZXIgSWhyIFBhc3N3b3J0IHp1csO8Y2tnZXNldHp0IHd1cmRlLiAKCklociBCZW51dHplcm5hbWU6Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQp7bG9naW59Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoKV2VubiBTaWUgSWhyIEtvbnRvIGvDvG5mdGlnIG51dHplbiBtw7ZjaHRlbiwgZGFubiBmb3JkZXJuIFNpZSB1bnRlciBkZXIgZm9sZ2VuZGVuCkFkcmVzc2UgZWluZSBMaW5rIGFuLCB1bSBJaHIgUGFzc3dvcnQgbmV1IHNldHplbiB6dSBrw7ZubmVuLgoKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCntwb3J0YWxVcmx9e3Jlc2V0dXJsfQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCntmb290ZXJ9'><source>{header}
+Sie erhalten diese Email, weil Ihr Konto auf {portalUrl} neu angelegt oder Ihr Passwort zurückgesetzt wurde. 
+
+Ihr Benutzername:
+------------------------------
+{login}
+------------------------------
+
+Wenn Sie Ihr Konto künftig nutzen möchten, dann fordern Sie unter der folgenden
+Adresse eine Link an, um Ihr Passwort neu setzen zu können.
+
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+{footer}</source><target>{header}
+You have received this email, because your account on {portalUrl} was created or your password was reset. 
+
+Your username:
+------------------------------
+{login}
+------------------------------
+
+If you want to use your account in the future, then please request a link
+to reset your password from the following address.
+
+------------------------------
+{portalUrl}{reseturl}
+------------------------------
+
+{footer}</target></trans-unit>
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggYWxsZSBCZW51dHplciBkZXIgUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGFiZ2VzY2hsb3NzZW4uPGJyIC8+'>
+    <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source>
+    <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished by all users of the role <i>{previousRole}</i> in the task-portal {portalLink}.<br /></target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgbnVuIGF1dG9tYXRpc2NoIGbDvHIgZGllIGZvbGdlbmRlbiBCZW51dHplciBpbiBkZXIgUm9sbGUgPGk+e25leHRSb2xlfTwvaT4gZnJlaWdlZ2ViZW46PGJyIC8+Cnt1c2VyTGlzdH08YnIgLz4KPGJyIC8+CkRpZSBCZW51dHplciB3dXJkZW4gcGVyIEUtTWFpbCBkYXLDvGJlciBpbmZvcm1pZXJ0LjxiciAvPgo8YnIgLz4='>
+    <source>Die Aufgabe wurde nun automatisch für die folgenden Benutzer in der Rolle <i>{nextRole}</i> freigegeben:<br />
+{userList}<br />
 <br />
-The changes made by the preceeding proofreaders are listed below:<br />
-%4$s
+Die Benutzer wurden per E-Mail darüber informiert.<br />
+<br /></source>
+<target>The task was opened automatically for the following users in the role <i>{nextRole}</i>:<br />
+{userList}<br />
+<br/>
+The users were informed by e-mail.<br />
+<br/></target>
+</trans-unit>
+<trans-unit id='LSBEaWUgRGF0ZW4gc2luZCBudXIgaW4gZGVyIEhUTUwtQW5zaWNodCBkZXIgRS1NYWlsIHZlcmbDvGdiYXIhIC0='><source>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</source><target>- The data is only available in the HTML-version of that e-mail! -</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke3VzZXJzTm90aWZpZWR9PGJyIC8+CjxiciAvPgpJbSBmb2xnZW5kZW4gZGllIGdldMOkdGlndGVuIMOEbmRlcnVuZ2VuIGRlciB6dXZvciBha3RpdmVuIEJlbnV0emVyIGRlciBSb2xsZSB7cHJldmlvdXNSb2xlfTo8YnIgLz4Ke2NoYW5nZWRTZWdtZW50c30KPGhyIC8+CjxiciAvPgp7Zm9vdGVyfQ=='><source>{header}
+{action}<br />
+{usersNotified}<br />
+<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle {previousRole}:<br />
+{changedSegments}
 <hr />
 <br />
+{footer}</source><target>{header}
+{action}<br />
+{usersNotified}<br />
 <br />
-You can access the portal at: %3$s<br />
+The changes made by the formerly active user of the role <b>{previousRole}</b> are listed below:<br />
+{changedSegments}
+<hr />
 <br />
-<br />Many thanks and best regards,
-<br />The Project Management team
-<br />%7$s
+{footer}</target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZsO8ciBTaWUgZnJlaWdlZ2ViZW4uPGJyIC8+CjxiciAvPgpJbSBmb2xnZW5kZW4gZGllIGdldMOkdGlndGVuIMOEbmRlcnVuZ2VuIGRlciB2b3JoZXJnZWhlbmRlbiBSb2xsZSA8Yj57cHJldmlvdXNSb2xlfTwvYj46PGJyIC8+CntjaGFuZ2VkU2VnbWVudHN9CjxociAvPgo8YnIgLz4Ke2Zvb3Rlcn0='>
+    <source>{header}
+Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
 <br />
-<br />This e-mail has been generated automatically. Please do not reply to this e-mail.</target>
+Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
+{changedSegments}
+<hr />
+<br />
+{footer}</source>
+<target>{header}
+The task <b>{task.taskNr} - {task.taskName}</b> was opened for you in the task-portal {portalLink}.<br />
+<br />
+The changes made by the formerly active role <b>{previousRole}</b> are listed below:<br />
+{changedSegments}
+<hr />
+<br />
+{footer}</target>
+</trans-unit>
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gYXVmZ3J1bmQgZWluZXIgVGVybWluw7xiZXJzY2hyZWl0dW5nIGF1dG9tYXRpc2NoIGbDvHIgYWxsZSBCZW51dHplciBkZXIgUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+IGFiZ2VzY2hsb3NzZW4uPGJyIC8+'>
+    <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> aufgrund einer Terminüberschreitung automatisch für alle Benutzer der Rolle <i>{previousRole}</i> abgeschlossen.<br /></source>
+    <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished due a missed deadline automatically for all users of the role <i>{previousRole}</i> in the task-portal {portalLink}.<br /></target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgaXN0IHZvbGxzdMOkbmRpZyBiZWFyYmVpdGV0LCBlcyBzaW5kIGtlaW5lIHdlaXRlcmVuIEJlbnV0emVyIGRlciBBdWZnYWJlIHp1Z2VvcmRuZXQuPGJyIC8+CjxiciAvPgo='><source>Die Aufgabe ist vollständig bearbeitet, es sind keine weiteren Benutzer der Aufgabe zugeordnet.<br />
+<br />
+</source><target>The task ist completed, there are no more users associated with the task.<br />
+<br />
+</target></trans-unit>
+<trans-unit id='RGllIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPiB3YXIgbmljaHQgVGVpbCBkZXIgV29ya2Zsb3drZXR0ZSwgZGFoZXIgd3VyZGVuIGtlaW5lIEJlbnV0emVyIGJlbmFjaHJpY2h0aWd0LjxiciAvPgo8YnIgLz4K'><source>Die Rolle <i>{previousRole}</i> war nicht Teil der Workflowkette, daher wurden keine Benutzer benachrichtigt.<br />
+<br />
+</source><target>The role <i>{previousRole}</i> was not part of workflow, so no users were notified.<br />
+<br />
+</target></trans-unit>
+  <trans-unit id='ezB9IChNaW4uIHsxfSk='>
+    <source>{0} (Min. {1})</source>
+    <target>{0} (Min. {1})</target>
+  </trans-unit>
+  <trans-unit id='ezB9IHZvbiB7MX0='>
+    <source>{0} von {1}</source>
+    <target>{0} of {1}</target>
+  </trans-unit>
+ <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGt1cnohIE1pbmRlc3RlbnMgezB9IFplaWNoZW4gbcO8c3NlbiB2b3JoYW5kZW4gc2Vpbi4='>
+    <source>Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.</source>
+    <target>The segment content is too short! At least {0} characters must exist.</target>
+  </trans-unit>
+  <trans-unit id='RGVyIFNlZ21lbnRpbmhhbHQgaXN0IHp1IGxhbmchIE1heGltYWwgezB9IFplaWNoZW4gc2luZCBlcmxhdWJ0Lg=='>
+    <source>Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.</source>
+    <target>The segment content is too long! Maximum {0} characters are allowed.</target>
+  </trans-unit>
+  
+  <trans-unit id='PGI+UmVsYWlzc3ByYWNoZTo8L2I+IHtyZWxhaXNMYW5ndWFnZVRyYW5zbGF0ZWR9PGJyIC8+'>
+      <source><b>Relaissprache:</b> {relaisLanguageTranslated}<br /></source>
+      <target><b>relay language:</b> {relaisLanguageTranslated}<br /></target>
+  </trans-unit>
+  <trans-unit id='PGI+QXVmZ2FiZTo8L2I+IHt0YXNrLnRhc2tOYW1lfTxiciAvPgogICAgPGI+UXVlbGxzcHJhY2hlOjwvYj4ge3NvdXJjZUxhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIDxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIHtyZWxhaXNMYW5ndWFnZUZyYWdtZW50fTxiPkxpZWZlcmRhdHVtIExla3RvcmVuOjwvYj4ge3RhcmdldERlbGl2ZXJ5RGF0ZX08YnIgLz4KICAgIDxiPldvcnRhbnphaGw6PC9iPiB7d29yZENvdW50fTxiciAvPg=='>
+<source><b>Aufgabe:</b> {task.taskName}<br />
+    <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
+    <b>Zielsprache:</b> {targetLanguageTranslated}<br />
+    {relaisLanguageFragment}<b>Lieferdatum Lektoren:</b> {targetDeliveryDate}<br />
+    <b>Wortanzahl:</b> {wordCount}<br /></source>
+<target><b>Task:</b> {task.taskName}<br />
+    <b>Source-language:</b> {sourceLanguageTranslated}<br />
+    <b>Target-language:</b> {targetLanguageTranslated}<br />
+    {relaisLanguageFragment}<b>Lieferdatum Lektoren:</b> {targetDeliveryDate}<br />
+    <b>Word-count:</b> {wordCount}<br /></target>
 </trans-unit>
 
+<trans-unit id='e2hlYWRlcn0KCkltIFByb2pla3Rwb3J0YWwge3BvcnRhbExpbmt9IHd1cmRlIElobmVuIGVpbmUgQXVmZ2FiZSB6dWdld2llc2VuLjxiciAvPgo8YnIgLz4KPGI+Um9sbGU6PC9iPiB7cm9sZX08YnIvPgp7dGFza0ZyYWdtZW50fXtwcm9vZnJlYWRlcnNGcmFnbWVudH17Zm9vdGVyfQ=='>
+    <source>{header}
+
+Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
+<br />
+<b>Rolle:</b> {role}<br/>
+{taskFragment}{proofreadersFragment}{footer}</source>
+<target>{header}
+
+A task was associated to you in the task-portal {portalLink}.<br />
+<br />
+<b>Role:</b> {role}<br/>
+{taskFragment}{proofreadersFragment}{footer}</target>
+</trans-unit>
+<trans-unit id='Cjxici8+PGI+QWxsZSBkZXIgQXVmZ2FiZSB6dWdlb3JkbmV0ZW4gQmVudXR6ZXI6PC9iPgo8YnIvPg=='>
+    <source>
+<br/><b>Alle der Aufgabe zugeordneten Benutzer:</b>
+<br/></source>
+<target>
+<br/><b>All users associated to the task:</b>
+<br/></target>
+</trans-unit>
+
+<trans-unit id='RS1NYWlsIEFkcmVzc2U='>
+    <source>E-Mail Adresse</source>
+    <target>E-mail address</target>
+</trans-unit>
+
+<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgSWhuZW4gZWluZSBBdWZnYWJlIHp1Z2V3aWVzZW4uPGJyIC8+CjxiciAvPgo8Yj5Sb2xsZTo8L2I+IHtyb2xlfTxici8+Cnt0YXNrRnJhZ21lbnR9e2Zvb3Rlcn0='>
+    <source>{header}
+Im Projektportal {portalLink} wurde Ihnen eine Aufgabe zugewiesen.<br />
+<br />
+<b>Rolle:</b> {role}<br/>
+{taskFragment}{footer}</source>
+<target>{header}
+A task was associated to you in the task-portal {portalLink}.<br />
+<br />
+<b>Role:</b> {role}<br/>
+{taskFragment}{footer}</target>
+</trans-unit>
+
+<trans-unit id='QmVudXR6ZXIgZGVyIHZvcmhlcmlnZW4gUm9sbGUgPGk+e3ByZXZpb3VzUm9sZX08L2k+Ogp7cHJldmlvdXNVc2Vyc308YnIvPgo='>
+    <source>Benutzer der vorherigen Rolle <i>{previousRole}</i>:
+{previousUsers}<br/>
+</source>
+<target>Users of the previous role <i>{previousRole}</i>:
+{previousUsers}<br/>
+</target>
+</trans-unit>
+
+<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke3VzZXJzTm90aWZpZWR9PGJyIC8+Cnt1c2Vyc1ByZXZpb3VzUm9sZX08YnIgLz4KPGJyIC8+CkltIGZvbGdlbmRlbiBkaWUgZ2V0w6R0aWd0ZW4gw4RuZGVydW5nZW4gZGVyIHp1dm9yIGFrdGl2ZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntwcmV2aW91c1JvbGV9PC9pPjo8YnIgLz4Ke2NoYW5nZWRTZWdtZW50c30KPGhyIC8+CjxiciAvPgp7Zm9vdGVyfQ=='>
+    <source>{header}
+{action}<br />
+{usersNotified}<br />
+{usersPreviousRole}<br />
+<br />
+Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i>{previousRole}</i>:<br />
+{changedSegments}
+<hr />
+<br />
+{footer}</source>
+<target>{header}
+{action}<br />
+{usersNotified}<br />
+{usersPreviousRole}<br />
+<br />
+The changes made by the formerly active user of the role <i>{previousRole}</i> are listed below:<br />
+{changedSegments}
+<hr />
+<br />
+{footer}</target>
+</trans-unit>
+
+<trans-unit id="RGllIFN1Y2hlIHdpcmQgbnVyIGF1ZiBkZW4gZ2VmaWx0ZXJ0ZW4gU2VnbWVudGVuIGR1cmNoZ2Vmw7xocnQ=">
+    <source>Die Suche wird nur auf den gefilterten Segmenten durchgeführt</source>
+    <target>The search will be performed only on the filtered segments</target>
+</trans-unit>
+
+ <trans-unit id="RXJzZXR6ZW4=">
+    <source>Ersetzen</source>
+    <target>Replace</target>
+</trans-unit>
+
+<trans-unit id="w5xiZXJnZW9yZG5ldGVyIEJlbnV0emVy">
+    <source>Übergeordneter Benutzer</source>
+    <target>Parent User</target>
+</trans-unit>
+
+<trans-unit id="S2VpbmUgRXJnZWJuaXNzZSBmw7xyIGRpZSBha3R1ZWxsZSBTdWNoZSE=">
+    <source>Keine Ergebnisse für die aktuelle Suche!</source>
+    <target>No results for the current search!</target>
+</trans-unit>
+
+<trans-unit id="QWxsZSBFcmdlYm5pc3NlIGVyc2V0emVu">
+    <source>Alle Ergebnisse ersetzen</source>
+    <target>Replace all results</target>
+</trans-unit>
+
+<trans-unit id="RXJnZWJuaXNzZSBlcnNldHplbg==">
+    <source>Ergebnisse ersetzen</source>
+    <target>Replace results</target>
+</trans-unit>
+
+<trans-unit id="w7xiZXJlaW5zdGltbXVuZ2VuIGdlZnVuZGVuLiBXb2xsZW4gU2llIHdpcmtsaWNoIGFsbGUgZXJzZXR6ZW4/IEFsbGUgZ2VmdW5kZW5lbiBTZWdtZW50ZSB3ZXJkZW4gaW5rbHVzaXZlIEF1dG8tU3RhdHVzIHVuZCBsZXR6dGVtIEVkaXRvciBnZcOkbmRlcnQ=">
+    <source>übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert</source>
+    <target>matches found. Do you really want to replace all of them? All found segments will be changed including auto-status and last editor</target>
+</trans-unit>
+
+<trans-unit id="RGVyIFN1Y2hzdHJpbmcgaXN0IHp1IGdyb8Of">
+    <source>Der Suchstring ist zu groß</source>
+    <target>The search string is too big</target>
+</trans-unit>
+
+<trans-unit id="RGFzIFNlZ21lbnQgaXN0IGluIElocmVyIGFrdHVlbGxlbiBGaWx0ZXJ1bmcgbmljaHQgZW50aGFsdGVuLg==">
+    <source>Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.</source>
+    <target>The segment is not included in your current filtering.</target>
+</trans-unit>
+
+<trans-unit id="U3VjaGVuIHVuZCBlcnNldHplbg==">
+    <source>Suchen und ersetzen</source>
+    <target>Search and replace</target>
+</trans-unit>
+
+
+<trans-unit id="SW5mbyB6dW0gU3VjaGVuIHVuZCBFcnNldHplbg==">
+    <source>Info zum Suchen und Ersetzen</source>
+    <target>Info about the search and replace</target>
+</trans-unit>
+
+<trans-unit id="U3VjaGVuIG5hY2g=">
+    <source>Suchen nach</source>
+    <target>Search for</target>
+</trans-unit>
+
+<trans-unit id="U3VjaGVuIGlu">
+    <source>Suchen in</source>
+    <target>Search in</target>
+</trans-unit>
+
+<trans-unit id="R3Jvw58vS2xlaW5zY2hyZWlidW5nIGJlYWNodGVu">
+    <source>Groß/Kleinschreibung beachten</source>
+    <target>Match case</target>
+</trans-unit>
+
+<trans-unit id="TmFjaCBvYmVuIHN1Y2hlbg==">
+    <source>Nach oben suchen</source>
+    <target>Search towards the top</target>
+</trans-unit>
+
+<trans-unit id="QmVpIGRlciBTdWNoZSB2ZXJ3ZW5kZW4=">
+    <source>Bei der Suche verwenden</source>
+    <target>Use for search</target>
+</trans-unit>
+
+<trans-unit id="Tm9ybWFsIChTdGFuZGFyZCk=">
+    <source>Normal (Standard)</source>
+    <target>Normal (default)</target>
+</trans-unit>
+
+<trans-unit id="UmVndWzDpHJlciBBdXNkcnVjaw==">
+    <source>Regulärer Ausdruck</source>
+    <target>Regular expression</target>
+</trans-unit>
+
+<trans-unit id="V2lsZGNhcmRzICgqIHVuZCA/KQ==">
+    <source>Wildcards (* und ?)</source>
+    <target>Wildcards (* and ?)</target>
+</trans-unit>
+
+<trans-unit id="U2VnbWVudCBiZWltIFNjaGxpZcOfZW4gc3BlaWNoZXJu">
+    <source>Segment beim Schließen speichern</source>
+    <target>Save segment on close</target>
+</trans-unit>
+
+<trans-unit id="VW5nw7xsdGlnZXIgUmVndWzDpHJlciBBdXNkcnVjaw==">
+    <source>Ungültiger Regulärer Ausdruck</source>
+    <target>Invalid regular expression</target>
+</trans-unit>
+
+<trans-unit id="RGllc2VyIHJlZ3Vsw6RyZSBBdXNkcnVjayB3aXJkIG5pY2h0IHVudGVyc3TDvHR6dA==">
+    <source>Dieser reguläre Ausdruck wird nicht unterstützt</source>
+    <target>This regular expression is not supported</target>
+</trans-unit>
+            
+<trans-unit id="U3VjaGVu">
+    <source>Suchen</source>
+    <target>Search</target>
+</trans-unit>
+
+<trans-unit id="QWxsZXMgZXJzZXR6ZW4=">
+    <source>Alles ersetzen</source>
+    <target>Replace all</target>
+</trans-unit>
+
+<trans-unit id="U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg==">
+    <source>Segmente mit Suchtreffer:</source>
+    <target>Segments with search hits:</target>
+</trans-unit>
+
+<trans-unit id='bmljaHQgYmVzdMOkdGlndA=='>
+    <source>nicht bestätigt</source>
+    <target>not approved</target>
+</trans-unit>
+
+<trans-unit id='IC0gW0FVRkdBQkUgVU5CRVNUw4RUSUdUXQ=='>
+    <source> - [AUFGABE UNBESTÄTIGT]</source>
+    <target> - [TASK NOT APPROVED]</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSB3dXJkZSBiZXN0w6R0aWd0IHVuZCB6dW0gQmVhcmJlaXRlbiBmcmVpZ2VnZWJlbi4='>
+    <source>Aufgabe wurde bestätigt und zum Bearbeiten freigegeben.</source>
+    <target>Task was approved and can be edited now.</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSB3aXJkIGJlc3TDpHRpZ3QuLi4='>
+    <source>Aufgabe wird bestätigt...</source>
+    <target>Approving task...</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSBiZXN0w6R0aWdlbj8='>
+    <source>Aufgabe bestätigen?</source>
+    <target>Approve task?</target>
+</trans-unit>
+<trans-unit id='YmVzdMOkdGlnZW4='>
+    <source>bestätigen</source>
+    <target>approve</target>
+</trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlc3TDpHRpZ2VuPyA8YnIvPiBPaG5lIEJlc3TDpHRpZ3VuZyBrYW5uIGRpZXNlIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLg=='>
+    <source>Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.</source>
+    <target>Do you want to approve the task? <br/> Only an approved task can be edited.</target>
+</trans-unit>
+<trans-unit id='U2llIGhhYmVuIGtlaW5lIEF1ZmdhYmUgKG1laHIpIGdlw7ZmZm5ldC4gRXZlbnR1ZWxsIHd1cmRlIGRpZSBBdWZnYWJlIGluIGVpbmVtIGFuZGVyZW4gRmVuc3RlciBnZXNjaGxvc3Nlbi4='>
+    <source>Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.</source>
+    <target>You don't have any task opened (anymore) for editing. The task may have been closed in another window.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgendpc2NoZW56ZWl0bGljaCBpbSBudXIgTGVzZW1vZHVzIGdlw7ZmZm5ldC4='>
+    <source>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</source>
+    <target>In the meantime, the task was opened in read-only mode.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

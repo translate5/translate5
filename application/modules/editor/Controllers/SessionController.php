@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -32,6 +31,18 @@ END LICENSE AND COPYRIGHT
  * else RestRoutes, ACL authentication, etc. will not work.
  */
 class editor_SessionController extends ZfExtended_SessionController {
+    const AUTH_HASH_DISABLED = 'disabled';
+    const AUTH_HASH_DYNAMIC = 'dynamic';
+    const AUTH_HASH_STATIC = 'static';
+    
+    public function indexAction() {
+        if(!empty($_REQUEST['authhash'])) {
+            $this->hashauth();
+            return;
+        }
+        parent::indexAction();
+    }
+    
     public function postAction() {
         if(!parent::postAction()) {
             return;
@@ -57,6 +68,68 @@ class editor_SessionController extends ZfExtended_SessionController {
             //clearing the view vars added in Task::PUT keeps the old content (the session id and token) 
             $view = $event->getParam('view');
             $view->clearVars();
+        });
+    }
+    
+    /**
+     * Authentication via a static hash
+     * - usage of invalidLoginCounter makes no sense here
+     * - singleUserRestriction is also not usable with this authentication
+     * @return void|boolean
+     */
+    protected function hashauth() {
+        if($this->isMaintenanceLoginLock()){
+            return;
+        }
+        
+        //FIXME ensure that only PMs may do that stuff! → spearte ACL
+        
+        $enabled = Zend_Registry::get('config')->runtimeOptions->hashAuthentication;
+        if($enabled != self::AUTH_HASH_DYNAMIC && $enabled != self::AUTH_HASH_STATIC) {
+            $this->log->logError('Tried to authenticate via hashAuthentication, but feature is disabled in the config!');
+            parent::indexAction();
+        }
+        
+        settype($_REQUEST['authhash'], 'string');
+        $taskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $taskUserAssoc editor_Models_TaskUserAssoc */
+        $taskUserAssoc->loadByHash($_REQUEST['authhash']);
+        if($enabled == self::AUTH_HASH_DYNAMIC) {
+            $taskUserAssoc->createStaticAuthHash();
+            $taskUserAssoc->save();
+        }
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($taskUserAssoc->getUserGuid());
+        $this->setLocale(new Zend_Session_Namespace(), $user);
+        $login = $user->getLogin();
+
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskUserAssoc->getTaskGuid());
+        
+        $user->setUserSessionNamespaceWithoutPwCheck($login);
+        
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getByTask($task);
+        $state = $workflow->isWriteable($taskUserAssoc) ? $workflow::STATE_EDIT : $workflow::STATE_VIEW;
+        
+        
+        //open task
+        $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
+        $this->forward('put', 'task', 'editor', $params);
+        //Mit dem nachfolgenden header ist man zwar authentifiziert, nicht aber im Task! Gehe ich händisch auf den Task passts. Sind die Daten noch nicht in der Session? wegen dem Exit? 
+        
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        $mv->cleanUp();
+        
+        $event = Zend_EventManager_StaticEventManager::getInstance();
+        $event->attach('editor_TaskController', 'afterPutAction', function() {
+            //the redirect must be triggered after the successful PUT OPEN of the task above 
+            $this->redirect(APPLICATION_RUNDIR.'/editor', ['code' => 302]);
         });
     }
 }

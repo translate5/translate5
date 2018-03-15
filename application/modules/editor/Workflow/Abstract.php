@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -29,6 +28,9 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Abstract Workflow Class
+ * 
+ * Warning: When adding new workflows, a alter script must be provided to add 
+ *   a default userpref entry for that workflow for each task 
  */
 abstract class editor_Workflow_Abstract {
     /*
@@ -49,14 +51,12 @@ abstract class editor_Workflow_Abstract {
     //setting this state opens the task readonly 
     const STATE_VIEW = 'view'; 
     
-    //currently we have 2 places to define userRoles: IndexController for 
-    //translation and PHP editor_Workflow_Default for programmatic usage
-    const ROLE_VISITOR = 'visitor';
-    const ROLE_LECTOR = 'lector';
     const ROLE_TRANSLATOR = 'translator';
+    const ROLE_LECTOR = 'lector';
+    const ROLE_TRANSLATORCHECK = 'translatorCheck';
+    const ROLE_VISITOR = 'visitor';
     
-    //currently we have 2 places to define userRoles: IndexController for 
-    //translation and PHP editor_Workflow_Default for programmatic usage
+    const STEP_TRANSLATION = 'translation';
     const STEP_LECTORING = 'lectoring';
     const STEP_TRANSLATORCHECK = 'translatorCheck';
     const STEP_PM_CHECK = 'pmCheck';
@@ -75,9 +75,11 @@ abstract class editor_Workflow_Abstract {
         'STATE_OPEN' => 'offen', 
         'STATE_EDIT' => 'selbst in Arbeit', 
         'STATE_VIEW' => 'selbst geöffnet', 
-        'ROLE_VISITOR' => 'Besucher',
-        'ROLE_LECTOR' => 'Lektor',
         'ROLE_TRANSLATOR' => 'Übersetzer',
+        'ROLE_LECTOR' => 'Lektor',
+        'ROLE_TRANSLATORCHECK' => 'Übersetzer (Überprüfung)',
+        'ROLE_VISITOR' => 'Besucher',
+        'STEP_TRANSLATION' => 'Übersetzung',
         'STEP_LECTORING' => 'Lektorat',
         'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
         'STEP_PM_CHECK' => 'PM Prüfung',
@@ -126,12 +128,6 @@ abstract class editor_Workflow_Abstract {
     protected $newUtaState;
 
     /**
-     * latest LogEntry (actual workflow step)
-     * @var editor_Workflow_Log
-     */
-    protected $latestWorkflowLogEntry;
-    
-    /**
      * enables / disables debugging (logging), can be enabled by setting runtimeOptions.debug.core.workflow = 1 in installation.ini
      * 0 => disabled
      * 1 => log called handler methods (logging must be manually implemented in the handler methods by usage of $this->doDebug)
@@ -151,13 +147,20 @@ abstract class editor_Workflow_Abstract {
     protected $authenticatedUserModel;
     
     /**
+     * Import config, only available on workflow stuff triggerd in the context of an import 
+     * @var editor_Models_Import_Configuration
+     */
+    protected $importConfig = null;
+    
+    /**
      * lists all roles with read access to tasks
      * @var array 
      */
     protected $readableRoles = array(
         self::ROLE_VISITOR,
         self::ROLE_LECTOR,
-        self::ROLE_TRANSLATOR
+        self::ROLE_TRANSLATOR,
+        self::ROLE_TRANSLATORCHECK,
     );
     /**
      * lists all roles with write access to tasks
@@ -165,7 +168,8 @@ abstract class editor_Workflow_Abstract {
      */
     protected $writeableRoles = array(
         self::ROLE_LECTOR,
-        self::ROLE_TRANSLATOR
+        self::ROLE_TRANSLATOR,
+        self::ROLE_TRANSLATORCHECK,
     );
     /**
      * lists all states which allow read access to tasks
@@ -195,30 +199,78 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $stepChain = array(
+        self::STEP_TRANSLATION,
         self::STEP_LECTORING,
         self::STEP_TRANSLATORCHECK,
     );
     
     /**
      * Mapping between roles and workflowSteps. 
-     * @todo Since this must not be a 1 to 1 relation, we have to save the step also in userTaskAssoc
      * @var array
      */
     protected $steps2Roles = array(
+        self::STEP_TRANSLATION=>self::ROLE_TRANSLATOR,
         self::STEP_LECTORING=>self::ROLE_LECTOR,
-        self::STEP_TRANSLATORCHECK=>self::ROLE_TRANSLATOR
+        self::STEP_TRANSLATORCHECK=>self::ROLE_TRANSLATORCHECK
     );
+    
+    /**
+     * Valid state / role combination for each step
+     * the first state of the states array is also the default state for that step and role
+     * @var array
+     */
+    protected $validStates = [
+        self::STEP_TRANSLATION => [
+            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+            self::ROLE_LECTOR => [self::STATE_WAITING],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
+        ],
+        self::STEP_LECTORING => [
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_LECTOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
+        ],
+        self::STEP_TRANSLATORCHECK => [
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+        ],
+    ];
     
     /**
      * @var ZfExtended_EventManager
      */
     protected $events = false;
     
+    /**
+     * determines if calls were done by cronjob
+     * @var boolean
+     */
+    protected $isCron = false;
+    
+    protected $validDirectTrigger = [
+            'notifyAllUsersAboutTaskAssociation',
+    ]; 
     
     public function __construct() {
         $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        $events = Zend_EventManager_StaticEventManager::getInstance();
+        $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
+            $tua = $event->getParam('entity');
+            $this->recalculateWorkflowStep($tua);
+            $this->doUserAssociationAdd($tua);
+        });
+        
+        $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
+            $this->recalculateWorkflowStep($event->getParam('entity'));
+        });
+        
+        $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
+            $this->newTask = $event->getParam('task');
+            $this->handleBeforeImport();
+        });
     }
     
     /**
@@ -235,12 +287,60 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * returns a recursive list of workflow IDs used by this workflows instances class hierarchy
+     * @return array
+     */
+    public function getIdList() {
+        $parents = class_parents($this);
+        $result = [static::WORKFLOW_ID];
+        foreach($parents as $parent) {
+            if (defined($parent.'::WORKFLOW_ID')) {
+                $result[] = constant($parent.'::WORKFLOW_ID');
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * returns true if the workflow methods were triggered by a cron job and no direct user/API interaction
+     * @return boolean
+     */
+    public function isCalledByCron() {
+        return $this->isCron;
+    }
+    
+    /**
      * returns the step to roles mapping
      * @return array
      */
     public function getSteps2Roles() {
         return $this->steps2Roles;
     }
+    
+    /**
+     * returns the workflow steps which should have initially an activated segment filter
+     * @return string[]
+     */
+    public function getStepsWithFilter() {
+        return [self::STEP_TRANSLATORCHECK];
+    }
+    
+    /**
+     * returns the initial states of the different roles in the different steps
+     * @return string[][]
+     */
+    public function getInitialStates() {
+        $result = [];
+        foreach($this->validStates as $step => $statesToRoles) {
+            $result[$step] = [];
+            foreach($statesToRoles as $role => $states) {
+                //the initial state per role is just the first defined state per role
+                $result[$step][$role] = reset($states);
+            }
+        }
+        return $result;
+    }
+    
     /**
      * @param mixed $step string or null
      * @return string $role OR false if step does not exist
@@ -265,13 +365,12 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * returns the step of a role
+     * returns the step of a role (the first configured one, if there are multiple steps for a role)
      * @param string $role
-     * @return boolean
+     * @return string|false
      */
     public function getStepOfRole(string $role) {
-        $roles2steps = array_flip($this->steps2Roles);
-        return isset($roles2steps[$role]) ? $roles2steps[$role] : false;
+        return array_search($role, $this->steps2Roles, true);
     }
     
     /**
@@ -303,10 +402,11 @@ abstract class editor_Workflow_Abstract {
         }
         $config = Zend_Registry::get('config');
         $isCron = $config->runtimeOptions->cronIP === $_SERVER['REMOTE_ADDR'];
+        $isWorker = defined('ZFEXTENDED_IS_WORKER_THREAD');
         $this->authenticatedUserModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         
         if($userGuid === false){
-            if(!$isCron) {
+            if(!$isCron && !$isWorker) {
                 throw new ZfExtended_NotAuthenticatedException("Cannot authenticate the system user!");
             }
             //set session user data with system user
@@ -323,6 +423,7 @@ abstract class editor_Workflow_Abstract {
     public function getSteps(){
         return $this->getFilteredConstants('STEP_');
     }
+    
     /**
      * 
      * @return array of available role constants (keys are constants, valus are constant-values)
@@ -332,10 +433,30 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * returns an array of wf roles which are allowed by the current user to be used in task user associations
+     * @return array of for the authenticated user usable role constants (keys are constants, valus are constant-values)
+     */
+    public function getAddableRoles(){
+        $roles = $this->getRoles();
+        //FIXME instead of checking the roles a user have, 
+        //this must come from ACL table analogous to setaclrole, use a setwfrole then
+        // check sub classes on refactoring too!
+        $user = new Zend_Session_Namespace('user');
+        if(in_array(ACL_ROLE_PM, $user->data->roles)) {
+            return $roles;
+        }
+        return [];
+    }
+    
+    /**
      * returns the already translated labels as assoc array
+     * @var boolean $translated optional, defaults to true
      * @return array
      */
-    public function getLabels() {
+    public function getLabels($translated = true) {
+        if(!$translated) {
+            return $this->labels;
+        }
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         return array_map(function($label) use ($t) {
             return $t->_($label);
@@ -517,7 +638,7 @@ abstract class editor_Workflow_Abstract {
             return;
         }
         if($this->debug == 1) {
-            error_log($name);
+            error_log(get_class($this).'::'.$name);
             return;
         }
         if($this->debug == 2) {
@@ -569,8 +690,8 @@ abstract class editor_Workflow_Abstract {
             $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr);
             
             //sets the actual workflow step name, does currently depend only on the userTaskRole!
-            $roles2Step = array_flip($this->steps2Roles);
-            $segmentToSave->setWorkflowStep($roles2Step[$tua->getRole()]);
+            $step = $this->getStepOfRole($tua->getRole());
+            $step && $segmentToSave->setWorkflowStep($step);
         }
 
         $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
@@ -600,7 +721,8 @@ abstract class editor_Workflow_Abstract {
         //a segment mv creation is currently not needed, since doEnd deletes it, and doReopen creates it implicitly!
 
         if($newState == $oldState) {
-            $this->events->trigger("doNothing", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
+            $this->doTaskChange();
+            $this->events->trigger("doTaskChange", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
             return; //saved some other attributes, do nothing
         }
         switch($newState) {
@@ -609,10 +731,17 @@ abstract class editor_Workflow_Abstract {
                     $this->doReopen();
                     $this->events->trigger("doReopen", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
                 }
+                if($oldState == $newTask::STATE_UNCONFIRMED) {
+                    $this->doConfirm();
+                    $this->events->trigger("doConfirm", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                }
                 break;
             case $newTask::STATE_END:
                 $this->doEnd();
                 $this->events->trigger("doEnd", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                break;
+            case $newTask::STATE_UNCONFIRMED:
+                //doing currently nothing 
                 break;
         }
     }
@@ -627,17 +756,18 @@ abstract class editor_Workflow_Abstract {
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
-        //ensure that segment MV is createad
         if(empty($this->newTask)) {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($newTua->getTaskGuid());
+            $this->newTask = $task;
         }
         else {
             $task = $this->newTask;
         }
+        //ensure that segment MV is createad
         $task->createMaterializedView();
-        
+        $this->recalculateWorkflowStep($newTua);
         $state = $this->getTriggeredState($oldTua, $newTua);
         if(!empty($state)) {
             if(method_exists($this, $state)) {
@@ -645,6 +775,151 @@ abstract class editor_Workflow_Abstract {
             } 
             $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
         }
+    }
+    
+    /**
+     * calls the actions configured to the trigger with given role and state
+     * @param string $trigger
+     * @param string $step can be empty
+     * @param string $role can be empty
+     * @param string $state can be empty
+     */
+    protected function callActions($trigger, $step = null, $role = null, $state = null) {
+        $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
+        /* @var $actions editor_Models_Workflow_Action */
+        $workflows = $this->getIdList();
+        $actions = $actions->loadByTrigger($workflows, $trigger, $step, $role, $state);
+        $this->doDebug($this->actionDebugMessage($workflows, $trigger, $step, $role, $state));
+        $instances = [];
+        foreach($actions as $action) {
+            $class = $action['actionClass'];
+            $method = $action['action'];
+            if(empty($instances[$class])) {
+                $instance = ZfExtended_Factory::get($class);
+                /* @var $instance editor_Workflow_Actions_Abstract */
+                $instance->init($this->getActionConfig());
+                $instances[$class] = $instance;
+            }
+            else {
+                $instance = $instances[$class];
+            }
+            
+            $msg = $this->actionDebugMessage($action, $trigger, $step, $role, $state);
+            $this->doDebug($msg);
+            if(empty($action['parameters'])) {
+                call_user_func([$instance, $method]);
+                continue;
+            }
+            call_user_func([$instance, $method], json_decode($action['parameters']));
+            if(json_last_error() != JSON_ERROR_NONE) {
+                $this->doDebug('Last Workflow called action: JSON Parameters for last call could not be parsed with message: '.json_last_error_msg());
+            }
+        }
+    }
+    
+    /**
+     * generates a debug message for called actions
+     * @param array $action
+     * @param string $trigger
+     * @param string $step
+     * @param string $role
+     * @param string $state
+     * @return string
+     */
+    protected function actionDebugMessage(array $action, $trigger, $step, $role, $state) {
+        if(!empty($action) && empty($action['actionClass'])) {
+            //called in context before action load
+            $msg = ' Try to load actions for workflow(s) "'.join(', ', $action).'" through trigger '.$trigger;
+        }
+        else {
+            //called in context after action loaded
+            $msg = ' Workflow called action '.$action['actionClass'].'::'.$action['action'].'() through trigger '.$trigger;
+        }
+        if(!empty($step)) {
+            $msg .= "\n".' with step '.$step;
+        }
+        if(!empty($role)) {
+            $msg .= "\n".' with role '.$role;
+        }
+        if(!empty($state)) {
+            $msg .= "\n".' and state '.$state;
+        }
+        if(!empty($action['parameters'])) {
+            $msg .= "\n".' and parameters '.$action['parameters'];
+        }
+        return $msg;
+    }
+    
+    /**
+     * prepares a config object for workflow actions
+     * @return editor_Workflow_Actions_Config
+     */
+    protected function getActionConfig() {
+        $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
+        /* @var $config editor_Workflow_Actions_Config */
+        $config->workflow = $this;
+        $config->newTua = $this->newTaskUserAssoc;
+        $config->oldTask = $this->oldTask;
+        $config->task = $this->newTask;
+        $config->importConfig = $this->importConfig;
+        $config->authenticatedUser = $this->authenticatedUserModel;
+        return $config;
+    }
+    
+    /**
+     * recalculates the workflow step by the given task user assoc combinations
+     * If the combination of roles and states are pointing to an specific workflow step, this step is used
+     * If the states and roles does not match any valid combination, no step is changed. 
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
+        $tuas = $tua->loadByTaskGuidList([$tua->getTaskGuid()]);
+        
+        $areTuasSubset = function($toCompare) use ($tuas){
+            foreach($tuas as $tua) {
+                if(empty($toCompare[$tua['role']])) {
+                    return false;
+                }
+                if(!in_array($tua['state'], $toCompare[$tua['role']])) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        
+        $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
+        /* @var $msg ZfExtended_Models_Messages */
+        
+        $matchingSteps = [];
+        foreach($this->validStates as $step => $roleStates) {
+            if(!$areTuasSubset($roleStates)) {
+                continue;
+            }
+            $matchingSteps[] = $step;
+        }
+        
+        //if the current step is one of the possible steps for the tua configuration
+        // then everything is OK, 
+        // or if no valid configuration is found, then we also could not change the step
+        if(empty($matchingSteps) || in_array($task->getWorkflowStepName(), $matchingSteps)) {
+            return;
+        }
+        //set the first found valid step to the current workflow step
+        $step = reset($matchingSteps);
+        $task->updateWorkflowStep($step, false);
+        $log = ZfExtended_Factory::get('editor_Workflow_Log');
+        /* @var $log editor_Workflow_Log */
+        $log->log($task, $this->authenticatedUser->userGuid);
+        //set $step as new workflow step if different to before!
+        $labels = $this->getLabels();
+        $steps = $this->getSteps();
+        $step = $labels[array_search($step, $steps)];
+        $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
+        return;
     }
     
     /**
@@ -693,6 +968,35 @@ abstract class editor_Workflow_Abstract {
         return null;
     }
 
+    /**
+     * Sets the new workflow step in the given task and increases by default the workflow step nr
+     * @param editor_Models_Task $task
+     * @param string $stepName
+     */
+    protected function setNextStep(editor_Models_Task $task, $stepName) {
+        $this->doDebug(__FUNCTION__);
+        $task->updateWorkflowStep($stepName, true);
+        $log = ZfExtended_Factory::get('editor_Workflow_Log');
+        /* @var $log editor_Workflow_Log */
+        $log->log($task, $this->authenticatedUser->userGuid);
+        //call action directly without separate handler method
+        $newTua = $this->newTaskUserAssoc;
+        $this->callActions('handleSetNextStep', $stepName, $newTua->getRole(), $newTua->getState());
+    }
+    
+    /**
+     * Inits the workflow step in the given task
+     * @param editor_Models_Task $task
+     * @param string $stepName
+     */
+    protected function initWorkflowStep(editor_Models_Task $task, $stepName) {
+        $task->updateWorkflowStep($stepName, false);
+        $log = ZfExtended_Factory::get('editor_Workflow_Log');
+        /* @var $log editor_Workflow_Log */
+        //since we are in the import, we don't have the current user, so we use the pmGuid user of the task:
+        $log->log($task, $task->getPmGuid()); 
+    }
+    
     /*
     //DO Methods.
      the do.. methods 
@@ -704,9 +1008,54 @@ abstract class editor_Workflow_Abstract {
      * is called directly after import
      * @param editor_Models_Task $importedTask
      */
-    public function doImport(editor_Models_Task $importedTask) {
+    public function doImport(editor_Models_Task $importedTask, editor_Models_Import_Configuration $importConfig) {
         $this->newTask = $importedTask;
+        $this->importConfig = $importConfig;
         $this->handleImport();
+    }
+    
+    /**
+     * is called after a user association is added
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    public function doUserAssociationAdd(editor_Models_TaskUserAssoc $tua) {
+        $this->newTaskUserAssoc = $tua;
+        $this->handleUserAssociationAdded();
+    }
+    
+    /**
+     * can be triggered via API, valid triggers are currently
+     * @param editor_Models_Task $task
+     * @param unknown $trigger
+     */
+    public function doDirectTrigger(editor_Models_Task $task, $trigger) {
+        if(!in_array($trigger, $this->validDirectTrigger)) {
+            return false;
+        }
+        $this->newTask = $task;
+        
+        //try to load an user assoc between current user and task 
+        $this->newTaskUserAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        try {
+            $this->newTaskUserAssoc->loadByParams($this->authenticatedUser->userGuid, $task->getTaskGuid());
+            $role = $this->newTaskUserAssoc->getRole();
+            $state = $this->newTaskUserAssoc->getState();
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->newTaskUserAssoc = null;
+            $role = null;
+            $state = null;
+        }
+        $this->callActions('handleDirect::'.$trigger, $task->getWorkflowStepName());
+        return true;
+    }
+    
+    /**
+     * returns the valid direct trigger
+     * @return string[]
+     */
+    public function getDirectTrigger() {
+        return $this->validDirectTrigger;
     }
     
     /**
@@ -727,6 +1076,29 @@ abstract class editor_Workflow_Abstract {
      * is called when a task assoc state gets OPEN
      */
     protected function doOpen() {
+    }
+    
+    /**
+     * is called when a task is opened coming from state unconfirmed
+     */
+    protected function doConfirm() {
+    }
+    
+    /**
+     * is called when a task changes via API
+     */
+    protected function doTaskChange() {
+        $function = 'handleTaskChange';
+        $this->doDebug($function);
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        try {
+            $tua->loadByParams($this->authenticatedUser->userGuid, $this->newTask->getTaskGuid());
+            $this->callActions($function, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->callActions($function, $this->newTask->getWorkflowStepName());
+        }
     }
     
     /**
@@ -789,6 +1161,11 @@ abstract class editor_Workflow_Abstract {
     abstract protected function handleImport();
     
     /**
+     * will be called directly before import is started, task is already created and available
+     */
+    abstract protected function handleBeforeImport();
+    
+    /**
      * will be called after a user has finished a task
      * @abstract
      */
@@ -840,4 +1217,9 @@ abstract class editor_Workflow_Abstract {
      * will be called daily
      */
     abstract public function doCronDaily();
+    
+    /**
+     * will be called when a new task user association is created
+     */
+    abstract protected function handleUserAssociationAdded();
 }

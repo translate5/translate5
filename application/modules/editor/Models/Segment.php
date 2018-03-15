@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -75,13 +74,17 @@ END LICENSE AND COPYRIGHT
  * @method void setWorkflowStepNr() setWorkflowStepNr(integer $stepNr)
  * @method string getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(string $name)
+ * 
+ * this are just some helper for the always existing segment fields, similar named methods exists for all segment fields: 
+ * @method void setSource() setSource(string $content)
+ * @method void setSourceEdit() setSourceEdit(string $content)
+ * @method void setSourceMd5() setSourceMd5(string $md5hash)
+ * @method void setTarget() setTarget(string $content)
+ * @method void setTargetEdit() setTargetEdit(string $content)
+ * @method void setTargetMd5() setTargetMd5(string $md5hash)
+ * 
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
-    /**
-     * This value is normally extracted from DB, because of the fluent interface we have to define it for segments
-     * @var integer
-     */
-    const TOSORT_LENGTH = 30;
     
     protected $dbInstanceClass          = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
@@ -130,7 +133,152 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function __construct()
     {
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         parent::__construct();
+    }
+    
+    
+    /***
+     * Search the matirialized view for given search field,search string and match case.
+     * Only hits in the editable fields will be returned
+     * 
+     * @param unknown $request
+     * @return string|array
+     */
+    public function search($request){
+        $queryString=$request->getParam('searchCombo');
+        $searchInCombo=$request->getParam('searchInCombo').editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $matchCase=$request->getParam('matchCase');
+        $searchType=$request->getParam('searchType');
+        $session = new Zend_Session_Namespace();
+        $taskGuid=$session->taskGuid;
+        if ($session->taskGuid !== $request->getParam('taskGuid')) {
+            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+        
+        //$mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        /* @var $mv editor_Models_Segment_MaterializedView  */
+        //$mv->setTaskGuid($taskGuid);
+        //$viewName=$mv->getName();
+        
+        $this->reInitDb($taskGuid);
+        $this->segmentFieldManager->initFields($taskGuid);
+        $searchQuery=$this->buildSearchString($searchInCombo,$queryString, $searchType, $matchCase);
+        
+        if(!$searchQuery){
+            return "Invalid search string.";
+        }
+        
+        $select= $this->db->select()
+        ->where($searchQuery)
+        ->where('editable = 1');
+        
+        /* //TODO:The idea how we can use the search limitation
+         * 
+         * SELECT id,rank FROM (
+            	SELECT @rownum := @rownum + 1 AS rank, 
+            	   `id`, `segmentNrInTask`, `fileId`, `mid`, `userGuid`, `userName`, `taskGuid`, `timestamp`, 
+            	   `editable`, `pretrans`, `matchRate`, `matchRateType`, `qmId`, `stateId`, `autoStateId`, `fileOrder`, 
+            	   `comments`, `workflowStepNr`, `workflowStep`, `source`, `sourceMd5`, `sourceToSort`, `target`, 
+            	   `targetMd5`, `targetToSort`, `targetEdit`, `targetEditToSort` 
+            	   FROM `LEK_segment_view_10ba195a738894769f296aee08364626`, (SELECT @rownum := 0) r
+            	   ORDER BY `fileOrder` asc, `id` asc LIMIT 100 OFFSET 100000
+               ) sub
+            WHERE targetEditToSort  REGEXP '[0-9]';
+         */
+        $result = $this->loadFilterdCustom($select);
+        return $result;
+    }
+    
+    //FIXME impruve the error handling!!!!!
+    public function replaceAll($request){
+        $result=$this->search($request,true);
+        
+        $queryString=$request->getParam('searchCombo');
+        $searchInCombo=$request->getParam('searchInCombo');
+        $searchType=$request->getParam('searchType');
+        $matchCase=$request->getParam('matchCase');
+        
+        if(!$result || empty($result)){
+            return;
+        }
+        $result=json_decode($result);
+        
+        foreach ($result as $res){
+            $value=$res->{$searchInCombo};
+            //REPLACE THE
+        }
+    }
+    
+    /***
+     * Buld search sql string for given field based on the search type
+     * 
+     * @param string $searchInCombo
+     * @param string $queryString
+     * @param string $searchType
+     * @param boolean $matchCase
+     * @return boolean|string
+     */
+    public function buildSearchString($searchInCombo,$queryString,$searchType,$matchCase){
+        //search type regular expression
+        if($searchType==='regularExpressionSearch'){
+            //simples way to test if the regular expression is valid
+            //try {
+                //@preg_match($patern, 'Test string');
+            //} catch (Exception $e) {
+            //    return false;
+            //}
+            if(!$matchCase){
+                return $searchInCombo.' REGEXP '.$this->db->getAdapter()->quote($queryString);
+            }
+            return $searchInCombo.' REGEXP BINARY '.$this->db->getAdapter()->quote($queryString);
+        }
+        //search type regular wildcard
+        if($searchType==='wildcardsSearch'){
+            $queryString=str_replace("*","%",$queryString);
+            $queryString=str_replace("?","_",$queryString);
+        }
+        //if match case, search without lower function
+        if($matchCase){
+            return $searchInCombo.' like '.$this->db->getAdapter()->quote('%'.$queryString.'%').' COLLATE utf8_bin';
+        }
+        return 'lower('.$searchInCombo.') like lower('.$this->db->getAdapter()->quote('%'.$queryString.'%').') COLLATE utf8_bin';
+    }
+    
+    //TODO here also the ins and delete segments should be added
+    public function replaceSearchString($searchString,$queryString,$searchType){
+        
+       // This must be done by the INS/DEL plugin, since the correct attributes for the tags must be added
+       // $queryString = '<del>'.$searchString.'</del><ins>'.$queryString.'</ins>';
+        
+        //"/^PHP$/"
+        switch ($searchType) {
+            case 'normalSearch':
+                $searchString='/'.$queryString.'/';
+                if(!$matchCase){
+                    break;
+                }
+                $searchString='/^'.$queryString.'$/';
+                break;
+            case 'wildcardsSearch':
+                $searchString=str_replace("*","%",$queryString);
+                $searchString=str_replace("?","_",$queryString);
+                if(!$matchCase){
+                    return $searchString;
+                }
+                $searchString=' REGEXP "[[:<:]]'.$searchString.'[[:>:]]"';
+                break;
+            case 'regularExpressionSearch':
+                if($matchCase){
+                    return ' REGEXP BINARY "'.$queryString.'"';
+                }
+                $outSql=' REGEXP "'.$queryString.'"';
+                return $outSql;
+                break;
+        }
+        
+        return $searchString;
     }
     
     /**
@@ -143,20 +291,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         $v = $this->__call('get'.ucfirst($name), array());
-        $this->__call('set'.ucfirst($toSort), array($this->truncateSegmentsToSort($v)));
-    }
-    
-    /**
-     * truncates the given segment content and strips tags for the toSort fields
-     * truncation is needed for sorting in MSSQL
-     * @param $segment
-     * @return string
-     */
-    protected function truncateSegmentsToSort($segment) {
-        if(!is_string($segment)){
-            return $segment;
-        }
-        return mb_substr(strip_tags($segment),0,self::TOSORT_LENGTH,'utf-8');
+        $this->__call('set'.ucfirst($toSort), array($this->stripTags($v)));
     }
     
     /**
@@ -194,6 +329,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         return parent::set($name, $value);
     }
+    
+    
 
     /**
      * gets segment attributes, filters the fluent fields and gets them from a different location
@@ -245,7 +382,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($this->stripTermTags($data->edited) !== $this->stripTermTags($data->original)) {
+            if($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($data->original)) {
                 $this->isDataModifiedAgainstOriginal = true;
             }
         }
@@ -268,7 +405,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             if(!$isEditable || !$edited || !empty($typeFilter) && $data->type !== $typeFilter) {
                 continue;
             }
-            if($this->stripTermTags($data->edited) !== $this->stripTermTags($this->getOldValue($fieldName))) {
+            if($this->stripTermTagsAndTrackChanges($data->edited) !== $this->stripTermTagsAndTrackChanges($this->getOldValue($fieldName))) {
                 $this->isDataModified = true;
             }
         }
@@ -296,10 +433,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     /**
      * strips all tags including internal tag content
-     * @param string $segmentContent
+     * //TODO: this function is also used when matirialized view is created, to update the toSort fields. 
+     *         The strip tags will remove the also the del and insert tags.
+     * 
      * @return string $segmentContent
      */
     public function stripTags($segmentContent) {
+        $segmentContent = preg_replace('/<del[^>]*>.*?<\/del>/i', '', $segmentContent);
         return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#','',$segmentContent));
     }
     
@@ -343,7 +483,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $segmentContent
      * @return string $segmentContent
      */
-    public function stripTermTags($segmentContent) {
+    public function stripTermTagsAndTrackChanges($segmentContent) {
         try {
             $options = array(
                     'format_output' => false,
@@ -352,6 +492,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     'convert_from_encoding' => 'utf-8',
                     'ignore_parser_warnings' => true,
             );
+            $segmentContent= $this->tagHelper->removeTrackChanges($segmentContent);
             $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, $options);
             /* @var $seg QueryPath\\DOMQuery */
             //advise libxml not to throw exceptions, but collect warnings and errors internally:
@@ -422,7 +563,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         
         $history->setSegmentId($this->getId());
 
-        $fields = array('taskGuid', 'userGuid', 'userName', 'timestamp', 'editable', 'pretrans', 'qmId', 'stateId', 'autoStateId', 'workflowStep', 'workflowStepNr', 'matchRate', 'matchRateType');
+        $fields = $history->getFieldsToUpdate();
         //TRANSLATE-885 
         $fields[] = 'targetMd5';
         $fields[] = 'target';
@@ -476,7 +617,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             /* @var $row editor_Models_Db_SegmentDataRow */
             $row->name = $name;
             $field = $sfm->getByName($name);
-            $row->originalToSort = $this->truncateSegmentsToSort($row->original);
+            $row->originalToSort = $this->stripTags($row->original);
             $row->taskGuid = $this->getTaskGuid();
             $row->mid = $this->getMid();
             if($field->editable) {
@@ -544,11 +685,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             'mid' => $mid,
             'original' => $data['original'],
             'originalMd5' => $data['originalMd5'],
-            'originalToSort' => $this->truncateSegmentsToSort($data['original']),
+            'originalToSort' => $this->stripTags($data['original']),
         );
         if($field->editable) {
             $data['edited'] = $data['original'];
-            $data['editedToSort'] = $this->truncateSegmentsToSort($data['original']);
+            $data['editedToSort'] = $this->stripTags($data['original']);
         }
         
         try {
@@ -603,7 +744,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //only update the mat view if the segment was already in DB (so do not save mat view on import!)
         if(!empty($oldIdValue)) {
-            $this->segmentFieldManager->getView()->updateSegment($this);
+            $matView = $this->segmentFieldManager->getView();
+            $matView->exists() && $matView->updateSegment($this);
         }
         return $segmentId;
     }
@@ -880,7 +1022,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
         
-        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userName', 'timestamp');
+        $fields = array('id', 'mid', 'segmentNrInTask', 'stateId', 'autoStateId', 'matchRate', 'qmId', 'comments', 'fileId', 'userGuid', 'userName', 'timestamp');
         $fields = array_merge($fields, $this->segmentFieldManager->getDataIndexList());
         
         $this->initDefaultSort();
@@ -1061,7 +1203,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $taskGuid
      */
     protected function reInitDb($taskGuid) {
+        $this->segmentFieldManager->initFields($taskGuid);
         $mv = $this->segmentFieldManager->getView();
+        $mv->setTaskGuid($taskGuid);
         /* @var $mv editor_Models_Segment_MaterializedView */
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
         $db = $this->db;
@@ -1160,7 +1304,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Bulk updating a specific autoState of a task 
+     * Bulk updating a specific autoState of a task, affects only non edited segments
+     * If userGuid and username are set in this segment instance, the this values are also set in the affected segments
+     * FIXME test me for translation workflow!
      * @param string $taskGuid
      * @param integer $oldState
      * @param integer $newState
@@ -1173,11 +1319,22 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $segTable = $db->info($db::NAME);
         $viewName = $sfm->getView()->getName();
         
-        $sql_tpl = 'UPDATE `%s` set autoStateId = ? where autoStateId = ? and taskGuid = ?';
+        //if this segment instance have a userGuid and userName he segments are also changed with that data
+        $userGuid = $this->getUserGuid();
+        $username = $this->getUserName();
+        
+        $changeUser = !empty($userGuid) && !empty($username);
+        if($changeUser) {
+            $sql_tpl = 'UPDATE `%s` set autoStateId = ?, userGuid = ?, userName = ? where autoStateId = ? and taskGuid = ?';
+            $bind = array($newState, $userGuid, $username, $oldState, $taskGuid);
+        }
+        else {
+            $sql_tpl = 'UPDATE `%s` set autoStateId = ? where autoStateId = ? and taskGuid = ?';
+            $bind = array($newState, $oldState, $taskGuid);
+        }
         $sql = sprintf($sql_tpl, $segTable);
         $sql_view = sprintf($sql_tpl, $viewName);
         
-        $bind = array($newState, $oldState, $taskGuid);
         $db->getAdapter()->beginTransaction();
         
         if(!$emptyEditedOnly) {
@@ -1202,8 +1359,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->queryWithExistingView($sql_view, $bind);
         
         //updates LEK_segments directly, but only where all above requested fields are empty
-        $bind = array($taskGuid, $newState, $oldState, $taskGuid);
-        $sql  = 'UPDATE `%s` segment, %s subquery set segment.autoStateId = ? where segment.autoStateId = ? and segment.taskGuid = ? ';
+        $sql  = 'UPDATE `%s` segment, %s subquery set segment.autoStateId = ? ';
+        if($changeUser) {
+            $bind = array($taskGuid, $newState, $userGuid, $username, $oldState, $taskGuid);
+            $sql .= ', segment.userGuid = ?, segment.userName = ? ';
+        }
+        else {
+            $bind = array($taskGuid, $newState, $oldState, $taskGuid);
+        }
+        $sql .= 'where segment.autoStateId = ? and segment.taskGuid = ? ';
         $sql .= 'and subquery.segmentId = segment.id and subquery.cnt = %s';
         
         //subQuery to get the count of empty fields, fields as requested above
@@ -1215,6 +1379,46 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $sql = sprintf($sql, $segTable, $subQuery, count($affectedFieldNames));
         $db->getAdapter()->query($sql, $bind);
         $db->getAdapter()->commit();
+    }
+    
+    /***
+     * Find last editor from segment history, and update it in the lek segment table
+     * @param string $taskGuid
+     * @param integer $autoState
+     */
+    public function updateLastAuthorFromHistory(string $taskGuid,integer $autoState){
+        if(empty($taskGuid) || empty($autoState)){
+            return;
+        }
+        $adapter=$this->db->getAdapter();
+        $bind=array(
+                $taskGuid,
+                $autoState
+        );
+        $sql='UPDATE LEK_segments as seg,
+            (
+                SELECT hist.id,hist.userGuid,hist.userName,hist.segmentId
+                FROM LEK_segment_history hist
+                INNER JOIN LEK_segments s
+                ON s.id = hist.segmentId
+                WHERE s.taskGuid=?
+                AND s.autoStateId=?
+                AND hist.id= (SELECT id FROM LEK_segment_history WHERE segmentId=s.id ORDER BY created DESC LIMIT 1 )
+            ) as h
+            SET seg.userGuid = h.userGuid,seg.userName = h.userName WHERE seg.id=h.segmentId';
+        
+        $adapter->query($sql,$bind);
+    }
+    
+    /**
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getAutoStateCount(string $taskGuid) {
+        $this->reInitDb($taskGuid);
+        $s = $this->db->select()->from($this->tableName, ['autoStateId', 'cnt' => 'count(id)'])
+        ->group('autoStateId');
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**
@@ -1254,7 +1458,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * convenient method to get the task meta data
+     * convenient method to get the segment meta data
      * @return editor_Models_Segment_Meta
      */
     public function meta() {

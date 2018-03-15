@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -80,6 +79,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $extJs ZfExtended_Controller_Helper_ExtJs */
         $this->view->extJsCss = $extJs->getCssPath();
         $this->view->extJsBasepath = $extJs->getHttpPath();
+        $this->view->extJsVersion = $extJs->getVersion();
         
         $this->view->buildType = 'development';
         
@@ -204,6 +204,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
       $this->view->Php2JsVars()->set('segments.showStatus', (boolean)$rop->segments->showStatus);
       $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
+      $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (boolean)$rop->segments->userCanIgnoreTagValidation);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -226,7 +227,13 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
       
       //maintenance start date
-      $this->view->Php2JsVars()->set('maintenance.startDate',isset($rop->maintenance->startDate)?$rop->maintenance->startDate:'');
+      if(isset($rop->maintenance->startDate)) {
+          $startDate = date(DATE_ISO8601, strtotime($rop->maintenance->startDate));
+      }
+      else{
+          $startDate = '';
+      }
+      $this->view->Php2JsVars()->set('maintenance.startDate',$startDate);
       //maintenance warning panel is showed
       $this->view->Php2JsVars()->set('maintenance.timeToNotify',isset($rop->maintenance->timeToNotify)?$rop->maintenance->timeToNotify:'');
       //minutes before the point in time of the update the application is locked for new log-ins
@@ -241,9 +248,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
       $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
       
-      $validImportExtensions = array_keys(editor_Models_Import_FileParser::getAllFileParsersMap());
-      $validImportExtensions[] = 'zip'; //ZIP is not provided by a specific fileparser
-      $this->view->Php2JsVars()->set('import.validExtensions', $validImportExtensions);
+      $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+      /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
+      $this->view->Php2JsVars()->set('import.validExtensions', array_keys($supportedFiles->getSupportedTypes()));
       
       $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
       $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (integer)$rop->editor->columns->widthOffsetEditable);
@@ -255,6 +262,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           $this->view->Php2JsVars()->set('supportedBrowsers', $rop->supportedBrowsers->toArray());
       }
       
+      //default state configuration for frontend components(grid)
+      $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
+      
+      $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
+      
+      //flag if the segment count status strip component should be displayed
+      $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
+      
       $this->setJsAppData();
     }
 
@@ -264,6 +279,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function setJsAppData() {
         $userSession = new Zend_Session_Namespace('user');
         $userSession->data->passwd = '********';
+        $userRoles = $userSession->data->roles;
         
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
@@ -304,11 +320,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $allRoles = $acl->getRoles();
         $roles = array();
         foreach($allRoles as $role) {
-            //
             if($role == 'noRights' || $role == 'basic') {
                 continue;
             }
-            $roles[$role] = ucfirst($role);
+            //set the setable, if the user is able to set/modify this role
+            $roles[$role] = [
+                    'label' => $this->translate->_(ucfirst($role)),
+                    'setable' => $acl->isInAllowedRoles($userRoles, "setaclrole", $role)
+            ];
         }
         $php2js->set('app.roles', $roles);
         
@@ -316,7 +335,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         /* @var $wm editor_Workflow_Manager */
         $php2js->set('app.workflows', $wm->getWorkflowData());
         
-        $php2js->set('app.userRights', $acl->getFrontendRights($userSession->data->roles));
+        $php2js->set('app.userRights', $acl->getFrontendRights($userRoles));
         
         $php2js->set('app.version', $this->view->appVersion);
     }
@@ -345,7 +364,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments');
+            'ChangeAlike', 'Comments','SearchReplace');
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -388,7 +407,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $result = array();
         foreach ($langs as $lang) {
             $name = $this->translate->_($lang['langName']);
-            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl']);
+            $result[$name] = array($lang['id'], $name.' ('.$lang['rfc5646'].')', $lang['rtl'],$lang['rfc5646']);
         }
         ksort($result); //sort by name of language
         if(empty($result)){
@@ -414,34 +433,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     
     public function applicationstateAction() {
         $this->_helper->layout->disableLayout();
-        //$this->_helper->viewRenderer->setNoRender();
-        $result = new stdClass();
-        $downloader = ZfExtended_Factory::get('ZfExtended_Models_Installer_Downloader', array(APPLICATION_PATH.'/..'));
-        /* @var $downloader ZfExtended_Models_Installer_Downloader */
-        try {
-            $result->isUptodate = $downloader->applicationIsUptodate();
-        } catch (Exception $e) {
-            $result->isUptodate = -1;
-        }
-        $versionFile = APPLICATION_PATH.'../version';
-        if(file_exists($versionFile)) {
-            $result->version = file_get_contents($versionFile);
-        }
-        else {
-            $result->version = 'development';
-            $result->branch = exec('cd '.APPLICATION_PATH.'; git status -bs | head -1');
-        }
-        
-        $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
-        /* @var $worker ZfExtended_Models_Worker */
-        $result->worker = $worker->getSummary();
-        
-        $pm = Zend_Registry::get('PluginManager');
-        /* @var $pm ZfExtended_Plugin_Manager */
-        $result->pluginsLoaded = $pm->getActive();
-        
-        $this->view->applicationstate = $result;
-        
+        $this->view->applicationstate = ZfExtended_Debug::applicationState();
     }
     
     public function generatesmalltagsAction() {
@@ -582,6 +574,51 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //currently this method is fixed to JS:
         header('Content-Type: '.$types[$extension]);
         readfile($wholePath);
+        exit;
+    }
+    
+    public function testnotifyAction() {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+        
+        $class = 'editor_Workflow_Notification';
+        
+        
+        $config = ZfExtended_Factory::get('editor_Workflow_Actions_Config');
+        /* @var $config editor_Workflow_Actions_Config */
+        $config->workflow = ZfExtended_Factory::get('editor_Workflow_Default');
+        $config->newTua = null;
+        $config->oldTask = ZfExtended_Factory::get('editor_Models_Task');
+        $config->oldTask->init([
+            'taskGuid' => '{97789a10-0bbb-4de5-b4b0-c5caceba3b25}',
+            'taskNr' => '',
+            'taskName' => 'Test Task',
+            'sourceLang' => 5,
+            'targetLang' => 4,
+            'relaisLang' => 4,
+            'state' => 'open',
+            'workflow' => 'default',
+            'workflowStep' => '1',
+            'workflowStepName' => 'lectoring',
+            'pmGuid' => '{dab18309-7dfd-4185-b27e-f490c3dcb888}',
+            'pmName' => 'PM Username',
+            'wordCount' => '123',
+            'targetDeliveryDate' => '2017-12-21 00:00:00',
+            'realDeliveryDate' => null,
+            'orderdate' => '2017-12-20 00:00:00',
+        ]);
+        $config->task = $config->oldTask;
+        $config->importConfig = new editor_Models_Import_Configuration();
+        $config->importConfig->importFolder = APPLICATION_PATH.'/needed/';
+        $config->importConfig->setLanguages('de', 'it', '', ZfExtended_Languages::LANG_TYPE_RFC5646);
+        $config->importConfig->userGuid = '{F1D11C25-45D2-11D0-B0E2-444553540101}';
+        $config->importConfig->userName = 'Thomas Lauria';
+        
+        $notify = ZfExtended_Factory::get($class);
+        /* @var $notify editor_Workflow_Notification */
+        $notify->init($config);
+        $notify->testNotifications();
+        echo "Sent dummy test Mails";
         exit;
     }
 }
