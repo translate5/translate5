@@ -33,18 +33,45 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Mixin with Helpers regarding the Editor
- * @class Editor.plugins.TrackChanges.controller.UtilEditor
+ * Mixin with Helpers regarding the LanguageTool
+ * @class Editor.plugins.TrackChanges.controller.UtilLanguageTool
  */
 Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
     
+    urlCheck: 'http://translate5.local:8081/v2/check',         // TODO: set url according to user's configuration
+    urlLanguages: 'http://translate5.local:8081/v2/languages', // TODO: set url according to user's configuration 
+    
     /**
-     * Get a list of supported languages
+     * Checks if the given targetLangCode language is supported by LanguageTool.
+     * If yes, we will fire an event and thus start the SpellChecker.
+     * Returns an Array with the rfc5646-Codes.
      * @returns {Array}
      */
-    getSupportedLanguages: function() {
+    checkSupportedLanguages: function(targetLangCode) {
         var me = this,
-            supportedLanguages = ['german'];
-        return supportedLanguages;
+            url = me.urlLanguages;
+        Ext.Ajax.request({
+            url:url,
+            method:"GET",
+            headers: {
+                //CORS
+                //'Access-Control-Allow-Origin': '*',
+                //'Access-Control-Allow-Headers': 'X-Requested-With',
+                //JSON
+                'Content-Type': 'application/json'
+            },
+            success: function(response){
+                me.consoleLog('HURRA! Next step: Sprache prüfen und wenn ok fireEvent für SpellCheck.');
+                //var obj = Ext.decode(response.responseText);
+                //console.dir(obj);
+                //me.renderArrayWithSupportedLanguageCodes(response);
+                // if Ext.Array.contains(supportedLanguages,targetLangCode);
+                // => fire event
+            },
+            failure: function(response){
+                me.consoleLog('getSupportedLanguages from LanguageTool failed: ' + response.status);
+            }
+        });
     }
+
 });

@@ -60,7 +60,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
 
     editor: null,
-    
+    targetLangCode: null,
     USE_CONSOLE: true, // (true|false): use true for developing using the browser's console, otherwise use false
     
     // =========================================================================
@@ -88,6 +88,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     /**
      * 
      */
+    initSpellCheck: function(event) {
+        var me = this;
+        me.consoleLog('*** initSpellCheck ***');
+        me.initLanguageSupport();
+    },
+    /**
+     * 
+     */
     initEditor: function() {
         var me = this,
             plug = me.getSegmentGrid().editingPlugin,
@@ -95,35 +103,43 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.consoleLog('initEditor');
         me.editor = editor.mainEditor; // → this is the HtmlEditor
     },
-    /**
-     * 
-     */
-    initSpellCheck: function(event) {
-        var me = this;
-        me.consoleLog('*** initSpellCheck ***');
-
-        me.initEditor();
-        
-        if (!me.isSupportedLanguage()) {
-            me.consoleLog('SpellChecker stopped; language is not supported.');
-            return;
-        }
-        
-    },
 
     // =========================================================================
-    // SpellChecker: generic layer for integrating specific tools
+    // SpellCheck: generic layer for integrating specific tools
     // =========================================================================
     
     /**
-     * Is the language supported by the tool(s) we use)?
+     * Is the language supported by the tool(s) we use?
      * @returns Boolean
      */
-    isSupportedLanguage: function() {
+    initLanguageSupport: function() {
         var me = this,
-            supportedLanguages = me.getSupportedLanguages();
-        console.dir(supportedLanguages);
-        return true;
+            targetLangCode = me.getTargetLangCode();
+        me.checkSupportedLanguages(targetLangCode);
+    },
+    
+    // =========================================================================
+    // Helpers
+    // =========================================================================
+    
+    /***
+     * Don't fetch targetLangCode from scratch if we already have it.
+     * @returns {String}
+     */
+    getTargetLangCode: function(){
+        var me = this,
+            languages,
+            task,
+            targetLang,
+            targetLangCode;
+        if(me.targetLangCode){
+            return me.targetLangCode;
+        }
+        languages = Ext.getStore('admin.Languages');
+        task = Editor.data.task;
+        targetLang = languages.getById(task.get('targetLang'));
+        me.targetLangCode = targetLang.get('rfc5646');
+        return me.targetLangCode;
     },
     
     // =========================================================================
