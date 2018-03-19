@@ -13,9 +13,9 @@
  * Do NOT hand edit this file.
  */
 
-Ext.define('Erp.view.customer.PanelViewController', {
+Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.customerpanel',
+    alias: 'controller.customerPanel',
     
     dblclick: function(dataview, record, item, index, e, eOpts) {
         var formPanel = this.getReferences().form,
@@ -49,15 +49,15 @@ Ext.define('Erp.view.customer.PanelViewController', {
 
         record.save({
             success: function() {
-                Erp.MessageBox.addSuccess('Kunde "'+record.get('name')+'" gespeichert!');
+                Editor.MessageBox.addSuccess('Kunde "'+record.get('name')+'" gespeichert!');
                 store.load();
                 me.fireEvent('customerSaved', record);
                 me.getView().unmask();
                 me.cancelEdit();
             },
-            failure: Erp.app.getController('ServerException').invokeFormCallback(formPanel, function(){
-                me.getView().unmask();
-            })
+            failure:function(){
+                console.log(arguments);
+            }
         });
     },
 
@@ -83,11 +83,10 @@ Ext.define('Erp.view.customer.PanelViewController', {
     },
 
     add: function(button, e, eOpts) {
+        debugger;
         var formPanel = this.getReferences().form,
             form = formPanel.getForm(),
-            newRecord = Ext.create('Erp.model.Customer',{
-                id: null
-            }),
+            newRecord = Ext.create('Editor.plugins.Customer.model.Customer'),
             vm = this.getViewModel();
 
         // Clear form
@@ -99,9 +98,6 @@ Ext.define('Erp.view.customer.PanelViewController', {
 
         // Set title
         vm.set('title', 'Kunde hinzufügen');
-
-        //focus on first empty field
-        Erp.Utils.focusOnFirstEmptyField(formPanel.getForm());
     },
 
     refresh: function(button, e, eOpts) {

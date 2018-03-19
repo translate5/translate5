@@ -37,12 +37,12 @@
 /**
  *
  */
-class editor_Plugins_CustomerAdministration_CustomerController extends ZfExtended_RestController {
+class editor_Plugins_Customer_CustomerController extends ZfExtended_RestController {
     
-    protected $entityClass = 'editor_Plugins_CustomerAdministration_Models_Customer';
+    protected $entityClass = 'editor_Plugins_Customer_Models_Customer';
     
     /**
-     * @var editor_Plugins_CustomerAdministration_Models_Customer
+     * @var editor_Plugins_Customer_Models_Customer
      */
     protected $entity;
     

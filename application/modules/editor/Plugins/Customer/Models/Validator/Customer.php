@@ -34,20 +34,20 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/**
- * Customer Entity Objekt
- * 
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * 
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * 
- * @method string getNumber() getNumber()
- * @method void setNumber() setNumber(string $number)
- * 
-*/
-class editor_Plugins_CustomerAdministration_Models_Customer extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_CustomerAdministration_Models_Db_Customer';
-    protected $validatorInstanceClass   = 'editor_Plugins_CustomerAdministration_Models_Validator_Customer';
+class editor_Plugins_Customer_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstract {
+    
+    /**
+    * Validators for Customer entity
+    */
+    protected function defineValidators() {
+        
+        //`id` int(11) NOT NULL AUTO_INCREMENT,
+        $this->addValidator('id', 'int');
+        
+        //`name` varchar(255) NOT NULL DEFAULT '',
+        $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 255));
+        
+        //`number` varchar(255) DEFAULT NULL,
+        $this->addValidator('number', 'stringLength', array('min' => 0, 'max' => 255));
+    }
 }

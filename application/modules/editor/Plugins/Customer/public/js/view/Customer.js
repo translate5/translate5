@@ -13,18 +13,18 @@
  * Do NOT hand edit this file.
  */
 
-Ext.define('Editor.plugins.CustomerAdministration.view.CustomerPanel', {
+Ext.define('Editor.plugins.Customer.view.Customer', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.customerpanel',
-
+    alias: 'widget.customerPanel',
+    itemId:'customerPanel',
     requires: [
-        'Editor.plugins.CustomerAdministration.view.CustomerViewModel',
-        'Editor.plugins.CustomerAdministration.view.CustomerViewController',
+        'Editor.plugins.Customer.view.CustomerViewModel',
+        'Editor.plugins.Customer.view.CustomerViewController',
     ],
 
-    controller: 'customerpanel',
+    controller: 'customerPanel',
     viewModel: {
-        type: 'customerpanel'
+        type: 'customerPanel'
     },
     listeners: {
         activate: {
@@ -39,7 +39,7 @@ Ext.define('Editor.plugins.CustomerAdministration.view.CustomerPanel', {
     shrinkWrap: 0,
     layout: 'border',
     collapsed: false,
-    title: 'My Panel',
+    title: '#UT#Kundenübersicht',
     defaultListenerScope: true,
     defaultButton: 'saveButton',
     referenceHolder: true,
@@ -90,10 +90,11 @@ Ext.define('Editor.plugins.CustomerAdministration.view.CustomerPanel', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
+                title: me.title, //see EXT6UPD-9
                 items: [
                     {
                         xtype: 'gridpanel',
-                        flex: 1,
+                        flex: 0.7,
                         region: 'center',
                         split: true,
                         reference: 'list',
@@ -119,32 +120,6 @@ Ext.define('Editor.plugins.CustomerAdministration.view.CustomerPanel', {
                                 filter: {
                                     type: 'string'
                                 }
-                            },
-                            {
-                                xtype: 'gridcolumn',
-                                renderer: function(value, metaData, record, rowIndex, colIndex, store, view) {
-                                    var store = me.getViewModel().getStore('keyaccounts'),
-                                        keyaccount = store.getById(value);
-                                    if(keyaccount && value>0) {
-                                        return keyaccount.get('name');
-                                    }
-                                    return '';
-                                },
-                                dataIndex: 'keyaccount',
-                                text: 'Keyaccount',
-                                filter: me.processMyListFilter({
-                                    type: 'list',
-                                    labelField: 'name'
-                                })
-                            },
-                            {
-                                xtype: 'numbercolumn',
-                                dataIndex: 'taxPercent',
-                                text: 'Steuersatz',
-                                align:'right',
-                                filter: {
-                                    type: 'number'
-                                }
                             }
                         ],
                         listeners: {
@@ -169,7 +144,7 @@ Ext.define('Editor.plugins.CustomerAdministration.view.CustomerPanel', {
                     },
                     {
                         xtype: 'panel',
-                        flex: 1,
+                        flex: 0.3,
                         region: 'east',
                         split: true,
                         reference: 'display',
@@ -204,31 +179,6 @@ Ext.define('Editor.plugins.CustomerAdministration.view.CustomerPanel', {
                                         allowBlank: false,
                                         maxLength: 255,
                                         minLength: 3
-                                    },
-                                    {
-                                        xtype: 'combobox',
-                                        fieldLabel: 'Keyaccount',
-                                        name: 'keyaccount',
-                                        editable: false,
-                                        displayField: 'name',
-                                        forceSelection: true,
-                                        queryMode: 'local',
-                                        valueField: 'id',
-                                        bind:{
-                                            store:'{keyaccounts}'
-                                        }
-                                    },
-                                    {
-                                        xtype: 'combobox',
-                                        fieldLabel: 'Steuersatz',
-                                        name: 'taxPercent',
-                                        allowBlank: false,
-                                        editable: false,
-                                        forceSelection: true,
-                                        valueField: 'id',
-                                        bind: {
-                                            store: '{taxsets}'
-                                        }
                                     },
                                     {
                                         xtype: 'container',
@@ -285,10 +235,6 @@ Ext.define('Editor.plugins.CustomerAdministration.view.CustomerPanel', {
         me.callParent(arguments);
         //this will enable the store to be loaded when onFilterEndUpdate is called,it is disabled on store configuration
         me.getViewModel().getStore('customers').suppressNextFilter = false;
-    },
-    processMyListFilter: function(config) {
-        config.options = Erp.data.customers.keyaccounts;
-        return config;
     },
     
     onViewBeforeRefresh: function(dataview, eOpts) {
