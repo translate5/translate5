@@ -49,6 +49,7 @@ Ext.define('Editor.view.ToolTip', {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
         history: '#UT#HISTORY',
+        notrackchangesplugin: '#UT#TrackChanges found, but Plugin is not activated.',
         severity: '#UT#Gewichtung'
     },
     userStore: null,
@@ -147,18 +148,28 @@ Ext.define('Editor.view.ToolTip', {
     },
     getTrackChangesData: function(node) {
         var me = this,
-            trackChanges = Editor.plugins.TrackChanges.controller.Editor,
-            attrnameUsername = trackChanges.ATTRIBUTE_USERNAME,
-            attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP,
-            attrnameHistorylist = trackChanges.ATTRIBUTE_HISTORYLIST,
-            attrnameHistoryActionPrefix = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX,
-            attrnameHistoryUsernamePrefix = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX,
+            trackChanges,
+            attrnameUsername,
+            attrnameTimestamp,
+            attrnameHistorylist,
+            attrnameHistoryActionPrefix,
+            attrnameHistoryUsernamePrefix,
             attrUserName,
             attrTimestamp,
             nodeAction = '',
             nodeUser = '',
             nodeDate = '',
             nodeHistory = '';
+        // TrackChanges-Plugin activated?
+        if (!Editor.plugins.TrackChanges) {
+            return me.messages.notrackchangesplugin;
+        }
+        trackChanges = Editor.plugins.TrackChanges.controller.Editor,
+        attrnameUsername = trackChanges.ATTRIBUTE_USERNAME;
+        attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP;
+        attrnameHistorylist = trackChanges.ATTRIBUTE_HISTORYLIST;
+        attrnameHistoryActionPrefix = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX;
+        attrnameHistoryUsernamePrefix = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX;
         // What has been done (INS/DEL)?
         if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_INS) {
             nodeAction = me.messages.insertedby;
