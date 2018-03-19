@@ -56,6 +56,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         }
     },
+    statics: {
+        NODE_NAME_MATCH: 'div',
+        CSS_CLASSNAME_MATCH: 'spellcheck'
+    },
     
     // =========================================================================
     
@@ -90,7 +94,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             ev = Ext.event.Event;
         conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
             me.initSpellCheck();
-        }, true];
+        }, false];
     },
     /**
      * 
@@ -121,6 +125,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             editor = plug.editor; // → this is the row editor component
         me.consoleLog('initEditor');
         me.editor = editor.mainEditor; // → this is the HtmlEditor
+        
+        // inject CSS
+        Ext.util.CSS.createStyleSheetToWindow(
+                me.editor.getDoc(),
+                '.spellcheck {border-bottom: 1px solid red; display: inline-block;}' 
+            );
     },
 
     // =========================================================================
@@ -128,22 +138,22 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     
     /**
-     * Start the SpellCheck (make sure to run this only for supported languages).
+     * Start the SpellCheck (be sure to run this only for supported languages).
      */
     startSpellCheck: function() {
         var me = this,
             editorText,
-            editorRange = rangy.createRange();
+            rangeForEditor = rangy.createRange();
         me.consoleLog('startSpellCheck...');
         me.initEditor();
-        editorRange.selectNode(me.editor.getEditorBody());
+        rangeForEditor.selectNode(me.editor.getEditorBody());
         
         // TODO: run SpellCheck only if the content in the Editor has changed.
         
         //add display none to all del nodes, with this they are ignored as searchable
         me.prepareDelNodeForSearch(true);
         
-        editorText = editorRange.text();
+        editorText = rangeForEditor.text();
         me.runSpellCheck(editorText);
     },
     /**
@@ -151,10 +161,33 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {Array} matches
      */
     applySpellCheck: function(matches) {
-        var me = this;
+        var me = this,
+            editorBody,
+            rangeForMatch,
+            matchStart,
+            matchEnd,
+            allRangesForMatches = [],
+            documentFragmentForMatch,
+            spellCheckNode;
+        me.consoleLog('applySpellCheck...');
+        
         if (matches.length > 0) {
-            me.consoleLog('applySpellCheck...');
+            editorBody = me.editor.getEditorBody();
+            Ext.Array.each(matches, function(match, index) {
+                rangeForMatch = rangy.createRange();
+                matchStart = match.context.offset;
+                matchEnd = matchStart + match.context.length;
+                rangeForMatch.selectCharacters(editorBody,matchStart,matchEnd);
+                allRangesForMatches[index] = rangeForMatch;
+            });
+            Ext.Array.each(allRangesForMatches, function(rangeForMatch, index) {
+                documentFragmentForMatch = rangeForMatch.extractContents();
+                spellCheckNode = me.createSpellcheckNode();
+                spellCheckNode.appendChild(documentFragmentForMatch);
+                rangeForMatch.insertNode(spellCheckNode);
+            });
         }
+        
         me.finishSpellCheck();
     },
     /**
@@ -192,7 +225,22 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     
     // =========================================================================
-    // Helpers
+    // Helpers for the the SpellChecker
+    // =========================================================================
+    
+    /**
+     * Create and return a new node for SpellCheck-Match.
+     * @returns {Object}
+     */
+    createSpellcheckNode: function(){
+        var me = this,
+            nodeElParams = { tag: me.self.NODE_NAME_MATCH,
+                             cls: me.self.CSS_CLASSNAME_MATCH };
+        return Ext.DomHelper.createDom(nodeElParams);
+    },
+    
+    // =========================================================================
+    // Helpers for the Editor and Task
     // =========================================================================
     
     /***
