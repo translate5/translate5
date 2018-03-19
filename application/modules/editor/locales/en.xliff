@@ -994,6 +994,10 @@
         <source>HISTORY</source>
         <target>HISTORY</target>
     </trans-unit>
+    <trans-unit id='VHJhY2tDaGFuZ2VzIGZvdW5kLCBidXQgUGx1Z2luIGlzIG5vdCBhY3RpdmF0ZWQu'>
+        <source>TrackChanges found, but Plugin is not activated.</source>
+        <target>TrackChanges found, but Plugin is not activated.</target>
+    </trans-unit>
     <trans-unit id='R2V3aWNodHVuZw=='>
         <source>Gewichtung</source>
         <target>Severity</target>
