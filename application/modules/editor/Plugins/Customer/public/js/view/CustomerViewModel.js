@@ -17,16 +17,8 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.customerPanel',
 
-    requires: [
-        'Ext.data.BufferedStore',
-        'Ext.util.Sorter',
-        'Ext.data.Store',
-        'Ext.data.field.Integer',
-        'Ext.data.field.String'
-    ],
-
     data: {
-        title: 'Kunde bearbeiten',
+        title: '',
         record: false
     },
 
@@ -35,7 +27,6 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewModel', {
             config = {
                 stores: {
                     customers: {
-                        type: 'buffered',
                         pageSize: 200,
                         autoLoad: true,
                         model: 'Editor.plugins.Customer.model.Customer'

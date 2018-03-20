@@ -17,25 +17,31 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.customerPanel',
     
+    /**
+     * Set record for editing
+     */
     dblclick: function(dataview, record, item, index, e, eOpts) {
         var formPanel = this.getReferences().form,
+            removeButton = this.getReferences().removeButton,
             vm = this.getViewModel();
 
-        //FIXME: Beim Öffnen eines anderen Datensatzes wird der aktuell geöffnete gespeichert. Inkl validation etc. pp.
         vm.set('record', record);
-        vm.set('title', 'Kunde bearbeiten');
+        vm.set('title', this.getView().strings.editCustomerTitle);
 
         formPanel.loadRecord(record);
-        //console.log(record);
+        removeButton.setDisabled(false);
     },
 
+    /**
+     * Save record
+     */
     save: function(button, e, eOpts) {
         var me = this,
             formPanel = me.getReferences().form,
             form = formPanel.getForm(),
             record = form.getRecord(),
             store = me.getStore('customers'),
-            saving = 'Kunde wird gespeichert...';
+            saving = me.getView().strings.saveCustomerMsg;
 
         // Valid
         if (!form.isValid()) {
@@ -49,18 +55,21 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
 
         record.save({
             success: function() {
-                Editor.MessageBox.addSuccess('Kunde "'+record.get('name')+'" gespeichert!');
+                Editor.MessageBox.addSuccess(me.getView().strings.customerSavedMsg);
                 store.load();
-                me.fireEvent('customerSaved', record);
                 me.getView().unmask();
                 me.cancelEdit();
             },
-            failure:function(){
-                console.log(arguments);
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+                me.getView().unmask();
             }
         });
     },
 
+    /***
+     * Reset the form on escape key press
+     */
     onCustomerPanelRender:function(cmp){
         var me=this,
             map = new Ext.util.KeyMap({
@@ -72,6 +81,9 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
             });
     },
     
+    /**
+     * Reset the customer form
+     */
     cancelEdit: function(button, e, eOpts) {
         var formPanel = this.getReferences().form,
             form = formPanel.getForm(),
@@ -82,9 +94,12 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
         vm.set('record', false);
     },
 
+    /***
+     * Load empty record in customer form
+     */
     add: function(button, e, eOpts) {
-        debugger;
         var formPanel = this.getReferences().form,
+            removeButton = this.getReferences().removeButton,
             form = formPanel.getForm(),
             newRecord = Ext.create('Editor.plugins.Customer.model.Customer'),
             vm = this.getViewModel();
@@ -97,33 +112,84 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
         vm.set('record', newRecord);
 
         // Set title
-        vm.set('title', 'Kunde hinzufügen');
+        vm.set('title',this.getView().strings.addCustomerTitle);
+
+        removeButton.setDisabled(true);
     },
 
+    /**
+     * Refresh the customers store
+     */
     refresh: function(button, e, eOpts) {
         this.getReferences().list.getSelectionModel().deselectAll();
-        //FIXME reload does not work, must use load instead!
         this.getStore('customers').load();
     },
+
+    /**
+     * Show confirmation message for remove customer
+     */
+    remove:function(){
+        var me=this;
+
+        Ext.create('Ext.window.MessageBox').show({
+            title: me.getView().strings.customerDeleteTitle,
+            msg: me.getView().strings.customerDeleteMsg,
+            buttons: Ext.Msg.YESNO,
+            fn:me.handleDeleteCustomerWindowButton,
+            scope:me,
+            defaultFocus:'no',
+            icon: Ext.MessageBox.QUESTION
+        });
+
+    },
+
+    /***
+     * Remove the loaded customer
+     */
+    removeCustomer:function(){
+        var me = this,
+            formPanel = me.getReferences().form,
+            form = formPanel.getForm(),
+            record = form.getRecord(),
+            store = me.getStore('customers'),
+            deleting = me.getView().strings.customerDeleteTitle;
+
+        // Update associated record with values
+        form.updateRecord();
+
+        me.getView().mask(deleting);
+
+        //remnove the record from the store
+        store.remove(record);
+
+        //sync the store with the proxy
+        store.sync({
+            success:function(){
+                Editor.MessageBox.addSuccess(me.getView().strings.customerDeletedMsg);
+                me.getView().unmask();
+                me.cancelEdit();
+            },
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
+                me.getView().unmask();
+            }
+        });
+    },
+
+    /***
+     * Handler for the delete customer dialog window.
+     * 
+     */
+    handleDeleteCustomerWindowButton:function(button){
+        if(button=="yes"){
+            this.removeCustomer();
+            return true;
+        }
+        return false
+    },
+
     //when customers panel is displayed,this function is executed
     reloadCustomerStore:function(){
         this.getStore('customers').load();
-    },
-    //clear filters and sorting in customer grid
-    clearFilterAndSort:function(){
-        var me = this,
-            store = me.getStore('customers'),
-            filters = me.getView().down('gridpanel').filters,
-            sorters = store.sorters;
-        if(sorters.length != 0){
-            sorters.clear();
-        }
-        if(store.getFilters().length > 0){
-          //reloading of the store is caused by clearFilter call
-          filters.clearFilters();
-        }
-        else {
-          store.reload();
-        }
     }
 });

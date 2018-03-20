@@ -41,6 +41,22 @@ Editor.controller.Localizer.addPluginInit('Customer', function() {
 
     Ext.define("Editor.locale.plugins.Customer.view.Customer", {
         override: "Editor.plugins.Customer.view.Customer",
-        title:'<?php echo $this->translate->_("Kundenübersicht");?>'
+        title:'<?php echo $this->translate->_("Kundenübersicht");?>',
+        strings: {
+            addCustomer:'<?php echo $this->translate->_("Hinzufügen");?>',
+            refreshCustomer:'<?php echo $this->translate->_("Aktualisieren");?>',
+            customerName:'<?php echo $this->translate->_("Kundenname");?>',
+            customerNumber:'<?php echo $this->translate->_("Kundennummer");?>',
+            save:'<?php echo $this->translate->_("Speichern");?>',
+            cancel:'<?php echo $this->translate->_("Abbrechen");?>',
+            remove:'<?php echo $this->translate->_("Löschen");?>',
+            editCustomerTitle:'<?php echo $this->translate->_("Kunde bearbeiten");?>',
+            addCustomerTitle:'<?php echo $this->translate->_("Kunde hinzufügen");?>',
+            saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
+            customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
+            customerDeleteMsg:'<?php echo $this->translate->_("Diesen Kunden löschen?");?>',
+            customerDeleteTitle:'<?php echo $this->translate->_("Kunden löschen");?>',
+            customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>'
+        }
     });
 });

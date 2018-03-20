@@ -46,7 +46,20 @@ class editor_Plugins_Customer_CustomerController extends ZfExtended_RestControll
      */
     protected $entity;
     
+    public function indexAction(){
+        //check if the user is allowed to do customer administration
+        if(!$this->isAllowed("backend","customerAdministration")){
+            throw new ZfExtended_NoAccessException();
+        }
+        
+        return parent::indexAction();
+    }
+    
     public function postAction() {
+        //check if the user is allowed to do customer administration
+        if(!$this->isAllowed("backend","customerAdministration")){
+            throw new ZfExtended_NoAccessException();
+        }
         try {
             return parent::postAction();
         }
@@ -56,6 +69,10 @@ class editor_Plugins_Customer_CustomerController extends ZfExtended_RestControll
     }
     
     public function putAction() {
+        //check if the user is allowed to do customer administration
+        if(!$this->isAllowed("backend","customerAdministration")){
+            throw new ZfExtended_NoAccessException();
+        }
         try {
             return parent::putAction();
         }

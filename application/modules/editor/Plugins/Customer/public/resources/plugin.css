@@ -26,12 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.plugins.CustomerAdministration.store.Customer
- * @extends Ext.data.Store
- */
-Ext.define('Editor.plugins.CustomerAdministration.store.Customer', {
-    extend : 'Ext.data.Store',
-    model: 'Editor.plugins.CustomerAdministration.model.Customer',
-    autoLoad: true
-});
+@CHARSET "UTF-8";
+
+.icon-add {background-image: url("images/book_add.png");background-repeat:no-repeat;background-position:center;}
+.icon-refresh {background-image: url("images/arrow_refresh_small.png");background-repeat:no-repeat;background-position:center;}

@@ -36,6 +36,22 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
             scope:'controller'
         }
     },
+    strings:{
+        addCustomer:'#UT#Hinzufügen',
+        refreshCustomer:'Aktualisieren',
+        customerName:'#UT#Kundenname',
+        customerNumber:'#UT#Kundennummer',
+        save:'#UT#Speichern',
+        cancel:'#UT#Abbrechen',
+        remove:'#UT#Löschen',
+        editCustomerTitle:'#UT#Kunde bearbeiten',
+        addCustomerTitle:'#UT#Kunde hinzufügen',
+        saveCustomerMsg:'#UT#Kunde wird gespeichert...',
+        customerSavedMsg:'#UT#Kunde gespeichert!',
+        customerDeleteMsg:'#UT#Diesen Kunden löschen?',
+        customerDeleteTitle:'#UT#Kunden löschen',
+        customerDeletedMsg:'#UT#Kunde gelöscht'
+    },
     shrinkWrap: 0,
     layout: 'border',
     collapsed: false,
@@ -43,49 +59,6 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
     defaultListenerScope: true,
     defaultButton: 'saveButton',
     referenceHolder: true,
-    dockedItems: [
-        {
-            xtype: 'toolbar',
-            dock: 'top',
-            items: [
-                {
-                    xtype: 'button',
-                    iconCls: 'icon-add',
-                    text: 'Hinzufügen',
-                    listeners: {
-                        click: {
-                            fn: 'add',
-                            scope: 'controller'
-                        }
-                    }
-                },
-                {
-                    xtype: 'button',
-                    iconCls: 'icon-refresh',
-                    text: 'Aktualisieren',
-                    listeners: {
-                        click: {
-                            fn: 'refresh',
-                            scope: 'controller'
-                        }
-                    }
-                },
-                {
-                    xtype: 'tbseparator'
-                },
-                {
-                    xtype: 'button',
-                    text: 'Sortierung / Filterung zurücksetzen',
-                    listeners: {
-                        click: {
-                            fn: 'clearFilterAndSort',
-                            scope: 'controller'
-                        }
-                    }
-                }
-            ]
-        }
-    ],
 
     initConfig: function(instanceConfig) {
         var me = this,
@@ -108,7 +81,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                             {
                                 xtype: 'gridcolumn',
                                 dataIndex: 'name',
-                                text: 'Kundenname',
+                                text: me.strings.customerName,
                                 filter: {
                                     type: 'string'
                                 }
@@ -116,7 +89,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                             {
                                 xtype: 'gridcolumn',
                                 dataIndex: 'number',
-                                text: 'Kundennummer',
+                                text:  me.strings.customerNumber,
                                 filter: {
                                     type: 'string'
                                 }
@@ -159,6 +132,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                                 fieldDefaults: {
                                     anchor: '1'
                                 },
+                                title:me.strings.editCustomerTitle,
                                 bind: {
                                     disabled: '{!record}',
                                     title: '{title}'
@@ -166,7 +140,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                                 items: [
                                     {
                                         xtype: 'textfield',
-                                        fieldLabel: 'Kundenname',
+                                        fieldLabel: me.strings.customerName,
                                         name: 'name',
                                         allowBlank: false,
                                         maxLength: 255,
@@ -174,7 +148,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                                     },
                                     {
                                         xtype: 'textfield',
-                                        fieldLabel: 'Kundennummer',
+                                        fieldLabel: me.strings.customerNumber,
                                         name: 'number',
                                         allowBlank: false,
                                         maxLength: 255,
@@ -196,7 +170,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                                                 itemId: 'saveButton',
                                                 reference: 'saveButton',
                                                 margin: 5,
-                                                text: 'Speichern',
+                                                text: me.strings.save,
                                                 listeners: {
                                                     click: {
                                                         fn: 'save',
@@ -209,17 +183,63 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                                                 flex: 1,
                                                 itemId: 'cancelButton',
                                                 margin: 5,
-                                                text: 'Abbrechen',
+                                                text: me.strings.cancel,
                                                 listeners: {
                                                     click: {
                                                         fn: 'cancelEdit',
                                                         scope: 'controller'
                                                     }
                                                 }
+                                            },
+                                            {
+                                                xtype: 'button',
+                                                flex: 1,
+                                                itemId: 'removeButton',
+                                                margin: 5,
+                                                text: me.strings.remove,
+                                                disabled:true,
+                                                reference: 'removeButton',
+                                                listeners: {
+                                                    click: {
+                                                        fn: 'remove',
+                                                        scope: 'controller'
+                                                    }
+                                                }
+                                                
                                             }
                                         ]
                                     }
                                 ]
+                            }
+                        ]
+                    }
+                ],
+                dockedItems: [
+                    {
+                        xtype: 'toolbar',
+                        dock: 'top',
+                        items: [
+                            {
+                                xtype: 'button',
+                                iconCls: 'icon-add',
+                                text: me.strings.addCustomer,
+                                listeners: {
+                                    click: {
+                                        fn: 'add',
+                                        scope: 'controller'
+                                    }
+                                }
+                            },
+                            {
+                                xtype: 'button',
+                                iconCls: 'icon-refresh',
+                                text: me.strings.refreshCustomer,
+                                listeners: {
+                                    click: {
+                                        fn: 'refresh',
+                                        scope: 'controller'
+                                    }
+                                }
                             }
                         ]
                     }

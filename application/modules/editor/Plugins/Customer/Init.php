@@ -59,6 +59,7 @@ class editor_Plugins_Customer_Init extends ZfExtended_Plugin_Abstract {
     
     protected function initEvents() {
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+        $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -66,6 +67,11 @@ class editor_Plugins_Customer_Init extends ZfExtended_Plugin_Abstract {
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
+    public function injectFrontendConfig(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        /* @var $view Zend_View_Interface */
+        $view->headLink()->appendStylesheet(APPLICATION_RUNDIR.'/editor/plugins/resources/customer/plugin.css');
+    }
     /**
      * defines all URL routes of this plug-in
      */

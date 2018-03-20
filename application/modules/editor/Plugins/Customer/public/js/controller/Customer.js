@@ -71,6 +71,9 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
     },
 
     onHeadPanelAfterRender: function(toolbar) {
+        if(!this.isCustomerOverviewAllowed()){
+            return;
+        }
         var pos = toolbar.items.length - 2;
         toolbar.insert(pos, {
             xtype: 'button',
@@ -83,6 +86,9 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
      * Fires when the components in this container are arranged by the associated layout manager.
      */
     onCentarPanelComponentAfterLayout:function(component){
+        if(!this.isCustomerOverviewAllowed()){
+            return;
+        }
         //set the component to visible on each centar panel element hide
         this.isCustomerOverviewButtonHidden(false);
     },
@@ -120,10 +126,17 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
      */
     onCustomerPanelShow: function(panel) {
         //set the help button data
-        Editor.data.helpSection = 'customer';
+        Editor.data.helpSection = 'customeroverview';
         Editor.data.helpSectionTitle = panel.getTitle();
 
         //hide the customerOverview button
         this.isCustomerOverviewButtonHidden(true);
+    },
+    
+    /**
+     * Check if the user has a frontend right to see the customer overview 
+     */
+    isCustomerOverviewAllowed:function(){
+        return Editor.app.authenticatedUser.isAllowed('customerAdministration');
     }
 });
