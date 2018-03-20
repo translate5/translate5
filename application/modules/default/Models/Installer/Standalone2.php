@@ -33,8 +33,12 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
+ * TODO: 
+ * - initApplication in den Modulen verfügbar machen
+ * - Danach können z.B. die database funktionalität in ein Modul überführt werden
+ * - Langfristig alles in Module packen 
  */
-class Models_Installer_Standalone {
+class Models_Installer_Standalone2 {
     const INSTALL_INI = '/application/config/installation.ini';
     const CLIENT_SPECIFIC_INSTALL = '/client-specific-installation';
     const CLIENT_SPECIFIC = '/client-specific';
@@ -99,12 +103,24 @@ class Models_Installer_Standalone {
     protected $preconditonChecker;
     
     /**
+     * @var ZfExtended_Models_Installer_Logger
+     */
+    protected $logger;
+    
+    protected $modules = [
+        'help' => 'ZfExtended_Models_Installer_Modules_Help',
+        'database' => 'ZfExtended_Models_Installer_Modules_Database',
+    ];
+    
+    /**
      * Options: 
      * mysql_bin => path to mysql binary
      * @param array $options
      */
     public static function mainLinux(array $options = null) {
         $saInstaller = new self(getcwd(), $options);
+        $saInstaller->runModule();
+        exit;
         $saInstaller->checkAndCallTools();
         $saInstaller->checkEnvironment();
         $saInstaller->processDependencies();
@@ -118,6 +134,11 @@ class Models_Installer_Standalone {
         $saInstaller->done();
     }
     
+    public static function mainWindows(array $options = null) {
+        //TODO basicly the same as under linux
+        self::mainLinux($options);
+    }
+    
     /**
      * @param string $currentWorkingDir
      * @param array $options options from outside
@@ -125,15 +146,15 @@ class Models_Installer_Standalone {
     protected function __construct($currentWorkingDir, array $options) {
         $this->options = $options;
         $this->currentWorkingDir = $currentWorkingDir;
-        if(empty($this->options['zend'])) {
-            $this->options['zend'] = $this->currentWorkingDir.self::ZEND_LIB;
-        }
-        //requiering the following hardcoded since, autoloader must be downloaded with Zend Package
+        //requiring the following hardcoded since, autoloader must be downloaded with Zend Package
+        require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Logger.php';
+        require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Modules/Abstract.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/License.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Downloader.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/Dependencies.php';
         require_once $this->currentWorkingDir.'/library/ZfExtended/Models/Installer/DbUpdater.php';
         require_once $this->currentWorkingDir.'/application/modules/default/Models/Installer/PreconditionCheck.php';
+        $this->logger = new ZfExtended_Models_Installer_Logger();
         $this->preconditonChecker = new Models_Installer_PreconditionCheck();
         $this->setHostname();
     }
@@ -146,10 +167,6 @@ class Models_Installer_Standalone {
     }
     
     protected function checkAndCallTools() {
-        if(!empty($this->options['help'])) {
-            $this->showHelp();
-            exit;
-        }
         if(!empty($this->options['maintenance'])) {
             $this->addZendToIncludePath();
             $this->initApplication();
@@ -176,30 +193,6 @@ class Models_Installer_Standalone {
             $this->preconditonChecker->checkWorkers();
             exit; //exiting here completly after checkrun
         }
-    }
-    
-    protected function showHelp() {
-        echo "\n";
-        echo "  Usage: install-and-update.sh\n";
-        echo "  or:    install-and-update.sh [OPTION]...\n";
-        echo "  or:    install-and-update.sh [ZIPFILE]\n";
-        echo "\n";
-        echo "  Without parameters: updates translate5 installation with latest public release.\n";
-        echo "  Without ZIP File as parameter: ZIP must be a valid translate5 release, updates the current installation with the release given in the ZIP file.\n";
-        echo "  Without other arguments: do some maintenance tasks listed below.\n";
-        echo "\n\n";
-        echo "  Arguments: \n";
-        echo "    ZIPFILE               Optional, updates the installation with the given release from the ZIP file.";
-        echo "    --help                shows this help text\n";
-        echo "    --database            just applies all available database updates\n";
-        echo "                          Does not fetch any updates and does not apply any file change!\n";
-        echo "    --check               shows some status information about the current installation,\n"; 
-        echo "                          to decide if maintenance mode is needed or not\n";
-        echo "    --maintenance         shows maintance mode status\n"; 
-        echo "    --maintenance TIME    time in format 00:00, sets start of maintenance to TODAY TIME \n"; 
-        echo "    --maintenance off     disables maintenance, must be used after maintenance since\n"; 
-        echo "                          there is no automatic maintenance stop functionality!";
-        echo "\n\n";
     }
     
     protected function maintenanceMode() {
@@ -237,7 +230,7 @@ class Models_Installer_Standalone {
     
     protected function processDependencies() {
         $options = $this->options;
-        $this->logSection('Checking server for updates and packages:');
+        $this->logger->logSection('Checking server for updates and packages:');
         $downloader = new ZfExtended_Models_Installer_Downloader($this->currentWorkingDir);
         
         if(isset($options['applicationZipOverride']) && file_exists($options['applicationZipOverride'])) {
@@ -261,7 +254,7 @@ class Models_Installer_Standalone {
             return;
         }
         $this->isInstallation = true;
-        $this->logSection('Translate5 Installation');
+        $this->logger->logSection('Translate5 Installation');
         
         if(is_array($options) && isset($options['mysql_bin']) && $options['mysql_bin'] != self::MYSQL_BIN) {
             $this->dbCredentials['executable'] = $options['mysql_bin'];
@@ -327,9 +320,9 @@ class Models_Installer_Standalone {
      * Adds the downloaded Zend Lib to the include path
      */
     protected function addZendToIncludePath() {
-        $zendDir = $this->options['zend'];
+        $zendDir = $this->currentWorkingDir.$this->options['zend'];
         if(!is_dir($zendDir)) {
-            $this->log("Could not find Zend library ".$zendDir);
+            $this->logger->log("Could not find Zend library ".$zendDir);
             exit;
         }
         $path = get_include_path();
@@ -340,9 +333,9 @@ class Models_Installer_Standalone {
      * prompting the user for the DB credentials
      */
     protected function promptDbCredentials() {
-        $this->log('Please enter the MySQL database settings, the database must already exist.');
-        $this->log('Default character set must be utf8. This can be done for example with the following command: ');
-        $this->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;'."\n");
+        $this->logger->log('Please enter the MySQL database settings, the database must already exist.');
+        $this->logger->log('Default character set must be utf8. This can be done for example with the following command: ');
+        $this->logger->log('  CREATE DATABASE IF NOT EXISTS `translate5` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;'."\n");
         
         foreach($this->dbCredentials as $key => $default) {
             //executable is determined by the surrounding bash script
@@ -379,7 +372,7 @@ class Models_Installer_Standalone {
             $licenses = ZfExtended_Models_Installer_License::create($dep);
             foreach ($licenses as $license){
                 if($first) {
-                    $this->logSection('Third party library license agreements:', '-');
+                    $this->logger->logSection('Third party library license agreements:', '-');
                     $first = false;
                 }
                 if(!$license->checkFileExistance()) {
@@ -444,7 +437,7 @@ class Models_Installer_Standalone {
      * Applies the DbInit.sql
      */
     protected function initDb() {
-        $this->log("\nCreating the database base layout...");
+        $this->logger->log("\nCreating the database base layout...");
         $dbInit = $this->currentWorkingDir.'/'.self::DB_INIT;
         $exec = empty($this->dbCredentials['executable']) ? self::MYSQL_BIN : $this->dbCredentials['executable'];
         
@@ -456,10 +449,10 @@ class Models_Installer_Standalone {
         
         $dbupdater = new ZfExtended_Models_Installer_DbUpdater($db, $exec, $this->currentWorkingDir);
         if(!$dbupdater->executeSqlFile($exec, $db, $dbInit, $output)) {
-            $this->log('Error on Importing '.self::DB_INIT.' file, stopping installation. Called command: '.$exec.".\n".'Result of Command: '.print_r($output,1));
+            $this->logger->log('Error on Importing '.self::DB_INIT.' file, stopping installation. Called command: '.$exec.".\n".'Result of Command: '.print_r($output,1));
             exit;
         }
-        $this->log('Translate5 tables created.');
+        $this->logger->log('Translate5 tables created.');
     }
     
     /**
@@ -482,9 +475,9 @@ class Models_Installer_Standalone {
         
         $bytes = file_put_contents($this->currentWorkingDir.self::INSTALL_INI, join("\n",$content));
         if($bytes > 0) {
-            $this->log("\nDB Config successfully stored in .".self::INSTALL_INI."!\n");
+            $this->logger->log("\nDB Config successfully stored in .".self::INSTALL_INI."!\n");
         } else {
-            $this->log("\nDB Config could NOT be stored in .".self::INSTALL_INI."!\n");
+            $this->logger->log("\nDB Config could NOT be stored in .".self::INSTALL_INI."!\n");
         }
         return ($bytes > 0);
     }
@@ -497,7 +490,7 @@ class Models_Installer_Standalone {
      * Applies all DB alter statement files to the DB
      */
     protected function updateDb() {
-        $this->logSection('Updating Translate5 database scheme');
+        $this->logger->logSection('Updating Translate5 database scheme');
         
         $dbupdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
@@ -505,11 +498,11 @@ class Models_Installer_Standalone {
         
         $errors = $dbupdater->getErrors();
         if(!empty($errors)) {
-            $this->log("DB Update not OK\nErrors: \n".print_r($errors,1));
+            $this->logger->log("DB Update not OK\nErrors: \n".print_r($errors,1));
             return;
         }
         
-        $this->log("DB Update OK\n  New statement files: ".$stat['new']."\n  Modified statement files: ".$stat['modified']."\n");
+        $this->logger->log("DB Update OK\n  New statement files: ".$stat['new']."\n  Modified statement files: ".$stat['modified']."\n");
     }
     
     /**
@@ -537,21 +530,48 @@ class Models_Installer_Standalone {
     }
     
     protected function done() {
-        $this->log("\nTranslate5 installation / update done.\n");
+        $this->logger->log("\nTranslate5 installation / update done.\n");
         if(!empty($this->hostname)) {
-            $this->log("\nPlease visit http://".$this->hostname."/ to enjoy Translate5.\n");
-            $this->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");
+            $this->logger->log("\nPlease visit http://".$this->hostname."/ to enjoy Translate5.\n");
+            $this->logger->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");
         }
-        $this->log('  In case of errors on installation / update please visit http://confluence.translate5.net');
-        $this->log('  or post a message in translate5 user group, which is linked from http://www.translate5.net/index/usage/.');
+        $this->logger->log('  In case of errors on installation / update please visit http://confluence.translate5.net');
+        $this->logger->log('  or post a message in translate5 user group, which is linked from http://www.translate5.net/index/usage/.');
     }
     
-    protected function log($msg) {
-        echo $msg."\n";
+    protected function parseAndHandleArguments($moduleShortOptions, $moduleLongOptions) {
+        $globalShort = '';
+        $globalLong = ['zend::','mod::'];
+        $allOptions = getopt($globalShort.$moduleShortOptions, array_merge($globalLong, $moduleLongOptions));
+        $this->options = array_merge($this->options, $allOptions);
+        if(empty($this->options['mod'])) {
+            $this->options['mod'] = 'help';
+        }
+        if(empty($this->options['zend'])) {
+            $this->options['zend'] = self::ZEND_LIB;
+        }
     }
     
-    protected function logSection($msg, $lineChar = '=') {
-        echo "\n".$msg."\n";
-        echo str_pad('', strlen($msg), $lineChar)."\n\n";
+    protected function runModule($module = null) {
+        //remove script name
+        array_shift($this->options['arguments']);
+        
+        //get module name if none given
+        if(empty($module)) {
+            $module = $this->options['module'];
+        }
+        //set help as default if given is invalid
+        if(empty($module) || empty($this->modules[$module])) {
+            $module = 'help';
+        }
+        $file = explode('_', $this->modules[$module]);
+        $file = $this->currentWorkingDir.'/library/'.join('/', $file).'.php';
+        require_once $file;
+        $class = $this->modules[$module];
+        $moduleInstance = new $class();
+        /* @var $moduleInstance ZfExtended_Models_Installer_Modules_Abstract */
+        $this->parseAndHandleArguments($moduleInstance->getShortOptions(), $moduleInstance->getLongOptions());
+        $moduleInstance->setOptions($this->options);
+        $moduleInstance->run();
     }
 }
