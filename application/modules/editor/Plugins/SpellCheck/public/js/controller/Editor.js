@@ -54,8 +54,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         controller: {
             '#Editor': {
                 beforeKeyMapUsage: 'handleEditorKeyMapUsage'
+            },
+            '#Editor.$application': {
+                editorViewportOpened: 'initSpellCheckPluginForTask',
+                editorViewportClosed: 'onDestroy'
+            },
+        },
+        component: {
+            'segmentsHtmleditor': {
+                initialize: 'initSpellCheckPluginForEditor',
             }
-        }
+        },
     },
     statics: {
         NODE_NAME_MATCH: 'div',
@@ -71,10 +80,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     editorBody: null,               // Segment's Editor: HTMLBodyElement
     editorBodyExtDomElement: null,  // Segment's Editor: Ext.dom.Element
     
-    taskId: null,                   // current taskId (updated with every initSpellCheck)
-    
-    targetLangCode: [],             // store targetLang by tasks
-    isSupportedLanguage: [],        // store isSupportedLanguage by tasks
+    targetLangCode: null,           // language to be checked
+    isSupportedLanguage: null,      // if the language is supported by our tools
     
     spellCheckTooltip: null,        // spellcheck tooltip instance
     spellCheckMatch: null,          // current spellCheck-node for the ToolTip
@@ -95,43 +102,61 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     onDestroy:function(){
         var me=this;
-        //clean the spellcheck tooltip instance
         if(me.spellCheckTooltip){
             me.spellCheckTooltip.destroy();
             me.spellCheckTooltip = null;
         }
-        this.callParent(arguments);
         Ext.dom.GarbageCollector.collect();
+        me.consoleLog('SpellCheck-Plugin: cleanup done.');
     },
-    
+    /**
+     * Init the SpellCheck-Plugin for the current task:
+     * - Store task-specific properties (targetLangCode, isSupportedLanguage).
+     */
+    initSpellCheckPluginForTask: function() {
+        var me = this;
+        me.consoleLog('0.2a initSpellCheckPluginForTask');
+        me.setTargetLangCode();
+        me.setLanguageSupport();
+    },  
+    /**
+     * Init the SpellCheck-Plugin for the current Editor
+     * (only if the language is supported by our own tools):
+     * - Initialize the Editor.
+     * - Disable the browser's spellcheck if the language IS supported by our own tools.
+     */
+    initSpellCheckPluginForEditor: function() {
+        var me = this;
+        if (me.isSupportedLanguage) {
+            me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
+            me.initEditorEtc();
+            me.setBrowserSpellcheck();
+        } else {
+            me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ').');
+        }
+    },  
     /**
      * 
      */
     handleEditorKeyMapUsage: function(conf, area, mapOverwrite) {
         var me = this,
             ev = Ext.event.Event;
-        conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
-            me.initSpellCheck();
-        }, false];
+        if (me.isSupportedLanguage) {
+            conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
+                me.initSpellCheck();
+            }, false];
+        }
     },
     /**
-     * 
+     * Check if language is supported and if so, start the SpellCheck.
      */
     initSpellCheck: function() {
         var me = this;
-        // We store task-specific properties (targetLangCode, isSupportedLanguage)
-        // => always check everything related to the current task!
-        me.taskId = Editor.data.task.get('id');
-        // Start SpellCheck if language is supported.
-        me.consoleLog('*** 0.2 initSpellCheck for task ' + me.taskId + ' (' + me.targetLangCode[me.taskId] + '/' + me.isSupportedLanguage[me.taskId] + ') ***');
-        if(me.isSupportedLanguage[me.taskId] == null) {
-            me.consoleLog('(0.2 => checkSupportedLanguages first.)');
-            me.startSpellCheckAfterCheckingSupportedLanguages();
-        } else if (me.isSupportedLanguage[me.taskId] == true) {
-            me.consoleLog('(0.2 => startSpellCheck directly.)');
+        if (me.isSupportedLanguage== true) {
+            me.consoleLog('(0.3 => startSpellCheck.)');
             me.startSpellCheck();
         } else {
-            me.consoleLog('(0.2 => startSpellCheck not started because language is not supported.)');
+            me.consoleLog('(0.3 => startSpellCheck not started because language is not supported.)');
         }
     },
     /**
@@ -141,8 +166,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             plug = me.getSegmentGrid().editingPlugin,
             editor = plug.editor; // → this is the row editor component;
-        me.consoleLog('initEditor');
-        me.editor = editor.mainEditor; // → this is the HtmlEditor
+        
+        // → this is the HtmlEditor:
+        me.editor = editor.mainEditor;
         
         // inject CSS
         Ext.util.CSS.createStyleSheetToWindow(
@@ -176,15 +202,16 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             editorBodyExtDomEl = me.getEditorBodyExtDomElement();
         
         editorBodyExtDomEl.on({
-            click:{
+            contextmenu:{
                 delegated: false,
                 delegate: 'div.spellcheck',
                 fn: me.showToolTip,
-                scope: this
+                scope: this,
+                preventDefault: true
             }
         });
     },
-
+    
     // =========================================================================
     // SpellCheck
     // =========================================================================
@@ -196,11 +223,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             editorText,
             rangeForEditor = rangy.createRange();
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('startSpellCheck failed because language is not supported.');
+            return;
+        }
         me.consoleLog('startSpellCheck...');
-        me.initEditorEtc();
         rangeForEditor.selectNode(me.editor.getEditorBody());
-        
-        // TODO: run SpellCheck only if the content in the Editor has changed.
         
         //add display none to all del nodes, with this they are ignored as searchable
         me.prepareDelNodeForSearch(true);
@@ -259,16 +287,16 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     /**
      * Is the language supported by the tool(s) we use?
      * The tool's specific code shall:
-     * (1) store the result in me.isSupportedLanguage[me.taskId]
-     * (2) call 'startSpellCheck' if the language is supported.
+     * - store the result in me.isSupportedLanguage
      */
-    startSpellCheckAfterCheckingSupportedLanguages: function() {
+    setLanguageSupport: function() {
         var me = this;
-        me.startSpellCheckAfterCheckingSupportedLanguagesWithTool();
+        me.setLanguageSupportWithTool();
     },
     /**
      * Run the SpellCheck for the given text.
-     * The tool's specific code shall call 'applySpellCheck' with the found matches.
+     * The tool's specific code shall: 
+     * - call applySpellCheck() with the found matches
      * @param {String} textToCheck
      */
     runSpellCheck: function(textToCheck) {
@@ -277,7 +305,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     
     // =========================================================================
-    // Helpers for the the SpellChecker
+    // Helpers for the SpellChecker
     // =========================================================================
     
     /**
@@ -322,26 +350,24 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         return me.editorBodyExtDomElement;
     },
     /***
-     * Don't fetch targetLangCode for the given taskId from scratch if we already have it.
+     * Set targetLangCode for the current task.
      * @returns {String}
      */
-    getTargetLangCodeByTaskId: function(taskId){
+    setTargetLangCode: function(){
         var me = this,
-            languages,
-            task,
-            targetLang;
-        if(me.targetLangCode[taskId]){
-            return me.targetLangCode[taskId];
-        }
-        task = Editor.data.task;
-        if (Editor.data.task.get('id') != taskId) {
-            me.consoleLog('getTargetLangCodeByTaskId failed: Cannot fetch data for the given taskId.');
-            return null;
-        }
-        languages = Ext.getStore('admin.Languages');
-        targetLang = languages.getById(task.get('targetLang'));
-        me.targetLangCode[taskId] = targetLang.get('rfc5646');
-        return me.targetLangCode[taskId];
+            task = Editor.data.task,
+            languages = Ext.getStore('admin.Languages'),
+            targetLang = languages.getById(task.get('targetLang'));
+        me.targetLangCode = targetLang.get('rfc5646');
+    },
+    /**
+     * Disable the browser's SpellChecker?
+     */
+    setBrowserSpellcheck: function(){
+        var me = this,
+            editorBody = me.getEditorBody();
+        editorBody.spellcheck = !me.isSupportedLanguage;
+        me.consoleLog('(browserSpellcheck is set to:' + editorBody.spellcheck + ')');
     },
     
     // =========================================================================
