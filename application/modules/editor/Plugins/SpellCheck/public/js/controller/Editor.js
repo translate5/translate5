@@ -39,7 +39,8 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     extend: 'Ext.app.Controller',
-    requires: ['Editor.util.SegmentContent'],
+    requires: ['Editor.util.SegmentContent',
+               'Ext.tip.ToolTip'],
     mixins: ['Editor.plugins.SpellCheck.controller.UtilLanguageTool',
              'Editor.util.SearchReplaceUtils'],
     refs:[{
@@ -58,7 +59,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     statics: {
         NODE_NAME_MATCH: 'div',
-        CSS_CLASSNAME_MATCH: 'spellcheck'
+        CSS_CLASSNAME_MATCH: 'spellcheck',
+            
+        // Attributes for the spellcheck-Node
+        ATTRIBUTE_MESSAGE:         'data-spellcheck-message'
     },
     
     // =========================================================================
@@ -71,6 +75,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     targetLangCode: [],             // store targetLang by tasks
     isSupportedLanguage: [],        // store isSupportedLanguage by tasks
+    
+    spellCheckTooltip: null,        // spellcheck tooltip instance
+    spellCheckMatch: null,          // current spellCheck-node for the ToolTip
     
     USE_CONSOLE: true,              // (true|false): use true for developing using the browser's console, otherwise use false
     
@@ -86,6 +93,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         this.callParent(arguments);
         me.consoleLog('0.1 init Editor.plugins.SpellCheck.controller.Editor');
     },
+    onDestroy:function(){
+        var me=this;
+        //clean the spellcheck tooltip instance
+        if(me.spellCheckTooltip){
+            me.spellCheckTooltip.destroy();
+            me.spellCheckTooltip = null;
+        }
+        this.callParent(arguments);
+        Ext.dom.GarbageCollector.collect();
+    },
+    
     /**
      * 
      */
@@ -117,12 +135,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
     },
     /**
-     * 
+     * Init Editor etc (= related stuff: CSS, ToolTips, MouseEvents).
      */
-    initEditor: function() {
+    initEditorEtc: function() {
         var me = this,
             plug = me.getSegmentGrid().editingPlugin,
-            editor = plug.editor; // → this is the row editor component
+            editor = plug.editor; // → this is the row editor component;
         me.consoleLog('initEditor');
         me.editor = editor.mainEditor; // → this is the HtmlEditor
         
@@ -131,6 +149,40 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 me.editor.getDoc(),
                 '.spellcheck {border-bottom: 1px solid red; display: inline-block;}' 
             );
+        
+        // init ToolTips
+        me.initTooltips();
+        
+        // init mouse events (for ToolTips)
+        me.initMouseEvents();
+    },
+    initTooltips:function(){
+        var me = this;
+        me.spellCheckTooltip = Ext.create('Ext.tip.ToolTip', {
+            closable: true,
+            renderTo: Ext.getBody(),
+            target: me.getEditorBody(),
+            targetIframe: me.editor.iframeEl,
+            targetOffset: me.editor.iframeEl.getXY(),
+            listeners: {
+                beforeshow: function(tip) {
+                    me.handleSpellCheckTooltip(tip);
+                }
+            }
+        });
+    },
+    initMouseEvents: function() {
+        var me = this,
+            editorBodyExtDomEl = me.getEditorBodyExtDomElement();
+        
+        editorBodyExtDomEl.on({
+            click:{
+                delegated: false,
+                delegate: 'div.spellcheck',
+                fn: me.showToolTip,
+                scope: this
+            }
+        });
     },
 
     // =========================================================================
@@ -145,7 +197,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             editorText,
             rangeForEditor = rangy.createRange();
         me.consoleLog('startSpellCheck...');
-        me.initEditor();
+        me.initEditorEtc();
         rangeForEditor.selectNode(me.editor.getEditorBody());
         
         // TODO: run SpellCheck only if the content in the Editor has changed.
@@ -182,7 +234,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             });
             Ext.Array.each(allRangesForMatches, function(rangeForMatch, index) {
                 documentFragmentForMatch = rangeForMatch.extractContents();
-                spellCheckNode = me.createSpellcheckNode();
+                spellCheckNode = me.createSpellcheckNode(matches[index]);
                 spellCheckNode.appendChild(documentFragmentForMatch);
                 rangeForMatch.insertNode(spellCheckNode);
             });
@@ -232,10 +284,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * Create and return a new node for SpellCheck-Match.
      * @returns {Object}
      */
-    createSpellcheckNode: function(){
+    createSpellcheckNode: function(match){
         var me = this,
             nodeElParams = { tag: me.self.NODE_NAME_MATCH,
                              cls: me.self.CSS_CLASSNAME_MATCH };
+        nodeElParams[me.self.ATTRIBUTE_MESSAGE] = match.message;
         return Ext.DomHelper.createDom(nodeElParams);
     },
     
@@ -244,7 +297,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     
     /***
-     * Use this function to get the editor
+     * Use this function to get the editor body.
+     * @returns {HTMLBodyElement}
      */
     getEditorBody:function(){
         var me=this;
@@ -259,7 +313,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         return me.editorBody;
     },
     /***
-     * Use this function to get the editor ext document element
+     * Use this function to get the editor ext document element.
+     * @returns {Ext.dom.Element}
      */
     getEditorBodyExtDomElement:function(){
         var me=this;
@@ -287,6 +342,40 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         targetLang = languages.getById(task.get('targetLang'));
         me.targetLangCode[taskId] = targetLang.get('rfc5646');
         return me.targetLangCode[taskId];
+    },
+    
+    // =========================================================================
+    // ToolTips
+    // =========================================================================
+    
+    /***
+     * Tooltips for the spellcheck-matches.
+     */
+    handleSpellCheckTooltip: function(tip) {
+        var me = this,
+            spellCheckData = me.getSpellCheckData(),
+            tplData = {
+                spellCheck: spellCheckData
+            };
+        if(!me.spellCheckTpl) {
+            me.spellCheckTpl = new Ext.Template('{spellCheck}');
+            me.spellCheckTpl.compile();
+        }
+        tip.update(me.spellCheckTpl.apply(tplData));
+    },
+    getSpellCheckData: function() {
+        var me = this,
+            node = me.spellCheckMatch,
+            nodeMessage;
+        if (node.hasAttribute(me.self.ATTRIBUTE_MESSAGE)) {
+            nodeMessage = node.getAttribute(me.self.ATTRIBUTE_MESSAGE);
+        }
+        return '<b>'+ nodeMessage + '</b><br /><a href="/test.html">Test</a>'+'<br />';
+    },
+    showToolTip: function(event) {
+        var me = this;
+        me.spellCheckMatch = event.currentTarget;
+        me.spellCheckTooltip.show();
     },
     
     // =========================================================================
