@@ -103,6 +103,10 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     cursor: move;
 }
 
+#segment-grid .x-grid-row-editor .autoState .x-form-display-field {
+    white-space: nowrap
+}
+
 .x-grid-row-editor {
     box-shadow: -6px 0px 25px 0px rgba(0,0,0,0.75);
 }
@@ -265,6 +269,11 @@ background-color: #EAF1FB;
 #segment-grid .comments-field .x-grid-cell-inner img {
     display:none;
 }
+
+#segment-grid .x-grid-row-editor .autoState .x-form-display-field img.edit {
+    display:inline;
+}
+
 #segment-grid .x-grid-row-editor .x-btn {float:right;}
 #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add,
 #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {

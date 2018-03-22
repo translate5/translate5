@@ -40,15 +40,21 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.column.AutoState', {
   extend: 'Ext.grid.column.Column',
   alias: 'widget.autoStateColumn',
+  mixins: ['Editor.view.segments.column.InfoToolTipMixin'],
   dataIndex: 'autoStateId',
   text: 'Autostatus',
+  showInMetaTooltip: true,
   isErgonomicVisible: true,
   isErgonomicSetWidth: true,
-  ergonomicWidth: 90,
+  ergonomicWidth: 96,
   isErgonomicVisible: true,
-  imgTpl: new Ext.Template('<img valign="text-bottom" class="autoState-{0}" src="'+Editor.data.moduleFolder+'images/autoStateFlags-{0}.png?v=1" alt="{1}" title="{1}"/>'),
+  imgTpl: new Ext.Template('<img valign="text-bottom" class="{2}" src="'+Editor.data.moduleFolder+'images/{0}.png?v=1" alt="{1}" />'),
   stateLabels: [],
   filter: null,
+  editor: {
+      xtype: 'displayfield',
+      cls: 'autoState'
+  },
   initComponent: function() {
     var me = this,
         autoStates = Ext.Array.filter(Editor.data.segments.autoStateFlags, function(item) {
@@ -63,7 +69,7 @@ Ext.define('Editor.view.segments.column.AutoState', {
         //we have to clone the values, if not we change the originals by reference
         list[idx] = {
             id: item.id,
-            label: me.imgTpl.apply([item.id, item.label]) + ' ' +  item.label
+            label: me.autoStateImg(item.id, item.label) + ' ' +  item.label
         } 
     });
     
@@ -75,18 +81,35 @@ Ext.define('Editor.view.segments.column.AutoState', {
     };
     me.callParent(arguments);
   },
-  /**
-   * rendert den integer Value des autoStateFlags zu einem img Element mit passender URL
-   * @param {Integer} value
-   * @param {Object} t
-   * @param {Editor.model.Segment} record
-   * @see {Ext.grid.column.Column}
-   * @returns String
-   */
-  renderer: function(value,t,record){
-      if(! this.stateLabels[value]) {
-          value = 0;
-      }
-      return this.imgTpl.apply([value,this.stateLabels[value]]);
-  }
+  autoStateImg: function(stateId, label) {
+      return this.imgTpl.apply(['autoStateFlags-'+stateId, label, 'autoState-'+stateId]);
+  },
+    /**
+     * rendert den integer Value des autoStateFlags zu einem img Element mit passender URL
+     * @param {Integer} value
+     * @param {Object} t
+     * @param {Editor.model.Segment} record
+     * @see {Ext.grid.column.Column}
+     * @returns String
+     */
+    renderer: function(value,t,record){
+        var res = '';
+        if(! this.stateLabels[value]) {
+            value = 0;
+        }
+      
+        if(record.get('isWatched')) {
+            res += ' ' + this.imgTpl.apply(['star', 'bookmarked', '']);
+        }
+        if(record.get('comments') && record.get('comments').length > 0) {
+            res += ' ' + this.imgTpl.apply(['comments', 'has comments', 'edit']);
+        }
+        
+        //the following if checks if we are in renderInfoQtip or normal row rendering
+        if(arguments.length > 3) { //for grid and roweditor rendering
+            t.tdAttr = 'data-qtip="'+this.renderInfoQtip(record)+'"';
+            return this.autoStateImg(value, this.stateLabels[value]) + res;
+        }
+        return this.stateLabels[value];
+    }
 });

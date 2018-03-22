@@ -38,15 +38,21 @@ END LICENSE AND COPYRIGHT
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.column.IsWatched', {
-  extend: 'Editor.view.ui.segments.column.IsWatched',
+  extend: 'Ext.grid.column.Column',
   alias: 'widget.iswatchedColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
-
+  itemId: '',
+  width: 90,
+  dataIndex: 'isWatched',
+  hidden: true,
+  text: '#UT#Lesezeichen',
+  text_tip: '#UT#Mit Lesezeichen versehen',
   showInMetaTooltip: true,
 
   initComponent: function() {
     var me = this;
     me.initBaseMixin();
+    me.scope = me; //so that renderer can access this object instead the whole grid.
     me.callParent(arguments);
   },
   filter: {
@@ -54,9 +60,12 @@ Ext.define('Editor.view.segments.column.IsWatched', {
   },
   
   renderer: function(value,t,record){
-      if(value)
-      {
-          return '<img src="'+Editor.data.moduleFolder+'/images/tick.png" alt="ticked"/>'
+      if(value) {
+          if(arguments.length > 3) { //for grid and roweditor rendering
+              t.tdAttr = this.text_tip;
+              return '<img src="'+Editor.data.moduleFolder+'/images/star.png" alt="bookmarked"/>'
+          }
+          return this.text_tip; //for tooltip rendering
       }
       return '';
   }
