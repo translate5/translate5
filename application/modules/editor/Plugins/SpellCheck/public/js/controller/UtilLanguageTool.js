@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Mixin with Helpers regarding the LanguageTool
+ * Mixin with Helpers regarding the LanguageTool: https://languagetool.org/
  * @class Editor.plugins.TrackChanges.controller.UtilLanguageTool
  */
 Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
@@ -133,8 +133,33 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
         });
     },
     /**
+     * Turn matches into ranges.
+     * @param {Object} matches
+     * @returns {Array} allRangesForMatches
+     */
+    getRangesForMatchesFromTool: function (matches) {
+        var me = this,
+            editorBody,
+            rangeForMatch,
+            matchStart,
+            matchEnd,
+            allRangesForMatches = [];
+        if (matches.length > 0) {
+            editorBody = me.editor.getEditorBody();
+            Ext.Array.each(matches, function(match, index) {
+                rangeForMatch = rangy.createRange(editorBody);
+                matchStart = match.offset;
+                matchEnd = matchStart + match.context.length;
+                rangeForMatch.selectCharacters(editorBody,matchStart,matchEnd);
+                Ext.Array.push(allRangesForMatches, rangeForMatch);
+            });
+        }
+        return allRangesForMatches;
+    },
+    /**
      * extract data from match: css according to issueType.
      * @param {Object} match
+     * @returns {String}
      */
     getCSSForMatchFromTool: function (match) {
         var me = this,
@@ -149,12 +174,38 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
               };
           return (cssForMatch[match.rule.issueType] || cssForMatch['default']);
     },
-    
     /**
      * extract data from match: message
      * @param {Object} match
+     * @returns {String}
      */
     getMessageForMatchFromTool: function (match) {
         return match.message;
+    },
+    /**
+     * extract data from match: replacement(s)
+     * @param {Object} match
+     * @returns {Array}
+     */
+    getReplacementsForMatchFromTool: function (match) {
+        var me = this,
+            replacements = [];
+        Ext.Array.each(match.replacements, function(replacement, index) {
+            Ext.Array.push(replacements, replacement.value );
+        });
+        return replacements;
+    },
+    /**
+     * extract data from match: URL(s) for more information
+     * @param {Object} match
+     * @returns {Array}
+     */
+    getInfoURLsForMatchFromTool: function (match) {
+        var me = this,
+            infoURLs = [];
+        Ext.Array.each(match.rule.urls, function(url, index) {
+            Ext.Array.push(infoURLs, url.value );
+        });
+        return infoURLs;
     }
 });

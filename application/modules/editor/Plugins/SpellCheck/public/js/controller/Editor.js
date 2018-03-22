@@ -66,6 +66,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         },
     },
+    messages: {
+        moreinformation: '#UT#More information'
+    },
     statics: {
         // spellcheck-Node
         NODE_NAME_MATCH: 'span',
@@ -75,7 +78,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         CSS_CLASSNAME_SUGGESTION:   'suggestion',
         CSS_CLASSNAME_SPELLERROR:   'spellError',
         // Attributes for the spellcheck-Node
-        ATTRIBUTE_MESSAGE: 'data-spellcheck-message'
+        ATTRIBUTE_MESSAGE:      'data-spellcheck-message',
+        ATTRIBUTE_REPLACEMENTS: 'data-spellcheck-replacements',
+        ATTRIBUTE_URLS:         'data-spellcheck-urls'
     },
     
     // =========================================================================
@@ -237,25 +242,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     applySpellCheck: function(matches) {
         var me = this,
-            editorBody,
-            rangeForMatch,
-            matchStart,
-            matchEnd,
-            allRangesForMatches = [],
+            allRangesForMatches,
             documentFragmentForMatch,
             spellCheckNode;
         me.consoleLog('applySpellCheck...');
         
         if (matches.length > 0) {
-            editorBody = me.editor.getEditorBody();
-            Ext.Array.each(matches, function(match, index) {// TODO: some of this depends on what the tool returns => add generic layer and move method to Util
-                rangeForMatch = rangy.createRange(editorBody);
-                matchStart = match.offset;
-                matchEnd = matchStart + match.context.length;
-                rangeForMatch.selectCharacters(editorBody,matchStart,matchEnd);
-                allRangesForMatches[index] = rangeForMatch;
-            });
-            Ext.Array.each(allRangesForMatches, function(rangeForMatch, index, allRangesForMatches) {
+            allRangesForMatches = me.getRangesForMatchesFromTool(matches);
+            Ext.Array.each(allRangesForMatches, function(rangeForMatch, index) {
                 documentFragmentForMatch = rangeForMatch.extractContents();
                 spellCheckNode = me.createSpellcheckNode(matches[index]);
                 spellCheckNode.appendChild(documentFragmentForMatch);
@@ -310,9 +304,24 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     createSpellcheckNode: function(match){
         var me = this,
+            replacements,
+            infoURLs,
             nodeElParams = { tag: me.self.NODE_NAME_MATCH };
+        // CSS-class(es)
         nodeElParams['cls'] = me.self.CSS_CLASSNAME_MATCH + ' ' + me.getCSSForMatchFromTool(match);
+        // message
         nodeElParams[me.self.ATTRIBUTE_MESSAGE] = me.getMessageForMatchFromTool(match);
+        // replacement(s)
+        replacements = me.getReplacementsForMatchFromTool(match);
+        if (replacements.length > 0) {
+            nodeElParams[me.self.ATTRIBUTE_REPLACEMENTS] = replacements.toString();
+        }
+        // info-URL(s)
+        infoURLs = me.getInfoURLsForMatchFromTool(match);
+        if (infoURLs.length > 0) {
+            nodeElParams[me.self.ATTRIBUTE_URLS] = infoURLs.toString();
+        }
+        // create and return node
         return Ext.DomHelper.createDom(nodeElParams);
     },
     
@@ -374,9 +383,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 me.editor.getDoc(),
                 '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' +
                 '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 2px dotted; border-color: red;}' + // TODO: use wavy line instead
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' {border-color: #ab8906;}' +           // dark yellow
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' {border-color: #458fe6;}' +             // blue
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' {border-color: #e645a8;}'               // red-violet
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' {border-color: #ab8906;}' +    // dark yellow
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' {border-color: #458fe6;}' +      // blue
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' {border-color: #e645a8;}'        // red-violet
             );
     },
     
@@ -402,11 +411,27 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     getSpellCheckData: function() {
         var me = this,
             node = me.spellCheckMatch,
-            nodeMessage;
+            nodeData = '',
+            replacements,
+            infoURLs;
         if (node.hasAttribute(me.self.ATTRIBUTE_MESSAGE)) {
-            nodeMessage = node.getAttribute(me.self.ATTRIBUTE_MESSAGE);
+            nodeData += '<b>'+ node.getAttribute(me.self.ATTRIBUTE_MESSAGE) + '</b><br />';
         }
-        return '<b>'+ nodeMessage + '</b><br /><a href="/test.html">Test</a>'+'<br />';
+        if (node.hasAttribute(me.self.ATTRIBUTE_REPLACEMENTS)) {
+            nodeData += '<hr>'
+            replacements = node.getAttribute(me.self.ATTRIBUTE_REPLACEMENTS).split(",");
+            Ext.Array.each(replacements, function(replacement, index) {
+                nodeData += replacement + '<br />';
+            });
+        }
+        if (node.hasAttribute(me.self.ATTRIBUTE_URLS)) {
+            nodeData += '<hr>'
+            infoURLs = node.getAttribute(me.self.ATTRIBUTE_URLS).split(",");
+            Ext.Array.each(infoURLs, function(url, index) {
+                nodeData += '<a href="' + url + '" target="_blank">' + me.messages.moreinformation + '</a><br />';
+            });
+        }
+        return nodeData;
     },
     showToolTip: function(event) {
         var me = this;

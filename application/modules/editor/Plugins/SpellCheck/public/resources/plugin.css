@@ -33,3 +33,5 @@ END LICENSE AND COPYRIGHT
 Images to the plugins image path are adressed relativly, for example (from matchResource plugin):
 .ico-tm-edit {background-image: url("images/book_edit.png");background-repeat:no-repeat;background-position:center;}
  */
+ 
+.x-tip-body-default a:hover, a:hover {color: #fce500;}
