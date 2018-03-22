@@ -67,11 +67,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
     },
     statics: {
-        NODE_NAME_MATCH: 'div',
-        CSS_CLASSNAME_MATCH: 'spellcheck',
-            
+        // spellcheck-Node
+        NODE_NAME_MATCH: 'span',
+        // CSS-Classes for the spellcheck-Node
+        CSS_CLASSNAME_MATCH:        'spellcheck',
+        CSS_CLASSNAME_GRAMMERERROR: 'grammarError',
+        CSS_CLASSNAME_SUGGESTION:   'suggestion',
+        CSS_CLASSNAME_SPELLERROR:   'spellError',
         // Attributes for the spellcheck-Node
-        ATTRIBUTE_MESSAGE:         'data-spellcheck-message'
+        ATTRIBUTE_MESSAGE: 'data-spellcheck-message'
     },
     
     // =========================================================================
@@ -167,23 +171,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             plug = me.getSegmentGrid().editingPlugin,
             editor = plug.editor; // → this is the row editor component;
         
-        // → this is the HtmlEditor:
-        me.editor = editor.mainEditor;
-        
-        // inject CSS
-        Ext.util.CSS.createStyleSheetToWindow(
-                me.editor.getDoc(),
-                '.spellcheck {border-bottom: 1px solid red; display: inline-block;}' 
-            );
-        
-        // init ToolTips
+        me.editor = editor.mainEditor; // → this is the HtmlEditor:
+        me.injectCSSForEditor();
         me.initTooltips();
-        
-        // init mouse events (for ToolTips)
         me.initMouseEvents();
     },
     initTooltips:function(){
         var me = this;
+        
         me.spellCheckTooltip = Ext.create('Ext.tip.ToolTip', {
             closable: true,
             renderTo: Ext.getBody(),
@@ -204,7 +199,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         editorBodyExtDomEl.on({
             contextmenu:{
                 delegated: false,
-                delegate: 'div.spellcheck',
+                delegate: me.self.NODE_NAME_MATCH + '.' + me.self.CSS_CLASSNAME_MATCH,
                 fn: me.showToolTip,
                 scope: this,
                 preventDefault: true
@@ -253,19 +248,19 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (matches.length > 0) {
             editorBody = me.editor.getEditorBody();
-            Ext.Array.each(matches, function(match, index) {
-                rangeForMatch = rangy.createRange();
-                matchStart = match.context.offset;
+            Ext.Array.each(matches, function(match, index) {// TODO: some of this depends on what the tool returns => add generic layer and move method to Util
+                rangeForMatch = rangy.createRange(editorBody);
+                matchStart = match.offset;
                 matchEnd = matchStart + match.context.length;
                 rangeForMatch.selectCharacters(editorBody,matchStart,matchEnd);
                 allRangesForMatches[index] = rangeForMatch;
             });
-            Ext.Array.each(allRangesForMatches, function(rangeForMatch, index) {
+            Ext.Array.each(allRangesForMatches, function(rangeForMatch, index, allRangesForMatches) {
                 documentFragmentForMatch = rangeForMatch.extractContents();
                 spellCheckNode = me.createSpellcheckNode(matches[index]);
                 spellCheckNode.appendChild(documentFragmentForMatch);
                 rangeForMatch.insertNode(spellCheckNode);
-            });
+            }, me, true); // iterate in reverse order! (Otherwise the ranges get lost due to DOM-changes "in front of them".) 
         }
         
         me.finishSpellCheck();
@@ -310,13 +305,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     /**
      * Create and return a new node for SpellCheck-Match.
+     * For match-specific data, get the data from the tool.
      * @returns {Object}
      */
     createSpellcheckNode: function(match){
         var me = this,
-            nodeElParams = { tag: me.self.NODE_NAME_MATCH,
-                             cls: me.self.CSS_CLASSNAME_MATCH };
-        nodeElParams[me.self.ATTRIBUTE_MESSAGE] = match.message;
+            nodeElParams = { tag: me.self.NODE_NAME_MATCH };
+        nodeElParams['cls'] = me.self.CSS_CLASSNAME_MATCH + ' ' + me.getCSSForMatchFromTool(match);
+        nodeElParams[me.self.ATTRIBUTE_MESSAGE] = me.getMessageForMatchFromTool(match);
         return Ext.DomHelper.createDom(nodeElParams);
     },
     
@@ -368,6 +364,20 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             editorBody = me.getEditorBody();
         editorBody.spellcheck = !me.isSupportedLanguage;
         me.consoleLog('(browserSpellcheck is set to:' + editorBody.spellcheck + ')');
+    },
+    /**
+     * Inject CSS into the Editor
+     */
+    injectCSSForEditor: function() {
+        var me = this;
+        Ext.util.CSS.createStyleSheetToWindow(
+                me.editor.getDoc(),
+                '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' +
+                '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 2px dotted; border-color: red;}' + // TODO: use wavy line instead
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' {border-color: #ab8906;}' +           // dark yellow
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' {border-color: #458fe6;}' +             // blue
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' {border-color: #e645a8;}'               // red-violet
+            );
     },
     
     // =========================================================================
