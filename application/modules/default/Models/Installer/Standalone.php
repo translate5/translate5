@@ -47,12 +47,13 @@ class Models_Installer_Standalone {
     const OS_OSX = 4;
     const HOSTNAME_WIN = 'localhost';
     const HOSTNAME_LINUX = 'translate5.local';
+    const JIRA_URL = 'https://jira.translate5.net/browse/';
     
     /**
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 3;
+    const INSTALLER_VERSION = 4;
     
     /**
      * @var string
@@ -499,9 +500,19 @@ class Models_Installer_Standalone {
     protected function updateDb() {
         $this->logSection('Updating Translate5 database scheme');
         
+        $changelog = ZfExtended_Factory::get('editor_Models_Changelog');
+        /* @var $changelog editor_Models_Changelog */
+        $beforeMaxChangeLogId = $changelog->getMaxId();
+        
         $dbupdater = ZfExtended_Factory::get('ZfExtended_Models_Installer_DbUpdater');
         /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
         $stat = $dbupdater->importAll(true); //FIXME remove this parameter after some time, see comment in importAll method
+        
+        $beforeMaxChangeLogId = 200;
+        $newChangeLogEntries = $changelog->moreChangeLogs($beforeMaxChangeLogId, $changelog::ALL_GROUPS);
+        $version = ZfExtended_Utils::getAppVersion();
+        $changelog->updateVersion($beforeMaxChangeLogId, $version);
+        $this->sendChangeLogs($newChangeLogEntries, $version);
         
         $errors = $dbupdater->getErrors();
         if(!empty($errors)) {
@@ -510,6 +521,57 @@ class Models_Installer_Standalone {
         }
         
         $this->log("DB Update OK\n  New statement files: ".$stat['new']."\n  Modified statement files: ".$stat['modified']."\n");
+    }
+    
+    /**
+     * Send the given changelogs to the admin users.
+     * @param array $newChangeLogEntries
+     */
+    protected function sendChangeLogs($newChangeLogEntries, $version) {
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $admins = $user->loadAllByRole('admin');
+        //Zend_Registry::set('Zend_Locale', 'en');
+        $mail = ZfExtended_Factory::get('Zend_Mail');
+        /* @var $mail Zend_Mail */
+        $mail->setSubject("ChangeLog to translate5 version ".$version);
+        $html  = 'Your translate5 installation was updated to version <b>'.$version.'</b>.<br><br>';
+        $html .= '<b><u>ChangeLog</u></b><br>';
+        
+        $byType = ['bugfix' => [], 'feature' => [], 'change' => []];
+        $typeLabels = ['feature' => 'New Features:', 'change' => 'Changes:', 'bugfix' => 'Fixes:'];
+        foreach($newChangeLogEntries as $entry) {
+            $byType[$entry['type']][] = $entry;
+        }
+        foreach($typeLabels as $type => $label) {
+            $entries = $byType[$type];
+            if(empty($entries)) {
+                continue;
+            }
+            $html .= '<br><b>'.$label.'</b><br>';
+            foreach($entries as $entry) {
+                $html .= '<p style="margin:0;padding:0 0 5px 0;">';
+                if(preg_match('/^[A-Z0-9]+-[0-9]+$/', $entry['jiraNumber'])) {
+                    $link = '<a href="'.self::JIRA_URL.$entry['jiraNumber'].'">'.htmlspecialchars($entry['jiraNumber']).'</a>';
+                }
+                else {
+                    $link = $entry['jiraNumber'];
+                }
+                $html .= $link.': '.htmlspecialchars($entry['title']);
+                if(!empty($entry['description']) && $entry['title'] != $entry['description']) {
+                    $html .= '<p style="font-size:smaller;padding:0;margin:0;">'.htmlspecialchars($entry['description']).'</p>';
+                }
+                $html .= '</p>';
+            }
+        }
+        $html .= '<br><br>This e-mail was created automatically by the translate5 install and update script.';
+        
+        $mail->setBodyHtml($html);
+        foreach($admins as $admin) {
+            //$mail->setFrom('thomas@mittagqi.com'); //system mailer?
+            $mail->addTo($admin['email'], $admin['firstName'].' '.$admin['surName']);
+        }
+        $mail->send();
     }
     
     /**
