@@ -2286,6 +2286,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</source>
     <target>In the meantime, the task was opened in read-only mode.</target>
 </trans-unit>
+<trans-unit id='bWl0IExlc2V6ZWljaGVuIHZlcnNlaGVu'>
+    <source>mit Lesezeichen versehen</source>
+    <target>bookmarked</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
