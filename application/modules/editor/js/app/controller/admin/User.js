@@ -303,10 +303,11 @@ Ext.define('Editor.controller.admin.User', {
       }
       var win = Ext.widget('adminUserAddWindow',{editMode: true}),
           noEdit = ! rec.get('editable');
-      win.loadRecord(rec);
-      win.down('form').setDisabled(noEdit);
-      win.down('#save-user-btn').setDisabled(noEdit);
-      win.show();
+        win.down('form').setDisabled(noEdit);
+        win.down('#save-user-btn').setDisabled(noEdit);
+        win.show();
+        //load the record after the window is rendered
+        win.loadRecord(rec);
   },
   /**
    * shows the form to add a user
@@ -316,8 +317,8 @@ Ext.define('Editor.controller.admin.User', {
           return;
       }
       var win = Ext.widget('adminUserAddWindow');
-      win.loadRecord(this.getNewUser());
       win.show();
+      win.loadRecord(this.getNewUser());
   },
   /**
    * creates a new User Record
