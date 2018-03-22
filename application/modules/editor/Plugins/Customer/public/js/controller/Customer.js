@@ -171,10 +171,9 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
             text:this.strings.customer,
             filter: {
                 type: 'list',
-                idField:'id',
-                labelField:'name',
                 store:Ext.StoreManager.get('customersStore'),
-                phpMode: false
+                idField:'id',
+                labelField:'name'
             },
             renderer: function(v, meta, rec){
                 var names = [];
