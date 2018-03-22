@@ -22,6 +22,8 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
         'Editor.plugins.Customer.view.CustomerViewController',
     ],
 
+    stores:['Editor.plugins.Customer.store.Customer'],
+
     controller: 'customerPanel',
     viewModel: {
         type: 'customerPanel'
@@ -75,7 +77,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                         title: '',
                         forceFit: true,
                         bind: {
-                            store: '{customers}'
+                            store: 'customersStore'
                         },
                         columns: [
                             {
@@ -253,8 +255,6 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
     initComponent: function() {
         var me = this;
         me.callParent(arguments);
-        //this will enable the store to be loaded when onFilterEndUpdate is called,it is disabled on store configuration
-        me.getViewModel().getStore('customers').suppressNextFilter = false;
     },
     
     onViewBeforeRefresh: function(dataview, eOpts) {

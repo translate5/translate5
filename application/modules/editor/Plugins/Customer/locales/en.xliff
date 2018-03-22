@@ -77,6 +77,11 @@
 		    <target>Customer deleted</target>
 		</trans-unit>
 
+		<trans-unit id='RW5ka3VuZGU='>
+		    <source>Endkunde</source>
+		    <target>End customer</target>
+		</trans-unit>
+
     </body>
   </file>
 </xliff>

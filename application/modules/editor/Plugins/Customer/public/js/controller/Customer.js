@@ -35,8 +35,11 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
 
     views: [
         'Editor.plugins.Customer.view.Customer',
-        'Editor.plugins.Customer.model.Customer'
+        'Editor.plugins.Customer.model.Customer',
+        'Editor.plugins.Customer.view.CustomerTagField'
     ],
+
+    stores:['Editor.plugins.Customer.store.Customer'],
 
     refs:[{
         ref: 'customerPanel',
@@ -62,14 +65,23 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
             },
             'viewport container[region="center"] panel':{
                 hide:'onCentarPanelComponentAfterLayout'
+            },
+            '#adminUserAddWindow':{
+                afterrender:'onAdminUserAddWindowAfterRender'
+            },
+            '#adminUserGrid': {
+                beforerender:'onAdminUserGridBeforeRender'
             }
         }
     },
 
     strings:{
-        customerOverviewButton:'#UT#Kunden',
+        customer:'#UT#Kunden'
     },
 
+    /**
+     * On head panel after render handler
+     */
     onHeadPanelAfterRender: function(toolbar) {
         if(!this.isCustomerOverviewAllowed()){
             return;
@@ -78,7 +90,7 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
         toolbar.insert(pos, {
             xtype: 'button',
             itemId: 'btnCustomerOverviewWindow',
-            text:this.strings.customerOverviewButton
+            text:this.strings.customer
         });
     },
 
@@ -90,9 +102,12 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
             return;
         }
         //set the component to visible on each centar panel element hide
-        this.isCustomerOverviewButtonHidden(false);
+        this.setCustomerOverviewButtonHidden(false);
     },
 
+    /**
+     * Customer overview button click handler
+     */
     onCustomerOverviewClick: function(window) {
         var me = this,
             panel = me.getCustomerPanel();
@@ -114,11 +129,72 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
         me.onCustomerPanelShow(panel);
     },
 
-    isCustomerOverviewButtonHidden:function(isHidden){
-        if(!this.getHeadToolBar()){
+    /**
+     * Admin add window after render handler
+     */
+    onAdminUserAddWindowAfterRender:function(adminWindow){
+        if(!this.isCustomerOverviewAllowed()){
             return;
         }
-        this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(isHidden);
+        var me=this,
+            loginFieldset=adminWindow.down('#loginDetailsFieldset');
+        
+        loginFieldset.add({
+            xtype:'customers'
+        });
+    },
+
+    /***
+     * On admin user grid before render handler.
+     */
+    onAdminUserGridBeforeRender:function(taskgrid){
+        if(!this.isCustomerOverviewAllowed()){
+            return;
+        }
+
+        //insert the customer column in the user grid
+        var me = this,
+            grid = taskgrid.getView().grid,
+            column;
+
+        if(grid.down('gridcolumn[dataIndex=customers]')){
+            return;
+        }
+        
+        column = Ext.create('Ext.grid.column.Column', {
+            xtype: 'gridcolumn',
+            width: 250,
+            dataIndex:'customers',
+            tdCls: 'customers',
+            sortable: false,
+            cls: 'customers',
+            text:this.strings.customer,
+            filter: {
+                type: 'list',
+                idField:'id',
+                labelField:'name',
+                store:Ext.StoreManager.get('customersStore'),
+                phpMode: false
+            },
+            renderer: function(v, meta, rec){
+                var names = [];
+                if(!v || v.length == 0){
+                    return '';
+                }
+                var v = v.replace(/(^,)|(,$)/g, ''),
+                    customersStore=Ext.StoreManager.get('customersStore');
+                v=v.split(',');
+                for(i=0;i<v.length;i++){
+                    var tmpRec=customersStore.findRecord('id',v[i],0,false,false,true);
+                    tmpRec && names.push(tmpRec.get('name'));
+                }
+                
+                return names.join(',');
+            }
+        });
+        //insert the column after the locale column
+        grid.headerCt.insert((grid.down('gridcolumn[dataIndex=locale]').fullColumnIndex + 1), column);
+        grid.getView().refresh();
     },
 
     /***
@@ -130,9 +206,19 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
         Editor.data.helpSectionTitle = panel.getTitle();
 
         //hide the customerOverview button
-        this.isCustomerOverviewButtonHidden(true);
+        this.setCustomerOverviewButtonHidden(true);
     },
-    
+
+    /**
+     * Set the customer overview button hidden property
+     */
+    setCustomerOverviewButtonHidden:function(isHidden){
+        if(!this.getHeadToolBar()){
+            return;
+        }
+        this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(isHidden);
+    },
+
     /**
      * Check if the user has a frontend right to see the customer overview 
      */

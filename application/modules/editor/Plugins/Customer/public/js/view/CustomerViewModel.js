@@ -25,13 +25,6 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewModel', {
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                stores: {
-                    customers: {
-                        pageSize: 200,
-                        autoLoad: true,
-                        model: 'Editor.plugins.Customer.model.Customer'
-                    }
-                }
             };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);

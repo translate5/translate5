@@ -50,3 +50,6 @@ WHERE `right` = 'all'
 AND `resource` = 'editor_plugins_customer_customer' 
 AND `role` = 'pm'
 AND `module` = 'editor';
+
+ALTER TABLE `Zf_users` 
+DROP COLUMN `customers`;

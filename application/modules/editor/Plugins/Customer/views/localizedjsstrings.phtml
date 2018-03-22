@@ -34,7 +34,7 @@ Editor.controller.Localizer.addPluginInit('Customer', function() {
     Ext.define("Editor.locale.plugins.Customer.controller.Customer", {
         override: "Editor.plugins.Customer.controller.Customer",
         strings: {
-            customerOverviewButton:'<?php echo $this->translate->_("Kunden");?>',
+            customer:'<?php echo $this->translate->_("Kunden");?>',
         }
     });
 
@@ -58,5 +58,10 @@ Editor.controller.Localizer.addPluginInit('Customer', function() {
             customerDeleteTitle:'<?php echo $this->translate->_("Kunden löschen");?>',
             customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>'
         }
+    });
+
+    Ext.define("Editor.locale.plugins.Customer.view.CustomerTagField", {
+        override: "Editor.plugins.Customer.view.CustomerTagField",
+        fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
     });
 });

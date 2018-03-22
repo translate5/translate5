@@ -88,7 +88,7 @@ class editor_Plugins_Customer_CustomerController extends ZfExtended_RestControll
      */
     protected function handleDuplicateNumber(Zend_Db_Statement_Exception $e) {
         $msg = $e->getMessage();
-        if(stripos($msg, 'duplicate entry') === false || stripos($msg, "for key 'number'") === false) {
+        if(stripos($msg, 'Duplicate entry') === false || stripos($msg, "for key ") === false) {
             throw $e; //otherwise throw this again
         }
     

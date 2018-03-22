@@ -27,8 +27,9 @@
 CREATE TABLE `LEK_customer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
-  `number` varchar(255) DEFAULT NULL,
+  `number` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `number_UNIQUE` (`number`),
   KEY `name` (`name`),
   KEY `number` (`number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -45,3 +46,7 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
   VALUES ('editor', 'pm', 'editor_plugins_customer_customer', 'all');
+
+ALTER TABLE `Zf_users` 
+  ADD COLUMN `customers` VARCHAR(255) NULL;
+

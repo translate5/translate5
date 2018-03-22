@@ -40,7 +40,7 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
             formPanel = me.getReferences().form,
             form = formPanel.getForm(),
             record = form.getRecord(),
-            store = me.getStore('customers'),
+            store = Ext.StoreManager.get('customersStore'),
             saving = me.getView().strings.saveCustomerMsg;
 
         // Valid
@@ -58,11 +58,23 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
                 Editor.MessageBox.addSuccess(me.getView().strings.customerSavedMsg);
                 store.load();
                 me.getView().unmask();
+                //me.getView().fireEvent('customerSaved');
                 me.cancelEdit();
             },
-            failure: function(response){
-                Editor.app.getController('ServerException').handleException(response);
+            failure: function(rec, op) {
+                var error,
+                    errorRes = op.error && op.error.response,
+                    errorHandler = Editor.app.getController('ServerException');
+                
                 me.getView().unmask();
+                if(errorRes && errorRes.responseText) {
+                    error = Ext.decode(errorRes.responseText);
+                    if(error.errors && op.error && op.error.status == '400') {
+                        form.markInvalid(error.errors);
+                        return;
+                    }
+                }
+                errorHandler.handleCallback.apply(errorHandler, arguments); 
             }
         });
     },
@@ -122,7 +134,7 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
      */
     refresh: function(button, e, eOpts) {
         this.getReferences().list.getSelectionModel().deselectAll();
-        this.getStore('customers').load();
+        Ext.StoreManager.get('customersStore').load();
     },
 
     /**
@@ -151,7 +163,7 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
             formPanel = me.getReferences().form,
             form = formPanel.getForm(),
             record = form.getRecord(),
-            store = me.getStore('customers'),
+            store = Ext.StoreManager.get('customersStore'),
             deleting = me.getView().strings.customerDeleteTitle;
 
         // Update associated record with values
@@ -168,10 +180,22 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
                 Editor.MessageBox.addSuccess(me.getView().strings.customerDeletedMsg);
                 me.getView().unmask();
                 me.cancelEdit();
+                //me.getView().fireEvent('customerRemoved');
             },
-            failure: function(response){
-                Editor.app.getController('ServerException').handleException(response);
+            failure: function(rec, op) {
+                var error,
+                    errorRes = op.error && op.error.response,
+                    errorHandler = Editor.app.getController('ServerException');
+                
                 me.getView().unmask();
+                if(errorRes && errorRes.responseText) {
+                    error = Ext.decode(errorRes.responseText);
+                    if(error.errors && op.error && op.error.status == '400') {
+                        form.markInvalid(error.errors);
+                        return;
+                    }
+                }
+                errorHandler.handleCallback.apply(errorHandler, arguments); 
             }
         });
     },
@@ -190,6 +214,6 @@ Ext.define('Editor.plugins.Customer.view.CustomerViewController', {
 
     //when customers panel is displayed,this function is executed
     reloadCustomerStore:function(){
-        this.getStore('customers').load();
+        Ext.StoreManager.get('customersStore').load();
     }
 });
