@@ -28,14 +28,13 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Changelog Entity Object
- * 
- * 
  */
-class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
+    const ALL_GROUPS = 15;
     /**
      * @var string
      */
-    protected $dbInstanceClass = 'editor_Plugins_ChangeLog_Models_Db_Changelog';
+    protected $dbInstanceClass = 'editor_Models_Db_Changelog';
     
     /**
      * ACL Map
@@ -118,6 +117,21 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
     }
     
     /**
+     * Updates the version for all entries with an greater ID as the given ID
+     * returns the rowcount of changed entries 
+     * 
+     * @param int $lastOldId
+     * @param string $version
+     * @return int 
+     */
+    public function updateVersion($lastOldId, $version) {
+        $updated = $this->db->update([
+            'version' => $version
+        ], ['id > ?' => $lastOldId]);
+        return $updated;
+    }
+    
+    /**
      * returns the changelog id which the user has seen the last time, -1 if he never have seen any changelogs before
      * @param integer $userId
      * @return integer
@@ -165,5 +179,16 @@ class editor_Plugins_ChangeLog_Models_Changelog extends ZfExtended_Models_Entity
                 error_log('In DB available roles ('.join(';', $configured).') does not contain all roles configured in Changelog Model ('.join(';', $used).')');
             }
         }
+    }
+    
+    /**
+     * returns the highest changelog entry id, 0 if there is no one
+     * @return integer
+     */
+    public function getMaxId() {
+        $db = $this->db;
+        $select = $db->select()->from($db->info($db::NAME) , ['maxid' => 'MAX(id)']);
+        $res = $select->query();
+        return (int)$res->fetchObject()->maxid;
     }
 }

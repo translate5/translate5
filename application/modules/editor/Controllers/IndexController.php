@@ -341,13 +341,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     protected function getAppVersion() {
-        $versionFile = APPLICATION_PATH.'/../version';
-        $regex = '/MAJOR_VER=([0-9]+)\s*MINOR_VER=([0-9]+).*\s*BUILD=([0-9]+).*/';
-        if(file_exists($versionFile) && $res = preg_match($regex, file_get_contents($versionFile), $matches)) {
-            array_shift($matches);
-            return join('.', $matches);
-        }
-        return 'development';
+        return ZfExtended_Utils::getAppVersion();
     }
     
     /**
