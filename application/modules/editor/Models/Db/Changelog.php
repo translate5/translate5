@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * DB Access for TmMt Entity
  */
-class editor_Plugins_ChangeLog_Models_Db_Changelog extends Zend_Db_Table_Abstract {
+class editor_Models_Db_Changelog extends Zend_Db_Table_Abstract {
     protected $_name = 'LEK_change_log';
     public $_primary = 'id';
 }

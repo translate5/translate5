@@ -424,6 +424,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @return string
      */
     protected function prepareText($text) {
+        $text = $this->taghelperInternal->removeTrackChanges($text);
         if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
             $text = $this->handleTerminology($text, true);
             return $this->exportParser->exportSingleSegmentContent($text);

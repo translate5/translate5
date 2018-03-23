@@ -152,7 +152,14 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
-  	
+    
+    
+    Ext.define("Editor.locale.de.view.segments.column.IsWatched", {
+        override: "Editor.view.segments.column.IsWatched",
+        text: '<?php echo $this->translate->_('Lesezeichen');?>',
+        text_tip: '<?php echo $this->translate->_('mit Lesezeichen versehen');?>'
+    });
+    
     Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
         override: "Editor.view.segments.column.MatchrateType",
         text: '<?php echo $this->translate->_('Matchrate Typ');?>',
