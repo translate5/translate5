@@ -102,8 +102,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                 text: textToCheck,
                 language: me.languageToCheck.longCode
             },
-            resultLT,
-            matches = [];
+            resultLT;
         
         Ext.Ajax.request({
             url:url,
@@ -117,8 +116,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                 me.consoleLog('runSpellCheckWithTool (LanguageTool) done.');
                 // TODO: SyntaxError: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data
                 // resultLT = Ext.util.JSON.decode(response.responseText);
-                // matches = resultLT.matches;
-                // me.applySpellCheck(matches);
+                // me.allMatchesOfTool = resultLT.matches;
+                // me.applySpellCheck();
             },
             failure: function(response){
                 me.consoleLog('runSpellCheckWithTool (LanguageTool) failed: ' + response.status);
@@ -126,35 +125,27 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                 var responseText = '{"software":{"name":"LanguageTool","version":"4.1-SNAPSHOT","buildDate":"2018-03-21 21:01","apiVersion":1,"status":""},"warnings":{"incompleteResults":false},"language":{"name":"German","code":"de"},"matches":[{"message":"Dieser Satz fängt nicht mit einem großgeschriebenen Wort an","shortMessage":"","replacements":[{"value":"Oder"}],"offset":100,"length":4,"context":{"text":"...auf die farbig unterlegten Textstellen. oder nutzen Sie diesen Text als Beispiel für...","offset":43,"length":4},"sentence":"oder nutzen Sie diesen Text als Beispiel für ein Paar Fehler , die LanguageTool erkennen kann: Ihm wurde Angst und bange.","rule":{"id":"UPPERCASE_SENTENCE_START","description":"Großschreibung am Satzanfang","issueType":"typographical","category":{"id":"CASING","name":"Groß-/Kleinschreibung"}}},{"message":"Meinten Sie ein paar (=einige), im Unterschied zu ein Paar (=genau zwei)?","shortMessage":"Bitte überprüfen Sie die Groß-/Kleinschreibung.","replacements":[{"value":"ein paar"}],"offset":145,"length":8,"context":{"text":"...nutzen Sie diesen Text als Beispiel für ein Paar Fehler , die LanguageTool erkennen kann...","offset":43,"length":8},"sentence":"oder nutzen Sie diesen Text als Beispiel für ein Paar Fehler , die LanguageTool erkennen kann: Ihm wurde Angst und bange.","rule":{"id":"EIN_PAAR","subId":"2","description":"Paar vs. paar","issueType":"uncategorized","urls":[{"value":"http://www.canoo.net/services/GermanSpelling/Regeln/Gross-klein/Denominalisierung.html#Anchor-Die-14210"}],"category":{"id":"CASING","name":"Groß-/Kleinschreibung"}}},{"message":"Nur hinter einem Komma steht ein Leerzeichen, aber nicht davor.","shortMessage":"","replacements":[{"value":","}],"offset":160,"length":2,"context":{"text":"...en Text als Beispiel für ein Paar Fehler , die LanguageTool erkennen kann: Ihm wur...","offset":43,"length":2},"sentence":"oder nutzen Sie diesen Text als Beispiel für ein Paar Fehler , die LanguageTool erkennen kann: Ihm wurde Angst und bange.","rule":{"id":"COMMA_PARENTHESIS_WHITESPACE","description":"Leerzeichen vor/hinter Kommas und Klammern","issueType":"whitespace","category":{"id":"TYPOGRAPHY","name":"Typographie"}}},{"message":"In der Wendung angst und bange werden/sein werden angst und bange kleingeschrieben.","shortMessage":"Bitte überprüfen Sie die Groß-/Kleinschreibung.","replacements":[{"value":"angst und bange"}],"offset":205,"length":15,"context":{"text":"...e LanguageTool erkennen kann: Ihm wurde Angst und bange. Mögliche stilistische Probleme werden ...","offset":43,"length":15},"sentence":"oder nutzen Sie diesen Text als Beispiel für ein Paar Fehler , die LanguageTool erkennen kann: Ihm wurde Angst und bange.","rule":{"id":"ANGST_UND_BANGE","subId":"2","description":"Angst/angst und Bange/bange","issueType":"uncategorized","urls":[{"value":"http://www.canoo.net/services/GermanSpelling/Regeln/Gross-klein/Denominalisierung.html#Anchor-Die-49575"}],"category":{"id":"CASING","name":"Groß-/Kleinschreibung"}}},{"message":"besser wie ist umgangssprachlich. Verwenden Sie zum Ausdrücken von Ungleichheit als.","shortMessage":"","replacements":[{"value":"als"}],"offset":295,"length":3,"context":{"text":"...rden blau hervorgehoben: Das ist besser wie vor drei Jahren. Eine Rechtschreibprüfu...","offset":43,"length":3},"sentence":"Mögliche stilistische Probleme werden blau hervorgehoben: Das ist besser wie vor drei Jahren.","rule":{"id":"KOMP_WIE","subId":"3","description":"besser wie (als)","issueType":"register","category":{"id":"COLLOQUIALISMS","name":"Umgangssprache"}}},{"message":"Möglicherweise ist hier ein Wort zu viel oder es fehlt ein Komma.","shortMessage":"Möglicherweise ist hier ein Wort zu viel oder es fehlt ein Komma","replacements":[{"value":"findet"},{"value":"findet, findet"}],"offset":340,"length":13,"context":{"text":"...or drei Jahren. Eine Rechtschreibprüfun findet findet übrigens auch statt. Donnerstag, den 27...","offset":43,"length":13},"sentence":"Eine Rechtschreibprüfun findet findet übrigens auch statt.","rule":{"id":"SAGT_RUFT","subId":"1","description":"Zwei aufeinanderfolgende Verben","issueType":"uncategorized","category":{"id":"TYPOS","name":"Mögliche Tippfehler"}}},{"message":"Das Datum 27.06.2017 fällt nicht auf einen Donnerstag, sondern auf einen Dienstag.","shortMessage":"","replacements":[],"offset":375,"length":26,"context":{"text":"...üfun findet findet übrigens auch statt. Donnerstag, den 27.06.2017 wurde LanguageTool 3.8 veröffentlicht.","offset":43,"length":26},"sentence":"Donnerstag, den 27.06.2017 wurde LanguageTool 3.8 veröffentlicht.","rule":{"id":"DATUM_WOCHENTAG","subId":"1","description":"Wochentag passt nicht zum Datum","issueType":"uncategorized","category":{"id":"SEMANTICS","name":"Semantische Unstimmigkeiten"}}}]}';
                 //resultLT = Ext.util.JSON.decode(responseText);
                 resultLT = JSON.parse(responseText); // Ext.util.JSON.decode sometimes throws an exception that the responseText is not valid JSON
-                matches = resultLT.matches;
-                me.applySpellCheck(matches);
+                me.allMatchesOfTool = resultLT.matches;
+                me.applySpellCheck();
                 // -------------------------
             }
         });
     },
     /**
-     * Turn matches into ranges.
-     * @param {Object} matches
-     * @returns {Array} allRangesForMatches
+     * extract data from match: (bookmark for) range
+     * @param {Object} match
+     * @returns {String}
      */
-    getRangesForMatchesFromTool: function (matches) {
+    getRangeForMatchFromTool: function (match) {
         var me = this,
-            editorBody,
-            rangeForMatch,
+            editorBody = me.editor.getEditorBody(),
+            rangeForMatch = rangy.createRange(editorBody),
             matchStart,
-            matchEnd,
-            allRangesForMatches = [];
-        if (matches.length > 0) {
-            editorBody = me.editor.getEditorBody();
-            Ext.Array.each(matches, function(match, index) {
-                rangeForMatch = rangy.createRange(editorBody);
-                matchStart = match.offset;
-                matchEnd = matchStart + match.context.length;
-                rangeForMatch.selectCharacters(editorBody,matchStart,matchEnd);
-                Ext.Array.push(allRangesForMatches, rangeForMatch);
-            });
-        }
-        return allRangesForMatches;
+            matchEnd;
+        matchStart = match.offset;
+        matchEnd = matchStart + match.context.length;
+        rangeForMatch.selectCharacters(editorBody,matchStart,matchEnd);
+        return rangeForMatch.getBookmark();
     },
     /**
      * extract data from match: css according to issueType.
