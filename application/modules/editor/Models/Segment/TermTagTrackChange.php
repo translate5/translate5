@@ -55,9 +55,10 @@ class editor_Models_Segment_TermTagTrackChange {
     /**
      * For fetching/searching the TrackChanges and TermTags:
      */
-    const REGEX_DEL     = '/<del[^>]*>.*?<\/del>/i';    // del-Tag:  including their content!
-    const REGEX_INS     = '/<\/?ins[^>]*>/i';           // ins-Tag:  only the tags without their content
-    const REGEX_TERMTAG = '/<\/?div[^>]*>/i';           // term-Tag: only the tags without their content (all other divs have been masked already) // TODO: get regex from from editor_Models_Segment_TermTag
+    const REGEX_DEL_NODOUBLESPACE = '/ <del[^>]*>.*?<\/del> /i';  // del-Tag:  avoid double space after removing a deleted word with one space at both sides (TRANSLATE-1194)
+    const REGEX_DEL               = '/<del[^>]*>.*?<\/del>/i';    // del-Tag:  including their content!
+    const REGEX_INS               = '/<\/?ins[^>]*>/i';           // ins-Tag:  only the tags without their content
+    const REGEX_TERMTAG           = '/<\/?div[^>]*>/i';           // term-Tag: only the tags without their content (all other divs have been masked already) // TODO: get regex from from editor_Models_Segment_TermTag
     
     /**
      * For the process of decoding a given text:

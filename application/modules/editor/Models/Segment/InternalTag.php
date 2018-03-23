@@ -77,6 +77,7 @@ class editor_Models_Segment_InternalTag {
      * - INS => markup-Tag ONLY is removed
      */
     public function removeTrackChanges(string $segment) {
+        $segment= preg_replace('/ <del[^>]*>.*?<\/del> /i', ' ', $segment); // replace deleted content that has a whitespace at both ends with one single whitespace first (TRANSLATE-1194)
     	$segment= preg_replace('/<del[^>]*>.*?<\/del>/i', '', $segment);
     	$segment= preg_replace('/<\/?ins[^>]*>/i', '', $segment);
     	return $segment;
