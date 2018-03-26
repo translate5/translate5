@@ -528,6 +528,9 @@ class Models_Installer_Standalone {
      * @param array $newChangeLogEntries
      */
     protected function sendChangeLogs($newChangeLogEntries, $version) {
+        if(empty($newChangeLogEntries)) {
+            return;
+        }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $admins = $user->loadAllByRole('admin');
