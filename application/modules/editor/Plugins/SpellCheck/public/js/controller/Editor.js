@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
-                initialize: 'initSpellCheckPluginForEditor',
+                initialize: 'initSpellCheckPluginForEditor'
             }
         },
     },
@@ -124,6 +124,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         Ext.dom.GarbageCollector.collect();
     },
     /**
+     * 
+     */
+    handleEditorKeyMapUsage: function(conf, area, mapOverwrite) {
+        var me = this,
+            ev = Ext.event.Event;
+        if (me.isSupportedLanguage) {
+            conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
+                me.initSpellCheck();
+            }, false];
+        }
+    },
+    /**
      * Init the SpellCheck-Plugin for the current task:
      * - Store task-specific properties (targetLangCode, isSupportedLanguage).
      */
@@ -145,22 +157,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
             me.initEditorEtc();
             me.setBrowserSpellcheck();
+            me.initSpellCheck();
         } else {
             me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ').');
         }
     },  
-    /**
-     * 
-     */
-    handleEditorKeyMapUsage: function(conf, area, mapOverwrite) {
-        var me = this,
-            ev = Ext.event.Event;
-        if (me.isSupportedLanguage) {
-            conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
-                me.initSpellCheck();
-            }, false];
-        }
-    },
     /**
      * Check if language is supported and if so, start the SpellCheck.
      */
@@ -237,16 +238,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     doSpellCheck: function() {
         var me = this,
-            editorText,
-            rangeForEditor = rangy.createRange();
+            rangeForEditor = rangy.createRange(),
+            editorText;
         if (!me.isSupportedLanguage) {
             me.consoleLog('doSpellCheck failed because language is not supported.');
             return;
         }
-        rangeForEditor.selectNode(me.editor.getEditorBody());
+        
+        me.cleanSpellCheckTags(); // in case a spellcheck has been run before already
         
         me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored as searchable)
         
+        rangeForEditor.selectNode(me.editor.getEditorBody());
         editorText = rangeForEditor.text();
         me.runSpellCheck(editorText);
     },
@@ -261,6 +264,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.allMatchesOfTool.length > 0) {
             me.storeAllMatchesFromTool();
             me.showAllMatchesInEditor();
+        } else {
+            me.consoleLog('allMatchesOfTool: no results (not checked or nothing found).');
         }
         me.finishSpellCheck();
     },
@@ -294,7 +299,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         // new DOM after replacement => find and apply the matches again:
-        me.cleanSpellCheckTags();
         me.doSpellCheck(); 
         
         // TODO: close ToolTip

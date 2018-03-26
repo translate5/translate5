@@ -34,3 +34,9 @@ VALUES ('editor', 'editor', 'frontend', 'pluginSpellCheck'),
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
 ('runtimeOptions.plugins.SpellCheck.active', 1, 'editor', 'plugins', 1, 1, '', 'boolean', 'Defines if SpellCheck should be active (Can be set in task template task specific)');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'pm', 'editor_plugins_spellcheck_spellcheckquery ', 'all');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
+('runtimeOptions.plugins.SpellCheck.languagetool.api.baseurl', '1', 'editor', 'plugins', 'http://translate5.local:8081/v2', 'https://languagetool.org/api/v2/', '', 'string', 'Base-URL used for LanguagaTool');

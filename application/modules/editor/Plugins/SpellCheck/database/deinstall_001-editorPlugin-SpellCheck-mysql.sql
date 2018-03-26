@@ -31,3 +31,8 @@ WHERE `module` = 'editor' AND `resource` = 'frontend' AND
 `right` IN ('pluginSpellCheck');
 
 DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.SpellCheck.active';
+
+DELETE FROM Zf_acl_rules 
+WHERE `module` = 'editor' AND `resource` = 'editor_plugins_spellcheck_spellcheckquery';
+
+DELETE FROM Zf_configuration WHERE `name` = 'runtimeOptions.plugins.SpellCheck.languagetool.api.baseurl';

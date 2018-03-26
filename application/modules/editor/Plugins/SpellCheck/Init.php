@@ -39,6 +39,7 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $frontendControllers = array(
         'pluginSpellCheck' => 'Editor.plugins.SpellCheck.controller.Editor',
+        'pluginSpellCheckSpellCheckQuery' => 'Editor.plugins.SpellCheck.controller.SpellCheckQuery'
     );
     
     protected $localePath = 'locales';
@@ -52,6 +53,8 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
     
     public function init() {
         $this->initEvents();
+        $this->addController('SpellCheckQueryController');
+        $this->initRoutes();
     }
     
     protected function initEvents() {
@@ -70,5 +73,39 @@ class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
     public function initJsTranslations(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
+    }
+    
+    /**
+     * defines all URL routes of this plug-in
+     */
+    protected function initRoutes() {
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $r = $f->getRouter();
+        
+        $restRoute = new Zend_Rest_Route($f, array(), array(
+                'editor' => array('plugins_spellcheck_spellcheckquery',
+                ),
+        ));
+        $r->addRoute('plugins_spellcheck_restdefault', $restRoute);
+        
+        $languagesRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_spellcheck_spellcheckquery/languages',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'plugins_spellcheck_spellcheckquery',
+                        'action' => 'languages'
+                ));
+        $r->addRoute('plugins_spellcheck_languages', $languagesRoute);
+        
+        
+        $matchesRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_spellcheck_spellcheckquery/matches',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'plugins_spellcheck_spellcheckquery',
+                        'action' => 'matches'
+                ));
+        $r->addRoute('plugins_spellcheck_matches', $matchesRoute);
     }
 }
