@@ -15,6 +15,7 @@
                 <source>GeneralMetatagTitleSuffix</source>
                 <target state="needs-review-adaptation">translate5 - open source web-based translation system</target>
             </trans-unit>
+            <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>Terminologie suche</target></trans-unit>
   </body>
  </file>
 </xliff>
