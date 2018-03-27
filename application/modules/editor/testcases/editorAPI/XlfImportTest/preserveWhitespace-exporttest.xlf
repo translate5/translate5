@@ -23,8 +23,7 @@ should make any problem!]]></header>
       <trans-unit id="12344323" datatype="html" xml:space="default">
           <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
             like config.</source>
-        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
-            likez configz.</target>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz Spacez</sub>&quot;/&gt;</ph>Whitespacez - shouldz bez likez configz.</target>
         <note priority="1" from="description">Test file preserve &gt; trans-unit default.</note>
       </trans-unit>
     </body>
@@ -34,8 +33,7 @@ should make any problem!]]></header>
       <trans-unit id="22344321" datatype="html">
           <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
             like config.</source>
-        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
-            likez configz.</target>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz Spacez</sub>&quot;/&gt;</ph>Whitespacez - shouldz bez likez configz.</target>
         <note priority="1" from="description">Test file default &gt; trans-unit undefined.</note>
       </trans-unit>
       <trans-unit id="22344322" datatype="html" xml:space="preserve">
@@ -48,8 +46,7 @@ should make any problem!]]></header>
       <trans-unit id="22344323" datatype="html" xml:space="default">
           <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
             like config.</source>
-        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
-            likez configz.</target>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz Spacez</sub>&quot;/&gt;</ph>Whitespacez - shouldz bez likez configz.</target>
         <note priority="1" from="description">Test file default &gt; trans-unit default.</note>
       </trans-unit>
     </body>
@@ -59,8 +56,7 @@ should make any problem!]]></header>
       <trans-unit id="32344321" datatype="html">
           <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
             like config.</source>
-        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
-            likez configz.</target>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz Spacez</sub>&quot;/&gt;</ph>Whitespacez - shouldz bez likez configz.</target>
         <note priority="1" from="description">Test file undefined &gt; trans-unit undefined.</note>
       </trans-unit>
       <trans-unit id="32344322" datatype="html" xml:space="preserve">
@@ -73,8 +69,7 @@ should make any problem!]]></header>
       <trans-unit id="32344323" datatype="html" xml:space="default">
           <source>Test preserve <ph id="test-sub">&lt;img alt=&quot;<sub>Multi    Space</sub>&quot;/&gt;</ph>Whitespace -    	      should be 
             like config.</source>
-        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz    Spacez</sub>&quot;/&gt;</ph>Whitespacez -    	      shouldz bez 
-            likez configz.</target>
+        <target>Testz preservez <ph id="test-sub">&lt;img alt=&quot;<sub>Multiz Spacez</sub>&quot;/&gt;</ph>Whitespacez - shouldz bez likez configz.</target>
         <note priority="1" from="description">Test file undefined &gt; trans-unit default.</note>
       </trans-unit>
       <trans-unit id="32344324" datatype="html">
@@ -91,20 +86,19 @@ should make any problem!]]></header>
       <trans-unit id="32344326" datatype="html" xml:space="default">
         <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
         <seg-source> <mrk mtype="seg" mid="0">Test not to preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk>  </seg-source>
-        <target> 
-            <mrk mtype="seg" mid="0">Testz notz toz preservez whitespacez.</mrk> <mrk mtype="seg" mid="1">Betweenz mrkz tagsz.</mrk>  <mrk mtype="seg" mid="2">Andz surroundingz tagsz.</mrk>  
-        </target>
+        <target><mrk mtype="seg" mid="0">Testz notz toz preservez whitespacez.</mrk><mrk mtype="seg" mid="1">Betweenz mrkz tagsz.</mrk><mrk mtype="seg" mid="2">Andz surroundingz tagsz.</mrk></target>
         <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
       </trans-unit>
       <trans-unit id="32344327" datatype="html" xml:space="preserve">
         <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
         <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk> <mrk mtype="seg" mid="3">With missing or empty target.</mrk>  </seg-source>
-        <target/>
+        <target> <mrk mtype="seg" mid="0"></mrk> <mrk mtype="seg" mid="1"></mrk>  <mrk mtype="seg" mid="2"></mrk> <mrk mtype="seg" mid="3"></mrk>  </target>
         <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
       </trans-unit>
       <trans-unit id="32344328" datatype="html" xml:space="preserve">
         <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
         <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk> <mrk mtype="seg" mid="3">With missing or empty target.</mrk>  </seg-source>
+        <target> <mrk mtype="seg" mid="0"></mrk> <mrk mtype="seg" mid="1"></mrk>  <mrk mtype="seg" mid="2"></mrk> <mrk mtype="seg" mid="3"></mrk>  </target>
         <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
       </trans-unit>
     </body>

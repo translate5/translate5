@@ -244,9 +244,10 @@ class editor_Models_Import_FileParser_XmlParser {
     
     /**
      * Warning: parentTag works only of a handler is registered for parentTag
+     * leave $handler empty to unregister it
      * @param callable $handler Parameters: $other, $key
      */
-    public function registerOther(callable $handler) {
+    public function registerOther(callable $handler = null) {
         $this->handlerOther = $handler;
     }
     
