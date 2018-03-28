@@ -102,8 +102,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                 success: function(response){
                     me.consoleLog('runSpellCheckWithTool (LanguageTool) done.');
                     resultLT = Ext.util.JSON.decode(response.responseText);
-                    me.allMatchesOfTool = resultLT.rows.matches;
-                    me.applySpellCheck();
+                    if (resultLT.rows.matches) {
+                        me.allMatchesOfTool = resultLT.rows.matches;
+                        me.applySpellCheck();
+                    }
                 },
                 failure: function(response){
                     me.consoleLog('runSpellCheckWithTool (LanguageTool) failed: ' + response.status);

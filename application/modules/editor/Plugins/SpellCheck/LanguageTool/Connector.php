@@ -92,7 +92,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
     }
     
     /***
-     * Check for the status of the response. If the status is different than 200 or 201,
+     * Check for the status of the response. If the status is different than 200,
      * ZfExtended_BadGateway exception is thrown.
      * Also the function checks for the invalid decoded json.
      * 
@@ -102,16 +102,13 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      * @return stdClass|string
      */
     private function processResponse(Zend_Http_Response $response){
-        $validStates = [200,201,401];
+        $validStates = [200]; // not checked: 
+                              // - 201 Created (we don't create any resources)
+                              // - 401 Unauthorized (we don't use authentication)
         
         //check for HTTP State (REST errors)
         if(!in_array($response->getStatus(), $validStates)) {
             throw new ZfExtended_BadGateway($response->getBody(), 500);
-        }
-        
-        //if the user is unauthorized
-        if($response->getStatus() == 401){
-            throw new ZfExtended_NotAuthenticatedException($response->getBody(),401);
         }
         
         $result = json_decode(trim($response->getBody()));
@@ -142,7 +139,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
      * Get matches from LanguageTool.
      * @param string $text
      * @param string $language
-     * @return array
+     * @return object
      */
     public function getMatches($text, $language){
         $http = $this->getHttpClient(self::PATH_MATCHES);

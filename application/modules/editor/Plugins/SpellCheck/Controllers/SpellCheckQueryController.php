@@ -82,16 +82,20 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
     }
     
     public function matchesAction(){
+        $text = "";
+        $language = "";
         if($this->getParam('text') && $this->getParam('text')!=""){
             $text = $this->getParam('text');
         }
         if($this->getParam('language') && $this->getParam('language')!=""){
             $language = $this->getParam('language');
         }
-        if(!$text || !$language){
+        if($text=="" || $language==""){
+            error_log("NO text or language.");
             $this->view->rows = "[]";
             return;
         }
+        
         $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
         $this->view->rows = $connector->getMatches($text,$language);
     }

@@ -63,7 +63,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
-                initialize: 'initSpellCheckPluginForEditor'
+                initialize: 'initSpellCheckPluginForEditor',
+                push: 'initSpellCheck'
             }
         },
     },
@@ -130,7 +131,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             ev = Ext.event.Event;
         if (me.isSupportedLanguage) {
-            conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) {
+            conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) { // TODO: we must run this on KeyUp, not on KeyDown
                 me.initSpellCheck();
             }, false];
         }
@@ -157,7 +158,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
             me.initEditorEtc();
             me.setBrowserSpellcheck();
-            me.initSpellCheck();
         } else {
             me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ').');
         }
@@ -240,6 +240,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             rangeForEditor = rangy.createRange(),
             editorText;
+        if(!me.editor) {
+            me.initEditorEtc();
+        }
         if (!me.isSupportedLanguage) {
             me.consoleLog('doSpellCheck failed because language is not supported.');
             return;
@@ -249,7 +252,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored as searchable)
         
-        rangeForEditor.selectNode(me.editor.getEditorBody());
+        rangeForEditor.selectNode(me.getEditorBody());
         editorText = rangeForEditor.text();
         me.runSpellCheck(editorText);
     },
@@ -274,7 +277,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     finishSpellCheck: function() {
         var me = this;
-        me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js (set the dell nodes visible again)
+        me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js (set the del nodes visible again)
     },
     /**
      * Apply replacement as suggested in the ToolTip.
@@ -298,10 +301,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.setTrackChangesInternalSpellCheckFlag(false);
         }
         
-        // new DOM after replacement => find and apply the matches again:
-        me.doSpellCheck(); 
+        me.spellCheckTooltip.hide();
         
-        // TODO: close ToolTip
+        // new DOM after replacement => find and apply the matches again:
+        me.doSpellCheck();
     },
 
     // =========================================================================
@@ -325,7 +328,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     runSpellCheck: function(textToCheck) {
         var me = this;
-        me.runSpellCheckWithTool(textToCheck);
+        if(textToCheck != "") {
+            console.log("textToCheck: " + textToCheck);
+            me.runSpellCheckWithTool(textToCheck);
+        }
     },
     /**
      * Store data for all matches found by the tool (=> then accessable independent from tool).
@@ -507,7 +513,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     showToolTip: function(event) {
         var me = this;
         me.activeMatchNode = event.currentTarget;
-        // TODO: close spellCheckTooltip first if one is already opened 
+        me.spellCheckTooltip.hide();
         me.spellCheckTooltip.show();
     },
     
@@ -520,14 +526,23 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     cleanSpellCheckTags:function(){
         var me = this,
-            editorBody = me.getEditorBody(),
-            cleanValue;
-        if(!editorBody){
+            editorBodyExtDomEl = me.getEditorBodyExtDomElement(),
+            allSpellCheckElements,
+            spellCheckElementParentNode;
+        if(!editorBodyExtDomEl){
             return false;
         }
-        // TODO: better add classname 'spellcheck' and merge the two replaces into a single one?
-        cleanValue = editorBody.innerHTML.replace(/<span[^>]*>/ig, '').replace(/<\/span>/ig, '');
-        editorBody.innerHTML = cleanValue;
+        me.consoleLog('cleanSpellCheckTags...');
+        // find all spellcheck-elements and "remove their tags"
+        allSpellCheckElements = editorBodyExtDomEl.query('.' + me.self.CSS_CLASSNAME_MATCH);
+        Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
+            spellCheckElementParentNode = spellCheckEl.parentNode;
+            while(spellCheckEl.firstChild) {
+                spellCheckElementParentNode.insertBefore(spellCheckEl.firstChild, spellCheckEl);
+            }
+            spellCheckElementParentNode.removeChild(spellCheckEl);
+            spellCheckElementParentNode.normalize();
+        });
     },
     
     // =========================================================================
