@@ -64,7 +64,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         component: {
             'segmentsHtmleditor': {
                 initialize: 'initSpellCheckPluginForEditor',
-                push: 'initSpellCheck'
+                push: 'startSpellCheck',
+                afterInsertMarkup: 'startSpellCheck'
             }
         },
     },
@@ -132,7 +133,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             ev = Ext.event.Event;
         if (me.isSupportedLanguage) {
             conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) { // TODO: we must run this on KeyUp, not on KeyDown
-                me.initSpellCheck();
+                me.startSpellCheck();
             }, false];
         }
     },
@@ -161,18 +162,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         } else {
             me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ').');
         }
-    },  
-    /**
-     * Check if language is supported and if so, start the SpellCheck.
-     */
-    initSpellCheck: function() {
-        var me = this;
-        if (me.isSupportedLanguage== true) {
-            me.consoleLog('(0.3 => doSpellCheck.)');
-            me.doSpellCheck();
-        } else {
-            me.consoleLog('(0.3 => doSpellCheck not started because language is not supported.)');
-        }
     },
     /**
      * Init Editor etc (= related stuff: CSS, ToolTips, MouseEvents).
@@ -186,6 +175,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.injectCSSForEditor();
         me.initTooltips();
         me.initMouseEvents();
+        me.startSpellCheck();
     },
     initTooltips:function(){
         var me = this;
@@ -236,23 +226,31 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     /**
      * Prepare and run the SpellCheck (be sure to run this only for supported languages).
      */
-    doSpellCheck: function() {
+    startSpellCheck: function() {
         var me = this,
             rangeForEditor = rangy.createRange(),
+            editorBody,
             editorText;
         if(!me.editor) {
+            me.consoleLog('startSpellCheck: initEditorEtc first...');
             me.initEditorEtc();
         }
         if (!me.isSupportedLanguage) {
-            me.consoleLog('doSpellCheck failed because language is not supported.');
+            me.consoleLog('startSpellCheck failed because language is not supported.');
             return;
         }
+        me.consoleLog('(0.3 => startSpellCheck.)');
         
         me.cleanSpellCheckTags(); // in case a spellcheck has been run before already
         
         me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored as searchable)
         
-        rangeForEditor.selectNode(me.getEditorBody());
+        editorBody = me.getEditorBody();
+        if(!me.editorBody) {
+            me.consoleLog('startSpellCheck failed because editorBody is not found.');
+            return;
+        }
+        rangeForEditor.selectNode(editorBody);
         editorText = rangeForEditor.text();
         me.runSpellCheck(editorText);
     },
@@ -284,10 +282,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     applyReplacement: function(event) {
         var me = this,
-            activeMatchIndex = me.activeMatchNode.getAttribute(me.self.ATTRIBUTE_ACTIVEMATCHINDEX),
-            activeMatch = me.allMatches[activeMatchIndex],
-            range = activeMatch.range,
-            replaceText = event.currentTarget.innerText;
+            rangeForMatch = rangy.createRange(),
+            replaceText = event.currentTarget.innerText,
+            range;
+        
+        rangeForMatch.selectNodeContents(me.activeMatchNode);
+        range = rangeForMatch.getBookmark();
         
         me.isActiveTrackChanges();             // SearchReplace.js
         if(!me.activeTrackChanges){            // SearchReplace.js
@@ -304,7 +304,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.spellCheckTooltip.hide();
         
         // new DOM after replacement => find and apply the matches again:
-        me.doSpellCheck();
+        me.startSpellCheck();
     },
 
     // =========================================================================
