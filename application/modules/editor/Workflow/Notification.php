@@ -275,6 +275,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             $tua['originalRole'] = $tua['role'];
             $tua['role'] = $labels[array_search($tua['role'], $workflow->getRoles())];
         }
+        unset ($tua);
         
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
