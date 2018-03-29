@@ -2295,6 +2295,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>mit Lesezeichen versehen</source>
     <target>bookmarked</target>
 </trans-unit>
+<trans-unit id='U3VjaGUgaW4gZ2VzcGVycnRlbiBTZWdtZW50ZW4='>
+    <source>Suche in gesperrten Segmenten</source>
+    <target>Search in locked segments</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

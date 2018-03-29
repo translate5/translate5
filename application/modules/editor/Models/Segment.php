@@ -167,10 +167,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         //the field where the search will be performed (toSort field)
         $searchInToSort=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
         
+        //check if wearch in locked segment is clicked, if yes, remove the editable filter
+        $searchLocked=false;
+        if($parametars['searchInLockedSegments']){
+            $searchLocked=$parametars['searchInLockedSegments']==="true";
+        }
+        
         $select= $this->db->select()
         ->from($viewName,array('id','segmentNrInTask',$parametars['searchInField'],$searchInToSort,'editable'))
-        ->where($searchQuery)
-        ->where('editable = 1');
+        ->where($searchQuery);
+        if(!$searchLocked){
+            $select->where('editable=1');
+        }
         
         /* //TODO:The idea how we can use the search limitation
          * 
