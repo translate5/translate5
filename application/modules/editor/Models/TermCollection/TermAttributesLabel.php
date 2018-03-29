@@ -28,4 +28,17 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_TermCollection_TermAttributesLabel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributesLabel';
+    
+    
+    /***
+     * Get the label by given label name
+     * 
+     * @param string $labelName
+     */
+    public function getLabelByName($labelName){
+        $s = $this->db->select()
+        ->from($this->db)
+        ->where('label=?', $labelName);
+        return $this->db->fetchAll($s)->toArray();
+    }
 }
