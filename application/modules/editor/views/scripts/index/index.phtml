@@ -37,13 +37,6 @@ END LICENSE AND COPYRIGHT
     <meta name="msapplication-config" content="none"/>
     <link rel="shortcut icon" href="<?php echo $this->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
     <title><?php echo $this->translate->_('translate5'); ?></title>
-    
-    <?php
-        if($this->enableJsLogger) {
-            echo $this->render('index/jslogger.phtml');
-        }
-    ?>
-    
     <script>
     Editor = {};
     <?php
@@ -52,6 +45,9 @@ END LICENSE AND COPYRIGHT
     Editor.TRANSTILDE = '~@#!WS~';
     </script>
     <?php
+        if($this->enableJsLogger) {
+            echo $this->render('index/jslogger.phtml');
+        }
         echo $this->render('index/app-js-'.$this->buildType.'.phtml');
         echo $this->headLink();
     ?>
