@@ -67,20 +67,14 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
     protected function parse() {
         $this->_skeletonFile = $this->_origFile;
         $this->qp = qp($this->_skeletonFile, ':root',array('format_output'=> false, 'encoding'=>'UTF-8','use_parser'=>'xml'));
-        $this->parseSegmentAttributes('fake - not needed, except for declaration');
-        $this->extractSegment('fake - not needed, except for declaration');
-        $this->_skeletonFile = $this->qp->xml();
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
-     */
-    protected function parseSegmentAttributes($transunit) {
+        
         $id = $this->segmentCount++;
         //just create a segment attributes object with default values
         $this->createSegmentAttributes($id);
         $this->setMid($id);
+        
+        $this->extractSegment('fake - not needed, except for declaration');
+        $this->_skeletonFile = $this->qp->xml();
     }
 
     /**

@@ -270,8 +270,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
 
     /**
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
+     * parses the given transunit array
+     * @param array $transunit
      */
     protected function parseSegmentAttributes($transunit) {
         $start = strpos($transunit, '<sdl:seg-defs');

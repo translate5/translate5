@@ -352,7 +352,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             );
         }
 
-        $this->parseSegmentAttributes($lineArr); //<< hier kann crap übergeben werden
+        //just create a segment attributes object with default values
+        $this->createSegmentAttributes($this->_mid);
+        
         $segmentId = $this->setAndSaveSegmentValues();
         foreach($this->colOrder as $name => $idx) {
             $field = $this->segmentFieldManager->getByName($name);
@@ -631,19 +633,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $text = preg_replace_callback($regEx, $mask, $text);
         }
         return $this->parseSegmentInsertPlaceholders($text,$this->regexInternalTags);
-    }
-    
-    /**
-     * Sets the segment attributes for the segment currently worked on, uses the system defaults
-     * $this->_target and $this->_source must be defined already!
-     * most of the attributes are not defined for CSV and are accordingly presetted
-     * 
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
-     */
-    protected function parseSegmentAttributes($segment){
-        //just create a segment attributes object with default values
-        $this->createSegmentAttributes($this->_mid);
     }
     
     /**

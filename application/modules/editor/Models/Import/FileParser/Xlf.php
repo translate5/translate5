@@ -519,10 +519,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
+     * parses the TransUnit attributes
+     * @param array $attributes transUnit attributes
+     * @param integer $mid MRK tag mid or 0 if no mrk mtype seg used
+     * @return editor_Models_Import_FileParser_SegmentAttributes
      */
-    protected function parseSegmentAttributes($attributes) {
+    protected function parseSegmentAttributes($attributes, $mid) {
         settype($attributes['id'], 'integer');
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
@@ -530,6 +532,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $id = $attributes['id'].'_'.++$this->segmentCount;
         
         $segmentAttributes = $this->createSegmentAttributes($id);
+        $segmentAttributes->mrkMid = $mid;
 
         //process nonxliff attributes
         $this->namespaces->transunitAttributes($attributes, $segmentAttributes);
@@ -651,7 +654,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             );
             
             //parse attributes for each found segment not only for the whole trans-unit
-            $attributes = $this->parseSegmentAttributes($transUnit);
+            $attributes = $this->parseSegmentAttributes($transUnit, $mid);
+            
             //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
             if(strpos($mid, self::PREFIX_SUB) === 0) {
                 $this->setMid($this->_mid.'-'.$mid);
@@ -693,10 +697,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //if there is any other content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed 
         // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
-        if(preg_match('/[^\s]+/', join(array_merge($this->otherContentTarget, $this->otherContentSource)))) {
-            $data = array_merge($this->otherContentTarget, $this->otherContentSource);
-            $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
-        }
+        // TODO basicly correct, but probably not working correctly with $leadingTags/$trailingTags
+        //if(preg_match('/[^\s]+/', join(array_merge($this->otherContentTarget, $this->otherContentSource)))) {
+            //$data = array_merge($this->otherContentTarget, $this->otherContentSource);
+            //$this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
+        //}
         
         $hasNoTarget = is_null($this->currentPlainTarget);
         $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
