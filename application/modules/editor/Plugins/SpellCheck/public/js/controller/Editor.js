@@ -63,8 +63,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
-                push: 'startSpellCheck',
-                afterInsertMarkup: 'startSpellCheck'
+                push: 'startTimerForSpellCheck',
+                afterInsertMarkup: 'startTimerForSpellCheck'
             }
         },
     },
@@ -83,7 +83,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // Attributes for the spellcheck-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellcheck-activeMatchIndex',
         // In ToolTips
-        CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement'
+        CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
+        // Milliseconds to pass before SpellCheck is started when no editing occurs
+        EDITIDLE_MILLISECONDS: 1000,
     },
     
     // =========================================================================
@@ -100,6 +102,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     activeMatchNode: null,          // node of single match currently in use
     
     spellCheckTooltip: null,        // spellcheck tooltip instance
+    
+    editIdleTimer: null,            // time "nothing" is changed in the Editor's content; 1) user: presses no key 2) segmentsHtmleditor: no push, no afterInsertMarkup
+    editIdleRestarted: null,        // has the content been changed in the Editor (= timer restarted) since the last timer has started the SpellCheck?
     
     USE_CONSOLE: true,              // (true|false): use true for developing using the browser's console, otherwise use false
     
@@ -181,18 +186,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         });
     },
     /**
-     * Init and handle events
+     * Init Events
      */
     initKeyboardEvents: function() {
         var me = this;
-        Ext.get(me.editor.getDoc()).on('keyup', me.handleKeyUp, me, {priority: 9999, delegated: false});
-    },
-    handleKeyUp: function(event) {
-        var me = this;
-        if( event.getKey() == Ext.event.Event.SPACE) {
-            me.consoleLog('SPACE entered => startSpellCheck');
-            me.startSpellCheck();
-        }
+        Ext.get(me.editor.getDoc()).on('keydown', me.startTimerForSpellCheck, me, {priority: 9999, delegated: false});
     },
     initMouseEvents: function() {
         var me = this,
@@ -217,6 +215,23 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 preventDefault: true
             }
         });
+    },
+    
+    // =========================================================================
+    // When do we run the SpellCheck?
+    // =========================================================================
+    /**
+     * Everytime the user stops editing for a certain time (EDITIDLE_MILLISECONDS),
+     * the SpellCheck ist started.
+     */
+    startTimerForSpellCheck: function() {
+        var me = this;
+        clearTimeout(me.editIdleTimer);
+        me.editIdleRestarted = true;
+        me.editIdleTimer = setTimeout(function(){
+                me.editIdleRestarted = false;
+                me.startSpellCheck();
+            }, me.self.EDITIDLE_MILLISECONDS);
     },
     
     // =========================================================================
@@ -265,6 +280,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     applySpellCheck: function() {
         var me = this;
+        if (me.editIdleRestarted) {
+            me.consoleLog('applySpellCheck not started: results might be invalid after the content was edited in the meantime.');
+            return;
+        }
         if (me.allMatchesOfTool.length > 0) {
             me.storeAllMatchesFromTool();
             me.showAllMatchesInEditor();
@@ -279,6 +298,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     finishSpellCheck: function() {
         var me = this;
         me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js (set the del nodes visible again)
+        // TODO: if the user was editing content behind the first match, the caret jumps in front of the first match.
     },
     /**
      * Apply replacement as suggested in the ToolTip.
