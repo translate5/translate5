@@ -63,7 +63,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
-                initialize: 'initSpellCheckPluginForEditor',
                 push: 'startSpellCheck',
                 afterInsertMarkup: 'startSpellCheck'
             }
@@ -90,8 +89,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     
     editor: null,                   // The segment's Editor (Editor.view.segments.HtmlEditor)
-    editorBody: null,               // Segment's Editor: HTMLBodyElement
-    editorBodyExtDomElement: null,  // Segment's Editor: Ext.dom.Element
+    editorBodyExtDomElement: null,  // Segment's Editor: Ext.dom.Element (also needed for me.prepareDelNodeForSearch() in SearchReplaceUtils.js)
     
     targetLangCode: null,           // language to be checked
     isSupportedLanguage: null,      // if the language is supported by our tool(s)
@@ -126,18 +124,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         Ext.dom.GarbageCollector.collect();
     },
     /**
-     * 
-     */
-    handleEditorKeyMapUsage: function(conf, area, mapOverwrite) {
-        var me = this,
-            ev = Ext.event.Event;
-        if (me.isSupportedLanguage) {
-            conf.keyMapConfig['space'] = [ev.SPACE,{ctrl: false, alt: false},function(key) { // TODO: we must run this on KeyUp, not on KeyDown
-                me.startSpellCheck();
-            }, false];
-        }
-    },
-    /**
      * Init the SpellCheck-Plugin for the current task:
      * - Store task-specific properties (targetLangCode, isSupportedLanguage).
      */
@@ -146,40 +132,41 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.consoleLog('0.2a initSpellCheckPluginForTask');
         me.setTargetLangCode();
         me.setLanguageSupport();
-    },  
+    },
     /**
      * Init the SpellCheck-Plugin for the current Editor
-     * (only if the language is supported by our own tools):
-     * - Initialize the Editor.
-     * - Disable the browser's spellcheck if the language IS supported by our own tools.
+     * (only if the language is supported by our own tools)
      */
     initSpellCheckPluginForEditor: function() {
         var me = this;
         if (me.isSupportedLanguage) {
             me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
-            me.initEditorEtc();
+            me.initEditor();
             me.setBrowserSpellcheck();
+            me.initTooltips();
+            me.initKeyboardEvents();
+            me.initMouseEvents();
         } else {
             me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ').');
         }
     },
     /**
-     * Init Editor etc (= related stuff: CSS, ToolTips, MouseEvents).
+     * Init Editor
      */
-    initEditorEtc: function() {
+    initEditor: function() {
         var me = this,
             plug = me.getSegmentGrid().editingPlugin,
             editor = plug.editor; // → this is the row editor component;
-        
-        me.editor = editor.mainEditor; // → this is the HtmlEditor:
+        me.consoleLog('initEditor');
+        me.editor = editor.mainEditor; // → this is the HtmlEditor
+        me.editorBodyExtDomElement = me.getEditorBodyExtDomElement();
         me.injectCSSForEditor();
-        me.initTooltips();
-        me.initMouseEvents();
-        me.startSpellCheck();
     },
+    /**
+     * Init ToolTips
+     */
     initTooltips:function(){
         var me = this;
-        
         me.spellCheckTooltip = Ext.create('Ext.tip.ToolTip', {
             closable: true,
             renderTo: Ext.getBody(),
@@ -193,12 +180,25 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         });
     },
+    /**
+     * Init and handle events
+     */
+    initKeyboardEvents: function() {
+        var me = this;
+        Ext.get(me.editor.getDoc()).on('keyup', me.handleKeyUp, me, {priority: 9999, delegated: false});
+    },
+    handleKeyUp: function(event) {
+        var me = this;
+        if( event.getKey() == Ext.event.Event.SPACE) {
+            me.consoleLog('SPACE entered => startSpellCheck');
+            me.startSpellCheck();
+        }
+    },
     initMouseEvents: function() {
         var me = this,
-            editorBodyExtDomEl = me.getEditorBodyExtDomElement(),
             tooltipBody = Ext.getBody();
         
-        editorBodyExtDomEl.on({
+        me.editorBodyExtDomElement.on({
             contextmenu:{
                 delegated: false,
                 delegate: me.self.NODE_NAME_MATCH + '.' + me.self.CSS_CLASSNAME_MATCH,
@@ -231,25 +231,28 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             rangeForEditor = rangy.createRange(),
             editorBody,
             editorText;
-        if(!me.editor) {
-            me.consoleLog('startSpellCheck: initEditorEtc first...');
-            me.initEditorEtc();
-        }
         if (!me.isSupportedLanguage) {
             me.consoleLog('startSpellCheck failed because language is not supported.');
             return;
         }
+
+        editorBody = me.getEditorBody();
+        if(!me.editor || !editorBody) {
+            me.consoleLog('startSpellCheck: initSpellCheckPluginForEditor first...');
+            me.initSpellCheckPluginForEditor();
+            editorBody = me.getEditorBody();
+        }
+        if(!editorBody) {
+            me.consoleLog('startSpellCheck failed because editorBody is not found.');
+            return;
+        }
+        
         me.consoleLog('(0.3 => startSpellCheck.)');
         
         me.cleanSpellCheckTags(); // in case a spellcheck has been run before already
         
         me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored as searchable)
         
-        editorBody = me.getEditorBody();
-        if(!me.editorBody) {
-            me.consoleLog('startSpellCheck failed because editorBody is not found.');
-            return;
-        }
         rangeForEditor.selectNode(editorBody);
         editorText = rangeForEditor.text();
         me.runSpellCheck(editorText);
@@ -410,25 +413,22 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @returns {HTMLBodyElement}
      */
     getEditorBody:function(){
-        var me=this;
+        var me = this;
         if(!me.editor){
             return false;
         }
         if(me.editor.editorBody){
             return me.editor.editorBody;
         }
-        //reinit the editor body
-        me.editorBody=me.editor.getEditorBody();
-        return me.editorBody;
+        return me.editor.getEditorBody();
     },
     /***
      * Use this function to get the editor ext document element.
      * @returns {Ext.dom.Element}
      */
     getEditorBodyExtDomElement:function(){
-        var me=this;
-        me.editorBodyExtDomElement=Ext.get(me.getEditorBody());
-        return me.editorBodyExtDomElement;
+        var me = this;
+        return Ext.get(me.getEditorBody());
     },
     /***
      * Set targetLangCode for the current task.
@@ -526,15 +526,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     cleanSpellCheckTags:function(){
         var me = this,
-            editorBodyExtDomEl = me.getEditorBodyExtDomElement(),
             allSpellCheckElements,
             spellCheckElementParentNode;
-        if(!editorBodyExtDomEl){
+        if(!me.editorBodyExtDomElement){
+            me.consoleLog('cleanSpellCheckTags failed with missing editorBodyExtDomElement.');
             return false;
         }
-        me.consoleLog('cleanSpellCheckTags...');
         // find all spellcheck-elements and "remove their tags"
-        allSpellCheckElements = editorBodyExtDomEl.query('.' + me.self.CSS_CLASSNAME_MATCH);
+        allSpellCheckElements = me.editorBodyExtDomElement.query('.' + me.self.CSS_CLASSNAME_MATCH);
         Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
             spellCheckElementParentNode = spellCheckEl.parentNode;
             while(spellCheckEl.firstChild) {
