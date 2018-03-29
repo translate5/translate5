@@ -136,7 +136,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         
         $task = $this->api()->getTask();
         //start task export 
-        $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'ibm-opentm2.xlf', 'ibm-opentm2-export-normal.xlf');
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '01-ibm-opentm2.xlf', 'ibm-opentm2-export-normal.xlf');
         //start task export with diff
         // diff export will be disabled for XLF!
     }
@@ -148,7 +148,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
     public function testPreserveContentBetweenMrk() {
         $task = $this->api()->getTask();
         //start task export 
-        $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '02-preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
     }
     
     /**

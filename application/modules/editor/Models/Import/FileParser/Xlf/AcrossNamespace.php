@@ -126,6 +126,7 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
         }
         if(isset($this->matchRate[$mid])) {
             $segmentAttributes->matchRate = $this->matchRate[$mid];
+            $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_TM;
         }
     }
     
