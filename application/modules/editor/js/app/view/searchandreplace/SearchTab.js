@@ -57,7 +57,8 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
       saveCurrentOpen:'#UT#Segment beim Schließen speichern',//Save segment on close
       invalidRegularExpression:'#UT#Ungültiger Regulärer Ausdruck',
       unsupportedRegularExpression:'#UT#Dieser reguläre Ausdruck wird nicht unterstützt',
-      segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:'
+      segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:',
+      searchInLockedSegments:'#UT#Suche in gesperrten Segmenten'
     },
     
     padding:'10 10 10 10',
@@ -144,6 +145,17 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                         value:'{!isSearchView}'
                     },
                     boxLabel:me.strings.saveCurrentOpen
+                },{
+                    xtype:'checkbox',
+                    itemId:'searchInLockedSegments',
+                    name:'searchInLockedSegments',
+                    boxLabel:me.strings.searchInLockedSegments,
+                    bind:{
+                        visible:'{isSearchView}'
+                    },
+                    listeners:{
+                        change:'resetSearchParametars'
+                    }
                 }]
         };
         if (instanceConfig) {

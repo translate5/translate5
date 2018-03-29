@@ -1292,6 +1292,7 @@ Ext.define('Editor.controller.SearchReplace', {
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             replaceField=activeTab.down('#searchInField'),
+            searchInLockedSegments=activeTab.down('#searchInLockedSegments').checked,
             selectedColumnDataIndex=replaceField.getSelection().get('id');
 
         callback = function() {
@@ -1314,12 +1315,18 @@ Ext.define('Editor.controller.SearchReplace', {
                 
                 //clean the mark tags from the editor
                 me.cleanMarkTags();
-                //find matches 
-                me.findMatchesDelay();
-            }else{
+
+                //if is not a locked segment search, do regular find match
+                if(!searchInLockedSegments){
+                    me.findMatchesDelay();
+                }
+            }
+
+            //no editable content or locked search, find matches in the cell
+            if(!me.isContentEditableField() || searchInLockedSegments){
                 var visibleColumns=grid.query('gridcolumn:not([hidden])'),
                     cellIndex=0;
-
+    
                 //find the index of the searched column
                 for(var i=0;i<visibleColumns.length;i++){
                     if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
