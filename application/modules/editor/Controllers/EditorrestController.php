@@ -42,13 +42,20 @@ abstract class editor_Controllers_EditorrestController extends ZfExtended_RestCo
      * @throws ZfExtended_NotAuthenticatedException
      */
     public function init() {
-      $this->session = new Zend_Session_Namespace();
-      $guid = new ZfExtended_Validate_Guid();
-      if(!$guid->isValid($this->session->taskGuid)) {
-        throw new ZfExtended_NotAuthenticatedException();
-      }
-      $this->afterTaskGuidCheck();
-      parent::init();
+        $this->session = new Zend_Session_Namespace();
+        parent::init();
+    }
+    
+    public function preDispatch(){
+        $guid = new ZfExtended_Validate_Guid();
+        if(!$guid->isValid($this->session->taskGuid)) {
+            $e = new ZfExtended_NoAccessException();
+            $e->setMessage("Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.", true);
+            $e->setLogging(false); //TODO loglevel info
+            throw $e;
+        }
+        $this->afterTaskGuidCheck();
+        parent::preDispatch();
     }
     
     protected function afterTaskGuidCheck() {

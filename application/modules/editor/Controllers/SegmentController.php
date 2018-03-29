@@ -82,16 +82,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
     
-    
-    public function init() {
-      parent::init();
-      $this->entity->setEnableWatchlistJoin();
-      $this->entity->getFilter()->setSegmentFields(array_keys($this->_sortColMap));
-    }
-    
     protected function afterTaskGuidCheck() {
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
         $this->_sortColMap = $sfm->getSortColMap();
+        $this->entity->setEnableWatchlistJoin();
+        $this->entity->getFilter()->setSegmentFields(array_keys($this->_sortColMap));
         parent::afterTaskGuidCheck();
     }
     
@@ -267,6 +262,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->load((int) $this->_getParam('id'));
 
         $this->checkTaskGuidAndEditable();
+        $task = $this->checkTaskState();
 
         $history = $this->entity->getNewHistoryEntity();
 
@@ -287,7 +283,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $this->entity->updateToSort($field);
         }
 
-        
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
         $this->entity->restoreNotModfied();
@@ -304,7 +299,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->validate();
         
         //FIXME: Introduced with TRANSLATE-885, but is more a hack as a solution. See Issue comments for more information!
-        $this->updateTargetHashAndOriginal();
+        $this->updateTargetHashAndOriginal($task);
 
         foreach($allowedAlternatesToChange as $field) {
             if($this->entity->isModified($field)) {
@@ -460,13 +455,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Can be done only in Workflow Step 1 and if all targets were empty on import
      * This is more a hack as a right solution. See TRANSLATE-885 comments for more information!
      * See also in AlikesegmenController!
+     * @param editor_Models_Task $task
      */
-    protected function updateTargetHashAndOriginal() {
+    protected function updateTargetHashAndOriginal(editor_Models_Task $task) {
         //TODO: also a check is missing, if task has alternate targets or not.
-        // With alternates no recalc is needed at all, since no repetition editor can be used 
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        // With alternates no recalc is needed at all, since no repetition editor can be used
+        
         if($task->getWorkflowStep() == 1 && (bool) $task->getEmptyTargets()){
             $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$task]);
             /* @var $hasher editor_Models_Segment_RepetitionHash */
@@ -575,14 +569,32 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     /**
      * checks if current session taskguid matches to loaded segment taskguid
      * @throws ZfExtended_Models_Entity_NoAccessException
+     * @return editor_Models_Task
      */
     protected function checkTaskGuidAndEditable() {
         $session = new Zend_Session_Namespace();
         $editable = $this->entity->getEditable();
+
         if (empty($editable) || $session->taskGuid !== $this->entity->getTaskGuid()) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
+    }
+    
+    /**
+     * checks if current task state allows editing
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * @return editor_Models_Task
+     */
+    protected function checkTaskState() {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        if ($task->getState() === $task::STATE_UNCONFIRMED) {
+            //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
+            throw new ZfExtended_Models_Entity_NoAccessException('Task is not confirmed so no segment can be edited! Task: '.$task->getTaskGuid());
+        }
+        return $task;
     }
     
     protected function isEditable(){

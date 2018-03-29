@@ -15,6 +15,7 @@ export LOGOUT_PATH=$LOGOUT_PATH
 
 #single test to test the "things around" (translate5 internal test framework)
 #phpunit --verbose --include-path $INCLUDES --bootstrap bootstrap.php editorAPI/DummyTest.php
+#exit $?
 
 if [ -n "$1" ]; then
 TO_RUN=$@

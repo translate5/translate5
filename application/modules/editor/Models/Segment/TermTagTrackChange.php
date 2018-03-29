@@ -114,7 +114,7 @@ class editor_Models_Segment_TermTagTrackChange {
     public function restoreNodes($text, $textId) {
         $this->doDebug('Restore TrackChangeNodes for (textId: ' . $textId . '): ' . $text);
         
-        if (!array_key_exists($textId, $this->arrTrackChangeNodes)) {
+        if (!array_key_exists($textId, $this->arrTrackChangeNodes) || $this->arrTrackChangeNodes[$textId] == null) {
             //throw new ZfExtended_Exception('Decoding TrackChanges failed because there is no information about the original version (textId: ' . $textId . '): ' . $text);
             $this->doDebug('Decoding TrackChanges failed because there is no information about the original version (textId: ' . $textId . '): ' . $text);
             return $text;
@@ -255,7 +255,7 @@ class editor_Models_Segment_TermTagTrackChange {
         $length = strlen($termTagInText);
         $this->arrTrackChangeNodesInText = $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length, $this->posInText);
         $this->posInText += $length;
-        $this->debugText .= "\n" . $this->posInText .": vorgefunden: " . $termTagInText.  "\n- length:" . $length . "\n- weiter bei: " . $this->posInText;
+        $this->debugText .= "\n- vorgefunden: " . $termTagInText.  "\n- length:" . $length . "\n- weiter bei: " . $this->posInText;
         if ($openingTrackChangeNode != null) {
             $length = strlen($openingTrackChangeNode);
             $this->arrTrackChangeNodesInText = $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length, $this->posInText);
@@ -339,7 +339,7 @@ class editor_Models_Segment_TermTagTrackChange {
                 return $oldKey + $number;
             }
         }, $arrOldKeys);
-            return array_combine($arrNewKeys, $arrOldValues);
+        return array_combine($arrNewKeys, $arrOldValues);
     }
     
     /**

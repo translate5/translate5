@@ -57,12 +57,30 @@ class editor_Models_Import_Worker_SetTaskToOpen extends editor_Models_Import_Wor
         if ($task->getState() != $task::STATE_IMPORT) {
             return false;
         }
-        $task->setState($task::STATE_OPEN);
+        
+        $task->setState($this->getInitialTaskState($task));
         $task->save();
         $task->unlock();
         
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         $eventManager->trigger('importCompleted', $this, array('task' => $task));
         return true;
+    }
+    
+    /**
+     * returns the initial status for a task directly after import
+     * see config runtimeOptions.import.initialTaskState;
+     * @param editor_Models_Task $task
+     * @return string
+     */
+    protected function getInitialTaskState(editor_Models_Task $task) {
+        $config = Zend_Registry::get('config');
+        $status = $config->runtimeOptions->import->initialTaskState;
+        $reflection = new ReflectionObject($task);
+        $constants = $reflection->getConstants();
+        if(!in_array($status, $constants)) {
+            throw new ZfExtended_Exception('The configured initialTaskState is not valid! state: '.$status.'; valid states:'.print_r($constants,1));
+        }
+        return $status;
     }
 }

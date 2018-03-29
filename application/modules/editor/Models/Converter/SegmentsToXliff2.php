@@ -704,6 +704,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @return string
      */
     protected function cleanTrackChanges($text){
+        $text= preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_DEL_NODOUBLESPACE, ' ', $text);
         $text= preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_DEL, '', $text);
         $text= preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_INS, '', $text);
         return $text;

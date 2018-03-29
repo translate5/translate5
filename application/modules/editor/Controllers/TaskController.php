@@ -155,6 +155,7 @@ class editor_TaskController extends ZfExtended_RestController {
         // here no check for pmGuid, since this is done in task::loadListByUserAssoc
         $isAllowedToLoadAll = $this->isAllowed('backend', 'loadAllTasks'); 
         $filter = $this->entity->getFilter();
+        /* @var $filter editor_Models_Filter_TaskSpecific */
         $filter->convertStates($isAllowedToLoadAll);
         $assocFilter = $filter->isUserAssocNeeded();
         if(!$assocFilter && $isAllowedToLoadAll) {
@@ -585,17 +586,20 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function openAndLock() {
         $session = new Zend_Session_Namespace();
+        $task = $this->entity;
         if($this->isOpenTaskRequest(true)){
-            if(!$this->entity->lock($this->now)){
-                $workflow = $this->workflow;
+            $workflow = $this->workflow;
+            $unconfirmed = $task->getState() == $task::STATE_UNCONFIRMED;
+            //first check for confirmation, if unconfirmed, don't lock just set to view mode!
+            if($unconfirmed || !$task->lock($this->now)){
                 $this->data->userState = $workflow::STATE_VIEW;
             }
         }
         if($this->isOpenTaskRequest()){
-            $this->entity->createMaterializedView();
-            $this->entity->registerInSession($this->data->userState);
+            $task->createMaterializedView();
+            $task->registerInSession($this->data->userState);
             $this->events->trigger("afterTaskOpen", $this, array(
-                'task' => $this->entity, 
+                'task' => $task, 
                 'view' => $this->view, 
                 'openState' => $this->data->userState)
             );

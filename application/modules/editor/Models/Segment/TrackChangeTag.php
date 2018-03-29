@@ -46,6 +46,14 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      */
     const REGEX_INS     = '/<\/?ins[^>]*>/i';
     
+    
+    /***
+     * del-Tag:  avoid double space after removing a deleted word with one space at both sides (TRANSLATE-1194)
+     * 
+     * @var string
+     */
+    const REGEX_DEL_NODOUBLESPACE = '/ <del[^>]*>.*?<\/del> /i';
+    
     /***
      * del protected tag regex 
      * @var string
@@ -170,10 +178,12 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     
     /**
      * removes TrackChanges-Tags:
+     * - DEL => avoid double space after removing a deleted word with one space at both sides
      * - DEL => markup-Tag AND content inbetween is removed
      * - INS => markup-Tag ONLY is removed
      */
     public function removeTrackChanges(string $segment) {
+        $segment= preg_replace(self::REGEX_DEL_NODOUBLESPACE, ' ', $segment);
         $segment= preg_replace(self::REGEX_DEL, '', $segment);
         $segment= preg_replace(self::REGEX_INS, '', $segment);
         return $segment;

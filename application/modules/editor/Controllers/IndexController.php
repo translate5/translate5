@@ -265,6 +265,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //default state configuration for frontend components(grid)
       $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
       
+      $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
+      
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
       
@@ -339,13 +341,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     protected function getAppVersion() {
-        $versionFile = APPLICATION_PATH.'/../version';
-        $regex = '/MAJOR_VER=([0-9]+)\s*MINOR_VER=([0-9]+).*\s*BUILD=([0-9]+).*/';
-        if(file_exists($versionFile) && $res = preg_match($regex, file_get_contents($versionFile), $matches)) {
-            array_shift($matches);
-            return join('.', $matches);
-        }
-        return 'development';
+        return ZfExtended_Utils::getAppVersion();
     }
     
     /**
