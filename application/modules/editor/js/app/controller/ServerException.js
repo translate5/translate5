@@ -38,6 +38,7 @@ Ext.define('Editor.controller.ServerException', {
         "403": '#UT#Für die angeforderten Daten fehlen Ihnen die nötigen Berechtigungen!',
         "403_destroy": '#UT#Zum Löschen der geforderten Daten fehlen Ihnen die nötigen Berechtigungen!',
         "403_create": '#UT#Zum Speichern von neuen Daten fehlen Ihnen die nötigen Berechtigungen!',
+        "403_update": '#UT#Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!',
         "403_edit": '#UT#Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!',
         "404": '#UT#Die angeforderten / zu bearbeitenden Daten wurden nicht gefunden!',
         "405_del_assoc": '#UT#Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.',
@@ -120,7 +121,6 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 Ext.Msg.alert(str.title, appendServerMsg(str.timeout));
                 return;
-            case 403: //Forbidden: authenticated, but not allowed to see the specific resource 
             //@todo remove this specific 405 handler with TRANSLATE-94
             case 405: //Method Not Allowed: the used HTTP Method is not allowed
                 var req = response.request,
@@ -137,7 +137,8 @@ Ext.define('Editor.controller.ServerException', {
                 }
                 Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
                 return;
-            case 404: //Not Found: Ressource does not exist
+            case 403: //Forbidden: authenticated, but not allowed to see the specific resource 
+            case 404: //Not Found: Resource does not exist
                 if(str[_status+'_'+action]) {
                     _status = _status+'_'+action;
                 }

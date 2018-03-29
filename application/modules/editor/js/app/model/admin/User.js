@@ -102,7 +102,7 @@ Ext.define('Editor.model.admin.User', {
               }
               break;
           case 'editorEndTask':
-              if(task.isEnded() || task.isLocked()) {
+              if(task.isEnded() || task.isLocked() || task.isUnconfirmed()) {
                   return false;
               }
               break;
@@ -122,7 +122,7 @@ Ext.define('Editor.model.admin.User', {
               //TODO this is a good example how currently workflow state transtions 
               //     are encapuslated in JS, we want to finish the task, and have to check the current state.
               //     This should also come from the PHP workflow definition.
-              if(task.get('userRole') == 'visitor' || task.get('userRole') == '' || task.isWaiting() || task.isFinished() || task.isEnded()) {
+              if(task.get('userRole') == 'visitor' || task.get('userRole') == '' || task.isWaiting() || task.isFinished() || task.isEnded() || task.isUnconfirmed()) {
                   return false;
               }
               break;
@@ -134,6 +134,11 @@ Ext.define('Editor.model.admin.User', {
               break;
           case 'editorShowexportmenuTask':
               if(!task.hasQmSub() && !me.isAllowed('editorExportTask')){
+                  return false;
+              }
+              break;
+          case 'editorExportTask':
+              if(task.isUnconfirmed()){
                   return false;
               }
               break;

@@ -78,7 +78,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
       user_state_waiting: '#UT#wartend',
       user_state_finished: '#UT#abgeschlossen',
       task_state_end: '#UT#beendet',
-      task_state_import: '#UT#beendet',
+      task_state_unconfirmed: '#UT#nicht bestätigt',
+      task_state_import: '#UT#import',
       locked: '#UT#in Arbeit',
       forMe: '#UT#für mich '
   },
@@ -115,7 +116,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
               return res.join(' ');
           }
           if(task.isCustomState()) {
-              res.push('customeState');
+              res.push('customState');
+          }
+          if(task.isUnconfirmed()) {
+              res.push('unconfirmed');
           }
           if(task.isOpenable() && !task.isCustomState()) {
               res.push('openable');
@@ -200,7 +204,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           states = [],
           config,
           //we must have here an own ordered list of states to be filtered 
-          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_import'],
+          stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'task_state_import'],
           relaisLanguages = Ext.Array.clone(Editor.data.languages);
           
           //we're hardcoding the state filter options order, all other (unordered) workflow states are added below
@@ -253,6 +257,14 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   if(rec.isLocked() && rec.isCustomState()) {
                       meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedSystem, rec.get('state'))+'"';
                       return me.strings.locked;
+                  }
+                  if(rec.isLocked() && rec.isUnconfirmed()) {
+                      meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
+                      return me.strings.locked;
+                  }
+                  if(rec.isUnconfirmed()) {
+                      meta.tdAttr = 'data-qtip="' + me.states.task_state_unconfirmed+'"';
+                      return me.states.task_state_unconfirmed;
                   }
                   if(rec.isLocked()) {
                       meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';

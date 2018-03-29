@@ -39,8 +39,13 @@ Ext.define('Editor.model.admin.Task', {
   USER_STATE_VIEW: 'view',
   USER_STATE_WAITING: 'waiting',
   USER_STATE_FINISH: 'finished',
-  STATE_ERROR: 'error',
-  STATE_IMPORT: 'import',
+  states: {
+      ERROR: 'error',
+      IMPORT: 'import',
+      UNCONFIRMED: 'unconfirmed',
+      OPEN: 'open',
+      END: 'end',
+  },
   fields: [
     {name: 'id', type: 'int'},
     {name: 'taskGuid', type: 'string'},
@@ -124,7 +129,8 @@ Ext.define('Editor.model.admin.Task', {
    * @return {Boolean}
    */
   isCustomState: function() {
-      return this.get('state') !== 'open' && this.get('state') !== 'end' && this.get('state') !== 'import';
+      var knownStates = Ext.Object.getValues(this.states);
+      return !Ext.Array.contains(knownStates, this.get('state'));
   },
   /**
    * must consider also the old value (temporary set to open / edit)
@@ -159,21 +165,28 @@ Ext.define('Editor.model.admin.Task', {
    * @returns {Boolean}
    */
   isImporting: function() {
-      return this.get('state') == this.STATE_IMPORT;
+      return this.get('state') == this.states.IMPORT;
+  },
+  /**
+   * returns if task is still in import state
+   * @returns {Boolean}
+   */
+  isUnconfirmed: function() {
+      return this.get('state') == this.states.UNCONFIRMED;
   },
   /**
    * returns if task had errors while import
    * @returns {Boolean}
    */
   isErroneous: function() {
-      return this.get('state') == this.STATE_ERROR;
+      return this.get('state') == this.states.ERROR;
   },
   /**
    * returns if task is openable
    * @returns {Boolean}
    */
   isOpenable: function() {
-      if(this.get('state') == this.STATE_IMPORT) {
+      if(this.get('state') == this.states.IMPORT) {
           return false;
       }
       //a user with editorEditAllTasks (normally PMs) can always open the task or if the current loged user is a pm to that project
