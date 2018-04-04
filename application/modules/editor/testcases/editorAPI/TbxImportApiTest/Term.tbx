@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE martif>
+<martif type="TBX" xml:lang="en">
+	<martifHeader>
+		<fileDesc>
+			<sourceDesc>
+				<p>Across terms export</p>
+			</sourceDesc>
+		</fileDesc>
+	</martifHeader>
+	<text>
+		<body>
+			<!-- termEntry id → groupId -->
+			<!-- about Attributes on term level 
+			LEK_term_entry_attributes, ForeignKey to groupId 
+			LEK_term_language_attributes, foreignKey to new languageId + groupId
+			LEK_term_attributes, foreignKey to mid
+			
+			or
+			
+			LEK_term_attributes
+			collectionId as foreignKey
+			referenceID → can reference to either mid, or groupId or groupId + language
+			type: defines the attribute level: termEntry or language or term
+			
+			next problem: FKs and just  keys are not working, thy must be unique (including term collection)
+			sollution → just a FK to the collectionID.
+			-->
+			
+			<termEntry id="9f7a1227-eb7d-491e-ace1-4ab859a92c2a" cid="628586">
+				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">Testkunde</descrip>
+				<!-- 
+                        goes into LEK_termEntry_attributes: 
+                        id: PK
+                        collectionId: FK to collection table
+                        termEntryId:  FK to termEntry table
+                        labelId:      FK to label table
+                        parentId:     FK to myself, nullable
+                        language:     nullable, refers to <langSet xml:lang="de-de"> if attribute is inside a langSet
+                        name: "descrip"
+                        attrType: "thesaurusDescriptor"
+                        attrTarget: "idff506136-f259-4f49-9205-22f5a0af80eb"
+                        attrId: not existing in the example, but in the specification
+                        attrLang: from xml:lang
+                        value: Testkunde
+                    -->
+				<transacGrp>
+					<transac>creation</transac><!-- becomes the id of the transac as parentId -->
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+				</transacGrp>
+				<transacGrp>
+					<transac>modification</transac>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+				</transacGrp>
+				<!-- tig → combination of termEntry ID + language -->
+				<langSet xml:lang="de-de">
+					<!-- same as for termEntry expect that the language field is set -->
+					
+					<!-- the same here as in the transacGrp -->
+					<descripGrp>
+						<descrip type="definition" xml:lang="de-de">Das ist die Definition auf Eintragsebene.</descrip>
+						<transacGrp>
+							<!-- parentId from descript -->
+							<transac>creation</transac>
+							<!-- parentId from transac -->
+							<date>2018-01-12</date>
+							<!-- parentId from transac -->
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</descripGrp>
+					<ntig>
+						<termGrp>
+							<!-- term id → mid in LEK_terms -->
+							
+							<!-- this is not saved as attribute -->
+							<term id="37705a81-e0df-4209-9a12-eaddc93674e0">Schreibtisch</term>
+							
+							<!-- same as for termEntry expect into LEK_term_attributes -->
+							
+							<!-- this is saved in the term attributes without parrentId -->
+							<termNote type="processStatus">finalized</termNote>
+							<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms.</termNote>
+							<termNote type="across_userdef_textfield_Zusatzinformationen">Weitere Zusatzinformationen zum Term.</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+							<admin type="projectSubset" target="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">Test Änderungsverfolgung</admin>
+							<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x</admin>
+							<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF</admin>
+						</termGrp>
+						
+						
+						<!-- this is not saved in the table  -->
+						<transacGrp>
+							<!-- this is saved in the lek attributes, add this parrentId to the date and transacNote  -->
+							<transac>creation</transac>
+							<!-- this here have only parrent id  -->
+							<date>2018-01-12</date>
+							<!-- this here have only parrent id  -->
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</ntig>
+					<ntig>
+						<termGrp>
+							<term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmierplatz</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+							<termNote type="across_userdef_picklist_Verwendung">Unwort</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+						</termGrp>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</ntig>
+				</langSet>
+				<langSet xml:lang="en-us">
+					<ntig>
+						<termGrp>
+							<term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk</term>
+							<termNote type="processStatus">finalized</termNote>
+							<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms.</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+							<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x</admin>
+							<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF</admin>
+						</termGrp>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</ntig>
+				</langSet>
+			</termEntry>
+			<termEntry id="626a86ec-4979-43e5-8293-6bb6532b7cf5" cid="628587">
+				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">Testkunde</descrip>
+				<transacGrp>
+					<transac>creation</transac>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+				</transacGrp>
+				<transacGrp>
+					<transac>modification</transac>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+				</transacGrp>
+				<langSet xml:lang="de-de">
+					<ntig>
+						<termGrp>
+							<term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9">Fahrrad</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+						</termGrp>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</ntig>
+				</langSet>
+				<langSet xml:lang="en-us">
+					<ntig>
+						<termGrp>
+							<term id="add5dad8-61cd-4830-9c6e-1ceaff00c8c1">Bike</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+							<termNote type="across_userdef_picklist_Verwendung">Empfohlen</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+						</termGrp>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</ntig>
+					<ntig>
+						<termGrp>
+							<term id="a2301cd4-6be8-469d-95b4-62946571aa2e">Bicycle</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+						</termGrp>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</ntig>
+				</langSet>
+				<langSet xml:lang="fr-fr">
+					<ntig>
+						<termGrp>
+							<term id="d3a56ef0-2e6c-49c6-80a5-88b54819a733">Vélo</term>
+							<termNote type="processStatus">provisionallyProcessed</termNote>
+						</termGrp>
+						<transacGrp>
+							<transac>creation</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+						<transacGrp>
+							<transac>modification</transac>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+						</transacGrp>
+					</ntig>
+				</langSet>
+			</termEntry>
+		</body>
+		<back>
+			<refObjectList type="projectSet">
+				<refObject id="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">
+					<item type="projectName">Test Änderungsverfolgung</item>
+				</refObject>
+				<refObject id="3b9a499d-7264-40df-a26e-60a9555efc8f">
+					<item type="projectName">18-00056_Gravitrax_12x</item>
+				</refObject>
+				<refObject id="aabea2bc-2e34-4a24-81cc-6366b35826f4">
+					<item type="projectName">Testprojekt_DXF</item>
+				</refObject>
+			</refObjectList>
+			<refObjectList type="customerSet">
+				<refObject id="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">
+					<item type="customerName">Testkunde</item>
+				</refObject>
+			</refObjectList>
+			<refObjectList type="thesaurusDescrip">
+				<refObject id="ff506136-f259-4f49-9205-22f5a0af80eb">
+					<item type="thesaurusName">Testkunde</item>
+					<item type="thesaurusDescription"></item>
+					<item type="thesaurusSys">DictionaryUnknown</item>
+					<item type="thesaurusImage">iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAwUExURQAAAP///wRIeVOCo3yZrvf39/Ly8tjY2L+/v8DAwAAAAAAAAAAAAAAAAAAAAAAAAHox2rgAAAAKdFJOU////////////wCyzCzPAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAALUlEQVQoU2Pg5GRhhgNOTk6gADMbIxSwQwU4oHxGVqgAE1QDEAx1ARYkAU5OAGCxBHYe/aRLAAAAAElFTkSuQmCC</item>
+					<item type="thesaurusOwner">27EF9546-1575-4E44-96AE-5F75B9DE305B</item>
+				</refObject>
+			</refObjectList>
+		</back>
+	</text>
+</martif>

@@ -26,7 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermEntry';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermEntry';
+/**
+ */
+class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
+    
+    public static function setUpBeforeClass() {
+        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+        
+        self::assertNeededUsers(); //last authed user is testmanager
+        self::assertLogin('testmanager');
+        $appState = $api->requestJson('editor/index/applicationstate');
+    }
+    
+    public function testTbxImport(){
+        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => 2));
+        self::assertGreaterThan(0,$termCollection->id,"Unable to create a test collection");
+        $this->api()->addFile('Term.tbx', $this->api()->getFile('Term.tbx'), "application/xml");
+        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' => $termCollection->id, 'customerId' => 2));
+    }
+    
 }

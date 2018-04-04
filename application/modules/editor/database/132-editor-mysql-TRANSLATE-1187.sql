@@ -27,9 +27,16 @@
 
 CREATE TABLE `LEK_term_collection` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(100) NULL,
+  `name` VARCHAR(256) NULL,
+  `customerId` INT NULL,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`),
+  INDEX `fk_LEK_term_collection_1_idx` (`customerId` ASC),
+  CONSTRAINT `fk_LEK_term_collection_1`
+    FOREIGN KEY (`customerId`)
+    REFERENCES `LEK_customer` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
 
 
 CREATE TABLE `LEK_term_entry` (

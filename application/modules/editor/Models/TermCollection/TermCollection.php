@@ -28,4 +28,17 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermCollection';
+    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermCollection';
+    
+    public function importTbx($params){
+        $upload = new Zend_File_Transfer_Adapter_Http();
+        /* @var $upload Zend_File_Transfer_Adapter_Http */
+        if(!$upload->isUploaded("Term_tbx")) {
+            return;
+        }
+        $theFile=$upload->getFileInfo("Term_tbx");
+        $fileContent=file_get_contents($theFile['Term_tbx']['tmp_name']);
+        error_log($fileContent);
+        //TODO: start the import. Run the new tbx importer
+    }
 }

@@ -33,9 +33,8 @@ END LICENSE AND COPYRIGHT
  *
 
 /**
- * Kapselt den Import der Meta Daten zu einem Projekt.
- * - sucht selbstständig nach MetaDaten im Projekt
- * - importiert die gefundenen MetaDaten
+ * Collect the terms and the terms attributes from the tbx file and save them to the database
+ *
  */
 class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IMetaDataImporter {
     const TBX_ARCHIV_NAME = 'terminology.tbx';
@@ -74,22 +73,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $actualLangId;
 
     /**
-     * autoincrement-IDd zu den aktuell bearbeiteten langSet Tags aus der Tabelle LEK_languages im Format $this->actualLangIDs[$this->actualLang] = (int)ID
-     * @var array
-     */
-    protected $actualLangIDs = array();
-
-    /**
      * Term Definition des aktuellen langSet Tags
      * @var string
      */
     protected $actualDefinition='';
-
-    /**
-     * Liste mit Termen im aktuell offenen Lang Set
-     * @var array
-     */
-    protected $actualTermsInLangSet = array();
 
     /**
      * @var array
@@ -97,25 +84,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $languages = array();
 
     /**
-     * @var editor_Models_Languages
-     */
-    protected $sourceLang;
-
-    /**
-     * @var editor_Models_Languages
-     */
-    protected $targetLang;
-
-    /**
      * @var array
      */
     protected $processedLanguages = array();
-
-    /**
-     * Um den Durchsatz beim Speichern der Terme zu erhöhen, werde diese zwischengespeichert und en block in die DB gelegt.
-     * @var array
-     */
-    protected $termInsertBuffer = array();
 
     /**
      * Das Array beinhaltet eine Zuordnung der in TBX möglichen Term Stati zu den im Editor verwendeten
@@ -145,35 +116,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $timer;
     
     
-    /**
-     * If set to true, all IDs (termEntry, tig, term) are set automatically
-     * If set to false (not recomended at this moment) IDs will be quessed from the submitted tbx-file 
-     * @var boolean
-     */
-    protected $autoIds = true;
-    
-    /**
-     * Will be set in first <termEntry> of the tbx-file.
-     * Detects if ids should be added to the termEntries or not 
-     * @var boolean
-     */
-    protected $addTermEntryIds = true;
-    
-    /**
-     * Will be set in first <tig> of the tbx-file.
-     * Detects if ids should be added to the terms or not 
-     * @var boolean
-     */
-    protected $addTigIds = true;
-    
-    /**
-     * Will be set in first <term> of the tbx-file.
-     * Detects if ids should be added to the terms or not 
-     * @var boolean
-     */
-    protected $addTermIds = true;
-    
-    
     protected $counterTermEntry = 0;
     protected $counterTig = 0;
     protected $counterTigInLangSet = 0;
@@ -187,8 +129,42 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $forceOnImport = false;
     
     
-    const TERM_INSERT_BLOCKSIZE = 15;
+    /***
+     * Term collection id
+     * 
+     * @var integer
+     */
+    protected $termCollectionId;
+    
+    /***
+     * The actual term entry id from the lek_term_entry table
+     * 
+     * @var int
+     */
+    protected $actualTermEntryIdDb;
 
+    /***
+     * Id of the last inserted attribute
+     * 
+     * @var mixed
+     */
+    protected $actualParentId;
+    
+    /***
+     * Id of the actuel db term record
+     * 
+     * @var mixed
+     */
+    protected $actualTermIdDb;
+    
+    /***
+     * if the current node is inside ntig
+     * 
+     * @var boolean
+     */
+    private $isInsideNtig=false;
+    
+    
     public function __construct() {
         if(!defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
             //Mindestversion siehe http://www.php.net/manual/de/xmlreader.readstring.php
@@ -244,12 +220,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         //$this->xml->open(self::getTbxPath($task));
         $this->xml->open($file->getPathname());
 
+        
+        //create the term collection
+        $this->termCollectionId = $this->createTermCollection();
+        
         //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
         while($this->fastForwardTo('termEntry')) {
             $this->handleTermEntry();
         }
-        $this->saveTermEntityToDb();
-        $end = microtime(true);
+        
 
         $notProcessed = array_diff(
             array_keys($this->languages),
@@ -277,9 +256,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(!$this->forceOnImport && $tbxPath->isReadable()) {
             return file_get_contents($tbxPath);
         }
-        //after recreation we need to fetch the IDs!
-        //$this->data['fetchIds'] = true;
-        
         //fallback for recreation of TBX file:
         $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
@@ -340,6 +316,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         // save actual termEntryId
         $this->actualTermEntry = $this->getIdTermEntry();            
         
+        //create term entry and get the id
+        $this->actualTermEntryIdDb=$this->createTermEntryRecord();
+        
         if(empty($this->actualTermEntry)) {
             $this->log('termEntry Tag without an ID found and ignored!');
             return;
@@ -351,26 +330,24 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 case 'langSet':
                     $start = microtime(true);
                     $this->counterTigInLangSet = 0;
+                    $this->actualParentId=null;
                     $this->handleLanguage();
                     $this->timer->langSet += (microtime(true) - $start);
                     break;
-                case 'tig':
-                    $start = microtime(true);
-                    $this->counterTermInTig = 0;
-                    $this->handleTig();
-                    $this->timer->tig += (microtime(true) - $start);
-                    break;
-                case 'term':
-                    $start = microtime(true);
-                    $this->handleTerm();
-                    $this->timer->term += (microtime(true) - $start);
-                    break;
-                case 'termNote':
-                    $this->handleTermNote(); //type="normativeAuthorization"
-                    break;
-                //ich gehe davon aus, dass descrips mit dem type Definition immer der Term Description entsprechen
                 case 'descrip':
                     $this->handleDefinition(); //type="Definition"
+                    $this->handleDescrip();
+                    break;
+                case 'transacGrp':
+                    $this->handleTransacGrp();
+                    break;
+                case 'ntig':
+                    $this->actualTermIdDb=null;
+                    $this->actualParentId=null;
+                    $this->isInsideNtig=$this->isStartTag();
+                    break;
+                case 'termGrp':
+                    $this->handleTermGrp();
                     break;
             }
         }
@@ -381,10 +358,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      */
     protected function handleLanguage() {
         if($this->isEndTag()){
-            $this->saveTermEntity();
             $this->actualDefinition = '';
             $this->actualLang = null;
-            $this->actualTermsInLangSet = array();
         }
         
         if(! $this->isStartTag()) {
@@ -407,7 +382,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             //bis zum Ende des aktuellen LangTags gehen.
             while($this->xml->read() && $this->xml->name !== 'langSet'){}
         }
-
     }
 
     /**
@@ -451,110 +425,53 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected function normalizeLanguage($langString) {
         return explode('-',strtolower(str_replace('_','-',$langString)));
     }
-
-    protected function saveTermEntity() {
-        $config = Zend_Registry::get('config');
-        foreach ($this->actualTermsInLangSet as $mid => $termData) {
-            $termData['taskGuid'] = $this->task->getTaskGuid();
-            //term; mid; status in $termData
-            if (!empty($termData['definition']) && !empty($this->actualDefinition)) {
-                $termData['definition'] = $this->actualDefinition." ".$termData['definition'];
-            }
-            if (empty($termData['definition'])) {
-                $termData['definition'] = $this->actualDefinition;
-            }
-            $termData['groupId'] = $this->actualTermEntry;
-            $termData['language'] = $this->actualLangID;
-            if(empty($termData['status'])){
-                $termData['status'] = $config->runtimeOptions->tbx->defaultTermStatus;
-            }
-            $this->termInsertBuffer[] = $termData;
-        }
-        if(count($this->termInsertBuffer) > self::TERM_INSERT_BLOCKSIZE){
-            $this->saveTermEntityToDb();
-        }
-    }
-
+    
     /**
-     * The Terms are added in blocks, not as single inserts
-     * @return Zend_Db_Statement_Pdo | null
-     */
-    protected function saveTermEntityToDb() {
-        if(empty($this->termInsertBuffer)) {
-            return null;
-        }
-        
-        $termTable = ZfExtended_Factory::get('editor_Models_Db_Terms');
-        /* @var $termTable editor_Models_Db_Terms */
-        
-        $firstTerm = reset($this->termInsertBuffer);
-        $sql = $termTable->getInsertSql(array_keys($firstTerm));
-        $db = $termTable->getAdapter();
-
-        $query = $termTable->getInsertSql(array_keys($firstTerm));
-        $queryVals = array();
-        foreach ($this->termInsertBuffer as $row) {
-          foreach($row as &$col) {
-            $col = $db->quote($col);
-          }
-          $queryVals[] = '(' . implode(',', $row) . ')';
-        }
-        
-        $res = $db->query($query . implode(',', $queryVals));
-        $this->termInsertBuffer = array();
-        return $res;
-    }
-
-    /**
-     * wenn das Ende eines Tigs erreicht wird,
-     * dessen Daten unter der ID des Tigs zum aktuellen langSet fügen
-     */
-    protected function handleTig() {
-        if($this->isStartTag()){
-            $this->actualTig = array('mid' => null, 'term' => null, 'status' => null, 'definition' => null);
-            $this->actualTig['tigId'] = $this->getIdTig();
-            return;
-        }
-        if(!$this->isEndTag()){
-            return;
-        }
-        // check if aktu tig is empty self-closing tag
-        if ($this->xml->isEmptyElement) {
-            return;
-        }
-        
-        if(empty($this->actualTig) || empty($this->actualTig['mid'])){
-            $this->log('tig-tag without relevant content or without attribut id. tig-tag will be ignored.');
-            return;
-        }
-        $this->actualTermsInLangSet[$this->actualTig['mid']] = $this->actualTig;
-    }
-
-    /**
-     * Extrahiert die Daten eines Term Tags
+     * Save the data to the lek terms table and set the actual term database id 
      */
     protected function handleTerm() {
         if(!$this->isStartTag()){
             return;
         }
+        
         // check if aktu term is empty self-closing tag
         if ($this->xml->isEmptyElement) {
             return;
         }
         
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
         
-        $this->actualTig['mid'] = $this->getIdTerm();
-        $this->actualTig['term'] = $this->xml->readInnerXml();
+        $term->setTerm($this->xml->readInnerXml());
+        $term->setMid($this->getIdTerm());
+        //the status will be updated when is found from the termNote
+        $term->setDefinition($this->actualDefinition);
+        $term->setGroupId($this->actualTermEntry);
+        $term->setLanguage((integer)$this->actualLangId);
+        $term->setTigId($this->getIdTig());
+        $term->setCollectionId($this->termCollectionId);
+        //TODO: add the customerId
+        //$term->setCustomerId();
+        $term->setTermEntryId($this->actualTermEntryIdDb);
+        $this->actualTermIdDb=$term->save();
     }
 
     /**
-     * Extrahiert die Daten eines TermNote Tags mit Type Defintion (=> Status)
+     * Check if the termNote is of a type normativeAuthorization.
+     * Update the statuso to the current term in the database.
      */
-    protected function handleTermNote() {
+    protected function checkTermStatus() {
         if(!$this->isStartTag() || $this->xml->getAttribute('type') !== 'normativeAuthorization'){
           return;
         }
-        $this->actualTig['status'] = $this->getMappedStatus($this->xml->readString());
+        $actualTermNoteStatus= $this->getMappedStatus($this->xml->readString());
+
+        //update the term with the status
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $term->init($this->actualTermIdDb);
+        $term->setStatus($actualTermNoteStatus);
+        $term->save();
     }
 
     /**
@@ -589,7 +506,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         // if <descrip> on <tig>-level, write term-definition direct into actualTig
         if ($this->xml->getAttribute('type') == 'definition') {
-            $this->actualTig['definition'] = $this->xml->readString();
+            $this->actualDefinition= $this->xml->readString();
             return;
         }
         
@@ -597,7 +514,144 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             $this->actualDefinition = $this->xml->readString();
         }
     }
-
+    
+    
+    protected function handleDescrip() {
+        if(!$this->isStartTag()){
+            return;
+        }
+        //insert descript
+        $entry=$this->saveEntryAttribute(null);
+        $this->actualParentId=$entry->getId();
+    }
+    
+    /***
+     * transacGrp attribute handler.
+     * TransacGrp attribute can be saved in the term attributes or in the term entry attributes table depends on if the transacGrp is in nTig tag
+     * 
+     */
+    protected function handleTransacGrp(){
+        //internal parentId pointer
+        $tmpParrentId=null;
+        while($this->xml->read() && $this->xml->name !== 'transacGrp') {
+            switch($this->xml->name) {
+                case 'transac':
+                    if($this->isInsideNtig){
+                        $entry=$this->saveTermAttribute($this->actualParentId);
+                    }else{
+                        $entry=$this->saveEntryAttribute($this->actualParentId);
+                    }
+                    if($entry){
+                        $tmpParrentId = $entry->getId();
+                    }
+                    break;
+                case 'date':
+                case 'transacNote':
+                    $this->isInsideNtig ? $this->saveTermAttribute($tmpParrentId) : $this->saveEntryAttribute($tmpParrentId);
+                    break;
+                    
+            }
+        }
+    }
+    
+    /***
+     * Handle the term group element.
+     * Save all needed child inside the termGrp tag
+     */
+    protected function handleTermGrp(){
+        if(!$this->isStartTag()){
+            return;
+        }
+        // handle all inner elements of termGrp
+        while($this->xml->read() && $this->xml->name !== 'termGrp') {
+            switch($this->xml->name) {
+                case 'term':
+                    $this->handleTerm();
+                    break;
+                case 'termNote':
+                    $this->checkTermStatus();
+                    $this->saveTermAttribute(null);
+                    break;
+                case 'admin':
+                    $this->saveTermAttribute(null);
+                    break;
+            }
+        }
+    }
+    
+    /***
+     * Save term entry attribute in the database
+     * 
+     * @param unknown $parentId
+     * @return boolean|editor_Models_TermCollection_TermEntryAttributes
+     */
+    protected function saveEntryAttribute($parentId){
+        if(!$this->isStartTag()){
+            return false;
+        }
+        $attribute=$this->getAttributeObject(false,$parentId);
+        $attribute->setTermEntryId($this->actualTermEntryIdDb);
+        $attribute->save();
+        return $attribute;
+    }
+    
+    /***
+     * Save term attribute in the database
+     * 
+     * @param unknown $parentId
+     * @return void|editor_Models_TermCollection_TermEntryAttributes
+     */
+    protected function saveTermAttribute($parentId){
+        if(!$this->isStartTag()){
+            return;
+        }
+        $attribute=$this->getAttributeObject(true,$parentId);
+        $attribute->setTermId($this->actualTermIdDb);
+        $attribute->save();
+        return $attribute;
+    }
+    
+    /***
+     * Get the term attribute or term entry attribute model
+     * 
+     * @param boolean $isTermAttribute
+     * @param mixed $parentId
+     * 
+     * @return editor_Models_TermCollection_TermEntryAttributes
+     */
+    protected function getAttributeObject($isTermAttribute,$parentId){
+        $attribute=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
+        if($isTermAttribute){
+            $attribute=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributes');
+        }
+        
+        $attribute->setCollectionId($this->termCollectionId);
+        
+        $label=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+        $labelResult=$label->getLabelByName($this->xml->name);
+        if(empty($labelResult)){
+            $label->setLabel($this->xml->name);
+            $labelResult=$label->save();
+            $attribute->setLabelId($labelResult);
+        }else{
+            $attribute->setLabelId($labelResult[0]['id']);
+        }
+        
+        $attribute->setLanguage($this->actualLang);
+        if(!$parentId){
+            $parentId=$this->actualParentId;
+        }
+        $attribute->setParentId($parentId);
+        $attribute->setName($this->xml->name);
+        $attribute->setAttrType($this->xml->getAttribute('type'));
+        $attribute->setAttrTarget($this->xml->getAttribute('target'));
+        $attribute->setAttrId($this->xml->getAttribute('id'));
+        $attribute->setAttrLang($this->xml->getAttribute('xml:lang'));
+        $attribute->setValue($this->xml->readInnerXml());
+        return $attribute;
+    }
+    
     protected function isEndTag() {
         return ($this->xml->nodeType === XmlReader::END_ELEMENT);
     }
@@ -614,50 +668,23 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
     
     /**
-     * Generates a unic id for a termEntry-element.
-     * If autoIds is set to false and there is an id in the tbx-file this id is used
-     *
+     * Get the actual term entry id
+     * 
      * @return string
      */
     private function getIdTermEntry() {
-        // detect on first call if IDs should be added
-        if ($this->counterTermEntry == 0 && $this->addTermEntryIds) {
-            if (! $this->autoIds && ! empty($this->xml->getAttribute('id'))) {
-                $this->addTermEntryIds = false;
-            }
-        }
-        
-        if ($this->addTermEntryIds == false) {
-            return $this->xml->getAttribute('id');
-        }
-        
         $this->counterTermEntry++;
-        
-        return 'termEntry_' . str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT);
+        return $this->xml->getAttribute('id');
     }
-
 
     /**
      * Generates a unic id for a tig-element.
-     * If autoIds is set to false and there is an id in the tbx-file this id is used
      *
      * @return string
      */
     private function getIdTig() {
-        // detect on first call if IDs should be added
-        if ($this->counterTig == 0 && $this->addTigIds) {
-            if (! $this->autoIds && ! empty($this->xml->getAttribute('id'))) {
-                $this->addTigIds = false;
-            }
-        }
-        
-        if ($this->addTigIds == false) {
-            return $this->xml->getAttribute('id');
-        }
-        
         $this->counterTigInLangSet++;
         $this->counterTig++;
-        
         $tempId = 'tig'
                   .'_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
                   .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
@@ -668,33 +695,43 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
 
 
     /**
-     * Generates a unic id for a term-element.
-     * If autoIds is set to false and there is an id in the tbx-file this id is used
-     *
+     * Get the term id from the xml tag
+     * 
      * @return string
      */
     private function getIdTerm() {
-        // detect on first call if IDs should be added
-        if ($this->counterTerm == 0 && $this->addTermIds) {
-            if (! $this->autoIds && ! empty($this->xml->getAttribute('id'))) {
-                $this->addTermIds = false;
-            }
-        }
-        
-        if ($this->addTermIds == false) {
-            return $this->xml->getAttribute('id');
-        }
-        
         $this->counterTermInTig++;
         $this->counterTerm++;
-        
-        $tempId = 'term'
-                  .'_'.str_pad($this->counterTermEntry, 7, '0', STR_PAD_LEFT)
-                  .'_'.str_pad($this->counterTigInLangSet, 3, '0', STR_PAD_LEFT)
-                  .'_'.$this->actualLang
-                  .'_'.str_pad($this->counterTermInTig, 3, '0', STR_PAD_LEFT)
-                  .'_'.str_pad($this->counterTerm, 7, '0', STR_PAD_LEFT);
-        return $tempId;
+        return $this->xml->getAttribute('id');
     }
     
+    /***
+     * Create the term collection and return the id
+     * TODO: add name as parametar ?
+     */
+    private function createTermCollection(){
+        $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        $termCollection->setName("Term collection name");
+        //TODO: set the customerId
+        //$termCollection->setCustomerId();
+        $termCollection->save();
+        return $termCollection->getId();
+    }
+    
+    /***
+     * Create a term entry record in the database, for the current collection and the
+     * actual termEntryId
+     *  
+     * @return int
+     */
+    private function createTermEntryRecord(){
+        //actualTermEntry
+        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry->setCollectionId($this->termCollectionId);
+        $termEntry->setGroupId($this->actualTermEntry);
+        $termEntry->save();
+        return $termEntry->getId();
+    }
 }

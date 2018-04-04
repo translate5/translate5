@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 class editor_Models_TermCollection_TermAttributesLabel extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributesLabel';
-    
+    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributesLabel';
     
     /***
      * Get the label by given label name

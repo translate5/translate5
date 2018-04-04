@@ -35,5 +35,6 @@ class editor_Models_Validator_TermCollection_TermCollection extends ZfExtended_M
     //comment = string, without length contrain. No validator needed / possible 
     $this->addValidator('id', 'int');
     $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 100));
+    $this->addValidator('customerId', 'int');
   }
 }
