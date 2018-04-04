@@ -54,7 +54,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     listen: {
         controller: {
             '#Editor': {
-                beforeKeyMapUsage: 'handleEditorKeyMapUsage'
+                beforeKeyMapUsage: 'handleEditorKeyMapUsage',
+                runSpellCheckOnSaving: 'handleSpellCheckOnSaving'
             },
             '#Editor.$application': {
                 editorViewportOpened: 'initSpellCheckPluginForTask',
@@ -69,7 +70,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
     },
     messages: {
-        moreinformation: '#UT#More information'
+        moreInformation: '#UT#More information',
+        errorsFoundOnSaving: '#UT#SpellCheck: errors found on saving Segment Nr. %segmentnr.',
+        spellCheckOnSavingIsAlreadyRunningForAnotherSegment: '#UT#The SpellCheck on saving the segment failed because there is already another process running for Segment Nr. %segmentnr.',
     },
     statics: {
         // spellcheck-Node
@@ -85,7 +88,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // In ToolTips
         CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
         // Milliseconds to pass before SpellCheck is started when no editing occurs
-        EDITIDLE_MILLISECONDS: 1000,
+        EDIT_IDLE_MILLISECONDS: 1000,
     },
     
     // =========================================================================
@@ -101,10 +104,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     allMatchesRanges: null,         // bookmarks of all ranges for the matches found by the tool(s); here already stored independently from the tool
     activeMatchNode: null,          // node of single match currently in use
     
+    spellCheckResults: null,        // Store results for already checked Html-Content in the Editor: me.spellCheckResults[htmlWithoutSpellCheckNodes] = htmlWithSpellCheckNodes
+    
     spellCheckTooltip: null,        // spellcheck tooltip instance
     
     editIdleTimer: null,            // time "nothing" is changed in the Editor's content; 1) user: presses no key 2) segmentsHtmleditor: no push, no afterInsertMarkup
     editIdleRestarted: null,        // has the content been changed in the Editor (= timer restarted) since the last timer has started the SpellCheck?
+    
+    isSpellCheckOnSaving: false,    // flag to indicate that the SpellChecker runs on saving the segment
+    savedSegmentNrInTask: false,    // segmentNrInTask of the segment that started the SpellCheck on saving
     
     USE_CONSOLE: true,              // (true|false): use true for developing using the browser's console, otherwise use false
     
@@ -137,6 +145,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.consoleLog('0.2a initSpellCheckPluginForTask');
         me.setTargetLangCode();
         me.setLanguageSupport();
+        me.spellCheckResults = [];
     },
     /**
      * Init the SpellCheck-Plugin for the current Editor
@@ -151,6 +160,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.initTooltips();
             me.initKeyboardEvents();
             me.initMouseEvents();
+            me.isSpellCheckOnSaving = false; // = "default" until we save the segment
         } else {
             me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ').');
         }
@@ -221,7 +231,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // When do we run the SpellCheck?
     // =========================================================================
     /**
-     * Everytime the user stops editing for a certain time (EDITIDLE_MILLISECONDS),
+     * Everytime the user stops editing for a certain time (EDIT_IDLE_MILLISECONDS),
      * the SpellCheck ist started.
      */
     startTimerForSpellCheck: function() {
@@ -231,7 +241,31 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.editIdleTimer = setTimeout(function(){
                 me.editIdleRestarted = false;
                 me.startSpellCheck();
-            }, me.self.EDITIDLE_MILLISECONDS);
+            }, me.self.EDIT_IDLE_MILLISECONDS);
+    },
+    
+    // =========================================================================
+    // Additional handlers for events
+    // =========================================================================
+    /**
+     * When a segment is saved, the SpellChecker is activated.
+     * - If there are errors (for the segment that might now be closed already), the user will get a popup-message.
+     * - The SpellCheck-status of the segment in the grid is updated.
+     * 
+     * TODO: Should we run a check also if a segment is not saved, but closed?
+     */
+    handleSpellCheckOnSaving: function(segmentNrInTask) {
+        var me = this,
+            message;
+        me.consoleLog('handleSpellCheckOnSaving...');
+        if (me.isSpellCheckOnSaving && (me.savedSegmentNrInTask != null) && (me.savedSegmentNrInTask != segmentNrInTask) ){
+            message = me.messages.SpellCheckOnSavingIsAlreadyRunningForAnotherSegment.replace(/%segmentnr/, me.savedSegmentNrInTask);
+            Editor.MessageBox.addError(message);
+            return;
+        }
+        me.savedSegmentNrInTask = segmentNrInTask;
+        me.isSpellCheckOnSaving = true;
+        me.startSpellCheck();
     },
     
     // =========================================================================
@@ -245,12 +279,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             rangeForEditor = rangy.createRange(),
             editorBody,
-            editorText;
+            editorText,
+            htmlWithoutSpellCheckNodes,
+            htmlWithSpellCheckNodes;
         if (!me.isSupportedLanguage) {
             me.consoleLog('startSpellCheck failed because language is not supported.');
             return;
         }
-
+        
         editorBody = me.getEditorBody();
         if(!me.editor || !editorBody) {
             me.consoleLog('startSpellCheck: initSpellCheckPluginForEditor first...');
@@ -268,6 +304,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored as searchable)
         
+        // If the text has not changed, we can use the result we have already fetched and applied.
+        // (Doing "nothing" is not an option because then there won't be any SpellCheck-Nodes at all in the Editor.)
+        // TODO: keep the position of the caret!
+        htmlWithoutSpellCheckNodes = me.editorBodyExtDomElement.getHtml();
+        if (!me.isSpellCheckOnSaving && (htmlWithoutSpellCheckNodes in me.spellCheckResults) ) {
+            htmlWithSpellCheckNodes = me.spellCheckResults[htmlWithoutSpellCheckNodes];
+            me.editorBodyExtDomElement.setHtml(htmlWithSpellCheckNodes);
+            me.consoleLog('startSpellCheck did not start a new check because we have already run a check for this content. We used the result we already have.');
+            return;
+        }
+        
         rangeForEditor.selectNode(editorBody);
         editorText = rangeForEditor.text();
         me.runSpellCheck(editorText);
@@ -279,17 +326,37 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {Array} matchesFromTool
      */
     applySpellCheck: function() {
-        var me = this;
+        var me = this,
+            message,
+            htmlWithoutSpellCheckNodes,
+            htmlWithSpellCheckNodes;
+        if (me.isSpellCheckOnSaving) {
+            me.consoleLog('applySpellCheck on isSpellCheckOnSaving...');
+            if (me.allMatchesOfTool.length > 0) {
+                message = me.messages.errorsFoundOnSaving.replace(/%segmentnr/, me.savedSegmentNrInTask);
+                Editor.MessageBox.addInfo(message); // TODO: Should we show this message only if the errors are not the same as already known?
+            }
+            // TODO: update segment-status in grid
+            me.isSpellCheckOnSaving = false; // = reset to "default"
+            return;
+        }
         if (me.editIdleRestarted) {
             me.consoleLog('applySpellCheck not started: results might be invalid after the content was edited in the meantime.');
             return;
         }
+        
+        htmlWithoutSpellCheckNodes = me.editorBodyExtDomElement.getHtml();
         if (me.allMatchesOfTool.length > 0) {
             me.storeAllMatchesFromTool();
             me.showAllMatchesInEditor();
         } else {
             me.consoleLog('allMatchesOfTool: no results (not checked or nothing found).');
         }
+        htmlWithSpellCheckNodes = me.editorBodyExtDomElement.getHtml();
+        
+        // and store the result of the SpellCheck for the html WITHOUT the SpellCheck-Nodes
+        me.spellCheckResults[htmlWithoutSpellCheckNodes] = htmlWithSpellCheckNodes;
+        
         me.finishSpellCheck();
     },
     /**
@@ -395,7 +462,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             spellCheckNode = me.createSpellcheckNode(index);
             spellCheckNode.appendChild(documentFragmentForMatch);
             rangeForMatch.insertNode(spellCheckNode);
-        }, me, true); // iterate in reverse order! (Otherwise the ranges get lost due to DOM-changes "in front of them".) 
+        }, me, true); // iterate in reverse order! (Otherwise the ranges get lost due to DOM-changes "in front of them".)
     },
     /**
      * Create and return a new node for SpellCheck-Match of the given index.
@@ -478,7 +545,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         Ext.util.CSS.createStyleSheetToWindow(
                 me.editor.getDoc(),
                 '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' +
-                '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 2px dotted; border-color: red;}' + // TODO: use wavy line instead
+                '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 3px dotted; border-color: red;}' + // TODO: use wavy line instead
                 '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' {border-color: #ab8906;}' +    // dark yellow
                 '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' {border-color: #458fe6;}' +      // blue
                 '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' {border-color: #e645a8;}'        // red-violet
@@ -525,7 +592,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (infoURLs.length > 0) {
             nodeData += '<hr>'
             Ext.Array.each(infoURLs, function(url, index) {
-                nodeData += '<a href="' + url + '" target="_blank">' + me.messages.moreinformation + '</a><br />';
+                nodeData += '<a href="' + url + '" target="_blank">' + me.messages.moreInformation + '</a><br />';
             });
         }
         return nodeData;
