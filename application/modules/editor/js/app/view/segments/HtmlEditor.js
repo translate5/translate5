@@ -96,19 +96,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
-      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}"/>'
+      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}" data-length="{length}" />'
     ]);
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
       '<span title="{text}" class="short">&lt;{shortTag}&gt;</span>',
-      '<span data-originalid="{id}" data-filename="{md5}" class="full">{text}</span>'
+      '<span data-originalid="{id}" data-filename="{md5}" data-length="{length}" class="full">{text}</span>'
     ]);
     me.spanTemplate.compile();
     me.callParent(arguments);
   },
   initFrameDoc: function() {
 	  this.callParent(arguments);
-	  this.fireEvent('afterinitframedoc', this);
+      this.fireEvent('afterinitframedoc', this);
   },
 
   /**
@@ -120,7 +120,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
         body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;line-height:14px;"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=12" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=14" />'; //disable Img resizing
     return Ext.String.format(body, me.iframePad, additionalCss, dir);
   },
   /**
@@ -357,6 +357,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       spanShort = divItem.down('span.short');
       data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
       data.id = spanFull.getAttribute('data-originalid');
+      data.length = spanFull.getAttribute('data-length');
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!
       if(data.id) {

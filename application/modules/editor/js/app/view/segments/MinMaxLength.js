@@ -178,13 +178,29 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Get the character count of the segment text, without the tags in it
      */
-    getSegmentCharactersCount:function(segmentText){
-        var me=this;
-        if(segmentText===null){
-            segmentText=me.htmlEditor.getValueAndUnMarkup();
+    getSegmentCharactersCount:function(text){
+        var me = this,
+            div = document.createElement("div"),
+            tagLength = 0;
+        //TODO for what is that if?
+        if(text === null){
+            text = me.htmlEditor.getValueAndUnMarkup();
         }
-        segmentText=me.cleanTextHtmlTags(segmentText);
-        return segmentText.length;
+        //FIXME: improve that clean del tag by reuse methods from track changes
+        text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
+        
+        div.innerHTML = text;
+        Ext.fly(div).select('img').each(function(item){
+            var l = parseInt(item.getAttribute('data-length') || "0");
+            //data-length is -1 if no length provided
+            if(l > 0) {
+                tagLength += l;
+            }
+        });
+
+        text = div.textContent || div.innerText || "";
+        div = null;
+        return tagLength + text.length;
     },
 
     /**
@@ -232,19 +248,5 @@ Ext.define('Editor.view.segments.MinMaxLength', {
             saveSegment=me.isCharactersInBorder(charactersLength,metaCache.minWidth,metaCache.maxWidth);
         
         return saveSegment;
-    },
-
-    /***
-     * Remove the unneeded html tags from the segment
-     */
-    cleanTextHtmlTags:function(segmentText){
-        var res=segmentText.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
-        var div = document.createElement("div");
-        div.innerHTML = res;
-        var text = div.textContent || div.innerText || "";
-        div=null;
-        return text;
-    }
-
-    
+    }  
 });
