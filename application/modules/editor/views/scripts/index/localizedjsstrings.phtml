@@ -691,7 +691,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.searchandreplace.SearchTab",
         strings: {
             comboFieldLabel: '<?php echo $this->translate->_('Suchen nach');?>',
-            searchInCombo: '<?php echo $this->translate->_('Suchen in');?>',
+            searchInField: '<?php echo $this->translate->_('Suchen in');?>',
             matchCaseLabel: '<?php echo $this->translate->_('Groß/Kleinschreibung beachten');?>',
             towardsTop: '<?php echo $this->translate->_('Nach oben suchen');?>',
             useForSearch: '<?php echo $this->translate->_('Bei der Suche verwenden');?>',
@@ -702,6 +702,7 @@ Ext.define('Editor.controller.Localizer', {
             invalidRegularExpression: '<?php echo $this->translate->_('Ungültiger Regulärer Ausdruck');?>',
             unsupportedRegularExpression: '<?php echo $this->translate->_('Dieser reguläre Ausdruck wird nicht unterstützt');?>',
             segmentMatchInfoMessage: '<?php echo $this->translate->_('Segmente mit Suchtreffer:');?>',
+            searchInLockedSegments: '<?php echo $this->translate->_('Suche in gesperrten Segmenten');?>'
         }
     });
     
@@ -714,6 +715,7 @@ Ext.define('Editor.controller.Localizer', {
             replaceAllButton: '<?php echo $this->translate->_('Alles ersetzen');?>',
             searchButton: '<?php echo $this->translate->_('Suchen');?>',
             replaceButton: '<?php echo $this->translate->_('Ersetzen');?>',
+            mqmNotSupporterTooltip: '<?php echo $this->translate->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');?>',
         }
     });
     
