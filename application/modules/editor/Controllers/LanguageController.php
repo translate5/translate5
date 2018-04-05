@@ -34,7 +34,7 @@ class editor_LanguageController extends ZfExtended_RestController {
     
     /**
      * Instance of the Entity
-     * @var editor_Models_Task_Meta
+     * @var editor_Models_Languages
      */
     protected $entity;
 }
