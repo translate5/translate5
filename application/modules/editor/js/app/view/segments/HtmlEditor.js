@@ -278,12 +278,28 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     var me = this,
         tempNode = document.createElement('DIV'),
         plainContent = plainContent || [];
+
+    me.measure = Ext.fly(me.getEditorBody()).createChild({
+        //<debug> 
+        // tell the spec runner to ignore this element when checking if the dom is clean  
+        'data-sticky': true,
+        //</debug> 
+        role: 'presentation',
+        cls: Ext.baseCSSPrefix + 'textmetrics'
+    });
+ 
+    me.measure.setVisibilityMode(1);
+    me.measure.position('absolute');
+    me.measure.setLocalXY(-1000, -1000);
+    me.measure.hide();
+ 
     me.result = [];
     //tempnode mit inhalt füllen => Browser HTML Parsing
     value = value.replace(/ </g, Editor.TRANSTILDE+'<');
     value = value.replace(/> /g, '>'+Editor.TRANSTILDE);
     Ext.fly(tempNode).update(value);
     me.replaceTagToImage(tempNode, plainContent);
+    Ext.destroy(me.measure);
     return me.result;
   },
 
@@ -339,11 +355,38 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         return;
       }
       data = me.getData(item,data);
-      
+
+      if(me.viewModesController.isFullTag()) {
+        data.path = me.getSvg(data.text, data.fullWidth);
+      }
+      else {
+        data.path = me.getSvg(data.nr, data.shortWidth);
+      }
       me.result.push(me.imageTemplate.apply(data));
       plainContent.push(me.markupImages[data.key].html);
     });
   },
+  
+  getSvg: function(text, width) {
+      var prefix = 'data:image/svg+xml;charset=utf-8,',
+          svg = '', 
+          //cell = Ext.fly(this.up('segmentroweditor').context.row).select('.segment-tag-column .x-grid-cell-inner').first(),
+          cell = Ext.fly(this.getEditorBody()),
+          styles = cell.getStyle(['font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing', 'word-break']),
+          lineHeight = styles['line-height'].replace(/px/,'');
+
+      if(!Ext.isNumber(lineHeight)) {
+          lineHeight = Math.round(styles['font-size'].replace(/px/, '') * 1.3);
+      }
+
+      svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
+      svg += '<svg xmlns="http://www.w3.org/2000/svg" height="'+lineHeight+'" width="'+width+'">';
+      svg += '<rect width="100%" height="100%" fill="rgb(57,255,163)" rx="3" ry="3"/>';
+      svg += '<text x="0" y="'+(lineHeight-5)+'" font-size="'+styles['font-size']+'" font-weight="'+styles['font-weight']+'" font-family="'+styles['font-family'].replace(/"/g,"'")+'">'
+      svg += Ext.String.htmlEncode(text)+'</text></svg>';
+      return prefix + encodeURI(svg);
+  },
+  
   /**
    * daten aus den tags holen
    */
@@ -395,21 +438,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.key = data.type+data.nr;
 
       //zusammengesetzte img Pfade:
-      sp = data.shortPath+data.nr+data.suffix+'.png';
-      fp = data.fullPath+data.md5+data.suffix+'.png';
-      //caching der Pfade und den zugehörigen divs fürs unmarkup 
+      this.measure.setHtml(data.text);
+      data.fullWidth = this.measure.getSize().width;
+      this.measure.setHtml(data.nr);
+      data.shortWidth = this.measure.getSize().width;
+      //cache the data to be rendered via svg and the html for unmarkup
       me.markupImages[data.key] = {
-          shortPath: sp,
-          fullPath: fp,
+          shortTag: data.nr,
+          fullTag: data.text,
+          fullWidth: data.fullWidth,
+          shortWidth: data.shortWidth,
           html: '<div class="'+item.className+'">'+me.spanTemplate.apply(data)+'</div>'
       };
 
-      if(me.viewModesController.isFullTag()){
-        data.path = fp;
-      }
-      else {
-        data.path = sp;
-      }
       return data;
   },
   /**
@@ -764,11 +805,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   },
   setImagePath: function(target){
     var me = this;
-    me.getEditorBody().className = '';
     Ext.each(Ext.query('img', true, me.getEditorBody()), function(item){
       var markupImage;
       if(markupImage = me.getMarkupImage(item.id)){
-        item.src = markupImage[target];
+        if(target == 'fullPath') {
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag, markupImage.fullWidth));
+        }
+        else {
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.shortTag, markupImage.shortWidth));
+        }
       }
     });
   },

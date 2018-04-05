@@ -68,7 +68,11 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-container.x-form-display-field div.single,
 .segment-tag-container .x-autocontainer-innerCt div.open,
 .segment-tag-container .x-autocontainer-innerCt div.close,
-.segment-tag-container .x-autocontainer-innerCt div.single {display:inline;background:#39FFA3;}
+.segment-tag-container .x-autocontainer-innerCt div.single {
+    display:inline;
+    background:#39FFA3;
+    border-radius:4px;
+}
 
 /* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
 .segment-tag-container.x-tip div.open,
