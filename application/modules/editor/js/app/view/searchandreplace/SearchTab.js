@@ -47,7 +47,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
     
     strings:{
       comboFieldLabel:'#UT#Suchen nach',//Search for
-      searchInCombo:'#UT#Suchen in',
+      searchInField:'#UT#Suchen in',
       matchCaseLabel:'#UT#Groß/Kleinschreibung beachten',//Match case
       towardsTop:'#UT#Nach oben suchen',//Search towards the top
       useForSearch:'#UT#Bei der Suche verwenden',//Use for search
@@ -57,7 +57,8 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
       saveCurrentOpen:'#UT#Segment beim Schließen speichern',//Save segment on close
       invalidRegularExpression:'#UT#Ungültiger Regulärer Ausdruck',
       unsupportedRegularExpression:'#UT#Dieser reguläre Ausdruck wird nicht unterstützt',
-      segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:'
+      segmentMatchInfoMessage:'#UT#Segmente mit Suchtreffer:',
+      searchInLockedSegments:'#UT#Suche in gesperrten Segmenten'
     },
     
     padding:'10 10 10 10',
@@ -67,9 +68,9 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
         config = {
                 items:[{
                     xtype:'textfield',
-                    itemId:'searchCombo',
+                    itemId:'searchField',
                     maxLength:1024,
-                    name:'searchCombo',
+                    name:'searchField',
                     focusable:true,
                     enableKeyEvents:true,
                     fieldLabel:me.strings.comboFieldLabel,
@@ -79,9 +80,9 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                     }
                 },{
                     xtype:'combo',
-                    itemId:'searchInCombo',
-                    name:'searchInCombo',
-                    fieldLabel:me.strings.searchInCombo,
+                    itemId:'searchInField',
+                    name:'searchInField',
+                    fieldLabel:me.strings.searchInField,
                     displayField:'value',
                     valueField:'id',
                     forceSelection:true,
@@ -144,6 +145,17 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                         value:'{!isSearchView}'
                     },
                     boxLabel:me.strings.saveCurrentOpen
+                },{
+                    xtype:'checkbox',
+                    itemId:'searchInLockedSegments',
+                    name:'searchInLockedSegments',
+                    boxLabel:me.strings.searchInLockedSegments,
+                    bind:{
+                        visible:'{isSearchView}'
+                    },
+                    listeners:{
+                        change:'resetSearchParametars'
+                    }
                 }]
         };
         if (instanceConfig) {
