@@ -65,7 +65,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * 
      * @var integer
      */
-    public $durationsDivisor=1;
+    protected $durationsDivisor=1;
     
     /**
      * Initialize event-trigger.
@@ -329,9 +329,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $parametars=$this->getAllParams();
         
         //check if the required search parametars are in the request
-        if(!$this->checkRequiredSearchParametars($parametars)){
-            return;
-        }
+        $this->checkRequiredSearchParameters($parametars);
         
         //check character number limit
         if(!$this->checkSearchStringLength($parametars['searchField'])){
@@ -355,37 +353,35 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /***
      * Replace all search matches and save the new segment content to the database.
-     * Retrun the modefied segments
+     * Return the modified segments
      */
     public function replaceallAction(){
-        $parametars=$this->getAllParams();
+        $parameters=$this->getAllParams();
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */;
         
         //check if the required search parametars are in the request
-        if(!$this->checkRequiredSearchParametars($parametars)){
-            return;
-        }
+        $this->checkRequiredSearchParameters($parameters);
         
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
-        if($this->isMqmTask($parametars['taskGuid'])){
+        if($this->isMqmTask($parameters['taskGuid'])){
             $this->view->message= $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
             $this->view->hasMqm=true;
             return;
         }
         
         //check character number limit
-        if(!$this->checkSearchStringLength($parametars['searchField'])){
+        if(!$this->checkSearchStringLength($parameters['searchField'])){
             return;
         }
         
         //find all segments for the search parametars
-        $results=$this->entity->search($parametars);
+        $results=$this->entity->search($parameters);
         
-        $searchInField=$parametars['searchInField'];
-        $searchType=isset($parametars['searchType']) ? $parametars['searchType'] : null;
-        $matchCase=isset($parametars['matchCase']) ? (strtolower($parametars['matchCase'])=='true'): false;
+        $searchInField=$parameters['searchInField'];
+        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
+        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
         
         if(!$results || empty($results)){
             $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
@@ -401,14 +397,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
             
             //if the trackchanges are active, setup some trackchanges parametars
-            if(isset($parametars['isActiveTrackChanges']) && $parametars['isActiveTrackChanges']){
-                $replace->trackChangeTag->attributeWorkflowstep=$parametars['attributeWorkflowstep'];
-                $replace->trackChangeTag->userColorNr=$parametars['userColorNr'];
-                $replace->isActiveTrackChanges=$parametars['isActiveTrackChanges'];
+            if(isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']){
+                $replace->trackChangeTag->attributeWorkflowstep=$parameters['attributeWorkflowstep'];
+                $replace->trackChangeTag->userColorNr=$parameters['userColorNr'];
+                $replace->isActiveTrackChanges=$parameters['isActiveTrackChanges'];
             }
             
             //find matches in the html text and replace them
-            $replace->replaceText($parametars['searchField'], $parametars['replaceField'],$searchType,$matchCase);
+            $replace->replaceText($parameters['searchField'], $parameters['replaceField'],$searchType,$matchCase);
             
             //init the entity
             $this->entity = ZfExtended_Factory::get($this->entityClass);
@@ -423,7 +419,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             
             //create duration for modefied field
             $duration=new stdClass();
-            $duration->$searchInField=$parametars['durations'];
+            $duration->$searchInField=$parameters['durations'];
             $ob->durations=$duration;
             
             //set the duration devisor to the number of the results so the duration is splitted equally for each replaced result
@@ -700,21 +696,20 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         return $isValid;
     }
     
-    /***
-     * Check if the required search parametars are provided
+    /**
+     * Check if the required search parameters are provided
      * 
-     * @param array $parametars
-     * @return boolean
+     * @param array $parameters
+     * @throws ZfExtended_ValidateException
      */
-    private function checkRequiredSearchParametars(array $parametars){
-        if(!isset($parametars['searchInField']) || !isset($parametars['searchField']) || !isset($parametars['searchType'])){
+    private function checkRequiredSearchParameters(array $parameters){
+        if(!isset($parameters['searchInField']) || !isset($parameters['searchField']) || !isset($parameters['searchType'])){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */;
             $e = new ZfExtended_ValidateException();
-            $e->setMessage($t->_('Missing search parametar. Required parametars:searchInField,searchField,searchType.'));
+            $e->setMessage($t->_('Missing search parameter. Required parameters: searchInField, searchField, searchType. Given was: ').print_r($parameters,1));
             throw $e;
         }
-        return true;
     }
     
     /***

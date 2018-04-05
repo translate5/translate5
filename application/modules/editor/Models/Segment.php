@@ -139,16 +139,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     
     /***
-     * Search the matirialized view for given search field,search string and match case.
+     * Search the materialized view for given search field,search string and match case.
      * Only hits in the editable fields will be returned
      * 
-     * @param array $parametars
+     * @param array $parameters
      * @return string|array
      */
-    public function search(array $parametars){
+    public function search(array $parameters){
         $session = new Zend_Session_Namespace();
         $taskGuid=$session->taskGuid;
-        if ($session->taskGuid !== $parametars['taskGuid']) {
+        if ($session->taskGuid !== $parameters['taskGuid']) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
@@ -162,19 +162,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($taskGuid);
         
         //get the search sql string
-        $searchQuery=$this->buildSearchString($parametars);
+        $searchQuery=$this->buildSearchString($parameters);
         
         //the field where the search will be performed (toSort field)
-        $searchInToSort=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchInToSort=$parameters['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
         
-        //check if wearch in locked segment is clicked, if yes, remove the editable filter
+        //check if search in locked segment is clicked, if yes, remove the editable filter
         $searchLocked=false;
-        if($parametars['searchInLockedSegments']){
-            $searchLocked=$parametars['searchInLockedSegments']==="true";
+        if($parameters['searchInLockedSegments']){
+            $searchLocked=$parameters['searchInLockedSegments']==="true";
         }
         
         $select= $this->db->select()
-        ->from($viewName,array('id','segmentNrInTask',$parametars['searchInField'],$searchInToSort,'editable'))
+        ->from($viewName,array('id','segmentNrInTask',$parameters['searchInField'],$searchInToSort,'editable'))
         ->where($searchQuery);
         if(!$searchLocked){
             $select->where('editable=1');
@@ -199,18 +199,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Buld search sql string for given field based on the search type
+     * Build search SQL string for given field based on the search type
      * 
-     * @param array $parametars
+     * @param array $parameters
      * @return boolean|string
      */
-    public function buildSearchString($parametars){
+    public function buildSearchString($parameters){
         $adapter=$this->db->getAdapter();
 
-        $queryString=$parametars['searchField'];
-        $searchInField=$parametars['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
-        $searchType=isset($parametars['searchType']) ? $parametars['searchType'] : null;
-        $matchCase=isset($parametars['matchCase']) ? (strtolower($parametars['matchCase'])=='true'): false;
+        $queryString=$parameters['searchField'];
+        $searchInField=$parameters['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
+        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
         
         //search type regular expression
         if($searchType==='regularExpressionSearch'){
