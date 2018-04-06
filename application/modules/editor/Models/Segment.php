@@ -139,40 +139,46 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     
     /***
-     * Search the matirialized view for given search field,search string and match case.
+     * Search the materialized view for given search field,search string and match case.
      * Only hits in the editable fields will be returned
      * 
-     * @param unknown $request
+     * @param array $parameters
      * @return string|array
      */
-    public function search($request){
-        $queryString=$request->getParam('searchCombo');
-        $searchInCombo=$request->getParam('searchInCombo').editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
-        $matchCase=$request->getParam('matchCase');
-        $searchType=$request->getParam('searchType');
+    public function search(array $parameters){
         $session = new Zend_Session_Namespace();
         $taskGuid=$session->taskGuid;
-        if ($session->taskGuid !== $request->getParam('taskGuid')) {
+        if ($session->taskGuid !== $parameters['taskGuid']) {
             //nach außen so tun als ob das gewünschte Entity nicht gefunden wurde
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
-        //$mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView  */
-        //$mv->setTaskGuid($taskGuid);
-        //$viewName=$mv->getName();
+        $mv->setTaskGuid($taskGuid);
+        $viewName=$mv->getName();
         
         $this->reInitDb($taskGuid);
         $this->segmentFieldManager->initFields($taskGuid);
-        $searchQuery=$this->buildSearchString($searchInCombo,$queryString, $searchType, $matchCase);
         
-        if(!$searchQuery){
-            return "Invalid search string.";
+        //get the search sql string
+        $searchQuery=$this->buildSearchString($parameters);
+        
+        //the field where the search will be performed (toSort field)
+        $searchInToSort=$parameters['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        
+        //check if search in locked segment is clicked, if yes, remove the editable filter
+        $searchLocked=false;
+        if($parameters['searchInLockedSegments']){
+            $searchLocked=$parameters['searchInLockedSegments']==="true";
         }
         
         $select= $this->db->select()
-        ->where($searchQuery)
-        ->where('editable = 1');
+        ->from($viewName,array('id','segmentNrInTask',$parameters['searchInField'],$searchInToSort,'editable'))
+        ->where($searchQuery);
+        if(!$searchLocked){
+            $select->where('editable=1');
+        }
         
         /* //TODO:The idea how we can use the search limitation
          * 
@@ -188,39 +194,24 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             WHERE targetEditToSort  REGEXP '[0-9]';
          */
         $result = $this->loadFilterdCustom($select);
+        
         return $result;
     }
     
-    //FIXME impruve the error handling!!!!!
-    public function replaceAll($request){
-        $result=$this->search($request,true);
-        
-        $queryString=$request->getParam('searchCombo');
-        $searchInCombo=$request->getParam('searchInCombo');
-        $searchType=$request->getParam('searchType');
-        $matchCase=$request->getParam('matchCase');
-        
-        if(!$result || empty($result)){
-            return;
-        }
-        $result=json_decode($result);
-        
-        foreach ($result as $res){
-            $value=$res->{$searchInCombo};
-            //REPLACE THE
-        }
-    }
-    
     /***
-     * Buld search sql string for given field based on the search type
+     * Build search SQL string for given field based on the search type
      * 
-     * @param string $searchInCombo
-     * @param string $queryString
-     * @param string $searchType
-     * @param boolean $matchCase
+     * @param array $parameters
      * @return boolean|string
      */
-    public function buildSearchString($searchInCombo,$queryString,$searchType,$matchCase){
+    public function buildSearchString($parameters){
+        $adapter=$this->db->getAdapter();
+
+        $queryString=$parameters['searchField'];
+        $searchInField=$parameters['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
+        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
+        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
+        
         //search type regular expression
         if($searchType==='regularExpressionSearch'){
             //simples way to test if the regular expression is valid
@@ -230,9 +221,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             //    return false;
             //}
             if(!$matchCase){
-                return $searchInCombo.' REGEXP '.$this->db->getAdapter()->quote($queryString);
+                return $adapter->quoteIdentifier($searchInField).' REGEXP '.$adapter->quote($queryString);
             }
-            return $searchInCombo.' REGEXP BINARY '.$this->db->getAdapter()->quote($queryString);
+            return $adapter->quoteIdentifier($searchInField).' REGEXP BINARY '.$adapter->quote($queryString);
         }
         //search type regular wildcard
         if($searchType==='wildcardsSearch'){
@@ -241,44 +232,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         //if match case, search without lower function
         if($matchCase){
-            return $searchInCombo.' like '.$this->db->getAdapter()->quote('%'.$queryString.'%').' COLLATE utf8_bin';
+            return $adapter->quoteIdentifier($searchInField).' like '.$adapter->quote('%'.$queryString.'%').' COLLATE utf8_bin';
         }
-        return 'lower('.$searchInCombo.') like lower('.$this->db->getAdapter()->quote('%'.$queryString.'%').') COLLATE utf8_bin';
-    }
-    
-    //TODO here also the ins and delete segments should be added
-    public function replaceSearchString($searchString,$queryString,$searchType){
-        
-       // This must be done by the INS/DEL plugin, since the correct attributes for the tags must be added
-       // $queryString = '<del>'.$searchString.'</del><ins>'.$queryString.'</ins>';
-        
-        //"/^PHP$/"
-        switch ($searchType) {
-            case 'normalSearch':
-                $searchString='/'.$queryString.'/';
-                if(!$matchCase){
-                    break;
-                }
-                $searchString='/^'.$queryString.'$/';
-                break;
-            case 'wildcardsSearch':
-                $searchString=str_replace("*","%",$queryString);
-                $searchString=str_replace("?","_",$queryString);
-                if(!$matchCase){
-                    return $searchString;
-                }
-                $searchString=' REGEXP "[[:<:]]'.$searchString.'[[:>:]]"';
-                break;
-            case 'regularExpressionSearch':
-                if($matchCase){
-                    return ' REGEXP BINARY "'.$queryString.'"';
-                }
-                $outSql=' REGEXP "'.$queryString.'"';
-                return $outSql;
-                break;
-        }
-        
-        return $searchString;
+        return 'lower('.$adapter->quoteIdentifier($searchInField).') like lower('.$adapter->quote('%'.$queryString.'%').') COLLATE utf8_bin';
     }
     
     /**
@@ -439,7 +395,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return string $segmentContent
      */
     public function stripTags($segmentContent) {
-        $segmentContent = preg_replace('/<del[^>]*>.*?<\/del>/i', '', $segmentContent);
+        $segmentContent = preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_DEL, '', $segmentContent);
         return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#','',$segmentContent));
     }
     
@@ -492,7 +448,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     'convert_from_encoding' => 'utf-8',
                     'ignore_parser_warnings' => true,
             );
-            $segmentContent= $this->tagHelper->removeTrackChanges($segmentContent);
+            $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+            /* @var $trackChange editor_Models_Segment_TrackChangeTag */
+            $segmentContent= $trackChange->removeTrackChanges($segmentContent);
+            
             $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, $options);
             /* @var $seg QueryPath\\DOMQuery */
             //advise libxml not to throw exceptions, but collect warnings and errors internally:

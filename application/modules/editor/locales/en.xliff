@@ -2244,6 +2244,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Replace all</target>
 </trans-unit>
 
+<trans-unit id="QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0">
+    <source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source>
+    <target>Replace all is not supported for task with segments with mqm tags</target>
+</trans-unit>
+
 <trans-unit id="U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg==">
     <source>Segmente mit Suchtreffer:</source>
     <target>Segments with search hits:</target>
@@ -2289,6 +2294,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='bWl0IExlc2V6ZWljaGVuIHZlcnNlaGVu'>
     <source>mit Lesezeichen versehen</source>
     <target>bookmarked</target>
+</trans-unit>
+<trans-unit id='U3VjaGUgaW4gZ2VzcGVycnRlbiBTZWdtZW50ZW4='>
+    <source>Suche in gesperrten Segmenten</source>
+    <target>Search in locked segments</target>
 </trans-unit>
     </body>
   </file>

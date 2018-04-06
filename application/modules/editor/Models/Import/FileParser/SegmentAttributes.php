@@ -32,6 +32,12 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_FileParser_SegmentAttributes {
     /**
+     * for XLF derivates there can be <mrk mtype="seg" mid=""> segments, this mid is stored here
+     * @var integer
+     */
+    public $mrkMid = 0;
+    
+    /**
      * the segments matchrate, defaults to 0
      * @var integer
      */

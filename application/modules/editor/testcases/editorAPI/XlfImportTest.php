@@ -98,6 +98,8 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
     public function testSegmentEditing() {
         //get segment list (just the ones of the first file for that tests)
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
+        $this->assertNotEmpty($segments, 'No segments are found in the Task!');
+        
         require_once 'Models/Segment/InternalTag.php';
 
         foreach($segments as $idx => $segToEdit) {
@@ -134,18 +136,29 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         
         $task = $this->api()->getTask();
         //start task export 
-        $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'ibm-opentm2-export-normal.xlf');
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '01-ibm-opentm2.xlf', 'ibm-opentm2-export-normal.xlf');
         //start task export with diff
         // diff export will be disabled for XLF!
+    }
+    
+    /**
+     * check if the whitespace between mrk tags on the import are also exported again
+     * @depends testSegmentEditing
+     */
+    public function testPreserveContentBetweenMrk() {
+        $task = $this->api()->getTask();
+        //start task export 
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '02-preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
     }
     
     /**
      * tests the export results
      * @param stdClass $task
      * @param string $exportUrl
+     * @param string $fileToExport
      * @param string $fileToCompare
      */
-    protected function checkExport(stdClass $task, $exportUrl, $fileToCompare) {
+    protected function checkExport(stdClass $task, $exportUrl, $fileToExport, $fileToCompare) {
         $this->api()->login('testmanager');
         $this->api()->request($exportUrl);
 
@@ -153,7 +166,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $path = $this->api()->getTaskDataDirectory();
         $pathToZip = $path.'export.zip';
         $this->assertFileExists($pathToZip);
-        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/ibm-opentm2.xlf');
+        $exportedFile = $this->api()->getFileContentFromZipPath($pathToZip, $task->taskGuid.'/'.$fileToExport);
         //compare it
         $expectedResult = $this->api()->getFileContent($fileToCompare);
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));

@@ -82,6 +82,31 @@ should make any problem!]]></header>
           </source>
           <note priority="1" from="description">This segment should be ignored at all since whitespace is collapsed and segment is empty then!</note>
       </trans-unit>
+      <trans-unit id="32344325" datatype="html" xml:space="preserve">
+        <source> Test preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk>  </seg-source>
+        <target> <mrk mtype="seg" mid="0">Testz preservez whitespacez.</mrk> <mrk mtype="seg" mid="1">Betweenz mrkz tagsz.</mrk>  <mrk mtype="seg" mid="2">Andz surroundingz tagsz.</mrk>  </target>
+        <note priority="1" from="description">Preserve whitespace between mrk tags.</note>
+      </trans-unit>
+      <trans-unit id="32344326" datatype="html" xml:space="default">
+        <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test not to preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk>  </seg-source>
+        <target> 
+            <mrk mtype="seg" mid="0">Testz notz toz preservez whitespacez.</mrk> <mrk mtype="seg" mid="1">Betweenz mrkz tagsz.</mrk>  <mrk mtype="seg" mid="2">Andz surroundingz tagsz.</mrk>  
+        </target>
+        <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
+      </trans-unit>
+      <trans-unit id="32344327" datatype="html" xml:space="preserve">
+        <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk> <mrk mtype="seg" mid="3">With missing or empty target.</mrk>  </seg-source>
+        <target/>
+        <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
+      </trans-unit>
+      <trans-unit id="32344328" datatype="html" xml:space="preserve">
+        <source> Test not to preserve whitespace. Between mrk tags.  And surrounding tags.  </source>
+        <seg-source> <mrk mtype="seg" mid="0">Test preserve whitespace.</mrk> <mrk mtype="seg" mid="1">Between mrk tags.</mrk>  <mrk mtype="seg" mid="2">And surrounding tags.</mrk> <mrk mtype="seg" mid="3">With missing or empty target.</mrk>  </seg-source>
+        <note priority="1" from="description">Preserve whitespace between mrk tags as defined in the config.</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

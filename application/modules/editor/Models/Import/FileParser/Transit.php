@@ -185,7 +185,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
                 continue;
             }
             $this->setMid($segId);
-            $this->parseSegmentAttributes($seg);
+            //segment-id of transit is used as mid and thus used here
+            $attributes = $this->createSegmentAttributes($segment->getId());
+            //from transit we support only the matchRate at the moment, rest is default 
+            $attributes->matchRate = (int)$segment->getMatchValue();
             $transUnit = array('source'=>$source,'target'=>$target);
             
             $this->extractSegment($transUnit);
@@ -238,19 +241,6 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             $this->meta->setTaskGuid($this->task->getTaskGuid());
             $this->meta->save();
         }
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
-     * 
-     * @param editor_Plugins_Transit_Segment $segment
-     */
-    protected function parseSegmentAttributes($segment){
-        //segment-id of transit is used as mid and thus used here
-        $attributes = $this->createSegmentAttributes($segment->getId());
-        //from transit we support only the matchRate at the moment, rest is default 
-        $attributes->matchRate = (int)$segment->getMatchValue();
     }
     
     /**

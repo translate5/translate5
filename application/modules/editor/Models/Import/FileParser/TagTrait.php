@@ -99,10 +99,12 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @var array
      */
     protected $whitespaceTagList = [
-        '#<hardReturn/>#',
-        '#<softReturn/>#',
-        '#<macReturn/>#',
-        '#<space ts="[^"]*"/>#',
+        '#<(hardReturn)/>#',
+        '#<(softReturn)/>#',
+        '#<(macReturn)/>#',
+        '#<(char) ts="[^"]*"( length="([0-9]+)")?/>#',
+        '#<(tab) ts="[^"]*"( length="([0-9]+)")?/>#',
+        '#<(space) ts="[^"]*"( length="([0-9]+)")?/>#',
     ];
     
     /**
@@ -110,10 +112,16 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @var array
      */
     protected $_tagMapping = [
-        'hardReturn' => ['text' => '&lt;hardReturn/&gt;', 'imgText' => '<hardReturn/>'],
-        'softReturn' => ['text' => '&lt;softReturn/&gt;', 'imgText' => '<softReturn/>'],
-        'macReturn' => ['text' => '&lt;macReturn/&gt;', 'imgText' => '<macReturn/>'],
-        'space' => ['text' => '&lt;space/&gt;', 'imgText' => '<space/>'],
+        // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
+        'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;', 'imgText' => '<↵ hardReturn/>'], //in title irgendwas mit <hardReturn/> 
+        'softReturn' => ['text' => '&lt;↵ softReturn/&gt;', 'imgText' => '<↵ softReturn/>'], //in title irgendwas mit <softReturn/>
+        'macReturn' => ['text' => '&lt;↵ macReturn/&gt;', 'imgText' => '<↵ macReturn/>'],  //in title irgendwas mit <macReturn/>
+        // ·    U+00B7      c2 b7       &middot;    &#183;      MIDDLE DOT
+        'space' => ['text' => '&lt;·/&gt;', 'imgText' => '<·/>'],
+        // →    U+2192      e2 86 92    &rarr;      &#8594;     RIGHTWARDS ARROW
+        'tab' => ['text' => '&lt;→/&gt;', 'imgText' => '<→/>'],
+        // �    U+FFFD      ef bf bd                &#65533;    REPLACEMENT CHARACTER (Questionmark on black diamond)
+        'char' => ['text' => '&lt;�/&gt;', 'imgText' => '<�/>'],
     ];
 
     /**
@@ -133,7 +141,15 @@ trait editor_Models_Import_FileParser_TagTrait {
     protected function whitespaceTagReplacer($segment) {
         return preg_replace_callback($this->whitespaceTagList, function($match) use ($segment) {
             $tag = $match[0];
-            $tagName = preg_replace('"<([^/ ]*).*>"', '\\1', $tag);
+            $tagName = $match[1];
+            
+            //if there is no length attribute, use length = 1
+            if(empty($match[2])) {
+                $length = 1;
+            }
+            else {
+                $length = $match[3]; //else use the stored length value
+            }
             if(!isset($this->_tagMapping[$tagName])) {
                 trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$segment, E_USER_ERROR);
             }
@@ -141,6 +157,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             
             //generate the html tag for the editor
             $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
+            $p['length'] = $length; //FIXME refactor whole tagparams stuff!
             $tag = $this->_singleTag->getHtmlTag($p);
             $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
             return $tag;
@@ -220,21 +237,20 @@ trait editor_Models_Import_FileParser_TagTrait {
         //protect multispaces and tabs
         $textNode = preg_replace_callback('/ ( +)|(\t+)/', function ($match) {
             //depending on the regex use the found spaces (match[1]) or the tabs (match[2]).
-            $content = empty($match[1]) ? $match[2] : $match[1];
-            $result = $this->makeInternalSpace($content);
             if(empty($match[2])){
                 //prepend the remaining whitespace before the space tag. 
                 // Only the additional spaces are replaced as a tag
                 // One space must remain in the content
                 //Pay attention to the leading space on refactoring!
-                return ' '.$result;
+                return ' '.$this->maskSpecialContent('space', $match[1], strlen($match[1]));
             }
-            //tab(s) are completly replaced with an tag
-            return $result;
+            //tab(s) are completely replaced with a tag
+            return $this->maskSpecialContent('tab', $match[2], strlen($match[2]));
         }, $textNode);
         
         return preg_replace_callback($this->protectedUnicodeList, function ($match) {
-            return $this->makeInternalSpace($match[0]);
+            //always one single character is masked, so length = 1 
+            return $this->maskSpecialContent('char', $match[0], 1);
         }, $textNode);
     }
     
@@ -267,11 +283,13 @@ trait editor_Models_Import_FileParser_TagTrait {
     }
     
     /**
-     * Creates the internal Space tag
+     * Creates the internal Space/Tab/SpecialChar tags
+     * @param string $type
      * @param string $toBeProtected
+     * @param integer $length
      * @return string
      */
-    protected function makeInternalSpace($toBeProtected) {
-        return '<space ts="' . implode(',', unpack('H*', $toBeProtected)) . '"/>';
+    protected function maskSpecialContent($type, $toBeProtected, $length) {
+        return '<'.$type.' ts="' . implode(',', unpack('H*', $toBeProtected)) . '" length="'.(int)$length.'"/>';
     }
 }

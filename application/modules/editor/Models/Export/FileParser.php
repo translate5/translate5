@@ -290,7 +290,10 @@ abstract class editor_Models_Export_FileParser {
         
         $edited = (string) $segment->getFieldEdited($field);
         
-        $edited = $this->tagHelper->removeTrackChanges($edited);
+        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
+        
+        $edited= $trackChange->removeTrackChanges($edited);
         
         $before = $edited;
         $edited = $this->tagHelper->protect($edited);
@@ -427,8 +430,8 @@ abstract class editor_Models_Export_FileParser {
           "\r",
         );
         $content = str_replace($search, $replace, $content);
-        return preg_replace_callback('"<space ts=\"([A-Fa-f0-9]*)\"/>"', function ($match) {
-                    return pack('H*', $match[1]);
+        return preg_replace_callback('#<(space|char|tab) ts="([A-Fa-f0-9]*)"( length="[0-9]+")?/>#', function ($match) {
+                    return pack('H*', $match[2]);
                 }, $content);
     }
 }

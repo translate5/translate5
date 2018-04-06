@@ -163,10 +163,15 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         /* @var $file editor_Models_File */
         $file->load($segment->getFileId());
         
-        $source = $internalTag->removeTrackChanges($this->getQueryString($segment));
+        $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChange editor_Models_Segment_TrackChangeTag */
+        
+        $source= $trackChange->removeTrackChanges($this->getQueryString($segment));
+        
         $source = $internalTag->toXliffPaired($source);
         
-        $target = $internalTag->removeTrackChanges($segment->getTargetEdit());
+        $target= $trackChange->removeTrackChanges($segment->getTargetEdit());
+        
         $target = $internalTag->toXliffPaired($target);
         
         if($this->api->update($source, $target, $segment, $file->getFileName())) {
