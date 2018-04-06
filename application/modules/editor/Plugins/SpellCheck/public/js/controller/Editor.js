@@ -39,9 +39,12 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     extend: 'Ext.app.Controller',
-    requires: ['Editor.util.SegmentContent',
-               'Ext.tip.ToolTip'],
-    mixins: ['Editor.plugins.SpellCheck.controller.UtilLanguageTool',
+    requires: ['Ext.tip.ToolTip'],
+    mixins: ['Editor.util.DevelopmentTools',
+             'Editor.util.Event',
+             'Editor.util.SegmentEditor',
+             'Editor.util.SegmentEditorSnapshots',
+             'Editor.plugins.SpellCheck.controller.UtilLanguageTool',
              'Editor.controller.SearchReplace',
              'Editor.util.SearchReplaceUtils'],
     refs:[{
@@ -60,12 +63,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             '#Editor.$application': {
                 editorViewportOpened: 'initSpellCheckPluginForTask',
                 editorViewportClosed: 'onDestroy'
-            },
+            }
         },
         component: {
             'segmentsHtmleditor': {
-                push: 'startTimerForSpellCheck',
-                afterInsertMarkup: 'startTimerForSpellCheck'
+                push: 'handleAfterContentUpdate',
+                afterInsertMarkup: 'handleAfterContentUpdate'
             }
         },
     },
@@ -93,9 +96,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     // =========================================================================
     
-    editor: null,                   // The segment's Editor (Editor.view.segments.HtmlEditor)
-    editorBodyExtDomElement: null,  // Segment's Editor: Ext.dom.Element (also needed for me.prepareDelNodeForSearch() in SearchReplaceUtils.js)
-    
     targetLangCode: null,           // language to be checked
     isSupportedLanguage: null,      // if the language is supported by our tool(s)
     
@@ -114,7 +114,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     isSpellCheckOnSaving: false,    // flag to indicate that the SpellChecker runs on saving the segment
     savedSegmentNrInTask: false,    // segmentNrInTask of the segment that started the SpellCheck on saving
     
-    USE_CONSOLE: true,              // (true|false): use true for developing using the browser's console, otherwise use false
+    segmentId: null,                // ID of the currently edited Segment
     
     // =========================================================================
     // Init
@@ -135,6 +135,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.spellCheckTooltip = null;
         }
         Ext.dom.GarbageCollector.collect();
+        me.editor = null;
+        me.consoleLog('----------------- SpellCheck: onDestroy FINISHED. ---------------');
     },
     /**
      * Init the SpellCheck-Plugin for the current task:
@@ -156,6 +158,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.isSupportedLanguage) {
             me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
             me.initEditor();
+            me.initSnapshotHistory();
             me.setBrowserSpellcheck();
             me.initTooltips();
             me.initKeyboardEvents();
@@ -174,7 +177,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             editor = plug.editor; // → this is the row editor component;
         me.consoleLog('initEditor');
         me.editor = editor.mainEditor; // → this is the HtmlEditor
-        me.editorBodyExtDomElement = me.getEditorBodyExtDomElement();
         me.injectCSSForEditor();
     },
     /**
@@ -198,15 +200,27 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     /**
      * Init Events
      */
+    /**
+     * Init the event and "Reset" everything for the new keydown-Event
+     */
+    initKeyDownEvent: function(event) {
+        var me = this;
+        me.consoleLog('initKeyDownEvent');
+        // "reset" for Editor.util.Event:
+        me.event = event;
+        me.ignoreEvent = false;
+        me.stopEvent = false;
+    },
     initKeyboardEvents: function() {
         var me = this;
-        Ext.get(me.editor.getDoc()).on('keydown', me.startTimerForSpellCheck, me, {priority: 9999, delegated: false});
+        Ext.get(me.editor.getDoc()).on('keydown', me.handleKeyDown, me, {priority: 9999, delegated: false});
+        Ext.get(me.editor.getDoc()).on('keyup', me.handleKeyUp, me, {priority: 9999, delegated: false});
     },
     initMouseEvents: function() {
         var me = this,
             tooltipBody = Ext.getBody();
         
-        me.editorBodyExtDomElement.on({
+        me.getEditorBodyExtDomElement().on({
             contextmenu:{
                 delegated: false,
                 delegate: me.self.NODE_NAME_MATCH + '.' + me.self.CSS_CLASSNAME_MATCH,
@@ -230,6 +244,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     // When do we run the SpellCheck?
     // =========================================================================
+    
     /**
      * Everytime the user stops editing for a certain time (EDIT_IDLE_MILLISECONDS),
      * the SpellCheck ist started.
@@ -247,6 +262,74 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     // Additional handlers for events
     // =========================================================================
+    
+    /**
+     * Handle KeyDown-Events of Editor.view.segments.HtmlEditor
+     * @param {Object} event
+     */
+    handleKeyDown: function(event) {
+        var me = this;
+        me.initKeyDownEvent(event);
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('SpellCheck: handleKeyDown failed because language is not supported or SpellCheck-Tool does not run.');
+            return;
+        }
+        switch(true) {
+            case me.eventIsCtrlZ():
+                // Restore older snapshot...
+                me.cleanupSnapshotHistory();
+                me.rewindSnapshot();
+                me.restoreSnapshotInEditor();
+                // ... then stop everything
+                me.ignoreEvent = true;
+                me.stopEvent = true;
+            break;
+            case me.eventIsCtrlY():
+                // Restore newer snapshot...
+                me.fastforwardSnapshot();
+                me.restoreSnapshotInEditor();
+                // ... then stop everything
+                me.ignoreEvent = true;
+                me.stopEvent = true;
+            break;
+            default:
+                me.startTimerForSpellCheck();
+            break;
+        }
+        // Stop event?
+        if(me.stopEvent) {
+            event.stopEvent();
+        }
+    },
+    /**
+     * Handle KeyUp-Events of Editor.view.segments.HtmlEditor
+     */
+    handleKeyUp: function() {
+        var me = this;
+        if(me.ignoreEvent) {
+            return;
+        }
+        // Keep a snapshot from the new content
+        me.saveSnapshot();
+    },
+    /**
+     * After each push etc.: When the content in the Editor gets updated, we save a snapshot and start the timer for running the next SpellCheck.
+     */
+    handleAfterContentUpdate: function() {
+        var me = this;
+        // (1) New segment opened?
+        me.consoleLog("segmentId: " + me.segmentId + "/" + me.getSegmentGrid().editingPlugin.context.record.get('id'));
+        if (me.segmentId != me.getSegmentGrid().editingPlugin.context.record.get('id')) {
+            // New segment opened? Then start a new snapshot-history.
+            me.segmentId = me.getSegmentGrid().editingPlugin.context.record.get('id');
+            me.initSpellCheckPluginForEditor();
+            me.initSnapshotHistory();
+        }
+        // (1) keep a snapshot from the current content
+        me.saveSnapshot();
+        // (2) start Timer for SpellCheck
+        me.startTimerForSpellCheck();
+    },
     /**
      * When a segment is saved, the SpellChecker is activated.
      * - If there are errors (for the segment that might now be closed already), the user will get a popup-message.
@@ -267,7 +350,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.isSpellCheckOnSaving = true;
         me.startSpellCheck();
     },
-    
     // =========================================================================
     // Run, apply and finish the SpellCheck.
     // =========================================================================
@@ -283,7 +365,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             htmlWithoutSpellCheckNodes,
             htmlWithSpellCheckNodes;
         if (!me.isSupportedLanguage) {
-            me.consoleLog('startSpellCheck failed because language is not supported.');
+            me.consoleLog('startSpellCheck failed because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
         
@@ -307,10 +389,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // If the text has not changed, we can use the result we have already fetched and applied.
         // (Doing "nothing" is not an option because then there won't be any SpellCheck-Nodes at all in the Editor.)
         // TODO: keep the position of the caret!
-        htmlWithoutSpellCheckNodes = me.editorBodyExtDomElement.getHtml();
+        htmlWithoutSpellCheckNodes = me.getEditorBodyExtDomElement().getHtml();
         if (!me.isSpellCheckOnSaving && (htmlWithoutSpellCheckNodes in me.spellCheckResults) ) {
             htmlWithSpellCheckNodes = me.spellCheckResults[htmlWithoutSpellCheckNodes];
-            me.editorBodyExtDomElement.setHtml(htmlWithSpellCheckNodes);
+            me.getEditorBodyExtDomElement().setHtml(htmlWithSpellCheckNodes);
             me.consoleLog('startSpellCheck did not start a new check because we have already run a check for this content. We used the result we already have.');
             return;
         }
@@ -334,10 +416,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.consoleLog('applySpellCheck on isSpellCheckOnSaving...');
             if (me.allMatchesOfTool.length > 0) {
                 message = me.messages.errorsFoundOnSaving.replace(/%segmentnr/, me.savedSegmentNrInTask);
-                Editor.MessageBox.addInfo(message); // TODO: Should we show this message only if the errors are not the same as already known?
+                Editor.MessageBox.addWarning(message); // TODO: Should we show this message only if the errors are not the same as already known?
             }
             // TODO: update segment-status in grid
             me.isSpellCheckOnSaving = false; // = reset to "default"
+            me.onDestroy();
             return;
         }
         if (me.editIdleRestarted) {
@@ -345,14 +428,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             return;
         }
         
-        htmlWithoutSpellCheckNodes = me.editorBodyExtDomElement.getHtml();
+        htmlWithoutSpellCheckNodes = me.getEditorBodyExtDomElement().getHtml();
         if (me.allMatchesOfTool.length > 0) {
             me.storeAllMatchesFromTool();
             me.showAllMatchesInEditor();
         } else {
             me.consoleLog('allMatchesOfTool: no results (not checked or nothing found).');
         }
-        htmlWithSpellCheckNodes = me.editorBodyExtDomElement.getHtml();
+        htmlWithSpellCheckNodes = me.getEditorBodyExtDomElement().getHtml();
         
         // and store the result of the SpellCheck for the html WITHOUT the SpellCheck-Nodes
         me.spellCheckResults[htmlWithoutSpellCheckNodes] = htmlWithSpellCheckNodes;
@@ -392,6 +475,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         me.spellCheckTooltip.hide();
+        
+        me.saveSnapshot();
         
         // new DOM after replacement => find and apply the matches again:
         me.startSpellCheck();
@@ -494,29 +579,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     // Helpers for the Editor and Task
     // =========================================================================
-    
-    /***
-     * Use this function to get the editor body.
-     * @returns {HTMLBodyElement}
-     */
-    getEditorBody:function(){
-        var me = this;
-        if(!me.editor){
-            return false;
-        }
-        if(me.editor.editorBody){
-            return me.editor.editorBody;
-        }
-        return me.editor.getEditorBody();
-    },
-    /***
-     * Use this function to get the editor ext document element.
-     * @returns {Ext.dom.Element}
-     */
-    getEditorBodyExtDomElement:function(){
-        var me = this;
-        return Ext.get(me.getEditorBody());
-    },
     /***
      * Set targetLangCode for the current task.
      * @returns {String}
@@ -615,12 +677,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             allSpellCheckElements,
             spellCheckElementParentNode;
-        if(!me.editorBodyExtDomElement){
+        if(!me.getEditorBodyExtDomElement()){
             me.consoleLog('cleanSpellCheckTags failed with missing editorBodyExtDomElement.');
             return false;
         }
         // find all spellcheck-elements and "remove their tags"
-        allSpellCheckElements = me.editorBodyExtDomElement.query('.' + me.self.CSS_CLASSNAME_MATCH);
+        allSpellCheckElements = me.getEditorBodyExtDomElement().query('.' + me.self.CSS_CLASSNAME_MATCH);
         Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
             spellCheckElementParentNode = spellCheckEl.parentNode;
             while(spellCheckEl.firstChild) {
@@ -630,29 +692,4 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             spellCheckElementParentNode.normalize();
         });
     },
-    
-    // =========================================================================
-    // Development
-    // =========================================================================
-    
-    /**
-     * Write into the browser console depending on the setting of me.USE_CONSOLE.
-     * @param {(String|Object)} outputForConsole
-     */
-    consoleLog: function(outputForConsole) {
-        var me = this;
-        if (me.USE_CONSOLE) {
-            if (typeof outputForConsole === 'string' || outputForConsole instanceof String) {
-                console.log(outputForConsole);
-            } else {
-                console.dir(outputForConsole);
-            }
-        }
-    },
-    consoleClear: function() {
-        var me = this;
-        if (me.USE_CONSOLE) {
-            console.clear();
-        }
-    }
 });
