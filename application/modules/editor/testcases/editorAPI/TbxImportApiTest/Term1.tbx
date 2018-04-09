@@ -28,7 +28,7 @@
 			-->
 			
 			<termEntry id="9f7a1227-eb7d-491e-ace1-4ab859a92c2a" cid="628586">
-				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">$2222.0 Initial Version$</descrip>
+				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">Testkunde</descrip>
 				<!-- 
                         goes into LEK_termEntry_attributes: 
                         id: PK
@@ -46,13 +46,13 @@
                     -->
 				<transacGrp>
 					<transac>creation</transac><!-- becomes the id of the transac as parentId -->
-					<date>2018-01-12 $2222.0 Initial Version$</date>
-					<transacNote type="responsiblePerson">Roland Dietrich $2222.0 Initial Version$</transacNote>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
 				</transacGrp>
 				<transacGrp>
 					<transac>modification</transac>
-					<date>2018-01-12 $2222.0 Initial Version$</date>
-					<transacNote type="responsiblePerson">Roland Dietrich $2222.0 Initial Version$</transacNote>
+					<date>2018-01-12</date>
+					<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
 				</transacGrp>
 				<!-- tig → combination of termEntry ID + language -->
 				<langSet xml:lang="de-de">
@@ -60,19 +60,19 @@
 					
 					<!-- the same here as in the transacGrp -->
 					<descripGrp>
-						<descrip type="definition" xml:lang="de-de">#007.0 Initial Version# Das ist die Definition auf Eintragsebene.</descrip>
+						<descrip type="definition" xml:lang="de-de">Das ist die Definition auf Eintragsebene.</descrip>
 						<transacGrp>
 							<!-- parentId from descript -->
 							<transac>creation</transac>
 							<!-- parentId from transac -->
-							<date>#2222.0 Initial Version# 2018-01-12</date>
+							<date>2018-01-12</date>
 							<!-- parentId from transac -->
-							<transacNote type="responsiblePerson">#007.0 Initial Version# Roland Dietrich</transacNote>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
 						</transacGrp>
 						<transacGrp>
 							<transac>modification</transac>
-							<date>#2222.0 Initial Version# 2018-01-12</date>
-							<transacNote type="responsiblePerson">#007.0 Initial Version# Roland Dietrich</transacNote>
+							<date>2018-01-12</date>
+							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
 						</transacGrp>
 					</descripGrp>
 					<ntig>

@@ -40,7 +40,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
 
     public function importAction(){
         $params=$this->getRequest()->getParams();
-        $this->entity->importTbx($params);
+        //the return is needed for the tests
+        $this->view->success=$this->entity->importTbx($params);
     }
 }
 

@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * extends and modifies the original TBX importer, so that only missing Term entries ares imported
+ * @deprecated 
  */
 class editor_Models_Import_TermListParser_TbxReimportMissing extends editor_Models_Import_TermListParser_Tbx {
     

@@ -32,17 +32,28 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function setUpBeforeClass() {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
-        
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         $appState = $api->requestJson('editor/index/applicationstate');
     }
     
     public function testTbxImport(){
-        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => 2));
-        self::assertGreaterThan(0,$termCollection->id,"Unable to create a test collection");
+        //TODO: for the customer we should do same thing as for the user
+        //add sql like test-users.sql -> test-customers.sql
+        //create simmilar logic as assertLogin() -> assertCustomer
+        //get the id from there and use it here
+        $appState = $this->api()->requestJson('editor/index/applicationstate');
+        
+        self::assertTrue(in_array('editor_Plugins_Customer_Init',$appState->pluginsLoaded),'Plugin Customer must be active for this test case!');
+        
+        self::assertCustomer();
+        
+        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => $this->api()->getCustomer()->id));
+        self::assertTrue(is_object($termCollection), 'Unable to create a test collection');
+        
         $this->api()->addFile('Term.tbx', $this->api()->getFile('Term.tbx'), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' => $termCollection->id, 'customerId' => 2));
+        //$this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' => 135));
+        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$termCollection->id));
     }
     
 }

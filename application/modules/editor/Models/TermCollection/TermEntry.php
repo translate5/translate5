@@ -29,4 +29,18 @@ END LICENSE AND COPYRIGHT
 class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermEntry';
     protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermEntry';
+    
+    
+    /***
+     * Get term entry by given collectionId and groupId (termEntry tbx id) 
+     * @param unknown $termEntryId
+     * @param unknown $collectionId
+     * @return Zend_Db_Table_Row_Abstract|NULL
+     */
+    public function getTermEntryByIdAndCollection($termEntryId,$collectionId){
+        $s = $this->db->select()
+        ->where('groupId = ?', $termEntryId)
+        ->where('collectionId = ?', $collectionId);
+        return $this->db->fetchRow($s);
+    }
 }

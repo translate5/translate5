@@ -34,11 +34,17 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         $upload = new Zend_File_Transfer_Adapter_Http();
         /* @var $upload Zend_File_Transfer_Adapter_Http */
         if(!$upload->isUploaded("Term_tbx")) {
-            return;
+            return false;
         }
+        //TODO: handle missing parametars!!!!!11
+        
         $theFile=$upload->getFileInfo("Term_tbx");
-        $fileContent=file_get_contents($theFile['Term_tbx']['tmp_name']);
-        error_log($fileContent);
+        $fileinfo = new SplFileInfo($theFile['Term_tbx']['tmp_name']);
+        $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
+        /* @var $import editor_Models_Import_TermListParser_Tbx */
+        return $import->parseTbxFile($fileinfo->getPathname(),$params['collectionId']);
+        
+        //error_log($fileContent);
         //TODO: start the import. Run the new tbx importer
     }
 }

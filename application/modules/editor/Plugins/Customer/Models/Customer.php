@@ -50,4 +50,16 @@
 class editor_Plugins_Customer_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_Customer_Models_Db_Customer';
     protected $validatorInstanceClass   = 'editor_Plugins_Customer_Models_Validator_Customer';
+    
+    
+    /***
+     * Find customer by number
+     * 
+     * @param mixed $number
+     */
+    public function findCustomerByNumber($number){
+        $s = $this->db->select()
+        ->where('number = ?', $number);
+        return $this->db->fetchRow($s);
+    }
 }

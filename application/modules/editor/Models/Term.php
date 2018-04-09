@@ -461,6 +461,52 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $exporteur->export();
     }
     
+    /***
+     * Get term by collection, language and term
+     * 
+     * @param mixed $collectionId
+     * @param mixed $languageId
+     * @param mixed $termValue
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function loadByCollectionLanguageAndTermValue($collectionId,$languageId,$termValue){
+        $s = $this->db->select()
+            ->where('collectionId = ?', $collectionId)
+            ->where('language = ?', $languageId)
+            ->where('term = ?', $termValue);
+        return $this->db->fetchAll($s);
+    }
+    
+    /***
+     * Check if the given term entry exist in the collection
+     * @param mixed $termEntry
+     * @param integer $collectionId
+     * @return boolean
+     */
+    public function isTermEntryInCollection($termEntry,$collectionId){
+        $s = $this->db->select()
+        ->where('groupId = ?', $termEntry)
+        ->where('collectionId = ?', $collectionId);
+        $terms=$this->db->fetchAll($s);
+        return $terms->count()>0;
+    }
+    
+    /***
+     * Check if the term should be updated for the term collection
+     * 
+     * @param mixed $termEntry
+     * @param mixed $termId
+     * @param mixed $collectionId
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function isUpdateTermForCollection($termEntry,$termId,$collectionId){
+        $s = $this->db->select()
+        ->where('groupId = ?', $termEntry)
+        ->where('mid = ?', $termId)
+        ->where('collectionId = ?', $collectionId);
+        return $this->db->fetchAll($s);
+    }
+    
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array
