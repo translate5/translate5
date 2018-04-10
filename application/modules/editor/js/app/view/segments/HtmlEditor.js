@@ -96,11 +96,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
-      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}" data-length="{length}" />'
+      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" />'
     ]);
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
-      '<span title="{text}" class="short">{shortTag}</span>',
+      '<span title="{title}" class="short">{shortTag}</span>',
       '<span data-originalid="{id}" data-filename="{md5}" data-length="{length}" class="full">{text}</span>'
     ]);
     me.spanTemplate.compile();
@@ -382,7 +382,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       //padding left 1px and right 1px by adding x+1 and width + 2
       //svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
       svg += '<svg xmlns="http://www.w3.org/2000/svg" height="'+lineHeight+'" width="'+(width+2)+'">';
-      svg += '<rect width="100%" height="100%" fill="rgb(57,255,163)" rx="3" ry="3"/>';
+      svg += '<rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/>';
       svg += '<text x="1" y="'+(lineHeight-5)+'" font-size="'+styles['font-size']+'" font-weight="'+styles['font-weight']+'" font-family="'+styles['font-family'].replace(/"/g,"'")+'">'
       svg += Ext.String.htmlEncode(text)+'</text></svg>';
       return prefix + encodeURI(svg);
@@ -401,6 +401,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       spanShort = divItem.down('span.short');
       data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
       data.id = spanFull.getAttribute('data-originalid');
+      data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
       data.length = spanFull.getAttribute('data-length');
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!

@@ -59,11 +59,11 @@ Ext.define('Editor.view.ToolTip', {
         beforeshow : function(tip) {
             var t = tip.triggerElement,
                 fly = Ext.fly(t); 
-            if(fly.hasCls('qmflag') || fly.hasCls('trackchanges')) {
+            if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
                 // Don't show multiple ToolTips that overlap, but collect data into one single ToolTip
-                this.handleCollectedTooltip(t, tip);
+                return this.handleCollectedTooltip(t, tip);
             }
-            //else if hasClass for other ToolTip Types
+            return false;
         }
     },
 
@@ -90,34 +90,35 @@ Ext.define('Editor.view.ToolTip', {
     handleCollectedTooltip: function(node, tip) {
         var me = this,
             fly = Ext.fly(node),
-            tplData = {};
+            result = '';
         // 'default'
-        tplData.qmFlag = '';
-        tplData.trackChanges = '';
         // add tooltip for qmFlag?
         if(fly.hasCls('qmflag')) {
-            tplData.qmFlag = me.getQmFlagData(node);
+            result = me.getQmFlagData(node);
         } else {
             var allQmFlagNodes = node.getElementsByClassName('qmflag');
             if (allQmFlagNodes.length == 1) {
-                tplData.qmFlag = me.getQmFlagData(allQmFlagNodes[0]);
+                result = me.getQmFlagData(allQmFlagNodes[0]);
             } else {
                 // a) there is no qmFlag-Node
                 // b) there are many qmFlag-Nodes and we don't know which exactly the mouseover refers to
-                tplData.qmFlag = '';
+                result = '';
             }
         }
         // add tooltip for trackChanges?
         if(fly.hasCls('trackchanges')) {
-            tplData.trackChanges = me.getTrackChangesData(node);
+            result += me.getTrackChangesData(node);
         } else if (/(^|[\s])trackchanges([\s]|$)/.test(node.parentNode.className)) {
-            tplData.trackChanges = me.getTrackChangesData(node.parentNode);
+            result += me.getTrackChangesData(node.parentNode);
         }
-        if(!me.toolTipCollectedTpl) {
-            me.toolTipCollectedTpl = new Ext.Template('{qmFlag}{trackChanges}');
-            me.toolTipCollectedTpl.compile();
-        }
-        tip.update(me.toolTipCollectedTpl.apply(tplData));
+        
+
+        //Workaround to show the titles of the img tags always in fulltag mode
+        if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp'))) {
+            result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
+        };
+        tip.update(result);
+        return !!result; //if there is no content for ttip, we return false to prevent the show of the tooltip
     },
     
     // ------------------------------------------------------------------
