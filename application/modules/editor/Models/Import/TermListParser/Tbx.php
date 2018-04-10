@@ -409,6 +409,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             //bis zum Ende des aktuellen LangTags gehen.
             while($this->xml->read() && $this->xml->name !== 'langSet'){}
         }
+        if($this->actualLangId<1){
+            $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $langModel editor_Models_Languages */
+            $langModel->loadByRfc5646($this->actualLang);
+            $this->actualLangId=$langModel->getId();
+        }
     }
 
     /**
@@ -789,7 +795,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             
             foreach ($tmpTermValue as $t){
                 $t = (object) $t;
-                $checkCase=$checkCase && ($t->language==$this->actualLangId);
+                $checkCase=$t->language==$this->actualLangId;
                 $checkCase=$checkCase && ($t->term==$this->xml->readInnerXml());
                 //the groupId is already the same
                 //$checkCase=$checkCase && ($t->groupId==$this->getIdTerm());
@@ -836,7 +842,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             ->where('collectionId = ?', $this->termCollectionId);
             $tmpTermValue=$term->db->fetchAll($s);
             
-            if(!empty($tmpTermValue)){
+            if($tmpTermValue->count()>0){
                 //the first term thus found is updated by the values ​​in the TBX file. 
                 //The term-ID and termEntry-ID remain the same as they already existed in translate5.
                 $tmpTermValue=$tmpTermValue->toArray();
