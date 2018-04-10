@@ -205,7 +205,7 @@ Ext.define('Editor.controller.SearchReplace', {
      * Last selected segment index when replace all is clicked.
      * It is used so the segment grid is scrolled to the same position after replace all.
      */
-    replaceAllSegmentIndex:null,
+    //replaceAllSegmentIndex:null,
     
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
@@ -1405,7 +1405,11 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //if the update is needed, load the segment store
         if(updateRecord){
-            segmentStore.load(function(records, operation, success) {
+            segmentStore.load();
+            //FIXME: this is disabled, sometimes this throws an error
+            //https://jira.translate5.net/browse/TRANSLATE-1134
+            /*
+            me.getSegmentGrid().getStore().load(function(records, operation, success) {
                 if(me.replaceAllSegmentIndex){
                     //scroll to the last active index
                     me.getSegmentGrid().scrollTo(me.replaceAllSegmentIndex, {
@@ -1414,8 +1418,10 @@ Ext.define('Editor.controller.SearchReplace', {
                     });
                 }
             });
+            */
             return;
         }
+        
         for(var i=0;i<results.length;i++){
             //fieldName,value,startIndex,anyMatch,caseSensitive,exactMatch
             var record=segmentStore.findRecord('segmentNrInTask',results[i].segmentNrInTask,0,false,false,true);
@@ -1426,13 +1432,16 @@ Ext.define('Editor.controller.SearchReplace', {
             record.set('autoStateId',999);
         }
         
+        //FIXME: this is disabled, sometimes this throws an error
+        //https://jira.translate5.net/browse/TRANSLATE-1134
         //find the current selection
-        var selectedSegment= me.getSegmentGrid().getSelection()[0];
+        /*var selectedSegment= me.getSegmentGrid().getSelection()[0];
         if(!selectedSegment){
             return;
         }
         //get the segment grid row index from the current selection
         me.replaceAllSegmentIndex=me.getSegmentRowNumber(selectedSegment);
+        */
     },
 
     /**
