@@ -126,6 +126,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             $tag = $match[0];
             $tagName = $match[1];
             $cls = ' '.$tagName;
+            $title = '<'.$this->shortTagIdent.'/>: ';
             
             //if there is no length attribute, use length = 1
             if(empty($match[2])) {
@@ -145,16 +146,19 @@ trait editor_Models_Import_FileParser_TagTrait {
                 case 'macReturn':
                     $cls = ' newline';
                     $text = '↵';
+                    $title .= 'Newline';
                     break;
                 case 'space':
                     // ·    U+00B7      c2 b7       &middot;    &#183;      MIDDLE DOT
                     //'space' => ['text' => '&lt;·/&gt;'],
                     $text = str_repeat('·',$length);
+                    $title .= $length.' whitespace character'.($length>1?'s':'');
                     break;
                 case 'tab':
                     // →    U+2192      e2 86 92    &rarr;      &#8594;     RIGHTWARDS ARROW
                     //'tab' => ['text' => '&lt;→/&gt;'],
                     $text = str_repeat('→',$length);
+                    $title .= $length.' tab character'.($length>1?'s':'');
                     break;
                 case 'char':
                 default:
@@ -167,14 +171,19 @@ trait editor_Models_Import_FileParser_TagTrait {
                 //U+23B5	⎵	e2 8e b5		&#9141;	⎵ 	BOTTOM SQUARE BRACKET
                         $text = '⎵';
                         $cls = ' nbsp';
+                        $title .= 'Non breaking space';
                     }
                     else {
-                        $text = 'protected Special character';
+                        $text = 'protected Special-Character';
+                        $title .= 'protected Special-Character';
                     }
             }
             $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $text);
-            $p['class'] .= $cls; //FIXME refactor whole tagparams stuff!
-            $p['length'] = $length; //FIXME refactor whole tagparams stuff!
+            //FIXME refactor whole tagparams stuff!
+            $p['class'] .= $cls; 
+            $p['length'] = $length;
+            $p['title'] = $title; //Only translatable with using ExtJS QTips in the frontend, as title attribute not possible!
+            
             $tag = $this->_singleTag->getHtmlTag($p);
             return $tag;
         }, $segment);

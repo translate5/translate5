@@ -85,7 +85,7 @@ abstract class editor_ImageTag {
      */
     protected $_filename;
     
-    protected $htmlTagTpl = '<div class="{type} {class} internal-tag"><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-filename="{filenameHash}" data-length="{length}" class="full">{text}</span></div>';
+    protected $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-filename="{filenameHash}" data-length="{length}" class="full">{text}</span></div>';
     
     /**
      * @var array enthält alle images, die mit dem aktuellen Objekt erzeugt wurden als Values
