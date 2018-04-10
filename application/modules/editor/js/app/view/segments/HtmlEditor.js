@@ -101,7 +101,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
       '<span title="{title}" class="short">{shortTag}</span>',
-      '<span data-originalid="{id}" data-filename="{md5}" data-length="{length}" class="full">{text}</span>'
+      '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
     ]);
     me.spanTemplate.compile();
     me.callParent(arguments);
@@ -405,14 +405,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.length = spanFull.getAttribute('data-length');
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!
-      if(data.id) {
-          //new way
-          data.md5 = spanFull.getAttribute('data-filename');
-      }
-      else {
+      if(!data.id) {
           split = spanFull.getAttribute('id').split('-');
           data.id = split.shift();
-          data.md5 = split.pop();
       }
       shortTagContent = spanShort.dom.innerHTML;
 	  data.nr = shortTagContent.replace(/[^0-9]/g, '');
