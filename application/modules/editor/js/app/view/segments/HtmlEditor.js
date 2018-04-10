@@ -107,7 +107,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.callParent(arguments);
   },
   initFrameDoc: function() {
-	  this.callParent(arguments);
+      this.callParent(arguments);
       this.fireEvent('afterinitframedoc', this);
   },
 

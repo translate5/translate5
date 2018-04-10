@@ -225,6 +225,8 @@ Ext.define('Editor.controller.Editor', {
                 }
             ]
         }));
+        //inits the editor iframe directly after loading the application
+        plug.editor = plug.initEditor(); 
         
         me.handleReferneceFilesMessage();
     },
