@@ -100,6 +100,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=41');
         $this->assertNotEmpty($segments, 'No segments are found in the Task!');
         
+        require_once 'Models/Segment/TagAbstract.php';
         require_once 'Models/Segment/InternalTag.php';
 
         foreach($segments as $idx => $segToEdit) {
