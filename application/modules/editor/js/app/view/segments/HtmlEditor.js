@@ -100,7 +100,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     ]);
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
-      '<span title="{text}" class="short">&lt;{shortTag}&gt;</span>',
+      '<span title="{text}" class="short">{shortTag}</span>',
       '<span data-originalid="{id}" data-filename="{md5}" data-length="{length}" class="full">{text}</span>'
     ]);
     me.spanTemplate.compile();
@@ -120,7 +120,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
         body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;line-height:14px;"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=14" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=15" />'; //disable Img resizing
     return Ext.String.format(body, me.iframePad, additionalCss, dir);
   },
   /**
@@ -356,11 +356,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       data = me.getData(item,data);
 
-      if(me.viewModesController.isFullTag()) {
+      if(me.viewModesController.isFullTag() || data.alwaysFullTag) {
         data.path = me.getSvg(data.text, data.fullWidth);
       }
       else {
-        data.path = me.getSvg(data.nr, data.shortWidth);
+        data.path = me.getSvg(data.shortTag, data.shortWidth);
       }
       me.result.push(me.imageTemplate.apply(data));
       plainContent.push(me.markupImages[data.key].html);
@@ -379,10 +379,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           lineHeight = Math.round(styles['font-size'].replace(/px/, '') * 1.3);
       }
 
-      svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
-      svg += '<svg xmlns="http://www.w3.org/2000/svg" height="'+lineHeight+'" width="'+width+'">';
+      //padding left 1px and right 1px by adding x+1 and width + 2
+      //svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
+      svg += '<svg xmlns="http://www.w3.org/2000/svg" height="'+lineHeight+'" width="'+(width+2)+'">';
       svg += '<rect width="100%" height="100%" fill="rgb(57,255,163)" rx="3" ry="3"/>';
-      svg += '<text x="0" y="'+(lineHeight-5)+'" font-size="'+styles['font-size']+'" font-weight="'+styles['font-weight']+'" font-family="'+styles['font-family'].replace(/"/g,"'")+'">'
+      svg += '<text x="1" y="'+(lineHeight-5)+'" font-size="'+styles['font-size']+'" font-weight="'+styles['font-weight']+'" font-family="'+styles['font-family'].replace(/"/g,"'")+'">'
       svg += Ext.String.htmlEncode(text)+'</text></svg>';
       return prefix + encodeURI(svg);
   },
@@ -435,19 +436,22 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           data.shortTag = data.nr+'/';
           break;
       }
+      data.alwaysFullTag = /nbsp|tab|space|newline/.test(item.className);
       data.key = data.type+data.nr;
+      data.shortTag = '&lt;'+data.shortTag+'&gt;';
 
       //zusammengesetzte img Pfade:
       this.measure.setHtml(data.text);
       data.fullWidth = this.measure.getSize().width;
-      this.measure.setHtml(data.nr);
+      this.measure.setHtml(data.shortTag);
       data.shortWidth = this.measure.getSize().width;
       //cache the data to be rendered via svg and the html for unmarkup
       me.markupImages[data.key] = {
-          shortTag: data.nr,
+          shortTag: data.shortTag,
           fullTag: data.text,
           fullWidth: data.fullWidth,
           shortWidth: data.shortWidth,
+          alwaysFullTag: data.alwaysFullTag,
           html: '<div class="'+item.className+'">'+me.spanTemplate.apply(data)+'</div>'
       };
 
@@ -808,11 +812,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.each(Ext.query('img', true, me.getEditorBody()), function(item){
       var markupImage;
       if(markupImage = me.getMarkupImage(item.id)){
-        if(target == 'fullPath') {
-            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag, markupImage.fullWidth));
+        if(target == 'fullPath' || markupImage.alwaysFullTag) {
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag), markupImage.fullWidth);
         }
         else {
-            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.shortTag, markupImage.shortWidth));
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.shortTag), markupImage.shortWidth);
         }
       }
     });
