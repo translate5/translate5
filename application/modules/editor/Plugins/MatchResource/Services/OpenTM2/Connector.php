@@ -253,8 +253,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 'class' => 'ignoreInEditor',
                 'text' => '&lt;AdditionalTagFromTM/&gt;',
                 'id' => 'toignore-'.$shortTag,
-                'shortTag' => $shortTag,
-                'filenameHash' => 'irrelevant'
+                'shortTag' => $shortTag
             ]);
         }, $segment);
     }

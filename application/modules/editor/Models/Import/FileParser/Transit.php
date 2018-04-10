@@ -321,13 +321,11 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     
     protected function createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText) {
-        $fileNameHash = md5($tagText);
         if(strpos($tagText, '<') !== false ||strpos($tagText, '"') !== false){
             $tagText = htmlspecialchars($tagText, ENT_QUOTES | ENT_XML1);
         }
-        $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $fileNameHash, $tagText);
+        $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $tagText);
         $tag = $this->$tagType->getHtmlTag($p);
-        $this->$tagType->createAndSaveIfNotExists($tagText, $fileNameHash);
         return $tag;
     }
     /**
