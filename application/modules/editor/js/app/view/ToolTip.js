@@ -185,8 +185,12 @@ Ext.define('Editor.view.ToolTip', {
         }
         // When?
         if (node.hasAttribute(attrnameTimestamp)) {
-            attrTimestamp = parseInt(node.getAttribute(attrnameTimestamp));
-            nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
+            attrTimestamp = node.getAttribute(attrnameTimestamp);
+            if (Number(parseInt(attrTimestamp)) == attrTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
+                nodeDate = Ext.Date.format(new Date(parseInt(attrTimestamp)),'Y-m-d H:i');
+            } else {
+                nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
+            }
         }
         // History
         if (node.hasAttribute(attrnameHistorylist)) {
@@ -194,9 +198,19 @@ Ext.define('Editor.view.ToolTip', {
             var historyItems = node.getAttribute(attrnameHistorylist).split(",");
             for(var i=0, len=historyItems.length; i < len; i++){
                 var historyItemTimestamp = historyItems[i],
-                    historyItemAction = node.getAttribute(attrnameHistoryActionPrefix + historyItemTimestamp),
-                    historyItemUser   = node.getAttribute(attrnameHistoryUsernamePrefix + historyItemTimestamp),
-                    historyItemDate   = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
+                    historyItemAction,
+                    historyItemUser,
+                    historyItemDate;
+                if (Number(parseInt(historyItemTimestamp)) == historyItemTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
+                    historyItemDate = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
+                } else {
+                    historyItemDate = Ext.Date.format(new Date(historyItemTimestamp),'Y-m-d H:i');
+                }
+                if (Number(parseInt(historyItemTimestamp)) != historyItemTimestamp) { 
+                    historyItemTimestamp = Ext.Date.format(new Date(historyItemTimestamp), 'time'); // TRANSLATE-1202, but attribute-name would be invalid using ISO => still uses millisecond-timestamp
+                }
+                historyItemAction = node.getAttribute(attrnameHistoryActionPrefix + historyItemTimestamp);
+                historyItemUser = node.getAttribute(attrnameHistoryUsernamePrefix + historyItemTimestamp);
                 if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_INS) {
                     historyItemAction = me.messages.insertedby;
                 } else if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_DEL) {
