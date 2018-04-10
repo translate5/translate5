@@ -744,13 +744,13 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                     //convert the date
                     if($argName==='translate5:date'){
                         $argValue= str_replace('"','', $argValue);
-                        
-                        $tagDate = new DateTime();
-                        $tagDate->setTimestamp($argValue);
-                        //if the +0200 at the end makes trouble use the following
-                        //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
-                        $tagDate= $tagDate->format($tagDate::ATOM);
-                        $argValue='"'.$tagDate.'"';
+                        //check if the date is 13 digit timestamp 
+                        if(is_numeric($argValue) && strlen((string)$argValue)===13){
+                            //convert the timestamp to ISO 8601 date
+                            $argValue=date('c',$argValue/1000);
+                            
+                        }
+                        $argValue='"'.$argValue.'"';
                     }
                     
                     $buildTag[$argName]=$argValue;
