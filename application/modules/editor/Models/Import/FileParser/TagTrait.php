@@ -126,7 +126,7 @@ trait editor_Models_Import_FileParser_TagTrait {
             $tag = $match[0];
             $tagName = $match[1];
             $cls = ' '.$tagName;
-            $title = '<'.$this->shortTagIdent.'/>: ';
+            $title = '&lt;'.$this->shortTagIdent.'/&gt;: ';
             
             //if there is no length attribute, use length = 1
             if(empty($match[2])) {
