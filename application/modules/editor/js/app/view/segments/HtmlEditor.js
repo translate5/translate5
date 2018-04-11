@@ -356,7 +356,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       data = me.getData(item,data);
 
-      if(me.viewModesController.isFullTag() || data.alwaysFullTag) {
+      if(me.viewModesController.isFullTag() || data.whitespaceTag) {
         data.path = me.getSvg(data.text, data.fullWidth);
       }
       else {
@@ -432,9 +432,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           data.shortTag = data.nr+'/';
           break;
       }
-      data.alwaysFullTag = /nbsp|tab|space|newline/.test(item.className);
       data.key = data.type+data.nr;
       data.shortTag = '&lt;'+data.shortTag+'&gt;';
+      data.whitespaceTag = /nbsp|tab|space|newline/.test(item.className);
+      if(data.whitespaceTag) {
+          data.type += ' whitespace';
+      }
 
       //zusammengesetzte img Pfade:
       this.measure.setHtml(data.text);
@@ -447,7 +450,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           fullTag: data.text,
           fullWidth: data.fullWidth,
           shortWidth: data.shortWidth,
-          alwaysFullTag: data.alwaysFullTag,
+          whitespaceTag: data.whitespaceTag,
           html: '<div class="'+item.className+'">'+me.spanTemplate.apply(data)+'</div>'
       };
 
@@ -594,7 +597,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               if(me[todo[i][0]].length > 0) {
                   msg += me.strings[todo[i][1]];
                   Ext.each(me[todo[i][0]], function(tag) {
-                      msg += '<img src="'+tag.shortPath+'"> ';
+                      msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
                   })
                   msg += '<br /><br />';
               }
@@ -629,11 +632,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   checkContentTags: function(nodelist) {
       var me = this,
-          foundIds = [];
+          foundIds = [],
+          ignoreWhitespace = Editor.data.segments.userCanModifyWhitespaceTags;
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
       
       Ext.each(nodelist, function(img) {
+          if(ignoreWhitespace && /whitespace/.test(img.className)) {
+              return;
+          }
           if(Ext.Array.contains(foundIds, img.id) && !img.parentNode.nodeName.toLowerCase()==="del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
@@ -644,6 +651,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
       });
       Ext.Object.each(this.markupImages, function(key, item){
+          if(ignoreWhitespace && item.whitespaceTag) {
+              return;
+          }
           if(!Ext.Array.contains(foundIds, me.idPrefix+key)) {
               me.missingContentTags.push(item);
           }
@@ -808,7 +818,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.each(Ext.query('img', true, me.getEditorBody()), function(item){
       var markupImage;
       if(markupImage = me.getMarkupImage(item.id)){
-        if(target == 'fullPath' || markupImage.alwaysFullTag) {
+        if(target == 'fullPath' || markupImage.whitespaceTag) {
             item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag), markupImage.fullWidth);
         }
         else {
