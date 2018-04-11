@@ -39,9 +39,10 @@ class editor_Models_TermCollection_TermEntryAttributes extends ZfExtended_Models
         $s = $this->db->select();
         $toSave=$this->row->toArray();
         $notCheckField=array(
-                'id'
+                'id',
+                'value'
         );
-
+        
         //check if the field is unupdatable
         //transac field with value creation and modification are unupdatable
         $isUnupdatable=in_array($toSave['name'], $this->unupdatebleField);
@@ -50,13 +51,11 @@ class editor_Models_TermCollection_TermEntryAttributes extends ZfExtended_Models
             if(in_array($key, $notCheckField)){
                 continue;
             }
-            
-            if($key=='value'){
-                $comparator=$isUnupdatable ? ($key.'=?') : ($key.'!=?');
-                $s->where($comparator,$value);
-                continue;
-            }
-            
+            //if($key=='value'){
+            //    $comparator=$isUnupdatable ? ($key.'=?') : ($key.'!=?');
+            //    $s->where($comparator,$value);
+            //    continue;
+            //}
             if($value==null){
                 $s->where($key.' IS NULL');
                 continue;
@@ -70,16 +69,42 @@ class editor_Models_TermCollection_TermEntryAttributes extends ZfExtended_Models
             $this->save();
             return ;
         }
-        //do not update the same match(existing transac: creation or modification), it contains the same value as the old record
-        if($isUnupdatable){
-            //set the id here, it is needed for the next elements as parrentId
+        
+        if($checkRow['value']===$toSave['value']){
             $this->setId($checkRow['id']);
             return;
         }
+        
         //load the record
         $this->load($checkRow['id']);
         //update the value with the new one
         $this->setValue($toSave['value']);
         $this->save();
+    }
+    
+    public function saveOrUpdateTransac(){
+        $s = $this->db->select();
+        $toSave=$this->row->toArray();
+        $notCheckField=array(
+                'id'
+        );
+        foreach ($toSave as $key=>$value){
+            if(in_array($key, $notCheckField)){
+                continue;
+            }
+            if($value==null){
+                $s->where($key.' IS NULL');
+                continue;
+            }
+            
+            $s->where($key.'=?',$value);
+        }
+        //save the field if does not exist
+        $checkRow=$this->db->fetchRow($s);
+        if(empty($checkRow)){
+            $this->save();
+            return ;
+        }
+        $this->setId($checkRow['id']);
     }
 }

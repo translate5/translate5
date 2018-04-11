@@ -80,42 +80,42 @@
 							<!-- term id → mid in LEK_terms -->
 							
 							<!-- this is not saved as attribute -->
-							<term id="37705a81-e0df-4209-9a12-eaddc93674e0">Schreibtisch</term>
+							<term id="37705a81-e0df-4209-9a12-eaddc93674e0">Schreibtisch #new2#</term>
 							
 							<!-- same as for termEntry expect into LEK_term_attributes -->
 							
 							<!-- this is saved in the term attributes without parrentId -->
-							<termNote type="processStatus">finalized</termNote>
-							<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms.</termNote>
-							<termNote type="across_userdef_textfield_Zusatzinformationen">Weitere Zusatzinformationen zum Term.</termNote>
-							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
-							<admin type="projectSubset" target="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">Test Änderungsverfolgung</admin>
-							<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x</admin>
-							<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF</admin>
+							<termNote type="processStatus">finalized change</termNote>
+							<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms. </termNote>
+							<termNote type="across_userdef_textfield_Zusatzinformationen">Weitere Zusatzinformationen zum Term. </termNote>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde AutoteilePremium</admin>
+							<admin type="projectSubset" target="4f759a7a-8b4e-4dae-aeed-a332dba4b0f7">Test Änderungsverfolgung </admin>
+							<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x </admin>
+							<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF </admin>
 						</termGrp>
 						
 						
 						<!-- this is not saved in the table  -->
 						<transacGrp>
 							<!-- this is saved in the lek attributes, add this parrentId to the date and transacNote  -->
-							<transac>creation</transac>
+							<transac>creation </transac>
 							<!-- this here have only parrent id  -->
-							<date>2018-01-12</date>
+							<date>2018-01-12 </date>
 							<!-- this here have only parrent id  -->
-							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+							<transacNote type="responsiblePerson">Roland Dietrich </transacNote>
 						</transacGrp>
 						<transacGrp>
-							<transac>modification</transac>
-							<date>2018-01-12</date>
-							<transacNote type="responsiblePerson">Roland Dietrich</transacNote>
+							<transac>modification </transac>
+							<date>2018-01-12 </date>
+							<transacNote type="responsiblePerson">Roland Dietrich </transacNote>
 						</transacGrp>
 					</ntig>
 					<ntig>
 						<termGrp>
-							<term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmierplatz</term>
+							<term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmierplatz #new2#</term>
 							<termNote type="processStatus">provisionallyProcessed</termNote>
 							<termNote type="across_userdef_picklist_Verwendung">Unwort</termNote>
-							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde AutoteilePremium</admin>
 						</termGrp>
 						<transacGrp>
 							<transac>creation</transac>
@@ -132,10 +132,10 @@
 				<langSet xml:lang="en-us">
 					<ntig>
 						<termGrp>
-							<term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk</term>
+							<term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk #new2#</term>
 							<termNote type="processStatus">finalized</termNote>
 							<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms.</termNote>
-							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde AutoteilePremium</admin>
 							<admin type="projectSubset" target="3b9a499d-7264-40df-a26e-60a9555efc8f">18-00056_Gravitrax_12x</admin>
 							<admin type="projectSubset" target="aabea2bc-2e34-4a24-81cc-6366b35826f4">Testprojekt_DXF</admin>
 						</termGrp>
@@ -153,7 +153,7 @@
 				</langSet>
 			</termEntry>
 			<termEntry id="626a86ec-4979-43e5-8293-6bb6532b7cf5" cid="628587">
-				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">Testkunde</descrip>
+				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">Testkunde AutoteilePremium</descrip>
 				<transacGrp>
 					<transac>creation</transac>
 					<date>2018-01-12</date>
@@ -167,9 +167,9 @@
 				<langSet xml:lang="de-de">
 					<ntig>
 						<termGrp>
-							<term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9">Fahrrad</term>
+							<term id="9eaaafc9-e256-4bce-a2e5-ce848c0b7cd9">Fahrrad #new2#</term>
 							<termNote type="processStatus">provisionallyProcessed</termNote>
-							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde AutoteilePremium</admin>
 						</termGrp>
 						<transacGrp>
 							<transac>creation</transac>
@@ -186,10 +186,10 @@
 				<langSet xml:lang="en-us">
 					<ntig>
 						<termGrp>
-							<term id="add5dad8-61cd-4830-9c6e-1ceaff00c8c1">Bike</term>
+							<term id="add5dad8-61cd-4830-9c6e-1ceaff00c8c1">Bike #new2#</term>
 							<termNote type="processStatus">provisionallyProcessed</termNote>
 							<termNote type="across_userdef_picklist_Verwendung">Empfohlen</termNote>
-							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde AutoteilePremium</admin>
 						</termGrp>
 						<transacGrp>
 							<transac>creation</transac>
@@ -204,9 +204,9 @@
 					</ntig>
 					<ntig>
 						<termGrp>
-							<term id="a2301cd4-6be8-469d-95b4-62946571aa2e">Bicycle</term>
+							<term id="a2301cd4-6be8-469d-95b4-62946571aa2e">Bicycle #new2#</term>
 							<termNote type="processStatus">provisionallyProcessed</termNote>
-							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
+							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde AutoteilePremium</admin>
 						</termGrp>
 						<transacGrp>
 							<transac>creation</transac>
@@ -223,7 +223,7 @@
 				<langSet xml:lang="fr-fr">
 					<ntig>
 						<termGrp>
-							<term id="d3a56ef0-2e6c-49c6-80a5-88b54819a733">Vélo</term>
+							<term id="d3a56ef0-2e6c-49c6-80a5-88b54819a733">Vélo #new2#</term>
 							<termNote type="processStatus">provisionallyProcessed</termNote>
 						</termGrp>
 						<transacGrp>

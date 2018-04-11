@@ -48,12 +48,12 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         
         self::assertCustomer();
         
-        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => $this->api()->getCustomer()->id));
-        self::assertTrue(is_object($termCollection), 'Unable to create a test collection');
+        //$termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => $this->api()->getCustomer()->id));
+        //self::assertTrue(is_object($termCollection), 'Unable to create a test collection');
         
         $this->api()->addFile('Term.tbx', $this->api()->getFile('Term.tbx'), "application/xml");
-        //$this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' => 135));
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$termCollection->id));
+        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' => 69));
+        //$this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$termCollection->id));
     }
     
 }

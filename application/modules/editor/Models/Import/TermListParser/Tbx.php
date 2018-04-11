@@ -386,6 +386,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if($this->isEndTag()){
             $this->actualDefinition = '';
             $this->actualLang = null;
+            $this->actualLangId=0;
         }
         
         if(! $this->isStartTag()) {
@@ -476,7 +477,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
 
     /**
      * Check if the termNote is of a type normativeAuthorization.
-     * Update the statuso to the current term in the database.
+     * Update the status to the current term in the database.
      */
     protected function checkTermStatus() {
         if(!$this->isStartTag() || $this->xml->getAttribute('type') !== 'normativeAuthorization'){
@@ -554,11 +555,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         while($this->xml->read() && $this->xml->name !== 'transacGrp') {
             switch($this->xml->name) {
                 case 'transac':
-                    if($this->isInsideNtig){
-                        $entry=$this->saveTermAttribute($this->actualParentId);
-                    }else{
-                        $entry=$this->saveEntryAttribute($this->actualParentId);
+                    if(!$this->isStartTag()){
+                        break;
                     }
+                    //get the attribute model object
+                    $entry=$this->getAttributeObject($this->isInsideNtig,$this->actualParentId);
+                    //set the termId or termEntryId depending of the needed object
+                    $this->isInsideNtig ? $entry->setTermId($this->actualTermIdDb) : $entry->setTermEntryId($this->actualTermEntryIdDb);
+                    //save the transact to the database
+                    $entry->saveOrUpdateTransac();
                     if($entry){
                         $tmpParrentId = $entry->getId();
                     }
@@ -769,6 +774,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         /* @var $term editor_Models_Term */
         //FIRST CHECK
         $terms=$term->isUpdateTermForCollection($this->actualTermEntry,$this->getIdTerm(),$this->termCollectionId);
+        //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
             foreach ($terms as $t){
                 $t = (object) $t;
@@ -778,6 +784,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 $termModel->load($t->id);
                 $termModel->setTerm($this->xml->readInnerXml());
                 $termModel->save();
+                $this->actualTermIdDb=$termModel->getId();
                 return;
             }
         }
