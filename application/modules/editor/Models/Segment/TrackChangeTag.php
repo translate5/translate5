@@ -30,7 +30,10 @@
  * Track changes tag replacer
  * 
  * @author aleksandar
- *
+ * 
+ * @method string protect() protect(string $segment) protects the DEL tags of one segment
+ * @method string unprotect() unprotect(string $segment) unprotects / restores the DEL tags
+ * @method string replace() replace(string $segment, Closure|string $replacer, int $limit = -1, int &$count = null) replaces DEL tags with either the callback or the given scalar
  */
 class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbstract{
     
