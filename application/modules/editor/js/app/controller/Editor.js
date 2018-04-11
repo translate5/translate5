@@ -989,7 +989,8 @@ Ext.define('Editor.controller.Editor', {
             }
 
             Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
-                if(editor.getDoc().getElementById(id)){
+                var tagInTarget = editor.getDoc().getElementById(id);
+                if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase()!=="del"){
                     return;
                 }
                 editor.insertMarkup(tag);
