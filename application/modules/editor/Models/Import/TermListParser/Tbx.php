@@ -555,15 +555,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         while($this->xml->read() && $this->xml->name !== 'transacGrp') {
             switch($this->xml->name) {
                 case 'transac':
-                    if(!$this->isStartTag()){
-                        break;
+                    
+                    if($this->isInsideNtig){
+                        $entry=$this->saveTermAttribute($this->actualParentId);
+                    }else{
+                        $entry=$this->saveEntryAttribute($this->actualParentId);
                     }
-                    //get the attribute model object
-                    $entry=$this->getAttributeObject($this->isInsideNtig,$this->actualParentId);
-                    //set the termId or termEntryId depending of the needed object
-                    $this->isInsideNtig ? $entry->setTermId($this->actualTermIdDb) : $entry->setTermEntryId($this->actualTermEntryIdDb);
-                    //save the transact to the database
-                    $entry->saveOrUpdateTransac();
                     if($entry){
                         $tmpParrentId = $entry->getId();
                     }
@@ -896,87 +893,5 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $term->setTermEntryId($this->actualTermEntryIdDb);
         $this->actualTermIdDb=$term->save();
         //END LAST CHECK
-        
-        return;
-        
-        //////////////
-        /////END/////
-        /////////////
-        
-        
-        
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-        if(!$term->isTermEntryInCollection($this->actualTermEntry, $this->termCollectionId)){
-            $term=ZfExtended_Factory::get('editor_Models_Term');
-            /* @var $term editor_Models_Term */
-            
-            $term->setTerm($this->xml->readInnerXml());
-            $term->setMid($this->getIdTerm());
-            //the status will be updated when is found from the termNote
-            $term->setDefinition($this->actualDefinition);
-            $term->setGroupId($this->actualTermEntry);
-            $term->setLanguage((integer)$this->actualLangId);
-            $term->setTigId($this->getIdTig());
-            $term->setCollectionId($this->termCollectionId);
-            $term->setTermEntryId($this->actualTermEntryIdDb);
-            $this->actualTermIdDb=$term->save();
-            return;
-        }
-        
-        
-        //
-        
-        $terms=$term->loadByCollectionLanguageAndTermValue($this->actualTermEntry,$this->termCollectionId, $this->actualLangId, $this->xml->readInnerXml());
-        if(empty($terms)){
-            //add new term
-            
-            $term=ZfExtended_Factory::get('editor_Models_Term');
-            /* @var $term editor_Models_Term */
-            
-            $term->setTerm($this->xml->readInnerXml());
-            $term->setMid($this->getIdTerm());
-            //the status will be updated when is found from the termNote
-            $term->setDefinition($this->actualDefinition);
-            $term->setGroupId($this->actualTermEntry);
-            $term->setLanguage((integer)$this->actualLangId);
-            $term->setTigId($this->getIdTig());
-            $term->setCollectionId($this->termCollectionId);
-            $term->setTermEntryId($this->actualTermEntryIdDb);
-            $this->actualTermIdDb=$term->save();
-            return;
-        }
-
-        foreach ($terms as $t){
-            $t = (object) $t;
-            
-            if($t->groupId == $this->actualTermEntry){
-                
-            }
-        }
-        
-        
-        //termEntry = actualTermEntry = groupId
-        //termId = $this->getIdTerm() = mid
-        
-        
-        //TODO:
-        //if select * from lek_term where termEntry and termId and collectionId
-        //check term for collection
-        //if the upper give us results, load the term and set the new values here
-        //the question is what will happen with the attributes, should i update them to ? i think they will be updated automatically see the term entry attribute
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-        
-        $term->setTerm($this->xml->readInnerXml());
-        $term->setMid($this->getIdTerm());
-        //the status will be updated when is found from the termNote
-        $term->setDefinition($this->actualDefinition);
-        $term->setGroupId($this->actualTermEntry);
-        $term->setLanguage((integer)$this->actualLangId);
-        $term->setTigId($this->getIdTig());
-        $term->setCollectionId($this->termCollectionId);
-        $term->setTermEntryId($this->actualTermEntryIdDb);
-        $this->actualTermIdDb=$term->save();
     }
 }
