@@ -3,6 +3,27 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.29] - 2018-04-11
+###Added
+TRANSLATE-1130: Show specific whitespace-Tag
+TRANSLATE-1132: Whitespace tags: Always deleteable
+TRANSLATE-1127: xliff: Preserve whitespace between mrk-Tags
+TRANSLATE-1137: Show bookmark and comment icons in autostatus column
+TRANSLATE-1058: Send changelog via email to admin users when updating with install-and-update script
+
+###Changed
+T5DEV-217: remaining search and replace todos
+TRANSLATE-1200: Refactor images of internal tags to SVG content instead PNG
+
+###Bugfixes
+TRANSLATE-1209: TrackChanges: content tags in DEL INS tags are not displayed correctly in full tag mode
+TRANSLATE-1212: TrackChanges: deleted content tags in a DEL tag can not readded via CTRL+, + Number
+TRANSLATE-1210: TrackChanges: Using repetition editor on segments where a content tag is in a DEL and INS tag throws an exception
+TRANSLATE-1194: TrackChanges: When the export removes deleted words, no double spaces must be left.
+TRANSLATE-1124: store whitespace tag metrics into internal tag
+VISUAL-24: visualReview: After adding a comment, a strange white window appears
+
+
 ## [2.6.27] - 2018-03-15
 ###Changed
 T5DEV-236; visualReview: Matching-Algorithm: added some more "special spaces"
