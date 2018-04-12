@@ -537,8 +537,8 @@ class Models_Installer_Standalone {
         //Zend_Registry::set('Zend_Locale', 'en');
         $mail = ZfExtended_Factory::get('Zend_Mail');
         /* @var $mail Zend_Mail */
-        $mail->setSubject("ChangeLog to translate5 version ".$version);
-        $html  = 'Your translate5 installation was updated to version <b>'.$version.'</b>.<br><br>';
+        $mail->setSubject("ChangeLog to translate5 version ".$version.' on '.$this->hostname);
+        $html  = 'Your translate5 installation on '.$this->hostname.' was updated to version <b>'.$version.'</b>.<br><br>';
         $html .= '<b><u>ChangeLog</u></b><br>';
         
         $byType = ['bugfix' => [], 'feature' => [], 'change' => []];
