@@ -1318,7 +1318,7 @@ Ext.define('Editor.controller.SearchReplace', {
                     editableColumn=theColum[0];
                 }
                 
-                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_SCROLLUNDER);
+                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
                 
                 //clean the mark tags from the editor
                 me.cleanMarkTags();
@@ -1349,7 +1349,7 @@ Ext.define('Editor.controller.SearchReplace', {
         
         grid.scrollTo(goToIndex, {
             callback: callback,
-            notScrollCallback: callback
+            callback: callback
         });
     },
     
