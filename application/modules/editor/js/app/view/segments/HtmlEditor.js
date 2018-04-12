@@ -107,8 +107,19 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.callParent(arguments);
   },
   initFrameDoc: function() {
-      this.callParent(arguments);
-      this.fireEvent('afterinitframedoc', this);
+      var me = this,
+          wantedLoad = true; //the first load event is wanted, all others not
+      me.callParent(arguments);
+      me.iframeEl.on('load', function(){
+          if(!wantedLoad) {
+              //If you get multiple of that log entries, 
+              // your code architecture is bad due to much DOM Manipulations at the wrong place. See TRANSLATE-1219
+              Ext.log({msg: 'HtmlEditor iframe is re-initialised!', level: 'warn'});
+              me.initFrameDoc();
+          }
+          wantedLoad = false;
+      });
+      me.fireEvent('afterinitframedoc', me);
   },
 
   /**
