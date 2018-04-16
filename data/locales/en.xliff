@@ -274,10 +274,6 @@
                 <source>Segmentliste und Editor</source>
                 <target state="needs-review-adaptation">Segment list and editor</target>
             </trans-unit>
-            <trans-unit id="QW5zaWNodHNtb2R1cw==">
-                <source>Ansichtsmodus</source>
-                <target state="needs-review-adaptation">View mode</target>
-            </trans-unit>
             <trans-unit id="QmVhcmJlaXR1bmdzbW9kdXM=">
                 <source>Bearbeitungsmodus</source>
                 <target state="needs-review-adaptation">Processing mode</target>
@@ -1110,18 +1106,6 @@ E-Mail: service@MittagQI.com</pre>
             <trans-unit id="RWRpdG9ybW9kaQ==">
                 <source>Editormodi</source>
                 <target>Editor modes</target>
-            </trans-unit>
-            <trans-unit id="QW5zaWNodA==">
-                <source>Ansicht</source>
-                <target>View</target>
-            </trans-unit>
-            <trans-unit id="QmVhcmJlaXR1bmc=">
-                <source>Bearbeitung</source>
-                <target>Editing</target>
-            </trans-unit>
-            <trans-unit id="RXJnb25vbWlj">
-                <source>Ergonomic</source>
-                <target>Ergonomic</target>
             </trans-unit>
             <trans-unit id="U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbg==">
                 <source>Speichern und nächstes öffnen</source>
