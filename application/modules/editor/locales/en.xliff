@@ -1517,10 +1517,6 @@
     <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
     <target>In addition to our ZIP-container format you can also use SDLXLIFF, XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
 </trans-unit>
-<trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='>
-    <source>Ergonomic (Ansicht)</source>
-    <target>Ergonomic (view mode)</target>
-</trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
     <target>(at time of import)</target>
@@ -2309,7 +2305,19 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RGV0YWlscw=='>
     <source>Details</source>
-    <target>details</target>
+    <target>Details</target>
+</trans-unit>
+<trans-unit id='RGV0YWlscyAobnVyIExlc2Vtb2R1cyk='>
+    <source>Details (nur Lesemodus)</source>
+    <target>Details (read-only)</target>
+</trans-unit>
+<trans-unit id='Tm9ybWFs'>
+    <source>Normal</source>
+    <target>Normal</target>
+</trans-unit>
+<trans-unit id='Tm9ybWFsIChudXIgTGVzZW1vZHVzKQ=='>
+    <source>Normal (nur Lesemodus)</source>
+    <target>Normal (read-only)</target>
 </trans-unit>
 <trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='>
     <source>Status "{0}" durch einen anderen Benutzer</source>
