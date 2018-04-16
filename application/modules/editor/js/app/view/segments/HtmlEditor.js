@@ -272,6 +272,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             termTageNode.parentNode.removeChild(termTageNode);
         }
         // insert
+        this.fireEvent('beforeInsertMarkup', range);
+        range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
