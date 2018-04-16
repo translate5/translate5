@@ -508,7 +508,6 @@ class Models_Installer_Standalone {
         /* @var $dbupdater ZfExtended_Models_Installer_DbUpdater */
         $stat = $dbupdater->importAll(true); //FIXME remove this parameter after some time, see comment in importAll method
         
-        $beforeMaxChangeLogId = 200;
         $newChangeLogEntries = $changelog->moreChangeLogs($beforeMaxChangeLogId, $changelog::ALL_GROUPS);
         $version = ZfExtended_Utils::getAppVersion();
         $changelog->updateVersion($beforeMaxChangeLogId, $version);
@@ -535,7 +534,7 @@ class Models_Installer_Standalone {
         /* @var $user ZfExtended_Models_User */
         $admins = $user->loadAllByRole('admin');
         //Zend_Registry::set('Zend_Locale', 'en');
-        $mail = ZfExtended_Factory::get('Zend_Mail');
+        $mail = ZfExtended_Factory::get('Zend_Mail', ['utf8']);
         /* @var $mail Zend_Mail */
         $mail->setSubject("ChangeLog to translate5 version ".$version.' on '.$this->hostname);
         $html  = 'Your translate5 installation on '.$this->hostname.' was updated to version <b>'.$version.'</b>.<br><br>';
