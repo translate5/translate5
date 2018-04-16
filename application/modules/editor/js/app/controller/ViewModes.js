@@ -357,6 +357,9 @@ Ext.define('Editor.controller.ViewModes', {
         }
         
         body = Ext.fly(editor.getEditorBody());
+        if(!body) {
+            return;
+        }
         body.removeCls(me.self.MODE_ERGONOMIC);
         if(me.isErgonomicMode()){
             body.addCls(me.self.MODE_ERGONOMIC);
