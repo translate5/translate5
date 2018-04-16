@@ -3,6 +3,18 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.30] - 2018-04-16
+###Changed
+TRANSLATE-1218: XLIFF Import: preserveWhitespace per default to true
+Renamed all editor modes
+
+###Bugfixes
+TRANSLATE-1154: Across xliff import does not set match rate
+TRANSLATE-1215: TrackChanges: JS Exception on CTRL+. usage
+TRANSLATE-1140: Row editor is not displayed after the first match in certain situations.
+TRANSLATE-1219: Editor iframe body is reset and therefore not usable due missing content
+VISUAL-28: Opening of visual task in IE 11 throws JS error
+
 ## [2.6.29] - 2018-04-11
 ###Added
 TRANSLATE-1130: Show specific whitespace-Tag
