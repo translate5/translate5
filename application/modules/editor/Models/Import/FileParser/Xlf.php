@@ -576,8 +576,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $mid = str_replace(editor_Models_Import_FileParser_Xlf::PREFIX_MRK, '', $mid);
         }
         if(isset($this->matchRate[$mid])) {
-            $segmentAttributes->matchRate = $this->matchRate[$mid];
-            $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_TM;
+            $attributes->matchRate = $this->matchRate[$mid];
+            $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_TM;
         }
     }
     
