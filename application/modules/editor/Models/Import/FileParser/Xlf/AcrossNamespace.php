@@ -47,24 +47,13 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
      */
     protected $comments = [];
     
-    protected $matchRate = [];
-    
     /**
      * {@inheritDoc}
      * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::registerParserHandler()
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $currentComment = null;
-        $xmlparser->registerElement('xliff trans-unit', function($tag, $attributes) {
-            $this->matchRate = [];
-        });
-        $xmlparser->registerElement('trans-unit alt-trans', function($tag, $attributes) use ($xmlparser){
-            $mid = $xmlparser->getAttribute($attributes, 'mid', 0); //defaulting to 0 for transunits without mrks
-            $matchRate = $xmlparser->getAttribute($attributes, 'match-quality', false);
-            if($matchRate !== false) {
-                $this->matchRate[$mid] = (int) trim($matchRate,'% '); //removing the percent sign
-            }
-        });
+        
         $xmlparser->registerElement('trans-unit ax:named-property', function($tag, $attributes) use (&$currentComment){
             if($attributes['name'] == 'Comment') {
                 $currentComment = ZfExtended_Factory::get('editor_Models_Comment');
@@ -116,18 +105,6 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
                     break;
             }
         });
-    }
-    
-    public function transunitAttributes(array $attributes, editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
-        $mid = $segmentAttributes->mrkMid;
-        if(strpos($mid, editor_Models_Import_FileParser_Xlf::PREFIX_MRK) === 0) {
-            //remove the mrk prefix again to get numeric ids
-            $mid = str_replace(editor_Models_Import_FileParser_Xlf::PREFIX_MRK, '', $mid);
-        }
-        if(isset($this->matchRate[$mid])) {
-            $segmentAttributes->matchRate = $this->matchRate[$mid];
-            $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_TM;
-        }
     }
     
     /**

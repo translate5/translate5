@@ -147,6 +147,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected $log;
     
+    protected $matchRate = [];    
+    
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -275,6 +277,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //handling sub segment mrks and sub tags
         $this->xmlparser->registerElement('trans-unit > target > mrk[mtype=seg], trans-unit > target sub', null, function($tag, $key, $opener){
             $this->currentTarget[$this->calculateMid($opener, false)] = $this->getTargetMeta($tag, $key, $opener);
+        });
+        
+        $this->xmlparser->registerElement('trans-unit alt-trans', function($tag, $attributes){
+            $mid = $this->xmlparser->getAttribute($attributes, 'mid', 0); //defaulting to 0 for transunits without mrks
+            $matchRate = $this->xmlparser->getAttribute($attributes, 'match-quality', false);
+            if($matchRate !== false) {
+                $this->matchRate[$mid] = (int) trim($matchRate,'% '); //removing the percent sign
+            }
         });
         
         $this->xmlparser->registerElement('*', null, function($tag, $key, $opener){
@@ -441,6 +451,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->xmlparser->registerElement('trans-unit', function($tag, $attributes, $key){
             $this->processSegment = $this->isTranslateable($attributes);
             $this->sourceOrigin = 0;
+            $this->matchRate = [];
             $this->currentSource = [];
             $this->currentTarget = [];
             $this->sourceProcessOrder = [];
@@ -533,6 +544,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         $segmentAttributes = $this->createSegmentAttributes($id);
         $segmentAttributes->mrkMid = $mid;
+        
+        $this->calculateMatchRate($segmentAttributes);
 
         //process nonxliff attributes
         $this->namespaces->transunitAttributes($attributes, $segmentAttributes);
@@ -554,6 +567,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         
         return $segmentAttributes;
+    }
+    
+    protected function calculateMatchRate(editor_Models_Import_FileParser_SegmentAttributes $attributes) {
+        $mid = $attributes->mrkMid;
+        if(strpos($mid, editor_Models_Import_FileParser_Xlf::PREFIX_MRK) === 0) {
+            //remove the mrk prefix again to get numeric ids
+            $mid = str_replace(editor_Models_Import_FileParser_Xlf::PREFIX_MRK, '', $mid);
+        }
+        if(isset($this->matchRate[$mid])) {
+            $segmentAttributes->matchRate = $this->matchRate[$mid];
+            $segmentAttributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_TM;
+        }
     }
     
     /**
