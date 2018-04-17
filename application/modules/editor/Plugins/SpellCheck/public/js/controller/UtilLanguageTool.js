@@ -105,6 +105,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                     if (resultLT.rows.matches) {
                         me.allMatchesOfTool = resultLT.rows.matches;
                         me.applySpellCheck();
+                    } else {
+                        me.finishSpellCheck();
                     }
                 },
                 failure: function(response){

@@ -75,6 +75,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     messages: {
         moreInformation: '#UT#More information',
         errorsFoundOnSaving: '#UT#SpellCheck: errors found on saving Segment Nr. %segmentnr.',
+        isApplyingInProgress: '#UT#The SpellCheck-Plugin was currently applying the matches, sorry for the inconvenience.',
         spellCheckOnSavingIsAlreadyRunningForAnotherSegment: '#UT#The SpellCheck on saving the segment failed because there is already another process running for Segment Nr. %segmentnr.',
     },
     statics: {
@@ -104,17 +105,29 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     allMatchesRanges: null,         // bookmarks of all ranges for the matches found by the tool(s); here already stored independently from the tool
     activeMatchNode: null,          // node of single match currently in use
     
-    spellCheckResults: null,        // Store results for already checked Html-Content in the Editor: me.spellCheckResults[htmlWithoutSpellCheckNodes] = htmlWithSpellCheckNodes
+    spellCheckResults: null,        // Store results for already checked Html-Content in the Editor: me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes] = content after SpellCheck (= with SpellCheck-Nodes)
     
     spellCheckTooltip: null,        // spellcheck tooltip instance
     
     editIdleTimer: null,            // time "nothing" is changed in the Editor's content; 1) user: presses no key 2) segmentsHtmleditor: no push, no afterInsertMarkup
     editIdleRestarted: null,        // has the content been changed in the Editor (= timer restarted) since the last timer has started the SpellCheck?
     
+    isApplyingInProgress: false,    // flag to indicate if we are in the process of applying the matches that has been found
+    
     isSpellCheckOnSaving: false,    // flag to indicate that the SpellChecker runs on saving the segment
     savedSegmentNrInTask: false,    // segmentNrInTask of the segment that started the SpellCheck on saving
     
     segmentId: null,                // ID of the currently edited Segment
+    
+    // before the SpellCheck-results are applied:
+    // (1) we store content in the Editor (= must be the same at the moment of sending it to the SpellCheck and of applying the results!)
+    editorBodyAtSpellCheckStart: null,
+    editorBodyExtDomElementAtSpellCheckStart: null,
+    contentBeforeSpellCheck: null,
+    contentBeforeSpellCheckWithoutSpellCheckNodes: null,
+    // (2) we bookmark the selection:
+    selectionForCaret: null,
+    bookmarkForCaret: null,
     
     // =========================================================================
     // Init
@@ -274,6 +287,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.consoleLog('SpellCheck: handleKeyDown failed because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
+        if (me.isApplyingInProgress) {
+            Editor.MessageBox.addWarning(me.messages.isApplyingInProgress);
+            return;
+        }
         switch(true) {
             case me.eventIsCtrlZ():
                 // Restore older snapshot...
@@ -355,7 +372,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.startSpellCheck();
     },
     // =========================================================================
-    // Run, apply and finish the SpellCheck.
+    // Start and finish (!) the SpellCheck.
     // =========================================================================
     
     /**
@@ -365,9 +382,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             rangeForEditor = rangy.createRange(),
             editorBody,
-            editorText,
-            htmlWithoutSpellCheckNodes,
-            htmlWithSpellCheckNodes;
+            editorText;
         if (!me.isSupportedLanguage) {
             me.consoleLog('startSpellCheck failed because language is not supported or SpellCheck-Tool does not run.');
             return;
@@ -386,25 +401,57 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.consoleLog('(0.3 => startSpellCheck.)');
         
-        me.cleanSpellCheckTags(); // in case a spellcheck has been run before already
+        // Here we store the content of the Editor for the SpellCheck. 
+        // HTMLBodyElement and Ext.dom.Element must catch the very same status of the Editor, the content MUST NOT have changed from one to the other.
+        // TODO: check if it's safe enough to get them this way:
+        me.editorBodyAtSpellCheckStart = me.getEditorBody();                           // HTMLBodyElement
+        me.editorBodyExtDomElementAtSpellCheckStart = me.getEditorBodyExtDomElement(); // Ext.dom.Element
         
-        me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored as searchable)
+        rangeForEditor.selectNode(me.editorBodyAtSpellCheckStart);
+        me.contentBeforeSpellCheck = me.editorBodyExtDomElementAtSpellCheckStart.getHtml();
+
+        me.cleanSpellCheckTags(); // in case a spellcheck has been run before already
+        me.contentBeforeSpellCheckWithoutSpellCheckNodes = me.editorBodyExtDomElementAtSpellCheckStart.getHtml();
+        
+        // After this point you MUST finish the SpellCheck with finishSpellCheck() if the Editor is still opened then!!!
+        
+        // (1) where is the caret at the moment?
+        me.selectionForCaret = rangy.getSelection(me.getEditorBody());
+        me.bookmarkForCaret = me.selectionForCaret.getBookmark(me.getEditorBody());
         
         // If the text has not changed, we can use the result we have already fetched and applied.
         // (Doing "nothing" is not an option because then there won't be any SpellCheck-Nodes at all in the Editor.)
-        // TODO: keep the position of the caret!
-        htmlWithoutSpellCheckNodes = me.getEditorBodyExtDomElement().getHtml();
-        if (!me.isSpellCheckOnSaving && (htmlWithoutSpellCheckNodes in me.spellCheckResults) ) {
-            htmlWithSpellCheckNodes = me.spellCheckResults[htmlWithoutSpellCheckNodes];
-            me.getEditorBodyExtDomElement().setHtml(htmlWithSpellCheckNodes);
+        if (!me.isSpellCheckOnSaving && (me.contentBeforeSpellCheckWithoutSpellCheckNodes in me.spellCheckResults) ) {
+            me.getEditorBodyExtDomElement().setHtml(me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes]);
             me.consoleLog('startSpellCheck did not start a new check because we have already run a check for this content. We used the result we already have.');
+            me.finishSpellCheck();
             return;
         }
-        
-        rangeForEditor.selectNode(editorBody);
+        me.prepareDelNodeForSearch(true); // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored in rangeForEditor.text())
         editorText = rangeForEditor.text();
         me.runSpellCheck(editorText);
     },
+    /**
+     * Finish the SpellCheck.
+     */
+    finishSpellCheck: function() {
+        var me = this;
+        // (1) set the del nodes visible again
+        me.prepareDelNodeForSearch(false); // SearchReplaceUtils.js
+        // (2) set Editor to editable again
+        me.editor.setReadOnly(false);
+        me.consoleLog(' ------------------ Editor is editable again.');
+        // (3) restore position of the caret (do this AFTER setReadOnly(false), otherwise there is no focus).
+        if (me.bookmarkForCaret != null) {
+            me.selectionForCaret.moveToBookmark(me.bookmarkForCaret);
+            me.bookmarkForCaret = null;
+        }
+    },
+    
+    // =========================================================================
+    // Work with the results that have been found by the tool.
+    // =========================================================================
+    
     /**
      * Apply the matches found by the SpellCheck:
      * - store data for all matches from tool
@@ -413,46 +460,50 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     applySpellCheck: function() {
         var me = this,
-            message,
-            htmlWithoutSpellCheckNodes,
-            htmlWithSpellCheckNodes;
+            message;
         if (me.isSpellCheckOnSaving) {
             me.consoleLog('applySpellCheck on isSpellCheckOnSaving...');
             if (me.allMatchesOfTool.length > 0) {
                 message = me.messages.errorsFoundOnSaving.replace(/%segmentnr/, me.savedSegmentNrInTask);
                 Editor.MessageBox.addWarning(message); // TODO: Should we show this message only if the errors are not the same as already known?
             }
-            // TODO: update segment-status in grid
+            
+            // TODO step2: update segment-status in grid
+            
             me.isSpellCheckOnSaving = false; // = reset to "default"
             me.onDestroy();
             return;
         }
         if (me.editIdleRestarted) {
             me.consoleLog('applySpellCheck not started: results might be invalid after the content was edited in the meantime.');
+            me.finishSpellCheck();
             return;
         }
         
-        htmlWithoutSpellCheckNodes = me.getEditorBodyExtDomElement().getHtml();
+        if (me.getEditorBodyExtDomElement() == null) {
+            me.consoleLog('applySpellCheck not started: no editor-body found (maybe the editor is closed already).');
+            return;
+        }
+        
+        // (1) where is the caret at the moment?
+        me.selectionForCaret = rangy.getSelection(me.getEditorBody());
+        me.bookmarkForCaret = me.selectionForCaret.getBookmark(me.getEditorBody());
+        
         if (me.allMatchesOfTool.length > 0) {
             me.storeAllMatchesFromTool();
-            me.showAllMatchesInEditor();
+            // while we apply the matches, the content must not be edited in the Editor => set the flag:
+            me.isApplyingInProgress = true;
+                // (2) set Editor to readonly, otherwise things get messy.
+                me.consoleLog('Editor set to ReadOnly ------------------');
+                me.editor.setReadOnly(true);
+                // (3) apply matches
+                me.applyAllMatches();
+            me.isApplyingInProgress = false;
         } else {
             me.consoleLog('allMatchesOfTool: no results (not checked or nothing found).');
         }
-        htmlWithSpellCheckNodes = me.getEditorBodyExtDomElement().getHtml();
-        
-        // and store the result of the SpellCheck for the html WITHOUT the SpellCheck-Nodes
-        me.spellCheckResults[htmlWithoutSpellCheckNodes] = htmlWithSpellCheckNodes;
         
         me.finishSpellCheck();
-    },
-    /**
-     * Finish the SpellCheck.
-     */
-    finishSpellCheck: function() {
-        var me = this;
-        me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js (set the del nodes visible again)
-        // TODO: if the user was editing content behind the first match, the caret jumps in front of the first match.
     },
     /**
      * Apply replacement as suggested in the ToolTip.
@@ -462,6 +513,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             rangeForMatch = rangy.createRange(),
             replaceText = event.currentTarget.innerText,
             range;
+        
+        me.selectionForCaret = rangy.getSelection(me.getEditorBody());
+        me.bookmarkForCaret = me.selectionForCaret.getBookmark(me.getEditorBody());
         
         rangeForMatch.selectNodeContents(me.activeMatchNode);
         range = rangeForMatch.getBookmark();
@@ -510,6 +564,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if(textToCheck != "") {
             console.log("textToCheck: " + textToCheck);
             me.runSpellCheckWithTool(textToCheck);
+        } else {
+            me.finishSpellCheck();
         }
     },
     /**
@@ -537,21 +593,33 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
 
     /**
-     * Apply results to Editor.
+     * Apply results to captured content from the Editor.
      */
-    showAllMatchesInEditor: function() {
+    applyAllMatches: function() {
         var me = this,
             editorBody = me.getEditorBody(),
-            rangeForMatch = rangy.createRange(editorBody),
+            rangeForMatch,
             documentFragmentForMatch,
-            spellCheckNode;
+            spellCheckNode,
+            contentWithSpellCheckResults;
+        // before we start, the content in Editor MUST be the very same content that we have been checking
+        me.getEditorBodyExtDomElement().setHtml(me.contentBeforeSpellCheck);
+        // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
+        rangeForMatch = rangy.createRange(editorBody);
         Ext.Array.each(me.allMatches, function(match, index) {
             rangeForMatch.moveToBookmark(match.range);
             documentFragmentForMatch = rangeForMatch.extractContents();
             spellCheckNode = me.createSpellcheckNode(index);
             spellCheckNode.appendChild(documentFragmentForMatch);
             rangeForMatch.insertNode(spellCheckNode);
-        }, me, true); // iterate in reverse order! (Otherwise the ranges get lost due to DOM-changes "in front of them".)
+        }, me, true);
+        // store the result of the SpellCheck for the html WITHOUT the SpellCheck-Nodes
+        // for checking later if we need to run the check again
+        if (me.contentBeforeSpellCheckWithoutSpellCheckNodes in me.spellCheckResults) {
+            return;
+        }
+        contentWithSpellCheckResults = me.getEditorBodyExtDomElement().getHtml();
+        me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes] = contentWithSpellCheckResults;
     },
     /**
      * Create and return a new node for SpellCheck-Match of the given index.
@@ -675,18 +743,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     
     /***
-     * Remove SpellCheck-Tags from the editor but keep their content.
+     * Remove SpellCheck-Tags from the content we found in the editor but keep their content.
      */
     cleanSpellCheckTags:function(){
         var me = this,
             allSpellCheckElements,
             spellCheckElementParentNode;
-        if(!me.getEditorBodyExtDomElement()){
-            me.consoleLog('cleanSpellCheckTags failed with missing editorBodyExtDomElement.');
+        if(!me.editorBodyExtDomElementAtSpellCheckStart){
+            me.consoleLog('cleanSpellCheckTags failed with missing me.editorBodyExtDomElementAtSpellCheckStart.');
             return false;
         }
         // find all spellcheck-elements and "remove their tags"
-        allSpellCheckElements = me.getEditorBodyExtDomElement().query('.' + me.self.CSS_CLASSNAME_MATCH);
+        allSpellCheckElements = me.editorBodyExtDomElementAtSpellCheckStart.query('.' + me.self.CSS_CLASSNAME_MATCH);
         Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
             spellCheckElementParentNode = spellCheckEl.parentNode;
             while(spellCheckEl.firstChild) {
