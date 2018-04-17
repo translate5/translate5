@@ -46,7 +46,7 @@ ALTER TABLE `LEK_term_collection`
 ADD COLUMN `taskGuid` VARCHAR(38) NULL;
 
 INSERT INTO LEK_term_collection (`name`,`taskGuid`)
-SELECT concat("Term Collection for Task:",`task`.`taskName` ,";Task Name:",`task`.`taskNr`,";Task Guid:",`task`.`taskGuid`) as `taskName`,`task`.`taskGuid` FROM `LEK_terms` `term`
+SELECT concat("Term Collection for Task:",`task`.`taskName` ,";Task Number:",`task`.`taskNr`,";Task Guid:",`task`.`taskGuid`) as `taskName`,`task`.`taskGuid` FROM `LEK_terms` `term`
 INNER JOIN `LEK_task` `task` ON `task`.`taskGuid`=`term`.`taskGuid`
 WHERE  `task`.`terminologie` = 1
 GROUP BY `term`.`taskGuid`;

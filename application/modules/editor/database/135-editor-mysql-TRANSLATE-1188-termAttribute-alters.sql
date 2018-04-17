@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,23 +26,27 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermAttributesLabel extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributesLabel';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributesLabel';
-    
-    /***
-     * Get the label by given label name and label type
-     * 
-     * @param string $labelName
-     * @param string $labelType
-     */
-    public function getLabelByNameAndType($labelName,$labelType){
-        $s = $this->db->select()
-        ->from($this->db)
-        ->where('label=?', $labelName);
-        if($labelType){
-            $s->where('type=?', $labelType);
-        }
-        return $this->db->fetchAll($s)->toArray();
-    }
-}
+ALTER TABLE `LEK_terms` 
+ADD COLUMN `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `LEK_terms` 
+ADD COLUMN `updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+
+ALTER TABLE `LEK_term_attributes` 
+ADD COLUMN `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `LEK_term_attributes` 
+ADD COLUMN `updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+
+ALTER TABLE `LEK_term_entry_attributes` 
+ADD COLUMN `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE `LEK_term_entry_attributes` 
+ADD COLUMN `updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+
+ALTER TABLE `LEK_term_attributes_label` 
+ADD COLUMN `type` VARCHAR(255) NULL AFTER `label`,
+ADD COLUMN `labelText` VARCHAR(255) NULL AFTER `type`;

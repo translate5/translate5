@@ -30,21 +30,55 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermCollection';
     protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermCollection';
     
-    public function importTbx($params){
-        $upload = new Zend_File_Transfer_Adapter_Http();
-        /* @var $upload Zend_File_Transfer_Adapter_Http */
-        if(!$upload->isUploaded("Term_tbx")) {
-            return false;
-        }
-        //TODO: handle missing parametars!!!!!11
-        
-        $theFile=$upload->getFileInfo("Term_tbx");
-        $fileinfo = new SplFileInfo($theFile['Term_tbx']['tmp_name']);
+    /***
+     * Import the tbx files in the term collection
+     * 
+     * @param array $filePath
+     * @param integer $collectionId
+     * @param integer $customerId
+     * @return void|boolean
+     */
+    public function importTbx(array $filePath,integer $collectionId,integer $customerId){
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $import editor_Models_Import_TermListParser_Tbx */
-        return $import->parseTbxFile($fileinfo->getPathname(),$params['collectionId']);
-        
-        //error_log($fileContent);
-        //TODO: start the import. Run the new tbx importer
+        $import->mergeTerms=true;
+        $import->customerId=$customerId;
+        return $import->parseTbxFile($filePath,$collectionId);
+    }
+    
+    /***
+     * Get all collection associated with the task
+     * 
+     * @param guid $taskGuid
+     * @return array
+     */
+    public function getCollectionsForTask($taskGuid){
+        $s=$this->db->select()
+        ->from('LEK_term_collection_taskassoc')
+        ->where('taskGuid=?',$taskGuid);
+        return $this->db->fetchRow($s)->toArray();
+    }
+    
+    
+    /***
+     * Get the attribute count for the collection
+     * The return array will be in format: 
+     *  [
+     *      'termsCount'=>number,
+     *      'termsAtributeCount'=>number,
+     *      'termsEntryAtributeCount'=>number,
+     *  ]
+     * @param unknown $collectionId
+     * @return array
+     */
+    public function getAttributesCountForCollection($collectionId){
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(array('tc' => 'LEK_term_collection'), array('id'))
+        ->join(array('t' => 'LEK_terms'),'tc.id=t.collectionId', array('count(DISTINCT t.id) as termsCount'))
+        ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId', array('count(DISTINCT ta.id) as termsAtributeCount'))
+        ->join(array('tea' => 'LEK_term_entry_attributes'),'tc.id=tea.collectionId', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
+        ->where('tc.id =?',$collectionId);
+        return $this->db->fetchRow($s)->toArray();
     }
 }

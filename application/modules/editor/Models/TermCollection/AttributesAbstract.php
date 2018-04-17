@@ -29,15 +29,26 @@ END LICENSE AND COPYRIGHT
 class editor_Models_TermCollection_AttributesAbstract extends ZfExtended_Models_Entity_Abstract {
     
     
+    /***
+     * Attribute fields which are not updatable
+     * @var array
+     */
     public $unupdatebleField=array(
             'transac'
     );
     
+    /***
+     * Save or update an attribute
+     * 
+     * @return mixed|array
+     */
     public function saveOrUpdate(){
         $s = $this->db->select();
         $toSave=$this->row->toArray();
         $notCheckField=array(
-                'id'
+                'id',
+                'created',
+                'updated'
         );
         
         //check if the field is unupdatable
@@ -67,23 +78,22 @@ class editor_Models_TermCollection_AttributesAbstract extends ZfExtended_Models_
         $checkRow=$this->db->fetchRow($s);
         if(empty($checkRow)){
             //the field does not exist
-            $this->save();
-            return ;
+            return $this->save();
         }
         //the field exist, set the id it is needed for parentId
         $this->setId($checkRow['id']);
         if($isUnupdatable){
-            return;
+            return $checkRow['id'];
         }
         //the same values, ignore
         if($checkRow['value']===$toSave['value']){
-            return;
+            return $checkRow['id'];
         }
         
         //new value is found, update the attribute
         //load the record
         $this->load($checkRow['id']);
         $this->setValue($toSave['value']);
-        $this->save();
+        return $this->save();
     }
 }

@@ -230,6 +230,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 ));
         $this->front->getRouter()->addRoute('termCollectionImport', $termCollection);
         
+        $getCollectionAttributes= new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/testgetattributes/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'testgetattributes'
+                ));
+        $this->front->getRouter()->addRoute('testgetattributes', $getCollectionAttributes);
     }
     
     
