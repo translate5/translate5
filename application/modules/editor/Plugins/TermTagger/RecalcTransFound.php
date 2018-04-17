@@ -89,6 +89,10 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             return $source;
         }
         $taskGuid = $this->task->getTaskGuid();
+        $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $assoc editor_Models_TermCollection_TermCollection */
+        $collectionIds=$assoc->getCollectionsForTask($taskGuid);
+        
         $source = $this->removeExistingFlags($source);
         $target = $this->removeExistingFlags($target);
 
@@ -97,9 +101,10 @@ class editor_Plugins_TermTagger_RecalcTransFound {
         $toMarkMemory = array();
         $this->groupCounter = array();
         foreach ($sourceMids as $sourceMid) {
-            $this->termModel->loadByMid($sourceMid, $taskGuid);
+            $this->termModel->loadByMid($sourceMid, $collectionIds);
             $groupId = $this->termModel->getGroupId();
-            $groupedTerms = $this->termModel->getAllTermsOfGroup($taskGuid, $groupId, array($this->task->getTargetLang()));
+            
+            $groupedTerms = $this->termModel->getAllTermsOfGroup($collectionIds, $groupId, array($this->task->getTargetLang()));
             if(empty($groupedTerms)) {
                 $this->notPresentInTbxTarget[$groupId] = true;
             }

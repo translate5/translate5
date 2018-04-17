@@ -86,20 +86,20 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns for a termId the associated termentries by group 
-     * @param string $taskGuid
+     * @param array $collectionIds associated collections to the task
      * @param string $termId
      * @param int $langId
      * @return array
      */
-    public function getTermGroupEntries($taskGuid, $termId,$langId) {
+    public function getTermGroupEntries(array $collectionIds, $termId,$langId) {
         $s1 = $this->db->getAdapter()->select()
         ->from(array('t1' => 'LEK_terms'),
                 array('t1.groupId'))
         ->where('t1.id = ?', $termId)
-        ->where('t1.taskGuid = ?', $taskGuid);
+        ->where('t1.collectionId IN(?)', $collectionIds);
         $s2 = $this->db->getAdapter()->select()
         ->from(array('t2' => 'LEK_terms'))
-        ->where('t2.taskGuid = ?', $taskGuid)
+        ->where('t2.collectionId IN(?)', $collectionIds)
         ->where('t2.language = ? and t2.groupId = ('.$s1->assemble().')', $langId);
         return $this->db->getAdapter()->fetchAll($s2);
     }
@@ -107,16 +107,16 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns an array with groupId and term to a given mid
      * @param string $mid
-     * @param string $taskGuid
+     * @param array $collectionIds
      * @return array
      */
-    public function getTermAndGroupIdToMid($mid, $taskGuid) {
+    public function getTermAndGroupIdToMid($mid, $collectionIds) {
         if(!empty(self::$groupIdCache[$mid])) {
             return self::$groupIdCache[$mid];
         }
         $select = $this->db->select()
         ->from($this->db, array('groupId', 'term'))
-        ->where('taskGuid = ?', $taskGuid)
+        ->where('collectionId IN(?)', $collectionIds)
         ->where('mid = ?', $mid);
         $res = $this->db->fetchRow($select);
         if(empty($res)) {
@@ -158,6 +158,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             return array();
         }
         
+        $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $assoc editor_Models_TermCollection_TermCollection */
+        $collections=$assoc->getCollectionsForTask($task->getTaskGuid());
         $result = $this->getSortedTermGroups($task->getTaskGuid(), $termIds, $task->getSourceLang());
         
         if(empty($result)) {
@@ -167,22 +170,22 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Returns term-informations for $segmentId in $taskGuid.
+     * Returns term-informations for $segmentId in termCollection.
      * Includes assoziated terms corresponding to the tagged terms
      * 
-     * @param string $taskGuid
+     * @param array $collectionIds
      * @param string $mid
      * @param array $languageIds 1-dim array with languageIds|default empty array; 
      *          if passed only terms with the passed languageIds are returned
      * @return 2-dim array (get term of first row like return[0]['term'])
      */
-    public function getAllTermsOfGroupByMid(string $taskGuid, string $mid, $languageIds = array()) {
+    public function getAllTermsOfGroupByMid(array $collectionIds, string $mid, $languageIds = array()) {
         $db = $this->db;
         $s = $db->select()
             ->from(array('t1' => $db->info($db::NAME)))
             ->join(array('t2' => $db->info($db::NAME)), 't1.groupId = t2.groupId', '')
-            ->where('t1.taskGuid = ?', $taskGuid)
-            ->where('t2.taskGuid = ?', $taskGuid)
+            ->where('t1.collectionId IN(?)', $collectionIds)
+            ->where('t2.collectionId IN(?)', $collectionIds)
             ->where('t2.mid = ?', $mid);
         $s->setIntegrityCheck(false);
         if(!empty($languageIds)) {
@@ -194,16 +197,16 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * Returns term-informations for a given group id
      * 
-     * @param string $taskGuid
+     * @param array $collectionIds
      * @param string $groupid
      * @param array $languageIds 1-dim array with languageIds|default empty array; 
      *          if passed only terms with the passed languageIds are returned
      * @return 2-dim array (get term of first row like return[0]['term'])
      */
-    public function getAllTermsOfGroup(string $taskGuid, string $groupid, $languageIds = array()) {
+    public function getAllTermsOfGroup(array $collectionIds, string $groupid, $languageIds = array()) {
         $db = $this->db;
         $s = $db->select()
-            ->where('taskGuid = ?', $taskGuid)
+            ->where('collectionId IN(?)', $collectionIds)
             ->where('groupId = ?', $groupid);
         if(!empty($languageIds)) {
             $s->where('language in (?)', $languageIds);
@@ -278,13 +281,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * 
      * !! TODO: Sortierung der Gruppen in der Reihenfolge wie sie im Segment auftauchen (order by seg2term.id sollte hinreichend sein)
      * 
-     * @param string $taskGuid unic id of current task
+     * @param array $collectionIds term collections associated to the task
      * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
      * @param $sourceLang
      * 
      * @return array
      */
-    protected function getSortedTermGroups($taskGuid, array $termIds, $sourceLang) {
+    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang) {
         $sourceIds = array();
         $targetIds = array();
         $transFoundSearch = array();
@@ -305,8 +308,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 ->distinct()
                 ->joinLeft(array('t2' =>'LEK_terms'), 't1.groupId = t2.groupId', null)
                 ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
-                ->where('t1.taskGuid = ?', $taskGuid)
-                ->where('t2.taskGuid = ?', $taskGuid)
+                ->where('t1.collectionId IN(?)', $collectionIds)
+                ->where('t2.collectionId IN(?)', $collectionIds)
                 ->where('t1.mid IN('.$serialIds.')');
        
         $terms = $this->db->getAdapter()->fetchAll($sql);
@@ -333,14 +336,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * 
      * @param string $mid
-     * @param string $taskGuid
+     * @param array $collectionIds
      * @return Zend_Db_Table_Row_Abstract | null
      */
-    public function loadByMid(string $mid,string $taskGuid) {
+    public function loadByMid(string $mid,array $collectionIds) {
         $s = $this->db->select(false);
         $db = $this->db;
         $s->from($this->db);
-        $s->where('taskGuid = ?', $taskGuid)->where('mid = ?', $mid);
+        $s->where('collectionId IN(?)', $collectionIds)->where('mid = ?', $mid);
         
         
         $this->row = $this->db->fetchRow($s);
@@ -447,8 +450,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if($task->getRelaisLang() > 0) {
             $langs[] = $task->getRelaisLang();
         }
+        
+        $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $assoc editor_Models_TermCollection_TermCollection */
+        $collectionIds=$assoc->getCollectionsForTask($task->getTaskGuid());
+        
         $s = $this->db->select()
-        ->where('taskGuid = ?', $task->getTaskGuid())
+        ->where('collectionId IN(?)', $collectionIds)
         ->where('language in (?)', $langs)
         ->order('groupId ASC')
         ->order('language ASC')

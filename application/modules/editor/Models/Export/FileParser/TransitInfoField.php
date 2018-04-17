@@ -262,7 +262,14 @@ class editor_Models_Export_FileParser_TransitInfoField {
      * @return array empty array if nothing found
      */
     protected function getTermAndGroupIdToMid($mid) {
-        $res = $this->termModel->getTermAndGroupIdToMid($mid, $this->task->getTaskGuid());
+        $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $assoc editor_Models_TermCollection_TermCollection */
+        $collections=$assoc->getCollectionsForTask($this->task->getTaskGuid());
+        //if no collections are associated to the task
+        if(empty($collections)){
+            return $collections;
+        }
+        $res = $this->termModel->getTermAndGroupIdToMid($mid, $collections);
         if(!empty($res)) {
             return $res;
         }
