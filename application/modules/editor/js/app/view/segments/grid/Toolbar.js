@@ -43,10 +43,10 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
 
     //Item Strings: 
     item_viewModesMenu: '#UT#Editormodi',
-    item_viewModeBtn: '#UT#Ansichtsmodus',
-    item_editModeBtn: '#UT#Bearbeitungsmodus',
-    item_ergonomicModeBtn: '#UT#Ergonomic',
-    item_ergonomicModeReadonlyBtn: '#UT#Ergonomic (Ansicht)',
+    item_viewModeBtn: '#UT#Details (nur Lesemodus)',
+    item_editModeBtn: '#UT#Details',
+    item_ergonomicModeBtn: '#UT#Normal',
+    item_ergonomicModeReadonlyBtn: '#UT#Normal (nur Lesemodus)',
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',

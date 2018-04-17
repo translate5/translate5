@@ -96,19 +96,30 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
-      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}" data-length="{length}" />'
+      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" />'
     ]);
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
-      '<span title="{text}" class="short">&lt;{shortTag}&gt;</span>',
-      '<span data-originalid="{id}" data-filename="{md5}" data-length="{length}" class="full">{text}</span>'
+      '<span title="{title}" class="short">{shortTag}</span>',
+      '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
     ]);
     me.spanTemplate.compile();
     me.callParent(arguments);
   },
   initFrameDoc: function() {
-	  this.callParent(arguments);
-      this.fireEvent('afterinitframedoc', this);
+      var me = this,
+          wantedLoad = true; //the first load event is wanted, all others not
+      me.callParent(arguments);
+      me.iframeEl.on('load', function(){
+          if(!wantedLoad) {
+              //If you get multiple of that log entries, 
+              // your code architecture is bad due to much DOM Manipulations at the wrong place. See TRANSLATE-1219
+              Ext.log({msg: 'HtmlEditor iframe is re-initialised!', level: 'warn'});
+              me.initFrameDoc();
+          }
+          wantedLoad = false;
+      });
+      me.fireEvent('afterinitframedoc', me);
   },
 
   /**
@@ -120,7 +131,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
         body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;line-height:14px;"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=14" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=15" />'; //disable Img resizing
     return Ext.String.format(body, me.iframePad, additionalCss, dir);
   },
   /**
@@ -261,6 +272,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             termTageNode.parentNode.removeChild(termTageNode);
         }
         // insert
+        this.fireEvent('beforeInsertMarkup', range);
+        range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
@@ -356,11 +369,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       data = me.getData(item,data);
 
-      if(me.viewModesController.isFullTag()) {
+      if(me.viewModesController.isFullTag() || data.whitespaceTag) {
         data.path = me.getSvg(data.text, data.fullWidth);
       }
       else {
-        data.path = me.getSvg(data.nr, data.shortWidth);
+        data.path = me.getSvg(data.shortTag, data.shortWidth);
       }
       me.result.push(me.imageTemplate.apply(data));
       plainContent.push(me.markupImages[data.key].html);
@@ -379,10 +392,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           lineHeight = Math.round(styles['font-size'].replace(/px/, '') * 1.3);
       }
 
-      svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
-      svg += '<svg xmlns="http://www.w3.org/2000/svg" height="'+lineHeight+'" width="'+width+'">';
-      svg += '<rect width="100%" height="100%" fill="rgb(57,255,163)" rx="3" ry="3"/>';
-      svg += '<text x="0" y="'+(lineHeight-5)+'" font-size="'+styles['font-size']+'" font-weight="'+styles['font-weight']+'" font-family="'+styles['font-family'].replace(/"/g,"'")+'">'
+      //padding left 1px and right 1px by adding x+1 and width + 2
+      //svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
+      svg += '<svg xmlns="http://www.w3.org/2000/svg" height="'+lineHeight+'" width="'+(width+2)+'">';
+      svg += '<rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/>';
+      svg += '<text x="1" y="'+(lineHeight-5)+'" font-size="'+styles['font-size']+'" font-weight="'+styles['font-weight']+'" font-family="'+styles['font-family'].replace(/"/g,"'")+'">'
       svg += Ext.String.htmlEncode(text)+'</text></svg>';
       return prefix + encodeURI(svg);
   },
@@ -400,17 +414,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       spanShort = divItem.down('span.short');
       data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
       data.id = spanFull.getAttribute('data-originalid');
+      data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
       data.length = spanFull.getAttribute('data-length');
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!
-      if(data.id) {
-          //new way
-          data.md5 = spanFull.getAttribute('data-filename');
-      }
-      else {
+      if(!data.id) {
           split = spanFull.getAttribute('id').split('-');
           data.id = split.shift();
-          data.md5 = split.pop();
       }
       shortTagContent = spanShort.dom.innerHTML;
 	  data.nr = shortTagContent.replace(/[^0-9]/g, '');
@@ -436,18 +446,24 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           break;
       }
       data.key = data.type+data.nr;
+      data.shortTag = '&lt;'+data.shortTag+'&gt;';
+      data.whitespaceTag = /nbsp|tab|space|newline/.test(item.className);
+      if(data.whitespaceTag) {
+          data.type += ' whitespace';
+      }
 
       //zusammengesetzte img Pfade:
       this.measure.setHtml(data.text);
       data.fullWidth = this.measure.getSize().width;
-      this.measure.setHtml(data.nr);
+      this.measure.setHtml(data.shortTag);
       data.shortWidth = this.measure.getSize().width;
       //cache the data to be rendered via svg and the html for unmarkup
       me.markupImages[data.key] = {
-          shortTag: data.nr,
+          shortTag: data.shortTag,
           fullTag: data.text,
           fullWidth: data.fullWidth,
           shortWidth: data.shortWidth,
+          whitespaceTag: data.whitespaceTag,
           html: '<div class="'+item.className+'">'+me.spanTemplate.apply(data)+'</div>'
       };
 
@@ -594,7 +610,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               if(me[todo[i][0]].length > 0) {
                   msg += me.strings[todo[i][1]];
                   Ext.each(me[todo[i][0]], function(tag) {
-                      msg += '<img src="'+tag.shortPath+'"> ';
+                      msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
                   })
                   msg += '<br /><br />';
               }
@@ -629,11 +645,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   checkContentTags: function(nodelist) {
       var me = this,
-          foundIds = [];
+          foundIds = [],
+          ignoreWhitespace = Editor.data.segments.userCanModifyWhitespaceTags;
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
       
       Ext.each(nodelist, function(img) {
+          if(ignoreWhitespace && /whitespace/.test(img.className)) {
+              return;
+          }
           if(Ext.Array.contains(foundIds, img.id) && !img.parentNode.nodeName.toLowerCase()==="del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
@@ -644,6 +664,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
       });
       Ext.Object.each(this.markupImages, function(key, item){
+          if(ignoreWhitespace && item.whitespaceTag) {
+              return;
+          }
           if(!Ext.Array.contains(foundIds, me.idPrefix+key)) {
               me.missingContentTags.push(item);
           }
@@ -808,11 +831,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.each(Ext.query('img', true, me.getEditorBody()), function(item){
       var markupImage;
       if(markupImage = me.getMarkupImage(item.id)){
-        if(target == 'fullPath') {
-            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag, markupImage.fullWidth));
+        if(target == 'fullPath' || markupImage.whitespaceTag) {
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag), markupImage.fullWidth);
         }
         else {
-            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.shortTag, markupImage.shortWidth));
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.shortTag), markupImage.shortWidth);
         }
       }
     });

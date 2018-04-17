@@ -201,6 +201,12 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     timeTracking:null,
 
+    /***
+     * Last selected segment index when replace all is clicked.
+     * It is used so the segment grid is scrolled to the same position after replace all.
+     */
+    //replaceAllSegmentIndex:null,
+    
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
         comboFieldLabel:'#UT#Ersetzen',
@@ -871,6 +877,7 @@ Ext.define('Editor.controller.SearchReplace', {
 
         //stop the time tracking
         me.stopTimeTracking();
+        
         //setup segment grid autostate before replace all is called
         me.segmentGridOnReplaceAll(activeTabViewModel.get('result'));
 
@@ -1311,7 +1318,7 @@ Ext.define('Editor.controller.SearchReplace', {
                     editableColumn=theColum[0];
                 }
                 
-                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_SCROLLUNDER);
+                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
                 
                 //clean the mark tags from the editor
                 me.cleanMarkTags();
@@ -1342,7 +1349,7 @@ Ext.define('Editor.controller.SearchReplace', {
         
         grid.scrollTo(goToIndex, {
             callback: callback,
-            notScrollCallback: callback
+            callback: callback
         });
     },
     
@@ -1395,6 +1402,25 @@ Ext.define('Editor.controller.SearchReplace', {
     segmentGridOnReplaceAll:function(results,updateRecord){
         var me=this,
             segmentStore=me.getSegmentGrid().getStore();
+
+        //if the update is needed, load the segment store
+        if(updateRecord){
+            segmentStore.load();
+            //FIXME: this is disabled, sometimes this throws an error
+            //https://jira.translate5.net/browse/TRANSLATE-1134
+            /*
+            me.getSegmentGrid().getStore().load(function(records, operation, success) {
+                if(me.replaceAllSegmentIndex){
+                    //scroll to the last active index
+                    me.getSegmentGrid().scrollTo(me.replaceAllSegmentIndex, {
+                        callback: function(){},
+                        notScrollCallback: function(){}
+                    });
+                }
+            });
+            */
+            return;
+        }
         
         for(var i=0;i<results.length;i++){
             //fieldName,value,startIndex,anyMatch,caseSensitive,exactMatch
@@ -1402,14 +1428,20 @@ Ext.define('Editor.controller.SearchReplace', {
             if(!record){
                 continue;
             }
-            //update the record in the segment grid
-            if(updateRecord){
-                record.load();
-                continue;
-            }
             //set the autostate
             record.set('autoStateId',999);
         }
+        
+        //FIXME: this is disabled, sometimes this throws an error
+        //https://jira.translate5.net/browse/TRANSLATE-1134
+        //find the current selection
+        /*var selectedSegment= me.getSegmentGrid().getSelection()[0];
+        if(!selectedSegment){
+            return;
+        }
+        //get the segment grid row index from the current selection
+        me.replaceAllSegmentIndex=me.getSegmentRowNumber(selectedSegment);
+        */
     },
 
     /**
