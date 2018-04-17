@@ -147,7 +147,7 @@ Ext.define('Editor.util.SegmentEditor', {
      */
     getLastRelevantNodeInEditor: function(direction) {
         var me = this,
-            node = (direction == 'fromEnd') ? me.editorBody.lastChild : me.editorBody.firstChild;
+            node = (direction == 'fromEnd') ? me.getEditorBody().lastChild : me.getEditorBody().firstChild;
         while (node) {
             if (!me.isContainerToIgnore(node)) {
                 return node;
