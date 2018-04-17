@@ -30,7 +30,10 @@
  * Track changes tag replacer
  * 
  * @author aleksandar
- *
+ * 
+ * @method string protect() protect(string $segment) protects the DEL tags of one segment
+ * @method string unprotect() unprotect(string $segment) unprotects / restores the DEL tags
+ * @method string replace() replace(string $segment, Closure|string $replacer, int $limit = -1, int &$count = null) replaces DEL tags with either the callback or the given scalar
  */
 class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbstract{
     
@@ -148,12 +151,8 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         //workflow-step:
         $node[]=self::ATTRIBUTE_WORKFLOWSTEP.'="'.$this->attributeWorkflowstep.'"';
         
-        //create 13 digit unix timestamp used by trackchanges tooltip
-        list($usec, $sec) = explode(" ", microtime());
-        $time13 = sprintf('%d%03d', $sec, $usec/1000);
-        
         // timestamp af the change:
-        $node[]=self::ATTRIBUTE_TIMESTAMP.'="'.$time13.'"';
+        $node[]=self::ATTRIBUTE_TIMESTAMP.'="'.date("c").'"';
         
         $node[]='>'.$nodeText.'</'.$nodeName.'>';
         

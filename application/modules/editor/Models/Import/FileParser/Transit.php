@@ -186,9 +186,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
             }
             $this->setMid($segId);
             //segment-id of transit is used as mid and thus used here
-            $attributes = $this->createSegmentAttributes($segment->getId());
+            $attributes = $this->createSegmentAttributes($seg->getId());
             //from transit we support only the matchRate at the moment, rest is default 
-            $attributes->matchRate = (int)$segment->getMatchValue();
+            $attributes->matchRate = (int)$seg->getMatchValue();
             $transUnit = array('source'=>$source,'target'=>$target);
             
             $this->extractSegment($transUnit);
@@ -321,13 +321,11 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     }
     
     protected function createTag($tag, $shortTagIdent, $tagName, $tagType, $tagText) {
-        $fileNameHash = md5($tagText);
         if(strpos($tagText, '<') !== false ||strpos($tagText, '"') !== false){
             $tagText = htmlspecialchars($tagText, ENT_QUOTES | ENT_XML1);
         }
-        $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $fileNameHash, $tagText);
+        $p = $this->getTagParams($tag, $shortTagIdent, $tagName, $tagText);
         $tag = $this->$tagType->getHtmlTag($p);
-        $this->$tagType->createAndSaveIfNotExists($tagText, $fileNameHash);
         return $tag;
     }
     /**

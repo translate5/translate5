@@ -138,6 +138,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $tagHelper editor_Models_Segment_InternalTag */
         
+        $trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChangesTagHelper editor_Models_Segment_TrackChangeTag */
+        
         $alikeCount = count($ids);
         foreach($ids as $id) {
             $id = (int) $id;
@@ -161,7 +164,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 }
 
                 //if source editing = true, then fieldLoop loops also over the source field
-                $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes, $tagHelper){
+                $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes, $tagHelper, $trackChangesTagHelper){
                     $getOriginal = 'get'.ucfirst($field);
                     //Entity befüllen:
                     if($config->runtimeOptions->editor->enableQmSubSegments) {
@@ -174,9 +177,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     $originalTags = $tagHelper->get($entity->{$getOriginal}());
                     if(!empty($originalTags)) {
                         $i = 0;
+                        $segmentContent = $trackChangesTagHelper->protect($segmentContent);
                         $segmentContent = $tagHelper->replace($segmentContent, function($foo) use (&$i, $originalTags){
                             return $originalTags[$i++];
                         });
+                        $segmentContent = $trackChangesTagHelper->unprotect($segmentContent);
                     }
                     $entity->{$setter}($segmentContent);
                     $entity->updateToSort($editField);

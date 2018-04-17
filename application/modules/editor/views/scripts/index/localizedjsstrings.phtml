@@ -132,10 +132,10 @@ Ext.define('Editor.controller.Localizer', {
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>';
-  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>';
-  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>';
-  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Ergonomic');?>';
-  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Ergonomic (Ansicht)');?>';
+  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
+  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
+  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
+  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Normal (nur Lesemodus)');?>';
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';

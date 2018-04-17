@@ -93,9 +93,6 @@
 <trans-unit id='U2VnbWVudGxpc3RlIHVuZCBFZGl0b3I='><source>Segmentliste und Editor</source><target>Segmentliste und Editor</target></trans-unit>
 <trans-unit id='U2VnbWVudGxpc3RlIHVuZCBFZGl0b3IgLSBbTEVTRU1PRFVTXQ=='><source>Segmentliste und Editor - [LESEMODUS]</source><target>Segmentliste und Editor - [LESEMODUS]</target></trans-unit>
 <trans-unit id='RWRpdG9ybW9kaQ=='><source>Editormodi</source><target>Editormodi</target></trans-unit>
-<trans-unit id='QW5zaWNodA=='><source>Ansicht</source><target>Ansicht</target></trans-unit>
-<trans-unit id='QmVhcmJlaXR1bmc='><source>Bearbeitung</source><target>Bearbeitung</target></trans-unit>
-<trans-unit id='RXJnb25vbWlj'><source>Ergonomic</source><target>Ergonomic</target></trans-unit>
 <trans-unit id='VGFncyB2ZXJiZXJnZW4='><source>Tags verbergen</source><target>Tags verbergen</target></trans-unit>
 <trans-unit id='VGFnLUt1cnphbnNpY2h0'><source>Tag-Kurzansicht</source><target>Tag-Kurzansicht</target></trans-unit>
 <trans-unit id='VGFnLVZvbGxhbnNpY2h0'><source>Tag-Vollansicht</source><target>Tag-Vollansicht</target></trans-unit>
@@ -825,7 +822,6 @@
 <trans-unit id='RmVhdHVyZQ=='><source>Feature</source><target>Feature</target></trans-unit>
 <trans-unit id='Q2hhbmdl'><source>Change</source><target>Change</target></trans-unit>
 <trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='><source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source><target>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</target></trans-unit>
-<trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='><source>Ergonomic (Ansicht)</source><target>Ergonomic (Ansicht)</target></trans-unit>
 <trans-unit id='IFRlc3Q='><source> Test</source><target> Test</target></trans-unit>
 <trans-unit id='TVFN'><source>MQM</source><target>MQM</target></trans-unit>
 <trans-unit id='TVFNIFN0YXRpc3Rpaw=='><source>MQM Statistik</source><target>MQM Statistik</target></trans-unit>
@@ -1258,6 +1254,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='U2llIGhhYmVuIGtlaW5lIEF1ZmdhYmUgKG1laHIpIGdlw7ZmZm5ldC4gRXZlbnR1ZWxsIHd1cmRlIGRpZSBBdWZnYWJlIGluIGVpbmVtIGFuZGVyZW4gRmVuc3RlciBnZXNjaGxvc3Nlbi4='><source>Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.</source><target>Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgendpc2NoZW56ZWl0bGljaCBpbSBudXIgTGVzZW1vZHVzIGdlw7ZmZm5ldC4='><source>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</source><target>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</target></trans-unit>
 <trans-unit id='bWl0IExlc2V6ZWljaGVuIHZlcnNlaGVu'><source>mit Lesezeichen versehen</source><target>mit Lesezeichen versehen</target></trans-unit>
+<trans-unit id='RGV0YWlscw=='><source>Details</source><target>Details</target></trans-unit>
+<trans-unit id='RGV0YWlscyAobnVyIExlc2Vtb2R1cyk='><source>Details (nur Lesemodus)</source><target>Details (nur Lesemodus)</target></trans-unit>
+<trans-unit id='Tm9ybWFs'><source>Normal</source><target>Normal</target></trans-unit>
+<trans-unit id='Tm9ybWFsIChudXIgTGVzZW1vZHVzKQ=='><source>Normal (nur Lesemodus)</source><target>Normal (nur Lesemodus)</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -41,6 +41,13 @@
  * no matter if the TrackChange-Plugin is activated or not.
  * That's why we need this in the core-Code, not in the Plugin-Code.
  *
+ * ********************* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! *********************
+ * NO MULTIBYTE_PROBLEMS occur at the moment - although we use strlen and substr. This is because we just 
+ * walk through the string step by step, and it does not matter that these steps are bytes, not characters. 
+ * USING mb_strlen and mb_substr however WILL PRODUCE WRONG RESULTS because we loose the offsets from PREG_OFFSET_CAPTURE 
+ * in preg_match_all.
+ * ********************* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! *********************
+ * 
  */
 class editor_Models_Segment_TermTagTrackChange {
     

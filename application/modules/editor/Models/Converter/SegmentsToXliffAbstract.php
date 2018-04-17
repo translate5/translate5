@@ -139,6 +139,11 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
     protected $taghelperInternal;
     
     /**
+     * @var editor_Models_Segment_TrackChangeTag
+     */
+    protected $taghelperTrackChanges;
+    
+    /**
      * @var editor_Models_Segment_TermTag
      */
     protected $taghelperTerm;
@@ -321,6 +326,9 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
         }
         if(empty($this->taghelperMqm)) {
             $this->taghelperMqm = ZfExtended_Factory::get('editor_Models_Segment_QmSubsegments');
+        }
+        if(empty($this->taghelperTrackChanges)) {
+            $this->taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         }
     }
 }

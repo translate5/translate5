@@ -108,23 +108,6 @@ trait editor_Models_Import_FileParser_TagTrait {
     ];
     
     /**
-     * defines the GUI representation of internal used tags for masking special characters  
-     * @var array
-     */
-    protected $_tagMapping = [
-        // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
-        'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;', 'imgText' => '<↵ hardReturn/>'], //in title irgendwas mit <hardReturn/> 
-        'softReturn' => ['text' => '&lt;↵ softReturn/&gt;', 'imgText' => '<↵ softReturn/>'], //in title irgendwas mit <softReturn/>
-        'macReturn' => ['text' => '&lt;↵ macReturn/&gt;', 'imgText' => '<↵ macReturn/>'],  //in title irgendwas mit <macReturn/>
-        // ·    U+00B7      c2 b7       &middot;    &#183;      MIDDLE DOT
-        'space' => ['text' => '&lt;·/&gt;', 'imgText' => '<·/>'],
-        // →    U+2192      e2 86 92    &rarr;      &#8594;     RIGHTWARDS ARROW
-        'tab' => ['text' => '&lt;→/&gt;', 'imgText' => '<→/>'],
-        // �    U+FFFD      ef bf bd                &#65533;    REPLACEMENT CHARACTER (Questionmark on black diamond)
-        'char' => ['text' => '&lt;�/&gt;', 'imgText' => '<�/>'],
-    ];
-
-    /**
      * to be called in the constructors
      */
     protected function initImageTags(){
@@ -142,6 +125,8 @@ trait editor_Models_Import_FileParser_TagTrait {
         return preg_replace_callback($this->whitespaceTagList, function($match) use ($segment) {
             $tag = $match[0];
             $tagName = $match[1];
+            $cls = ' '.$tagName;
+            $title = '&lt;'.$this->shortTagIdent.'/&gt;: ';
             
             //if there is no length attribute, use length = 1
             if(empty($match[2])) {
@@ -150,16 +135,56 @@ trait editor_Models_Import_FileParser_TagTrait {
             else {
                 $length = $match[3]; //else use the stored length value
             }
-            if(!isset($this->_tagMapping[$tagName])) {
-                trigger_error('The used tag ' . $tagName .' is undefined! Segment: '.$segment, E_USER_ERROR);
-            }
-            $fileNameHash = md5($this->_tagMapping[$tagName]['imgText']);
-            
             //generate the html tag for the editor
-            $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $fileNameHash);
-            $p['length'] = $length; //FIXME refactor whole tagparams stuff!
+            switch ($match[1]) {
+                // ↵    U+21B5      e2 86 b5    &crarr;     &#8629;     DOWNWARDS ARROW WITH CORNER LEFTWARDS
+                //'hardReturn' => ['text' => '&lt;↵ hardReturn/&gt;'], //in title irgendwas mit <hardReturn/> 
+                //'softReturn' => ['text' => '&lt;↵ softReturn/&gt;'], //in title irgendwas mit <softReturn/>
+                //'macReturn' => ['text' => '&lt;↵ macReturn/&gt;'],  //in title irgendwas mit <macReturn/>
+                case 'hardReturn':
+                case 'softReturn':
+                case 'macReturn':
+                    $cls = ' newline';
+                    $text = '↵';
+                    $title .= 'Newline';
+                    break;
+                case 'space':
+                    // ·    U+00B7      c2 b7       &middot;    &#183;      MIDDLE DOT
+                    //'space' => ['text' => '&lt;·/&gt;'],
+                    $text = str_repeat('·',$length);
+                    $title .= $length.' whitespace character'.($length>1?'s':'');
+                    break;
+                case 'tab':
+                    // →    U+2192      e2 86 92    &rarr;      &#8594;     RIGHTWARDS ARROW
+                    //'tab' => ['text' => '&lt;→/&gt;'],
+                    $text = str_repeat('→',$length);
+                    $title .= $length.' tab character'.($length>1?'s':'');
+                    break;
+                case 'char':
+                default:
+                    //'char' => ['text' => 'protected Special character'],
+                    if($tag == '<char ts="c2a0" length="1"/>'){
+                //new type non breaking space: U+00A0
+                //symbolyzed in word as: 
+                //U+00B0	°	c2 b0	&deg;	° 	&#176;	° 	DEGREE SIGN
+                //in unix tools:
+                //U+23B5	⎵	e2 8e b5		&#9141;	⎵ 	BOTTOM SQUARE BRACKET
+                        $text = '⎵';
+                        $cls = ' nbsp';
+                        $title .= 'Non breaking space';
+                    }
+                    else {
+                        $text = 'protected Special-Character';
+                        $title .= 'protected Special-Character';
+                    }
+            }
+            $p = $this->getTagParams($tag, $this->shortTagIdent++, $tagName, $text);
+            //FIXME refactor whole tagparams stuff!
+            $p['class'] .= $cls; 
+            $p['length'] = $length;
+            $p['title'] = $title; //Only translatable with using ExtJS QTips in the frontend, as title attribute not possible!
+            
             $tag = $this->_singleTag->getHtmlTag($p);
-            $this->_singleTag->createAndSaveIfNotExists($this->_tagMapping[$tagName]['imgText'], $fileNameHash);
             return $tag;
         }, $segment);
     }
@@ -169,19 +194,14 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @param string $tag
      * @param string $shortTag
      * @param string $tagId
-     * @param string $fileNameHash
      * @param string $text
      */
-    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
-        if($text === false) {
-            $text = $this->_tagMapping[$tagId]['text'];
-        }
+    protected function getTagParams($tag, $shortTag, $tagId, $text) {
         return array(
             'class' => $this->parseSegmentGetStorageClass($tag),
             'text' => $text,
             'shortTag' => $shortTag,
             'id' => $tagId, //mostly original tag id
-            'filenameHash' => $fileNameHash,
         );
     }
     
