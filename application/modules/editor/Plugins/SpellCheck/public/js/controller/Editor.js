@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     extend: 'Ext.app.Controller',
-    requires: ['Ext.tip.ToolTip'],
+    requires: ['Editor.util.SegmentContent'],
     mixins: ['Editor.util.DevelopmentTools',
              'Editor.util.Event',
              'Editor.util.SegmentEditor',
@@ -317,6 +317,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     handleAfterContentUpdate: function() {
         var me = this;
+        // Stop if we open a task (not a segment) or try to open a segment that is not editable
+        if (me.getSegmentGrid().editingPlugin.context == undefined) {
+            return;
+        }
         // (1) New segment opened?
         me.consoleLog("segmentId: " + me.segmentId + "/" + me.getSegmentGrid().editingPlugin.context.record.get('id'));
         if (me.segmentId != me.getSegmentGrid().editingPlugin.context.record.get('id')) {
@@ -605,7 +609,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     injectCSSForEditor: function() {
         var me = this;
         Ext.util.CSS.createStyleSheetToWindow(
-                me.editor.getDoc(),
+                me.getEditorDoc(),
                 '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' +
                 '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 3px dotted; border-color: red;}' + // TODO: use wavy line instead
                 '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' {border-color: #ab8906;}' +    // dark yellow

@@ -119,7 +119,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
      */
     getRangeForMatchFromTool: function (match) {
         var me = this,
-            editorBody = me.editor.getEditorBody(),
+            editorBody = me.getEditorBody(),
             rangeForMatch = rangy.createRange(editorBody),
             matchStart,
             matchEnd;
