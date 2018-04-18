@@ -283,36 +283,50 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     handleKeyDown: function(event) {
         var me = this;
         me.initKeyDownEvent(event);
-        if (!me.isSupportedLanguage) {
-            me.consoleLog('SpellCheck: handleKeyDown failed because language is not supported or SpellCheck-Tool does not run.');
-            return;
+        if(me.eventHasToBeIgnored()){
+            me.consoleLog(" => Ignored for SpellCheck.");
+            me.ignoreEvent = true;
+            me.stopEvent = false;
         }
-        if (me.isApplyingInProgress) {
-            Editor.MessageBox.addWarning(me.messages.isApplyingInProgress);
-            return;
+        if(me.eventHasToBeIgnoredAndStopped()){
+            me.consoleLog(" => Ignored and stopped for SpellCheck!");
+            me.ignoreEvent = true;
+            me.stopEvent = true;
         }
-        switch(true) {
-            case me.eventIsCtrlZ():
-                // Restore older snapshot...
-                me.cleanupSnapshotHistory();
-                me.rewindSnapshot();
-                me.restoreSnapshotInEditor();
-                // ... then stop everything
-                me.ignoreEvent = true;
-                me.stopEvent = true;
-            break;
-            case me.eventIsCtrlY():
-                // Restore newer snapshot...
-                me.fastforwardSnapshot();
-                me.restoreSnapshotInEditor();
-                // ... then stop everything
-                me.ignoreEvent = true;
-                me.stopEvent = true;
-            break;
-            default:
-                me.startTimerForSpellCheck();
-            break;
+        
+        if(!me.ignoreEvent) {
+            if (!me.isSupportedLanguage) {
+                me.consoleLog('SpellCheck: handleKeyDown failed because language is not supported or SpellCheck-Tool does not run.');
+                return;
+            }
+            if (me.isApplyingInProgress) {
+                Editor.MessageBox.addWarning(me.messages.isApplyingInProgress);
+                return;
+            }
+            switch(true) {
+                case me.eventIsCtrlZ():
+                    // Restore older snapshot...
+                    me.cleanupSnapshotHistory();
+                    me.rewindSnapshot();
+                    me.restoreSnapshotInEditor();
+                    // ... then stop everything
+                    me.ignoreEvent = true;
+                    me.stopEvent = true;
+                break;
+                case me.eventIsCtrlY():
+                    // Restore newer snapshot...
+                    me.fastforwardSnapshot();
+                    me.restoreSnapshotInEditor();
+                    // ... then stop everything
+                    me.ignoreEvent = true;
+                    me.stopEvent = true;
+                break;
+                default:
+                    me.startTimerForSpellCheck();
+                break;
+            }
         }
+        
         // Stop event?
         if(me.stopEvent) {
             event.stopEvent();
@@ -410,7 +424,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         rangeForEditor.selectNode(me.editorBodyAtSpellCheckStart);
         me.contentBeforeSpellCheck = me.editorBodyExtDomElementAtSpellCheckStart.getHtml();
 
-        me.cleanSpellCheckTags(); // in case a spellcheck has been run before already
+        me.editorBodyExtDomElementAtSpellCheckStart = me.cleanSpellCheckTags(me.editorBodyExtDomElementAtSpellCheckStart); // in case a spellcheck has been run before already
         me.contentBeforeSpellCheckWithoutSpellCheckNodes = me.editorBodyExtDomElementAtSpellCheckStart.getHtml();
         
         // After this point you MUST finish the SpellCheck with finishSpellCheck() if the Editor is still opened then!!!
@@ -736,32 +750,5 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.activeMatchNode = event.currentTarget;
         me.spellCheckTooltip.hide();
         me.spellCheckTooltip.show();
-    },
-    
-    // =========================================================================
-    // TODO: merge this with some of SearchReplaceUtils
-    // =========================================================================
-    
-    /***
-     * Remove SpellCheck-Tags from the content we found in the editor but keep their content.
-     */
-    cleanSpellCheckTags:function(){
-        var me = this,
-            allSpellCheckElements,
-            spellCheckElementParentNode;
-        if(!me.editorBodyExtDomElementAtSpellCheckStart){
-            me.consoleLog('cleanSpellCheckTags failed with missing me.editorBodyExtDomElementAtSpellCheckStart.');
-            return false;
-        }
-        // find all spellcheck-elements and "remove their tags"
-        allSpellCheckElements = me.editorBodyExtDomElementAtSpellCheckStart.query('.' + me.self.CSS_CLASSNAME_MATCH);
-        Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
-            spellCheckElementParentNode = spellCheckEl.parentNode;
-            while(spellCheckEl.firstChild) {
-                spellCheckElementParentNode.insertBefore(spellCheckEl.firstChild, spellCheckEl);
-            }
-            spellCheckElementParentNode.removeChild(spellCheckEl);
-            spellCheckElementParentNode.normalize();
-        });
-    },
+    }
 });
