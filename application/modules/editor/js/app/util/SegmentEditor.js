@@ -242,6 +242,24 @@ Ext.define('Editor.util.SegmentEditor', {
             }
         };
         return null;
+    },
+    /***
+     * Remove SpellCheck-Tags but keep their content.
+     * @param {Ext.dom.Element}
+     * @returns {Ext.dom.Element}
+     */
+    cleanSpellCheckTags:function(el){
+        var allSpellCheckElements,
+            spellCheckElementParentNode;
+        allSpellCheckElements = el.query('.spellcheck');
+        Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
+            spellCheckElementParentNode = spellCheckEl.parentNode;
+            while(spellCheckEl.firstChild) {
+                spellCheckElementParentNode.insertBefore(spellCheckEl.firstChild, spellCheckEl);
+            }
+            spellCheckElementParentNode.removeChild(spellCheckEl);
+            spellCheckElementParentNode.normalize();
+        });
+        return el;
     }
-    
 });
