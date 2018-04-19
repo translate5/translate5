@@ -26,6 +26,4 @@
 -- */
 
 INSERT INTO `LEK_customer` (`name`, `number`) VALUES ('Alex, Test Customer', '123456789');
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_customer_customer', 'find');
-
     

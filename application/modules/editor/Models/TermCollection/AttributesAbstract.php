@@ -87,7 +87,10 @@ class editor_Models_TermCollection_AttributesAbstract extends ZfExtended_Models_
         }
         //the same values, ignore
         if($checkRow['value']===$toSave['value']){
-            return $checkRow['id'];
+            $this->load($checkRow['id']);
+            //force the update timestamp to change
+            $this->setUpdated(null);
+            return $this->save();
         }
         
         //new value is found, update the attribute

@@ -33,7 +33,8 @@ END LICENSE AND COPYRIGHT
     2. create tearm collection for each task in lek_terms table
     3. insert task to term collection association
     4. update the term collection id in lek_terms after the term collection for this task is created
-    3. remove the taskguid from lek_terms table
+    3. remove the taskguid column from lek_terms table
+    4. remove the tigId column from lek_terms table
  */
 
 ALTER TABLE `LEK_terms` 
@@ -59,4 +60,6 @@ UPDATE `LEK_terms` `t`, `LEK_term_collection` `c` set `t`.`collectionId` = `c`.`
 ALTER TABLE `LEK_term_collection` DROP COLUMN `taskGuid`;
 
 ALTER TABLE `LEK_terms` DROP COLUMN `taskGuid`;
+ALTER TABLE `LEK_terms` DROP COLUMN `tigId`, DROP INDEX `tigId` ;
+
 

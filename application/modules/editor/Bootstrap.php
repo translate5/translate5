@@ -221,14 +221,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorQueue', $workerRoute);
         
-        $termCollection = new ZfExtended_Controller_RestLikeRoute(
+        $termCollectionImport = new ZfExtended_Controller_RestLikeRoute(
                 'editor/termcollection/import/*',
                 array(
                         'module' => 'editor',
                         'controller' => 'termcollection',
                         'action' => 'import'
                 ));
-        $this->front->getRouter()->addRoute('termCollectionImport', $termCollection);
+        $this->front->getRouter()->addRoute('termCollectionImport', $termCollectionImport);
+        
+        $termCollectionExport = new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/export/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'export'
+                ));
+        $this->front->getRouter()->addRoute('termCollectionExport', $termCollectionExport);
+        
         
         $getCollectionAttributes= new ZfExtended_Controller_RestLikeRoute(
                 'editor/termcollection/testgetattributes/*',

@@ -81,14 +81,6 @@ class editor_Plugins_Customer_CustomerController extends ZfExtended_RestControll
         }
     }
     
-    public function findAction(){
-        $params=$this->getRequest()->getParams();
-        if(!isset($params['number'])){
-            throw new ZfExtended_BadMethodCallException();
-        }
-        $this->view->rows=$this->entity->findCustomerByNumber($params['number'])->toArray();
-    }
-    
     /**
      * Internal handler for duplicated entity message
      * @param Zend_Db_Statement_Exception $e

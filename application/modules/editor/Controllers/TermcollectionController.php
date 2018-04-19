@@ -45,6 +45,30 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
      */
     protected $uploadErrors = array();
 
+    /***
+     * Info: function incomplete! 
+     * Only used in a test at the moment! 
+     */
+    public function exportAction() {
+        $this->decodePutData();
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        
+        $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
+        /* @var $export editor_Models_Export_Terminology_Tbx */
+        
+        $data=$term->loadSortedByCollectionAndLanguages([$this->data->collectionId]);
+        $export->setData($data);
+        $exportData=$export->export();
+        
+        $this->view->filedata=$exportData;
+    }
+    
+    /***
+     * Import the terms into the term collection
+     * 
+     * @throws ZfExtended_Exception
+     */
     public function importAction(){
         $params=$this->getRequest()->getParams();
         
@@ -58,20 +82,23 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             $this->view->success=false;
         }else{
             //the return is needed for the tests
-            $this->view->success=$this->entity->importTbx($filePath,(integer)$params['collectionId'],(integer)$params['customerId']);
+            $this->view->success=$this->entity->importTbx($filePath,$params);
         }
         
     }
     
-    public function deleteAction(){
-        parent::deleteAction();
-        $this->view->success=true;
-    }
+    //public function deleteAction(){
+    //    parent::deleteAction();
+    //    $this->view->success=true;
+    //}
     
+    /***
+     * This action is only used in a test at the moment! 
+     */
     public function testgetattributesAction(){
         $this->view->rows=$this->entity->getAttributesCountForCollection($this->getParam('collectionId'));
     }
-
+    
     /***
      * Return the uploaded tbx files paths
      * 

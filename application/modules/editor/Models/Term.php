@@ -161,7 +161,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collections=$assoc->getCollectionsForTask($task->getTaskGuid());
-        $result = $this->getSortedTermGroups($task->getTaskGuid(), $termIds, $task->getSourceLang());
+        $result = $this->getSortedTermGroups($collections, $termIds, $task->getSourceLang());
         
         if(empty($result)) {
             return array();
@@ -455,18 +455,35 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collectionIds=$assoc->getCollectionsForTask($task->getTaskGuid());
         
+        $data=$this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
+        if(!$data) {
+            return null;
+        }
+        $exporteur->setData($data);
+        return $exporteur->export();
+    }
+    
+    /***
+     * Load terms in given collection and languages. The returned data will be sorted by groupId,language and id
+     * 
+     * @param array $collectionIds
+     * @param array $langs
+     * @return NULL|Zend_Db_Table_Rowset_Abstract
+     */
+    public function loadSortedByCollectionAndLanguages(array $collectionIds,$langs=array()){
         $s = $this->db->select()
-        ->where('collectionId IN(?)', $collectionIds)
-        ->where('language in (?)', $langs)
-        ->order('groupId ASC')
+        ->where('collectionId IN(?)', $collectionIds);
+        if(!empty($langs)){
+            $s->where('language in (?)', $langs);
+        }
+        $s->order('groupId ASC')
         ->order('language ASC')
         ->order('id ASC');
         $data = $this->db->fetchAll($s);
         if($data->count() == 0) {
             return null;
         }
-        $exporteur->setData($data);
-        return $exporteur->export();
+        return $data;
     }
     
     /***
@@ -515,6 +532,17 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s);
     }
     
+    /***
+     * Find term in collection by given language and term value
+     */
+    public function findTermInCollection($termText,$languageId,$termCollection){
+        $s = $this->db->select()
+        ->where('language = ?', $languageId)
+        ->where('term = ?', $termText)
+        ->where('collectionId = ?',$termCollection);
+        return $this->db->fetchAll($s);
+    }
+
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array

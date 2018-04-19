@@ -34,16 +34,15 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      * Import the tbx files in the term collection
      * 
      * @param array $filePath
-     * @param integer $collectionId
-     * @param integer $customerId
+     * @param array $params
      * @return void|boolean
      */
-    public function importTbx(array $filePath,integer $collectionId,integer $customerId){
+    public function importTbx(array $filePath,array $params){
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $import editor_Models_Import_TermListParser_Tbx */
-        $import->mergeTerms=true;
-        $import->customerId=$customerId;
-        return $import->parseTbxFile($filePath,$collectionId);
+        $import->mergeTerms=isset($params['mergeTerms']) ? $params['mergeTerms'] : false;
+        $import->customerId=$params['customerId'];
+        return $import->parseTbxFile($filePath,$params['collectionId']);
     }
     
     /***
@@ -54,9 +53,15 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      */
     public function getCollectionsForTask($taskGuid){
         $s=$this->db->select()
-        ->from('LEK_term_collection_taskassoc')
-        ->where('taskGuid=?',$taskGuid);
-        return $this->db->fetchRow($s)->toArray();
+            ->setIntegrityCheck(false)
+            ->from('LEK_term_collection_taskassoc')
+            ->where('taskGuid=?',$taskGuid);
+        $rows=$this->db->fetchAll($s)->toArray();
+        if(!empty($rows)){
+            $ids = array_column($rows, 'collectionId');
+            return $ids;
+        }
+        return null;
     }
     
     
@@ -80,5 +85,17 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         ->join(array('tea' => 'LEK_term_entry_attributes'),'tc.id=tea.collectionId', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
         ->where('tc.id =?',$collectionId);
         return $this->db->fetchRow($s)->toArray();
+    }
+    
+    /***
+     * Associate termCollection to taskGuid
+     * 
+     * @param mixed $collectionId
+     * @param guid $taskGuid
+     */
+    public function addTermCollectionTaskAssoc($collectionId,$taskGuid){
+        $sql='INSERT INTO LEK_term_collection_taskassoc (collectionId,taskGuid) '.
+              'VALUES(?,?);';
+        $retval=$this->db->getAdapter()->query($sql,[$collectionId,$taskGuid]);
     }
 }

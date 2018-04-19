@@ -84,15 +84,5 @@ class editor_Plugins_Customer_Init extends ZfExtended_Plugin_Abstract {
                 'editor' => array('plugins_customer_customer',),
         ));
         $r->addRoute('plugins_customer_restdefault', $restRoute);
-        
-        $findRoute = new ZfExtended_Controller_RestLikeRoute(
-                'editor/plugins_customer_customer/:number/find',
-                array(
-                        'module' => 'editor',
-                        'controller' => 'plugins_customer_customer',
-                        'action' => 'find'
-                ));
-        $r->addRoute('plugins_customer_find', $findRoute);
-        
     }
 }

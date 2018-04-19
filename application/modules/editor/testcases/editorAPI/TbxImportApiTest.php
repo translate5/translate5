@@ -27,104 +27,100 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * Test the tbx import into the term collection with multiple tbx files with modified and new terms. 
+ * TODO: Since the tbx export does not provide the tbx file with term entry attributes and term attributes
+ *       the test can not relay on tbx content test.
+ *       When in the tbx export result the attributes are include this can be changed  
  */
 class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
+    
+    /***
+     * The current active collection
+     * @var integer
+     */
+    protected static $collId;
     
     public static function setUpBeforeClass() {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         $appState = $api->requestJson('editor/index/applicationstate');
-    }
-    
-    public function testTbxImport(){
-        $appState = $this->api()->requestJson('editor/index/applicationstate');
-        
         self::assertTrue(in_array('editor_Plugins_Customer_Init',$appState->pluginsLoaded),'Plugin Customer must be active for this test case!');
-        
         self::assertCustomer();
+    }
+    
+    /***
+     * Test the tbx import.
+     * The test will import different tbx files, with different content in it.
+     * The test will test against the generated tbx content after tbx import however the number
+     * of the created attributes after the import
+     */
+    public function testTbxImport(){
         
         $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => $this->api()->getCustomer()->id));
-        self::assertTrue(is_object($termCollection), 'Unable to create a test collection');
+        $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
+        $this->assertEquals('Test api collection', $termCollection->name);
         
-        //save the termCollection id so later the collection can be deleted
-        $this->api()->addScharedParameters('collectionId', $termCollection->id);
+        self::$collId =$termCollection->id;
         
-        /*
-        $this->api()->addFile('Term.tbx', $this->api()->getFile('Term3.tbx'), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$termCollection->id, 'customerId' => $this->api()->getCustomer()->id));
-        //$this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>108, 'customerId' => $this->api()->getCustomer()->id));
-        
-        $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>$termCollection->id));
-        
-        self::assertTrue(7==$attributes->termsCount, 'Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:7');
-        self::assertTrue(65==$attributes->termsAtributeCount, 'Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:65');
-        self::assertTrue(21==$attributes->termsEntryAtributeCount, 'Invalid number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:21');
-        
-        //test with the another file, only the values in the terms, tersmAttributes, and termEntryAttributes are change
-        $this->api()->addFile('Term1.tbx', $this->api()->getFile('Term1.tbx'), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$termCollection->id, 'customerId' => $this->api()->getCustomer()->id));
-        
-        $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>$termCollection->id));
-        
-        self::assertTrue(7==$attributes->termsCount, 'Second file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:7');
-        self::assertTrue(65==$attributes->termsAtributeCount, 'Second file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:65');
-        self::assertTrue(21==$attributes->termsEntryAtributeCount, 'Second file test.Invalid number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:21');
-        
-        $this->api()->addFile('Term1.tbx', $this->api()->getFile('Term1.tbx'), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$termCollection->id, 'customerId' => $this->api()->getCustomer()->id));
-        
-        $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>$termCollection->id));
-        
-        self::assertTrue(7==$attributes->termsCount, 'Second file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:7');
-        self::assertTrue(65==$attributes->termsAtributeCount, 'Second file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:65');
-        self::assertTrue(21==$attributes->termsEntryAtributeCount, 'Second file test.Invalid number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:21');
-        */
-
         //import the first tbx file,
-        $this->singleFileTest('Term.tbx', 7, 65, 21);
+        $this->singleTest('Term.tbx', 8, 73, 21);
         
-        //sleep(15);
+        //change existing term entry attribute
+        //change existing term attribute
+        //change existing term content
+        //add new term to term collection
+        $this->singleTest('Term1.tbx', 9, 81, 21);
         
-        //the secound tbx file should update some of the terms and term attributes
-        $this->singleFileTest('Term1.tbx', 7, 65, 21);
-
-        //sleep(15);
+        //different term entry id, different term id, same language and term content -> update the term and insert
+        //all terms in the same tbx term entry in the database
+        $this->singleTest('Term2.tbx', 11, 101, 21);
         
-        //termEntry in the tbx does not exist in the database, but the term exist
-        //after Term2.tbx is imported, one term is merged, and the other 2 in the same term entry in the tbx
-        //are added to the same termEntry in the database
-        $this->singleFileTest('Term2.tbx', 9, 85, 21);
+        //add new terms to the term collection
+        //handle the unknown tags
+        $this->singleTest('Export.tbx', 13, 128, 37);
         
+        //one term attribute is removed and the term text is changed
+        //add two new term attributes
+        $this->singleTest('ExportTermChange.tbx', 13, 129, 37);
     }
     
-    public function XXXtestTbxImportDifferentTerm(){
-        self::assertCustomer();
-        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => $this->api()->getCustomer()->id));
-
-        self::assertTrue(is_object($termCollection), 'Unable to create a test collection');
-        
-        $this->api()->addFile('DifferentAttributes.tbx', $this->api()->getFile('DifferentAttributes.tbx'), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$termCollection->id, 'customerId' => $this->api()->getCustomer()->id));
-    }
-    
-    private function singleFileTest($fileName,$termCount,$termsAtributeCount,$termsEntryAtributeCount){
-        $collectionId=self::$api->getScharedParameterValue('collectionId');
-        
+    /***
+     * Run single test for each file. Test against the content and attributes count
+     * 
+     * @param string $fileName
+     * @param integer $termCount : the count of the terms after the import
+     * @param integer $termsAtributeCount : the count afo the term attributes after the import
+     * @param integer $termsEntryAtributeCount : the count of the term entry attributes after the import
+     */
+    private function singleTest($fileName,$termCount,$termsAtributeCount,$termsEntryAtributeCount){
         $this->api()->addFile($fileName, $this->api()->getFile($fileName), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>$collectionId, 'customerId' => $this->api()->getCustomer()->id));
+        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>self::$collId, 'customerId' => $this->api()->getCustomer()->id,'mergeTerms'=>true));
         
-        $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>$collectionId));
+        //export the generated file
+        $response=$this->api()->requestJson('editor/termcollection/export', 'POST', array('collectionId' =>self::$collId));
+
+        $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
+        $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
         
-        self::assertTrue($termCount==$attributes->termsCount, $fileName.' file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:'.$termCount);
-        self::assertTrue($termsAtributeCount==$attributes->termsAtributeCount, $fileName.' file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:'.$termsAtributeCount);
-        self::assertTrue($termsEntryAtributeCount==$attributes->termsEntryAtributeCount, $fileName.' file test.Invalid number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
+        //file_put_contents('/var/www/translate5/application/modules/editor/testcases/editorAPI/TbxImportApiTest/E_'.$fileName, $response->filedata);
+        $expected=$this->api()->getFileContent('E_'.$fileName);
+        $actual=$response->filedata;
+        
+        //check for differences between the expected and the actual content
+        $this->assertEquals($expected, $actual,"The expected file an the result file does not match.Test file name:".$fileName);
+        
+        $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>self::$collId));
+        
+        //check if the generated attributes are matching
+        $this->assertTrue($termCount==$attributes->termsCount, $fileName.' file test.Invalid number of terms created.Terms count:'.$attributes->termsCount.', expected:'.$termCount);
+        $this->assertTrue($termsAtributeCount==$attributes->termsAtributeCount, $fileName.' file test.Invalid number of term attribute created.Terms attribute count:'.$attributes->termsAtributeCount.', expected:'.$termsAtributeCount);
+        $this->assertTrue($termsEntryAtributeCount==$attributes->termsEntryAtributeCount, $fileName.' file test.Invalid number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
     }
     
     public static function tearDownAfterClass() {
         self::$api->login('testmanager');
-        $collectionId=self::$api->getScharedParameterValue('collectionId');
-        //self::$api->requestJson('editor/termcollection/'.$collectionId,'DELETE');
+        self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
     }
     
 }
