@@ -87,11 +87,6 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         
     }
     
-    //public function deleteAction(){
-    //    parent::deleteAction();
-    //    $this->view->success=true;
-    //}
-    
     /***
      * This action is only used in a test at the moment! 
      */

@@ -78,11 +78,11 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         
         //add new terms to the term collection
         //handle the unknown tags
-        $this->singleTest('Export.tbx', 13, 128, 37);
+        $this->singleTest('Export.tbx', 13, 128, 35);
         
         //one term attribute is removed and the term text is changed
         //add two new term attributes
-        $this->singleTest('ExportTermChange.tbx', 13, 129, 37);
+        $this->singleTest('ExportTermChange.tbx', 13, 129, 35);
     }
     
     /***

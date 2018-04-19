@@ -735,10 +735,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return false;
         }
         
-        if($this->isInsideNtig){
-            return $this->saveTermAttribute($this->actualParentId);;
-        }
-        return $this->saveEntryAttribute($this->actualParentId);
+        error_log("Unsupported tag found during the tbx parsing:#Tag name:".$this->xml->name.'#Term collection id:'.$this->termCollectionId.'#');
     }
     
     /***

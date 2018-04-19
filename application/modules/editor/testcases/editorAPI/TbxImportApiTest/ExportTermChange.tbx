@@ -49,6 +49,7 @@
 							<admin type="projectSubset" target="id95535a52-5ba1-4ac2-9edd-c6291646de27">marcstest</admin>
 							<admin type="projectSubset" target="idf029bbb8-250e-4ecd-b8ad-8fdc4bf8c1ed">S</admin>
 							<admin type="customerSubset" target="ida257e5b4-db0f-433e-b353-095205e812af">Testkunde 1</admin>
+							<admin type="customerSubset" target="custom term attribute alex">New term attribute from Alex</admin>
 							<transacGrp>
 								<transac>creation</transac>
 								<date>2018-03-22</date>
@@ -67,6 +68,7 @@
 							<termNote type="termType">abbreviated form of term</termNote>
 							<termNote type="partOfSpeech">noun</termNote>
 							<termNote type="grammaticalGender">masculine</termNote>
+							<termNote type="alexType">Test alex type</termNote>
 							<admin type="customerSubset" target="ida257e5b4-db0f-433e-b353-095205e812af">Testkunde 1</admin>
 							<transacGrp>
 								<transac>creation</transac>
@@ -103,10 +105,10 @@
 </refObjectList>
 <refObjectList type="thesaurusDescrip">
 	<refObject id="ide36c2eba-0e69-405b-9348-97ba49d51e41">
-		<item type="thesaurusName">Default across Server</item>
+		<item type="thesaurusName">Default Server</item>
 		<item type="thesaurusDescription"></item>
 		<item type="thesaurusSys">DictionaryDefault</item>
-		<item type="thesaurusImage">R0lGODlhEAAQAPcAAAAAADxWdj5YdkpgeyBBhiJGkSNHkyVKliRLmydMmCpPmytRnjdYliZSqi5ToS9VoypaujFXpTVcqzZerjtjsz1ltitfxEBqu0Jsvkdxw0hzxkt1x0t3y015zUVz0Up63Ut73lB90VJ900x94GyOu3mUr1OB11WC2F6K3VCC6VGE6lKF7FKG7leL9FeL9ViN9lmO91qO+V6T/V+U/nWVwGCV/2KW/2ab/2ec/2mc/2uf/3Gj/3Kk/3Sl/3en/32q/36s/5ikvZuz0YGt/4Ku/4ix/4qy/4y1/5K5/5W5/5W6/5y+/7G90LLF3L7I1b3L3aLC/8DL2cvR2c/V3MXV79Lb49TZ4NTb5djd5Nzh6OHl6+fo7ejr8PH6/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAP8ALAAAAAAQABAAAAirAP8JHEiwoEGBJ05YODgwIQolRxYeNCECypIkR4hYCBLEYIgOS5QYGeLDQpcrAwpy0IDECJAeOiB04SKgYAYMRV7msNGgi5aaBC9U+MEjR40YCLpkATqQwoQdOGrAYFGgCxamAiVEuDHjxYoRVa1g/fdggQwXKkB4INBlylgFCVqk+OCAQIkuUsYeMLChLgkqW7xUGUuAAAMaQpo8ieKEydh/ASJLlsyw8sCAADs</item>
+		<item type="thesaurusImage">+/+/</item>
 		<item type="thesaurusOwner">b6bacbf7-a2f3-484e-a803-17aedf423114</item>
 	</refObject>
 </refObjectList>
