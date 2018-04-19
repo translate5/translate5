@@ -150,6 +150,9 @@ Ext.define('Editor.util.SearchReplaceUtils', {
 	 * @return {Boolean} True if cls is present, false otherwise.
 	 */
 	hasClass:function(ele, cls) {
+        if(!ele.getAttribute('class')){
+            return false;
+        }
 	    return ele.getAttribute('class').indexOf(cls) > -1;
 	},
 

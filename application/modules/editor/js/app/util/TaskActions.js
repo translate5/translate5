@@ -198,7 +198,7 @@ Ext.define('Editor.util.TaskActions', {
      * @param {Editor.models.Task} task
      * @param {Boolean} readonly
      */
-    getInitialState:function(task, readonly) {
+    getInitialState: function(task, readonly) {
         readonly = (readonly === true || task.isReadOnly());
         return readonly ? task.USER_STATE_VIEW : task.USER_STATE_EDIT;
     },

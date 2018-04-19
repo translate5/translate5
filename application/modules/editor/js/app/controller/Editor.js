@@ -225,6 +225,8 @@ Ext.define('Editor.controller.Editor', {
                 }
             ]
         }));
+        //inits the editor iframe directly after loading the application
+        plug.editor = plug.initEditor(); 
         
         me.handleReferneceFilesMessage();
     },
@@ -479,6 +481,7 @@ Ext.define('Editor.controller.Editor', {
 
         if(me.isEditing &&rec && rec.get('editable')) {
             me.fireEvent('prepareTrackChangesForSaving');
+            me.fireEvent('runSpellCheckOnSaving',rec.get('segmentNrInTask'));
             me.fireEvent('saveUnsavedComments');
             me.fireEvent('saveSegment');
         }
@@ -986,7 +989,8 @@ Ext.define('Editor.controller.Editor', {
             }
 
             Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
-                if(editor.getDoc().getElementById(id)){
+                var tagInTarget = editor.getDoc().getElementById(id);
+                if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase()!=="del"){
                     return;
                 }
                 editor.insertMarkup(tag);
@@ -1022,6 +1026,8 @@ Ext.define('Editor.controller.Editor', {
             stopText = navi.item_stopWatchingSegment,
             but = navi.down('#watchSegmentBtn'),
             success = function(rec, op) {
+                var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
+                    autoStateCell = Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
                 //isWatched
                 record.set('isWatched', !isWatched);
                 record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
@@ -1033,6 +1039,8 @@ Ext.define('Editor.controller.Editor', {
                 else {
                     me.fireEvent('watchlistRemoved', record, me, rec);
                 }
+                //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
+                displayfield.setValue(autoStateCell.getHtml());
             },
             failure = function(rec, op) {
                 but.setTooltip(isWatched ? stopText : startText);
