@@ -357,12 +357,6 @@ abstract class editor_Models_Import_FileParser {
     }
 
     /**
-     * parses the current segment data for segment attributes, must call createSegmentAttributes therefore
-     * @param mixed transunit
-     */
-    abstract protected function parseSegmentAttributes($transunit);
-    
-    /**
      * checks and sets the given MID internally
      * Because of DB reasons we only accept a 60chars long MID. If the given value was longer we trigger an error.
      * @param string $mid

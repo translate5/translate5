@@ -132,10 +132,10 @@ Ext.define('Editor.controller.Localizer', {
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>';
-  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>';
-  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>';
-  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Ergonomic');?>';
-  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Ergonomic (Ansicht)');?>';
+  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
+  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
+  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
+  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Normal (nur Lesemodus)');?>';
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
@@ -152,7 +152,14 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
-  	
+    
+    
+    Ext.define("Editor.locale.de.view.segments.column.IsWatched", {
+        override: "Editor.view.segments.column.IsWatched",
+        text: '<?php echo $this->translate->_('Lesezeichen');?>',
+        text_tip: '<?php echo $this->translate->_('mit Lesezeichen versehen');?>'
+    });
+    
     Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
         override: "Editor.view.segments.column.MatchrateType",
         text: '<?php echo $this->translate->_('Matchrate Typ');?>',
@@ -684,7 +691,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.searchandreplace.SearchTab",
         strings: {
             comboFieldLabel: '<?php echo $this->translate->_('Suchen nach');?>',
-            searchInCombo: '<?php echo $this->translate->_('Suchen in');?>',
+            searchInField: '<?php echo $this->translate->_('Suchen in');?>',
             matchCaseLabel: '<?php echo $this->translate->_('Groß/Kleinschreibung beachten');?>',
             towardsTop: '<?php echo $this->translate->_('Nach oben suchen');?>',
             useForSearch: '<?php echo $this->translate->_('Bei der Suche verwenden');?>',
@@ -695,6 +702,7 @@ Ext.define('Editor.controller.Localizer', {
             invalidRegularExpression: '<?php echo $this->translate->_('Ungültiger Regulärer Ausdruck');?>',
             unsupportedRegularExpression: '<?php echo $this->translate->_('Dieser reguläre Ausdruck wird nicht unterstützt');?>',
             segmentMatchInfoMessage: '<?php echo $this->translate->_('Segmente mit Suchtreffer:');?>',
+            searchInLockedSegments: '<?php echo $this->translate->_('Suche in gesperrten Segmenten');?>'
         }
     });
     
@@ -707,6 +715,7 @@ Ext.define('Editor.controller.Localizer', {
             replaceAllButton: '<?php echo $this->translate->_('Alles ersetzen');?>',
             searchButton: '<?php echo $this->translate->_('Suchen');?>',
             replaceButton: '<?php echo $this->translate->_('Ersetzen');?>',
+            mqmNotSupporterTooltip: '<?php echo $this->translate->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');?>',
         }
     });
     
@@ -716,6 +725,7 @@ Ext.define('Editor.controller.Localizer', {
             deletedby: '<?php echo $this->translate->_('Deleted by');?>',
             insertedby: '<?php echo $this->translate->_('Inserted by');?>',
             history: '<?php echo $this->translate->_('HISTORY');?>',
+            notrackchangesplugin: '<?php echo $this->translate->_('TrackChanges found, but Plugin is not activated.');?>',
             severity: '<?php echo $this->translate->_('Gewichtung');?>'
         }
     });

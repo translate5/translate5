@@ -61,7 +61,8 @@ class editor_Models_Segment_TermTag {
      * Lazy instantiation of the internal tags helper
      */
     protected function initInternalTagHelper() {
-        if(!empty($this->internalTags)) {
+        //FIXME: the old check make no sence
+        if(empty($this->internalTags)) {
             $this->internalTags = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         }
     }
@@ -107,9 +108,11 @@ class editor_Models_Segment_TermTag {
      * @param boolean $preserveInternal if true, internal tags are masked before removing term tags.
      */
     public function remove(string $segment, $preserveInternal = false) {
+        
         if($preserveInternal) {
             $this->initInternalTagHelper();
-            $segment = $$this->internalTags->protect($segment);
+            //FIXME: why ??
+            $segment = $this->internalTags->protect($segment);
         }
         $segment = preg_replace(self::REGEX_TERM_TAG_START, '', $segment);
         //This str_replace destroys our internal tags! so ensure that the content does not contain internal tags!

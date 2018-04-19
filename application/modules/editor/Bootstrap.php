@@ -95,6 +95,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
+        //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',
             array(
@@ -131,6 +132,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             )
         ));
         
+        //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',
             array(
@@ -139,7 +141,8 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'nextsegments'
             ));
         $this->front->getRouter()->addRoute('editorNextSegments', $filemapRoute);
-        
+
+        //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/matchratetypes/*',
             array(
@@ -149,7 +152,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('editorMatchratetypes', $filemapRoute);
 
-        $searchRoute = new ZfExtended_Controller_RestFakeRoute(
+        $searchRoute = new ZfExtended_Controller_RestLikeRoute(
                 'editor/segment/search/*',
                 array(
                         'module' => 'editor',
@@ -158,7 +161,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 ));
         $this->front->getRouter()->addRoute('editorSearchSegment', $searchRoute);
         
-        $replaceAllRoute = new ZfExtended_Controller_RestFakeRoute(
+        $replaceAllRoute = new ZfExtended_Controller_RestLikeRoute(
                 'editor/segment/replaceall/*',
                 array(
                         'module' => 'editor',

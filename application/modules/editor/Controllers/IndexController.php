@@ -205,6 +205,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('segments.showStatus', (boolean)$rop->segments->showStatus);
       $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
       $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (boolean)$rop->segments->userCanIgnoreTagValidation);
+      $this->view->Php2JsVars()->set('segments.userCanModifyWhitespaceTags', (boolean)$rop->segments->userCanModifyWhitespaceTags);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -341,13 +342,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     }
     
     protected function getAppVersion() {
-        $versionFile = APPLICATION_PATH.'/../version';
-        $regex = '/MAJOR_VER=([0-9]+)\s*MINOR_VER=([0-9]+).*\s*BUILD=([0-9]+).*/';
-        if(file_exists($versionFile) && $res = preg_match($regex, file_get_contents($versionFile), $matches)) {
-            array_shift($matches);
-            return join('.', $matches);
-        }
-        return 'development';
+        return ZfExtended_Utils::getAppVersion();
     }
     
     /**

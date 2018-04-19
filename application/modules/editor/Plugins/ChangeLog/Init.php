@@ -62,8 +62,8 @@ class editor_Plugins_ChangeLog_Init extends ZfExtended_Plugin_Abstract {
         $view = $event->getParam('view');
         $user = new Zend_Session_Namespace('user');
         $userId = $user->data->id;
-        $changelogdb = ZfExtended_Factory::get('editor_Plugins_ChangeLog_Models_Changelog');
-        /* @var $changelogdb editor_Plugins_ChangeLog_Models_Changelog */
+        $changelogdb = ZfExtended_Factory::get('editor_Models_Changelog');
+        /* @var $changelogdb editor_Models_Changelog */
         
         //-1 when user has not seen any changelogs before
         $lastChangeLogId = $changelogdb->getLastChangelogForUserId($userId);

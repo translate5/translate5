@@ -31,10 +31,10 @@ END LICENSE AND COPYRIGHT
  */
 	  
 class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestController {
-    protected $entityClass = 'editor_Plugins_ChangeLog_Models_Changelog';
+    protected $entityClass = 'editor_Models_Changelog';
 
     /**
-     * @var editor_Plugins_ChangeLog_Models_Changelog
+     * @var editor_Models_Changelog
      */
     protected $entity;
     

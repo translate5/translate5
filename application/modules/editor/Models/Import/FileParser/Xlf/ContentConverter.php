@@ -171,11 +171,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         if(empty($text)) {
             $text = htmlentities($originalContent);
         }
-        $imgText = html_entity_decode($text, ENT_QUOTES, 'utf-8');
-        $fileNameHash = md5($imgText);
         $tagNr = $this->getShortTagNumber($rid);
-        $p = $this->getTagParams($originalContent, $tagNr, $tag, $fileNameHash, $text);
-        $this->{$type}->createAndSaveIfNotExists($imgText, $fileNameHash);
+        $p = $this->getTagParams($originalContent, $tagNr, $tag, $text);
         return $this->{$type}->getHtmlTag($p);
     }
     

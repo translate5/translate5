@@ -994,6 +994,10 @@
         <source>HISTORY</source>
         <target>HISTORY</target>
     </trans-unit>
+    <trans-unit id='VHJhY2tDaGFuZ2VzIGZvdW5kLCBidXQgUGx1Z2luIGlzIG5vdCBhY3RpdmF0ZWQu'>
+        <source>TrackChanges found, but Plugin is not activated.</source>
+        <target>TrackChanges found, but Plugin is not activated.</target>
+    </trans-unit>
     <trans-unit id='R2V3aWNodHVuZw=='>
         <source>Gewichtung</source>
         <target>Severity</target>
@@ -1512,10 +1516,6 @@
 <trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='>
     <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
     <target>In addition to our ZIP-container format you can also use SDLXLIFF, XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
-</trans-unit>
-<trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='>
-    <source>Ergonomic (Ansicht)</source>
-    <target>Ergonomic (view mode)</target>
 </trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
@@ -2240,6 +2240,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Replace all</target>
 </trans-unit>
 
+<trans-unit id="QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0">
+    <source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source>
+    <target>Replace all is not supported for task with segments with mqm tags</target>
+</trans-unit>
+
 <trans-unit id="U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg==">
     <source>Segmente mit Suchtreffer:</source>
     <target>Segments with search hits:</target>
@@ -2281,6 +2286,42 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgendpc2NoZW56ZWl0bGljaCBpbSBudXIgTGVzZW1vZHVzIGdlw7ZmZm5ldC4='>
     <source>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</source>
     <target>In the meantime, the task was opened in read-only mode.</target>
+</trans-unit>
+<trans-unit id='bWl0IExlc2V6ZWljaGVuIHZlcnNlaGVu'>
+    <source>mit Lesezeichen versehen</source>
+    <target>bookmarked</target>
+</trans-unit>
+<trans-unit id='U3VjaGUgaW4gZ2VzcGVycnRlbiBTZWdtZW50ZW4='>
+    <source>Suche in gesperrten Segmenten</source>
+    <target>Search in locked segments</target>
+</trans-unit>
+<trans-unit id='RWlnZW5zY2hhZnRlbg=='>
+    <source>Eigenschaften</source>
+    <target>properties</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSBrbG9uZW4='>
+    <source>Aufgabe klonen</source>
+    <target>clone task</target>
+</trans-unit>
+<trans-unit id='RGV0YWlscw=='>
+    <source>Details</source>
+    <target>Details</target>
+</trans-unit>
+<trans-unit id='RGV0YWlscyAobnVyIExlc2Vtb2R1cyk='>
+    <source>Details (nur Lesemodus)</source>
+    <target>Details (read-only)</target>
+</trans-unit>
+<trans-unit id='Tm9ybWFs'>
+    <source>Normal</source>
+    <target>Normal</target>
+</trans-unit>
+<trans-unit id='Tm9ybWFsIChudXIgTGVzZW1vZHVzKQ=='>
+    <source>Normal (nur Lesemodus)</source>
+    <target>Normal (read-only)</target>
+</trans-unit>
+<trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='>
+    <source>Status "{0}" durch einen anderen Benutzer</source>
+    <target>status "{0}" by another user</target>
 </trans-unit>
     </body>
   </file>

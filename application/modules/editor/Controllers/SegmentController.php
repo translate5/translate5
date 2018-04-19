@@ -60,6 +60,13 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     protected $events = false;
     
     
+    /***
+     * Number to divide the segment duration
+     * 
+     * @var integer
+     */
+    protected $durationsDivisor=1;
+    
     /**
      * Initialize event-trigger.
      * 
@@ -262,7 +269,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->decodePutData();
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
-        $this->entity->setTimeTrackData($this->data->durations);
+        $this->entity->setTimeTrackData($this->data->durations,$this->durationsDivisor);
         $this->convertQmId();
 
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
@@ -314,42 +321,129 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->rows = $this->entity->getDataObject();
     }
     
+    /***
+     * Search segment action.
+     */
     public function searchAction(){
-        //check here also if the max allowed character number it is in his limit
-        $searchCombo=$this->getParam('searchCombo');
-        $length=strlen(utf8_decode($searchCombo));
-        if($length>1024){
-            $retval['success']=false;
-            $retval['error']="The search string is to big.";
-            $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
-            echo $retval;
-            exit();
+        
+        $parametars=$this->getAllParams();
+        
+        //check if the required search parametars are in the request
+        $this->checkRequiredSearchParameters($parametars);
+        
+        //check character number limit
+        if(!$this->checkSearchStringLength($parametars['searchField'])){
+            return;
         }
         
-        $result=$this->entity->search($this);
+        //find all segments for the search parametars
+        $result=$this->entity->search($parametars);
         
-        if(!is_array($result)){
-            $retval['success']=false;
-            $retval['error']=$result;
-            $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
-            echo $retval;
-            exit();
+        if(!$result|| empty($result)){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
+            return;
         }
         
-        $retval['success']=true;
-        $retval['rows']=$result;
-        $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
-        echo $retval;
-        exit();
+        $this->view->rows = $result;
+        $this->view->total=count($result);
+        $this->view->hasMqm=$this->isMqmTask($parametars['taskGuid']);
     }
     
+    /***
+     * Replace all search matches and save the new segment content to the database.
+     * Return the modified segments
+     */
     public function replaceallAction(){
-        $retval=$this->entity->rellaceAll($this);
+        $parameters=$this->getAllParams();
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */;
         
-        $retval['success']=true;
-        $retval['rows']=$result;
-        $retval=Zend_Json::encode((object)$retval, Zend_Json::TYPE_OBJECT);
-        echo $retval;
+        //check if the required search parametars are in the request
+        $this->checkRequiredSearchParameters($parameters);
+        
+        //check if the task has mqm tags
+        //replace all is not supported for tasks with mqm
+        if($this->isMqmTask($parameters['taskGuid'])){
+            $this->view->message= $t->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');
+            $this->view->hasMqm=true;
+            return;
+        }
+        
+        //check character number limit
+        if(!$this->checkSearchStringLength($parameters['searchField'])){
+            return;
+        }
+        
+        //find all segments for the search parametars
+        $results=$this->entity->search($parameters);
+        
+        $searchInField=$parameters['searchInField'];
+        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
+        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
+        
+        if(!$results || empty($results)){
+            $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
+            return;
+        }
+        $resultsCount=count($results);
+        foreach ($results as $result){
+            $replace=ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment',[
+                    $result[$searchInField],//text to be replaced
+                    $searchInField,//replace target field
+                    $result['id']//segment id
+            ]);
+            /* @var $replace editor_Models_SearchAndReplace_ReplaceMatchesSegment */
+            
+            //if the trackchanges are active, setup some trackchanges parametars
+            if(isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']){
+                $replace->trackChangeTag->attributeWorkflowstep=$parameters['attributeWorkflowstep'];
+                $replace->trackChangeTag->userColorNr=$parameters['userColorNr'];
+                $replace->isActiveTrackChanges=$parameters['isActiveTrackChanges'];
+            }
+            
+            //find matches in the html text and replace them
+            $replace->replaceText($parameters['searchField'], $parameters['replaceField'],$searchType,$matchCase);
+            
+            //init the entity
+            $this->entity = ZfExtended_Factory::get($this->entityClass);
+            
+            //set the segment id
+            $this->getRequest()->setParam('id', $result['id']);
+            
+            //create the object for the data parametars
+            $ob=new stdClass();
+            $ob->$searchInField=$replace->segmentText;
+            $ob->autoStateId=999;
+            
+            //create duration for modefied field
+            $duration=new stdClass();
+            $duration->$searchInField=$parameters['durations'];
+            $ob->durations=$duration;
+            
+            //set the duration devisor to the number of the results so the duration is splitted equally for each replaced result
+            $this->durationsDivisor=$resultsCount;
+            
+            $this->getRequest()->setParam('data',null);
+            $this->getRequest()->setParam('data',json_encode((array)$ob));
+            
+            //trigger the before put action
+            $this->beforeActionEvent('put');
+            
+            //call the put action so the segment is modefied and saved
+            $this->putAction();
+            
+            //trigger the after put action
+            $this->afterActionEvent('put');
+            
+            //do not return the segment text, it will be loaded by the segments store
+            $result[$searchInField]='';
+        }
+        
+        //return the modefied segments
+        $this->view->rows = $results;
+        $this->view->total=count($results);
     }
     
     /**
@@ -568,5 +662,64 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $sql = $db->select()->from($db, 'matchrateType')->distinct();
         
         echo Zend_Json::encode($db->fetchAll($sql)->toArray(), Zend_Json::TYPE_ARRAY);
+    }
+    
+    /***
+     * Check if the search string length is in between 0 and 1024 characters long
+     */
+    private function checkSearchStringLength($searchField){
+        
+        $isValid=true;
+        if(!$searchField){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+            
+            $errors = array('searchField' => $t->_('Das Suchfeld ist leer.'));
+            $e = new ZfExtended_ValidateException();
+            $e->setErrors($errors);
+            $this->handleValidateException($e);
+            $isValid=false;
+        }
+        
+        $length=strlen(utf8_decode($searchField));
+        if($length>1024){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            
+            $errors = array('searchField' => $t->_('Der Suchbegriff ist zu groß.'));
+            $e = new ZfExtended_ValidateException();
+            $e->setErrors($errors);
+            $this->handleValidateException($e);
+            $isValid=false;
+        }
+        
+        return $isValid;
+    }
+    
+    /**
+     * Check if the required search parameters are provided
+     * 
+     * @param array $parameters
+     * @throws ZfExtended_ValidateException
+     */
+    private function checkRequiredSearchParameters(array $parameters){
+        if(!isset($parameters['searchInField']) || !isset($parameters['searchField']) || !isset($parameters['searchType'])){
+            $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+            /* @var $t ZfExtended_Zendoverwrites_Translate */;
+            $e = new ZfExtended_ValidateException();
+            $e->setMessage($t->_('Missing search parameter. Required parameters: searchInField, searchField, searchType. Given was: ').print_r($parameters,1));
+            throw $e;
+        }
+    }
+    
+    /***
+     * Check if the task contains mqm tags for some of the segments
+     * @param taskGuid $taskGuid
+     * @return boolean
+     */
+    private function isMqmTask($taskGuid){
+        $qms=ZfExtended_Factory::get('editor_Models_Qmsubsegments');
+        /* @var $qms  editor_Models_Qmsubsegments */
+        return $qms->hasTaskMqm($taskGuid);
     }
 }
