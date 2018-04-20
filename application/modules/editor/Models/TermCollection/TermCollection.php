@@ -98,4 +98,19 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
               'VALUES(?,?);';
         $retval=$this->db->getAdapter()->query($sql,[$collectionId,$taskGuid]);
     }
+    
+    /***
+     * Get term collection by name
+     * @param unknown $name
+     * @return array
+     */
+    public function loadByName($name){
+        $s=$this->db->select()
+        ->where('name=?',$name);
+        $result=$this->db->fetchRow($s);
+        if($result){
+            return $result->toArray();
+        }
+        return $result;
+    }
 }
