@@ -72,6 +72,10 @@ Ext.define('Editor.util.SegmentEditorSnapshots', {
         if (me.editorSnapshotHistory == null) {
             me.initSnapshotHistory();
         }
+        if (me.getEditorBodyExtDomElement() == null) {
+            me.consoleLog("saveSnapshot: no snapshop saved because editor-body was not found (maybe the editor is closed already)."); 
+            return;
+        }
         contentForSnaphot = me.getEditorBodyExtDomElement().getHtml();
         selectionForSnapshot = rangy.getSelection(me.getEditorBody());
         bookmarkForSnapshot = selectionForSnapshot.getBookmark(me.getEditorBody());

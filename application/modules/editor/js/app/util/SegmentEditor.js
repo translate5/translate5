@@ -244,12 +244,12 @@ Ext.define('Editor.util.SegmentEditor', {
         return null;
     },
     /***
-     * Remove SpellCheck-Tags but keep their content.
-     * @param {Ext.dom.Element}
-     * @returns {Ext.dom.Element}
+     * Remove SpellCheck-Tags "live" in the Editor but keep their content.
      */
-    cleanSpellCheckTags:function(el){
-        var allSpellCheckElements,
+    cleanSpellCheckTagsInEditor:function(){
+        var me = this,
+            el = me.getEditorBodyExtDomElement(),
+            allSpellCheckElements,
             spellCheckElementParentNode;
         allSpellCheckElements = el.query('.spellcheck');
         Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
@@ -260,6 +260,5 @@ Ext.define('Editor.util.SegmentEditor', {
             spellCheckElementParentNode.removeChild(spellCheckEl);
             spellCheckElementParentNode.normalize();
         });
-        return el;
     }
 });
