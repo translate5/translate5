@@ -121,13 +121,37 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
      */
     getRangeForMatchFromTool: function (match) {
         var me = this,
-            editorBody = me.getEditorBody(),
-            rangeForMatch = rangy.createRange(editorBody),
+            rangeForMatch = rangy.createRange(),
             matchStart,
-            matchEnd;
+            matchEnd,
+            allDelNodes = [],
+            rangeForDelNode = rangy.createRange(),
+            bookmarkForDelNode,
+            lengthOfDelNode,
+            characterOptions = {
+                includeBlockContentTrailingSpace: true
+            };
+        // offsets of text-only version
         matchStart = match.offset;
         matchEnd = matchStart + match.context.length;
-        rangeForMatch.selectCharacters(editorBody,matchStart,matchEnd);
+        rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
+        me.consoleLog("- matchStart: " + matchStart + " / matchEnd: " + matchEnd);
+        // move offsets according to hidden del-Nodes in front of the match
+        allDelNodes = me.getEditorBodyExtDomElement().query('del');
+        Ext.Array.each(allDelNodes, function(delNode, index) {
+            rangeForDelNode.selectNodeContents(delNode);
+            bookmarkForDelNode = rangeForDelNode.getBookmark();
+            if (bookmarkForDelNode.start <= matchStart) {
+                lengthOfDelNode = rangeForDelNode.text().length;
+                me.consoleLog("- length: " + lengthOfDelNode);
+                rangeForMatch.moveStart('character', lengthOfDelNode, characterOptions);
+                rangeForMatch.moveEnd('character', lengthOfDelNode, characterOptions);
+                me.consoleLog("- match NOW: " + rangeForMatch.getBookmark().start + " / " + rangeForMatch.getBookmark().end);
+            } else {
+                me.consoleLog("- we are already behind the match: " + bookmarkForDelNode.start + " > " + matchStart);
+                return false; // break here; we are already behind the match
+            }
+        });
         return rangeForMatch.getBookmark();
     },
     /**

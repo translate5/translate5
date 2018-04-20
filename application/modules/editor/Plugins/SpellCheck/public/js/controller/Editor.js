@@ -317,10 +317,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                     me.ignoreEvent = true;
                     me.stopEvent = true;
                 break;
-                default:
-                    me.startTimerForSpellCheck();
-                break;
             }
+            me.startTimerForSpellCheck();
         }
         
         // Stop event?
@@ -412,8 +410,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // If the text has not changed, we can use the result we have already fetched and applied.
         // (Doing "nothing" is not an option because then there won't be any SpellCheck-Nodes at all in the Editor.)
         if (!me.isSpellCheckOnSaving && (me.contentBeforeSpellCheckWithoutSpellCheckNodes in me.spellCheckResults) ) {
-            me.applySpellCheck(me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes]);
-            me.consoleLog('startSpellCheck did not start a new check because we have already run a check for this content. We used the result we already have.');
+            me.consoleLog('startSpellCheck did not start a new check because we have already run a check for this content.');
+            me.applySpellCheckResult(me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes]);
             return;
         }
         
@@ -599,6 +597,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         Ext.Array.each(me.allMatches, function(match, index) {
             rangeForMatch.moveToBookmark(match.range);
             documentFragmentForMatch = rangeForMatch.extractContents();
+            me.cleanUpNode(documentFragmentForMatch);
             spellCheckNode = me.createSpellcheckNode(index);
             spellCheckNode.appendChild(documentFragmentForMatch);
             rangeForMatch.insertNode(spellCheckNode);
@@ -613,7 +612,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     /**
      * Create and return a new node for SpellCheck-Match of the given index.
      * For match-specific data, get the data from the tool.
-     * By storing this data as attributes we  
      * @param {Integer} index
      * @returns {Object}
      */
