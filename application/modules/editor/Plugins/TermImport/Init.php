@@ -34,38 +34,6 @@ END LICENSE AND COPYRIGHT
 
 class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
     
-    /***
-     * Import from file system config file
-     * @var string
-     */
-    const FILESYSTEM_CONFIG_NAME="filesystem.config";
-    
-    /***
-     * Import from across api config name
-     * @var string
-     */
-    const CROSSAPI_CONFIG_NAME="crossapi.config";
-    
-    /***
-     * Import dir key from the filesystem config file
-     * @var string
-     */
-    const IMPORT_DIR_ARRAY_KEY="importDir";
-    
-    /***
-     * File mapping group name in the filesystem config
-     * 
-     * @var string
-     */
-    const FILE_MAPPING_GROUP="FileMapping";
-    
-    /***
-     * Collection mapping group name in the filesystem config
-     * 
-     * @var string
-     */
-    const COLLECTION_MAPPING_GROUP="CollectionMapping";
-    
     /**
      * @var array
      */
@@ -73,127 +41,38 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
     );
     
     
-    /***
-     * Data from the filesystem config file
-     * @var array
-     */
-    public $filesystemMap=array();
-    
-    
-    /***
-     * Data from the cross api config file
-     * @var array
-     */
-    public $crossapiMap=array();
-    
     public function init() {
         $this->initEvents();
+        $this->addController('TermImportController');
+        $this->initRoutes();
     }
     
     protected function initEvents() {
-    }
-    
-    /***
-     * File system import handler.
-     * //TODO:call this function(cron job ?) so the import is triggered
-     */
-    public function handleFileSystemImport(){
         
-        if(empty($this->filesystemMap)){
-            $this->loadConfigFiles();
-        }
-        
-        //tbx files import folder
-        $importDir=$this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
-
-        if (!is_dir(dirname($importDir))) {
-            mkdir($importDir, 0777, true);
-        }
-        
-        if($this->isFolderEmpty($importDir)){
-            return ;
-        }
-        
-        //get all files from the import direcotry
-        $files = array_slice(scandir($importDir), 2);
-        
-        foreach ($files as $file){
-            
-            if(!isset($this->filesystemMap[self::FILE_MAPPING_GROUP]) || !isset($this->filesystemMap[self::FILE_MAPPING_GROUP][$file])){
-                continue;
-            }
-            
-            $collectionName=$this->filesystemMap[self::FILE_MAPPING_GROUP][$file];
-            $customerId=$this->filesystemMap[self::COLLECTION_MAPPING_GROUP][$collectionName];
-            
-            $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $model editor_Models_TermCollection_TermCollection */
-            
-            $tc=$model->loadByName($collectionName);
-            
-            //if the term collection does not exist, create a new one
-            if(empty($tc)){
-                
-                $model->setName($collectionName);
-                if($customerId){
-                    $model->setCustomerId($customerId);
-                }
-                $model->save();
-                $tc=array(
-                        'id'=>$model->getId(),
-                        'name'=>$model->getName(),
-                );
-            }
-            
-            $params=array('collectionId'=>$tc['id'],'customerId'=>$customerId,'mergeTerms'=>true);
-            if($model->importTbx([$importDir.$file], $params)){
-                error_log("File:".$file.' was imported in the collection:'.$collectionName);
-            }else{
-                error_log("Unable to import the file:".$file." into the collection");
-            }
-        }
     }
     
     /**
-     * Load the configuration files into the data holders
+     * defines all URL routes of this plug-in
      */
-    private function loadConfigFiles(){
-        $path=$this->getPluginConfigFolderPath();
-        $fileSystemFile=$path.self::FILESYSTEM_CONFIG_NAME;
-        $crossApiFile=$path.self::CROSSAPI_CONFIG_NAME;
+    protected function initRoutes() {
+        $f = Zend_Registry::get('frontController');
+        /* @var $f Zend_Controller_Front */
+        $r = $f->getRouter();
         
-        $this->initConfigFile($fileSystemFile, $this->filesystemMap);
-        $this->initConfigFile($crossApiFile, $this->crossapiMap);
-    }
-    
-    /***
-     * Init the config array
-     * 
-     * @param string $filePath : absolute path to the config file
-     * @param arrayy $mapArray : array where the config data will be stored
-     * 
-     * @throws ZfExtended_ValidateException
-     */
-    private function initConfigFile($filePath,&$mapArray){
-        if(!file_exists($filePath)){
-            throw new ZfExtended_ValidateException("Configuration file is missing:".$filePath);
-        }
-        $file=file_get_contents($filePath);
-        if(empty($file)){
-            throw new ZfExtended_ValidateException("The configuration file:".$filePath.' is empty.');
-        }
+        $restRoute = new Zend_Rest_Route($f, array(), array(
+                'editor' => array('plugins_termimport_termimport',
+                ),
+        ));
+        $r->addRoute('plugins_termimport_restdefault', $restRoute);
         
-        $mapArray= parse_ini_file($filePath,true);
-        if(empty($mapArray)){
-            throw new ZfExtended_ValidateException("Wrong file structure in :".$filePath);
-        }
-    }
-
-    /***
-     * Get the plugin config folder absolute path
-     * @return string
-     */
-    private function getPluginConfigFolderPath(){
-        return APPLICATION_PATH.DIRECTORY_SEPARATOR.$this->getPluginPath().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
+        
+        $filesystemRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_termimport_termimport/filesystem',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'plugins_termimport_termimport',
+                        'action' => 'filesystem'
+                ));
+        $r->addRoute('plugins_termimport_filesystem', $filesystemRoute);
     }
 }
