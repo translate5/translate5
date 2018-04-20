@@ -106,11 +106,16 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
         //tbx files import folder
         $importDir=$this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
 
+        if (!is_dir(dirname($importDir))) {
+            mkdir($importDir, 0777, true);
+        }
+        
+        if($this->isFolderEmpty($importDir)){
+            return ;
+        }
+        
         //get all files from the import direcotry
         $files = array_slice(scandir($importDir), 2);
-        if(empty($files)){
-            return;
-        }
         
         foreach ($files as $file){
             
