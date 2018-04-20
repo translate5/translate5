@@ -249,16 +249,41 @@ Ext.define('Editor.util.SegmentEditor', {
     cleanSpellCheckTagsInEditor:function(){
         var me = this,
             el = me.getEditorBodyExtDomElement(),
-            allSpellCheckElements,
-            spellCheckElementParentNode;
-        allSpellCheckElements = el.query('.spellcheck');
-        Ext.Array.each(allSpellCheckElements, function(spellCheckEl, index) {
-            spellCheckElementParentNode = spellCheckEl.parentNode;
-            while(spellCheckEl.firstChild) {
-                spellCheckElementParentNode.insertBefore(spellCheckEl.firstChild, spellCheckEl);
+            elContent,
+            selectionForCaret,
+            bookmarkForCaret;
+        selectionForCaret = rangy.getSelection(me.getEditorBody());
+        bookmarkForCaret = selectionForCaret.getBookmark();
+        elContent = el.getHtml();
+        elContent = elContent.replace(/<span[^>]*class="*spellcheck*[^>]*>/i, '').replace(/<\/span>/i, '');
+        el.setHtml(elContent);
+        me.getEditorBodyExtDomElement().dom.normalize();
+        selectionForCaret.moveToBookmark(bookmarkForCaret);
+    },
+    /***
+     * Clean up Nodes, e.g. remove empty del-Children.
+     */
+    cleanUpNode:function(node){
+        var me = this,
+            allDelNodes,
+            isEmptyNode = function(nodeToCheck){
+                if (nodeToCheck.nodeValue == null) {
+                    if (nodeToCheck.childNodes.length == 0) {
+                        return true;
+                    }
+                    if (nodeToCheck.childNodes.length == 1 && nodeToCheck.firstChild.nodeType == 3) {
+                        if (nodeToCheck.firstChild.data == "") {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+        allDelNodes = Ext.fly(node).query('del');
+        Ext.Array.each(allDelNodes, function(delNode, index) {
+            if (isEmptyNode(delNode) && delNode.parentNode != null) {
+                delNode.parentNode.removeChild(delNode);
             }
-            spellCheckElementParentNode.removeChild(spellCheckEl);
-            spellCheckElementParentNode.normalize();
-        });
+        });        
     }
 });
