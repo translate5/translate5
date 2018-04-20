@@ -3,6 +3,39 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.30] - 2018-04-16
+###Changed
+TRANSLATE-1218: XLIFF Import: preserveWhitespace per default to true
+Renamed all editor modes
+
+###Bugfixes
+TRANSLATE-1154: Across xliff import does not set match rate
+TRANSLATE-1215: TrackChanges: JS Exception on CTRL+. usage
+TRANSLATE-1140: Row editor is not displayed after the first match in certain situations.
+TRANSLATE-1219: Editor iframe body is reset and therefore not usable due missing content
+VISUAL-28: Opening of visual task in IE 11 throws JS error
+
+## [2.6.29] - 2018-04-11
+###Added
+TRANSLATE-1130: Show specific whitespace-Tag
+TRANSLATE-1132: Whitespace tags: Always deleteable
+TRANSLATE-1127: xliff: Preserve whitespace between mrk-Tags
+TRANSLATE-1137: Show bookmark and comment icons in autostatus column
+TRANSLATE-1058: Send changelog via email to admin users when updating with install-and-update script
+
+###Changed
+T5DEV-217: remaining search and replace todos
+TRANSLATE-1200: Refactor images of internal tags to SVG content instead PNG
+
+###Bugfixes
+TRANSLATE-1209: TrackChanges: content tags in DEL INS tags are not displayed correctly in full tag mode
+TRANSLATE-1212: TrackChanges: deleted content tags in a DEL tag can not readded via CTRL+, + Number
+TRANSLATE-1210: TrackChanges: Using repetition editor on segments where a content tag is in a DEL and INS tag throws an exception
+TRANSLATE-1194: TrackChanges: When the export removes deleted words, no double spaces must be left.
+TRANSLATE-1124: store whitespace tag metrics into internal tag
+VISUAL-24: visualReview: After adding a comment, a strange white window appears
+
+
 ## [2.6.27] - 2018-03-15
 ###Changed
 T5DEV-236; visualReview: Matching-Algorithm: added some more "special spaces"
