@@ -41,7 +41,10 @@ ALTER TABLE `LEK_terms`
 DROP FOREIGN KEY `LEK_terms_ibfk_1`;
 
 ALTER TABLE `LEK_terms` 
-DROP INDEX `taskGuid_2` ;
+DROP INDEX `taskGuid`;
+
+ALTER TABLE `LEK_terms` 
+DROP INDEX `taskGuid_2`;
 
 ALTER TABLE `LEK_term_collection` 
 ADD COLUMN `taskGuid` VARCHAR(38) NULL;
