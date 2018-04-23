@@ -47,7 +47,7 @@ CREATE TABLE `LEK_term_entry` (
   INDEX `fk_LEK_term_entry_1_idx` (`collectionId` ASC),
   CONSTRAINT `fk_LEK_term_entry_1`
     FOREIGN KEY (`collectionId`)
-    REFERENCES `translate5`.`LEK_term_collection` (`id`)
+    REFERENCES `LEK_term_collection` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
