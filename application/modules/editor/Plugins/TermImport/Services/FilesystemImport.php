@@ -112,7 +112,16 @@ class editor_Plugins_TermImport_Services_FilesystemImport {
             }
             
             $collectionName=$this->filesystemMap[self::FILE_MAPPING_GROUP][$file];
-            $customerId=$this->filesystemMap[self::COLLECTION_MAPPING_GROUP][$collectionName];
+            $customerNumber=$this->filesystemMap[self::COLLECTION_MAPPING_GROUP][$collectionName];
+            
+            $cm=ZfExtended_Factory::get('editor_Plugins_Customer_Models_Customer');
+            /* @var $cm editor_Plugins_Customer_Models_Customer */
+            $customer=$cm->findCustomerByNumber($customerNumber);
+            $customerId=null;
+            
+            if($customer && $customer['id']){
+                $customerId=$customer['id'];
+            }
             
             $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
             /* @var $model editor_Models_TermCollection_TermCollection */

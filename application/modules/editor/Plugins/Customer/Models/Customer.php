@@ -60,6 +60,10 @@ class editor_Plugins_Customer_Models_Customer extends ZfExtended_Models_Entity_A
     public function findCustomerByNumber($number){
         $s = $this->db->select()
         ->where('number = ?', $number);
-        return $this->db->fetchRow($s);
+        $res=$this->db->fetchRow($s);
+        if(empty($res)) {
+            return $res;
+        }
+        return $res->toArray();
     }
 }
