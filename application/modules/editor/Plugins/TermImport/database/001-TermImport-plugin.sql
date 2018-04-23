@@ -31,7 +31,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_termimport_termimport', 'all');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'admin', 'editor_plugins_termimport_termimport', 'all');
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
-VALUES ('editor', 'pm', 'editor_plugins_termimport_termimport', 'filesystem');
+VALUES ('editor', 'admin', 'editor_plugins_termimport_termimport', 'filesystem');
