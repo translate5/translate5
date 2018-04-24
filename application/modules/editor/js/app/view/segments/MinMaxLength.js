@@ -36,24 +36,52 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     alias: 'widget.segment.minmaxlength',
     itemId:'segmentMinMaxLength',
     cls: 'segment-min-max',
-    tpl: '<div class="{0}" data-qtip="{1}">{2}</div>',
+    tpl: '<div class="{cls}" data-qtip="{tip}">{text}</div>',
     hidden:true,
-    strings:{
-        minText:'#UT#{0} (Min. {1})',
-        maxText:'#UT#{0} von {1}',
-        segmentBellowLimit:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
-        segmentOverLimit:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.',
+    strings: {
+        minText:'#UT#Min. {minWidth}',
+        maxText:'#UT# von {maxWidth}',
+        siblingSegments: '#UT#Seg.: {siblings}'
     },
     /***
      * Segment model record
      */
     segmentRecord:null,
     
-    /***
-     * Hold the active error message (when the segment is over the limit or bellow)
+    /**
+     * 
      */
-    activeErroMessage:null,
-    
+    initComponent : function() {
+        var str = this.strings;
+        //If there is only max length: 10 of 12
+        //If there is only min length: 12 (Min. 10)
+        //If both are given: 10 of 12 (Min. 10)
+        //same with sibling segments: 
+        //If there is only max length: 10 of 12 (Seg.: 23, 24, 25)
+        //If there is only min length: 12 (Min. 10; Seg.: 23, 24, 25)
+        //If both are given: 10 of 12 (Min. 10; Seg.: 23, 24, 25)
+        
+        this.labelTpl = new Ext.XTemplate(
+            '{length}',
+            '<tpl if="maxWidth">',
+                str.maxText,
+            '</tpl>',
+            '<tpl if="minWidth || siblings">',
+                ' (',
+                '<tpl if="minWidth">',
+                    str.minText,
+                '</tpl>',
+                '<tpl if="minWidth && siblings">',
+                    '; ',
+                '</tpl>',
+                '<tpl if="siblings">',
+                    str.siblingSegments,
+                '</tpl>',
+                ')',
+            '</tpl>'
+        );
+        return this.callParent(arguments);
+    },
     
     initConfig : function(instanceConfig) {
         var me=this,
@@ -82,19 +110,20 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     onHtmlEditorChange:function(htmlEditor,newValue,oldValue,eOpts){
         var me=this;
         if(me.isVisible()){
-            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(newValue));
+            me.updateLabel(me.segmentRecord,htmlEditor.getTransunitLength(newValue));
         }
     },
 
     /***
      * Handler for html editor initializer, the function is called after the iframe is initialized
+     * FIXME testme
      */
     onHtmlEditorInitialize:function(htmlEditor,eOpts){
         var me=this,
             editorBody=htmlEditor.getEditorBody();
         
         if(me.isVisible()){
-            me.updateLabel(me.segmentRecord,me.getSegmentCharactersCount(htmlEditor.getValue()));
+            me.updateLabel(me.segmentRecord,htmlEditor.getTransunitLength());
         }
 
         if(!Editor.controller.SearchReplace){
@@ -116,14 +145,8 @@ Ext.define('Editor.view.segments.MinMaxLength', {
      * Return true or false if the minmax status strip should be visible
      */
     handleElementVisible:function(record){
-        var me=this,
-            metaCache=record.get('metaCache'),
-            charactersCount=me.getSegmentCharactersCount(me.htmlEditor.getValue());
-        
-        if(!metaCache || metaCache.minWidth===null && metaCache.maxWidth===null){
-            return false;
-        }
-        return true;
+        var metaCache = record.get('metaCache');
+        return (metaCache && (metaCache.minWidth !== null || metaCache.maxWidth !== null));
     },
 
     /***
@@ -140,113 +163,39 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Update the minmax status strip label
      */
-    updateLabel:function(record,charactersCount){
+    updateLabel:function(record, charactersCount){
         var me=this,
-            metaCache=record.get('metaCache'),
-            minWidth=metaCache && metaCache.minWidth,
-            maxWidth=metaCache && metaCache.maxWidth,
-            cls = 'invalid-length',
-            tooltipText=[];
+            meta=record.get('metaCache'),
+            msgs = me.up('segmentsHtmleditor').strings,
+            labelData = {
+                length: charactersCount,
+                minWidth: meta && meta.minWidth ? meta.minWidth : 0,
+                maxWidth: meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER,
+                siblings: null
+            },
+            tplData = {
+                cls: 'invalid-length'
+            };
 
-        if(me.isCharactersInBorder(charactersCount,minWidth,maxWidth)){
-            cls = 'valid-length';
+        if(labelData.minWidth <= charactersCount && charactersCount <= labelData.maxWidth) {
+            tplData.cls = 'valid-length';
         }
-        //If there is only max length: 10 of 12
-        //If there is only min length: 12 (Min. 10)
-        //If both are given: 10 of 12 (Min. 10)
-        if(maxWidth!==null){
-            tooltipText.push(Ext.String.format(me.strings.maxText,charactersCount,maxWidth));
+        else {
+            tplData.tip = charactersCount > labelData.maxWidth ? msgs.segmentToLong : msgs.segmentToShort;
+            tplData.tip = Ext.String.format(tplData.tip, charactersCount > labelData.maxWidth ? labelData.maxWidth : labelData.minWidth);
         }
         
-        if(minWidth!==null){
-            var toAdd=Ext.String.format(me.strings.minText,charactersCount,minWidth);
-            if(maxWidth!==null){
-                //remove the character count value from the text (it allready exist from the maxWidth text)
-                toAdd=toAdd.split(' ');
-                toAdd=toAdd.slice(1, toAdd.length);
+        if(meta && meta.siblingData) {
+            var nrs = Ext.Object.getValues(meta.siblingData).map(function(item){
+                return item.nr;
+            });
+            //show segments only if there are more then one (inclusive the current one)
+            if(nrs.length > 1) {
+                labelData.siblings = nrs.join(', ');
             }
-            tooltipText.push(toAdd);
-        }
-        //if min or max is null do not display the tooltip
-        me.lookupTpl('tpl').overwrite(me.getEl(),[
-            cls,
-            tooltipText.join(' '),
-            tooltipText.join(' ')
-        ]);
-    },
-
-    /**
-     * Get the character count of the segment text, without the tags in it
-     */
-    getSegmentCharactersCount:function(text){
-        var me = this,
-            div = document.createElement("div"),
-            tagLength = 0;
-        //TODO for what is that if?
-        if(text === null){
-            text = me.htmlEditor.getValueAndUnMarkup();
-        }
-        //FIXME: improve that clean del tag by reuse methods from track changes
-        text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
-        
-        div.innerHTML = text;
-        Ext.fly(div).select('img').each(function(item){
-            var l = parseInt(item.getAttribute('data-length') || "0");
-            //data-length is -1 if no length provided
-            if(l > 0) {
-                tagLength += l;
-            }
-        });
-
-        text = div.textContent || div.innerText || "";
-        div = null;
-        return tagLength + text.length;
-    },
-
-    /**
-     * Check if the given number of characters is in between allowed range
-     */
-    isCharactersInBorder:function(charactersCount,minWidth,maxWidth){
-        var me=this;
-        if(minWidth===null){
-            minWidth=0;
-        }
-        if(maxWidth===null){
-            maxWidth=Number.MAX_SAFE_INTEGER;
         }
         
-        //if the character count is bellow the limit, add custom error message.
-        if(charactersCount<minWidth){
-            me.activeErroMessage=Ext.String.format(me.strings.segmentBellowLimit,minWidth);
-            return false;
-        }
-      //if the character count is over the limit, add custom error message.
-        if(charactersCount>maxWidth){
-            me.activeErroMessage=Ext.String.format(me.strings.segmentOverLimit,maxWidth);
-            return false;
-        }
-        return true;
-    },
-
-    /**
-     * Check if the segment character number is within the defined borders
-     */
-    isSegmentLengthInRange:function(segmentText){
-        var me=this;
-        
-        if(!me.segmentRecord){
-            return true;
-        }
-        
-        var metaCache=me.segmentRecord.get('metaCache');
-        
-        if(metaCache.minWidth===null && metaCache.maxWidth===null){
-            return true;
-        }
-        //get the characters length and is segment saveble
-        var charactersLength=me.getSegmentCharactersCount(segmentText),
-            saveSegment=me.isCharactersInBorder(charactersLength,metaCache.minWidth,metaCache.maxWidth);
-        
-        return saveSegment;
-    }  
+        tplData.text = me.labelTpl.apply(labelData);
+        me.update(tplData);
+    }
 });

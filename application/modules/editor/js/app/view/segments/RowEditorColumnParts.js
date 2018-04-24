@@ -110,7 +110,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             oldField[0].setValue(rec.get(oldIdx));
         }
         if(me.setColumnToEdit(column)) {
-            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
+            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec, me.columnToEdit);
         }
         me.focusContextCell();
     },
@@ -334,7 +334,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.callParent(arguments);
         
         me.setColumnToEdit(me.context.column);
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
+        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit);
         
         //init internal markup table for tag check, but only if a translation task
         if(Editor.data.task.get('emptyTargets')) {
@@ -356,7 +356,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, ''),
             cleanValue = newValue.replace(/<img[^>]* class="duplicatesavecheck"[^>]*>/,''),
             
-            title, msg;
+            title, msg, meta;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
@@ -389,6 +389,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
+        //update the segment length in the metaCache of the edited segment:
+        record.updateMetaCacheLength(me.columnToEdit, me.mainEditor.getLastSegmentLength());
         record.endEdit();
         return true;
     },

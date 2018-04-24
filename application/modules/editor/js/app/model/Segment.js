@@ -77,6 +77,9 @@ Ext.define('Editor.model.Segment', {
         {name: 'qmId', type: 'string'},
         {name: 'stateId', type: 'int'},
         {name: 'metaCache', convert: function(val) {
+            if(Ext.isObject(val)){
+                return val;
+            }
             if(!val || val==""){
                 return null;
             }
@@ -119,5 +122,18 @@ Ext.define('Editor.model.Segment', {
         else {
             this.set('qmId', '');
         }
+    },
+    /**
+     * Updates the segment length in the metaCache for the given editable field name
+     * @param {String} fieldname for which the length is changed
+     * @param {Integer} new length value
+     */
+    updateMetaCacheLength(field, length) {
+        var id = this.get('id'), 
+            meta = this.get('metaCache');
+        if(meta && meta.siblingData && meta.siblingData[id]) {
+            meta.siblingData[id].length[field] = length;
+            this.set('metaCache', meta);
+        }        
     }
 });

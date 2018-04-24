@@ -115,7 +115,8 @@ Ext.define('Editor.controller.Segments', {
           },
           '#ChangeAlike': {
               //called after currently loaded segment data is not used anymore by the save chain / change alike handling
-              segmentUsageFinished: 'onSegmentUsageFinished'
+              segmentUsageFinished: 'onSegmentUsageFinished',
+              afterUpdateChangeAlike: 'updateSiblingsMetaCache'
           },
           '#Fileorder': {
               itemsaved: 'handleFileSaved'
@@ -510,6 +511,9 @@ Ext.define('Editor.controller.Segments', {
           me.saveChainEnd(); 
           return;
       }
+      
+      //update the sibling segments metaCache.siblingData from the currentSegment
+      //same again after segment was saved successfully
 
       //the following handlers should only be bound if no 
       if(config.chainEnd && Ext.isFunction(config.chainEnd)) {
@@ -578,6 +582,10 @@ Ext.define('Editor.controller.Segments', {
           callback: me.saveChainSaveCallback //NEXT step in save chain
       });
       me.saveIsRunning = true;
+      
+      // update length stuff in siblings of store
+      me.updateSiblingsMetaCache(record);
+      
       //fire event to process things after save call is started, like change alike handling
       //parameters are the callback to the final save chain call,
       //for later usage in ChangeAlike Handling and the saved record
@@ -601,6 +609,8 @@ Ext.define('Editor.controller.Segments', {
           me.saveChainEnd();
           return;
       }
+      me.updateSiblingsMetaCache(records);
+      
       //show other messages on the segment:
       Editor.MessageBox.addByOperation(operation);
       //show save segment success message 
@@ -617,6 +627,38 @@ Ext.define('Editor.controller.Segments', {
       if(me.fireEvent('saveComplete')){
           me.saveChainEnd(); //NEXT step in save chain
       }
+  },
+  /**
+   * Updates the siblings metaCache of the given record
+   * @param {Editor.models.Segment} records
+   */
+  updateSiblingsMetaCache: function(records) {
+      if(!Ext.isArray(records)) {
+          records = [records];
+      }
+      Ext.Array.each(records, function(rec){
+          var sourceId = rec.get('id'), 
+              meta = rec.get('metaCache');
+          if(!meta || !meta.siblingData || !meta.siblingData[sourceId]) {
+              return;
+          }
+          //clone the sources data inside the target record:
+          Ext.Object.each(meta.siblingData, function(targetId, data) {
+              targetId = parseInt(targetId); //targetId is coming from the object key, which is string.
+              if(targetId == sourceId) {
+                  //don't update myself again
+                  return;
+              }
+              var targetRec = rec.store.getById(targetId),
+                  targetMeta = targetRec && targetRec.get('metaCache');
+              if(!targetMeta || !targetMeta.siblingData || !targetMeta.siblingData[sourceId]) {
+                  return;
+              }
+              targetMeta.siblingData[sourceId] = Ext.clone(meta.siblingData[sourceId]);
+              targetRec.set('metaCache', targetMeta);
+              targetRec.commit();
+          });
+      });
   },
   /**
    * End of the save chain.
