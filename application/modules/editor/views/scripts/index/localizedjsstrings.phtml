@@ -302,17 +302,18 @@ Ext.define('Editor.controller.Localizer', {
             tagMissingText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:');?>',
             tagDuplicatedText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:');?>',
             tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>',
-            cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
+            cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>',
+            segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
+            segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
         }
     });
 
     Ext.define("Editor.locale.de.view.segments.MinMaxLength", {
         override: "Editor.view.segments.MinMaxLength",
         strings: {
-            minText: '<?php echo $this->translate->_('{0} (Min. {1})');?>',
-            maxText: '<?php echo $this->translate->_('{0} von {1}');?>',
-            segmentBellowLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
-            segmentOverLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
+            minText: '<?php echo $this->translate->_('Min. {minWidth}');?>',
+            maxText: '<?php echo $this->translate->_(' von {maxWidth}');?>',
+            siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>'
         }
     });
     
@@ -349,7 +350,8 @@ Ext.define('Editor.controller.Localizer', {
         alikeSingular: '<?php echo $this->translate->_('{0} Wiederholung wurde bearbeitet und gespeichert');?>',
         alikePlural: '<?php echo $this->translate->_('{0} Wiederholungen wurden bearbeitet und gespeichert');?>',
         alikesDisabled: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.');?>',
-        alikesFailure: '<?php echo $this->translate->_('Die Wiederholungen konnten nicht gespeichert werden');?>'
+        alikesFailure: '<?php echo $this->translate->_('Die Wiederholungen konnten nicht gespeichert werden');?>',
+        alikesNotAllSaved: '<?php echo $this->translate->_('Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.');?>'
     };
     
   	Ext.grid.column.Boolean.prototype.falseText = '<?php echo $no;?>';

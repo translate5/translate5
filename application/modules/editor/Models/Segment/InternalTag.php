@@ -71,6 +71,18 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
     
     /**
+     * returns the stored length of the given tag node
+     * @param string $tag the tag as div/span construct
+     * @return integer returns the length of the tag or -1 of no length configured
+     */
+    public function getLength($tag) {
+        if(preg_match('/<span[^>]+data-length="([^"]*)"[^>]+>/', $tag, $matches)) {
+            return $matches[1];
+        }
+        return -1;
+    }
+    
+    /**
      * Counts the internal tags in the given segment string
      * @param string $segment
      * @return number

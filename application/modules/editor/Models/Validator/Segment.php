@@ -33,10 +33,16 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
     protected $segmentFieldManager;
     
     /**
+     * @var editor_Models_Segment
+     */
+    protected $segment;
+    
+    /**
      * Segment Validator needs a instanced editor_Models_SegmentFieldManager
      * @param editor_Models_SegmentFieldManager $sfm
      */
-    public function __construct(editor_Models_SegmentFieldManager $sfm) {
+    public function __construct(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment) {
+        $this->segment = $segment;
         $this->segmentFieldManager = $sfm;
         parent::__construct();
     }
@@ -48,11 +54,23 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
     protected function defineValidators() {
         $editable = $this->segmentFieldManager->getEditableDataIndexList();
         $toValidate = $this->segmentFieldManager->getSortColMap();
+        $config = Zend_Registry::get('config');
+        $contentLengthCheck = (boolean)$config->runtimeOptions->segments->enableCountSegmentLength;
+        
         foreach($toValidate as $edit => $toSort) {
-            //edited = string, ohne längenbegrenzung. Daher kein Validator nötig / möglich 
-            $this->addDontValidateField($edit);
-            //the 4294967295 is the colum size of mysql longtext
-            $this->addValidator($toSort,'stringLength', array('min' => 0, 'max' =>PHP_INT_MAX));
+            //if $contentLengthCheck is enabled, we have to check the segment length against the configured min max values
+            if($contentLengthCheck) {
+                $this->addValidatorCustom($edit, function($value) use ($edit){
+                    return $this->validateLength($value, $edit);
+                },true);
+            }
+            else {
+                $this->addDontValidateField($edit);
+            }
+            //by default the edited and toSort fields don't have a length restriction, so we add it to the addDontValidateField
+            // (ok, the MySQL length restriction for longtext fields, 
+            // but that should not bother the user in the frontend, since a segment will never get so long)
+            $this->addDontValidateField($toSort);
         }
     
         $this->addValidator('userGuid', 'guid');
@@ -97,5 +115,47 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
     };
     
     $this->addValidatorCustom('qmId', $qmIdValidator);
+  }
+  
+  /**
+   * validates the given value of the given field with the sibling length agains the min and max values of the transunit
+   * @param string $value
+   * @param string $field
+   * @return boolean
+   */
+  protected function validateLength($value, $field){
+      $data = $this->segment->getDataObject();
+      if(!property_exists($data, 'metaCache') || empty($data->metaCache)) {
+          return true;
+      }
+      $meta = json_decode($data->metaCache, true);
+      if(empty($meta['siblingData'])) {
+          return true;
+      }
+      $length = 0;
+      foreach($meta['siblingData'] as $id => $data) {
+          //if we don't have any information about the givens field length, we assume all OK
+          if(!array_key_exists($field, $data['length'])){
+              return true;
+          }
+          if($id == $this->segment->getId()) {
+              //if the found sibling is the segment itself, use the length of the value to be stored
+              $length += (int)$this->segment->textLength($value);
+          }
+          else {
+              //add the text length of desired field 
+              $length += (int)$data['length'][$field];
+          }
+      }
+      
+      if(array_key_exists('minWidth', $meta) && $length < $meta['minWidth']) {
+          $this->addMessage($field, 'segmentToShort', 'Transunit length is '.$length.' minWidth is '.$meta['minWidth']);
+          return false;
+      }
+      if(array_key_exists('maxWidth', $meta) && $length > $meta['maxWidth']) {
+          $this->addMessage($field, 'segmentToLong', 'Transunit length is '.$length.' maxWidth is '.$meta['maxWidth']);
+          return false;
+      }
+      return true;
   }
 }

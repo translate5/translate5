@@ -46,7 +46,6 @@ class editor_Models_Segment_MaterializedView {
      */
     public function __construct($taskGuid = null) {
         $this->config = Zend_Registry::get('config');
-        $this->db = Zend_Registry::get('db');
         if(!empty($taskGuid)) {
             $this->setTaskGuid($taskGuid);
         }
@@ -207,15 +206,11 @@ class editor_Models_Segment_MaterializedView {
         $sfm->walkFields($walker);
         $selectSql = join(',', $selectSql).', ';
         
-        //build up the segment meta cache, currently only the min and max width 
-        $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), \'}\') metaCache ';
-        $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
-        $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id';
-        $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
-        $selectSql .= ' GROUP BY d.segmentId';
+        //build up the segment meta cache query
+        $selectSql .= $this->buildMetaCacheSql(true);
         
         $db = Zend_Db_Table::getDefaultAdapter();
-        $db->query($selectSql, $this->taskGuid);
+        $db->query($selectSql, [$this->taskGuid, $this->taskGuid]);
     }
     
     /**
@@ -231,6 +226,69 @@ class editor_Models_Segment_MaterializedView {
         unset($data->isWatched);
         unset($data->segmentUserAssocId);
         $db->update((array) $data, array('id = ?' => $id));
+    }
+    
+    /**
+     * Updates the view metaCache for the given segment and its siblings in the same transunit 
+     * 
+     * FIXME test me for CSV task!
+     * 
+     * @param editor_Models_Segment $segment
+     */
+    public function updateSiblingMetaCache(editor_Models_Segment $segment) {
+        $groupId = $segment->meta()->getTransunitId();
+        $this->buildMetaCacheSql();
+        $sql = 'update '.$this->viewName.' view, (SELECT m.segmentId,';
+        $sql .= $this->buildMetaCacheSql(false);
+        $sql .= ') data';
+        $sql .= ' SET view.metaCache = data.metaCache';
+        $sql .= ' WHERE view.id = data.segmentId';
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $db->query($sql, [$this->taskGuid, $this->taskGuid, $groupId]);
+    }
+    
+    /**
+     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given gorupId/transunitId
+     * @param boolean $forWholeTask
+     * @return string
+     */
+    protected function buildMetaCacheSql($forWholeTask = true) {
+        $selectSql = '';
+        $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), ';
+        $selectSql .= '\',"siblingData":{\', ifnull(siblings.siblingData,\'\'), \'}}\') metaCache';
+        $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
+        $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id ';
+        $selectSql .= ' LEFT JOIN (
+            SELECT transunitId, GROUP_CONCAT(CONCAT(\'"\',segmentId,\'": \',siblingData) SEPARATOR ",") siblingData
+            FROM LEK_segments_meta
+            WHERE taskGuid = ?
+            GROUP BY transunitId
+            ) siblings ON siblings.transunitId = m.transunitId';
+        if($forWholeTask) {
+            $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
+        }
+        else {
+            $selectSql .= ' WHERE s.taskGuid = ? and m.transunitId = ? and d.segmentId = s.id';
+        }
+        $selectSql .= ' GROUP BY d.segmentId';
+        return $selectSql;
+    }
+    
+    /**
+     * returns the metaCache of a specific segment
+     * @param editor_Models_Segment $segment
+     * @return NULL|string
+     */
+    public function getMetaCache(editor_Models_Segment $segment) {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $s = $db->select()
+        ->from($this->viewName, ['metaCache'])
+        ->where('id = ?', $segment->get('id'));
+        $row = $db->fetchRow($s);
+        if(empty($row)) {
+            return null;
+        }
+        return $row['metaCache'];
     }
     
     /**
