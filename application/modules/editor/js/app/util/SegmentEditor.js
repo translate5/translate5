@@ -280,17 +280,17 @@ Ext.define('Editor.util.SegmentEditor', {
         selectionForCaret = rangy.getSelection(me.getEditorBody());
         bookmarkForCaret = selectionForCaret.getBookmark();
         elContent = el.getHtml();
-        elContent = elContent.replace(/<span[^>]*class="*spellcheck*[^>]*>/i, '').replace(/<\/span>/i, '');
+        elContent = elContent.replace(/<\s*\/?\s*span\s*.*?>/g, ''); // This will find ALL spans. If only Spellcheck-Spans are needed, we will have to add the 'spellcheck'-CSS-class
         el.setHtml(elContent);
         me.getEditorBodyExtDomElement().dom.normalize();
         selectionForCaret.moveToBookmark(bookmarkForCaret);
     },
     /***
-     * Clean up Nodes, e.g. remove empty del-Children.
+     * Clean up Nodes, e.g. remove empty TrackChange-Nodes.
      */
     cleanUpNode:function(node){
         var me = this,
-            allDelNodes,
+            allTrackChangeNodes,
             isEmptyNode = function(nodeToCheck){
                 if (nodeToCheck.nodeValue == null) {
                     if (nodeToCheck.childNodes.length == 0) {
@@ -304,10 +304,10 @@ Ext.define('Editor.util.SegmentEditor', {
                 }
                 return false;
             };
-        allDelNodes = Ext.fly(node).query('del');
-        Ext.Array.each(allDelNodes, function(delNode, index) {
-            if (isEmptyNode(delNode) && delNode.parentNode != null) {
-                delNode.parentNode.removeChild(delNode);
+            allTrackChangeNodes = Ext.fly(node).query('.trackchanges');
+        Ext.Array.each(allTrackChangeNodes, function(trackChangeNode, index) {
+            if (isEmptyNode(trackChangeNode) && trackChangeNode.parentNode != null) {
+                trackChangeNode.parentNode.removeChild(trackChangeNode);
             }
         });        
     }
