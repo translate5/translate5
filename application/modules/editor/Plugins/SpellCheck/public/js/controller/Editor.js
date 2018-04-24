@@ -90,7 +90,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // Attributes for the spellcheck-Node
         ATTRIBUTE_ACTIVEMATCHINDEX: 'data-spellcheck-activeMatchIndex',
         // In ToolTips
+        CSS_CLASSNAME_TOOLTIP_HEADER:  'spellcheck-tooltip-header',
         CSS_CLASSNAME_REPLACEMENTLINK:  'spellcheck-replacement',
+        CSS_CLASSNAME_TOOLTIP_MOREINFO:  'spellcheck-tooltip-moreinformation',
         // Milliseconds to pass before SpellCheck is started when no editing occurs
         EDIT_IDLE_MILLISECONDS: 1000,
     },
@@ -107,7 +109,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     spellCheckResults: null,        // Store results for already checked Html-Content in the Editor: me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes] = content after SpellCheck (= with SpellCheck-Nodes)
     
-    spellCheckTooltip: null,        // spellcheck tooltip instance
+    spellCheckTooltip: null,        // Ext.menu.Menu ("ToolTip"-instance)
     
     editIdleTimer: null,            // time "nothing" is changed in the Editor's content; 1) user: presses no key 2) segmentsHtmleditor: no push, no afterInsertMarkup
     editIdleRestarted: null,        // has the content been changed in the Editor (= timer restarted) since the last timer has started the SpellCheck?
@@ -172,7 +174,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.initMouseEvents();
             me.isSpellCheckOnSaving = false; // = "default" until we save the segment
         } else {
-            me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ').');
+            me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ') or SpellCheck-Tool does not run.');
         }
     },
     /**
@@ -191,15 +193,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     initTooltips:function(){
         var me = this;
-        me.spellCheckTooltip = Ext.create('Ext.tip.ToolTip', {
-            closable: true,
+        me.spellCheckTooltip = Ext.create('Ext.menu.Menu', {
+            minWidth: 200,
+            plain: true,
             renderTo: Ext.getBody(),
-            target: me.getEditorBody(),
-            targetIframe: me.editor.iframeEl,
-            targetOffset: me.editor.iframeEl.getXY(),
+            items: [],
             listeners: {
-                beforeshow: function(tip) {
-                    me.handleSpellCheckTooltip(tip);
+                beforeshow: function() {
+                    me.handleSpellCheckTooltip();
                 }
             }
         });
@@ -240,7 +241,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         tooltipBody.on({
             click:{
                 delegated: false,
-                delegate: 'a.' + me.self.CSS_CLASSNAME_REPLACEMENTLINK,
+                delegate: 'div.' + me.self.CSS_CLASSNAME_REPLACEMENTLINK,
                 fn: me.applyReplacement,
                 scope: this,
                 preventDefault: true
@@ -680,17 +681,16 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     /***
      * Tooltips for the spellcheck-matches.
      */
-    handleSpellCheckTooltip: function(tip) {
+    handleSpellCheckTooltip: function() {
         var me = this,
-            spellCheckData = me.getSpellCheckData(),
-            tplData = {
-                spellCheck: spellCheckData
-            };
-        if(!me.spellCheckTpl) {
-            me.spellCheckTpl = new Ext.Template('{spellCheck}');
-            me.spellCheckTpl.compile();
-        }
-        tip.update(me.spellCheckTpl.apply(tplData));
+            oldMenuItems;
+        // remove formerly added menu-items
+        oldMenuItems = me.spellCheckTooltip.items.items;
+        Ext.Array.each(oldMenuItems, function(itemToRemove, index) {
+            me.spellCheckTooltip.remove(itemToRemove);
+        },me, true);
+        // update Tooltip
+        me.spellCheckTooltip.add(me.getSpellCheckData());
     },
     getSpellCheckData: function() {
         var me = this,
@@ -699,29 +699,34 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             message      = activeMatch.message,
             replacements = activeMatch.replacements,
             infoURLs     = activeMatch.infoURLs,
-            nodeData = '';
+            items = [];
         // message
-        nodeData += '<b>'+ message + '</b><br />';
-        // replacements
+        items.push({text: '<b>'+message+'</b>',
+                    cls: me.self.CSS_CLASSNAME_TOOLTIP_HEADER });
+        // replacement(s)
         if (replacements.length > 0) {
-            nodeData += '<hr>'
             Ext.Array.each(replacements, function(replacement, index) {
-                nodeData += '<a href="#" class="' + me.self.CSS_CLASSNAME_REPLACEMENTLINK + '">' + replacement + '</a><br />';
+                items.push({text: replacement,
+                            cls: me.self.CSS_CLASSNAME_REPLACEMENTLINK });
             });
         }
-        // infoURLs
+        // infoURL(s)
         if (infoURLs.length > 0) {
-            nodeData += '<hr>'
             Ext.Array.each(infoURLs, function(url, index) {
-                nodeData += '<a href="' + url + '" target="_blank">' + me.messages.moreInformation + '</a><br />';
+                items.push({text: me.messages.moreInformation,
+                            cls: me.self.CSS_CLASSNAME_TOOLTIP_MOREINFO,
+                            href: url,
+                            hrefTarget: '_blank'});
             });
         }
-        return nodeData;
+        return items;
     },
     showToolTip: function(event) {
-        var me = this;
+        var me = this,
+            posX = event.getX() + me.editor.iframeEl.getX()
+            posY = event.getY() + me.editor.iframeEl.getY();
         me.activeMatchNode = event.currentTarget;
         me.spellCheckTooltip.hide();
-        me.spellCheckTooltip.show();
+        me.spellCheckTooltip.showAt(posX,posY);
     }
 });
