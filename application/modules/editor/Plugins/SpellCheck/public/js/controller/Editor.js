@@ -511,7 +511,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             replaceText = event.currentTarget.innerText,
             range;
         
+        // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
+        range = rangeForMatch.getBookmark();
+
+        // Remove SpellCheck-Nodes.
+        me.cleanSpellCheckTagsInEditor();
+        
+        // Update the range (the SpellCheck-Node is no longer in the DOM!...).
+        rangeForMatch.moveToBookmark(range);
         range = rangeForMatch.getBookmark();
         
         me.isActiveTrackChanges();             // SearchReplace.js
@@ -598,11 +606,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         Ext.Array.each(me.allMatches, function(match, index) {
             rangeForMatch.moveToBookmark(match.range);
             documentFragmentForMatch = rangeForMatch.extractContents();
-            me.cleanUpNode(documentFragmentForMatch);
             spellCheckNode = me.createSpellcheckNode(index);
             spellCheckNode.appendChild(documentFragmentForMatch);
             rangeForMatch.insertNode(spellCheckNode);
         }, me, true);
+        me.cleanUpNode(editorBody);
         // store the result of the SpellCheck for the html WITHOUT the SpellCheck-Nodes
         // for checking later if we need to run the check again at all
         if (me.contentBeforeSpellCheckWithoutSpellCheckNodes in me.spellCheckResults) {
