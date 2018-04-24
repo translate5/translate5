@@ -37,7 +37,8 @@ END LICENSE AND COPYRIGHT
  * @class Editor.util.Event
  */
 Ext.define('Editor.util.Event', {
-    mixins: ['Editor.util.DevelopmentTools'],
+    mixins: ['Editor.util.DevelopmentTools',
+             'Editor.util.SegmentEditor'],
 
     event: null,                        // for KeyboardEvent (from Ext.event.Event)
     ignoreEvent: false,                 // ignore event? (= we do nothing here)

@@ -141,6 +141,31 @@ Ext.define('Editor.util.SegmentEditor', {
         return false;
     },
     /**
+     * Position the caret "at the end" of the Editor.
+     * @returns {Boolean} 
+     */
+    positionCaretAtEnd: function() {
+        var me = this,
+            lastNodeInEditor = me.getLastRelevantNodeInEditor('fromEnd'),
+            rangeForCaret = rangy.createRange();
+        if (lastNodeInEditor == null) {
+            lastNodeInEditor = me.getLastNodeInEditor('fromEnd');
+        }
+        me.consoleLog("isEmptyEditor => lastNodeInEditor:");
+        me.consoleLog(lastNodeInEditor);
+        if (lastNodeInEditor != null ) {
+            rangeForCaret.setEndAfter(lastNodeInEditor);
+            rangeForCaret.collapse();
+            me.setSingleRangeInEditor(rangeForCaret);
+            me.rangeForEvent = rangeForCaret;
+            return true;
+        }
+        if(me.USE_CONSOLE) {
+            debugger;
+        }
+        return false;
+    },
+    /**
      * Returns the first/last node in the editor that is not of the kind to be ignored.
      * @param {String} direction
      * @returns {Boolean} 
