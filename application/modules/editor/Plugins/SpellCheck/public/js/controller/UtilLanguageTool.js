@@ -127,31 +127,33 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
             allDelNodes = [],
             rangeForDelNode = rangy.createRange(),
             bookmarkForDelNode,
-            lengthOfDelNode,
-            characterOptions = {
-                includeBlockContentTrailingSpace: true
-            };
+            lengthOfDelNode;
         // offsets of text-only version
         matchStart = match.offset;
         matchEnd = matchStart + match.context.length;
-        rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
-        me.consoleLog("- matchStart: " + matchStart + " / matchEnd: " + matchEnd);
-        // move offsets according to hidden del-Nodes in front of the match
+        me.consoleLog("---\n- matchStart: " + matchStart + " / matchEnd: " + matchEnd);
+        // move offsets according to hidden del-Nodes in front of the match's start and/or end
         allDelNodes = me.getEditorBodyExtDomElement().query('del');
         Ext.Array.each(allDelNodes, function(delNode, index) {
             rangeForDelNode.selectNodeContents(delNode);
             bookmarkForDelNode = rangeForDelNode.getBookmark();
-            if (bookmarkForDelNode.start <= matchStart) {
-                lengthOfDelNode = rangeForDelNode.text().length;
-                me.consoleLog("- length: " + lengthOfDelNode);
-                rangeForMatch.moveStart('character', lengthOfDelNode, characterOptions);
-                rangeForMatch.moveEnd('character', lengthOfDelNode, characterOptions);
-                me.consoleLog("- match NOW: " + rangeForMatch.getBookmark().start + " / " + rangeForMatch.getBookmark().end);
-            } else {
-                me.consoleLog("- we are already behind the match: " + bookmarkForDelNode.start + " > " + matchStart);
+            me.consoleLog("- bookmarkForDelNode: " + bookmarkForDelNode.start + " / " + bookmarkForDelNode.end);
+            if (bookmarkForDelNode.start > matchStart && bookmarkForDelNode.end > matchEnd) {
+                me.consoleLog("- we are already behind the match: " + bookmarkForDelNode.start + " > " + matchStart + " && " + bookmarkForDelNode.end + " > " + matchEnd);
                 return false; // break here; we are already behind the match
             }
+            lengthOfDelNode = rangeForDelNode.text().length;
+            me.consoleLog("- length: " + lengthOfDelNode);
+            if (bookmarkForDelNode.start <= matchStart) {
+                matchStart = matchStart + lengthOfDelNode;
+                matchEnd = matchEnd + lengthOfDelNode;
+                me.consoleLog("- match NOW (start and end moved): " + matchStart + " / " + matchEnd);
+            } else if (bookmarkForDelNode.end <= matchEnd) {
+                matchEnd = matchEnd + lengthOfDelNode;
+                me.consoleLog("- match NOW (only end moved): " + matchStart + " / " + matchEnd);
+            }
         });
+        rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
         return rangeForMatch.getBookmark();
     },
     /**
