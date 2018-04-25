@@ -509,27 +509,27 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     applyReplacement: function(event) {
         var me = this,
             rangeForMatch = rangy.createRange(),
-            replaceText = event.currentTarget.innerText,
-            range;
+            rangeForMatchBookmark,
+            replaceText = event.currentTarget.innerText;
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
-        range = rangeForMatch.getBookmark();
-
+        rangeForMatchBookmark = rangeForMatch.getBookmark();
+        
         // Remove SpellCheck- and TermTag-Markup.
         me.cleanSpanMarkupInEditor();
         
         // Update the range (the SpellCheck-Node is no longer in the DOM!...).
-        rangeForMatch.moveToBookmark(range);
-        range = rangeForMatch.getBookmark();
+        rangeForMatch.moveToBookmark(rangeForMatchBookmark);
+        rangeForMatchBookmark = rangeForMatch.getBookmark();
         
-        me.isActiveTrackChanges();             // SearchReplace.js
-        if(!me.activeTrackChanges){            // SearchReplace.js
-            me.pureReplace(range,replaceText); // SearchReplace.js
+        me.isActiveTrackChanges();                             // SearchReplace.js
+        if(!me.activeTrackChanges){                            // SearchReplace.js
+            me.pureReplace(rangeForMatchBookmark,replaceText); // SearchReplace.js
         } else {
             me.setTrackChangesInternalSpellCheckFlag(true);
             me.fireEvent('deleteAndReplace',
-                 range,
+                 rangeForMatchBookmark,
                  replaceText
             );
             me.setTrackChangesInternalSpellCheckFlag(false);
