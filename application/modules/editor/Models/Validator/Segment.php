@@ -152,7 +152,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           $this->addMessage($field, 'segmentToShort', 'Transunit length is '.$length.' minWidth is '.$meta['minWidth']);
           return false;
       }
-      if(array_key_exists('maxWidth', $meta) && $length > $meta['maxWidth']) {
+      if(array_key_exists('maxWidth', $meta)&& !empty($meta['maxWidth']) && $length > $meta['maxWidth']) {
           $this->addMessage($field, 'segmentToLong', 'Transunit length is '.$length.' maxWidth is '.$meta['maxWidth']);
           return false;
       }
