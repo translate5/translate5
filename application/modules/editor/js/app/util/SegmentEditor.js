@@ -269,9 +269,9 @@ Ext.define('Editor.util.SegmentEditor', {
         return null;
     },
     /***
-     * Remove SpellCheck-Tags "live" in the Editor but keep their content.
+     * Remove Span-Markup (SpellCheck, TermTagger) in the Editor but keep their content.
      */
-    cleanSpellCheckTagsInEditor:function(){
+    cleanSpanMarkupInEditor:function(){
         var me = this,
             el = me.getEditorBodyExtDomElement(),
             elContent,
@@ -280,7 +280,7 @@ Ext.define('Editor.util.SegmentEditor', {
         selectionForCaret = rangy.getSelection(me.getEditorBody());
         bookmarkForCaret = selectionForCaret.getBookmark();
         elContent = el.getHtml();
-        elContent = elContent.replace(/<\s*\/?\s*span\s*.*?>/g, ''); // This will find ALL spans. If only Spellcheck-Spans are needed, we will have to add the 'spellcheck'-CSS-class
+        elContent = elContent.replace(/<\s*\/?\s*span\s*.*?>/g, '');
         el.setHtml(elContent);
         me.getEditorBodyExtDomElement().dom.normalize();
         selectionForCaret.moveToBookmark(bookmarkForCaret);
