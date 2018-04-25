@@ -402,10 +402,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.consoleLog('(0.3 => startSpellCheck.)');
         
-        // store content WITH SpellCheck-Nodes
+        // store content WITH SpellCheck-Markup
         me.contentBeforeSpellCheck = me.getEditorBodyExtDomElement().getHtml();
-        // store content WITHOUT SpellCheck-Nodes 
-        me.cleanSpellCheckTagsInEditor(); // in case a spellcheck has been run before already
+        // store content WITHOUT SpellCheck-Markup
+        me.cleanSpanMarkupInEditor(); // in case a spellcheck has been run before already
         me.contentBeforeSpellCheckWithoutSpellCheckNodes = me.getEditorBodyExtDomElement().getHtml();
         
         // If the text has not changed, we can use the result we have already fetched and applied.
@@ -449,7 +449,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         if (!me.allMatchesOfTool.length > 0) {
-            me.consoleLog('allMatchesOfTool: no results (not checked or nothing found).');
+            me.consoleLog('allMatchesOfTool: no results; re-apply the initial content with all tags (eg TermTags).');
+            me.getEditorBodyExtDomElement().setHtml(me.contentBeforeSpellCheck);
             return;
         }
         
@@ -515,8 +516,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         rangeForMatch.selectNodeContents(me.activeMatchNode);
         range = rangeForMatch.getBookmark();
 
-        // Remove SpellCheck-Nodes.
-        me.cleanSpellCheckTagsInEditor();
+        // Remove SpellCheck- and TermTag-Markup.
+        me.cleanSpanMarkupInEditor();
         
         // Update the range (the SpellCheck-Node is no longer in the DOM!...).
         rangeForMatch.moveToBookmark(range);
