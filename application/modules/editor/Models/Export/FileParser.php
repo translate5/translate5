@@ -129,6 +129,12 @@ abstract class editor_Models_Export_FileParser {
     protected $events;
     
     /**
+     * contains the length of the last content returned by getSegmentContent
+     * @var integer
+     */
+    protected $lastSegmentLength = 0;
+    
+    /**
      * 
      * @param integer $fileId
      * @param boolean $diff
@@ -300,8 +306,13 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->removeTermTags($edited);
         $edited = $this->tagHelper->unprotect($edited);
         
+        //count length after removing removeTrackChanges and removeTermTags 
+        // so that the same removement must not be done again inside of textLength
+        $this->lastSegmentLength = $segment->textLength($edited);
+        
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
+        
         if(!$this->_diff){
             return $this->unprotectWhitespace($edited);
         }

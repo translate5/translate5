@@ -565,7 +565,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         if($sizeUnit == 'char') {
             $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
             $segmentAttributes->maxWidth = $this->xmlparser->getAttribute($attributes, 'maxwidth', null);
-            
         }
         
         return $segmentAttributes;

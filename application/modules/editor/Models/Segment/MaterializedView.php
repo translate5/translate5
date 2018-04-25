@@ -230,9 +230,6 @@ class editor_Models_Segment_MaterializedView {
     
     /**
      * Updates the view metaCache for the given segment and its siblings in the same transunit 
-     * 
-     * FIXME test me for CSV task!
-     * 
      * @param editor_Models_Segment $segment
      */
     public function updateSiblingMetaCache(editor_Models_Segment $segment) {
