@@ -23,7 +23,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_48\":{\"nr\":\"48\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false,
         "isFirstofFile": true
     },
@@ -51,7 +51,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -78,7 +78,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_50\":{\"nr\":\"50\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false
     },
     {
@@ -105,7 +105,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -132,7 +132,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_52\":{\"nr\":\"52\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -159,7 +159,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -186,7 +186,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_54\":{\"nr\":\"54\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -213,7 +213,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -240,7 +240,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_56\":{\"nr\":\"56\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false
     },
     {
@@ -267,7 +267,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -294,7 +294,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_58\":{\"nr\":\"58\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -321,7 +321,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -348,7 +348,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_60\":{\"nr\":\"60\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -375,7 +375,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -402,7 +402,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_62\":{\"nr\":\"62\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false
     },
     {
@@ -429,7 +429,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -456,7 +456,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_64\":{\"nr\":\"64\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -483,7 +483,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":[]}",
         "isWatched": false
     },
     {
@@ -510,7 +510,7 @@
         "targetToSort": "Testz preservez whitespacez.",
         "targetEdit": "Testz preservez whitespacez.",
         "targetEditToSort": "Testz preservez whitespacez.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":28}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":20}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -537,7 +537,7 @@
         "targetToSort": "Betweenz mrkz tagsz.",
         "targetEdit": "Betweenz mrkz tagsz.",
         "targetEditToSort": "Betweenz mrkz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":28}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":20}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -564,7 +564,7 @@
         "targetToSort": "Andz surroundingz tagsz.",
         "targetEdit": "Andz surroundingz tagsz.",
         "targetEditToSort": "Andz surroundingz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":28}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":20}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -591,7 +591,7 @@
         "targetToSort": "Testz notz toz preservez whitespacez.",
         "targetEdit": "Testz notz toz preservez whitespacez.",
         "targetEditToSort": "Testz notz toz preservez whitespacez.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":37}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":20}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -618,7 +618,7 @@
         "targetToSort": "Betweenz mrkz tagsz.",
         "targetEdit": "Betweenz mrkz tagsz.",
         "targetEditToSort": "Betweenz mrkz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":37}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":20}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -645,7 +645,7 @@
         "targetToSort": "Andz surroundingz tagsz.",
         "targetEdit": "Andz surroundingz tagsz.",
         "targetEditToSort": "Andz surroundingz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":37}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":20}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -672,7 +672,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":0}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":0}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":0}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -699,7 +699,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":0}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":0}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":0}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -726,7 +726,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":0}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":0}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":0}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -753,7 +753,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":0}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":0}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":0}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -780,7 +780,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":0}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":0}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":0}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -807,7 +807,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":0}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":0}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":0}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -834,7 +834,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":0}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":0}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":0}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -861,7 +861,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":0}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":0}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":0}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -888,7 +888,7 @@
         "targetToSort": "Testword",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>Testword<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>",
         "targetEditToSort": "Testword",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":75}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":75,\"siblingData\":{\"fakeSegId_80\":{\"nr\":\"80\",\"length\":{\"targetEdit\":8}},\"fakeSegId_45\":{\"nr\":\"45\",\"length\":{\"targetEdit\":113}}}}",
         "isWatched": false,
         "isFirstofFile": true
     },
@@ -916,7 +916,7 @@
         "targetToSort": "testtext one",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>testtext one",
         "targetEditToSort": "testtext one",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":450}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":12}},\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":13}},\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":14}}}}",
         "isWatched": false
     },
     {
@@ -943,7 +943,7 @@
         "targetToSort": "text text two",
         "targetEdit": "text text two",
         "targetEditToSort": "text text two",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":450}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":12}},\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":13}},\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":14}}}}",
         "isWatched": false
     },
     {
@@ -970,7 +970,7 @@
         "targetToSort": "texttext three",
         "targetEdit": "texttext three",
         "targetEditToSort": "texttext three",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":450}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":12}},\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":13}},\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":14}}}}",
         "isWatched": false
     },
     {
@@ -997,7 +997,7 @@
         "targetToSort": "without match",
         "targetEdit": "without match",
         "targetEditToSort": "without match",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_84\":{\"nr\":\"84\",\"length\":{\"targetEdit\":13}}}}",
         "isWatched": false
     }
 ]
