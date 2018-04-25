@@ -170,6 +170,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
         $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         //check direct PUT result
+        error_log(print_r($segment,1));
         $this->assertSegmentContentToFile('testSegmentEditing-assert-seg7.json', $segment);
         
         //check again with GET fresh from server
