@@ -144,26 +144,27 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Return true or false if the minmax status strip should be visible
      */
-    handleElementVisible:function(record){
-        var metaCache = record.get('metaCache');
-        return (metaCache && (metaCache.minWidth !== null || metaCache.maxWidth !== null));
-    },
-
-    /***
-    * Set the segment record
-    */
-    setSegmentRecord:function(record){
-        var me=this;
-        me.segmentRecord=null;
-        if(me.isVisible()){
-            me.segmentRecord=record;
+    updateSegment: function(record, fieldname){
+        var me=this,
+            metaCache = record.get('metaCache'),
+            htmlEditor = me.up('segmentsHtmleditor'),
+            fields = Editor.data.task.segmentFields(),
+            field = fields.getAt(fields.findExact('name', fieldname.replace(/Edit$/, ''))),
+            enabled = field && field.isTarget() && (metaCache && (metaCache.minWidth !== null || metaCache.maxWidth !== null));
+        
+        me.setVisible(enabled);
+        me.segmentRecord = null;
+        if(enabled){
+            me.segmentRecord = record;
+            me.updateLabel(me.segmentRecord, htmlEditor.getTransunitLength());
         }
+        return enabled;
     },
 
     /**
      * Update the minmax status strip label
      */
-    updateLabel:function(record, charactersCount){
+    updateLabel: function(record, charactersCount){
         var me=this,
             meta=record.get('metaCache'),
             msgs = me.up('segmentsHtmleditor').strings,

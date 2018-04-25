@@ -47,7 +47,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   //prefix der img Tag ids im HTML Editor
   idPrefix: 'tag-image-',
   requires: [
-      'Editor.view.segments.HtmlEditorLayout'
+      'Editor.view.segments.HtmlEditorLayout',
+      'Editor.view.segments.StatusStrip'
   ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
@@ -70,6 +71,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   segmentLengthStatus:0,
   lastSegmentLength:null,
   currentSegment: null,
+  statusStrip: null,
 
   strings: {
       tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
@@ -110,6 +112,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     ]);
     me.spanTemplate.compile();
     me.callParent(arguments);
+    //add the status strip component to the row editor
+    me.statusStrip = me.add({
+        xtype:'segments.statusstrip',
+        htmlEditor: me
+    });
+  },
+  setHeight: function(height) {
+      var me = this,
+          stripHeight = Math.max(0, me.statusStrip.getHeight() - 5); //reduce statusStrip height about 5px
+      me.callParent([height + stripHeight]);
   },
   initFrameDoc: function() {
       var me = this,
@@ -182,6 +194,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       }
       me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
+      me.statusStrip.updateSegment(segment, fieldName);
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -939,7 +952,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @param {String} text optional, if omitted use currently stored value
    * @return {Integer} returns the transunit length
    */
-  getTransunitLength:function(text){
+  getTransunitLength: function(text){
       var me = this,
           div = document.createElement("div"),
           additionalLength = 0,
@@ -947,8 +960,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           field = me.dataIndex;
       
       //function can be called with given text - or not. Then it uses the current value.
-      if(text === null){
+      if(!Ext.isDefined(text) || text === null){
           text = me.getValue();
+      }
+      if(!Ext.isString(text)) {
+          text = "";
       }
       //FIXME: improve that clean del tag by reuse methods from track changes
       text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
