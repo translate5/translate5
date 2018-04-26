@@ -317,7 +317,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
          * To prevent that <a><b></b></a> is collected as <a><b></b></a> and <b></b> we store the start key in the trackTagOutsideMrk flag 
          */
         $this->xmlparser->registerElement('*', function($tag, $attributes, $key){
-            $inTarget = $this->xmlparser->getParent('target');
+            $inTarget = $this->xmlparser->getParent('trans-unit > target');
             $inSegSource = $this->xmlparser->getParent('seg-source');
             if(empty($inTarget) && empty($inSegSource)) {
                 $this->trackTagOutsideMrk = false;
@@ -733,6 +733,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //if target was given and source contains tags only or is empty, then it will be ignored
             if(!empty($this->segmentData[$targetName]['original']) && !$this->hasText($this->segmentData[$sourceName]['original'])) {
+                $placeHolders[$mid] = $this->xmlparser->join($targetChunksOriginal);
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
@@ -767,11 +768,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //it is easier to collect all content not in an mrk and dismiss this content after 
         // we find out that we don't have any mrk at all instead of trying to collect only the content really outside of mrk tags
-        
         if(!$this->checkContentOutsideMrk) {
             $this->otherContentTarget = [];
             $this->otherContentSource = [];
         }
+        
         //if there is any other text content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed 
         // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
         // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
@@ -780,8 +781,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $data = array_merge($this->otherContentTarget, $this->otherContentSource);
             $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
         }
-        //error_log(print_r($this->otherContentTarget,1));
-        //error_log(print_r($this->otherContentSource,1));
         
         $hasNoTarget = is_null($this->currentPlainTarget);
         $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
