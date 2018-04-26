@@ -91,7 +91,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
             'editor' => array(  'file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker',
-                                'taskmeta', 'config', 'segmentuserassoc', 'session', 'language','termcollection'),
+                    'taskmeta', 'config', 'segmentuserassoc', 'session', 'language','termcollection'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -251,6 +251,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'testgetattributes'
                 ));
         $this->front->getRouter()->addRoute('testgetattributes', $getCollectionAttributes);
+        
+        $searchTermCollection= new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/search/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'search'
+                ));
+        $this->front->getRouter()->addRoute('searchtermcollection', $searchTermCollection);
     }
     
     

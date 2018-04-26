@@ -542,6 +542,78 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->where('collectionId = ?',$termCollection);
         return $this->db->fetchAll($s);
     }
+    
+    /**
+     * Search terms in the term collection with the given search string and language.
+     * 
+     * @param string $queryString
+     * @param string $language
+     * @param array $collectionIds
+     * @param mixed $limit
+     * 
+     * @return array|NULL
+     */
+    public function searchTermByLanguage($queryString,$language,$collectionIds,$limit=null){
+        
+        //if wildcards are used, adopt them to the mysql needs
+        $queryString=str_replace("*","%",$queryString);
+        $queryString=str_replace("?","_",$queryString);
+        
+        $adapter=$this->db->getAdapter();
+        
+        $s=$this->db->select()
+        ->from($this->db, array('definition','groupId', 'term as label','id as value','term as desc'))
+        ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString.'%')
+        ->where('language=?',$language)
+        ->where('collectionId IN(?)',$collectionIds)
+        ->order('term asc');
+        if($limit){
+            $s->limit($limit);
+        }
+        $rows=$this->db->fetchAll($s)->toArray();
+        if(!empty($rows)){
+            return $rows;
+        }
+        return null;
+    }
+    
+    /***
+     * Find term attributes in the given term entry (lek_terms groupId)
+     * @param unknown $groupId
+     * @return array|NULL
+     */
+    public function searchTermAttributesInTermentry($groupId){
+        $s=$this->db->select()
+        ->from($this->db, array('definition','groupId', 'term as label','id as value','term as desc'))
+        ->join('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id')
+        ->where('groupId=?',$groupId)
+        ->order('label');
+        $s->setIntegrityCheck(false);
+        $rows=$this->db->fetchAll($s)->toArray();
+        if(!empty($rows)){
+            return $rows;
+        }
+        return null;
+    }
+    
+    /***
+     * Find term entry attributes in the given term entry (lek_terms groupId)
+     * @param unknown $groupId
+     * @return array|NULL
+     */
+    public function searchTermEntryAttributesInTermentry($groupId){
+        $s=$this->db->select()
+        ->from($this->db, array('definition','groupId', 'term','id as termId'))
+        ->join('LEK_term_entry_attributes', 'LEK_term_entry_attributes.termEntryId = LEK_terms.termEntryId')
+        ->where('LEK_terms.groupId=?',$groupId)
+        ->group('LEK_terms.groupId');
+        $s->setIntegrityCheck(false);
+        $rows=$this->db->fetchAll($s)->toArray();
+        if(!empty($rows)){
+            return $rows;
+        }
+        return null;
+    }
 
     /**
      * returns a map CONSTNAME => value of all term status

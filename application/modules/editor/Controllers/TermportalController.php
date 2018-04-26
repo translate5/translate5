@@ -1,0 +1,88 @@
+<?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
+
+class Editor_TermportalController extends ZfExtended_Controllers_Action {
+    
+    public function indexAction(){
+        //TODO: why the user session is empty ?
+        $sessionUser = new Zend_Session_Namespace('user');
+        $sessionUser=$sessionUser->data;
+        
+        $config = Zend_Registry::get('config');
+        $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
+        $langs=$sessionUser->sourceLanguage;
+        
+        $langsArray = array();
+        
+        $model=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $model editor_Models_Languages */
+        
+        if(empty($sessionUser->customers)){
+            //TODO: what do we do if no customers are assigned to the user
+            //TODO: what do we do if no collections are assigned to the customer
+            //throw new ZfExtended_ValidateException("No customers assigned to the user.");
+        }
+        
+        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $collection editor_Models_TermCollection_TermCollection */
+        $collectionIds=$collection->getCollectionsIdsForCustomer($sessionUser->customers);
+
+        //get the user languages
+        if(!empty($langs)){
+            $langsArray=$model->loadByIds(trim($langs,","));
+        }else if(empty($langsArray) && !empty($defaultLangs)){
+            //if no user languages are defined, get the default config languages
+            $langsArray=$model->loadByRfc($defaultLangs);
+        }
+        
+        if(empty($langsArray)){
+            throw new ZfExtended_ValidateException("No user or default languages are configured.");
+        }
+        
+        //get the translated labels
+        $labelsModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        /* @var $labelsModel editor_Models_TermCollection_TermAttributesLabel */
+        $labels=$labelsModel->loadAll();
+        
+        $this->view->languages=$langsArray;
+        $this->view->labels=$labels;
+        $this->view->collectionIds=$collectionIds;
+        
+        //translated strings for some of the result tables
+        //TODO: change to the real names
+        $translatedStrings=array(
+                "termTableTitle"=>"Terms",
+                "termEntryAttributeTableTitle"=>"Term-entry attributes",
+                "termAttributeTableTitle"=>"Term attributes"
+        );
+        
+        $this->view->translations=$translatedStrings;
+        
+        $this->_helper->layout->disableLayout();
+    }
+}

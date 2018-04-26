@@ -29,4 +29,22 @@ END LICENSE AND COPYRIGHT
 class editor_Models_TermCollection_TermEntryAttributes extends editor_Models_TermCollection_AttributesAbstract{
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermEntryAttributes';
     protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermEntryAttributes';
+    
+    /***
+     * Get all attributes for the given term entry (groupId)
+     * @param string $groupId - original termEntry id from the tbx
+     * @return array|NULL
+     */
+    public function getAttributesForTermEntry($groupId){
+        $s=$this->db->select()
+        ->from($this->db)
+        ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_entry_attributes.termEntryId')
+        ->where('LEK_term_entry.groupId=?',$groupId);
+        $s->setIntegrityCheck(false);
+        $rows=$this->db->fetchAll($s)->toArray();
+        if(!empty($rows)){
+            return $rows;
+        }
+        return null;
+    }
 }

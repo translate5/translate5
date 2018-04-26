@@ -64,6 +64,28 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         return null;
     }
     
+    /***
+     * Get all collections ids assigned to the customer.
+     * If no customerId is provided, all unassigned collections will be returned.
+     * 
+     * @param unknown $customerId
+     */
+    public function getCollectionsIdsForCustomer($customerId){
+        $s=$this->db->select();
+        
+        if(!$customerId){
+            $s->where('customerId IS NULL');
+        }else{
+            $s->where('customerId=?',$customerId);
+        }
+        $rows=$this->db->fetchAll($s)->toArray();
+        if(!empty($rows)){
+            $ids = array_column($rows, 'id');
+            return $ids;
+        }
+        return null;
+    }
+    
     
     /***
      * Get the attribute count for the collection

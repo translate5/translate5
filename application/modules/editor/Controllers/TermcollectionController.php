@@ -88,6 +88,36 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     }
     
     /***
+     * Search terms 
+     */
+    public function searchAction(){
+        $params=$this->getRequest()->getParams();
+        $responseArray=array();
+        
+        $model=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $model editor_Models_Term */
+        
+        $config = Zend_Registry::get('config');
+        $termCount=$config->runtimeOptions->termportal->searchTermsCount;
+        
+        //if groupid is provided, search the termattributes and termEntry attributes
+        if(isset($params['groupId'])){
+            //FIXME: move this to separatea action ?
+            $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId']);
+
+            $entryAtr=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
+            /* @var $entryAtr editor_Models_TermCollection_TermEntryAttributes */
+            $responseArray['termEntryAttributes']=$entryAtr->getAttributesForTermEntry($params['groupId']);
+            
+        }else if(isset($params['term'])){
+            $lang=isset($params['language']) ? $params['language'] : null;
+            $responseArray['term']=$model->searchTermByLanguage($params['term'],$lang,$params['collectionIds'],$termCount);
+        }
+        
+        $this->view->rows=$responseArray;
+    }
+    
+    /***
      * This action is only used in a test at the moment! 
      */
     public function testgetattributesAction(){

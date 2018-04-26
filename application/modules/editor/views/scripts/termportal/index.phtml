@@ -1,0 +1,84 @@
+<?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
+
+?>
+
+<div class="flex-container">
+
+    <div class="center">
+          <input class="serchField" type="text" placeholder="Search.." name="search" id="search">
+          <button id="searchButton"></button>
+          <select name="languages" id="languages">
+          <?php
+            foreach ($this->languages as $lang){
+                echo '<option value="'.$lang["id"].'">'.$lang["rfc5646"].'</option>';
+            }
+          ?>
+          </select>
+	</div>
+</div>
+
+<div class="resultContent wrap" id="finalResultContent">
+	<div class="floatleft">
+		<div id="searchTermsHolder" class="floatleft">
+		<select id="searchTermsSelect" size="10" style="width: 200px; display: inline-block; display: none;">
+		</select>
+		</div>
+		<div class="floatleft">
+       	 	<table class="tabble-inner-style" id="termAttributeTable">
+        	</table>
+		
+       	 	<table class="tabble-inner-style" id="termTable">
+        	</table>
+        </div>
+        <div style="clear: both;"></div>
+	</div>
+	<div class="floatleft">
+		<table class="tabble-inner-style" id="attributeTable">
+        </table>
+	</div>
+	<div style="clear: both;"></div>
+</div>
+
+<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/jquery-ui-1.12.1/jquery-ui.min.css">
+<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/termportal/css/termportal.css">
+<script src="<?php echo APPLICATION_RUNDIR; ?>/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+
+
+<script type="text/javascript">
+//init the labels here, for later usage
+var attributeLabels='<?php echo json_encode($this->labels);?>';
+attributeLabels = JSON.parse(attributeLabels);
+
+var termTableTitle='<?php echo $this->translations["termTableTitle"];?>';
+var termEntryAttributeTableTitle='<?php echo $this->translations["termEntryAttributeTableTitle"];?>';
+var termAttributeTableTitle='<?php echo $this->translations["termAttributeTableTitle"];?>';
+var collectionIds=<?php echo json_encode($this->collectionIds);?>;
+</script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/Termportal.js"></script>
