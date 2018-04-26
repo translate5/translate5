@@ -151,9 +151,15 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     /**
      * Flag if unknown content should be collected or not
-     * @var string
+     * @var boolean
      */
-    protected $enableOtherContentHandler = false;
+    protected $checkContentOutsideMrk = false;
+    
+    /**
+     * Flag if current tag is collected as otherContent (outside mrk tags)
+     * @var integer|boolean
+     */
+    protected $trackTagOutsideMrk = false;
     
     /**
      * (non-PHPdoc)
@@ -221,36 +227,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function registerContent() {
         $sourceEndHandler = function($tag, $key, $opener){
-            $this->enableMrkOtherHandler($tag);
             $this->handleSourceTag($tag, $key, $opener);
         };
         
-        //handler to get content between mrk tags
+        //handler to get content outside of mrk tags
         $otherContentHandler = function($other) {
-            if(func_num_args() > 2) {
-                error_log("Unknown in XLF Parser ". $other); //→ $other evaluates to the tag in the wildcard handler
-            }
-            if(!$this->enableOtherContentHandler || $this->xmlparser->isHandlingDisabled()) {
-                return;
-            }
-            if(func_num_args() > 2) {
-                //if we are handling unknow tags (3 parameters $tag, $key, $opener), we save the original text
-                $args = func_get_args();
-                $this->otherContentHandler($this->xmlparser->getRange($args[2]['openerKey'], $args[1], true));
-                return;
-            }
-            //if we are handling other plain text (2 parameter the other text, $key), we save the text
             $this->otherContentHandler($other);
         };
-        
-        // register other handler to get and check content between mrk tags
-        $this->xmlparser->registerOther($otherContentHandler); 
         
         $sourceTag = 'trans-unit > source, trans-unit > seg-source, trans-unit > seg-source > mrk[mtype=seg]';
         $sourceTag .= ', trans-unit > source sub, trans-unit > seg-source sub';
         
         $this->xmlparser->registerElement($sourceTag, function($tag, $attributes){
-            $this->disableMrkOtherHandler($tag);
             $sourceImportance = $this->compareSourceOrigin($tag);
             //set the source origin where we are currently (mrk or sub or plain source or seg-source)
             $this->setSourceOrigin($tag);
@@ -267,21 +255,24 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 // for that we just set the source indizes here in the startHandler, here the order is correct
                 $this->sourceProcessOrder[] = $this->calculateMid(['tag' => $tag, 'attributes' => $attributes], true);
             }
+            if($tag == 'mrk') {
+                $this->otherContentSource[] = ''; //add a new container for the content after the current mrk
+            }
         }, $sourceEndHandler);
         
         //register to seg-source directly to enable / disable the collection of other content 
-        $this->xmlparser->registerElement('xliff trans-unit > seg-source', function() use ($otherContentHandler){
-            $this->enableOtherContentHandler = true;
-            
-        }, function() {
-            $this->enableOtherContentHandler = false;
+        $this->xmlparser->registerElement('xliff trans-unit > seg-source', function() use ($otherContentHandler) {
+            //if we have a seg-source we probably have also mrks where no other content is allowed to be outside the mrks 
+            $this->checkContentOutsideMrk = true;
+            $this->xmlparser->registerOther($otherContentHandler); // register other handler to get and check content between mrk tags
+        }, function(){
+            $this->xmlparser->registerOther(null); // unregister other handler
         });
         
-        $this->xmlparser->registerElement('trans-unit > target', function() use ($otherContentHandler){
-            $this->enableOtherContentHandler = true;
+        $this->xmlparser->registerElement('trans-unit > target', function() use ($otherContentHandler) {
+            $this->xmlparser->registerOther($otherContentHandler); // register other handler to get and check content between mrk tags
         }, function($tag, $key, $opener){
-            $this->enableOtherContentHandler = false;
-            
+            $this->xmlparser->registerOther(null); // unregister other handler
             //if empty targets are given as Single Tags
             $this->currentPlainTarget = $this->getTargetMeta($tag, $key, $opener);
             if($opener['isSingle']) {
@@ -303,9 +294,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //handling sub segment mrks and sub tags
         $this->xmlparser->registerElement('trans-unit > target > mrk[mtype=seg], trans-unit > target sub', function($tag) {
-            $this->disableMrkOtherHandler($tag);
+            if($tag == 'mrk') {
+                //if we have a mrk we enable the content outside mrk check
+                $this->checkContentOutsideMrk = true;
+                $this->otherContentTarget[] = ''; //add a new container for the content after the current mrk 
+            }
         }, function($tag, $key, $opener){
-            $this->enableMrkOtherHandler($tag);
             $this->currentTarget[$this->calculateMid($opener, false)] = $this->getTargetMeta($tag, $key, $opener);
         });
         
@@ -317,30 +311,28 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         });
         
-        $this->xmlparser->registerElement('*', function() {
-            if($this->enableOtherContentHandler) {
-                error_log("DIS ".print_r(func_get_args(),1));
-                $this->xmlparser->disableHandlersUntilEndtag();
+        /**
+         * If we are in target or seg-source we collect all unknown tags and save them as strings into 
+         * the otherContent fields. 
+         * To prevent that <a><b></b></a> is collected as <a><b></b></a> and <b></b> we store the start key in the trackTagOutsideMrk flag 
+         */
+        $this->xmlparser->registerElement('*', function($tag, $key){
+            $inTarget = $this->xmlparser->getParent('target');
+            $inSegSource = $this->xmlparser->getParent('seg-source');
+            if(empty($inTarget) && empty($inSegSource)) {
+                $this->trackTagOutsideMrk = false;
             }
-        }, $otherContentHandler);
-    }
-    
-    /**
-     * sets enableOtherContentHandler flag to true if we are in an mrk tag
-     */
-    protected function enableMrkOtherHandler($currentTag) {
-        if($currentTag == 'mrk') {
-            $this->enableOtherContentHandler = true;
-        }
-    }
-    
-    /**
-     * sets enableOtherContentHandler flag to false if we are in an mrk tag
-     */
-    protected function disableMrkOtherHandler($currentTag) {
-        if($currentTag == 'mrk') {
-            $this->enableOtherContentHandler = false;
-        }
+            else {
+                $this->trackTagOutsideMrk = $key;
+            }
+        }, function($tag, $key, $opener){
+            if($this->trackTagOutsideMrk === $opener['openerKey']) {
+                $this->otherContentHandler($this->xmlparser->getRange($opener['openerKey'], $key, true));
+                $this->trackTagOutsideMrk = false;
+            }
+        });
+        //error_log("Unknown in XLF Parser ". $other); //→ $other evaluates to the tag in the wildcard handler
+        
     }
     
     /**
@@ -774,14 +766,20 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         
-        if($this->enableOtherContentHandler) {
-            
+        //it is easier to collect all content not in an mrk and dismiss this content after 
+        // we find out that we don't have any mrk at all instead of trying to collect only the content really outside of mrk tags 
+        if(!$this->checkContentOutsideMrk) {
+            $this->otherContentTarget = [];
+            $this->otherContentSource = [];
         }
         //if there is any other text content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed 
         // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
         // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
         $otherContent = join(array_merge($this->otherContentTarget, $this->otherContentSource));
-        if(preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent))) {
+        if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
+            error_log("BEFORE: ".$otherContent);
+            error_log("AFTER: ".$this->contentConverter->removeXlfTags($otherContent));
+            error_log(print_r($matches,1));
             $data = array_merge($this->otherContentTarget, $this->otherContentSource);
             $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
         }
@@ -980,10 +978,20 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         $inTarget = $this->xmlparser->getParent('target');
         if(empty($inTarget)) {
-            $this->otherContentSource[] = $other;
+            $l = count($this->otherContentSource);
+            if($l === 0) {
+                $l = 1;
+                $this->otherContentSource[] = '';
+            }
+            $this->otherContentSource[$l-1] .= $other;
         }
         else {
-            $this->otherContentTarget[] = $other;
+            $l = count($this->otherContentTarget);
+            if($l === 0) {
+                $l = 1;
+                $this->otherContentTarget[] = '';
+            }
+            $this->otherContentTarget[$l-1] .= $other;
         }
     }
 }
