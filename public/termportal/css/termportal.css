@@ -1,0 +1,59 @@
+.flex-container {
+	display: flex;
+	text-align:center;
+	height:250px;
+}
+
+.center {
+    margin:auto;
+}
+.serchField{
+	width:50em;
+	height:2em;
+}
+
+#searchButton{
+	height:1.8em;
+	background-color: white;
+}
+
+#languages{
+	background-color: #01579B;
+	height:2em;
+	border-radius: 4px;
+	color:white;
+}
+#languages > option{
+    background-color: white;
+    color:black;
+}
+
+#termTable {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tabble-inner-style td,.tabble-inner-style th{
+	padding: 8px;
+    border-radius: 5px;
+}
+
+.tabble-inner-style{
+	background-color: #E8F2FF;
+}
+
+.tabble-inner-style tr:nth-child(even){background-color: #ffffff;}
+
+.tabble-inner-style tr:nth-child(even){background-color: #ffffff;}
+
+#termTable tr:hover {background-color: #ddd; cursor: pointer;}
+
+
+.wrap {
+    width: 100%;
+}
+
+.floatleft {
+    float:left; 
+    padding-left: 50px;
+}

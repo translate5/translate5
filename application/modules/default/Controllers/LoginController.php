@@ -60,8 +60,24 @@ class LoginController extends ZfExtended_Controllers_Login {
         }
         
         $this->localeSetup();
-        header ('HTTP/1.1 302 Moved Temporarily');
-        header ('Location: '.APPLICATION_RUNDIR.'/editor');
+        
+        
+        $sessionUser = new Zend_Session_Namespace('user');
+        $acl = ZfExtended_Acl::getInstance();
+        /* @var $acl ZfExtended_Acl */
+        $roles=$sessionUser->data->roles;
+        if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
+            header ('HTTP/1.1 302 Moved Temporarily');
+            header ('Location: '.APPLICATION_RUNDIR.'/editor');
+        }
+        //check if the user contains the termportal right
+        elseif($acl->isInAllowedRoles($roles, 'initial_page', 'termPortal')) {
+            header ('HTTP/1.1 302 Moved Temporarily');
+            //same check for new term search page
+            header ('Location: '.APPLICATION_RUNDIR.'/editor/termportal');
+        }else {
+            throw new ZfExtended_NoAccessException("No initial_page resource is found.");
+        }
         exit;
     }
 }
