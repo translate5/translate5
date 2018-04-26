@@ -1211,7 +1211,7 @@
         "targetToSort": "f2-14 -  Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat",
         "targetEdit": "f2-14 - <div class=\"open 6270742069643d223122207269643d223122202f internal-tag ownttip\"><span title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"bpt\" data-length=\"-1\" class=\"full\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div> Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat<div class=\"close 6570742069643d223222207269643d223122202f internal-tag ownttip\"><span title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"ept\" data-length=\"-1\" class=\"full\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>",
         "targetEditToSort": "f2-14 -  Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_45\":{\"nr\":\"45\",\"length\":{\"targetEdit\":113}},\"fakeSegId_80\":{\"nr\":\"80\",\"length\":{\"targetEdit\":8}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_45\":{\"nr\":\"45\",\"length\":{\"targetEdit\":113}}}}",
         "isWatched": false
     },
     {
