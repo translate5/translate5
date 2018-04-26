@@ -89,9 +89,9 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             $xmlparser->replaceChunk($key, $this->getSegmentContent($id, $field));
         });
         
-            $xmlparser->registerElement('trans-unit', function(){
-                $this->transUnitLength = 0;
-            }, function($tag, $key, $opener) use ($xmlparser){
+        $xmlparser->registerElement('trans-unit', function(){
+            $this->transUnitLength = 0;
+        }, function($tag, $key, $opener) use ($xmlparser){
             $segments = [];
             foreach($this->segmentIdsPerUnit as $segmentId) {
                 $segments[] = $this->getSegment($segmentId);
@@ -251,6 +251,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
         
+        //restoring of sub tags is working only if the parent tag has a valid id - this is the identifier for the sub segment content
         $xmlparser->registerElement('sub', function($tag, $attributes, $key) use($xmlparser){
             //disable handling of tags if we reach a sub, this is done recursivly in the loaded content of the found sub
             $xmlparser->disableHandlersUntilEndtag();

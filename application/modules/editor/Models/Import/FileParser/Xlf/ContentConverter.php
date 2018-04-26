@@ -84,6 +84,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     protected $preserveWhitespace = false;
     
     /**
+     * Flag to switch normal mode and remove tags mode
+     * @var string
+     */
+    protected $removeTags = false;
+    
+    /**
      * @param array $namespaces
      * @param editor_Models_Task $task for debugging reasons only
      * @param string $filename for debugging reasons only
@@ -142,6 +148,9 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * @return string
      */
     protected function createTag($rid, $tag, $originalContent, $text = null) {
+        if($this->removeTags){
+            return ''; 
+        }
         switch ($tag) {
             case 'x':
             case 'ph':
@@ -256,6 +265,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      */
     public function convert(array $chunks, $source, $preserveWhitespace = false) {
         $this->result = [];
+        $this->removeTags = false;
         //this assumes that source tags come always before target tags
         if($source) {
             $this->shortTagIdent = 1;
@@ -276,6 +286,22 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $this->result[$lastIdx] = rtrim($this->result[$lastIdx]);
         }
         return $this->result;
+    }
+    
+    /**
+     * removes all Xlf Tags and the masked content from the given string
+     * @param string $content
+     * @return string
+     */
+    public function removeXlfTags($content) {
+        $this->result = [];
+        //by setting removeTags to false, currently all side effects related to $this->shortTag* fields are prevented.
+        // Keep in mind if changing getShortTagNumber code or usage, 
+        // since this is the only place manipulating the fields - and which deacticated with remove tags implicitly.
+        $this->removeTags = true; 
+        $this->preserveWhitespace = false;
+        $this->xmlparser->parse($content);
+        return $this->xmlparser->join($this->result);
     }
     
     /**

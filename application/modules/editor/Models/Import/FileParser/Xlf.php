@@ -316,7 +316,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
          * the otherContent fields. 
          * To prevent that <a><b></b></a> is collected as <a><b></b></a> and <b></b> we store the start key in the trackTagOutsideMrk flag 
          */
-        $this->xmlparser->registerElement('*', function($tag, $key){
+        $this->xmlparser->registerElement('*', function($tag, $attributes, $key){
             $inTarget = $this->xmlparser->getParent('target');
             $inSegSource = $this->xmlparser->getParent('seg-source');
             if(empty($inTarget) && empty($inSegSource)) {
@@ -327,12 +327,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }, function($tag, $key, $opener){
             if($this->trackTagOutsideMrk === $opener['openerKey']) {
-                $this->otherContentHandler($this->xmlparser->getRange($opener['openerKey'], $key, true));
                 $this->trackTagOutsideMrk = false;
+                $this->otherContentHandler($this->xmlparser->getRange($opener['openerKey'], $key, true));
             }
         });
         //error_log("Unknown in XLF Parser ". $other); //→ $other evaluates to the tag in the wildcard handler
-        
     }
     
     /**
@@ -503,7 +502,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->currentPlainTarget = null;
             $this->otherContentSource = [];//reset otherContent for new source
             $this->otherContentTarget = [];//reset otherContent for new target
-
+            $this->checkContentOutsideMrk = false;
+            
 //From Globalese:
 //<trans-unit id="segmentNrInTask">
 //<source>Installation and Configuration</source>
@@ -664,7 +664,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             
             if($hasTargets && empty($this->currentTarget[$mid])){
-                error_log($mid.' # '.print_r($this->currentTarget,1));
                 $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
                 $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
                 $this->throwSegmentationException($msg, $transUnitMid);
@@ -767,7 +766,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         
         //it is easier to collect all content not in an mrk and dismiss this content after 
-        // we find out that we don't have any mrk at all instead of trying to collect only the content really outside of mrk tags 
+        // we find out that we don't have any mrk at all instead of trying to collect only the content really outside of mrk tags
+        
         if(!$this->checkContentOutsideMrk) {
             $this->otherContentTarget = [];
             $this->otherContentSource = [];
@@ -777,12 +777,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
         $otherContent = join(array_merge($this->otherContentTarget, $this->otherContentSource));
         if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
-            error_log("BEFORE: ".$otherContent);
-            error_log("AFTER: ".$this->contentConverter->removeXlfTags($otherContent));
-            error_log(print_r($matches,1));
             $data = array_merge($this->otherContentTarget, $this->otherContentSource);
             $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
         }
+        //error_log(print_r($this->otherContentTarget,1));
+        //error_log(print_r($this->otherContentSource,1));
         
         $hasNoTarget = is_null($this->currentPlainTarget);
         $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
@@ -972,10 +971,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function otherContentHandler($other) {
         $inMrk = $this->xmlparser->getParent('mrk');
-        if(!empty($inMrk)) {
+        if(!empty($inMrk) || $this->trackTagOutsideMrk !== false) {
             //we are in a mrk, so we do nothing
+            // or if we are in a tag we also don't have to track the data, this is done by the whole tag then
             return;
         }
+//error_log("OTHER ".$other);
         $inTarget = $this->xmlparser->getParent('target');
         if(empty($inTarget)) {
             $l = count($this->otherContentSource);
