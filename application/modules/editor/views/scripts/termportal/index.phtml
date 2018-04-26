@@ -27,7 +27,15 @@
  */
 
 ?>
+<a href="/login/logout">Logout</a>
+<?php 
 
+if(isset($this->error)){
+    echo $this->error;
+    exit;
+}
+
+?>
 <div class="flex-container">
 
     <div class="center">

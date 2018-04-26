@@ -29,13 +29,12 @@
 class Editor_TermportalController extends ZfExtended_Controllers_Action {
     
     public function indexAction(){
-        //TODO: why the user session is empty ?
         $sessionUser = new Zend_Session_Namespace('user');
         $sessionUser=$sessionUser->data;
         
         $config = Zend_Registry::get('config');
         $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
-        $langs=$sessionUser->sourceLanguage;
+        $langs=isset($sessionUser->sourceLanguage) ? $sessionUser->sourceLanguage : null;
         
         $langsArray = array();
         
@@ -43,15 +42,23 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         /* @var $model editor_Models_Languages */
         
         if(empty($sessionUser->customers)){
-            //TODO: what do we do if no customers are assigned to the user
-            //TODO: what do we do if no collections are assigned to the customer
-            //throw new ZfExtended_ValidateException("No customers assigned to the user.");
+            $this->view->error="No customers assigned to the user.";
+            return;
         }
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
-        $collectionIds=$collection->getCollectionsIdsForCustomer($sessionUser->customers);
+        
+        $customers=trim($sessionUser->customers,",");
+        $customers=explode(',', $customers);
+        
+        $collectionIds=$collection->getCollectionsIdsForCustomer($customers);
 
+        if(empty($collectionIds)){
+            $this->view->error="No available term collections for the associated customer were found.";
+            return;
+        }
+        
         //get the user languages
         if(!empty($langs)){
             $langsArray=$model->loadByIds(trim($langs,","));
