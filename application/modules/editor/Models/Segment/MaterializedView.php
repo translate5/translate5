@@ -245,7 +245,7 @@ class editor_Models_Segment_MaterializedView {
     }
     
     /**
-     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given gorupId/transunitId
+     * creates a reusable SQL fragment for updating the mat view metaCache field for a whole task or a given groupId/transunitId (including fileId)
      * @param boolean $forWholeTask
      * @return string
      */
