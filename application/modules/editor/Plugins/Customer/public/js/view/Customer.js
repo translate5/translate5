@@ -167,8 +167,7 @@ Ext.define('Editor.plugins.Customer.view.Customer', {
                                         fieldLabel: me.strings.customerNumber,
                                         name: 'number',
                                         allowBlank: false,
-                                        maxLength: 255,
-                                        minLength: 3
+                                        maxLength: 255
                                     },
                                     {
                                         xtype: 'container',

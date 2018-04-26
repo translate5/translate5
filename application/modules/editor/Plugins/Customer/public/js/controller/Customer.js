@@ -72,17 +72,34 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
             '#adminUserGrid': {
                 beforerender:'onAdminUserGridBeforeRender'
             }
+        },
+        controller:{
+            '#Editor.$application': {
+                editorViewportOpen: 'onEditorViewportOpen'
+            }
         }
     },
 
     strings:{
         customer:'#UT#Kunden'
     },
+    
+    /***
+     * hide the customers button when editor is opened
+     */
+    onEditorViewportOpen:function(){
+        this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(true);
+    },
 
     /**
      * On head panel after render handler
      */
     onHeadPanelAfterRender: function(toolbar) {
+        //if we are in edit task mode, do not add the customer button
+        if(Ext.ComponentQuery.query('#segmentgrid')[0]){
+            return;
+        }
+        
         if(!this.isCustomerOverviewAllowed()){
             return;
         }
