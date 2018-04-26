@@ -94,6 +94,11 @@ function searchTerm(searchString,successCallback){
 function fillSearchTermSelect(){
 
     if(!searchTermsResponse){
+        
+        if(requestFromSearchButton){
+            requestFromSearchButton=false;
+        }
+        
         $('#searchTermsSelect').hide();
         return;
     }
