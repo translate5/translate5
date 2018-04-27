@@ -48,10 +48,19 @@ class editor_Plugins_TermImport_TermImportController extends ZfExtended_RestCont
     }
     
     public function filesystemAction(){
-        $import=ZfExtended_Factory::get('editor_Plugins_TermImport_Services_FilesystemImport');
-        /* @var $import editor_Plugins_TermImport_Services_FilesystemImport */
+        $import=ZfExtended_Factory::get('editor_Plugins_TermImport_Services_Import');
+        /* @var $import editor_Plugins_TermImport_Services_Import */
         
         $message=$import->handleFileSystemImport();
+        $this->view->messages=$message;
+    }
+    
+    
+    public function crossapiAction(){
+        $import=ZfExtended_Factory::get('editor_Plugins_TermImport_Services_Import');
+        /* @var $import editor_Plugins_TermImport_Services_Import */
+        
+        $message=$import->handleAccrossApiImport();
         $this->view->messages=$message;
     }
 }

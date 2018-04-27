@@ -74,5 +74,15 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
                         'action' => 'filesystem'
                 ));
         $r->addRoute('plugins_termimport_filesystem', $filesystemRoute);
+        
+        
+        $crossapiRoute = new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_termimport_termimport/crossapi',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'plugins_termimport_termimport',
+                        'action' => 'crossapi'
+                ));
+        $r->addRoute('plugins_termimport_crossapi', $crossapiRoute);
     }
 }

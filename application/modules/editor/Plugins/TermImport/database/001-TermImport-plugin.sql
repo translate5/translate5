@@ -35,3 +35,7 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
 VALUES ('editor', 'admin', 'editor_plugins_termimport_termimport', 'filesystem');
+
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'admin', 'editor_plugins_termimport_termimport', 'crossapi');
