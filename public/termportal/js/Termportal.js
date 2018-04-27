@@ -18,15 +18,15 @@ var selectItem = function (event, ui) {
     //empty term options component
     $('#searchTermsSelect').empty();
 
-    //if there are more than one results, show the term option component
-    if(searchTermsResponse.length>1){
+    //if there are results, show them
+    if(searchTermsResponse.length>0){
         $('#searchTermsSelect').show();
+        $('#finalResultContent').show();
     }
 
     fillSearchTermSelect();
     //find the attributes for
     findTermsAndAttributes(ui.item.groupId);
-    $('#attributeTable').empty();
     //$("#search").val(ui.item.value);
     return false;
 }
@@ -99,7 +99,7 @@ function fillSearchTermSelect(){
             requestFromSearchButton=false;
         }
         
-        $('#searchTermsSelect').hide();
+        $("#finalResultContent").hide();
         return;
     }
 
@@ -113,8 +113,8 @@ function fillSearchTermSelect(){
             findTermsAndAttributes(searchTermsResponse[0].groupId);
             return;
         }
-        if(searchTermsResponse.length>1){
-            $('#searchTermsSelect').show();
+        if(searchTermsResponse.length>0){
+            $("#finalResultContent").show();
         }
         
     }
@@ -125,11 +125,31 @@ function fillSearchTermSelect(){
     
     //fill the term component with the search results
     $.each(searchTermsResponse, function (i, item) {
-        $('#searchTermsSelect').append($('<option>', { 
-            value: item.groupId,
-            text : item.desc
-        }));
+        $('#searchTermsSelect').append(
+                $('<li>').attr('data-value', item.groupId).attr('class', 'ui-widget-content').append(
+                        $('<div>').attr('class', 'ui-widget').append(item.desc)
+            ));
     });
+    $("#searchTermsSelect").selectable();
+    $("#searchTermsSelect li.ui-selectee").on( "mouseover", function( event ) {
+        $(this).addClass('ui-state-hover');
+    });
+    $("#searchTermsSelect li.ui-selectee").on( "mouseout", function( event ) {
+        $(this).removeClass('ui-state-hover');
+    });
+    $("#searchTermsSelect").on( "selectableselecting", function( event, ui ) {
+        $(ui.selecting).addClass('ui-state-active');
+    });
+    $("#searchTermsSelect").on( "selectableunselecting", function( event, ui ) {
+        $(ui.unselecting).removeClass('ui-state-active');
+    });
+    $("#searchTermsSelect").on( "selectableselected", function( event, ui ) {
+        $(ui.selected).addClass('ui-state-active');
+        findTermsAndAttributes($(ui.selected).attr('data-value'));
+    });
+    if(searchTermsResponse.length==1){
+        $("#searchTermsSelect li:first-child").addClass('ui-state-active').addClass('ui-selected');
+    }
 }
 
 /***
@@ -171,12 +191,20 @@ function drawTermGroups(){
         return;
     }
     $('#termTable').empty();
-    $('#termTable').append( '<tr><td colspan="3">'+termTableTitle+'</td></tr>' );
     var count=0;
     termAttributeContainer.forEach(function(attribute) {
-        $('#termTable').append( '<tr onclick="drawAttributes('+count+');"><td>' + attribute[0].language + '</td><td>' + attribute[0].desc + '</td></tr>' );
+        $('#termTable').append( '<h3>'+attribute[0].language + ' ' + attribute[0].desc + '</h3><div>' + this.renderAttributes(count) + '</div>' );
         count++;
     });
+    if ($('#termTable').hasClass('ui-accordion')) {
+        $('#termTable').accordion('refresh');
+    } else {
+        $("#termTable").accordion({
+            active: false,
+            collapsible: true,
+            heightStyle: "content"
+        });
+    }
 }
 
 /***
@@ -189,7 +217,6 @@ function drawTermEntryAttributes(entryAttribute){
         return;
     }
     $('#termAttributeTable').empty();
-    $('#termAttributeTable').append( '<tr><td colspan="3">'+termEntryAttributeTableTitle+'</td></tr>' );
     entryAttribute.forEach(function(attribute) {
         var type=attribute.attrType ? attribute.attrType : "";
         var attVal=attribute.value ? attribute.value : "";
@@ -199,24 +226,24 @@ function drawTermEntryAttributes(entryAttribute){
 }
 
 /***
- * Draw term attributes by given term
+ * Render term attributes by given term
  * 
  * @param termId
- * @returns
+ * @returns {String}
  */
-function drawAttributes(termId){
-    var attributes=termAttributeContainer[termId];
-    $('#attributeTable').empty();
-
-    $('#attributeTable').append( '<tr><td colspan="3">'+termAttributeTableTitle+'</td></tr>' );
+function renderAttributes(termId){
+    var attributes=termAttributeContainer[termId]
+        html = '<table class="tabble-inner-style">';
     attributes.forEach(function(attribute) {
         var type=attribute.attrType ? attribute.attrType : "";
         var attVal=attribute.value ? attribute.value : "";
         
         //var labelTrans=attributeLabels.find( label => label.id === attribute.labelId );
         //$('#attributeTable').append( '<tr><td>' + labelTrans.labelText + '</td><td>' + attribute.name + '</td><td>' + type + '</td><td>' + attVal + '</td></tr>' );
-        $('#attributeTable').append( '<tr><td>' + attribute.name + '</td><td>' + type + '</td><td>' + attVal + '</td></tr>' );
+        html += '<tr><td>' + attribute.name + '</td><td>' + type + '</td><td>' + attVal + '</td></tr>';
     });
+    html += '</table>';
+    return html;
 }
 
 $("#searchButton" ).button({
@@ -224,7 +251,6 @@ $("#searchButton" ).button({
 }).click(function(){
     requestFromSearchButton=true;
     $('#termAttributeTable').empty();
-    $('#attributeTable').empty();
     $('#termTable').empty();
     
     $("#search").autocomplete( "search", $("#search").val() );
@@ -235,15 +261,10 @@ $('#search').keyup(function (e) {
       $("#search").autocomplete( "search", $("#search").val() );
       return false;
     }
-    $('#searchTermsSelect').hide();
+    $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
     
     $('#termAttributeTable').empty();
-    $('#attributeTable').empty();
     $('#termTable').empty();
 });
 
-$('#searchTermsSelect').on('change', function() {
-    $('#attributeTable').empty();
-    findTermsAndAttributes($(this).val());
-});

@@ -1,11 +1,11 @@
-.flex-container {
-	display: flex;
-	text-align:center;
-	height:250px;
+.wrap {
+    width: 100%;
+    margin-bottom: 3em;
 }
 
 .center {
-    margin:auto;
+    text-align: center;
+    padding: 0px auto;
 }
 .serchField{
 	width:50em;
@@ -28,14 +28,24 @@
     color:black;
 }
 
-#termTable {
-    border-collapse: collapse;
-    width: 100%;
+#finalResultContent {
+    display: flex;
 }
+
+#searchTermsHolder {
+    flex: 0 0 10em;
+}
+
+#resultTermsHolder {
+    flex: 1 1 auto;
+}
+
+#searchTermsSelect { list-style-type: none; margin: 0; padding: 0; }
+#searchTermsSelect li { margin: 3px; padding: 0.4em; }
 
 .tabble-inner-style td,.tabble-inner-style th{
 	padding: 8px;
-    border-radius: 5px;
+	border-radius: 5px;
 }
 
 .tabble-inner-style{
@@ -49,11 +59,3 @@
 #termTable tr:hover {background-color: #ddd; cursor: pointer;}
 
 
-.wrap {
-    width: 100%;
-}
-
-.floatleft {
-    float:left; 
-    padding-left: 50px;
-}
