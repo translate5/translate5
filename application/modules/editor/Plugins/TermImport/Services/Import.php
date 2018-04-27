@@ -162,6 +162,9 @@ class editor_Plugins_TermImport_Services_Import {
                 error_log("Unable to import the file:".$file." into the collection");
             }
         }
+        if(empty($returnMessage)){
+            $returnMessage[]="No files where imported";
+        }
         return $returnMessage;
     }
     
@@ -264,7 +267,9 @@ class editor_Plugins_TermImport_Services_Import {
                 unlink($tmpFile);
             }
         }
-        
+        if(empty($returnMessage)){
+            $returnMessage[]="No files where imported";
+        }
         return $returnMessage;
     }
     
