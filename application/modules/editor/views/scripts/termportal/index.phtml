@@ -36,41 +36,39 @@ if(isset($this->error)){
 }
 
 ?>
-<div class="flex-container">
 
-    <div class="center">
-          <input class="serchField" type="text" placeholder="Search.." name="search" id="search">
-          <button id="searchButton"></button>
-          <select name="languages" id="languages">
-          <?php
-            foreach ($this->languages as $lang){
-                echo '<option value="'.$lang["id"].'">'.$lang["rfc5646"].'</option>';
-            }
-          ?>
-          </select>
-	</div>
+<div class="wrap center">
+      <input class="serchField" type="text" placeholder="Search.." name="search" id="search">
+      <button id="searchButton"></button>
+      <select name="languages" id="languages">
+      <?php
+        foreach ($this->languages as $lang){
+            echo '<option value="'.$lang["id"].'">'.$lang["rfc5646"].'</option>';
+        }
+      ?>
+      </select>
 </div>
 
-<div class="resultContent wrap" id="finalResultContent">
-	<div class="floatleft">
-		<div id="searchTermsHolder" class="floatleft">
-		<select id="searchTermsSelect" size="10" style="width: 200px; display: inline-block; display: none;">
-		</select>
-		</div>
-		<div class="floatleft">
-       	 	<table class="tabble-inner-style" id="termAttributeTable">
-        	</table>
-		
-       	 	<table class="tabble-inner-style" id="termTable">
-        	</table>
-        </div>
-        <div style="clear: both;"></div>
+<div class="wrap" id="finalResultContent" style="display: none;">
+	<div id="searchTermsHolder">
+    	<ul id="searchTermsSelect" size="10" style="width: 200px; display: inline-block;">
+    	</ul>
 	</div>
-	<div class="floatleft">
-		<table class="tabble-inner-style" id="attributeTable">
+	<div id="resultTermsHolder">
+      <ul>
+        <li><a href="#resultTermsHolder-1">termAttributeTable</a></li>
+        <li><a href="#resultTermsHolder-2">Terms</a></li>
+      </ul>
+      <div id="resultTermsHolder-1">
+        <table class="tabble-inner-style" id="termAttributeTable">
         </table>
-	</div>
-	<div style="clear: both;"></div>
+      </div>
+      <div id="resultTermsHolder-2">
+            <table class="tabble-inner-style" id="termTable">
+            </table>
+        </div>
+       </div>
+    </div>
 </div>
 
 <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/jquery-ui-1.12.1/jquery-ui.min.css">
@@ -89,5 +87,10 @@ var termTableTitle='<?php echo $this->translations["termTableTitle"];?>';
 var termEntryAttributeTableTitle='<?php echo $this->translations["termEntryAttributeTableTitle"];?>';
 var termAttributeTableTitle='<?php echo $this->translations["termAttributeTableTitle"];?>';
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
+
+$( function() {
+    $("#resultTermsHolder").tabs();
+} );
+
 </script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/Termportal.js"></script>
