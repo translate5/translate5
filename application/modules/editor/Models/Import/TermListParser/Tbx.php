@@ -181,8 +181,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * 
      * @var boolean
      */
-    private $isInsideNtig=false;
+    private $isInsideTig=false;
     
+    
+    /***
+     * if the current node is inside desciption group
+     * @var string
+     */
+    private $isInsideDescripGrp=false;
     
     /***
      * Is the current active termEntry exist in the current collection
@@ -229,6 +235,25 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * @var unknown
      */
     private $lastMergeTermEntryId;
+    
+    
+    /***
+     * Count the note tag in each level
+     * @var array
+     */
+    private $noteLevelCount=[
+            'termEntry'=>0,
+            'transacGrp'=>0,
+            'langSet'=>0,
+            'descripGrp'=>0,
+            'tig'=>0
+    ];
+    
+    /***
+     * Array of actual tag parent tree
+     * @var array
+     */
+    private $actualLevel=array();
     
     public function __construct() {
         if(!defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
@@ -331,6 +356,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 
                 //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
                 while($this->fastForwardTo('termEntry')) {
+                    $this->setActualLevel();
                     $this->handleTermEntry();
                 }
                 
@@ -434,8 +460,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $tmpParrentId=null;
         // handle all inner elements of termEntry
         while($this->xml->read() && $this->xml->name !== 'termEntry') {
+            if($this->isIgnoreTag()){
+                continue;
+            }
             switch($this->xml->name) {
                 case 'langSet':
+                    $this->setActualLevel();
                     $start = microtime(true);
                     $this->counterTigInLangSet = 0;
                     $this->actualParentId=null;
@@ -446,11 +476,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                     $this->handleDescrip();
                     break;
                 case 'transacGrp':
+                    $this->setActualLevel();
                     $tmpParrentId=null;
                     break;
                 case 'transac':
                     
-                    if($this->isInsideNtig){
+                    if($this->isInsideTig){
                         $entry=$this->saveTermAttribute($this->actualParentId);
                     }else{
                         $entry=$this->saveEntryAttribute($this->actualParentId);
@@ -461,11 +492,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                     break;
                 case 'date':
                 case 'transacNote':
-                    $this->isInsideNtig ? $this->saveTermAttribute($tmpParrentId) : $this->saveEntryAttribute($tmpParrentId);
+                    $this->isInsideTig ? $this->saveTermAttribute($tmpParrentId) : $this->saveEntryAttribute($tmpParrentId);
                     break;
                 case 'descripGrp':
+                    $this->setActualLevel();
+                    $this->isInsideDescripGrp=$this->isStartTag();
                     break;
                 case 'tig':
+                    $this->setActualLevel();
                     $this->handleTig();
                     break;
                 case 'term':
@@ -477,6 +511,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                     break;
                 case 'admin':
                     $this->saveTermAttribute(null);
+                    break;
+                case 'ref':
+                    $this->handleRef($tmpParrentId);
+                    break;
+                case 'note':
+                    $this->handleNote($tmpParrentId);
                     break;
                 default:
                     $this->handleUnknown();
@@ -695,18 +735,27 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(!$this->isStartTag()){
             return;
         }
+        $this->actualParentId=null;
         //insert descript
-        $entry=$this->saveEntryAttribute(null);
-        $this->actualParentId=$entry->getId();
+        if($this->isInsideTig){
+            $entry=$this->saveTermAttribute($this->actualParentId);
+        }else{
+            $entry=$this->saveEntryAttribute($this->actualParentId);
+        }
+
+        //if inside description group, set the parent id from the current description tag
+        if($this->isInsideDescripGrp){
+            $this->actualParentId=$entry->getId();
+        }
     }
     
     /***
      * Tig tag handler
      */
     protected function handleTig(){
-        $this->isInsideNtig=$this->isStartTag();
+        $this->isInsideTig=$this->isStartTag();
         
-        if(!$this->isInsideNtig){
+        if(!$this->isInsideTig){
             //remove unneeded term attributes
             if(!empty($this->termAttirbuteContainer)){
                 $termAttributes=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermAttributes');
@@ -726,6 +775,59 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $this->termAttirbuteContainer=array();
     }
     
+    protected function handleRef($tmpParrentId){
+        if(!$this->isStartTag()){
+            return;
+        }
+        $this->saveRefOrNote($tmpParrentId);
+    }
+    
+    protected function handleNote($tmpParrentId){
+        if(!$this->isStartTag()){
+            return;
+        }
+        
+        //increment the current note count in the level
+        $this->noteLevelCount[end($this->actualLevel)]++;
+        
+        //get the current note count in the level
+        $internalCount=$this->noteLevelCount[end($this->actualLevel)];
+        
+        $this->saveRefOrNote($tmpParrentId, $internalCount);
+    }
+    
+    /***
+     * Save ref attribute or note attribute 
+     * 
+     * @param int $tmpParrentId
+     * @param int $internalCount
+     */
+    private function saveRefOrNote($tmpParrentId,$internalCount=null){
+        //if yes, inside transacGrp
+        if($tmpParrentId){
+            $this->isInsideTig ? $this->saveTermAttribute($tmpParrentId,$internalCount) : $this->saveEntryAttribute($tmpParrentId,$internalCount);
+            return;
+        }
+        
+        //if inside description grp, use the actualParrentId (the decript id)
+        if($this->isInsideDescripGrp){
+            $this->isInsideTig ? $this->saveTermAttribute($this->actualParentId,$internalCount) : $this->saveEntryAttribute($this->actualParentId,$internalCount);
+            return;
+        }
+        
+        //the attribute is with null parentId, hold the old parent and save the attribute with null parent id
+        $oldActualParentId=$this->actualParentId;
+        $this->actualParentId = null;
+        
+        if($this->isInsideTig){
+            $this->saveTermAttribute($this->actualParentId,$internalCount);
+        }else{
+            $this->saveEntryAttribute($this->actualParentId,$internalCount);
+        }
+        
+        $this->actualParentId=$oldActualParentId;
+    }
+    
     /***
      * Save the unknown parameter to the database
      * @return boolean|void|editor_Models_TermCollection_TermEntryAttributes|boolean|editor_Models_TermCollection_TermEntryAttributes
@@ -739,17 +841,20 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
     
     /***
-     * Save term entry attribute in the database
+     * Save term entry attribute in the database.
      * 
      * @param unknown $parentId
+     * @param int $internalCount: the current tag count of the same type in one group
+     * 
      * @return boolean|editor_Models_TermCollection_TermEntryAttributes
      */
-    protected function saveEntryAttribute($parentId){
+    protected function saveEntryAttribute($parentId,$internalCount=null){
         if(!$this->isStartTag()){
             return false;
         }
         $attribute=$this->getAttributeObject(false,$parentId);
         $attribute->setTermEntryId($this->actualTermEntryIdDb);
+        $attribute->setInternalCount($internalCount);
         $attribute->saveOrUpdate();
 
         //add the inserted/update attribute to the collection
@@ -761,14 +866,17 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * Save term attribute in the database
      * 
      * @param unknown $parentId
+     * @param int $internalCount: the current tag count of the same type in one group
+     * 
      * @return void|editor_Models_TermCollection_TermEntryAttributes
      */
-    protected function saveTermAttribute($parentId){
+    protected function saveTermAttribute($parentId,$internalCount=null){
         if(!$this->isStartTag()){
             return;
         }
         $attribute=$this->getAttributeObject(true,$parentId);
         $attribute->setTermId($this->actualTermIdDb);
+        $attribute->setInternalCount($internalCount);
         $attribute->saveOrUpdate();
         
         //add the inserted/update attribute to the collection
@@ -813,11 +921,48 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $attribute->setParentId($parentId);
         $attribute->setName($this->xml->name);
         $attribute->setAttrType($this->xml->getAttribute('type'));
+        $attribute->setAttrDataType($this->xml->getAttribute('datatype'));
         $attribute->setAttrTarget($this->xml->getAttribute('target'));
         $attribute->setAttrId($this->xml->getAttribute('id'));
         $attribute->setAttrLang($this->xml->getAttribute('xml:lang'));
         $attribute->setValue($this->xml->readInnerXml());
         return $attribute;
+    }
+    
+    /***
+       Set the actual tag tree.
+       Example:
+     	<termEntry>
+		   <descrip>Description</descrip>
+		   <ref>General</ref>
+		   <note>Entry level</note>
+		   <transacGrp>
+			  <transac>creation</transac>
+			  <date>2018-03-22</date>
+			  <transacNote>Default Supervisor</transacNote>
+			  <ref>General</ref>  <- this is the curent active node => actualLevel -> ('termEntry','transacGrp');
+			  
+			   
+     */
+    protected function setActualLevel(){
+        if($this->isStartTag()){
+            array_push($this->actualLevel, $this->xml->name);
+            return;
+        }
+        $this->noteLevelCount[$this->xml->name]=0;
+        unset($this->actualLevel[array_search($this->xml->name, $this->actualLevel)]);
+    }
+    
+    /***
+     * Ignore the tag of type figure.
+     * TODO: if more tags need to be ignored, extend this!
+     * @return boolean
+     */
+    protected function isIgnoreTag(){
+        if($this->isStartTag()){
+            return $this->xml->getAttribute('type')==="figure";
+        }
+        return false;
     }
     
     protected function isEndTag() {
