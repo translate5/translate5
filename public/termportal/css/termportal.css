@@ -30,14 +30,17 @@
 
 #finalResultContent {
     display: flex;
+    flex-flow: row wrap;
 }
 
 #searchTermsHolder {
     flex: 0 0 10em;
+    order: 1;
 }
 
 #resultTermsHolder {
     flex: 1 1 auto;
+    order: 2;
 }
 
 #searchTermsSelect { list-style-type: none; margin: 0; padding: 0; }
