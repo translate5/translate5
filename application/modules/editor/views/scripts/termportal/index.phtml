@@ -27,7 +27,10 @@
  */
 
 ?>
-<a href="/login/logout">Logout</a>
+<div id="head">
+<a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a>
+</div>
+
 <?php 
 
 if(isset($this->error)){
@@ -37,20 +40,21 @@ if(isset($this->error)){
 
 ?>
 
-<div class="wrap center">
-      <input class="serchField" type="text" placeholder="Search.." name="search" id="search">
-      <button id="searchButton"></button>
-      <select name="languages" id="languages">
+<div class="wrap">
       <?php
         foreach ($this->languages as $lang){
-            echo '<option value="'.$lang["id"].'">'.$lang["rfc5646"].'</option>';
+            echo '<label for="'.$lang["id"].'">'.$lang["rfc5646"].'</label>';
+            echo '<input type="radio" name="languages" value="'.$lang["id"].'" id="'.$lang["id"].'">';
         }
       ?>
-      </select>
+        <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
+            <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" placeholder="Search.." name="search" id="search">
+            <button id="searchButton"></button>
+        </div>
 </div>
 
 <div class="wrap" id="finalResultContent" style="display: none;">
-	<div id="searchTermsHolder">
+	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
     	<ul id="searchTermsSelect" size="10" style="width: 200px; display: inline-block;">
     	</ul>
 	</div>
@@ -89,6 +93,8 @@ var termAttributeTableTitle='<?php echo $this->translations["termAttributeTableT
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
 
 $( function() {
+    $("input[name=languages]").first().prop("checked", true);
+    $("input[name=languages]").checkboxradio();
     $("#resultTermsHolder").tabs();
 } );
 
