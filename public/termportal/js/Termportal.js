@@ -76,7 +76,7 @@ function searchTerm(searchString,successCallback){
         dataType: "json",
         data: {
             'term':searchString,
-            'language':$("#languages").val(),
+            'language':$('input[name=languages]:checked').val(),
             'collectionIds':collectionIds
         },
         success: function(result){
