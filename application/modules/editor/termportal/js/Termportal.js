@@ -39,6 +39,10 @@ $("#search").autocomplete({
     },
     select: selectItem,
     minLength: 3,
+    focus: function(event, ui) {
+        event.preventDefault();
+        $(this).val(ui.item.label);
+    },
     change: function() {
         $("#myText").val("").css("display", 2);
     }
@@ -59,6 +63,7 @@ function findTermsAndAttributes(termGroupid){
         success: function(result){
             groupTermAttributeData(result.rows[KEY_TERM_ATTRIBUTES]);
             drawTermEntryAttributes(result.rows[KEY_TERM_ENTRY_ATTRIBUTES]);
+            $("#resultTermsHolder ul li:first-child a").click();
         }
     })
 }
@@ -70,13 +75,19 @@ function findTermsAndAttributes(termGroupid){
  * @returns
  */
 function searchTerm(searchString,successCallback){
-    searchTermsResponse=[];
+    var langVal;
+    if ($('#languages').is("div")) {
+        langVal = $('#languages input[name=languages]:checked').val();
+    } else {
+        langVal = $('#languages').val();
+    }
+    searchTermsResponse=[];  
     $.ajax({
         url: "/editor/termcollection/search",
         dataType: "json",
         data: {
             'term':searchString,
-            'language':$('input[name=languages]:checked').val(),
+            'language':langVal,
             'collectionIds':collectionIds
         },
         success: function(result){
@@ -130,13 +141,12 @@ function fillSearchTermSelect(){
                         $('<div>').attr('class', 'ui-widget').append(item.desc)
             ));
     });
+    
     $("#searchTermsSelect").selectable();
-    $("#searchTermsSelect li.ui-selectee").on( "mouseover", function( event ) {
+    
+    $("#searchTermsSelect li").hover(function() {
         $(this).addClass('ui-state-hover');
-    });
-    $("#searchTermsSelect li.ui-selectee").on( "mouseout", function( event ) {
-        $(this).removeClass('ui-state-hover');
-    });
+      });
     $("#searchTermsSelect").on( "selectableselecting", function( event, ui ) {
         $(ui.selecting).addClass('ui-state-active');
     });
@@ -150,6 +160,9 @@ function fillSearchTermSelect(){
     if(searchTermsResponse.length==1){
         $("#searchTermsSelect li:first-child").addClass('ui-state-active').addClass('ui-selected');
     }
+    
+    // "reset" search form
+    $("#search").autocomplete( "search", $("#search").val('') );
 }
 
 /***
@@ -197,6 +210,7 @@ function drawTermGroups(){
         count++;
     });
     if ($('#termTable').hasClass('ui-accordion')) {
+        $('#resultTermsHolder ul li:first-child a').click();
         $('#termTable').accordion('refresh');
     } else {
         $("#termTable").accordion({
@@ -250,6 +264,8 @@ $("#searchButton" ).button({
     icon:"ui-icon-search"
 }).click(function(){
     requestFromSearchButton=true;
+    $('#finalResultContent').hide();
+    $('#searchTermsSelect').empty();
     $('#termAttributeTable').empty();
     $('#termTable').empty();
     
@@ -258,13 +274,24 @@ $("#searchButton" ).button({
 
 $('#search').keyup(function (e) {
     if (e.which == 13) {
+      requestFromSearchButton=true;
       $("#search").autocomplete( "search", $("#search").val() );
       return false;
     }
+    
+    termAttributeContainer=[];
+    termEntryAttributeContainer=[];
+    searchTermsResponse=[];
+    requestFromSearchButton=false;
+    
     $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
     
     $('#termAttributeTable').empty();
     $('#termTable').empty();
+});
+
+$('input[name=languages]').on("change", function(event){
+    $("#search").autocomplete( "search", $("#search").val() );
 });
 
