@@ -27,14 +27,22 @@
  */
 
 ?>
+
+<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/jquery-ui-1.12.1/jquery-ui.min.css">
+<script src="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+
+<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/termportal/css/termportal.css">
+
 <div id="head">
 <a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a>
 </div>
 
 <?php 
-
 if(isset($this->error)){
+    echo '<div class="ui-state-error ui-corner-all">';
     echo $this->error;
+    echo '</div>';
     exit;
 }
 
@@ -84,12 +92,6 @@ if(isset($this->error)){
        </div>
     </div>
 </div>
-
-<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/jquery-ui-1.12.1/jquery-ui.min.css">
-<script src="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/termportal/js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-
-<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/termportal/css/termportal.css">
 
 
 <script type="text/javascript">
