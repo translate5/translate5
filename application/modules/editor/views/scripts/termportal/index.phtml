@@ -34,66 +34,69 @@
 
 <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/css/termportal.css">
 
-
-<div id="head">
-<a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a>
+<div id="header">
+    <img src="/images/translate5.png?v=1" alt="translate5">
+    <div id="slogan">open source web-based translation system<br><small>translation, proofreading, postediting &amp; QA</small></div>
 </div>
 
-<?php 
-if(isset($this->error)){
-    echo '<div class="ui-state-error ui-corner-all">';
-    echo $this->error;
-    echo '</div>';
-    exit;
-}
+<div id="container">
 
-?>
-
-<div class="wrap">
-      <?php
-      if (count($this->languages) <= 3) {
-          echo '<div name="languages" id="languages">';
-          foreach ($this->languages as $lang){
-              echo '<label for="'.$lang["id"].'">'.$lang["rfc5646"].'</label>';
-              echo '<input type="radio" name="languages" value="'.$lang["id"].'" id="'.$lang["id"].'">';
+    <?php 
+    if(isset($this->error)){
+        echo '<div class="ui-state-error ui-corner-all">';
+        echo $this->error;
+        echo '</div>';
+        exit;
+    }
+    
+    ?>
+    
+    <div class="wrap">
+          <?php
+          if (count($this->languages) <= 3) {
+              echo '<div name="languages" id="languages">';
+              foreach ($this->languages as $lang){
+                  echo '<label for="'.$lang["id"].'">'.$lang["rfc5646"].'</label>';
+                  echo '<input type="radio" name="languages" value="'.$lang["id"].'" id="'.$lang["id"].'">';
+              }
+              echo '</div>';
+          } else {
+              echo '<select name="languages" id="languages">';
+              foreach ($this->languages as $lang){
+                  echo '<option value="'.$lang["id"].'">'.$lang["rfc5646"].'</option>';
+              }
+              echo '</select>';
           }
-          echo '</div>';
-      } else {
-          echo '<select name="languages" id="languages">';
-          foreach ($this->languages as $lang){
-              echo '<option value="'.$lang["id"].'">'.$lang["rfc5646"].'</option>';
-          }
-          echo '</select>';
-      }
-      ?>
-        <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
-            <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" placeholder="Search.." name="search" id="search">
-            <button id="searchButton"></button>
-        </div>
-</div>
-
-<div class="wrap" id="finalResultContent" style="display: none;">
-	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
-    	<ul id="searchTermsSelect" size="10" style="width: 200px; display: inline-block;">
-    	</ul>
-	</div>
-	<div id="resultTermsHolder">
-      <ul>
-        <li><a href="#resultTermsHolder-1">termAttributeTable</a></li>
-        <li><a href="#resultTermsHolder-2">Terms</a></li>
-      </ul>
-      <div id="resultTermsHolder-1">
-        <table class="tabble-inner-style" id="termAttributeTable">
-        </table>
-      </div>
-      <div id="resultTermsHolder-2">
-            <table class="tabble-inner-style" id="termTable">
-            </table>
-        </div>
-       </div>
+          ?>
+            <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
+                <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" placeholder="Search.." name="search" id="search">
+                <button id="searchButton"></button>
+            </div>
     </div>
-</div>
+    
+    <div class="wrap" id="finalResultContent" style="display: none;">
+    	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
+        	<ul id="searchTermsSelect" size="10" style="width: 200px; display: inline-block;">
+        	</ul>
+    	</div>
+    	<div id="resultTermsHolder">
+          <ul>
+            <li><a href="#resultTermsHolder-1">termAttributeTable</a></li>
+            <li><a href="#resultTermsHolder-2">Terms</a></li>
+          </ul>
+          <div id="resultTermsHolder-1">
+            <table class="tabble-inner-style" id="termAttributeTable">
+            </table>
+          </div>
+          <div id="resultTermsHolder-2">
+                <table class="tabble-inner-style" id="termTable">
+                </table>
+            </div>
+           </div>
+        </div>
+    </div>
 
+</div>
 
 <script type="text/javascript">
 //init the labels here, for later usage
