@@ -175,7 +175,8 @@ function groupTermAttributeData(data){
     if(!data || data.length<1){
         return;
     }
-    console.log(data)
+    
+    
     termAttributeContainer=[];
     var oldKey="",
         newKey="",
@@ -186,11 +187,16 @@ function groupTermAttributeData(data){
         if(newKey !=oldKey){
             count++;
             termAttributeContainer[count]=[];
-        }
+        }        
         termAttributeContainer[count].push(data[i]);
-        oldKey = data[i].termId;
+        oldKey = data[i].termId
     }
-    console.log(termAttributeContainer)
+    
+    //merge the childs
+    termAttributeContainer.forEach(function(termData,index) {
+        termAttributeContainer[index]=groupTermAttributeDataSingle(termData);
+    });
+    
     //draw the term groups
     drawTermGroups();
 }
@@ -231,6 +237,9 @@ function drawTermEntryAttributes(entryAttribute){
         return;
     }
     $('#termAttributeTable').empty();
+    
+    entryAttribute = groupTermEntryAttributes(entryAttribute);
+    
     entryAttribute.forEach(function(attribute) {
         var type=attribute.attrType ? attribute.attrType : "";
         var attVal=attribute.value ? attribute.value : "";
@@ -239,6 +248,53 @@ function drawTermEntryAttributes(entryAttribute){
     });
 }
 
+//TODO: use only one function here
+function groupTermEntryAttributes(list) {
+    var map = {}, node, roots = [], i;
+    for (i = 0; i < list.length; i += 1) {
+        map[list[i].attributeId] = i; // initialize the map
+        list[i].children = []; // initialize the children
+    }
+    for (i = 0; i < list.length; i += 1) {
+        node = list[i];
+        var labelTrans=attributeLabels.find( label => label.id === node.labelId );
+        node.headerText=node.attrType ? node.attrType : node.name;
+        if(labelTrans && labelTrans.labelText){
+            node.headerText=labelTrans.labelText;
+        }
+        if (node.parentId !== null) {
+            // if you have dangling branches check that map[node.parentId] exists
+            list[map[node.parentId]].children.push(node);
+        } else {
+            roots.push(node);
+        }
+    }
+    return roots;
+}
+
+//TODO: use only one function here
+function groupTermAttributeDataSingle(list) {
+    var map = {}, node, roots = [], i;
+    for (i = 0; i < list.length; i += 1) {
+        map[list[i].id] = i; // initialize the map
+        list[i].children = []; // initialize the children
+    }
+    for (i = 0; i < list.length; i += 1) {
+        node = list[i];
+        var labelTrans=attributeLabels.find( label => label.id === node.labelId );
+        node.headerText=node.attrType ? node.attrType : node.name;
+        if(labelTrans && labelTrans.labelText){
+            node.headerText=labelTrans.labelText;
+        }
+        if (node.parentId !== null) {
+            // if you have dangling branches check that map[node.parentId] exists
+            list[map[node.parentId]].children.push(node);
+        } else {
+            roots.push(node);
+        }
+    }
+    return roots;
+}
 /***
  * Render term attributes by given term
  * 
