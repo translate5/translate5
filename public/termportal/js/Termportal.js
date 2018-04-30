@@ -39,6 +39,10 @@ $("#search").autocomplete({
     },
     select: selectItem,
     minLength: 3,
+    focus: function(event, ui) {
+        event.preventDefault();
+        $(this).val(ui.item.label);
+    },
     change: function() {
         $("#myText").val("").css("display", 2);
     }
@@ -150,6 +154,9 @@ function fillSearchTermSelect(){
     if(searchTermsResponse.length==1){
         $("#searchTermsSelect li:first-child").addClass('ui-state-active').addClass('ui-selected');
     }
+    
+    // "reset" search form
+    $("#search").autocomplete( "search", $("#search").val('') );
 }
 
 /***
@@ -258,6 +265,7 @@ $("#searchButton" ).button({
 
 $('#search').keyup(function (e) {
     if (e.which == 13) {
+      requestFromSearchButton=true;
       $("#search").autocomplete( "search", $("#search").val() );
       return false;
     }
