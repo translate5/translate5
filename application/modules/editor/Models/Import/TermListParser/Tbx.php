@@ -361,6 +361,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 }
                 
                 $this->xml->close();
+                
+                $this->saveFileLocal($path,$termCollection->getName());
             }
         }catch (Exception $e){
             error_log("Something went wrong with tbx file parsing. Error message:".$e->getMessage());
@@ -1202,5 +1204,27 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $term->setCollectionId($this->termCollectionId);
         $term->setTermEntryId($this->actualTermEntryIdDb);
         $this->actualTermIdDb=$term->save();
+    }
+    
+    /***
+     * Save the imported file to the disk.
+     * The file location will be "trasnalte5 parh" /data/import/tbximported/"collectionname"/"the file"
+     * 
+     * @param string $filepath: source file location
+     * @param string $collectionName: term collection name
+     */
+    private function saveFileLocal($filepath,$collectionName) {
+        $ds=DIRECTORY_SEPARATOR;
+        $newFilePath=APPLICATION_RUNDIR.'..'.$ds.'data'.$ds.'import'.$ds.'tbximported'.$ds.$collectionName;
+        
+        if(!is_dir($newFilePath)){
+            mkdir($newFilePath, 0777, true);
+        }
+        
+        $fi = new FilesystemIterator($newFilePath, FilesystemIterator::SKIP_DOTS);
+        $fileName="ImportedFile-".iterator_count($fi).'.tbx';
+        
+        //save the file to the location
+        file_put_contents($newFilePath.$ds.$fileName, file_get_contents($filepath));
     }
 }
