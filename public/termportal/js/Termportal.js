@@ -74,13 +74,19 @@ function findTermsAndAttributes(termGroupid){
  * @returns
  */
 function searchTerm(searchString,successCallback){
-    searchTermsResponse=[];
+    var langVal;
+    if ($('#languages').is("div")) {
+        langVal = $('#languages input[name=languages]:checked').val();
+    } else {
+        langVal = $('#languages').val();
+    }
+    searchTermsResponse=[];  
     $.ajax({
         url: "/editor/termcollection/search",
         dataType: "json",
         data: {
             'term':searchString,
-            'language':$('input[name=languages]:checked').val(),
+            'language':langVal,
             'collectionIds':collectionIds
         },
         success: function(result){
