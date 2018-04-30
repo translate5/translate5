@@ -104,6 +104,10 @@ $( function() {
         $("#languages").selectmenu();
     <?php endif; ?>
     
+    $("#searchTermsSelect").on( "selectableselected", function( event, ui ) {
+        findTermsAndAttributes($(ui.selected).attr('data-value'));
+    });
+    
     $("#resultTermsHolder").tabs();
 } );
 
