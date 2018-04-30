@@ -89,7 +89,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         );
         
         $this->view->translations=$translatedStrings;
-        
-        $this->_helper->layout->disableLayout();
+        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts/termportal');
     }
 }
