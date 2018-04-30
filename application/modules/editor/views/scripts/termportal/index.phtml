@@ -28,17 +28,6 @@
 
 ?>
 
-<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.css">
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-
-<link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/css/termportal.css">
-
-<div id="header">
-    <img src="/images/translate5.png?v=1" alt="translate5">
-    <div id="slogan">open source web-based translation system<br><small>translation, proofreading, postediting &amp; QA</small></div>
-</div>
-
 <div id="container">
 
     <?php 
@@ -81,18 +70,17 @@
     	</div>
     	<div id="resultTermsHolder">
           <ul>
-            <li><a href="#resultTermsHolder-1">termAttributeTable</a></li>
-            <li><a href="#resultTermsHolder-2">Terms</a></li>
+            <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termTableTitle"];?></a></li>
+            <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTableTitle"];?></a></li>
           </ul>
           <div id="resultTermsHolder-1">
-            <table class="tabble-inner-style" id="termAttributeTable">
-            </table>
-          </div>
-          <div id="resultTermsHolder-2">
                 <table class="tabble-inner-style" id="termTable">
                 </table>
-            </div>
-           </div>
+          </div>
+          <div id="resultTermsHolder-2">
+              <table class="tabble-inner-style" id="termAttributeTable">
+              </table>
+          </div>
         </div>
     </div>
 

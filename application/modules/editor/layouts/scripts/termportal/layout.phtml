@@ -52,8 +52,18 @@ echo $this->doctype()
         <?php echo $this->headStyle() ?>
         <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
 <?php echo $this->headScript() ?>
+
+        <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.css">
+        <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
+        <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+        
+        <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/css/termportal.css">
     </head>
     <body>
+        <div id="header">
+            <img src="/images/translate5.png?v=1" alt="<?php echo 'translate5'; ?>">
+            <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
+        </div>
         <?php echo $this->layout()->content; ?>
     </body>
-                                                                                                    </html>
+</html>
