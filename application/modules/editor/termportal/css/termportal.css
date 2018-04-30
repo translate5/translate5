@@ -1,8 +1,5 @@
-#head {
-    background: url(/images/translate5.png?v=1) no-repeat left -12px #ffffff; background-size: 120px; background-position: top right;
-    min-height: 85px;
-    padding-right: 150px;
-    text-align: right;
+#container {
+    margin: 10px;
 }
 
 .wrap {
