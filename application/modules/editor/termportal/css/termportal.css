@@ -1,0 +1,66 @@
+#head {
+    background: url(/images/translate5.png?v=1) no-repeat left -12px #ffffff; background-size: 120px; background-position: top right;
+    min-height: 85px;
+    padding-right: 150px;
+    text-align: right;
+}
+
+.wrap {
+    margin-bottom: 2em;
+    margin-right: 150px;
+}
+
+#searchForm {
+    padding: 5px;
+    margin: 5px 0px;
+}
+
+#search {
+	width: 90%;
+}
+
+#search,
+#searchButton {
+    height: 2em;
+    position: relative;
+}
+
+#finalResultContent {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+#searchTermsHolder {
+    flex: 0 0 10em;
+    order: 1;
+    margin-right: 4px;
+}
+
+#searchTermsSelect { list-style-type: none; margin: 0; padding: 0; }
+#searchTermsSelect li { margin: 3px; padding: 0.4em; }
+
+#resultTermsHolder {
+    flex: 1 1 auto;
+    order: 2;
+}
+
+#resultTermsHolder table {
+    width: 100%;;
+}
+
+.tabble-inner-style td,.tabble-inner-style th{
+	padding: 8px;
+	border-radius: 5px;
+}
+
+.tabble-inner-style{
+	background-color: #E8F2FF;
+}
+
+.tabble-inner-style tr:nth-child(even){background-color: #ffffff;}
+
+.tabble-inner-style tr:nth-child(even){background-color: #ffffff;}
+
+#termTable tr:hover {background-color: #ddd; cursor: pointer;}
+
+
