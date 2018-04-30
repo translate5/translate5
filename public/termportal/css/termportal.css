@@ -7,22 +7,35 @@
 
 .wrap {
     margin-bottom: 2em;
-    margin-right: 150px;
+}
+
+#languages label {
+    margin-right: 5px;
 }
 
 #searchForm {
-    padding: 5px;
+    display: flex;
+    flex-flow: row wrap;
+    padding: 12px 10px 10px 10px;
     margin: 5px 0px;
 }
 
 #search {
-	width: 90%;
+    flex: 1 1 auto;
+    order: 1;
+    margin-right: 5px;
+    padding: 0px 5px;
+}
+#searchButton {
+    flex: 0 0 20px;
+    order: 2;
 }
 
 #search,
 #searchButton {
     height: 2em;
     position: relative;
+    margin-top:  -3px;
 }
 
 #finalResultContent {
@@ -31,9 +44,14 @@
 }
 
 #searchTermsHolder {
-    flex: 0 0 10em;
+    flex: 0 0 12em;
     order: 1;
-    margin-right: 4px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    max-height: 500px;
+    overflow-y: scroll;
+    overflow-x:  hidden;
+    padding-right: 30px;
 }
 
 #searchTermsSelect { list-style-type: none; margin: 0; padding: 0; }
@@ -42,6 +60,11 @@
 #resultTermsHolder {
     flex: 1 1 auto;
     order: 2;
+}
+
+#resultTermsHolder div {
+    max-height: 420px;
+    overflow: scroll;
 }
 
 #resultTermsHolder table {

@@ -63,6 +63,7 @@ function findTermsAndAttributes(termGroupid){
         success: function(result){
             groupTermAttributeData(result.rows[KEY_TERM_ATTRIBUTES]);
             drawTermEntryAttributes(result.rows[KEY_TERM_ENTRY_ATTRIBUTES]);
+            $("#resultTermsHolder ul li:first-child a").click();
         }
     })
 }
@@ -140,13 +141,12 @@ function fillSearchTermSelect(){
                         $('<div>').attr('class', 'ui-widget').append(item.desc)
             ));
     });
+    
     $("#searchTermsSelect").selectable();
-    $("#searchTermsSelect li.ui-selectee").on( "mouseover", function( event ) {
+    
+    $("#searchTermsSelect li").hover(function() {
         $(this).addClass('ui-state-hover');
-    });
-    $("#searchTermsSelect li.ui-selectee").on( "mouseout", function( event ) {
-        $(this).removeClass('ui-state-hover');
-    });
+      });
     $("#searchTermsSelect").on( "selectableselecting", function( event, ui ) {
         $(ui.selecting).addClass('ui-state-active');
     });
@@ -210,6 +210,7 @@ function drawTermGroups(){
         count++;
     });
     if ($('#termTable').hasClass('ui-accordion')) {
+        $('#resultTermsHolder ul li:first-child a').click();
         $('#termTable').accordion('refresh');
     } else {
         $("#termTable").accordion({
@@ -263,6 +264,8 @@ $("#searchButton" ).button({
     icon:"ui-icon-search"
 }).click(function(){
     requestFromSearchButton=true;
+    $('#finalResultContent').hide();
+    $('#searchTermsSelect').empty();
     $('#termAttributeTable').empty();
     $('#termTable').empty();
     
@@ -275,10 +278,20 @@ $('#search').keyup(function (e) {
       $("#search").autocomplete( "search", $("#search").val() );
       return false;
     }
+    
+    termAttributeContainer=[];
+    termEntryAttributeContainer=[];
+    searchTermsResponse=[];
+    requestFromSearchButton=false;
+    
     $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
     
     $('#termAttributeTable').empty();
     $('#termTable').empty();
+});
+
+$('input[name=languages]').on("change", function(event){
+    $("#search").autocomplete( "search", $("#search").val() );
 });
 
