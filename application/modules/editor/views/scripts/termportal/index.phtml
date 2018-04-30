@@ -42,10 +42,20 @@ if(isset($this->error)){
 
 <div class="wrap">
       <?php
-        foreach ($this->languages as $lang){
-            echo '<label for="'.$lang["id"].'">'.$lang["rfc5646"].'</label>';
-            echo '<input type="radio" name="languages" value="'.$lang["id"].'" id="'.$lang["id"].'">';
-        }
+      if (count($this->languages) <= 3) {
+          echo '<div name="languages" id="languages">';
+          foreach ($this->languages as $lang){
+              echo '<label for="'.$lang["id"].'">'.$lang["rfc5646"].'</label>';
+              echo '<input type="radio" name="languages" value="'.$lang["id"].'" id="'.$lang["id"].'">';
+          }
+          echo '</div>';
+      } else {
+          echo '<select name="languages" id="languages">';
+          foreach ($this->languages as $lang){
+              echo '<option value="'.$lang["id"].'">'.$lang["rfc5646"].'</option>';
+          }
+          echo '</select>';
+      }
       ?>
         <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
             <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" placeholder="Search.." name="search" id="search">
@@ -93,8 +103,13 @@ var termAttributeTableTitle='<?php echo $this->translations["termAttributeTableT
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
 
 $( function() {
-    $("input[name=languages]").first().prop("checked", true);
-    $("input[name=languages]").checkboxradio();
+    <?php if (count($this->languages) <= 3): ?>
+        $("#languages input").first().prop("checked", true);
+        $("#languages input").checkboxradio();
+    <?php else: ?>
+        $("#languages").selectmenu();
+    <?php endif; ?>
+    
     $("#resultTermsHolder").tabs();
 } );
 
