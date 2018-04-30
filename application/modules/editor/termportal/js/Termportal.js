@@ -63,7 +63,6 @@ function findTermsAndAttributes(termGroupid){
         success: function(result){
             groupTermAttributeData(result.rows[KEY_TERM_ATTRIBUTES]);
             drawTermEntryAttributes(result.rows[KEY_TERM_ENTRY_ATTRIBUTES]);
-            $("#resultTermsHolder ul li:first-child a").click();
         }
     })
 }
@@ -216,7 +215,6 @@ function drawTermGroups(){
         count++;
     });
     if ($('#termTable').hasClass('ui-accordion')) {
-        $('#resultTermsHolder ul li:first-child a').click();
         $('#termTable').accordion('refresh');
     } else {
         $("#termTable").accordion({
