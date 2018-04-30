@@ -15,6 +15,8 @@ var termAttributeContainer=[],
  */
 var selectItem = function (event, ui) {
     
+    console.log("selectItem: " + ui.item.groupId);
+    
     //empty term options component
     $('#searchTermsSelect').empty();
 
@@ -23,7 +25,9 @@ var selectItem = function (event, ui) {
         $('#searchTermsSelect').show();
         $('#finalResultContent').show();
     }
-
+    
+    console.log("selectItem: " + ui.item.groupId);
+    
     fillSearchTermSelect();
     //find the attributes for
     findTermsAndAttributes(ui.item.groupId);
@@ -42,6 +46,7 @@ $("#search").autocomplete({
     focus: function(event, ui) {
         event.preventDefault();
         $(this).val(ui.item.label);
+        console.log("autocomplete: FOCUS " + ui.item.label);
     },
     change: function() {
         $("#myText").val("").css("display", 2);
@@ -105,6 +110,8 @@ function fillSearchTermSelect(){
 
     if(!searchTermsResponse){
         
+        console.log("fillSearchTermSelect: nichts gefunden");
+        
         if(requestFromSearchButton){
             requestFromSearchButton=false;
         }
@@ -112,25 +119,34 @@ function fillSearchTermSelect(){
         $("#finalResultContent").hide();
         return;
     }
+    
+    console.log("fillSearchTermSelect: " + searchTermsResponse.length + " Treffer");
 
     if(requestFromSearchButton){
+        console.log("fillSearchTermSelect: requestFromSearchButton");
+        
         requestFromSearchButton=false;
 
         $('#searchTermsSelect').empty();
         
         //if only one record, find the attributes and display them
         if(searchTermsResponse.length===1){
+            console.log("fillSearchTermSelect: only one record => find the attributes and display them");
             findTermsAndAttributes(searchTermsResponse[0].groupId);
-            return;
         }
+        
         if(searchTermsResponse.length>0){
             $("#finalResultContent").show();
         }
         
     }
-
+    
     if(!$('#searchTermsSelect').is(":visible")){
         return;
+    }
+    
+    if(searchTermsResponse.length > 1){
+        $("#resultTermsHolder").hide();
     }
     
     //fill the term component with the search results
@@ -209,6 +225,7 @@ function drawTermGroups(){
         return;
     }
     $('#termTable').empty();
+    $("#resultTermsHolder").show();
     var count=0;
     termAttributeContainer.forEach(function(attribute) {
         $('#termTable').append( '<h3>'+attribute[0].language + ' ' + attribute[0].desc + '</h3><div>' + this.renderAttributes(count) + '</div>' );
@@ -235,6 +252,7 @@ function drawTermEntryAttributes(entryAttribute){
         return;
     }
     $('#termAttributeTable').empty();
+    $("#resultTermsHolder").show();
     
     entryAttribute = groupTermEntryAttributes(entryAttribute);
     
@@ -328,11 +346,12 @@ $("#searchButton" ).button({
 
 $('#search').keyup(function (e) {
     if (e.which == 13) {
+        console.log("keyup: Enter");
       requestFromSearchButton=true;
       $("#search").autocomplete( "search", $("#search").val() );
       return false;
     }
-    
+    console.log("keyup");
     termAttributeContainer=[];
     termEntryAttributeContainer=[];
     searchTermsResponse=[];
@@ -340,12 +359,15 @@ $('#search').keyup(function (e) {
     
     $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
-    
     $('#termAttributeTable').empty();
     $('#termTable').empty();
 });
 
 $('input[name=languages]').on("change", function(event){
+    $('#finalResultContent').hide();
+    $('#searchTermsSelect').empty();
+    $('#termAttributeTable').empty();
+    $('#termTable').empty();
     $("#search").autocomplete( "search", $("#search").val() );
 });
 
