@@ -51,7 +51,7 @@ $("#search").autocomplete({
  */
 function findTermsAndAttributes(termGroupid){
     $.ajax({
-        url: "http://translate5.local/editor/termcollection/search",
+        url: "/editor/termcollection/search",
         dataType: "json",
         data: {
             'groupId':termGroupid
@@ -72,7 +72,7 @@ function findTermsAndAttributes(termGroupid){
 function searchTerm(searchString,successCallback){
     searchTermsResponse=[];
     $.ajax({
-        url: "http://translate5.local/editor/termcollection/search",
+        url: "/editor/termcollection/search",
         dataType: "json",
         data: {
             'term':searchString,
