@@ -59,6 +59,7 @@ $("#search").autocomplete({
  * @returns
  */
 function findTermsAndAttributes(termGroupid){
+    console.log("findTermsAndAttributes() for: " + termGroupid);
     $.ajax({
         url: "/editor/termcollection/search",
         dataType: "json",
@@ -79,6 +80,7 @@ function findTermsAndAttributes(termGroupid){
  * @returns
  */
 function searchTerm(searchString,successCallback){
+    console.log("searchTerm() for: " + searchString);
     var langVal;
     if ($('#languages').is("div")) {
         langVal = $('#languages input[name=languages]:checked').val();
@@ -119,15 +121,14 @@ function fillSearchTermSelect(){
         $("#finalResultContent").hide();
         return;
     }
-    
+
+    $('#searchTermsSelect').empty();
     console.log("fillSearchTermSelect: " + searchTermsResponse.length + " Treffer");
 
     if(requestFromSearchButton){
         console.log("fillSearchTermSelect: requestFromSearchButton");
         
         requestFromSearchButton=false;
-
-        $('#searchTermsSelect').empty();
         
         //if only one record, find the attributes and display them
         if(searchTermsResponse.length===1){
@@ -157,10 +158,17 @@ function fillSearchTermSelect(){
             ));
     });
     
-    $("#searchTermsSelect").selectable();
+    if ($('#searchTermsSelect').hasClass('ui-selectable')) {
+        $("#searchTermsSelect").selectable("destroy");
+    }
     
-    $("#searchTermsSelect li").hover(function() {
+    $("#searchTermsSelect").selectable();
+
+    $("#searchTermsSelect li").mouseenter(function() {
         $(this).addClass('ui-state-hover');
+      });
+    $("#searchTermsSelect li").mouseleave(function() {
+        $(this).removeClass('ui-state-hover');
       });
     $("#searchTermsSelect").on( "selectableselecting", function( event, ui ) {
         $(ui.selecting).addClass('ui-state-active');
@@ -170,8 +178,8 @@ function fillSearchTermSelect(){
     });
     $("#searchTermsSelect").on( "selectableselected", function( event, ui ) {
         $(ui.selected).addClass('ui-state-active');
-        findTermsAndAttributes($(ui.selected).attr('data-value'));
     });
+    
     if(searchTermsResponse.length==1){
         $("#searchTermsSelect li:first-child").addClass('ui-state-active').addClass('ui-selected');
     }
