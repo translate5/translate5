@@ -81,19 +81,13 @@ function findTermsAndAttributes(termGroupid){
  */
 function searchTerm(searchString,successCallback){
     console.log("searchTerm() for: " + searchString);
-    var langVal;
-    if ($('#languages').is("div")) {
-        langVal = $('#languages input[name=languages]:checked').val();
-    } else {
-        langVal = $('#languages').val();
-    }
     searchTermsResponse=[];  
     $.ajax({
         url: "/editor/termcollection/search",
         dataType: "json",
         data: {
             'term':searchString,
-            'language':langVal,
+            'language':$('#languages').val(),
             'collectionIds':collectionIds
         },
         success: function(result){
@@ -268,7 +262,7 @@ function drawTermEntryAttributes(entryAttribute){
         var type=attribute.attrType ? attribute.attrType : "";
         var attVal=attribute.value ? attribute.value : "";
         
-        $('#termAttributeTable').append( '<tr><td>' + attribute.name + '</td><td>' + type + '</td><td>' + attVal + '</td></tr>' );
+        $('#termAttributeTable').append( '<h4 class="ui-widget-header ui-corner-all">' + attribute.name + '</h4>' + '<p>' + attVal + '</p>' );
     });
 }
 
@@ -327,16 +321,15 @@ function groupTermAttributeDataSingle(list) {
  */
 function renderAttributes(termId){
     var attributes=termAttributeContainer[termId]
-        html = '<table class="tabble-inner-style">';
+        html = '';
     attributes.forEach(function(attribute) {
         var type=attribute.attrType ? attribute.attrType : "";
         var attVal=attribute.value ? attribute.value : "";
         
         //var labelTrans=attributeLabels.find( label => label.id === attribute.labelId );
         //$('#attributeTable').append( '<tr><td>' + labelTrans.labelText + '</td><td>' + attribute.name + '</td><td>' + type + '</td><td>' + attVal + '</td></tr>' );
-        html += '<tr><td>' + attribute.name + '</td><td>' + type + '</td><td>' + attVal + '</td></tr>';
+        html += '<h4 class="ui-widget-header ui-corner-all">' + attribute.name + '</h4>' + '<p>' + attVal + '</p>';
     });
-    html += '</table>';
     return html;
 }
 
@@ -344,19 +337,14 @@ $("#searchButton" ).button({
     icon:"ui-icon-search"
 }).click(function(){
     requestFromSearchButton=true;
-    $('#finalResultContent').hide();
-    $('#searchTermsSelect').empty();
-    $('#termAttributeTable').empty();
-    $('#termTable').empty();
-    
-    $("#search").autocomplete( "search", $("#search").val() );
+    startAutocomplete();
 });
 
 $('#search').keyup(function (e) {
     if (e.which == 13) {
-        console.log("keyup: Enter");
+      console.log("keyup: Enter");
       requestFromSearchButton=true;
-      $("#search").autocomplete( "search", $("#search").val() );
+      startAutocomplete();
       return false;
     }
     console.log("keyup");
@@ -371,11 +359,14 @@ $('#search').keyup(function (e) {
     $('#termTable').empty();
 });
 
-$('input[name=languages]').on("change", function(event){
+function startAutocomplete(){
+    console.log("startAutocomplete...");
     $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
     $('#termAttributeTable').empty();
     $('#termTable').empty();
-    $("#search").autocomplete( "search", $("#search").val() );
-});
+    $("#search").autocomplete( "search", $("#search").val());
+}
+
+
 
