@@ -386,7 +386,7 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
  
         me.store = newStore;
         
-        me.setBodyTop(me.position = me.scrollTop = 0);
+        me.setBodyTop(me.scrollTop = me.position = 0);
         
         // Delete whatever our last viewSize might have been, and fall back to the prototype's default.      
         delete me.viewSize;
@@ -413,16 +413,16 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             previousFirstItem,
             previousLastItem,
             prevRowCount = rows.getCount(),
-            viewMoved = startIndex !== rows.startIndex && !me.isStoreLoading,
             calculatedTop = -1,
+            viewMoved = startIndex !== rows.startIndex && !me.isStoreLoading,
             scrollIncrement,
             restoreFocus;
  
-        me.isStoreLoading = false;
  
         // So that listeners to the itemremove events know that its because of a refresh. 
         // And so that this class's refresh listener knows to ignore it. 
         view.refreshing = me.refreshing = true;
+        me.isStoreLoading = false;
  
         if (view.refreshCounter) {
  
@@ -469,11 +469,11 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             // Ensure we jump to top. 
             // Apply empty text. 
             else {
-                me.scrollTop = calculatedTop = me.position = 0;
+                calculatedTop = me.scrollTop = me.position = 0;
                 view.addEmptyText();
             }
  
-            // Keep scroll and rendered block positions synched if there is scrolling. 
+            // Keep scroll and rendered block positions synched.  
             if (scroller && calculatedTop !== -1) {
                 me.setBodyTop(calculatedTop);
                 scroller.suspendEvent('scroll');
@@ -607,7 +607,8 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
  
             // We've just added a bunch of rows to the top of our range, so move upwards to keep the row appearance stable 
            newTop = me.bodyTop + increment;
-        } else {
+        } 
+        else {
             // No overlapping nodes; we'll need to render the whole range. 
             // teleported flag is set in getFirstVisibleRowIndex/getLastVisibleRowIndex if 
             // the table body has moved outside the viewport bounds 
@@ -718,7 +719,7 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             }
         }
  
-        // Calculate position of item container. 
+        // Position the item container. 
         newTop = Math.max(Math.floor(newTop), 0);
  
         // Sync the other side to exactly the same range from the dataset. 
@@ -856,6 +857,6 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
                 return me.getLastVisibleRowIndex(target + 1, endRow, viewportTop, viewportBottom);
             }
         }
-        return Math.min(me.getFirstVisibleRowIndex() + Math.ceil(clientHeight / me.rowHeight), rows.endIndex);
+        return Math.min(rows.endIndex, me.getFirstVisibleRowIndex() + Math.ceil(clientHeight / me.rowHeight));
     }
 });
