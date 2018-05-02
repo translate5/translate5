@@ -60,7 +60,7 @@
     margin-right: 5px;
     max-height: 600px;
     overflow-y: scroll;
-    overflow-x:  hidden;
+    overflow-x:  scroll;
     padding-right: 30px;
 }
 
@@ -90,13 +90,13 @@
 @media (min-width: 700px) {
     #resultTermsHolder {
         max-height: 520px;
-        overflow: scroll;
+        overflow-y: scroll;
         padding-right: 30px;
     }
 }
 
 #resultTermsHolder div {
-    overflow: scroll;
+    overflow-y: scroll;
 }
 
 #termTable,
