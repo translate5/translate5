@@ -1,10 +1,4 @@
-#logout {
-    margin-top: 20px;
-    margin-right: 7px;
-    float: right;
-}
-
-#container {
+.container {
     margin: 10px;
 }
 
@@ -12,8 +6,48 @@
     margin-bottom: 2em;
 }
 
+#container-header {
+    display: flex;
+    flex-flow: row wrap;
+}
+#logo {
+    flex: 0 0 180px;
+    order: 1;
+    height: 130px;
+    background: url(/images/translate5.png?v=1) no-repeat left -12px #ffffff;
+    background-position-x: left;
+    background-position-y: -12px;
+    background-size: auto auto;
+    background-size: 150px;
+    background-position: 19px 19px;
+}
+#languageSelector {
+    flex: 1 1 auto;
+    order: 2;
+    text-align: right;
+    margin-right: 7px;
+    margin-top: 19px;
+}
+#logout {
+    flex: 0 0 80px;
+    order: 3;
+    text-align: right;
+    margin-top: 19px;
+}
+
+@media (max-width: 610px) {
+    #logo {
+        flex: 0 1 100%;
+        text-align:left;
+        margin-right: 0px;
+    }
+    #logo { order: 3; }
+    #languageSelector { order: 1; text-align: left;}
+    #logout { order: 2; }
+}
+
 @media (max-width: 400px) {
-    #container .ui-selectmenu-button.ui-button {
+    .container-content .ui-button {
         display: block;
         width: auto;
     }
