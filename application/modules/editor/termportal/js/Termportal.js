@@ -82,19 +82,27 @@ function findTermsAndAttributes(termGroupid){
  * @returns
  */
 function searchTerm(searchString,successCallback){
+    var lng=$('#languages').val();
+    if(!lng){
+        lng=$("input[name='languages']:checked").val();
+    }
     console.log("searchTerm() for: " + searchString);
+    console.log("searchTerm() for language: " + lng);
     searchTermsResponse=[];  
     $.ajax({
         url: "/editor/termcollection/search",
         dataType: "json",
         data: {
             'term':searchString,
-            'language':$('#languages').val(),
-            'collectionIds':collectionIds
+            'language':lng,
+            'collectionIds':collectionIds,
+            'disableLimit':requestFromSearchButton
         },
         success: function(result){
             searchTermsResponse=result.rows[KEY_TERM];
-            successCallback(result.rows[KEY_TERM]);
+            if(successCallback){
+                successCallback(result.rows[KEY_TERM]);
+            }
             fillSearchTermSelect();
         }
     });
@@ -397,14 +405,16 @@ $("#searchButton" ).button({
     icon:"ui-icon-search"
 }).click(function(){
     requestFromSearchButton=true;
-    startAutocomplete();
+    //startAutocomplete();
+    searchTerm($("#search").val());
 });
 
 $('#search').keyup(function (e) {
     if (e.which == 13) {
       console.log("keyup: Enter");
       requestFromSearchButton=true;
-      startAutocomplete();
+      //startAutocomplete();
+      searchTerm($("#search").val());
       return false;
     }
     console.log("keyup");
