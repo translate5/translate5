@@ -351,14 +351,14 @@ function handleAttributeDrawData(attribute){
         case "transac":
             var header=attribute.name+" "+attribute.value;
             
-            html += '<h4 class="ui-widget-header ui-corner-all">' + header + '</h4>';
+            html += '<h4 class="ui-widget-header ui-corner-all">' + header + ':</h4>';
             
             if(attribute.children.length>0){
                 var childData=[];
                 attribute.children.forEach(function(child) {
                     //get the header text
                     childDataText=handleAttributeHeaderText(child);
-                    var attVal=child.value ? child.value : "";
+                    var attVal=child.value ? (" " + child.value) : "";
                     //the data tag is displayed as first in this group
                     if(child.name ==="date"){
                         childData.unshift('<p>' + childDataText + attVal+'</p>')
