@@ -125,7 +125,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from('LEK_terms',array('LEK_terms.language as id'))
-        ->join('LEK_languages', 'LEK_languages.id = LEK_terms.language',array('LEK_languages.rfc5646'))
+        ->join('LEK_languages', 'LEK_languages.id = LEK_terms.language',array('LEK_languages.rfc5646','LEK_languages.ISO_3166-1_alpha-2'))
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->group('LEK_terms.language');
         $rows=$this->db->fetchAll($s)->toArray();

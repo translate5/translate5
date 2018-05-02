@@ -95,6 +95,7 @@ var termTableTitle='<?php echo $this->translations["termTableTitle"];?>';
 var termEntryAttributeTableTitle='<?php echo $this->translations["termEntryAttributeTableTitle"];?>';
 var termAttributeTableTitle='<?php echo $this->translations["termAttributeTableTitle"];?>';
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
+var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 
 $( function() {
     <?php if (count($this->languages) <= 3): ?>

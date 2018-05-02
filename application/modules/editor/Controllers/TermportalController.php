@@ -77,6 +77,16 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $labels=$labelsModel->loadAll();
         
         $this->view->languages=$langsArray;
+        
+        $rfcFlags=[];
+        foreach ($langsArray as $lng){
+            $rfcFlags[$lng['rfc5646']]=$lng['ISO_3166-1_alpha-2'];
+            
+        }
+        
+        //rfc language code to language flag mapping
+        $this->view->rfcFlags=$rfcFlags;
+        
         $this->view->labels=$labels;
         $this->view->collectionIds=$collectionIds;
         
