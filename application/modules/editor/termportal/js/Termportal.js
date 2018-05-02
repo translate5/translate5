@@ -6,6 +6,7 @@ var termAttributeContainer=[],
     termEntryAttributeContainer=[],
     searchTermsResponse=[],
     requestFromSearchButton=false,
+    languageDefinitionContent=[],//it is used to store the description definition for language
     KEY_TERM="term",
     KEY_TERM_ATTRIBUTES="termAttributes",
     KEY_TERM_ENTRY_ATTRIBUTES="termEntryAttributes";
@@ -67,8 +68,9 @@ function findTermsAndAttributes(termGroupid){
             'groupId':termGroupid
         },
         success: function(result){
-            groupTermAttributeData(result.rows[KEY_TERM_ATTRIBUTES]);
             drawTermEntryAttributes(result.rows[KEY_TERM_ENTRY_ATTRIBUTES]);
+
+            groupTermAttributeData(result.rows[KEY_TERM_ATTRIBUTES]);
         }
     })
 }
@@ -211,7 +213,7 @@ function groupTermAttributeData(data){
     
     //merge the childs
     termAttributeContainer.forEach(function(termData,index) {
-        termAttributeContainer[index]=groupTermAttributeDataSingle(termData);
+        termAttributeContainer[index]=groupChildData(termData);
     });
     
     //draw the term groups
@@ -230,7 +232,7 @@ function drawTermGroups(){
     $("#resultTermsHolder").show();
     var count=0;
     termAttributeContainer.forEach(function(attribute) {
-        $('#termTable').append( '<h3>'+attribute[0].language + ' ' + attribute[0].desc + '</h3><div>' + this.renderAttributes(count) + '</div>' );
+        $('#termTable').append( '<h3>'+attribute[0].language + ' ' + attribute[0].desc + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
         count++;
     });
     if ($('#termTable').hasClass('ui-accordion')) {
@@ -256,81 +258,139 @@ function drawTermEntryAttributes(entryAttribute){
     $('#termAttributeTable').empty();
     $("#resultTermsHolder").show();
     
-    entryAttribute = groupTermEntryAttributes(entryAttribute);
+    entryAttribute = groupChildData(entryAttribute);
     
     entryAttribute.forEach(function(attribute) {
-        var type=attribute.attrType ? attribute.attrType : "";
-        var attVal=attribute.value ? attribute.value : "";
-        
-        $('#termAttributeTable').append( '<h4 class="ui-widget-header ui-corner-all">' + attribute.name + '</h4>' + '<p>' + attVal + '</p>' );
+        var drawData=handleAttributeDrawData(attribute);
+        $('#termAttributeTable').append(drawData);
     });
 }
 
-//TODO: use only one function here
-function groupTermEntryAttributes(list) {
-    var map = {}, node, roots = [], i;
-    for (i = 0; i < list.length; i += 1) {
-        map[list[i].attributeId] = i; // initialize the map
-        list[i].children = []; // initialize the children
-    }
-    for (i = 0; i < list.length; i += 1) {
-        node = list[i];
-        var labelTrans=attributeLabels.find( label => label.id === node.labelId );
-        node.headerText=node.attrType ? node.attrType : node.name;
-        if(labelTrans && labelTrans.labelText){
-            node.headerText=labelTrans.labelText;
-        }
-        if (node.parentId !== null) {
-            // if you have dangling branches check that map[node.parentId] exists
-            list[map[node.parentId]].children.push(node);
-        } else {
-            roots.push(node);
-        }
-    }
-    return roots;
-}
-
-//TODO: use only one function here
-function groupTermAttributeDataSingle(list) {
-    var map = {}, node, roots = [], i;
-    for (i = 0; i < list.length; i += 1) {
-        map[list[i].id] = i; // initialize the map
-        list[i].children = []; // initialize the children
-    }
-    for (i = 0; i < list.length; i += 1) {
-        node = list[i];
-        var labelTrans=attributeLabels.find( label => label.id === node.labelId );
-        node.headerText=node.attrType ? node.attrType : node.name;
-        if(labelTrans && labelTrans.labelText){
-            node.headerText=labelTrans.labelText;
-        }
-        if (node.parentId !== null) {
-            // if you have dangling branches check that map[node.parentId] exists
-            list[map[node.parentId]].children.push(node);
-        } else {
-            roots.push(node);
-        }
-    }
-    return roots;
-}
 /***
  * Render term attributes by given term
  * 
  * @param termId
  * @returns {String}
  */
-function renderAttributes(termId){
+function drawTermAttributes(termId){
     var attributes=termAttributeContainer[termId]
-        html = '';
+        html = '',
+        tmpLang=attributes[0].language;
+    
+    if(languageDefinitionContent[tmpLang]){
+        html +=languageDefinitionContent[tmpLang];
+    }
+    
     attributes.forEach(function(attribute) {
-        var type=attribute.attrType ? attribute.attrType : "";
-        var attVal=attribute.value ? attribute.value : "";
-        
-        //var labelTrans=attributeLabels.find( label => label.id === attribute.labelId );
-        //$('#attributeTable').append( '<tr><td>' + labelTrans.labelText + '</td><td>' + attribute.name + '</td><td>' + type + '</td><td>' + attVal + '</td></tr>' );
-        html += '<h4 class="ui-widget-header ui-corner-all">' + attribute.name + '</h4>' + '<p>' + attVal + '</p>';
+        html +=handleAttributeDrawData(attribute);
     });
     return html;
+}
+
+/***
+ * Group childs by parent id to the nodes
+ * 
+ * @param list
+ * @returns
+ */
+function groupChildData(list) {
+    var map = {}, node, roots = [], i;
+    for (i = 0; i < list.length; i += 1) {
+        map[list[i].attributeId] = i; // initialize the map
+        list[i].children = []; // initialize the children
+    }
+    
+    for (i = 0; i < list.length; i += 1) {
+        node = list[i];
+        var labelTrans=attributeLabels.find( label => label.id === node.labelId );
+        node.headerText=null;
+        if(labelTrans && labelTrans.labelText){
+            node.headerText=labelTrans.labelText;
+        }
+        if (node.parentId !== null) {
+            // if you have dangling branches check that map[node.parentId] exists
+            list[map[node.parentId]].children.push(node);
+        } else {
+            roots.push(node);
+        }
+    }
+    return roots;
+}
+
+/***
+ * Find child's for the attribute, and build the data in needed structure
+ *  
+ * @param attribute
+ * @returns html
+ */
+function handleAttributeDrawData(attribute){
+    var html="";
+    
+    switch(attribute.name) {
+        case "transac":
+            var header=attribute.name+" "+attribute.value;
+            
+            html += '<h4 class="ui-widget-header ui-corner-all">' + header + '</h4>';
+            
+            if(attribute.children.length>0){
+                var childData=[];
+                attribute.children.forEach(function(child) {
+                    //get the header text
+                    childDataText=handleAttributeHeaderText(child);
+                    var attVal=child.value ? child.value : "";
+                    //the data tag is displayed as first in this group
+                    if(child.name ==="date"){
+                        childData.unshift('<p>' + childDataText + attVal+'</p>')
+                        return true;
+                    }
+                    childData.push('<p>' + childDataText + attVal+'</p>')
+                });
+                html+=childData.join('');
+            }
+            break;
+        case "descrip":
+            
+            var attVal=attribute.value ? attribute.value : "";
+            var headerText = handleAttributeHeaderText(attribute);
+        
+            html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
+            
+            //if it is definition on language level, get store the data in variable so it is displayed also on term language level
+            if(attribute.attrType=="definition" && attribute.attrLang){
+                languageDefinitionContent[attribute.attrLang]="";
+                if(attribute.children.length>0){
+                    attribute.children.forEach(function(child) {
+                        html+=handleAttributeDrawData(child);
+                    });
+                    
+                    languageDefinitionContent[attribute.attrLang]=html;
+                }
+            }
+            
+            break;
+        default:
+            var attVal=attribute.value ? attribute.value : "";
+            var headerText = handleAttributeHeaderText(attribute);
+            html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
+            break;
+    }
+    return html;
+}
+
+/***
+ * Build the attribute text, based on if headerText (db translation for the attribute) is provided
+ * @param attribute
+ * @returns
+ */
+function handleAttributeHeaderText(attribute){
+    var attVal=attribute.value ? attribute.value : "";
+    
+    var noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : "");
+    
+    //if no headerText use attribute name + if exist attribute type
+    var headerText=attribute.headerText ? attribute.headerText :  noHeaderName;
+    
+    return headerText+":";
 }
 
 $("#searchButton" ).button({
@@ -352,6 +412,8 @@ $('#search').keyup(function (e) {
     termEntryAttributeContainer=[];
     searchTermsResponse=[];
     requestFromSearchButton=false;
+
+    languageDefinitionContent=[];
     
     $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
