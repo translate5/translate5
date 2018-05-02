@@ -81,7 +81,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $rfcFlags=[];
         foreach ($langsArray as &$lng){
-            $rfcFlags[$lng['rfc5646']]=$lng['ISO_3166-1_alpha-2'];
+            $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['ISO_3166-1_alpha-2']);
             
             //load all similar languages
             $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
@@ -93,6 +93,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         //rfc language code to language flag mapping
         $this->view->rfcFlags=$rfcFlags;
+        $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         
         $this->view->labels=$labels;
         $this->view->collectionIds=$collectionIds;
