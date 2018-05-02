@@ -28,7 +28,26 @@
 
 ?>
 
-<div id="container">
+
+<div id="container-header" class="container">
+    <div id="logo"></div>
+<?php 
+    // see View_Helper_LanguageSelector
+    $session = new Zend_Session_Namespace();
+    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    echo '<form action="#" method="post" name="languageSelector" id="languageSelector">';
+    echo '<select id="locale">';
+    foreach ($translate->getAvailableTranslations() as $locale => $translation) {
+        $selected = ($locale == $session->locale) ? ' selected' : '';
+        echo '<option value="'.$locale.'"'.$selected.'>'.$translation.'</option>';
+    }
+    echo '</select>';
+    echo '</form>';
+?>
+    <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
+</div>
+        
+<div id="container-content" class="container">
 
     <?php 
     if(isset($this->error)){
@@ -91,6 +110,14 @@ $( function() {
     $('#languages').selectmenu({
         change: function( event, ui ) {
             startAutocomplete();
+        }
+      });
+    
+    $('#locale').selectmenu({
+        change: function() {
+            var action = $(this).val();
+            $("#languageSelector").attr("action", "?locale=" + action);
+            $("#languageSelector").submit();
         }
       });
     
