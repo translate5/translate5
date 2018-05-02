@@ -35,9 +35,11 @@
     // see View_Helper_LanguageSelector
     $session = new Zend_Session_Namespace();
     $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    $availableTranslations = $translate->getAvailableTranslations();
+    asort($availableTranslations);
     echo '<form action="#" method="post" name="languageSelector" id="languageSelector">';
     echo '<select id="locale">';
-    foreach ($translate->getAvailableTranslations() as $locale => $translation) {
+    foreach ($availableTranslations as $locale => $translation) {
         $selected = ($locale == $session->locale) ? ' selected' : '';
         echo '<option value="'.$locale.'"'.$selected.'>'.$translation.'</option>';
     }
@@ -60,16 +62,20 @@
     ?>
     
     <div class="wrap">
-          <?php
-                echo '<select name="languages" id="languages">';
-                foreach ($this->languages as $lang){
-                    echo '<option value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
-                }
-                echo '</select>';
-          ?>
             <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
                 <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" placeholder="Search.." name="search" id="search">
                 <button id="searchButton"></button>
+                <?php
+                    $languages = $this->languages;
+                    uasort($languages, function($a, $b) {
+                        return strcmp($a['rfc5646'], $b['rfc5646']);
+                    });
+                    echo '<select name="languages" id="languages">';
+                    foreach ($languages as $lang){
+                        echo '<option value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
+                    }
+                    echo '</select>';
+                ?>
             </div>
     </div>
     
