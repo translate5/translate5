@@ -500,7 +500,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                     $this->setActualLevel();
                     $this->isInsideDescripGrp=$this->isStartTag();
                     break;
+                case 'termGrp':
+                    $this->setActualLevel();
+                    break;
                 case 'tig':
+                case 'ntig':
                     $this->setActualLevel();
                     $this->handleTig();
                     break;
@@ -512,7 +516,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                     $this->saveTermAttribute(null);
                     break;
                 case 'admin':
-                    $this->saveTermAttribute(null);
+                    $this->isInsideTig ? $this->saveTermAttribute(null) : $this->saveEntryAttribute(null);
                     break;
                 case 'ref':
                     $this->handleRef($tmpParrentId);
@@ -600,8 +604,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if($this->actualLangId<1){
             $langModel=ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $langModel editor_Models_Languages */
-            $langModel->loadByRfc5646($this->actualLang);
-            $this->actualLangId=$langModel->getId();
+            try {
+                $langModel->loadByRfc5646($this->actualLang);
+                $this->actualLangId=$langModel->getId();
+            } catch (ZfExtended_Models_Entity_NotFoundException$e) {
+                error_log("Unable to imprt terms in this language set. Invalid Rfc5646 language code. Language code:".$this->actualLang);
+                while($this->xml->read() && $this->xml->name !== 'langSet'){}
+            }
         }
     }
 
@@ -902,27 +911,38 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         $attribute->setCollectionId($this->termCollectionId);
         
+        $attribute->setLanguage($this->actualLang);
+        if(!$parentId){
+            $parentId=$this->actualParentId;
+        }
+        $attribute->setParentId($parentId);
+        
+        $attrName=$this->xml->name;
+        $attrType=$this->xml->getAttribute('type');
+        
+        $attribute->setName($attrName);
+        
+        //if it is transac without type use the value as type
+        if($attrName==="transac" && !$attrType){
+            $attrType = $this->xml->readInnerXml();
+        }
+        
+        $attribute->setAttrType($attrType);
+        
         $label=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $label editor_Models_TermCollection_TermAttributesLabel */
-        $labelResult=$label->getLabelByNameAndType($this->xml->name,$this->xml->getAttribute('type'));
+        $labelResult=$label->getLabelByNameAndType($this->xml->name,$attrType);
         
         //if the label is not found, insert a new label entry
         if(empty($labelResult)){
-            $label->setLabel($this->xml->name);
-            $label->setType($this->xml->getAttribute('type'));
+            $label->setLabel($attrName);
+            $label->setType($attrType);
             $labelResult=$label->save();
             $attribute->setLabelId($labelResult);
         }else{
             $attribute->setLabelId($labelResult[0]['id']);
         }
         
-        $attribute->setLanguage($this->actualLang);
-        if(!$parentId){
-            $parentId=$this->actualParentId;
-        }
-        $attribute->setParentId($parentId);
-        $attribute->setName($this->xml->name);
-        $attribute->setAttrType($this->xml->getAttribute('type'));
         $attribute->setAttrDataType($this->xml->getAttribute('datatype'));
         $attribute->setAttrTarget($this->xml->getAttribute('target'));
         $attribute->setAttrId($this->xml->getAttribute('id'));

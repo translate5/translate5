@@ -583,9 +583,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return array|NULL
      */
     public function searchTermAttributesInTermentry($groupId){
+        $cols=array(
+          'LEK_term_attributes.*',
+          'LEK_term_attributes.id AS attributeId'
+        );
         $s=$this->db->select()
         ->from($this->db, array('definition','groupId', 'term as label','id as value','term as desc'))
-        ->join('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id')
+        ->join('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$cols)
         ->where('groupId=?',$groupId)
         ->order('label');
         $s->setIntegrityCheck(false);
@@ -655,5 +659,4 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             }
         }
     }
-    
 }

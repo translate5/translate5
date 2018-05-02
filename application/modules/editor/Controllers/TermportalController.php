@@ -34,7 +34,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $config = Zend_Registry::get('config');
         $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
-        $langs=isset($sessionUser->sourceLanguage) ? $sessionUser->sourceLanguage : null;
         
         $langsArray = array();
         
@@ -59,10 +58,11 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             return;
         }
         
+        //get all languages in the term collections
+        $langsArray=$collection->getLanguagesInTermCollecions($collectionIds);
+        
         //get the user languages
-        if(!empty($langs)){
-            $langsArray=$model->loadByIds(trim($langs,","));
-        }else if(empty($langsArray) && !empty($defaultLangs)){
+        if(empty($langsArray) && !empty($defaultLangs)){
             //if no user languages are defined, get the default config languages
             $langsArray=$model->loadByRfc($defaultLangs);
         }
