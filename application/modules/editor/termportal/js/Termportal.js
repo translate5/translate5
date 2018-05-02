@@ -228,6 +228,14 @@ function groupTermAttributeData(data){
     drawTermGroups();
 }
 
+function getLanguageFlag(rfcLanguage) {
+    if (rfcLanguage in rfcLanguageFlags) {
+        return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcLanguage] + '.png" alt="' + rfcLanguage + '" title="' + rfcLanguage + '">';
+    } else {
+        return rfcLanguage;
+    }
+}
+
 /***
  * Draw the tearm groups
  * @returns
@@ -238,9 +246,11 @@ function drawTermGroups(){
     }
     $('#termTable').empty();
     $("#resultTermsHolder").show();
-    var count=0;
+    var count=0,
+        rfcLanguage;
     termAttributeContainer.forEach(function(attribute) {
-        $('#termTable').append( '<h3>'+attribute[0].language + ' ' + attribute[0].desc + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
+        rfcLanguage = getLanguageFlag(attribute[0].language);
+        $('#termTable').append( '<h3>'+ rfcLanguage + ' ' + attribute[0].desc + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
         count++;
     });
     if ($('#termTable').hasClass('ui-accordion')) {
