@@ -76,13 +76,20 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         /* @var $labelsModel editor_Models_TermCollection_TermAttributesLabel */
         $labels=$labelsModel->loadAll();
         
-        $this->view->languages=$langsArray;
+        $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languagesModel editor_Models_Languages */
         
         $rfcFlags=[];
-        foreach ($langsArray as $lng){
+        foreach ($langsArray as &$lng){
             $rfcFlags[$lng['rfc5646']]=$lng['ISO_3166-1_alpha-2'];
             
+            //load all similar languages
+            $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
+            $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
         }
+        
+        $this->view->languages=$langsArray;
+        
         
         //rfc language code to language flag mapping
         $this->view->rfcFlags=$rfcFlags;

@@ -544,16 +544,16 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Search terms in the term collection with the given search string and language.
+     * Search terms in the term collection with the given search string and languages.
      * 
      * @param string $queryString
-     * @param string $language
+     * @param array $languages
      * @param array $collectionIds
      * @param mixed $limit
      * 
      * @return array|NULL
      */
-    public function searchTermByLanguage($queryString,$language,$collectionIds,$limit=null){
+    public function searchTermByLanguage($queryString,$languages,$collectionIds,$limit=null){
         
         //if wildcards are used, adopt them to the mysql needs
         $queryString=str_replace("*","%",$queryString);
@@ -561,10 +561,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         
         $adapter=$this->db->getAdapter();
         
+        //when limit is provided -> autocomplete search
+        if($limit){
+            $queryString=$queryString.'%';
+        }
+        
         $s=$this->db->select()
         ->from($this->db, array('definition','groupId', 'term as label','id as value','term as desc'))
-        ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString.'%')
-        ->where('language=?',$language)
+        ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString)
+        ->where('language IN(?)',explode(',', $languages))
         ->where('collectionId IN(?)',$collectionIds)
         ->order('term asc');
         if($limit){

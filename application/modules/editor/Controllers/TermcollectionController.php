@@ -110,8 +110,14 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             $responseArray['termEntryAttributes']=$entryAtr->getAttributesForTermEntry($params['groupId']);
             
         }else if(isset($params['term'])){
-            $lang=isset($params['language']) ? $params['language'] : null;
-            $responseArray['term']=$model->searchTermByLanguage($params['term'],$lang,$params['collectionIds'],$termCount);
+            $languages=isset($params['language']) ? $params['language'] : null;
+            
+            //if the limit is disabled, do not use it
+            if(isset($params['disableLimit']) && $params['disableLimit']=="true"){
+                $termCount=null;
+            }
+            
+            $responseArray['term']=$model->searchTermByLanguage($params['term'],$languages,$params['collectionIds'],$termCount);
         }
         
         $this->view->rows=$responseArray;
