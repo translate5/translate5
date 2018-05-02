@@ -46,6 +46,10 @@
     #logout { order: 2; }
 }
 
+#error-no-results {
+    padding: 7px;
+}
+
 @media (max-width: 400px) {
     .container-content .ui-button {
         display: block;
@@ -139,6 +143,7 @@
 }
 
 h4, p {
+    padding: 3px;
     -webkit-margin-before: 0px;
     -webkit-margin-after: 5px;
     -webkit-margin-start: 0px;

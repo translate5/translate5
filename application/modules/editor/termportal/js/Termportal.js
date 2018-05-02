@@ -116,6 +116,8 @@ function fillSearchTermSelect(){
 
     if(!searchTermsResponse){
         
+        $('#error-no-results').show();
+        
         console.log("fillSearchTermSelect: nichts gefunden");
         
         if(requestFromSearchButton){
@@ -125,7 +127,8 @@ function fillSearchTermSelect(){
         $("#finalResultContent").hide();
         return;
     }
-
+    
+    $('#error-no-results').hide();
     $('#searchTermsSelect').empty();
     console.log("fillSearchTermSelect: " + searchTermsResponse.length + " Treffer");
 
