@@ -16,6 +16,18 @@ var termAttributeContainer=[],
  */
 var selectItem = function (event, ui) {
     
+    // if an item from the autocomplete.list has been selected and clicked via mouse, "update" search results first using THIS item
+    var origEvent = event;
+    while (origEvent.originalEvent !== undefined){
+        origEvent = origEvent.originalEvent;
+    }
+    if (origEvent.type == 'click'){
+        console.log("clicked item: " + ui.item.groupId);
+        searchTerm(ui.item.label);
+        requestFromSearchButton=true;
+        return;
+    }
+
     console.log("selectItem: " + ui.item.groupId);
     
     //empty term options component
@@ -45,9 +57,11 @@ $("#search").autocomplete({
     select: selectItem,
     minLength: 3,
     focus: function(event, ui) {
-        event.preventDefault();
-        $(this).val(ui.item.label);
-        console.log("autocomplete: FOCUS " + ui.item.label);
+        if (event.which != 0) {
+            event.preventDefault();
+            $(this).val(ui.item.label);
+            console.log("autocomplete: FOCUS " + ui.item.label);
+        }
     },
     change: function() {
         $("#myText").val("").css("display", 2);
@@ -113,7 +127,6 @@ function searchTerm(searchString,successCallback){
  * @returns
  */
 function fillSearchTermSelect(){
-
     if(!searchTermsResponse){
         
         $('#error-no-results').show();
