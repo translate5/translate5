@@ -1,0 +1,15 @@
+crossAPIurl=http://win.translate5.net
+crossExportFilesDir=/var/www/translate5/data/tbx-import/crossapi-import-templates/
+
+apiUsername=crossapi.user
+apiPassword=pass
+
+;mapping between across export template and term collection
+[FileMapping]
+template-1.export=exampletermCollection
+
+;mapping between term collection name and customer number
+[CollectionMapping]
+exampletermCollection3=10001;
+exampletermCollection2=10002;
+exampletermCollection=10002;
