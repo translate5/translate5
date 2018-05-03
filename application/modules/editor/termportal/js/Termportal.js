@@ -9,7 +9,8 @@ var termAttributeContainer=[],
     languageDefinitionContent=[],//it is used to store the description definition for language
     KEY_TERM="term",
     KEY_TERM_ATTRIBUTES="termAttributes",
-    KEY_TERM_ENTRY_ATTRIBUTES="termEntryAttributes";
+    KEY_TERM_ENTRY_ATTRIBUTES="termEntryAttributes",
+    termGroupsCache=[];//cache the groups results
 
 /***
  * On dropdown select function handler
@@ -75,6 +76,15 @@ $("#search").autocomplete({
  */
 function findTermsAndAttributes(termGroupid){
     console.log("findTermsAndAttributes() for: " + termGroupid);
+    languageDefinitionContent=[];
+    
+    //check the cache
+    if(termGroupsCache[termGroupid]){
+        drawTermEntryAttributes(termGroupsCache[termGroupid].rows[KEY_TERM_ENTRY_ATTRIBUTES]);
+        groupTermAttributeData(termGroupsCache[termGroupid].rows[KEY_TERM_ATTRIBUTES]);
+        return;
+    }
+    
     $.ajax({
         url: "/editor/termcollection/search",
         dataType: "json",
@@ -82,8 +92,11 @@ function findTermsAndAttributes(termGroupid){
             'groupId':termGroupid
         },
         success: function(result){
+            
+            //store the results to the cache
+            termGroupsCache[termGroupid]=result;
+            
             drawTermEntryAttributes(result.rows[KEY_TERM_ENTRY_ATTRIBUTES]);
-
             groupTermAttributeData(result.rows[KEY_TERM_ATTRIBUTES]);
         }
     })
@@ -396,9 +409,8 @@ function handleAttributeDrawData(attribute){
                     attribute.children.forEach(function(child) {
                         html+=handleAttributeDrawData(child);
                     });
-                    
-                    languageDefinitionContent[attribute.attrLang]=html;
                 }
+                languageDefinitionContent[attribute.attrLang]=html;
             }
             
             break;
@@ -450,6 +462,7 @@ $('#search').keyup(function (e) {
     requestFromSearchButton=false;
 
     languageDefinitionContent=[];
+    termGroupsCache=[];
     
     $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
