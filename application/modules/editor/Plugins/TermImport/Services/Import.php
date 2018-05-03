@@ -125,7 +125,7 @@ class editor_Plugins_TermImport_Services_Import {
         //tbx files import folder
         $importDir=$this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
         
-        if (!is_dir(dirname($importDir))) {
+        if (!is_dir($importDir)) {
             mkdir($importDir, 0777, true);
         }
         
@@ -151,6 +151,9 @@ class editor_Plugins_TermImport_Services_Import {
                 
             $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
             /* @var $model editor_Models_TermCollection_TermCollection */
+            
+            //define the import source, used for storing the file in the disk in the needed location
+            $params['importSource']="filesystem";
             
             if($model->importTbx([$importDir.$file], $params)){
                 $msg="File:".$file.' was imported in the collection:'.$params['collectionName'];
@@ -199,7 +202,7 @@ class editor_Plugins_TermImport_Services_Import {
         //tbx files import folder
         $exportFilesDir=$this->crossapiMap[self::CROSS_EXPORT_FILES_DIR];
         
-        if (!is_dir(dirname($exportFilesDir))) {
+        if (!is_dir($exportFilesDir)) {
             mkdir($exportFilesDir, 0777, true);
         }
         
@@ -239,6 +242,7 @@ class editor_Plugins_TermImport_Services_Import {
             }
             
             $respTbxl=$connector->getTbx($file);
+            
             if(empty($respTbxl)){
                 $returnMessage[]="Empty tbx file for across config file:".$file;
                 continue;
@@ -251,6 +255,9 @@ class editor_Plugins_TermImport_Services_Import {
             
             $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
             /* @var $model editor_Models_TermCollection_TermCollection */
+            
+            //define the import source, used for storing the file in the disk in the needed location
+            $params['importSource']="crossapi";
             
             if($model->importTbx([$tmpFile], $params)){
                 $msg="File:".$file.' was imported in the collection:'.$params['collectionName'];
@@ -386,12 +393,6 @@ class editor_Plugins_TermImport_Services_Import {
      * @return boolean
      */
     private function isFolderEmpty($dir) {
-        foreach (new DirectoryIterator($dir) as $fileInfo) {
-            if($fileInfo->isDot()){
-                continue;
-            }
-            return false;
-        }
-        return true;
+        return (($files = @scandir($dir)) && count($files) <= 2);
     }
 }

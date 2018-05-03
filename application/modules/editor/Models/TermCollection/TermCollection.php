@@ -41,6 +41,10 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $import editor_Models_Import_TermListParser_Tbx */
         $import->mergeTerms=isset($params['mergeTerms']) ? $params['mergeTerms'] : false;
+        
+        //import source (filesystem or crosspai)
+        $import->importSource=isset($params['importSource']) ? $params['importSource'] : "";
+        
         $import->customerId=$params['customerId'];
         return $import->parseTbxFile($filePath,$params['collectionId']);
     }

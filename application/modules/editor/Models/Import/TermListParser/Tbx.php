@@ -255,6 +255,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      */
     private $actualLevel=array();
     
+    
+    /***
+     * Resource import source. It is used to make the difference between filesystem import and crossapi import
+     * @var string
+     */
+    public $importSource="";
+    
     public function __construct() {
         if(!defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
             //Mindestversion siehe http://www.php.net/manual/de/xmlreader.readstring.php
@@ -1235,14 +1242,20 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     
     /***
      * Save the imported file to the disk.
-     * The file location will be "trasnalte5 parh" /data/import/tbximported/"collectionname"/"the file"
+     * The file location will be "trasnalte5 parh" /data/tbx-import/tbx-for-filesystem-import/"collectionname"/"the file"
      * 
      * @param string $filepath: source file location
      * @param string $collectionName: term collection name
      */
     private function saveFileLocal($filepath,$collectionName) {
+        
+        //if import source is not defined save it in filesystem folder
+        if(!$this->importSource){
+            $this->importSource="filesystem";
+        }
+        
         $ds=DIRECTORY_SEPARATOR;
-        $newFilePath=APPLICATION_RUNDIR.'..'.$ds.'data'.$ds.'import'.$ds.'tbximported'.$ds.$collectionName;
+        $newFilePath=APPLICATION_RUNDIR.'..'.$ds.'data'.$ds.'tbx-import'.$ds.'tbx-for-'.$this->importSource.'-import'.$ds.$collectionName;
         
         if(!is_dir($newFilePath)){
             mkdir($newFilePath, 0777, true);

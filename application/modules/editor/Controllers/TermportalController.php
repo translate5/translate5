@@ -94,6 +94,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
         }
         
+        //all languages in the available term collections for the user
         $this->view->languages=$langsArray;
         
         
@@ -103,6 +104,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->view->labels=$labels;
         $this->view->collectionIds=$collectionIds;
+        
+        $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         
         //translated strings for some of the result tables
         //TODO: change to the real names
