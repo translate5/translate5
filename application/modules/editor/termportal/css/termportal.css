@@ -11,41 +11,40 @@
 #container-header {
     display: flex;
     flex-flow: row wrap;
+    border-bottom: 1px solid #00adef;
+    padding-top: 19px;
+    padding-bottom:  10px;
 }
 #logo {
     flex: 0 0 180px;
     order: 1;
-    height: 130px;
-    background: url(/images/translate5.png?v=1) no-repeat left -12px #ffffff;
-    background-position-x: left;
-    background-position-y: -12px;
+    height: 110px;
+    background: url(/images/translate5.png?v=1) no-repeat left top;
     background-size: auto auto;
     background-size: 150px;
-    background-position: 19px 19px;
 }
 #languageSelector {
-    flex: 1 1 auto;
+    flex: 1 0 auto;
     order: 2;
     text-align: right;
     margin-right: 7px;
-    margin-top: 19px;
 }
+#locale-button {width: 9em;}
 #logout {
     flex: 0 0 80px;
     order: 3;
     text-align: right;
-    margin-top: 19px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
     #logo {
         flex: 0 1 100%;
         text-align:left;
         margin-right: 0px;
     }
-    #logo { order: 3; }
-    #languageSelector { order: 1; text-align: left;}
-    #logout { order: 2; }
+    #logo { order: 1; }
+    #languageSelector { order: 2; text-align: left;}
+    #logout { order: 3; }
 }
 
 /* --------------- search --------------- */
