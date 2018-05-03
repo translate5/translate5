@@ -375,9 +375,11 @@ function handleAttributeDrawData(attribute){
     
     switch(attribute.name) {
         case "transac":
-            var header=attribute.name+" "+attribute.value;
             
-            html += '<h4 class="ui-widget-header ui-corner-all">' + header + ':</h4>';
+            
+            var header=handleAttributeHeaderText(attribute);
+            
+            html += '<h4 class="ui-widget-header ui-corner-all">' + header + '</h4>';
             
             if(attribute.children.length>0){
                 var childData=[];
