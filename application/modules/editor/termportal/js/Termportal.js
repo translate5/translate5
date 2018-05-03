@@ -386,7 +386,9 @@ function handleAttributeDrawData(attribute){
                 attribute.children.forEach(function(child) {
                     //get the header text
                     childDataText=handleAttributeHeaderText(child);
-                    var attVal=child.value ? (" " + child.value) : "";
+                    
+                    var attVal=getAttributeValue(child);
+                    
                     //the data tag is displayed as first in this group
                     if(child.name ==="date"){
                         childData.unshift('<p>' + childDataText + attVal+'</p>')
@@ -399,7 +401,8 @@ function handleAttributeDrawData(attribute){
             break;
         case "descrip":
             
-            var attVal=attribute.value ? attribute.value : "";
+            var attVal=getAttributeValue(attribute);
+            
             var headerText = handleAttributeHeaderText(attribute);
         
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
@@ -417,7 +420,9 @@ function handleAttributeDrawData(attribute){
             
             break;
         default:
-            var attVal=attribute.value ? attribute.value : "";
+            
+            var attVal=getAttributeValue(attribute);
+            
             var headerText = handleAttributeHeaderText(attribute);
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
             break;
@@ -426,12 +431,22 @@ function handleAttributeDrawData(attribute){
 }
 
 /***
+ * Get the value from the attribute. Replace the line break with br tag.
+ * @param attribute
+ * @returns
+ */
+function getAttributeValue(attribute){
+    var attVal=attribute.value ? attribute.value : "";
+    return attVal.replace(/$/mg,'<br>');
+}
+/***
  * Build the attribute text, based on if headerText (db translation for the attribute) is provided
  * @param attribute
  * @returns
  */
 function handleAttributeHeaderText(attribute){
-    var attVal=attribute.value ? attribute.value : "";
+    
+    var attVal=getAttributeValue(attribute);
     
     var noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : "");
     

@@ -116,14 +116,14 @@ Ext.define('Editor.controller.Termportal', {
             return;
         }
         //set the component to visible on each centar panel element hide
-        this.setCustomerOverviewButtonHidden(false);
+        this.setTermportalButtonHidden(false);
     },
 
     /**
      * Set the term portal button hidden property
      */
-    setCustomerOverviewButtonHidden:function(isHidden){
-        if(!this.getHeadToolBar()){
+    setTermportalButtonHidden:function(isHidden){
+        if(!this.getHeadToolBar() || !this.getHeadToolBar().down('#btnTermPortal')){
             return;
         }
         this.getHeadToolBar().down('#btnTermPortal').setHidden(isHidden);
