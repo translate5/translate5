@@ -2323,6 +2323,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Status "{0}" durch einen anderen Benutzer</source>
     <target>status "{0}" by another user</target>
 </trans-unit>
+
+<trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'>
+    <source>Terminologieportal</source>
+    <target>Terminology portal</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
