@@ -930,7 +930,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $attribute->setName($attrName);
         
         //if it is transac without type use the value as type
-        if($attrName==="transac" && !$attrType){
+        if($attrName==="transac"){
             $attrType = $this->xml->readInnerXml();
         }
         
