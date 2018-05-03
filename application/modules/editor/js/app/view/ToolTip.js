@@ -59,7 +59,6 @@ Ext.define('Editor.view.ToolTip', {
 
     // Change content dynamically depending on which element triggered the show.
     onBeforeShow: function(tip) {
-        console.log("BAR");
         var t = tip.triggerElement,
             fly = Ext.fly(t); 
         if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
