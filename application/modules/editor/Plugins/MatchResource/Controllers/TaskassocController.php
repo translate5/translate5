@@ -44,7 +44,6 @@ class editor_Plugins_MatchResource_TaskassocController extends ZfExtended_RestCo
      */
     protected $postBlacklist = array('id');
     
-    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()

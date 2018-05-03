@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * 
  * TODO: MQM and Terminology markup export is missing! 
  */
-class editor_Models_Converter_SegmentsToXliffAbstract {
+abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     /**
      * includeDiff                = boolean, enable or disable diff generation, defaults to false
      * @var string
@@ -79,6 +79,8 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
      * @var string
      */
     const CONFIG_ADD_TERMINOLOGY = 'addTerminology';
+    
+    const XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>';
     
     /**
      * @var editor_Models_Task
@@ -198,6 +200,85 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
     }
     
     /**
+     * converts a list with segment data to xliff
+     * 
+     * @param editor_Models_Task $task
+     * @param array $segments
+     */
+    public function convert(editor_Models_Task $task, array $segments) {
+        $this->result = [self::XML_HEADER];
+        $this->task = $task;
+        $allSegmentsByFile = $this->reorderByFilename($segments);
+        
+        $this->initConvertionData();
+        
+        $this->createXmlHeader();
+        
+        foreach($allSegmentsByFile as $filename => $segmentsOfFile) {
+            $this->processAllSegments($filename, new ArrayIterator($segmentsOfFile));
+        }
+        
+        return $this->finishResult();
+    }
+    
+    /**
+     * Exports a task into the xliff dialect of this class
+     * @param editor_Models_Task $task
+     */
+    public function export(editor_Models_Task $task) {
+        $this->result = [self::XML_HEADER];
+        $this->task = $task;
+        
+        $this->initConvertionData();
+        $this->createXmlHeader();
+        
+        $foldertree = ZfExtended_Factory::get('editor_Models_Foldertree');
+        /* @var $foldertree editor_Models_Foldertree */
+        $foldertree->setPathPrefix('');
+        $paths = $foldertree->getPaths($this->task->getTaskGuid(), 'file');
+        
+        foreach($paths as $fileId => $filename) {
+            $segmentsOfFile = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid(), $fileId]);
+            /* @var $segmentsOfFile editor_Models_Segment_Iterator */
+            $this->processAllSegments($filename, $segmentsOfFile);
+        }
+        
+        return $this->finishResult();
+    }
+    
+    /**
+     * process and convert all segments to xliff
+     * @param string $filename
+     * @param array $segmentsOfFile
+     */
+    abstract protected function processAllSegments($filename, Traversable $segmentsOfFile);
+    
+    /**
+     * Internally we use array based access on the segment data, but data gan be given as editor_Models_Segment or StdClass or array
+     * @param mixed $data
+     * @return array
+     */
+    protected function unifySegmentData($data){
+        if(is_array($data)) {
+            return $data;
+        }
+        if(is_object($data)) {
+            if($data instanceof editor_Models_Segment) {
+                $data = $data->getDataObject();
+            }
+            if($data instanceof stdClass) {
+                return (array) $data;
+            }
+        }
+        return null;
+    }
+    
+    protected function finishResult() {
+        $this->result[] = '</xliff>';
+        return join("\n", $this->result);
+    }
+    
+    /**
      * initializes internally needed data for convertion
      */
     protected function initConvertionData() {
@@ -301,7 +382,6 @@ class editor_Models_Converter_SegmentsToXliffAbstract {
      * returns: array('FILENAME_1' => array(seg1, seg2), 'FILENAME_2' => array(seg3, seg4)
      * 
      * @param array $segments
-     * //FIXME this is universal also
      * @return array
      */
     protected function reorderByFilename(array $segments) {

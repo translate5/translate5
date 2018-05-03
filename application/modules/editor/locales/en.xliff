@@ -2343,6 +2343,21 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
     <target>The replacements could not be applied in all found segments. There can be different reasons for that. Please use search and replace without 'replace all' to identify and reedit the non changed segments.</target>
 </trans-unit>
+
+<trans-unit id='ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQp'>
+    <source>exportieren (Orginalformat)</source>
+    <target>export (original import format)</target>
+</trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMik='>
+    <source>exportieren (XLIFF 2.2)</source>
+    <target>export (XLIFF 2.2)</target>
+</trans-unit>
+<trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
+    <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
+    <target>Re-import chosen tasks into current TM</target>
+</trans-unit>
+
+
     </body>
   </file>
 </xliff>
