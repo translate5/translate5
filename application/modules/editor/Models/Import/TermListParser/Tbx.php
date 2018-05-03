@@ -946,7 +946,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $attribute->setAttrDataType($this->xml->getAttribute('datatype'));
         $attribute->setAttrTarget($this->xml->getAttribute('target'));
         $attribute->setAttrId($this->xml->getAttribute('id'));
-        $attribute->setAttrLang($this->xml->getAttribute('xml:lang'));
+        
+        //if for the attribute there is no xml:lang parameter, get the langSet language
+        $xmlLang=$this->xml->getAttribute('xml:lang');
+        if(!$xmlLang){
+            $xmlLang=$this->actualLang;
+        }
+        
+        $attribute->setAttrLang($xmlLang);
         $attribute->setValue($this->xml->readInnerXml());
         return $attribute;
     }
