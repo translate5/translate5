@@ -30,7 +30,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
     
     public function indexAction(){
         $sessionUser = new Zend_Session_Namespace('user');
+        
         $sessionUser=$sessionUser->data;
+        
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        
+        $userModel->load($sessionUser->id);
         
         $config = Zend_Registry::get('config');
         $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
@@ -40,7 +46,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $model=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
         
-        if(empty($sessionUser->customers)){
+        if(empty($userModel->getCustomers())){
             $this->view->error="No customers assigned to the user.";
             return;
         }
@@ -48,7 +54,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
         
-        $customers=trim($sessionUser->customers,",");
+        $customers=trim($userModel->getCustomers(),",");
         $customers=explode(',', $customers);
         
         $collectionIds=$collection->getCollectionsIdsForCustomer($customers);
