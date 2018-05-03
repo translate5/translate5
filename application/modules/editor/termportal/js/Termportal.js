@@ -86,7 +86,7 @@ function findTermsAndAttributes(termGroupid){
     }
     
     $.ajax({
-        url: "/editor/termcollection/search",
+        url: REST_PATH+"termcollection/search",
         dataType: "json",
         data: {
             'groupId':termGroupid
@@ -117,7 +117,7 @@ function searchTerm(searchString,successCallback){
     console.log("searchTerm() for language: " + lng);
     searchTermsResponse=[];  
     $.ajax({
-        url: "/editor/termcollection/search",
+        url: REST_PATH+"termcollection/search",
         dataType: "json",
         data: {
             'term':searchString,
