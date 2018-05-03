@@ -229,7 +229,7 @@ Ext.define('Editor.plugins.Customer.controller.Customer', {
      * Set the customer overview button hidden property
      */
     setCustomerOverviewButtonHidden:function(isHidden){
-        if(!this.getHeadToolBar()){
+        if(!this.getHeadToolBar() || !this.getHeadToolBar().down('#btnCustomerOverviewWindow')){
             return;
         }
         this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(isHidden);

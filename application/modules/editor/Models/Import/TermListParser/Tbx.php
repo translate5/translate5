@@ -961,7 +961,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
         
         $attribute->setAttrLang($xmlLang);
-        $attribute->setValue($this->xml->readInnerXml());
+        
+        //check if the string contains unneeded character
+        $cleanValue=$this->checkValue($this->xml->readInnerXml());
+        
+        $attribute->setValue($cleanValue);
         return $attribute;
     }
     
@@ -1266,5 +1270,23 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         //save the file to the location
         file_put_contents($newFilePath.$ds.$fileName, file_get_contents($filepath));
+    }
+    
+    /***
+     * Replace window alt+enter with unix linebreak
+     * @param string $value
+     * @return string
+     */
+    private function checkValue($value){
+        $tempFunnyChars = array(
+                [json_decode('"\uE70A"'), "\n"]
+        );
+        $replaceSpecialChars = function ($text, $chars) {
+            foreach ($chars as $char) {
+                $text = str_replace($char[0], $char[1], $text);
+            }
+            return $text;
+        };
+        return $replaceSpecialChars($value, $tempFunnyChars);
     }
 }
