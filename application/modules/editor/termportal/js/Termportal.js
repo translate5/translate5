@@ -258,6 +258,7 @@ function groupTermAttributeData(data){
 }
 
 function getLanguageFlag(rfcLanguage) {
+    rfcLanguage = rfcLanguage.toLowerCase();
     if (rfcLanguage in rfcLanguageFlags) {
         return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcLanguage] + '.png" alt="' + rfcLanguage + '" title="' + rfcLanguage + '">';
     } else {
