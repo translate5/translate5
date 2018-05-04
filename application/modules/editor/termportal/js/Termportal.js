@@ -279,7 +279,7 @@ function drawTermGroups(){
         rfcLanguage;
     termAttributeContainer.forEach(function(attribute) {
         rfcLanguage = getLanguageFlag(attribute[0].language);
-        $('#termTable').append( '<h3>'+ rfcLanguage + ' ' + attribute[0].desc + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
+        $('#termTable').append( '<h3 data-term-value="'+attribute[0].desc+'">'+ rfcLanguage + ' ' + attribute[0].desc + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
         count++;
     });
     if ($('#termTable').hasClass('ui-accordion')) {
@@ -291,6 +291,24 @@ function drawTermGroups(){
             heightStyle: "content"
         });
     }
+    
+    //find the selected item form the search result and expand it
+    $.each($("#searchTermsSelect li"), function (i, item) {
+        if($(item).hasClass('ui-state-active')){
+            $('#termTable').accordion({
+                active:false
+            });
+            
+            $.each($("#termTable h3"), function (i, termitem) {
+                if(termitem.dataset.termValue === item.textContent){
+                    $('#termTable').accordion({
+                        active:i
+                    });
+                }
+            });
+            
+        }
+    });
 }
 
 /***
