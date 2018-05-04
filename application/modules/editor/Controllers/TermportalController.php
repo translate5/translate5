@@ -113,12 +113,14 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         //translated strings for some of the result tables
         //TODO: change to the real names
         $translatedStrings=array(
                 "termTableTitle"=>"Terms",
                 "termEntryAttributeTableTitle"=>"Term-entry attributes",
-                "termAttributeTableTitle"=>"Term attributes"
+                "termAttributeTableTitle"=>"Term attributes",
+                "noResults" => $this->translate->_('Keine Ergebnisse für die aktuelle Suche!')
         );
         
         $this->view->translations=$translatedStrings;

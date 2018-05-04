@@ -79,7 +79,7 @@
             </div>
     </div>
     
-    <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;">No results.</div>
+    <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
     
     <div class="wrap" id="finalResultContent" style="display: none;">
     	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
@@ -106,10 +106,6 @@
 //init the labels here, for later usage
 var attributeLabels='<?php echo json_encode($this->labels);?>';
 attributeLabels = JSON.parse(attributeLabels);
-
-var termTableTitle='<?php echo $this->translations["termTableTitle"];?>';
-var termEntryAttributeTableTitle='<?php echo $this->translations["termEntryAttributeTableTitle"];?>';
-var termAttributeTableTitle='<?php echo $this->translations["termAttributeTableTitle"];?>';
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
 var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
@@ -121,7 +117,6 @@ $( function() {
             startAutocomplete();
         }
       });
-    
     $('#locale').selectmenu({
         change: function() {
             var action = $(this).val();
@@ -129,12 +124,11 @@ $( function() {
             $("#languageSelector").submit();
         }
       });
-    
     $("#searchTermsSelect").on( "selectableselected", function( event, ui ) {
         findTermsAndAttributes($(ui.selected).attr('data-value'));
     });
-    
     $("#resultTermsHolder").tabs();
+    $("#search").focus();
 } );
 
 </script>
