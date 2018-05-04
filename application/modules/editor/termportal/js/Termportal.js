@@ -395,10 +395,10 @@ function handleAttributeDrawData(attribute){
                     
                     //the data tag is displayed as first in this group
                     if(child.name ==="date"){
-                        childData.unshift('<p>' + childDataText + attVal+'</p>')
+                        childData.unshift('<p>' + childDataText + ' ' + attVal+'</p>')
                         return true;
                     }
-                    childData.push('<p>' + childDataText + attVal+'</p>')
+                    childData.push('<p>' + childDataText + ' ' + attVal+'</p>')
                 });
                 html+=childData.join('');
             }
@@ -428,6 +428,7 @@ function handleAttributeDrawData(attribute){
             var attVal=getAttributeValue(attribute);
             
             var headerText = handleAttributeHeaderText(attribute);
+            
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
             break;
     }
@@ -440,8 +441,33 @@ function handleAttributeDrawData(attribute){
  * @returns
  */
 function getAttributeValue(attribute){
-    var attVal=attribute.attrValue ? attribute.attrValue : "";
-    return attVal.replace(/$/mg,'<br>');
+    var attVal=attribute.attrValue ? attribute.attrValue : "",
+        isPicklistUsage = function(attrType) {
+            switch(attrType) {
+                case "across_ISO_picklist_Usage":
+                case "across_ISO_picklist_Verwendung":
+                case "across_userdef_picklist_Verwendung":
+                    return true;
+                default:
+                    return false;
+            }
+        },
+        isUnwort = function(attVal) {
+            switch(attVal) {
+                case "do not use":
+                case "Unwort":
+                    return true;
+                default:
+                    return false;
+            }
+        };
+    if (attribute.attrType == "processStatus" && attVal == "finalized") {
+        return'<img src="' + moduleFolder + 'images/finalized.png" alt="finalized" title="finalized">';
+    } else if (isPicklistUsage(attribute.attrType) && isUnwort(attVal) ) {
+        return '<img src="' + moduleFolder + 'images/do_not_use.png" alt="'+attVal+'" title="'+attVal+'">';
+    } else {
+        return attVal.replace(/$/mg,'<br>');
+    }
 }
 /***
  * Build the attribute text, based on if headerText (db translation for the attribute) is provided
