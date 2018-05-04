@@ -391,10 +391,10 @@ function handleAttributeDrawData(attribute){
                     
                     //the data tag is displayed as first in this group
                     if(child.name ==="date"){
-                        childData.unshift('<p>' + childDataText + attVal+'</p>')
+                        childData.unshift('<p>' + childDataText + ' ' + attVal+'</p>')
                         return true;
                     }
-                    childData.push('<p>' + childDataText + attVal+'</p>')
+                    childData.push('<p>' + childDataText + ' ' + attVal+'</p>')
                 });
                 html+=childData.join('');
             }
