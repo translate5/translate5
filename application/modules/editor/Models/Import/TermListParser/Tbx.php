@@ -965,6 +965,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         //check if the string contains unneeded character
         $cleanValue=$this->checkValue($this->xml->readInnerXml());
         
+        if($attrName =="date"){
+            //handle the date format
+            $now = new DateTime($cleanValue);
+            $cleanValue= $now->format('U');
+        }
         $attribute->setValue($cleanValue);
         return $attribute;
     }

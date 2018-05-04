@@ -25,7 +25,6 @@
  
  END LICENSE AND COPYRIGHT
  */
-
 ?>
 
 
@@ -49,17 +48,16 @@
     <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
 </div>
         
+<?php 
+if(isset($this->error)){
+    echo '<div class="ui-state-error ui-corner-all">';
+    echo $this->error;
+    echo '</div>';
+    return;
+}    
+?>
 <div id="container-content" class="container">
 
-    <?php 
-    if(isset($this->error)){
-        echo '<div class="ui-state-error ui-corner-all">';
-        echo $this->error;
-        echo '</div>';
-        exit;
-    }
-    
-    ?>
     
     <div class="wrap">
             <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
@@ -110,6 +108,7 @@ var collectionIds=<?php echo json_encode($this->collectionIds);?>;
 var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
 var REST_PATH='<?php echo $this->restPath; ?>';
+var SESSION_LOCALE='<?php echo $session->locale; ?>';
 
 $( function() {
     $('#languages').selectmenu({

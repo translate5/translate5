@@ -46,8 +46,12 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $model=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
         
+        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts/termportal');
+        
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        
         if(empty($userModel->getCustomers())){
-            $this->view->error="No customers assigned to the user.";
+            $this->view->error=$this->translate->_("Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.");
             return;
         }
         
@@ -60,7 +64,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $collectionIds=$collection->getCollectionsIdsForCustomer($customers);
 
         if(empty($collectionIds)){
-            $this->view->error="No available term collections for the associated customer were found.";
+            $this->view->error=$this->translate->_("Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.");
             return;
         }
         
@@ -113,18 +117,15 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         
-        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        
         //translated strings for some of the result tables
-        //TODO: change to the real names
         $translatedStrings=array(
-                "termTableTitle"=>"Terms",
-                "termEntryAttributeTableTitle"=>"Term-entry attributes",
-                "termAttributeTableTitle"=>"Term attributes",
+                "termTableTitle"=>$this->translate->_("Terme"),
+                "termEntryAttributeTableTitle"=>$this->translate->_("Eigenschaften des Eintrags"),
                 "search" => $this->translate->_('Suche'),
                 "noResults" => $this->translate->_('Keine Ergebnisse für die aktuelle Suche!')
         );
         
         $this->view->translations=$translatedStrings;
-        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts/termportal');
     }
 }

@@ -2330,6 +2330,25 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
 
+<trans-unit id='SWhuZW4gc2luZCBkZXJ6ZWl0IGtlaW5lIEt1bmRlbnZlcmtuw7xwZnVuZ2VuIHVuZCBkYW1pdCBhdWNoIGtlaW5lIFRlcm1Db2xsZWN0aW9ucyB6dWdlb3JkbmV0LiBEYWhlciBpc3QgYXVjaCBrZWluZSBUZXJtc3VjaGUgbcO2Z2xpY2gu'>
+	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
+	<target>There are currently no customers connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
+</trans-unit>
+
+<trans-unit id='RXMgd3VyZGVuIGtlaW5lIHZlcmbDvGdiYXJlbiB0ZXJtQ29sbGVjdGlvbiBmw7xyIGRlbiBJaG5lbiB6dWdlb3JkbmV0ZW4gS3VuZGVuIGdlZnVuZGVuLg=='>
+	<source>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</source>
+	<target>No available term collections were found for the customer that is associated to you.</target>
+</trans-unit>
+
+<trans-unit id='VGVybWU='>
+	<source>Terme</source>
+	<target>Terms</target>
+</trans-unit>
+
+<trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='>
+	<source>Eigenschaften des Eintrags</source>
+	<target>Attributes of the term entry</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
