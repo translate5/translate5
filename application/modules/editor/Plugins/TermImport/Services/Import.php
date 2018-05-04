@@ -61,6 +61,13 @@ class editor_Plugins_TermImport_Services_Import {
      */
     const IMPORT_ACOSS_API_URL="crossAPIurl";
     
+
+    /***
+     * Key for the merge terms flag used by the tbx import parser
+     * @var string
+     */
+    const IMPORT_MERGE_TERMS_KEY="mergeTerms";
+    
     /***
      *  Key from the crossapi config file for the across api user
      * @var string
@@ -125,6 +132,7 @@ class editor_Plugins_TermImport_Services_Import {
         //tbx files import folder
         $importDir=$this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
         
+        
         if (!is_dir($importDir)) {
             mkdir($importDir, 0777, true);
         }
@@ -154,6 +162,11 @@ class editor_Plugins_TermImport_Services_Import {
             
             //define the import source, used for storing the file in the disk in the needed location
             $params['importSource']="filesystem";
+            
+            
+            if(isset($this->filesystemMap[self::IMPORT_MERGE_TERMS_KEY])){
+                $params['mergeTerms']=$this->filesystemMap[self::IMPORT_MERGE_TERMS_KEY] ==="true" || $this->filesystemMap[self::IMPORT_MERGE_TERMS_KEY] ==="1";
+            }
             
             if($model->importTbx([$importDir.$file], $params)){
                 $msg="File:".$file.' was imported in the collection:'.$params['collectionName'];
@@ -258,6 +271,11 @@ class editor_Plugins_TermImport_Services_Import {
             
             //define the import source, used for storing the file in the disk in the needed location
             $params['importSource']="crossapi";
+            
+            
+            if(isset($this->crossapiMap[self::IMPORT_MERGE_TERMS_KEY])){
+                $params['mergeTerms']=$this->crossapiMap[self::IMPORT_MERGE_TERMS_KEY] ==="true" || $this->crossapiMap[self::IMPORT_MERGE_TERMS_KEY] ==="1";;
+            }
             
             if($model->importTbx([$tmpFile], $params)){
                 $msg="File:".$file.' was imported in the collection:'.$params['collectionName'];
