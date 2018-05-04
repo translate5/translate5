@@ -54,19 +54,20 @@ Ext.define('Editor.view.ToolTip', {
     },
     userStore: null,
     listeners : {
-        // Change content dynamically depending on which element triggered
-        // the show.
-        beforeshow : function(tip) {
-            var t = tip.triggerElement,
-                fly = Ext.fly(t); 
-            if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
-                // Don't show multiple ToolTips that overlap, but collect data into one single ToolTip
-                return this.handleCollectedTooltip(t, tip);
-            }
-            return false;
-        }
+        beforeshow : 'onBeforeShow'
     },
 
+    // Change content dynamically depending on which element triggered the show.
+    onBeforeShow: function(tip) {
+        var t = tip.triggerElement,
+            fly = Ext.fly(t); 
+        if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
+            // Don't show multiple ToolTips that overlap, but collect data into one single ToolTip
+            return this.handleCollectedTooltip(t, tip);
+        }
+        return false;
+    },
+    
     constructor: function() {
         this.renderTo = Ext.getBody();
         this.callParent(arguments);

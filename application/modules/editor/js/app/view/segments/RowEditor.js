@@ -43,7 +43,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     itemId: 'roweditor',
     liveDrag: true,
     rowToEditOrigHeight: 0,
-    editorExtraHeight:20,// 20,
+    editorExtraHeight:10, // 20,
     editorLocalTop: 0,
     /**
      * If set to true, rowEditor remains on its position on startEdit and grid scrolls instead
@@ -411,15 +411,9 @@ Ext.define('Editor.view.segments.RowEditor', {
             context = me.context,
             row = Ext.get(context.row),
             rowHeight = row.setHeight(null) && row.getHeight(), //force recalculation on each call
-            editorHeight = rowHeight + me.editorExtraHeight,
-            moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight(),
-            segmentStatusStrip=Ext.ComponentQuery.query('#segmentStatusStrip');
+            //height of the whole roweditor, contains doubled extraHeight
+            editorHeight, moveEditor;
         
-        //add extra height if the segment status strip contains an visible element
-        if(segmentStatusStrip.length>0 && segmentStatusStrip[0].isItemVisible()){
-            editorHeight+=15;
-        }
-
         // when switching tag mode recalculation is triggered, 
         //  but when the row is not available anymore due grid reload we don't have any height information 
         //  in this case its better to leave the old height instead of use a rowHeight of 0
@@ -427,6 +421,10 @@ Ext.define('Editor.view.segments.RowEditor', {
             return;
         }
         me.rowToEditOrigHeight = rowHeight;
+        me.mainEditor.setHeight(rowHeight + me.editorExtraHeight); //+ 10
+        //get height again, since htmlEditor could modify / increase the height itself
+        editorHeight = me.mainEditor.getHeight() + me.editorExtraHeight; //add the extra height again
+        moveEditor = (me.editorLocalTop + editorHeight) - me.scrollingView.getHeight()
         row.setHeight(editorHeight);
         //low border of editor is outside of the visible area, then we have to move the editor additionaly
         if(moveEditor > 0) {

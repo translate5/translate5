@@ -217,7 +217,8 @@ Ext.define('Editor.controller.SearchReplace', {
         replaceAllWindowMessage:'#UT#übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert',
         characterLimitError:'#UT#Der Suchstring ist zu groß',
         noIndexFound:'#UT#Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.',
-        searchAndReplaceMenuItem:'#UT#Suchen und ersetzen'
+        searchAndReplaceMenuItem:'#UT#Suchen und ersetzen',
+        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
     },
     
     constructor:function(){
@@ -899,6 +900,10 @@ Ext.define('Editor.controller.SearchReplace', {
                     return;
                 }
 
+                if(responseData.total != activeTabViewModel.get('resultsCount')) {
+                    Editor.MessageBox.addError(me.strings.replaceAllErrors);
+                } 
+                
                 var replacedSegments = responseData.rows,
                     message=responseData.message,
                     tabPanelviewModel=tabPanel.getViewModel();

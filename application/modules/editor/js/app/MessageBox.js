@@ -76,8 +76,10 @@ Ext.define('Editor.MessageBox',{
         if(!operation.success) {
             return; //on a real server error the message is processed by serverexception!
         }
-        var resp = operation.getResponse(),
-            json, tpl;
+        this.addByResponse(operation.getResponse());
+    },
+    addByResponse: function(resp) {
+        var json, tpl;
         if(!resp || !resp.responseText) {
             return;
         }
@@ -96,6 +98,7 @@ Ext.define('Editor.MessageBox',{
             }
             Editor.MessageBox.getInstance().addMessage(error.msg, error.type || Editor.MessageBox.INFO);
         });
+        
     },
     /**
      * converts the given array to a table with errors

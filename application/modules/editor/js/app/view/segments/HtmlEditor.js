@@ -47,7 +47,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   //prefix der img Tag ids im HTML Editor
   idPrefix: 'tag-image-',
   requires: [
-      'Editor.view.segments.HtmlEditorLayout'
+      'Editor.view.segments.HtmlEditorLayout',
+      'Editor.view.segments.StatusStrip'
   ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
@@ -66,14 +67,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
-  segmentLengthInRange:false,//is segment number of characters in defined range
+  //0: segment length is OK, -1 segment is to short (shorter as minLength), 1 segment is to long (longer as maxLength)
+  segmentLengthStatus:0,
+  lastSegmentLength:null,
+  currentSegment: null,
+  statusStrip: null,
 
   strings: {
       tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
       tagMissingText: '#UT# Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:',
       tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
       tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
-      cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
+      cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
+      segmentToShort:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
+      segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.'
   },
   
   //***********************************************************************************
@@ -105,6 +112,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     ]);
     me.spanTemplate.compile();
     me.callParent(arguments);
+    //add the status strip component to the row editor
+    me.statusStrip = me.add({
+        xtype:'segments.statusstrip',
+        htmlEditor: me
+    });
+  },
+  setHeight: function(height) {
+      var me = this,
+          stripHeight = Math.max(0, me.statusStrip.getHeight() - 5); //reduce statusStrip height about 5px
+      me.callParent([height + stripHeight]);
   },
   initFrameDoc: function() {
       var me = this,
@@ -160,11 +177,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   /**
    * Setzt Daten im HtmlEditor und fügt markup hinzu
-   * @param value String
+   * @param value {String}
+   * @param segment {Editor.models.Segment}
+   * @param value {fieldName}
    */
-  setValueAndMarkup: function(value, segmentId, fieldName){
+  setValueAndMarkup: function(value, segment, fieldName){
       //check tag is needed for the checkplausibilityofput feature on server side 
       var me = this,
+          segmentId = segment.get('id'),
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
       if (Ext.isGecko && value=="") {
           // TRANSLATE-1042: Workaround Firefox
@@ -172,7 +192,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           // - will be removed on saving anyway (or even before during clean-up of the TrackChanges)
           value = "&#8203;"; 
       }
+      me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
+      me.statusStrip.updateSegment(segment, fieldName);
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -200,10 +222,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getValueAndUnMarkup: function(){
     var me = this,
-    	result,
+    	result, length,
     	body = me.getEditorBody();
     me.checkTags(body);
-    me.setSegmentLengthInRange(body.innerHTML || "");
+    me.checkSegmentLength(body.innerHTML || "");
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
     return result;
@@ -580,7 +602,21 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @return {Boolean}
    */
   hasAndDisplayErrors: function() {
-      var me = this;
+      var me = this, msg, meta = me.currentSegment.get('metaCache');
+      
+      //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
+      if(Editor.data.segments.enableCountSegmentLength && me.segmentLengthStatus != 0) {
+          //fire the event, and get the message from the segmentminmaxlength component
+          if(me.segmentLengthStatus > 0) {
+              msg = Ext.String.format(me.strings.segmentToLong, meta.maxLength);
+          }
+          else {
+              msg = Ext.String.format(me.strings.segmentToShort, meta.minLength);
+          }
+          me.fireEvent('contentErrors', me, msg);
+          return true;
+      }
+      
       //if we are running a second time into this method triggered by callback, 
       //  the callback can disable a second error check
       if(me.disableErrorCheck){
@@ -592,13 +628,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
 	  //since this error can't be handled somehow, we don't fire an event but show the message and stop immediatelly
       if(Editor.data.task.get('notEditContent') && me.contentEdited){
           Editor.MessageBox.addError(me.strings.cantEditContents);
-          return true;
-      }
-
-      //if the segment characters length is not in the defined range, add the message
-      if(!me.segmentLengthInRange) {
-          //fire the event, and get the message from the segmentminmaxlength component
-          me.fireEvent('contentErrors', me, me.getSegmentMinMaxLength().activeErroMessage);
           return true;
       }
       
@@ -894,27 +923,88 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       body.setStyle('direction', dir);
   },
   
-  /***
-   * Set the internal flag segmentLengthInRange based on if the currently edited segment number of characters is within the defined range.
+  /**
+   * Check if the segment character number is within the defined borders
+   * @param {String} segmentText
    */
-  setSegmentLengthInRange:function(bodyText){
-      var me=this,
-          minMaxLength=me.getSegmentMinMaxLength();
-      //check if the the min/max length is supplied
-      if(minMaxLength){
-          me.segmentLengthInRange=minMaxLength.isSegmentLengthInRange(bodyText);
-          return;
+  checkSegmentLength: function(segmentText){
+      var me = this,
+          length,
+          metaCache = me.currentSegment && me.currentSegment.get('metaCache'),
+          minWidth = metaCache && metaCache.minWidth ? metaCache.minWidth : 0,
+          maxWidth = metaCache && metaCache.maxWidth ? metaCache.maxWidth : Number.MAX_SAFE_INTEGER;
+      
+      me.segmentLengthStatus = 0;
+      
+      //get the characters length and is segment saveble
+      length = me.getTransunitLength(segmentText);
+      
+      if(length < minWidth) {
+          me.segmentLengthStatus = -1;
       }
-      me.segmentLengthInRange=true;
+      else if(length > maxWidth) {
+          me.segmentLengthStatus = 1;
+      }
   },
   
-  /***
-   * Return segmentMinMaxLength component instance
+  /**
+   * Get the character count of the segment text + sibling segment lengths, without the tags in it (whitespace tags evaluated to their length)
+   * @param {String} text optional, if omitted use currently stored value
+   * @return {Integer} returns the transunit length
    */
-  getSegmentMinMaxLength:function(){
-      var me=this,
-          minMaxLength=Ext.ComponentQuery.query('#segmentMinMaxLength');
-      return minMaxLength.length>0 ? minMaxLength[0] : null;
+  getTransunitLength: function(text){
+      var me = this,
+          div = document.createElement("div"),
+          additionalLength = 0,
+          meta = me.currentSegment.get('metaCache'),
+          field = me.dataIndex;
+      
+      //function can be called with given text - or not. Then it uses the current value.
+      if(!Ext.isDefined(text) || text === null){
+          text = me.getValue();
+      }
+      if(!Ext.isString(text)) {
+          text = "";
+      }
+      //FIXME: improve that clean del tag by reuse methods from track changes
+      text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
+      
+      div.innerHTML = text;
+      //add the length stored in each img tag 
+      Ext.fly(div).select('img').each(function(item){
+          var l = parseInt(item.getAttribute('data-length') || "0");
+          //data-length is -1 if no length provided
+          if(l > 0) {
+              additionalLength += l;
+          }
+      });
+      
+      //add the length of the text itself 
+      text = div.textContent || div.innerText || "";
+      div = null;
+      
+      //only the segment length + the tag lengths:
+      me.lastSegmentLength = additionalLength + text.length;
+
+      //add the length of the sibling segments (min max length is given for the whole transunit, not each mrk tag
+      if(meta && meta.siblingData) {
+          Ext.Object.each(meta.siblingData, function(id, data) {
+              if(me.currentSegment.get('id') == id) {
+                  return; //dont add myself again
+              }
+              if(data.length && data.length[field]) {
+                  additionalLength += data.length[field];
+              }
+          });
+      }
+      
+      return additionalLength + text.length;
+  },
+  /**
+   * returns the last calculated segment length (with tag lengths, without sibling lengths)
+   * @return {Integer}
+   */
+  getLastSegmentLength: function() {
+      return this.lastSegmentLength;
   }
-  
 });
