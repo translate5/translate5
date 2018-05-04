@@ -373,6 +373,10 @@ function groupChildData(list) {
 function handleAttributeDrawData(attribute){
     var html="";
     
+    if(!attribute.attributeId){
+        return html;
+    }
+    
     switch(attribute.name) {
         case "transac":
             
@@ -408,14 +412,14 @@ function handleAttributeDrawData(attribute){
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
             
             //if it is definition on language level, get store the data in variable so it is displayed also on term language level
-            if(attribute.attrType=="definition" && attribute.attrLang){
-                languageDefinitionContent[attribute.attrLang]="";
+            if(attribute.attrType=="definition" && attribute.language){
+                languageDefinitionContent[attribute.language]="";
                 if(attribute.children.length>0){
                     attribute.children.forEach(function(child) {
                         html+=handleAttributeDrawData(child);
                     });
                 }
-                languageDefinitionContent[attribute.attrLang]=html;
+                languageDefinitionContent[attribute.language]=html;
             }
             
             break;
@@ -436,7 +440,7 @@ function handleAttributeDrawData(attribute){
  * @returns
  */
 function getAttributeValue(attribute){
-    var attVal=attribute.value ? attribute.value : "";
+    var attVal=attribute.attrValue ? attribute.attrValue : "";
     return attVal.replace(/$/mg,'<br>');
 }
 /***
