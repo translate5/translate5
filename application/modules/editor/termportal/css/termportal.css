@@ -43,8 +43,8 @@
         margin-right: 0px;
     }
     #logo { order: 1; }
-    #languageSelector { order: 2; text-align: left;}
-    #logout { order: 3; }
+    #languageSelector { order: 2; text-align: left; margin-top: 5px;}
+    #logout { order: 3; margin-top: 5px;}
 }
 
 /* --------------- search --------------- */
