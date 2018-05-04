@@ -428,9 +428,14 @@ function handleAttributeDrawData(attribute){
         case "descrip":
             
             var attVal=getAttributeValue(attribute);
+
+            var flagContent="";
+            //add the flag for the definition in the term entry attributes
+            if(attribute.attrType=="definition" && attribute.language){
+                flagContent=getLanguageFlag(attribute.language);
+            }
+            var headerText = handleAttributeHeaderText(attribute)+flagContent;
             
-            var headerText = handleAttributeHeaderText(attribute);
-        
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
             
             //if it is definition on language level, get store the data in variable so it is displayed also on term language level
@@ -441,7 +446,9 @@ function handleAttributeDrawData(attribute){
                         html+=handleAttributeDrawData(child);
                     });
                 }
-                languageDefinitionContent[attribute.language]=html;
+                
+                //remove the flag from the html which will be displayed in the term
+                languageDefinitionContent[attribute.language]=html.replace(flagContent,'');;
             }
             
             break;
@@ -483,6 +490,14 @@ function getAttributeValue(attribute){
                     return false;
             }
         };
+    //if it is a date attribute, handle the date format
+    if(attribute.name=="date"){
+        var dateFormat='dd.mm.yy';
+        if(SESSION_LOCALE=="en"){
+            dateFormat='mm/dd/yy';
+        }
+        return $.datepicker.formatDate(dateFormat, new Date(attVal*1000));
+    }
     if (attribute.attrType == "processStatus" && attVal == "finalized") {
         return '<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
     } else if (isPicklistUsage(attribute.attrType) && isUnwort(attVal) ) {
