@@ -280,7 +280,11 @@ function drawTermGroups(){
         rfcLanguage;
     termAttributeContainer.forEach(function(attribute) {
         rfcLanguage = getLanguageFlag(attribute[0].language);
-        $('#termTable').append( '<h3 data-term-value="'+attribute[0].desc+'">'+ rfcLanguage + ' ' + attribute[0].desc + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
+        
+        //check if the term contains attribute with status icon
+        var statusIcon=checkTermStatusIcon(attribute);
+        
+        $('#termTable').append( '<h3 data-term-value="'+attribute[0].desc+'">'+ rfcLanguage + ' ' + attribute[0].desc +' '+(statusIcon ? statusIcon : '') + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
         count++;
     });
     if ($('#termTable').hasClass('ui-accordion')) {
@@ -481,7 +485,7 @@ function getAttributeValue(attribute){
             }
         };
     if (attribute.attrType == "processStatus" && attVal == "finalized") {
-        return'<img src="' + moduleFolder + 'images/finalized.png" alt="finalized" title="finalized">';
+        return '<img src="' + moduleFolder + 'images/finalized.png" alt="finalized" title="finalized">';
     } else if (isPicklistUsage(attribute.attrType) && isUnwort(attVal) ) {
         return '<img src="' + moduleFolder + 'images/do_not_use.png" alt="'+attVal+'" title="'+attVal+'">';
     } else {
@@ -503,6 +507,24 @@ function handleAttributeHeaderText(attribute){
     var headerText=attribute.headerText ? attribute.headerText :  noHeaderName;
     
     return headerText+":";
+}
+
+/***
+ * Check the term status icon in the term attributes.
+ * Return the image html if such an attribute is found
+ * @param attribute
+ * @returns
+ */
+function checkTermStatusIcon(attribute){
+    var retVal=false;
+    $.each($(attribute), function (i, attr) {
+        var statusIcon=getAttributeValue(attr);
+        if(statusIcon && statusIcon.startsWith('<img src="')){
+            retVal=statusIcon;
+            return false;
+        }
+    });
+    return retVal;
 }
 
 $("#searchButton" ).button({
