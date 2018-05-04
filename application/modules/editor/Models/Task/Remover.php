@@ -138,9 +138,6 @@ class editor_Models_Task_Remover {
         $segmentTable = ZfExtended_Factory::get('editor_Models_Db_Segments');
         $segmentTable->delete(array('taskGuid = ?' => $taskGuid));
         
-        $termTable = ZfExtended_Factory::get('editor_Models_Db_Terms');
-        $termTable->delete(array('taskGuid = ?' => $taskGuid));
-        
         $filesTable = ZfExtended_Factory::get('editor_Models_Db_Files');
         $filesTable->delete(array('taskGuid = ?' => $taskGuid));
     }
