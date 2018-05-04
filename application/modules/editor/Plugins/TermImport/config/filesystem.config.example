@@ -1,6 +1,12 @@
 ;import directory of the tbx files
 importDir=/var/www/translate5/data/tbx-import/filesystem/;
 
+;mergeTerms: Allowed values: true or false. 
+;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection. 
+;Otherwise all terms will be added to the termCollection, if the ID in the TBX does NOT exist already in the DB
+;when the ID of the termEntry of the TBX does already exist in the DB, the terms of this termEntry will always be merged
+mergeTerms=true;
+
 ;mapping between file and term collection name
 [FileMapping]
 Term.tbx=exampletermCollection;
