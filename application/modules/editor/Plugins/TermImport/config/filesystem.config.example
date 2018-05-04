@@ -1,5 +1,5 @@
 ;import directory of the tbx files
-importDir=/var/www/translate5/data/tbx-import/filesystem/;
+importDir=/path/to/your/translate5/data/tbx-import/filesystem/;
 
 ;mergeTerms: Allowed values: true or false. 
 ;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection. 

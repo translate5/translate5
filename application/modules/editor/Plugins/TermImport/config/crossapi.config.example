@@ -1,5 +1,5 @@
-crossAPIurl=http://win.translate5.net
-crossExportFilesDir=/var/www/translate5/data/tbx-import/crossapi-import-templates/
+crossAPIurl=http://example.net
+crossExportFilesDir=/path/to/your/translate5/data/tbx-import/crossapi-import-templates/
 
 ;mergeTerms: Allowed values: true or false. 
 ;If this is true, terms will be merged as described at https://confluence.translate5.net/display/TAD/Term+Collection. 
