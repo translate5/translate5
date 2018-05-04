@@ -89,9 +89,15 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         foreach ($langsArray as &$lng){
             $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['ISO_3166-1_alpha-2']);
             
-            //load all similar languages
-            $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
-            $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
+            $isSingleLang=strpos($lng['rfc5646'], '-')===false;
+            //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
+            if($isSingleLang){
+                //load all similar languages
+                $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
+                $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
+                continue;
+            }
+            $lng['languageGroup']=[$lng['id']];
         }
         
         //all languages in the available term collections for the user

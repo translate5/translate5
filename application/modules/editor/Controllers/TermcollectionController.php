@@ -105,9 +105,9 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             //FIXME: move this to separatea action ?
             $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId']);
 
-            $entryAtr=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
-            /* @var $entryAtr editor_Models_TermCollection_TermEntryAttributes */
-            $responseArray['termEntryAttributes']=$entryAtr->getAttributesForTermEntry($params['groupId']);
+            $entryAttr=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
+            /* @var $entryAttr editor_Models_TermCollection_TermEntryAttributes */
+            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId']);
             
         }else if(isset($params['term'])){
             $languages=isset($params['language']) ? $params['language'] : null;

@@ -588,13 +588,37 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return array|NULL
      */
     public function searchTermAttributesInTermentry($groupId){
-        $cols=array(
-          'LEK_term_attributes.*',
-          'LEK_term_attributes.id AS attributeId'
+        $attCols=array(
+                'LEK_term_attributes.labelId as labelId',
+                'LEK_term_attributes.id AS attributeId',
+                'LEK_term_attributes.parentId AS parentId',
+                'LEK_term_attributes.internalCount AS internalCount',
+                'LEK_term_attributes.name AS name',
+                'LEK_term_attributes.attrType AS attrType',
+                'LEK_term_attributes.attrTarget AS attrTarget',
+                'LEK_term_attributes.attrId AS attrId',
+                'LEK_term_attributes.attrLang AS attrLang',
+                'LEK_term_attributes.value AS attrValue',
+                'LEK_term_attributes.created AS attrCreated',
+                'LEK_term_attributes.updated AS attrUpdated',
+                'LEK_term_attributes.attrDataType AS attrDataType',
         );
+        
+        $cols=array(
+                'definition',
+                'groupId', 
+                'term as label',
+                'id as value',
+                'term as desc',
+                'id as termId',
+                'collectionId',
+                'language as languageId'
+        );
+        
         $s=$this->db->select()
-        ->from($this->db, array('definition','groupId', 'term as label','id as value','term as desc'))
-        ->join('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$cols)
+        ->from($this->db,$cols)
+        ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
+        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'))
         ->where('groupId=?',$groupId)
         ->order('label');
         $s->setIntegrityCheck(false);

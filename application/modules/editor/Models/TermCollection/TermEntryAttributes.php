@@ -36,9 +36,29 @@ class editor_Models_TermCollection_TermEntryAttributes extends editor_Models_Ter
      * @return array|NULL
      */
     public function getAttributesForTermEntry($groupId){
+        
+        $cols=array(
+                'LEK_term_entry_attributes.id AS attributeId',
+                'LEK_term_entry_attributes.labelId as labelId',
+                'LEK_term_entry_attributes.termEntryId AS termEntryId',
+                'LEK_term_entry_attributes.parentId AS parentId',
+                'LEK_term_entry_attributes.internalCount AS internalCount',
+                'LEK_term_entry_attributes.language AS language',
+                'LEK_term_entry_attributes.name AS name',
+                'LEK_term_entry_attributes.attrType AS attrType',
+                'LEK_term_entry_attributes.attrDataType AS attrDataType',
+                'LEK_term_entry_attributes.attrTarget AS attrTarget',
+                'LEK_term_entry_attributes.attrId AS attrId',
+                'LEK_term_entry_attributes.attrLang AS attrLang',
+                'LEK_term_entry_attributes.value AS attrValue',
+                'LEK_term_entry_attributes.created AS attrCreated',
+                'LEK_term_entry_attributes.updated AS attrUpdated',
+                'LEK_term_entry.collectionId AS collectionId'
+        );
+        
         $s=$this->db->select()
         ->from($this->db)
-        ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_entry_attributes.termEntryId',array('LEK_term_entry_attributes.id AS attributeId'))
+        ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_entry_attributes.termEntryId',$cols)
         ->where('LEK_term_entry.groupId=?',$groupId);
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
