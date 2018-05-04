@@ -92,7 +92,6 @@ function findTermsAndAttributes(termGroupid){
             'groupId':termGroupid
         },
         success: function(result){
-            
             //store the results to the cache
             termGroupsCache[termGroupid]=result;
             
@@ -485,7 +484,7 @@ function getAttributeValue(attribute){
             }
         };
     if (attribute.attrType == "processStatus" && attVal == "finalized") {
-        return '<img src="' + moduleFolder + 'images/finalized.png" alt="finalized" title="finalized">';
+        return '<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
     } else if (isPicklistUsage(attribute.attrType) && isUnwort(attVal) ) {
         return '<img src="' + moduleFolder + 'images/do_not_use.png" alt="'+attVal+'" title="'+attVal+'">';
     } else {
@@ -516,12 +515,11 @@ function handleAttributeHeaderText(attribute){
  * @returns
  */
 function checkTermStatusIcon(attribute){
-    var retVal=false;
+    var retVal="";
     $.each($(attribute), function (i, attr) {
         var statusIcon=getAttributeValue(attr);
         if(statusIcon && statusIcon.startsWith('<img src="')){
-            retVal=statusIcon;
-            return false;
+            retVal+=statusIcon;
         }
     });
     return retVal;
