@@ -232,6 +232,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                     items:[
                         {
                             xtype: 'fieldset',
+                            itemId:'loginDetailsFieldset',
                             margin:5,
                             flex:1,
                             defaults: defaults,

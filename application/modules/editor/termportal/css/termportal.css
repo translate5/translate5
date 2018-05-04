@@ -1,0 +1,170 @@
+.container {
+    margin: 10px;
+}
+
+.wrap {
+    margin-bottom: 2em;
+}
+
+/* --------------- header --------------- */
+
+#container-header {
+    display: flex;
+    flex-flow: row wrap;
+    border-bottom: 1px solid #00adef;
+    padding-top: 19px;
+    padding-bottom:  10px;
+}
+#logo {
+    flex: 0 0 180px;
+    order: 1;
+    height: 110px;
+    background: url(/images/translate5.png?v=1) no-repeat left top;
+    background-size: auto auto;
+    background-size: 150px;
+}
+#languageSelector {
+    flex: 1 0 auto;
+    order: 2;
+    text-align: right;
+    margin-right: 7px;
+}
+#locale-button {width: 9em;}
+#logout {
+    flex: 0 0 80px;
+    order: 3;
+    text-align: right;
+}
+
+@media (max-width: 500px) {
+    #logo {
+        flex: 0 1 100%;
+        text-align:left;
+        margin-right: 0px;
+    }
+    #logo { order: 1; }
+    #languageSelector { order: 2; text-align: left; margin-top: 5px;}
+    #logout { order: 3; margin-top: 5px;}
+}
+
+/* --------------- search --------------- */
+
+#searchForm {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    align-content: stretch;
+    justify-content: flex-end;
+    padding: 12px 10px 10px 10px;
+    margin: 5px 0px;
+}
+
+#search {
+    flex: 1 1 auto;
+    order: 1;
+    padding: 0px 5px;
+    margin-right: 0px;
+}
+#searchButton {
+    flex: 0 0 20px;
+    order: 2;
+    margin-right: 0px;
+}
+#languages-button {
+    flex: 0 0 80px;
+    order: 3;
+    margin-right: 0px;
+}
+
+@media (max-width: 600px) {
+    #search {
+        flex: 20 0 90%;
+        height: 30px;
+        margin-bottom: 5px;
+    }
+}
+
+/* --------------- results --------------- */
+
+#error-no-results {
+    padding: 7px;
+}
+
+@media (max-width: 400px) {
+    .container-content .ui-button {
+        display: block;
+        width: auto;
+    }
+}
+
+#languages label {
+    margin-right: 5px;
+}
+
+#finalResultContent {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+#searchTermsHolder {
+    flex: 0 0 12em;
+    order: 1;
+    margin-right: 5px;
+    max-height: 600px;
+    overflow-x: auto;
+    overflow-y: auto;
+    padding-right: 30px;
+}
+
+#searchTermsSelect,
+#searchTermsSelect ul,
+#searchTermsSelect li  { width: 100%;}
+#searchTermsSelect { list-style-type: none; margin: 0px; padding: 0px; }
+#searchTermsSelect li { margin: 3px; padding: 0.4em; }
+
+@media (max-width: 600px) {
+    #searchTermsHolder {
+        flex-grow: 1;
+        flex-basis: 90%;
+        max-height: 200px;
+        margin-right: 0px;
+        margin-bottom: 15px;
+    }
+}
+
+#resultTermsHolder {
+    flex: 1 1 auto;
+    order: 2;
+    flex-shrink: 1;
+    flex-grow:  1;
+}
+
+@media (min-width: 600px) {
+    #resultTermsHolder {
+        max-height: 520px;
+        overflow-x: auto;
+        overflow-y: auto;
+        padding-right: 30px;
+    }
+}
+
+#resultTermsHolder div {
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+#termTable,
+#termAttributeTable {
+    width: 100%;
+}
+
+h4, p {
+    padding: 3px;
+    margin: 2px 0px;
+    -webkit-margin-before: 0px;
+    -webkit-margin-after: 5px;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+
+
