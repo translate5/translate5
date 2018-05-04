@@ -1144,8 +1144,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         ->where('collectionId = ?', $this->termCollectionId);
         $tmpTermValue=$term->db->fetchAll($s);
         
-        if($tmpTermValue->count()>0){
-            $addNewTerm=true;
+        $addNewTerm=$tmpTermValue->count()>0;
+        if($addNewTerm){
+            
             foreach ($tmpTermValue as $t){
                 $t = (object) $t;
                 $checkCase=$t->language==$this->actualLangId;
@@ -1169,19 +1170,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 return;
             }
             
-            //add new
-            $this->saveTerm();
-            return;
         }
         
         if($this->mergeTerms){
             
-            $tmpTermValue=null;
-            //skip the check if one of the terms is already merged
-            //with this all terms in this term entry will get the termId from the merged term
-            if(!$this->lastMergeTermEntryId){
-                $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollectionId);
-            }
+            //check if the term text exist in the term collection within the language
+            $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollectionId);
             
             if($tmpTermValue && $tmpTermValue->count()>0){
                 //the first term thus found is updated by the values ​​in the TBX file. 
@@ -1202,8 +1196,16 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                     $this->lastMergeTermEntryIdDb=$termModel->getTermEntryId();
                     $this->lastMergeTermEntryId=$termModel->getGroupId();
                 }
+                
                 return;
             }
+            
+            //if the term is no merged but his term entry exist in the database, add it as a new term
+            if($addNewTerm){
+                $this->saveTerm();
+                return;
+            }
+            
             //save the term without termEntryId
             $term=ZfExtended_Factory::get('editor_Models_Term');
             /* @var $term editor_Models_Term */
