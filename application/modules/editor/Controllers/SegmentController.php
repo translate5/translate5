@@ -388,7 +388,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             return;
         }
         $resultsCount=count($results);
-        foreach ($results as $result){
+        foreach ($results as $idx => $result){
             $replace=ZfExtended_Factory::get('editor_Models_SearchAndReplace_ReplaceMatchesSegment',[
                     $result[$searchInField],//text to be replaced
                     $searchInField,//replace target field
@@ -431,11 +431,23 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //trigger the before put action
             $this->beforeActionEvent('put');
             
-            //call the put action so the segment is modefied and saved
-            $this->putAction();
-            
-            //trigger the after put action
-            $this->afterActionEvent('put');
+            try {
+                // call the put action so the segment is modefied and saved
+                $this->putAction();
+                //trigger the after put action
+                $this->afterActionEvent('put');
+            }
+            catch (Exception $e) {
+                /**
+                 * Any exception on saving a segment in replace all should not break the whole loop.
+                 * But the problem should be logged, and also the user should be informed in the GUI
+                 */
+                unset($results[$idx]); //remove the unchanged segment from result list, so that GUI knows there was going something wrong
+                $log = new ZfExtended_Log(false);
+                $log->logException($e);
+                $msg  = 'Loaded Segment '.print_r($this->entity->getDataObject(),1)."\n";
+                $log->log('Additional log info to previous '.get_class($e).' exception', $msg);
+            }
             
             //do not return the segment text, it will be loaded by the segments store
             $result[$searchInField]='';

@@ -147,7 +147,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected $log;
     
-    protected $matchRate = [];    
+    protected $matchRate = [];
+    
+    /**
+     * Flag if unknown content should be collected or not
+     * @var boolean
+     */
+    protected $checkContentOutsideMrk = false;
+    
+    /**
+     * Flag if current tag is collected as otherContent (outside mrk tags)
+     * @var integer|boolean
+     */
+    protected $trackTagOutsideMrk = false;
     
     /**
      * (non-PHPdoc)
@@ -217,6 +229,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $sourceEndHandler = function($tag, $key, $opener){
             $this->handleSourceTag($tag, $key, $opener);
         };
+        
+        //handler to get content outside of mrk tags
         $otherContentHandler = function($other) {
             $this->otherContentHandler($other);
         };
@@ -241,20 +255,24 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 // for that we just set the source indizes here in the startHandler, here the order is correct
                 $this->sourceProcessOrder[] = $this->calculateMid(['tag' => $tag, 'attributes' => $attributes], true);
             }
+            if($tag == 'mrk') {
+                $this->otherContentSource[] = ''; //add a new container for the content after the current mrk
+            }
         }, $sourceEndHandler);
         
         //register to seg-source directly to enable / disable the collection of other content 
-        $this->xmlparser->registerElement('xliff trans-unit > seg-source', function() use ($otherContentHandler){
+        $this->xmlparser->registerElement('xliff trans-unit > seg-source', function() use ($otherContentHandler) {
+            //if we have a seg-source we probably have also mrks where no other content is allowed to be outside the mrks 
+            $this->checkContentOutsideMrk = true;
             $this->xmlparser->registerOther($otherContentHandler); // register other handler to get and check content between mrk tags
-        }, function() {
+        }, function(){
             $this->xmlparser->registerOther(null); // unregister other handler
         });
         
-        $this->xmlparser->registerElement('trans-unit > target', function() use ($otherContentHandler){
+        $this->xmlparser->registerElement('trans-unit > target', function() use ($otherContentHandler) {
             $this->xmlparser->registerOther($otherContentHandler); // register other handler to get and check content between mrk tags
         }, function($tag, $key, $opener){
             $this->xmlparser->registerOther(null); // unregister other handler
-            
             //if empty targets are given as Single Tags
             $this->currentPlainTarget = $this->getTargetMeta($tag, $key, $opener);
             if($opener['isSingle']) {
@@ -275,7 +293,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         });
         
         //handling sub segment mrks and sub tags
-        $this->xmlparser->registerElement('trans-unit > target > mrk[mtype=seg], trans-unit > target sub', null, function($tag, $key, $opener){
+        $this->xmlparser->registerElement('trans-unit > target > mrk[mtype=seg], trans-unit > target sub', function($tag) {
+            if($tag == 'mrk') {
+                //if we have a mrk we enable the content outside mrk check
+                $this->checkContentOutsideMrk = true;
+                $this->otherContentTarget[] = ''; //add a new container for the content after the current mrk 
+            }
+        }, function($tag, $key, $opener){
             $this->currentTarget[$this->calculateMid($opener, false)] = $this->getTargetMeta($tag, $key, $opener);
         });
         
@@ -287,9 +311,27 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         });
         
-        $this->xmlparser->registerElement('*', null, function($tag, $key, $opener){
-            //error_log("Unknown in XLF Parser ". $tag);
+        /**
+         * If we are in target or seg-source we collect all unknown tags and save them as strings into 
+         * the otherContent fields. 
+         * To prevent that <a><b></b></a> is collected as <a><b></b></a> and <b></b> we store the start key in the trackTagOutsideMrk flag 
+         */
+        $this->xmlparser->registerElement('*', function($tag, $attributes, $key){
+            $inTarget = $this->xmlparser->getParent('trans-unit > target');
+            $inSegSource = $this->xmlparser->getParent('seg-source');
+            if(empty($inTarget) && empty($inSegSource)) {
+                $this->trackTagOutsideMrk = false;
+            }
+            else {
+                $this->trackTagOutsideMrk = $key;
+            }
+        }, function($tag, $key, $opener){
+            if($this->trackTagOutsideMrk === $opener['openerKey']) {
+                $this->trackTagOutsideMrk = false;
+                $this->otherContentHandler($this->xmlparser->getRange($opener['openerKey'], $key, true));
+            }
         });
+        //error_log("Unknown in XLF Parser ". $other); //→ $other evaluates to the tag in the wildcard handler
     }
     
     /**
@@ -405,7 +447,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     /**
      * Sets the source origin importance
-     * @see compareSourceOrigin
+     * @see self::compareSourceOrigin
      * @param string $tag
      */
     protected function setSourceOrigin($tag) {
@@ -460,7 +502,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->currentPlainTarget = null;
             $this->otherContentSource = [];//reset otherContent for new source
             $this->otherContentTarget = [];//reset otherContent for new target
-
+            $this->checkContentOutsideMrk = false;
+            
 //From Globalese:
 //<trans-unit id="segmentNrInTask">
 //<source>Installation and Configuration</source>
@@ -560,6 +603,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $segmentAttributes->editable = false;
         }
         
+        $segmentAttributes->transunitId = $this->_fileId.'_'.$this->xmlparser->getAttribute($attributes, 'id', null);
         $sizeUnit = $this->xmlparser->getAttribute($attributes, 'size-unit');
         if($sizeUnit == 'char') {
             $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
@@ -642,6 +686,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             // to exclude tags leading and trailing tags in the segment
             $this->startShiftCount = 0;
             $this->endShiftCount = 0;
+//since we are calling the leading/trailing tag stuff on the already fetched source segments, we have no ability here to conserve content outside the mrk tags. 
             if(!$this->hasSameStartAndEndTags($sourceChunks, $targetChunks)) {
                 //if there is just leading/trailing whitespace but no tags we reset the counter 
                 // since then we dont want to cut off something
@@ -688,6 +733,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //if target was given and source contains tags only or is empty, then it will be ignored
             if(!empty($this->segmentData[$targetName]['original']) && !$this->hasText($this->segmentData[$sourceName]['original'])) {
+                $placeHolders[$mid] = $this->xmlparser->join($targetChunksOriginal);
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
@@ -720,13 +766,21 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         
-        //if there is any other content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed 
+        //it is easier to collect all content not in an mrk and dismiss this content after 
+        // we find out that we don't have any mrk at all instead of trying to collect only the content really outside of mrk tags
+        if(!$this->checkContentOutsideMrk) {
+            $this->otherContentTarget = [];
+            $this->otherContentSource = [];
+        }
+        
+        //if there is any other text content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed 
         // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
-        // TODO basicly correct, but probably not working correctly with $leadingTags/$trailingTags
-        //if(preg_match('/[^\s]+/', join(array_merge($this->otherContentTarget, $this->otherContentSource)))) {
-            //$data = array_merge($this->otherContentTarget, $this->otherContentSource);
-            //$this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
-        //}
+        // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
+        $otherContent = join(array_merge($this->otherContentTarget, $this->otherContentSource));
+        if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
+            $data = array_merge($this->otherContentTarget, $this->otherContentSource);
+            $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
+        }
         
         $hasNoTarget = is_null($this->currentPlainTarget);
         $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
@@ -740,14 +794,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $otherContent = $this->otherContentTarget;
         }
         
-        if($preserveWhitespace) {
-            //the combination of array_merge and array_map combines the otherContent values
-            // and the placeholders in a zipper (Reißverschlussverfahren) way 
-            $placeHolder = join(array_merge(...array_map(null, $otherContent, array_values($placeHolders))));
+        if(!$preserveWhitespace) {
+            $otherContent = array_map(function($fragment) {
+                //since the regex delete only whitespace before and after possible tags, 
+                // whitespace inside tags (<ph> for example) are preserved here. 
+                // But this should be ok, since the content inside the tag coming from "otherContent" is not editable.
+                return preg_replace('/^[\s]+|[\s]+$/', '', $fragment);
+            }, $otherContent);
         }
-        else {
-            $placeHolder = join($placeHolders);
-        }
+        //the combination of array_merge and array_map combines the otherContent values
+        // and the placeholders in a zipper (Reißverschlussverfahren) way 
+        $placeHolder = join(array_merge(...array_map(null, $otherContent, array_values($placeHolders))));
         
         //this solves TRANSLATE-879: sdlxliff and XLF import does not work with missing target
         //if there is no target at all:
@@ -913,16 +970,28 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function otherContentHandler($other) {
         $inMrk = $this->xmlparser->getParent('mrk');
-        if(!empty($inMrk)) {
+        if(!empty($inMrk) || $this->trackTagOutsideMrk !== false) {
             //we are in a mrk, so we do nothing
+            // or if we are in a tag we also don't have to track the data, this is done by the whole tag then
             return;
         }
+//error_log("OTHER ".$other);
         $inTarget = $this->xmlparser->getParent('target');
         if(empty($inTarget)) {
-            $this->otherContentSource[] = $other;
+            $l = count($this->otherContentSource);
+            if($l === 0) {
+                $l = 1;
+                $this->otherContentSource[] = '';
+            }
+            $this->otherContentSource[$l-1] .= $other;
         }
         else {
-            $this->otherContentTarget[] = $other;
+            $l = count($this->otherContentTarget);
+            if($l === 0) {
+                $l = 1;
+                $this->otherContentTarget[] = '';
+            }
+            $this->otherContentTarget[$l-1] .= $other;
         }
     }
 }

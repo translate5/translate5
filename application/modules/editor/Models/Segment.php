@@ -128,12 +128,23 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $watchlistFilterEnabled = false;
 
     /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $tagHelper;
+    
+    /**
+     * @var editor_Models_Segment_TrackChangeTag
+     */
+    protected $trackChangesTagHelper;
+    
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
     {
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         parent::__construct();
     }
     
@@ -388,25 +399,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
     }
     /**
-     * strips all tags including internal tag content
-     * //TODO: this function is also used when matirialized view is created, to update the toSort fields. 
-     *         The strip tags will remove the also the del and insert tags.
-     * 
+     * strips all tags including internal tag content and del tag content
      * @return string $segmentContent
      */
     public function stripTags($segmentContent) {
-        $segmentContent = preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_DEL, '', $segmentContent);
+        $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
         return strip_tags(preg_replace('#<span[^>]*>[^<]*<\/span>#','',$segmentContent));
     }
     
     /**
      * dedicated method to count chars of given segment content
      * does a htmlentitydecode, so that 5 char "&amp;" is converted to one char "&" for counting 
+     * Further:
+     * - content in <del> tags is ignored
+     * - all other tags are ignored, if the tag has a length attribute, this length is added
      * @param string $segmentContent
      * @return integer
      */
-    public function charCount($segmentContent) {
-        return mb_strlen($this->prepareForCount($segmentContent));
+    public function textLength($segmentContent) {
+        return mb_strlen($this->prepareForCount($segmentContent, true));
     }
     
     /**
@@ -423,12 +434,23 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Strips tags and reconverts html entities so that several count operations can be performed.
+     * Reconverts html entities so that several count operations can be performed.
      * @param string $text
+     * @param boolean $padTagLength if true, replace tags with a length with a padded string in that length
      * @return string
      */
-    protected function prepareForCount($text) {
-        return html_entity_decode($this->stripTags($text), ENT_QUOTES | ENT_XHTML);
+    protected function prepareForCount($text, $padTagLength = false) {
+        $text = $this->trackChangesTagHelper->removeTrackChanges($text);
+        $text = $this->tagHelper->replace($text, function($matches) use ($padTagLength) {
+            if($padTagLength) {
+                $length = max((int) $this->tagHelper->getLength($matches[0]), 0);
+                return str_repeat('x', $length); //create a "x" string as long as the tag stored tag length
+            }
+            else {
+                return ''; //just remove the internal tags
+            }
+        });
+        return html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_XHTML);
     }
     
     /**
@@ -448,9 +470,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                     'convert_from_encoding' => 'utf-8',
                     'ignore_parser_warnings' => true,
             );
-            $trackChange=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-            /* @var $trackChange editor_Models_Segment_TrackChangeTag */
-            $segmentContent= $trackChange->removeTrackChanges($segmentContent);
+            $segmentContent= $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
             
             $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, $options);
             /* @var $seg QueryPath\\DOMQuery */
@@ -569,6 +589,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param array $segmentData key: fieldname; value: array with original and originalMd5
      */
     public function setFieldContents(editor_Models_SegmentFieldManager $sfm, array $segmentData) {
+        $this->segmentFieldManager = $sfm;
         $db = ZfExtended_Factory::get('editor_Models_Db_SegmentData');
         /* @var $db editor_Models_Db_SegmentData */
         foreach($segmentData as $name => $data) {
@@ -584,7 +605,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 $row->editedToSort = $row->originalToSort;
             }
             /* @var $row editor_Models_Db_SegmentDataRow */
-            $this->segmentdata[] = $row;
+            $this->segmentdata[$name] = $row;
         }
     }
     
@@ -701,10 +722,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
             $data->save();
         }
+        $this->meta()->setSiblingData($this);
+        $this->meta()->save();
         //only update the mat view if the segment was already in DB (so do not save mat view on import!)
         if(!empty($oldIdValue)) {
             $matView = $this->segmentFieldManager->getView();
-            $matView->exists() && $matView->updateSegment($this);
+            if($matView->exists()) {
+                $matView->updateSegment($this);
+                $matView->updateSiblingMetaCache($this);
+            }
         }
         return $segmentId;
     }
@@ -728,6 +754,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $res->isWatched = null;
             $res->segmentUserAssocId = null;
         }
+        $matView = $this->segmentFieldManager->getView();
+        if(property_exists($res, 'metaCache') || !$matView->exists()) {
+            return $res;
+        }
+        $res->metaCache = $matView->getMetaCache($this);
         return $res;
     }
 
@@ -761,6 +792,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function getEditableDataIndexList() {
         return $this->segmentFieldManager->getEditableDataIndexList();
+    }
+    
+    /**
+     * Returns an array with just the editable field values (value) and field names (key)
+     * @return array key: fieldname, value: field content
+     */
+    public function getEditableFieldData() {
+        $editables = $this->segmentFieldManager->getEditableDataIndexList();
+        $result = [];
+        foreach($editables as $field){
+            $result[$field] = $this->get($field);
+        }
+        return $result;
     }
     
     /**
@@ -1183,7 +1227,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         }
         $this->segmentFieldManager->initFields($taskGuid);
         if(empty($this->validator)) {
-            $this->validator = ZfExtended_Factory::get($this->validatorInstanceClass, array($this->segmentFieldManager));
+            $this->validator = ZfExtended_Factory::get($this->validatorInstanceClass, array($this->segmentFieldManager, $this));
         }
     }
     

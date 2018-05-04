@@ -53,6 +53,8 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
      */
     protected $segmentIdsPerUnit = [];
     
+    protected $segmentsToLog = [];
+    
     /**
      * übernimmt das eigentliche FileParsing
      *
@@ -87,7 +89,9 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             $xmlparser->replaceChunk($key, $this->getSegmentContent($id, $field));
         });
         
-        $xmlparser->registerElement('trans-unit', null, function($tag, $key, $opener) use ($xmlparser){
+        $xmlparser->registerElement('trans-unit', function(){
+            $this->transUnitLength = 0;
+        }, function($tag, $key, $opener) use ($xmlparser){
             $segments = [];
             foreach($this->segmentIdsPerUnit as $segmentId) {
                 $segments[] = $this->getSegment($segmentId);
@@ -124,14 +128,63 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
                     $attributes .= ' '.$attribute.'="'.$value.'"';
                 }
                 $xmlparser->replaceChunk($opener['openerKey'], '<'.$tag.$attributes.'>');
+                $originalAttributes = $event->getParam('attributes');
             }
             
             //reset segments per unit: 
             $this->segmentIdsPerUnit = [];
+            
+            $sizeUnit = $xmlparser->getAttribute($originalAttributes, 'size-unit');
+            if($sizeUnit == 'char') {
+                $minWidth = $xmlparser->getAttribute($originalAttributes, 'minwidth', 0);
+                $maxWidth = $xmlparser->getAttribute($originalAttributes, 'maxwidth', PHP_INT_MAX);
+                if($this->transUnitLength < $minWidth) {
+                    $this->logSegment($originalAttributes, 'segment to short');
+
+                }
+                if($this->transUnitLength > $maxWidth) {
+                    $this->logSegment($originalAttributes, 'segment to long');
+                }
+            }
+            
         });
         
         $this->_exportFile = $xmlparser->parse($this->_skeletonFile);
-        
+        $this->sendLog();
+    }
+    
+    /**
+     * Logs export errors to the segment defined by the given transunit attributes
+     * @param array $attributes
+     * @param string $msg
+     */
+    protected function logSegment(array $attributes, $msg) {
+        $this->segmentsToLog[] = [
+            'transunitAttributes' => $attributes,
+            'transunitLength' => $this->transUnitLength,
+            'error' => $msg,
+        ];
+    }
+    
+    /**
+     * send the tracked export warnings to the user
+     */
+    protected function sendLog() {
+        if(empty($this->segmentsToLog)) {
+            return;
+        }
+        $log = ZfExtended_Factory::get('ZfExtended_Log');
+        //Some Segments are producing warnings on export
+        $msg = 'Some Segments are producing warnings on export of Task: '."\n";
+        $msg .= '  '.$this->_task->getTaskName(). ' (guid: '.$this->_task->getTaskGuid().')'."\n\n";
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($this->_fileId);
+        $msg .= 'File: '.$file->getFileName().' (id: '.$this->_fileId.')'."\n\n";
+        $msg .= 'Segments: '."\n";
+        $msg .= print_r($this->segmentsToLog,1);
+        $log->log('Export Warnings for task '.$this->_task->getTaskName(), $msg);
+        $this->segmentsToLog = [];
     }
     
     /**
@@ -185,6 +238,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     protected function getSegmentContent($segmentId, $field) {
         $this->segmentIdsPerUnit[] = $segmentId;
         $content = parent::getSegmentContent($segmentId, $field);
+        $this->transUnitLength += $this->lastSegmentLength;
         //without sub tags, no sub tags must be restored
         if(stripos($content, '<sub') === false) {
             return $content;
@@ -197,6 +251,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
         
+        //restoring of sub tags is working only if the parent tag has a valid id - this is the identifier for the sub segment content
         $xmlparser->registerElement('sub', function($tag, $attributes, $key) use($xmlparser){
             //disable handling of tags if we reach a sub, this is done recursivly in the loaded content of the found sub
             $xmlparser->disableHandlersUntilEndtag();
