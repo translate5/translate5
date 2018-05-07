@@ -312,7 +312,6 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         }
         $segmentsOfFile->rewind();
         $first = $this->unifySegmentData($segmentsOfFile->current());
-        error_log(print_r($first,1));
         
         $file = '<file id="%s" translate5:filename="%s">';
         $this->result[] = sprintf($file,$first['fileId'],htmlspecialchars($filename));
