@@ -2448,7 +2448,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Endkunde</source>
     <target>End customer</target>
 </trans-unit>
-<trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='><source>no existing attributes</source><target>no existing attributes</target></trans-unit>
+<trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='><source>no existing attributes</source><target>No existing attributes</target></trans-unit>
     </body>
   </file>
 </xliff>
