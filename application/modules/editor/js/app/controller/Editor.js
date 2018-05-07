@@ -904,7 +904,7 @@ Ext.define('Editor.controller.Editor', {
             rec = plug.context.record,
             columnToRead = editor.columnToEdit.replace(/Edit$/, '');
         Editor.MessageBox.addInfo(me.messages.segmentReset);
-        editor.mainEditor.setValueAndMarkup(rec.get(columnToRead), rec.get('id'), editor.columnToEdit);
+        editor.mainEditor.setValueAndMarkup(rec.get(columnToRead), rec, editor.columnToEdit);
     },
     /**
      * handler for the F2 key

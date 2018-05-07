@@ -31,9 +31,7 @@ Ext.define('Editor.view.segments.StatusStrip', {
     alias: 'widget.segments.statusstrip',
     itemId:'segmentStatusStrip',
     
-    controller: 'segmentstatusstrip',
     requires:[
-        'Editor.view.segments.StatusStripViewController',
         'Editor.view.segments.MinMaxLength'
     ],
     framed: false,
@@ -43,11 +41,6 @@ Ext.define('Editor.view.segments.StatusStrip', {
     defaults: {
         margin: '0 5 0 5' //top right bottom left (clockwise) margins of each item/column,
     },
-
-    /***
-     * Flag if there is a visible item in the status strip
-     */
-    isChildVisible:false,
 
     /***
      * Html editor instance
@@ -75,29 +68,15 @@ Ext.define('Editor.view.segments.StatusStrip', {
 
     /***
      * For each child element in the status strip, set the record instance
+     * @param {Editor.models.Segment} record
+     * @param {String} fieldName
      */
-    setRecordAndVisible:function(record){
+    updateSegment:function(record, fieldName){
         var me=this;
-        me.isChildVisible=false;
         me.items.each(function(item){
             //check if the element needs to be visible, if no visibility handler is defined
             //hide the component
-            if(item.handleElementVisible && item.handleElementVisible(record)){
-                item.setVisible(true);
-                //update the component (add css, tooltips, etc..), 
-                me.isChildVisible=true;
-            }else{
-                item.setVisible(false);
-            }
-            item.setSegmentRecord && item.setSegmentRecord(record);
+            item.updateSegment && item.updateSegment(record, fieldName);
         });  
-    },
-
-    /***
-     * Flag if there is a visible item in the status strip
-     */
-    isItemVisible:function(){
-        return this.isChildVisible;
     }
-
 });

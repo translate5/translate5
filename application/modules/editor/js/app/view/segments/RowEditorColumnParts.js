@@ -37,13 +37,9 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
     override: 'Editor.view.segments.RowEditor',
 
     columnToEdit: null,
-    editorFieldExtraHeight: 10, //was 10, FIXME depending on the existence of the additional info bar or not
     previousRecord: null,
     timeTrackingData: null,
 
-    requires:[
-        'Editor.view.segments.StatusStrip'
-    ],
     messages: {
         segmentNotSavedUserMessage: '#UT#Das Segment konnte nicht gespeichert werden. Bitte schließen Sie das Segment ggf. durch Klick auf "Abbrechen" und öffnen, bearbeiten und speichern Sie es erneut. Vielen Dank!',
         cantSaveEmptySegment: '#UT#Das Segment kann nicht ohne Inhalt gespeichert werden!'
@@ -59,11 +55,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         });
         
         me.mainEditor = me.add(new Editor.view.segments.HtmlEditor());
-        //add the status strip component to the row editor
-        me.mainEditor.add({
-            xtype:'segments.statusstrip',
-            htmlEditor: me.mainEditor
-        });
     },
     
     /**
@@ -110,7 +101,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             oldField[0].setValue(rec.get(oldIdx));
         }
         if(me.setColumnToEdit(column)) {
-            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec.get('id'), me.columnToEdit);
+            me.mainEditor.setValueAndMarkup(rec.get(me.columnToEdit), rec, me.columnToEdit);
         }
         me.focusContextCell();
     },
@@ -241,19 +232,6 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             view.scrollBy(offset, 0, false);
         }
     },
-    setEditorHeight: function() {
-        var me = this,
-            statusStrip=me.mainEditor.down('#segmentStatusStrip'),
-            statusStripHeight=0;
-        
-        //add extra height if the segment status strip contains an visible element
-        if(statusStrip.isItemVisible()){
-            statusStripHeight=15;
-        }
-        
-        me.callParent(arguments);
-        me.mainEditor.setHeight(me.rowToEditOrigHeight + me.editorFieldExtraHeight + statusStripHeight);
-    },
     /**
      * place the HtmlEditor/MainEditor in the rowEditor over the desired displayfield
      */
@@ -334,7 +312,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         me.callParent(arguments);
         
         me.setColumnToEdit(me.context.column);
-        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record.get('id'), me.columnToEdit);
+        me.mainEditor.setValueAndMarkup(record.get(me.columnToEdit), record, me.columnToEdit);
         
         //init internal markup table for tag check, but only if a translation task
         if(Editor.data.task.get('emptyTargets')) {
@@ -356,7 +334,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             newValue = me.mainEditor.getValueAndUnMarkup().replace(/\u200B/g, ''),
             cleanValue = newValue.replace(/<img[^>]* class="duplicatesavecheck"[^>]*>/,''),
             
-            title, msg;
+            title, msg, meta;
             
         //check, if the context delivers really the correct record, because through some issues in reallive data 
         //rose the idea, that there might exist special race conditions, where
@@ -389,6 +367,8 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
         record.beginEdit();
         record.set(me.columnToEdit, newValue);
         record.set('autoStateId', 999);
+        //update the segment length in the metaCache of the edited segment:
+        record.updateMetaCacheLength(me.columnToEdit, me.mainEditor.getLastSegmentLength());
         record.endEdit();
         return true;
     },
