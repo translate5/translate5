@@ -110,10 +110,8 @@
     flex: 0 0 12em;
     order: 1;
     margin-right: 5px;
-    max-height: 600px;
-    overflow-x: auto;
-    overflow-y: auto;
     padding-right: 30px;
+    overflow-x: auto;
 }
 
 #searchTermsSelect,
@@ -122,7 +120,9 @@
 #searchTermsSelect { list-style-type: none; margin: 0px; padding: 0px; }
 #searchTermsSelect li { margin: 3px; padding: 0.4em; }
 
-@media (max-width: 600px) {
+@media (max-width: 810px) {
+    /* - example: 640 px for 700px in real; don't know why! */
+    /* - already 870px (not 700px) can easily use row for flex */
     #searchTermsHolder {
         flex-grow: 1;
         flex-basis: 90%;
@@ -137,20 +137,6 @@
     order: 2;
     flex-shrink: 1;
     flex-grow:  1;
-}
-
-@media (min-width: 600px) {
-    #resultTermsHolder {
-        max-height: 520px;
-        overflow-x: auto;
-        overflow-y: auto;
-        padding-right: 30px;
-    }
-}
-
-#resultTermsHolder div {
-    overflow-x: auto;
-    overflow-y: auto;
 }
 
 #termTable,
