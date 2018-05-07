@@ -3,6 +3,29 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.6.32] - 2018-05-07
+###Added
+TRANSLATE-1136: Check for content outside of mrk-tags (xliff)
+TRANSLATE-1192: Length restriction: Add length of several segments
+TRANSLATE-1130: Show specific whitespace-Tag
+TRANSLATE-1190: Automatic import of TBX files
+TRANSLATE-1189: Flexible Term and TermEntry Attributes
+TRANSLATE-1187: Introduce TermCollections
+TRANSLATE-1188: Extending the TBX-import
+TRANSLATE-1186: new system role "termCustomerSearch"
+TRANSLATE-1184: Client management
+TRANSLATE-1185: Add field "end client" to user management
+
+###Changed
+VISUAL-30: The connection algorithm connects segments only partially
+
+###Bugfixes
+TRANSLATE-1229: xliff 1.2 export deletes tags
+TRANSLATE-1236: User creation via API should accept a given userGuid
+TRANSLATE-1235: User creation via API produces errors on POST/PUT with invalid content
+TRANSLATE-1128: Selecting segment and scrolling leads to jumping of grid
+TRANSLATE-1233: Keyboard Navigation through grid looses focus
+
 ## [2.6.30] - 2018-04-16
 ###Changed
 TRANSLATE-1218: XLIFF Import: preserveWhitespace per default to true
