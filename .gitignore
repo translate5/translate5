@@ -1,6 +1,7 @@
 client-specific
 application/config/installation.ini
 data/editorImportedTasks/*
+data/tbx-import/*
 data/dummyTm_*
 /nbproject/
 .buildpath
