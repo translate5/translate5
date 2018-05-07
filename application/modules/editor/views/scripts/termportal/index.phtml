@@ -109,6 +109,7 @@ var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
 var REST_PATH='<?php echo $this->restPath; ?>';
 var SESSION_LOCALE='<?php echo $session->locale; ?>';
+var noExistingAttributes='<?php echo $this->translations["noExistingAttributes"];?>';
 
 $( function() {
     $('#languages').selectmenu({

@@ -1267,6 +1267,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMSBtaXQgw4RuZGVydW5nc2hpc3RvcmllKQ=='><source>exportieren (XLIFF 2.1 mit Änderungshistorie)</source><target>exportieren (XLIFF 2.1 mit Änderungshistorie)</target></trans-unit>
 <trans-unit id="ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQgbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZSk="><source>exportieren (Orginalformat mit Änderungshistorie)</source><target>exportieren (Orginalformat mit Änderungshistorie)</target></trans-unit>
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='><source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source><target>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</target></trans-unit>
+<trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='><source>no existing attributes</source><target>Keine Attribute.</target></trans-unit>
+
   </body>
  </file>
 </xliff>
