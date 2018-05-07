@@ -123,7 +123,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "termTableTitle"=>$this->translate->_("Terme"),
                 "termEntryAttributeTableTitle"=>$this->translate->_("Eigenschaften des Eintrags"),
                 "search" => $this->translate->_('Suche'),
-                "noResults" => $this->translate->_('Keine Ergebnisse für die aktuelle Suche!')
+                "noResults" => $this->translate->_('Keine Ergebnisse für die aktuelle Suche!'),
+                "noExistingAttributes" => $this->translate->_('no existing attributes')
         );
         
         $this->view->translations=$translatedStrings;

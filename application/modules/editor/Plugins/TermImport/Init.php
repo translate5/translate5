@@ -32,6 +32,11 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/***
+ * This plug-in is used for automatically exports TBX files from the filesystem and Across and imports them to translate5.
+ * In the config folder there are custom cinfigs for each tbx import type(filesystem and crossapi)
+ * More info: https://confluence.translate5.net/display/TAD/Plug-In+TermImport%3A+TermImport
+ */
 class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
     
     /**
@@ -42,13 +47,8 @@ class editor_Plugins_TermImport_Init extends ZfExtended_Plugin_Abstract {
     
     
     public function init() {
-        $this->initEvents();
         $this->addController('TermImportController');
         $this->initRoutes();
-    }
-    
-    protected function initEvents() {
-        
     }
     
     /**
