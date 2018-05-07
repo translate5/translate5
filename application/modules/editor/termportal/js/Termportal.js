@@ -86,7 +86,7 @@ function findTermsAndAttributes(termGroupid){
     }
     
     $.ajax({
-        url: REST_PATH+"termcollection/search",
+        url: REST_PATH+"termcollection/searchattribute",
         dataType: "json",
         data: {
             'groupId':termGroupid
@@ -403,7 +403,7 @@ function handleAttributeDrawData(attribute){
         case "transac":
             
             
-            var header=handleAttributeHeaderText(attribute);
+            var header=handleAttributeHeaderText(attribute,true);
             
             html += '<h4 class="ui-widget-header ui-corner-all">' + header + '</h4>';
             
@@ -411,7 +411,7 @@ function handleAttributeDrawData(attribute){
                 var childData=[];
                 attribute.children.forEach(function(child) {
                     //get the header text
-                    childDataText=handleAttributeHeaderText(child);
+                    childDataText=handleAttributeHeaderText(child,true);
                     
                     var attVal=getAttributeValue(child);
                     
@@ -432,9 +432,16 @@ function handleAttributeDrawData(attribute){
             var flagContent="";
             //add the flag for the definition in the term entry attributes
             if(attribute.attrType=="definition" && attribute.language){
-                flagContent=getLanguageFlag(attribute.language);
+                flagContent=" "+getLanguageFlag(attribute.language);
             }
-            var headerText = handleAttributeHeaderText(attribute)+flagContent;
+
+            var headerText="";
+            
+            if(flagContent && flagContent!=""){
+                headerText =handleAttributeHeaderText(attribute,false)+flagContent;
+            }else{
+                headerText =handleAttributeHeaderText(attribute)+flagContent;
+            }
             
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
             
@@ -448,7 +455,7 @@ function handleAttributeDrawData(attribute){
                 }
                 
                 //remove the flag from the html which will be displayed in the term
-                languageDefinitionContent[attribute.language]=html.replace(flagContent,'');;
+                languageDefinitionContent[attribute.language]=html.replace(flagContent,'');
             }
             
             break;
@@ -456,7 +463,7 @@ function handleAttributeDrawData(attribute){
             
             var attVal=getAttributeValue(attribute);
             
-            var headerText = handleAttributeHeaderText(attribute);
+            var headerText = handleAttributeHeaderText(attribute,true);
             
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
             break;
@@ -508,10 +515,11 @@ function getAttributeValue(attribute){
 }
 /***
  * Build the attribute text, based on if headerText (db translation for the attribute) is provided
- * @param attribute
+ * @param attribute: entry or term attribute
+ * @param addColon: add colon on the end of the header text
  * @returns
  */
-function handleAttributeHeaderText(attribute){
+function handleAttributeHeaderText(attribute,addColon){
     
     var attVal=getAttributeValue(attribute);
     
@@ -520,7 +528,7 @@ function handleAttributeHeaderText(attribute){
     //if no headerText use attribute name + if exist attribute type
     var headerText=attribute.headerText ? attribute.headerText :  noHeaderName;
     
-    return headerText+":";
+    return headerText+ (addColon ? ":" : "");
 }
 
 /***
