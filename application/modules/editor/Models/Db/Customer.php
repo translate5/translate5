@@ -34,36 +34,7 @@
  END LICENSE AND COPYRIGHT 
  */
 
-/**
- * Customer Entity Objekt
- * 
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * 
- * @method string getName() getName()
- * @method void setName() setName(string $name)
- * 
- * @method string getNumber() getNumber()
- * @method void setNumber() setNumber(string $number)
- * 
-*/
-class editor_Plugins_Customer_Models_Customer extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_Customer_Models_Db_Customer';
-    protected $validatorInstanceClass   = 'editor_Plugins_Customer_Models_Validator_Customer';
-    
-    
-    /***
-     * Find customer by number
-     * 
-     * @param mixed $number
-     */
-    public function findCustomerByNumber($number){
-        $s = $this->db->select()
-        ->where('number = ?', $number);
-        $res=$this->db->fetchRow($s);
-        if(empty($res)) {
-            return $res;
-        }
-        return $res->toArray();
-    }
+class editor_Models_Db_Customer extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_customer';
+    public $_primary = 'id';
 }

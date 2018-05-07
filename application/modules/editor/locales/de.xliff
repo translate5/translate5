@@ -1267,6 +1267,19 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMSBtaXQgw4RuZGVydW5nc2hpc3RvcmllKQ=='><source>exportieren (XLIFF 2.1 mit Änderungshistorie)</source><target>exportieren (XLIFF 2.1 mit Änderungshistorie)</target></trans-unit>
 <trans-unit id="ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQgbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZSk="><source>exportieren (Orginalformat mit Änderungshistorie)</source><target>exportieren (Orginalformat mit Änderungshistorie)</target></trans-unit>
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='><source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source><target>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</target></trans-unit>
+<trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
+<trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='><source>Kundenübersicht</source><target>Kundenübersicht</target></trans-unit>
+<trans-unit id='SGluenVmw7xnZW4='><source>Hinzufügen</source><target>Hinzufügen</target></trans-unit>
+<trans-unit id='S3VuZGVubmFtZQ=='><source>Kundenname</source><target>Kundenname</target></trans-unit>
+<trans-unit id='S3VuZGVubnVtbWVy'><source>Kundennummer</source><target>Kundennummer</target></trans-unit>
+<trans-unit id='S3VuZGUgYmVhcmJlaXRlbg=='><source>Kunde bearbeiten</source><target>Kunde bearbeiten</target></trans-unit>
+<trans-unit id='S3VuZGUgaGluenVmw7xnZW4='><source>Kunde hinzufügen</source><target>Kunde hinzufügen</target></trans-unit>
+<trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4u'><source>Kunde wird gespeichert...</source><target>Kunde wird gespeichert...</target></trans-unit>
+<trans-unit id='S3VuZGUgZ2VzcGVpY2hlcnQh'><source>Kunde gespeichert!</source><target>Kunde gespeichert!</target></trans-unit>
+<trans-unit id='RGllc2VuIEt1bmRlbiBsw7ZzY2hlbj8='><source>Diesen Kunden löschen?</source><target>Diesen Kunden löschen?</target></trans-unit>
+<trans-unit id='S3VuZGVuIGzDtnNjaGVu'><source>Kunden löschen</source><target>Kunden löschen</target></trans-unit>
+<trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'><source>Kunde gelöscht</source><target>Kunde gelöscht</target></trans-unit>
+<trans-unit id='RW5ka3VuZGU='><source>Endkunde</source><target>Endkunde</target></trans-unit>
   </body>
  </file>
 </xliff>

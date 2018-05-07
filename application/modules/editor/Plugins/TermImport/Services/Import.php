@@ -318,8 +318,8 @@ class editor_Plugins_TermImport_Services_Import {
             
         $customerNumber=$configFile[self::COLLECTION_MAPPING_GROUP][$collectionName];
         
-        $cm=ZfExtended_Factory::get('editor_Plugins_Customer_Models_Customer');
-        /* @var $cm editor_Plugins_Customer_Models_Customer */
+        $cm=ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $cm editor_Models_Customer */
         $customer=$cm->findCustomerByNumber($customerNumber);
         
         if(!$customer){

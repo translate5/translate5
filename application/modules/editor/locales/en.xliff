@@ -2384,6 +2384,70 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<source>Eigenschaften des Eintrags</source>
 	<target>Attributes of the term entry</target>
 </trans-unit>
+<trans-unit id='S3VuZGVu'>
+    <source>Kunden</source>
+    <target>Customers</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='>
+    <source>Kundenübersicht</source>
+    <target>Customers overview</target>
+</trans-unit>
+
+<trans-unit id='SGluenVmw7xnZW4='>
+    <source>Hinzufügen</source>
+    <target>Add</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGVubmFtZQ=='>
+    <source>Kundenname</source>
+    <target>Customer name</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGVubnVtbWVy'>
+    <source>Kundennummer</source>
+    <target>Customer number</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgYmVhcmJlaXRlbg=='>
+    <source>Kunde bearbeiten</source>
+    <target>Edit customer</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgaGluenVmw7xnZW4='>
+    <source>Kunde hinzufügen</source>
+    <target>Add a customer</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4u'>
+    <source>Kunde wird gespeichert...</source>
+    <target>Customer is saved ...</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgZ2VzcGVpY2hlcnQh'>
+    <source>Kunde gespeichert!</source>
+    <target>Customer saved!</target>
+</trans-unit>
+
+<trans-unit id='RGllc2VuIEt1bmRlbiBsw7ZzY2hlbj8='>
+    <source>Diesen Kunden löschen?</source>
+    <target>Delete this customer ?</target>
+</trans-unit>
+
+    <trans-unit id='S3VuZGVuIGzDtnNjaGVu'>
+    <source>Kunden löschen</source>
+    <target>Delete customer</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'>
+    <source>Kunde gelöscht</source>
+    <target>Customer deleted</target>
+</trans-unit>
+
+<trans-unit id='RW5ka3VuZGU='>
+    <source>Endkunde</source>
+    <target>End customer</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

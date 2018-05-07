@@ -34,7 +34,7 @@
  END LICENSE AND COPYRIGHT 
  */
 
-class editor_Plugins_Customer_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstract {
+class editor_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstract {
     
     /**
     * Validators for Customer entity

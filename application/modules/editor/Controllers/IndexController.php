@@ -386,6 +386,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $controllers[] = 'admin.TaskUserAssoc';
             $controllers[] = 'admin.User';
         }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','customerAdministration')){
+            $controllers[] = 'admin.Customer';
+        }
 
         //Localizer must be the last one!
         $controllers[] = 'Localizer';
