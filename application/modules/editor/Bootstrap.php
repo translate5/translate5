@@ -89,9 +89,9 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     public function _initRestRoutes()
     {
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => array(  'file', 'segment', 'alikesegment', 'referencefile', 'qmstatistics', 'comment',
+            'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker',
-                                'taskmeta', 'config', 'segmentuserassoc', 'session', 'language'),
+                    'taskmeta', 'config', 'segmentuserassoc', 'session', 'language','termcollection'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -223,6 +223,52 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'queue'
             ));
         $this->front->getRouter()->addRoute('editorQueue', $workerRoute);
+        
+        $termCollectionImport = new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/import/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'import'
+                ));
+        $this->front->getRouter()->addRoute('termCollectionImport', $termCollectionImport);
+        
+        $termCollectionExport = new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/export/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'export'
+                ));
+        $this->front->getRouter()->addRoute('termCollectionExport', $termCollectionExport);
+        
+        
+        $getCollectionAttributes= new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/testgetattributes/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'testgetattributes'
+                ));
+        $this->front->getRouter()->addRoute('testgetattributes', $getCollectionAttributes);
+        
+        $searchTermCollection= new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/search/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'search'
+                ));
+        $this->front->getRouter()->addRoute('searchtermcollection', $searchTermCollection);
+        
+        $searchAttributeTermCollection= new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/searchattribute/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'searchattribute'
+                ));
+        $this->front->getRouter()->addRoute('searchattributetermcollection', $searchAttributeTermCollection);
     }
     
     

@@ -103,4 +103,14 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * @var integer
      */
     public $maxWidth = null;
+    
+    /**
+     * The transunitId and fileId (or in general group id) if some segments are belonging together.
+     * For example in XLF there is one transunit with multiple mrk tags. 
+     * Each MRK tag is one segment in translate5, through the transunitId the segments are grouped.
+     * The value is fileId_transunitId
+     *  
+     * @var string
+     */
+    public $transunitId;
 }

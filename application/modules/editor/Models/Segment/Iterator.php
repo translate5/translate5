@@ -49,9 +49,16 @@ class editor_Models_Segment_Iterator implements Iterator {
     protected $isEmpty = false;
     
     /**
+     * If set, iterate only over the segments of the given file Id.
+     * @var integer
+     */
+    protected $fileId = null;
+    
+    /**
      * @param string $taskGuid
      */
-    public function __construct($taskGuid) {
+    public function __construct($taskGuid, $fileId = null) {
+        $this->fileId = $fileId;
         $this->taskGuid = $taskGuid;
         $this->rewind();
     }
@@ -71,7 +78,7 @@ class editor_Models_Segment_Iterator implements Iterator {
      * @return editor_Models_Segment | null
      */
     public function next() {
-        $this->segment = $this->segment->loadNext($this->taskGuid, $this->key());
+        $this->segment = $this->segment->loadNext($this->taskGuid, $this->key(), $this->fileId);
         return $this->segment;
     }
     
@@ -94,7 +101,7 @@ class editor_Models_Segment_Iterator implements Iterator {
     public function rewind() {
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         try {
-            $this->segment->loadFirst($this->taskGuid);
+            $this->segment->loadFirst($this->taskGuid, $this->fileId);
             $this->isEmpty = false;
         }
         catch(ZfExtended_Models_Entity_NotFoundException $noSegments) {

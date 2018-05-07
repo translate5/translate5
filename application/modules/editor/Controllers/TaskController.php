@@ -106,7 +106,20 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
         $this->config = Zend_Registry::get('config');
+        
+        //add context xliff2 as valid format
+        $this->_helper
+        ->getHelper('contextSwitch')
+        ->addContext('xliff2', [
+            'headers' => [
+                'Content-Type'          => 'text/xml',
+            ]
+        ])
+        ->addActionContext('export', 'xliff2')
+        ->initContext();
     }
+    
+    
     
     /**
      * init the internal used workflow
@@ -792,10 +805,24 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->checkStateAllowsActions();
         
         $diff = (boolean)$this->getRequest()->getParam('diff');
+        
+        $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        switch ($context) {
+            case 'xliff2':
+                $worker = ZfExtended_Factory::get('editor_Models_Export_Xliff2Worker');
+                $diff = false;
+                /* @var $worker editor_Models_Export_Xliff2Worker */
+                $exportFolder = $worker->initExport($this->entity);
+                break;
+            
+            default:
+                $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
+                /* @var $worker editor_Models_Export_Worker */
+                $exportFolder = $worker->initExport($this->entity, $diff);
+                break;
+        }        
 
-        $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
-        /* @var $worker editor_Models_Export_Worker */
-        $exportFolder = $worker->initExport($this->entity, $diff);
+
         $workerId = $worker->queue();
         
         //FIXME multiple problems here
@@ -812,10 +839,17 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $worker editor_Models_Export_ExportedWorker */
         $zipFile = $worker->initZip($this->entity->getTaskGuid(), $exportFolder);
         
+        
         //TODO for the API usage of translate5 blocking on export makes no sense
         // better would be a URL to fetch the latest export or so (perhaps using state 202?)
         $worker->setBlocking(); //we have to wait for the underlying worker to provide the download
         $worker->queue($workerId);
+        
+        //currently we can only strip the directory path for xliff2 exports, since for default exports we need this as legacy code
+        // can be used in general with TRANSLATE-764
+        if($context == 'xliff2') {
+            ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
+        }
         
         if($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();

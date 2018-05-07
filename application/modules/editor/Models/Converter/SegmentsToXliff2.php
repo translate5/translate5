@@ -27,53 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_SegmentsToXliffAbstract {
-    
-    
-    
-    /***
-     * Value for 'its:person' argument in unit tag
-     * @var string
-     */
-    protected $itsPerson=null;
-    
-    /***
-     * Value for 'translate5:personGuid' argument in unit tag
-     * @var string
-     */
-    protected $itsPersonGuid=null;
-    
-    /***
-     * Value for 'its:revPerson' argument in unit tag
-     * @var string
-     */
-    protected $itsRevPerson=null;
-    
-    /***
-     * Value for 'revPersonGuid' argument in unit tag
-     * @var string
-     */
-    protected $itsRevPersonGuid=null;
-    
-    
-    /***
-     * Unsupported configs:
-     */
-    protected $unsupportedConfigs=[
-            self::CONFIG_ADD_RELAIS_LANGUAGE,
-            self::CONFIG_ADD_ALTERNATIVES,
-            self::CONFIG_PLAIN_INTERNAL_TAGS,
-            self::CONFIG_ADD_PREVIOUS_VERSION,
-            self::CONFIG_ADD_STATE_QM,
-            self::CONFIG_ADD_DISCLAIMER
-    ];
-    
-    /***
-     * Finished workflow step
-     * 
-     * @var string
-     */
-    public $workflowStep=null;
-    
     /***
      * xlif2 segment state
      * @var string
@@ -103,6 +56,49 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @var string
      */
     const CONFIG_ADD_QM = 'addQm';
+    
+    /***
+     * Value for 'its:person' argument in unit tag
+     * @var string
+     */
+    protected $itsPerson=null;
+    
+    /***
+     * Value for 'translate5:personGuid' argument in unit tag
+     * @var string
+     */
+    protected $itsPersonGuid=null;
+    
+    /***
+     * Value for 'its:revPerson' argument in unit tag
+     * @var string
+     */
+    protected $itsRevPerson=null;
+    
+    /***
+     * Value for 'revPersonGuid' argument in unit tag
+     * @var string
+     */
+    protected $itsRevPersonGuid=null;
+    
+    /***
+     * Unsupported configs:
+     */
+    protected $unsupportedConfigs=[
+            self::CONFIG_ADD_RELAIS_LANGUAGE,
+            self::CONFIG_ADD_ALTERNATIVES,
+            self::CONFIG_PLAIN_INTERNAL_TAGS,
+            self::CONFIG_ADD_PREVIOUS_VERSION,
+            self::CONFIG_ADD_STATE_QM,
+            self::CONFIG_ADD_DISCLAIMER
+    ];
+    
+    /***
+     * Finished workflow step
+     * 
+     * @var string
+     */
+    protected $workflowStep = null;
     
     /***
       Mapping of translate5 autostates to xliff 2.x default segment state is as follows:
@@ -186,7 +182,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      */
     const QM_ID_PREFIX="QM_";
     
-    public function __construct(array $config = []){
+    /**
+     * @param array $config the configuration for the xliff converter, see the CONFIG_ flags
+     * @param string $workflowstep the current workflow step
+     */
+    public function __construct(array $config = [], $workflowstep){
+        $this->workflowStep = $workflowstep;
         $this->insDelTagId=1;
         parent::__construct($config);
     }
@@ -230,33 +231,6 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         }
     }
     
-    
-    /**
-     * converts a list with segment data to xml (xliff2)
-     * @param editor_Models_Task $task
-     * @param array $segments
-     */
-    public function convert(editor_Models_Task $task, array $segments) {
-        $this->result = array('<?xml version="1.0" encoding="UTF-8"?>');
-        $this->task = $task;
-        $allSegmentsByFile = $this->reorderByFilename($segments);
-        
-        $this->initConvertionData();
-        
-        $this->createXmlHeader();
-        
-        foreach($allSegmentsByFile as $filename => $segmentsOfFile) {
-            $this->processAllSegments($filename, $segmentsOfFile);
-        }
-        
-        //XML Footer, no extra method
-        $this->result[] = '</xliff>';
-        
-        $xml = join("\n", $this->result);
-        
-        return $xml;
-    }
-    
     /***
      * Init the needed data for xliff 2.1 convertion
      * {@inheritDoc}
@@ -298,7 +272,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     /**
      * Helper function to create the XML Header
      */
-    public function createXmlHeader() {
+    protected function createXmlHeader() {
         $headParams = array('xliff', 'version="2.1"');
         
         $headParams[] = 'xmlns="urn:oasis:names:tc:xliff:document:2.0"';
@@ -332,18 +306,19 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @param string $filename
      * @param array $segmentsOfFile
      */
-    protected function processAllSegments($filename, array $segmentsOfFile) {
+    protected function processAllSegments($filename, Traversable $segmentsOfFile) {
         if(empty($segmentsOfFile)) {
             return;
         }
+        $first = $this->unifySegmentData(reset($segmentsOfFile));
         
         $file = '<file id="%s" translate5:filename="%s">';
-        $this->result[] = sprintf($file,$segmentsOfFile[0]['fileId'],htmlspecialchars($filename));
+        $this->result[] = sprintf($file,$first['fileId'],htmlspecialchars($filename));
         
         $this->addComments('unitComment');
         
         foreach($segmentsOfFile as $segment) {
-            $this->processSegmentsOfFile($segment);
+            $this->processSegmentsOfFile($this->unifySegmentData($segment));
         }
         
         $this->result[] = '</file>';

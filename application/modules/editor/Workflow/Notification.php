@@ -409,10 +409,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
             ];
-            $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf]);
+            $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $currentStep]);
             /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
-            
-            $xliffConverter->workflowStep=$currentStep;
             return $xliffConverter;
         }
         

@@ -184,7 +184,10 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Import_Worke
             return;
         }
         try {
-            $t = $this->term->loadByMid($mid, $this->taskGuid);
+            $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            /* @var $assoc editor_Models_TermCollection_TermCollection */
+            $collectionIds=$assoc->getCollectionsForTask($this->taskGuid);
+            $t = $this->term->loadByMid($mid, $collectionIds);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e){
             $this->termContent[$mid] = "Term not found in DB! Mid: ".$mid;
@@ -209,7 +212,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Import_Worke
         $stat->setFieldType($field->type);
         $stat->setType($this->type);
         $stat->setFileId($segment->getFileId());
-        $stat->setCharCount($segment->charCount($segmentContent));
+        $stat->setCharCount($segment->textLength($segmentContent));
         $stat->setWordCount($segment->wordCount($segmentContent));
         $stat->setTermNotFound(array_sum($termCount['notFound']));
         $stat->setTermFound(array_sum($termCount['found']));

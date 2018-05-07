@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xliff version="1.1" xmlns="urn:oasis:names:tc:xliff:document:1.1" xmlns:tmgr="http://www.ibm.com">
+  <file datatype="plaintext" original="testfile1.html" source-language="en-US" target-language="de-DE" tool="OpenTM2">
+    <header>
+      <tmgr:properties>
+        <tmgr:folder>TEST_M01</tmgr:folder>
+        <tmgr:markup>IBMUHTM3</tmgr:markup>
+        <tmgr:sourcelang>English(U.S.)</tmgr:sourcelang>
+        <tmgr:targetlang>German(reform)</tmgr:targetlang>
+        <tmgr:shortname>TESTFILE.000</tmgr:shortname>
+        <tmgr:shipment>1</tmgr:shipment>
+      </tmgr:properties>
+    </header>
+    <body>
+
+      <trans-unit id="15" translate="yes" tmgr:segstatus="XLATED" tmgr:matchinfo="FUZZY" tmgr:matchratio="80">
+        <source>15 - Test an existing translation. With MRK tags. And Content outside MRK.</source>
+        <seg-source><mrk mtype="seg" mid="0">15 - Test an existing translation. </mrk>And Content outside MRK.<mrk mtype="seg" mid="1">15 - With MRK tags.</mrk></seg-source>
+        <target state="translated"><mrk mtype="seg" mid="0">15 - Teste eine vorhandene Übersetzung.</mrk><mrk mtype="seg" mid="1">Mit MRK Tags</mrk></target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

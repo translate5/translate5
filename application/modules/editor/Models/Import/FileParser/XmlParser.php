@@ -243,7 +243,7 @@ class editor_Models_Import_FileParser_XmlParser {
     
     
     /**
-     * Warning: parentTag works only of a handler is registered for parentTag
+     * Warning: parentTag works only if a handler is registered for parentTag
      * leave $handler empty to unregister it
      * @param callable $handler Parameters: $other, $key
      */
@@ -541,6 +541,14 @@ class editor_Models_Import_FileParser_XmlParser {
             call_user_func($this->handlerOther, $other, $key);
         }
         $this->log("Other#".$other.'#');
+    }
+    
+    /**
+     * returns true if handlers are disabled at the moment, false otherwise
+     * @return boolean
+     */
+    public function isHandlingDisabled() {
+        return $this->disableHandlerCount > 0;
     }
     
     protected function log($msg) {
