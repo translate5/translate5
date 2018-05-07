@@ -34,6 +34,12 @@ END LICENSE AND COPYRIGHT
 
 /**
  * Mixin with Helpers regarding the LanguageTool: https://languagetool.org/
+ * 
+ * Some of this might already be done by PHP instead of handling the data here.
+ * For performance however it might be even better to use the user's browser 
+ * instead of the server (that must handle many requests anyway). And the data 
+ * that we transfer has just a few KB and thus doesn't make a big difference, too.
+ * 
  * @class Editor.plugins.TrackChanges.controller.UtilLanguageTool
  */
 Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
