@@ -2349,7 +2349,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id="ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQgbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZSk=">
     <source>exportieren (Orginalformat mit Änderungshistorie)</source>
-    <target>Export (original import format incl. track changes)</target>
+    <target>Export (original format incl. import/export diff)</target>
 </trans-unit>
 <trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMSk='>
     <source>exportieren (XLIFF 2.1)</source>
