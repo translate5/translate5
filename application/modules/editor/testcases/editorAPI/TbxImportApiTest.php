@@ -45,7 +45,6 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         $appState = $api->requestJson('editor/index/applicationstate');
-        self::assertTrue(in_array('editor_Plugins_Customer_Init',$appState->pluginsLoaded),'Plugin Customer must be active for this test case!');
         self::assertCustomer();
     }
     
