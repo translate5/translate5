@@ -510,7 +510,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             rangeForMatch = rangy.createRange(),
             rangeForMatchBookmark,
-            replaceText = event.currentTarget.innerText;
+            replaceText;
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
@@ -522,6 +522,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // Update the range (the SpellCheck-Node is no longer in the DOM!...).
         rangeForMatch.moveToBookmark(rangeForMatchBookmark);
         rangeForMatchBookmark = rangeForMatch.getBookmark();
+        
+        // Replacement
+        replaceText = event.currentTarget.innerText;
+        if (replaceText == '') { // quick and dirty workaround for empty spaces (e.g. when "  " should be replaced with " ", but innerText returns "")
+            replaceText = '&nbsp;';
+        }
         
         me.isActiveTrackChanges();                             // SearchReplace.js
         if(!me.activeTrackChanges){                            // SearchReplace.js
