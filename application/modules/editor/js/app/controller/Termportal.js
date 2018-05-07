@@ -34,12 +34,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.Termportal', {
     extend : 'Ext.app.Controller',
     
-    views: [
-        'Editor.plugins.Customer.view.Customer',
-        'Editor.plugins.Customer.model.Customer',
-        'Editor.plugins.Customer.view.CustomerTagField'
-    ],
-
     refs:[{
         ref: 'headToolBar',
         selector: 'headPanel toolbar#top-menu'
