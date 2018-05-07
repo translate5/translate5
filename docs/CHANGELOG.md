@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [2.7.0] - 2018-05-07
+## [2.7.1] - 2018-05-07
 ###Added
 TRANSLATE-1136: Check for content outside of mrk-tags (xliff)
 TRANSLATE-1192: Length restriction: Add length of several segments
