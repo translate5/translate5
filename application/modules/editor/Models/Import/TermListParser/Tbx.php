@@ -562,15 +562,18 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             }
         }
         
+        $termEntryAttributes=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermEntryAttributes');
+        /* @var $termEntryAttributes editor_Models_Db_TermCollection_TermEntryAttributes */
+        $deleteParams=array();
+        
+        $deleteParams['termEntryId = ?']=$this->actualTermEntryIdDb;
+        
         if(!empty($this->termEntryAttributeContainer)){
-            //remove the old term entry attributes
-            $termEntryAttributes=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermEntryAttributes');
-            /* @var $termEntryAttributes editor_Models_Db_TermCollection_TermEntryAttributes */
-            $termEntryAttributes->delete(array(
-                    'termEntryId = ?' => $this->actualTermEntryIdDb,
-                    'id NOT IN (?)' => $this->termEntryAttributeContainer
-            ));
+            $deleteParams['id NOT IN (?)']=$this->termEntryAttributeContainer;
         }
+        
+            //remove the old term entry attributes
+        $termEntryAttributes->delete($deleteParams);
         
         $this->termEntryAttributeContainer=array();
         $this->lastMergeTermEntryId=null;
@@ -778,14 +781,18 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         if(!$this->isInsideTig){
             //remove unneeded term attributes
+            $termAttributes=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermAttributes');
+            /* @var $termAttributes editor_Models_Db_TermCollection_TermAttributes */
+            
+            $deleteParams=array();
+            $deleteParams['termId = ?'] = $this->actualTermIdDb;
+            
+            //remove the old attribute
             if(!empty($this->termAttirbuteContainer)){
-                $termAttributes=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermAttributes');
-                /* @var $termAttributes editor_Models_Db_TermCollection_TermAttributes */
-                $termAttributes->delete(array(
-                        'termId = ?' => $this->actualTermIdDb,
-                        'id NOT IN (?)' => $this->termAttirbuteContainer
-                ));
+                $deleteParams['id NOT IN (?)'] = $this->termAttirbuteContainer;
             }
+            
+            $termAttributes->delete($deleteParams);
         }else{
             $this->counterTigInLangSet++;
         }
