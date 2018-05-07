@@ -55,7 +55,8 @@ Ext.define('Editor.model.admin.User', {
     }},
     {name: 'sourceLanguage'},
     {name: 'targetLanguage'},
-    {name: 'locale', type: 'string'}
+    {name: 'locale', type: 'string'},
+    {name: 'customers', type: 'string'}
   ],
   idProperty: 'id',
   proxy : {
