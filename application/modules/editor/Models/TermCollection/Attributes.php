@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_AttributesAbstract extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_TermCollection_Attributes extends ZfExtended_Models_Entity_Abstract {
     
     
     /***
@@ -77,6 +77,7 @@ class editor_Models_TermCollection_AttributesAbstract extends ZfExtended_Models_
         //check if the field exist
         $checkRow=$this->db->fetchRow($s);
         if(empty($checkRow)){
+            $this->setUpdated(date("Y-m-d H:i:s"));
             //the field does not exist
             return $this->save();
         }
@@ -88,8 +89,7 @@ class editor_Models_TermCollection_AttributesAbstract extends ZfExtended_Models_
         //the same values, ignore
         if($checkRow['value']===$toSave['value']){
             $this->load($checkRow['id']);
-            //force the update timestamp to change
-            $this->setUpdated(null);
+            $this->setUpdated(date("Y-m-d H:i:s"));
             return $this->save();
         }
         
@@ -97,6 +97,7 @@ class editor_Models_TermCollection_AttributesAbstract extends ZfExtended_Models_
         //load the record
         $this->load($checkRow['id']);
         $this->setValue($toSave['value']);
+        $this->setUpdated(date("Y-m-d H:i:s"));
         return $this->save();
     }
 }

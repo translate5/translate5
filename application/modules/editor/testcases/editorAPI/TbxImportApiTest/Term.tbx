@@ -14,12 +14,12 @@
 				<descrip type="thesaurusDescriptor" target="ff506136-f259-4f49-9205-22f5a0af80eb">$2222.0 Initial Version$</descrip>
 				<transacGrp>
 					<transac>creation</transac>
-					<date>2018-01-12 $2222.0 Initial Version$</date>
+					<date>2018-01-12</date>
 					<transacNote type="responsiblePerson">Aleksandar Mitrev $2222.0 Initial Version$</transacNote>
 				</transacGrp>
 				<transacGrp>
 					<transac>modification</transac>
-					<date>2018-01-12 $2222.0 Initial Version$</date>
+					<date>2018-01-12</date>
 					<transacNote type="responsiblePerson">Aleksandar Mitrev $2222.0 Initial Version$</transacNote>
 				</transacGrp>
 				<langSet xml:lang="de-de">
@@ -27,12 +27,12 @@
 						<descrip type="definition" xml:lang="de-de">#007.0 Initial Version# Das ist die Definition auf Eintragsebene.</descrip>
 						<transacGrp>
 							<transac>creation</transac>
-							<date>#2222.0 Initial Version# 2018-01-12</date>
+							<date>2018-01-12</date>
 							<transacNote type="responsiblePerson">#007.0 Initial Version# Aleksandar Mitrev</transacNote>
 						</transacGrp>
 						<transacGrp>
 							<transac>modification</transac>
-							<date>#2222.0 Initial Version# 2018-01-12</date>
+							<date>2018-01-12</date>
 							<transacNote type="responsiblePerson">#007.0 Initial Version# Aleksandar Mitrev</transacNote>
 						</transacGrp>
 					</descripGrp>
