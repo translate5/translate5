@@ -35,8 +35,8 @@ Ext.define('Editor.view.admin.ExportMenu', {
   itemId: 'exportMenu',
   messages: {
       exportDef: '#UT#exportieren (Orginalformat)',
-      export2Def: '#UT#exportieren (XLIFF 2.2)',
-      exportDiff: '#UT#exportieren mit Änderungshistorie',
+      exportDiff: '#UT#exportieren (Orginalformat mit Änderungshistorie)',
+      export2Def: '#UT#exportieren (XLIFF 2.1 mit Änderungshistorie)',
       exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}'
   },
   alias: 'widget.adminExportMenu',
@@ -54,15 +54,15 @@ Ext.define('Editor.view.admin.ExportMenu', {
         href: me.makePath('task/export/id/{0}'),
         text: me.messages.exportDef
     },{
-        itemId: 'exportItemXliff2',
-        hrefTarget: '_blank',
-        href: me.makePath('task/export/id/{0}?format=xliff2'),
-        text: me.messages.export2Def
-    },{
         itemId: 'exportDiffItem',
         hrefTarget: '_blank',
         href: me.makePath('task/export/id/{0}/diff/1'),
         text : me.messages.exportDiff
+    },{
+        itemId: 'exportItemXliff2',
+        hrefTarget: '_blank',
+        href: me.makePath('task/export/id/{0}?format=xliff2'),
+        text: me.messages.export2Def
     }];
     
     if(fields === false) {

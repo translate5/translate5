@@ -396,7 +396,7 @@ function handleAttributeDrawData(attribute){
     var html="";
     
     if(!attribute.attributeId){
-        return html;
+        return noExistingAttributes; // see /application/modules/editor/views/scripts/termportal/index.phtml
     }
     
     switch(attribute.name) {
