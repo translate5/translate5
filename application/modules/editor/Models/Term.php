@@ -214,6 +214,19 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $db->fetchAll($s)->toArray();
     }
     
+    /***
+     * check if the term with the same termEntry,collection but different termId exist
+     * 
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function getRestTermsOfGroup($groupId, $mid, $collectionId){
+        $s = $this->db->select()
+        ->where('groupId = ?', $groupId)
+        ->where('mid != ?', $mid)
+        ->where('collectionId = ?',$collectionId);
+        return $this->db->fetchAll($s);
+    }
+    
     /**
      * returns all term mids of the given segment in a multidimensional array.
      * First level contains source or target (the fieldname)

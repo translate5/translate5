@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermEntryAttributes extends editor_Models_TermCollection_AttributesAbstract{
+class editor_Models_TermCollection_TermEntryAttributes extends editor_Models_TermCollection_Attributes{
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermEntryAttributes';
     protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermEntryAttributes';
     

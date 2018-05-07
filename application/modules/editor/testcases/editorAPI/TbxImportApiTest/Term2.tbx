@@ -57,7 +57,7 @@
 						</transacGrp>
 					</tig>
 					<tig>
-							<term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmierplatz</term>
+							<term id="fb1b8aca-bbc9-4e94-9469-c19f0b310074">Schmier</term>
 							<termNote type="processStatus">provisionallyProcessed</termNote>
 							<termNote type="across_userdef_picklist_Verwendung">Unwort</termNote>
 							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>
@@ -75,7 +75,7 @@
 				</langSet>
 				<langSet xml:lang="en-us">
 					<tig>
-							<term id="462bed50-6779-4cb1-be6b-223e78b54f26">Desk</term>
+							<term id="462bed50-6779-4cb1-be6b-223e78b54f26">Table</term>
 							<termNote type="processStatus">finalized</termNote>
 							<termNote type="across_userdef_textfield_Quelle">Informationen zur Quelle des Terms.</termNote>
 							<admin type="customerSubset" target="97d0604d-3972-4adf-ba96-7e54bf7ffdf6">Testkunde</admin>

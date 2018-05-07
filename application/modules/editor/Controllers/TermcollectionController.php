@@ -100,16 +100,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $config = Zend_Registry::get('config');
         $termCount=$config->runtimeOptions->termportal->searchTermsCount;
         
-        //if groupid is provided, search the termattributes and termEntry attributes
-        if(isset($params['groupId'])){
-            //FIXME: move this to separatea action ?
-            $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId']);
-
-            $entryAttr=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
-            /* @var $entryAttr editor_Models_TermCollection_TermEntryAttributes */
-            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId']);
-            
-        }else if(isset($params['term'])){
+        if(isset($params['term'])){
             $languages=isset($params['language']) ? $params['language'] : null;
             
             //if the limit is disabled, do not use it
@@ -118,6 +109,28 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             }
             
             $responseArray['term']=$model->searchTermByLanguage($params['term'],$languages,$params['collectionIds'],$termCount);
+        }
+        
+        $this->view->rows=$responseArray;
+    }
+    
+    /***
+     * Search term entry and term attributes in group
+     */
+    public function searchattributeAction(){
+        $params=$this->getRequest()->getParams();
+        $responseArray=array();
+        
+        $model=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $model editor_Models_Term */
+        
+        if(isset($params['groupId'])){
+            $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId']);
+            
+            $entryAttr=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
+            /* @var $entryAttr editor_Models_TermCollection_TermEntryAttributes */
+            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId']);
+            
         }
         
         $this->view->rows=$responseArray;

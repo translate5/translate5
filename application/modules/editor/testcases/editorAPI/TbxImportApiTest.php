@@ -72,8 +72,8 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         //add new term to term collection
         $this->singleTest('Term1.tbx', 9, 81, 21);
         
-        //different term entry id, different term id, same language and term content -> update the term and insert
-        //all terms in the same tbx term entry in the database
+        //different term entry id, different term id, same language and term content -> update the term and 
+        //check if the other terms in the tbx term entry can be merged
         $this->singleTest('Term2.tbx', 11, 101, 21);
         
         //add new terms to the term collection
@@ -103,7 +103,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue(is_object($response),"Unable to export the terms by term collection");
         $this->assertNotEmpty($response->filedata,"The exported tbx file by collection is empty");
         
-        //file_put_contents('/var/www/translate5/application/modules/editor/testcases/editorAPI/TbxImportApiTest/E_'.$fileName, $response->filedata);
+        file_put_contents('/var/www/translate5/application/modules/editor/testcases/editorAPI/TbxImportApiTest/E_'.$fileName, $response->filedata);
         $expected=$this->api()->getFileContent('E_'.$fileName);
         $actual=$response->filedata;
         
@@ -120,7 +120,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
     
     public static function tearDownAfterClass() {
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
+        //self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
     }
     
 }

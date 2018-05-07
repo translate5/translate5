@@ -260,6 +260,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'search'
                 ));
         $this->front->getRouter()->addRoute('searchtermcollection', $searchTermCollection);
+        
+        $searchAttributeTermCollection= new ZfExtended_Controller_RestLikeRoute(
+                'editor/termcollection/searchattribute/*',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'termcollection',
+                        'action' => 'searchattribute'
+                ));
+        $this->front->getRouter()->addRoute('searchattributetermcollection', $searchAttributeTermCollection);
     }
     
     

@@ -697,6 +697,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         if($term->loadIfExist($this->actualTermIdDb)){
             $term->setStatus($actualTermNoteStatus);
+            $term->setUpdated(date("Y-m-d H:i:s"));
             $term->save();
             return;
         }
@@ -704,6 +705,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if(isset($this->termsContainer[$this->actualTermIdTbx])){
             $term=$this->termsContainer[$this->actualTermIdTbx];
             $term->setStatus($actualTermNoteStatus);
+            $term->setUpdated(date("Y-m-d H:i:s"));
             $term->save();
         }
     }
@@ -1137,22 +1139,20 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 /* @var $termModel editor_Models_Term */
                 $termModel->load($t->id);
                 $termModel->setTerm($this->xml->readInnerXml());
+                $termModel->setUpdated(date("Y-m-d H:i:s"));
                 $termModel->save();
                 $this->actualTermIdDb=$termModel->getId();
                 return;
             }
         }
         //check if the term with the same termEntry,collection but different termId exist
-        //INFO: this select make no sence to be created in the term model 
-        $s = $term->db->select()
-        ->where('groupId = ?', $this->actualTermEntry)
-        ->where('mid != ?', $this->actualTermIdTbx)
-        ->where('collectionId = ?', $this->termCollectionId);
-        $tmpTermValue=$term->db->fetchAll($s);
         
+        $tmpTermValue=$term->getRestTermsOfGroup($this->actualTermEntry, $this->actualTermIdTbx, $this->termCollectionId);
+
         $addNewTerm=$tmpTermValue->count()>0;
         if($addNewTerm){
-            
+
+            //foreach term in the db term entry, find if the current term has the same language and value
             foreach ($tmpTermValue as $t){
                 $t = (object) $t;
                 $checkCase=$t->language==$this->actualLangId;
@@ -1166,6 +1166,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                     /* @var $termModel editor_Models_Term */
                     $termModel->load($t->id);
                     $termModel->setDefinition($this->actualDefinition);
+                    $termModel->setUpdated(date("Y-m-d H:i:s"));
                     $termModel->save();
                     $this->actualTermIdDb=$t->id;
                     $addNewTerm=false;
@@ -1194,6 +1195,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 /* @var $term editor_Models_Term */
                 
                 $termModel->load($tmpTermValue['id']);
+                $termModel->setUpdated(date("Y-m-d H:i:s"));
                 $termModel->save();
                 $termModel->setDefinition($this->actualDefinition);
                 $this->actualTermIdDb=$tmpTermValue['id'];
@@ -1222,7 +1224,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             $term->setDefinition($this->actualDefinition);
             $term->setLanguage((integer)$this->actualLangId);
             $term->setCollectionId($this->termCollectionId);
-
+            $term->setUpdated(date("Y-m-d H:i:s"));
+            
             $this->actualTermIdDb=$term->save();
 
             //collect the term so later can be updated
@@ -1249,6 +1252,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $term->setLanguage((integer)$this->actualLangId);
         $term->setCollectionId($this->termCollectionId);
         $term->setTermEntryId($this->actualTermEntryIdDb);
+        $term->setUpdated(date("Y-m-d H:i:s"));
         $this->actualTermIdDb=$term->save();
     }
     
