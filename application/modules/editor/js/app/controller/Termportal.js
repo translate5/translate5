@@ -34,12 +34,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.Termportal', {
     extend : 'Ext.app.Controller',
     
-    views: [
-        'Editor.plugins.Customer.view.Customer',
-        'Editor.plugins.Customer.model.Customer',
-        'Editor.plugins.Customer.view.CustomerTagField'
-    ],
-
     refs:[{
         ref: 'headToolBar',
         selector: 'headPanel toolbar#top-menu'
@@ -66,7 +60,7 @@ Ext.define('Editor.controller.Termportal', {
     },
     
     /***
-     * hide the customers button when editor is opened
+     * hide the termportal button when editor is opened
      */
     onEditorViewportOpen:function(){
         this.getHeadToolBar().down('#btnTermPortal').setHidden(true);
