@@ -205,6 +205,21 @@ $dep->dependencies = [[
             "license" => "MIT",
             "relpath" => "docs/third-party-licenses/rangy-license.txt"
         ]]
+    ],[
+        "name" => "jquery-ui",
+        "label" => "JQuery UI",
+        "version" => "1.12.1",
+        "url" => "RELEASE:jquery-ui.zip",
+        "target" => "public/js/jquery-ui",
+        "licenses" => [[
+            "uses" => "JQuery",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/jquery-license.txt"
+        ],[
+            "uses" => "JQuery UI",
+            "license" => "JQuery UI",
+            "relpath" => "docs/third-party-licenses/jquery-ui-license.txt"
+        ]]
     ]
 ];
 
