@@ -46,7 +46,10 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
     dataIndex: 'segmentNrInTask',
     text: 'Nr.',
     alias: 'widget.segmentNrInTaskColumn',
-    mixins: ['Editor.view.segments.column.BaseMixin'],
+    mixins: [
+        'Editor.view.segments.column.BaseMixin',
+        'Editor.view.segments.column.InfoToolTipMixin'
+    ],
     isErgonomicVisible: true,
     isErgonomicSetWidth: true,
     ergonomicWidth: 60,
@@ -54,29 +57,11 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
     filter: {
         type: 'numeric'
     },
-    tableTpl: ['<table>',
-    '<tpl for=".">',
-        '<tpl if="value">',
-          '<tr><th>{name}</th><td>{value}</td></tr>',
-        '</tpl>',
-    '</tpl></table>'],
     initComponent: function() {
         this.scope = this; //so that renderer can access this object instead the whole grid.
-        this.tableTpl = new Ext.XTemplate(this.tableTpl);
         this.callParent(arguments);
     },
-    initOtherRenderers: function() {
-        var me = this,
-            grid = me.up('grid');
-
-        me.otherRenderers = {};
-        Ext.Array.each(grid.columns, function(item) {
-            if(!item.showInMetaTooltip) {
-                return;
-            }
-            me.otherRenderers[item.dataIndex] = item;
-        });
-    },
+    
     editor: {
         xtype: 'displayfield',
         getModelData: function() {
@@ -97,38 +82,7 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
         }
     },
     renderer: function(v, meta, record) {
-        //TODO this should be done in a native Editor.view.ToolTip implementation to create the ToolTips on the fly. 
-        // Since invocation of ToolTip is bound to QmSubSegments,
-        // the invocation should be changed in a general manner before reusing the general Editor.ToolTip class
-        var me = this,
-            data = [];
-
-        if(!me.otherRenderers) {
-            me.initOtherRenderers();
-        }
-
-        Ext.Object.each(me.otherRenderers, function(id, column){
-            var scope = column.scope || me.up('grid'),
-                obj = {
-                    name: column.text
-                };
-
-            if (column.renderer) {
-                obj.value = column.renderer.apply(scope, [record.get(id), {}, record]);
-            }
-            else {
-                obj.value = record.get(id);
-            }
-
-            if(id == 'comments'){
-                //cleaning up comment add/edit icon
-                obj.value = obj.value.replace(/^<img class="(add|edit)"[^>]+>/, '');
-            }
-
-            data.push(obj);
-        })
-
-        meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(me.tableTpl.apply(data))+'"';
+        meta.tdAttr = 'data-qtip="'+this.renderInfoQtip(record)+'"';
         return v;
     }
 });

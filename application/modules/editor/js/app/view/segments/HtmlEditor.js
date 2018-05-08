@@ -47,7 +47,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   //prefix der img Tag ids im HTML Editor
   idPrefix: 'tag-image-',
   requires: [
-      'Editor.view.segments.HtmlEditorLayout'
+      'Editor.view.segments.HtmlEditorLayout',
+      'Editor.view.segments.StatusStrip'
   ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
@@ -66,14 +67,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   duplicatedContentTags: [],
   contentEdited: false, //is set to true if text content or content tags were modified
   disableErrorCheck: false,
-  segmentLengthInRange:false,//is segment number of characters in defined range
+  //0: segment length is OK, -1 segment is to short (shorter as minLength), 1 segment is to long (longer as maxLength)
+  segmentLengthStatus:0,
+  lastSegmentLength:null,
+  currentSegment: null,
+  statusStrip: null,
 
   strings: {
       tagOrderErrorText: '#UT# Einige der im Segment verwendeten Tags sind in der falschen Reihenfolgen (schließender vor öffnendem Tag).',
       tagMissingText: '#UT# Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:',
       tagDuplicatedText: '#UT# Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:',
       tagRemovedText: '#UT# Es wurden Tags mit fehlendem Partner entfernt!',
-      cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.'
+      cantEditContents: '#UT#Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.',
+      segmentToShort:'#UT#Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.',
+      segmentToLong:'#UT#Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.'
   },
   
   //***********************************************************************************
@@ -96,19 +103,40 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
-      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{text}" alt="{text}" src="{path}"/>'
+      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" />'
     ]);
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
-      '<span title="{text}" class="short">&lt;{shortTag}&gt;</span>',
-      '<span data-originalid="{id}" data-filename="{md5}" class="full">{text}</span>'
+      '<span title="{title}" class="short">{shortTag}</span>',
+      '<span data-originalid="{id}" data-length="{length}" class="full">{text}</span>'
     ]);
     me.spanTemplate.compile();
     me.callParent(arguments);
+    //add the status strip component to the row editor
+    me.statusStrip = me.add({
+        xtype:'segments.statusstrip',
+        htmlEditor: me
+    });
+  },
+  setHeight: function(height) {
+      var me = this,
+          stripHeight = Math.max(0, me.statusStrip.getHeight() - 5); //reduce statusStrip height about 5px
+      me.callParent([height + stripHeight]);
   },
   initFrameDoc: function() {
-	  this.callParent(arguments);
-	  this.fireEvent('afterinitframedoc', this);
+      var me = this,
+          wantedLoad = true; //the first load event is wanted, all others not
+      me.callParent(arguments);
+      me.iframeEl.on('load', function(){
+          if(!wantedLoad) {
+              //If you get multiple of that log entries, 
+              // your code architecture is bad due to much DOM Manipulations at the wrong place. See TRANSLATE-1219
+              Ext.log({msg: 'HtmlEditor iframe is re-initialised!', level: 'warn'});
+              me.initFrameDoc();
+          }
+          wantedLoad = false;
+      });
+      me.fireEvent('afterinitframedoc', me);
   },
 
   /**
@@ -120,7 +148,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
         body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;line-height:14px;"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'/css/htmleditor.css?v=12" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=15" />'; //disable Img resizing
     return Ext.String.format(body, me.iframePad, additionalCss, dir);
   },
   /**
@@ -149,11 +177,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   /**
    * Setzt Daten im HtmlEditor und fügt markup hinzu
-   * @param value String
+   * @param value {String}
+   * @param segment {Editor.models.Segment}
+   * @param value {fieldName}
    */
-  setValueAndMarkup: function(value, segmentId, fieldName){
+  setValueAndMarkup: function(value, segment, fieldName){
       //check tag is needed for the checkplausibilityofput feature on server side 
       var me = this,
+          segmentId = segment.get('id'),
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
       if (Ext.isGecko && value=="") {
           // TRANSLATE-1042: Workaround Firefox
@@ -161,7 +192,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           // - will be removed on saving anyway (or even before during clean-up of the TrackChanges)
           value = "&#8203;"; 
       }
+      me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
+      me.statusStrip.updateSegment(segment, fieldName);
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -189,10 +222,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getValueAndUnMarkup: function(){
     var me = this,
-    	result,
+    	result, length,
     	body = me.getEditorBody();
     me.checkTags(body);
-    me.setSegmentLengthInRange(body.innerHTML || "");
+    me.checkSegmentLength(body.innerHTML || "");
     result = me.unMarkup(body);
     me.contentEdited = me.plainContent.join('') !== result.replace(/<img[^>]+>/g, '');
     return result;
@@ -261,6 +294,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
             termTageNode.parentNode.removeChild(termTageNode);
         }
         // insert
+        this.fireEvent('beforeInsertMarkup', range);
+        range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
@@ -278,12 +313,28 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     var me = this,
         tempNode = document.createElement('DIV'),
         plainContent = plainContent || [];
+
+    me.measure = Ext.fly(me.getEditorBody()).createChild({
+        //<debug> 
+        // tell the spec runner to ignore this element when checking if the dom is clean  
+        'data-sticky': true,
+        //</debug> 
+        role: 'presentation',
+        cls: Ext.baseCSSPrefix + 'textmetrics'
+    });
+ 
+    me.measure.setVisibilityMode(1);
+    me.measure.position('absolute');
+    me.measure.setLocalXY(-1000, -1000);
+    me.measure.hide();
+ 
     me.result = [];
     //tempnode mit inhalt füllen => Browser HTML Parsing
     value = value.replace(/ </g, Editor.TRANSTILDE+'<');
     value = value.replace(/> /g, '>'+Editor.TRANSTILDE);
     Ext.fly(tempNode).update(value);
     me.replaceTagToImage(tempNode, plainContent);
+    Ext.destroy(me.measure);
     return me.result;
   },
 
@@ -339,11 +390,39 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         return;
       }
       data = me.getData(item,data);
-      
+
+      if(me.viewModesController.isFullTag() || data.whitespaceTag) {
+        data.path = me.getSvg(data.text, data.fullWidth);
+      }
+      else {
+        data.path = me.getSvg(data.shortTag, data.shortWidth);
+      }
       me.result.push(me.imageTemplate.apply(data));
       plainContent.push(me.markupImages[data.key].html);
     });
   },
+  
+  getSvg: function(text, width) {
+      var prefix = 'data:image/svg+xml;charset=utf-8,',
+          svg = '', 
+          //cell = Ext.fly(this.up('segmentroweditor').context.row).select('.segment-tag-column .x-grid-cell-inner').first(),
+          cell = Ext.fly(this.getEditorBody()),
+          styles = cell.getStyle(['font-size','font-style', 'font-weight', 'font-family','line-height', 'text-transform', 'letter-spacing', 'word-break']),
+          lineHeight = styles['line-height'].replace(/px/,'');
+
+      if(!Ext.isNumber(lineHeight)) {
+          lineHeight = Math.round(styles['font-size'].replace(/px/, '') * 1.3);
+      }
+
+      //padding left 1px and right 1px by adding x+1 and width + 2
+      //svg += '<?xml version="1.0" encoding="UTF-8" standalone="no"?>';
+      svg += '<svg xmlns="http://www.w3.org/2000/svg" height="'+lineHeight+'" width="'+(width+2)+'">';
+      svg += '<rect width="100%" height="100%" fill="rgb(207,207,207)" rx="3" ry="3"/>';
+      svg += '<text x="1" y="'+(lineHeight-5)+'" font-size="'+styles['font-size']+'" font-weight="'+styles['font-weight']+'" font-family="'+styles['font-family'].replace(/"/g,"'")+'">'
+      svg += Ext.String.htmlEncode(text)+'</text></svg>';
+      return prefix + encodeURI(svg);
+  },
+  
   /**
    * daten aus den tags holen
    */
@@ -357,16 +436,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       spanShort = divItem.down('span.short');
       data.text = spanFull.dom.innerHTML.replace(/"/g, '&quot;');
       data.id = spanFull.getAttribute('data-originalid');
+      data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
+      data.length = spanFull.getAttribute('data-length');
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!
-      if(data.id) {
-          //new way
-          data.md5 = spanFull.getAttribute('data-filename');
-      }
-      else {
+      if(!data.id) {
           split = spanFull.getAttribute('id').split('-');
           data.id = split.shift();
-          data.md5 = split.pop();
       }
       shortTagContent = spanShort.dom.innerHTML;
 	  data.nr = shortTagContent.replace(/[^0-9]/g, '');
@@ -392,23 +468,27 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           break;
       }
       data.key = data.type+data.nr;
+      data.shortTag = '&lt;'+data.shortTag+'&gt;';
+      data.whitespaceTag = /nbsp|tab|space|newline/.test(item.className);
+      if(data.whitespaceTag) {
+          data.type += ' whitespace';
+      }
 
       //zusammengesetzte img Pfade:
-      sp = data.shortPath+data.nr+data.suffix+'.png';
-      fp = data.fullPath+data.md5+data.suffix+'.png';
-      //caching der Pfade und den zugehörigen divs fürs unmarkup 
+      this.measure.setHtml(data.text);
+      data.fullWidth = this.measure.getSize().width;
+      this.measure.setHtml(data.shortTag);
+      data.shortWidth = this.measure.getSize().width;
+      //cache the data to be rendered via svg and the html for unmarkup
       me.markupImages[data.key] = {
-          shortPath: sp,
-          fullPath: fp,
+          shortTag: data.shortTag,
+          fullTag: data.text,
+          fullWidth: data.fullWidth,
+          shortWidth: data.shortWidth,
+          whitespaceTag: data.whitespaceTag,
           html: '<div class="'+item.className+'">'+me.spanTemplate.apply(data)+'</div>'
       };
 
-      if(me.viewModesController.isFullTag()){
-        data.path = fp;
-      }
-      else {
-        data.path = sp;
-      }
       return data;
   },
   /**
@@ -522,7 +602,21 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @return {Boolean}
    */
   hasAndDisplayErrors: function() {
-      var me = this;
+      var me = this, msg, meta = me.currentSegment.get('metaCache');
+      
+      //if the segment length is not in the defined range, add an error message - not disableable, so before disableErrorCheck
+      if(Editor.data.segments.enableCountSegmentLength && me.segmentLengthStatus != 0) {
+          //fire the event, and get the message from the segmentminmaxlength component
+          if(me.segmentLengthStatus > 0) {
+              msg = Ext.String.format(me.strings.segmentToLong, meta.maxLength);
+          }
+          else {
+              msg = Ext.String.format(me.strings.segmentToShort, meta.minLength);
+          }
+          me.fireEvent('contentErrors', me, msg);
+          return true;
+      }
+      
       //if we are running a second time into this method triggered by callback, 
       //  the callback can disable a second error check
       if(me.disableErrorCheck){
@@ -536,13 +630,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           Editor.MessageBox.addError(me.strings.cantEditContents);
           return true;
       }
-
-      //if the segment characters length is not in the defined range, add the message
-      if(!me.segmentLengthInRange) {
-          //fire the event, and get the message from the segmentminmaxlength component
-          me.fireEvent('contentErrors', me, me.getSegmentMinMaxLength().activeErroMessage);
-          return true;
-      }
       
       if(me.missingContentTags.length > 0 || me.duplicatedContentTags.length > 0){
           var msg = '', 
@@ -552,7 +639,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               if(me[todo[i][0]].length > 0) {
                   msg += me.strings[todo[i][1]];
                   Ext.each(me[todo[i][0]], function(tag) {
-                      msg += '<img src="'+tag.shortPath+'"> ';
+                      msg += '<img src="'+me.getSvg(tag.whitespaceTag ? tag.fullTag : tag.shortTag, tag.whitespaceTag ? tag.fullWidth : tag.shortWidth)+'"> ';
                   })
                   msg += '<br /><br />';
               }
@@ -587,11 +674,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   checkContentTags: function(nodelist) {
       var me = this,
-          foundIds = [];
+          foundIds = [],
+          ignoreWhitespace = Editor.data.segments.userCanModifyWhitespaceTags;
       me.missingContentTags = [];
       me.duplicatedContentTags = [];
       
       Ext.each(nodelist, function(img) {
+          if(ignoreWhitespace && /whitespace/.test(img.className)) {
+              return;
+          }
           if(Ext.Array.contains(foundIds, img.id) && !img.parentNode.nodeName.toLowerCase()==="del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
@@ -602,6 +693,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
       });
       Ext.Object.each(this.markupImages, function(key, item){
+          if(ignoreWhitespace && item.whitespaceTag) {
+              return;
+          }
           if(!Ext.Array.contains(foundIds, me.idPrefix+key)) {
               me.missingContentTags.push(item);
           }
@@ -763,11 +857,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   },
   setImagePath: function(target){
     var me = this;
-    me.getEditorBody().className = '';
     Ext.each(Ext.query('img', true, me.getEditorBody()), function(item){
       var markupImage;
       if(markupImage = me.getMarkupImage(item.id)){
-        item.src = markupImage[target];
+        if(target == 'fullPath' || markupImage.whitespaceTag) {
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.fullTag), markupImage.fullWidth);
+        }
+        else {
+            item.src = me.getSvg(Ext.String.htmlDecode(markupImage.shortTag), markupImage.shortWidth);
+        }
       }
     });
   },
@@ -825,27 +923,88 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       body.setStyle('direction', dir);
   },
   
-  /***
-   * Set the internal flag segmentLengthInRange based on if the currently edited segment number of characters is within the defined range.
+  /**
+   * Check if the segment character number is within the defined borders
+   * @param {String} segmentText
    */
-  setSegmentLengthInRange:function(bodyText){
-      var me=this,
-          minMaxLength=me.getSegmentMinMaxLength();
-      //check if the the min/max length is supplied
-      if(minMaxLength){
-          me.segmentLengthInRange=minMaxLength.isSegmentLengthInRange(bodyText);
-          return;
+  checkSegmentLength: function(segmentText){
+      var me = this,
+          length,
+          metaCache = me.currentSegment && me.currentSegment.get('metaCache'),
+          minWidth = metaCache && metaCache.minWidth ? metaCache.minWidth : 0,
+          maxWidth = metaCache && metaCache.maxWidth ? metaCache.maxWidth : Number.MAX_SAFE_INTEGER;
+      
+      me.segmentLengthStatus = 0;
+      
+      //get the characters length and is segment saveble
+      length = me.getTransunitLength(segmentText);
+      
+      if(length < minWidth) {
+          me.segmentLengthStatus = -1;
       }
-      me.segmentLengthInRange=true;
+      else if(length > maxWidth) {
+          me.segmentLengthStatus = 1;
+      }
   },
   
-  /***
-   * Return segmentMinMaxLength component instance
+  /**
+   * Get the character count of the segment text + sibling segment lengths, without the tags in it (whitespace tags evaluated to their length)
+   * @param {String} text optional, if omitted use currently stored value
+   * @return {Integer} returns the transunit length
    */
-  getSegmentMinMaxLength:function(){
-      var me=this,
-          minMaxLength=Ext.ComponentQuery.query('#segmentMinMaxLength');
-      return minMaxLength.length>0 ? minMaxLength[0] : null;
+  getTransunitLength: function(text){
+      var me = this,
+          div = document.createElement("div"),
+          additionalLength = 0,
+          meta = me.currentSegment.get('metaCache'),
+          field = me.dataIndex;
+      
+      //function can be called with given text - or not. Then it uses the current value.
+      if(!Ext.isDefined(text) || text === null){
+          text = me.getValue();
+      }
+      if(!Ext.isString(text)) {
+          text = "";
+      }
+      //FIXME: improve that clean del tag by reuse methods from track changes
+      text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
+      
+      div.innerHTML = text;
+      //add the length stored in each img tag 
+      Ext.fly(div).select('img').each(function(item){
+          var l = parseInt(item.getAttribute('data-length') || "0");
+          //data-length is -1 if no length provided
+          if(l > 0) {
+              additionalLength += l;
+          }
+      });
+      
+      //add the length of the text itself 
+      text = div.textContent || div.innerText || "";
+      div = null;
+      
+      //only the segment length + the tag lengths:
+      me.lastSegmentLength = additionalLength + text.length;
+
+      //add the length of the sibling segments (min max length is given for the whole transunit, not each mrk tag
+      if(meta && meta.siblingData) {
+          Ext.Object.each(meta.siblingData, function(id, data) {
+              if(me.currentSegment.get('id') == id) {
+                  return; //dont add myself again
+              }
+              if(data.length && data.length[field]) {
+                  additionalLength += data.length[field];
+              }
+          });
+      }
+      
+      return additionalLength + text.length;
+  },
+  /**
+   * returns the last calculated segment length (with tag lengths, without sibling lengths)
+   * @return {Integer}
+   */
+  getLastSegmentLength: function() {
+      return this.lastSegmentLength;
   }
-  
 });

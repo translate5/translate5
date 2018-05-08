@@ -68,7 +68,11 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 .segment-tag-container.x-form-display-field div.single,
 .segment-tag-container .x-autocontainer-innerCt div.open,
 .segment-tag-container .x-autocontainer-innerCt div.close,
-.segment-tag-container .x-autocontainer-innerCt div.single {display:inline;background:#39FFA3;}
+.segment-tag-container .x-autocontainer-innerCt div.single {
+    display:inline;
+    background:#cfcfcf;
+    border-radius:4px;
+}
 
 /* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
 .segment-tag-container.x-tip div.open,
@@ -81,10 +85,26 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 #segment-grid div.x-grid-cell-inner div.close span {} /* Grafik Style für close Tag*/
 #segment-grid div.x-grid-cell-inner div.single span {} /* Grafik Style für single Tag*/
 
+div.open + div,
+div.close + div,
+div.single + div {
+  margin-left:1px;
+}
+
 .short-tag div span.full,
 .full-tag div span.short,
 .hide-tag div span.short,
 .hide-tag div span.full{display:none;}
+
+/* special characters are always showing the fulltag, the same is done for the img tags in HtmlEditor.js */
+.short-tag div.internal-tag.tab span.short,
+.short-tag div.internal-tag.space span.short,
+.short-tag div.internal-tag.newline span.short,
+.short-tag div.internal-tag.nbsp span.short {display:none;}
+.short-tag div.internal-tag.tab span.full,
+.short-tag div.internal-tag.space span.full,
+.short-tag div.internal-tag.newline span.full,
+.short-tag div.internal-tag.nbsp span.full {display:inline;}
 
 #segment-grid span.term {
     text-decoration: underline;
@@ -101,6 +121,10 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     white-space: normal;
     overflow: visible;
     cursor: move;
+}
+
+#segment-grid .x-grid-row-editor .autoState .x-form-display-field {
+    white-space: nowrap
 }
 
 .x-grid-row-editor {
@@ -265,6 +289,11 @@ background-color: #EAF1FB;
 #segment-grid .comments-field .x-grid-cell-inner img {
     display:none;
 }
+
+#segment-grid .x-grid-row-editor .autoState .x-form-display-field img.edit {
+    display:inline;
+}
+
 #segment-grid .x-grid-row-editor .x-btn {float:right;}
 #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add,
 #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {

@@ -26,17 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.view.StatusStripViewController
- * @extends Ext.app.ViewController
- */
-Ext.define('Editor.view.segments.StatusStripViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.segmentstatusstrip',
+Ext.define('Editor.store.admin.Customers', {
+    extend : 'Ext.data.Store',
+    model: 'Editor.model.admin.Customer',
+    autoLoad: true,
+    storeId:'customersStore'
 });

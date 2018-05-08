@@ -293,7 +293,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
                     ed.context.row = me.getSegmentGrid().getView().getNode(origRec);
                     ed.reposition();
                     dis.setRawValue(Editor.view.segments.column.Comments.getFirstComment(rec.get('comments')));
-                    stateid.setRawValue(ed.columns.get(stateid.id).renderer(rec.get('autoStateId')));
+                    stateid.setRawValue(ed.columns.get(stateid.id).renderer(rec.get('autoStateId'),{},rec));
                 }
             }
         });

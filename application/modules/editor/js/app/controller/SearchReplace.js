@@ -69,11 +69,11 @@ Ext.define('Editor.controller.SearchReplace', {
             '#searchTopChekbox':{
                 change:'onSearchTopChange'
             },
-            '#searchCombo':{
-                change:'onSearchComboChange',
+            '#searchField':{
+                change:'onSearchFieldChange',
                 keyup:'triggerSearchOnEnter'
             },
-            '#searchInCombo':{
+            '#searchInField':{
                 keyup:'triggerSearchOnEnter'
             },
             'segmentsHtmleditor': {
@@ -196,6 +196,17 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     editorBodyExtDomElement: null,
     
+    /***
+     * Segment search replace time tracking
+     */
+    timeTracking:null,
+
+    /***
+     * Last selected segment index when replace all is clicked.
+     * It is used so the segment grid is scrolled to the same position after replace all.
+     */
+    //replaceAllSegmentIndex:null,
+    
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
         comboFieldLabel:'#UT#Ersetzen',
@@ -206,7 +217,8 @@ Ext.define('Editor.controller.SearchReplace', {
         replaceAllWindowMessage:'#UT#übereinstimmungen gefunden. Wollen Sie wirklich alle ersetzen? Alle gefundenen Segmente werden inklusive Auto-Status und letztem Editor geändert',
         characterLimitError:'#UT#Der Suchstring ist zu groß',
         noIndexFound:'#UT#Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.',
-        searchAndReplaceMenuItem:'#UT#Suchen und ersetzen'
+        searchAndReplaceMenuItem:'#UT#Suchen und ersetzen',
+        replaceAllErrors: "#UT#Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten."
     },
     
     constructor:function(){
@@ -234,7 +246,7 @@ Ext.define('Editor.controller.SearchReplace', {
     },
 
     /**
-     * Handle push-Even
+     * Handle push-Event
      */
     handleAfterPush: function(editor) {
         var me=this;
@@ -313,6 +325,7 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this;
         me.cleanMarkTags();
         me.removeReplaceClass();
+        me.resetSearchParametars();
     },
     
     /***
@@ -395,7 +408,7 @@ Ext.define('Editor.controller.SearchReplace', {
         this.updateSegmentIndex(newValue);
     },
     
-    onSearchComboChange:function(){
+    onSearchFieldChange:function(){
         this.searchRequired=true;
     },
 
@@ -487,19 +500,19 @@ Ext.define('Editor.controller.SearchReplace', {
         var tabPanel=win.down('#searchreplacetabpanel'),
             replaceTab=tabPanel.down('#replaceTab'),
             activeTab=tabPanel.getActiveTab(),
-            searchCombo=activeTab.down('#searchCombo'),
-            searchInCombo=activeTab.down('#searchInCombo');
+            searchField=activeTab.down('#searchField'),
+            searchInField=activeTab.down('#searchInField');
 
         
         replaceTab.insert(1,{
             xtype:'textfield',
-            itemId:'replaceCombo',
+            itemId:'replaceField',
             focusable:true,
             fieldLabel:this.strings.comboFieldLabel,
         });
         
-        searchCombo.focus();
-        this.initSearchInComboStore(searchInCombo);
+        searchField.focus();
+        this.initSearchInFieldStore(searchInField);
     },
     
     /***
@@ -542,8 +555,8 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            replaceCombo=activeTab.down('#replaceCombo'),
-            replaceText=replaceCombo.getRawValue(),
+            replaceField=activeTab.down('#replaceField'),
+            replaceText=replaceField.getRawValue(),
             editor=Editor.app.getController('Editor'),
             grid = editor.getSegmentGrid(),
             ed=grid.editingPlugin;
@@ -561,13 +574,13 @@ Ext.define('Editor.controller.SearchReplace', {
 
         me.findMatches();
         
-        
         me.setTrackChangesInternalFlag(true);
         
         if(me.jumpToNextSegment()){
             return;
         }
         
+        //if the trachchanges are not active, do a pure replace (without ins/del tags)
         if(!me.activeTrackChanges){
             me.pureReplace(me.replaceRanges[me.activeSegment.matchIndex],replaceText);
             me.onDeleteAndReplaceFinished();
@@ -580,6 +593,9 @@ Ext.define('Editor.controller.SearchReplace', {
         );
     },
     
+    /**
+     * On replace all button click handler
+     */
     onReplaceAllButtonClick:function(){
         var me=this,
             tabPanel=me.getTabPanel(),
@@ -693,13 +709,13 @@ Ext.define('Editor.controller.SearchReplace', {
     /***
      * Init the search and replace columns combos
      */
-    initSearchInComboStore:function(){
+    initSearchInFieldStore:function(){
         var me=this,
             segmentGrid=Ext.ComponentQuery.query('#segmentgrid')[0],
             columns = segmentGrid.query('gridcolumn[isContentColumn]:not([hidden])'),
             searchStoreData=[],
             replaceStoreData=[],
-            searchInCombos=Ext.ComponentQuery.query('#searchInCombo');
+            searchInFields=Ext.ComponentQuery.query('#searchInField');
         
         
         Ext.Array.each(columns, function(rec) {
@@ -709,7 +725,7 @@ Ext.define('Editor.controller.SearchReplace', {
             }
         });
         
-        Ext.Array.each(searchInCombos,function(combo){
+        Ext.Array.each(searchInFields,function(combo){
             combo.setStore(Ext.create('Ext.data.Store', {
                 fields: ['id', 'value'],
                 data:combo.up('#searchTab') ? searchStoreData :replaceStoreData
@@ -729,6 +745,7 @@ Ext.define('Editor.controller.SearchReplace', {
             segmentGrid=me.getSegmentGrid();
         me.searchFields=[];
         me.replaceFields=[];
+        //as concepted we provide only the visible grid columns for searching / replacing
         me.searchFields=me.getColumnDataIndex(segmentGrid.query('gridcolumn[isContentColumn]:not([hidden])'));
         me.replaceFields=me.getColumnDataIndex(segmentGrid.query('gridcolumn[isEditableContentColumn]:not([hidden])'));
     },
@@ -748,61 +765,58 @@ Ext.define('Editor.controller.SearchReplace', {
     },
 
     /***
-     * Search the givven imput string
+     * Search for the matches in the database.
+     * If matches are found, set the viewmodels and open the first segment where the matches are found
      */
     search:function(){
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             activeTabViewModel=activeTab.getViewModel(),
-            form=activeTab.getForm(),
-            segmentGrid = me.getSegmentGrid(),
-            segmentStore=segmentGrid.editingPlugin.grid.store,
-            proxy = segmentStore.getProxy(),
             params = {};
-        
-        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
-        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
-        params['taskGuid']=Editor.data.task.get('taskGuid');
+
 
         me.searchRequired=false;
-        
-        form.submit({
+
+        //get the search parametars (with filter and sort included)
+        params=me.getSearchReplaceParams();
+
+        Ext.Ajax.request({
             url: Editor.data.restpath+'segment/search',
             params:params,
             method:'GET',
-            success: function(form, submit){
-                if(!submit.result || !submit.result.rows){
+            success: function(response){
+                var responseData = JSON.parse(response.responseText);
+                if(!responseData){
                     return;
                 }
-                var foundSegments = submit.result.rows,
-                    foundSegmentsLength=foundSegments.length,
+                var foundSegments = responseData.rows,
+                    message=responseData.message,
                     tabPanelviewModel=tabPanel.getViewModel();
 
-                tabPanelviewModel.set('searchPerformed',foundSegmentsLength > 0);
-                activeTabViewModel.set('resultsCount',foundSegmentsLength);
+                tabPanelviewModel.set('hasMqm',responseData.hasMqm ? true : false);
+                
+                if(!foundSegments && message){
+                    Editor.MessageBox.addInfo(message);
+                    return;
+                }
+
+                tabPanelviewModel.set('searchResultsFound',foundSegments.length > 0);
+                
+                activeTabViewModel.set('resultsCount',foundSegments.length);
                 
                 activeTabViewModel.set('result',foundSegments);
                 activeTabViewModel.set('showResultsLabel',true);
                 me.handleRowSelection();
+
+                me.startTimeTracking();
             },
-            failure: function(form, submit){
-                var res = submit.result;
-                //submit results are always state 200.
-                //If success false and errors is an array, this errors are shown in the form directly,
-                // so we dont need the handleException
-                if(!res || res.success || !Ext.isArray(res.errors)) {
-                    Editor.app.getController('ServerException').handleException(submit.response);
-                    return;
-                }
-                if(Ext.isArray(res.errors)) {
-                    form.markInvalid(res.errors);
-                    return;
-                }
+            failure: function(response){
+                Editor.app.getController('ServerException').handleException(response);
             }
         });
     },
-    
+
     /***
      * Replace the text only, without ins, dell tags
      */
@@ -823,6 +837,7 @@ Ext.define('Editor.controller.SearchReplace', {
             return true;
         });
 
+        //FIXME this uses tc function for remove content, can be moved in my code for example
         //remove the content between the range
         range.deleteContents();
 
@@ -845,41 +860,77 @@ Ext.define('Editor.controller.SearchReplace', {
         range.insertNode(replaceNode);
     },
     
-    
+    /***
+     * Replace all ajax call
+     */
     replaceAll:function(){
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
             activeTabViewModel=activeTab.getViewModel(),
-            form=activeTab.getForm(),
-            params = {};
+            params = {},
+            editingPlugin=me.getSegmentGrid().editingPlugin;
+
+        //colose the row editor if is opened
+        if(editingPlugin.editing){
+            editingPlugin.cancelEdit();
+        }
+
+        //stop the time tracking
+        me.stopTimeTracking();
         
-        params['taskGuid']=Editor.data.task.get('taskGuid');
-        params['result']=JSON.stringify(activeTabViewModel.get('result'));
-        
-        form.submit({
+        //setup segment grid autostate before replace all is called
+        me.segmentGridOnReplaceAll(activeTabViewModel.get('result'));
+
+        //show the loading mask on the search window and on the segment grid
+        me.showReplaceAllLoading(true);
+
+        //get the search parametars
+        params=me.getSearchReplaceParams(true);
+
+        Ext.Ajax.request({
             url: Editor.data.restpath+'segment/replaceall',
+            timeout:'120000',//increase the timeout to 2 min
             params:params,
-            method:'GET',
-            success: function(form, submit){
-                if(!submit.result || !submit.result.rows){
+            method:'POST',
+            success: function(response){
+                //stop the loading
+                me.showReplaceAllLoading(false);
+                var responseData = JSON.parse(response.responseText);
+                if(!responseData){
                     return;
                 }
-                var foundSegments = submit.result.rows;
+
+                if(responseData.total != activeTabViewModel.get('resultsCount')) {
+                    Editor.MessageBox.addError(me.strings.replaceAllErrors);
+                } 
+                
+                var replacedSegments = responseData.rows,
+                    message=responseData.message,
+                    tabPanelviewModel=tabPanel.getViewModel();
+
+                //display the message if there are no results
+                if(!replacedSegments && message){
+                    Editor.MessageBox.addInfo(message);
+                    tabPanelviewModel.set('hasMqm',responseData.hasMqm);
+                    return;
+                }
+                tabPanelviewModel.set('hasMqm',false);
+
+                //update the modefied segments in the segment store
+                me.segmentGridOnReplaceAll(replacedSegments,true);
+
+                //reset some of the viewmodels properties (clean the search results)
+                me.resetSearchParametars();
             },
-            failure: function(form, submit){
-                var res = submit.result;
-                //submit results are always state 200.
-                //If success false and errors is an array, this errors are shown in the form directly,
-                // so we dont need the handleException
-                if(!res || res.success || !Ext.isArray(res.errors)) {
-                    Editor.app.getController('ServerException').handleException(submit.response);
-                    return;
-                }
-                if(Ext.isArray(res.errors)) {
-                    form.markInvalid(res.errors);
-                    return;
-                }
+            failure: function(response){
+                //stop the loading
+                me.showReplaceAllLoading(false);
+                
+                //reload the requested segments
+                me.segmentGridOnReplaceAll(activeTabViewModel.get('result'),true);
+
+                Editor.app.getController('ServerException').handleException(response);
             }
         });
     },
@@ -900,6 +951,7 @@ Ext.define('Editor.controller.SearchReplace', {
             me.findEditorSegment(plug);
             return;
         }
+
         //clean the mark tags from the editor
         me.cleanMarkTags();
         
@@ -932,9 +984,9 @@ Ext.define('Editor.controller.SearchReplace', {
             iframeDocument = me.getSegmentIframeDocument(),
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            searchCombo=activeTab.down('#searchCombo'),
-            searchTerm=searchCombo.getRawValue(),
-            replaceCombo=activeTab.down('#replaceCombo'),
+            searchField=activeTab.down('#searchField'),
+            searchTerm=searchField.getRawValue(),
+            replaceField=activeTab.down('#replaceField'),
             searchType=activeTab.down('radiofield').getGroupValue(),
             matchCase=activeTab.down('#matchCase').checked;
         
@@ -972,13 +1024,12 @@ Ext.define('Editor.controller.SearchReplace', {
 
             // Remove existing highlights
             var range = rangy.createRange(),
-                caseSensitive = false,
                 searchScopeRange = rangy.createRange();
             
             searchScopeRange.selectNodeContents(iframeDocument);
 
             var options = {
-                caseSensitive: caseSensitive,
+                caseSensitive: matchCase,
                 wholeWordsOnly: false,
                 withinRange: searchScopeRange,
                 wordOptions:{
@@ -1052,9 +1103,9 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            searchCombo=activeTab.down('#searchCombo'),
-            searchTerm=searchCombo.getRawValue(),
-            replaceCombo=activeTab.down('#replaceCombo'),
+            searchField=activeTab.down('#searchField'),
+            searchTerm=searchField.getRawValue(),
+            replaceField=activeTab.down('#replaceField'),
             searchType=activeTab.down('radiofield').getGroupValue(),
             matchCase=activeTab.down('#matchCase').checked;
         
@@ -1081,7 +1132,6 @@ Ext.define('Editor.controller.SearchReplace', {
     
             // Remove existing highlights
             var range = rangy.createRange(),
-                caseSensitive = false,
                 searchScopeRange = rangy.createRange(),
                 contentDiv=Ext.get(cell.dom).query('div.x-grid-cell-inner'),
                 contentDiv=contentDiv.length>0 ? contentDiv[0] : null;
@@ -1089,7 +1139,7 @@ Ext.define('Editor.controller.SearchReplace', {
             searchScopeRange.selectNodeContents(cell.dom);
     
             var options = {
-                caseSensitive: caseSensitive,
+                caseSensitive: matchCase,
                 wholeWordsOnly: false,
                 withinRange: searchScopeRange,
                 wordOptions:{
@@ -1254,8 +1304,9 @@ Ext.define('Editor.controller.SearchReplace', {
             ed=grid.editingPlugin,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-            replaceCombo=activeTab.down('#searchInCombo'),
-            selectedColumnDataIndex=replaceCombo.getSelection().get('id');
+            replaceField=activeTab.down('#searchInField'),
+            searchInLockedSegments=activeTab.down('#searchInLockedSegments').checked,
+            selectedColumnDataIndex=replaceField.getSelection().get('id');
 
         callback = function() {
             grid.selectOrFocus(goToIndex);
@@ -1273,16 +1324,22 @@ Ext.define('Editor.controller.SearchReplace', {
                     editableColumn=theColum[0];
                 }
                 
-                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_SCROLLUNDER);
+                ed.startEdit(sel[0], editableColumn, ed.self.STARTEDIT_MOVEEDITOR);
                 
                 //clean the mark tags from the editor
                 me.cleanMarkTags();
-                //find matches 
-                me.findMatchesDelay();
-            }else{
+
+                //if is not a locked segment search, do regular find match
+                if(!searchInLockedSegments){
+                    me.findMatchesDelay();
+                }
+            }
+
+            //no editable content or locked search, find matches in the cell
+            if(!me.isContentEditableField() || searchInLockedSegments){
                 var visibleColumns=grid.query('gridcolumn:not([hidden])'),
                     cellIndex=0;
-
+    
                 //find the index of the searched column
                 for(var i=0;i<visibleColumns.length;i++){
                     if(visibleColumns[i].dataIndex===selectedColumnDataIndex){
@@ -1298,7 +1355,7 @@ Ext.define('Editor.controller.SearchReplace', {
         
         grid.scrollTo(goToIndex, {
             callback: callback,
-            notScrollCallback: callback
+            callback: callback
         });
     },
     
@@ -1342,6 +1399,77 @@ Ext.define('Editor.controller.SearchReplace', {
                 Editor.app.getController('ServerException').handleException(response);
             }
         });
+    },
+
+
+    /***
+     * Update segment grid data based on matched results. 
+     */
+    segmentGridOnReplaceAll:function(results,updateRecord){
+        var me=this,
+            segmentStore=me.getSegmentGrid().getStore();
+
+        //if the update is needed, load the segment store
+        if(updateRecord){
+            segmentStore.load();
+            //FIXME: this is disabled, sometimes this throws an error
+            //https://jira.translate5.net/browse/TRANSLATE-1134
+            /*
+            me.getSegmentGrid().getStore().load(function(records, operation, success) {
+                if(me.replaceAllSegmentIndex){
+                    //scroll to the last active index
+                    me.getSegmentGrid().scrollTo(me.replaceAllSegmentIndex, {
+                        callback: function(){},
+                        notScrollCallback: function(){}
+                    });
+                }
+            });
+            */
+            return;
+        }
+        
+        for(var i=0;i<results.length;i++){
+            //fieldName,value,startIndex,anyMatch,caseSensitive,exactMatch
+            var record=segmentStore.findRecord('segmentNrInTask',results[i].segmentNrInTask,0,false,false,true);
+            if(!record){
+                continue;
+            }
+            //set the autostate
+            record.set('autoStateId',999);
+        }
+        
+        //FIXME: this is disabled, sometimes this throws an error
+        //https://jira.translate5.net/browse/TRANSLATE-1134
+        //find the current selection
+        /*var selectedSegment= me.getSegmentGrid().getSelection()[0];
+        if(!selectedSegment){
+            return;
+        }
+        //get the segment grid row index from the current selection
+        me.replaceAllSegmentIndex=me.getSegmentRowNumber(selectedSegment);
+        */
+    },
+
+    /**
+     * Reset some of the search/replace tab view model properties.
+     * 
+     */
+    resetSearchParametars:function(){
+        if(!this.getSearchReplaceWindow()){
+            return;
+        }
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            tabPanelviewModel=tabPanel.getViewModel(),
+            activeTab=tabPanel.getActiveTab(),
+            activeTabViewModel=activeTab.getViewModel();
+
+        tabPanelviewModel.set('searchResultsFound',false);
+        activeTabViewModel.set('resultsCount',0);
+        activeTabViewModel.set('result',[]);
+        activeTabViewModel.set('showResultsLbel',false);
+
+        me.searchRequired=true;
     },
 
     /***
@@ -1422,9 +1550,9 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this,
             tabPanel=me.getTabPanel(),
             activeTab=tabPanel.getActiveTab(),
-        searchInCombo=activeTab.down('#searchInCombo'),
-        searchInComboSelectedVal=searchInCombo.getValue();
-        return Ext.Array.contains(this.replaceFields,searchInComboSelectedVal);
+        searchInField=activeTab.down('#searchInField'),
+        searchInFieldSelectedVal=searchInField.getValue();
+        return Ext.Array.contains(this.replaceFields,searchInFieldSelectedVal);
     },
 
     /**
@@ -1468,6 +1596,46 @@ Ext.define('Editor.controller.SearchReplace', {
         };
     },
     
+    /***
+     * Get the search parametar from the search form.
+     */
+    getSearchReplaceParams:function(isReplace){
+        var me=this,
+            tabPanel=me.getTabPanel(),
+            activeTab=tabPanel.getActiveTab(),
+            form=activeTab.getForm(),
+            formFields=form.getFields().items,
+            segmentGrid = me.getSegmentGrid(),
+            segmentStore=segmentGrid.editingPlugin.grid.store,
+            proxy = segmentStore.getProxy(),
+            params = {};
+
+        params[proxy.getFilterParam()] = proxy.encodeFilters(segmentStore.getFilters().items);
+        params[proxy.getSortParam()] = proxy.encodeSorters(segmentStore.getSorters().items);
+        params['taskGuid']=Editor.data.task.get('taskGuid');
+        params['searchType']=activeTab.down('radiofield').getGroupValue();
+
+        //set the form values as parametars
+        for(var i=0;i<formFields.length;i++){
+            if(formFields[i].itemId){
+                params[formFields[i].itemId]=formFields[i].getValue();
+            }
+        }
+
+        if(isReplace){
+            params['durations']=me.timeTracking;
+        }
+
+        //if track changes are active, set the trackchanges flag and parametars
+        if(me.isActiveTrackChanges()){
+            params['isActiveTrackChanges']=true;
+            params['attributeWorkflowstep']=Editor.data.task.get('workflowStepName')+Editor.data.task.get('workflowStep');
+            params['userColorNr']=Editor.data.task.get('userColorNr');
+        }
+
+        return params;
+    },
+
     /***
      * Return the search term for given type
      */
@@ -1527,11 +1695,43 @@ Ext.define('Editor.controller.SearchReplace', {
         //check if the trackchanges are active
         if(!Editor.plugins.TrackChanges){
             this.activeTrackChanges=false;
-            return;
+        }else{
+            this.activeTrackChanges=!(Editor.data.task.get('workflowStepName')  == 'translation'
+                                    && Editor.data.task.get('workflowStep') =='1');
         }
-        this.activeTrackChanges=!(Editor.data.task.get('workflowStepName')  == 'translation'
-                                && Editor.data.task.get('workflowStep') =='1');
+        return this.activeTrackChanges;
+    },
+
+    /**
+     * Show/hide the loading mask for segment grid and search replace window
+     */
+    showReplaceAllLoading:function(show){
+        var me=this;
+        me.getSegmentGrid().setLoading(show);
+        me.getSearchReplaceWindow().setLoading(show);
+    },
+
+    /**
+     * Start the replace all time tracking
+     */
+    startTimeTracking:function(){
+        var me = this; 
+        me.timeTracking = new Date();
+    },
+
+    /**
+     * Stop the search and replace time tracking
+     */
+    stopTimeTracking:function(){
+        var me = this;
+        //if it was a date, calculate the spend time
+        if(me.timeTracking instanceof Date) {
+            me.timeTracking = (new Date()) - me.timeTracking;
+        }
+        else {
+            me.timeTracking = 0;
+        }
     }
-    
+
 });
     

@@ -47,15 +47,16 @@ Ext.define('Editor.model.admin.User', {
     {name: 'passwd', type: 'string'},
     {name: 'editable', type: 'boolean', persist: false},
     {name: 'parentIds', type: 'int', convert: function(v,rec) {
-        if(!v || !Ext.isString(v)) {
-            return;
+        if(Ext.isArray(v)) {
+            //return last element of the array or null
+            return (v && v.length) ? v[v.length - 1] : null;
         }
-        var parentIds = v.replace(/^,|,$/g, '').split(',');
-        return parentIds ? parentIds[parentIds.length - 1] : null;
+        return v;
     }},
     {name: 'sourceLanguage'},
     {name: 'targetLanguage'},
-    {name: 'locale', type: 'string'}
+    {name: 'locale', type: 'string'},
+    {name: 'customers', type: 'string'}
   ],
   idProperty: 'id',
   proxy : {

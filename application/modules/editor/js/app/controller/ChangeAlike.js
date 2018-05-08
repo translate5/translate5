@@ -71,7 +71,8 @@ Ext.define('Editor.controller.ChangeAlike', {
   messages: {
     alikeSingular: '#UT#Wiederholung wurde bearbeitet und gespeichert',
     alikePlural: '#UT#Wiederholungen wurden bearbeitet und gespeichert',
-    alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.'
+    alikesDisabled: '#UT#Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.',
+    alikesNotAllSaved: '#UT#Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.'
   },
   alikesToProcess: null,
   fetchedAlikes: null,
@@ -277,7 +278,9 @@ Ext.define('Editor.controller.ChangeAlike', {
    */
   handleSaveChangeAlike: function() {
     var me = this,
-        rec = me.actualRecord;
+        rec = me.actualRecord,
+        meta = rec.get('metaCache'),
+        newLength = null;
     
     //Daten des aktuelle bearbeiteten Segments, die angezeigten AlikeSegmente im Segment Store werden mit diesen überschrieben 
     //Hier wird auch das Alike Segment vorübergehend auf nicht editierbar gesetzt, bis das OK vom Server kommt
@@ -287,6 +290,10 @@ Ext.define('Editor.controller.ChangeAlike', {
       editable: 0,
       autoStateId: 999
     };
+    //get the length of the changed master segment
+    if(meta && meta.siblingData[rec.get('id')]) {
+        newLength = Ext.clone(meta.siblingData[rec.get('id')].length);
+    }
     if(me.getSourceEditing()) {
         data.sourceEdit = rec.data.sourceEdit;
     }
@@ -302,7 +309,7 @@ Ext.define('Editor.controller.ChangeAlike', {
     //die 
     //alike segmente mit den Änderungen befüllen, aber noch nicht comitten, erst im alikesSaveSuccessHandler wenn die Alike Segmente auf dem Server gespeichert sind
     Ext.Array.each(me.alikesToProcess, function(alikeId){
-        me.updateSegment(alikeId, data);
+        me.updateSegment(alikeId, data, newLength);
     });
     
     //ab hier nur bei manuellem processing der Alike Segmente
@@ -463,7 +470,8 @@ Ext.define('Editor.controller.ChangeAlike', {
   cleanUpAlikeSegments: function() {
       var me = this,
           alikes = me.alikesToProcess;
-      if(!alikes) {
+      me.alikesToProcess = null;
+      if(!alikes || alikes.length == 0) {
           me.callbackToSaveChain();
           return;
       }
@@ -475,7 +483,7 @@ Ext.define('Editor.controller.ChangeAlike', {
               delete rec._editorDataSave;
           }
       });
-      me.alikesToProcess = null;
+      Editor.MessageBox.addError(me.messages.alikesNotAllSaved);
       me.callbackToSaveChain();
   },
   /**
@@ -485,12 +493,12 @@ Ext.define('Editor.controller.ChangeAlike', {
    * zur Zwischenspeicherung hier nicht verwendet werden, da diese sonst automatisch den Store gegen den Server synct. 
    * @param {Number} id
    * @param {Object} data
+   * @param {Object} newLength optional, defaults to null then. If given then length object: {"targetEdit": 123} 
    * @return {Editor.model.Segment}
    */
-  updateSegment: function(id, data) {
+  updateSegment: function(id, data, newLength) {
     var store = this.getStore('Segments'),
         rec = store.getById(id);
-    
     
     if(!rec) {
       if(!store.prefetchData){
@@ -505,6 +513,11 @@ Ext.define('Editor.controller.ChangeAlike', {
     }
     rec._editorDataSave = Ext.apply({}, rec.data);
     rec.beginEdit();
+    if(newLength && Ext.isNumeric(newLength.targetEdit)) {
+        //alten metaCache holen, die neue targetEdit (fix da wdhe nur das kann) length einfügen, den neuen metaCache einsetzen
+        //since changeAlike can not be done with multiple targets, and lengths are only usable for target fields, targetEdit is hardcoded here
+        rec.updateMetaCacheLength('targetEdit', newLength.targetEdit);
+    }
     rec.set(data);
     rec.endEdit(true);
     rec.commit();

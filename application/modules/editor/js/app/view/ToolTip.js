@@ -49,24 +49,25 @@ Ext.define('Editor.view.ToolTip', {
         deletedby: '#UT#Deleted by',
         insertedby: '#UT#Inserted by',
         history: '#UT#HISTORY',
+        notrackchangesplugin: '#UT#TrackChanges found, but Plugin is not activated.',
         severity: '#UT#Gewichtung'
     },
     userStore: null,
     listeners : {
-        // Change content dynamically depending on which element triggered
-        // the show.
-        beforeshow : function(tip) {
-            var t = tip.triggerElement,
-                fly = Ext.fly(t); 
-            if(fly.hasCls('qmflag')) {
-                this.handleQmFlag(t, tip);
-            } else if (fly.hasCls('trackchanges')) {
-                this.handleTrackChanges(t, tip);
-            }
-            //else if hasClass for other ToolTip Types
-        }
+        beforeshow : 'onBeforeShow'
     },
 
+    // Change content dynamically depending on which element triggered the show.
+    onBeforeShow: function(tip) {
+        var t = tip.triggerElement,
+            fly = Ext.fly(t); 
+        if(fly.hasCls('qmflag') || fly.hasCls('trackchanges') || fly.hasCls('internal-tag')) {
+            // Don't show multiple ToolTips that overlap, but collect data into one single ToolTip
+            return this.handleCollectedTooltip(t, tip);
+        }
+        return false;
+    },
+    
     constructor: function() {
         this.renderTo = Ext.getBody();
         this.callParent(arguments);
@@ -83,24 +84,48 @@ Ext.define('Editor.view.ToolTip', {
         return this.callParent(arguments);
     },
     
-    handleQmFlag: function(t, tip) {
+    /**
+     * Collect data for"common" ToolTip.
+     * First the node itself is checked, but (if necessary) be careful to check for parent or child-Nodes, too.
+     */
+    handleCollectedTooltip: function(node, tip) {
         var me = this,
-            qmFlagData = me.getQmFlagData(t),
-            meta = {
-                qmFlag: qmFlagData
-            }
-        // add tooltip for trackChanges?
-        if (/(^|[\s])trackchanges([\s]|$)/.test(t.parentNode.className)) {
-            meta.trackChanges = me.getTrackChangesData(t.parentNode);
+            fly = Ext.fly(node),
+            result = '';
+        // 'default'
+        // add tooltip for qmFlag?
+        if(fly.hasCls('qmflag')) {
+            result = me.getQmFlagData(node);
         } else {
-            meta.trackChanges = '';
+            var allQmFlagNodes = node.getElementsByClassName('qmflag');
+            if (allQmFlagNodes.length == 1) {
+                result = me.getQmFlagData(allQmFlagNodes[0]);
+            } else {
+                // a) there is no qmFlag-Node
+                // b) there are many qmFlag-Nodes and we don't know which exactly the mouseover refers to
+                result = '';
+            }
         }
-        if(!me.qmflagTpl) {
-            me.qmflagTpl = new Ext.Template('{qmFlag}{trackChanges}');
-            me.qmflagTpl.compile();
+        // add tooltip for trackChanges?
+        if(fly.hasCls('trackchanges')) {
+            result += me.getTrackChangesData(node);
+        } else if (/(^|[\s])trackchanges([\s]|$)/.test(node.parentNode.className)) {
+            result += me.getTrackChangesData(node.parentNode);
         }
-        tip.update(me.qmflagTpl.apply(meta));		
+        
+
+        //Workaround to show the titles of the img tags always in fulltag mode
+        if(fly.hasCls('internal-tag') && (fly.hasCls('tab')||fly.hasCls('space')||fly.hasCls('newline')||fly.hasCls('nbsp'))) {
+            result = fly.down('span.short').getAttribute('title') + (result ? '<br>'+result : '');
+        };
+        tip.update(result);
+        return !!result; //if there is no content for ttip, we return false to prevent the show of the tooltip
     },
+    
+    // ------------------------------------------------------------------
+    // ----------------- get data ---------------------------------------
+    // ------------------------------------------------------------------
+    
     getQmFlagData: function(node) {
         var me = this, 
             qmtype,
@@ -120,45 +145,33 @@ Ext.define('Editor.view.ToolTip', {
         } else {
             meta.comment = '<br />'+ meta.comment
         }
-        // For Tooltip:
+        // => For Tooltip:
         return '<b>'+meta.qmtype+'</b><br />'+meta.sevTitle+': '+meta.sev+meta.comment+'<br />';
-    },
-    
-    handleTrackChanges: function(node, tip) {
-        var me = this,
-            trackChangesData = me.getTrackChangesData(node),
-            tplData = {
-                trackChanges: trackChangesData
-            };
-        // add tooltip for qmFlag?
-        var allQmFlagNodes = node.getElementsByClassName('qmflag');
-        if (allQmFlagNodes.length == 1) {
-            tplData.qmFlag = me.getQmFlagData(allQmFlagNodes[0]);
-        } else {
-            // a) there is no qmFlag-Node
-            // b) there are many qmFlag-Nodes and we don't know which exactly the mouseover refers to
-            tplData.qmFlag = '';
-        }
-        if(!me.trackChangesTpl) {
-            me.trackChangesTpl = new Ext.Template('{qmFlag}{trackChanges}');
-            me.trackChangesTpl.compile();
-        }
-        tip.update(me.trackChangesTpl.apply(tplData));
     },
     getTrackChangesData: function(node) {
         var me = this,
-            trackChanges = Editor.plugins.TrackChanges.controller.Editor,
-            attrnameUsername = trackChanges.ATTRIBUTE_USERNAME,
-            attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP,
-            attrnameHistorylist = trackChanges.ATTRIBUTE_HISTORYLIST,
-            attrnameHistoryActionPrefix = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX,
-            attrnameHistoryUsernamePrefix = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX,
+            trackChanges,
+            attrnameUsername,
+            attrnameTimestamp,
+            attrnameHistorylist,
+            attrnameHistoryActionPrefix,
+            attrnameHistoryUsernamePrefix,
             attrUserName,
             attrTimestamp,
             nodeAction = '',
             nodeUser = '',
             nodeDate = '',
             nodeHistory = '';
+        // TrackChanges-Plugin activated?
+        if (!Editor.plugins.TrackChanges) {
+            return me.messages.notrackchangesplugin;
+        }
+        trackChanges = Editor.plugins.TrackChanges.controller.Editor,
+        attrnameUsername = trackChanges.ATTRIBUTE_USERNAME;
+        attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP;
+        attrnameHistorylist = trackChanges.ATTRIBUTE_HISTORYLIST;
+        attrnameHistoryActionPrefix = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX;
+        attrnameHistoryUsernamePrefix = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX;
         // What has been done (INS/DEL)?
         if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_INS) {
             nodeAction = me.messages.insertedby;
@@ -174,8 +187,12 @@ Ext.define('Editor.view.ToolTip', {
         }
         // When?
         if (node.hasAttribute(attrnameTimestamp)) {
-            attrTimestamp = parseInt(node.getAttribute(attrnameTimestamp));
-            nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
+            attrTimestamp = node.getAttribute(attrnameTimestamp);
+            if (Number(parseInt(attrTimestamp)) == attrTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
+                nodeDate = Ext.Date.format(new Date(parseInt(attrTimestamp)),'Y-m-d H:i');
+            } else {
+                nodeDate = Ext.Date.format(new Date(attrTimestamp),'Y-m-d H:i');
+            }
         }
         // History
         if (node.hasAttribute(attrnameHistorylist)) {
@@ -183,9 +200,19 @@ Ext.define('Editor.view.ToolTip', {
             var historyItems = node.getAttribute(attrnameHistorylist).split(",");
             for(var i=0, len=historyItems.length; i < len; i++){
                 var historyItemTimestamp = historyItems[i],
-                    historyItemAction = node.getAttribute(attrnameHistoryActionPrefix + historyItemTimestamp),
-                    historyItemUser   = node.getAttribute(attrnameHistoryUsernamePrefix + historyItemTimestamp),
-                    historyItemDate   = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
+                    historyItemAction,
+                    historyItemUser,
+                    historyItemDate;
+                if (Number(parseInt(historyItemTimestamp)) == historyItemTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
+                    historyItemDate = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
+                } else {
+                    historyItemDate = Ext.Date.format(new Date(historyItemTimestamp),'Y-m-d H:i');
+                }
+                if (Number(parseInt(historyItemTimestamp)) != historyItemTimestamp) { 
+                    historyItemTimestamp = Ext.Date.format(new Date(historyItemTimestamp), 'time'); // TRANSLATE-1202, but attribute-name would be invalid using ISO => still uses millisecond-timestamp
+                }
+                historyItemAction = node.getAttribute(attrnameHistoryActionPrefix + historyItemTimestamp);
+                historyItemUser = node.getAttribute(attrnameHistoryUsernamePrefix + historyItemTimestamp);
                 if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_INS) {
                     historyItemAction = me.messages.insertedby;
                 } else if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_DEL) {
@@ -197,6 +224,8 @@ Ext.define('Editor.view.ToolTip', {
         // => For Tooltip:
         return '<b>'+nodeAction+'</b><br>'+nodeUser+'<br>'+nodeDate+'<br>'+ nodeHistory;
     },
+    
+    // ------------------------------------------------------------------
     
     /**
      * Override of default setTarget, only change see below.

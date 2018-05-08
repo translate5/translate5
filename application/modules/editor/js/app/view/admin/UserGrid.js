@@ -171,7 +171,8 @@ Ext.define('Editor.view.admin.UserGrid', {
           },
           text: me.text_cols.locale,
           tooltip: me.strings.localeTooltip
-      },{
+      },
+      {
           xtype: 'actioncolumn',
           stateId:'userGridActionColumn',
           width: 80,
@@ -220,28 +221,28 @@ Ext.define('Editor.view.admin.UserGrid', {
     return me.callParent([config]);
   },
 
-  /**
-   * Return the language field configuration for type of language (sourceLanguage,targetLanguage)
-   */
-  getLanguagesConfig:function(langageType,text,tooltip){
-      var field={
-            xtype: 'gridcolumn',
-            minWidth: 160,
-            dataIndex: langageType,
-            stateId:langageType,
-            renderer: this.userRenderer,
-            text:text,
-            tooltip: tooltip,
-            filter: {
-                type: 'list',
-                idField:'id',
-                labelField:'label',
-                options: Editor.data.languages,
-                phpMode: false
-            }
-      };
-      return field;
-  },
+    /**
+     * Return the language field configuration for type of language (sourceLanguage,targetLanguage)
+     */
+    getLanguagesConfig:function(langageType,text,tooltip){
+        var field={
+                xtype: 'gridcolumn',
+                minWidth: 160,
+                dataIndex: langageType,
+                stateId:langageType,
+                renderer: this.userRenderer,
+                text:text,
+                tooltip: tooltip,
+                filter: {
+                    type: 'list',
+                    idField:'id',
+                    labelField:'label',
+                    options: Editor.data.languages,
+                    phpMode: false
+                }
+        };
+        return field;
+    },
     userRenderer: function(value,metaData){
         if(value === null || value.length<1){
             return [];
