@@ -890,6 +890,7 @@ Ext.define('Editor.controller.SearchReplace', {
 
         Ext.Ajax.request({
             url: Editor.data.restpath+'segment/replaceall',
+            timeout:'120000',//increase the timeout to 2 min
             params:params,
             method:'POST',
             success: function(response){
