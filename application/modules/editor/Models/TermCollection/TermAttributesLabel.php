@@ -26,10 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * DB Access for TmMt Entity
- */
-class editor_Plugins_ChangeLog_Models_Db_Changelog extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_change_log';
-    public $_primary = 'id';
+class editor_Models_TermCollection_TermAttributesLabel extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributesLabel';
+    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributesLabel';
+    
+    /***
+     * Get the label by given label name and label type
+     * 
+     * @param string $labelName
+     * @param string $labelType
+     */
+    public function getLabelByNameAndType($labelName,$labelType){
+        $s = $this->db->select()
+        ->from($this->db)
+        ->where('label=?', $labelName);
+        if($labelType){
+            $s->where('type=?', $labelType);
+        }
+        return $this->db->fetchAll($s)->toArray();
+    }
 }

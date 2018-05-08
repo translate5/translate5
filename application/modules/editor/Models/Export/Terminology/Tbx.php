@@ -105,6 +105,7 @@ class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Termi
     }
     
     /**
+     * TODO: add the term attributes and term entry attributes 
      * (non-PHPdoc)
      * @see editor_Models_Export_Terminology_Interface::export()
      */

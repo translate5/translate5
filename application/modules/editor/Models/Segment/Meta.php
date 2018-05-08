@@ -34,6 +34,9 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method string getSegmentId() getSegmentId()
  * @method void setSegmentId() setSegmentId(integer $id)
+ * @method string getTransunitId() getTransunitId()
+ * @method void setTransunitId() setTransunitId(integer $id)
+ * @method string getSiblingData() getSiblingData()
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
@@ -49,5 +52,20 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     public function initEmptyRowset(){
         //currently not implemented for segment meta, see task meta for usage and what to implement
         // for segments meta add also segment id to initial row set
+    }
+    
+    /**
+     * Sets the siblingData field from the given segment instance
+     * @param editor_Models_Segment $segment
+     */
+    public function setSiblingData(editor_Models_Segment $segment) {
+        $data = new stdClass();
+        $data->nr = $segment->getSegmentNrInTask();
+        $data->length = [];
+        $editables = $segment->getEditableFieldData();
+        foreach($editables as $field => $value){
+            $data->length[$field] = $segment->textLength($value);
+        }
+        $this->__call(__FUNCTION__, [json_encode($data)]);
     }
 }

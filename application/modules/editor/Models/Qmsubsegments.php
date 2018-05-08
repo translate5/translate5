@@ -402,6 +402,20 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
         return $this->db->getAdapter()->fetchAll($q);
     }
 
+    /***
+     * Check if the given task has segments with mqm
+     * 
+     * @param string $taskGuid
+     * @return boolean
+     */
+    public function hasTaskMqm(string $taskGuid){
+        $q = $this->db->getAdapter()->select()
+                ->from(array('q' => 'LEK_qmsubsegments'), array('id'))
+                ->where('taskGuid = ?', $taskGuid);
+        
+        return !empty($this->db->getAdapter()->fetchAll($q));
+    }
+    
     /**
      * 
      * @param array $data

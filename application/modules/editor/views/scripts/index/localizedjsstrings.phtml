@@ -80,6 +80,7 @@ Ext.define('Editor.controller.Localizer', {
         "403_destroy": '<?php echo $this->translate->_('Zum Löschen der Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
         "403_create": '<?php echo $this->translate->_('Zum Speichern von neuen Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
         "403_edit": '<?php echo $this->translate->_('Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
+        "403_update": '<?php echo $this->translate->_('Zum Speichern der bearbeiten Daten fehlen Ihnen die nötigen Berechtigungen!');?>',
         "404": '<?php echo $this->translate->_('Die angeforderten bzw. zu bearbeitenden Daten wurden nicht gefunden!');?>',
         "405_del_assoc": '<?php echo $this->translate->_('Ein Benutzer konnte nicht aus der Aufgabe entfernt werden, da er die Aufgabe aktuell benutzt.');?>',
         "406": '<?php echo $this->translate->_('Es ist ein Fehler aufgetreten!');?>',
@@ -131,10 +132,10 @@ Ext.define('Editor.controller.Localizer', {
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
   	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>';
-  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Ansicht');?>';
-  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Bearbeitung');?>';
-  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Ergonomic');?>';
-  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Ergonomic (Ansicht)');?>';
+  	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
+  	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
+  	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
+  	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Normal (nur Lesemodus)');?>';
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
@@ -151,7 +152,14 @@ Ext.define('Editor.controller.Localizer', {
 
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
-  	
+    
+    
+    Ext.define("Editor.locale.de.view.segments.column.IsWatched", {
+        override: "Editor.view.segments.column.IsWatched",
+        text: '<?php echo $this->translate->_('Lesezeichen');?>',
+        text_tip: '<?php echo $this->translate->_('mit Lesezeichen versehen');?>'
+    });
+    
     Ext.define("Editor.locale.de.view.segments.column.MatchrateType", {
         override: "Editor.view.segments.column.MatchrateType",
         text: '<?php echo $this->translate->_('Matchrate Typ');?>',
@@ -294,17 +302,18 @@ Ext.define('Editor.controller.Localizer', {
             tagMissingText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden noch nicht hinzugefügt oder beim Editieren gelöscht, das Segment kann nicht gespeichert werden. <br /><br />Die Tastenkombination<br /><ul><li>STRG + EINFG (alternativ STRG + . (Punkt)) fügt den kompletten Quelltext in den Zieltext ein.</li><li>STRG + , (Komma) + &gt;Nummer&lt; fügt den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10) ein.</li><li>STRG + SHIFT + , (Komma) + &gt;Nummer&lt; fügt die Tags mit den Nummern 11 bis 20 in den Zieltext ein.</li></ul>Fehlende Tags:');?>',
             tagDuplicatedText: '<?php echo $this->translate->_('Die nachfolgenden Tags wurden beim Editieren dupliziert, das Segment kann nicht gespeichert werden. Löschen Sie die duplizierten Tags. <br />Duplizierte Tags:');?>',
             tagRemovedText: '<?php echo $this->translate->_('Es wurden Tags mit fehlendem Partner entfernt!');?>',
-            cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>'
+            cantEditContents: '<?php echo $this->translate->_('Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.');?>',
+            segmentToShort: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
+            segmentToLong: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
         }
     });
 
     Ext.define("Editor.locale.de.view.segments.MinMaxLength", {
         override: "Editor.view.segments.MinMaxLength",
         strings: {
-            minText: '<?php echo $this->translate->_('{0} (Min. {1})');?>',
-            maxText: '<?php echo $this->translate->_('{0} von {1}');?>',
-            segmentBellowLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu kurz! Mindestens {0} Zeichen müssen vorhanden sein.');?>',
-            segmentOverLimit: '<?php echo $this->translate->_('Der Segmentinhalt ist zu lang! Maximal {0} Zeichen sind erlaubt.');?>'
+            minText: '<?php echo $this->translate->_('Min. {minWidth}');?>',
+            maxText: '<?php echo $this->translate->_(' von {maxWidth}');?>',
+            siblingSegments: '<?php echo $this->translate->_('Seg.: {siblings}');?>'
         }
     });
     
@@ -341,7 +350,8 @@ Ext.define('Editor.controller.Localizer', {
         alikeSingular: '<?php echo $this->translate->_('{0} Wiederholung wurde bearbeitet und gespeichert');?>',
         alikePlural: '<?php echo $this->translate->_('{0} Wiederholungen wurden bearbeitet und gespeichert');?>',
         alikesDisabled: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Der Wiederholungseditor wurde daher deaktiviert.');?>',
-        alikesFailure: '<?php echo $this->translate->_('Die Wiederholungen konnten nicht gespeichert werden');?>'
+        alikesFailure: '<?php echo $this->translate->_('Die Wiederholungen konnten nicht gespeichert werden');?>',
+        alikesNotAllSaved: '<?php echo $this->translate->_('Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.');?>'
     };
     
   	Ext.grid.column.Boolean.prototype.falseText = '<?php echo $no;?>';
@@ -557,8 +567,9 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.ExportMenu", {
         override: "Editor.view.admin.ExportMenu",
         messages: {
-            exportDef: '<?php echo $this->translate->_('exportieren');?>',
-            exportDiff: '<?php echo $this->translate->_('exportieren mit Änderungshistorie');?>',
+            exportDef: '<?php echo $this->translate->_('exportieren (Orginalformat)');?>',
+            exportDiff: '<?php echo $this->translate->_('exportieren (Orginalformat mit Änderungshistorie)');?>',
+            export2Def: '<?php echo $this->translate->_('exportieren (XLIFF 2.1)');?>',
             exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>'
         }
     });
@@ -668,6 +679,15 @@ Ext.define('Editor.controller.Localizer', {
             characterLimitError: '<?php echo $this->translate->_('Der Suchstring ist zu groß');?>',
             noIndexFound: '<?php echo $this->translate->_('Das Segment ist in Ihrer aktuellen Filterung nicht enthalten.');?>',
             searchAndReplaceMenuItem: '<?php echo $this->translate->_('Suchen und ersetzen');?>',
+            replaceAllErrors: '<?php echo $this->translate->_('Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die \'Alles Ersetzen\' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.');?>',
+        }
+    });
+    
+    
+    Ext.define("Editor.locale.de.controller.Termportal", {
+        override: "Editor.controller.Termportal",
+        strings: {
+            termPortal: '<?php echo $this->translate->_('Terminologieportal');?>'
         }
     });
     
@@ -683,7 +703,7 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.searchandreplace.SearchTab",
         strings: {
             comboFieldLabel: '<?php echo $this->translate->_('Suchen nach');?>',
-            searchInCombo: '<?php echo $this->translate->_('Suchen in');?>',
+            searchInField: '<?php echo $this->translate->_('Suchen in');?>',
             matchCaseLabel: '<?php echo $this->translate->_('Groß/Kleinschreibung beachten');?>',
             towardsTop: '<?php echo $this->translate->_('Nach oben suchen');?>',
             useForSearch: '<?php echo $this->translate->_('Bei der Suche verwenden');?>',
@@ -694,6 +714,7 @@ Ext.define('Editor.controller.Localizer', {
             invalidRegularExpression: '<?php echo $this->translate->_('Ungültiger Regulärer Ausdruck');?>',
             unsupportedRegularExpression: '<?php echo $this->translate->_('Dieser reguläre Ausdruck wird nicht unterstützt');?>',
             segmentMatchInfoMessage: '<?php echo $this->translate->_('Segmente mit Suchtreffer:');?>',
+            searchInLockedSegments: '<?php echo $this->translate->_('Suche in gesperrten Segmenten');?>'
         }
     });
     
@@ -706,6 +727,7 @@ Ext.define('Editor.controller.Localizer', {
             replaceAllButton: '<?php echo $this->translate->_('Alles ersetzen');?>',
             searchButton: '<?php echo $this->translate->_('Suchen');?>',
             replaceButton: '<?php echo $this->translate->_('Ersetzen');?>',
+            mqmNotSupporterTooltip: '<?php echo $this->translate->_('Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt');?>',
         }
     });
     
@@ -715,6 +737,7 @@ Ext.define('Editor.controller.Localizer', {
             deletedby: '<?php echo $this->translate->_('Deleted by');?>',
             insertedby: '<?php echo $this->translate->_('Inserted by');?>',
             history: '<?php echo $this->translate->_('HISTORY');?>',
+            notrackchangesplugin: '<?php echo $this->translate->_('TrackChanges found, but Plugin is not activated.');?>',
             severity: '<?php echo $this->translate->_('Gewichtung');?>'
         }
     });
@@ -895,7 +918,44 @@ Ext.define('Editor.controller.Localizer', {
       forAll: '<?php echo $this->translate->_('für alle');?>'
     };
 <?php 
-    }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){ 
+    }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
+    
+    if($hasFrontendController('Editor.controller.admin.Customer')){
+?>
+	Ext.define("Editor.locale.controller.admin.Customer", {
+		override: "Editor.controller.admin.Customer",
+        strings: {
+            customer:'<?php echo $this->translate->_("Kunden");?>',
+        }
+    });
+
+    Ext.define("Editor.locale.view.admin.customer.Panel", {
+    	override: "Editor.view.admin.customer.Panel",
+        title:'<?php echo $this->translate->_("Kundenübersicht");?>',
+        strings: {
+            addCustomer:'<?php echo $this->translate->_("Hinzufügen");?>',
+            refreshCustomer:'<?php echo $this->translate->_("Aktualisieren");?>',
+            customerName:'<?php echo $this->translate->_("Kundenname");?>',
+            customerNumber:'<?php echo $this->translate->_("Kundennummer");?>',
+            save:'<?php echo $this->translate->_("Speichern");?>',
+            cancel:'<?php echo $this->translate->_("Abbrechen");?>',
+            remove:'<?php echo $this->translate->_("Löschen");?>',
+            editCustomerTitle:'<?php echo $this->translate->_("Kunde bearbeiten");?>',
+            addCustomerTitle:'<?php echo $this->translate->_("Kunde hinzufügen");?>',
+            saveCustomerMsg:'<?php echo $this->translate->_("Kunde wird gespeichert...");?>',
+            customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
+            customerDeleteMsg:'<?php echo $this->translate->_("Diesen Kunden löschen?");?>',
+            customerDeleteTitle:'<?php echo $this->translate->_("Kunden löschen");?>',
+            customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.admin.customer.TagField", {
+    	override: "Editor.view.admin.customer.TagField",
+        fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
+    });
+<?php 
+    }; //if($hasFrontendController('Editor.controller.admin.Customer')){
 ?>
 
     Ext.define("Editor.locale.de.view.MaintenancePanel", {

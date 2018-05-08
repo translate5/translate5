@@ -994,6 +994,10 @@
         <source>HISTORY</source>
         <target>HISTORY</target>
     </trans-unit>
+    <trans-unit id='VHJhY2tDaGFuZ2VzIGZvdW5kLCBidXQgUGx1Z2luIGlzIG5vdCBhY3RpdmF0ZWQu'>
+        <source>TrackChanges found, but Plugin is not activated.</source>
+        <target>TrackChanges found, but Plugin is not activated.</target>
+    </trans-unit>
     <trans-unit id='R2V3aWNodHVuZw=='>
         <source>Gewichtung</source>
         <target>Severity</target>
@@ -1512,10 +1516,6 @@
 <trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='>
     <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
     <target>In addition to our ZIP-container format you can also use SDLXLIFF, XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
-</trans-unit>
-<trans-unit id='RXJnb25vbWljIChBbnNpY2h0KQ=='>
-    <source>Ergonomic (Ansicht)</source>
-    <target>Ergonomic (view mode)</target>
 </trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
@@ -2240,6 +2240,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Replace all</target>
 </trans-unit>
 
+<trans-unit id="QWxsZSBlcnNldHplbiB3aXJkIGbDvHIgQXVmZ2FiZW4gbWl0IFNlZ21lbnRlbiBtaXQgTVFNLVRhZ3MgbmljaHQgdW50ZXJzdMO8dHp0">
+    <source>Alle ersetzen wird für Aufgaben mit Segmenten mit MQM-Tags nicht unterstützt</source>
+    <target>Replace all is not supported for task with segments with mqm tags</target>
+</trans-unit>
+
 <trans-unit id="U2VnbWVudGUgbWl0IFN1Y2h0cmVmZmVyOg==">
     <source>Segmente mit Suchtreffer:</source>
     <target>Segments with search hits:</target>
@@ -2266,17 +2271,184 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Aufgabe bestätigen?</source>
     <target>Approve task?</target>
 </trans-unit>
-
 <trans-unit id='YmVzdMOkdGlnZW4='>
     <source>bestätigen</source>
     <target>approve</target>
 </trans-unit>
-
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRpZSBBdWZnYWJlIGJlc3TDpHRpZ2VuPyA8YnIvPiBPaG5lIEJlc3TDpHRpZ3VuZyBrYW5uIGRpZXNlIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLg=='>
     <source>Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.</source>
     <target>Do you want to approve the task? <br/> Only an approved task can be edited.</target>
 </trans-unit>
+<trans-unit id='U2llIGhhYmVuIGtlaW5lIEF1ZmdhYmUgKG1laHIpIGdlw7ZmZm5ldC4gRXZlbnR1ZWxsIHd1cmRlIGRpZSBBdWZnYWJlIGluIGVpbmVtIGFuZGVyZW4gRmVuc3RlciBnZXNjaGxvc3Nlbi4='>
+    <source>Sie haben keine Aufgabe (mehr) geöffnet. Eventuell wurde die Aufgabe in einem anderen Fenster geschlossen.</source>
+    <target>You don't have any task opened (anymore) for editing. The task may have been closed in another window.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd3VyZGUgendpc2NoZW56ZWl0bGljaCBpbSBudXIgTGVzZW1vZHVzIGdlw7ZmZm5ldC4='>
+    <source>Die Aufgabe wurde zwischenzeitlich im nur Lesemodus geöffnet.</source>
+    <target>In the meantime, the task was opened in read-only mode.</target>
+</trans-unit>
+<trans-unit id='bWl0IExlc2V6ZWljaGVuIHZlcnNlaGVu'>
+    <source>mit Lesezeichen versehen</source>
+    <target>bookmarked</target>
+</trans-unit>
+<trans-unit id='U3VjaGUgaW4gZ2VzcGVycnRlbiBTZWdtZW50ZW4='>
+    <source>Suche in gesperrten Segmenten</source>
+    <target>Search in locked segments</target>
+</trans-unit>
+<trans-unit id='RWlnZW5zY2hhZnRlbg=='>
+    <source>Eigenschaften</source>
+    <target>properties</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSBrbG9uZW4='>
+    <source>Aufgabe klonen</source>
+    <target>clone task</target>
+</trans-unit>
+<trans-unit id='RGV0YWlscw=='>
+    <source>Details</source>
+    <target>Details</target>
+</trans-unit>
+<trans-unit id='RGV0YWlscyAobnVyIExlc2Vtb2R1cyk='>
+    <source>Details (nur Lesemodus)</source>
+    <target>Details (read-only)</target>
+</trans-unit>
+<trans-unit id='Tm9ybWFs'>
+    <source>Normal</source>
+    <target>Normal</target>
+</trans-unit>
+<trans-unit id='Tm9ybWFsIChudXIgTGVzZW1vZHVzKQ=='>
+    <source>Normal (nur Lesemodus)</source>
+    <target>Normal (read-only)</target>
+</trans-unit>
+<trans-unit id='U3RhdHVzICJ7MH0iIGR1cmNoIGVpbmVuIGFuZGVyZW4gQmVudXR6ZXI='>
+    <source>Status "{0}" durch einen anderen Benutzer</source>
+    <target>status "{0}" by another user</target>
+</trans-unit>
+<trans-unit id='TWluLiB7bWluV2lkdGh9'>
+    <source>Min. {minWidth}</source>
+    <target>min. {minWidth}</target>
+</trans-unit>
+<trans-unit id='IHZvbiB7bWF4V2lkdGh9'>
+    <source> von {maxWidth}</source>
+    <target> of {maxWidth}</target>
+</trans-unit>
+<trans-unit id='U2VnLjoge3NpYmxpbmdzfQ=='>
+    <source>Seg.: {siblings}</source>
+    <target>seg.: {siblings}</target>
+</trans-unit>
+<trans-unit id='RXMga29ubnRlbiBuaWNodCBhbGxlIHdpZWRlcmhvbHRlbiBTZWdtZW50ZSBnZXNwZWljaGVydCB3ZXJkZW4hIERpZXMga2FubiB1bnRlcnNjaGllZGxpY2hlIFVyc2FjaGVuIGhhYmVuLiBCaXR0ZSBzcGVpY2hlcm4gU2llIGRhcyB6dWxldHp0IGJlYXJiZWl0ZXRlIFNlZ21lbnQgZXJuZXV0IHVuZCB2ZXJ3ZW5kZW4gU2llIGRlbiBtYW51ZWxsZW4gTW9kdXMgZGVzIFdpZWRlcmhvbHVuZ3NlZGl0b3IgdW0gZGllIGJldHJvZmZlbmVuIFNlZ21lbnRlIHp1IGlkZW50aWZpemllcmVuIHVtIHNpZSBkYW5hY2ggaMOkbmRpc2NoIHp1IGJlYXJiZWl0ZW4u'>
+    <source>Es konnten nicht alle wiederholten Segmente gespeichert werden! Dies kann unterschiedliche Ursachen haben. Bitte speichern Sie das zuletzt bearbeitete Segment erneut und verwenden Sie den manuellen Modus des Wiederholungseditor um die betroffenen Segmente zu identifizieren um sie danach händisch zu bearbeiten.</source>
+    <target>Not all repeated segments could be saved! There can be different reasons for that. Please save the last edited segment again and use the manual mode of the repetition editor to identify and reedit manually the non changed segments.</target>
+</trans-unit>
+<trans-unit id='RGllIGF1dG9tYXRpc2NoZW4gRXJzZXR6dW5nZW4ga29ubnRlbiBuaWNodCBpbiBhbGxlbiBnZWZ1bmRlbmVuIFNlZ21lbnRlbiBkdXJjaGdlZsO8aHJ0IHdlcmRlbi4gRGllcyBrYW5uIHVudGVyc2NoaWVkbGljaGUgVXJzYWNoZW4gaGFiZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU3VjaGUgdW5kIEVyc2V0emVuIG9obmUgZGllICdBbGxlcyBFcnNldHplbicgRnVua3Rpb25hbGl0w6R0IHVtIGRpZSBiZXRyb2ZmZW5lbiBTZWdtZW50ZSBlaW56ZWxuIHp1IGZpbmRlbiB1bmQgenUgYmVhcmJlaXRlbi4='>
+    <source>Die automatischen Ersetzungen konnten nicht in allen gefundenen Segmenten durchgeführt werden. Dies kann unterschiedliche Ursachen haben. Bitte verwenden Sie Suche und Ersetzen ohne die 'Alles Ersetzen' Funktionalität um die betroffenen Segmente einzeln zu finden und zu bearbeiten.</source>
+    <target>The replacements could not be applied in all found segments. There can be different reasons for that. Please use search and replace without 'replace all' to identify and reedit the non changed segments.</target>
+</trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQp'>
+    <source>exportieren (Orginalformat)</source>
+    <target>Export (original import format)</target>
+</trans-unit>
+<trans-unit id="ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQgbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZSk=">
+    <source>exportieren (Orginalformat mit Änderungshistorie)</source>
+    <target>Export (original format incl. import/export diff)</target>
+</trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMSk='>
+    <source>exportieren (XLIFF 2.1)</source>
+    <target>Export (Xliff 2.1)</target>
+</trans-unit>
+<trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
+    <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
+    <target>Re-import chosen tasks into current TM</target>
+</trans-unit>
+<trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'>
+    <source>Terminologieportal</source>
+    <target>Terminology portal</target>
+</trans-unit>
+<trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
 
+<trans-unit id='SWhuZW4gc2luZCBkZXJ6ZWl0IGtlaW5lIEt1bmRlbnZlcmtuw7xwZnVuZ2VuIHVuZCBkYW1pdCBhdWNoIGtlaW5lIFRlcm1Db2xsZWN0aW9ucyB6dWdlb3JkbmV0LiBEYWhlciBpc3QgYXVjaCBrZWluZSBUZXJtc3VjaGUgbcO2Z2xpY2gu'>
+	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
+	<target>There are currently no customers connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
+</trans-unit>
+
+<trans-unit id='RXMgd3VyZGVuIGtlaW5lIHZlcmbDvGdiYXJlbiB0ZXJtQ29sbGVjdGlvbiBmw7xyIGRlbiBJaG5lbiB6dWdlb3JkbmV0ZW4gS3VuZGVuIGdlZnVuZGVuLg=='>
+	<source>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</source>
+	<target>No available term collections were found for the customer that is associated to you.</target>
+</trans-unit>
+
+<trans-unit id='VGVybWU='>
+	<source>Terme</source>
+	<target>Terms</target>
+</trans-unit>
+
+<trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='>
+	<source>Eigenschaften des Eintrags</source>
+	<target>Attributes of the term entry</target>
+</trans-unit>
+<trans-unit id='S3VuZGVu'>
+    <source>Kunden</source>
+    <target>Customers</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='>
+    <source>Kundenübersicht</source>
+    <target>Customers overview</target>
+</trans-unit>
+
+<trans-unit id='SGluenVmw7xnZW4='>
+    <source>Hinzufügen</source>
+    <target>Add</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGVubmFtZQ=='>
+    <source>Kundenname</source>
+    <target>Customer name</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGVubnVtbWVy'>
+    <source>Kundennummer</source>
+    <target>Customer number</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgYmVhcmJlaXRlbg=='>
+    <source>Kunde bearbeiten</source>
+    <target>Edit customer</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgaGluenVmw7xnZW4='>
+    <source>Kunde hinzufügen</source>
+    <target>Add a customer</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4u'>
+    <source>Kunde wird gespeichert...</source>
+    <target>Customer is saved ...</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgZ2VzcGVpY2hlcnQh'>
+    <source>Kunde gespeichert!</source>
+    <target>Customer saved!</target>
+</trans-unit>
+
+<trans-unit id='RGllc2VuIEt1bmRlbiBsw7ZzY2hlbj8='>
+    <source>Diesen Kunden löschen?</source>
+    <target>Delete this customer ?</target>
+</trans-unit>
+
+    <trans-unit id='S3VuZGVuIGzDtnNjaGVu'>
+    <source>Kunden löschen</source>
+    <target>Delete customer</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'>
+    <source>Kunde gelöscht</source>
+    <target>Customer deleted</target>
+</trans-unit>
+
+<trans-unit id='RW5ka3VuZGU='>
+    <source>Endkunde</source>
+    <target>End customer</target>
+</trans-unit>
+<trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='><source>no existing attributes</source><target>No existing attributes</target></trans-unit>
     </body>
   </file>
 </xliff>

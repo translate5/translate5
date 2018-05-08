@@ -53,6 +53,7 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
      */
     public function registerParserHandler(editor_Models_Import_FileParser_XmlParser $xmlparser) {
         $currentComment = null;
+        
         $xmlparser->registerElement('trans-unit ax:named-property', function($tag, $attributes) use (&$currentComment){
             if($attributes['name'] == 'Comment') {
                 $currentComment = ZfExtended_Factory::get('editor_Models_Comment');

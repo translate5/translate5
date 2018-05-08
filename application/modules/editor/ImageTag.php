@@ -85,7 +85,7 @@ abstract class editor_ImageTag {
      */
     protected $_filename;
     
-    protected $htmlTagTpl = '<div class="{type} {class}"><span title="{text}" class="short">{shortTag}</span><span data-originalid="{id}" data-filename="{filenameHash}" class="full">{text}</span></div>';
+    protected $htmlTagTpl = '<div class="{type} {class} internal-tag ownttip"><span title="{title}" class="short">{shortTag}</span><span data-originalid="{id}" data-length="{length}" class="full">{text}</span></div>';
     
     /**
      * @var array enthält alle images, die mit dem aktuellen Objekt erzeugt wurden als Values
@@ -109,7 +109,9 @@ abstract class editor_ImageTag {
 
     /**
      * erzeugt und speichert einen Image-Tag, falls noch nicht im SavePath vorhanden
+     * → not needed anymore since using dynamically generated SVG content therefore
      *
+     * @deprecated
      * @param string $text Text auf dem Tag
      * @param string $hash md5-hash von $text
      * @return self
@@ -136,6 +138,12 @@ abstract class editor_ImageTag {
      * @return string
      */
     public function getHtmlTag(array $parameters) {
+        if(! isset($parameters['length'])) {
+            $parameters['length'] = -1;
+        }
+        if(! isset($parameters['title'])) {
+            $parameters['title'] = $parameters['text'];
+        }
         $keys = array_map(function($k){
             return '{'.$k.'}';
         }, array_keys($parameters));

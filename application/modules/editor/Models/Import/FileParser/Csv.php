@@ -39,9 +39,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParser {
-    use editor_Models_Import_FileParser_TagTrait {
-        getTagParams as protected traitGetTagParams;
-    }
+    use editor_Models_Import_FileParser_TagTrait;
     
     /**
      * string "source" as defined in application.ini column definition
@@ -352,7 +350,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             );
         }
 
-        $this->parseSegmentAttributes($lineArr); //<< hier kann crap übergeben werden
+        //just create a segment attributes object with default values
+        $this->createSegmentAttributes($this->_mid);
+        
         $segmentId = $this->setAndSaveSegmentValues();
         foreach($this->colOrder as $name => $idx) {
             $field = $this->segmentFieldManager->getByName($name);
@@ -454,15 +454,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         return $segment;
     }
 
-    /**
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::getTagParams()
-     * @see TRANSLATE-659
-     */
-    protected function getTagParams($tag, $shortTag, $tagId, $fileNameHash, $text = false) {
-        return $this->traitGetTagParams($tag, $shortTag, $tagId, $fileNameHash, $text);
-    }
-    
     private function parseSegmentProtectTags($segment) {
         
         if (strpos($segment, '<')=== false || !$this->tagProtection) {
@@ -504,13 +495,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             }
             $tagId = $this->shortTagIdent++;
             $tag = $matches[0];
-            $fileNameHash = md5($tag);
             
-            $p = $this->getTagParams($tag, $tagId, $tagName, $fileNameHash, $this->encodeTagsForDisplay($tag));
+            $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
             $r = $this->_singleTag->getHtmlTag($p);
-            
-            $this->_singleTag->createAndSaveIfNotExists($tag, $fileNameHash);
-            
             return $r;
         };
         
@@ -532,13 +519,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $tag = $match[3];
                 $tagId = $match[1];
                 $tagName = $match[2];
-                $fileNameHash = md5($tag);
-                
-                $p = $this->getTagParams($tag, $tagId, $tagName, $fileNameHash, $this->encodeTagsForDisplay($tag));
+                $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
                 $replace = $this->_singleTag->getHtmlTag($p);
                 $text = str_replace($match[0], $replace, $text);
-                
-                $this->_singleTag->createAndSaveIfNotExists($tag, $fileNameHash);
             }
         }
         return $text;
@@ -557,13 +540,9 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $tag = $match[3];
                 $tagId = $match[1];
                 $tagName = $match[2];
-                $fileNameHash = md5($tag);
-                
-                $p = $this->getTagParams($tag, $tagId, $tagName, $fileNameHash, $this->encodeTagsForDisplay($tag));
+                $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
                 $replace = $this->_leftTag->getHtmlTag($p);
                 $text = str_replace($match[0], $replace, $text);
-                
-                $this->_leftTag->createAndSaveIfNotExists($tag, $fileNameHash);
             }
         }
         return $text;
@@ -582,13 +561,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 $tag = $match[1];
                 $tagId = $match[2];
                 $tagName = preg_replace('/<[\/]*([^ ]*).*>/i', '$1', $tag);
-                $fileNameHash = md5($tag);
                 
-                $p = $this->getTagParams($tag, $tagId, $tagName, $fileNameHash, $this->encodeTagsForDisplay($tag));
+                $p = $this->getTagParams($tag, $tagId, $tagName, $this->encodeTagsForDisplay($tag));
                 $replace = $this->_rightTag->getHtmlTag($p);
                 $text = str_replace($match[0], $replace, $text);
-                
-                $this->_rightTag->createAndSaveIfNotExists($tag, $fileNameHash);
             }
         }
         return $text;
@@ -613,17 +589,14 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 return $tag;
             }
             $tagId = $this->shortTagIdent++;
-            $fileNameHash = md5($tag);
             $p = array(
                 'class' => implode('', unpack('H*', $tag)),
                 'text' => $this->encodeTagsForDisplay($tag),
                 'shortTag' => $tagId,
                 'id' => 'regex',
-                'filenameHash' => $fileNameHash,
             );
             
             $r = $this->_singleTag->getHtmlTag($p);
-            $this->_singleTag->createAndSaveIfNotExists($tag, $fileNameHash);
             
             return $r;
         };
@@ -631,19 +604,6 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $text = preg_replace_callback($regEx, $mask, $text);
         }
         return $this->parseSegmentInsertPlaceholders($text,$this->regexInternalTags);
-    }
-    
-    /**
-     * Sets the segment attributes for the segment currently worked on, uses the system defaults
-     * $this->_target and $this->_source must be defined already!
-     * most of the attributes are not defined for CSV and are accordingly presetted
-     * 
-     * (non-PHPdoc)
-     * @see editor_Models_Import_FileParser::parseSegmentAttributes()
-     */
-    protected function parseSegmentAttributes($segment){
-        //just create a segment attributes object with default values
-        $this->createSegmentAttributes($this->_mid);
     }
     
     /**

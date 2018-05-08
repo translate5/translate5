@@ -263,6 +263,11 @@
         <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
         <target>The queried OpenTM2 instance is not available</target>
     </trans-unit>
+    <trans-unit id='QXVmZ2FiZW4gcmVpbXBvcnRpZXJlbg=='>
+        <source>Aufgaben reimportieren</source>
+        <target>Reimport tasks</target>
+    </trans-unit>
+
   </body>
  </file>
 </xliff>

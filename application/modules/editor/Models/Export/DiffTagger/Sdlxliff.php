@@ -73,7 +73,6 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      * @return string $edited mit diff-Syntax fertig ausgezeichnet
      */
     public function diffSegment($target, $edited, $changeTimestamp, $userName) {
-        
         $escapedGTagsTarget = array();
         $escapedGTagsEdited = array();
         

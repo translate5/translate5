@@ -91,7 +91,8 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         
         $this->segmentNrInTask++;
         $seg->setSegmentNrInTask($this->segmentNrInTask);
-        $seg->setFieldContents($parser->getSegmentFieldManager(), $parser->getFieldContents());
+        $sfm = $parser->getSegmentFieldManager();
+        $seg->setFieldContents($sfm, $parser->getFieldContents());
         
         $segmentId = $seg->save();
         $this->processSegmentMeta($seg, $attributes);
@@ -104,19 +105,18 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      */
     protected function processSegmentMeta(editor_Models_Segment $seg, editor_Models_Import_FileParser_SegmentAttributes $attributes) {
-        $modified = false;
         $meta = $seg->meta();
         if(!empty($attributes->maxWidth) && !is_null($attributes->maxWidth)) {
             $meta->setMaxWidth($attributes->maxWidth);
-            $modified = true;
         }
         if(!empty($attributes->minWidth) && !is_null($attributes->minWidth)) {
             $meta->setMinWidth($attributes->minWidth);
-            $modified = true;
         }
-        if($modified) {
-            $meta->save();
+        if(!empty($attributes->transunitId) && !is_null($attributes->transunitId)) {
+            $meta->setTransunitId($attributes->transunitId);
         }
+        $meta->setSiblingData($seg);
+        $meta->save();
     }
     
     /**

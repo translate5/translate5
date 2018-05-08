@@ -29,6 +29,9 @@ END LICENSE AND COPYRIGHT
 /**
  * Converts a List with Segments to XML
  * 
+ * For Xliff see https://code.google.com/p/interoperability-now/downloads/detail?name=XLIFFdoc%20Representation%20Guide%20v1.0.1.pdf&can=2&q=
+ * and http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html
+ * 
  * TODO: MQM and Terminology markup export is missing! 
  */
 class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_SegmentsToXliffAbstract{
@@ -140,36 +143,6 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
     }
     
     /**
-     * converts a list with segment data to xml (xliff)
-     * 
-     * For Xliff see https://code.google.com/p/interoperability-now/downloads/detail?name=XLIFFdoc%20Representation%20Guide%20v1.0.1.pdf&can=2&q=
-     * and http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html
-     * 
-     * @param editor_Models_Task $task
-     * @param array $segments
-     */
-    public function convert(editor_Models_Task $task, array $segments) {
-        $this->result = array('<?xml version="1.0" encoding="UTF-8"?>');
-        $this->task = $task;
-        $allSegmentsByFile = $this->reorderByFilename($segments);
-        
-        $this->initConvertionData();
-        
-        $this->createXmlHeader();
-        
-        foreach($allSegmentsByFile as $filename => $segmentsOfFile) {
-            $this->processAllSegments($filename, $segmentsOfFile);
-        }
-        
-        //XML Footer, no extra method
-        $this->result[] = '</xliff>';
-        
-        $xml = join("\n", $this->result);
-
-        return $xml;
-    }
-    
-    /**
      * Helper function to create the XML Header
      */
     protected function createXmlHeader() {
@@ -216,19 +189,20 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @param string $filename
      * @param array $segmentsOfFile
      */
-    protected function processAllSegments($filename, array $segmentsOfFile) {
+    protected function processAllSegments($filename, Traversable $segmentsOfFile) {
         if(empty($segmentsOfFile)) {
             return;
         }
+        $first = $this->unifySegmentData(reset($segmentsOfFile));
 
-        $this->exportParser = $this->getExportFileparser($segmentsOfFile[0]['fileId'], $filename);
+        $this->exportParser = $this->getExportFileparser($first['fileId'], $filename);
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve" datatype="x-translate5">';
         $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';
         
         $fileMapKey = $this->prepareTagsStorageInHeader();
         foreach($segmentsOfFile as $segment) {
-            $this->processSegmentsOfFile($segment);
+            $this->processSegmentsOfFile($this->unifySegmentData($segment));
         }
         $this->storeTagsInHeader($fileMapKey);
         
@@ -424,6 +398,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @return string
      */
     protected function prepareText($text) {
+        $text = $this->taghelperTrackChanges->removeTrackChanges($text);
         if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
             $text = $this->handleTerminology($text, true);
             return $this->exportParser->exportSingleSegmentContent($text);

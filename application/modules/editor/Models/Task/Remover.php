@@ -52,12 +52,14 @@ class editor_Models_Task_Remover {
     /**
      * Removes a task completly from translate5 if task is not locked and therefore removable
      */
-    public function remove() {
+    public function remove($forced = false) {
         $taskGuid = $this->task->getTaskGuid();
         if(empty($taskGuid)) {
             return false;
         }
-        $this->checkRemovable();
+        if(!$forced) {
+            $this->checkRemovable();
+        }
         $this->removeDataDirectory();
         $this->removeRelatedDbData();
         $this->task->delete();
@@ -135,9 +137,6 @@ class editor_Models_Task_Remover {
         
         $segmentTable = ZfExtended_Factory::get('editor_Models_Db_Segments');
         $segmentTable->delete(array('taskGuid = ?' => $taskGuid));
-        
-        $termTable = ZfExtended_Factory::get('editor_Models_Db_Terms');
-        $termTable->delete(array('taskGuid = ?' => $taskGuid));
         
         $filesTable = ZfExtended_Factory::get('editor_Models_Db_Files');
         $filesTable->delete(array('taskGuid = ?' => $taskGuid));
