@@ -52,6 +52,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
      */
     protected $tables = array(
             'LEK_browser_log' => false,
+            'LEK_customer' => false,
             'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
             'LEK_files' => 'taskGuid',
@@ -77,14 +78,20 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_task_log' => 'taskGuid',
             'LEK_task_meta' => 'taskGuid',
             'LEK_task_migration' => 'taskGuid',
-            'LEK_terms' => 'taskGuid',
+            'LEK_terms' => false,
+            'LEK_term_attributes'=>false,
+            'LEK_term_attributes_label'=>false,
+            'LEK_term_collection'=>false,
+            'LEK_term_collection_taskassoc'=>false,
+            'LEK_term_entry'=>false,
+            'LEK_term_entry_attributes'=>false,
             'LEK_user_changelog_info' => false,
             'LEK_visualreview_files' => 'taskGuid',
             'LEK_visualreview_segmentmapping' => 'taskGuid',
             'LEK_workflow_log' => 'taskGuid',
             'LEK_workflow_action' => false,
             'LEK_workflow_userpref' => 'taskGuid',
-            'Zf_dbversion' => true,
+            'Zf_dbversion' => true
     );
     
     /**
