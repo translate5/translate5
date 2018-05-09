@@ -3,6 +3,11 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.7.3] - 2018-05-09
+###Bugfixes
+TRANSLATE-1243: IE11 could not load Segment.js
+TRANSLATE-1239: JS: Uncaught TypeError: Cannot read property 'length' of undefined
+
 ## [2.7.2] - 2018-05-08
 ###Changed
 TRANSLATE-1240: Integrate external libs correctly in installer
