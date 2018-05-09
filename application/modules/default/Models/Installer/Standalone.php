@@ -283,11 +283,12 @@ class Models_Installer_Standalone {
         $deleteList = dirname(__FILE__).'/filesToBeDeleted.txt';
         $toDeleteList = file($deleteList);
         foreach($toDeleteList as $toDelete) {
+            $toDelete = trim($toDelete);
             //ignore comments
-            if(strpos(trim($toDelete), '#') === 0){
+            if(empty($toDelete) || strpos($toDelete, '#') === 0){
                 continue;
             }
-            $file = new SplFileInfo($this->currentWorkingDir.trim($toDelete));
+            $file = new SplFileInfo($this->currentWorkingDir.$toDelete);
             if($file->isFile() && $file->isReadable()) {
                 unlink($file);
             }
