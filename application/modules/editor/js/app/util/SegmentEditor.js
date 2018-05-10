@@ -181,6 +181,16 @@ Ext.define('Editor.util.SegmentEditor', {
         }
         return null;
     },
+    /**
+     * Returns the first/last node in the editor.
+     * @param {String} direction
+     * @returns {Boolean} 
+     */
+    getLastNodeInEditor: function(direction) {
+        var me = this,
+            node = (direction == 'fromEnd') ? me.getEditorBody().lastChild : me.getEditorBody().firstChild;
+        return node;
+    },
     
     /**
      * Get the TermTag-Node for a node (= the node itself or loop its parents until we find it).
