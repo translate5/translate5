@@ -121,7 +121,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     segmentId: null,                // ID of the currently edited Segment
     
-    // before the SpellCheck-results are applied, we store content from the Editor:
+    // before the SpellCheck-results are applied, we store caret and content from the Editor:
+    selectionForCaret: null,
+    bookmarkForCaret: null,
     contentBeforeSpellCheck: null,
     contentBeforeSpellCheckWithoutSpellCheckNodes: null,
     
@@ -402,6 +404,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.consoleLog('(0.3 => startSpellCheck.)');
         
+        // where is the caret at the moment?
+        me.selectionForCaret = rangy.getSelection(me.getEditorBody());
+        me.bookmarkForCaret = me.selectionForCaret.getBookmark();
+        
         // store content WITH SpellCheck-Markup
         me.contentBeforeSpellCheck = me.getEditorBodyExtDomElement().getHtml();
         // store content WITHOUT SpellCheck-Markup
@@ -421,6 +427,19 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js
         me.runSpellCheck(editorText);
         // => runSpellCheck with the tool calls applySpellCheck() when the results arrive.
+    },
+    /**
+     * What to do after the SpellCheck has been run.
+     */
+    finishSpellCheck: function() {
+        var me = this;
+        
+        // restore position of the caret (do this AFTER setReadOnly(false), otherwise there is no focus).
+        me.selectionForCaret.moveToBookmark(me.bookmarkForCaret);
+        
+        // "reset"
+        me.contentBeforeSpellCheck = null;
+        me.contentBeforeSpellCheckWithoutSpellCheckNodes = null;
     },
     
     // =========================================================================
@@ -451,6 +470,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (!me.allMatchesOfTool.length > 0) {
             me.consoleLog('allMatchesOfTool: no results; re-apply the initial content with all tags (eg TermTags).');
             me.getEditorBodyExtDomElement().setHtml(me.contentBeforeSpellCheck);
+            me.finishSpellCheck();
             return;
         }
         
@@ -462,21 +482,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {String} resultFromFormerCheck (optional)
      */
     applySpellCheckResult: function(resultFromFormerCheck) {
-        var me = this,
-            selectionForCaret,
-            bookmarkForCaret;
+        var me = this;
         if (me.editIdleRestarted) {
             me.consoleLog('applySpellCheck not started: results might be invalid after the content was edited in the meantime.');
+            me.finishSpellCheck();
             return;
         }
         if (me.getEditorBodyExtDomElement() == null) {
             me.consoleLog('applySpellCheck not started: no editor-body found (maybe the editor is closed already).');
+            me.finishSpellCheck();
             return;
         }
-        
-        // where is the caret at the moment?
-        selectionForCaret = rangy.getSelection(me.getEditorBody());
-        bookmarkForCaret = selectionForCaret.getBookmark();
         
         // ------------- while we apply the matches, the content must not be edited in the Editor ------------------
         me.isApplyingInProgress = true;
@@ -496,12 +512,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.isApplyingInProgress = false;
         // ---------------------------------------------------------------------------------------------------------
         
-        // restore position of the caret (do this AFTER setReadOnly(false), otherwise there is no focus).
-        selectionForCaret.moveToBookmark(bookmarkForCaret);
-        
-        // "reset"
-        me.contentBeforeSpellCheck = null;
-        me.contentBeforeSpellCheckWithoutSpellCheckNodes = null;
+        me.finishSpellCheck();
     },
     /**
      * Apply replacement as suggested in the ToolTip.

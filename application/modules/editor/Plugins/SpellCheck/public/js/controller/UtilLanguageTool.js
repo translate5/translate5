@@ -137,15 +137,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
         // offsets of text-only version
         matchStart = match.offset;
         matchEnd = matchStart + match.context.length;
-        me.consoleLog("---\n- matchStart: " + matchStart + " / matchEnd: " + matchEnd);
+        //me.consoleLog("---\n- matchStart: " + matchStart + " / matchEnd: " + matchEnd);
         // move offsets according to hidden del-Nodes in front of the match's start and/or end
         allDelNodes = me.getEditorBodyExtDomElement().query('del');
         Ext.Array.each(allDelNodes, function(delNode, index) {
             rangeForDelNode.selectNodeContents(delNode);
             bookmarkForDelNode = rangeForDelNode.getBookmark();
-            me.consoleLog("- bookmarkForDelNode: " + bookmarkForDelNode.start + " / " + bookmarkForDelNode.end);
+            //me.consoleLog("- bookmarkForDelNode: " + bookmarkForDelNode.start + " / " + bookmarkForDelNode.end);
             if (bookmarkForDelNode.start > matchStart && bookmarkForDelNode.end > matchEnd) {
-                me.consoleLog("- we are already behind the match: " + bookmarkForDelNode.start + " > " + matchStart + " && " + bookmarkForDelNode.end + " > " + matchEnd);
+                //me.consoleLog("- we are already behind the match: " + bookmarkForDelNode.start + " > " + matchStart + " && " + bookmarkForDelNode.end + " > " + matchEnd);
                 return false; // break here; we are already behind the match
             }
             lengthOfDelNode = rangeForDelNode.text().length;
@@ -153,10 +153,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
             if (bookmarkForDelNode.start <= matchStart) {
                 matchStart = matchStart + lengthOfDelNode;
                 matchEnd = matchEnd + lengthOfDelNode;
-                me.consoleLog("- match NOW (start and end moved): " + matchStart + " / " + matchEnd);
+                //me.consoleLog("- match NOW (start and end moved): " + matchStart + " / " + matchEnd);
             } else if (bookmarkForDelNode.end <= matchEnd) {
                 matchEnd = matchEnd + lengthOfDelNode;
-                me.consoleLog("- match NOW (only end moved): " + matchStart + " / " + matchEnd);
+                //me.consoleLog("- match NOW (only end moved): " + matchStart + " / " + matchEnd);
             }
         });
         rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
