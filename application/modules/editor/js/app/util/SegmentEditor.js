@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.util.SegmentEditor
  */
 Ext.define('Editor.util.SegmentEditor', {
-    mixins: ['Editor.util.DevelopmentTools'],
+    mixins: ['Editor.util.DevelopmentTools'], // cannot add 'Editor.controller.SearchReplace' due to circulation-error
     
     editor: null, // = the segment's Editor (Editor.view.segments.HtmlEditor)
     
@@ -122,7 +122,7 @@ Ext.define('Editor.util.SegmentEditor', {
     addPlaceholderIfEditorIsEmpty: function() {
         var me = this;
         if ( (Ext.isGecko  || Ext.isWebKit) && me.isEmptyEditor()) {
-            me.getEditorBody().innerHTML = me.placeholder_empty_INS + me.getEditorBody().innerHTML;
+            me.getEditorBody().innerHTML = "&#8203;" + me.getEditorBody().innerHTML;
             me.consoleLog("Firefox: Editor must never be empty => Placeholder added.");
         }
     },
@@ -164,6 +164,45 @@ Ext.define('Editor.util.SegmentEditor', {
             debugger;
         }
         return false;
+    },
+    /**
+     * Returns the content in the Editor taking into account its tags:
+     * - content in delNodes is ignored
+     * Does NOT change anything in the content of the Editor.
+     * @param {Boolean} collapseWhitespace
+     * @returns {Boolean}
+     */
+    getEditorContentAsText: function(collapseWhitespace) {
+        var me = this,
+            rangeForEditor = rangy.createRange(),
+            el,
+            elContent,
+            invisibleElements,
+            editorContentAsText,
+            selectionForCaret,
+            bookmarkForCaret;
+        me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored in rangeForEditor.text())
+        if (collapseWhitespace) {
+            // CAUTION: rangy.innerText collapses whitespace! (https://github.com/timdown/rangy/wiki/Text-Range-Module#visible-text)
+            editorContentAsText = rangy.innerText(me.getEditorBody());
+        } else {
+            // Do NOT collapse multiple whitespace: Remove invisible content and keep ALL of the rest.
+            el = me.getEditorBodyExtDomElement();
+            selectionForCaret = rangy.getSelection(me.getEditorBody());
+            bookmarkForCaret = selectionForCaret.getBookmark();
+            elContent = el.getHtml();
+            // Collect all invisible elements; add selectors as needed:
+            invisibleElements = el.select('.searchreplace-hide-element'); // SearchReplaceUtils.js
+            Ext.Array.each(invisibleElements, function(invisibleEl, index) {
+                invisibleEl.destroy();
+            });
+            rangeForEditor.selectNodeContents(me.getEditorBody());
+            editorContentAsText = rangeForEditor.toString();
+            el.setHtml(elContent);
+            selectionForCaret.moveToBookmark(bookmarkForCaret);
+        }
+        me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js
+        return editorContentAsText;
     },
     /**
      * Returns the first/last node in the editor that is not of the kind to be ignored.
@@ -319,6 +358,43 @@ Ext.define('Editor.util.SegmentEditor', {
             if (isEmptyNode(trackChangeNode) && trackChangeNode.parentNode != null) {
                 trackChangeNode.parentNode.removeChild(trackChangeNode);
             }
-        });        
+        });
+    },
+    /**
+     * (1) Removes all multiple whitespaces with nothing between them (we delete them anyway on save).
+     * (2) Checks if there are tags between the multiple whitespaces.
+     * @returns {Boolean} hasTagsBetweenWhitespaces
+     */
+    removeMultipleWhitespaceInEditor: function() {
+        var me = this,
+            el = me.getEditorBodyExtDomElement(),
+            elContent,
+            elContentAsText,
+            selectionForCaret,
+            bookmarkForCaret,
+            hasTagsBetweenWhitespaces = false;
+        // (1) replace multiple whitespace
+        selectionForCaret = rangy.getSelection(me.getEditorBody());
+        bookmarkForCaret = selectionForCaret.getBookmark();
+        elContent = el.getHtml();
+        elContent = elContent.replace(/&nbsp;+/gi,'  ').replace(/\s\s+/g, '&nbsp;');
+        el.setHtml(elContent);
+        selectionForCaret.moveToBookmark(bookmarkForCaret);
+        // (2a) check for tags between whitespace:
+        if(/\s\<[^>]+\>\s/.test(elContent)) {
+            //var test = elContent.match(/\s\<[^>]+\>\s/);
+            //debugger;
+            hasTagsBetweenWhitespaces = true;
+            me.consoleLog("(removeMultipleWhitespaceInEditor:) Tags between whitespace found: " + elContent);
+        }
+        // (2b) "abc<ins> </ins> def" is ALSO multiple whitespace" => check again considering the tags:
+        elContentAsText = me.getEditorContentAsText(false);
+        if(/\s\s+/g.test(elContentAsText)) {
+            //var test = elContentAsText.match(/\s\s+/g);
+            //debugger;
+            hasTagsBetweenWhitespaces = true;
+            me.consoleLog("(removeMultipleWhitespaceInEditor:) Multiple whitespace found considering content in tags: " + elContentAsText);
+        }
+        return hasTagsBetweenWhitespaces;
     }
 });
