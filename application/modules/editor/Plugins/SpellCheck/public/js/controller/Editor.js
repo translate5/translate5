@@ -72,11 +72,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         },
     },
-    messages: {
+    spellCheckMessages: {
         moreInformation: '#UT#More information',
         errorsFoundOnSaving: '#UT#SpellCheck: errors found on saving Segment Nr. %segmentnr.',
+        tagsBetweenWhitespaces: '#UT#There are tags between multiple whitespaces.',
         isApplyingInProgress: '#UT#The SpellCheck-Plugin was currently applying the matches, sorry for the inconvenience.',
         spellCheckOnSavingIsAlreadyRunningForAnotherSegment: '#UT#The SpellCheck on saving the segment failed because there is already another process running for Segment Nr. %segmentnr.',
+        spellCheckStopped: '#UT#The SpellChecks has been stopped.'
     },
     statics: {
         // spellcheck-Node
@@ -228,7 +230,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     initMouseEvents: function() {
         var me = this,
+            editorDoc = Ext.get(me.editor.getDoc()),
             tooltipBody = Ext.getBody();
+        
+        editorDoc.on({
+            click:{
+                delegated: false,
+                fn: me.handleClickInEditor,
+                scope: this,
+                preventDefault: true
+            }
+        });
         
         me.getEditorBodyExtDomElement().on({
             contextmenu:{
@@ -257,7 +269,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     /**
      * Everytime the user stops editing for a certain time (EDIT_IDLE_MILLISECONDS),
-     * the SpellCheck ist started.
+     * the SpellCheck is started.
      */
     startTimerForSpellCheck: function() {
         var me = this;
@@ -274,6 +286,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // Additional handlers for events
     // =========================================================================
     
+    handleClickInEditor: function(event) {
+        var me = this;
+        me.editIdleTimer = null;
+    },
     /**
      * Handle KeyDown-Events of Editor.view.segments.HtmlEditor
      * @param {Object} event
@@ -299,7 +315,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 return;
             }
             if (me.isApplyingInProgress) {
-                Editor.MessageBox.addWarning(me.messages.isApplyingInProgress);
+                Editor.MessageBox.addWarning(me.spellCheckMessages.isApplyingInProgress);
                 return;
             }
             switch(true) {
@@ -374,7 +390,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             message;
         me.consoleLog('handleSpellCheckOnSaving...');
         if (me.isSpellCheckOnSaving && (me.savedSegmentNrInTask != null) && (me.savedSegmentNrInTask != segmentNrInTask) ){
-            message = me.messages.SpellCheckOnSavingIsAlreadyRunningForAnotherSegment.replace(/%segmentnr/, me.savedSegmentNrInTask);
+            message = me.spellCheckMessages.SpellCheckOnSavingIsAlreadyRunningForAnotherSegment.replace(/%segmentnr/, me.savedSegmentNrInTask);
             Editor.MessageBox.addError(message);
             return;
         }
@@ -392,6 +408,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     startSpellCheck: function() {
         var me = this,
             editorText;
+        
         if (!me.isSupportedLanguage) {
             me.consoleLog('startSpellCheck failed because language is not supported or SpellCheck-Tool does not run.');
             return;
@@ -400,6 +417,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if(!me.getEditorBody()) {
             me.consoleLog('startSpellCheck: initSpellCheckPluginForEditor first...');
             me.initSpellCheckPluginForEditor();
+        }
+        
+        // "ignore" multiple whitespaces, because we delete them anyway on save.
+        // Exception: Show the error message if there are tags between the multiple whitespaces.
+        if(me.removeMultipleWhitespaceInEditor()) {
+            me.consoleLog('startSpellCheck stopped: multiple whitespaces found.');
+            Editor.MessageBox.addError(me.spellCheckMessages.tagsBetweenWhitespaces + ' ' + me.spellCheckMessages.spellCheckStopped);
+            return;
         }
         
         me.consoleLog('(0.3 => startSpellCheck.)');
@@ -422,9 +447,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             return;
         }
         
-        me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored in rangeForEditor.text())
-        editorText = rangy.innerText(me.getEditorBody());
-        me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js
+        editorText = me.getEditorContentAsText(false);
+        console.log("editorText: " + editorText);
         me.runSpellCheck(editorText);
         // => runSpellCheck with the tool calls applySpellCheck() when the results arrive.
     },
@@ -456,7 +480,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.isSpellCheckOnSaving) {
             me.consoleLog('applySpellCheck on isSpellCheckOnSaving...');
             if (me.allMatchesOfTool.length > 0) {
-                message = me.messages.errorsFoundOnSaving.replace(/%segmentnr/, me.savedSegmentNrInTask);
+                message = me.spellCheckMessages.errorsFoundOnSaving.replace(/%segmentnr/, me.savedSegmentNrInTask);
                 Editor.MessageBox.addWarning(message); // TODO: Should we show this message only if the errors are not the same as already known?
             }
             
@@ -739,7 +763,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // infoURL(s)
         if (infoURLs.length > 0) {
             Ext.Array.each(infoURLs, function(url, index) {
-                items.push({text: me.messages.moreInformation,
+                items.push({text: me.spellCheckMessages.moreInformation,
                             cls: me.self.CSS_CLASSNAME_TOOLTIP_MOREINFO,
                             href: url,
                             hrefTarget: '_blank'});
