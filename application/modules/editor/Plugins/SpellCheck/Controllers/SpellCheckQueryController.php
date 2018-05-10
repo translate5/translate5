@@ -62,6 +62,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             return;
         }
         $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
+        /* @var $connector editor_Plugins_SpellCheck_LanguageTool_Connector */
         $supportedLanguages= $connector->getLanguages();
         $this->view->rows = $this->checkLanguageSupport($supportedLanguages, $targetLangCode);
     }
@@ -74,7 +75,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
      */
     private function checkLanguageSupport($supportedLanguages, $targetLangCode){
         foreach ($supportedLanguages as $lang) {
-            if ($lang->code == $targetLangCode) {
+            if ($lang->code == $targetLangCode || $lang->longCode == $targetLangCode ) {
                 return $lang;
             }
         }
