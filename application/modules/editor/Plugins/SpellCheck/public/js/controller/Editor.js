@@ -492,8 +492,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         if (!me.allMatchesOfTool.length > 0) {
-            me.consoleLog('allMatchesOfTool: no results; re-apply the initial content with all tags (eg TermTags).');
-            me.getEditorBodyExtDomElement().setHtml(me.contentBeforeSpellCheck);
+            me.consoleLog('allMatchesOfTool: no results.');
             me.finishSpellCheck();
             return;
         }
@@ -559,7 +558,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         rangeForMatchBookmark = rangeForMatch.getBookmark();
         
         // Replacement
-        replaceText = event.currentTarget.innerText;
+        replaceText = Ext.get(event.currentTarget).query('a:first-child')[0].innerText;
         
         me.isActiveTrackChanges();                             // SearchReplace.js
         if(!me.activeTrackChanges){                            // SearchReplace.js
@@ -573,7 +572,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.setTrackChangesInternalSpellCheckFlag(false);
         }
         
+        me.consoleLog('replaceText (' + replaceText + ') applied.');
+        
         me.spellCheckTooltip.hide();
+        
+        me.removeMultipleWhitespaceInEditor();
         
         me.saveSnapshot();
         
@@ -753,7 +756,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // replacement(s)
         if (replacements.length > 0) {
             Ext.Array.each(replacements, function(replacement, index) {
-                items.push({text: replacement.replace(/\s+/g, '&nbsp;'), // quick and dirty workaround for empty spaces (e.g. when "  " should be replaced with " " or when " - " should be replaced with " – ")
+                items.push({text: replacement.replace(' ', '&nbsp;'), // quick and dirty workaround for empty spaces (e.g. when "  " should be replaced with " " or when " - " should be replaced with " – ")
                             cls: me.self.CSS_CLASSNAME_REPLACEMENTLINK });
             });
         }
