@@ -560,9 +560,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         // Replacement
         replaceText = event.currentTarget.innerText;
-        if (replaceText == '') { // quick and dirty workaround for empty spaces (e.g. when "  " should be replaced with " ", but innerText returns "")
-            replaceText = '&nbsp;';
-        }
         
         me.isActiveTrackChanges();                             // SearchReplace.js
         if(!me.activeTrackChanges){                            // SearchReplace.js
@@ -756,7 +753,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // replacement(s)
         if (replacements.length > 0) {
             Ext.Array.each(replacements, function(replacement, index) {
-                items.push({text: replacement,
+                items.push({text: replacement.replace(/\s+/g, '&nbsp;'), // quick and dirty workaround for empty spaces (e.g. when "  " should be replaced with " " or when " - " should be replaced with " – ")
                             cls: me.self.CSS_CLASSNAME_REPLACEMENTLINK });
             });
         }
