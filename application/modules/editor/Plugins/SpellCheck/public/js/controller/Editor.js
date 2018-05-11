@@ -217,7 +217,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     initKeyDownEvent: function(event) {
         var me = this;
-        me.consoleLog('initKeyDownEvent (SpellCheck)');
         // "reset" for Editor.util.Event:
         me.event = event;
         me.ignoreEvent = false;
@@ -297,7 +296,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     handleKeyDown: function(event) {
         var me = this;
         me.initKeyDownEvent(event);
-        me.consoleLog("initKeyDownEvent (SpellCheck)");
         if(me.eventHasToBeIgnored()){
             me.consoleLog(" => Ignored for SpellCheck.");
             me.ignoreEvent = true;
@@ -422,7 +420,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // "ignore" multiple whitespaces, because we delete them anyway on save.
         // Exception: Show the error message if there are tags between the multiple whitespaces.
         if(me.removeMultipleWhitespaceInEditor()) {
-            me.consoleLog('startSpellCheck stopped: multiple whitespaces found.');
             Editor.MessageBox.addError(me.spellCheckMessages.tagsBetweenWhitespaces + ' ' + me.spellCheckMessages.spellCheckStopped);
             return;
         }
@@ -458,10 +455,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     finishSpellCheck: function() {
         var me = this;
         
-        // restore position of the caret (do this AFTER setReadOnly(false), otherwise there is no focus).
-        me.selectionForCaret.moveToBookmark(me.bookmarkForCaret);
+        // restore position of the caret ( do this AFTER setReadOnly(false), otherwise there is no focus).
+        if (me.bookmarkForCaret != null) {
+            me.selectionForCaret.moveToBookmark(me.bookmarkForCaret);
+        }
         
         // "reset"
+        me.bookmarkForCaret = null;
         me.contentBeforeSpellCheck = null;
         me.contentBeforeSpellCheckWithoutSpellCheckNodes = null;
     },
@@ -493,6 +493,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (!me.allMatchesOfTool.length > 0) {
             me.consoleLog('allMatchesOfTool: no results.');
+            me.bookmarkForCaret = null;
             me.finishSpellCheck();
             return;
         }
@@ -523,6 +524,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.editor.setReadOnly(true);
                 
             if (resultFromFormerCheck != undefined) {
+                me.bookmarkForCaret = me.selectionForCaret.getBookmark();
                 me.getEditorBodyExtDomElement().setHtml(resultFromFormerCheck);
                 me.consoleLog('resultFromFormerCheck applied.');
             } else if (me.allMatchesOfTool.length > 0) {
@@ -544,7 +546,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             rangeForMatch = rangy.createRange(),
             rangeForMatchBookmark,
-            replaceText;
+            replaceText,
+            bookmarkForCaretOnReplacement;
+        
+        bookmarkForCaretOnReplacement = me.selectionForCaret.getBookmark();
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
@@ -582,6 +587,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         // new DOM after replacement => find and apply the matches again:
         me.startSpellCheck();
+        
+        me.selectionForCaret.moveToBookmark(bookmarkForCaretOnReplacement); // TODO: does not land right if the replacement has not the same length as what was replaced
+        me.getEditorBody().focus();
     },
 
     // =========================================================================
