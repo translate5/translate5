@@ -158,14 +158,21 @@ Ext.define('Editor.util.Event', {
      */
     eventIsTranslate5: function() {
         var me = this,
-            editorKeyMap = me.editor.editorKeyMap,
-            lastWasDigitPreparation = editorKeyMap.lastWasDigitPreparation,
+            editorKeyMap,
+            lastWasDigitPreparation,
             editorKeyMapBinding,
             editorKeyMapBindingKeys,
             eventAlt,
             eventCtrl,
             eventShift,
             isHandledByKeyMapConfig = false;
+        
+        if (!me.editor) {
+            return;
+        }
+        
+        editorKeyMap = me.editor.editorKeyMap;
+        lastWasDigitPreparation = editorKeyMap.lastWasDigitPreparation;
         
         // check if our event is prepared for being handled by handleDigit()
         if (lastWasDigitPreparation) {

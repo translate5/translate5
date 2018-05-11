@@ -82,7 +82,6 @@ Ext.define('Editor.util.SegmentEditorSnapshots', {
         me.removeNewerSnapshots(); // delete newer items if there are any.
         me.editorSnapshotHistory.push({content: contentForSnaphot, bookmark: bookmarkForSnapshot});
         me.editorSnapshotReference = me.editorSnapshotHistory.length - 1;
-        me.consoleLog("saveSnapshot => editorSnapshotHistory.length: " + me.editorSnapshotHistory.length + " / editorSnapshotReference: " + me.editorSnapshotReference);
     },
     /**
      * Return the content of the newest snaphot-item.
@@ -159,16 +158,11 @@ Ext.define('Editor.util.SegmentEditorSnapshots', {
             indexRemoveTo,
             howmany;
         if (me.editorSnapshotReference < me.editorSnapshotHistory.length) {
-            me.consoleLog("removeNewerSnapshots");
             indexRemoveFrom = me.editorSnapshotReference + 1,       // keep the currently indexed item, start removing with the next item
             indexRemoveTo = (me.editorSnapshotHistory.length) - 1,  // the length is not the index...
             howmany = 1 + (indexRemoveTo - indexRemoveFrom);        // howmany starts with 1 (= to remove the indexed item itself), additional items for removal are ADDED UP
-            me.consoleLog("indexRemoveFrom: " + indexRemoveFrom + " / indexRemoveTo: " + indexRemoveTo + " => howmany: " + howmany);
-            me.consoleLog(" => howmany: " + howmany);
             me.editorSnapshotHistory.splice(indexRemoveFrom,  1 + howmany);
             // me.editorSnapshotReference is a different topic; don't change it here automatically!
-        } else {
-            me.consoleLog("(no newerSnapshots removed.)");
         }
     },
     /**
