@@ -61,8 +61,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   }],
   alias: 'controller.taskOverviewController',
   
-  id:'taskOverviewController',
-  
   isCardFinished:false,
   /**
    * Container for translated task handler confirmation strings
