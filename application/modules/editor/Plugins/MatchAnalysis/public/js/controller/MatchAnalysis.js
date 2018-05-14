@@ -38,4 +38,56 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     extend: 'Ext.app.Controller',
+    
+    requires: [
+        'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
+    ],
+    
+    refs:[{
+        ref: 'adminTaskPreferencesWindow',
+        selector: 'adminTaskPreferencesWindow'
+    }],
+        
+    strings:{
+        taskGridIconTooltip:'#UT#Analysis panel'
+    },
+    listen:{
+        component:{
+            '#adminTaskPreferencesWindow tabpanel':{
+                render:'onTaskPreferencesWindowPanelRender'
+            },
+            '#adminTaskGrid taskActionColumn':{
+                beforerender:'onActionColumBeforeRender'
+            }
+        },
+        controller:{
+            '#taskOverviewController':{
+                taskActionColumnNoHandler:'onTaskActionColumnNoHandler'
+            }
+        }
+    },
+    
+    
+    onTaskPreferencesWindowPanelRender:function(panel){
+        panel.add({
+           xtype:'matchAnalysisPanel' 
+        });
+    },
+    
+    onActionColumBeforeRender:function(column){
+        var me=this;
+        column.items.push({
+            tooltip:me.strings.taskGridIconTooltip,
+            iconCls: 'ico-task-analysis'
+        });
+    },
+    
+    onTaskActionColumnNoHandler:function(column,task){
+        if(this.getAdminTaskPreferencesWindow()){
+            return;
+        }
+        var me=this,
+            taskPref = me.application.getController('admin.TaskPreferences');
+        taskPref.handleTaskPreferences(task);
+    } 
 });

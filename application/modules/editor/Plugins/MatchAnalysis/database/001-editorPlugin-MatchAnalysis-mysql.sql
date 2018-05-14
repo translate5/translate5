@@ -25,23 +25,45 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+
+CREATE TABLE `LEK_match_analysis_taskassoc` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `taskGuid` VARCHAR(38) NULL,
+  `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `fk_LEK_match_analysis_taskassoc_1_idx` (`taskGuid` ASC),
+  CONSTRAINT `fk_LEK_match_analysis_taskassoc_1`
+    FOREIGN KEY (`taskGuid`)
+    REFERENCES `translate5`.`LEK_task` (`taskGuid`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
 CREATE TABLE `LEK_match_analysis` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `analysisId` INT(11) NULL,
   `taskGuid` VARCHAR(38) NULL,
   `segmentId` INT(11) NULL,
   `segmentNrInTask` INT(11) NULL,
   `tmmtid` INT(11) NULL,
   `matchRate` INT(11) NULL,
+  `wordCount` INT(11) NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_LEK_match_analysis_1_idx` (`taskGuid` ASC),
-  UNIQUE INDEX `segmentId_UNIQUE` (`segmentId` ASC),
-  UNIQUE INDEX `tmmtid_UNIQUE` (`tmmtid` ASC),
-  UNIQUE INDEX `taskGuid_UNIQUE` (`taskGuid` ASC),
+  INDEX `fk_LEK_match_analysis_2_idx` (`analysisId` ASC),
+  INDEX `index3` (`segmentId` ASC),
+  INDEX `index4` (`tmmtid` ASC),
   CONSTRAINT `fk_LEK_match_analysis_1`
     FOREIGN KEY (`taskGuid`)
     REFERENCES `translate5`.`LEK_task` (`taskGuid`)
     ON DELETE CASCADE
+  	ON UPDATE CASCADE,
+  CONSTRAINT `fk_LEK_match_analysis_2_idx`
+    FOREIGN KEY (`analysisId`)
+    REFERENCES `LEK_match_analysis_taskassoc` (`id`)
+    ON DELETE CASCADE
     ON UPDATE CASCADE);
+
 
 
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
@@ -57,3 +79,6 @@ VALUES
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginMatchAnalysisMatchAnalysis');
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_matchanalysis_matchanalysis', 'all');
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorAnalysisTask');
+

@@ -472,7 +472,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the tmmt
-        $this->entity->checkTaskAndTmmtAccess($tmmtId, $segment);
+        $this->entity->checkTaskAndTmmtAccess($session->taskGuid,$tmmtId, $segment);
         
         $this->entity->load($tmmtId);
 
@@ -508,7 +508,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
         
         //checks if the current task is associated to the tmmt
-        $this->entity->checkTaskAndTmmtAccess($tmmtId);
+        $this->entity->checkTaskAndTmmtAccess($session->taskGuid,$tmmtId);
         
         $this->entity->load($tmmtId);
         

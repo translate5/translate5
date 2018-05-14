@@ -26,6 +26,7 @@
 -- */
 
 DROP TABLE IF EXISTS `LEK_match_analysis`;
+DROP TABLE IF EXISTS `LEK_match_analysis_taskassoc`;
 
 DELETE FROM `Zf_worker_dependencies` where `worker` =  'editor_Plugins_MatchAnalysis_Worker' AND `dependency` = 'editor_Models_Import_Worker';
 DELETE FROM `Zf_worker_dependencies` where `worker` =  'editor_Plugins_TermTagger_Worker_TermTaggerImport' AND `dependency` = 'editor_Plugins_MatchAnalysis_Worker';
@@ -43,5 +44,11 @@ AND `module` = 'editor';
 DELETE FROM `Zf_acl_rules` 
 WHERE `right` = 'all' 
 AND `resource` = 'editor_plugins_matchanalysis_matchanalysis' 
+AND `role` = 'pm'
+AND `module` = 'editor';
+
+DELETE FROM `Zf_acl_rules` 
+WHERE `right` = 'editorAnalysisTask' 
+AND `resource` = 'frontend' 
 AND `role` = 'pm'
 AND `module` = 'editor';

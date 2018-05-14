@@ -1514,4 +1514,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $x = $this->db->fetchRow($s);
         return ((int) $x->cnt) == 0;
     }
+    
+    /***
+     * Get semgnet repetitions from the task view
+     * 
+     * @param guid $taskGuid
+     */
+    public function getRepetitions($taskGuid){
+        $adapter=$this->db->getAdapter();
+        $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        /* @var $mv editor_Models_Segment_MaterializedView  */
+        $mv->setTaskGuid($taskGuid);
+        $viewName=$mv->getName();
+        $sql='SELECT v1.id,v1.sourceMd5 FROM '.$viewName.' v1, (
+	          SELECT sourceMd5, count(sourceMd5) cnt
+               FROM '.$viewName.'
+               GROUP BY sourceMd5
+              ) v2
+              WHERE v2.cnt > 1 and v1.sourceMd5 = v2.sourceMd5
+              ORDER by v1.id';
+        return $adapter->query($sql)->fetchAll();
+    }
 }

@@ -80,13 +80,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * define all event listener
      */
     protected function initEvents() {
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
+        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
+        //$this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'startTestCode'));
     }
     
     
     /***
      * After task import event handler
-     * 
      * @param Zend_EventManager_Event $event
      */
     public function handleOnAfterImport(Zend_EventManager_Event $event) {
@@ -107,8 +107,22 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $worker->queue($parentWorkerId);
     }
     
-    public function checkTaskAssoc($taskGuid){
+    public function startTestCode(Zend_EventManager_Event $event){
+        $taskGuid=$event->getParam('entity')->getTaskGuid();
         
+        $service=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis');
+        /* @var $service editor_Plugins_MatchAnalysis_Analysis */
+        
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        $task->loadByTaskGuid($taskGuid);
+        $service->setTask($task);
+        
+        $service->calculateMatchrate();
+    }
+    
+    public function checkTaskAssoc($taskGuid){
     }
     
     /**

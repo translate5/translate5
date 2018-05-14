@@ -47,8 +47,16 @@ END LICENSE AND COPYRIGHT
  * @method integer getMatchRate() getMatchRate()
  * @method void setMatchRate() setMatchRate(integer $matchrate)
  * 
+ * @method integer getAnalysisId() getAnalysisId()
+ * @method void setAnalysisId() setAnalysisId(integer $analysisId)
+ * 
  */
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
+    
+    
+    public function loadByBestMatchRate(){
+        
+    }
 }
