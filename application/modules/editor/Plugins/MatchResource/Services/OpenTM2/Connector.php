@@ -37,10 +37,27 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract {
 
+    /***
+     * Exact-exact match percent value.
+     * An exact-exact match is a 100% match, that has the same document name as the currently translated document.
+     * @var integer
+     */
+    const EXACT_EXACT_MATCH_VALUE=101;
+    
+    /***
+     * Context match percent value.
+     * A context match is an exact-exact match, 
+     * that in addition has the same context set in TM as in the document - usally an ID, 
+     * which often is the line number or segment-id (depends on what the import does)
+     * @var integer
+     */
+    const CONTEXT_MATCH_VALUE=103;
+    
     /**
      * @var editor_Plugins_MatchResource_Services_OpenTM2_HttpApi
      */
     protected $api;
+    
     
     /**
      * {@inheritDoc}
@@ -226,7 +243,13 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 }
                 $target = $internalTag->reapply2dMap($found->target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
-                $this->resultList->addResult($target, $found->matchRate, $this->getMetaData($found));
+                
+                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $segment, $file->getFileName());
+                
+                $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                
+                //$this->resultList->addResult($target, $found->matchRate, $this->getMetaData($found));
+                
                 $source = $internalTag->reapply2dMap($found->source, $map);
                 $source = $this->replaceAdditionalTags($source, $mapCount);
                 $this->resultList->setSource($source);
@@ -453,5 +476,47 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         }, $this->api->getErrors()));
             
         return self::STATUS_NOCONNECTION;
+    }
+    
+    /***
+     * Calculate the new matchrate value.
+     * Check if the current match is of type context-match or exact-exact match
+     * 
+     * @param integer $matchRate
+     * @param array $metaData
+     * @param editor_Models_Segment $segment
+     * @param string $filename
+     * @return unknown|string
+     */
+    public function calculateMatchRate($matchRate,$metaData,$segment,$filename){
+        
+        if($matchRate<100){
+            return $matchRate;
+        }
+        
+        $isExacExac=false;
+        $isContext=false;
+        foreach ($metaData as $data){
+            
+            //exact-exact match
+            if($data->name=="documentName" && $data->value==$filename){
+                $isExacExac=true;
+            }
+            
+            //context metch
+            if($data->name=="context" && $data->value==$segment->getSegmentNrInTask()){
+                $isContext=true;
+            }
+        }
+        
+        if($isExacExac){
+            $matchRate=self::EXACT_EXACT_MATCH_VALUE;
+        }
+        
+        if($isExacExac && $isContext){
+            $matchRate=self::CONTEXT_MATCH_VALUE;
+        }
+        
+        return $matchRate;
     }
 }

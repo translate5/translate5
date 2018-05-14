@@ -39,11 +39,23 @@ class editor_Plugins_MatchAnalysis_Analysis{
     
     
     /***
+     * Analysis id 
+     * 
+     * @var mixed
+     */
+    protected $analysisId;
+    
+    
+    /***
      * Collection of assigned resources to the task
      * @var array
      */
     protected $connectors=array();
-    
+
+    public function __construct(editor_Models_Task $task,$analysisId){
+        $this->task=$task;
+        $this->analysisId=$analysisId;
+    }
     
     /***
      * Query the match resource service for each segment, calculate the best match rate, and save the match analysis model
@@ -82,6 +94,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
                     $matchAnalysis->setSegmentId($segment->getId());
                     $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
                     $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
+                    $matchAnalysis->setAnalysisId($this->analysisId);
                     $matchAnalysis->setTmmtid(0);
                     $matchAnalysis->setMatchRate(102);
                     $matchAnalysis->save();
@@ -188,6 +201,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $matchAnalysis->setSegmentId($segment->getId());
             $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
             $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
+            $matchAnalysis->setAnalysisId($this->analysisId);
             $matchAnalysis->setTmmtid($tmmtid);
             
             foreach ($tmMatch as $match){
@@ -222,13 +236,4 @@ class editor_Plugins_MatchAnalysis_Analysis{
         $matchAnalysis->setTmmtId($tmmtid);
         $matchAnalysis->save();
     }
-    
-    public function setTask(editor_Models_Task $task){
-        $this->task=$task;
-    }
-    
-    public function getTask(){
-        return $this->task;
-    }
-    
 }
