@@ -61,6 +61,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   }],
   alias: 'controller.taskOverviewController',
   
+  id:'taskOverviewController',
+  
   isCardFinished:false,
   /**
    * Container for translated task handler confirmation strings
@@ -455,7 +457,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           task = view.getStore().getAt(row),
           confirm;
 
-      if(! me.isAllowed(right) || ! me[action] || ! Ext.isFunction(me[action])){
+      if(! me.isAllowed(right)){
+          return;
+      }
+      
+      if(! me[action] || ! Ext.isFunction(me[action])){
+          //fire event if no handler function for the action button is defined
+          me.fireEvent('taskActionColumnNoHandler',t,task);
           return;
       }
 

@@ -74,6 +74,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       forAll: '#UT#für alle'
   },
   actualTask: null,
+  alias: 'controller.taskPreferencesController',
+  
   init : function() {
       var me = this,
           toc = me.application.getController('admin.TaskOverview'),
