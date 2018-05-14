@@ -59,14 +59,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             '#adminTaskGrid taskActionColumn':{
                 beforerender:'onActionColumBeforeRender'
             }
-        },
-        controller:{
-            '#taskOverviewController':{
-                taskActionColumnNoHandler:'onTaskActionColumnNoHandler'
-            }
         }
     },
     
+    init : function() {
+        var me = this,
+            toc = me.application.getController('admin.TaskOverview');
+        toc.on('taskActionColumnNoHandler', me.onTaskActionColumnNoHandler, me);
+    },
     
     onTaskPreferencesWindowPanelRender:function(panel){
         panel.add({
@@ -78,6 +78,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         var me=this;
         column.items.push({
             tooltip:me.strings.taskGridIconTooltip,
+            cls: 'ico-task-analysis',
             iconCls: 'ico-task-analysis'
         });
     },
