@@ -425,6 +425,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         me.consoleLog('(0.3 => startSpellCheck.)');
+        me.allMatches = null;
+        me.allMatchesRanges = null;
         
         // where is the caret at the moment?
         me.selectionForCaret = rangy.getSelection(me.getEditorBody());
