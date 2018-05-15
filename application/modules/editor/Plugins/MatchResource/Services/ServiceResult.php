@@ -147,6 +147,10 @@ class editor_Plugins_MatchResource_Services_ServiceResult {
         return $this->results;
     }
     
+    public function resetResult(){
+        $this->results=[];
+    }
+    
     /**
      * @param editor_Plugins_MatchResource_Models_TmMt $tmmt
      */

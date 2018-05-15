@@ -97,6 +97,10 @@ class editor_Plugins_MatchAnalysis_Analysis{
                     $matchAnalysis->setAnalysisId($this->analysisId);
                     $matchAnalysis->setTmmtid(0);
                     $matchAnalysis->setMatchRate(102);
+                    
+                    //TODO: is this the real text to be calculated from ?
+                    $matchAnalysis->setWordCount($this->calculateWordCount($segment->getFieldOriginal('source'),'en'));
+                    
                     $matchAnalysis->save();
                     continue;
             }
@@ -106,8 +110,9 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $matchesByTm=[];
             //query the segment for each assigned tm
             foreach ($this->connectors as $tmmtid => $connector){
-                /* @var $resource editor_Plugins_MatchResource_Services_Connector_Abstract */
+                /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
                 
+                $matches=[];
                 try {
                     $matches=$connector->query($segment);
                 } catch (Exception $e) {
@@ -119,6 +124,9 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 }
                 
                 $matchesByTm[$tmmtid]=$matches->getResult();
+                
+                //FIXME: is this the right way to reset ?
+                $matches->resetResult();
             }
             
             //calculate the match count based on the received results
@@ -204,18 +212,132 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $matchAnalysis->setAnalysisId($this->analysisId);
             $matchAnalysis->setTmmtid($tmmtid);
             
+            $text="";
             foreach ($tmMatch as $match){
                 
                 if($matchAnalysis->getMatchRate() >= $match->matchrate){
                     continue;
                 }
                 $matchAnalysis->setMatchRate($match->matchrate);
+                
+                //TODO: is this the real text to be calculated from ?
+                $text=$match->source;
             }
+            
+            $matchAnalysis->setWordCount($this->calculateWordCount($text,'en'));
             //save match analysis
             $matchAnalysis->save();
         }
     }
+
+    private $whiteSpaceChars=array(
+            '00000009',
+            '0000000A',
+            '0000000B',
+            '0000000C',
+            '0000000D',
+            '00000020',
+            '00000085',
+            '000000A0',
+            '00001680',
+            '00002000',
+            '00002001',
+            '00002002',
+            '00002003',
+            '00002004',
+            '00002005',
+            '00002006',
+            '00002007',
+            '00002008',
+            '00002009',
+            '0000200A',
+            '0000200D',
+            '00002028',
+            '00002029',
+            '0000202F',
+            '0000205F',
+            '00003000',
+            '0000feff'
+    );
+    public function calculateWordCount($text,$rfcLang){
+        $count=0;
+        //TODO: All whitespace tags (new type of tags Thomas just introduced) are replaced by a single space
+        //TODO: All other tags and other markups are deleted from the segment
+        //$patern=implode('\\', $this->whiteSpaceChars);
+        //$patern='/'.$patern.'/u';
+        
+        
+        //average words in East Asian languages by language
+        //Chinese (all forms): 2.8
+        //Japanese: 3.0
+        //Korean: 3.3
+        //Thai: 6.0
+        
+        switch (strtolower($rfcLang)) {
+            case 'zh':
+            case 'zh-hk':
+            case 'zh-mo':
+            case 'zh-sg':
+                $text=preg_replace("#[[:punct:]]#", "", $text);
+
+                $average=2.8;
+                $count = grapheme_strlen($text);
+                $count = round($count/$average);
+                break;
+            case 'th-th':
+                $text=preg_replace("#[[:punct:]]#", "", $text);
+                
+                $average=6.0;
+                $count = grapheme_strlen($text);
+                $count = round($count/$average);
+                break;
+            case 'ja-jp':
+                $text=preg_replace("#[[:punct:]]#", "", $text);
+                
+                $average=3.0;
+                $count = grapheme_strlen($text);
+                $count = round($count/$average);
+            case 'ko-kr':
+                $text=preg_replace("#[[:punct:]]#", "", $text);
+                
+                $average=3.3;
+                $count = grapheme_strlen($text);
+                $count = round($count/$average);
+                break;
+            
+            default:
+                $retText=$this->toCodePoint($text,'UTF-8');
+                $finalString="";
+                foreach ($retText as $ret){
+                    if(in_array($ret, $this->whiteSpaceChars)){
+                        $ret='00000020';
+                    }
+                    $ret=hexdec($ret);//to decimal
+                    
+                    $ret=chr($ret);//get char
+                    
+                    $finalString.=$ret;
+                }
+                $count = str_word_count($finalString, 0);
+            break;
+        }
+        
+        
+        return $count;
+    }
     
+    public function toCodePoint( $string, $encoding )
+    {
+        $utf32  = mb_convert_encoding( $string, 'UTF-32', $encoding );
+        $length = mb_strlen( $utf32, 'UTF-32' );
+        $result = [];
+        
+        
+        for( $i = 0; $i < $length; ++$i ){
+            $result[] = bin2hex( mb_substr( $utf32, $i, 1, 'UTF-32'  ));
+        }
+        return $result;
+    }
     
     /***
      * Save the match analysis record with the calculated matchrate to the database

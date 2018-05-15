@@ -47,6 +47,9 @@ END LICENSE AND COPYRIGHT
  * @method integer getMatchRate() getMatchRate()
  * @method void setMatchRate() setMatchRate(integer $matchrate)
  * 
+ * @method integer getWordCount() getWordCount()
+ * @method void setWordCount() setWordCount(integer $wordCount)
+ * 
  * @method integer getAnalysisId() getAnalysisId()
  * @method void setAnalysisId() setAnalysisId(integer $analysisId)
  * 
@@ -56,7 +59,16 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
     
     
-    public function loadByBestMatchRate(){
+    public function loadByBestMatchRate($taskGuid){
+        $s = $this->db->select()
+        ->from($this->db, array('segmentId','taskGuid','matchRate','COUNT(DISTINCT wordCount) AS wordCount'))
+        ->where('`taskGuid` = ?', $taskGuid)
+        ->group('matchRate');
+        $resultArray=$this->db->fetchAll($s)->toArray();
         
+        if(empty($resultArray)){
+            return null;
+        }
+        return $this->db->fetchAll($s)->toArray(); 
     }
 }

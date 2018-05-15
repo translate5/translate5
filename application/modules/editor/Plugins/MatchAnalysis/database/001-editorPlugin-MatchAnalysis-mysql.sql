@@ -40,29 +40,22 @@ CREATE TABLE `LEK_match_analysis_taskassoc` (
 
 
 CREATE TABLE `LEK_match_analysis` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `analysisId` INT(11) NULL,
-  `taskGuid` VARCHAR(38) NULL,
-  `segmentId` INT(11) NULL,
-  `segmentNrInTask` INT(11) NULL,
-  `tmmtid` INT(11) NULL,
-  `matchRate` INT(11) NULL,
-  `wordCount` INT(11) NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `taskGuid` varchar(38) DEFAULT NULL,
+  `segmentId` int(11) DEFAULT NULL,
+  `segmentNrInTask` int(11) DEFAULT NULL,
+  `tmmtid` int(11) DEFAULT NULL,
+  `matchRate` int(11) DEFAULT NULL,
+  `wordCount` int(11) DEFAULT NULL,
+  `analysisId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_LEK_match_analysis_1_idx` (`taskGuid` ASC),
-  INDEX `fk_LEK_match_analysis_2_idx` (`analysisId` ASC),
-  INDEX `index3` (`segmentId` ASC),
-  INDEX `index4` (`tmmtid` ASC),
-  CONSTRAINT `fk_LEK_match_analysis_1`
-    FOREIGN KEY (`taskGuid`)
-    REFERENCES `translate5`.`LEK_task` (`taskGuid`)
-    ON DELETE CASCADE
-  	ON UPDATE CASCADE,
-  CONSTRAINT `fk_LEK_match_analysis_2_idx`
-    FOREIGN KEY (`analysisId`)
-    REFERENCES `LEK_match_analysis_taskassoc` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE);
+  KEY `fk_LEK_match_analysis_1_idx` (`taskGuid`),
+  KEY `index3` (`segmentId`),
+  KEY `index4` (`tmmtid`),
+  KEY `fk_LEK_match_analysis_2_idx` (`analysisId`),
+  CONSTRAINT `fk_LEK_match_analysis_1` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_LEK_match_analysis_2` FOREIGN KEY (`analysisId`) REFERENCES `LEK_match_analysis_taskassoc` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 
 
