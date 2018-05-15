@@ -568,7 +568,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         rangeForMatchBookmark = rangeForMatch.getBookmark();
         
         // Replacement
-        replaceText = Ext.get(event.currentTarget).query('a:first-child')[0].innerText;
+        replaceText = Ext.get(event.currentTarget).query('a:first-child span:first-child')[0].innerHTML;
         
         me.isActiveTrackChanges();                             // SearchReplace.js
         if(!me.activeTrackChanges){                            // SearchReplace.js
