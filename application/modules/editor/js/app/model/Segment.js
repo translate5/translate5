@@ -80,7 +80,7 @@ Ext.define('Editor.model.Segment', {
             if(Ext.isObject(val)){
                 return val;
             }
-            if(!val || val==""){
+            if(!val || val===""){
                 return null;
             }
             return JSON.parse(val);
@@ -128,7 +128,7 @@ Ext.define('Editor.model.Segment', {
      * @param {String} fieldname for which the length is changed
      * @param {Integer} new length value
      */
-    updateMetaCacheLength(field, length) {
+    updateMetaCacheLength: function (field, length) {
         var id = this.get('id'), 
             meta = this.get('metaCache');
         if(meta && meta.siblingData && meta.siblingData[id]) {

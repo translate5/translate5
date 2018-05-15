@@ -36,7 +36,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
   messages: {
       exportDef: '#UT#exportieren (Orginalformat)',
       exportDiff: '#UT#exportieren (Orginalformat mit Änderungshistorie)',
-      export2Def: '#UT#exportieren (XLIFF 2.1 mit Änderungshistorie)',
+      export2Def: '#UT#exportieren (XLIFF 2.1)',
       exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}'
   },
   alias: 'widget.adminExportMenu',
