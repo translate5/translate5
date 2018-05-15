@@ -91,7 +91,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $rfcFlags=[];
         foreach ($langsArray as &$lng){
-            $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['ISO_3166-1_alpha-2']);
+            $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['iso3166Part1alpha2']);
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
             //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)

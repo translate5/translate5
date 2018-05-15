@@ -1,2 +1,4 @@
 testcases/apitest.conf
 Plugins/MatchResource/public/.vscode
+Plugins/TermImport/config/filesystem.config
+Plugins/TermImport/config/crossapi.config
