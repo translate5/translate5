@@ -109,7 +109,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     allMatchesRanges: null,         // bookmarks of all ranges for the matches found by the tool(s); here already stored independently from the tool
     activeMatchNode: null,          // node of single match currently in use
     
-    spellCheckResults: null,        // Store results for already checked Html-Content in the Editor: me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes] = content after SpellCheck (= with SpellCheck-Nodes)
+    spellCheckResults: null,        // Store Html-results for already checked Html-Content in the Editor: me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes] = content after SpellCheck (= with SpellCheck-Nodes)
+    spellCheckResultsMatches: null, // Store matches for already checked Html-Content
     
     spellCheckTooltip: null,        // Ext.menu.Menu ("ToolTip"-instance)
     
@@ -161,6 +162,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.setTargetLangCode();
         me.setLanguageSupport();
         me.spellCheckResults = [];
+        me.spellCheckResultsMatches = [];
     },
     /**
      * Init the SpellCheck-Plugin for the current Editor
@@ -442,6 +444,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // (Doing "nothing" is not an option because then there won't be any SpellCheck-Nodes at all in the Editor.)
         if (!me.isSpellCheckOnSaving && (me.contentBeforeSpellCheckWithoutSpellCheckNodes in me.spellCheckResults) ) {
             me.consoleLog('startSpellCheck did not start a new check because we have already run a check for this content.');
+            me.allMatches = me.spellCheckResultsMatches[me.contentBeforeSpellCheckWithoutSpellCheckNodes];
             me.applySpellCheckResult(me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes]);
             return;
         }
@@ -669,6 +672,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             return;
         }
         me.spellCheckResults[me.contentBeforeSpellCheckWithoutSpellCheckNodes] = me.getEditorBodyExtDomElement().getHtml();
+        me.spellCheckResultsMatches[me.contentBeforeSpellCheckWithoutSpellCheckNodes] = me.allMatches;
+        
     },
     /**
      * Create and return a new node for SpellCheck-Match of the given index.
