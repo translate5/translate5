@@ -102,7 +102,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     
     targetLangCode: null,           // language to be checked
-    isSupportedLanguage: null,      // if the language is supported by our tool(s)
+    isSupportedLanguage: false,     // if the language is supported by our tool(s)
     
     allMatchesOfTool: null,         // all matches as found by the tool
     allMatches: null,               // data of all matches found by the tool(s); here already stored independently from the tool

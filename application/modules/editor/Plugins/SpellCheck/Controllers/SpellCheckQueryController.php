@@ -64,18 +64,45 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
         $connector = ZfExtended_Factory::get('editor_Plugins_SpellCheck_LanguageTool_Connector');
         /* @var $connector editor_Plugins_SpellCheck_LanguageTool_Connector */
         $supportedLanguages= $connector->getLanguages();
-        $this->view->rows = $this->checkLanguageSupport($supportedLanguages, $targetLangCode);
+        $this->view->rows = $this->getSupportedLanguage($supportedLanguages, $targetLangCode);
     }
     
     /**
      * Is the language supported by the LanguageTool?
+     * Examples:
+     * |----------------------------------------------------------------------------|
+     * |---from Editor-----|--see LEK_languages---|--------see LanguageTool---------|
+     * |----------------------------------------------------------------------------|
+     * | targetLang (=rfc) |  ISO   | sublanguage | longcode | needed result for LT |
+     * |----------------------------------------------------------------------------|
+     * |      de           |   de   |   de-DE     |   de-DE  |       de-DE          |
+     * |     de-DE         |   de   |   de-DE     |   de-DE  |       de-DE          |
+     * |     de-AT         |   de   |   de-AT     |   de-AT  |       de-AT          |
+     * |      fr           |   fr   |   fr-FR     |     fr   |         fr           |
+     * |     fr-FR         |   fr   |   fr-FR     |     fr   |         fr           |
+     * |      he           |   il   |   he-IL     |     -    |       false          |
+     * |----------------------------------------------------------------------------|
      * @param array $supportedLanguages
      * @param string $targetLangCode
-     * @return boolean|object
+     * @return object|false
      */
-    private function checkLanguageSupport($supportedLanguages, $targetLangCode){
+    private function getSupportedLanguage($supportedLanguages, $targetLangCode){
+        $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languagesModel editor_Models_Languages */
+        $sublanguage = $languagesModel->getSublanguageByRfc5646($targetLangCode);
+        $iso = $languagesModel->getIso3166Part1alpha2ByRfc5646($targetLangCode);
         foreach ($supportedLanguages as $lang) {
-            if ($lang->code == $targetLangCode || $lang->longCode == $targetLangCode ) {
+            if ($lang->longCode == $sublanguage) {      // priority: longCode (e.g. "de-DE") is the default sublanguage ("de-DE") of the targetLangCode ("de")
+                return $lang;
+            }
+        }
+        foreach ($supportedLanguages as $lang) {
+            if ($lang->longCode == $targetLangCode) {   // fallback 1: longCode (e.g. "fr") is the ISO ("fr") of the targetLangCode ("fr")
+                return $lang;
+            }
+        }
+        foreach ($supportedLanguages as $lang) {
+            if ($lang->longCode == $targetLangCode) {   // fallback 2: longCode (e.g. "fr") is the ISO ("fr") of the targetLangCode ("fr")
                 return $lang;
             }
         }
