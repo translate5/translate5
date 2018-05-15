@@ -158,7 +158,7 @@ Ext.define('Editor.view.segments.RowEditor', {
                 },
                 constrainTo: grid.body,
                 //constrainTo: me.view.body//,
-                delegate: '.x-form-display-field-body'
+                delegate: '.x-field:not(.segment-content) .x-form-display-field-body'
             };
 
         me.dd = new Ext.util.ComponentDragger(me, ddConfig);
@@ -348,7 +348,7 @@ Ext.define('Editor.view.segments.RowEditor', {
             grid = editingPlugin.grid,
             context = me.context = editingPlugin.context,
             alreadyVisible = me.isVisible(),
-            wrapEl = me.wrapEl;
+            wrapEl = me.wrapEl, sel;
 
         // Ensure that the render operation does not lay out
         // The show call will update the layout
@@ -384,6 +384,10 @@ Ext.define('Editor.view.segments.RowEditor', {
             me.reposition(true);
         } else {
             me.show();
+        }
+        sel = rangy.getSelection()
+        if(sel) {
+            sel.removeAllRanges();
         }
     },
     /**

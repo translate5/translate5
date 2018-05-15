@@ -67,12 +67,22 @@ Ext.define('Editor.view.segments.column.Content', {
   getTypeCls: function(field) {
       var segField = Editor.model.segment.Field,
           type = field.get('type');
-      return ' type-'+type+' '+segField.getDirectionCls(type);
+      return ' x-selectable type-'+type+' '+segField.getDirectionCls(type);
   },
   initComponent: function() {
     var me = this;
     me.initBaseMixin();
     me.callParent(arguments);
+  },
+  initConfig: function(instanceConfig) {
+      var me = this,
+      config = {
+          enableTextSelection: true
+      };
+      if (instanceConfig) {
+          me.self.getConfigurator().merge(me, config, instanceConfig);
+      }
+      return me.callParent([config]);
   },
   /**
    * internal method to create a display field
@@ -90,6 +100,7 @@ Ext.define('Editor.view.segments.column.Content', {
                   return null;
               },
               name: this.dataIndex,
+              cls: 'segment-content',
               fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
           };
       return plug.getColumnField(me, config);
