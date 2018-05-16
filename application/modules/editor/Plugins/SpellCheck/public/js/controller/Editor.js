@@ -434,6 +434,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.allMatches = null;
         me.allMatchesRanges = null;
         
+        // ------------- while we run the spellcheck, the content must not be edited in the Editor ------------------
+        me.isApplyingInProgress = true;
+        me.consoleLog('Set Editor to ReadOnly ------------------');
+        me.editor.setReadOnly(true); // (on the other hand this prevents the isApplyingInProgress-message on keyDown-Events)
+        
         // where is the caret at the moment?
         me.selectionForCaret = rangy.getSelection(me.getEditorBody());
         me.bookmarkForCaret = me.selectionForCaret.getBookmark();
@@ -468,6 +473,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.bookmarkForCaret != null) {
             me.selectionForCaret.moveToBookmark(me.bookmarkForCaret);
         }
+        
+        me.editor.setReadOnly(false);
+        me.consoleLog(' ------------------ Editor is editable again.');
+        me.isApplyingInProgress = false;
+        // ---------------------------------------------------------------------------------------------------------
         
         // "reset"
         me.bookmarkForCaret = null;
@@ -527,24 +537,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             return;
         }
         
-        // ------------- while we apply the matches, the content must not be edited in the Editor ------------------
-        me.isApplyingInProgress = true;
-        me.consoleLog('Set Editor to ReadOnly ------------------');
-        me.editor.setReadOnly(true);
-                
-            if (resultFromFormerCheck != undefined) {
-                me.bookmarkForCaret = me.selectionForCaret.getBookmark();
-                me.getEditorBodyExtDomElement().setHtml(resultFromFormerCheck);
-                me.consoleLog('resultFromFormerCheck applied.');
-            } else if (me.allMatchesOfTool.length > 0) {
-                me.applyAllMatches();
-                me.consoleLog('allMatches applied.');
-            }
-            
-        me.editor.setReadOnly(false);
-        me.consoleLog(' ------------------ Editor is editable again.');
-        me.isApplyingInProgress = false;
-        // ---------------------------------------------------------------------------------------------------------
+        if (resultFromFormerCheck != undefined) {
+            me.bookmarkForCaret = me.selectionForCaret.getBookmark();
+            me.getEditorBodyExtDomElement().setHtml(resultFromFormerCheck);
+            me.consoleLog('resultFromFormerCheck applied.');
+        } else if (me.allMatchesOfTool.length > 0) {
+            me.applyAllMatches();
+            me.consoleLog('allMatches applied.');
+        }
         
         me.finishSpellCheck();
     },
