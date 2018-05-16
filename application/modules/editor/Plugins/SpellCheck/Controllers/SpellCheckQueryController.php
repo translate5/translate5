@@ -97,12 +97,7 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
             }
         }
         foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $targetLangCode) {   // fallback 1: longCode (e.g. "fr") is the ISO ("fr") of the targetLangCode ("fr")
-                return $lang;
-            }
-        }
-        foreach ($supportedLanguages as $lang) {
-            if ($lang->longCode == $targetLangCode) {   // fallback 2: longCode (e.g. "fr") is the ISO ("fr") of the targetLangCode ("fr")
+            if ($lang->longCode == $iso) {              // fallback: longCode (e.g. "fr") is the ISO ("fr") of the targetLangCode ("fr")
                 return $lang;
             }
         }

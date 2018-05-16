@@ -274,6 +274,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     startTimerForSpellCheck: function() {
         var me = this;
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('startTimerForSpellCheck not started because language is not supported or SpellCheck-Tool does not run.');
+            return;
+        }
         clearTimeout(me.editIdleTimer);
         me.editIdleRestarted = true;
         me.editIdleTimer = setTimeout(function(){
