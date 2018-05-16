@@ -247,7 +247,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             contextmenu:{
                 delegated: false,
                 delegate: me.self.NODE_NAME_MATCH + '.' + me.self.CSS_CLASSNAME_MATCH,
-                fn: me.showToolTip,
+                fn: me.showToolTipOnEvent,
                 scope: this,
                 preventDefault: true
             }
@@ -300,7 +300,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {Object} event
      */
     handleKeyDown: function(event) {
-        var me = this;
+        var me = this,
+            docSelRange,
+            docSelRangeParentNode,
+            posX,
+            posY;
         me.initKeyDownEvent(event);
         if(me.eventHasToBeIgnored()){
             me.consoleLog(" => Ignored for SpellCheck.");
@@ -323,12 +327,31 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 return;
             }
             switch(true) {
+                case me.eventIsCtrlE():
+                    // Open contextmenu if caret is in SpellCheck-Match... 
+                    me.selectionForCaret = rangy.getSelection(me.getEditorBody());
+                    docSelRange = me.selectionForCaret.rangeCount ? me.selectionForCaret.getRangeAt(0) : null;
+                    if (me.selectionForCaret .isCollapsed && docSelRange != null) {
+                        docSelRangeParentNode = docSelRange.commonAncestorContainer.parentNode;
+                        if (docSelRangeParentNode.nodeName.toLowerCase() == me.self.NODE_NAME_MATCH.toLowerCase()
+                                && Ext.get(docSelRangeParentNode).hasCls(me.self.CSS_CLASSNAME_MATCH)) {
+                            posX = Ext.get(docSelRangeParentNode).getX();
+                            posY = Ext.get(docSelRangeParentNode).getY();
+                            me.showToolTip(docSelRangeParentNode,posX,posY);
+                        }
+                    }
+                    // ... and stop the event (no matter if we are in SpellCheck-Match or not; sometimes passing the event on to the browser and sometimes not will be confusing)
+                    me.ignoreEvent = true;
+                    me.stopEvent = true;
+                break;
                 case me.eventIsCtrlZ():
                     // Restore older snapshot...
                     me.cleanupSnapshotHistory();
                     me.rewindSnapshot();
                     me.restoreSnapshotInEditor();
-                    // ... then stop everything
+                    // .... reset timer ...
+                    me.startTimerForSpellCheck();
+                    // ... and stop the event
                     me.ignoreEvent = true;
                     me.stopEvent = true;
                 break;
@@ -336,12 +359,16 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                     // Restore newer snapshot...
                     me.fastforwardSnapshot();
                     me.restoreSnapshotInEditor();
-                    // ... then stop everything
+                    // .... reset timer ...
+                    me.startTimerForSpellCheck();
+                    // ... and stop the event
                     me.ignoreEvent = true;
                     me.stopEvent = true;
                 break;
+                default:
+                    me.startTimerForSpellCheck();
+                break;
             }
-            me.startTimerForSpellCheck();
         }
         
         // Stop event?
@@ -437,7 +464,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // ------------- while we run the spellcheck, the content must not be edited in the Editor ------------------
         me.isApplyingInProgress = true;
         me.consoleLog('Set Editor to ReadOnly ------------------');
-        me.editor.setReadOnly(true); // (on the other hand this prevents the isApplyingInProgress-message on keyDown-Events)
+        me.editor.setReadOnly(true);
         
         // where is the caret at the moment?
         me.selectionForCaret = rangy.getSelection(me.getEditorBody());
@@ -476,6 +503,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.editor.setReadOnly(false);
         me.consoleLog(' ------------------ Editor is editable again.');
+        me.getEditorBody().focus();
         me.isApplyingInProgress = false;
         // ---------------------------------------------------------------------------------------------------------
         
@@ -598,7 +626,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.startSpellCheck();
         
         me.selectionForCaret.moveToBookmark(bookmarkForCaretOnReplacement); // TODO: does not land right if the replacement has not the same length as what was replaced
-        me.getEditorBody().focus();
     },
 
     // =========================================================================
@@ -625,6 +652,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if(textToCheck != "") {
             console.log("textToCheck: " + textToCheck);
             me.runSpellCheckWithTool(textToCheck);
+        } else {
+            me.finishSpellCheck();
         }
     },
     /**
@@ -760,6 +789,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },me, true);
         // update Tooltip
         me.spellCheckTooltip.add(me.getSpellCheckData());
+        // helpful if user works with keyboard:
+        me.spellCheckTooltip.focus();
     },
     getSpellCheckData: function() {
         var me = this,
@@ -790,11 +821,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         return items;
     },
-    showToolTip: function(event) {
+    showToolTipOnEvent: function(event) {
         var me = this,
-            posX = event.getX() + me.editor.iframeEl.getX()
-            posY = event.getY() + me.editor.iframeEl.getY();
-        me.activeMatchNode = event.currentTarget;
+            activeMatchNode = event.currentTarget,
+            posX = event.getX()
+            posY = event.getY();
+        me.showToolTip(activeMatchNode,posX,posY);
+    },
+    showToolTip: function(activeMatchNode,posX,posY) {
+        var me = this,
+            posX = posX + me.editor.iframeEl.getX()
+            posY = posY + me.editor.iframeEl.getY();
+        me.activeMatchNode = activeMatchNode;
         me.spellCheckTooltip.hide();
         me.spellCheckTooltip.showAt(posX,posY);
     }
