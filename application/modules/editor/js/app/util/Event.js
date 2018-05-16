@@ -108,6 +108,17 @@ Ext.define('Editor.util.Event', {
         return true;
     },
     /**
+     * (Ctrl+E triggers the contextmenu in the SpellCheck-Plugin)
+     * @returns {Boolean}
+     */
+    eventIsCtrlE: function() {
+        var me = this;
+        if(!me.event){
+            return;
+        }
+        return  me.event.ctrlKey && (me.event.getKey() == me.extEv.E);                              // Ctrl+E
+    },
+    /**
      * Is the Key-Event an insertion by Ctrl+V?
      * @returns {Boolean}
      */
