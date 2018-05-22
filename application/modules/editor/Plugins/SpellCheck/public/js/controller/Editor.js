@@ -75,7 +75,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     spellCheckMessages: {
         moreInformation: '#UT#More information',
         errorsFoundOnSaving: '#UT#SpellCheck: errors found on saving Segment Nr. %segmentnr.',
-        tagsBetweenWhitespaces: '#UT#There are tags between multiple whitespaces.',
         isApplyingInProgress: '#UT#The SpellCheck-Plugin was currently applying the matches, sorry for the inconvenience.',
         spellCheckOnSavingIsAlreadyRunningForAnotherSegment: '#UT#The SpellCheck on saving the segment failed because there is already another process running for Segment Nr. %segmentnr.',
         spellCheckStopped: '#UT#The SpellChecks has been stopped.'
@@ -430,11 +429,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         // "ignore" multiple whitespaces, because we delete them anyway on save.
-        // Exception: Show the error message if there are tags between the multiple whitespaces.
-        if(me.removeMultipleWhitespaceInEditor()) {
-            Editor.MessageBox.addError(me.spellCheckMessages.tagsBetweenWhitespaces + ' ' + me.spellCheckMessages.spellCheckStopped);
-            return;
-        }
+        me.collapseMultipleWhitespaceInEditor();
         
         me.consoleLog('(0.3 => startSpellCheck.)');
         me.allMatches = null;
