@@ -326,6 +326,7 @@ Ext.define('Editor.util.SegmentEditor', {
             elContent,
             selectionForCaret,
             bookmarkForCaret;
+        me.consoleLog('cleanSpanMarkupInEditor');
         selectionForCaret = rangy.getSelection(me.getEditorBody());
         bookmarkForCaret = selectionForCaret.getBookmark();
         elContent = el.getHtml();
@@ -361,40 +362,20 @@ Ext.define('Editor.util.SegmentEditor', {
         });
     },
     /**
-     * (1) Removes all multiple whitespaces with nothing between them (we delete them anyway on save).
-     * (2) Checks if there are tags between the multiple whitespaces.
-     * @returns {Boolean} hasTagsBetweenWhitespaces
+     * Collapse all multiple whitespaces with nothing between them (we delete them anyway on save).
      */
-    removeMultipleWhitespaceInEditor: function() {
+    collapseMultipleWhitespaceInEditor: function() {
         var me = this,
             el = me.getEditorBodyExtDomElement(),
             elContent,
             elContentAsText,
             selectionForCaret,
-            bookmarkForCaret,
-            hasTagsBetweenWhitespaces = false;
-        // (1) replace multiple whitespace
+            bookmarkForCaret;
         selectionForCaret = rangy.getSelection(me.getEditorBody());
         bookmarkForCaret = selectionForCaret.getBookmark();
         elContent = el.getHtml();
         elContent = elContent.replace(/&nbsp;+/gi,'  ').replace(/\s\s+/g, '&nbsp;');
         el.setHtml(elContent);
         selectionForCaret.moveToBookmark(bookmarkForCaret);
-        // (2a) check for tags between whitespace:
-        if(/\s\<[^>]+\>\s/.test(elContent)) {
-            //var test = elContent.match(/\s\<[^>]+\>\s/);
-            //debugger;
-            hasTagsBetweenWhitespaces = true;
-            me.consoleLog("(removeMultipleWhitespaceInEditor:) Tags between whitespace found: " + elContent);
-        }
-        // (2b) "abc<ins> </ins> def" is ALSO multiple whitespace" => check again considering the tags:
-        elContentAsText = me.getEditorContentAsText(false);
-        if(/\s\s+/g.test(elContentAsText)) {
-            //var test = elContentAsText.match(/\s\s+/g);
-            //debugger;
-            hasTagsBetweenWhitespaces = true;
-            me.consoleLog("(removeMultipleWhitespaceInEditor:) Multiple whitespace found considering content in tags: " + elContentAsText);
-        }
-        return hasTagsBetweenWhitespaces;
     }
 });
