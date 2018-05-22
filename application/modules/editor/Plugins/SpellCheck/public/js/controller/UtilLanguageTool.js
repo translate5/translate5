@@ -92,7 +92,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
      * 
      * @param {String} text
      */
-    runSpellCheckWithTool: function (textToCheck) {
+    runSpellCheckWithTool: function (textToCheck,spellCheckProcessID) {
         var me = this,
             url = Editor.data.restpath+'plugins_spellcheck_spellcheckquery/matches',
             method = 'POST',
@@ -111,9 +111,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                     resultLT = Ext.util.JSON.decode(response.responseText);
                     if (resultLT.rows.matches) {
                         me.allMatchesOfTool = resultLT.rows.matches;
-                        me.applySpellCheck();
+                        me.applySpellCheck(spellCheckProcessID);
                     } else {
-                        me.finishSpellCheck();
+                        me.finishSpellCheck(spellCheckProcessID);
                     }
                 },
                 failure: function(response){
