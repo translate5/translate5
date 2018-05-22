@@ -122,46 +122,20 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
             });
     },
     /**
-     * extract data from match: (bookmark for) range
+     * extract data from match: get (character-only-offset-)start of match
      * @param {Object} match
-     * @returns {String}
+     * @returns {Integer}
      */
-    getRangeForMatchFromTool: function (match) {
-        var me = this,
-            rangeForMatch = rangy.createRange(),
-            matchStart,
-            matchEnd,
-            allDelNodes = [],
-            rangeForDelNode = rangy.createRange(),
-            bookmarkForDelNode,
-            lengthOfDelNode;
-        // offsets of text-only version
-        matchStart = match.offset;
-        matchEnd = matchStart + match.context.length;
-        //me.consoleLog("---\n- matchStart: " + matchStart + " / matchEnd: " + matchEnd);
-        // move offsets according to hidden del-Nodes in front of the match's start and/or end
-        allDelNodes = me.getEditorBodyExtDomElement().query('del');
-        Ext.Array.each(allDelNodes, function(delNode, index) {
-            rangeForDelNode.selectNodeContents(delNode);
-            bookmarkForDelNode = rangeForDelNode.getBookmark();
-            //me.consoleLog("- bookmarkForDelNode: " + bookmarkForDelNode.start + " / " + bookmarkForDelNode.end);
-            if (bookmarkForDelNode.start > matchStart && bookmarkForDelNode.end > matchEnd) {
-                //me.consoleLog("- we are already behind the match: " + bookmarkForDelNode.start + " > " + matchStart + " && " + bookmarkForDelNode.end + " > " + matchEnd);
-                return false; // break here; we are already behind the match
-            }
-            lengthOfDelNode = rangeForDelNode.text().length;
-            me.consoleLog("- length: " + lengthOfDelNode);
-            if (bookmarkForDelNode.start <= matchStart) {
-                matchStart = matchStart + lengthOfDelNode;
-                matchEnd = matchEnd + lengthOfDelNode;
-                //me.consoleLog("- match NOW (start and end moved): " + matchStart + " / " + matchEnd);
-            } else if (bookmarkForDelNode.end <= matchEnd) {
-                matchEnd = matchEnd + lengthOfDelNode;
-                //me.consoleLog("- match NOW (only end moved): " + matchStart + " / " + matchEnd);
-            }
-        });
-        rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
-        return rangeForMatch.getBookmark();
+    getStartOfMatchFromTool: function (match) {
+        return match.offset;
+    },
+    /**
+     * extract data from match: get (character-only-offset-)end of match
+     * @param {Object} match
+     * @returns {Integer}
+     */
+    getEndOfMatchFromTool: function (match) {
+        return  match.offset + match.context.length;
     },
     /**
      * extract data from match: css according to issueType.

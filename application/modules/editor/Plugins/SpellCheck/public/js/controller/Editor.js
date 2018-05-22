@@ -400,6 +400,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.isSpellCheckOnSaving = true;
         me.startSpellCheck();
     },
+    
     // =========================================================================
     // Start and finish (!) the SpellCheck.
     // =========================================================================
@@ -529,7 +530,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         if (me.allMatchesOfTool.length > 0) {
-            me.applyAllMatches();
+            me.applyAllMatches(spellCheckProcessID);
             me.consoleLog('allMatches applied.');
         }
         
@@ -549,14 +550,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
-        rangeForMatchBookmark = rangeForMatch.getBookmark();
+        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch);
         
         // Remove SpellCheck- and TermTag-Markup.
         me.cleanSpanMarkupInEditor();
         
         // Update the range (the SpellCheck-Node is no longer in the DOM!...).
-        rangeForMatch.moveToBookmark(rangeForMatchBookmark);
-        rangeForMatchBookmark = rangeForMatch.getBookmark();
+        rangeForMatch = me.moveRangeToBookmarkInTranslate5(rangeForMatch,rangeForMatchBookmark);
+        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch);
         
         // Replacement
         replaceText = Ext.get(event.currentTarget).query('a:first-child span:first-child')[0].innerHTML;
@@ -586,7 +587,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.setPositionOfCaret(bookmarkForCaretOnReplacement); // TODO: does not land right if the replacement has not the same length as what was replaced
     },
-
+    
     // =========================================================================
     // SpellCheck: generic layer for integrating specific tools
     // =========================================================================
@@ -620,12 +621,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     storeAllMatchesFromTool: function() {
         var me = this,
+            matchStart,
+            matchEnd,
             singleMatchObject;
         me.allMatches = [];
         Ext.Array.each(me.allMatchesOfTool, function(match, index) {
+            // offsets of text-only version
+            matchStart = me.getStartOfMatchFromTool(match);
+            matchEnd = me.getEndOfMatchFromTool(match);
             singleMatchObject = {
                     matchIndex        : index,                                      // Integer
-                    range             : me.getRangeForMatchFromTool(match),         // Rangy bookmark
+                    range             : me.getRangeForMatch(matchStart,matchEnd),   // Rangy bookmark
                     message           : me.getMessageForMatchFromTool(match),       // String
                     replacements      : me.getReplacementsForMatchFromTool(match),  // Array
                     infoURLs          : me.getInfoURLsForMatchFromTool(match),      // Array
@@ -638,11 +644,54 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     // Helpers for the SpellChecker
     // =========================================================================
-
+    
+    /**
+     * Get the range of a match in the Editor using the offsets of the text-only version.
+     * @param {Integer} matchStart
+     * @param {Integer} matchEnd
+     * @returns {Object}
+     */
+    getRangeForMatch: function(matchStart,matchEnd) {
+        var me = this,
+            rangeForMatch = rangy.createRange(),
+            allDelNodes = [],
+            rangeForDelNode = rangy.createRange(),
+            bookmarkForDelNode,
+            lengthOfDelNode;
+        // me.consoleLog("---\n- matchStart: " + matchStart + " / matchEnd: " + matchEnd);
+        
+        // move offsets according to hidden del-Nodes in front of the match's start and/or end
+        allDelNodes = me.getEditorBodyExtDomElement().query('del');
+        Ext.Array.each(allDelNodes, function(delNode, index) {
+            rangeForDelNode.selectNodeContents(delNode);
+            bookmarkForDelNode = rangeForDelNode.getBookmark();
+            //me.consoleLog("- bookmarkForDelNode: " + bookmarkForDelNode.start + " / " + bookmarkForDelNode.end);
+            if (bookmarkForDelNode.start > matchStart && bookmarkForDelNode.end > matchEnd) {
+                //me.consoleLog("- we are already behind the match: " + bookmarkForDelNode.start + " > " + matchStart + " && " + bookmarkForDelNode.end + " > " + matchEnd);
+                return false; // break here; we are already behind the match
+            }
+            lengthOfDelNode = rangeForDelNode.text().length;
+            me.consoleLog("- length: " + lengthOfDelNode);
+            if (bookmarkForDelNode.start <= matchStart) {
+                matchStart = matchStart + lengthOfDelNode;
+                matchEnd = matchEnd + lengthOfDelNode;
+                //me.consoleLog("- match NOW (start and end moved): " + matchStart + " / " + matchEnd);
+            } else if (bookmarkForDelNode.end <= matchEnd) {
+                matchEnd = matchEnd + lengthOfDelNode;
+                //me.consoleLog("- match NOW (only end moved): " + matchStart + " / " + matchEnd);
+            }
+        });
+        
+        // set range for Match by selecting characters
+        rangeForMatch.selectCharacters(me.getEditorBody(),matchStart,matchEnd);
+        
+        // return the bookmark
+        return rangeForMatch.getBookmark();
+    },
     /**
      * Apply results to captured content from the Editor.
      */
-    applyAllMatches: function() {
+    applyAllMatches: function(spellCheckProcessID) {
         var me = this,
             editorBody = me.getEditorBody(),
             rangeForMatch,
@@ -651,10 +700,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // apply the matches (iterate in reverse order; otherwise the ranges get lost due to DOM-changes "in front of them")
         rangeForMatch = rangy.createRange(editorBody);
         Ext.Array.each(me.allMatches, function(match, index) {
-            if (!me.spellCheckInProgressID) {
+            if (spellCheckProcessID != me.spellCheckInProgressID) {
                 return false; // break (eg after a new keyDown-event)
             }
             rangeForMatch.moveToBookmark(match.range);
+            rangeForMatch = me.cleanBordersOfRange(rangeForMatch);
             documentFragmentForMatch = rangeForMatch.extractContents();
             spellCheckNode = me.createSpellcheckNode(index);
             spellCheckNode.appendChild(documentFragmentForMatch);
@@ -696,6 +746,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     // Helpers for the Editor and Task
     // =========================================================================
+    
     /***
      * Set targetLangCode for the current task.
      * @returns {String}
@@ -724,7 +775,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         Ext.util.CSS.createStyleSheetToWindow(
                 me.getEditorDoc(),
                 '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' +
-                '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 3px dotted; border-color: red;}' + // TODO: use wavy line instead
+                '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 3px dotted; border-color: red;}' +
                 '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' {border-color: #ab8906;}' +    // dark yellow
                 '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' {border-color: #458fe6;}' +      // blue
                 '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' {border-color: #e645a8;}'        // red-violet
