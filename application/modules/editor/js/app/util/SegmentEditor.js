@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.util.SegmentEditor
  */
 Ext.define('Editor.util.SegmentEditor', {
-    mixins: ['Editor.util.DevelopmentTools'], // cannot add 'Editor.controller.SearchReplace' due to circulation-error
+    mixins: ['Editor.util.DevelopmentTools'],
     
     editor: null, // = the segment's Editor (Editor.view.segments.HtmlEditor)
     
@@ -141,6 +141,24 @@ Ext.define('Editor.util.SegmentEditor', {
         return false;
     },
     /**
+     * Is the given node an MQM-Tag?
+     * @param {Object} node
+     * @returns {Boolean}
+     */ 
+    isMQMTag: function(node) {
+        return (Ext.fly(node).hasCls('qmflag') && node.hasAttribute('data-seq'));
+    },
+    /**
+     * Is the given node a Content-Tag?
+     * @param {Object} node
+     * @returns {Boolean}
+     */ 
+    isContentTag: function(node) {
+        var me = this,
+            idPrefix = me.editor.idPrefix; // s. Editor.view.segments.HtmlEditor
+        return Ext.String.startsWith(node.id, idPrefix);
+    },
+    /**
      * Position the caret "at the end" of the Editor.
      * @returns {Boolean} 
      */
@@ -179,7 +197,6 @@ Ext.define('Editor.util.SegmentEditor', {
             elContent,
             invisibleElements,
             editorContentAsText,
-            selectionForCaret,
             bookmarkForCaret;
         me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored in rangeForEditor.text())
         if (collapseWhitespace) {
@@ -188,8 +205,7 @@ Ext.define('Editor.util.SegmentEditor', {
         } else {
             // Do NOT collapse multiple whitespace: Remove invisible content and keep ALL of the rest.
             el = me.getEditorBodyExtDomElement();
-            selectionForCaret = rangy.getSelection(me.getEditorBody());
-            bookmarkForCaret = selectionForCaret.getBookmark();
+            bookmarkForCaret = me.getPositionOfCaret();
             elContent = el.getHtml();
             // Collect all invisible elements; add selectors as needed:
             invisibleElements = el.select('.searchreplace-hide-element'); // SearchReplaceUtils.js
@@ -199,7 +215,7 @@ Ext.define('Editor.util.SegmentEditor', {
             rangeForEditor.selectNodeContents(me.getEditorBody());
             editorContentAsText = rangeForEditor.toString();
             el.setHtml(elContent);
-            selectionForCaret.moveToBookmark(bookmarkForCaret);
+            me.setPositionOfCaret(bookmarkForCaret);
         }
         me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js
         return editorContentAsText;
@@ -275,7 +291,7 @@ Ext.define('Editor.util.SegmentEditor', {
             imgOnCheck,
             i,
             arrLength;
-        if (Ext.fly(mqmImgNode).hasCls('qmflag') && mqmImgNode.hasAttribute('data-seq')) {
+        if (me.isMQMTag(mqmImgNode)) {
             imgInEditorTotal = me.getEditorDoc().images;
             arrLength = imgInEditorTotal.length;
             for(i = 0; i < arrLength; i++){
@@ -301,7 +317,7 @@ Ext.define('Editor.util.SegmentEditor', {
             contentTagImgClass = contentTagImgNode.className,
             contentTagImgId = contentTagImgNode.id,
             partnerTagImgId = null;
-        if (Ext.String.startsWith(contentTagImgId, idPrefix)) {
+        if (me.isContentTag(contentTagImgNode)) {
             // "Toggle" id
             switch(true){
               case /open/.test(contentTagImgClass):
@@ -317,6 +333,20 @@ Ext.define('Editor.util.SegmentEditor', {
         };
         return null;
     },
+    /**
+     * Collapse all multiple whitespaces with nothing between them (we delete them anyway on save).
+     */
+    collapseMultipleWhitespaceInEditor: function() {
+        var me = this,
+            el = me.getEditorBodyExtDomElement(),
+            elContent,
+            bookmarkForCaret = me.getPositionOfCaret();
+        elContent = el.getHtml();
+        elContent = elContent.replace(/&nbsp;+/gi,'  ').replace(/\s\s+/g, '&nbsp;');
+        el.setHtml(elContent);
+        me.getEditorBodyExtDomElement().dom.normalize();
+        me.setPositionOfCaret(bookmarkForCaret);
+    },
     /***
      * Remove Span-Markup (SpellCheck, TermTagger) in the Editor but keep their content.
      */
@@ -324,16 +354,12 @@ Ext.define('Editor.util.SegmentEditor', {
         var me = this,
             el = me.getEditorBodyExtDomElement(),
             elContent,
-            selectionForCaret,
-            bookmarkForCaret;
-        me.consoleLog('cleanSpanMarkupInEditor');
-        selectionForCaret = rangy.getSelection(me.getEditorBody());
-        bookmarkForCaret = selectionForCaret.getBookmark();
+            bookmarkForCaret = me.getPositionOfCaret();
         elContent = el.getHtml();
         elContent = elContent.replace(/<\s*\/?\s*span\s*.*?>/g, '');
         el.setHtml(elContent);
         me.getEditorBodyExtDomElement().dom.normalize();
-        selectionForCaret.moveToBookmark(bookmarkForCaret);
+        me.setPositionOfCaret(bookmarkForCaret);
     },
     /***
      * Clean up Nodes, e.g. remove empty TrackChange-Nodes.
@@ -360,22 +386,5 @@ Ext.define('Editor.util.SegmentEditor', {
                 trackChangeNode.parentNode.removeChild(trackChangeNode);
             }
         });
-    },
-    /**
-     * Collapse all multiple whitespaces with nothing between them (we delete them anyway on save).
-     */
-    collapseMultipleWhitespaceInEditor: function() {
-        var me = this,
-            el = me.getEditorBodyExtDomElement(),
-            elContent,
-            elContentAsText,
-            selectionForCaret,
-            bookmarkForCaret;
-        selectionForCaret = rangy.getSelection(me.getEditorBody());
-        bookmarkForCaret = selectionForCaret.getBookmark();
-        elContent = el.getHtml();
-        elContent = elContent.replace(/&nbsp;+/gi,'  ').replace(/\s\s+/g, '&nbsp;');
-        el.setHtml(elContent);
-        selectionForCaret.moveToBookmark(bookmarkForCaret);
     }
 });

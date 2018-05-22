@@ -86,6 +86,15 @@ Ext.define('Editor.util.Event', {
         return (keyCodesToIgnoreAndStop.indexOf(me.event.getKey()) != -1);
     },
     /**
+     * Is the Key-Event an Arrow-Key? (can eg indicate that the user is still editing)
+     * @returns {Boolean}
+     */
+    eventIsArrowKey: function() {
+        var me = this,
+            keyCodesForArrows = [me.extEv.LEFT, me.extEv.UP, me.extEv.RIGHT, me.extEv.DOWN];        // Arrow Keys
+        return (keyCodesForArrows.indexOf(me.event.getKey()) != -1);
+    },
+    /**
      * Is the Key-Event a DELETION?
      * @returns {Boolean}
      */
