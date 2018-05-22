@@ -385,8 +385,155 @@ Ext.define('Editor.util.Range', {
     },
     
     // =========================================================================
-    // Get and set the position of the caret in the Editor
+    // Helpers for the content of/in a range
     // =========================================================================
+    
+    /**
+     * If there are empty text-Nodes or non-text-content-Nodes (MQM-Tag, Content-Tag) at the beginning or end, move them OUT of the given range.
+     * @param {Object} range
+     * @returns {Object} range
+     */
+    cleanBordersOfRange: function(range) {
+        var me = this,
+            documentFragmentForRange,
+            tagNodesInRange,
+            nodeAtBorder,
+            nodeToSeperate,
+            i,
+            iMax,
+            isTagNodeInRange = function(nodeToCheck){
+                var nodeFound = false;
+                Ext.Array.each(tagNodesInRange, function(node, index) {
+                    if (node.id == nodeToCheck.id) {
+                        nodeFound = true;
+                    }
+                });
+                return nodeFound;
+            },
+            isEmptyTextNode = function(nodeToCheck){
+                if (nodeToCheck.nodeType == 3 && nodeToCheck.data == "") {
+                    return true;
+                }
+                return false;
+            },
+            findNodeInEditor = function(nodeToFind){
+                var nodeFound = null;
+                Ext.Array.each(me.getEditorBody().childNodes, function(node, index) {
+                    if ( (node.id === nodeToFind.id) || node.isEqualNode(nodeToFind) ) {
+                        nodeFound = node;
+                    }
+                });
+                return nodeFound;
+            },
+            getNextBorderNode = function(direction){
+                return (direction == "fromEnd") ? documentFragmentForRange.lastChild : documentFragmentForRange.firstChild;
+            },
+            seperateNodeFromRange = function(nodeToSeperate,direction){
+                if (direction == "fromEnd") {
+                    range.setEndBefore(nodeToSeperate);
+                } else {
+                    range.setStartAfter(nodeToSeperate);
+                }
+            },
+            cleanBorderNodesFromRange = function(direction){
+                i = 0;
+                nodeAtBorder = getNextBorderNode(direction);
+                while (i<iMax && nodeAtBorder != null && (isEmptyTextNode(nodeAtBorder) || isTagNodeInRange(nodeAtBorder)) ) {
+                    switch(true) {
+                        case isEmptyTextNode(nodeAtBorder):
+                            // empty text-nodes are irrelevant, skip them
+                            documentFragmentForRange.removeChild(nodeAtBorder);
+                            break;
+                        case isTagNodeInRange(nodeAtBorder):
+                            nodeToSeperate = findNodeInEditor(nodeAtBorder);
+                            if(nodeToSeperate != null) {
+                                seperateNodeFromRange(nodeToSeperate,direction);
+                                documentFragmentForRange = range.cloneContents();
+                            } else {
+                                nodeAtBorder ==  null; // stop iteration
+                            }
+                            break;
+                    }
+                    if (nodeAtBorder != null) {
+                        nodeAtBorder = getNextBorderNode(direction);
+                    }
+                    i++;
+                }
+            };
+        
+        documentFragmentForRange = range.cloneContents();
+        tagNodesInRange = range.getNodes([1]);
+        iMax = documentFragmentForRange.childNodes.length;
+        cleanBorderNodesFromRange("fromStart");
+        cleanBorderNodesFromRange("fromEnd");
+        
+        return range;
+    },
+    
+    // =========================================================================
+    // Workarounds for buggy Bookmarks of Rangy
+    // =========================================================================
+    // Rangy is buggy (eg when the cursor is right BEHIND an MQM-Tag, 
+    // the bookmark will place the cursor right IN FRONT of the MQM-Tag) 
+    // => workaround: return and apply node.
+    // =========================================================================
+    
+    // ---------- When to use the workaround -----------------------------------
+    
+    useWorkaroundForBookmark: function(range) {
+        var me = this,
+            contentBeforeRange;
+        contentBeforeRange = me.getContainerForCharacterNextToCaret(range,'previous');
+        return (contentBeforeRange !=  null && "nodeType" in contentBeforeRange && contentBeforeRange.nodeType === 1 
+                && ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) ) );
+    },
+    isWorkaroundOfBookmark: function(bookmark) {
+        return ("nodeType" in bookmark && bookmark.nodeType === 1);
+    },
+    
+    // ---------- What to use as workround -------------------------------------
+    
+    getBookmarkUsingTheWorkaround: function(range) {
+        var me = this;
+        if (!range.collapsed) {
+            return me.cleanBordersOfRange(range).getBookmark();
+        } else {
+            return me.getContainerForCharacterNextToCaret(range,'previous');
+        }
+    },
+    applyBookmarkUsingTheWorkaround: function(range,bookmark) {
+        var me = this,
+            nodeForBookmark;
+        nodeForBookmark = Ext.get(me.getEditorBody()).getById(bookmark.id,true);
+        range.setStartAfter(nodeForBookmark);
+        range.collapse(true);
+        return range;
+    },
+    
+    // ---------- Bookmarks for Ranges -----------------------------------------
+    
+    getBookmarkForRangeInTranslate5: function(range) {
+        var me = this;
+        if (me.useWorkaroundForBookmark(range)) {
+            return me.getBookmarkUsingTheWorkaround(range);
+        } else {
+            return range.getBookmark();
+        }
+    },
+    moveRangeToBookmarkInTranslate5: function(range,bookmark) {
+        var me = this,
+            nodeForBookmark;
+        if (me.isWorkaroundOfBookmark(bookmark)){
+            range = me.applyBookmarkUsingTheWorkaround(range,bookmark);
+        } else {
+            range.moveToBookmark(bookmark);
+        }
+        range = me.cleanBordersOfRange(range);
+        return range;
+    },
+    
+    // ---------- Get and set the position of the caret in the Editor ----------
+    // ---------- (use SELECTION if workaround is not applied) -----------------
     
     /**
      * Get the bookmark for the current position of the cursor in the Editor.
@@ -395,13 +542,9 @@ Ext.define('Editor.util.Range', {
     getPositionOfCaret: function() {
         var me = this,
             selectionForCaret = rangy.getSelection(me.getEditorBody()),
-            rangeForCaret = selectionForCaret.rangeCount ? selectionForCaret.getRangeAt(0) : null,
-            contentBeforeCaret = me.getContainerForCharacterNextToCaret(rangeForCaret,'previous');
-        if (contentBeforeCaret !=  null && "nodeType" in contentBeforeCaret && contentBeforeCaret.nodeType === 1 
-                && ( me.isMQMTag(contentBeforeCaret) || me.isContentTag(contentBeforeCaret) ) ) {
-            // Rangy is buggy (eg when the cursor is right BEHIND an MQM-Tag, the bookmark will place the cursor right IN FRONT of the MQM-Tag) 
-            // => workaround: return and apply node 
-            return contentBeforeCaret;
+            rangeForCaret = selectionForCaret.rangeCount ? selectionForCaret.getRangeAt(0) : null;
+        if (me.useWorkaroundForBookmark(rangeForCaret)) {
+            return me.getBookmarkUsingTheWorkaround(rangeForCaret);
         } else {
             return selectionForCaret.getBookmark();
         }
@@ -415,12 +558,8 @@ Ext.define('Editor.util.Range', {
             selectionForCaret = rangy.getSelection(me.getEditorBody()),
             rangeForCaret = rangy.createRange(),
             nodeForBookmark;
-        if("nodeType" in bookmarkForCaret && bookmarkForCaret.nodeType === 1){
-            // Rangy is buggy (eg when the cursor is right BEHIND an MQM-Tag, the bookmark will place the cursor right IN FRONT of the MQM-Tag) 
-            // => workaround: return and apply node
-            nodeForBookmark = Ext.get(me.getEditorBody()).getById(bookmarkForCaret.id,true);
-            rangeForCaret.setStartAfter(nodeForBookmark);
-            rangeForCaret.collapse(true);
+        if(me.isWorkaroundOfBookmark(bookmarkForCaret)){
+            rangeForCaret = me.applyBookmarkUsingTheWorkaround(rangeForCaret,bookmarkForCaret);
             selectionForCaret.setSingleRange(rangeForCaret);
         } else {
             selectionForCaret.moveToBookmark(bookmarkForCaret);

@@ -39,6 +39,7 @@ Ext.define('Editor.controller.SearchReplace', {
     ],
     
     mixins: [
+        'Editor.util.Range',
         'Editor.util.SearchReplaceUtils'
     ],
 
@@ -827,7 +828,7 @@ Ext.define('Editor.controller.SearchReplace', {
             iframeDocument = me.getSegmentIframeDocument(),
             range = rangy.createRange();
         
-        range.moveToBookmark(bookmarkRangeForDel);
+        range = me.moveRangeToBookmarkInTranslate5(range,bookmarkRangeForDel);
         
         //collect all images in the range
         collectedNodesForDel = range.getNodes([1,3], function(node) {
