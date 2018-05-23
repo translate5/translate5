@@ -420,8 +420,10 @@ Ext.define('Editor.util.Range', {
                 var nodeFound = null,
                     allNodesInEditor = me.getEditorBodyExtDomElement().query('*');
                 Ext.Array.each(allNodesInEditor, function(node, index) {
-                    if ( (node.id === nodeToFind.id) || node.isEqualNode(nodeToFind) ) {
+                    if ( (node.id != null && node.id != "" && node.id === nodeToFind.id) 
+                            || node.isEqualNode(nodeToFind) ) {
                         nodeFound = node;
+                        debugger;
                     }
                 });
                 return nodeFound;
@@ -463,7 +465,9 @@ Ext.define('Editor.util.Range', {
             };
         
         documentFragmentForRange = range.cloneContents();
-        tagNodesInRange = range.getNodes([1]);
+        tagNodesInRange = range.getNodes([1], function(node) {
+            return ( me.isMQMTag(node) || me.isContentTag(node) );
+        });
         iMax = documentFragmentForRange.childNodes.length;
         cleanBorderNodesFromRange("fromStart");
         cleanBorderNodesFromRange("fromEnd");
