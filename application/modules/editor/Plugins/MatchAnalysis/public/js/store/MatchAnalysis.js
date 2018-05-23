@@ -35,5 +35,5 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchAnalysis.store.MatchAnalysis', {
   extend : 'Ext.data.Store',
   model: 'Editor.plugins.MatchAnalysis.model.MatchAnalysis',
-  autoLoad: true
+  autoLoad: false
 });

@@ -65,10 +65,11 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * Group result index: 103,  102,  101,  100,  99,      89,      79,      69,      59,      noMatch
      * 
      * The result array will contain the total word count in the result.
-     * @param unknown $taskGuid
+     * @param guid $taskGuid
+     * @param boolean $isExport: is the data requested for export
      * @return NULL|array
      */
-    public function loadByBestMatchRate($taskGuid){
+    public function loadByBestMatchRate($taskGuid,$isExport=false){
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from($this->db, array('LEK_match_analysis_taskassoc.created','analysisId','segmentId','taskGuid','matchRate','wordCount'))
@@ -80,7 +81,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         if(empty($resultArray)){
             return null;
         }
-        return $this->groupByMatchrate($resultArray);
+        return $this->groupByMatchrate($resultArray,$isExport);
     }
     
     /***
@@ -88,14 +89,20 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * @param array $results
      * @return array[]
      */
-    private function groupByMatchrate($results){
+    private function groupByMatchrate($results,$isExport=false){
         
         $groupedResults=[];
         
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
         $groupBorder=[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
         $wordCountTotal=0;
+        $createdDate=null;
+        
         foreach ($results as $res){
+        
+            if(!$createdDate){
+                $createdDate=$res['created'];
+            }
             
             $resultFound=false;
             
@@ -103,12 +110,21 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             foreach ($groupBorder as $border=>$value){
                 if($res['matchRate']>$border){
                     if(!isset($groupedResults[$value])){
-                        $groupedResults[$value]=[];
-                        $groupedResults[$value]['rateCount']=0;
-                        $groupedResults[$value]['wordCount']=0;
+                        if(!$isExport){
+                            $groupedResults[$value]=[];
+                            $groupedResults[$value]['rateCount']=0;
+                            $groupedResults[$value]['wordCount']=0;
+                        }else{
+                            $groupedResults[$value]=0;
+                        }
                     }
-                    $groupedResults[$value]['rateCount']++;
-                    $groupedResults[$value]['wordCount']+=$res['wordCount'];
+                    if(!$isExport){
+                        $groupedResults[$value]['rateCount']++;
+                        $groupedResults[$value]['wordCount']+=$res['wordCount'];
+                    }else{
+                        $groupedResults[$value]++;
+                    }
+                    
                     $wordCountTotal+=$res['wordCount'];
                     $resultFound=true;
                     break;
@@ -117,16 +133,27 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             
             if(!$resultFound){
                 if(!isset($groupedResults['noMatch'])){
-                    $groupedResults['noMatch']=[];
-                    $groupedResults['noMatch']['rateCount']=0;
-                    $groupedResults['noMatch']['wordCount']=0;
+                    if(!$isExport){
+                        $groupedResults['noMatch']=[];
+                        $groupedResults['noMatch']['rateCount']=0;
+                        $groupedResults['noMatch']['wordCount']=0;
+                    }else{
+                        $groupedResults['noMatch']=0;
+                    }
                 }
-                $groupedResults['noMatch']['rateCount']++;
-                $groupedResults['noMatch']['wordCount']+=$res['wordCount'];
+                
+                if(!$isExport){
+                    $groupedResults['noMatch']['rateCount']++;
+                    $groupedResults['noMatch']['wordCount']+=$res['wordCount'];
+                }else{
+                    $groupedResults['noMatch']++;
+                }
+                
                 $wordCountTotal+=$res['wordCount'];
             }
         }
         $groupedResults['wordCountTotal']=$wordCountTotal;
+        $groupedResults['created']=$createdDate;
         
         return $groupedResults;
     }

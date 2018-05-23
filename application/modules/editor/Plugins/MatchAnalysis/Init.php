@@ -140,5 +140,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
                 ),
         ));
         $r->addRoute('plugins_matchanalysis_restdefault', $restRoute);
+        
+        $exportAnalysis = new ZfExtended_Controller_RestLikeRoute(
+                'editor/plugins_matchanalysis_matchanalysis/export',
+                array(
+                        'module' => 'editor',
+                        'controller' => 'plugins_matchanalysis_matchanalysis',
+                        'action' => 'export'
+                ));
+        $r->addRoute('plugins_matchanalysis_export', $exportAnalysis);
     }
 }

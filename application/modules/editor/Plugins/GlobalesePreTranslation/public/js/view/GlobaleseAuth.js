@@ -44,6 +44,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
         'Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewController'
     ],
     mixins:['Editor.controller.admin.IWizardCard'],
+    //card type, used for card display order
     importType:'import',
     listeners: {
         beforerender: 'onAuthPanelBeforeRender'

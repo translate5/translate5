@@ -93,10 +93,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * On task preferences window tabpanel render
      */
     onTaskPreferencesWindowPanelRender:function(panel){
+        var me=this,
+            prefWindow=panel.up('window');
         
         //add the matchanalysis panel in the tabpanel
         panel.add({
-           xtype:'matchAnalysisPanel' 
+           xtype:'matchAnalysisPanel',
+           task:prefWindow.actualTask
         });
     },
     

@@ -40,106 +40,38 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.matchAnalysisPanel',
     
-    //controller: '',
-    //viewModel: {
-    //    type: ''
-    //},
-    //bind: {
-    //    store: '{matchAnalysis}'
-    //},
     itemId:'matchAnalysisPanel',
 
-    /*
-     * 
-     * 
-     *     {name: 'id', type: 'int'},
-    {name: 'created', type: 'date', dateFormat: Editor.DATEONLY_ISO_FORMAT },
-    {name: '103', type: 'string'},
-    {name: '102', type: 'string'},
-    {name: '101', type: 'string'},
-    {name: '100', type: 'string'},
-    {name: '99', type: 'string'},//99-90
-    {name: '89', type: 'string'},//89-80
-    {name: '79', type: 'string'},//79-70
-    {name: '69', type: 'string'},//69-60
-    {name: '59', type: 'string'},//59-51
-    {name: 'noMatch', type: 'string'},//50-0
-    {name: 'matchCount', type: 'string'}
-     */
     strings:{
       noMatch:'#UT#No matche',
       matchCount:'#UT#Match Count',
-      tabTitle:"#UT#Analysis"
+      tabTitle:"#UT#Analysis",
+      exportAnalysis:'#UT#Export'
     },
     
-    templateString: '<table>'+
-                    '<tr>'+
-                        '<th>103%</th>'+
-                        '<th>102%</th>'+
-                        '<th>101%</th>'+
-                        '<th>100%</th>'+
-                        '<th>99%-90%</th>'+
-                        '<th>89%-80%</th>'+
-                        '<th>79%-70%</th>'+
-                        '<th>69%-60%</th>'+
-                        '<th>59%-51%</th>'+
-                        '<th>No match</th>'+
-                        '<th>Match Count</th>'+
-                      '</tr>'+
-                      '<tr>'+
-                        '<th>{103.rateCount}</th>'+
-                        '<th>{102.rateCount}</th>'+
-                        '<th>{101.rateCount}</th>'+
-                        '<th>{100.rateCount}</th>'+
-                        '<th>{99.rateCount}</th>'+
-                        '<th>{89.rateCount}</th>'+
-                        '<th>{79.rateCount}</th>'+
-                        '<th>{69.rateCount}</th>'+
-                        '<th>{59.rateCount}</th>'+
-                        '<th>{noMatch}</th>'+
-                        '<th>{wordCountTotal}</th>'+
-                      '</tr>'+
-                '</table>',
+    layout:'fit',
+    
     initConfig: function(instanceConfig) {
         var me = this,
             config,
             columnRenderer=function(val, meta, record) {
                 return val && val.rateCount;
-            };
-    
+            },
+            analysisStore=Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis');
+            
+            //load the analysis for the taskGuid
+            analysisStore.load({ 
+                params: {
+                    taskGuid:instanceConfig.task.get('taskGuid')
+                } 
+            });
+            
         config = {
             title:me.strings.tabTitle,
             items:[{
-                xtype:'panel',
-                itemId:'printArea',
-                title:"printable",
-                tools: [{
-                    type: 'print',
-                    handler: function() {
-                        var analysisStore=me.down('#matchAnalysisGrid').getStore();
-                        var t = new Ext.Template([
-                            me.templateString
-                        ]);
-                        t.compile();
-                        var div = document.createElement("div");
-                        div.id="printableDiv";
-                        
-                        var theDat=analysisStore.getAt(0).getData();
-                        t.append(div,theDat);
-                        
-                        var myWindow = window.open('', '', 'width=1000,height=800');
-                        myWindow.document.write('<html>');
-                        myWindow.document.write('<head></head>');
-                        myWindow.document.write('<body>');
-                        myWindow.document.write(div.innerHTML);
-                        myWindow.document.write('</body></html>');
-                        myWindow.print();
-                    }
-                }],
-                items:[{
                     xtype:'grid',
                     itemId:'matchAnalysisGrid',
-                    store : 'Editor.plugins.MatchAnalysis.store.MatchAnalysis',
+                    store : analysisStore,
                     columns: [{
                         xtype: 'gridcolumn',
                         flex: 2,
@@ -216,10 +148,25 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: 'wordCountTotal',
                         cellWrap: true,
                         text: me.strings.matchCount
+                    }],
+                    dockedItems: [{
+                        xtype: 'toolbar',
+                        dock: 'bottom',
+                        items: [{ 
+                            xtype: 'button',
+                            iconCls:'icon-excel-export',
+                            text:me.strings.exportAnalysis,
+                            listeners:{
+                                click:function(){
+                                    var params = {};
+                                    params["taskGuid"] = me.task.get('taskGuid');
+                                    window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
+                                }
+                            }
+                        }]
                     }]
                 
                 }]
-                }],
         };
         
         if (instanceConfig) {

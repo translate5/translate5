@@ -38,7 +38,66 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     protected $entity;
     
     public function indexAction(){
-        $taskGuid="{ed03996b-37fd-4ecd-b988-b118ccbe5069}";
-        $this->view->rows=$this->entity->loadByBestMatchRate($taskGuid);
+        $params=$this->getAllParams();
+        $this->view->rows=$this->entity->loadByBestMatchRate($params['taskGuid']);
+    }
+    
+    public function exportAction(){
+        $params=$this->getAllParams();
+
+        //load the export data
+        $rows=$this->entity->loadByBestMatchRate($params['taskGuid'],true);
+        
+        //sort the data
+        krsort($rows);
+        
+        $newRows=[];
+        foreach ($rows as $key=>$value){
+            $newKey=$key;
+            if(is_numeric($key)){
+                $newKey=$key.'Group';
+            }
+            $newRows[$newKey]=$value;
+        }
+        unset($rows);
+        
+        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+        
+        // set property for export-filename
+        $excel->setProperty('filename', 'Match analysis');
+        
+        //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
+        //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
+        $excel->setLabel('103Group', 'Context match (103%)');
+        $excel->setLabel('102Group', 'Repetition (102%)');
+        $excel->setLabel('101Group', 'Exact-exact match (101%)');
+        $excel->setLabel('100Group', '100%');
+        
+        $excel->setLabel('99Group', '99%-90%');
+        $excel->setLabel('89Group', '89%-80%');
+        $excel->setLabel('79Group', '79%-70%');
+        $excel->setLabel('69Group', '69%-60%');
+        $excel->setLabel('59Group', '59%-51%');
+        $excel->setLabel('noMatch', '50%-0%');
+        
+        $excel->setLabel('wordCountTotal', 'Words count');
+        $excel->setLabel('created', 'Creation date');
+        
+        //set the cell autosize
+        $excel->simpleArrayToExcel([$newRows],function($phpExcel) {
+            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
+                
+                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
+                
+                $sheet = $phpExcel->getActiveSheet();
+                $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(true);
+                /** @var PHPExcel_Cell $cell */
+                foreach ($cellIterator as $cell) {
+                    $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
+                }
+            }
+        });
     }
 }
