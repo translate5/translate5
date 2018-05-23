@@ -81,15 +81,35 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     width : 1000,
     modal : true,
     layout: 'anchor',
+    
+    groupCards:[],
+    
     listeners:{
-      afterrender:function(win){
-          var winLayout=win.getLayout(),
-              vm=win.getViewModel();
-          taskUpload = {
-                  xtype:'taskUpload',
-                  itemId:'taskUploadCard'
-          };
-          win.insertImport(taskUpload);
+        beforerender:function(win){
+            
+            //insert the taskUpload card in before render
+            win.insertCard({
+                xtype:'taskUpload', 
+                itemId:'taskUploadCard'
+            },'import');
+        },
+        render:function(win){
+            //add all of the cards in the window by order: preimport, import, postimport
+            for(var i=0;i<win.groupCards['preimport'].length;i++){
+                win.add(win.groupCards['preimport'][i]);
+            }
+            
+            for(var i=0;i<win.groupCards['import'].length;i++){
+                win.add(win.groupCards['import'][i]);
+            }
+            
+            for(var i=0;i<win.groupCards['postimport'].length;i++){
+                win.add(win.groupCards['postimport'][i]);
+            }
+        },
+        afterrender:function(win){
+            var winLayout=win.getLayout(),
+                vm=win.getViewModel();
           vm.set('activeItem',winLayout.getActiveItem());
       }
     },
@@ -109,6 +129,12 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             },
             now = new Date(),
             config;
+        
+        //init the card group arrays
+        me.groupCards['preimport']=[];
+        me.groupCards['import']=[];
+        me.groupCards['postimport']=[];
+        
         now.setHours(0,0,0,0);
         config = {
                 title: me.title, //see EXT6UPD-9
@@ -341,16 +367,20 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         }
         return me.callParent([config]);
     },
-    insertPreImport:function(card){
-        //find the index and insert the card
+    
+    /***
+     * Insert card in window at given group
+     * The groups are: preimport,import,postimport
+     */
+    insertCard:function(card,group){
+        var me=this;
+        if(!me.groupCards[group]){
+            me.groupCards[group]=[];
+        }
+        
+        me.groupCards[group].push(card);
     },
-    insertImport:function(card){
-        //find the index and insert the card
-        this.add(card);
-    },
-    insertPostImport:function(card){
-        //inser the card at the end of the items
-    },
+    
     isTaskUploadNext:function(){
         var winLayout=this.getLayout(),
             nextItem=winLayout.getNext();

@@ -389,6 +389,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           win = me.getTaskAddWindow(),
           winLayout=win.getLayout(),
           nextStep=winLayout.getNext(),
+          activeItem=winLayout.getActiveItem(),
           vm=win.getViewModel();
       
       if(skipCards){
@@ -399,16 +400,38 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
 
       if(!nextStep){
-          //me.handleTaskCancel();
-          me.saveTask();
+          
+          //if no next step, and no task, save it 
+          if(!activeItem.task){
+              me.saveTask();
+          }else{
+              //the task is already saved, close the window 
+              me.handleTaskCancel();
+          }
           return;
       }
-      if(nextStep.strings && nextStep.strings.wizardTitle){
-          win.setTitle(nextStep.strings.wizardTitle);
-      }
       
-      vm.set('activeItem',nextStep);
-      winLayout.setActiveItem(nextStep);
+      //switch to next card help function
+      var goToNextCard=function(task){
+          if(nextStep.strings && nextStep.strings.wizardTitle){
+              win.setTitle(nextStep.strings.wizardTitle);
+          }
+          //if the task is provided, set the next card task variable
+          if(task){
+              nextStep.task=task;
+          }
+          
+          vm.set('activeItem',nextStep);
+          winLayout.setActiveItem(nextStep);
+      };
+      
+      //when switch from import to postimport, save the task
+      if(activeItem.importType=="import" && nextStep.importType=="postimport"){
+          me.saveTask(goToNextCard);
+          return;
+      }
+      //change the card
+      goToNextCard();
   },
   
   onWizardCardSkiped:function(){
@@ -672,8 +695,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 
   /***
    * starts the upload / form submit
+   * 
    */
-  saveTask:function(){
+  saveTask:function(successCallback){
       var me = this,
           win = me.getTaskAddWindow(),
           error = win.down('#feedbackBtn');
@@ -695,8 +719,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.fireEvent('taskCreated', task);
               win.setLoading(false);
               me.getAdminTasksStore().load();
-              me.handleTaskCancel();
+              
               Editor.MessageBox.addSuccess(win.importTaskMessage,2);
+              
+              //call the callback if exist
+              if(!successCallback){
+                  me.handleTaskCancel();
+              }else{
+                  successCallback(task);
+              }
           },
           failure: function(form, submit) {
               win.setLoading(false);

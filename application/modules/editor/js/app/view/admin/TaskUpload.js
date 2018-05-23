@@ -47,6 +47,10 @@ Ext.define('Editor.view.admin.TaskUpload', {
     listeners: {
         activate:'onTaskUploadActivate'
     },
+    
+    //card type, used for card display order
+    importType:'import',
+    
     strings:{
         wizardTitle:'#UT#Dateien werden hochgeladen',
         finishButton:'#UT#Schließen',

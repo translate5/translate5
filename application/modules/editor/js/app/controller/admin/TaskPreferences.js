@@ -247,8 +247,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * Opens the Preferences to the choosen Task
    * triggerd by click on the Task Preferences Button / (Cell also => @todo)
    * @param {Editor.model.admin.Task} task
+   * @param  activeTab: the tab in the window which will be focused
    */
-  handleTaskPreferences: function(task) {
+  handleTaskPreferences: function(task,activeTab) {
       this.actualTask = task;
       var win = Ext.widget('adminTaskPreferencesWindow',{
           actualTask: task
@@ -256,6 +257,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       win.show();
       win.setLoading(true);
       this.loadAllPreferences(task);
+      
+      if(activeTab){
+          win.down('tabpanel').setActiveTab(activeTab);
+      }
   },
   /**
    * handler if close button is pressed

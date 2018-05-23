@@ -374,5 +374,15 @@ Ext.application({
       if(!supportedBrowser) {
           Ext.MessageBox.alert(me.browserAdviceTextTitle, me.browserAdviceText);
       }
+  },
+  
+  getClassesByMixin:function(mixinName){
+      var classes=[];
+      Ext.iterate(Ext.ClassManager.classes,function(className,c){
+          if(c.prototype &&c.prototype.mixins &&  c.prototype.mixins[mixinName]){
+              classes.push(className);
+          }
+      });
+      return classes;
   }
 });
