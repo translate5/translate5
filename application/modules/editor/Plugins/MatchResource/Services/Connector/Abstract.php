@@ -86,6 +86,13 @@ abstract class editor_Plugins_MatchResource_Services_Connector_Abstract {
         //to be implemented if needed
         $this->log(__METHOD__, ' segment '.$segment->getId());
     }
+    
+    /***
+     * Reset the tm result list data
+     */
+    public function resetResultList(){
+        $this->resultList->resetResult();
+    }
 
     /**
      * makes a tm / mt / file query to find a match / translation

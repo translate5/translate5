@@ -47,16 +47,16 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
   listen: {
       component: {
           '#adminTaskAddWindow': {
-              render:'onAdminTaskWindowRender'
+              beforerender:'onAdminTaskWindowBeforeRender'
           }
       }
   },
-  onAdminTaskWindowRender:function(window,eOpts){
-      window.insertImport({
+  onAdminTaskWindowBeforeRender:function(window,eOpts){
+      window.insertCard({
           xtype:'globaleseAuthPanel'
-      });      
-      window.insertImport({
+      },'import');      
+      window.insertCard({
               xtype:'globaleseSettingsPanel'    
-      });
+      },'import');
   }
 });

@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * //TODO find better name
+ * //TODO Add class desc
  *
  */
 class editor_Plugins_MatchAnalysis_Analysis{
@@ -79,33 +79,51 @@ class editor_Plugins_MatchAnalysis_Analysis{
         foreach($results as $key=>$value){
             $repetitionsDb[$value['id']] = $value;
         }
+        unset($results);
 
-        $repetitions=array();
+        $repetitionByHash=array();
         //error_log(print_r($repetitions,1));
-
+        
+        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        
+        $langModel->load($this->task->getSourceLang());
+        
+        $wordCount=ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
+                $langModel->getRfc5646()
+        ]);
+        
+        /* @var $wordCount editor_Models_Segment_WordCount */
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
+
+            $wordCount->setSegment($segment);
             
-            if(isset($repetitionsDb[$segment->getId()]) && isset($repetitions[md5($segment->getFieldOriginal('source'))])){
+            $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
+            /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
+            
+            $matchAnalysis->setSegmentId($segment->getId());
+            $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
+            $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
+            $matchAnalysis->setAnalysisId($this->analysisId);
+            
+
+            //check if the segment source hash exist in the repetition array
+            //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 tmmt
+            //segment does not exist in repetition array -> query the tm save the best match rate per tm
+            if(isset($repetitionsDb[$segment->getId()]) && isset($repetitionByHash[md5($segment->getFieldOriginal('source'))])){
                     
-                    $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
-                    /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-                    
-                    $matchAnalysis->setSegmentId($segment->getId());
-                    $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
-                    $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
-                    $matchAnalysis->setAnalysisId($this->analysisId);
                     $matchAnalysis->setTmmtid(0);
-                    $matchAnalysis->setMatchRate(102);
+                    $matchAnalysis->setMatchRate(editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE);
                     
-                    //TODO: is this the real text to be calculated from ?
-                    $matchAnalysis->setWordCount($this->calculateWordCount($segment->getFieldOriginal('source'),'en'));
+                    $matchAnalysis->setWordCount($wordCount->getSourceCount());
                     
                     $matchAnalysis->save();
                     continue;
             }
             
-            $repetitions[md5($segment->getFieldOriginal('source'))]=array();
+            //add the segment source hash in the array
+            $repetitionByHash[md5($segment->getFieldOriginal('source'))]=true;
             
             $matchesByTm=[];
             //query the segment for each assigned tm
@@ -113,31 +131,33 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
                 
                 $matches=[];
-                try {
-                    $matches=$connector->query($segment);
-                } catch (Exception $e) {
-                    error_log(print_r($segment->getFieldOriginal('source'),1));
-                    error_log(print_r($segment->getSegmentNrInTask(),1));
-                    error_log(print_r($repetitions,1));
-                    error_log(print_r($repetitionsDb,1));
-                    continue;
+                $connector->resetResultList();
+                $matches=$connector->query($segment);
+                
+                //for each match, fint the best match rate, and save it
+                foreach ($matches->getResult() as $match){
+                    if($matchAnalysis->getMatchRate() >= $match->matchrate){
+                        continue;
+                    }
+                    $matchAnalysis->setMatchRate($match->matchrate);
                 }
                 
-                $matchesByTm[$tmmtid]=$matches->getResult();
+                $matchAnalysis->setTmmtid($tmmtid);
+                $matchAnalysis->setWordCount($wordCount->getSourceCount());
+                //save match analysis
+                $matchAnalysis->save();
                 
-                //FIXME: is this the right way to reset ?
                 $matches->resetResult();
             }
-            
-            //calculate the match count based on the received results
-            $calcMatch=$this->calculateMatch($matchesByTm,$segment);
-            
-            //save the match analysis 
-            //$this->saveMatchAnalysis($segment,$calcMatch['count'],$calcMatch['tmmtid']);
         }
     }
     
     
+    /***
+     * Init the tmmt connectiors
+     * 
+     * @return NULL|array
+     */
     public function initConnectors(){
         
         $tmmts=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
@@ -188,174 +208,5 @@ class editor_Plugins_MatchAnalysis_Analysis{
         $connector=$manager->getConnector($tmmt);
         
         return $connector->query($segment);
-    }
-        
-    
-    /***
-     * TODO: implement me,
-     * TODO: return [count=> the count, tmmtid=> best mathc tm] 
-     * @param array $matches
-     * @return array
-     */
-    public function calculateMatch($matchesByTm,$segment){
-        
-        
-        //for each tm-match save the best
-        foreach ($matchesByTm as $tmmtid=>$tmMatch){
-            
-            $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
-            /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-            
-            $matchAnalysis->setSegmentId($segment->getId());
-            $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
-            $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
-            $matchAnalysis->setAnalysisId($this->analysisId);
-            $matchAnalysis->setTmmtid($tmmtid);
-            
-            $text="";
-            foreach ($tmMatch as $match){
-                
-                if($matchAnalysis->getMatchRate() >= $match->matchrate){
-                    continue;
-                }
-                $matchAnalysis->setMatchRate($match->matchrate);
-                
-                //TODO: is this the real text to be calculated from ?
-                $text=$match->source;
-            }
-            
-            $matchAnalysis->setWordCount($this->calculateWordCount($text,'en'));
-            //save match analysis
-            $matchAnalysis->save();
-        }
-    }
-
-    private $whiteSpaceChars=array(
-            '00000009',
-            '0000000A',
-            '0000000B',
-            '0000000C',
-            '0000000D',
-            '00000020',
-            '00000085',
-            '000000A0',
-            '00001680',
-            '00002000',
-            '00002001',
-            '00002002',
-            '00002003',
-            '00002004',
-            '00002005',
-            '00002006',
-            '00002007',
-            '00002008',
-            '00002009',
-            '0000200A',
-            '0000200D',
-            '00002028',
-            '00002029',
-            '0000202F',
-            '0000205F',
-            '00003000',
-            '0000feff'
-    );
-    public function calculateWordCount($text,$rfcLang){
-        $count=0;
-        //TODO: All whitespace tags (new type of tags Thomas just introduced) are replaced by a single space
-        //TODO: All other tags and other markups are deleted from the segment
-        //$patern=implode('\\', $this->whiteSpaceChars);
-        //$patern='/'.$patern.'/u';
-        
-        
-        //average words in East Asian languages by language
-        //Chinese (all forms): 2.8
-        //Japanese: 3.0
-        //Korean: 3.3
-        //Thai: 6.0
-        
-        switch (strtolower($rfcLang)) {
-            case 'zh':
-            case 'zh-hk':
-            case 'zh-mo':
-            case 'zh-sg':
-                $text=preg_replace("#[[:punct:]]#", "", $text);
-
-                $average=2.8;
-                $count = grapheme_strlen($text);
-                $count = round($count/$average);
-                break;
-            case 'th-th':
-                $text=preg_replace("#[[:punct:]]#", "", $text);
-                
-                $average=6.0;
-                $count = grapheme_strlen($text);
-                $count = round($count/$average);
-                break;
-            case 'ja-jp':
-                $text=preg_replace("#[[:punct:]]#", "", $text);
-                
-                $average=3.0;
-                $count = grapheme_strlen($text);
-                $count = round($count/$average);
-            case 'ko-kr':
-                $text=preg_replace("#[[:punct:]]#", "", $text);
-                
-                $average=3.3;
-                $count = grapheme_strlen($text);
-                $count = round($count/$average);
-                break;
-            
-            default:
-                $retText=$this->toCodePoint($text,'UTF-8');
-                $finalString="";
-                foreach ($retText as $ret){
-                    if(in_array($ret, $this->whiteSpaceChars)){
-                        $ret='00000020';
-                    }
-                    $ret=hexdec($ret);//to decimal
-                    
-                    $ret=chr($ret);//get char
-                    
-                    $finalString.=$ret;
-                }
-                $count = str_word_count($finalString, 0);
-            break;
-        }
-        
-        
-        return $count;
-    }
-    
-    public function toCodePoint( $string, $encoding )
-    {
-        $utf32  = mb_convert_encoding( $string, 'UTF-32', $encoding );
-        $length = mb_strlen( $utf32, 'UTF-32' );
-        $result = [];
-        
-        
-        for( $i = 0; $i < $length; ++$i ){
-            $result[] = bin2hex( mb_substr( $utf32, $i, 1, 'UTF-32'  ));
-        }
-        return $result;
-    }
-    
-    /***
-     * Save the match analysis record with the calculated matchrate to the database
-     * 
-     * @param editor_Models_Segment $segment
-     * @param int $matchRate
-     * @param int $tmmtid
-     */
-    public function saveMatchAnalysis(editor_Models_Segment $segment,$matchRate,$tmmtid){
-        $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
-        /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-        
-        //save match analysis
-        $matchAnalysis->setMatchRate($matchRate);
-        $matchAnalysis->setSegmentId($segment->getId());
-        $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
-        $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
-        $matchAnalysis->setTmmtId($tmmtid);
-        $matchAnalysis->save();
     }
 }

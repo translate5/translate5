@@ -53,6 +53,13 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     const CONTEXT_MATCH_VALUE=103;
     
+    /***
+     * A repetition is a segment, that already showed up with the same words and tag order further above in the same task
+     * @var integer
+     */
+    const REPETITION_MATCH_VALUE=102;
+    
+    
     /**
      * @var editor_Plugins_MatchResource_Services_OpenTM2_HttpApi
      */
@@ -488,7 +495,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @param string $filename
      * @return unknown|string
      */
-    public function calculateMatchRate($matchRate,$metaData,$segment,$filename){
+    protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
         
         if($matchRate<100){
             return $matchRate;
@@ -504,17 +511,17 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
             }
             
             //context metch
-            if($data->name=="context" && $data->value==$segment->getSegmentNrInTask()){
+            if($data->name=="context" && $data->value==$segment->getMid()){
                 $isContext=true;
             }
         }
         
-        if($isExacExac){
-            $matchRate=self::EXACT_EXACT_MATCH_VALUE;
+        if($isExacExac && $isContext){
+            return self::CONTEXT_MATCH_VALUE;
         }
         
-        if($isExacExac && $isContext){
-            $matchRate=self::CONTEXT_MATCH_VALUE;
+        if($isExacExac){
+            return self::EXACT_EXACT_MATCH_VALUE;
         }
         
         return $matchRate;

@@ -40,6 +40,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $frontendControllers = array(
         'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
+        'pluginMatchAnalysisGridPrinter' => 'Editor.plugins.MatchAnalysis.controller.GridPrinter',
     );
     
     protected $localePath = 'locales';
@@ -72,6 +73,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if(ZfExtended_Debug::hasLevel('plugin', 'MatchAnalysis')) {
             ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
         }
+        $this->addController('MatchAnalysisController');
         $this->initEvents();
         $this->initRoutes();
     }

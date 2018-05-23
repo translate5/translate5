@@ -1516,9 +1516,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Get semgnet repetitions from the task view
-     * 
+     * Get all segment repetitions from the task view.
+     * Segment repetitions are segments with the same sourceMd5 hash value
      * @param guid $taskGuid
+     * //TODO descrpit the method
      */
     public function getRepetitions($taskGuid){
         $adapter=$this->db->getAdapter();

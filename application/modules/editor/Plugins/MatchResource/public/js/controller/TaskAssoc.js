@@ -51,7 +51,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       selector: 'adminTaskPreferencesWindow > tabpanel'
   },{
       ref: 'grid',
-      selector: 'adminTaskPreferencesWindow > tabpanel #tmTaskAssocGrid'
+      selector: '#tmTaskAssocGrid'
   },{
       ref: 'adminTaskWindow',
       selector: 'adminTaskPreferencesWindow'
@@ -103,13 +103,19 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
               }
           };
+      //set the actual task
+      me.actualTask = task;
       me.getGrid().store.removeAll();
       me.getGrid().store.load(tmmtparams);
   },
   handleOnSaveButtonClick: function(window) {
       var me = this,
           tmpStore = me.getGrid().store;
-      me.getAdminTaskWindow().setLoading(true);
+
+      if(me.getAdminTaskWindow()){
+          me.getAdminTaskWindow().setLoading(true);
+      }
+      
       me.requestsCount = tmpStore.getCount();
       tmpStore.each(me.saveOneAssocRecord, me);
   },
@@ -194,6 +200,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   },
   hideLoadingMask:function(){
       var me=this;
+      if(!me.getAdminTaskWindow()){
+          return;
+      }
       if(me.requestsCount <= 0){
           var task = me.getAdminTaskWindow().actualTask;
           me.getAdminTaskWindow().setLoading(false);

@@ -41,54 +41,82 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     requires: [
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
+        'Editor.plugins.MatchAnalysis.view.MatchResources'
     ],
+    
+    models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],
+    stores:['Editor.plugins.MatchAnalysis.store.MatchAnalysis'],
     
     refs:[{
         ref: 'adminTaskPreferencesWindow',
         selector: 'adminTaskPreferencesWindow'
+    },{
+        ref: 'preferencesTabpanal',
+        selector: 'adminTaskPreferencesWindow > tabpanel'
+    },{
+        ref:'matchAnalysisPanel',
+        selector: 'matchAnalysisPanel'
     }],
         
     strings:{
         taskGridIconTooltip:'#UT#Analysis panel'
     },
+    
     listen:{
         component:{
             '#adminTaskPreferencesWindow tabpanel':{
                 render:'onTaskPreferencesWindowPanelRender'
             },
-            '#adminTaskGrid taskActionColumn':{
-                beforerender:'onActionColumBeforeRender'
+            '#adminTaskAddWindow': {
+                beforerender:'onAdminTaskWindowBeforeRender'
             }
         }
     },
     
+    onAdminTaskWindowBeforeRender:function(window,eOpts){
+        var me=this;
+        window.insertCard({
+            xtype:'matchResourcesPanel',
+            listeners:{
+                activate:me.onMatchResourcesPanelActivate
+            }
+        },'postimport');      
+    },
+
     init : function() {
         var me = this,
             toc = me.application.getController('admin.TaskOverview');
         toc.on('taskActionColumnNoHandler', me.onTaskActionColumnNoHandler, me);
     },
     
+    /***
+     * On task preferences window tabpanel render
+     */
     onTaskPreferencesWindowPanelRender:function(panel){
+        
+        //add the matchanalysis panel in the tabpanel
         panel.add({
            xtype:'matchAnalysisPanel' 
         });
     },
     
-    onActionColumBeforeRender:function(column){
-        var me=this;
-        column.items.push({
-            tooltip:me.strings.taskGridIconTooltip,
-            cls: 'ico-task-analysis',
-            iconCls: 'ico-task-analysis'
-        });
-    },
-    
+    /***
+     * When action column click with no click handler is found
+     */
     onTaskActionColumnNoHandler:function(column,task){
         if(this.getAdminTaskPreferencesWindow()){
             return;
         }
         var me=this,
             taskPref = me.application.getController('admin.TaskPreferences');
-        taskPref.handleTaskPreferences(task);
-    } 
+        
+        //display the task preferences window with focus on matchanalysis panel
+        taskPref.handleTaskPreferences(task,'matchAnalysisPanel');
+    },
+    
+    onMatchResourcesPanelActivate:function(panel){
+        var me=this,
+            taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc');
+        taskAssoc.handleLoadPreferences(taskAssoc,panel.task);
+    }
 });

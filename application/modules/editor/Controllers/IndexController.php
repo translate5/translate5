@@ -95,7 +95,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $this->setJsVarsInView();
         $this->checkForUpdates();
         
-        $this->startTestCode();
+        //$this->startTestCode();
     }
     
     public function startTestCode(){

@@ -33,45 +33,32 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth
+ * @class Editor.plugins.MatchAnalysis.view.MatchResources
  * @extends Ext.form.Panel
  */
-Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
+Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
     extend:'Ext.panel.Panel',
-    alias: 'widget.globaleseAuthPanel',
-    controller: 'globaleseAuthPanel',
+    alias: 'widget.matchResourcesPanel',
+    controller: 'matchResourcesPanel',
     requires: [
-        'Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewController'
+        'Editor.plugins.MatchAnalysis.view.MatchResourcesViewController',
+        'Editor.plugins.MatchResource.view.TaskAssocPanel'
     ],
     mixins:['Editor.controller.admin.IWizardCard'],
-    importType:'import',
-    listeners: {
-        beforerender: 'onAuthPanelBeforeRender'
-    },
+    importType:'postimport',
+    
+    task:null,
+    
     strings:{
-        skipPreTranslation:'#UT#Globalese Vorübersetzung überspringen',
-        username:'#UT#Globalese Benutzer',
-        apiKey:'#UT#API Schlüssel',
-        wizardTitle:'#UT#Globalese Authentifizierung'
+        wizardTitle:'#UT#Match Resources'
     },
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                    defaults: {
-                        padding: '20 0 0 20'
-                    },
                     items: [{
-                        xtype: 'textfield',
-                        fieldLabel: me.strings.username,
-                        itemId:'apiUsername',
-                    },{
-                        xtype: 'textfield',
-                        fieldLabel:me.strings.apiKey,
-                        itemId:'apiPassword',
-                        width:380
+                        xtype: 'matchResourceTaskAssocPanel',
                     }]
             };
-        
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
@@ -87,7 +74,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuth', {
     },
 
     disableSkipButton:function(){
-        return false;
+        return true;
     },
     
     disableContinueButton:function(){

@@ -59,16 +59,75 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
     
     
+    /***
+     * Load the result by best match rate. The results will be grouped in the followed groups:
+     * Real groups:        103%, 102%, 101%, 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
+     * Group result index: 103,  102,  101,  100,  99,      89,      79,      69,      59,      noMatch
+     * 
+     * The result array will contain the total word count in the result.
+     * @param unknown $taskGuid
+     * @return NULL|array
+     */
     public function loadByBestMatchRate($taskGuid){
         $s = $this->db->select()
-        ->from($this->db, array('segmentId','taskGuid','matchRate','COUNT(DISTINCT wordCount) AS wordCount'))
-        ->where('`taskGuid` = ?', $taskGuid)
-        ->group('matchRate');
+        ->setIntegrityCheck(false)
+        ->from($this->db, array('LEK_match_analysis_taskassoc.created','analysisId','segmentId','taskGuid','matchRate','wordCount'))
+        ->join('LEK_match_analysis_taskassoc', 'LEK_match_analysis_taskassoc.id=LEK_match_analysis.analysisId')
+        ->where('LEK_match_analysis.taskGuid = ?', $taskGuid);
+        
         $resultArray=$this->db->fetchAll($s)->toArray();
         
         if(empty($resultArray)){
             return null;
         }
-        return $this->db->fetchAll($s)->toArray(); 
+        return $this->groupByMatchrate($resultArray);
+    }
+    
+    /***
+     * Group the results by match rate group
+     * @param array $results
+     * @return array[]
+     */
+    private function groupByMatchrate($results){
+        
+        $groupedResults=[];
+        
+        //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
+        $groupBorder=[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
+        $wordCountTotal=0;
+        foreach ($results as $res){
+            
+            $resultFound=false;
+            
+            //check on which border group this result belongs to
+            foreach ($groupBorder as $border=>$value){
+                if($res['matchRate']>$border){
+                    if(!isset($groupedResults[$value])){
+                        $groupedResults[$value]=[];
+                        $groupedResults[$value]['rateCount']=0;
+                        $groupedResults[$value]['wordCount']=0;
+                    }
+                    $groupedResults[$value]['rateCount']++;
+                    $groupedResults[$value]['wordCount']+=$res['wordCount'];
+                    $wordCountTotal+=$res['wordCount'];
+                    $resultFound=true;
+                    break;
+                }
+            }
+            
+            if(!$resultFound){
+                if(!isset($groupedResults['noMatch'])){
+                    $groupedResults['noMatch']=[];
+                    $groupedResults['noMatch']['rateCount']=0;
+                    $groupedResults['noMatch']['wordCount']=0;
+                }
+                $groupedResults['noMatch']['rateCount']++;
+                $groupedResults['noMatch']['wordCount']+=$res['wordCount'];
+                $wordCountTotal+=$res['wordCount'];
+            }
+        }
+        $groupedResults['wordCountTotal']=$wordCountTotal;
+        
+        return $groupedResults;
     }
 }

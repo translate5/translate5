@@ -44,6 +44,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettings', {
         'Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewController'
     ],
     mixins:['Editor.controller.admin.IWizardCard'],
+    importType:'import',
     strings:{
         wizardTitle:'#UT#Globalese Einstellungen',
         nextButtonText:'#UT#Importieren',

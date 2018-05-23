@@ -154,5 +154,5 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
             return label;
         }
         return '';
-    },
+    }
 });

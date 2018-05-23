@@ -1,4 +1,4 @@
-<?php
+
 /*
 START LICENSE AND COPYRIGHT
 
@@ -27,18 +27,41 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ * @class Editor.plugins.MatchAnalysis.view.MatchResourcesViewController
+ * @extends Ext.app.ViewController
  */
-class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_RestController {
+Ext.define('Editor.plugins.MatchAnalysis.view.MatchResourcesViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.matchResourcesPanel',
 
-    protected $entityClass = 'editor_Plugins_MatchAnalysis_Models_MatchAnalysis';
-
-    /**
-     * @var editor_Plugins_MatchAnalysis_Models_MatchAnalysis
-     */
-    protected $entity;
+    handleNextCardClick:function(){
+        debugger;
+        var me=this,
+            view=me.getView();
+        view.fireEvent('wizardCardFinished');
+    },
     
-    public function indexAction(){
-        $taskGuid="{ed03996b-37fd-4ecd-b988-b118ccbe5069}";
-        $this->view->rows=$this->entity->loadByBestMatchRate($taskGuid);
+    handleSkipCardClick:function(){
+        debugger;
+        var me=this,
+            view=me.getView();
+        view.fireEvent('wizardCardFinished',0);
     }
-}
+    
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
