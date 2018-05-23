@@ -175,7 +175,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * - INS => markup-Tag ONLY is removed
      */
     public function removeTrackChanges(string $segment) {
-        $this->protect($segment);
+        $segment = $this->protect($segment);
         $segment= preg_replace('/ <'.self::PLACEHOLDER_TAG_DEL.'[^>]+> /', ' ', $segment);
         $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
         $segment= preg_replace(self::REGEX_INS, '', $segment);
