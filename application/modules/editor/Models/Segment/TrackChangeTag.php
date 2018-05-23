@@ -49,15 +49,8 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      */
     const REGEX_INS     = '/<\/?ins[^>]*>/i';
     
-    
-    /***
-     * del-Tag:  avoid double space after removing a deleted word with one space at both sides (TRANSLATE-1194)
-     * 
-     * @var string
-     */
-    const REGEX_DEL_NODOUBLESPACE = '/ <del[^>]*>.*?<\/del> /i';
-    
-    /***
+    /**
+     * FIXME currently used only at one place, refactor so that this class provides a function to achieve the same stuff as currently done in ReplaceMatchesSegment.php
      * del protected tag regex 
      * @var string
      */
@@ -67,7 +60,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * trackchange placeholder template 
      * @var string
      */
-    const PLACEHOLDER_TEMPLATE='<segment:del id="%s" />';
+    const PLACEHOLDER_TAG_DEL='segment:del';
     
     /***
      * delete node name 
@@ -121,7 +114,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     
     public function __construct(){
         $this->replacerRegex=self::REGEX_DEL;
-        $this->placeholderTemplate=self::PLACEHOLDER_TEMPLATE;
+        $this->placeholderTemplate='<'.self::PLACEHOLDER_TAG_DEL.' id="%s" />';
     }
     
     /***
@@ -182,8 +175,9 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * - INS => markup-Tag ONLY is removed
      */
     public function removeTrackChanges(string $segment) {
-        $segment= preg_replace(self::REGEX_DEL_NODOUBLESPACE, ' ', $segment);
-        $segment= preg_replace(self::REGEX_DEL, '', $segment);
+        $this->protect($segment);
+        $segment= preg_replace('/ <'.self::PLACEHOLDER_TAG_DEL.'[^>]+> /', ' ', $segment);
+        $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
         $segment= preg_replace(self::REGEX_INS, '', $segment);
         return $segment;
     }
