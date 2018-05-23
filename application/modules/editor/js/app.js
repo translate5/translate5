@@ -376,6 +376,9 @@ Ext.application({
       }
   },
   
+  /***
+   * Get all classes with which are using the mixin
+   */
   getClassesByMixin:function(mixinName){
       var classes=[];
       Ext.iterate(Ext.ClassManager.classes,function(className,c){

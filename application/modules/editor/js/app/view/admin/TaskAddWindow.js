@@ -82,6 +82,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     modal : true,
     layout: 'anchor',
     
+    /***
+     * Group of cards before they are added to the window wizard
+     * The groups are:preimport, import and postimport
+     */
     groupCards:[],
     
     listeners:{
