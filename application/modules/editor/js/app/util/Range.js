@@ -417,8 +417,9 @@ Ext.define('Editor.util.Range', {
                 return false;
             },
             findNodeInEditor = function(nodeToFind){
-                var nodeFound = null;
-                Ext.Array.each(me.getEditorBody().childNodes, function(node, index) {
+                var nodeFound = null,
+                    allNodesInEditor = me.getEditorBodyExtDomElement().query('*');
+                Ext.Array.each(allNodesInEditor, function(node, index) {
                     if ( (node.id === nodeToFind.id) || node.isEqualNode(nodeToFind) ) {
                         nodeFound = node;
                     }
