@@ -774,11 +774,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         Ext.util.CSS.createStyleSheetToWindow(
                 me.getEditorDoc(),
-                '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' +
-                '.'+me.self.CSS_CLASSNAME_MATCH+' {border-bottom: 3px dotted; border-color: red;}' +
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' {border-color: #ab8906;}' +    // dark yellow
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' {border-color: #458fe6;}' +      // blue
-                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' {border-color: #e645a8;}'        // red-violet
+                '.'+me.self.CSS_CLASSNAME_MATCH+' {cursor: pointer;}' + "\n" +
+                '.'+me.self.CSS_CLASSNAME_MATCH+', .'+me.self.CSS_CLASSNAME_MATCH+' .trackchanges {border-bottom: 3px dotted; border-color: red;}' + "\n" +
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+', .'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_GRAMMERERROR+' .trackchanges {border-color: #ab8906;}' + "\n" + // dark yellow
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+', .'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SUGGESTION+' .trackchanges {border-color: #458fe6;}' + "\n" +     // blue
+                '.'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+', .'+me.self.CSS_CLASSNAME_MATCH+'.'+me.self.CSS_CLASSNAME_SPELLERROR+' .trackchanges {border-color: #e645a8;}' + "\n"       // red-violet
             );
     },
     
