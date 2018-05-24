@@ -65,6 +65,12 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     protected $api;
     
+    /***
+     * Filename by file id cache
+     * @var array
+     */
+    protected $fileNameCache=array();
+    
     
     /**
      * {@inheritDoc}
@@ -223,9 +229,16 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
-        $file->load($segment->getFileId());
+        
+        if(!isset($this->fileNameCache[$segment->getFileId()])){
+            $file = ZfExtended_Factory::get('editor_Models_File');
+            /* @var $file editor_Models_File */
+            $file->load($segment->getFileId());
+            $this->fileNameCache[$segment->getFileId()]=$file->getFileName();
+            
+        }
+        
+        $fileName=$this->fileNameCache[$segment->getFileId()];
         
         //Although we take the source fields from the OpenTM2 answer below
         // we have to set the default source here to fill the be added internal tags 
@@ -238,7 +251,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         $queryString = $internalTag->toXliffPaired($this->getQueryString($segment), true, $map);
         $mapCount = count($map);
         
-        if($this->api->lookup($segment, $queryString, $file->getFileName())){
+        if($this->api->lookup($segment, $queryString, $fileName)){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){
                 return $this->resultList; 
@@ -251,11 +264,9 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 $target = $internalTag->reapply2dMap($found->target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
                 
-                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $segment, $file->getFileName());
+                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $segment, $fileName);
                 
                 $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
-                
-                //$this->resultList->addResult($target, $found->matchRate, $this->getMetaData($found));
                 
                 $source = $internalTag->reapply2dMap($found->source, $map);
                 $source = $this->replaceAdditionalTags($source, $mapCount);

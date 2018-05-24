@@ -64,6 +64,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         /* @var $excel ZfExtended_Models_Entity_ExcelExport */
         
+        //TODO: translate the strings 
         // set property for export-filename
         $excel->setProperty('filename', 'Match analysis');
         

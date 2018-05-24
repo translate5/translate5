@@ -455,6 +455,10 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         if($deleteInResource && $connector instanceof editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract) {
             $connector->delete();
         }
+        
+        $userSession = new Zend_Session_Namespace('user');
+        
+        error_log("Tmmt with name:".$this->entity->getName()." and id:".$this->entity->getId()." was deleted by:".$userSession->data->firstName." ".$userSession->data->surName);
         $this->processClientReferenceVersion();
         $this->entity->delete();
     }
