@@ -94,6 +94,16 @@ class editor_Models_Segment_MatchRateType {
     const TYPE_EMPTY = 'empty';
     
     /**
+     * @var string
+     */
+    const TYPE_MISSING_SOURCE_MRK = 'missing-source-mrk';
+    
+    /**
+     * @var string
+     */
+    const TYPE_MISSING_TARGET_MRK = 'missing-target-mrk';
+    
+    /**
      * Uses as match rate prefix when the value comes from import
      * @var string
      */
@@ -171,6 +181,12 @@ class editor_Models_Segment_MatchRateType {
      */
     public function parseImport(editor_Models_Import_FileParser_SegmentAttributes $attributes, $mid){
         $importedValue = $attributes->matchRateType;
+        
+        if($importedValue == self::TYPE_MISSING_SOURCE_MRK || $importedValue == self::TYPE_MISSING_TARGET_MRK) {
+            $this->data = [$importedValue];
+            return $this;
+        }
+        
         $this->data = [self::PREFIX_IMPORT];
         
         if(!$attributes->isTranslated && $attributes->matchRate === 0) {

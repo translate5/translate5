@@ -48,20 +48,6 @@ class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
         self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
     }
     
-    public function testImportFailOnSegmentatationErrors1() {
-        $this->api()->addImportFile($this->api()->getFile('ibm-opentm2-fail1.xlf'), 'application/xml');
-        $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with segmentation errors did not produce a task state error!');
-        $task = $this->api()->getTask();
-        $this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
-    }
-    
-    public function testImportFailOnSegmentatationErrors2() {
-        $this->api()->addImportFile($this->api()->getFile('ibm-opentm2-fail2.xlf'), 'application/xml');
-        $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with segmentation errors did not produce a task state error!');
-        $task = $this->api()->getTask();
-        $this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
-    }
-    
     public function testImportMissingTagId() {
         $this->api()->addImportFile($this->api()->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
         $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');

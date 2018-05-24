@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParser {
     const PREFIX_MRK = 'mrk-';
     const PREFIX_SUB = 'sub-';
+    const MISSING_MRK = 'missing-mrk';
     
     private $wordCount = 0;
     private $segmentCount = 1;
@@ -643,6 +644,28 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //must be set before the loop, since in the loop the currentTarget is cleared on success
         $hasTargets = !empty($this->currentTarget);
+        
+        $this->padSourceMrkTags();
+        $this->padTargetMrkTags();
+        
+        //TODO TRANSLATE-1231: 
+        // OK - Finde die mrk-MIDs die in $this->sourceProcessOrder sind und als key in $this->currentTarget fehlen
+        // OK - Füge diese als "Leersegment" $this->currentTarget hinzu. Das Segment muss irgendwie speziell markiert werden, so dass 
+        //   OK -- Kein placeholder angelegt wird
+        //   OK -- der Matchtype entsprechend gesetzt werden kann
+        //   OFFEN -- das Segment als Readonly markiert wird, wenn kein Source Editing an ist, ansonsten darf nur das Source Feld editiert werden
+        // OK - Finde die mrk-MIDs die als key in $this->currentTarget sind und in $this->sourceProcessOrder fehlen
+        // OK - Sortiere diese numerisch in $this->sourceProcessOrder ein, und fülle $this->currentSource mit einem "Leersegment"
+        // OK - Es muss ebenfalls speziell markiert werden, so dass 
+        //   UNKLAR -- bei Source Editing kein PlaceHolder angelegt wird
+        //   OFFEN -- bei Source Editing das SourceFeld nicht editiert werden kann
+        //   OK -- der Matchtype entsprechend gesetzt werden kann
+        //
+        // - partielles ReadOnly im Frontend über matchtype??? Anstatt Marcs Text eine Grafik rendern?
+        // - Wie sind die Planungen hinsichtlich mrk splitting und merging? Sollte wurscht sein, wir reden hier über den Import. 
+        //   Splitting und Merging ist zur Laufzeit, die Datenbasis muss es halt hergeben.
+        //   
+        
         foreach($this->sourceProcessOrder as $mid) {
             
             if($mid === '') {
@@ -651,33 +674,45 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 continue;
             }
             $currentSource = $this->currentSource[$mid];
+            $isSourceMrkMissing = ($currentSource == self::MISSING_MRK);
             
-            //parse the source chunks
-            $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1);
-            $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
-            $sourceSegment = $this->xmlparser->join($sourceChunks);
-            
-            //if there is no source content, nothing can be done
-            if(empty($sourceSegment)){
-                unset($this->currentTarget[$mid]);
-                continue;
+            if($isSourceMrkMissing) {
+                $sourceChunks = [];
+            }
+            else {
+                //parse the source chunks
+                $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1);
+                $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
+                $sourceSegment = $this->xmlparser->join($sourceChunks);
+                
+                //if there is no source content, nothing can be done
+                if(empty($sourceSegment)){
+                    unset($this->currentTarget[$mid]);
+                    continue;
+                }
             }
             
             if($hasTargets && empty($this->currentTarget[$mid])){
                 $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-                $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
+                $msg  = 'SUB tag of source not found in target with Mid: '.$mid."\n";
                 $this->throwSegmentationException($msg, $transUnitMid);
             }
             if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
                 $targetChunksOriginal = $targetChunks = [];
+                $currentTarget = '';
             }
             else {
                 $currentTarget = $this->currentTarget[$mid];
                 unset($this->currentTarget[$mid]);
-                //parse the target chunks, store the real chunks from the XLF separatly 
-                $targetChunksOriginal = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
-                //in targetChunks the content is converted (tags, whitespace etc)
-                $targetChunks = $this->contentConverter->convert($targetChunksOriginal, false, $currentTarget['openerMeta']['preserveWhitespace']);
+                if($currentTarget == self::MISSING_MRK) {
+                    $targetChunksOriginal = $targetChunks = [];
+                }
+                else {
+                    //parse the target chunks, store the real chunks from the XLF separatly 
+                    $targetChunksOriginal = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
+                    //in targetChunks the content is converted (tags, whitespace etc)
+                    $targetChunks = $this->contentConverter->convert($targetChunksOriginal, false, $currentTarget['openerMeta']['preserveWhitespace']);
+                }
             }
             
             //reset start/end shift count. 
@@ -725,6 +760,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //parse attributes for each found segment not only for the whole trans-unit
             $attributes = $this->parseSegmentAttributes($transUnit, $mid);
+            if($currentTarget == self::MISSING_MRK) {
+                $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK;
+            } elseif($currentSource == self::MISSING_MRK) {
+                $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_SOURCE_MRK;
+            }
             
             //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
             if(strpos($mid, self::PREFIX_SUB) === 0) {
@@ -732,7 +772,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             
             //if target was given and source contains tags only or is empty, then it will be ignored
-            if(!empty($this->segmentData[$targetName]['original']) && !$this->hasText($this->segmentData[$sourceName]['original'])) {
+            if(!$isSourceMrkMissing && !empty($this->segmentData[$targetName]['original']) && !$this->hasText($this->segmentData[$sourceName]['original'])) {
                 $placeHolders[$mid] = $this->xmlparser->join($targetChunksOriginal);
                 continue;
             }
@@ -741,12 +781,15 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             if($segmentId !== false && is_numeric($segmentId)) {
                 $this->importComments((integer) $segmentId);
             }
-            $placeHolders[$mid] = $leadingTags.$this->getFieldPlaceholder($segmentId, $targetName).$trailingTags;
+            if($currentTarget !== self::MISSING_MRK) {
+                //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
+                $placeHolders[$mid] = $leadingTags.$this->getFieldPlaceholder($segmentId, $targetName).$trailingTags;
+            }
         }
         
         if(!empty($this->currentTarget)){
             $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-            $msg  = 'MRK/SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
+            $msg  = 'SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
             $this->throwSegmentationException($msg, $transUnitMid);
         }
         
@@ -888,6 +931,80 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function parseSegment($segment, $isSource) {
         //is abstract so must be defined empty since not used!
+    }
+    
+    /**
+     * compares source and target mrk mids, adds missing mrks mids into the sourceProcessOrder
+     * find all mrk-MIDs from $this->currentTarget which are missing in $this->sourceProcessOrder
+     * adds them by natural sort order to $this->sourceProcessOrder and to the currentSource container as special segment (MISSING_MRK)
+     */
+    protected function padSourceMrkTags() {
+        $isMrkMid = function($item) {
+            return strpos($item, self::PREFIX_MRK) === 0;
+        };
+        $targetMrkKeys = array_filter(array_keys($this->currentTarget), $isMrkMid);
+        $mrkMissingInSource = array_diff($targetMrkKeys, $this->sourceProcessOrder);
+        if(empty($mrkMissingInSource)) {
+            return;
+        }
+        
+        foreach($mrkMissingInSource as $target) {
+            $this->currentSource[$target] = self::MISSING_MRK;
+        }
+        
+        natsort($mrkMissingInSource);
+        $result = [];
+        //get the first target to compare
+        $target = array_shift($mrkMissingInSource);
+        foreach($this->sourceProcessOrder as $sourceMid) {
+            //if there is no target anymore, or the source is no mrk source, we just add the source
+            if(! $isMrkMid($sourceMid) || empty($target)) {
+                $result[] = $sourceMid;
+                continue;
+            }
+            
+            //if the current sourceMid would be greater or equal to the current target, 
+            // then we add first the target, then the sourceMid
+            if(strnatcmp($sourceMid, $target) >= 0) {
+                $result[] = $target;
+                //get the next target to compare
+                $target = array_shift($mrkMissingInSource);
+            }
+            $result[] = $sourceMid;
+        }
+        //if the target could not added (all source mids were smaller) add it after the loop
+        if(!empty($target)) {
+            $result[] = $target;
+        }
+        //same for all other remaining targets
+        if(!empty($mrkMissingInSource)) {
+            $result = array_merge($result, $mrkMissingInSource);
+        }
+        //store the result back
+        $this->sourceProcessOrder = $result;
+    }
+    
+    /**
+     * loop over $this->sourceProcessOrder and compare with $this->currentTarget, 
+     *   add missing entries to $this->currentTarget also as special segment (MISSING_MRK)
+     */
+    protected function padTargetMrkTags() {
+        //if currentTarget is completly empty, there are no single mrks missing, but all. 
+        // This is handled otherwise
+        if(empty($this->currentTarget)) {
+            return;
+        }
+        $isMrkMid = function($item) {
+            return strpos($item, self::PREFIX_MRK) === 0;
+        };
+        $targetMrkKeys = array_filter(array_keys($this->currentTarget), $isMrkMid);
+        $sourceMrkKeys = array_filter($this->sourceProcessOrder, $isMrkMid);
+        $mrkMissingInTarget = array_diff($sourceMrkKeys, $targetMrkKeys);
+        if(empty($mrkMissingInTarget)) {
+            return;
+        }
+        $mrkMissingInTarget = array_fill_keys($mrkMissingInTarget, self::MISSING_MRK);
+        $this->currentTarget = array_merge($this->currentTarget, $mrkMissingInTarget);
     }
     
     /**
