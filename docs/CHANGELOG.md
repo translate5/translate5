@@ -3,10 +3,22 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.7.4] - 2018-05-24
+###Added
+TRANSLATE-1135: Highlight and Copy text in source and target columns
+
+###Bugfixes
+TRANSLATE-1267: content between two track changes DEL tags is getting deleted on some circumstances
+VISUAL-33: Huge VisualReview projects lead to preg errors in PHP postprocessing of generated HTML
+TRANSLATE-1102: Calling default modules pages by ajax can lead to logout by loosing the session
+TRANSLATE-1226: Zend_Exception with message Array to string conversion
+
+
 ## [2.7.3] - 2018-05-09
 ###Bugfixes
 TRANSLATE-1243: IE11 could not load Segment.js
 TRANSLATE-1239: JS: Uncaught TypeError: Cannot read property 'length' of undefined
+
 
 ## [2.7.2] - 2018-05-08
 ###Changed
