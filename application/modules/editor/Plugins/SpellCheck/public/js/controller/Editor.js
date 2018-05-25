@@ -58,8 +58,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     listen: {
         controller: {
             '#Editor': {
-                beforeKeyMapUsage: 'handleEditorKeyMapUsage',
-                runSpellCheckOnSaving: 'handleSpellCheckOnSaving'
+                beforeKeyMapUsage: 'handleEditorKeyMapUsage'
             },
             '#Editor.$application': {
                 editorViewportOpened: 'initSpellCheckPluginForTask',
@@ -74,9 +73,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
     },
     spellCheckMessages: {
-        moreInformation: '#UT#More information',
-        errorsFoundOnSaving: '#UT#SpellCheck: errors found on saving Segment Nr. %segmentnr.',
-        spellCheckOnSavingIsAlreadyRunningForAnotherSegment: '#UT#The SpellCheck on saving the segment failed because there is already another process running for Segment Nr. %segmentnr.',
+        moreInformation: '#UT#More information'
     },
     statics: {
         // spellcheck-Node
@@ -112,9 +109,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     editIdleTimer: null,            // time since "nothing" is changed in the Editor's content; 1) user: presses no key 2) segmentsHtmleditor: no push, no afterInsertMarkup
     
     spellCheckInProgressID: false,  // id of the currently valid SpellCheck-Process (false if none is running)
-    
-    isSpellCheckOnSaving: false,    // flag to indicate that the SpellChecker runs on saving the segment
-    savedSegmentNrInTask: false,    // segmentNrInTask of the segment that started the SpellCheck on saving
     
     segmentId: null,                // ID of the currently edited Segment
     
@@ -380,26 +374,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         // (2) start Timer for SpellCheck
         me.startTimerForSpellCheck();
     },
-    /**
-     * When a segment is saved, the SpellChecker is activated.
-     * - If there are errors (for the segment that might now be closed already), the user will get a popup-message.
-     * 
-     * TODO: Should we run a check also if a segment is not saved, but closed?
-     * TODO: Can many segments be spellchecked? Then we'll need to control which result belongs to which SpellCheck.
-     */
-    handleSpellCheckOnSaving: function(segmentNrInTask) {
-        var me = this,
-            message;
-        me.consoleLog('handleSpellCheckOnSaving...');
-        if (me.isSpellCheckOnSaving && (me.savedSegmentNrInTask != null) && (me.savedSegmentNrInTask != segmentNrInTask) ){
-            message = me.spellCheckMessages.SpellCheckOnSavingIsAlreadyRunningForAnotherSegment.replace(/%segmentnr/, me.savedSegmentNrInTask);
-            Editor.MessageBox.addError(message);
-            return;
-        }
-        me.savedSegmentNrInTask = segmentNrInTask;
-        me.isSpellCheckOnSaving = true;
-        me.startSpellCheck();
-    },
     
     // =========================================================================
     // Start and finish (!) the SpellCheck.
@@ -484,17 +458,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     applySpellCheck: function(spellCheckProcessID) {
         var me = this,
             message;
-        
-        if (me.isSpellCheckOnSaving) {
-            me.consoleLog('applySpellCheck on isSpellCheckOnSaving...');
-            if (me.allMatchesOfTool.length > 0) {
-                message = me.spellCheckMessages.errorsFoundOnSaving.replace(/%segmentnr/, me.savedSegmentNrInTask);
-                Editor.MessageBox.addWarning(message);
-            }
-            me.isSpellCheckOnSaving = false; // = reset to "default"
-            me.onDestroy();
-            return;
-        }
         
         if (spellCheckProcessID != me.spellCheckInProgressID) {
             me.consoleLog('NO applySpellCheck, spellCheckProcess is no longer valid (' + spellCheckProcessID + '/' + me.spellCheckInProgressID + ').');
