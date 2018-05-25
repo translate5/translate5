@@ -1083,10 +1083,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * @param mixed $customerId
      */
     private function createTermCollection($costumerId){
-        //Term Collection for Task:C:\fakepath\TermImportTest-en-de;Task Name:;Task Guid:{8e27c298-0cba-46e0-82d9-0ccb6488bd91}
         $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $termCollection->setName("Term Collection for Task:".$this->task->getTaskName().";Task Number:".$this->task->getTaskNr().";Task Guid:".$this->task->getTaskGuid()."");
+        $termCollection->setName("tc_".$this->task->getTaskGuid());
         if($costumerId){
             $termCollection->setCustomerId((integer)$costumerId);
         }
