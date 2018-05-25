@@ -31,5 +31,11 @@ END LICENSE AND COPYRIGHT
 ?>
   
 Editor.controller.Localizer.addPluginInit('spellCheck', function() {
-  //see same named file in other plugins!
+  
+    Ext.define("Editor.locale.plugins.SpellCheck.controller.Editor", {
+        override: "Editor.plugins.SpellCheck.controller.Editor",
+        spellCheckMessages: {
+            moreInformation: '<?php echo $this->translate->_('More information');?>'
+        }
+    });
 });

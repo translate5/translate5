@@ -4,7 +4,10 @@
 <!-- html-tags inside the target-string must not be encoded as they should regarding xliff but should be left as plain hmtl. At this stage ZfExtended does not support xliff inline tags -->
  <file original='php-sourcecode' source-language='ha' target-language='en' datatype='php'>
   <body>
-    
+    <trans-unit id='TW9yZSBpbmZvcm1hdGlvbg=='>
+        <source>More information</source>
+        <target>More information</target>
+    </trans-unit>
   </body>
  </file>
 </xliff>
