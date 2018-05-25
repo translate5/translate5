@@ -797,7 +797,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             posX = event.getX() + me.editor.iframeEl.getX()
             posY = event.getY() + me.editor.iframeEl.getY();
         me.activeMatchNode = event.currentTarget;
-        me.spellCheckTooltip.hide();
+        me.initTooltips(); // me.spellCheckTooltip.hide() is not enough (e.g. after a contextmenu had been shown with a long list of replacements, the next contextmenu was placed as if it still has that height)
         me.spellCheckTooltip.showAt(posX,posY);
     }
 });
