@@ -389,11 +389,20 @@ Ext.define('Editor.util.Range', {
     // =========================================================================
     
     /**
-     * If there are empty text-Nodes or non-text-content-Nodes (MQM-Tag, Content-Tag) at the beginning or end, move them OUT of the given range.
+     * If there are empty text-Nodes or non-text-content-Nodes (MQM-Tag, Content-Tag) 
+     * at the beginning or end of a range that is based on characters (eg from SpellCheck),
+     * then we move these Nodes OUT of the given range. (Otherwise the context eg for 
+     * replacements would include these nodes, which would be wrong.)
+     * Example (range marked from "[" to "]"):
+     * - Content is:                                            ab<MQM>cd</MQM>ef
+     * - SpellCheck checks:                                     abcdef
+     * - A match in the SpllCheck means:                        cd
+     * - Finding this range based on the characters results in: ab[<MQM>cd]</MQM>ef
+     * - But correct is:                                        ab<MQM>[cd]</MQM>ef
      * @param {Object} range
      * @returns {Object} range
      */
-    cleanBordersOfRange: function(range) {
+    cleanBordersOfCharacterbasedRange: function(range) {
         var me = this,
             documentFragmentForRange,
             tagNodesInRange,
@@ -423,7 +432,6 @@ Ext.define('Editor.util.Range', {
                     if ( (node.id != null && node.id != "" && node.id === nodeToFind.id) 
                             || node.isEqualNode(nodeToFind) ) {
                         nodeFound = node;
-                        debugger;
                     }
                 });
                 return nodeFound;
@@ -483,8 +491,17 @@ Ext.define('Editor.util.Range', {
     // => workaround: return and apply node.
     // =========================================================================
     
-    // ---------- When to use the workaround -----------------------------------
+    // -------------------------------------------------------------------------
+    // When to use the workaround 
+    // -------------------------------------------------------------------------
     
+    /**
+     * On getting the bookmark:
+     * Check if the workaround as described above is needed to be applied
+     * (= when the cursor is placed after an MQM-Tag or a content-node).
+     * @param {Object} range
+     * @returns {Boolean}
+     */
     useWorkaroundForBookmark: function(range) {
         var me = this,
             contentBeforeRange;
@@ -492,56 +509,106 @@ Ext.define('Editor.util.Range', {
         return (contentBeforeRange !=  null && "nodeType" in contentBeforeRange && contentBeforeRange.nodeType === 1 
                 && ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) ) );
     },
-    isWorkaroundOfBookmark: function(bookmark) {
+    /**
+     * On applying the bookmark:
+     * Check if the workaround as described above is needed to be applied
+     * (= when the bookmark is a node).
+     * @param {Object} bookmark
+     * @returns {Boolean}
+     */
+    isBookmarkOfWorkaround: function(bookmark) {
         return ("nodeType" in bookmark && bookmark.nodeType === 1);
     },
     
-    // ---------- What to use as workround -------------------------------------
+    // -------------------------------------------------------------------------
+    // What to use as workaround
+    // -------------------------------------------------------------------------
     
-    getBookmarkUsingTheWorkaround: function(range) {
+    /**
+     * Get the bookmark using the workaround; optionally handles character-based ranges, too.
+     * @param {Object} range
+     * @param {Boolean} isCharacterbased
+     * @returns {Boolean}
+     */
+    getBookmarkUsingTheWorkaround: function(range,isCharacterbased) {
         var me = this;
-        if (!range.collapsed) {
-            return me.cleanBordersOfRange(range).getBookmark();
-        } else {
+        // Use the workaround only for collapsed ranges!
+        if (range.collapsed) {
             return me.getContainerForCharacterNextToCaret(range,'previous');
         }
+        // If we work with a (non-collapsed) character-based range: clean the borders first.
+        if (isCharacterbased) {
+            range = me.cleanBordersOfCharacterbasedRange(range);
+        }
+        // Fallback for non-collapsed ranges: Use rangy's bookmark as usual.
+        return range.getBookmark();
     },
+    /**
+     * Apply the bookmark using the workaround.
+     * If the node that we used for the workaround does no longer exist, we are lost.
+     * @param {Object} range
+     * @param {Object} bookmark
+     * @returns {Object} range
+     */
     applyBookmarkUsingTheWorkaround: function(range,bookmark) {
         var me = this,
             nodeForBookmark;
         nodeForBookmark = Ext.get(me.getEditorBody()).getById(bookmark.id,true);
-        range.setStartAfter(nodeForBookmark);
-        range.collapse(true);
+        if (nodeForBookmark != null) {
+            range.setStartAfter(nodeForBookmark);
+            range.collapse(true);
+        }
         return range;
     },
     
-    // ---------- Bookmarks for Ranges -----------------------------------------
+    // -------------------------------------------------------------------------
+    // Bookmarks for Ranges in translate5
+    // -------------------------------------------------------------------------
     
-    getBookmarkForRangeInTranslate5: function(range) {
+    /**
+     * Get the bookmark:
+     * - use workaround for buggy bookmarks when necesssary
+     * - optional: extra handling of characterbased ranges
+     * @param {Object} range
+     * @param {Boolean} isCharacterbased
+     * @returns {Object} rangy-bookmark|node
+     */
+    getBookmarkForRangeInTranslate5: function(range,isCharacterbased) {
         var me = this;
         if (me.useWorkaroundForBookmark(range)) {
-            return me.getBookmarkUsingTheWorkaround(range);
+            return me.getBookmarkUsingTheWorkaround(range,isCharacterbased);
         } else {
             return range.getBookmark();
         }
     },
-    moveRangeToBookmarkInTranslate5: function(range,bookmark) {
+    /**
+     * Apply a bookmark:
+     * @param {Object} range
+     * @param {Object} rangy-bookmark|node
+     * @param {Boolean} isCharacterbased
+     * @returns {Object} range
+     */
+    moveRangeToBookmarkInTranslate5: function(range,bookmark,isCharacterbased) {
         var me = this,
             nodeForBookmark;
-        if (me.isWorkaroundOfBookmark(bookmark)){
+        if (me.isBookmarkOfWorkaround(bookmark)){
             range = me.applyBookmarkUsingTheWorkaround(range,bookmark);
         } else {
             range.moveToBookmark(bookmark);
         }
-        range = me.cleanBordersOfRange(range);
+        if (isCharacterbased) {
+            range = me.cleanBordersOfCharacterbasedRange(range);
+        }
         return range;
     },
-    
-    // ---------- Get and set the position of the caret in the Editor ----------
-    // ---------- (use SELECTION if workaround is not applied) -----------------
+
+    // -------------------------------------------------------------------------
+    // Get and set the position of the caret in the Editor
+    // -------------------------------------------------------------------------
     
     /**
-     * Get the bookmark for the current position of the cursor in the Editor.
+     * Returns a bookmark for the current position of the cursor in the Editor.
+    // (Use bookmark of rangy's SELECTION if workaround is not applied).
      * @returns {Object} rangy-bookmark|node
      */
     getPositionOfCaret: function() {
@@ -551,11 +618,12 @@ Ext.define('Editor.util.Range', {
         if (me.useWorkaroundForBookmark(rangeForCaret)) {
             return me.getBookmarkUsingTheWorkaround(rangeForCaret);
         } else {
-            return selectionForCaret.getBookmark();
+            return selectionForCaret.getBookmark(); // = rangy's bookmark of the SELECTION, not a range
         }
     },
     /**
      * Set the position of the cursor according to the given bookmark or node.
+     * (Use bookmark of rangy's SELECTION if workaround is not applied).
      * @param {Object} rangy-bookmark|node
      */
     setPositionOfCaret: function(bookmarkForCaret) {
@@ -563,11 +631,11 @@ Ext.define('Editor.util.Range', {
             selectionForCaret = rangy.getSelection(me.getEditorBody()),
             rangeForCaret = rangy.createRange(),
             nodeForBookmark;
-        if(me.isWorkaroundOfBookmark(bookmarkForCaret)){
+        if(me.isBookmarkOfWorkaround(bookmarkForCaret)){
             rangeForCaret = me.applyBookmarkUsingTheWorkaround(rangeForCaret,bookmarkForCaret);
             selectionForCaret.setSingleRange(rangeForCaret);
         } else {
-            selectionForCaret.moveToBookmark(bookmarkForCaret);
+            selectionForCaret.moveToBookmark(bookmarkForCaret); // = rangy's bookmark of the SELECTION, not a range
         }
     }
 });
