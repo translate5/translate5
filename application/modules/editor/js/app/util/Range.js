@@ -389,6 +389,33 @@ Ext.define('Editor.util.Range', {
     // =========================================================================
     
     /**
+     * Returns true if all the relevant content in the editor is selected.
+     * @returns {Boolean} 
+     */
+    isSelectedAllRelevantNodesInEditor: function() {
+        var me = this,
+            selectionInEditor = rangy.getSelection(me.getEditorBody()),
+            rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null,
+            selectedNodes,
+            nodesInEditor,
+            notSelectedNodesFound = false;
+        if (rangeForSelection != null){
+            selectedNodes = rangeForSelection.cloneContents().childNodes;
+            nodesInEditor = me.getEditorBody().childNodes;
+            Ext.Array.each(nodesInEditor, function(node, index) {
+                if (!me.isContainerToIgnore(node)) {
+                    if (!node.isEqualNode(selectedNodes[index])) {
+                        notSelectedNodesFound = true;
+                        return false;
+                    }
+                }
+            });
+            return !notSelectedNodesFound;
+        }
+        return false; // might be true, but we couldn't check with the current code.
+    },
+    
+    /**
      * If there are empty text-Nodes or non-text-content-Nodes (MQM-Tag, Content-Tag) 
      * at the beginning or end of a range that is based on characters (eg from SpellCheck),
      * then we move these Nodes OUT of the given range. (Otherwise the context eg for 
