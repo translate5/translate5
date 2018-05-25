@@ -513,21 +513,21 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         // Find and bookmark the range that belongs to the SpellCheck-Node for the current ToolTip.
         rangeForMatch.selectNodeContents(me.activeMatchNode);
-        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch);
+        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch,true);
         
         // Remove SpellCheck- and TermTag-Markup.
         me.cleanSpanMarkupInEditor();
         
         // Update the range (the SpellCheck-Node is no longer in the DOM!...).
-        rangeForMatch = me.moveRangeToBookmarkInTranslate5(rangeForMatch,rangeForMatchBookmark);
-        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch);
+        rangeForMatch = me.moveRangeToBookmarkInTranslate5(rangeForMatch,rangeForMatchBookmark,true);
+        rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch,true);
         
         // Replacement
         replaceText = Ext.get(event.currentTarget).query('a:first-child span:first-child')[0].innerHTML;
         
-        me.isActiveTrackChanges();                             // SearchReplace.js
-        if(!me.activeTrackChanges){                            // SearchReplace.js
-            me.pureReplace(rangeForMatchBookmark,replaceText); // SearchReplace.js
+        me.isActiveTrackChanges();                                  // SearchReplace.js
+        if(!me.activeTrackChanges){                                 // SearchReplace.js
+            me.pureReplace(rangeForMatchBookmark,replaceText,true); // SearchReplace.js
         } else {
             me.setTrackChangesInternalSpellCheckFlag(true);
             me.fireEvent('deleteAndReplace',
@@ -667,7 +667,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 return false; // break (eg after a new keyDown-event)
             }
             rangeForMatch.moveToBookmark(match.range);
-            rangeForMatch = me.cleanBordersOfRange(rangeForMatch);
+            rangeForMatch = me.cleanBordersOfCharacterbasedRange(rangeForMatch);
             documentFragmentForMatch = rangeForMatch.extractContents();
             spellCheckNode = me.createSpellcheckNode(index);
             spellCheckNode.appendChild(documentFragmentForMatch);
