@@ -82,7 +82,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
     },
     
     /***
-     * saves the auth,engine and group parametars in session so we can use them in back-end
+     * saves the auth,engine and group parameters in session so we can use them in back-end
      */
     saveParamsInSession:function(){
         var me=this,
