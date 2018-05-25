@@ -128,6 +128,7 @@ class editor_Models_Task_Remover {
      * drops the tasks Materialized View and deletes several data (segments, terms, file entries)
      * All mentioned data has foreign keys to the task, to reduce locks while deletion this 
      * data is deleted directly instead of relying on referential integrity. 
+     * Also removes the task related term collection
      */
     protected function removeRelatedDbData() {
         //@todo ask marc if logging tables should also be deleted (no constraint is set)
@@ -140,5 +141,10 @@ class editor_Models_Task_Remover {
         
         $filesTable = ZfExtended_Factory::get('editor_Models_Db_Files');
         $filesTable->delete(array('taskGuid = ?' => $taskGuid));
+
+        $termcollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termcollection editor_Models_TermCollection_TermCollection  */
+        $termcollection->checkAndRemoveTaskImported($this->task->getTaskGuid());
+        
     }
 }

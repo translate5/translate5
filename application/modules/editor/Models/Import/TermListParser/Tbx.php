@@ -1089,6 +1089,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         if($costumerId){
             $termCollection->setCustomerId((integer)$costumerId);
         }
+        $termCollection->setAutoCreatedOnImport(1);
         return $termCollection->save();
     }
     

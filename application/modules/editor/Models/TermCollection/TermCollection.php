@@ -155,4 +155,31 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         }
         return $result;
     }
+    
+    /***
+     * Check and remove the term collection if it is imported via task import
+     * @param array $collectionIds
+     */
+    public function checkAndRemoveTaskImported($taskGuid){
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_term_collection',array('LEK_term_collection.*'))
+        ->join('LEK_term_collection_taskassoc', 'LEK_term_collection_taskassoc.collectionId = LEK_term_collection.id',array('LEK_term_collection_taskassoc.collectionId','LEK_term_collection_taskassoc.taskGuid'))
+        ->where('LEK_term_collection_taskassoc.taskGuid=?',$taskGuid)
+        ->where('LEK_term_collection.autoCreatedOnImport=?',1);
+        $rows=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($rows)){
+            return false;
+        }
+        $collectionId=$rows[0]['id'];
+        
+        //remove the collection
+        $this->load($collectionId);
+        $this->delete();
+        
+        //remove the task from the assoc table
+        $taskassoc = ZfExtended_Factory::get('editor_Models_Db_TermCollection_TaskAssoc');
+        $taskassoc->delete(array('taskGuid = ?' => $taskGuid));
+    }
 }
