@@ -2297,7 +2297,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='>
     <source>Eigenschaften</source>
-    <target>properties</target>
+    <target>Other properties</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBrbG9uZW4='>
     <source>Aufgabe klonen</source>

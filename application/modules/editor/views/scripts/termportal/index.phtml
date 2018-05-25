@@ -70,7 +70,9 @@ if(isset($this->error)){
                     });
                     echo '<select name="languages" id="languages">';
                     foreach ($languages as $lang){
-                        echo '<option value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
+                        //if the preselectedLang exist, select it
+                        $isSelected=!empty($this->preselectedLang) && ($this->preselectedLang==$lang["rfc5646"]);
+                        echo '<option '.($isSelected ? 'selected="selected"' : '').' value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
                     }
                     echo '</select>';
                 ?>

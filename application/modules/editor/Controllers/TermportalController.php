@@ -89,15 +89,36 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
         
+        $frontendLocale= $this->_session->locale;
+        
+        $preselectedLang=null;
+        
         $rfcFlags=[];
         foreach ($langsArray as &$lng){
             $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['iso3166Part1alpha2']);
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
+            
+            //if the frontend locale and the current language are the same, use it as preselected
+            if(!$preselectedLang && $frontendLocale==$lng['rfc5646']){
+                $preselectedLang=$frontendLocale;
+            }
+            
             //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
             if($isSingleLang){
                 //load all similar languages
                 $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
+                
+                //check if the current locale lang exist in the group
+                if(!$preselectedLang && !empty($group)){
+                    
+                    foreach ($group as $groupSingle){
+                        if(!$preselectedLang && $frontendLocale==$groupSingle['rfc5646']){
+                            $preselectedLang=$lng['rfc5646'];
+                            break;
+                        }
+                    }
+                }
                 $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
                 continue;
             }
@@ -114,6 +135,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->view->labels=$labels;
         $this->view->collectionIds=$collectionIds;
+        
+        $this->view->preselectedLang=$preselectedLang;
+        
         
         $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         
