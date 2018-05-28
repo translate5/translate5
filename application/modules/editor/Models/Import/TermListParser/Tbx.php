@@ -1290,7 +1290,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $newFileName=$newFilePath.'/'.$fileName;
         
         //save the new file
-        rename($filepath, $newFileName);
+        copy($filepath, $newFileName);
     }
     
     /***

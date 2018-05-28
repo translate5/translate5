@@ -141,10 +141,12 @@ class editor_Plugins_TermImport_Services_Import {
             return ["The configured import dir is empty"];
         }
         
-        //get all files from the import direcotry
-        $files = array_slice(scandir($importDir), 2);
         $returnMessage=[];
-        foreach ($files as $file){
+        
+        //get all files from the import direcotry
+        $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
+        foreach ($it as $fileinfo) {
+            $file=$fileinfo->getFilename();
             
             $params=$this->handleCollectionForFile($file, $this->filesystemMap);
             
@@ -224,14 +226,15 @@ class editor_Plugins_TermImport_Services_Import {
             return $returnMessage;
         }
         
-        //get all across export files from the dir
-        $files = array_slice(scandir($exportFilesDir), 2);
         $returnMessage=[];
         
         //FIXME: split the php file into classes ?
         require_once('AcrossTbxExport.php');
 
-        foreach ($files as $file){
+        //get all across export files from the dir
+        $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
+        foreach ($it as $fileinfo) {
+            $file=$fileinfo->getFilename();
             
             $connector=new TbxAcrossSoapConnector($apiUrl,$apiUser,$apiPwd);
             /* @var $connector TbxAcrossSoapConnector */
