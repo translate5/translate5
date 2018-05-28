@@ -660,6 +660,17 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         }
         return null;
     }
+    
+    /***
+     * Remove old terms by given date.
+     * The term attributes also will be removed.
+     * 
+     * @param string $olderThan
+     * @return boolean
+     */
+    public function removeOldTerms($olderThan){
+       return $this->db->delete(['updated < ?'=>$olderThan])>0;
+    }
 
     /**
      * returns a map CONSTNAME => value of all term status

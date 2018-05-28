@@ -43,4 +43,25 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
         ->where('collectionId = ?', $collectionId);
         return $this->db->fetchRow($s);
     }
+    
+    /***
+     * Remove empty term entries (term entries without any term in it).
+     * Only the empty term entries from the same term collection will be removed.
+     * @return boolean
+     */
+    public function removeEmptyFromCollection(){
+        $sql='SELECT id FROM LEK_term_entry WHERE LEK_term_entry.groupId NOT IN (
+                SELECT LEK_term_entry.groupId from LEK_term_entry
+                JOIN LEK_terms USING(groupId)
+                WHERE LEK_terms.collectionId=LEK_term_entry.collectionId
+                GROUP BY LEK_term_entry.groupId
+            )';
+        $toRemove=$this->db->getAdapter()->query($sql)->fetchAll();
+        
+        if(empty($toRemove)){
+            return false;
+        }
+        
+        $this->db->delete(['id IN (?)'=>$toRemove])>0;
+    }
 }
