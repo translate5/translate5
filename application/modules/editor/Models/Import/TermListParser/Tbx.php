@@ -1278,19 +1278,20 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             $this->importSource="filesystem";
         }
         
-        $newFilePath=APPLICATION_RUNDIR.'../data/tbx-import/tbx-for-'.$this->importSource.'-import/tc_'.$collectionId;
+        $newFilePath=APPLICATION_PATH.'/../data/tbx-import/tbx-for-'.$this->importSource.'-import/tc_'.$collectionId;
         
         if(!is_dir($newFilePath)){
             mkdir($newFilePath, 0777, true);
         }
         
         $fi = new FilesystemIterator($newFilePath, FilesystemIterator::SKIP_DOTS);
-        $fileName="ImportedFile-".iterator_count($fi).'.tbx';
+        
+        $fileName=iterator_count($fi).'-'.basename($filepath);
         
         $newFileName=$newFilePath.'/'.$fileName;
         
-        //save the new file
-        copy($filepath, $newFileName);
+        //move the new file
+        rename($filepath, $newFileName);
     }
     
     /***
