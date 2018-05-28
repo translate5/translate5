@@ -143,7 +143,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
     
     /***
      * Get term collection by name
-     * @param unknown $name
+     * @param string $name
      * @return array
      */
     public function loadByName($name){

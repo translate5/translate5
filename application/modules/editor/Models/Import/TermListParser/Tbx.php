@@ -369,7 +369,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 
                 $this->xml->close();
                 
-                $this->saveFileLocal($path,$termCollection->getName());
+                $this->saveFileLocal($path,$termCollection->getId());
             }
         }catch (Exception $e){
             error_log("Something went wrong with tbx file parsing. Error message:".$e->getMessage());
@@ -1085,11 +1085,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     private function createTermCollection($costumerId){
         $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $termCollection->setName("tc_".$this->task->getTaskGuid());
+        
         if($costumerId){
             $termCollection->setCustomerId((integer)$costumerId);
         }
         $termCollection->setAutoCreatedOnImport(1);
+        $termCollection->setName("Term Collection for ".$this->task->getTaskGuid());
         return $termCollection->save();
     }
     
@@ -1265,20 +1266,19 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     
     /***
      * Save the imported file to the disk.
-     * The file location will be "trasnalte5 parh" /data/tbx-import/tbx-for-filesystem-import/"collectionname"/"the file"
+     * The file location will be "trasnalte5 parh" /data/tbx-import/tbx-for-filesystem-import/tc_"collectionId"/the file"
      * 
      * @param string $filepath: source file location
-     * @param string $collectionName: term collection name
+     * @param string $collectionId: termcollectin id
      */
-    private function saveFileLocal($filepath,$collectionName) {
+    private function saveFileLocal($filepath,$collectionId) {
         
         //if import source is not defined save it in filesystem folder
         if(!$this->importSource){
             $this->importSource="filesystem";
         }
         
-        $ds=DIRECTORY_SEPARATOR;
-        $newFilePath=APPLICATION_RUNDIR.'..'.$ds.'data'.$ds.'tbx-import'.$ds.'tbx-for-'.$this->importSource.'-import'.$ds.$collectionName;
+        $newFilePath=APPLICATION_RUNDIR.'../data/tbx-import/tbx-for-'.$this->importSource.'-import/tc_'.$collectionId;
         
         if(!is_dir($newFilePath)){
             mkdir($newFilePath, 0777, true);
@@ -1287,8 +1287,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $fi = new FilesystemIterator($newFilePath, FilesystemIterator::SKIP_DOTS);
         $fileName="ImportedFile-".iterator_count($fi).'.tbx';
         
-        //save the file to the location
-        file_put_contents($newFilePath.$ds.$fileName, file_get_contents($filepath));
+        $newFileName=$newFilePath.'/'.$fileName;
+        
+        //save the new file
+        rename($filepath, $newFileName);
     }
     
     /***

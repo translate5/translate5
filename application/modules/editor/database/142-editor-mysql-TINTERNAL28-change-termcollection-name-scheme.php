@@ -29,15 +29,14 @@
 /**
  README:
  Change the termcollection folder name to the new scheme
- New name scheme is "tc_" + taskGuid
+ New name scheme is "tc_" + Term Collection id
  */
 set_time_limit(0);
 
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
-$ds=DIRECTORY_SEPARATOR;
-$importFilesDir=APPLICATION_PATH.$ds.'..'.$ds.'data'.$ds.'tbx-import'.$ds.'tbx-for-filesystem-import';
+$importFilesDir=APPLICATION_PATH.'/../data/tbx-import/tbx-for-filesystem-import';
 
 if(is_dir($importFilesDir)){
     $it = new FilesystemIterator($importFilesDir, FilesystemIterator::SKIP_DOTS);
@@ -48,20 +47,23 @@ if(is_dir($importFilesDir)){
         
         //check if the curent folder starts with prefix
         if (strncmp($fileinfo->getFilename(), $prefix, strlen($prefix)) === 0){
+            $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            /* @var $collection editor_Models_TermCollection_TermCollection */
             
-            //find the taskhuid from the folder name
-            if(preg_match('/\{?[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}\}?/', $fileinfo->getFilename(), $matches)){
-                $guid=$matches[0];
-                $newName='tc_'.$guid;
-                
-                $oldName=$importFilesDir.$ds.$fileinfo->getFilename();
-                $newName=$importFilesDir.$ds.$newName;
-                //rename the folder
-                rename($oldName, $newName);
-                
-                error_log("Tbx import folder was renamed:oldname->".$oldName.", newname:".$newName);
+            $collection=$collection->loadByName($fileinfo->getFilename());
+            
+            if(empty($collection)){
+                continue;
             }
             
+            $newName='tc_'.$collection['id'];
+            
+            $oldName=$importFilesDir.'/'.$fileinfo->getFilename();
+            $newName=$importFilesDir.'/'.$newName;
+            //rename the folder
+            rename($oldName, $newName);
+            
+            error_log("Tbx import folder was renamed:oldname->".$oldName.", newname:".$newName);
         }
     }
 }
