@@ -217,9 +217,13 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterSegmentPut(Zend_EventManager_Event $event) {
+        $segment = $event->getParam('entity');
+        /* @var $segment editor_Models_Segment */
         $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
         /* @var $manager editor_Plugins_MatchResource_Services_Manager */
-        $manager->updateSegment($event->getParam('entity'));
+        if(editor_Models_Segment_MatchRateType::isUpdateable($segment->getMatchRateType())) {
+            $manager->updateSegment($segment);
+        }
     }
     
     /**
