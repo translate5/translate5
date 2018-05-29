@@ -62,6 +62,26 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
             return false;
         }
         
-        $this->db->delete(['id IN (?)'=>$toRemove])>0;
+        return $this->db->delete(['id IN (?)'=>$toRemove])>0;
+    }
+    
+    
+    /***
+     * Remove term entry older than $olderThan date.
+     * The date format should be equivalent to mysql date format 'YYYY-MM-DD HH:MM:SS'
+     * 
+     * @param string $olderThan
+     * @return boolean : true if rows are removed
+     */
+    public function removeOlderThan($olderThan){
+        //find all modefied entries older than $olderThan date
+        //when the term is modefied the termEntry is modefied to
+        //the query will find the lates modefied term in entry, if the term update date is older than $olderThan, remove the termEntry
+        return $this->db->delete(['id IN (SELECT t.termEntryId
+            	FROM LEK_terms t
+            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_terms GROUP BY termEntryId)
+            	tm ON t.termEntryId = tm.termEntryId AND t.updated = tm.MaxDate
+            	WHERE t.updated < ?
+            	GROUP BY t.termEntryId)'=>$olderThan])>0;
     }
 }

@@ -12,6 +12,10 @@ mergeTerms=true;
 ;The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
 deleteEntriesModifiedOlderThan=2018-05-01
 
+;Deletes all termEntries in all listed termCollections, that have a modification date older than the the start of the current import.
+;possible values: true or false
+deleteEntriesOlderThanCurrentImport=false
+
 apiUsername=crossapi.user
 apiPassword=pass
 

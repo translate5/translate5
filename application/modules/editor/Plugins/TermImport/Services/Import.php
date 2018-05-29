@@ -114,6 +114,13 @@ class editor_Plugins_TermImport_Services_Import {
      */
     const DELETE_ENTRIES_KEY="deleteEntriesModifiedOlderThan";
     
+    
+    /***
+     * Config key for deleting entries older than current import date.
+     * @var string
+     */
+    CONST DELETE_OLDER_IMPORT_ENTRIES_KEY="deleteEntriesOlderThanCurrentImport";
+    
     /***
      * Data from the filesystem config file
      * @var array
@@ -146,6 +153,13 @@ class editor_Plugins_TermImport_Services_Import {
         
         if($this->isFolderEmpty($importDir)){
             return ["The configured import dir is empty"];
+        }
+        
+        
+        //check if delete old entries is configured in the config file
+        if(isset($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
+            //remove old term entries and terms
+            $this->removeEntriesOlderThenImport(date('Y-m-d H:i:s'));
         }
         
         $returnMessage=[];
@@ -242,6 +256,12 @@ class editor_Plugins_TermImport_Services_Import {
         }
         
         $returnMessage=[];
+        
+        //check if delete old entries is configured in the config file
+        if(isset($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
+            //remove old term entries and terms
+            $this->removeEntriesOlderThenImport(date('Y-m-d H:i:s'));
+        }
         
         //FIXME: split the php file into classes ?
         require_once('AcrossTbxExport.php');
@@ -435,6 +455,15 @@ class editor_Plugins_TermImport_Services_Import {
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
         $termEntry->removeEmptyFromCollection();
+    }
+    
+    /***
+     * Remove term entries older than $importDate
+     */
+    private function removeEntriesOlderThenImport($impotDate){
+        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry->removeOlderThan($impotDate);
     }
     
     /***
