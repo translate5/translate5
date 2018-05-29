@@ -33,7 +33,7 @@ ALTER TABLE `LEK_languages` CHANGE `rfc5646` `rfc5646` VARCHAR(30) CHARACTER SET
 UPDATE `LEK_languages` SET `rfc5646` = 'az-Cyrl' WHERE `LEK_languages`.`rfc5646` = 'Az-Cyrl';
 
 /* add new column: sublanguage */
-ALTER TABLE `LEK_languages` ADD `sublanguage` VARCHAR(30) NULL DEFAULT NULL COMMENT 'RFC5646 language shortcut (or similar) of the sublanguage that is most important e.g. for SpellChecks' AFTER `ISO_3166-1_alpha-2`;
+ALTER TABLE `LEK_languages` ADD `sublanguage` VARCHAR(30) NULL DEFAULT NULL COMMENT 'RFC5646 language shortcut (or similar) of the sublanguage that is most important e.g. for SpellChecks' AFTER `iso3166Part1alpha2`;
 
 UPDATE `LEK_languages` SET `sublanguage` = 'af-ZA' WHERE `LEK_languages`.`rfc5646` = 'af';
 UPDATE `LEK_languages` SET `sublanguage` = 'af-ZA' WHERE `LEK_languages`.`rfc5646` = 'af-ZA';
