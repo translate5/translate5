@@ -174,6 +174,20 @@ class editor_Models_Segment_MatchRateType {
     }
     
     /**
+     * Returns true if the given type may be updated (either in the segment itself, or the whole segment into another TM)
+     */
+    static public function isUpdateable($type) {
+        $type = explode(';', $type);
+        if(in_array(self::TYPE_MISSING_SOURCE_MRK, $type)){
+            return false;
+        }
+        if(in_array(self::TYPE_MISSING_TARGET_MRK, $type)){
+            return false;
+        }
+        return true;
+    }
+    
+    /**
      * generates the matchrate type by imported segment data
      * @param editor_Models_Import_FileParser_SegmentAttributes $importedValue the plain value from 
      * @param mixed $mid segment mid for logging purposes only
@@ -182,12 +196,12 @@ class editor_Models_Segment_MatchRateType {
     public function parseImport(editor_Models_Import_FileParser_SegmentAttributes $attributes, $mid){
         $importedValue = $attributes->matchRateType;
         
+        $this->data = [self::PREFIX_IMPORT];
+        
         if($importedValue == self::TYPE_MISSING_SOURCE_MRK || $importedValue == self::TYPE_MISSING_TARGET_MRK) {
-            $this->data = [$importedValue];
+            $this->data[] = $importedValue;
             return $this;
         }
-        
-        $this->data = [self::PREFIX_IMPORT];
         
         if(!$attributes->isTranslated && $attributes->matchRate === 0) {
             $this->data[] = self::TYPE_EMPTY;

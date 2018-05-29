@@ -644,27 +644,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //must be set before the loop, since in the loop the currentTarget is cleared on success
         $hasTargets = !empty($this->currentTarget);
+        $sourceEdit = $this->task->getEnableSourceEditing();
         
+        //find mrk mids missing in source and add them marked as missing
         $this->padSourceMrkTags();
+        //find mrk mids missing in target and add them marked as missing
         $this->padTargetMrkTags();
-        
-        //TODO TRANSLATE-1231: 
-        // OK - Finde die mrk-MIDs die in $this->sourceProcessOrder sind und als key in $this->currentTarget fehlen
-        // OK - Füge diese als "Leersegment" $this->currentTarget hinzu. Das Segment muss irgendwie speziell markiert werden, so dass 
-        //   OK -- Kein placeholder angelegt wird
-        //   OK -- der Matchtype entsprechend gesetzt werden kann
-        //   OFFEN -- das Segment als Readonly markiert wird, wenn kein Source Editing an ist, ansonsten darf nur das Source Feld editiert werden
-        // OK - Finde die mrk-MIDs die als key in $this->currentTarget sind und in $this->sourceProcessOrder fehlen
-        // OK - Sortiere diese numerisch in $this->sourceProcessOrder ein, und fülle $this->currentSource mit einem "Leersegment"
-        // OK - Es muss ebenfalls speziell markiert werden, so dass 
-        //   UNKLAR -- bei Source Editing kein PlaceHolder angelegt wird
-        //   OFFEN -- bei Source Editing das SourceFeld nicht editiert werden kann
-        //   OK -- der Matchtype entsprechend gesetzt werden kann
-        //
-        // - partielles ReadOnly im Frontend über matchtype??? Anstatt Marcs Text eine Grafik rendern?
-        // - Wie sind die Planungen hinsichtlich mrk splitting und merging? Sollte wurscht sein, wir reden hier über den Import. 
-        //   Splitting und Merging ist zur Laufzeit, die Datenbasis muss es halt hergeben.
-        //   
         
         foreach($this->sourceProcessOrder as $mid) {
             
@@ -692,9 +677,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
             
-            if($hasTargets && empty($this->currentTarget[$mid])){
+            if($sourceEdit && $isSourceMrkMissing || $hasTargets && empty($this->currentTarget[$mid])){
                 $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-                $msg  = 'SUB tag of source not found in target with Mid: '.$mid."\n";
+                $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
                 $this->throwSegmentationException($msg, $transUnitMid);
             }
             if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
@@ -703,15 +688,20 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             else {
                 $currentTarget = $this->currentTarget[$mid];
-                unset($this->currentTarget[$mid]);
                 if($currentTarget == self::MISSING_MRK) {
                     $targetChunksOriginal = $targetChunks = [];
+                    if(!$sourceEdit) { 
+                        //remove the item only if sourceEditing is disabled. 
+                        // That results then in an missing MRK error if sourceEditing enabled! 
+                        unset($this->currentTarget[$mid]);
+                    }
                 }
                 else {
                     //parse the target chunks, store the real chunks from the XLF separatly 
                     $targetChunksOriginal = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
                     //in targetChunks the content is converted (tags, whitespace etc)
                     $targetChunks = $this->contentConverter->convert($targetChunksOriginal, false, $currentTarget['openerMeta']['preserveWhitespace']);
+                    unset($this->currentTarget[$mid]);
                 }
             }
             
@@ -789,7 +779,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         if(!empty($this->currentTarget)){
             $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-            $msg  = 'SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
+            $msg  = 'MRK/SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
             $this->throwSegmentationException($msg, $transUnitMid);
         }
         
@@ -875,6 +865,21 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 return $placeHolder.$oldChunk;
             });
         }
+    }
+    
+    /**
+     * It must be sure, that this code runs after all other attribute calculations!
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser::setCalculatedSegmentAttributes()
+     */
+    protected function setCalculatedSegmentAttributes() {
+        $attributes = parent::setCalculatedSegmentAttributes();
+        if($attributes->editable) {
+            if(strpos($attributes->matchRateType, editor_Models_Segment_MatchRateType::TYPE_MISSING_TARGET_MRK) !== false){
+                $attributes->editable = false; //if its a missing target the segment is not editable
+            }
+        }
+        return $attributes;
     }
     
     /**

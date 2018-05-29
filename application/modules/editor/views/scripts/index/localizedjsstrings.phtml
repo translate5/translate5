@@ -153,6 +153,13 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.ui.segments.column.Quality.prototype.text = '<?php echo $this->translate->_('QM');?>';
   	Editor.view.segments.column.Matchrate.prototype.text = '<?php echo $this->translate->_('Matchrate');?>';
     
+    Ext.define("Editor.locale.view.segments.column.Content", {
+        override: "Editor.view.segments.column.Content",
+        strings: {
+            missingSource: '<?php echo $this->translate->_('ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT');?>',
+            missingTarget: '<?php echo $this->translate->_('ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT');?>'
+        }
+    });
     
     Ext.define("Editor.locale.de.view.segments.column.IsWatched", {
         override: "Editor.view.segments.column.IsWatched",
