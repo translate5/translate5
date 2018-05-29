@@ -1699,7 +1699,7 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     isActiveTrackChanges:function(){
         //check if the trackchanges are active
-        if(Editor.plugins != undefined && !Editor.plugins.TrackChanges){
+        if(Editor.plugins == undefined || !Editor.plugins.TrackChanges){
             this.activeTrackChanges=false;
         }else{
             this.activeTrackChanges=!(Editor.data.task.get('workflowStepName')  == 'translation'
