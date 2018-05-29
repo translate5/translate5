@@ -163,7 +163,7 @@ Ext.define('Editor.view.ToolTip', {
             nodeDate = '',
             nodeHistory = '';
         // TrackChanges-Plugin activated?
-        if (!Editor.plugins.TrackChanges) {
+        if (Editor.plugins != undefined && !Editor.plugins.TrackChanges) {
             return me.messages.notrackchangesplugin;
         }
         trackChanges = Editor.plugins.TrackChanges.controller.Editor,
