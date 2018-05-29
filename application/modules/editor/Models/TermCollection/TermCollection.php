@@ -65,7 +65,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
             $ids = array_column($rows, 'collectionId');
             return $ids;
         }
-        return null;
+        return [];
     }
     
     /***
