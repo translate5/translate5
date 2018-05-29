@@ -274,6 +274,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     handleClickInEditor: function(event) {
         var me = this;
+        me.terminateSpellCheck();
         me.editIdleTimer = null;
     },
     /**
