@@ -3,6 +3,19 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.7.5] - 2018-05-30
+###Changed
+TRANSLATE-1269: Enable deletion of older terms
+TINTERNAL-28: Change TBX Collection directory naming scheme
+TRANSLATE-1268: Pre-select language of term search with GUI-language
+TRANSLATE-1266: Show "-" as value instead of provisionallyProcessed
+
+###Bugfixes
+TRANSLATE-1231: xliff 1.2 import can not handle different number of mrk-tags in source and target
+TRANSLATE-1265: Deletion of task does not delete dependent termCollection
+TRANSLATE-1283: TermPortal: Add GUI translations for Term collection attributes
+TRANSLATE-1284: TermPortal: term searches are not restricted to a specific term collection
+
 ## [2.7.4] - 2018-05-24
 ###Added
 TRANSLATE-1135: Highlight and Copy text in source and target columns
