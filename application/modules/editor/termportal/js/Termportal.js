@@ -507,6 +507,8 @@ function getAttributeValue(attribute){
     }
     if (attribute.attrType == "processStatus" && attVal == "finalized") {
         return '<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
+    }else if(attribute.attrType == "processStatus" && attVal == "provisionallyProcessed"){
+    	return "-";
     } else if (isPicklistUsage(attribute.attrType) && isUnwort(attVal) ) {
         return '<img src="' + moduleFolder + 'images/do_not_use.png" alt="'+attVal+'" title="'+attVal+'">';
     } else {

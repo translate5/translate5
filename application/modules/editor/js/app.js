@@ -100,6 +100,10 @@ Ext.application({
       Ext.Ajax.setDefaultHeaders({
           'Accept': 'application/json'
       });
+      
+      //init the plugins namespace
+      Ext.ns('Editor.plugins');
+      
       this.applyDefaultState();
       this.callParent(arguments);
   },

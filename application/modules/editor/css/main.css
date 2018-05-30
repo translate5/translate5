@@ -53,6 +53,12 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     direction:ltr;
 }
 
+#segment-grid .missing-source-segment,
+#segment-grid .missing-target-segment {
+  font-style: italic;	
+  color:#acacac;
+}
+
 #segment-grid .editing-disabled {
   color:#acacac;
 }
@@ -72,6 +78,17 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     display:inline;
     background:#cfcfcf;
     border-radius:4px;
+}
+
+.segment-tag-column div.x-grid-cell-inner del,
+.segment-tag-column div.x-grid-cell-inner img,
+.segment-tag-column div.x-grid-cell-inner div.internal-tag,
+.segment-tag-column div.x-grid-cell-inner div.internal-tag span {
+    user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
 }
 
 /* this css is used in visual review tooltip, for displaying the internal tags, terminologie */
@@ -121,6 +138,9 @@ div.single + div {
     white-space: normal;
     overflow: visible;
     cursor: move;
+}
+#segment-grid .x-grid-row-editor .segment-content .x-form-display-field {
+    cursor: text;
 }
 
 #segment-grid .x-grid-row-editor .autoState .x-form-display-field {

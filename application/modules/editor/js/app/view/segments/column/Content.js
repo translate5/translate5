@@ -55,6 +55,10 @@ Ext.define('Editor.view.segments.column.Content', {
   fixed: true,
   isContentColumn: true,
   variableRowHeight: true,
+  strings: {
+      missingSource: '#UT#ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT',
+      missingTarget: '#UT#ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT'
+  },
   constructor: function(conf) {
       var field = conf.fieldName;
       Ext.applyIf(conf, {
@@ -63,16 +67,28 @@ Ext.define('Editor.view.segments.column.Content', {
           tdCls: 'segment-tag-column'+this.getTypeCls(conf.segmentField)
       });
       this.callParent(arguments);
+      
   },
   getTypeCls: function(field) {
       var segField = Editor.model.segment.Field,
           type = field.get('type');
-      return ' type-'+type+' '+segField.getDirectionCls(type);
+      return ' x-selectable type-'+type+' '+segField.getDirectionCls(type);
   },
   initComponent: function() {
     var me = this;
+    this.scope = this; //so that renderer can access this object instead the whole grid.
     me.initBaseMixin();
     me.callParent(arguments);
+  },
+  initConfig: function(instanceConfig) {
+      var me = this,
+      config = {
+          enableTextSelection: true
+      };
+      if (instanceConfig) {
+          me.self.getConfigurator().merge(me, config, instanceConfig);
+      }
+      return me.callParent([config]);
   },
   /**
    * internal method to create a display field
@@ -90,8 +106,25 @@ Ext.define('Editor.view.segments.column.Content', {
                   return null;
               },
               name: this.dataIndex,
+              cls: 'segment-content',
               fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
           };
       return plug.getColumnField(me, config);
+  },
+  renderer: function(v, meta, rec) {
+      var type = rec.get('matchRateType'),
+          fieldType = this.segmentField.get('type'),
+          isSource = fieldType === this.segmentField.TYPE_SOURCE,
+          isTarget = fieldType === this.segmentField.TYPE_TARGET;
+      
+      if(isSource && /missing-source-mrk/.test(type)) {
+          meta.tdCls += "missing-source-segment";
+          return this.strings.missingSource;
+      }
+      if(isTarget && /missing-target-mrk/.test(type)) {
+          meta.tdCls += "missing-target-segment";
+          return this.strings.missingTarget;
+      }
+      return v;
   }
 });

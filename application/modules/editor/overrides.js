@@ -251,6 +251,20 @@ Ext.override(Ext.util.CSS, {
 })
 
 /**
+ * Workaround for TRANSLATE-1239
+ * reported to sencha in: https://www.sencha.com/forum/showthread.php?470065-ExtJS-6-2-classic-Ext-data-PageMap-getPage-must-return-array-but-returns-undefined&p=1318664#post1318664
+ * Currently no Feedback from Sencha, if already fixed or so.
+ */
+Ext.override(Ext.data.PageMap, {
+    getPage: function(pageNumber) {
+        return this.get(pageNumber) || [];
+    },
+    hasRange: function(start, end) {
+        return this.callParent([start, Math.max(end, 0)]);
+    }
+});
+
+/**
  * Fix for TRANSLATE-1041 / EXTJS-24549 / https://www.sencha.com/forum/showthread.php?338435-ext-all-debug-js-206678-Uncaught-TypeError-cell-focus-is-not-a-function
  * needed for ext-6.2.0
  * should be solved natively with next version
