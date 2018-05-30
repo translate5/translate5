@@ -33,9 +33,10 @@ class editor_Models_TermCollection_TermEntryAttributes extends editor_Models_Ter
     /***
      * Get all attributes for the given term entry (groupId)
      * @param string $groupId - original termEntry id from the tbx
+     * @param array $collectionIds
      * @return array|NULL
      */
-    public function getAttributesForTermEntry($groupId){
+    public function getAttributesForTermEntry($groupId,$collectionIds){
         
         $cols=array(
                 'LEK_term_entry_attributes.id AS attributeId',
@@ -59,7 +60,8 @@ class editor_Models_TermCollection_TermEntryAttributes extends editor_Models_Ter
         $s=$this->db->select()
         ->from($this->db)
         ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_entry_attributes.termEntryId',$cols)
-        ->where('LEK_term_entry.groupId=?',$groupId);
+        ->where('LEK_term_entry.groupId=?',$groupId)
+        ->where('LEK_term_entry.collectionId IN(?)',$collectionIds);
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){

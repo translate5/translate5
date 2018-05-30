@@ -597,10 +597,12 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Find term attributes in the given term entry (lek_terms groupId)
+     * 
      * @param string $groupId
+     * @param array $collectionIds
      * @return array|NULL
      */
-    public function searchTermAttributesInTermentry($groupId){
+    public function searchTermAttributesInTermentry($groupId,$collectionIds){
         $attCols=array(
                 'LEK_term_attributes.labelId as labelId',
                 'LEK_term_attributes.id AS attributeId',
@@ -633,6 +635,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
         ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'))
         ->where('groupId=?',$groupId)
+        ->where('LEK_term_attributes.collectionId IN(?)',$collectionIds)
         ->order('label');
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
@@ -644,6 +647,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Find term entry attributes in the given term entry (lek_terms groupId)
+     * 
      * @param string $groupId
      * @return array|NULL
      */

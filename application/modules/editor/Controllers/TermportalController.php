@@ -29,14 +29,15 @@
 class Editor_TermportalController extends ZfExtended_Controllers_Action {
     
     public function indexAction(){
-        $sessionUser = new Zend_Session_Namespace('user');
-        
-        $sessionUser=$sessionUser->data;
-        
+
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
         
-        $userModel->load($sessionUser->id);
+        if(empty($customers)){
+            $this->view->error=$this->translate->_("Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.");
+            return;
+        }
         
         $config = Zend_Registry::get('config');
         $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
@@ -50,16 +51,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
-        if(empty($userModel->getCustomers())){
-            $this->view->error=$this->translate->_("Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.");
-            return;
-        }
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
-        
-        $customers=trim($userModel->getCustomers(),",");
-        $customers=explode(',', $customers);
         
         $collectionIds=$collection->getCollectionsIdsForCustomer($customers);
 
