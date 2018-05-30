@@ -45,4 +45,20 @@ class editor_Models_TermCollection_TermAttributesLabel extends ZfExtended_Models
         }
         return $this->db->fetchAll($s)->toArray();
     }
+    
+    /***
+     * Return all labels with translated labelText
+     * @return array
+     */
+    public function loadAllTranslated(){
+        $labels=$this->loadAll();
+        $translate=ZfExtended_Zendoverwrites_Translate::getInstance();
+        foreach ($labels as &$label){
+            if(empty($label['labelText'])){
+                continue;
+            }
+            $label['labelText']=$translate->_($label['labelText']);
+        }
+        return $labels;
+    }
 }

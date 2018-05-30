@@ -2382,7 +2382,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='>
 	<source>Eigenschaften des Eintrags</source>
-	<target>Attributes of the term entry</target>
+	<target>Entry attributes</target>
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
     <source>Kunden</source>

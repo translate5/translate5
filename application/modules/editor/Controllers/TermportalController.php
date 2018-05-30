@@ -78,7 +78,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         //get the translated labels
         $labelsModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $labelsModel editor_Models_TermCollection_TermAttributesLabel */
-        $labels=$labelsModel->loadAll();
+        $labels=$labelsModel->loadAllTranslated();
         
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
