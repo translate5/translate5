@@ -81,7 +81,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
             $ids = array_column($rows, 'id');
             return $ids;
         }
-        return null;
+        return [];
     }
     
     
@@ -93,7 +93,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      *      'termsAtributeCount'=>number,
      *      'termsEntryAtributeCount'=>number,
      *  ]
-     * @param unknown $collectionId
+     * @param integer $collectionId
      * @return array
      */
     public function getAttributesCountForCollection($collectionId){
@@ -111,7 +111,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      * Associate termCollection to taskGuid
      * 
      * @param mixed $collectionId
-     * @param guid $taskGuid
+     * @param string $taskGuid
      */
     public function addTermCollectionTaskAssoc($collectionId,$taskGuid){
         $sql='INSERT INTO LEK_term_collection_taskassoc (collectionId,taskGuid) '.
@@ -123,9 +123,9 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      * Get all existing languages in the term collections
      * 
      * @param array $collectionIds
-     * @return array|NULL
+     * @return array
      */
-    public function getLanguagesInTermCollecions(array $collectionIds){
+    public function getLanguagesInTermCollections(array $collectionIds){
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from('LEK_terms',array('LEK_terms.language as id'))
@@ -138,7 +138,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
             return $rows;
         }
         
-        return null;
+        return [];
     }
     
     /***

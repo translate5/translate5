@@ -69,7 +69,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         }
         
         //get all languages in the term collections
-        $langsArray=$collection->getLanguagesInTermCollecions($collectionIds);
+        $langsArray=$collection->getLanguagesInTermCollections($collectionIds);
         
         //get the user languages
         if(empty($langsArray) && !empty($defaultLangs)){
