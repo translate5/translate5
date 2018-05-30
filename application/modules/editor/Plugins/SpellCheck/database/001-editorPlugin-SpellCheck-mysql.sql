@@ -33,7 +33,7 @@ VALUES ('editor', 'editor', 'frontend', 'pluginSpellCheck'),
 ('editor', 'pm', 'frontend', 'pluginSpellCheck');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.SpellCheck.active', 1, 'editor', 'plugins', 1, 1, '', 'boolean', 'Defines if SpellCheck should be active (Can be set in task template task specific)');
+('runtimeOptions.plugins.SpellCheck.active', 1, 'editor', 'plugins', 0, 0, '', 'boolean', 'Defines if SpellCheck should be active (Can be set in task template task specific)');
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
 VALUES ('editor', 'editor', 'editor_plugins_spellcheck_spellcheckquery', 'all');

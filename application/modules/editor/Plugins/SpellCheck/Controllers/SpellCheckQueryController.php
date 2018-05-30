@@ -51,8 +51,12 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
+        throw new ZfExtended_BadMethodCallException(__CLASS__);
     }
     
+    /**
+     * Get the languages that are supported by the tool we use (currently: LanguageTool).
+     */
     public function languagesAction(){
         if($this->getParam('targetLangCode') && $this->getParam('targetLangCode')!=""){
             $targetLangCode = $this->getParam('targetLangCode');
@@ -104,16 +108,13 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
         return false;
     }
     
+    /**
+     * The matches that our tool finds (currently: LanguageTool).
+     */
     public function matchesAction(){
-        $text = "";
-        $language = "";
-        if($this->getParam('text') && $this->getParam('text')!=""){
-            $text = $this->getParam('text');
-        }
-        if($this->getParam('language') && $this->getParam('language')!=""){
-            $language = $this->getParam('language');
-        }
-        if($text=="" || $language==""){
+        $text = $this->getParam('text','');
+        $language= $this->getParam('language','');
+        if (empty($text) || empty($language) ) {
             error_log("NO text or language.");
             $this->view->rows = "[]";
             return;

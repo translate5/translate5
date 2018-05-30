@@ -15,9 +15,8 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -48,7 +47,13 @@ $version = '?v='.$this->appVersion;
 <script src="<?php echo $this->extJsBasepath;?>/build/classic/locale/locale-<?php echo $this->locale;?>-debug.js"></script>
 <script src="<?php echo $this->publicModulePath; ?>/js/app/MessageBox.js"></script>
 <script>
-
+<?php if($this->appVersion != 'development'){ ?>
+Ext.manifest = {
+    loader: {
+        cache: "<?php echo $this->appVersion; ?>"
+    }
+};
+<?php } ?>
 Ext.Loader.setPath('Ext.ux', '<?php echo $this->extJsBasepath;?>/packages/ux/classic/src/');
 
 //Intercept setPath for developing systems, on production all should work with above builded code 

@@ -34,7 +34,6 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_SpellCheck_Init extends ZfExtended_Plugin_Abstract {
     
     /**
-     * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
      * @var array
      */
     protected $frontendControllers = array(

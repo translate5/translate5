@@ -109,6 +109,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     editIdleTimer: null,            // time since "nothing" is changed in the Editor's content; 1) user: presses no key 2) segmentsHtmleditor: no push, no afterInsertMarkup
     
     spellCheckInProgressID: false,  // id of the currently valid SpellCheck-Process (false if none is running)
+    // TODO: Instead of using IDs for the processes it would be better to use an object for each process 
+    // (= handle the SpellCheck-Processes via a class with each process as an instance from it!).
     
     segmentId: null,                // ID of the currently edited Segment
     
@@ -154,12 +156,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         if (me.isSupportedLanguage) {
             me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
-            me.initEditor();
-            me.initSnapshotHistory();
-            me.setBrowserSpellcheck();
-            me.initTooltips();
-            me.initKeyboardEvents();
-            me.initMouseEvents();
+            if (me.editor == null) {
+                me.initEditor();
+            }
         } else {
             me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ') or SpellCheck-Tool does not run.');
         }
@@ -174,6 +173,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.consoleLog('initEditor (SpellCheck)');
         me.editor = editor.mainEditor; // → this is the HtmlEditor
         me.injectCSSForEditor();
+        // For SpellCheck:
+        me.initTooltips();
+        me.initKeyboardEvents();
+        me.initMouseEvents();
+        me.initSnapshotHistory();
+        me.setBrowserSpellcheck();
     },
     /**
      * Init ToolTips

@@ -109,17 +109,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
                               // - 201 Created (we don't create any resources)
                               // - 401 Unauthorized (we don't use authentication)
         
-        //check for HTTP State (REST errors)
-        if(!in_array($response->getStatus(), $validStates)) {
-            throw new ZfExtended_BadGateway($response->getBody(), 500);
-        }
-        
         $result = json_decode(trim($response->getBody()));
-        
-        //check for JSON errors
-        if(json_last_error() > 0){
-            throw new ZfExtended_Exception("Error on JSON decode: ".json_last_error_msg(), 500);
-        }
         
         return $result;
     }
