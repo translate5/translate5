@@ -177,7 +177,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
                 meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
             };
             
-        if(Editor.data.plugins.MatchResource && prefix == Editor.data.plugins.MatchResource.matchrateTypeChangedState) {
+        if(Editor.plugins.MatchResource && prefix == Editor.plugins.MatchResource.matchrateTypeChangedState) {
             return '...'; //do nothing here since pending save
         }
         

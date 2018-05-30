@@ -53,6 +53,12 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     direction:ltr;
 }
 
+#segment-grid .missing-source-segment,
+#segment-grid .missing-target-segment {
+  font-style: italic;	
+  color:#acacac;
+}
+
 #segment-grid .editing-disabled {
   color:#acacac;
 }
