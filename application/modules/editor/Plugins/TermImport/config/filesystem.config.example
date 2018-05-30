@@ -1,3 +1,6 @@
+;;;; ATTENTION: the below variables need to be placed above the areas [FileMapping] and [CollectionMapping]
+;;;; ATTENTION: the below variables need to be placed above the areas [FileMapping] and [CollectionMapping]
+
 ;import directory of the tbx files
 importDir=/path/to/your/translate5/data/tbx-import/filesystem/;
 
@@ -16,6 +19,8 @@ deleteEntriesModifiedOlderThan=2018-05-01
 ;possible values: true or false
 deleteEntriesOlderThanCurrentImport=true
 
+;;;; ATTENTION: the above variables need to be placed above the areas [FileMapping] and [CollectionMapping]
+ 
 ;mapping between file and term collection name
 [FileMapping]
 Term.tbx=exampletermCollection;
