@@ -203,15 +203,22 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         /* @var $file editor_Models_File */
         $file->load($segment->getFileId());
         
+        $queryString = $this->getQueryString($segment);
+        
+        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        if(empty($queryString)) {
+            return $this->resultList;
+        }
+        
         //Although we take the source fields from the OpenTM2 answer below
         // we have to set the default source here to fill the be added internal tags 
-        $this->resultList->setDefaultSource($this->getQueryString($segment));
+        $this->resultList->setDefaultSource($queryString);
         
         $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $internalTag editor_Models_Segment_InternalTag */
         
         //$map is returned by reference
-        $queryString = $internalTag->toXliffPaired($this->getQueryString($segment), true, $map);
+        $queryString = $internalTag->toXliffPaired($queryString, true, $map);
         $mapCount = count($map);
         
         if($this->api->lookup($segment, $queryString, $file->getFileName())){

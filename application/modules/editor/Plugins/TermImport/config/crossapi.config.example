@@ -1,3 +1,5 @@
+;;;; ATTENTION: the below variables need to be placed above the areas [FileMapping] and [CollectionMapping]
+ 
 crossAPIurl=http://example.net
 crossExportFilesDir=/path/to/your/translate5/data/tbx-import/crossapi-import-templates/
 
@@ -7,8 +9,20 @@ crossExportFilesDir=/path/to/your/translate5/data/tbx-import/crossapi-import-tem
 ;when the ID of the termEntry of the TBX does already exist in the DB, the terms of this termEntry will always be merged
 mergeTerms=true;
 
+;Deletes all termEntries in all listed termCollections, that have a modification date older than the listed one.
+;Since every entry that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
+;The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
+deleteEntriesModifiedOlderThan=2018-05-01
+
+;Deletes all termEntries in all listed termCollections, that have a modification date older than the the start of the current import.
+;possible values: true or false
+deleteEntriesOlderThanCurrentImport=false
+
 apiUsername=crossapi.user
 apiPassword=pass
+
+;;;; ATTENTION: the above variables need to be placed above the areas [FileMapping] and [CollectionMapping]
+ 
 
 ;mapping between across export template and term collection
 [FileMapping]

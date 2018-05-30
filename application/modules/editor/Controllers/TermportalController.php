@@ -29,14 +29,15 @@
 class Editor_TermportalController extends ZfExtended_Controllers_Action {
     
     public function indexAction(){
-        $sessionUser = new Zend_Session_Namespace('user');
-        
-        $sessionUser=$sessionUser->data;
-        
+
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
         
-        $userModel->load($sessionUser->id);
+        if(empty($customers)){
+            $this->view->error=$this->translate->_("Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.");
+            return;
+        }
         
         $config = Zend_Registry::get('config');
         $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
@@ -50,16 +51,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
-        if(empty($userModel->getCustomers())){
-            $this->view->error=$this->translate->_("Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.");
-            return;
-        }
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
-        
-        $customers=trim($userModel->getCustomers(),",");
-        $customers=explode(',', $customers);
         
         $collectionIds=$collection->getCollectionsIdsForCustomer($customers);
 
@@ -69,7 +63,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         }
         
         //get all languages in the term collections
-        $langsArray=$collection->getLanguagesInTermCollecions($collectionIds);
+        $langsArray=$collection->getLanguagesInTermCollections($collectionIds);
         
         //get the user languages
         if(empty($langsArray) && !empty($defaultLangs)){
@@ -84,20 +78,41 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         //get the translated labels
         $labelsModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $labelsModel editor_Models_TermCollection_TermAttributesLabel */
-        $labels=$labelsModel->loadAll();
+        $labels=$labelsModel->loadAllTranslated();
         
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
+        
+        $frontendLocale= $this->_session->locale;
+        
+        $preselectedLang=null;
         
         $rfcFlags=[];
         foreach ($langsArray as &$lng){
             $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['iso3166Part1alpha2']);
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
+            
+            //if the frontend locale and the current language are the same, use it as preselected
+            if(!$preselectedLang && $frontendLocale==$lng['rfc5646']){
+                $preselectedLang=$frontendLocale;
+            }
+            
             //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
             if($isSingleLang){
                 //load all similar languages
                 $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
+                
+                //check if the current locale lang exist in the group
+                if(!$preselectedLang && !empty($group)){
+                    
+                    foreach ($group as $groupSingle){
+                        if(!$preselectedLang && $frontendLocale==$groupSingle['rfc5646']){
+                            $preselectedLang=$lng['rfc5646'];
+                            break;
+                        }
+                    }
+                }
                 $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
                 continue;
             }
@@ -114,6 +129,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->view->labels=$labels;
         $this->view->collectionIds=$collectionIds;
+        
+        $this->view->preselectedLang=$preselectedLang;
+        
         
         $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         

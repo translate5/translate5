@@ -2297,7 +2297,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RWlnZW5zY2hhZnRlbg=='>
     <source>Eigenschaften</source>
-    <target>properties</target>
+    <target>Other properties</target>
 </trans-unit>
 <trans-unit id='QXVmZ2FiZSBrbG9uZW4='>
     <source>Aufgabe klonen</source>
@@ -2382,7 +2382,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='>
 	<source>Eigenschaften des Eintrags</source>
-	<target>Attributes of the term entry</target>
+	<target>Entry attributes</target>
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
     <source>Kunden</source>
@@ -2448,7 +2448,18 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Endkunde</source>
     <target>End customer</target>
 </trans-unit>
-<trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='><source>no existing attributes</source><target>No existing attributes</target></trans-unit>
+<trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='>
+    <source>no existing attributes</source>
+    <target>No existing attributes</target>
+</trans-unit>
+<trans-unit id='QUNIVFVORzogUVVFTExTUFJBQ0hMSUNIRVIgSU5IQUxUIElOIFZPUkhFUklHRU0gT0RFUiBOQUNIRk9MR0VOREVNIFNFR01FTlQ='>
+    <source>ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source>
+    <target>ATTENTION: SOURCE CONTENT CONTAINED IN PREVIOUS OR FOLLOWING SEGMENT</target>
+</trans-unit>
+<trans-unit id='QUNIVFVORzogWklFTFNQUkFDSExJQ0hFUiBJTkhBTFQgSU4gVk9SSEVSSUdFTSBPREVSIE5BQ0hGT0xHRU5ERU0gU0VHTUVOVA=='>
+    <source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source>
+    <target>ATTENTION: TARGET CONTENT CONTAINED IN PREVIOUS OR FOLLOWING SEGMENT</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

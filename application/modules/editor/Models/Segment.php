@@ -59,7 +59,6 @@ END LICENSE AND COPYRIGHT
  * @method int getMatchRate() getMatchRate()
  * @method void setMatchRate() setMatchRate(int $matchrate)
  * @method string getMatchRateType() getMatchRateType()
- * @method void setMatchRateType() setMatchRateType(string $type)
  * @method string getQmId() getQmId()
  * @method void setQmId() setQmId(string $qmid)
  * @method int getStateId() getStateId()
@@ -317,6 +316,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             return $this->segmentdata[$loc['field']]->__get($loc['column']);
         }
         return parent::get($name);
+    }
+
+    /**
+     * set the match rate type, does not modify the value if it is a missing-mrk type before
+     */
+    public function setMatchRateType($type) {
+        $oldValue = $this->getMatchRateType();
+        if(editor_Models_Segment_MatchRateType::isUpdateable($oldValue)) {
+            return $this->__call(__FUNCTION__, [$type]);
+        }
+        return $oldValue;
     }
     
     /**
@@ -1273,7 +1283,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected function _getAlikesSql(string $viewName) {
         return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch
     from '.$viewName.' 
-    where (sourceMd5 = ? 
+    where ((sourceMd5 = ? and source != \'\' and source IS NOT NULL) 
         or (targetMd5 = ? and target != \'\' and target IS NOT NULL)) 
         and taskGuid = ? and editable = 1
     order by fileOrder, id';
