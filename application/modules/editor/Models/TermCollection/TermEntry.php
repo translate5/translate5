@@ -33,8 +33,8 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
     
     /***
      * Get term entry by given collectionId and groupId (termEntry tbx id) 
-     * @param unknown $termEntryId
-     * @param unknown $collectionId
+     * @param integer $termEntryId
+     * @param integer $collectionId
      * @return Zend_Db_Table_Row_Abstract|NULL
      */
     public function getTermEntryByIdAndCollection($termEntryId,$collectionId){
@@ -75,11 +75,10 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
      */
     public function removeOlderThan($olderThan){
         //find all modefied entries older than $olderThan date
-        //when the term is modefied the termEntry is modefied to
-        //the query will find the lates modefied term in entry, if the term update date is older than $olderThan, remove the termEntry
+        //the query will find the lates modefied term entry attribute, if the term entry attribute update date is older than $olderThan, remove the termEntry
         return $this->db->delete(['id IN (SELECT t.termEntryId
-            	FROM LEK_terms t
-            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_terms GROUP BY termEntryId)
+            	FROM LEK_term_entry_attributes t
+            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_entry_attributes GROUP BY termEntryId)
             	tm ON t.termEntryId = tm.termEntryId AND t.updated = tm.MaxDate
             	WHERE t.updated < ?
             	GROUP BY t.termEntryId)'=>$olderThan])>0;

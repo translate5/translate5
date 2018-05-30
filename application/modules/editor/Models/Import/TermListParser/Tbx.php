@@ -225,14 +225,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     
     /***
      * Term entry id from the database of the last merged term 
-     * @var unknown
+     * @var integer
      */
     private $lastMergeTermEntryIdDb;
     
     /***
      * Term entry id from the tbx of the last merged term
      * 
-     * @var unknown
+     * @var string
      */
     private $lastMergeTermEntryId;
     
@@ -871,7 +871,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     /***
      * Save term entry attribute in the database.
      * 
-     * @param unknown $parentId
+     * @param integer $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
      * @return boolean|editor_Models_TermCollection_TermEntryAttributes
@@ -893,7 +893,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     /***
      * Save term attribute in the database
      * 
-     * @param unknown $parentId
+     * @param integer $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
      * @return void|editor_Models_TermCollection_TermEntryAttributes

@@ -347,8 +347,8 @@ class editor_Plugins_TermImport_Services_Import {
     /***
      * Check if for the current file there is config for the termcollection to tbx file association
      * and termcollection to customer number association
-     * @param filepath $file: file to check
-     * @param unknown $configFile: config file where the associated data is placed
+     * @param string $file: file to check
+     * @param array $configFile: config file where the associated data is placed
      * @return NULL|string|array
      */
     private function handleCollectionForFile($file,$configFile){
@@ -422,7 +422,7 @@ class editor_Plugins_TermImport_Services_Import {
      * Init the config array
      *
      * @param string $filePath : absolute path to the config file
-     * @param arrayy $mapArray : array where the config data will be stored
+     * @param array $mapArray : array where the config data will be stored
      *
      * @throws ZfExtended_ValidateException
      */

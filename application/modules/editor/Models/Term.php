@@ -270,7 +270,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns all term mids from given segment content (allows and returns also duplicated mids)
      * @param string $seg
-     * @return type array values are the mids of the terms in the string
+     * @return array values are the mids of the terms in the string
      */
     public function getTermMidsFromSegment(string $seg) {
         return array_map(function($item) {
@@ -597,7 +597,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Find term attributes in the given term entry (lek_terms groupId)
-     * @param unknown $groupId
+     * @param string $groupId
      * @return array|NULL
      */
     public function searchTermAttributesInTermentry($groupId){
@@ -644,7 +644,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Find term entry attributes in the given term entry (lek_terms groupId)
-     * @param unknown $groupId
+     * @param string $groupId
      * @return array|NULL
      */
     public function searchTermEntryAttributesInTermentry($groupId){
