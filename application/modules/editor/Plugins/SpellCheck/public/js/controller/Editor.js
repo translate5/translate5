@@ -73,7 +73,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
     },
     spellCheckMessages: {
-        moreInformation: 'More information'
+        moreInformation: 'Mehr Informationen'
     },
     statics: {
         // spellcheck-Node

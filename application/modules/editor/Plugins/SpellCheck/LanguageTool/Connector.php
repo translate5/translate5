@@ -32,52 +32,55 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_SpellCheck_LanguageTool_Connector {
     
-    /***
-     *
-     * @var $config Zend_Config
-     */
-    private $languageToolConfig;
-    
-    /***
-     *
-     * @var string
-     */
-    private $apiBaseUrl;
-    
-    /***
-     * LanguageTool: supported languages
-     */
-    private $languages;
-    
-    /***
-     * LanguageTool: matches from spellcheck
-     */
-    private $matches;
-    
-    /***
-     * 
-     * LanguageTool 
+    /**
+     * LanguageTool
      */
     const PATH_LANGUAGES = '/languages';
     const PATH_MATCHES = '/check';
     const METHOD_LANGUAGES = 'GET';
     const METHOD_MATCHES = 'POST';
     
-    /***
+    /**
      * Request timeout for the api
-     * 
      * @var integer
      */
     const REQUEST_TIMEOUT_SECONDS = 360;
     
+    /**
+     * @var Zend_Config
+     */
+    private $languageToolConfig;
+    
+    /**
+     * Base-URL used for LanguagaTool - use the URL of your installed languageTool (without trailing slash!).
+     * Taken from Zf_configuration (example: "http://yourlanguagetooldomain:8081/v2")
+     * @var string
+     */
+    private $apiBaseUrl;
+    
+    /**
+     * LanguageTool: supported languages
+     * @var array
+     */
+    private $languages;
+    
+    /**
+     * LanguageTool: matches from spellcheck
+     * @var object
+     */
+    private $matches;
+    
+    /**
+     * 
+     */
     public function __construct() {
         $this->languageToolConfig= Zend_Registry::get('config')->runtimeOptions->plugins->SpellCheck;
-        /* @var $config Zend_Config */
+        /* @var Zend_Config */
         
         $this->apiBaseUrl=$this->languageToolConfig->languagetool->api->baseurl;
     }
     
-    /***
+    /**
      * Create the http object and set the url
      * 
      * @param string $url
@@ -91,7 +94,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
         return $http;
     }
     
-    /***
+    /**
      * Check for the status of the response. If the status is different than 200,
      * ZfExtended_BadGateway exception is thrown.
      * Also the function checks for the invalid decoded json.
@@ -121,7 +124,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
         return $result;
     }
     
-    /***
+    /**
      * Get all languages supported by LanguageTool.
      * @return array
      */
@@ -135,7 +138,7 @@ class editor_Plugins_SpellCheck_LanguageTool_Connector {
         return $this->processResponse($response);
     }
     
-    /***
+    /**
      * Get matches from LanguageTool.
      * @param string $text
      * @param string $language
