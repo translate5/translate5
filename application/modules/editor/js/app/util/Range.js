@@ -401,15 +401,17 @@ Ext.define('Editor.util.Range', {
             notSelectedNodesFound = false;
         if (rangeForSelection != null){
             selectedNodes = rangeForSelection.cloneContents().childNodes;
-            nodesInEditor = me.getEditorBody().childNodes;
-            Ext.Array.each(nodesInEditor, function(node, index) {
-                if (!me.isContainerToIgnore(node)) {
-                    if (!node.isEqualNode(selectedNodes[index])) {
-                        notSelectedNodesFound = true;
-                        return false;
+            if (selectedNodes.length > 0) {
+                nodesInEditor = me.getEditorBody().childNodes;
+                Ext.Array.each(nodesInEditor, function(node, index) {
+                    if (!me.isContainerToIgnore(node)) {
+                        if (!node.isEqualNode(selectedNodes[index])) {
+                            notSelectedNodesFound = true;
+                            return false;
+                        }
                     }
-                }
-            });
+                });
+            }
             return !notSelectedNodesFound;
         }
         return false; // might be true, but we couldn't check with the current code.
