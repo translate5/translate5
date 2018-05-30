@@ -390,6 +390,7 @@ Ext.define('Editor.util.Range', {
     
     /**
      * Returns true if all the relevant content in the editor is selected.
+     * (CAUTION: CTRL+A does NOT select everything in this sense.)
      * @returns {Boolean} 
      */
     isSelectedAllRelevantNodesInEditor: function() {
@@ -399,22 +400,22 @@ Ext.define('Editor.util.Range', {
             selectedNodes,
             nodesInEditor,
             notSelectedNodesFound = false;
-        if (rangeForSelection != null){
-            selectedNodes = rangeForSelection.cloneContents().childNodes;
-            if (selectedNodes.length > 0) {
-                nodesInEditor = me.getEditorBody().childNodes;
-                Ext.Array.each(nodesInEditor, function(node, index) {
-                    if (!me.isContainerToIgnore(node)) {
-                        if (!node.isEqualNode(selectedNodes[index])) {
-                            notSelectedNodesFound = true;
-                            return false;
-                        }
-                    }
-                });
-            }
-            return !notSelectedNodesFound;
+        if (rangeForSelection == null || rangeForSelection.collapsed){
+            return false; // might be true, but we couldn't check with the current code.
         }
-        return false; // might be true, but we couldn't check with the current code.
+        selectedNodes = rangeForSelection.cloneContents().childNodes;
+        if (selectedNodes.length > 0) {
+            nodesInEditor = me.getEditorBody().childNodes;
+            Ext.Array.each(nodesInEditor, function(node, index) {
+                if (!me.isContainerToIgnore(node)) {
+                    if (!node.isEqualNode(selectedNodes[index])) {
+                        notSelectedNodesFound = true;
+                        return false;
+                    }
+                }
+            });
+        }
+        return !notSelectedNodesFound;
     },
     
     /**
