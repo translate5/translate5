@@ -372,6 +372,7 @@ abstract class editor_Models_Import_FileParser {
      * calculates and sets segment attributes needed by us, this info doesnt exist directly in the segment. 
      * These are currently: pretrans, editable, autoStateId
      * Parameters are given by the current segment
+     * @return editor_Models_Import_FileParser_SegmentAttributes
      */
     protected function setCalculatedSegmentAttributes() {
         $attributes = $this->getSegmentAttributes($this->_mid);
@@ -393,6 +394,8 @@ abstract class editor_Models_Import_FileParser {
         
         //if there was a matchRateType from the imported segment, then the original value was stored
         $attributes->matchRateType = $this->matchRateType->parseImport($attributes, $this->_mid);
+        
+        return $attributes;
     }
     
     /**

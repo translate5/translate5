@@ -146,6 +146,16 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
      * check if the whitespace between mrk tags on the import are also exported again
      * @depends testSegmentEditing
      */
+    public function testMissingMrks() {
+        $task = $this->api()->getTask();
+        //start task export 
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '04-segmentation.xlf', 'export-segmentation.xlf');
+    }
+    
+    /**
+     * check if the whitespace between mrk tags on the import are also exported again
+     * @depends testSegmentEditing
+     */
     public function testPreserveContentBetweenMrk() {
         $task = $this->api()->getTask();
         //start task export 
@@ -189,6 +199,6 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        //self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }

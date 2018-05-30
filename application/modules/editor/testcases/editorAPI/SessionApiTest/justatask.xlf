@@ -82,6 +82,7 @@
           <count count-type="word count" unit="word">3</count>
         </count-group>
       </trans-unit>
+    </body>
   </file>
   <file datatype="plaintext" original="testfile2.html" source-language="en-US" target-language="de-DE" tool="OpenTM2">
     <header>

@@ -107,6 +107,21 @@ class editor_Plugins_TermImport_Services_Import {
     const CROSS_API_TMP_FILENAME="Apiresponsetmpfilename.tbx";
     
     /***
+     * Deletes all termEntries in all listed termCollections, that have a modification date older than the listed one.
+     * Since every entry that exists in a TBX gets a new updated date on TBX-import, even if it is not changed: Simply set this date to yesterday to delete all terms, that are not part of the current import
+     * The updated date is a date internal to translate5 and different from the modified date of the term, that is shown in the interface
+     * @var string
+     */
+    const DELETE_ENTRIES_KEY="deleteEntriesModifiedOlderThan";
+    
+    
+    /***
+     * Config key for deleting entries older than current import date.
+     * @var string
+     */
+    CONST DELETE_OLDER_IMPORT_ENTRIES_KEY="deleteEntriesOlderThanCurrentImport";
+    
+    /***
      * Data from the filesystem config file
      * @var array
      */
@@ -128,7 +143,6 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($this->filesystemMap)){
             $this->loadFilesystemConfig();
         }
-        
         //tbx files import folder
         $importDir=$this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
         
@@ -141,10 +155,19 @@ class editor_Plugins_TermImport_Services_Import {
             return ["The configured import dir is empty"];
         }
         
-        //get all files from the import direcotry
-        $files = array_slice(scandir($importDir), 2);
+        
+        //check if delete old entries is configured in the config file
+        if(isset($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
+            //remove old term entries and terms
+            $this->removeEntriesOlderThenImport(date('Y-m-d H:i:s'));
+        }
+        
         $returnMessage=[];
-        foreach ($files as $file){
+        
+        //get all files from the import direcotry
+        $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
+        foreach ($it as $fileinfo) {
+            $file=$fileinfo->getFilename();
             
             $params=$this->handleCollectionForFile($file, $this->filesystemMap);
             
@@ -181,6 +204,14 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($returnMessage)){
             $returnMessage[]="No files where imported";
         }
+
+        //check if delete old tasks is configured in the config file
+        if(isset($this->filesystemMap[self::DELETE_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_ENTRIES_KEY])){
+            $olderThan=$this->filesystemMap[self::DELETE_ENTRIES_KEY];
+            //remove old term entries and terms
+            $this->removeOldTermsAndEntries($olderThan);
+        }
+        
         return $returnMessage;
     }
     
@@ -224,14 +255,21 @@ class editor_Plugins_TermImport_Services_Import {
             return $returnMessage;
         }
         
-        //get all across export files from the dir
-        $files = array_slice(scandir($exportFilesDir), 2);
         $returnMessage=[];
+        
+        //check if delete old entries is configured in the config file
+        if(isset($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
+            //remove old term entries and terms
+            $this->removeEntriesOlderThenImport(date('Y-m-d H:i:s'));
+        }
         
         //FIXME: split the php file into classes ?
         require_once('AcrossTbxExport.php');
 
-        foreach ($files as $file){
+        //get all across export files from the dir
+        $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
+        foreach ($it as $fileinfo) {
+            $file=$fileinfo->getFilename();
             
             $connector=new TbxAcrossSoapConnector($apiUrl,$apiUser,$apiPwd);
             /* @var $connector TbxAcrossSoapConnector */
@@ -295,14 +333,22 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($returnMessage)){
             $returnMessage[]="No files where imported";
         }
+        
+        //check if delete old tasks is configured in the config file
+        if(isset($this->crossapiMap[self::DELETE_ENTRIES_KEY]) && !empty($this->crossapiMap[self::DELETE_ENTRIES_KEY])){
+            $olderThan=$this->crossapiMap[self::DELETE_ENTRIES_KEY];
+            //remove old term entries and terms
+            $this->removeOldTermsAndEntries($olderThan);
+        }
+        
         return $returnMessage;
     }
     
     /***
      * Check if for the current file there is config for the termcollection to tbx file association
      * and termcollection to customer number association
-     * @param filepath $file: file to check
-     * @param unknown $configFile: config file where the associated data is placed
+     * @param string $file: file to check
+     * @param array $configFile: config file where the associated data is placed
      * @return NULL|string|array
      */
     private function handleCollectionForFile($file,$configFile){
@@ -376,7 +422,7 @@ class editor_Plugins_TermImport_Services_Import {
      * Init the config array
      *
      * @param string $filePath : absolute path to the config file
-     * @param arrayy $mapArray : array where the config data will be stored
+     * @param array $mapArray : array where the config data will be stored
      *
      * @throws ZfExtended_ValidateException
      */
@@ -393,6 +439,31 @@ class editor_Plugins_TermImport_Services_Import {
         if(empty($mapArray)){
             throw new ZfExtended_ValidateException("Wrong file structure in :".$filePath);
         }
+    }
+    
+    /***
+     * Remove terms older than the configured date in the config file.
+     * Also remove the enpty term entries in the same term collection 
+     */
+    private function removeOldTermsAndEntries($olderThan){
+        $termModel=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $termModel editor_Models_Term */
+        
+        $termModel->removeOldTerms($olderThan);
+        
+        //remove all empty term entries from the same term collection
+        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry->removeEmptyFromCollection();
+    }
+    
+    /***
+     * Remove term entries older than $importDate
+     */
+    private function removeEntriesOlderThenImport($impotDate){
+        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry->removeOlderThan($impotDate);
     }
     
     /***

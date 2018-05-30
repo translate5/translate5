@@ -65,7 +65,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
             $ids = array_column($rows, 'collectionId');
             return $ids;
         }
-        return null;
+        return [];
     }
     
     /***
@@ -81,7 +81,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
             $ids = array_column($rows, 'id');
             return $ids;
         }
-        return null;
+        return [];
     }
     
     
@@ -93,7 +93,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      *      'termsAtributeCount'=>number,
      *      'termsEntryAtributeCount'=>number,
      *  ]
-     * @param unknown $collectionId
+     * @param integer $collectionId
      * @return array
      */
     public function getAttributesCountForCollection($collectionId){
@@ -111,7 +111,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      * Associate termCollection to taskGuid
      * 
      * @param mixed $collectionId
-     * @param guid $taskGuid
+     * @param string $taskGuid
      */
     public function addTermCollectionTaskAssoc($collectionId,$taskGuid){
         $sql='INSERT INTO LEK_term_collection_taskassoc (collectionId,taskGuid) '.
@@ -123,13 +123,13 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      * Get all existing languages in the term collections
      * 
      * @param array $collectionIds
-     * @return array|NULL
+     * @return array
      */
-    public function getLanguagesInTermCollecions(array $collectionIds){
+    public function getLanguagesInTermCollections(array $collectionIds){
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from('LEK_terms',array('LEK_terms.language as id'))
-        ->join('LEK_languages', 'LEK_languages.id = LEK_terms.language',array('LEK_languages.rfc5646','LEK_languages.ISO_3166-1_alpha-2'))
+        ->join('LEK_languages', 'LEK_languages.id = LEK_terms.language',array('LEK_languages.rfc5646','LEK_languages.iso3166Part1alpha2'))
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->group('LEK_terms.language');
         $rows=$this->db->fetchAll($s)->toArray();
@@ -138,12 +138,12 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
             return $rows;
         }
         
-        return null;
+        return [];
     }
     
     /***
      * Get term collection by name
-     * @param unknown $name
+     * @param string $name
      * @return array
      */
     public function loadByName($name){
@@ -154,5 +154,50 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
             return $result->toArray();
         }
         return $result;
+    }
+    
+    /***
+     * Check and remove the term collection if it is imported via task import
+     * @param array $collectionIds
+     */
+    public function checkAndRemoveTaskImported($taskGuid){
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from('LEK_term_collection',array('LEK_term_collection.*'))
+        ->join('LEK_term_collection_taskassoc', 'LEK_term_collection_taskassoc.collectionId = LEK_term_collection.id',array('LEK_term_collection_taskassoc.collectionId','LEK_term_collection_taskassoc.taskGuid'))
+        ->where('LEK_term_collection_taskassoc.taskGuid=?',$taskGuid)
+        ->where('LEK_term_collection.autoCreatedOnImport=?',1);
+        $rows=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($rows)){
+            return false;
+        }
+        $collectionId=$rows[0]['id'];
+        
+        //remove the collection
+        $this->load($collectionId);
+        $this->delete();
+        
+        //remove the task from the assoc table
+        $taskassoc = ZfExtended_Factory::get('editor_Models_Db_TermCollection_TaskAssoc');
+        $taskassoc->delete(array('taskGuid = ?' => $taskGuid));
+        
+        //remove the termcollection from the disk
+        $this->removeCollectionDir($collectionId);
+    }
+    
+    /***
+     * Remove term collection from the disk
+     * @param integer $collectionId
+     */
+    protected function removeCollectionDir($collectionId){
+        $collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
+        if(is_dir($collectionPath)){
+            /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                'Recursivedircleaner'
+                );
+            $recursivedircleaner->delete($collectionPath);
+        }
     }
 }

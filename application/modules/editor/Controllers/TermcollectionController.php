@@ -94,6 +94,13 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
+        $collectionIds=$this->getCollectionForLogedUser();
+        
+        if(empty($collectionIds)){
+            $this->view->rows=$responseArray;
+            return;
+        }
+        
         $model=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $model editor_Models_Term */
         
@@ -108,7 +115,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 $termCount=null;
             }
             
-            $responseArray['term']=$model->searchTermByLanguage($params['term'],$languages,$params['collectionIds'],$termCount);
+            $responseArray['term']=$model->searchTermByLanguage($params['term'],$languages,$collectionIds,$termCount);
         }
         
         $this->view->rows=$responseArray;
@@ -121,15 +128,22 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
+        $collectionIds=$this->getCollectionForLogedUser();
+        
+        if(empty($collectionIds)){
+            $this->view->rows=$responseArray;
+            return;
+        }
+        
         $model=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $model editor_Models_Term */
         
         if(isset($params['groupId'])){
-            $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId']);
+            $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId'],$collectionIds);
             
             $entryAttr=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
             /* @var $entryAttr editor_Models_TermCollection_TermEntryAttributes */
-            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId']);
+            $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId'],$collectionIds);
             
         }
         
@@ -172,6 +186,27 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         return $filePath;
     }
     
+    /***
+     * Get the available collections for the currently logged user
+     * 
+     * @return array
+     */
+    private function getCollectionForLogedUser(){
+        
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
+
+        if(empty($customers)){
+            return array();
+        }
+        
+        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $collection editor_Models_TermCollection_TermCollection */
+        $collectionIds=$collection->getCollectionsIdsForCustomer($customers);
+        
+        return $collectionIds;
+    }
     
     /**
      * translates and transport upload errors to the frontend

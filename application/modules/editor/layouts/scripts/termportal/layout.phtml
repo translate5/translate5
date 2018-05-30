@@ -42,7 +42,8 @@ $config = Zend_Registry::get('config');
 /* @var $config Zend_Config */
 $menu = $config->runtimeOptions->content->mainMenu;
 
-echo $this->doctype()
+echo $this->doctype();
+$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-1.12.1';
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -53,9 +54,9 @@ echo $this->doctype()
         <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
 <?php echo $this->headScript() ?>
 
-        <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.css">
-        <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/external/jquery/jquery.js"></script>
-        <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="<?php echo $jqueryPath; ?>/jquery-ui.min.css">
+        <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js"></script>
+        <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js"></script>
         
         <link rel="stylesheet" href="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/css/termportal.css">
     </head>

@@ -624,7 +624,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected function prepareText($text) {
         //if active, track changes are exported as mrk tag, if not we remove the track changes content
         if($this->options[self::CONFIG_INCLUDE_DIFF]){
-            $text=$this->cleanTrackChanges($text);
+            $text=$this->taghelperTrackChanges->removeTrackChanges($text);
         }else{
             $text=$this->trackChangesAsMrk($text);
         }
@@ -673,19 +673,6 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             return '<mrk id="'.$tbxId.'" type="term" translate5:status="'.$status.'"'.$translation.'>';
         }, '</mrk>', $protectInternalTags);
     }
-    
-    /***
-     * Remove track changes tags from the segment (including the content of the del tags)
-     * @param string $text
-     * @return string
-     */
-    protected function cleanTrackChanges($text){
-        $text= preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_DEL_NODOUBLESPACE, ' ', $text);
-        $text= preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_DEL, '', $text);
-        $text= preg_replace(editor_Models_Segment_TrackChangeTag::REGEX_INS, '', $text);
-        return $text;
-    }
-    
     
     /***
      * Convert the trach changes tags to xliff 2.1 mrk tags

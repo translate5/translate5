@@ -97,20 +97,12 @@ abstract class editor_Models_Segment_TagAbstract {
     }
     
     /***
-     * Set the placeholder template
-     * @param string $template
-     */
-    public function setPlaceholderTemplate(string $template){
-        $this->placeholderTemplate=$template;
-    }
-    
-    /***
      * Return the placeholder template with id
      *
      * @param integer $id
      * @return string
      */
-    public function getPlaceholderTemplate($id){
+    protected function getPlaceholderTemplate($id){
         //if is not set, set the default placeholder template
         if(!$this->placeholderTemplate){
             throw new Zend_Exception("Placeholder template is not set");
@@ -119,20 +111,11 @@ abstract class editor_Models_Segment_TagAbstract {
     }
     
     /***
-     * Set the replacer regex used in replace function
-     *
-     * @param string $replacerRegex
-     */
-    public function setReplacerRegex(string $replacerRegex){
-        $this->replacerRegex=$replacerRegex;
-    }
-    
-    /***
      * Get the replace regex used in the replace function
      *
      * @return regexp
      */
-    public function getReplacerRegex(){
+    protected function getReplacerRegex(){
         //if it is not set, set the default regex
         if(!$this->replacerRegex){
             throw new Zend_Exception("Replacer regex is not set.");
