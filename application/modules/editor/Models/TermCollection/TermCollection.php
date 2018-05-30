@@ -181,5 +181,23 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         //remove the task from the assoc table
         $taskassoc = ZfExtended_Factory::get('editor_Models_Db_TermCollection_TaskAssoc');
         $taskassoc->delete(array('taskGuid = ?' => $taskGuid));
+        
+        //remove the termcollection from the disk
+        $this->removeCollectionDir($collectionId);
+    }
+    
+    /***
+     * Remove term collection from the disk
+     * @param integer $collectionId
+     */
+    protected function removeCollectionDir($collectionId){
+        $collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
+        if(is_dir($collectionPath)){
+            /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
+            $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+                'Recursivedircleaner'
+                );
+            $recursivedircleaner->delete($collectionPath);
+        }
     }
 }

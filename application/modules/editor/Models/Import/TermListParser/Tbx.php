@@ -1311,4 +1311,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         };
         return $replaceSpecialChars($value, $tempFunnyChars);
     }
+    
+    /***
+     * Get filesystem imported collection directory
+     */
+    static public function getFilesystemCollectionDir(){
+        return APPLICATION_PATH.'/../data/tbx-import/tbx-for-filesystem-import/';
+    }
 }
