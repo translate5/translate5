@@ -132,6 +132,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             )
         ));
         
+        $this->front->getRouter()->addRoute('editorTaskImport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/import',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'import'
+            )
+        ));
+        
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',
