@@ -430,9 +430,10 @@ Ext.define('Editor.util.Range', {
      * - Finding this range based on the characters results in: ab[<MQM>cd]</MQM>ef
      * - But correct is:                                        ab<MQM>[cd]</MQM>ef
      * @param {Object} range
+     * @param {String} direction (optional)
      * @returns {Object} range
      */
-    cleanBordersOfCharacterbasedRange: function(range) {
+    cleanBordersOfCharacterbasedRange: function(range,direction) {
         var me = this,
             documentFragmentForRange,
             tagNodesInRange,
@@ -507,8 +508,23 @@ Ext.define('Editor.util.Range', {
             return ( me.isMQMTag(node) || me.isContentTag(node) );
         });
         iMax = documentFragmentForRange.childNodes.length;
-        cleanBorderNodesFromRange("fromStart");
-        cleanBorderNodesFromRange("fromEnd");
+        
+        if (direction == null) {
+            direction = "fromBothEnds";
+        }
+        switch(direction) {
+            case "fromStart":
+                cleanBorderNodesFromRange("fromStart");
+                break;
+            case "fromEnd":
+                cleanBorderNodesFromRange("fromEnd");
+                break;
+            case "fromBothEnds":
+            default:
+                cleanBorderNodesFromRange("fromStart");
+                cleanBorderNodesFromRange("fromEnd");
+                break;
+        }
         
         return range;
     },
@@ -638,7 +654,7 @@ Ext.define('Editor.util.Range', {
     
     /**
      * Returns a bookmark for the current position of the cursor in the Editor.
-    // (Use bookmark of rangy's SELECTION if workaround is not applied).
+    // (Use rangy's bookmark if workaround is not applied).
      * @returns {Object} rangy-bookmark|node
      */
     getPositionOfCaret: function() {
@@ -648,24 +664,30 @@ Ext.define('Editor.util.Range', {
         if (me.useWorkaroundForBookmark(rangeForCaret)) {
             return me.getBookmarkUsingTheWorkaround(rangeForCaret);
         } else {
-            return selectionForCaret.getBookmark(); // = rangy's bookmark of the SELECTION, not a range
+            return rangeForCaret.getBookmark();
         }
     },
     /**
      * Set the position of the cursor according to the given bookmark or node.
-     * (Use bookmark of rangy's SELECTION if workaround is not applied).
+     * (Use rangy's bookmark if workaround is not applied).
      * @param {Object} rangy-bookmark|node
      */
     setPositionOfCaret: function(bookmarkForCaret) {
         var me = this,
             selectionForCaret = rangy.getSelection(me.getEditorBody()),
+            startNodeOfSelection = (selectionForCaret.isBackwards()) ? selectionForCaret.focusNode : selectionForCaret.anchorNode,
             rangeForCaret = rangy.createRange(),
             nodeForBookmark;
         if(me.isBookmarkOfWorkaround(bookmarkForCaret)){
             rangeForCaret = me.applyBookmarkUsingTheWorkaround(rangeForCaret,bookmarkForCaret);
-            selectionForCaret.setSingleRange(rangeForCaret);
         } else {
-            selectionForCaret.moveToBookmark(bookmarkForCaret); // = rangy's bookmark of the SELECTION, not a range
+            rangeForCaret.moveToBookmark(bookmarkForCaret);
         }
+        if (!rangeForCaret.collapsed && startNodeOfSelection.nodeType == 1) {
+            // rangy bug: if the selection starts between a tag and text, the tag will be included even it was not selected
+            // (does not happen at the end of the selection)
+            rangeForCaret = me.cleanBordersOfCharacterbasedRange(rangeForCaret,"fromStart");
+        }
+        selectionForCaret.setSingleRange(rangeForCaret);
     }
 });
