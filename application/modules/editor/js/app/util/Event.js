@@ -202,8 +202,11 @@ Ext.define('Editor.util.Event', {
                 // check key
                 editorKeyMapBindingKeys = (Ext.typeOf(bindings[index].key) == "string") ? new Array(bindings[index].key) : bindings[index].key;
                 Ext.each(editorKeyMapBindingKeys, function(bindedKey) {
+                    if (Ext.typeOf(bindedKey) == "string") {
+                        bindedKey = bindedKey.toLowerCase();
+                    }
                     // for characters: getKeyName(); for digits: getKey()
-                    if (bindedKey == me.event.getKeyName() || bindedKey == me.event.getKey() ) {
+                    if (bindedKey == me.event.getKeyName().toLowerCase() || bindedKey == me.event.getKey() ) {
                         // Caution: ALL DIGITS without alt and without ctrl ARE handled by keyMapConfig, but only for checking the handleDigit()-procedure.
                         if (Ext.Array.contains(me.editor.DEC_DIGITS,bindedKey)) {
                             isHandledByKeyMapConfig = (bindings[index].defaultEventAction == 'stopEvent');
