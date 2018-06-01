@@ -44,24 +44,35 @@ $menu = $config->runtimeOptions->content->mainMenu;
 
 echo $this->doctype()
 ?>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE HTML>
+<!--
+	HTML, CSS and Javascript outside of the logged in area of translate5 is based on the "Future Imperfect" HTML5 design by HTML5 UP
+        and therefore is under CCA 3.0 license. 
+        To be able to see, what was derived from "Future Imperfect" HTML5  the original "Future Imperfect" design package 
+        is added under /assets/html5up-future-imperfect.zip as a reference
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
     <head>
         <?php echo $this->headTitle() ?>
-        <?php echo $this->headMeta() ?>
-        <?php echo $this->headLink() ?>
-        <?php echo $this->headStyle() ?>
+        <meta name="description" content="Cloud open source translation, proofreading and postediting system.">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="/assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="/assets/css/ie8.css" /><![endif]-->
         <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
-<?php echo $this->headScript() ?>
     </head>
     <body>
-        <div id="header">
-            <img src="/images/translate5.png?v=1" alt="<?php echo 'translate5'; ?>">
-                <div id="slogan">open source web-based translation system<br><small>translation, proofreading, postediting &amp; QA</small></div>
-        </div>
-        <div id="menu">
-
-            <ul>
-                <?php
+        <div id="wrapper">
+            <!-- Header -->
+					<header id="header">
+                                            <h5><a href="/">translate5</a></h5>
+						<nav class="links">
+							<ul>
+								<?php
                 if (!is_null($menu)) {
                     foreach ($menu as $item) {
                         $item = (array) $item;
@@ -71,100 +82,111 @@ echo $this->doctype()
                     }
                 }
                 ?>
-                <li class="clear">&nbsp;</li>
-            </ul>
-        </div>
-        <div id="content">
-            <div class="main">
+							</ul>
+						</nav>
+						<nav class="main">
+							<ul>
+								<li class="menu">
+									<a class="fa-bars" href="#menu">Menu</a>
+								</li>
+							</ul>
+						</nav>
+					</header>
+            <!-- Menu -->
+					<section id="menu">
+						<!-- Links -->
+							<section>
+								<ul class="links">
+                                                                    <?php
+                if (!is_null($menu)) {
+                    foreach ($menu as $item) {
+                        $item = (array) $item;
+                        $item = each($item);
+                        $class = ($item['key'] === $_SERVER['REQUEST_URI']) ? ' class="active"' : '';
+                        echo '<li><a href="' . $item['key'] . '"' . $class . '><h3>' . $this->translate->_($item['value']) . '</h3></a></li>';
+                    }
+                }
+                ?>
+								</ul>
+							</section>
+
+						<!-- Actions -->
+							<section>
+								<ul class="actions vertical">
+									<li><a href="/login" class="button big fit">Log In</a></li>
+								</ul>
+							</section>
+
+					</section>
+            <div id="main">
+                
 <?php echo $this->layout()->content; ?>
             </div>
-            <div class="sidebar">
-                    
-                     <h4 class="important">Crowdfunding Gold Supporters</h4>
-                     <div class="sidebar-line"><a href="http://www.beo-doc.de/" target="_blank"><img class="supporters" style="margin-right: 110px" src="/images/supporters-small/beo-logo.jpg"></a>
- 
-                         <a href="http://www.supertext.ch/" target="_blank"><img class="supporters" src="/images/supporters-small/supertext-logo.png"></a></div>
-                     <div class="sidebar-line" style="margin-top: 21px; margin-bottom: 21px;">
-                   <a href="http://soluzione.de/" target="_blank"><img class="supporters" style="position: relative; left: -15px; margin-right: 0; width: 150px;" src="/images/supporters/soluzione.png"></a>
-                   <a href="http://www.pangeanic.com/" target="_blank"><img class="supporters"  style="width: 150px;" src="/images/supporters/pangeanic.png"></a>
-        </div>
-<div class="sidebar-line">
             
-<a href="http://www.supertext.ch/" target="_blank"><img class="supporters" style="margin-right: 70px;" src="/images/supporters-small/supertext-logo.png"></a>
-<a href="http://www.lexitech.com/" target="_blank"><img class="supporters" style="width: 132px;" src="/images/supporters/lexitech-logo.jpg"></a>
-        </div>
-    <h4 class="important" style="margin-bottom: 7px;">Crowdfunding Silver Supporters</h4>
-    <div class="sidebar-line">
-        <a href="http://www.oneword.de/" target="_blank"><img class="supporters" style="width: 115px; margin-right: 87px;" src="/images/supporters-small/oneword-logo.jpg"></a>
-    <a href="http://www.mt-g.de/" target="_blank"><img class="supporters" style="width: 100px;" src="/images/supporters-small/mt-g-logo.png"></a>
-    </div>
-    <h4 class="important" style="margin-top: 0px;">Crowdfunding Bronze Supporters</h4>
-    <div class="sidebar-line">
-        <a href="http://www.globalese-mt.com/" target="_blank"><img class="supporters" src="/images/supporters-small/globalese-logo.png"></a>
-           <a href="http://www.locasoft.com/" target="_blank"><img class="supporters" src="/images/supporters-small/locasoft-logo.jpg"></a>
- 
-        <a href="http://www.iolar.com/" target="_blank"><img class="supporters" src="/images/supporters-small/iolar-logo.png"></a>
-    </div>
-        <div class="sidebar-line" style="margin-top: 10px;">
-            <a href="http://www.lucysoftware.com/" target="_blank"><img class="supporters" style="margin-right: 114px;" src="/images/supporters-small/lucy-logo.png"></a>
-        <a href="http://www.oneword.de/" target="_blank"><img class="supporters" src="/images/supporters-small/oneword-logo.jpg"></a>
-        
-    
-    </div>
-    <h4 class="important" style="margin-bottom: 0px;">Crowdfunding Supporters</h4>
-    <div class="sidebar-line">
-        <a href="http://www.smartspokes.com/" target="_blank"><img class="supporters" src="/images/supporters/smartspokes-logo.png" alt="SmartSpokes AG"></a>
-        <a href="http://mccosh.de/" target="_blank" style="text-decoration: none; text-decoration: none; font-size: 14px; position: relative; top: -5px;">Daniel McCosh</a>
-        
-        
-    <a href="http://www.yavaway.com/" target="_blank"><img class="supporters" src="/images/supporters-small/yavaway-logo.jpg"></a>
-    
-    </div>
-    <div class="sidebar-line">
-        <a href="http://www.swissglobal.ch/" target="_blank"><img class="supporters" style="margin-right: 127px;" src="/images/supporters/swiss-global.jpg"></a>
-    <a href="http://www.translationprojex.com/" target="_blank"><img class="supporters" src="/images/supporters-small/translationprojex-logo.png"></a>
-    </div>
-   <p class="small-explanation">A 17th company that wants to stay anonymous at the present supported the crowdfunding.</p>
-                    
-                    
-                    
-                    
-                    
-                    <h3 class="important before-small-exception">Main supporters</h3>
-                    <p class="small-explanation">These companies supported large shares of the development besides the crowdfunding</p>
-                    <div class="sidebar-line"><a href="http://www.beo-doc.de/" target="_blank"><img src="/images/supporters/beo-logo.jpg" style="width:151px;" alt="beo Gesellschaft für Sprachen und Technologie mbH"></a>
-                    <a href="http://www.itl.eu/" target="_blank"><img src="/images/supporters/itl-logo.png"  style="width:100px; margin-left: 50px;" alt="itl Institut für technische Literatur AG"></a></div>     
-                    
-                    <div class="sidebar-line" style="margin-top: 11px; margin-bottom: 11px;">
-                        <a href="http://www.supertext.ch/" target="_blank"><img class="supporters" style="margin-right: 75px;" src="/images/supporters-small/supertext-logo.png"></a>
-                        <a href="http://www.dfki.de/" target="_blank"><img src="/images/supporters/dfki-logo.jpg"  style="width:150px;" alt="DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH"></a></div>
-                        <div class="sidebar-line">    <a href="http://www.mittagqi.com/" target="_blank"><img src="/images/supporters/mittagqi-logo.png"  style="width: 125px;"></a>
-                    </div>
-                    <h3 class="important before-small-exception">Permanent supporters</h3>
-                    <p class="small-explanation">SmartSpokes committed itself (without being asked for it!) for a constant, repeating funding. Thank you very much!</p>
-                    <div class="sidebar-line">
-                        <a href="http://www.smartspokes.com/" target="_blank"><img src="/images/supporters/smartspokes-logo.png" style="width:91px;" alt="SmartSpokes AG"></a>
-                    </div>                
-                    <h3 class="important">Supporter of selected features</h3>
-                    <a href="http://www.oneword.de/" target="_blank">oneword GmbH</a><br><br>
-                                                            <a href="http://xtra-services.com/" target="_blank">XTRA Translation Services</a><br><br>
-                                                                            <a href="http://www.textform.com/" target="_blank">text&amp;form</a><br><br>
-                                                                                    <h3 class="important">Individual supporters</h3>
-                                                                                    <a href="http://www.mccosh.de/" target="_blank">Daniel Mc Cosh</a><br><br>
-                                                                                            Peter Bourgonje<br><span class="thankyou">(Moses support)</span><br>
-                                                                                                    </div>
+<!-- Sidebar -->
+					<section id="sidebar">
+<!-- Intro -->
+							<section id="intro">
+								<a href="/" class="logo"><img src="/images/translate5-transparent.png" alt="translate5" /></a>
+								<header>
+									<h1>Open Source translation system</h1>
+									<p>Cloud open source translation, review and postediting system</p>
+								</header>
+                                                                <ul class="icons">
+                                                                    <li><a href="https://twitter.com/translate5_marc" class="fa-twitter" target="_blank"><span class="label">Twitter</span></a></li>
+									<li><a href="https://www.facebook.com/Translate5-412951439069652/" class="fa-facebook" target="_blank"><span class="label">Facebook</span></a></li>
+									<li><a href="mailto:support@translate5.net" class="fa-envelope" target="_blank"><span class="label">Email</span></a></li>
+								</ul>
+							</section>
+						<!-- Mini Posts -->
+							<section>
+								<div class="mini-posts">
 
-                                                                                                    <div class="clear">&nbsp;</div>
+									<!-- Mini Post -->
+										<article class="mini-post">
+											<header>
+                                                                                            <h3><a href="/index/crowd-of-companies">Crowdfunding &amp;<br>Crowd of companies</a></h3>
+                                                                                            <a href="/index/crowd-of-companies"><span class="published">Supporters of the development<br>Thank you very much!</span></a>
+									
+											</header>
+											<a href="/index/crowd-of-companies" class="image"><img src="/images/Community-of-companies.png" alt="Crowd of Companies" /></a>
+										</article>
 
-                                                                                                    </div>
-                                                                                                    <div id="footer">
-                                                                                                        <?php
-                                                                                                        /* @var $this Zend_View */
-                                                                                                        if (!isset($this->impressum)) {
-                                                                                                            ?><a href="/index/impressum">Imprint &amp; privacy policy</a> | <?php
-                                                                                                        }
-                                                                                                        ?>
-                                                                                                        <a href="mailto:support@translate5.net">Ask a question about translate5</a>
-                                                                                                    </div>
+									<!-- Mini Post -->
+										<article class="mini-post">
+											<header>
+												<h3><a href="#">Outstanding features</a></h3>
+                                                                                                <span class="published">Review in perfect layout<br>MS-word style track changes<br>100.000 segments per task</span>
+									
+											</header>
+											<a href="#" class="image"><img src="/images/translate5-visualReview-small.png" alt="translate5 visualReview" /></a>
+										</article>
+<!-- Mini Post -->
+										<article class="mini-post">
+											<header>
+												<h3><a href="#">Extremly flexible and extendable for integrations</a></h3>
+                                                                                                <span class="published">REST-API for every GUI feature<br>Very powerful plug-in's possible<br>Editor-only integration possible</span>
+									
+											</header>
+											<a href="#" class="image"><img src="/images/cloud-api-technology.png" alt="Cloud api technology" /></a>
+										</article>
+
+								</div>
+							</section>
+
+						<!-- Footer -->
+							<section id="footer">
+								<p class="copyright"><a href="/index/impressum">Imprint &amp; privacy policy</a> |                                                                                                         <a href="mailto:support@translate5.net">Ask a question about translate5</a>
+                                                                                                    </p>
+							</section>
+
+					</section>                                                                        
+            </div>
+        <!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/skel.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<!--[if lte IE 8]><script src="/assets/js/ie/respond.min.js"></script><![endif]-->
+			<script src="/assets/js/main.js"></script>
                                                                                                     </body>
                                                                                                     </html>

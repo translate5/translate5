@@ -41,7 +41,6 @@ trait ControllerMixIns  {
         $url = "/".$controller."/".$action;
         $config = Zend_Registry::get('config');
         $menu = $config->runtimeOptions->content->mainMenu;
-        
         if(empty($menu)) {
             return;
         }
@@ -53,6 +52,9 @@ trait ControllerMixIns  {
             if($found){
                 break;
             }
+        }
+        if($_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR.'/'|| $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR){
+            $found = true;
         }
         if (!$found){
             throw new ZfExtended_NotFoundException();
