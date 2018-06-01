@@ -399,14 +399,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           }
       }
 
+      //check for next step
       if(!nextStep){
           
-          //if no next step, and no task, save it 
+          //if no next step, and no task, save it and start the import 
           if(!activeItem.task){
-              me.saveTask();
+              me.saveTask(function(task){
+            	  me.startImport(task);
+              });
           }else{
-              //the task is already saved, close the window 
-              me.handleTaskCancel();
+              //the task is already saved, start the import 
+        	  me.startImport(activeItem.task);
           }
           return;
       }
@@ -702,7 +705,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           win = me.getTaskAddWindow(),
           error = win.down('#feedbackBtn');
       error.hide();
+      
       win.setLoading(me.strings.loadingWindowMessage);
+      
       this.getTaskAddForm().submit({
           //Accept Header of submitted file uploads could not be changed:
           //http://stackoverflow.com/questions/13344082/fileupload-accept-header
@@ -720,12 +725,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               win.setLoading(false);
               me.getAdminTasksStore().load();
               
-              Editor.MessageBox.addSuccess(win.importTaskMessage,2);
-              
               //call the callback if exist
-              if(!successCallback){
-                  me.handleTaskCancel();
-              }else{
+              if(successCallback){
                   successCallback(task);
               }
           },
@@ -737,5 +738,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               }
           }
       });
+  },
+  
+  /***
+   * Start the import for the given task
+   */
+  startImport:function(task){
+	  var me=this,
+	  	  url=Editor.data.restpath+"task/"+task.get('id')+"/import",
+	  	  win = me.getTaskAddWindow();
+	  
+	  win.setLoading(true);
+	  
+	  Ext.Ajax.request({
+		 url:url,
+		 method:'GET',
+         success: function(response){
+        	 win.setLoading(false);
+             Editor.MessageBox.addSuccess(win.importTaskMessage,2);
+             me.handleTaskCancel();
+         },
+         failure: function(response){
+        	 win.setLoading(false);
+             Editor.app.getController('ServerException').handleException(response);
+         }
+	  });
   }
+  
 });
