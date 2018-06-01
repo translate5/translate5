@@ -94,27 +94,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $this->view->appVersion = $this->getAppVersion();
         $this->setJsVarsInView();
         $this->checkForUpdates();
-        
-        //$this->startTestCode();
-    }
-    
-    public function startTestCode(){
-        $taskGuid="{ed03996b-37fd-4ecd-b988-b118ccbe5069}";
-        
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        
-        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
-        $analysisAssoc->setTaskGuid($task->getTaskGuid());
-        $analysisId=$analysisAssoc->save();
-        
-        $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
-        /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
-        
-        
-        $analysis->calculateMatchrate();
     }
     
     /**

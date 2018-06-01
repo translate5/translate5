@@ -156,7 +156,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
     /***
      * Init the tmmt connectiors
      * 
-     * @return NULL|array
+     * @return array
      */
     public function initConnectors(){
         
@@ -166,7 +166,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
         $assocs=$tmmts->loadByAssociatedTaskGuid($this->task->getTaskGuid());
         
         if(empty($assocs)){
-            return null;
+            return array();
         }
         
         foreach ($assocs as $assoc){
@@ -177,6 +177,13 @@ class editor_Plugins_MatchAnalysis_Analysis{
             
             $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
             /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+            $resource=$manager->getResource($tmmt);
+            
+            //ignore non analysable resources
+            if(!$resource->getAnalysable()){
+                continue;
+            }
+            
             $connector=$manager->getConnector($tmmt);
             
             $this->connectors[$assoc['id']]=[];

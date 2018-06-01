@@ -82,7 +82,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * define all event listener
      */
     protected function initEvents() {
-        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
+        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
         //$this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'startTestCode'));
     }
     
@@ -96,6 +96,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = $event->getParam('task');
         $taskGuid=$task->getTaskGuid();
         
+        if(!$this->checkMatchResources($taskGuid)){
+            return;
+        }
+        
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
         
@@ -108,23 +112,44 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         }
         $worker->queue($parentWorkerId);
     }
-    
-    public function startTestCode(Zend_EventManager_Event $event){
-        $taskGuid=$event->getParam('entity')->getTaskGuid();
+
+    /***
+     * Check if for the current task match resources are assigned.
+     * Check if the assigned match resources are analysable
+     * 
+     * @param string $taskGuid
+     * 
+     * @return boolean
+     */
+    private function checkMatchResources($taskGuid){
+        $tmmts=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+        /* @var $tmmts editor_Plugins_MatchResource_Models_TmMt */
         
-        $service=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis');
-        /* @var $service editor_Plugins_MatchAnalysis_Analysis */
+        $assocs=$tmmts->loadByAssociatedTaskGuid($taskGuid);
         
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
+        if(empty($assocs)){
+            return false;
+        }
         
-        $task->loadByTaskGuid($taskGuid);
-        $service->setTask($task);
+        $hasAnalysable=false;
+        foreach ($assocs as $assoc){
+            $tmmt=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+            /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt  */
+            
+            $tmmt->load($assoc['id']);
+            
+            $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+            /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+            $resource=$manager->getResource($tmmt);
+            
+            //analysable match resource is found
+            if($resource->getAnalysable()){
+               $hasAnalysable=true; 
+            }
+            
+        }
         
-        $service->calculateMatchrate();
-    }
-    
-    public function checkTaskAssoc($taskGuid){
+        return $hasAnalysable;
     }
     
     /**

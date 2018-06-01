@@ -511,7 +511,8 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @param array $metaData
      * @param editor_Models_Segment $segment
      * @param string $filename
-     * @return unknown|string
+     * 
+     * @return integer
      */
     protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
         

@@ -54,11 +54,22 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         return true; 
     }
     
-    private function runAnalysis($taskGuid){
-        $service=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Service');
-        /* @var $service editor_Plugins_MatchAnalysis_Service */
-        $service->setTaskGuid($taskGuid);
-        $service->calculateMatchrate();
+    /***
+     * Run match analysis for the given task
+     * @param string $taskGuid
+     */
+    protected function runAnalysis($taskGuid){
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
         
+        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc->setTaskGuid($task->getTaskGuid());
+        $analysisId=$analysisAssoc->save();
+        
+        $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
+        /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
+        $analysis->calculateMatchrate();
     }
 }

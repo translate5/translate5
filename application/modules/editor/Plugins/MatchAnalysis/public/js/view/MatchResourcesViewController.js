@@ -35,14 +35,12 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResourcesViewController', {
     alias: 'controller.matchResourcesPanel',
 
     handleNextCardClick:function(){
-        debugger;
         var me=this,
             view=me.getView();
         view.fireEvent('wizardCardFinished');
     },
     
     handleSkipCardClick:function(){
-        debugger;
         var me=this,
             view=me.getView();
         view.fireEvent('wizardCardFinished',0);

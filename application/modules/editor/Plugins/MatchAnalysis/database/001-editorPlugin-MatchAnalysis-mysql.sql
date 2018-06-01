@@ -34,9 +34,9 @@ CREATE TABLE `LEK_match_analysis_taskassoc` (
   INDEX `fk_LEK_match_analysis_taskassoc_1_idx` (`taskGuid` ASC),
   CONSTRAINT `fk_LEK_match_analysis_taskassoc_1`
     FOREIGN KEY (`taskGuid`)
-    REFERENCES `translate5`.`LEK_task` (`taskGuid`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    REFERENCES `LEK_task` (`taskGuid`)
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE);
 
 
 CREATE TABLE `LEK_match_analysis` (
