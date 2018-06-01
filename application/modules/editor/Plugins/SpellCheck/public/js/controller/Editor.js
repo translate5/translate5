@@ -417,8 +417,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.allMatches = null;
         me.allMatchesRanges = null;
         
-        me.cleanSpanMarkupInEditor(); // in case a spellcheck has been run before already
-        
         editorText = me.getEditorContentAsText(false);
         console.log("editorText: " + editorText);
         me.runSpellCheck(editorText, spellCheckProcessID);
@@ -497,6 +495,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.finishSpellCheck(spellCheckProcessID);
             return;
         }
+        
+        me.cleanSpanMarkupInEditor(); // in case a spellcheck has been run before already
         
         if (me.allMatchesOfTool.length > 0) {
             me.applyAllMatches(spellCheckProcessID);
