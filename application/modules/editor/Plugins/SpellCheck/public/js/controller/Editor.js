@@ -280,7 +280,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     handleClickInEditor: function(event) {
         var me = this;
         me.terminateSpellCheck();
-        me.editIdleTimer = null;
     },
     /**
      * Handle KeyDown-Events of Editor.view.segments.HtmlEditor
@@ -300,13 +299,16 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.stopEvent = true;
         }
         
-        // When the user is still editing,
-        // - immediately stop every currently running SpellCheck-Process
-        // - and start the timer anew
-        if (!me.ignoreEvent || me.eventIsArrowKey()) {  
-            me.terminateSpellCheck();
-            me.editIdleTimer = null;
-            me.startTimerForSpellCheck();
+        // Terminate running SpellChecks?
+        switch(true) {
+            case me.eventIsTranslate5():
+                me.consoleLog("translate5-Keyboard-Shortcut!");
+                me.terminateSpellCheck();
+            break;
+            case (!me.ignoreEvent || me.eventIsArrowKey()):
+                me.consoleLog("The user is still editing!");
+                me.terminateAndRestartSpellCheck(true);
+            break;
         }
         
         if(!me.ignoreEvent) {
@@ -450,6 +452,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.consoleLog('terminateSpellCheck; me.spellCheckInProgressID for ' + me.spellCheckInProgressID + ' now: false.');
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
+    },
+    /**
+     * "Terminate" the SpellCheck and restart the timer.
+     */
+    terminateAndRestartSpellCheck: function(restart) {
+        var me = this;
+        me.consoleLog('terminateAndRestartSpellCheck.');
+        me.terminateSpellCheck();
+        me.startTimerForSpellCheck();
     },
     
     // =========================================================================
