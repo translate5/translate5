@@ -174,6 +174,7 @@ Ext.define('Editor.util.Event', {
             eventAlt,
             eventCtrl,
             eventShift,
+            keyName = '',
             isHandledByKeyMapConfig = false;
         
         if (!me.editor) {
@@ -205,8 +206,11 @@ Ext.define('Editor.util.Event', {
                     if (Ext.typeOf(bindedKey) == "string") {
                         bindedKey = bindedKey.toLowerCase();
                     }
+                    if (me.event.getKeyName() != undefined) {
+                        keyName = me.event.getKeyName().toLowerCase();
+                    }
                     // for characters: getKeyName(); for digits: getKey()
-                    if (bindedKey == me.event.getKeyName().toLowerCase() || bindedKey == me.event.getKey() ) {
+                    if (bindedKey == keyName || bindedKey == me.event.getKey() ) {
                         // Caution: ALL DIGITS without alt and without ctrl ARE handled by keyMapConfig, but only for checking the handleDigit()-procedure.
                         if (Ext.Array.contains(me.editor.DEC_DIGITS,bindedKey)) {
                             isHandledByKeyMapConfig = (bindings[index].defaultEventAction == 'stopEvent');
