@@ -24,5 +24,5 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
-UPDATE `Zf_configuration` SET `value` = '[{"/login":"Try online"},{"/index/mission":"Mission"},{"/index/crowd-of-companies":"Crowd of companies"},{"/index/usage":"Usage"}, {"/index/install":"Installation"},{"/index/join":"Join the community"}, {"/index/source":"Source"}, {"/index/newsletter":"Newsletter"}]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.content.mainMenu';
-UPDATE `Zf_configuration` SET `default` = '[{"/login":"Try online"},{"/index/mission":"Mission"},{"/index/crowd-of-companies":"Crowd of companies"},{"/index/usage":"Usage"}, {"/index/install":"Installation"},{"/index/join":"Join the community"}, {"/index/source":"Source"}, {"/index/newsletter":"Newsletter"}]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.content.mainMenu';
+UPDATE `Zf_configuration` SET `value` = '[{"/login":"Try online"},{"/index/mission":"Mission"},{"/index/crowd-of-companies":"Crowd of companies"},{"/index/use":"Use"}, {"/index/integrate":"Integrate"}, {"/index/extend":"Extend"}, {"/index/newsletter":"Newsletter"}]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.content.mainMenu';
+UPDATE `Zf_configuration` SET `default` = '[{"/login":"Try online"},{"/index/mission":"Mission"},{"/index/crowd-of-companies":"Crowd of companies"},{"/index/use":"Use"}, {"/index/integrate":"Integrate"}, {"/index/extend":"Extend"}, {"/index/newsletter":"Newsletter"}]' WHERE `Zf_configuration`.`name` = 'runtimeOptions.content.mainMenu';

@@ -53,7 +53,12 @@ trait ControllerMixIns  {
                 break;
             }
         }
-        if($_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR.'/'|| $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR){
+        if(
+                $_SERVER['REQUEST_URI'] === '/index/support-the-project' || 
+                $_SERVER['REQUEST_URI'] === '/index/source' || 
+                $_SERVER['REQUEST_URI'] === '/index/outstanding-features' || 
+                
+                $_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR.'/'|| $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR){
             $found = true;
         }
         if (!$found){
