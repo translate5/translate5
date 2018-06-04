@@ -62,6 +62,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   alias: 'controller.taskOverviewController',
   
   isCardFinished:false,
+  
+  /***
+   * the flag is true, when import workers are started via ajax
+   */
+  isImportStarted:false,
+  
   /**
    * Container for translated task handler confirmation strings
    * Deletion of an entry means to disable confirmation.
@@ -86,6 +92,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht",
       loadingWindowMessage:"#UT#Dateien werden hochgeladen",
+      loading:'#UT#Laden'
   },
   init : function() {
       var me = this;
@@ -119,7 +126,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               click: me.handleTaskAddShow
           },
           '#adminTaskAddWindow': {
-              show:me.onAdminTaskAddWindowShow
+              show:me.onAdminTaskAddWindowShow,
+              close:me.onAdminTaskAddWindowClose
            },
           '#adminTaskAddWindow #add-task-btn': {
               click: me.handleTaskAdd
@@ -675,6 +683,22 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       //set the default values for the window fields
       this.setTaskAddFieldDefaults(win);
   },
+  
+  /**
+   * On admin add task window close handler
+   */
+  onAdminTaskAddWindowClose:function(win){
+      var me = this,
+	      win = me.getTaskAddWindow(),
+	      winLayout=win.getLayout(),
+	      nextStep=winLayout.getNext(),
+	      activeItem=winLayout.getActiveItem();
+      
+      //if the task exist start it if the import is not started yet
+      if(activeItem.task && !me.isImportStarted){
+    	  me.startImport(activeItem.task);
+      }
+  },
 
   /***
    * Set the default values for the add task window fields. The values are configured zf config
@@ -748,7 +772,10 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  	  url=Editor.data.restpath+"task/"+task.get('id')+"/import",
 	  	  win = me.getTaskAddWindow();
 	  
-	  win.setLoading(true);
+	  win.setLoading(me.strings.loading);
+	  
+	  //set the import started flag
+	  me.isImportStarted=true;
 	  
 	  Ext.Ajax.request({
 		 url:url,
@@ -757,10 +784,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
         	 win.setLoading(false);
              Editor.MessageBox.addSuccess(win.importTaskMessage,2);
              me.handleTaskCancel();
+             me.isImportStarted=false;
          },
          failure: function(response){
         	 win.setLoading(false);
              Editor.app.getController('ServerException').handleException(response);
+             me.isImportStarted=false;
          }
 	  });
   }

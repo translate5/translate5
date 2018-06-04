@@ -111,12 +111,16 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
               tooltip: me.messages.actionDelete,
               isAllowedFor: 'editorDeleteTask',
               iconCls: 'ico-task-delete'
-          },{
-              tooltip:me.messages.actionAnalysis,
-              iconCls: 'ico-task-analysis',
-              isAllowedFor: 'editorAnalysisTask'
           }],itemFilter),
           width = items.length * 18;
+          
+          if(Editor.plugins && Editor.plugins.MatchAnalysis){
+        	  items.push({
+        		  tooltip:me.messages.actionAnalysis,
+                  iconCls: 'ico-task-analysis',
+                  isAllowedFor: 'editorAnalysisTask'	  
+        	  })
+          }
           
       cfg = cfg || {};
       
