@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,42 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * @class Editor.plugins.MatchAnalysis.view.MatchResourcesViewController
- * @extends Ext.app.ViewController
- */
-Ext.define('Editor.plugins.MatchAnalysis.view.MatchResourcesViewController', {
-    extend: 'Ext.app.ViewController',
-    alias: 'controller.matchResourcesPanel',
-
-    handleNextCardClick:function(){
-        var me=this,
-            view=me.getView(),
-            taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc');
-        
-        taskAssoc.on({
-        	taskAssocSaveingFinished:function(){
-        		view.fireEvent('wizardCardFinished');
-        	}
-        });
-        
-        taskAssoc.handleOnSaveButtonClick();
-
-    }
+/* @var $this Zend_View */
+?>
+  
+Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
+    
+    Ext.define("Editor.locale.plugins.MatchAnalysis.controller.MatchAnalysis", {
+        override: "Editor.plugins.MatchAnalysis.controller.MatchAnalysis",
+        strings: {
+            finishTask:'<?php echo $this->translate->_("Beenden");?>',
+            taskGridIconTooltip:'<?php echo $this->translate->_("Match-Analyse");?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchAnalysis.view.AnalysisPanel", {
+        override: "Editor.plugins.MatchAnalysis.view.AnalysisPanel",
+        strings: {
+            noMatch:'<?php echo $this->translate->_("Keine Treffer");?>',
+            matchCount:'<?php echo $this->translate->_("Trefferanzahl");?>',
+            tabTitle:'<?php echo $this->translate->_("Analyse");?>',
+            exportAnalysis:'<?php echo $this->translate->_("Export");?>',
+        }
+    });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

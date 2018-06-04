@@ -59,7 +59,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     }],
         
     strings:{
-        taskGridIconTooltip:'#UT#Analysis panel'
+        taskGridIconTooltip:'#UT#Match-Analyse',
+        finishTask:'#UT#Beenden'
     },
     
     listen:{
@@ -78,7 +79,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         window.insertCard({
             xtype:'matchResourcesPanel',
             listeners:{
-                activate:me.onMatchResourcesPanelActivate
+                activate:{
+                	fn:me.onMatchResourcesPanelActivate,
+                	scope:me
+                },
+                render:{
+                	fn:me.onMatchResourceTaskAssocPanelRender,
+                	scope:me
+                }
             }
         },'postimport');      
     },
@@ -119,7 +127,20 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     onMatchResourcesPanelActivate:function(panel){
         var me=this,
-            taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc');
+            taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc'),
+            addWindow=panel.up('#adminTaskAddWindow'),
+            continueBtn=addWindow.down('#continue-wizard-btn');
+        
+        //load the task assoc store
         taskAssoc.handleLoadPreferences(taskAssoc,panel.task);
+        
+        //set the finish icon text and cls
+        continueBtn.setIconCls('ico-task-add');
+        continueBtn.setText(me.strings.finishTask);
+    },
+    
+    onMatchResourceTaskAssocPanelRender:function(panel){
+    	panel.down('#btnSaveChanges').setHidden(true);
+    	panel.down('#btnReload').setHidden(true);
     }
 });

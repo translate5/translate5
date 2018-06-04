@@ -56,7 +56,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
         var me = this,
             config = {
                     items: [{
-                        xtype: 'matchResourceTaskAssocPanel',
+                        xtype: 'matchResourceTaskAssocPanel'
                     }]
             };
         if (instanceConfig) {
@@ -86,7 +86,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
     },
     
     disableCancelButton:function(){
-        return false;
+        return true;
     }
     
 });

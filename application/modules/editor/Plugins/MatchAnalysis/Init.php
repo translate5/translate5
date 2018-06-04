@@ -39,8 +39,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @var array
      */
     protected $frontendControllers = array(
-        'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis',
-        'pluginMatchAnalysisGridPrinter' => 'Editor.plugins.MatchAnalysis.controller.GridPrinter',
+        'pluginMatchAnalysisMatchAnalysis' => 'Editor.plugins.MatchAnalysis.controller.MatchAnalysis'
     );
     
     protected $localePath = 'locales';
@@ -84,8 +83,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
         //$this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'startTestCode'));
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
     }
     
+    public function initJsTranslations(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
+    }
     
     /***
      * After task import event handler

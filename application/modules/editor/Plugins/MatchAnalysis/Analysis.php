@@ -114,7 +114,18 @@ class editor_Plugins_MatchAnalysis_Analysis{
             if(isset($repetitionsDb[$segment->getId()]) && isset($repetitionByHash[md5($segment->getFieldOriginal('source'))])){
                     
                     $matchAnalysis->setTmmtid(0);
-                    $matchAnalysis->setMatchRate(editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE);
+                    
+                    $repetitionMatchRate=$repetitionByHash[md5($segment->getFieldOriginal('source'))];
+
+                    //check the match rate for the initial segment (repetition) 
+                    if($repetitionMatchRate>=100 && $repetitionMatchRate<editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
+                        $matchAnalysis->setMatchRate(editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE);
+                    }else if($repetitionMatchRate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
+                        //TODO: if it is a context match, pretranslate it it is not counted as repetition
+                        continue;
+                    }else{
+                        $matchAnalysis->setMatchRate($repetitionMatchRate);
+                    }
                     
                     $matchAnalysis->setWordCount($wordCount->getSourceCount());
                     
@@ -122,10 +133,9 @@ class editor_Plugins_MatchAnalysis_Analysis{
                     continue;
             }
             
-            //add the segment source hash in the array
-            $repetitionByHash[md5($segment->getFieldOriginal('source'))]=true;
-            
             $matchesByTm=[];
+            $bestMatchRate=null;
+            
             //query the segment for each assigned tm
             foreach ($this->connectors as $tmmtid => $connector){
                 /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
@@ -142,6 +152,10 @@ class editor_Plugins_MatchAnalysis_Analysis{
                     $matchAnalysis->setMatchRate($match->matchrate);
                 }
                 
+                if($matchAnalysis->getMatchRate()>$bestMatchRate){
+                    $bestMatchRate=$matchAnalysis->getMatchRate();
+                }
+                
                 $matchAnalysis->setTmmtid($tmmtid);
                 $matchAnalysis->setWordCount($wordCount->getSourceCount());
                 //save match analysis
@@ -149,6 +163,9 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 
                 $matches->resetResult();
             }
+            
+            //add the segment source hash in the array
+            $repetitionByHash[md5($segment->getFieldOriginal('source'))]=$bestMatchRate;
         }
     }
     

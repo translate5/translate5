@@ -43,9 +43,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     itemId:'matchAnalysisPanel',
 
     strings:{
-      noMatch:'#UT#No matche',
-      matchCount:'#UT#Match Count',
-      tabTitle:"#UT#Analysis",
+      noMatch:'#UT#Keine Treffer',
+      matchCount:'#UT#Trefferanzahl',
+      tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export'
     },
     
