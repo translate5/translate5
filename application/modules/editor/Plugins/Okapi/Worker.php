@@ -164,7 +164,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         } catch (Exception $e){
             $debug = [
                 'fileId' => $fileId,
-                'file' => $file->__toString(),
+                'file' => $workFile,
             ];
             $this->log->logError('Okapi Error: Error on converting a file. Task: '.$this->taskGuid.'; File: '.print_r($debug, 1).'; Error was: '.$e);
         }
