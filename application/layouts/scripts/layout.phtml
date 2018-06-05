@@ -42,6 +42,35 @@ $config = Zend_Registry::get('config');
 /* @var $config Zend_Config */
 $menu = $config->runtimeOptions->content->mainMenu;
 
+
+function renderMenu ($menu, $additionalAttributes = '') {
+    if (is_null($menu)) {
+        return false;
+    }
+    
+    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    echo '<ul '.$additionalAttributes.'>'."\n";
+    foreach ($menu as $item) {
+        $hasSubNav = (count(get_object_vars($item)) > 1) ? TRUE : FALSE;
+        foreach($item as $key => $value) {
+            if (is_array($value)) {
+                renderMenu($value);
+                echo '</li>'."\n";
+            }
+            else {
+                $class = ($key === $_SERVER['REQUEST_URI']) ? ' class="active"' : '';
+                echo '<li><a href="' . $key . '"' . $class . '>' . $translate->_($value) . '</a>';
+            }
+            
+            if (!$hasSubNav) {
+                echo '</li>'."\n";
+            }
+        }
+    }
+    echo '</ul>'."\n";
+};
+
+
 echo $this->doctype()
 ?>
 <!DOCTYPE HTML>
@@ -68,46 +97,24 @@ echo $this->doctype()
     <body>
         <div id="wrapper">
             <!-- Header -->
-					<header id="header">
-                                            <h5><a href="/">translate5</a></h5>
-						<nav class="links">
-							<ul>
-								<?php
-                if (!is_null($menu)) {
-                    foreach ($menu as $item) {
-                        $item = (array) $item;
-                        $item = each($item);
-                        $class = ($item['key'] === $_SERVER['REQUEST_URI']) ? ' class="active"' : '';
-                        echo '<li><a href="' . $item['key'] . '"' . $class . '>' . $this->translate->_($item['value']) . '</a></li>';
-                    }
-                }
-                ?>
-							</ul>
-						</nav>
-						<nav class="main">
-							<ul>
-								<li class="menu">
-									<a class="fa-bars" href="#menu">Menu</a>
-								</li>
-							</ul>
-						</nav>
-					</header>
+            <header id="header">
+                <h5><a href="/">translate5</a></h5>
+                <nav class="links flyout">
+                    <?php renderMenu($menu); ?>
+                </nav>
+                <nav class="main">
+                    <ul>
+                        <li class="menu">
+                            <a class="fa-bars" href="#menu">Menu</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
             <!-- Menu -->
 					<section id="menu">
 						<!-- Links -->
 							<section>
-								<ul class="links">
-                                                                    <?php
-                if (!is_null($menu)) {
-                    foreach ($menu as $item) {
-                        $item = (array) $item;
-                        $item = each($item);
-                        $class = ($item['key'] === $_SERVER['REQUEST_URI']) ? ' class="active"' : '';
-                        echo '<li><a href="' . $item['key'] . '"' . $class . '><h3>' . $this->translate->_($item['value']) . '</h3></a></li>';
-                    }
-                }
-                ?>
-								</ul>
+								<?php renderMenu($menu, 'class="links"'); ?>
 							</section>
 
 						<!-- Actions -->

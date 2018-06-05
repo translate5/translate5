@@ -3018,17 +3018,15 @@
 			padding-left: 1.5em;
 		}
 
-			#header .links ul li {
+			#header .links ul li a {
 				border-left: solid 1px rgba(160, 160, 160, 0.3);
 				line-height: 1;
-				margin-left: 1em;
 				padding-left: 1em;
+				padding-right: 1em;
 			}
 
-				#header .links ul li:first-child {
+				#header .links ul li:first-child a {
 					border-left: 0;
-					margin-left: 0;
-					padding-left: 0;
 				}
 
 				#header .links ul li a {
@@ -3333,6 +3331,37 @@
 		text-align: center;
 	}
 
+/* Flyout Menu */
+
+/* flyout functionality (used for alle flyout menus) */
+.flyout ul {list-style-type: none;}
+.flyout ul, .flyout li {margin: 0px; padding: 0px;}
+
+.flyout > ul {display: inline-block;}
+
+.flyout li {
+    position: relative;
+}
+.flyout > ul > li {float: left;}
+.flyout > ul > li > ul {
+    position: absolute;
+    left: 0px;
+    
+    visibility: hidden;
+    font-size: 0px;
+    z-index: -1;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(160, 160, 160, 0.3);
+}
+.flyout li:hover ul, .flyout a:focus + ul, .flyout .hover ul
+{visibility: visible; font-size: inherit; z-index: 2;}
+
+/* overwrites for default theme behavoiur*/
+#header .links {overflow: visible;}
+#header .links ul ul li a {border: none; white-space: nowrap;} 
+#header ul ul li {display: block;}
+
+
 /* Menu */
 
 	#menu {
@@ -3372,7 +3401,7 @@
 			border-top: 0;
 		}
 
-		#menu .links {
+		#menu ul {
 			list-style: none;
 			padding: 0;
 		}
