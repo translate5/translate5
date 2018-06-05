@@ -3126,7 +3126,7 @@
 				padding: 0 0.5em 0 0;
 			}
 
-		@media screen and (max-width: 980px) {
+		@media screen and (max-width: 1050px) {
 
 			#header .links {
 				display: none;
