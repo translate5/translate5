@@ -102,4 +102,32 @@ class IndexController extends ZfExtended_Controllers_Action {
     public function impressumAction(){
         $this->view->impressum = true;
     }
+    
+    /**
+     * really simple CMS Controller action.
+     * this function includes *.html files located unter views/index/cms/
+     * if no xyz.html file exits under this directory, the function will return false
+     * 
+     * @TODO: this function will be much better located inside an won CmsController.
+     * So also the pathes will not be '/index/cms/xyz.html' but '/cms/xyz.html'
+     * but this need some bootstrap modification and I do not know where to to this
+     * SBE
+     */
+    public function cmsAction() {
+        //only allow *.html files
+        if (pathinfo($_SERVER['REQUEST_URI'], PATHINFO_EXTENSION) != 'html') {
+            return false;
+        }
+        
+        // check if the wanted file exists.
+        $tempFile = APPLICATION_PATH.'/modules/default/views/scripts/'.$_SERVER['REQUEST_URI'];
+        // .. if not, throw excpetion
+        if (!file_exists($tempFile)) {
+            return false;
+        }
+        
+        // ... if file exists, show it (by include the *.html in cms.phtml)
+        //$this->view->cms = true; // ??? is this necessary???
+        $this->view->site = $_SERVER['REQUEST_URI'];
+    }
 }
