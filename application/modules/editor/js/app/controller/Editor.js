@@ -681,8 +681,8 @@ Ext.define('Editor.controller.Editor', {
         
         msgBox = Ext.create('Ext.window.MessageBox', {
             buttonText:{
-                ok: me.messages.correctErrorsText,
-                yes: me.messages.correctErrorsText,
+                ok: "OK",
+                yes: "OK",
                 no: me.messages.saveAnyway
             }
         });
