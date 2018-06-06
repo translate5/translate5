@@ -2460,6 +2460,20 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source>
     <target>ATTENTION: TARGET CONTENT CONTAINED IN PREVIOUS OR FOLLOWING SEGMENT</target>
 </trans-unit>
+<trans-unit id='MTAwJSBtYXRjaGVzIG1pdCBkZW1zZWxiZW4gRG9rdW1lbnRuYW1lbiB3aWUgZGFzIGFrdHVlbGwgw7xiZXJzZXR6dGUgRG9rdW1lbnQ='>
+    <source>100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument</source>
+    <target>100% matches with the same document name as the currently translated document</target>
+</trans-unit>
+
+<trans-unit id='RWluZSBXaWVkZXJob2x1bmcgaXN0IGVpbiBTZWdtZW50LCBkYXMgYmVyZWl0cyBiZWkgZGVyc2VsYmVuIEF1ZmdhYmUgbWl0IGRlciBnbGVpY2hlbiBXb3J0LSB1bmQgVGFnLVJlaWhlbmZvbGdlIHdlaXRlciBvYmVuIGF1ZnRhdWNodGU='>
+    <source>Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte</source>
+    <target>A repetition is a segment, that already showed up with the same words and tag order further above in the same task</target>
+</trans-unit>
+
+<trans-unit id='MTAzJSBpc3QgZWluZSBleGFjdC1leGFjdC1tYXRjaCgxMDElIG1hdGNoKSwgYmVpIGRlciB6dXPDpHR6bGljaCBkZXIgZ2xlaWNoZSBLb250ZXh0IGluIFRNIHdpZSBpbSBEb2t1bWVudCBmZXN0Z2VsZWd0IGlzdA=='>
+    <source>103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist</source>
+    <target>103% match is an exact-exact match (101% match), that in addition has the same context set in TM as in the document</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

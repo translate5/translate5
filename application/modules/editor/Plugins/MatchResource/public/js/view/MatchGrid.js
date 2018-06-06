@@ -52,7 +52,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	           'Ext.form.Panel',
 	           'Ext.form.field.ComboBox',
 	           'Ext.button.Button',
-	           'Ext.toolbar.Toolbar'
+	           'Ext.toolbar.Toolbar',
+	           'Editor.util.MatchResources'
 	],
 	strings: {
         source: '#UT#Quelltext',
@@ -62,10 +63,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
         tooltipMsg: '#UT#Diesen Match in das geöffnete Segment übernehmen.',
         atributeTooltipMsg: '#UT#Attribute:',
         lastEditTooltipMsg: '#UT#letzte Änderung:',
-        createdTooltipMsg: '#UT#erstellt:',
-        exactMatch:'#UT#100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument',
-        repetitionMatch:'#UT#Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte',
-        contextMatch:'#UT#103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist'
+        createdTooltipMsg: '#UT#erstellt:'
     },
 	stores:[
 		'Editor.plugins.MatchResource.store.TaskAssocStore'
@@ -159,7 +157,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          renderer: function(matchrate, meta, record) {
 	              var str = me.assocStore.getById(record.get('tmmtid'));
 				  
-	              meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')'+ me.getMatchrateTooltip(matchrate)+'"';
+	              meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')'+"<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
 
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              clr = str.get('color');
@@ -189,18 +187,6 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	   * Get the match rate tooltip depending of the match rate percent
 	   */
 	  getMatchrateTooltip:function(matchrate){
-		  switch(matchrate) {
-		    case 101:
-		    	return "</br>"+this.strings.exactMatch;
-		        break;
-		    case 102:
-		    	return "</br>"+this.strings.repetitionMatch;
-		        break;
-		    case 103:
-		    	return "</br>"+this.strings.contextMatch;
-		        break;
-		    default:
-		    	return "";
-		}
+		  return Editor.util.MatchResources.getMatchrateTooltip(matchrate);
 	  }
 });

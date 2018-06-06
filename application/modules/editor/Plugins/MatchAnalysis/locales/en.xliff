@@ -35,6 +35,11 @@
 		    <target>Export</target>
 		</trans-unit>
 		
+		<trans-unit id='S2VpbmUgQW5hbHlzZSBmw7xyIGRpZSBha3R1ZWxsZSBBdWZnYWJl'>
+		    <source>Keine Analyse für die aktuelle Aufgabe</source>
+		    <target>No analysis for the current task</target>
+		</trans-unit>
+		
     </body>
   </file>
 </xliff>

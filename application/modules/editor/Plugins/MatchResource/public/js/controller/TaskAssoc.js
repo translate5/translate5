@@ -118,9 +118,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       
       me.requestsCount = tmpStore.getCount();
       tmpStore.each(me.saveOneAssocRecord, me);
-      
-      //fire event when the saveing is finished
-      me.fireEvent('taskAssocSaveingFinished',me);
   },
   handleOnReload: function(window) {
       var me = this;

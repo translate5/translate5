@@ -82,10 +82,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 activate:{
                 	fn:me.onMatchResourcesPanelActivate,
                 	scope:me
-                },
-                render:{
-                	fn:me.onMatchResourceTaskAssocPanelRender,
-                	scope:me
                 }
             }
         },'postimport');      
@@ -137,10 +133,5 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         //set the finish icon text and cls
         continueBtn.setIconCls('ico-task-add');
         continueBtn.setText(me.strings.finishTask);
-    },
-    
-    onMatchResourceTaskAssocPanelRender:function(panel){
-    	panel.down('#btnSaveChanges').setHidden(true);
-    	panel.down('#btnReload').setHidden(true);
     }
 });

@@ -46,6 +46,14 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
             matchCount:'<?php echo $this->translate->_("Trefferanzahl");?>',
             tabTitle:'<?php echo $this->translate->_("Analyse");?>',
             exportAnalysis:'<?php echo $this->translate->_("Export");?>',
+            noAnalysis:'<?php echo $this->translate->_("Keine Analyse für die aktuelle Aufgabe");?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.plugins.MatchAnalysis.view.MatchResources", {
+        override: "Editor.plugins.MatchAnalysis.view.MatchResources",
+        strings: {
+            wizardTitle:'<?php echo $this->translate->_("Matchressourcen zuweisen");?>'
         }
     });
 });

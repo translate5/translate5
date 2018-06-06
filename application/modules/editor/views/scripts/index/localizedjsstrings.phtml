@@ -655,6 +655,14 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Ext.define("Editor.locale.de.util.MatchResources", {
+        override: "Editor.util.MatchResources",
+        strings: {
+		    exactMatch: '<?php echo $this->translate->_('100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument');?>',
+            repetitionMatch: '<?php echo $this->translate->_('Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte');?>',
+            contextMatch: '<?php echo $this->translate->_('103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist');?>'
+        }
+    });
     Ext.define("Editor.locale.de.view.task.ConfirmationWindow", {
         override: "Editor.view.task.ConfirmationWindow",
         strings: {

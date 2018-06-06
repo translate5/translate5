@@ -50,13 +50,14 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
     task:null,
     
     strings:{
-        wizardTitle:'#UT#Match Resources'
+        wizardTitle:'#UT#Matchressourcen zuweisen'
     },
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
                     items: [{
-                        xtype: 'matchResourceTaskAssocPanel'
+                        xtype: 'matchResourceTaskAssocPanel',
+                        title:null
                     }]
             };
         if (instanceConfig) {

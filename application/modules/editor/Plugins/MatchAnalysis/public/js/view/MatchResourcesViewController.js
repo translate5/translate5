@@ -35,18 +35,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResourcesViewController', {
     alias: 'controller.matchResourcesPanel',
 
     handleNextCardClick:function(){
-        var me=this,
-            view=me.getView(),
-            taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc');
-        
-        taskAssoc.on({
-        	taskAssocSaveingFinished:function(){
-        		view.fireEvent('wizardCardFinished');
-        	}
-        });
-        
-        taskAssoc.handleOnSaveButtonClick();
-
+		this.getView().fireEvent('wizardCardFinished');
     }
 });
 

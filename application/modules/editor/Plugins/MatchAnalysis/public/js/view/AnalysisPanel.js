@@ -40,13 +40,18 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.matchAnalysisPanel',
     
+    requires: [
+        'Editor.util.MatchResources'
+    ],
+
     itemId:'matchAnalysisPanel',
 
     strings:{
       noMatch:'#UT#Keine Treffer',
       matchCount:'#UT#Trefferanzahl',
       tabTitle:"#UT#Analyse",
-      exportAnalysis:'#UT#Export'
+      exportAnalysis:'#UT#Export',
+	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe'
     },
     
     layout:'fit',
@@ -71,6 +76,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             items:[{
                     xtype:'grid',
                     itemId:'matchAnalysisGrid',
+                    emptyText:me.strings.noAnalysis,
                     store : analysisStore,
                     columns: [{
                         xtype: 'gridcolumn',
@@ -78,6 +84,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '103',
                         cellWrap: true,
                         text: "103%",
+                        tooltip:Editor.util.MatchResources.getMatchrateTooltip(103),
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -85,6 +92,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '102',
                         cellWrap: true,
                         text: "102%",
+                        tooltip:Editor.util.MatchResources.getMatchrateTooltip(102),
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -92,6 +100,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '101',
                         cellWrap: true,
                         text: "101%",
+                        tooltip:Editor.util.MatchResources.getMatchrateTooltip(101),
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
