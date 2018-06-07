@@ -51,7 +51,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       matchCount:'#UT#Trefferanzahl',
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
-	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe'
+	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
+	  matchResources:'#UT#Matchressourcen',
+	  analysisDate:'#UT#Datum'
     },
     
     layout:'fit',
@@ -65,10 +67,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             analysisStore=Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis');
             
             //load the analysis for the taskGuid
-            analysisStore.load({ 
+            analysisStore.load({
                 params: {
                     taskGuid:instanceConfig.task.get('taskGuid')
-                } 
+                },
+                callback: function(records, operation, success) {
+                	if(records && records.length>0){
+                		var rec=records[0];
+                		me.down('#analysisDatum').setValue(rec.get('created'));
+                	}
+                }
             });
             
         config = {
@@ -172,7 +180,24 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                                     window.open(Editor.data.restpath+'plugins_matchanalysis_matchanalysis/export?'+Ext.urlEncode(params));
                                 }
                             }
+                        },{
+                        	xtype: 'button',
+                            iconCls:'icon-match-resources',
+                            text:me.strings.matchResources,
+                            listeners:{
+                            	click:me.onMatchResourcesButtonClick
+                        	}
                         }]
+                    },{
+
+                        xtype: 'toolbar',
+                        dock: 'top',
+                        items: [{
+                            xtype: 'displayfield',
+                            fieldLabel: me.strings.analysisDate,
+                            itemId:'analysisDatum'
+                        }]
+                    
                     }]
                 
                 }]
@@ -182,5 +207,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    
+    /***
+     * focus on match resources tab on button click
+     */
+    onMatchResourcesButtonClick:function(button){
+    	var tabPanel=button.up('tabpanel');
+    	if(!tabPanel){
+    		return;
+    	}
+    	tabPanel.getLayout().setActiveItem('matchResourceTaskAssocPanel')
     }
 });

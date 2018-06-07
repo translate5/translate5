@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.matchResourceTaskAssocPanel',
+    itemId:'matchResourceTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
     cls : 'adminTaskGrid',
     title: '#UT#Matchressourcen zuweisen',

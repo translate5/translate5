@@ -46,7 +46,7 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},
-    {name: 'created', type: 'date', dateFormat: Editor.DATEONLY_ISO_FORMAT },
+    {name: 'created'},
     {name: '103'},
     {name: '102'},
     {name: '101'},
