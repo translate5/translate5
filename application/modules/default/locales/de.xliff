@@ -223,6 +223,11 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 {footer}</target></trans-unit>
 <trans-unit id='VHJ5IG9ubGluZQ=='><source>Try online</source><target>Try online</target></trans-unit>
 <trans-unit id='Q3Jvd2Qgb2YgY29tcGFuaWVz'><source>Crowd of companies</source><target>Crowd of companies</target></trans-unit>
+<trans-unit id='U3VwcG9ydCB0aGUgcHJvamVjdA=='><source>Support the project</source><target>Support the project</target></trans-unit>
+<trans-unit id='VXNl'><source>Use</source><target>Use</target></trans-unit>
+<trans-unit id='T3V0c3RhbmRpbmcgZmVhdHVyZXM='><source>Outstanding features</source><target>Outstanding features</target></trans-unit>
+<trans-unit id='SW50ZWdyYXRl'><source>Integrate</source><target>Integrate</target></trans-unit>
+<trans-unit id='RXh0ZW5k'><source>Extend</source><target>Extend</target></trans-unit>
   </body>
  </file>
 </xliff>
