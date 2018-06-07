@@ -420,7 +420,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.allMatchesRanges = null;
         
         editorText = me.getEditorContentAsText(false);
-        console.log("editorText: " + editorText);
+        me.consoleLog('editorText: ' + editorText);
         me.runSpellCheck(editorText, spellCheckProcessID);
         // => runSpellCheck with the tool calls applySpellCheck() when the results arrive.
     },
@@ -590,7 +590,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     runSpellCheck: function(textToCheck, spellCheckProcessID) {
         var me = this;
         if(textToCheck != "") {
-            console.log("textToCheck: " + textToCheck);
+            me.consoleLog('textToCheck: ' + textToCheck);
             me.runSpellCheckWithTool(textToCheck, spellCheckProcessID);
         } else {
             me.finishSpellCheck(spellCheckProcessID);
