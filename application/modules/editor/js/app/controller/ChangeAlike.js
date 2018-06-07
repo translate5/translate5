@@ -238,10 +238,19 @@ Ext.define('Editor.controller.ChangeAlike', {
    * @param {Function} finalCallback to return to save chain
    */
   onAfterSaveCall: function(finalCallback, record) {
-      var me = this;
-      me.callbackToSaveChain = finalCallback;
-      me.actualRecord = record;
-      me.saveIsRunning = true;
+	  var me = this;
+	  me.callbackToSaveChain = finalCallback;
+	  me.actualRecord = record;
+	  me.saveIsRunning = true;
+
+	  //If it is set to true, the repetition editor only pops up (processes automatically) 
+	  //when the target of the current segment is empty
+	  if(Editor.data.preferences.showOnEmptyTarget && record.get('target')!=""){
+		  me.fireEvent('segmentUsageFinished', me);
+		  me.callbackToSaveChain();
+		  return;
+	  }
+	  
       if(me.isDisabled || me.isManualProcessingDisabled() || me.noAlikes()) {
           me.fireEvent('segmentUsageFinished', me);
           me.callbackToSaveChain();
