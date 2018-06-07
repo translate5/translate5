@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.DevelopmentTools', {
     
-    USE_CONSOLE: true, // (true|false): use true for developing using the browser's console, otherwise use false
+    USE_CONSOLE: false, // (true|false): use true for developing using the browser's console, otherwise use false
     
     /**
      * Write into the browser console depending on the setting of me.USE_CONSOLE.
