@@ -23,6 +23,7 @@ var selectItem = function (event, ui) {
         origEvent = origEvent.originalEvent;
     }
     if (origEvent.type == 'click'){
+        event.preventDefault();
         console.log("clicked item: " + ui.item.groupId);
         searchTerm(ui.item.label);
         requestFromSearchButton=true;
