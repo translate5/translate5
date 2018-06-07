@@ -380,7 +380,7 @@ body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid
 .autoState-999 {background-position: center;background-repeat: no-repeat;}
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
 .ico-notify-user {background-image: url("../images/email_go.png");}
-.icon-excel-export {background-image: url("../images/page_excel.png");}
+
 body.loading {
     color: #404040;
     font-size: 13px;
