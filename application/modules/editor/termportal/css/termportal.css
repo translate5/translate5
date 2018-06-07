@@ -107,11 +107,16 @@
 }
 
 #searchTermsHolder {
-    flex: 0 0 12em;
+    flex: 0 0 20em;
     order: 1;
     margin-right: 5px;
     padding-right: 30px;
     overflow-x: auto;
+}
+@media (max-width: 1100px) {
+    #searchTermsHolder {
+        flex: 0 0 17em;
+    }
 }
 
 #searchTermsSelect,
