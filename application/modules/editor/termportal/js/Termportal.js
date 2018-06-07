@@ -38,7 +38,7 @@ var selectItem = function (event, ui) {
     //if there are results, show them
     if(searchTermsResponse.length>0){
         $('#searchTermsSelect').show();
-        $('#finalResultContent').show();
+        showFinalResultContent();
     }
     
     console.log("selectItem: " + ui.item.groupId);
@@ -170,7 +170,7 @@ function fillSearchTermSelect(){
         }
         
         if(searchTermsResponse.length>0){
-            $("#finalResultContent").show();
+            showFinalResultContent();
         }
         
     }
@@ -591,5 +591,15 @@ function startAutocomplete(){
     $("#search").autocomplete( "search", $("#search").val());
 }
 
+function showFinalResultContent() {
+    $('#finalResultContent').show();
+    setHeightOfSearchTermsHolder();
+}
+
+function setHeightOfSearchTermsHolder(){
+    if ($('#searchTermsHolder').is(':visible')) {
+        $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
+    }
+}
 
 
