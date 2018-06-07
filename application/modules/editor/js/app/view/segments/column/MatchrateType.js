@@ -39,6 +39,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.segments.column.MatchrateType', {
     extend: 'Ext.grid.column.Column',
     alias: 'widget.matchrateTypeColumn',
+    requires:[
+    	'Editor.util.MatchResources'
+	],
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'matchRateType',
     width: 82,
@@ -174,7 +177,12 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             qtip = function(meta, msg, desc) {
                 desc = desc ? '<br>'+desc : '';
                 meta.myLabel = msg; //as ref for the list filter renderer
-                meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
+                
+                if(record && record.get('matchRate')){
+                	meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'<br/>'+Editor.util.MatchResources.getMatchrateTooltip(record.get('matchRate'))+'"';
+                	return;
+                }
+            	meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
             };
             
         if(Editor.data.plugins.MatchResource && prefix == Editor.data.plugins.MatchResource.matchrateTypeChangedState) {

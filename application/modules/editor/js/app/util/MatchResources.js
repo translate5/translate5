@@ -49,6 +49,7 @@ Ext.define('Editor.util.MatchResources', {
      *  Get the match rate (only for 103,102,101 matches) tooltip depending of the match rate percent
      */
     getMatchrateTooltip:function(matchrate){
+    	matchrate=parseInt(matchrate);
     	switch(matchrate) {
     		case 101:
 		    	return this.strings.exactMatch;
