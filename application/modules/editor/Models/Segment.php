@@ -1281,7 +1281,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return string
      */
     protected function _getAlikesSql(string $viewName) {
-        return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch
+        return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
     from '.$viewName.' 
     where ((sourceMd5 = ? and source != \'\' and source IS NOT NULL) 
         or (targetMd5 = ? and target != \'\' and target IS NOT NULL)) 
