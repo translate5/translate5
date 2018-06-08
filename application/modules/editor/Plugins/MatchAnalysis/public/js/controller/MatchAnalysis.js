@@ -60,7 +60,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         
     strings:{
         taskGridIconTooltip:'#UT#Match-Analyse',
-        finishTask:'#UT#Beenden'
+        finishTask:'#UT#Beenden',
+        preTranslation:'#UT#Analyse',
+        analysis:'#UT#Pre-translate'
     },
     
     listen:{
@@ -70,6 +72,15 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             '#adminTaskAddWindow': {
                 beforerender:'onAdminTaskWindowBeforeRender'
+            },
+            '#matchResourceTaskAssocPanel':{
+            	render:'onMatchResourcesPanelRender'
+            },
+            '#matchResourceTaskAssocPanel #cbAnalysis':{
+            	change:'onCbAnalysisChecked'
+            },
+            '#matchResourceTaskAssocPanel #cbPreTranslation':{
+            	change:'onCbPreTranslationChecked'
             }
         }
     },
@@ -107,6 +118,20 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         });
     },
     
+    onMatchResourcesPanelRender:function(panel){
+    	panel.addDocked([{
+    		xtype:'checkbox',
+            boxLabel:this.strings.analysis,
+            itemId:'cbAnalysis',
+            dock:'bottom'
+    	},{
+    		xtype:'checkbox',
+    		boxLabel:this.strings.preTranslation,
+    		itemId:'cbPreTranslation',
+    		dock:'bottom'
+    	}]);
+    },
+    
     /***
      * When action column click with no click handler is found
      */
@@ -133,5 +158,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         //set the finish icon text and cls
         continueBtn.setIconCls('ico-task-add');
         continueBtn.setText(me.strings.finishTask);
+    },
+    
+    onCbAnalysisChecked:function(field,newValue,oldValue,eOpts){ 
+    	//TODO: implement me
+    },
+    
+    onCbPreTranslationChecked:function(field,newValue,oldValue,eOpts){ 
+    	//TODO: implement me
     }
 });
