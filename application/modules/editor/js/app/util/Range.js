@@ -655,13 +655,15 @@ Ext.define('Editor.util.Range', {
     /**
      * Returns a bookmark for the current position of the cursor in the Editor.
     // (Use rangy's bookmark if workaround is not applied).
-     * @returns {Object} rangy-bookmark|node
+     * @returns {Object|null} rangy-bookmark|node|null
      */
     getPositionOfCaret: function() {
         var me = this,
             selectionForCaret = rangy.getSelection(me.getEditorBody()),
             rangeForCaret = selectionForCaret.rangeCount ? selectionForCaret.getRangeAt(0) : null;
-        if (me.useWorkaroundForBookmark(rangeForCaret)) {
+        if (rangeForCaret == null) { // eg. after the push-event when newly opening a segment: editor is opened, but user is not in there yet.
+            return null;
+        } else if (me.useWorkaroundForBookmark(rangeForCaret)) {
             return me.getBookmarkUsingTheWorkaround(rangeForCaret);
         } else {
             return rangeForCaret.getBookmark();
@@ -670,24 +672,29 @@ Ext.define('Editor.util.Range', {
     /**
      * Set the position of the cursor according to the given bookmark or node.
      * (Use rangy's bookmark if workaround is not applied).
-     * @param {Object} rangy-bookmark|node
+     * @param {Object|null} rangy-bookmark|node|null
      */
     setPositionOfCaret: function(bookmarkForCaret) {
         var me = this,
-            selectionForCaret = rangy.getSelection(me.getEditorBody()),
-            startNodeOfSelection = (selectionForCaret.isBackwards()) ? selectionForCaret.focusNode : selectionForCaret.anchorNode,
-            rangeForCaret = rangy.createRange(),
+            selectionForCaret,
+            startNodeOfSelection,
+            rangeForCaret,
             nodeForBookmark;
-        if(me.isBookmarkOfWorkaround(bookmarkForCaret)){
-            rangeForCaret = me.applyBookmarkUsingTheWorkaround(rangeForCaret,bookmarkForCaret);
-        } else {
-            rangeForCaret.moveToBookmark(bookmarkForCaret);
+        if (bookmarkForCaret != null) {
+            selectionForCaret = rangy.getSelection(me.getEditorBody());
+            startNodeOfSelection = (selectionForCaret.isBackwards()) ? selectionForCaret.focusNode : selectionForCaret.anchorNode;
+            rangeForCaret = rangy.createRange();
+            if(me.isBookmarkOfWorkaround(bookmarkForCaret)){
+                rangeForCaret = me.applyBookmarkUsingTheWorkaround(rangeForCaret,bookmarkForCaret);
+            } else {
+                rangeForCaret.moveToBookmark(bookmarkForCaret);
+            }
+            if (!rangeForCaret.collapsed && startNodeOfSelection.nodeType == 1) {
+                // rangy bug: if the selection starts between a tag and text, the tag will be included even it was not selected
+                // (does not happen at the end of the selection)
+                rangeForCaret = me.cleanBordersOfCharacterbasedRange(rangeForCaret,"fromStart");
+            }
+            selectionForCaret.setSingleRange(rangeForCaret);
         }
-        if (!rangeForCaret.collapsed && startNodeOfSelection.nodeType == 1) {
-            // rangy bug: if the selection starts between a tag and text, the tag will be included even it was not selected
-            // (does not happen at the end of the selection)
-            rangeForCaret = me.cleanBordersOfCharacterbasedRange(rangeForCaret,"fromStart");
-        }
-        selectionForCaret.setSingleRange(rangeForCaret);
     }
 });
