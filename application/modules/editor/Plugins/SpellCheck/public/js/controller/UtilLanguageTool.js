@@ -85,6 +85,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
         } else {
             me.isSupportedLanguage = true;
             me.languageToCheckLongCode = resultLT.rows.longCode;
+            // E.g. after push: Now that we know that the language is supported, we start a new timer for a SpellCheck.
+            if (me.editor != null) {
+                me.terminateAndRestartSpellCheck();
+            }
         }
         me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
     },

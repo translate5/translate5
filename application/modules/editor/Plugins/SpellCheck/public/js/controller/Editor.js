@@ -67,6 +67,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
+                initialize: 'initSpellCheckPluginForEditor',
                 push: 'handleAfterContentUpdate',
                 afterInsertMarkup: 'handleAfterContentUpdate'
             }
@@ -97,7 +98,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     // =========================================================================
     
     targetLangCode: null,           // language to be checked
-    isSupportedLanguage: false,     // if the language is supported by our tool(s)
+    isSupportedLanguage: undefined, // if the language is supported by our tool(s):
+                                    // - initially: undefined
+                                    // - on task is opened => start setLanguageSupport() => result: true or false
+                                    // - on keyDown? keyDown is initialized via initEditor which is only done when isSupportedLanguage is already set and true.
+                                    // - on push: when isSupportedLanguage is still undefined => start setLanguageSupport() => result: true or false
     
     allMatchesOfTool: null,         // all matches as found by the tool
     allMatches: null,               // data of all matches found by the tool(s); here already stored independently from the tool
@@ -136,7 +141,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         Ext.dom.GarbageCollector.collect();
         me.editor = null;
-        me.consoleLog('----------------- SpellCheck: onDestroy FINISHED. ---------------');
+        me.consoleLog('---------------- SpellCheck: onDestroy FINISHED. -------------');
     },
     /**
      * Init the SpellCheck-Plugin for the current task:
@@ -150,34 +155,52 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     /**
      * Init the SpellCheck-Plugin for the current Editor
-     * (only if the language is supported by our own tools)
+     * (only if the language is supported by our own tools).
      */
     initSpellCheckPluginForEditor: function() {
         var me = this;
-        if (me.isSupportedLanguage) {
-            me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
-            if (me.editor == null) {
-                me.initEditor();
-            }
-        } else {
-            me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ') or SpellCheck-Tool does not run.');
+        
+        if (me.isSupportedLanguage == undefined) {
+            me.consoleLog('0.2b initSpellCheckPluginForEditor => setLanguageSupport() first.');
+            me.setLanguageSupport();
+            return;
         }
+        
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('0.2b SpellCheckPluginForEditor not initialized because language is not supported (' + me.targetLangCode + '/' + me.isSupportedLanguage + ') or SpellCheck-Tool does not run.');
+            return;
+        }
+        
+        me.consoleLog('0.2b initSpellCheckPluginForEditor (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
+        
+        if (me.editor == null) {
+            me.initEditor();
+            return;
+        }
+        
+        me.initSnapshotHistory();
     },
     /**
      * Init Editor
      */
     initEditor: function() {
         var me = this,
-            plug = me.getSegmentGrid().editingPlugin,
-            editor = plug.editor; // → this is the row editor component;
-        me.consoleLog('initEditor (SpellCheck)');
-        me.editor = editor.mainEditor; // → this is the HtmlEditor
+            plug,
+            editor;
+        if (me.editor != null) {
+            me.consoleLog('----------- SpellCheck: editor is initiaized already. ---------');
+            return;
+        }
+        me.consoleLog('--------------------- SpellCheck: initEditor ------------------');
+        // Initialize Editor in general:
+        plug = me.getSegmentGrid().editingPlugin,
+        editor = plug.editor;           // → this is the row editor component;
+        me.editor = editor.mainEditor;  // → this is the HtmlEditor
         me.injectCSSForEditor();
-        // For SpellCheck:
+        // SpellCheck-specific for Editor:
         me.initTooltips();
         me.initKeyboardEvents();
         me.initMouseEvents();
-        me.initSnapshotHistory();
         me.setBrowserSpellcheck();
     },
     /**
@@ -307,7 +330,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             break;
             case (!me.ignoreEvent || me.eventIsArrowKey()):
                 me.consoleLog("The user is still editing!");
-                me.terminateAndRestartSpellCheck(true);
+                me.terminateAndRestartSpellCheck();
             break;
         }
         
@@ -365,8 +388,14 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     handleAfterContentUpdate: function() {
         var me = this;
+        me.consoleLog('(SpellCheck:) handleAfterContentUpdate (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
         // Stop if we open a task (not a segment) or try to open a segment that is not editable
         if (me.getSegmentGrid().editingPlugin.context == undefined) {
+            return;
+        }
+        // If we don't know already if the language is supported, check now first.
+        if (me.isSupportedLanguage == undefined) {
+            me.setLanguageSupport();
             return;
         }
         // (1) New segment opened?
@@ -374,7 +403,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.segmentId != me.getSegmentGrid().editingPlugin.context.record.get('id')) {
             // New segment opened? Then start a new snapshot-history.
             me.segmentId = me.getSegmentGrid().editingPlugin.context.record.get('id');
-            me.initSpellCheckPluginForEditor();
             me.initSnapshotHistory();
         }
         // (1) keep a snapshot from the current content
@@ -398,11 +426,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (!me.isSupportedLanguage) {
             me.consoleLog('startSpellCheck failed because language is not supported or SpellCheck-Tool does not run.');
             return;
-        }
-        
-        if(!me.getEditorBody()) {
-            me.consoleLog('startSpellCheck: initSpellCheckPluginForEditor first...');
-            me.initSpellCheckPluginForEditor();
         }
         
         me.consoleLog('(0.3 => startSpellCheck (' + Ext.Date.format(new Date(), 'c') + ').)');
@@ -449,14 +472,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     terminateSpellCheck: function() {
         var me = this;
-        me.consoleLog('terminateSpellCheck; me.spellCheckInProgressID for ' + me.spellCheckInProgressID + ' now: false.');
+        me.consoleLog('terminateSpellCheck.');
+        clearTimeout(me.editIdleTimer);
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
     },
     /**
      * "Terminate" the SpellCheck and restart the timer.
      */
-    terminateAndRestartSpellCheck: function(restart) {
+    terminateAndRestartSpellCheck: function() {
         var me = this;
         me.consoleLog('terminateAndRestartSpellCheck.');
         me.terminateSpellCheck();
@@ -511,7 +535,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (me.allMatchesOfTool.length > 0) {
             me.applyAllMatches(spellCheckProcessID);
-            me.consoleLog('allMatches applied.');
+            me.consoleLog('allMatches applied (' + spellCheckProcessID + ').');
         }
         
         me.finishSpellCheck(spellCheckProcessID);
