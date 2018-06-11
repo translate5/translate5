@@ -35,10 +35,10 @@ END LICENSE AND COPYRIGHT
 /**
  * Mixin with Helpers regarding the LanguageTool: https://languagetool.org/
  * 
- * Some of this might already be done by PHP instead of handling the data here.
+ * Some of this could already be done by PHP instead of handling the data here.
  * For performance however it might be even better to use the user's browser 
  * instead of the server (that must handle many requests anyway). And the data 
- * that we transfer has just a few KB and thus doesn't make a big difference, too.
+ * that we transfer has just a few KB and thus doesn't make a big difference anyway.
  * 
  * @class Editor.plugins.TrackChanges.controller.UtilLanguageTool
  */
@@ -63,12 +63,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
             method:method,
             params:params,
             success: function(response){
-                me.consoleLog('Checking supported languages (LanguageTool) done.');
+                me.consoleLog('- Checking supported languages (LanguageTool) done.');
                 resultLT = Ext.util.JSON.decode(response.responseText);
                 me.setIsSupportedLanguage(resultLT);
             },
             failure: function(response){
-                me.consoleLog('Checking supported languages (LanguageTool) failed: ' + response.status);
+                me.consoleLog('- Checking supported languages (LanguageTool) failed: ' + response.status);
             }
         });
     },
@@ -85,10 +85,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
         } else {
             me.isSupportedLanguage = true;
             me.languageToCheckLongCode = resultLT.rows.longCode;
-            // E.g. after push: Now that we know that the language is supported, we start a new timer for a SpellCheck.
-            if (me.editor != null) {
-                me.terminateAndRestartSpellCheck();
-            }
+            me.initEditor();
         }
         me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
     },
