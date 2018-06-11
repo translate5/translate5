@@ -1830,6 +1830,11 @@
 			.button:disabled:before {
 				color: rgba(160, 160, 160, 0.3) !important;
 			}
+			
+		#main .important.button.big,
+		#loginForm #submit {
+            background-color: rgb(221, 221, 221) !important;
+        }
 
 /* Form */
 
