@@ -57,7 +57,24 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
     {name: '69'},//69-60
     {name: '59'},//59-51
     {name: 'noMatch'},//50-0
-    {name: 'wordCountTotal'}
+    {name: 'wordCountTotal',
+    	convert: function(val,row) {
+    		//sum all in row columns
+    		var ts=0;
+    		for (var key in row.data) {
+    		    // skip loop if the property is from prototype
+    		    if (!row.data.hasOwnProperty(key)){
+    		    	continue;	
+    		    }
+
+    		    if(key=="created" || key=="id"){
+    		    	continue
+		    	};
+	        	ts+=row.data[key].wordCount;
+    		}
+    		return ts;
+    	}    
+    }
   ],
   idProperty: 'id',
   proxy : {

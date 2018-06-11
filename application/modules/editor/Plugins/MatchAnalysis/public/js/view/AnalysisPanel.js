@@ -48,7 +48,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 
     strings:{
       noMatch:'#UT#Keine Treffer',
-      matchCount:'#UT#Trefferanzahl',
+      matchCount:'#UT#Gesamtzahl der Wörter',
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
 	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
@@ -62,7 +62,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         var me = this,
             config,
             columnRenderer=function(val, meta, record) {
-                return val && val.rateCount;
+        		if(val && val.wordCount && val.wordCount>0){
+        			return val.wordCount;
+        		}
+                return "";
             },
             analysisStore=Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis');
             
@@ -75,6 +78,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                 	if(records && records.length>0){
                 		var rec=records[0];
                 		me.down('#analysisDatum').setValue(rec.get('created'));
+                	}else{
+                		me.down('#exportExcel').setDisabled(true);
                 	}
                 }
             });
@@ -86,6 +91,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     itemId:'matchAnalysisGrid',
                     emptyText:me.strings.noAnalysis,
                     store : analysisStore,
+                    features: [{
+                        ftype: 'summary'
+                    }],
                     columns: [{
                         xtype: 'gridcolumn',
                         flex: 2,
@@ -93,7 +101,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         cellWrap: true,
                         text: "103%",
                         tooltip:Editor.util.MatchResources.getMatchrateTooltip(103),
-                        renderer:columnRenderer
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                            return me.calculateRowSum(103,analysisStore);
+                        },
+                        renderer:columnRenderer,
                     },{
                         xtype: 'gridcolumn',
                         flex: 2,
@@ -101,6 +113,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         cellWrap: true,
                         text: "102%",
                         tooltip:Editor.util.MatchResources.getMatchrateTooltip(102),
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(102,analysisStore); 
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -109,6 +125,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         cellWrap: true,
                         text: "101%",
                         tooltip:Editor.util.MatchResources.getMatchrateTooltip(101),
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(101,analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -116,6 +136,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '100',
                         cellWrap: true,
                         text: "100%",
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(100,analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -123,6 +147,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '99',
                         cellWrap: true,
                         text: "99%-90%",
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(99,analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -130,6 +158,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '89',
                         cellWrap: true,
                         text: "89%-80%",
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(89,analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -137,6 +169,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '79',
                         cellWrap: true,
                         text: "79%-70%",
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(79,analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -144,6 +180,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '69',
                         cellWrap: true,
                         text: "69%-60%",
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(69,analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -151,6 +191,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '59',
                         cellWrap: true,
                         text: "59%-51%",
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum(59,analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
@@ -158,12 +202,20 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: 'noMatch',
                         cellWrap: true,
                         text: me.strings.noMatch,
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                        	return me.calculateRowSum("noMatch",analysisStore);
+                        },
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
                         flex: 2,
                         dataIndex: 'wordCountTotal',
                         cellWrap: true,
+                        summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                            return value; 
+                        },
                         text: me.strings.matchCount
                     }],
                     dockedItems: [{
@@ -172,6 +224,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         items: [{ 
                             xtype: 'button',
                             iconCls:'icon-excel-export',
+                            itemId:'exportExcel',
                             text:me.strings.exportAnalysis,
                             listeners:{
                                 click:function(){
@@ -218,5 +271,18 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     		return;
     	}
     	tabPanel.getLayout().setActiveItem('matchResourceTaskAssocPanel')
+    },
+    
+    /***
+     * Calculate row total by group
+     */
+    calculateRowSum:function(group,store){
+    	var totalSum=0;
+    	store.each(function(record){
+    		if(record.get(group)){
+    			totalSum+=record.get(group).wordCount;
+    		}
+    	});
+    	return totalSum>0 ? totalSum : "";
     }
 });
