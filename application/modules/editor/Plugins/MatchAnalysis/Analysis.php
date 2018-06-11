@@ -99,19 +99,18 @@ class editor_Plugins_MatchAnalysis_Analysis{
 
             $wordCount->setSegment($segment);
             
-            $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
-            /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-            
-            $matchAnalysis->setSegmentId($segment->getId());
-            $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
-            $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
-            $matchAnalysis->setAnalysisId($this->analysisId);
-            
-
             //check if the segment source hash exist in the repetition array
             //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 tmmt
             //segment does not exist in repetition array -> query the tm save the best match rate per tm
             if(isset($repetitionsDb[$segment->getId()]) && isset($repetitionByHash[md5($segment->getFieldOriginal('source'))])){
+                    
+                    $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
+                    /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
+                    
+                    $matchAnalysis->setSegmentId($segment->getId());
+                    $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
+                    $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
+                    $matchAnalysis->setAnalysisId($this->analysisId);
                     
                     $matchAnalysis->setTmmtid(0);
                     
@@ -144,12 +143,24 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 $connector->resetResultList();
                 $matches=$connector->query($segment);
                 
+                $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
+                /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
+                
+                $matchAnalysis->setSegmentId($segment->getId());
+                $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
+                $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
+                $matchAnalysis->setAnalysisId($this->analysisId);
+                
                 //for each match, fint the best match rate, and save it
                 foreach ($matches->getResult() as $match){
                     if($matchAnalysis->getMatchRate() >= $match->matchrate){
                         continue;
                     }
                     $matchAnalysis->setMatchRate($match->matchrate);
+                }
+                
+                if($matchAnalysis->getMatchRate()==null){
+                    continue;
                 }
                 
                 if($matchAnalysis->getMatchRate()>$bestMatchRate){

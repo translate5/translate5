@@ -48,18 +48,31 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         //load the export data
         $rows=$this->entity->loadByBestMatchRate($params['taskGuid'],true);
         
-        //sort the data
-        krsort($rows);
-        
-        $newRows=[];
-        foreach ($rows as $key=>$value){
-            $newKey=$key;
-            if(is_numeric($key)){
-                $newKey=$key.'Group';
+        $createdDate=null;
+        //add to all groups 'Group' sufix, php excel does not handle integer keys
+        foreach ($rows as $rowKey=>$row){
+            $newRows=[];
+            krsort($row);
+            $wordCountTotal=0;
+            foreach ($row as $key=>$value){
+                $newKey=$key;
+                if($key=="created"){
+                    $createdDate=$value;
+                    continue;
+                }
+                if(is_numeric($key)){
+                    $newKey=$key.'Group';
+                    $wordCountTotal+=$value;
+                }
+                $newRows[$newKey]=$value;
             }
-            $newRows[$newKey]=$value;
+            
+            $newRows['wordCountTotal']=$wordCountTotal;
+            $newRows['created']=$createdDate;
+            
+            unset($rows[$rowKey]);
+            $rows[$rowKey]=$newRows;
         }
-        unset($rows);
         
         $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         /* @var $excel ZfExtended_Models_Entity_ExcelExport */
@@ -82,13 +95,30 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $excel->setLabel('59Group', '59%-51%');
         $excel->setLabel('noMatch', '50%-0%');
         
-        $excel->setLabel('wordCountTotal', 'Words count');
+        $excel->setLabel('wordCountTotal', 'Total Words');
+        
         $excel->setLabel('created', 'Creation date');
+
+        $rowsCount=count($rows);
+        $rowIndex=$rowsCount+2;
+        
+        $sheet=$excel->getPhpExcel()->getActiveSheet();
+        
+        $sheet->setCellValue("A".$rowIndex, "=SUM(A2:A".($rowIndex-1).")");
+        $sheet->setCellValue("B".$rowIndex, "=SUM(B2:B".($rowIndex-1).")");
+        $sheet->setCellValue("C".$rowIndex, "=SUM(C2:C".($rowIndex-1).")");
+        $sheet->setCellValue("D".$rowIndex, "=SUM(D2:D".($rowIndex-1).")");
+        $sheet->setCellValue("E".$rowIndex, "=SUM(E2:E".($rowIndex-1).")");
+        $sheet->setCellValue("F".$rowIndex, "=SUM(F2:F".($rowIndex-1).")");
+        $sheet->setCellValue("H".$rowIndex, "=SUM(H2:H".($rowIndex-1).")");
+        $sheet->setCellValue("I".$rowIndex, "=SUM(I2:I".($rowIndex-1).")");
+        $sheet->setCellValue("J".$rowIndex, "=SUM(J2:J".($rowIndex-1).")");
+        $sheet->setCellValue("K".$rowIndex, "=SUM(K2:K".($rowIndex-1).")");
         
         //set the cell autosize
-        $excel->simpleArrayToExcel([$newRows],function($phpExcel) {
+        $excel->simpleArrayToExcel($rows,function($phpExcel){
             foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
-                
+
                 $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
                 
                 $sheet = $phpExcel->getActiveSheet();

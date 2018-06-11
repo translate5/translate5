@@ -70,13 +70,17 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * @return NULL|array
      */
     public function loadByBestMatchRate($taskGuid,$isExport=false){
-        $s = $this->db->select()
-        ->setIntegrityCheck(false)
-        ->from($this->db, array('LEK_match_analysis_taskassoc.created','analysisId','segmentId','taskGuid','matchRate','wordCount'))
-        ->join('LEK_match_analysis_taskassoc', 'LEK_match_analysis_taskassoc.id=LEK_match_analysis.analysisId')
-        ->where('LEK_match_analysis.taskGuid = ?', $taskGuid);
         
-        $resultArray=$this->db->fetchAll($s)->toArray();
+        $sql='SELECT m.*,ma.created
+              FROM LEK_match_analysis m 
+                  LEFT JOIN LEK_match_analysis b
+                      ON m.tmmtid = b.tmmtid and m.segmentId = b.segmentId 
+                      AND b.matchRate > m.matchRate 
+              INNER JOIN LEK_match_analysis_taskassoc ma on ma.taskGuid=m.taskGuid
+              WHERE b.matchRate IS NULL 
+              AND m.taskGuid=?';
+        
+        $resultArray=$this->db->getAdapter()->query($sql,[$taskGuid])->fetchAll();
         
         if(empty($resultArray)){
             return null;
@@ -94,67 +98,72 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $groupedResults=[];
         
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
-        $groupBorder=[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
-        $wordCountTotal=0;
+        $groupBorder=[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59','noMatch'=>'noMatch'];
         $createdDate=null;
         
         foreach ($results as $res){
         
-            if(!$createdDate){
-                $createdDate=$res['created'];
+            $wordCountTotal=0;
+            
+            //for each tmmt separate array
+            if(!isset($groupedResults[$res['tmmtid']])){
+                $groupedResults[$res['tmmtid']]=[];
             }
             
             $resultFound=false;
             
             //check on which border group this result belongs to
             foreach ($groupBorder as $border=>$value){
+                
+                if(!isset($groupedResults[$res['tmmtid']][$value])){
+                    if(!$isExport){
+                        $groupedResults[$res['tmmtid']][$value]=[];
+                        $groupedResults[$res['tmmtid']][$value]['rateCount']=0;
+                        $groupedResults[$res['tmmtid']][$value]['wordCount']=0;
+                    }else{
+                        $groupedResults[$res['tmmtid']][$value]=0;
+                    }
+                }
+                //if result is found, create only empty column
+                if($resultFound){
+                    continue;
+                }
+
+                //check matchrate border
                 if($res['matchRate']>$border){
-                    if(!isset($groupedResults[$value])){
-                        if(!$isExport){
-                            $groupedResults[$value]=[];
-                            $groupedResults[$value]['rateCount']=0;
-                            $groupedResults[$value]['wordCount']=0;
-                        }else{
-                            $groupedResults[$value]=0;
-                        }
-                    }
                     if(!$isExport){
-                        $groupedResults[$value]['rateCount']++;
-                        $groupedResults[$value]['wordCount']+=$res['wordCount'];
+                        $groupedResults[$res['tmmtid']][$value]['rateCount']++;
+                        $groupedResults[$res['tmmtid']][$value]['wordCount']+=$res['wordCount'];
                     }else{
-                        $groupedResults[$value]++;
+                        $groupedResults[$res['tmmtid']][$value]+=$res['wordCount'];
                     }
-                    
-                    $wordCountTotal+=$res['wordCount'];
                     $resultFound=true;
-                    break;
                 }
             }
-            
             if(!$resultFound){
-                if(!isset($groupedResults['noMatch'])){
-                    if(!$isExport){
-                        $groupedResults['noMatch']=[];
-                        $groupedResults['noMatch']['rateCount']=0;
-                        $groupedResults['noMatch']['wordCount']=0;
-                    }else{
-                        $groupedResults['noMatch']=0;
-                    }
-                }
-                
                 if(!$isExport){
-                    $groupedResults['noMatch']['rateCount']++;
-                    $groupedResults['noMatch']['wordCount']+=$res['wordCount'];
+                    $groupedResults[$res['tmmtid']]['noMatch']['rateCount']++;
+                    $groupedResults[$res['tmmtid']]['noMatch']['wordCount']+=$res['wordCount'];
                 }else{
-                    $groupedResults['noMatch']++;
+                    $groupedResults[$res['tmmtid']]['noMatch']+=$res['wordCount'];
                 }
-                
-                $wordCountTotal+=$res['wordCount'];
             }
+            $groupedResults[$res['tmmtid']]['created']=$res['created'];
         }
-        $groupedResults['wordCountTotal']=$wordCountTotal;
-        $groupedResults['created']=$createdDate;
-        
-        return $groupedResults;
+        return $this->sortByTm($groupedResults);
+    }
+
+    /***
+     * Sort by best  tmmt
+     * TODO: implement me
+     * @param array $groupedResults
+     * @return array
+     */
+    private function sortByTm($groupedResults){
+        $retArray=[];
+        foreach ($groupedResults as $tmmtgroup){
+            array_push($retArray, $tmmtgroup);
+        }
+        return $retArray;
     }
 }
