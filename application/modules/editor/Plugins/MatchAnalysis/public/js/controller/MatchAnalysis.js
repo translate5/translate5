@@ -61,8 +61,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     strings:{
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
-        preTranslation:'#UT#Analyse',
-        analysis:'#UT#Pre-translate'
+        analysis:'#UT#Analyse',
+        preTranslation:'#UT#Pre-translate'
     },
     
     listen:{
@@ -75,12 +75,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             '#matchResourceTaskAssocPanel':{
             	render:'onMatchResourcesPanelRender'
-            },
-            '#matchResourceTaskAssocPanel #cbAnalysis':{
-            	change:'onCbAnalysisChecked'
-            },
-            '#matchResourceTaskAssocPanel #cbPreTranslation':{
-            	change:'onCbPreTranslationChecked'
             }
         }
     },
@@ -121,14 +115,26 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onMatchResourcesPanelRender:function(panel){
     	panel.addDocked([{
     		xtype:'checkbox',
-            boxLabel:this.strings.analysis,
-            itemId:'cbAnalysis',
-            dock:'bottom'
-    	},{
-    		xtype:'checkbox',
     		boxLabel:this.strings.preTranslation,
     		itemId:'cbPreTranslation',
-    		dock:'bottom'
+    		dock:'bottom',
+    		listeners:{
+            	change:{
+            		fn:this.onCbPreTranslationChecked,
+            		scope:this
+        		}
+            }
+    	},{
+    		xtype:'checkbox',
+            boxLabel:this.strings.analysis,
+            itemId:'cbAnalysis',
+            dock:'bottom',
+            listeners:{
+            	change:{
+            		fn:this.onCbAnalysisChecked,
+            		scope:this
+        		}
+            }
     	}]);
     },
     
@@ -160,11 +166,25 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         continueBtn.setText(me.strings.finishTask);
     },
     
+    /***
+     * analysis checkbox check change handler
+     */
     onCbAnalysisChecked:function(field,newValue,oldValue,eOpts){ 
-    	//TODO: implement me
+    	var me=this,
+    		cbPreTranslation=Ext.ComponentQuery.query('#cbPreTranslation')[0];
+    	if(!newValue){
+    		cbPreTranslation.setValue(newValue);
+    	}
     },
     
+    /***
+     * pre translation checkbox check change handler
+     */
     onCbPreTranslationChecked:function(field,newValue,oldValue,eOpts){ 
-    	//TODO: implement me
+    	var me=this,
+    		cbAnalysis=Ext.ComponentQuery.query('#cbAnalysis')[0];
+    	if(newValue){
+    		cbAnalysis.setValue(newValue);
+    	}
     }
 });
