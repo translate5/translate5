@@ -108,6 +108,9 @@ Ext.define('Editor.util.SegmentEditor', {
                 if (node.parentNode != null && me.isContainerToIgnore(node.parentNode)) {
                     return false;
                 }
+                if (Editor.plugins.TrackChanges && me.regex_FOR_placeholder_empty_INS.test(node.data)) {
+                    return false;
+                }
                 return node.data != "";
             }
         });
