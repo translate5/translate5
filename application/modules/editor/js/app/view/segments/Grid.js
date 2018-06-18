@@ -270,6 +270,12 @@ Ext.define('Editor.view.segments.Grid', {
         *
         * listeners: {'reconfigure': Ext.bind(this.onReconfigure, this)},
         */
+        	listeners:{
+    		  beforerender:function(grid){
+    			  //Disable the sorting on column click in editor : TRANSLATE-1295
+    			  grid.down('headercontainer').sortOnClick=false;
+    		  }
+    		},
             columns: columns
         });
 
