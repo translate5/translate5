@@ -57,16 +57,10 @@ Ext.define('Editor.MessageBox',{
     addWarning: function(msg,delayFactor) {
         Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.WARNING, delayFactor);
     },
-    addError: function(msg,msgToServerlog) {
+    addError: function(msg) {
       //Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.ERROR);
       //display a alert instead:
       Editor.MessageBox.getInstance().showDirectError(msg);
-      if(msgToServerlog !== undefined){
-            Ext.Ajax.request({
-                   url: Editor.data.pathToRunDir + '/error/jserror',
-                   params: { jsError: msgToServerlog + ' Stacktrace: ' + Editor.MessageBox.getInstance().stacktrace() }
-            });
-      }
     },
     addInfo: function(msg, delayFactor) {
       Editor.MessageBox.getInstance().addMessage(msg, Editor.MessageBox.INFO, delayFactor);
@@ -193,16 +187,5 @@ Ext.define('Editor.MessageBox',{
           buttons: box.OK,
           icon: box.ERROR
       });
-  },
-  stacktrace: function() { 
-    function st2(f,count) {
-      count = count + 1;
-      if(count>30){
-          return [f.toString().split('(')[0].substring(9) + '(' + Array.prototype.slice.call(f.arguments).join(',') + ')'];
-      }
-      return !f ? [] : 
-          st2(f.caller,count).concat([f.toString().split('(')[0].substring(9) + '(' + Array.prototype.slice.call(f.arguments).join(',') + ')']);
-    }
-    return st2(arguments.callee.caller,0);
-}
+  }
 });

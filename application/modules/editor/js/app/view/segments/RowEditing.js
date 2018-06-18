@@ -121,7 +121,12 @@ Ext.define('Editor.view.segments.RowEditing', {
         }
         //to prevent race-conditions, check if there isalready an opened record and if yes show an error (see RowEditor.js function completeEdit for more information)
         if (me.context && me.context.record) {
-            Editor.MessageBox.addError(me.messages.previousSegmentNotSaved,' Das Segment konnte nicht zum Bearbeiten geöffnet werden, da das vorherige Segment noch nicht korrekt gespeichert wurde. Im folgenden der Debug-Werte: this.context.record.internalId: ' + me.context.record.internalId + ' record.internalId: ' + record.internalId);
+            Editor.MessageBox.addError(me.messages.previousSegmentNotSaved);
+            Ext.raise({
+                msg: 'The segment could not be opened for editing, since the previously opened segment was not correctly saved yet.',
+                contextRecordInternalId: this.context.record.internalId,
+                recordInternalId: record.internalId
+            });
             return false;
         }
         if (!me.editingAllowed || !record.get('editable')) {
