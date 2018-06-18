@@ -53,7 +53,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       exportAnalysis:'#UT#Export',
 	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
 	  matchResources:'#UT#Matchressourcen',
-	  analysisDate:'#UT#Datum'
+	  analysisDate:'#UT#Datum',
+	  matchResourceName: '#UT#Name'
     },
     
     layout:'fit',
@@ -95,6 +96,14 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         ftype: 'summary'
                     }],
                     columns: [{
+                        xtype: 'gridcolumn',
+                        text: me.strings.matchResourceName,
+                        renderer: function(value, metaData, record) {
+                            return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('resourceColor')+';"></div>'+value;
+                        },
+                        dataIndex : 'resourceName',
+                        sortable : true
+                    },{
                         xtype: 'gridcolumn',
                         flex: 2,
                         dataIndex: '103',

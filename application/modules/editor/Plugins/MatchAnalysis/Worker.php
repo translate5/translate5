@@ -50,7 +50,12 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     protected function doWork() {
         $params = $this->workerModel->getParameters();
-        $this->runAnalysis($this->taskGuid);
+        
+        $pretranslate=false;
+        if(isset($params['pretranslate'])){
+            $pretranslate=$params['pretranslate'];
+        }
+        $this->runAnalysis($this->taskGuid,$pretranslate);
         return true; 
     }
     
@@ -58,7 +63,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      * Run match analysis for the given task
      * @param string $taskGuid
      */
-    protected function runAnalysis($taskGuid){
+    protected function runAnalysis($taskGuid,$pretranslate){
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
@@ -70,6 +75,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
         /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
+        $analysis->setPretranslate($pretranslate);
         $analysis->calculateMatchrate();
     }
 }

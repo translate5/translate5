@@ -81,10 +81,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * define all event listener
      */
     protected function initEvents() {
-        $this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
+        //$this->eventManager->attach('editor_Models_Import', 'afterImport', array($this, 'handleOnAfterImport'));
         //$this->eventManager->attach('Editor_SegmentController', 'afterPutAction', array($this, 'startTestCode'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
+        
+        $this->eventManager->attach('editor_TaskController', 'analysisOperation', array($this, 'handleOnAnalysisOperation'));
+        $this->eventManager->attach('editor_TaskController', 'pretranslationOperation', array($this, 'handleOnPretranslationOperation'));
     }
     
     public function injectFrontendConfig(Zend_EventManager_Event $event) {
@@ -99,15 +102,20 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * After task import event handler
-     * @param Zend_EventManager_Event $event
+     * Queue the match analysis worker
+     * 
+     * @param editor_Models_Task $task
+     * @param integer $parentWorkerId
+     * @param boolean $pretranlsate
+     * @return void|boolean
      */
-    public function handleOnAfterImport(Zend_EventManager_Event $event) {
-        $parentWorkerId = $event->getParam('parentWorkerId');
-        $task = $event->getParam('task');
+    public function queueAnalysis(editor_Models_Task $task,$parentWorkerId,$pretranlsate=false) {
+        //$parentWorkerId = $event->getParam('parentWorkerId');
+        //$task = $event->getParam('task');
         $taskGuid=$task->getTaskGuid();
         
         if(!$this->checkMatchResources($taskGuid)){
+            erro_log("The associated matchresources can not be used for analysis.");
             return;
         }
         
@@ -115,6 +123,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
         
         $params=[];
+
+        if($pretranlsate){
+            $params['pretranslate']=$pretranlsate;
+        }
         
         // init worker and queue it
         if (!$worker->init($taskGuid, $params)) {
@@ -122,6 +134,78 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         $worker->queue($parentWorkerId);
+    }
+    
+    /***
+     * Run match analysis and pretranslation
+     * 
+     * @param editor_Models_Task $task
+     * @param boolean $pretranslate
+     */
+    public function runAnalysis(editor_Models_Task $task,$pretranslate=false){
+        
+        if(!$this->checkMatchResources($task->getTaskGuid())){
+            erro_log("The associated matchresources can not be used for analysis.");
+            return;
+        }
+        
+        if(!$task->lock(NOW_ISO, true)) {
+            $this->log->logError('Match analysis and pretranslation canot be run. The following task is in use: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
+            continue;
+        }
+        
+        //lock the task while match analysis are running
+        $oldState = $task->getState();
+        $task->setState('matchanalysis');
+        $task->save();
+        
+        //create new analysis
+        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc->setTaskGuid($task->getTaskGuid());
+        $analysisId=$analysisAssoc->save();
+        
+        $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
+        /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
+        $analysis->setPretranslate($pretranslate);
+        $analysis->calculateMatchrate();
+        
+        //inlock the task
+        $task->setState($oldState);
+        $task->save();
+        $task->unlock();
+    }
+    
+    public function handleOnAnalysisOperation(Zend_EventManager_Event $event){
+        //if the task is in import state -> queue the worker, do not pretranslate
+        //if the task is allready imported -> run the analysis directly, do not pretranslate
+        $this->handleOperation($event);
+    }
+    
+    
+    public function handleOnPretranslationOperation(Zend_EventManager_Event $event){
+        //if the task is in import state -> queue the worker, set pretranslate to true in the worker and from the worker in the analysis
+        //if the task is allready imported -> run the analysis directly, set pretranslate to true
+        $this->handleOperation($event,true);
+    }
+    
+    /***
+     * Operation action handler. Run analysis and pretranslate if $pretranslate is true.
+     * 
+     * @param Zend_EventManager_Event $event
+     * @param boolean $pretranlsate
+     */
+    private function handleOperation(Zend_EventManager_Event $event,$pretranlsate=false){
+        $task = $event->getParam('entity');
+        /* @var $task editor_Models_Task */
+        
+        //if the task is in import state -> queue the worker
+        if($task->getState()==editor_Models_Task::STATE_IMPORT){
+            //TODO: load from Zf_worker  table the scheduled(or prepared???) import worker for that taskGuid to get the cirrect parentId
+            $this->queueAnalysis($task, $event->getParam('parentWorkerId'),$pretranlsate);
+            return;
+        }
+        $this->runAnalysis($task,$pretranlsate);
     }
 
     /***

@@ -88,6 +88,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     
     public function _initRestRoutes()
     {
+        
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
             'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker',
@@ -95,6 +96,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
+        $this->front->getRouter()->addRoute('editorOperationHandler', new ZfExtended_Controller_RestLikeRoute(
+            //'editor/:entity/:id/:operation/operation',
+            'editor/:controller/:id/:operation/operation',
+            array(
+                'module' => 'editor',
+                'action' => '',
+            )
+        ));
+        
         //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',

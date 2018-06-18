@@ -56,6 +56,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       ref: 'adminTaskWindow',
       selector: 'adminTaskPreferencesWindow'
   }],
+  
   listen: {
       controller: {
           '#admin.TaskPreferences': {
@@ -117,6 +118,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       }
       
       me.requestsCount = tmpStore.getCount();
+
       tmpStore.each(me.saveOneAssocRecord, me);
   },
   handleOnReload: function(window) {
@@ -190,6 +192,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
               }
               record.commit();
               me.hideLoadingMask();
+              //when all of the records are saved, fire event
+
+              if(me.requestsCount<1){
+            	  me.fireEvent('taskAssocSavingFinished',me.actualTask);
+              }
           },
           failure: function(response){
               me.requestsCount--;

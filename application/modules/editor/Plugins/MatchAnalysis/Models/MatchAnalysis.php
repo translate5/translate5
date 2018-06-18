@@ -67,23 +67,27 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * The result array will contain the total word count in the result.
      * @param guid $taskGuid
      * @param boolean $isExport: is the data requested for export
-     * @return NULL|array
+     * @return array
      */
     public function loadByBestMatchRate($taskGuid,$isExport=false){
         
-        $sql='SELECT m.*,ma.created
+        $sql='SELECT m.*
               FROM LEK_match_analysis m 
                   LEFT JOIN LEK_match_analysis b
                       ON m.tmmtid = b.tmmtid and m.segmentId = b.segmentId 
                       AND b.matchRate > m.matchRate 
-              INNER JOIN LEK_match_analysis_taskassoc ma on ma.taskGuid=m.taskGuid
               WHERE b.matchRate IS NULL 
-              AND m.taskGuid=?';
+              AND m.taskGuid=? 
+              AND m.analysisId = (
+				  SELECT MAX(id)
+				  FROM LEK_match_analysis_taskassoc
+				  WHERE taskGuid = ?
+			   )';
         
-        $resultArray=$this->db->getAdapter()->query($sql,[$taskGuid])->fetchAll();
+        $resultArray=$this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid])->fetchAll();
         
         if(empty($resultArray)){
-            return null;
+            return array();
         }
         return $this->groupByMatchrate($resultArray,$isExport);
     }
@@ -99,15 +103,26 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
         $groupBorder=[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59','noMatch'=>'noMatch'];
-        $createdDate=null;
+        
+        $analysisCreated=null;
         
         foreach ($results as $res){
         
-            $wordCountTotal=0;
-            
             //for each tmmt separate array
             if(!isset($groupedResults[$res['tmmtid']])){
                 $groupedResults[$res['tmmtid']]=[];
+                $groupedResults[$res['tmmtid']]['resourceName']="";
+                $groupedResults[$res['tmmtid']]['resourceColor']="";
+                //set tmmt color and name
+                if($res['tmmtid']>0){
+                    $tmmtModel=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+                    /* $tmmtModel editor_Plugins_MatchResource_Models_TmMt */
+                    $tmmtModel->load($res['tmmtid']);
+                    $groupedResults[$res['tmmtid']]['resourceName']=$tmmtModel->getName();
+                    $groupedResults[$res['tmmtid']]['resourceColor']=$tmmtModel->getColor();
+                }
+                
+                
             }
             
             $resultFound=false;
@@ -148,7 +163,13 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                     $groupedResults[$res['tmmtid']]['noMatch']+=$res['wordCount'];
                 }
             }
-            $groupedResults[$res['tmmtid']]['created']=$res['created'];
+            if(!$analysisCreated){
+                $model=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+                /* @var $model editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+                $model->load($res['analysisId']);
+                $groupedResults[$res['tmmtid']]['created']=$model->getCreated();
+                $analysisCreated=$model->getCreated();
+            }
         }
         return $this->sortByTm($groupedResults);
     }

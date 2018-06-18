@@ -67,7 +67,7 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
     		    	continue;	
     		    }
 
-    		    if(key=="created" || key=="id"){
+    		    if(key=="created" || key=="id" || key=="resourceName" || key=="resourceColor"){
     		    	continue
 		    	};
 	        	ts+=row.data[key].wordCount;

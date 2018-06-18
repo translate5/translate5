@@ -264,46 +264,48 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->checkTaskGuidAndEditable();
         $task = $this->checkTaskState();
 
-        $history = $this->entity->getNewHistoryEntity();
+        $history = $this->entity->getNewHistoryEntity();  //relevant for pretrans
 
         $this->decodePutData();
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
-        $this->entity->setTimeTrackData($this->data->durations,$this->durationsDivisor);
+        $this->entity->setTimeTrackData($this->data->durations,$this->durationsDivisor); //pretrans: set to 0
         $this->convertQmId();
 
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
         
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
+        //pretrans we update first target only: $sfm->getFirstTargetName()
         $updateSearchAndSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
         $this->checkPlausibilityOfPut($allowedAlternatesToChange);
         $this->sanitizeEditedContent($allowedAlternatesToChange);
+        //for pretrans: how deal with internal tags coming from the TM??? → same as the frontend does it on overtaking a match from matchresourcepanel
         $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
         foreach($updateSearchAndSort as $field) {
-            $this->entity->updateToSort($field);
+            $this->entity->updateToSort($field); //this single step must also be done for pretrans with the first target
         }
 
-        $this->entity->setUserGuid($sessionUser->data->userGuid);
-        $this->entity->setUserName($sessionUser->data->userName);
+        $this->entity->setUserGuid($sessionUser->data->userGuid);//to the authenticated userGuid
+        $this->entity->setUserName($sessionUser->data->userName);//to the authenticated userName
         $this->entity->restoreNotModfied();
         
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $wfm->getActive($this->entity->getTaskGuid())->beforeSegmentSave($this->entity);
+        $wfm->getActive($this->entity->getTaskGuid())->beforeSegmentSave($this->entity); //use that too for pretrans on non import. Use AutoState calcImport Method for import tasks 
         
         $wfh = $this->_helper->workflow;
         /* @var $wfh ZfExtended_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid);
+        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid); //not neede for pretrans
         
-        $this->entity->validate();
+        $this->entity->validate(); //needed for pretrans (if there are no problems)
         
         //FIXME: Introduced with TRANSLATE-885, but is more a hack as a solution. See Issue comments for more information!
-        $this->updateTargetHashAndOriginal($task);
+        $this->updateTargetHashAndOriginal($task); //pretrans yes
 
         foreach($allowedAlternatesToChange as $field) {
             if($this->entity->isModified($field)) {
-                $this->entity->updateQmSubSegments($field);
+                $this->entity->updateQmSubSegments($field); //not needed for pretrans
             }
         }
         //FIXME check who use this event so we klnow do we trigger this on replace all or not
@@ -312,12 +314,16 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 'model' => $this->entity, //FIXME model usage is deprecated and should be removed in future (today 2016-08-10) 
                 'history' => $history
         ));
+        //pretrans: MatchResource is triggered by beforePutSave: not relevant, since just matchRateType calculation, done by pretrans directly
+        //          TermTagger: On Import just ensure that TermTagerImportWorker runs after Pretrans Worker → everything OK
+        //                      After Import: Problem: Pretranslation must be extended to encapsulate TermTaggerWorker somehow! Not supported yet. Talk with Marc.
+        
         
         //saving history directly before normal saving, 
         // so no exception between can lead to history entries without changing the master segment
-        $history->save();
-        $this->entity->setTimestamp(null); //see TRANSLATE-922
-        $this->entity->save();
+        $history->save(); //pretrans yes
+        $this->entity->setTimestamp(null); //see TRANSLATE-922 pretrans yes
+        $this->entity->save(); //pretrans yes
         $this->view->rows = $this->entity->getDataObject();
     }
     
