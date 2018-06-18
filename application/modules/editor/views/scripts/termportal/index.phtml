@@ -131,6 +131,9 @@ $( function() {
     });
     $("#resultTermsHolder").tabs();
     $("#search").focus();
+    $(window).resize(function() {
+        setSizesInFinalResultContent();
+    });
 } );
 
 </script>

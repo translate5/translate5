@@ -33,6 +33,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();
+
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         if(empty($customers)){
             $this->view->error=$this->translate->_("Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.");
@@ -48,9 +50,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         /* @var $model editor_Models_Languages */
         
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts/termportal');
-        
-        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
@@ -78,7 +77,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         //get the translated labels
         $labelsModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $labelsModel editor_Models_TermCollection_TermAttributesLabel */
-        $labels=$labelsModel->loadAll();
+        $labels=$labelsModel->loadAllTranslated();
         
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
