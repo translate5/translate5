@@ -23,6 +23,7 @@ var selectItem = function (event, ui) {
         origEvent = origEvent.originalEvent;
     }
     if (origEvent.type == 'click'){
+        event.preventDefault();
         console.log("clicked item: " + ui.item.groupId);
         searchTerm(ui.item.label);
         requestFromSearchButton=true;
@@ -37,7 +38,7 @@ var selectItem = function (event, ui) {
     //if there are results, show them
     if(searchTermsResponse.length>0){
         $('#searchTermsSelect').show();
-        $('#finalResultContent').show();
+        showFinalResultContent();
     }
     
     console.log("selectItem: " + ui.item.groupId);
@@ -169,7 +170,7 @@ function fillSearchTermSelect(){
         }
         
         if(searchTermsResponse.length>0){
-            $("#finalResultContent").show();
+            showFinalResultContent();
         }
         
     }
@@ -313,6 +314,8 @@ function drawTermGroups(){
             
         }
     });
+    
+    setSizesInFinalResultContent();
 }
 
 /***
@@ -590,5 +593,26 @@ function startAutocomplete(){
     $("#search").autocomplete( "search", $("#search").val());
 }
 
+function showFinalResultContent() {
+    $('#finalResultContent').show();
+    setSizesInFinalResultContent();
+}
+
+function setSizesInFinalResultContent(){
+    var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
+    if ($('#searchTermsHolder').is(':visible')) {
+        // (1) Left column: ensure that the scrollable area has always the maximal possible height that is available in the current browser window.
+        $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
+        // (2) Right column: must not wrap underneath the left column until BOTH of them are wrapped to rows (is out of sight otherwise!)
+        if ($('#resultTermsHolder').is(':visible')) {
+            var widthTerms = $('#searchTermsHolder').width(),
+                widthResults = $('#resultTermsHolder').width();
+            if ( (widthResults - widthTerms > SCROLLBAROFFSET) &&       // = check if they have the same size (= wrapped as rows and both displayed in full width already)
+                 (widthResults + widthTerms > window.innerWidth) ) {    // = together they are broader than the window and the results would be wrapped
+                $('#resultTermsHolder').css("width", window.innerWidth - widthTerms - 100); // 100 is just to get small enough to not be wrapped; flex ("auto") will adjust the width by itself then
+            }
+        }
+    }
+}
 
 

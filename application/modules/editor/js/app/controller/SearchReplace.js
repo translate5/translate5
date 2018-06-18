@@ -39,6 +39,7 @@ Ext.define('Editor.controller.SearchReplace', {
     ],
     
     mixins: [
+        'Editor.util.Range',
         'Editor.util.SearchReplaceUtils'
     ],
 
@@ -820,14 +821,19 @@ Ext.define('Editor.controller.SearchReplace', {
     /***
      * Replace the text only, without ins, dell tags
      */
-    pureReplace:function(bookmarkRangeForDel,replaceText){
+    pureReplace:function(bookmarkRangeForDel,replaceText,isTextOnly){
         var me=this,
             allImagesInNode=[],
             collectedNodesForDel,
             iframeDocument = me.getSegmentIframeDocument(),
             range = rangy.createRange();
         
-        range.moveToBookmark(bookmarkRangeForDel);
+        if (isTextOnly) {
+            range = me.moveRangeToBookmarkInTranslate5(range,bookmarkRangeForDel,true);
+        } else {
+            //range.moveToBookmark(bookmarkRangeForDel);
+            range = me.moveRangeToBookmarkInTranslate5(range,bookmarkRangeForDel,true);
+        }
         
         //collect all images in the range
         collectedNodesForDel = range.getNodes([1,3], function(node) {

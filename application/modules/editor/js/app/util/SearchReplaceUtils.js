@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  * @class SearchReplaceUtils
  */
 Ext.define('Editor.util.SearchReplaceUtils', {
+    mixins: ['Editor.util.SegmentEditor'],
 
     NODE_NAME_MARK: 'mark',
     NODE_NAME_DEL: 'del',
@@ -67,7 +68,7 @@ Ext.define('Editor.util.SearchReplaceUtils', {
             return;
         }
 
-        var insNodes=me.editorBodyExtDomElement.query(me.NODE_NAME_INS),
+        var insNodes=me.getEditorBodyExtDomElement().query(me.NODE_NAME_INS),
             arrLength=insNodes.length;
         
         for (i = 0; i < arrLength; i++){
@@ -87,7 +88,7 @@ Ext.define('Editor.util.SearchReplaceUtils', {
             return;
         }
         
-        var delNodes=me.editorBodyExtDomElement.query(me.NODE_NAME_DEL),
+        var delNodes=me.getEditorBodyExtDomElement().query(me.NODE_NAME_DEL),
             arrLength = delNodes.length; 
         
         for (i = 0; i < arrLength; i++){

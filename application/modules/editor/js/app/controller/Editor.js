@@ -481,7 +481,6 @@ Ext.define('Editor.controller.Editor', {
 
         if(me.isEditing &&rec && rec.get('editable')) {
             me.fireEvent('prepareTrackChangesForSaving');
-            me.fireEvent('runSpellCheckOnSaving',rec.get('segmentNrInTask'));
             me.fireEvent('saveUnsavedComments');
             me.fireEvent('saveSegment');
         }
@@ -681,8 +680,8 @@ Ext.define('Editor.controller.Editor', {
         
         msgBox = Ext.create('Ext.window.MessageBox', {
             buttonText:{
-                ok: me.messages.correctErrorsText,
-                yes: me.messages.correctErrorsText,
+                ok: "OK",
+                yes: "OK",
                 no: me.messages.saveAnyway
             }
         });
