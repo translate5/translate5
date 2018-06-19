@@ -69,7 +69,7 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
 
     		    if(key=="created" || key=="id" || key=="resourceName" || key=="resourceColor"){
     		    	continue
-		    	};
+		    	}
 	        	ts+=row.data[key].wordCount;
     		}
     		return ts;

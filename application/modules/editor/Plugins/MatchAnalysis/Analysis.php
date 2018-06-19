@@ -53,6 +53,10 @@ class editor_Plugins_MatchAnalysis_Analysis{
     protected $connectors=array();
     
     
+    /***
+     * Flag if pretranslations is active
+     * @var string
+     */
     protected $pretranslate=false;
     
     /***
@@ -163,8 +167,10 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
                 $matchAnalysis->setAnalysisId($this->analysisId);
                 
+                $matchResults=$matches->getResult();
+                
                 //for each match, fint the best match rate, and save it
-                foreach ($matches->getResult() as $match){
+                foreach ($matchResults as $match){
                     
                     //TODO: pretranslation with best sort rate
                     
@@ -181,6 +187,12 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 }
                 
                 if($matchAnalysis->getMatchRate()==null){
+                    $matchAnalysis->setTmmtid($tmmtid);
+                    $matchAnalysis->setWordCount($wordCount->getSourceCount());
+                    //save match analysis
+                    $matchAnalysis->save();
+                    
+                    $matches->resetResult();
                     continue;
                 }
                 
@@ -273,7 +285,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
     /***
      * Pretranslate the given segment from the given resource
      * @param editor_Models_Segment $segment
-     * @param unknown $result
+     * @param stdClass $result
      */
     protected function pretranslateSegment(editor_Models_Segment $segment, $result){
         //if the segment target is not empty or best match rate is not found do not pretranslate
@@ -282,7 +294,6 @@ class editor_Plugins_MatchAnalysis_Analysis{
         if(!empty($segment->getFieldOriginal('target')) || !isset($result)){
             return;
         }
-        //FIXME move this to filebase abstract
         if($result->matchrate>=100 && $result->matchrate!=editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
             $segment->set($this->sfm->getFirstTargetName(),$result->target); //use sfm->getFirstTargetName here
             $segment->set($this->sfm->getFirstTargetName().'Edit',$result->target); //use sfm->getFirstTargetName here

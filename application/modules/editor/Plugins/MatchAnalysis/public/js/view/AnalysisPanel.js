@@ -63,10 +63,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         var me = this,
             config,
             columnRenderer=function(val, meta, record) {
-        		if(val && val.wordCount && val.wordCount>0){
+        		if(val && val.wordCount){
         			return val.wordCount;
         		}
-                return "";
+                return 0;
             },
             analysisStore=Ext.create('Editor.plugins.MatchAnalysis.store.MatchAnalysis');
             
