@@ -226,6 +226,8 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 <trans-unit id='VXNl'><source>Use</source><target>Use</target></trans-unit>
 <trans-unit id='SW50ZWdyYXRl'><source>Integrate</source><target>Integrate</target></trans-unit>
 <trans-unit id='RXh0ZW5k'><source>Extend</source><target>Extend</target></trans-unit>
+<trans-unit id='LSBEaWUgRGF0ZW4gc2luZCBudXIgaW4gZGVyIEhUTUwtQW5zaWNodCBkZXIgRS1NYWlsIHZlcmbDvGdiYXIhIC0='><source>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</source><target>- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -</target></trans-unit>
+<trans-unit id='RGVyIFJlc2V0SGFzaCBvZGVyIGRpZSBCcm93c2Vyc2l0enVuZyBpc3QgbmljaHQgKG1laHIpIGfDvGx0aWcuIEJpdHRlIGZvcmRlcm4gU2llIMO8YmVyIGRhcyBuZWJlbnN0ZWhlbmRlIEZvcm11bGFyIGVpbmUgRS1NYWlsIG1pdCBlaW5lbSBuZXVlbiBMaW5rIGFuLg=='><source>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</source><target>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</target></trans-unit>
   </body>
  </file>
 </xliff>

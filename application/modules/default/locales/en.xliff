@@ -227,8 +227,18 @@ If you did not send the request yourself, please inform us of this.
     <source>Einstufung</source>
     <target>Normative Authorization</target>
 </trans-unit>
-<trans-unit id='VHJ5IG9ubGluZQ=='><source>Try online</source><target>Try online</target></trans-unit>
-<trans-unit id='Q3Jvd2Qgb2YgY29tcGFuaWVz'><source>Crowd of companies</source><target>Crowd of companies</target></trans-unit>
+<trans-unit id='VHJ5IG9ubGluZQ=='>
+    <source>Try online</source>
+    <target>Try online</target>
+</trans-unit>
+<trans-unit id='Q3Jvd2Qgb2YgY29tcGFuaWVz'>
+    <source>Crowd of companies</source>
+    <target>Crowd of companies</target>
+</trans-unit>
+<trans-unit id='RGVyIFJlc2V0SGFzaCBvZGVyIGRpZSBCcm93c2Vyc2l0enVuZyBpc3QgbmljaHQgKG1laHIpIGfDvGx0aWcuIEJpdHRlIGZvcmRlcm4gU2llIMO8YmVyIGRhcyBuZWJlbnN0ZWhlbmRlIEZvcm11bGFyIGVpbmUgRS1NYWlsIG1pdCBlaW5lbSBuZXVlbiBMaW5rIGFuLg=='>
+    <source>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</source>
+    <target>The ResetHash or the browser session is not valid (anymore). Please request a new link via e-mail by using the beneath form.</target>
+</trans-unit>
         </body>
     </file>
 <!-- ids are base64-encoded --></xliff>
