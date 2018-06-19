@@ -115,7 +115,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $taskGuid=$task->getTaskGuid();
         
         if(!$this->checkMatchResources($taskGuid)){
-            erro_log("The associated matchresources can not be used for analysis.");
+            error_log("The associated matchresources can not be used for analysis.");
             return;
         }
         
@@ -130,7 +130,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         // init worker and queue it
         if (!$worker->init($taskGuid, $params)) {
-            $this->log->logError('MatchAnalysis-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            error_log('MatchAnalysis-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
         $worker->queue($parentWorkerId);
@@ -145,12 +145,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     public function runAnalysis(editor_Models_Task $task,$pretranslate=false){
         
         if(!$this->checkMatchResources($task->getTaskGuid())){
-            erro_log("The associated matchresources can not be used for analysis.");
+            error_log("The associated matchresources can not be used for analysis.");
             return;
         }
         
         if(!$task->lock(NOW_ISO, true)) {
-            $this->log->logError('Match analysis and pretranslation canot be run. The following task is in use: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
+            error_log('Match analysis and pretranslation canot be run. The following task is in use: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
             continue;
         }
         
