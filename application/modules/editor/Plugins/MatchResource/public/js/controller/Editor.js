@@ -153,11 +153,8 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       }
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
-          if (!Editor.plugins.TrackChanges) {
-              me.setMatchResourceValueForEditor(matchRecord.get('target'));
-          } else {
-              me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added first
-          }
+          me.setMatchResourceValueForEditor(matchRecord.get('target'));
+          me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added first and then setMatchResourceValueForEditor is applied from there (= again, but so what)
           editor.mainEditor.setValueAndMarkup(me.matchResourceValueForEditor, rec, editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
@@ -171,7 +168,6 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
   setMatchResourceValueForEditor: function(value) {
       var me = this;
       me.matchResourceValueForEditor = value;
-      me.fireEvent('afterSetValueAndMarkup'); // if TrackChanges are activated, handleAfterPush is started now
   },
   viewModeChangeEvent: function(controller){
       var me = this,
