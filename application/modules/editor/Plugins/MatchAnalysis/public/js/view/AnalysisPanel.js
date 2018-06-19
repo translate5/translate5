@@ -292,6 +292,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     			totalSum+=record.get(group).wordCount;
     		}
     	});
-    	return totalSum>0 ? totalSum : "";
+    	return totalSum;
     }
 });
