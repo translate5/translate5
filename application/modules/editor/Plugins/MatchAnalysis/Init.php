@@ -165,10 +165,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $analysisAssoc->setTaskGuid($task->getTaskGuid());
         $analysisId=$analysisAssoc->save();
         
-        $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
-        /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
-        $analysis->setPretranslate($pretranslate);
-        $analysis->calculateMatchrate();
+        try {
+            $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
+            /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
+            $analysis->setPretranslate($pretranslate);
+            $analysis->calculateMatchrate();
+        } catch (Exception $e) {
+            //inlock the task
+            $task->setState($oldState);
+            $task->save();
+            $task->unlock();
+            throw $e;
+        }
         
         //inlock the task
         $task->setState($oldState);
@@ -201,8 +209,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         //if the task is in import state -> queue the worker
         if($task->getState()==editor_Models_Task::STATE_IMPORT){
-            //TODO: load from Zf_worker  table the scheduled(or prepared???) import worker for that taskGuid to get the cirrect parentId
-            $this->queueAnalysis($task, $event->getParam('parentWorkerId'),$pretranlsate);
+            $worker=ZfExtended_Factory::get('ZfExtended_Models_Worker');
+            /* @var $worker ZfExtended_Models_Worker */
+            $result=$worker->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE, $task->getTaskGuid());
+            $parentWorkerId=null;
+            if(!empty($result)){
+                $parentWorkerId=$result[0]['id'];
+            }
+            $this->queueAnalysis($task,$parentWorkerId,$pretranlsate);
             return;
         }
         $this->runAnalysis($task,$pretranlsate);

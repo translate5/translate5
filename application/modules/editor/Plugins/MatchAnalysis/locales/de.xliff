@@ -39,7 +39,17 @@
 		    <source>Keine Analyse für die aktuelle Aufgabe</source>
 		    <target>Keine Analyse für die aktuelle Aufgabe</target>
 		</trans-unit>
-		
+
+		<trans-unit id='V2llZGVyaG9sdW5nZW46'>
+		    <source>Wiederholungen:</source>
+		    <target>Wiederholungen:</target>
+		</trans-unit>
+
+		<trans-unit id='U3VtbWU6'>
+		    <source>Summe:</source>
+		    <target>Summe:</target>
+		</trans-unit>
+
     </body>
   </file>
 </xliff>

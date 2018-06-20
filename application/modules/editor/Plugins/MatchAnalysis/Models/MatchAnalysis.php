@@ -65,7 +65,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * Group result index: 103,  102,  101,  100,  99,      89,      79,      69,      59,      noMatch
      * 
      * The result array will contain the total word count in the result.
-     * @param guid $taskGuid
+     * @param string $taskGuid
      * @param boolean $isExport: is the data requested for export
      * @return array
      */
@@ -93,7 +93,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     }
     
     /***
-     * Group the results by match rate group
+     * Group the results by match rate group.
      * @param array $results
      * @return array[]
      */
@@ -163,13 +163,16 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                     $groupedResults[$res['tmmtid']]['noMatch']+=$res['wordCount'];
                 }
             }
+            
+            //get the analysis created date
             if(!$analysisCreated){
                 $model=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
                 /* @var $model editor_Plugins_MatchAnalysis_Models_TaskAssoc */
                 $model->load($res['analysisId']);
-                $groupedResults[$res['tmmtid']]['created']=$model->getCreated();
                 $analysisCreated=$model->getCreated();
             }
+            
+            $groupedResults[$res['tmmtid']]['created']=$analysisCreated;
         }
         return $this->sortByTm($groupedResults);
     }

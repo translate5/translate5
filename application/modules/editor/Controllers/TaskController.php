@@ -426,6 +426,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         if($this->validate()) {
             $this->processUploadedFile();
+            $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
             $this->view->success = true;

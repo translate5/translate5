@@ -54,7 +54,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
 	  matchResources:'#UT#Matchressourcen',
 	  analysisDate:'#UT#Datum',
-	  matchResourceName: '#UT#Name'
+	  matchResourceName: '#UT#Name',
+	  repetitions:'#UT#Wiederholungen:',
+	  totalSum:'#UT#Summe'
     },
     
     layout:'fit',
@@ -99,7 +101,13 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         xtype: 'gridcolumn',
                         text: me.strings.matchResourceName,
                         renderer: function(value, metaData, record) {
+                        	if(!value){
+                        		return me.strings.repetitions;
+                        	}
                             return '<div style="float: left; width: 15px; height: 15px;margin-right:5px; border: 1px solid rgba(0, 0, 0, .2);background: #'+record.get('resourceColor')+';"></div>'+value;
+                        },
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                            return me.strings.totalSum;
                         },
                         dataIndex : 'resourceName',
                         sortable : true

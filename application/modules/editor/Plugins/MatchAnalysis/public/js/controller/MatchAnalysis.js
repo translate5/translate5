@@ -123,6 +123,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		win=panel.up('window'),
     		task=win.actualTask;
     	
+    	//if task is in import state, add checkboxes for the pretranslation and match analysis
     	if(!task || task.isImporting()){
     		panel.addDocked([{
     			xtype:'checkbox',
@@ -149,6 +150,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		}]);
     		return;
     	}
+    	
+    	//the task exist->add buttons in the task assoc panel
     	var dockedItems=panel.getDockedItems('toolbar[dock="bottom"]');
     	dockedItems=dockedItems[0];
     	
@@ -209,12 +212,15 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         continueBtn.setText(me.strings.finishTask);
     },
     
+    /***
+     * Event fired when all associated match resources for the task are saved
+     */
     onTaskAssocSavingFinished:function(task){
     	var me=this,
     		cbPreTranslation=Ext.ComponentQuery.query('#cbPreTranslation'),
     		cbAnalysis=Ext.ComponentQuery.query('#cbAnalysis');
     	
-    	if(cbPreTranslation.length<0 || cbAnalysis.length<0){
+    	if(cbPreTranslation.length<1 || cbAnalysis.length<1){
     		return;
     	}
     	

@@ -44,6 +44,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
   extend: 'Ext.data.Model',
+  
   fields: [
     {name: 'id', type: 'int'},
     {name: 'created'},
@@ -60,18 +61,26 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
     {name: 'wordCountTotal',
     	convert: function(val,row) {
     		//sum all in row columns
-    		var ts=0;
+    		var ignoreSumColumns=[
+    			  "created",
+    			  "id",
+    			  "resourceName",
+    			  "resourceColor"
+    		  ],ts=0;
+    		
     		for (var key in row.data) {
     		    // skip loop if the property is from prototype
     		    if (!row.data.hasOwnProperty(key)){
     		    	continue;	
     		    }
 
-    		    if(key=="created" || key=="id" || key=="resourceName" || key=="resourceColor"){
+    		    //some culumns shuld not be included in the sum
+    		    if(Ext.Array.contains(ignoreSumColumns,key)){
     		    	continue
 		    	}
 	        	ts+=row.data[key].wordCount;
     		}
+    		delete ignoreSumColumns;
     		return ts;
     	}    
     }

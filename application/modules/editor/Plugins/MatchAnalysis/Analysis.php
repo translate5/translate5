@@ -52,6 +52,13 @@ class editor_Plugins_MatchAnalysis_Analysis{
      */
     protected $connectors=array();
     
+    /***
+     * Collection of assigned tmmt resources types where key is tmmtid and resource type is the value
+     * 
+     * @var array
+     */
+    protected $resourceType=array();
+    
     
     /***
      * Flag if pretranslations is active
@@ -126,23 +133,17 @@ class editor_Plugins_MatchAnalysis_Analysis{
                     $matchAnalysis->setAnalysisId($this->analysisId);
                     
                     $matchAnalysis->setTmmtid(0);
+                    $matchAnalysis->setMatchRate(editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE);
+                    $matchAnalysis->setWordCount($wordCount->getSourceCount());
                     
                     $repetitionResult=$repetitionByHash[md5($segment->getFieldOriginal('source'))];
                     $repetitionMatchRate=$repetitionResult->matchrate;
                     
-                    //check the match rate for the initial segment (repetition) 
-                    if($repetitionMatchRate>=100 && $repetitionMatchRate<editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
-                        $matchAnalysis->setMatchRate(editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE);
-                    }else if($repetitionMatchRate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
-                        //if it is a context match, pretranslate it it is not counted as repetition
-                        $this->pretranslateSegment($segment, $repetitionResult);
+                    //if it is a context match, pretranslate it it is not counted as repetition
+                    if($repetitionMatchRate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
+                        $this->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
                         continue;
-                    }else{
-                        $matchAnalysis->setTmmtid($repetitionResult->internalTmmtid);
-                        $matchAnalysis->setMatchRate($repetitionMatchRate);
                     }
-                    
-                    $matchAnalysis->setWordCount($wordCount->getSourceCount());
                     
                     $matchAnalysis->save();
                     continue;
@@ -169,7 +170,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 
                 $matchResults=$matches->getResult();
                 
-                //for each match, fint the best match rate, and save it
+                //for each match, find the best match rate, and save it
                 foreach ($matchResults as $match){
                     
                     //TODO: pretranslation with best sort rate
@@ -212,7 +213,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $repetitionByHash[md5($segment->getFieldOriginal('source'))]=$bestMatchRateResult;
             
             if($this->pretranslate){
-                $this->pretranslateSegment($segment, $bestMatchRateResult);
+                $this->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
             }
         }
     }
@@ -248,6 +249,9 @@ class editor_Plugins_MatchAnalysis_Analysis{
             if(!$resource->getAnalysable()){
                 continue;
             }
+            
+            //store the resource type for the tmmt
+            $this->resourceType[$tmmt->getId()]=$resource->getType();
             
             $connector=$manager->getConnector($tmmt);
             
@@ -286,26 +290,44 @@ class editor_Plugins_MatchAnalysis_Analysis{
      * Pretranslate the given segment from the given resource
      * @param editor_Models_Segment $segment
      * @param stdClass $result
+     * @param int $tmmtid
      */
-    protected function pretranslateSegment(editor_Models_Segment $segment, $result){
+    protected function pretranslateSegment(editor_Models_Segment $segment, $result,$tmmtid){
         //if the segment target is not empty or best match rate is not found do not pretranslate
-        //TODO: in the final version check for the autoState and not on empty!
         //pretranslation only for editable segments, check if the segment interattor already does that
-        if(!empty($segment->getFieldOriginal('target')) || !isset($result)){
+        if(($segment->getAutoStateId()!=editor_Models_Segment_AutoStates::NOT_TRANSLATED) || !isset($result)){
             return;
         }
         if($result->matchrate>=100 && $result->matchrate!=editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
-            $segment->set($this->sfm->getFirstTargetName(),$result->target); //use sfm->getFirstTargetName here
-            $segment->set($this->sfm->getFirstTargetName().'Edit',$result->target); //use sfm->getFirstTargetName here
             
-            //$matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+            $history = $segment->getNewHistoryEntity();
+            
+            $segmentField=$this->sfm->getFirstTargetName();
+            $segmentFieldEdit=$this->sfm->getFirstTargetName().'Edit';
+            
+            $segment->set($segmentField,$result->target); //use sfm->getFirstTargetName here
+            $segment->set($segmentFieldEdit,$result->target); //use sfm->getFirstTargetName here
+            
+            $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
             /* @var $matchrateType editor_Models_Segment_MatchRateType */
             //set the type
-            //$matchrateType->initEdited($tmmt->getResource()->getType());
+            $matchrateType->initEdited($this->resourceType[$tmmtid]);
             
-            //$segment->setMatchRateType((string) $matchrateType);
+            $segment->setMatchRateType((string) $matchrateType);
             
+            
+            $duration=new stdClass();
+            $duration->$segmentField=0;
+            $segment->setTimeTrackData($duration);
+            
+            $duration=new stdClass();
+            $duration->$segmentFieldEdit=0;
+            $segment->setTimeTrackData($duration);
+            
+            $history->save();
+            $segment->setTimestamp(null);
             $segment->save();
+            
         }
         //TODO: change this when the best sort rate is implemented
         //100, 101, 103 -> pretranslate the segment
