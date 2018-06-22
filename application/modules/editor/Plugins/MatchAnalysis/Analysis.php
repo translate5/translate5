@@ -72,12 +72,18 @@ class editor_Plugins_MatchAnalysis_Analysis{
      */
     protected $sfm;
     
+    /***
+     * 
+     * @var string
+     */
+    protected $userGuid;
+    
     
     /***
-     * Session data
-     * @var array
+     * 
+     * @var string
      */
-    protected $sessionData;
+    protected $userName;
 
     public function __construct(editor_Models_Task $task,$analysisId){
         $this->task=$task;
@@ -334,9 +340,8 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $segment->updateToSort($segmentField);
             $segment->updateToSort($segmentFieldEdit);
             
-            $userSession=$this->sessionData['user'];
-            $segment->setUserGuid($userSession->userGuid);//to the authenticated userGuid
-            $segment->setUserName($userSession->userName);//to the authenticated userName
+            $segment->setUserGuid($this->userGuid);//to the authenticated userGuid
+            $segment->setUserName($this->userName);//to the authenticated userName
             
             $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
             /* @var $matchrateType editor_Models_Segment_MatchRateType */
@@ -346,24 +351,51 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $segment->setMatchRateType((string) $matchrateType);
 
 
+            //if the task is in state import calculate the autostate
             if($this->task->getState()==editor_Models_Task::STATE_IMPORT){
-                $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-                /* @var $wfm editor_Workflow_Manager */
-                $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
-                $activeWorkflow->setSession($this->sessionData);
-                $activeWorkflow->beforeSegmentSave($segment);
-            }else{
-                
                 $autoStates=ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
                 /* @var $autoStates editor_Models_Segment_AutoStates */
                 
                 //TODO: is the segment translated here ?
                 $segment->setAutoStateId($autoStates->calculateImportState($segment->isEditable(), true));
+                
+            }else{
+                $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+                /* @var $wfm editor_Workflow_Manager */
+                $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
+                
+                $updateAutoStates = function($autostates, $segment, $tua) {
+                    //sets the calculated autoStateId
+                    $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
+                };
+                
+                $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+                /* @var $tua editor_Models_TaskUserAssoc */
+                
+                //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
+                $tua->loadByParams($this->userGuid,$this->task->getTaskGuid());
+                if($tua->getIsPmOverride() == 1){
+                    $segment->setWorkflowStep(self::STEP_PM_CHECK);
+                }
+                else {
+                    //sets the actual workflow step
+                    $segment->setWorkflowStepNr($this->task->getWorkflowStep());
+                    
+                    //sets the actual workflow step name, does currently depend only on the userTaskRole!
+                    $step = $activeWorkflow->getStepOfRole($tua->getRole());
+                    $step && $segment->setWorkflowStep($step);
+                }
+                
+                $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+                
+                //set the autostate as defined in the given Closure
+                /* @var $autostates editor_Models_Segment_AutoStates */
+                $updateAutoStates($autostates, $segment, $tua);
             }
             
             
             //NOTE: remove me if to many problems
-            $segment->validate();
+            //$segment->validate();
             
             if($this->task->getWorkflowStep()==1){
                 $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
@@ -373,6 +405,11 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 $segment->setTargetMd5($segmentHash);
             }
             
+            //lock the pretranslations if 100 matches in the task are not editable
+            if(!$this->task->getEdit100PercentMatch()){
+                $segment->setEditable(false);
+            }
+                
             $duration=new stdClass();
             $duration->$segmentField=0;
             $segment->setTimeTrackData($duration);
@@ -399,7 +436,11 @@ class editor_Plugins_MatchAnalysis_Analysis{
         $this->pretranslate=$pretranslate;
     }
     
-    public function setSessionData($sessionData){
-        $this->sessionData=$sessionData;
+    public function setUserGuid($userGuid){
+        $this->userGuid=$userGuid;
+    }
+    
+    public function setUserName($userName){
+        $this->userName=$userName;
     }
 }

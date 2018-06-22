@@ -252,13 +252,6 @@ abstract class editor_Workflow_Abstract {
             'notifyAllUsersAboutTaskAssociation',
     ]; 
     
-    /***
-     * Current session
-     * 
-     * @var array
-     */
-    protected $session;
-    
     public function __construct() {
         $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
@@ -682,13 +675,8 @@ abstract class editor_Workflow_Abstract {
      * @param Closure $updateStates
      */
     protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates) {
-        if(isset($this->session)){
-            $session=$this->session['default'];
-            $sessionUser=$this->session['user'];
-        }else{
-            $session = new Zend_Session_Namespace();
-            $sessionUser = new Zend_Session_Namespace('user');
-        }
+        $session = new Zend_Session_Namespace();
+        $sessionUser = new Zend_Session_Namespace('user');
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
@@ -1069,14 +1057,6 @@ abstract class editor_Workflow_Abstract {
      */
     public function getDirectTrigger() {
         return $this->validDirectTrigger;
-    }
-    
-    /***
-     * Set the session data
-     * @param array $session
-     */
-    public function setSession(array $session){
-        $this->session=$session;
     }
     
     /**
