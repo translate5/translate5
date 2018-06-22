@@ -31,6 +31,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Plugins_MatchAnalysis_Analysis{
+    use editor_Models_Import_FileParser_TagTrait;
     
     /***
      * @var editor_Models_Task
@@ -70,6 +71,13 @@ class editor_Plugins_MatchAnalysis_Analysis{
      * @var editor_Models_SegmentFieldManager
      */
     protected $sfm;
+    
+    
+    /***
+     * Session data
+     * @var array
+     */
+    protected $sessionData;
 
     public function __construct(editor_Models_Task $task,$analysisId){
         $this->task=$task;
@@ -88,7 +96,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
         $this->initConnectors();
         
         if(empty($this->connectors)){
-            return;
+            return false;
         }
         
         $segmentModel=ZfExtended_Factory::get('editor_Models_Segment');
@@ -216,6 +224,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 $this->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
             }
         }
+        return true;
     }
     
     
@@ -289,7 +298,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
     /***
      * Pretranslate the given segment from the given resource
      * @param editor_Models_Segment $segment
-     * @param stdClass $result
+     * @param stdClass $result - match resources result
      * @param int $tmmtid
      */
     protected function pretranslateSegment(editor_Models_Segment $segment, $result,$tmmtid){
@@ -303,10 +312,31 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $history = $segment->getNewHistoryEntity();
             
             $segmentField=$this->sfm->getFirstTargetName();
-            $segmentFieldEdit=$this->sfm->getFirstTargetName().'Edit';
+            $segmentFieldEdit=$segmentField.'Edit';
             
-            $segment->set($segmentField,$result->target); //use sfm->getFirstTargetName here
-            $segment->set($segmentFieldEdit,$result->target); //use sfm->getFirstTargetName here
+            $targetResult=$result->target;
+            
+            $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+            /* @var $internalTag editor_Models_Segment_InternalTag */
+            
+            //since our internal tags are a div span construct with plain content in between, we have to replace them first
+            $targetResult = $internalTag->protect($targetResult);
+            
+            //this method splits the content at tag boundaries, and sanitizes the textNodes only
+            $targetResult = $this->parseSegmentProtectWhitespace($targetResult);
+            
+            //revoke the internaltag replacement
+            $targetResult = $internalTag->unprotect($targetResult);
+            
+            $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
+            $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here
+            
+            $segment->updateToSort($segmentField);
+            $segment->updateToSort($segmentFieldEdit);
+            
+            $userSession=$this->sessionData['user'];
+            $segment->setUserGuid($userSession->userGuid);//to the authenticated userGuid
+            $segment->setUserName($userSession->userName);//to the authenticated userName
             
             $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
             /* @var $matchrateType editor_Models_Segment_MatchRateType */
@@ -314,7 +344,34 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $matchrateType->initEdited($this->resourceType[$tmmtid]);
             
             $segment->setMatchRateType((string) $matchrateType);
+
+
+            if($this->task->getState()==editor_Models_Task::STATE_IMPORT){
+                $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+                /* @var $wfm editor_Workflow_Manager */
+                $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
+                $activeWorkflow->setSession($this->sessionData);
+                $activeWorkflow->beforeSegmentSave($segment);
+            }else{
+                
+                $autoStates=ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
+                /* @var $autoStates editor_Models_Segment_AutoStates */
+                
+                //TODO: is the segment translated here ?
+                $segment->setAutoStateId($autoStates->calculateImportState($segment->isEditable(), true));
+            }
             
+            
+            //NOTE: remove me if to many problems
+            $segment->validate();
+            
+            if($this->task->getWorkflowStep()==1){
+                $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
+                /* @var $hasher editor_Models_Segment_RepetitionHash */
+                //calculate and set segment hash
+                $segmentHash=$hasher->hashTarget($targetResult, $segment->getSource());
+                $segment->setTargetMd5($segmentHash);
+            }
             
             $duration=new stdClass();
             $duration->$segmentField=0;
@@ -340,5 +397,9 @@ class editor_Plugins_MatchAnalysis_Analysis{
     
     public function setPretranslate($pretranslate){
         $this->pretranslate=$pretranslate;
+    }
+    
+    public function setSessionData($sessionData){
+        $this->sessionData=$sessionData;
     }
 }

@@ -40,7 +40,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $params = $this->workerModel->getParameters();
         return $this->doWork();
     }
     
@@ -55,18 +54,13 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         if(isset($params['pretranslate'])){
             $pretranslate=$params['pretranslate'];
         }
-        $this->runAnalysis($this->taskGuid,$pretranslate);
-        return true; 
-    }
-    
-    /***
-     * Run match analysis for the given task
-     * @param string $taskGuid
-     */
-    protected function runAnalysis($taskGuid,$pretranslate){
+        $session=null;
+        if(isset($params['session'])){
+            $session=$params['session'];
+        }
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+        $task->loadByTaskGuid($this->taskGuid);
         
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
@@ -76,6 +70,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
         /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
         $analysis->setPretranslate($pretranslate);
-        $analysis->calculateMatchrate();
+        $analysis->setSessionData($session);
+        return $analysis->calculateMatchrate();
     }
 }

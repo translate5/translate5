@@ -123,7 +123,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
         
         $params=[];
-
+        $defaultSession = new Zend_Session_Namespace();
+        $params['session']['default']=$defaultSession;
+        
+        $userSession = new Zend_Session_Namespace('user');
+        $params['session']['user']=$userSession;
+        
         if($pretranlsate){
             $params['pretranslate']=$pretranlsate;
         }
@@ -169,6 +174,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
             /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
             $analysis->setPretranslate($pretranslate);
+            $session = new Zend_Session_Namespace();
+            
+            $sessionData=array();
+            $sessionData['default']=$session;
+            $user = new Zend_Session_Namespace('user');
+            $sessionData['user']=$user;
+            $analysis->setSessionData($sessionData);
             $analysis->calculateMatchrate();
         } catch (Exception $e) {
             //inlock the task
