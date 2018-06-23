@@ -480,6 +480,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (!me.allMatchesOfTool.length > 0) {
             me.consoleLog('allMatchesOfTool: no results.');
+            me.cleanSpanMarkupInEditor(); // in case there have been results marked before
             me.bookmarkForCaret = null;
             me.finishSpellCheck(spellCheckProcessID);
             return;
