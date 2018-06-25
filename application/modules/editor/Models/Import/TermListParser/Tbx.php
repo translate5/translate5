@@ -307,36 +307,16 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             //start with file parse
             $this->parseTbxFile([$file->getPathname()],$termCollectionId);
             
-            $this->assertTbxExists($this->task, new SplFileInfo(self::getTbxPath($this->task)));
+            //check if import languages are can be found in the tbx file
+            if($this->validateTbxLanguages()){
+                $this->assertTbxExists($this->task, new SplFileInfo(self::getTbxPath($this->task)));
+            }
+            
         }
         
         if(!empty($this->unknownStates)) {
             $this->log('TBX contains the following unknown term states: '.join(', ', $this->unknownStates));
         }
-    }
-    
-    /**
-     * Import the given TBX file
-     * @param SplFileInfo $file
-     * @param editor_Models_Task $task
-     * @param editor_Models_Languages $sourceLang
-     * @param editor_Models_Languages $targetLang
-     */
-    public function importOneTbx(SplFileInfo $file, editor_Models_Task $task, editor_Models_Languages $sourceLang, editor_Models_Languages $targetLang){
-        
-        //TODO: move this after import, check if the current imported task contains languages that exist for the imported collection
-        /*
-        $notProcessed = array_diff(
-            array_keys($this->languages),
-            array_keys($this->processedLanguages));
-        if(!empty($notProcessed)) {
-            $langs = array();
-            foreach ($notProcessed as $value) {
-                $langs[]= implode('-',$this->languages[$value]);
-            }
-            throw new ZfExtended_NotAcceptableException('For the following languages no term has been found in the tbx file: '.implode(', ', $langs));
-        }
-        */
     }
     
     /***
@@ -1242,6 +1222,54 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
         //add new
         $this->saveTerm();
+    }
+    
+    /***
+     * Validate import langages against tbx languages
+     * @return boolean
+     */
+    private function validateTbxLanguages(){
+        
+        $langs=array();
+        $langs[$this->task->getSourceLang()]=$this->task->getSourceLang();
+        $langs[$this->task->getTargetLang()]=$this->task->getTargetLang();
+
+        if($this->task->getRelaisLang() > 0) {
+            $langs[$this->task->getRelaisLang()]=$this->task->getRelaisLang();
+        }
+        
+        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $collection editor_Models_TermCollection_TermCollection */
+        $collLangs=$collection->getLanguagesInTermCollections(array($this->termCollectionId));
+        
+        //disable terminology when not terms for the term collection is available
+        if(empty($collLangs)){
+            $this->task->setTerminologie(0);
+            return false;
+        }
+        
+        $collLangKeys=array();
+        
+        foreach ($collLangs as $lng){
+            $collLangKeys[$lng['id']]=$lng['id'];
+        }
+        
+        //missing langs
+        $notProcessed = array_diff(
+            array_keys($langs),
+            array_keys($collLangKeys));
+        
+        if(empty($notProcessed)) {
+            return true;
+        }
+
+        $langs = array();
+        foreach ($notProcessed as $value) {
+            $langs[]= implode('-',$this->languages[$value]);
+        }
+        error_log('For the following languages no term has been found in the tbx file: '.implode(', ', $langs));
+        $this->task->setTerminologie(0);
+        return false;
     }
     
     /***
