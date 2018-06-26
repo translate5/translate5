@@ -592,6 +592,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             while($this->xml->read() && $this->xml->name !== 'langSet'){}
         }
         
+        //If the actualLangId is not set in isLanguageToProcess -> try to set it from actualLang (language(langset tag) rfc value from the tbx file )
         if($this->actualLangId<1){
             $langModel=ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $langModel editor_Models_Languages */
@@ -617,12 +618,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected function isLanguageToProcess() {
         $langToImport = $this->normalizeLanguage($this->actualLang);
         $lastLangId;
-        $this->actualLangID = 0;
+        $this->actualLangId = 0;
         $matched = false;
         foreach($this->languages as $langString => $langAllowed) {
             if($matched) {
                 $this->processedLanguages[$lastLangId] = 1;
-                $this->actualLangID = $lastLangId;
+                $this->actualLangId = $lastLangId;
                 return true;
             }
             $compareFirstOnly = count($langToImport) == 1 || count($langAllowed) < 2;
@@ -631,7 +632,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
         if($matched) {
             $this->processedLanguages[$lastLangId] = 1;
-            $this->actualLangID = $lastLangId;
+            $this->actualLangId = $lastLangId;
         }
         return $matched;
     }
@@ -1242,8 +1243,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         /* @var $collection editor_Models_TermCollection_TermCollection */
         $collLangs=$collection->getLanguagesInTermCollections(array($this->termCollectionId));
         
-        //disable terminology when not terms for the term collection is available
+        //disable terminology when no terms for the term collection are available
         if(empty($collLangs)){
+            error_log("Terminologie is disabled because no terms in the termcollection are found. TermcollectionId: ".$this->termCollectionId);
             $this->task->setTerminologie(0);
             return false;
         }
@@ -1306,10 +1308,23 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             $this->importSource="filesystem";
         }
         
-        $newFilePath=APPLICATION_PATH.'/../data/tbx-import/tbx-for-'.$this->importSource.'-import/tc_'.$collectionId;
+        $tbxImportDirectoryPath=APPLICATION_PATH.'/../data/tbx-import/';
+        $newFilePath=$tbxImportDirectoryPath.'tbx-for-'.$this->importSource.'-import/tc_'.$collectionId;
         
-        if(!is_dir($newFilePath)){
-            mkdir($newFilePath, 0777, true);
+        //check if the directory exist and it is writable
+        if(is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)){
+            error_log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$collectionId);
+            return;
+        }
+        
+        try {
+            if(!file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true)){
+                error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$collectionId);
+                return;
+            }
+        } catch (Exception $e) {
+            error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$collectionId);
+            return;
         }
         
         $fi = new FilesystemIterator($newFilePath, FilesystemIterator::SKIP_DOTS);
