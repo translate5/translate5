@@ -443,7 +443,7 @@ function handleAttributeDrawData(attribute){
             if(flagContent && flagContent!=""){
                 headerText =handleAttributeHeaderText(attribute,false)+flagContent;
             }else{
-                headerText =handleAttributeHeaderText(attribute)+flagContent;
+                headerText =handleAttributeHeaderText(attribute)+":";
             }
             
             html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
