@@ -133,6 +133,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected $sourceOrigin;
     
+    protected $transUnitCnt = 0;
+    
     /**
      * Defines the importance of the tags containing possible source content
      * @var array
@@ -493,6 +495,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         $this->xmlparser->registerElement('trans-unit', function($tag, $attributes, $key){
             $this->processSegment = $this->isTranslateable($attributes);
+            $this->transUnitCnt++;
             $this->sourceOrigin = 0;
             $this->matchRate = [];
             $this->currentSource = [];
@@ -583,7 +586,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
         // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
-        $id = $this->xmlparser->getAttribute($attributes, 'id', null).'_'.++$this->segmentCount;
+        $transunitId = $this->xmlparser->getAttribute($attributes, 'id', null);
+        $id = $transunitId.'_'.++$this->segmentCount;
         
         $segmentAttributes = $this->createSegmentAttributes($id);
         $segmentAttributes->mrkMid = $mid;
@@ -603,7 +607,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $segmentAttributes->editable = false;
         }
         
-        $segmentAttributes->transunitId = $this->_fileId.'_'.$id;
+        // since a transunitId can exist in each file of a translate5 task the fileId must be added for uniqness of the transunitId in the DB
+        // also in each XLIFF there can be multiple file containers, which must be reflected in the transunitId too. 
+        //  Easiest way: each transunit of the xlf file gets a counter   
+        $segmentAttributes->transunitId = $this->_fileId.'_'.$this->transUnitCnt.'_'.$transunitId;
         $sizeUnit = $this->xmlparser->getAttribute($attributes, 'size-unit');
         if($sizeUnit == 'char') {
             $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
