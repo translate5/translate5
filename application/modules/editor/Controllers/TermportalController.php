@@ -82,36 +82,28 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $languagesModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languagesModel editor_Models_Languages */
         
-        $frontendLocale= $this->_session->locale;
-        
+        $frontendLocaleNormalized=$this->normalizeLanguage($this->_session->locale);
         $preselectedLang=null;
         
         $rfcFlags=[];
         foreach ($langsArray as &$lng){
+
+            //set preselected term-search language based on user locale language
+            if(!$preselectedLang){
+                $collectionLanguage=$this->normalizeLanguage($lng['rfc5646']);
+                if($frontendLocaleNormalized[0] == $collectionLanguage[0]){
+                    $preselectedLang=$lng['rfc5646'];
+                }
+            }
+            
             $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['iso3166Part1alpha2']);
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
-            
-            //if the frontend locale and the current language are the same, use it as preselected
-            if(!$preselectedLang && $frontendLocale==$lng['rfc5646']){
-                $preselectedLang=$frontendLocale;
-            }
             
             //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
             if($isSingleLang){
                 //load all similar languages
                 $group=$languagesModel->findLanguageGroup($lng['rfc5646']);
-                
-                //check if the current locale lang exist in the group
-                if(!$preselectedLang && !empty($group)){
-                    
-                    foreach ($group as $groupSingle){
-                        if(!$preselectedLang && $frontendLocale==$groupSingle['rfc5646']){
-                            $preselectedLang=$lng['rfc5646'];
-                            break;
-                        }
-                    }
-                }
                 $lng['languageGroup']=!empty($group) ? array_column($group, 'id') : [];
                 continue;
             }
@@ -145,5 +137,16 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         );
         
         $this->view->translations=$translatedStrings;
+    }
+    
+    /**
+     * normalisiert den übergebenen Sprachstring für die interne Verwendung.
+     * => strtolower
+     * => trennt die per - oder _ getrennten Bestandteile in ein Array auf
+     * @param string $langString
+     * @return array
+     */
+    private function normalizeLanguage($langString) {
+        return explode('-',strtolower(str_replace('_','-',$langString)));
     }
 }
