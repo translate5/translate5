@@ -211,8 +211,8 @@ class editor_Models_Segment_MaterializedView {
         $selectSql .= $this->buildMetaCacheSql();
         
         $db = Zend_Db_Table::getDefaultAdapter();
-error_log($selectSql);
-error_log(print_r([$this->taskGuid, $this->taskGuid],1));
+//error_log($selectSql);
+//error_log(print_r([$this->taskGuid, $this->taskGuid],1));
         $db->query($selectSql, [$this->taskGuid]);
     }
     
@@ -243,8 +243,8 @@ error_log(print_r([$this->taskGuid, $this->taskGuid],1));
         $sql .= ' SET view.metaCache = data.metaCache';
         $sql .= ' WHERE view.id = data.segmentId';
         $db = Zend_Db_Table::getDefaultAdapter();
-error_log($sql);
-error_log(print_r([$this->taskGuid, $this->taskGuid, $groupId],1));
+//error_log($sql);
+//error_log(print_r([$this->taskGuid, $this->taskGuid, $groupId],1));
         $db->query($sql, [$this->taskGuid, $this->taskGuid, $groupId]);
     }
     
