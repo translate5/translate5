@@ -112,6 +112,8 @@ class IndexController extends ZfExtended_Controllers_Action {
      * So also the pathes will not be '/index/cms/xyz.html' but '/cms/xyz.html'
      * but this need some bootstrap modification and I do not know where to to this
      * SBE
+     * 
+     * TLA: Never used at the Moment!
      */
     public function cmsAction() {
         //only allow *.html files

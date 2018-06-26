@@ -38,30 +38,28 @@ trait ControllerMixIns  {
     public function __call($method, $args){
         $controller = $this->_request->getControllerName();
         $action = $this->_request->getActionName();
-        $url = "/".$controller."/".$action;
+        $url = $controller."/".$action;
         $config = Zend_Registry::get('config');
         $menu = $config->runtimeOptions->content->mainMenu;
         if(empty($menu)) {
             return;
         }
-        $found = false;
-        foreach ($menu as $item) {
-            $item = (array)$item;
-            $item = each($item);
-            $found = ($item['key']===$_SERVER['REQUEST_URI'])?true:false;
-            if($found){
-                break;
+        $getUrls = null;
+        $getUrls = function($menu) use (&$getUrls) {
+            $allUrls = [];
+            foreach($menu as $item) {
+                $urls = array_keys(get_object_vars($item));
+                if(in_array('subnavigation', $urls)) {
+                    unset($urls['subnavigation']);
+                    $urls = array_merge($urls, $getUrls($item->subnavigation));
+                }
+                $allUrls = array_merge($urls, $allUrls);
             }
-        }
-        if(
-                $_SERVER['REQUEST_URI'] === '/index/support-the-project' ||  // Crowd of companies
-                $_SERVER['REQUEST_URI'] === '/index/outstanding-features' || // Use
-                $_SERVER['REQUEST_URI'] === '/index/source' ||               // Use
-                
-                $_SERVER['REQUEST_URI'] === '/' || $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR.'/'|| $_SERVER['REQUEST_URI'] ===  APPLICATION_RUNDIR){
-            $found = true;
-        }
-        if (!$found){
+            return array_map(function($x){return trim($x, '/');}, $allUrls);
+        };
+        $urls = $getUrls($menu);
+        $urls[] = 'index/index';
+        if (!in_array($url, $urls)){
             throw new ZfExtended_NotFoundException();
         }
         $actionMethod = $action.'Action';
