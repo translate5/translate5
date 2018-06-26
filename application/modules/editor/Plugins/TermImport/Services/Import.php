@@ -144,11 +144,14 @@ class editor_Plugins_TermImport_Services_Import {
             $this->loadFilesystemConfig();
         }
         //tbx files import folder
-        $importDir=$this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
+        $importDir = $this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
         
-        
-        if (!is_dir($importDir)) {
-            mkdir($importDir, 0777, true);
+        try {
+            if(!file_exists($importDir) && !@mkdir($importDir, 0777, true)){
+                return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$importDir];
+            }
+        } catch (Exception $e) {
+            return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$importDir];
         }
         
         if($this->isFolderEmpty($importDir)){
@@ -246,8 +249,12 @@ class editor_Plugins_TermImport_Services_Import {
         //tbx files import folder
         $exportFilesDir=$this->crossapiMap[self::CROSS_EXPORT_FILES_DIR];
         
-        if (!is_dir($exportFilesDir)) {
-            mkdir($exportFilesDir, 0777, true);
+        try {
+            if(!file_exists($exportFilesDir) && !@mkdir($exportFilesDir, 0777, true)){
+                return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$exportFilesDir];
+            }
+        } catch (Exception $e) {
+            return ["Unable to create the TBX Import dir or the TBX import directory is missing. Path: ".$exportFilesDir];
         }
         
         if($this->isFolderEmpty($exportFilesDir)){

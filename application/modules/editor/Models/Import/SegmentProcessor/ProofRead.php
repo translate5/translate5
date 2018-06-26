@@ -115,6 +115,10 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         if(!empty($attributes->transunitId) && !is_null($attributes->transunitId)) {
             $meta->setTransunitId($attributes->transunitId);
         }
+        else {
+            //transunitId must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
+            $meta->setTransunitId($seg->getSegmentNrInTask());
+        }
         $meta->setSiblingData($seg);
         $meta->save();
     }

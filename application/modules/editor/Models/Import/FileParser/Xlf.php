@@ -580,11 +580,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
     protected function parseSegmentAttributes($attributes, $mid) {
-        settype($attributes['id'], 'integer');
         //build mid from id of segment plus segmentCount, because xlf-file can have more than one file in it with repeatingly the same ids.
         // and one trans-unit (where the id comes from) can contain multiple mrk type seg tags, which are all converted into single segments.
         // instead of using mid from the mrk type seg element, the segmentCount as additional ID part is fine.
-        $id = $attributes['id'].'_'.++$this->segmentCount;
+        $id = $this->xmlparser->getAttribute($attributes, 'id', null).'_'.++$this->segmentCount;
         
         $segmentAttributes = $this->createSegmentAttributes($id);
         $segmentAttributes->mrkMid = $mid;
@@ -604,7 +603,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $segmentAttributes->editable = false;
         }
         
-        $segmentAttributes->transunitId = $this->_fileId.'_'.$this->xmlparser->getAttribute($attributes, 'id', null);
+        $segmentAttributes->transunitId = $this->_fileId.'_'.$id;
         $sizeUnit = $this->xmlparser->getAttribute($attributes, 'size-unit');
         if($sizeUnit == 'char') {
             $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);

@@ -234,7 +234,6 @@ class editor_Models_Segment_MaterializedView {
      */
     public function updateSiblingMetaCache(editor_Models_Segment $segment) {
         $groupId = $segment->meta()->getTransunitId();
-        $this->buildMetaCacheSql();
         $sql = 'update '.$this->viewName.' view, (SELECT m.segmentId,';
         $sql .= $this->buildMetaCacheSql(false);
         $sql .= ') data';

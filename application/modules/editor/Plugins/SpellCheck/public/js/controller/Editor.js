@@ -368,7 +368,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         // Stop if we open a task (not a segment) or try to open a segment that is not editable
         if (me.getSegmentGrid().editingPlugin.context == undefined) {
-            me.consoleLog('(SpellCheck:) handleAfterContentUpdate => NO SpellCheck; no editable segment referred.');
+            me.consoleLog('(SpellCheck:) handleAfterContentUpdate => NO SpellCheck; no editable segment referred (eg. task opened).');
             return;
         }
         
@@ -480,6 +480,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (!me.allMatchesOfTool.length > 0) {
             me.consoleLog('allMatchesOfTool: no results.');
+            me.cleanSpanMarkupInEditor(); // in case there have been results marked before
             me.bookmarkForCaret = null;
             me.finishSpellCheck(spellCheckProcessID);
             return;
