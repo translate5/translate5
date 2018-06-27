@@ -3,6 +3,31 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.7.6] - 2018-06-27
+###Added
+TRANSLATE-1269: TermPortal: Enable deletion of older terms
+TRANSLATE-858: SpellCheck: Integrate languagetool grammer, style and spell checker as micro service
+VISUAL-44: VisualReview: Make "switch editor mode"-button configureable in visualReview
+
+###Changed
+TRANSLATE-1310: Improve import performance by SQL optimizing in metacache update
+TRANSLATE-1317: Check for /data/import folder
+TRANSLATE-1304: remove own js log call for one specific segment editing error in favour of rootcause
+TRANSLATE-1287: TermPortal: Introduce scrollbar in left result column of termPortal
+TRANSLATE-1296: Simplify error message on missing tags
+TRANSLATE-1295: Remove sorting by click on column header in editor
+
+###Bugfixes
+TRANSLATE-1311: segmentMeta transunitId was set to null or was calculated wrong for string ids
+TRANSLATE-1313: No error handling if tasks languages are not present in TBX
+TRANSLATE-1315: SpellCheck & TrackChanges: corrected errors still marked
+T5DEV-245: Error on opening a segment
+TRANSLATE-1283: TermPortal: Term collection attributes translation
+TRANSLATE-1318: TermPortal: Pre-select search language with matching GUI language group
+TRANSLATE-1294: TermPortal: Undefined variable: translate in termportal
+TRANSLATE-1292: TermPortal: Undefined variable: file in okapi worker
+TRANSLATE-1286: TermPortal: Number shows up, when selecting term from the live search
+
 ## [2.7.5] - 2018-05-30
 ###Changed
 TRANSLATE-1269: Enable deletion of older terms
