@@ -40,7 +40,13 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        return $this->doWork();
+        try {
+            $ret=$this->doWork();
+        } catch (Exception $e) {
+            error_log("Error happend on match analysis and pretranslation (taskGuid=".$this->task->getTaskGuid()."). Error was: ".$e->getMessage());
+            return false;
+        }
+        return $ret;
     }
     
     

@@ -48,11 +48,12 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         //load the export data
         $rows=$this->entity->loadByBestMatchRate($params['taskGuid'],true);
         
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        
         $createdDate=null;
         //add to all groups 'Group' sufix, php excel does not handle integer keys
         foreach ($rows as $rowKey=>$row){
             $newRows=[];
-            krsort($row);
             $wordCountTotal=0;
             foreach ($row as $key=>$value){
                 $newKey=$key;
@@ -60,6 +61,15 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                     $createdDate=$value;
                     continue;
                 }
+                //do not use resourceColor in export
+                if($key=="resourceColor"){
+                    continue;
+                }
+                
+                if($key=="resourceName" && $value==""){
+                    $value=$translate->_("Repetitions");
+                }
+                
                 if(is_numeric($key)){
                     $newKey=$key.'Group';
                     $wordCountTotal+=$value;
@@ -83,9 +93,10 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
         //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
-        $excel->setLabel('103Group', 'Context match (103%)');
-        $excel->setLabel('102Group', 'Repetition (102%)');
-        $excel->setLabel('101Group', 'Exact-exact match (101%)');
+        $excel->setLabel('resourceName', $translate->_("Name"));
+        $excel->setLabel('103Group', $translate->_("Context match (103%)"));
+        $excel->setLabel('102Group', $translate->_("Repetition (102%)"));
+        $excel->setLabel('101Group', $translate->_("Exact-exact match (101%)"));
         $excel->setLabel('100Group', '100%');
         
         $excel->setLabel('99Group', '99%-90%');
@@ -95,16 +106,15 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $excel->setLabel('59Group', '59%-51%');
         $excel->setLabel('noMatch', '50%-0%');
         
-        $excel->setLabel('wordCountTotal', 'Total Words');
+        $excel->setLabel('wordCountTotal', $translate->_("Total Words"));
         
-        $excel->setLabel('created', 'Creation date');
+        $excel->setLabel('created', $translate->_("Creation date"));
 
         $rowsCount=count($rows);
         $rowIndex=$rowsCount+2;
         
         $sheet=$excel->getPhpExcel()->getActiveSheet();
         
-        $sheet->setCellValue("A".$rowIndex, "=SUM(A2:A".($rowIndex-1).")");
         $sheet->setCellValue("B".$rowIndex, "=SUM(B2:B".($rowIndex-1).")");
         $sheet->setCellValue("C".$rowIndex, "=SUM(C2:C".($rowIndex-1).")");
         $sheet->setCellValue("D".$rowIndex, "=SUM(D2:D".($rowIndex-1).")");
@@ -114,6 +124,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $sheet->setCellValue("I".$rowIndex, "=SUM(I2:I".($rowIndex-1).")");
         $sheet->setCellValue("J".$rowIndex, "=SUM(J2:J".($rowIndex-1).")");
         $sheet->setCellValue("K".$rowIndex, "=SUM(K2:K".($rowIndex-1).")");
+        $sheet->setCellValue("L".$rowIndex, "=SUM(L2:L".($rowIndex-1).")");
         
         //set the cell autosize
         $excel->simpleArrayToExcel($rows,function($phpExcel){

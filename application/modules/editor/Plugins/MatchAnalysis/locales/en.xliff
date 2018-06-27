@@ -49,6 +49,11 @@
 		    <source>Summe:</source>
 		    <target>Sum:</target>
 		</trans-unit>
+
+		<trans-unit id='TWF0Y2gtQW5hbHlzZSB1bmQgVm9yw7xiZXJzZXR6dW5nZW4gd2VyZGVuIGF1c2dlZsO8aHJ0Lg=='>
+		    <source>Match-Analyse und Vorübersetzungen werden ausgeführt.</source>
+		    <target>Match analysis and pretranslations are running.</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

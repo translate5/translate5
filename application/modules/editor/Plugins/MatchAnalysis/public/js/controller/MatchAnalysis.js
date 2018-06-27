@@ -62,7 +62,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
         analysis:'#UT#Analyse',
-        preTranslation:'#UT#Pre-translate'
+        preTranslation:'#UT#Pre-translate',
+        startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.'
     },
     
     listen:{
@@ -282,16 +283,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         			
 		me.reloadTaskRecord(taskId);
 		
-    	Editor.MessageBox.addInfo("Match analysis and pretranslations are running.");
+    	Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
     	Ext.Ajax.request({
             url:Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
                 method: "PUT",
                 scope: this,
-                //params: {
-                //    param1: ""
-                //},
+                timeout:120000,
                 success: function(response){
-                	Editor.MessageBox.addInfo("Match analysis and pretranslations are finished.");
                 	me.reloadTaskRecord(taskId);
                 }, 
                 failure: function(response){
