@@ -38,6 +38,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.SegmentEditor', {
     mixins: ['Editor.util.DevelopmentTools'],
+    mixins: ['Editor.util.Node'],
     
     editor: null, // = the segment's Editor (Editor.view.segments.HtmlEditor)
     
@@ -351,18 +352,15 @@ Ext.define('Editor.util.SegmentEditor', {
         me.setPositionOfCaret(bookmarkForCaret);
     },
     /***
-     * Remove Span-Markup (SpellCheck, TermTagger) in the Editor but keep their content.
+     * Remove SpellCheck-Markup in the Editor but keep their content.
      */
-    cleanSpanMarkupInEditor:function(){
+    cleanSpellCheckMarkupInEditor:function(){
         var me = this,
             el = me.getEditorBodyExtDomElement(),
-            elContent,
-            bookmarkForCaret = me.getPositionOfCaret();
-        elContent = el.getHtml();
-        elContent = elContent.replace(/<\s*\/?\s*span\s*.*?>/g, '');
-        el.setHtml(elContent);
-        me.getEditorBodyExtDomElement().dom.normalize();
-        me.setPositionOfCaret(bookmarkForCaret);
+            allSpellCheckNodes = Ext.fly(el).query('.spellcheck');
+        Ext.Array.each(allSpellCheckNodes, function(spellCheckNode, index) {
+            me.removeMarkupAroundNode(spellCheckNode);
+        });
     },
     /***
      * Clean up Nodes, e.g. remove empty TrackChange-Nodes.
