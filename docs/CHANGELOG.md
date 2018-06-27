@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.7.7] - 2018-06-27
+###Bugfixes
+TRANSLATE-1324: RepetitionEditor: repetitions could not be saved due JS error
+
 ## [2.7.6] - 2018-06-27
 ###Added
 TRANSLATE-1269: TermPortal: Enable deletion of older terms
