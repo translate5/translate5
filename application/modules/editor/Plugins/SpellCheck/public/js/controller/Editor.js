@@ -75,6 +75,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
+                afterinitframedoc: 'initEditor',
                 push: 'handleAfterContentUpdate',
                 afterInsertMarkup: 'handleAfterContentUpdate'
             }
@@ -212,6 +213,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     initKeyboardEvents: function() {
         var me = this;
+        me.consoleLog('SpellCheck: initKeyboardEvents...');
         Ext.get(me.editor.getDoc()).on('keydown', me.handleKeyDown, me, {priority: 9980, delegated: false});
         Ext.get(me.editor.getDoc()).on('keyup', me.handleKeyUp, me, {priority: 9980, delegated: false});
     },
@@ -292,6 +294,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     handleKeyDown: function(event) {
         var me = this;
+        me.consoleLog('SpellCheck: handleKeyDown...');
         me.initKeyDownEvent(event);
         if(me.eventHasToBeIgnored()){
             me.consoleLog(" => Ignored for SpellCheck.");
