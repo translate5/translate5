@@ -570,6 +570,10 @@ class Models_Installer_Standalone {
         $html .= '<br><br>This e-mail was created automatically by the translate5 install and update script.';
         
         $mail->setBodyHtml($html);
+        //if there are no admins or we are in installation process, no e-mails are sent
+        if(empty($admins) || $this->isInstallation) {
+            return;
+        }
         foreach($admins as $admin) {
             //$mail->setFrom('thomas@mittagqi.com'); //system mailer?
             $mail->addTo($admin['email'], $admin['firstName'].' '.$admin['surName']);
