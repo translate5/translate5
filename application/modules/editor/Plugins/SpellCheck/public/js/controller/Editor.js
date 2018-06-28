@@ -75,6 +75,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
+                initialize: 'initEditor',
                 afterinitframedoc: 'initEditor',
                 push: 'handleAfterContentUpdate',
                 afterInsertMarkup: 'handleAfterContentUpdate'
@@ -109,7 +110,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     isSupportedLanguage: undefined, // if the language is supported by our tool(s):
                                     // - initially: undefined
                                     // - on task is opened => start setLanguageSupport() => result: true or false
-                                    // - on keyDown? keyDown is initialized via initEditor which is only done when isSupportedLanguage is already set and true.
                                     // - on push: when isSupportedLanguage is still undefined => start setLanguageSupport() => result: true or false
     
     allMatchesOfTool: null,         // all matches as found by the tool
@@ -160,7 +160,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         me.consoleLog('0.2 initSpellCheckPlugin.');
         me.setTargetLangCode();
-        me.setLanguageSupport(); // → will run initEditor() if language is supported
+        me.setLanguageSupport();
     },
     /**
      * Init Editor
