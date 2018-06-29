@@ -31,7 +31,6 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Plugins_MatchAnalysis_Analysis{
-    use editor_Models_Import_FileParser_TagTrait;
     
     /***
      * @var editor_Models_Task
@@ -127,6 +126,16 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 $langModel->getRfc5646()
         ]);
         
+        //init pretranslatio class
+        $pretranslation=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Pretranslation',[
+            $this->task
+        ]);
+        /* @var $pretranslation editor_Plugins_MatchAnalysis_Pretranslation */
+        
+        $pretranslation->setResourceType($this->resourceType);
+        $pretranslation->setUserGuid($this->userGuid);
+        $pretranslation->setUserName($this->userName);
+        
         /* @var $wordCount editor_Models_Segment_WordCount */
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
@@ -153,10 +162,14 @@ class editor_Plugins_MatchAnalysis_Analysis{
                     $repetitionResult=$repetitionByHash[md5($segment->getFieldOriginal('source'))];
                     $repetitionMatchRate=$repetitionResult->matchrate;
                     
-                    //if it is a context match, pretranslate it it is not counted as repetition
+                    //A repetition, that also is found as a 103% match in the TM is NOT counted as a repetition. And it is pre-translated.
                     if($repetitionMatchRate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
-                        $this->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
+                        $pretranslation->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
                         continue;
+                    }
+                    
+                    if($repetitionMatchRate>=100){
+                        $pretranslation->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
                     }
                     
                     $matchAnalysis->save();
@@ -227,7 +240,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $repetitionByHash[md5($segment->getFieldOriginal('source'))]=$bestMatchRateResult;
             
             if($this->pretranslate){
-                $this->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
+                $pretranslation->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
             }
         }
         return true;
@@ -275,156 +288,6 @@ class editor_Plugins_MatchAnalysis_Analysis{
         }
         
         return $this->connectors;
-    }
-    
-    /***
-     * Query the tm for the given segment 
-     * 
-     * @param editor_Models_Segment $segment
-     * @param integer $tmmtid
-     * @return editor_Plugins_MatchResource_Services_ServiceResult
-     */
-    public function querySegment(editor_Models_Segment $segment,integer $tmmtid){
-        $tmmt=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
-        /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt  */
-        
-        //check taskGuid of segment against loaded taskguid for security reasons
-        //checks if the current task is associated to the tmmt
-        $tmmt->checkTaskAndTmmtAccess($this->task->getTaskGuid(),$tmmtid, $segment);
-        
-        $tmmt->load($tmmtid);
-        
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
-        $connector=$manager->getConnector($tmmt);
-        
-        return $connector->query($segment);
-    }
-    
-    /***
-     * Pretranslate the given segment from the given resource
-     * @param editor_Models_Segment $segment
-     * @param stdClass $result - match resources result
-     * @param int $tmmtid
-     */
-    protected function pretranslateSegment(editor_Models_Segment $segment, $result,$tmmtid){
-        //if the segment target is not empty or best match rate is not found do not pretranslate
-        //pretranslation only for editable segments, check if the segment interattor already does that
-        if(($segment->getAutoStateId()!=editor_Models_Segment_AutoStates::NOT_TRANSLATED) || !isset($result)){
-            return;
-        }
-        if($result->matchrate>=100 && $result->matchrate!=editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
-            
-            $history = $segment->getNewHistoryEntity();
-            
-            $segmentField=$this->sfm->getFirstTargetName();
-            $segmentFieldEdit=$segmentField.'Edit';
-            
-            $targetResult=$result->target;
-            
-            $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-            /* @var $internalTag editor_Models_Segment_InternalTag */
-            
-            //since our internal tags are a div span construct with plain content in between, we have to replace them first
-            $targetResult = $internalTag->protect($targetResult);
-            
-            //this method splits the content at tag boundaries, and sanitizes the textNodes only
-            $targetResult = $this->parseSegmentProtectWhitespace($targetResult);
-            
-            //revoke the internaltag replacement
-            $targetResult = $internalTag->unprotect($targetResult);
-            
-            $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
-            $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here
-            
-            $segment->updateToSort($segmentField);
-            $segment->updateToSort($segmentFieldEdit);
-            
-            $segment->setUserGuid($this->userGuid);//to the authenticated userGuid
-            $segment->setUserName($this->userName);//to the authenticated userName
-            
-            $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-            /* @var $matchrateType editor_Models_Segment_MatchRateType */
-            //set the type
-            $matchrateType->initEdited($this->resourceType[$tmmtid]);
-            
-            $segment->setMatchRateType((string) $matchrateType);
-
-
-            //if the task is in state import calculate the autostate
-            if($this->task->getState()==editor_Models_Task::STATE_IMPORT){
-                $autoStates=ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-                /* @var $autoStates editor_Models_Segment_AutoStates */
-                
-                //TODO: is the segment translated here ?
-                $segment->setAutoStateId($autoStates->calculateImportState($segment->isEditable(), true));
-                
-            }else{
-                $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-                /* @var $wfm editor_Workflow_Manager */
-                $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
-                
-                $updateAutoStates = function($autostates, $segment, $tua) {
-                    //sets the calculated autoStateId
-                    $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
-                };
-                
-                $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-                /* @var $tua editor_Models_TaskUserAssoc */
-                
-                //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-                $tua->loadByParams($this->userGuid,$this->task->getTaskGuid());
-                if($tua->getIsPmOverride() == 1){
-                    $segment->setWorkflowStep(self::STEP_PM_CHECK);
-                }
-                else {
-                    //sets the actual workflow step
-                    $segment->setWorkflowStepNr($this->task->getWorkflowStep());
-                    
-                    //sets the actual workflow step name, does currently depend only on the userTaskRole!
-                    $step = $activeWorkflow->getStepOfRole($tua->getRole());
-                    $step && $segment->setWorkflowStep($step);
-                }
-                
-                $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-                
-                //set the autostate as defined in the given Closure
-                /* @var $autostates editor_Models_Segment_AutoStates */
-                $updateAutoStates($autostates, $segment, $tua);
-            }
-            
-            
-            //NOTE: remove me if to many problems
-            //$segment->validate();
-            
-            if($this->task->getWorkflowStep()==1){
-                $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$this->task]);
-                /* @var $hasher editor_Models_Segment_RepetitionHash */
-                //calculate and set segment hash
-                $segmentHash=$hasher->hashTarget($targetResult, $segment->getSource());
-                $segment->setTargetMd5($segmentHash);
-            }
-            
-            //lock the pretranslations if 100 matches in the task are not editable
-            if(!$this->task->getEdit100PercentMatch()){
-                $segment->setEditable(false);
-            }
-                
-            $duration=new stdClass();
-            $duration->$segmentField=0;
-            $segment->setTimeTrackData($duration);
-            
-            $duration=new stdClass();
-            $duration->$segmentFieldEdit=0;
-            $segment->setTimeTrackData($duration);
-            
-            $history->save();
-            $segment->setTimestamp(null);
-            $segment->save();
-            
-        }
-        //TODO: change this when the best sort rate is implemented
-        //100, 101, 103 -> pretranslate the segment
     }
     
     protected function isBestSortedPretranslatable($tmmtid,$matchRate){
