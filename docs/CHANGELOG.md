@@ -3,6 +3,15 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.7.8] - 2018-07-03
+###Changed
+VISUAL-43: VisualReview: Split segments search into long, middle, short
+TRANSLATE-1323: SpellCheck must not remove the TermTag-Markup
+
+###Bugfixes
+TRANSLATE-1234: changes.xliff diff algorithm fails under some circumstances
+TRANSLATE-1306: SpellCheck: blocked after typing with MatchResources
+
 ## [2.7.7] - 2018-06-27
 ###Bugfixes
 TRANSLATE-1324: RepetitionEditor: repetitions could not be saved due JS error
