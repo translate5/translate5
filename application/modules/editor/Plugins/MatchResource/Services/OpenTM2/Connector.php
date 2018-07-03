@@ -85,7 +85,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     public function addTm(array $fileinfo = null) {
         $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
-        
+
         //to ensure that we get unique TMs Names although of the above stripped content, 
         // we add the TMMT ID and a prefix which can be configured per each translate5 instance 
         $config = Zend_Registry::get('config');
@@ -521,5 +521,37 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         }
         
         return $matchRate;
+    }
+    
+    /***
+     * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
+     * The fuzzy tmmt name format is: oldname+Fuzzy-Analysis
+     * @throws ZfExtended_NotFoundException
+     * @return editor_Plugins_MatchResource_Services_Connector_Abstract
+     */
+    public function initFuzzyAnalysis() {
+        $mime="TM";
+
+        $validExportTypes = $this->getValidFiletypes();
+        
+        if(empty($validExportTypes[$mime])){
+            throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
+        }
+        $data = $this->getTm($validExportTypes[$mime]);
+        $memoryName=$this->tmmt->getName().'-Fuzzy-Analysis';
+        $this->api->createMemory($memoryName, $this->tmmt->getSourceLangRfc5646(), $data);
+        
+        $fuzzyTmmt=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+        /* @var $fuzzyTmmt editor_Plugins_MatchResource_Models_TmMt  */
+        
+        $fuzzyTmmt=$this->tmmt;
+        
+        $fuzzyTmmt->setName($memoryName);
+        $fuzzyTmmt->setId(null);
+        
+        $connector = ZfExtended_Factory::get($fuzzyTmmt->getServiceType().editor_Plugins_MatchResource_Services_Manager::CLS_CONNECTOR);
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
+        $connector->connectTo($fuzzyTmmt);
+        return $connector;
     }
 }

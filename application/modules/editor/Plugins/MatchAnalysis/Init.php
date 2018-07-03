@@ -104,16 +104,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     /***
      * Queue the match analysis worker
      * 
-     * @param editor_Models_Task $task
-     * @param integer $parentWorkerId
+     * @param string $taskGuid
      * @param boolean $pretranlsate
+     * @param boolean $internalFuzziy
      * @return void|boolean
      */
-    public function queueAnalysis(editor_Models_Task $task,$parentWorkerId,$pretranlsate=false) {
-        //$parentWorkerId = $event->getParam('parentWorkerId');
-        //$task = $event->getParam('task');
-        $taskGuid=$task->getTaskGuid();
-        
+    public function queueAnalysis($taskGuid,$pretranlsate=false,$internalFuzzy=false) {
         if(!$this->checkMatchResources($taskGuid)){
             error_log("The associated matchresources can not be used for analysis.");
             return;
@@ -132,10 +128,21 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $params['pretranslate']=$pretranlsate;
         }
         
+        if($internalFuzzy){
+            $params['internalFuzzy']=$internalFuzzy;
+        }
+        
         // init worker and queue it
         if (!$worker->init($taskGuid, $params)) {
             error_log('MatchAnalysis-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
+        }
+        $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $parent ZfExtended_Models_Worker */
+        $result=$parent->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$taskGuid);
+        $parentWorkerId=null;
+        if(!empty($result)){
+            $parentWorkerId=$result[0]['id'];
         }
         $worker->queue($parentWorkerId);
     }
@@ -145,8 +152,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @param editor_Models_Task $task
      * @param boolean $pretranslate
+     * @param boolean $internalFuzzy
      */
-    public function runAnalysis(editor_Models_Task $task,$pretranslate=false){
+    public function runAnalysis(editor_Models_Task $task,$pretranslate=false,$internalFuzzy=false){
         
         if(!$this->checkMatchResources($task->getTaskGuid())){
             error_log("The associated matchresources can not be used for analysis.");
@@ -175,11 +183,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $analysis->setPretranslate($pretranslate);
             $user = new Zend_Session_Namespace('user');
             
+            $analysis->setInternalFuzzy($internalFuzzy);
             $analysis->setUserGuid($user->data->userGuid);
             $analysis->setUserName($user->data->userName);
             $analysis->calculateMatchrate();
         } catch (Exception $e) {
-            error_log("Erro happend on match analysis and pretranslation (taskGuid=".$task->getTaskGuid()."). Error was: ".$e->getMessage());
+            //error_log("Error happend on match analysis and pretranslation (taskGuid=".$task->getTaskGuid()."). Error was: ".$e->getMessage());
+            error_log(var_export($e->getTraceAsString(), true));
             //inlock the task
             $task->setState($oldState);
             $task->save();
@@ -214,21 +224,19 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     private function handleOperation(Zend_EventManager_Event $event,$pretranlsate=false){
         $task = $event->getParam('entity');
-        /* @var $task editor_Models_Task */
+        $params=$event->getParam('params');
         
+        $internalFuzzy=false;
+        if(isset($params['internalFuzzy'])){
+            $internalFuzzy=$params['internalFuzzy'];
+        }
+        /* @var $task editor_Models_Task */
         //if the task is in import state -> queue the worker
         if($task->getState()==editor_Models_Task::STATE_IMPORT){
-            $worker=ZfExtended_Factory::get('ZfExtended_Models_Worker');
-            /* @var $worker ZfExtended_Models_Worker */
-            $result=$worker->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE, $task->getTaskGuid());
-            $parentWorkerId=null;
-            if(!empty($result)){
-                $parentWorkerId=$result[0]['id'];
-            }
-            $this->queueAnalysis($task,$parentWorkerId,$pretranlsate);
+            $this->queueAnalysis($task->getTaskGuid(),$pretranlsate,$internalFuzzy);
             return;
         }
-        $this->runAnalysis($task,$pretranlsate);
+        $this->runAnalysis($task,$pretranlsate,$internalFuzzy);
     }
 
     /***

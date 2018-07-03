@@ -74,7 +74,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      * @param stdClass $result - match resources result
      * @param int $tmmtid
      */
-    public function pretranslateSegment(editor_Models_Segment &$segment, $result,$tmmtid){
+    public function pretranslateSegment(editor_Models_Segment $segment, $result,$tmmtid){
         
         //if the segment target is not empty or best match rate is not found do not pretranslate
         //pretranslation only for editable segments, check if the segment interattor already does that
@@ -91,6 +91,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segmentFieldEdit=$segmentField.'Edit';
         
         $targetResult=$result->target;
+        
+        //ignore fuzzy match target
+        if($targetResult=="translate5-unique-id[".$segment->getTaskGuid()."]"){
+            return;
+        }
         
         $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $internalTag editor_Models_Segment_InternalTag */

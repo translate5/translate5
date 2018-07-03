@@ -63,7 +63,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         finishTask:'#UT#Beenden',
         analysis:'#UT#Analyse',
         preTranslation:'#UT#Pre-translate',
-        startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.'
+        startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
+        internalFuzzy:'#UT#Zähle interne Fuzzy'
     },
     
     listen:{
@@ -123,6 +124,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	var me=this,
     		win=panel.up('window'),
     		task=win.actualTask;
+    	
+    	//add internal fuzzy checkbox
+    	panel.addDocked([{
+			xtype:'checkbox',
+			boxLabel:this.strings.internalFuzzy,
+			itemId:'cbInternalFuzzy',
+			dock:'bottom'
+		}]);
     	
     	//if task is in import state, add checkboxes for the pretranslation and match analysis
     	if(!task || task.isImporting()){
@@ -218,16 +227,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onTaskAssocSavingFinished:function(task){
     	var me=this,
-    		cbPreTranslation=Ext.ComponentQuery.query('#cbPreTranslation'),
-    		cbAnalysis=Ext.ComponentQuery.query('#cbAnalysis');
+    		cbPreTranslation=me.getComponentByItemId('cbPreTranslation'),
+    		cbAnalysis=me.getComponentByItemId('cbAnalysis');
     	
-    	if(cbPreTranslation.length<1 || cbAnalysis.length<1){
+    	if(!cbPreTranslation || !cbAnalysis){
     		return;
     	}
     	
-    	cbPreTranslation=cbPreTranslation[0];
-    	cbAnalysis=cbAnalysis[0];
-
     	if(cbPreTranslation.checked){
     		me.startAnalysis(task.get('id'),"pretranslation");
     		return;
@@ -244,7 +250,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onCbAnalysisChecked:function(field,newValue,oldValue,eOpts){ 
     	var me=this,
-    		cbPreTranslation=Ext.ComponentQuery.query('#cbPreTranslation')[0],
+    		cbPreTranslation=me.getComponentByItemId('cbPreTranslation'),
     		win=me.getAdminTaskPreferencesWindow();
     	if(!newValue){
     		cbPreTranslation.setValue(newValue);
@@ -256,7 +262,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     onCbPreTranslationChecked:function(field,newValue,oldValue,eOpts){ 
     	var me=this,
-    		cbAnalysis=Ext.ComponentQuery.query('#cbAnalysis')[0];
+    		cbAnalysis=me.getComponentByItemId('cbAnalysis');
     	if(newValue){
     		cbAnalysis.setValue(newValue);
     	}
@@ -287,6 +293,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	Ext.Ajax.request({
             url:Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
                 method: "PUT",
+                params:{
+                	internalFuzzy:me.getComponentByItemId('cbInternalFuzzy').checked
+                },
                 scope: this,
                 timeout:120000,
                 success: function(response){
@@ -308,5 +317,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		taskStore=taskOverview.getAdminTasksStore();
 		//TODO reload only one row
     	taskStore.reload();
+    },
+    
+    /***
+     * Get component by itemId
+     */
+    getComponentByItemId:function(itemId){
+    	var cmp=Ext.ComponentQuery.query('#'+itemId);
+    	if(cmp.length<1){
+    		return;
+    	}
+    	return cmp[0];
     }
 });

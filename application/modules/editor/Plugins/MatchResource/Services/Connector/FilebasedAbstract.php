@@ -82,7 +82,7 @@ abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract
     
     /**
      * Gets the TM file content from the underlying system
-     * @param $mime the desired mimetype of the export
+     * @param string $mime the desired mimetype of the export
      * @return string
      */
     abstract public function getTm($mime);

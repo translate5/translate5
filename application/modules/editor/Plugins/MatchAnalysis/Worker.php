@@ -60,6 +60,12 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         if(isset($params['pretranslate'])){
             $pretranslate=$params['pretranslate'];
         }
+        
+        $internalFuzzy=false;
+        if(isset($params['internalFuzzy'])){
+            $internalFuzzy=$params['internalFuzzy'];
+        }
+        
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
@@ -72,7 +78,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
         /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
         $analysis->setPretranslate($pretranslate);
-        
+        $analysis->setInternalFuzzy($internalFuzzy);
         if(isset($params['userGuid'])){
             $analysis->setUserGuid($params['userGuid']);
         }

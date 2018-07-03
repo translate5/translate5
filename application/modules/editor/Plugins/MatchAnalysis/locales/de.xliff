@@ -54,6 +54,11 @@
 		    <source>Match-Analyse und Vorübersetzungen werden ausgeführt.</source>
 		    <target>Match-Analyse und Vorübersetzungen werden ausgeführt.</target>
 		</trans-unit>
+		
+		<trans-unit id='WsOkaGxlIGludGVybmUgRnV6enk='>
+		    <source>Zähle interne Fuzzy</source>
+		    <target>Zähle interne Fuzzy</target>
+		</trans-unit>
 
     </body>
   </file>

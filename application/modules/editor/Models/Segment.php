@@ -723,6 +723,13 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @see ZfExtended_Models_Entity_Abstract::save()
      */
     public function save() {
+        if(!empty($this->dbWritable)) {
+            if($this->dbWritable->isView()) {
+                //throw exception that we are saveing the view;
+                throw new ZfExtended_Exception("Unable to save the segment. The segment table name is set to matirialized view. Segment id:".$this->getId().", taskGuid:".$this->getTaskGuid());
+            }
+            $this->row->setTable($this->dbWritable);
+        }
         $oldIdValue = $this->getId();
         $segmentId = parent::save();
         foreach($this->segmentdata as $data) {
@@ -1221,6 +1228,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $mv->setTaskGuid($taskGuid);
         /* @var $mv editor_Models_Segment_MaterializedView */
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
+        $this->dbWritable = ZfExtended_Factory::get($this->dbInstanceClass);
         $db = $this->db;
         $this->tableName = $db->info($db::NAME);
     }

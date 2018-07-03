@@ -53,6 +53,12 @@ class editor_Plugins_MatchAnalysis_Analysis{
     protected $connectors=array();
     
     /***
+     * Collection of fuzzy resource connectors
+     * @var array
+     */
+    protected $fuzzyConnectors=array();
+    
+    /***
      * Collection of assigned tmmt resources types where key is tmmtid and resource type is the value
      * 
      * @var array
@@ -65,6 +71,12 @@ class editor_Plugins_MatchAnalysis_Analysis{
      * @var string
      */
     protected $pretranslate=false;
+
+    /***
+     * Flag if internal fuzzy will be calculated
+     * @var string
+     */
+    protected $internalFuzzy=false;
     
     /***
      * @var editor_Models_SegmentFieldManager
@@ -94,6 +106,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
      * Query the match resource service for each segment, calculate the best match rate, and save the match analysis model
      */
     public function calculateMatchrate(){
+
         // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$this->task->getTaskGuid()]);
         /* @var $segments editor_Models_Segment_Iterator */
@@ -184,8 +197,21 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
                 
                 $matches=[];
+                
+                $hasFuzzyConnector=isset($this->fuzzyConnectors[$tmmtid]);
+                //use fuzzy connector if internal fuzzy is active
+                if($this->internalFuzzy && $hasFuzzyConnector){
+                    $connector=$this->fuzzyConnectors[$tmmtid];
+                }
+                
                 $connector->resetResultList();
                 $matches=$connector->query($segment);
+                
+                //update the segment with custom target in fuzzy tm
+                if($this->internalFuzzy && $hasFuzzyConnector){
+                    $segment->setTargetEdit("translate5-unique-id[".$segment->getTaskGuid()."]");
+                    $connector->update($segment);
+                }
                 
                 $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
                 /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
@@ -282,12 +308,35 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $this->resourceType[$tmmt->getId()]=$resource->getType();
             
             $connector=$manager->getConnector($tmmt);
-            
             $this->connectors[$assoc['id']]=[];
             $this->connectors[$assoc['id']]=$connector;
+            
+            //if internal fuzzy is active, get the fuzzy connector
+            if($this->internalFuzzy){
+                //this function will clone the existing tmmt in opentm2 under oldname+Fuzzy-Analysis
+                $fuzzyConnector=$connector->initFuzzyAnalysis();
+                if($fuzzyConnector){
+                    $this->fuzzyConnectors[$assoc['id']]=$fuzzyConnector;
+                }
+            }
         }
+        //remove fuzzy tmmt from opentm2
+        $this->removeFuzzyResources();
         
         return $this->connectors;
+    }
+    
+    /***
+     * Remove fuzzy resources from the opentm2
+     */
+    public function removeFuzzyResources(){
+        if(empty($this->fuzzyConnectors)){
+            return;
+        }
+        
+        foreach($this->fuzzyConnectors as $connector){
+            $connector->delete();
+        }
     }
     
     protected function isBestSortedPretranslatable($tmmtid,$matchRate){
@@ -297,6 +346,10 @@ class editor_Plugins_MatchAnalysis_Analysis{
     
     public function setPretranslate($pretranslate){
         $this->pretranslate=$pretranslate;
+    }
+    
+    public function setInternalFuzzy($internalFuzzy) {
+        $this->internalFuzzy=$internalFuzzy;
     }
     
     public function setUserGuid($userGuid){

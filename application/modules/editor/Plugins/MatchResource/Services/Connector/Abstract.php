@@ -145,4 +145,12 @@ abstract class editor_Plugins_MatchResource_Services_Connector_Abstract {
         //to be implemented if needed
         $this->log(__METHOD__);
     }
+    
+    /***
+     * Initialyze fuzzy connectors. Currently only is used in opentm2
+     * @return boolean|editor_Plugins_MatchResource_Services_Connector_Abstract
+     */
+    public function initFuzzyAnalysis() {
+        return null;
+    }
 }
