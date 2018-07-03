@@ -513,6 +513,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               result.push(Ext.htmlEncode(text));
               return;
           }
+          if(!item.tagName) {
+              //try to find out why sometimes tagName is undefined. So nodeName is !== #text
+              //  Since this results in a therootcause entry the following log is catched there too
+              Ext.Logger.warn('tagName is undefined, nodeName is: '+item.nodeName);
+          }
           // Keep nodes from TrackChanges
           if( (item.tagName.toLowerCase() == 'ins' || item.tagName.toLowerCase() == 'del')  && /(^|[\s])trackchanges([\s]|$)/.test(item.className)){
               var clone = item.cloneNode(false);
