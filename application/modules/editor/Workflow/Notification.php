@@ -349,7 +349,24 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                 return;
             }
             
-            $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->config->task, $segments);
+            try {
+                $this->xmlCache[$segmentHash] = $xliff = $xliffConverter->convert($this->config->task, $segments);
+            }
+            catch(Exception $e) {
+                $log = ZfExtended_Factory::get('ZfExtended_Log');
+                /* @var $log ZfExtended_Log */
+                $task = $this->config->task;
+                $subject = 'error in changes.xliff creation for task '.$task->getTaskGuid();
+                $msg = "changes.xliff could not be created!\n\n";
+                $msg .= 'Task: '.$task->getTaskName()."\n";
+                $msg .= 'TaskGuid: '.$task->getTaskGuid()."\n\n";
+                $msg .= 'Exception: '.$e."\n";
+                $log->log($subject, $msg);
+                //if file saving is enabled we save the file with the debug content 
+                $this->xmlCache[$segmentHash] = $xliff = $msg;
+                //but we disable attaching it to the mail:
+                $xlfAttachment = false;
+            }
             
             if($xlfFile) {
                 $this->saveXmlToFile($xliff);
