@@ -92,6 +92,8 @@ END LICENSE AND COPYRIGHT
  * @method void delete() delete() see editor_Models_Task_Remover for complete task removal
  * @method boolean getEmptyTargets() getEmptyTargets()
  * @method void setEmptyTargets() setEmptyTargets(boolean $emptyTargets)
+ * @method string getImportAppVersion() getImportAppVersion()
+ * @method void setImportAppVersion() setImportAppVersion(string $version)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';

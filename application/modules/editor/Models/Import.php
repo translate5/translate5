@@ -151,6 +151,7 @@ class editor_Models_Import {
         $task->setPmGuid($params->pmGuid);
         $task->setEdit100PercentMatch((int)$params->editFullMatch);
         $task->setLockLocked((int)$params->lockLocked);
+        $task->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
