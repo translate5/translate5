@@ -671,6 +671,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var nodelist = node.getElementsByTagName('img');
       this.fixDuplicateImgIds(nodelist);
       if(!this.checkContentTags(nodelist)) {
+          // if there are content tag errors, and we are in save anyway mode, we remove orphaned tags then
+          this.disableErrorCheck && this.removeOrphanedTags(nodelist);
           return; //no more checks if missing tags found
       }
       this.removeOrphanedTags(nodelist);
