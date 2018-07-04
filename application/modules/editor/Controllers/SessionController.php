@@ -69,7 +69,7 @@ class editor_SessionController extends ZfExtended_SessionController {
         
         // the static event manager must be used!
         $events = Zend_EventManager_StaticEventManager::getInstance();
-        $events->attach('editor_TaskController', 'afterPutAction', function(Zend_EventManager_Event $event){
+        $events->attach('editor_TaskController', 'afterPutAction', function(Zend_EventManager_Event $event) use ($mv){
             //clearing the view vars added in Task::PUT keeps the old content (the session id and token) 
             $view = $event->getParam('view');
             $view->clearVars();
