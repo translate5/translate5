@@ -309,6 +309,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->convertToLanguageIds();
         $this->setDataInEntity();
         $this->entity->createTaskGuidIfNeeded();
+        $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
         //init workflow id for the task
         $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
