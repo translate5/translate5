@@ -401,6 +401,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['lockingUser']);
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();
+        $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
         ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
         $this->upload->initByGivenZip($copy);

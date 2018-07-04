@@ -61,5 +61,6 @@ class editor_Models_Validator_Task extends ZfExtended_Models_Validator_Abstract 
     $this->addValidator('edit100PercentMatch', 'int');
     $this->addValidator('lockLocked', 'int');
     $this->addValidator('enableSourceEditing', 'int');
+    $this->addValidator('importAppVersion', 'stringLength', array('min' => 0, 'max' => 64));
   }
 }
