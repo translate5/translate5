@@ -44,6 +44,9 @@ class editor_SessionController extends ZfExtended_SessionController {
     }
     
     public function postAction() {
+        $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        /* @var $mv editor_Models_Segment_MaterializedView */
+        
         if(!parent::postAction()) {
             return;
         }
@@ -52,13 +55,15 @@ class editor_SessionController extends ZfExtended_SessionController {
         
         //if there is no taskGuid provided, we don't have to load one
         if(empty($taskGuid)) {
+            //after successfull login we clean up the MVs like in the normal login
+            $mv->cleanUp();
             return;
         }
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        
+
         $params = ['id' => $task->getId(), 'data' => '{"userState":"edit","id":'.$task->getId().'}'];
         $this->forward('put', 'task', 'editor', $params);
         
@@ -68,6 +73,8 @@ class editor_SessionController extends ZfExtended_SessionController {
             //clearing the view vars added in Task::PUT keeps the old content (the session id and token) 
             $view = $event->getParam('view');
             $view->clearVars();
+            //if a taskGuid was given we clean the MVs after accessing that task to prevent drop MV then create MV  
+            $mv->cleanUp();
         });
     }
     
