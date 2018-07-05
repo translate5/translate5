@@ -206,21 +206,11 @@ Ext.define('Editor.controller.Editor', {
         
         me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
             'alt-c':[
-                "C",
-                {
-                    ctrl: false, alt: true
-                }, 
+                "C",{ctrl: false, alt: true}, 
                 function(key, e){
                     var me = this;
                     e.stopEvent();
-                    if(me.isEditing) {
-                        me.handleOpenComments();
-                        return false;
-                    }
-                    var found = Ext.select('#segment-grid-body .x-grid-item-selected td.comments-field img').first();
-                    if(found && (found.hasCls('add') || found.hasCls('edit'))){
-                        found.dom.click();
-                    }
+                    Ext.fireEvent('editorOpenComments');
                     return false;
                 }
             ]
@@ -732,7 +722,7 @@ Ext.define('Editor.controller.Editor', {
      * Handles pressing the comment keyboard shortcut
      */
     handleOpenComments: function(key) {
-        this.fireEvent('openComments');
+        Ext.fireEvent('editorOpenComments');
     },
     /**
      * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20

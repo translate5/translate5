@@ -329,7 +329,7 @@ Ext.define('Editor.controller.ViewModes', {
         },me);
         //inject css to the head to manipulate the column css, because it is easier than to set inject ergomic class for each column in the dom
         Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID); //delete if already exists!
-        Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
+        Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .segment-tag-column.x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
         
         //ergoOnly, others remove cls
         wasAlreadyErgo || grid.addCls(me.self.MODE_ERGONOMIC);

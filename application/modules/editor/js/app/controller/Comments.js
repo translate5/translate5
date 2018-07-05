@@ -86,28 +86,22 @@ Ext.define('Editor.controller.Comments', {
                     change: 'updateEditorComment'
                 },
                 
-                //here must be done different stuff, depending if commentspanel is in the window or not
-                '#editorCommentBtn' : {
-                    click: 'handleEditorCommentBtn'
-                },
-
                 '#metapanel #commentPanel' : {
                     expand: 'loadCommentPanel'
                 },
             },
-            controller:{
-                '#Comments':{
-                    editorCommentBtnClick:'handleEditorCommentBtnClick'
-                },
-                '#Editor': {
-                    openComments: 'handleEditorCommentBtnClick'
-                }
+            global: {
+                editorOpenComments: 'onRequestOpenComments'
             }
     },
     
+    /**
+     * on cancelling the segment edit the active comment is resetted by creating a new one
+     */
     cancelEdit: function() {
         var me=this,
-            panel =me.getCommentPanel();
+            panel = me.getCommentPanel(),
+            form = me.getCommentForm();
         
         if(!panel){
             return;
@@ -145,58 +139,46 @@ Ext.define('Editor.controller.Comments', {
      *   Native way would be checking the select state of column. But this is not sufficient, 
      *   because row is first selected, then the click event will be processed. This means click processing on every row.
      */
-    handleCommentsColumnClick: function(view, rec, tr, idx, ev) {
+    handleCommentsColumnClick: function(view, segment, tr, idx, ev) {
         var me = this,
             ed = me.getEditPlugin(),
             add = ev.getTarget('img.add'),
             edit = ev.getTarget('img.edit'),
-            readOnlyMode = view.lookupViewModel().get('editorIsReadonly'),
-            mpController = Editor.app.getController('MetaPanel');
-        me.record = null;
+            readOnlyMode = view.lookupViewModel().get('editorIsReadonly');
         
-        if(!me.getCommentPanel()){
-            return;
-        }
-        
-        me.getCommentPanel().handleCollapse();
-        
-        if(!rec.get('editable') && !me.isEnabledForLocked()) {
-            return;
-        }
-        
+        //close the comment panel on single clicking onto a segment
         if(add || edit) {
-            if(rec.get('editable') && !readOnlyMode) {
-                ed.startEdit(rec, view.getHeaderAtIndex(0));
-            }
-            else {
-                me.record = rec;
-                mpController.openReadonly(rec);
-            }
-            me.handleEditorCommentBtn();
-            return;
+            //fire the global open comments request
+            Ext.fireEvent('editorOpenComments', segment);
         }
+        else {
+            me.getCommentPanel() && me.getCommentPanel().handleCollapse();
+        }
+
         //close metapanel if clicking single on a row, and the previous row was not editable
-        if(!ed.editing || !ed.context.record) {
-            mpController.cancelEdit();
+        if(me.getCommentPanel() && (!ed.editing || !ed.context.record)) {
+            Editor.app.getController('MetaPanel').cancelEdit();
         }
     },
     /**
-     * Opens comment column for not editable segments on dblclick on comments column
+     * Triggers comments panel for not editable segments on dblclick on comments column
      */
-    handleCommentsColumnDblClick: function (view, rec, tr, idx, ev) {
+    handleCommentsColumnDblClick: function (view, segment, tr, idx, ev) {
         var me = this,
             readOnlyMode = view.lookupViewModel().get('editorIsReadonly'),
-            isEditable = (rec.get('editable') && !readOnlyMode);
+            isEditable = (segment.get('editable') && !readOnlyMode);
             isCommentsCol = ev.getTarget('td.comments-field'),
             isForced = me.isEnabledForLocked();
-        
+    
+        //if isEditable then dbl click should handle open the whole segment as usually
+        //if not dbl clicked on comments column do nothing
+        //if not isForced do nothing
         if(isEditable || !isCommentsCol || !isForced) {
             return;
         }
-        me.record = rec;
-        me.getCommentPanel().handleCollapse();
-        Editor.app.getController('MetaPanel').openReadonly(rec);
-        me.getCommentPanel().handleExpand();
+        
+        //fire the global open comments request
+        Ext.fireEvent('editorOpenComments', segment);
     },
     /**
      * handles starting the segment editor
@@ -249,18 +231,10 @@ Ext.define('Editor.controller.Comments', {
             box = me.getCommentContainer(),
             form = me.getCommentForm();
             
-        if(!form){
+        if(!form || !id){
             return;
         }
         
-        if(form._enabled) {
-            form.enable();
-        }
-
-        if(!id) {
-            return;
-        }
-
         //jump out here if comments already loaded for this segment.
         if(me.getLoadedSegmentId && me.getLoadedSegmentId == id) {
             return;
@@ -299,12 +273,6 @@ Ext.define('Editor.controller.Comments', {
     },
 
     /**
-     * Handles the click on the button in the comment displayfield
-     */
-    handleEditorCommentBtn: function() {
-        this.fireEvent('editorCommentBtnClick');
-    },
-    /**
      * updates the tooltip in the comment displayfield
      */
     updateEditorComment: function(field, val) {
@@ -317,34 +285,83 @@ Ext.define('Editor.controller.Comments', {
         }
     },
 
-    handleEditorCommentBtnClick:function(){
+    /**
+     * If the global open comment request is triggered, this function tries to load the comments into 
+     * the expandable comment panel in the metapanel
+     * @param {Editor.models.Segment} optional, the affected segment if the calling code nows it
+     */
+    onRequestOpenComments: function(segment){
         var me = this,
-            commentPanel = me.getCommentPanel();
-        
-        if(!commentPanel){
+            isForced = me.isEnabledForLocked(),
+            ed = this.getEditPlugin(),
+            panel = me.getCommentPanel(),
+            readOnlyMode = panel && panel.lookupViewModel().get('editorIsReadonly');
+
+        //if comment panel does not exist, we can not handle open comments here
+        if(!panel) {
             return;
         }
         
+        //remove current segment
+        me.record = null;
+        
+        //use given segment record or get the current used one
+        segment = segment || me.getCurrentSegment();
+        
+        //if we can not find any segment, we can not open the comments
+        if(!segment) {
+            return;
+        }
+        
+        //do nothing is segment is not editable or task is readOnly unless isForced is true
+        if(!isForced && (!segment.get('editable') || readOnlyMode)) {
+            return;
+        }
+        me.record = segment;
+
+        //start segment editing if possible
+        if(!ed.editing) {
+            if(segment.get('editable') && !readOnlyMode) {
+                ed.startEdit(segment, me.getSegmentGrid().getView().getHeaderAtIndex(0));
+            }
+            //otherwise open MetaPanel readonly
+            else {
+                Editor.app.getController('MetaPanel').openReadonly(segment);
+            }
+        }
+    
         var form = me.getCommentForm(),
             area = form.down('textarea');
 
-        if(!commentPanel.isCollapsable){
+        //expand the comment panel if possible
+        if(panel.isCollapsable && panel.collapsed){
+            panel.expand();
             return;
         }
 
-        if (commentPanel.collapsed)
-        {
-            commentPanel.expand();
-        }
-        else
-        {
-            if (area.rendered && area.isVisible())
-            {
-                area.focus(false, 500);
-            }
+        //set the focus of the text area
+        if (area.rendered && area.isVisible()) {
+            area.focus(false, 500);
         }
     },
 
+    /** 
+     * return the currently used segment based on roweditor or row selection.
+     */
+    getCurrentSegment: function() {
+        var ed = this.getEditPlugin(),
+            selection = this.getSegmentGrid().getSelection();
+
+        //get segment, if no segment was given as parameter:
+        if(ed.editing && ed.context.record) {
+            return ed.context.record;
+        }
+        if(selection && selection.length > 0) {
+            return selection[0];
+        }
+        return null;
+    },
+    
     getLoadedSegmentId:function(){
         return this.getCommentPanel().getController().loadedSegmentId;
     },

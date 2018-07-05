@@ -94,8 +94,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
             return;
         }
         
-        form.disable();
-        form._enabled = false;
+        form.setLoading();
         
         if(!btn){
             btn=me.getView().down('#saveBtn');
@@ -107,10 +106,9 @@ Ext.define('Editor.view.comments.PanelViewController', {
             preventDefaultHandler: true,
             callback: function(newrec, op) {
                 var errorHandler = Editor.app.getController('ServerException');
+                form.setLoading(false);
                 me.handleAddComment();
                 //enabling the collapsed form gives a visual misbehaviour, so enable it by a own flag on expand
-                me.getCommentPanel().collapsed || form.enable();
-                form._enabled = true;
                 btn.setIconCls('');
                 if(op.wasSuccessful()) {
                     me.handleCommentsChanged(rec, 'save'); //rec from outer scope is needed!

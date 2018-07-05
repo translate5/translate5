@@ -92,6 +92,9 @@ Ext.define('Editor.view.segments.column.Comments', {
                     },
                     iconCls: 'ico-comment-edit',
                     tooltip: Editor.view.segments.column.Comments.prototype.text_tooltip_icon,
+                    handler: function() {
+                        Ext.fireEvent('editorOpenComments');
+                    },
                     itemId: 'editorCommentBtn', 
                     renderTo: field.getEl()
                 });
