@@ -27,7 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * //TODO Add class desc
+ * After importing a task a match analysis will be created based on the assigned TM based MatchRessources. 
+ * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried MatchRessource the received best match rate is stored in a separate DB table. 
+ * Out of this table all desired analysis are calculated. 
  *
  */
 class editor_Plugins_MatchAnalysis_Analysis{
@@ -269,6 +271,10 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 $pretranslation->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
             }
         }
+        
+        //remove fuzzy tmmt from opentm2
+        $this->removeFuzzyResources();
+        
         return true;
     }
     
@@ -315,14 +321,11 @@ class editor_Plugins_MatchAnalysis_Analysis{
             if($this->internalFuzzy){
                 //this function will clone the existing tmmt in opentm2 under oldname+Fuzzy-Analysis
                 $fuzzyConnector=$connector->initFuzzyAnalysis();
-                if($fuzzyConnector){
+                if(!empty($fuzzyConnector)){
                     $this->fuzzyConnectors[$assoc['id']]=$fuzzyConnector;
                 }
             }
         }
-        //remove fuzzy tmmt from opentm2
-        $this->removeFuzzyResources();
-        
         return $this->connectors;
     }
     

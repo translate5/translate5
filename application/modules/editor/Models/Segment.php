@@ -728,6 +728,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                 //throw exception that we are saveing the view;
                 throw new ZfExtended_Exception("Unable to save the segment. The segment table name is set to matirialized view. Segment id:".$this->getId().", taskGuid:".$this->getTaskGuid());
             }
+            
+            //clean unneded materialized view data
+            $this->unsetMaterializedViewData();
             $this->row->setTable($this->dbWritable);
         }
         $oldIdValue = $this->getId();
@@ -1539,7 +1542,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * If the segment does not have repetition, it will not be returned by this function.
      * The returned segments are ordered by segment id
      * 
-     * @param guid $taskGuid
+     * @param string $taskGuid
      */
     public function getRepetitions($taskGuid){
         $adapter=$this->db->getAdapter();
@@ -1555,5 +1558,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
               WHERE v2.cnt > 1 and v1.sourceMd5 = v2.sourceMd5
               ORDER by v1.id';
         return $adapter->query($sql)->fetchAll();
+    }
+    
+    /***
+     * Unset row data collumns which are not existin in the $dbWritable
+     */
+    protected function unsetMaterializedViewData(){
+        $dataColumns=$this->row->toArray();
+        $tableInfo=$this->dbWritable->info();
+        $segmentColumns=$tableInfo['cols'];
+        
+        foreach ($dataColumns as $key=>$value){
+            //unset the rows not existing in the segment table
+            if(!in_array($key,$segmentColumns)){
+                $this->row->__unset($key);
+            }
+        }
     }
 }
