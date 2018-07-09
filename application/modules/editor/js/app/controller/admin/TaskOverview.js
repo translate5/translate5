@@ -343,8 +343,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Editor.util.TaskActions.openTask(task, readonly);
   },
   handleTaskCancel: function() {
-      this.getTaskAddForm().getForm().reset();
-      this.getTaskAddWindow().close();
+	  var me=this;
+	  if(!me.getTaskAddForm()){
+		  return;
+	  }
+      me.getTaskAddForm().getForm().reset();
+      me.getTaskAddWindow().close();
   },
 
   handleTaskAdd: function(button) {

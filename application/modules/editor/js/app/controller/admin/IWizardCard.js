@@ -33,6 +33,11 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.IWizardCard', {
 
+	/***
+	 * Index where the card will apear in the group
+	 */
+	groupIndex:-1,
+	
     /***
      * There are 3 options for import type:
      * preimport, import, postimport

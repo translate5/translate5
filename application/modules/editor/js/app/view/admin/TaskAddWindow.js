@@ -98,15 +98,30 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
             },'import');
         },
         render:function(win){
+        	
+        	//sort the group by group index
+        	win.groupCards['preimport'].sort(function (a, b) {
+        		return a.groupIndex - b.groupIndex;
+    		});
+        	
             //add all of the cards in the window by order: preimport, import, postimport
             for(var i=0;i<win.groupCards['preimport'].length;i++){
                 win.add(win.groupCards['preimport'][i]);
             }
             
+            //sort the group by group index
+        	win.groupCards['import'].sort(function (a, b) {
+        		return a.groupIndex - b.groupIndex;
+    		});
+        	
             for(var i=0;i<win.groupCards['import'].length;i++){
                 win.add(win.groupCards['import'][i]);
             }
-            
+            //sort the group by group index
+        	win.groupCards['postimport'].sort(function (a, b) {
+        		return a.groupIndex - b.groupIndex;
+    		});
+        	
             for(var i=0;i<win.groupCards['postimport'].length;i++){
                 win.add(win.groupCards['postimport'][i]);
             }
