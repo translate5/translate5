@@ -53,10 +53,14 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.controller.Globalese', {
   },
   onAdminTaskWindowBeforeRender:function(window,eOpts){
       window.insertCard({
-          xtype:'globaleseAuthPanel'
-      },'import');      
+          xtype:'globaleseAuthPanel',
+          //index where the card should appear in the group
+          groupIndex:2,
+      },'postimport');      
       window.insertCard({
-              xtype:'globaleseSettingsPanel'    
-      },'import');
+          xtype:'globaleseSettingsPanel',
+          //index where the card should appear in the group
+          groupIndex:3,
+      },'postimport');
   }
 });

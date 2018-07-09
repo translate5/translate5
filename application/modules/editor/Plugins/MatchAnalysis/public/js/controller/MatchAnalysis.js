@@ -64,7 +64,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         analysis:'#UT#Analyse',
         preTranslation:'#UT#Pre-translate',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
-        internalFuzzy:'#UT#Zähle interne Fuzzy'
+        internalFuzzy:'#UT#Zähle interne Fuzzy',
+        pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
+        pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist'
     },
     
     listen:{
@@ -82,6 +84,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         controller:{
         	'#Editor.plugins.MatchResource.controller.TaskAssoc':{
         		taskAssocSavingFinished:'onTaskAssocSavingFinished'
+        	},
+        	'#admin.TaskOverview':{
+        		taskCreated:'onTaskCreated'
         	}
         }
     
@@ -91,6 +96,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         var me=this;
         window.insertCard({
             xtype:'matchResourcesPanel',
+            //index where the card should appear in the group
+            groupIndex:1,
             listeners:{
                 activate:{
                 	fn:me.onMatchResourcesPanelActivate,
@@ -124,14 +131,43 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	var me=this,
     		win=panel.up('window'),
     		task=win.actualTask;
-    	
+
     	//add internal fuzzy checkbox
     	panel.addDocked([{
+    		xtype:'combobox',
+    		stretch: false,
+    		align: 'left',
+    		itemId:'cbMinMatchrate',
+    		fieldLabel: me.strings.pretranslateMatchRate,
+    		tooltip:me.strings.pretranslateMatchRateTooltip,
+    		store: Ext.create('Ext.data.Store', {
+    			fields: ['id', 'value'],
+    			data : [
+    				{"id":"10", "value":"10%"},
+    				{"id":"20", "value":"20%"},
+    				{"id":"30", "value":"30%"},
+    				{"id":"40", "value":"40%"},
+    				{"id":"50", "value":"50%"},
+    				{"id":"60", "value":"60%"},
+    				{"id":"70", "value":"70%"},
+    				{"id":"80", "value":"80%"},
+    				{"id":"90", "value":"90%"},
+    				{"id":"100", "value":"100%"},
+    				]
+    		}),
+    		value:100,
+    		displayField: 'value',
+    		valueField: 'id',
+    		queryMode: 'local',
+    		dock:'bottom'
+    	
+    	},{
 			xtype:'checkbox',
 			boxLabel:this.strings.internalFuzzy,
 			itemId:'cbInternalFuzzy',
 			dock:'bottom'
 		}]);
+    	
     	
     	//if task is in import state, add checkboxes for the pretranslation and match analysis
     	if(!task || task.isImporting()){
@@ -208,18 +244,37 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         taskPref.handleTaskPreferences(task,'matchAnalysisPanel');
     },
     
+    /***
+     * Event handler after a task was successfully created
+     */
+    onTaskCreated:function(task){
+    	this.loadTaskAssoc(task);
+    },
+    
     onMatchResourcesPanelActivate:function(panel){
-        var me=this,
-            taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc'),
-            addWindow=panel.up('#adminTaskAddWindow'),
-            continueBtn=addWindow.down('#continue-wizard-btn');
-        
-        //load the task assoc store
-        taskAssoc.handleLoadPreferences(taskAssoc,panel.task);
+    	if(!panel.task){
+    		return;
+    	}
+    	var me=this,
+    		addWindow=panel.up('#adminTaskAddWindow'),
+    		continueBtn=addWindow.down('#continue-wizard-btn');
+
+    	me.loadTaskAssoc(panel.task);
         
         //set the finish icon text and cls
         continueBtn.setIconCls('ico-task-add');
         continueBtn.setText(me.strings.finishTask);
+    },
+    
+    /***
+     * Load match resources task assoc store
+     */
+    loadTaskAssoc:function(task){
+        var me=this,
+	        taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc');
+	    
+	    //load the task assoc store
+	    taskAssoc.handleLoadPreferences(taskAssoc,task);
     },
     
     /***
@@ -294,7 +349,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             url:Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
                 method: "PUT",
                 params:{
-                	internalFuzzy:me.getComponentByItemId('cbInternalFuzzy').checked
+                	internalFuzzy:me.getComponentByItemId('cbInternalFuzzy').checked,
+                	pretranslateMatchrate:me.getComponentByItemId('cbMinMatchrate').getValue()
                 },
                 scope: this,
                 timeout:120000,

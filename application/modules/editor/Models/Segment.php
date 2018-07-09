@@ -726,6 +726,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         if(!empty($this->dbWritable)) {
             if($this->dbWritable->isView()) {
                 //throw exception that we are saveing the view;
+                //TODO the actual table name in the exception
                 throw new ZfExtended_Exception("Unable to save the segment. The segment table name is set to matirialized view. Segment id:".$this->getId().", taskGuid:".$this->getTaskGuid());
             }
             

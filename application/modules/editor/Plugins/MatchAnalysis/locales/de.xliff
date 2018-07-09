@@ -60,6 +60,16 @@
 		    <target>Zähle interne Fuzzy</target>
 		</trans-unit>
 
+		<trans-unit id='Vm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
+		    <source>Vorübersetzungs Match-Rate</source>
+		    <target>Vorübersetzungs Match-Rate</target>
+		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0'>
+		    <source>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</source>
+		    <target>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</target>
+		</trans-unit>
+
     </body>
   </file>
 </xliff>

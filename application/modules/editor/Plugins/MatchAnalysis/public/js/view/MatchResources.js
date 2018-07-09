@@ -45,6 +45,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
         'Editor.plugins.MatchResource.view.TaskAssocPanel'
     ],
     mixins:['Editor.controller.admin.IWizardCard'],
+    
+    //card type, used for card display order
     importType:'postimport',
     
     task:null,

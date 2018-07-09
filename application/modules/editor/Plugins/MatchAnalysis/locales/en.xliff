@@ -59,6 +59,18 @@
 		    <source>Zähle interne Fuzzy</source>
 		    <target>Count internal fuzzy</target>
 		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
+		    <source>Vorübersetzungs Match-Rate</source>
+		    <target>Pretranslation match rate</target>
+		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0'>
+		    <source>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</source>
+		    <target>Pretranslation with TM-Match greater than or equal to the selected value</target>
+		</trans-unit>
+		
+
     </body>
   </file>
 </xliff>

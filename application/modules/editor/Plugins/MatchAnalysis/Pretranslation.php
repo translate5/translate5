@@ -41,7 +41,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      * 
      * @var editor_Models_SegmentFieldManager
      */
-    protected $smf;
+    protected $sfm;
     
     /***
      * 
@@ -62,11 +62,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $resourceType=array();
     
-    public function __construct(editor_Models_Task $task){
-        $this->task=$task;
-        $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
-    }
     
+    /***
+     * Minimum matchrate so the segment is pretransalted
+     * @var integer
+     */
+    protected $pretranslateMatchrate=100;
     
     /***
      * Pretranslate the given segment from the given resource
@@ -81,7 +82,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if(($segment->getAutoStateId()!=editor_Models_Segment_AutoStates::NOT_TRANSLATED) || !isset($result)){
             return;
         }
-        if($result->matchrate<100 || $result->matchrate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
+        if($result->matchrate<$this->pretranslateMatchrate || $result->matchrate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
             return;
         }
         
@@ -94,6 +95,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         //ignore fuzzy match target
         if($targetResult=="translate5-unique-id[".$segment->getTaskGuid()."]"){
+            error_log("Segment ignored".$segment->getSegmentNrInTask());
             return;
         }
         
@@ -207,5 +209,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     public function setResourceType(array $resType) {
         $this->resourceType=$resType;
+    }
+    
+    public function setPretranslateMatchrate($pretranslateMatchrate) {
+        $this->pretranslateMatchrate=$pretranslateMatchrate;
     }
 }

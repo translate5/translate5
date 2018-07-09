@@ -32,13 +32,7 @@ END LICENSE AND COPYRIGHT
  * Out of this table all desired analysis are calculated. 
  *
  */
-class editor_Plugins_MatchAnalysis_Analysis{
-    
-    /***
-     * @var editor_Models_Task
-     */
-    protected $task;
-    
+class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Analysis id 
@@ -61,14 +55,6 @@ class editor_Plugins_MatchAnalysis_Analysis{
     protected $fuzzyConnectors=array();
     
     /***
-     * Collection of assigned tmmt resources types where key is tmmtid and resource type is the value
-     * 
-     * @var array
-     */
-    protected $resourceType=array();
-    
-    
-    /***
      * Flag if pretranslations is active
      * @var string
      */
@@ -80,24 +66,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
      */
     protected $internalFuzzy=false;
     
-    /***
-     * @var editor_Models_SegmentFieldManager
-     */
-    protected $sfm;
     
-    /***
-     * 
-     * @var string
-     */
-    protected $userGuid;
-    
-    
-    /***
-     * 
-     * @var string
-     */
-    protected $userName;
-
     public function __construct(editor_Models_Task $task,$analysisId){
         $this->task=$task;
         $this->analysisId=$analysisId;
@@ -141,16 +110,6 @@ class editor_Plugins_MatchAnalysis_Analysis{
                 $langModel->getRfc5646()
         ]);
         
-        //init pretranslatio class
-        $pretranslation=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Pretranslation',[
-            $this->task
-        ]);
-        /* @var $pretranslation editor_Plugins_MatchAnalysis_Pretranslation */
-        
-        $pretranslation->setResourceType($this->resourceType);
-        $pretranslation->setUserGuid($this->userGuid);
-        $pretranslation->setUserName($this->userName);
-        
         /* @var $wordCount editor_Models_Segment_WordCount */
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
@@ -179,13 +138,11 @@ class editor_Plugins_MatchAnalysis_Analysis{
                     
                     //A repetition, that also is found as a 103% match in the TM is NOT counted as a repetition. And it is pre-translated.
                     if($repetitionMatchRate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
-                        $pretranslation->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
+                        $this->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
                         continue;
                     }
                     
-                    if($repetitionMatchRate>=100){
-                        $pretranslation->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
-                    }
+                    $this->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
                     
                     $matchAnalysis->save();
                     continue;
@@ -268,7 +225,7 @@ class editor_Plugins_MatchAnalysis_Analysis{
             $repetitionByHash[md5($segment->getFieldOriginal('source'))]=$bestMatchRateResult;
             
             if($this->pretranslate){
-                $pretranslation->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
+                $this->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
             }
         }
         
@@ -353,13 +310,5 @@ class editor_Plugins_MatchAnalysis_Analysis{
     
     public function setInternalFuzzy($internalFuzzy) {
         $this->internalFuzzy=$internalFuzzy;
-    }
-    
-    public function setUserGuid($userGuid){
-        $this->userGuid=$userGuid;
-    }
-    
-    public function setUserName($userName){
-        $this->userName=$userName;
     }
 }

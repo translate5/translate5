@@ -85,6 +85,9 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         if(isset($params['userName'])){
             $analysis->setUserName($params['userName']);
         }
+        if(isset($params['pretranslateMatchrate'])){
+            $analysis->setPretranslateMatchrate($params['pretranslateMatchrate']);
+        }
         return $analysis->calculateMatchrate();
     }
 }

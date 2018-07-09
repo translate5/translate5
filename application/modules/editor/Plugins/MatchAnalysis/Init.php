@@ -106,10 +106,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @param string $taskGuid
      * @param boolean $pretranlsate
-     * @param boolean $internalFuzziy
+     * @param array $eventParams
      * @return void|boolean
      */
-    public function queueAnalysis($taskGuid,$pretranlsate=false,$internalFuzzy=false) {
+    public function queueAnalysis($taskGuid,$pretranlsate=false,$eventParams=array()) {
         if(!$this->checkMatchResources($taskGuid)){
             error_log("The associated matchresources can not be used for analysis.");
             return;
@@ -124,12 +124,17 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $params['userGuid']=$user->data->userGuid;
         $params['userName']=$user->data->userName;
         
+        //pretranslate flag
         if($pretranlsate){
             $params['pretranslate']=$pretranlsate;
         }
         
-        if($internalFuzzy){
-            $params['internalFuzzy']=$internalFuzzy;
+        if(isset($eventParams['internalFuzzy'])){
+            $params['internalFuzzy']=$eventParams['internalFuzzy'];
+        }
+        
+        if(isset($eventParams['pretranslateMatchrate'])){
+            $params['pretranslateMatchrate']=$eventParams['pretranslateMatchrate'];
         }
         
         // init worker and queue it
@@ -152,9 +157,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @param editor_Models_Task $task
      * @param boolean $pretranslate
-     * @param boolean $internalFuzzy
+     * @param array $eventParams
      */
-    public function runAnalysis(editor_Models_Task $task,$pretranslate=false,$internalFuzzy=false){
+    public function runAnalysis(editor_Models_Task $task,$pretranslate=false,$eventParams=array()){
         
         if(!$this->checkMatchResources($task->getTaskGuid())){
             error_log("The associated matchresources can not be used for analysis.");
@@ -183,7 +188,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $analysis->setPretranslate($pretranslate);
             $user = new Zend_Session_Namespace('user');
             
-            $analysis->setInternalFuzzy($internalFuzzy);
+            if(isset($eventParams['internalFuzzy'])){
+                $analysis->setInternalFuzzy($eventParams['internalFuzzy']);
+            }
+            if(isset($eventParams['pretranslateMatchrate'])){
+                $analysis->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
+            }
             $analysis->setUserGuid($user->data->userGuid);
             $analysis->setUserName($user->data->userName);
             $analysis->calculateMatchrate();
@@ -226,17 +236,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $task = $event->getParam('entity');
         $params=$event->getParam('params');
         
-        $internalFuzzy=false;
-        if(isset($params['internalFuzzy'])){
-            $internalFuzzy=$params['internalFuzzy'];
-        }
         /* @var $task editor_Models_Task */
         //if the task is in import state -> queue the worker
         if($task->getState()==editor_Models_Task::STATE_IMPORT){
-            $this->queueAnalysis($task->getTaskGuid(),$pretranlsate,$internalFuzzy);
+            $this->queueAnalysis($task->getTaskGuid(),$pretranlsate,$params);
             return;
         }
-        $this->runAnalysis($task,$pretranlsate,$internalFuzzy);
+        $this->runAnalysis($task,$pretranlsate,$params);
     }
 
     /***
