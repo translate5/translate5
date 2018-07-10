@@ -1333,8 +1333,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         $newFileName=$newFilePath.'/'.$fileName;
         
-        //move the new file
-        rename($filepath, $newFileName);
+        //copy the new file (rename probably not possible, if whole import folder is readonly in folder based imports)
+        copy($filepath, $newFileName);
     }
     
     /***
