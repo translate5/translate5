@@ -49,6 +49,8 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
         self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig may not be activated for this test case!');
         self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
         
+        $zipfile = $api->zipTestFiles('testfiles/','RelaisImportTest.zip');
+        
         $api->addImportFile($api->getFile('RelaisImportTest.zip'));
         $api->import($task);
         
