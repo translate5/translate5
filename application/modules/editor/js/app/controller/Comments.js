@@ -297,11 +297,6 @@ Ext.define('Editor.controller.Comments', {
             panel = me.getCommentPanel(),
             readOnlyMode = panel && panel.lookupViewModel().get('editorIsReadonly');
 
-        //if comment panel does not exist, we can not handle open comments here
-        if(!panel) {
-            return;
-        }
-        
         //remove current segment
         me.record = null;
         
@@ -317,8 +312,14 @@ Ext.define('Editor.controller.Comments', {
         if(!isForced && (!segment.get('editable') || readOnlyMode)) {
             return;
         }
+        //this reference is needed in general, since this controller is used also for comment invocations other as via comment panel 
         me.record = segment;
 
+        //if comment panel does not exist, we can not handle open comments here
+        if(!panel) {
+            return;
+        }
+        
         //start segment editing if possible
         if(!ed.editing) {
             if(segment.get('editable') && !readOnlyMode) {

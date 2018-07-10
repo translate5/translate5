@@ -209,6 +209,9 @@ Ext.define('Editor.view.comments.PanelViewController', {
             rec = me.getCommentsStore().model.create({
                 isEditable: true
             });
+        if(me.destroyed) {
+            return;
+        }
         rec.phantom = true;
         me.activeComment = rec;
         me.loadComment(rec);
@@ -220,6 +223,9 @@ Ext.define('Editor.view.comments.PanelViewController', {
      * @param {Editor.model.Comment} rec
     */
     loadComment: function(rec) {
+        if(this.destroyed){
+           return; 
+        }
         var me = this,
             form = me.getCommentForm(),
             area = form.down('textarea'),
