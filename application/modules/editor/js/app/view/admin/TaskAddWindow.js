@@ -90,12 +90,12 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     
     listeners:{
         beforerender:function(win){
-            
             //insert the taskUpload card in before render
             win.insertCard({
                 xtype:'taskUpload', 
-                itemId:'taskUploadCard'
-            },'import');
+                itemId:'taskUploadCard',
+                groupIndex:4,
+            },'postimport');
         },
         render:function(win){
         	
@@ -162,6 +162,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     {
                         xtype:'panel',
                         itemId: 'taskMainCard',
+                        importType:'import',
                         scrollable:'y',
                         items:[{
                             xtype: 'form',
