@@ -59,7 +59,6 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
     
     protected function initEvents() {
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'injectFrontendConfig'));
-        $this->eventManager->attach('editor_Models_Import', 'importWorkerQueued', array($this, 'handleImportWorkerQueued'));
         $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
     }
     
@@ -112,43 +111,5 @@ class editor_Plugins_GlobalesePreTranslation_Init extends ZfExtended_Plugin_Abst
             'globalese' => APPLICATION_RUNDIR.'/editor/plugins/resources/globalesePreTranslation/globalese.png'
         ]));
         
-    }
-    
-    /**
-     * The Globalese Worker must be initialized in a non worker request, to have access to the Globalese settings in the session 
-     * @param Zend_EventManager_Event $event
-     * @return void|boolean
-     */
-    public function handleImportWorkerQueued(Zend_EventManager_Event $event) {
-        $worker = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Worker');
-        /* @var $worker editor_Plugins_GlobalesePreTranslation_Worker */
-        
-        $globaleseSession = new Zend_Session_Namespace('GlobalesePreTranslation');
-        
-        //if the auth parameters are not set or the engine and group, then the globalese translation process should not be started
-        if($globaleseSession->group==null || $globaleseSession->engine==null || $globaleseSession->apiUsername==null || $globaleseSession->apiKey==null ){
-            return;
-        }
-        
-        $task = $event->getParam('task');
-        
-        //send the parametars from the session in the workier init method parametar
-        $params=[
-                'group'=>$globaleseSession->group,
-                'engine'=>$globaleseSession->engine,
-                'apiUsername'=>$globaleseSession->apiUsername,
-                'apiKey'=>$globaleseSession->apiKey,
-        ];
-        
-        // init worker and queue it
-        // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost 
-        if (!$worker->init($task->getTaskGuid(), $params)) {
-            $this->log->logError('GlobalesePreTranslation-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
-            return false;
-        }
-        $worker->queue($event->getParam('workerId'));
-        
-        //unset the session namespace
-        Zend_Session::namespaceUnset('GlobalesePreTranslation');
     }
 }

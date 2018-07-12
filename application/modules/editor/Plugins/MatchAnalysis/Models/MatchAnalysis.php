@@ -85,7 +85,6 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
 			   )';
         
         $resultArray=$this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid])->fetchAll();
-        
         if(empty($resultArray)){
             return array();
         }
@@ -106,6 +105,20 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         
         $analysisCreated=null;
         
+        $bestTmmtMatches=[];
+        $segmentBest=[];
+        //count only the best match rate from the tm
+        foreach ($results as $res){
+            if(!isset($bestTmmtMatches[$res['segmentNrInTask']])){
+                $bestTmmtMatches[$res['segmentNrInTask']]=$res['matchRate'];
+                $segmentBest[$res['segmentNrInTask']]=$res['tmmtid'];
+            }
+            if($bestTmmtMatches[$res['segmentNrInTask']]<$res['matchRate']){
+                $segmentBest[$res['segmentNrInTask']]=$res['tmmtid'];
+            }
+        }
+        
+        unset($bestTmmtMatches);
         foreach ($results as $res){
         
             //for each tmmt separate array
@@ -125,6 +138,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 
             }
             
+            
             $resultFound=false;
             
             //check on which border group this result belongs to
@@ -140,7 +154,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                     }
                 }
                 //if result is found, create only empty column
-                if($resultFound){
+                if($resultFound || $segmentBest[$res['segmentNrInTask']]!=$res['tmmtid']){
                     continue;
                 }
 
@@ -174,6 +188,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             
             $groupedResults[$res['tmmtid']]['created']=$analysisCreated;
         }
+        unset($segmentBest);
         return $this->sortByTm($groupedResults);
     }
 

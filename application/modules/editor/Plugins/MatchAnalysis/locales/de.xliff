@@ -25,9 +25,9 @@
 		    <target>Gesamtzahl der Wörter</target>
 		</trans-unit>
 		
-		<trans-unit id='QW5hbHlzZQ=='>
-		    <source>Analyse</source>
-		    <target>Analyse</target>
+		<trans-unit id='QW5hbHlzZSBTdGFydGVu'>
+		    <source>Analyse Starten</source>
+		    <target>Analyse Starten</target>
 		</trans-unit>
 		
 		<trans-unit id='RXhwb3J0'>
@@ -68,6 +68,16 @@
 		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0'>
 		    <source>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</source>
 		    <target>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</target>
+		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIFN0YXJ0ZW4='>
+		    <source>Vorübersetzung Starten</source>
+		    <target>Vorübersetzung Starten</target>
+		</trans-unit>
+
+		<trans-unit id='RGllIFZvcsO8YmVyc2V0enVuZyBsw7ZzdCBhdWNoIGVpbmUgbmV1ZSBBbmFseXNlIGF1cw=='>
+		    <source>Die Vorübersetzung löst auch eine neue Analyse aus</source>
+		    <target>Die Vorübersetzung löst auch eine neue Analyse aus</target>
 		</trans-unit>
 
     </body>

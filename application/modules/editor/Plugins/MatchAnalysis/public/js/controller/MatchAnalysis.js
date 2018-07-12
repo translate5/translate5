@@ -61,8 +61,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     strings:{
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
-        analysis:'#UT#Analyse',
-        preTranslation:'#UT#Pre-translate',
+        analysis:'#UT#Analyse Starten',
+        preTranslation:'#UT#Vorübersetzung Starten',
+        preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
         pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
@@ -79,17 +80,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             '#matchResourceTaskAssocPanel':{
             	render:'onMatchResourcesPanelRender'
+            },
+            'matchResourcesPanel':{
+            	startMatchAnalysis:'onStartMatchAnalysis'
             }
         },
         controller:{
-        	'#Editor.plugins.MatchResource.controller.TaskAssoc':{
-        		taskAssocSavingFinished:'onTaskAssocSavingFinished'
-        	},
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated'
         	}
         }
-    
     },
     
     onAdminTaskWindowBeforeRender:function(window,eOpts){
@@ -121,7 +121,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             prefWindow=panel.up('window');
         
         //add the matchanalysis panel in the tabpanel
-        panel.add({
+        panel.insert(2,{
            xtype:'matchAnalysisPanel',
            task:prefWindow.actualTask
         });
@@ -131,103 +131,62 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	var me=this,
     		win=panel.up('window'),
     		task=win.actualTask;
-
-    	//add internal fuzzy checkbox
-    	panel.addDocked([{
-    		xtype:'combobox',
-    		stretch: false,
-    		align: 'left',
-    		itemId:'cbMinMatchrate',
-    		fieldLabel: me.strings.pretranslateMatchRate,
-    		tooltip:me.strings.pretranslateMatchRateTooltip,
-    		store: Ext.create('Ext.data.Store', {
-    			fields: ['id', 'value'],
-    			data : [
-    				{"id":"10", "value":"10%"},
-    				{"id":"20", "value":"20%"},
-    				{"id":"30", "value":"30%"},
-    				{"id":"40", "value":"40%"},
-    				{"id":"50", "value":"50%"},
-    				{"id":"60", "value":"60%"},
-    				{"id":"70", "value":"70%"},
-    				{"id":"80", "value":"80%"},
-    				{"id":"90", "value":"90%"},
-    				{"id":"100", "value":"100%"},
-    				]
-    		}),
-    		value:100,
-    		displayField: 'value',
-    		valueField: 'id',
-    		queryMode: 'local',
-    		dock:'bottom'
-    	
-    	},{
-			xtype:'checkbox',
-			boxLabel:this.strings.internalFuzzy,
-			itemId:'cbInternalFuzzy',
-			dock:'bottom'
-		}]);
-    	
-    	
-    	//if task is in import state, add checkboxes for the pretranslation and match analysis
-    	if(!task || task.isImporting()){
-    		panel.addDocked([{
-    			xtype:'checkbox',
-    			boxLabel:this.strings.preTranslation,
-    			itemId:'cbPreTranslation',
-    			dock:'bottom',
-    			listeners:{
-    				change:{
-    					fn:this.onCbPreTranslationChecked,
-    					scope:this
-    				}
-    			}
-    		},{
-    			xtype:'checkbox',
-    			boxLabel:this.strings.analysis,
-    			itemId:'cbAnalysis',
-    			dock:'bottom',
-    			listeners:{
-    				change:{
-    					fn:this.onCbAnalysisChecked,
-    					scope:this
-    				}
-    			}
-    		}]);
-    		return;
-    	}
     	
     	//the task exist->add buttons in the task assoc panel
-    	var dockedItems=panel.getDockedItems('toolbar[dock="bottom"]');
-    	dockedItems=dockedItems[0];
-    	
-    	dockedItems.insert(1,{
-    		xtype:'button',
-			text:this.strings.preTranslation,
-			itemId:'btnPreTranslation',
-			width:150,
-			//TODO icon
-			listeners:{
-				click:{
-					fn:this.matchAnalysisButtonHandler,
-					scope:this
-				}
-			}
-    	});
-    	
-    	dockedItems.insert(2,{
-    		xtype:'button',
-			text:this.strings.analysis,
-			itemId:'btnAnalysis',
-			width:150,
-			//TODO icon
-			listeners:{
-				click:{
-					fn:this.matchAnalysisButtonHandler,
-					scope:this
-				}
-			}
-    	});
+    	panel.addDocked([{
+            xtype : 'toolbar',
+            dock : 'bottom',
+            ui: 'footer',
+            layout: {
+                type: 'hbox',
+                pack: 'start'
+            },
+            items : [
+            	this.getAnalysisConfig(task),
+            	this.getPretranslationConfig(task)
+            	]
+        },{
+            xtype : 'toolbar',
+            dock : 'bottom',
+            ui: 'footer',
+            layout: {
+                type: 'hbox',
+                pack: 'start'
+            },
+            items : [{
+        		xtype:'combobox',
+        		stretch: false,
+        		align: 'left',
+        		itemId:'cbMinMatchrate',
+        		fieldLabel: me.strings.pretranslateMatchRate,
+        		tooltip:me.strings.pretranslateMatchRateTooltip,
+        		store: Ext.create('Ext.data.Store', {
+        			fields: ['id', 'value'],
+        			data : [
+        				{"id":"10", "value":"10%"},
+        				{"id":"20", "value":"20%"},
+        				{"id":"30", "value":"30%"},
+        				{"id":"40", "value":"40%"},
+        				{"id":"50", "value":"50%"},
+        				{"id":"60", "value":"60%"},
+        				{"id":"70", "value":"70%"},
+        				{"id":"80", "value":"80%"},
+        				{"id":"90", "value":"90%"},
+        				{"id":"100", "value":"100%"},
+        				]
+        		}),
+        		value:100,
+        		displayField: 'value',
+        		valueField: 'id',
+        		queryMode: 'local',
+        		dock:'bottom'
+            },{
+    			xtype:'checkbox',
+    			boxLabel:this.strings.internalFuzzy,
+    			itemId:'cbInternalFuzzy',
+    			dock:'bottom'
+            }]
+        }]);
     },
     
     /***
@@ -277,27 +236,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);
     },
     
-    /***
-     * Event fired when all associated match resources for the task are saved
-     */
-    onTaskAssocSavingFinished:function(task){
-    	var me=this,
-    		cbPreTranslation=me.getComponentByItemId('cbPreTranslation'),
-    		cbAnalysis=me.getComponentByItemId('cbAnalysis');
-    	
-    	if(!cbPreTranslation || !cbAnalysis){
-    		return;
-    	}
-    	
-    	if(cbPreTranslation.checked){
-    		me.startAnalysis(task.get('id'),"pretranslation");
-    		return;
-    	}
-    	
-    	if(cbAnalysis.checked){
-    		me.startAnalysis(task.get('id'),"analysis");
-    		return;
-    	}
+    onStartMatchAnalysis:function(taskId,operation){
+    	this.startAnalysis(taskId,operation);
     },
     
     /***
@@ -384,5 +324,78 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		return;
     	}
     	return cmp[0];
+    },
+    
+    /***
+     * Get the analysis config. It can be checkbox or button depending if the task exist or not.
+     */
+    getAnalysisConfig:function(task){
+    	if(!task || task.isImporting()){
+    		return {
+    			xtype:'checkbox',
+    			boxLabel:this.strings.analysis,
+    			itemId:'cbAnalysis',
+    			dock:'bottom',
+    			listeners:{
+    				change:{
+    					fn:this.onCbAnalysisChecked,
+    					scope:this
+    				}
+    			}
+    		};
+    	}
+    	return {
+    		xtype:'button',
+			text:this.strings.analysis,
+			itemId:'btnAnalysis',
+			width:150,
+			dock:'bottom',
+			//TODO icon
+			listeners:{
+				click:{
+					fn:this.matchAnalysisButtonHandler,
+					scope:this
+				}
+			}
+    	};
+    },
+    
+    /***
+     * Get the pretranslation config. It can be checkbox or button depending if the task exist or not.
+     */
+    getPretranslationConfig:function(task){
+    	if(!task || task.isImporting()){
+    		return {
+    			xtype:'checkbox',
+    			boxLabel:this.strings.preTranslation,
+    		    autoEl: {
+    		        tag: 'div',
+    		        'data-qtip': this.strings.preTranslationTooltip
+    		    },
+    			itemId:'cbPreTranslation',
+    			dock:'bottom',
+    			listeners:{
+    				change:{
+    					fn:this.onCbPreTranslationChecked,
+    					scope:this
+    				}
+    			}
+    		};
+    	}
+    	return {
+    		xtype:'button',
+			text:this.strings.preTranslation,
+			tooltip:this.strings.preTranslationTooltip,
+			itemId:'btnPreTranslation',
+			width:170,
+			dock:'bottom',
+			//TODO icon
+			listeners:{
+				click:{
+					fn:this.matchAnalysisButtonHandler,
+					scope:this
+				}
+			}
+    	};
     }
 });

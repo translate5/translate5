@@ -25,9 +25,9 @@
 		    <target>Total Words</target>
 		</trans-unit>
 		
-		<trans-unit id='QW5hbHlzZQ=='>
-		    <source>Analyse</source>
-		    <target>Analysis</target>
+		<trans-unit id='QW5hbHlzZSBTdGFydGVu'>
+		    <source>Analyse Starten</source>
+		    <target>Start analysis</target>
 		</trans-unit>
 		
 		<trans-unit id='RXhwb3J0'>
@@ -69,8 +69,16 @@
 		    <source>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</source>
 		    <target>Pretranslation with TM-Match greater than or equal to the selected value</target>
 		</trans-unit>
-		
 
+		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIFN0YXJ0ZW4='>
+		    <source>Vorübersetzung Starten</source>
+		    <target>Start pre-translation</target>
+		</trans-unit>
+
+		<trans-unit id='RGllIFZvcsO8YmVyc2V0enVuZyBsw7ZzdCBhdWNoIGVpbmUgbmV1ZSBBbmFseXNlIGF1cw=='>
+		    <source>Die Vorübersetzung löst auch eine neue Analyse aus</source>
+		    <target>Pretranslation also triggers new analysis</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

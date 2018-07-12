@@ -74,12 +74,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   panel.setLoading(false);
               }
           },
-          'matchResourceTaskAssocPanel #btnSaveChanges': {
-              click: 'handleOnSaveButtonClick'
-          },
-          'matchResourceTaskAssocPanel #btnReload': {
-              click: 'handleOnReload'
-          },
           '#tmTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
               checkchange: 'handleSegmentsUpdateableChange'
           },
@@ -109,7 +103,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       me.getGrid().store.removeAll();
       me.getGrid().store.load(tmmtparams);
   },
-  handleOnSaveButtonClick: function(window) {
+  
+  saveTmAssoc: function(window) {
       var me = this,
           tmpStore = me.getGrid().store;
 
@@ -121,6 +116,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
 
       tmpStore.each(me.saveOneAssocRecord, me);
   },
+  
   handleOnReload: function(window) {
       var me = this;
       me.getGrid().store.reload();
@@ -133,6 +129,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           record = me.getGrid().store.getAt(rowIdx),
           oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
       record.set('segmentsUpdateable', checked && oldValue);
+      
+      me.saveTmAssoc();
   },
   /**
    * check row when segmentsUpdateable is checked

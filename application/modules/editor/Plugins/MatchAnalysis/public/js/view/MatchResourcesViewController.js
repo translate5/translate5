@@ -35,6 +35,30 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResourcesViewController', {
     alias: 'controller.matchResourcesPanel',
 
     handleNextCardClick:function(){
-		this.getView().fireEvent('wizardCardFinished');
+    	var me=this,
+    		view=me.getView(),
+			cbPreTranslation=view.down('#cbPreTranslation'),
+			cbAnalysis=view.down('#cbAnalysis');
+		
+		if(!cbPreTranslation || !cbAnalysis){
+			view.fireEvent('wizardCardFinished');
+			return;
+		}
+		
+		//if the pretranslation is checked, start the pretranslate operation
+		if(cbPreTranslation.checked){
+			view.fireEvent('startMatchAnalysis',view.task.get('id'),"pretranslation");
+			view.fireEvent('wizardCardFinished');
+			return;
+		}
+		
+		//if the analysis is checked, start the analysis operation
+		if(cbAnalysis.checked){
+			view.fireEvent('startMatchAnalysis',view.task.get('id'),"analysis");
+			view.fireEvent('wizardCardFinished');
+			return;
+		}
+		
+		view.fireEvent('wizardCardFinished');
     }
 });
