@@ -118,6 +118,7 @@ Ext.define('Editor.view.comments.Panel', {
                         xtype : 'textarea',
                         name: 'comment',
                         height: 100,
+                        enterIsSpecial: true,
                         fieldLabel: me.item_commentNew,
                         anchor: '100%'
                     },{
