@@ -49,7 +49,7 @@ Ext.define('Editor.view.admin.TaskUpload', {
     },
     
     //card type, used for card display order
-    importType:'import',
+    importType:'postimport',
     
     strings:{
         wizardTitle:'#UT#Dateien werden hochgeladen',

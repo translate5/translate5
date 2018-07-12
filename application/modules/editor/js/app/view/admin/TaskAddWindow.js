@@ -153,7 +153,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         me.groupCards['preimport']=[];
         me.groupCards['import']=[];
         me.groupCards['postimport']=[];
-        
+
         now.setHours(0,0,0,0);
         config = {
                 title: me.title, //see EXT6UPD-9

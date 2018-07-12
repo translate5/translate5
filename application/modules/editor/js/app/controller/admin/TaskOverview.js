@@ -753,6 +753,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               win.setLoading(false);
               me.getAdminTasksStore().load();
               
+              me.setCardsTask(task);
+              
               //call the callback if exist
               if(successCallback){
                   successCallback(task);
@@ -795,6 +797,19 @@ Ext.define('Editor.controller.admin.TaskOverview', {
              Editor.app.getController('ServerException').handleException(response);
              me.isImportStarted=false;
          }
+	  });
+  },
+  
+  /***
+   * For each card item set a task
+   */
+  setCardsTask:function(task){
+	  var me=this,
+	  	  win = me.getTaskAddWindow(),
+	  	  items=win.items.items;
+	  
+	  items.forEach(function(item){
+		  item.task=task;
 	  });
   }
   
