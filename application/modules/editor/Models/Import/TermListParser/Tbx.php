@@ -455,7 +455,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             switch($this->xml->name) {
                 case 'langSet':
                     $this->setActualLevel();
-                    $start = microtime(true);
                     $this->counterTigInLangSet = 0;
                     $this->actualParentId=null;
                     $this->handleLanguage();
@@ -774,6 +773,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             }
             
             $termAttributes->delete($deleteParams);
+            
+            //set the term status to defualt(from the config) if the status is empty/not set
+            $this->handleEmptyTermStatus();
         }else{
             $this->counterTigInLangSet++;
         }
@@ -847,6 +849,20 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
         
         error_log("Unsupported tag found during the tbx parsing:#Tag name:".$this->xml->name.'#Term collection id:'.$this->termCollectionId.'#');
+    }
+    
+    /***
+     * Check if the current term has empty status. If yes use the default term status from the config.
+     */
+    protected function handleEmptyTermStatus(){
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $term->load($this->actualTermIdDb);
+        if(empty($term->getStatus())){
+            $config = Zend_Registry::get('config');
+            $term->setStatus($config->runtimeOptions->tbx->defaultTermStatus);
+            $term->save();
+        }
     }
     
     /***
