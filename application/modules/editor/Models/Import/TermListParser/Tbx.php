@@ -331,7 +331,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 
                 $this->xml = new XmlReader();
                 //$this->xml->open(self::getTbxPath($task));
-                $this->xml->open($path);
+                $this->xml->open($path, null, LIBXML_PARSEHUGE);
                 
                 $this->termCollectionId = $termCollectionId;
                 
