@@ -103,6 +103,11 @@ Ext.define('Editor.controller.Editor', {
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
             },
+            
+            '#commentContainer textarea': {
+                specialkey: 'handleCommentEnter'
+            },
+            
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
             }
@@ -218,7 +223,7 @@ Ext.define('Editor.controller.Editor', {
         //inits the editor iframe directly after loading the application
         plug.editor = plug.initEditor(); 
         
-        me.handleReferneceFilesMessage();
+        me.handleReferenceFilesMessage();
     },
     
     handleSortOrFilter: function() {
@@ -1058,7 +1063,19 @@ Ext.define('Editor.controller.Editor', {
         }
     },
     
-    handleReferneceFilesMessage:function(){
+    /**
+     * In textareas ExtJS 6.2 enter keys are not bubbling up, but they are triggering a specialkey event
+     *  we listen to that event and process our own keys then. 
+     */
+    handleCommentEnter: function(field, e) {
+        var key = e.getKey();
+        
+        if (key === e.ENTER && e.hasModifier() && this.generalKeyMap) {
+            this.generalKeyMap.handleTargetEvent(e);
+        }
+    },
+    
+    handleReferenceFilesMessage:function(){
         if(Editor.data.task.get('referenceFiles')){
             var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
             task = new Ext.util.DelayedTask(function(){
