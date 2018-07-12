@@ -75,3 +75,5 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('edit
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorAnalysisTask');
 
+INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) VALUES ('editor_Plugins_GlobalesePreTranslation_Worker', 'editor_Plugins_MatchAnalysis_Worker');
+

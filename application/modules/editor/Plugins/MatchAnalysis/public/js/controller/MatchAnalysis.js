@@ -262,8 +262,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	me.loadTaskAssoc(panel.task);
         
         //set the finish icon text and cls
-        continueBtn.setIconCls('ico-task-add');
-        continueBtn.setText(me.strings.finishTask);
+        //continueBtn.setIconCls('ico-task-add');
+        //continueBtn.setText(me.strings.finishTask);
     },
     
     /***

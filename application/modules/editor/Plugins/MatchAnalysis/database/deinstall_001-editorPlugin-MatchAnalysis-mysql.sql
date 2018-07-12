@@ -52,3 +52,7 @@ WHERE `right` = 'editorAnalysisTask'
 AND `resource` = 'frontend' 
 AND `role` = 'pm'
 AND `module` = 'editor';
+
+DELETE FROM `Zf_worker_dependencies` 
+WHERE `worker` = 'editor_Plugins_GlobalesePreTranslation_Worker' 
+AND `dependency` = 'editor_Plugins_MatchAnalysis_Worker';
