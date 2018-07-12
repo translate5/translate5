@@ -60,12 +60,24 @@ Ext.define('Editor.view.comments.PanelViewController', {
               editorViewportClosed: 'clearComments'
             },
             '#Editor': {
-                saveUnsavedComments: 'onSaveBtnClick'
+                saveUnsavedComments: 'handleSaveUnsavedComments'
             }
         }
     },
 
-    onSaveBtnClick:function(btn){
+    /**
+     * Interceptor Method to call saveComment. 
+     * Since saveComment returns boolean it can stop the event loop, which is not wanted, 
+     * so we cannot use it directly as handlerMethod 
+     */
+    handleSaveUnsavedComments: function() {
+        this.saveComment();
+    },
+    
+    /**
+     * @return {Boolean} true if save request started, false if not
+     */
+    saveComment:function(){
         var me = this,
             now = new Date(),
             store = me.getCommentsStore(),
@@ -76,9 +88,9 @@ Ext.define('Editor.view.comments.PanelViewController', {
                 comment: form.getForm().getValues().comment,
                 modified: now
             };
-        if (rec === null)
-        {
-            return;    
+        
+        if (rec === null) {
+            return false;    
         }
         
         if(rec.phantom) {
@@ -91,15 +103,10 @@ Ext.define('Editor.view.comments.PanelViewController', {
         if(!rec.isModified('comment')) {
             rec.reject();
             me.handleAddComment();
-            return;
+            return false;
         }
         
         form.setLoading();
-        
-        if(!btn){
-            btn=me.getView().down('#saveBtn');
-        }
-        btn.setIconCls('ico-loading');
         
         rec.save({
             //prevent default ServerException handling
@@ -109,9 +116,9 @@ Ext.define('Editor.view.comments.PanelViewController', {
                 form.setLoading(false);
                 me.handleAddComment();
                 //enabling the collapsed form gives a visual misbehaviour, so enable it by a own flag on expand
-                btn.setIconCls('');
                 if(op.wasSuccessful()) {
                     me.handleCommentsChanged(rec, 'save'); //rec from outer scope is needed!
+                    me.getView() && me.getView().fireEvent('requestCommentClose', me.getCommentPanel());
                     return;
                 }
                 if(rec.phantom) {
@@ -127,6 +134,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
         if(!rec.store){
             store.insert(0, rec);
         }
+        return true;
     },
     
     onCloseBtnClick:function(){
@@ -136,12 +144,7 @@ Ext.define('Editor.view.comments.PanelViewController', {
             return;
         }
         me.handleAddComment();
-        //if the panel is collapsable -> collapse the panel, else close the window
-        if(commentPanel.isCollapsable){
-            commentPanel.collapse();
-            return;
-        }
-        commentPanel.up('window').destroy();
+        me.getView().fireEvent('requestCommentClose', commentPanel);
     },
 
     /**
@@ -297,7 +300,8 @@ Ext.define('Editor.view.comments.PanelViewController', {
                     ed.context.row = me.getSegmentGrid().getView().getNode(origRec);
                     ed.reposition();
                     dis.setRawValue(Editor.view.segments.column.Comments.getFirstComment(rec.get('comments')));
-                    stateid.setRawValue(ed.columns.get(stateid.id).renderer(rec.get('autoStateId'),{},rec));
+                    //add true as additional parameter to trigger correct rendertype in the renderer
+                    stateid.setRawValue(ed.columns.get(stateid.id).renderer(rec.get('autoStateId'),{},rec, true)); 
                 }
             }
         });

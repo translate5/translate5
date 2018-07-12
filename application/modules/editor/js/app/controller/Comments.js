@@ -85,10 +85,10 @@ Ext.define('Editor.controller.Comments', {
                 '#roweditor displayfield[name=comments]': {
                     change: 'updateEditorComment'
                 },
-                
                 '#metapanel #commentPanel' : {
-                    expand: 'loadCommentPanel'
-                },
+                    expand: 'loadCommentPanel',
+                    requestCommentClose: 'handleCloseComments'
+                }
             },
             global: {
                 editorOpenComments: 'onRequestOpenComments'
@@ -179,6 +179,14 @@ Ext.define('Editor.controller.Comments', {
         
         //fire the global open comments request
         Ext.fireEvent('editorOpenComments', segment);
+    },
+    /**
+     * Handle close comments request depending on the place where the panel is located
+     */
+    handleCloseComments: function(panel) {
+        if(panel.isCollapsable){
+            panel.collapse();
+        }
     },
     /**
      * handles starting the segment editor
@@ -295,6 +303,7 @@ Ext.define('Editor.controller.Comments', {
             isForced = me.isEnabledForLocked(),
             ed = this.getEditPlugin(),
             panel = me.getCommentPanel(),
+            inMetapanel = panel && panel.up('#metapanel'),
             readOnlyMode = panel && panel.lookupViewModel().get('editorIsReadonly');
 
         //remove current segment
@@ -315,11 +324,6 @@ Ext.define('Editor.controller.Comments', {
         //this reference is needed in general, since this controller is used also for comment invocations other as via comment panel 
         me.record = segment;
 
-        //if comment panel does not exist, we can not handle open comments here
-        if(!panel) {
-            return;
-        }
-        
         //start segment editing if possible
         if(!ed.editing) {
             if(segment.get('editable') && !readOnlyMode) {
@@ -327,8 +331,13 @@ Ext.define('Editor.controller.Comments', {
             }
             //otherwise open MetaPanel readonly
             else {
-                Editor.app.getController('MetaPanel').openReadonly(segment);
+                inMetapanel && Editor.app.getController('MetaPanel').openReadonly(segment);
             }
+        }
+        
+        //if comment panel does not exist or is not in metapanel, we can not handle open comments here
+        if(! inMetapanel) {
+            return;
         }
     
         var form = me.getCommentForm(),
@@ -342,7 +351,12 @@ Ext.define('Editor.controller.Comments', {
 
         //set the focus of the text area
         if (area.rendered && area.isVisible()) {
-            area.focus(false, 500);
+            if(area.hasFocus) {
+                ed.editing && ed.editor.mainEditor.deferFocus();
+            }
+            else {
+                area.focus(false, 500);
+            }
         }
     },
 
