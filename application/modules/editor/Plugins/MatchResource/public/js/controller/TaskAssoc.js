@@ -104,6 +104,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       me.getGrid().store.load(tmmtparams);
   },
   
+  /***
+   * Save each assoc if if it is changed
+   */
   saveTmAssoc: function(window) {
       var me = this,
           tmpStore = me.getGrid().store;
@@ -141,6 +144,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       if(checked && !record.get('checked')) {
           record.set('checked', true);
       }
+      me.saveTmAssoc();
   },
   /**
    * currently no easy "subentity" versioning is possible here, because of the bulk (store each) like saving / deleting.

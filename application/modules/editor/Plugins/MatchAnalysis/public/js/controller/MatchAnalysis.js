@@ -62,7 +62,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
         analysis:'#UT#Analyse Starten',
-        preTranslation:'#UT#Vorübersetzung Starten',
+        preTranslation:'#UT#Analyse & Vorübersetzungen Starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
