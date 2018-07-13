@@ -1,3 +1,4 @@
+
 -- /*
 -- START LICENSE AND COPYRIGHT
 -- 
@@ -25,8 +26,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-ALTER TABLE `LEK_segment_data`  
-CHANGE COLUMN `originalToSort` `originalToSort` LONGTEXT NULL DEFAULT NULL ,
-CHANGE COLUMN `editedToSort` `editedToSort` LONGTEXT NULL DEFAULT NULL ;
-
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2018-07-03', 'VISUAL-43', 'change', 'VisualReview: Improve performance by splitting segments search into long, middle, short', 'VisualReview: Improve performance by splitting segments search into long, middle, short', '12'),
+('2018-07-03', 'TRANSLATE-1323', 'change', 'SpellCheck must not remove the TermTag-Markup', 'TermTag-Markup was removed by using the SpellChecker, this should not be.', '14'),
+('2018-07-03', 'TRANSLATE-1234', 'bugfix', 'changes.xliff diff algorithm fails under some circumstances', 'changes.xliff diff algorithm fails under some circumstances', '12'),
+('2018-07-03', 'TRANSLATE-1306', 'bugfix', 'SpellCheck: blocked after typing with MatchResources', 'SpellCheck: blocked after typing with MatchResources', '14');

@@ -1,3 +1,4 @@
+
 -- /*
 -- START LICENSE AND COPYRIGHT
 -- 
@@ -25,8 +26,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-ALTER TABLE `LEK_segment_data`  
-CHANGE COLUMN `originalToSort` `originalToSort` LONGTEXT NULL DEFAULT NULL ,
-CHANGE COLUMN `editedToSort` `editedToSort` LONGTEXT NULL DEFAULT NULL ;
-
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2018-07-04', 'TRANSLATE-1331', 'change', 'add application version to task table', 'To each task the application version on import time is stored, for debugging and migration.', '8'),
+('2018-07-04', 'TRANSLATE-1336', 'bugfix', 'TermPortal: Fix unsupported functions by IE11 in termportal', 'TermPortal: Fix unsupported functions by IE11 in termportal', '14');

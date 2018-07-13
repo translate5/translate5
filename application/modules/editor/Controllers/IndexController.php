@@ -318,7 +318,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.user', $userSession->data);
         
-        $allRoles = $acl->getRoles();
+        $allRoles = $acl->getAllRoles();
         $roles = array();
         foreach($allRoles as $role) {
             if($role == 'noRights' || $role == 'basic') {

@@ -75,6 +75,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
+                initialize: 'initEditor',
+                afterinitframedoc: 'initEditor',
                 push: 'handleAfterContentUpdate',
                 afterInsertMarkup: 'handleAfterContentUpdate'
             }
@@ -108,7 +110,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     isSupportedLanguage: undefined, // if the language is supported by our tool(s):
                                     // - initially: undefined
                                     // - on task is opened => start setLanguageSupport() => result: true or false
-                                    // - on keyDown? keyDown is initialized via initEditor which is only done when isSupportedLanguage is already set and true.
                                     // - on push: when isSupportedLanguage is still undefined => start setLanguageSupport() => result: true or false
     
     allMatchesOfTool: null,         // all matches as found by the tool
@@ -159,7 +160,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         me.consoleLog('0.2 initSpellCheckPlugin.');
         me.setTargetLangCode();
-        me.setLanguageSupport(); // → will run initEditor() if language is supported
+        me.setLanguageSupport();
     },
     /**
      * Init Editor
@@ -212,6 +213,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     },
     initKeyboardEvents: function() {
         var me = this;
+        me.consoleLog('SpellCheck: initKeyboardEvents...');
         Ext.get(me.editor.getDoc()).on('keydown', me.handleKeyDown, me, {priority: 9980, delegated: false});
         Ext.get(me.editor.getDoc()).on('keyup', me.handleKeyUp, me, {priority: 9980, delegated: false});
     },
@@ -292,6 +294,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     handleKeyDown: function(event) {
         var me = this;
+        me.consoleLog('SpellCheck: handleKeyDown...');
         me.initKeyDownEvent(event);
         if(me.eventHasToBeIgnored()){
             me.consoleLog(" => Ignored for SpellCheck.");
@@ -480,7 +483,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (!me.allMatchesOfTool.length > 0) {
             me.consoleLog('allMatchesOfTool: no results.');
-            me.cleanSpanMarkupInEditor(); // in case there have been results marked before
+            me.cleanSpellCheckMarkupInEditor(); // in case there have been results marked before
             me.bookmarkForCaret = null;
             me.finishSpellCheck(spellCheckProcessID);
             return;
@@ -506,7 +509,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             return;
         }
         
-        me.cleanSpanMarkupInEditor(); // in case a spellcheck has been run before already
+        me.cleanSpellCheckMarkupInEditor(); // in case a spellcheck has been run before already
         
         if (me.allMatchesOfTool.length > 0) {
             me.applyAllMatches(spellCheckProcessID);
@@ -532,7 +535,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         rangeForMatchBookmark = me.getBookmarkForRangeInTranslate5(rangeForMatch,true);
         
         // Remove SpellCheck- and TermTag-Markup.
-        me.cleanSpanMarkupInEditor();
+        me.cleanSpellCheckMarkupInEditor();
         
         // Update the range (the SpellCheck-Node is no longer in the DOM!...).
         rangeForMatch = me.moveRangeToBookmarkInTranslate5(rangeForMatch,rangeForMatchBookmark,true);

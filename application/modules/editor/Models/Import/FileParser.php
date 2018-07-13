@@ -362,8 +362,8 @@ abstract class editor_Models_Import_FileParser {
      * @param string $mid
      */
     protected function setMid($mid) {
-        if(mb_strlen($mid) > 60) {
-            trigger_error('Given MID was to long (max 60 chars), MID: '.$mid, E_USER_ERROR);
+        if(mb_strlen($mid) > 1000) {
+            trigger_error('Given MID was to long (max 1000 chars), MID: "'.$mid.'"', E_USER_ERROR);
         }
         $this->_mid = $mid;
     }

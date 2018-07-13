@@ -1,3 +1,4 @@
+
 -- /*
 -- START LICENSE AND COPYRIGHT
 -- 
@@ -25,8 +26,4 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
-ALTER TABLE `LEK_segment_data`  
-CHANGE COLUMN `originalToSort` `originalToSort` LONGTEXT NULL DEFAULT NULL ,
-CHANGE COLUMN `editedToSort` `editedToSort` LONGTEXT NULL DEFAULT NULL ;
-
+INSERT INTO `LEK_change_log` (`dateOfChange`, `jiraNumber`, `type`, `title`, `description`, `userGroup`) VALUES ('2018-06-27', 'TRANSLATE-1324', 'bugfix', 'RepetitionEditor: repetitions could not be saved due JS error', 'RepetitionEditor: repetitions could not be saved due JS error', '14');

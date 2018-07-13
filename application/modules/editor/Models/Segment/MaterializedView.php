@@ -196,6 +196,7 @@ class editor_Models_Segment_MaterializedView {
      * prefills the materialized view
      */
     protected function fillWithData() {
+        $this->metaCacheCreateTempTable();
         $selectSql = array('INSERT INTO '.$this->viewName.' SELECT s.*');
 
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($this->taskGuid);
@@ -207,10 +208,12 @@ class editor_Models_Segment_MaterializedView {
         $selectSql = join(',', $selectSql).', ';
         
         //build up the segment meta cache query
-        $selectSql .= $this->buildMetaCacheSql(true);
+        $selectSql .= $this->buildMetaCacheSql();
         
         $db = Zend_Db_Table::getDefaultAdapter();
-        $db->query($selectSql, [$this->taskGuid, $this->taskGuid]);
+//error_log($selectSql);
+//error_log(print_r([$this->taskGuid, $this->taskGuid],1));
+        $db->query($selectSql, [$this->taskGuid]);
     }
     
     /**
@@ -235,11 +238,13 @@ class editor_Models_Segment_MaterializedView {
     public function updateSiblingMetaCache(editor_Models_Segment $segment) {
         $groupId = $segment->meta()->getTransunitId();
         $sql = 'update '.$this->viewName.' view, (SELECT m.segmentId,';
-        $sql .= $this->buildMetaCacheSql(false);
+        $sql .= $this->buildMetaCacheSql($segment->getId());
         $sql .= ') data';
         $sql .= ' SET view.metaCache = data.metaCache';
         $sql .= ' WHERE view.id = data.segmentId';
         $db = Zend_Db_Table::getDefaultAdapter();
+//error_log($sql);
+//error_log(print_r([$this->taskGuid, $this->taskGuid, $groupId],1));
         $db->query($sql, [$this->taskGuid, $this->taskGuid, $groupId]);
     }
     
@@ -248,26 +253,46 @@ class editor_Models_Segment_MaterializedView {
      * @param boolean $forWholeTask
      * @return string
      */
-    protected function buildMetaCacheSql($forWholeTask = true) {
+    protected function buildMetaCacheSql($segmentId = null) {
+        //integer cast is also save, no need for binding
+        $segmentId = (int)$segmentId;
         $selectSql = '';
         $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), ';
         $selectSql .= '\',"siblingData":{\', ifnull(siblings.siblingData,\'\'), \'}}\') metaCache';
         $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
         $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id ';
-        $selectSql .= ' LEFT JOIN (
-            SELECT transunitId, GROUP_CONCAT(CONCAT(\'"\',segmentId,\'": \',siblingData) SEPARATOR ",") siblingData
-            FROM LEK_segments_meta
-            WHERE taskGuid = ?
-            GROUP BY transunitId
-            ) siblings ON siblings.transunitId = m.transunitId';
-        if($forWholeTask) {
+        if(empty($segmentId)) {
+            $selectSql .= ' LEFT JOIN `siblings` ON `siblings`.`transunitId` = m.`transunitId`';
             $selectSql .= ' WHERE d.taskGuid = ? and s.taskGuid = d.taskGuid and d.segmentId = s.id';
         }
         else {
-            $selectSql .= ' WHERE s.taskGuid = ? and m.transunitId = ? and d.segmentId = s.id';
+            $selectSql .= ' LEFT JOIN '.$this->metaCacheInnerSql($segmentId).' siblings ON siblings.transunitId = m.transunitId';
+            $selectSql .= ' WHERE s.taskGuid = ? and m.transunitId = ? and d.segmentId = s.id and s.id = '.$segmentId;
         }
         $selectSql .= ' GROUP BY d.segmentId';
         return $selectSql;
+    }
+    
+    protected function metaCacheCreateTempTable() {
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $sql = 'CREATE TEMPORARY TABLE siblings (INDEX (`transunitId`)) AS '.$this->metaCacheInnerSql().';';
+        $db->query($sql, [$this->taskGuid]);
+    }
+    
+    protected function metaCacheInnerSql($segmentId = null) {
+        //integer cast is also save, no need for binding
+        $segmentId = (int)$segmentId;
+        $sql  = '(SELECT m1.transunitId, GROUP_CONCAT(CONCAT(\'"\',m1.segmentId,\'": \',m1.siblingData) SEPARATOR ",") siblingData ';
+        $sql .= ' FROM LEK_segments_meta m1';
+        if(empty($segmentId)) {
+            $sql .= ' WHERE m1.taskGuid = ? ';
+        }
+        else {
+            $sql .= ' LEFT JOIN LEK_segments_meta m2 ON m2.segmentId = '.$segmentId;
+            $sql .= ' WHERE m1.taskGuid = ? AND m1.transunitId = m2.transunitId ';
+        }
+        $sql .= ' GROUP BY transunitId)';
+        return $sql;
     }
     
     /**
