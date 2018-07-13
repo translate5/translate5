@@ -1,3 +1,30 @@
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
 
 /***
  * Helper variables
@@ -366,7 +393,7 @@ function drawTermAttributes(termId){
  * @returns
  */
 function groupChildData(list) {
-    var map = {}, node, roots = [], i;
+    var map = {}, node, roots = [], i,labelTrans;
     for (i = 0; i < list.length; i += 1) {
         map[list[i].attributeId] = i; // initialize the map
         list[i].children = []; // initialize the children
@@ -374,10 +401,11 @@ function groupChildData(list) {
     
     for (i = 0; i < list.length; i += 1) {
         node = list[i];
-        var labelTrans=attributeLabels.find( label => label.id === node.labelId );
+        labelTrans = $.grep(attributeLabels, function(e){ return e.id == node.labelId; });
+        
         node.headerText=null;
-        if(labelTrans && labelTrans.labelText){
-            node.headerText=labelTrans.labelText;
+        if(labelTrans.length==1 && labelTrans[0].labelText){
+            node.headerText=labelTrans[0].labelText;
         }
         if (node.parentId !== null) {
             // if you have dangling branches check that map[node.parentId] exists
@@ -545,8 +573,9 @@ function handleAttributeHeaderText(attribute,addColon){
 function checkTermStatusIcon(attribute){
     var retVal="";
     $.each($(attribute), function (i, attr) {
-        var statusIcon=getAttributeValue(attr);
-        if(statusIcon && statusIcon.startsWith('<img src="')){
+        var statusIcon=getAttributeValue(attr),
+        	cmpStr='<img src="';
+        if(statusIcon && statusIcon.slice(0, cmpStr.length) == cmpStr){
             retVal+=statusIcon;
         }
     });
@@ -597,22 +626,3 @@ function showFinalResultContent() {
     $('#finalResultContent').show();
     setSizesInFinalResultContent();
 }
-
-function setSizesInFinalResultContent(){
-    var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
-    if ($('#searchTermsHolder').is(':visible')) {
-        // (1) Left column: ensure that the scrollable area has always the maximal possible height that is available in the current browser window.
-        $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
-        // (2) Right column: must not wrap underneath the left column until BOTH of them are wrapped to rows (is out of sight otherwise!)
-        if ($('#resultTermsHolder').is(':visible')) {
-            var widthTerms = $('#searchTermsHolder').width(),
-                widthResults = $('#resultTermsHolder').width();
-            if ( (widthResults - widthTerms > SCROLLBAROFFSET) &&       // = check if they have the same size (= wrapped as rows and both displayed in full width already)
-                 (widthResults + widthTerms > window.innerWidth) ) {    // = together they are broader than the window and the results would be wrapped
-                $('#resultTermsHolder').css("width", window.innerWidth - widthTerms - 100); // 100 is just to get small enough to not be wrapped; flex ("auto") will adjust the width by itself then
-            }
-        }
-    }
-}
-
-

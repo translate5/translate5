@@ -70,7 +70,6 @@ Ext.define('Editor.controller.Segments', {
   //views: ['segments.Scroller', 'segments.RowEditing', 'segments.HtmlEditor', 'segments.GridFilter'],
   views: ['segments.RowEditing', 'segments.HtmlEditor', 'ToolTip'],
   messages: {
-    segmentSaved: 'Das Segment wurde gespeichert!',
     sortCleared: 'Die gewählte Sortierung der Segmente wurde zurückgesetzt!',
     segmentNotSaved: '#UT# Das zuletzt geöffnete Segment (Nr. {0}) konnte nicht gespeichert werden!',
     noSegmentToFilter: 'Kein Segment dieser Datei entspricht den Filterkriterien',
@@ -595,8 +594,6 @@ Ext.define('Editor.controller.Segments', {
       
       //show other messages on the segment:
       Editor.MessageBox.addByOperation(operation);
-      //show save segment success message 
-      Editor.MessageBox.addSuccess(me.messages.segmentSaved);
       
       //FIXME 
       //this event is triggered because we are not able to listen(use) the 'saveComplete' event

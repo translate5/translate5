@@ -103,6 +103,11 @@ Ext.define('Editor.controller.Editor', {
             '#showReferenceFilesButton': {
                 click:'onShowReferenceFilesButtonClick'
             },
+            
+            '#commentContainer textarea': {
+                specialkey: 'handleCommentEnter'
+            },
+            
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
             }
@@ -206,21 +211,11 @@ Ext.define('Editor.controller.Editor', {
         
         me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
             'alt-c':[
-                "C",
-                {
-                    ctrl: false, alt: true
-                }, 
+                "C",{ctrl: false, alt: true}, 
                 function(key, e){
                     var me = this;
                     e.stopEvent();
-                    if(me.isEditing) {
-                        me.handleOpenComments();
-                        return false;
-                    }
-                    var found = Ext.select('#segment-grid-body .x-grid-item-selected td.comments-field img').first();
-                    if(found && (found.hasCls('add') || found.hasCls('edit'))){
-                        found.dom.click();
-                    }
+                    Ext.fireEvent('editorOpenComments');
                     return false;
                 }
             ]
@@ -228,7 +223,7 @@ Ext.define('Editor.controller.Editor', {
         //inits the editor iframe directly after loading the application
         plug.editor = plug.initEditor(); 
         
-        me.handleReferneceFilesMessage();
+        me.handleReferenceFilesMessage();
     },
     
     handleSortOrFilter: function() {
@@ -479,9 +474,9 @@ Ext.define('Editor.controller.Editor', {
         //since save without moving was triggered, we have to reset the calculated data
         me.prevNextSegment.reset();
 
+        me.fireEvent('saveUnsavedComments');
         if(me.isEditing &&rec && rec.get('editable')) {
             me.fireEvent('prepareTrackChangesForSaving');
-            me.fireEvent('saveUnsavedComments');
             me.fireEvent('saveSegment');
         }
     },
@@ -607,11 +602,11 @@ Ext.define('Editor.controller.Editor', {
             selModel = grid.getSelectionModel(),
             ed = me.getEditPlugin();
         
+        me.fireEvent('saveUnsavedComments');
         if(!me.isEditing) {
             return;
         }
         me.fireEvent('prepareTrackChangesForSaving');
-        me.fireEvent('saveUnsavedComments');
         
         me.fireEvent('saveSegment', {
             scope: me,
@@ -732,7 +727,7 @@ Ext.define('Editor.controller.Editor', {
      * Handles pressing the comment keyboard shortcut
      */
     handleOpenComments: function(key) {
-        this.fireEvent('openComments');
+        Ext.fireEvent('editorOpenComments');
     },
     /**
      * Handles pressing the MQM tag shortcuts, without shift 1-10, with shift 11-20
@@ -1068,7 +1063,19 @@ Ext.define('Editor.controller.Editor', {
         }
     },
     
-    handleReferneceFilesMessage:function(){
+    /**
+     * In textareas ExtJS 6.2 enter keys are not bubbling up, but they are triggering a specialkey event
+     *  we listen to that event and process our own keys then. 
+     */
+    handleCommentEnter: function(field, e) {
+        var key = e.getKey();
+        
+        if (key === e.ENTER && e.hasModifier() && this.generalKeyMap) {
+            this.generalKeyMap.handleTargetEvent(e);
+        }
+    },
+    
+    handleReferenceFilesMessage:function(){
         if(Editor.data.task.get('referenceFiles')){
             var referenceInfoMessage = Ext.create('Editor.view.ReferenceFilesInfoMessage',{}),
             task = new Ext.util.DelayedTask(function(){

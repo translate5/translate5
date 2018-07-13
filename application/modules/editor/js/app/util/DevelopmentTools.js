@@ -47,7 +47,7 @@ Ext.define('Editor.util.DevelopmentTools', {
         var me = this;
         if (me.USE_CONSOLE) {
             if (typeof outputForConsole === 'string' || outputForConsole instanceof String) {
-                console.log(outputForConsole);
+                Ext.log({msg: outputForConsole});
             } else {
                 console.dir(outputForConsole);
             }

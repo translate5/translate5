@@ -118,6 +118,7 @@ Ext.define('Editor.view.comments.Panel', {
                         xtype : 'textarea',
                         name: 'comment',
                         height: 100,
+                        enterIsSpecial: true,
                         fieldLabel: me.item_commentNew,
                         anchor: '100%'
                     },{
@@ -140,7 +141,7 @@ Ext.define('Editor.view.comments.Panel', {
                             xtype : 'button',
                             itemId : 'saveBtn',
                             listeners:{
-                                click:'onSaveBtnClick'
+                                click:'saveComment'
                             },
                             text : me.item_saveBtn
                         }]
@@ -156,6 +157,14 @@ Ext.define('Editor.view.comments.Panel', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    
+    /**
+     * Save the current opened comment
+     * @return {Boolean} true if save request started, false if not (not valid or something)
+     */
+    save: function() {
+        return this.getController().saveComment();
     },
 
     handleCollapse:function(){

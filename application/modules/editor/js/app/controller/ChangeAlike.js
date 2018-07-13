@@ -300,7 +300,7 @@ Ext.define('Editor.controller.ChangeAlike', {
       autoStateId: 999
     };
     //get the length of the changed master segment
-    if(meta && meta.siblingData[rec.get('id')]) {
+    if(meta && meta.siblingData && meta.siblingData[rec.get('id')]) {
         newLength = Ext.clone(meta.siblingData[rec.get('id')].length);
     }
     if(me.getSourceEditing()) {

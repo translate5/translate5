@@ -38,6 +38,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.SegmentEditor', {
     mixins: ['Editor.util.DevelopmentTools'],
+    mixins: ['Editor.util.Node'],
     
     editor: null, // = the segment's Editor (Editor.view.segments.HtmlEditor)
     
@@ -351,17 +352,42 @@ Ext.define('Editor.util.SegmentEditor', {
         me.setPositionOfCaret(bookmarkForCaret);
     },
     /***
-     * Remove Span-Markup (SpellCheck, TermTagger) in the Editor but keep their content.
+     * Remove SpellCheck-Markup in the Editor but keep their content.
      */
-    cleanSpanMarkupInEditor:function(){
+    cleanSpellCheckMarkupInEditor:function(){
         var me = this,
             el = me.getEditorBodyExtDomElement(),
-            elContent,
+            allSpellCheckNodes = Ext.fly(el).query('.spellcheck');
+        Ext.Array.each(allSpellCheckNodes, function(spellCheckNode, index) {
+            me.removeMarkupAroundNode(spellCheckNode);
+        });
+    },
+    /***
+     * Remove SpellCheck-Markup at a range (e.g. the position of the cursor) but keep the content.
+     */
+    cleanSpellCheckMarkupAtRange:function(range){
+        var me = this,
+            allSpellCheckNodes = [],
+            spellCheckNode,
+            getSpellCheckNode = function(nodeToCheck){
+                while (nodeToCheck) {
+                    if (/\bspellcheck\b/i.test(nodeToCheck.className)) {
+                        return nodeToCheck;
+                    }
+                    nodeToCheck = nodeToCheck.parentNode;
+                }
+                return null;
+            },
             bookmarkForCaret = me.getPositionOfCaret();
-        elContent = el.getHtml();
-        elContent = elContent.replace(/<\s*\/?\s*span\s*.*?>/g, '');
-        el.setHtml(elContent);
-        me.getEditorBodyExtDomElement().dom.normalize();
+        allSpellCheckNodes.push(range.commonAncestorContainer);
+        allSpellCheckNodes.push(range.startContainer);
+        allSpellCheckNodes.push(range.endContainer);
+        Ext.Array.each(allSpellCheckNodes, function(node) {
+            spellCheckNode = getSpellCheckNode(node);
+            if (spellCheckNode != null) {
+                me.removeMarkupAroundNode(spellCheckNode);
+            }
+        });
         me.setPositionOfCaret(bookmarkForCaret);
     },
     /***
