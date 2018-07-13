@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-
+DELETE FROM LEK_term_attributes_label;
 INSERT INTO LEK_term_attributes_label (id, label, type, labelText) VALUES
 (1, 'transac', 'origination', 'Erstellung'),
 (2, 'transacNote', 'responsibility', 'Verantwortlich'),
