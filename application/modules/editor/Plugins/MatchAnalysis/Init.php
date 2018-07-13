@@ -197,9 +197,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $analysis->setUserGuid($user->data->userGuid);
             $analysis->setUserName($user->data->userName);
             $analysis->calculateMatchrate();
-        } catch (Exception $e) {
+        } catch (ZfExtended_Exception $e) {
             //error_log("Error happend on match analysis and pretranslation (taskGuid=".$task->getTaskGuid()."). Error was: ".$e->getMessage());
-            error_log(var_export($e->getTraceAsString(), true));
+            error_log($e->getMessage());
             //inlock the task
             $task->setState($oldState);
             $task->save();

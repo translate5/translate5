@@ -45,6 +45,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * 
+     * @var editor_Models_TaskUserAssoc
+     */
+    protected $userTaskAssoc;
+    
+    /***
+     * 
      * @var string
      */
     protected $userGuid;
@@ -71,11 +77,15 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Pretranslate the given segment from the given resource
+     * 
      * @param editor_Models_Segment $segment
      * @param stdClass $result - match resources result
-     * @param int $tmmtid
      */
-    public function pretranslateSegment(editor_Models_Segment $segment, $result,$tmmtid){
+    public function pretranslateSegment(editor_Models_Segment $segment, $result){
+        
+        if(empty($result)){
+            return;
+        }
         
         //if the segment target is not empty or best match rate is not found do not pretranslate
         //pretranslation only for editable segments, check if the segment interattor already does that
@@ -86,6 +96,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return;
         }
         
+        //the internalTmmtid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
+        $tmmtid=$result->internalTmmtid;
+        
         $history = $segment->getNewHistoryEntity();
         
         $segmentField=$this->sfm->getFirstTargetName();
@@ -94,8 +107,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $targetResult=$result->target;
         
         //ignore fuzzy match target
-        if($targetResult=="translate5-unique-id[".$segment->getTaskGuid()."]"){
-            error_log("Segment ignored".$segment->getSegmentNrInTask());
+        if (strpos($targetResult, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false){
             return;
         }
         
@@ -151,7 +163,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
             $tua->loadByParams($this->userGuid,$this->task->getTaskGuid());
             if($tua->getIsPmOverride() == 1){
-                $segment->setWorkflowStep(self::STEP_PM_CHECK);
+                
+                $segment->setWorkflowStep(editor_Workflow_Abstract::STEP_PM_CHECK);
             }
             else {
                 //sets the actual workflow step

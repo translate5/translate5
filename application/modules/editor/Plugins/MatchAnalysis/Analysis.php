@@ -65,6 +65,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @var string
      */
     protected $internalFuzzy=false;
+
+    /***
+     * Segment word count calculator
+     * 
+     * @var editor_Models_Segment_WordCount
+     */
+    protected $wordCount;
     
     
     public function __construct(editor_Models_Task $task,$analysisId){
@@ -99,140 +106,133 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         unset($results);
 
         $repetitionByHash=array();
-        //error_log(print_r($repetitions,1));
+
+        //init task user assoc so the segment can be edited
+        $this->initUserAssoc();
         
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
+        //init the word count calculator
+        $this->initWordCount();
         
-        $langModel->load($this->task->getSourceLang());
-        
-        $wordCount=ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
-                $langModel->getRfc5646()
-        ]);
-        
-        /* @var $wordCount editor_Models_Segment_WordCount */
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
-            $wordCount->setSegment($segment);
+            $this->wordCount->setSegment($segment);
             
             //check if the segment source hash exist in the repetition array
             //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 tmmt
             //segment does not exist in repetition array -> query the tm save the best match rate per tm
             if(isset($repetitionsDb[$segment->getId()]) && isset($repetitionByHash[md5($segment->getFieldOriginal('source'))])){
                     
-                    $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
-                    /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-                    
-                    $matchAnalysis->setSegmentId($segment->getId());
-                    $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
-                    $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
-                    $matchAnalysis->setAnalysisId($this->analysisId);
-                    
-                    $matchAnalysis->setTmmtid(0);
-                    $matchAnalysis->setMatchRate(editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE);
-                    $matchAnalysis->setWordCount($wordCount->getSourceCount());
-                    
-                    $repetitionResult=$repetitionByHash[md5($segment->getFieldOriginal('source'))];
-                    $repetitionMatchRate=$repetitionResult->matchrate;
-                    
-                    //A repetition, that also is found as a 103% match in the TM is NOT counted as a repetition. And it is pre-translated.
-                    if($repetitionMatchRate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::CONTEXT_MATCH_VALUE){
-                        $this->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
-                        continue;
-                    }
-                    
-                    $this->pretranslateSegment($segment,$repetitionResult,$repetitionResult->internalTmmtid);
-                    
-                    $matchAnalysis->save();
-                    continue;
+                //get the best match rate for the repetition segment, it can be context match
+                $repetitionResult=$this->getBestMatchrate($segment,false);
+                
+                //save the repetition analysis
+                $this->saveAnalysis($segment, editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE, 0);
+                
+                $this->pretranslateSegment($segment,$repetitionResult);
+                
+                continue;
             }
             
-            $bestMatchRateResult=null;
-            $bestMatchRate=null;
-            
-            //query the segment for each assigned tm
-            foreach ($this->connectors as $tmmtid => $connector){
-                /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
-                
-                $matches=[];
-                
-                $hasFuzzyConnector=isset($this->fuzzyConnectors[$tmmtid]);
-                //use fuzzy connector if internal fuzzy is active
-                if($this->internalFuzzy && $hasFuzzyConnector){
-                    $connector=$this->fuzzyConnectors[$tmmtid];
-                }
-                
-                $connector->resetResultList();
-                $matches=$connector->query($segment);
-                
-                //update the segment with custom target in fuzzy tm
-                if($this->internalFuzzy && $hasFuzzyConnector){
-                    $segment->setTargetEdit("translate5-unique-id[".$segment->getTaskGuid()."]");
-                    $connector->update($segment);
-                }
-                
-                $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
-                /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-                
-                $matchAnalysis->setSegmentId($segment->getId());
-                $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
-                $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
-                $matchAnalysis->setAnalysisId($this->analysisId);
-                
-                $matchResults=$matches->getResult();
-                
-                //for each match, find the best match rate, and save it
-                foreach ($matchResults as $match){
-                    
-                    //TODO: pretranslation with best sort rate
-                    
-                    if($matchAnalysis->getMatchRate() >= $match->matchrate){
-                        continue;
-                    }
-                    $matchAnalysis->setMatchRate($match->matchrate);
-                    
-                    //store best match rate results
-                    if($matchAnalysis->getMatchRate()>$bestMatchRate){
-                        $bestMatchRateResult=$match;
-                        $bestMatchRateResult->internalTmmtid=$tmmtid;
-                    }
-                }
-                
-                if($matchAnalysis->getMatchRate()==null){
-                    $matchAnalysis->setTmmtid($tmmtid);
-                    $matchAnalysis->setWordCount($wordCount->getSourceCount());
-                    //save match analysis
-                    $matchAnalysis->save();
-                    
-                    $matches->resetResult();
-                    continue;
-                }
-                
-                if($matchAnalysis->getMatchRate()>$bestMatchRate){
-                    $bestMatchRate=$matchAnalysis->getMatchRate();
-                }
-                
-                $matchAnalysis->setTmmtid($tmmtid);
-                $matchAnalysis->setWordCount($wordCount->getSourceCount());
-                //save match analysis
-                $matchAnalysis->save();
-                
-                $matches->resetResult();
-            }
-            
+            $bestMatchRateResult=$this->getBestMatchrate($segment,true);
             //add the segment source hash in the array
             $repetitionByHash[md5($segment->getFieldOriginal('source'))]=$bestMatchRateResult;
             
             if($this->pretranslate){
-                $this->pretranslateSegment($segment, $bestMatchRateResult,$tmmtid);
+                $this->pretranslateSegment($segment, $bestMatchRateResult);
             }
         }
         
         //remove fuzzy tmmt from opentm2
         $this->removeFuzzyResources();
         
+        //remove the entry in the task user assoc table
+        $this->removeUserAssoc();
         return true;
+    }
+    
+    /***
+     * Get best match rate result for the segment. If $saveAnalysis is provided, for each best match rate for the tm,
+     * one analysis will be saved
+     * 
+     * @param editor_Models_Segment $segment
+     * @param boolean $saveAnalysis
+     * @return NULL|stdClass
+     */
+    public function getBestMatchrate(editor_Models_Segment $segment,$saveAnalysis=true){
+        $bestMatchRateResult=null;
+        $bestMatchRate=null;
+        
+        //query the segment for each assigned tm
+        foreach ($this->connectors as $tmmtid => $connector){
+            /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
+            
+            $matches=[];
+            
+            $hasFuzzyConnector=isset($this->fuzzyConnectors[$tmmtid]);
+            //use fuzzy connector if internal fuzzy is active
+            if($this->internalFuzzy && $hasFuzzyConnector){
+                $connector=$this->fuzzyConnectors[$tmmtid];
+            }
+            
+            $connector->resetResultList();
+            $matches=$connector->query($segment);
+            
+            //update the segment with custom target in fuzzy tm
+            if($this->internalFuzzy && $hasFuzzyConnector){
+                $segment->setTargetEdit("translate5-unique-id[".$segment->getTaskGuid()."]");
+                $connector->update($segment);
+            }
+            
+            $matchResults=$matches->getResult();
+            
+            $matchRateInternal=null;
+            //for each match, find the best match rate, and save it
+            foreach ($matchResults as $match){
+                if($matchRateInternal >= $match->matchrate){
+                    continue;
+                }
+                $matchRateInternal=$match->matchrate;
+                
+                //store best match rate results
+                if($matchRateInternal>$bestMatchRate){
+                    $bestMatchRateResult=$match;
+                    $bestMatchRateResult->internalTmmtid=$tmmtid;
+                }
+            }
+            //no match rate is found in the tmmt result
+            if($matchRateInternal==null){
+                $saveAnalysis && $this->saveAnalysis($segment, null, $tmmtid);
+                $matches->resetResult();
+                continue;
+            }
+            
+            if($matchRateInternal>$bestMatchRate){
+                $bestMatchRate=$matchRateInternal;
+            }
+            
+            //save the match analyses if needed
+            $saveAnalysis && $this->saveAnalysis($segment, $matchRateInternal, $tmmtid);
+            
+            //reset the result collection
+            $matches->resetResult();
+        }
+        
+        return $bestMatchRateResult;
+    }
+    
+    public function saveAnalysis($segment,$matchRate,$tmmtid){
+        $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
+        /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
+        
+        $matchAnalysis->setSegmentId($segment->getId());
+        $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
+        $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
+        $matchAnalysis->setAnalysisId($this->analysisId);
+        $matchAnalysis->setTmmtid($tmmtid);
+        $matchAnalysis->setWordCount($this->wordCount->getSourceCount());
+        $matchAnalysis->setMatchRate($matchRate);
+        $matchAnalysis->save();
     }
     
     
@@ -277,13 +277,54 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //if internal fuzzy is active, get the fuzzy connector
             if($this->internalFuzzy){
                 //this function will clone the existing tmmt in opentm2 under oldname+Fuzzy-Analysis
-                $fuzzyConnector=$connector->initFuzzyAnalysis();
+                $fuzzyConnector=clone $connector->initFuzzyAnalysis();
                 if(!empty($fuzzyConnector)){
                     $this->fuzzyConnectors[$assoc['id']]=$fuzzyConnector;
                 }
             }
         }
         return $this->connectors;
+    }
+    
+    /***
+     * Init user assoc, so we are able to edit segments
+     */
+    public function initUserAssoc(){
+        $this->userTaskAssoc=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        
+        $this->userTaskAssoc->setUserGuid($this->userGuid);
+        $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
+        $this->userTaskAssoc->setRole('');
+        $this->userTaskAssoc->setState('');
+        $this->userTaskAssoc->setIsPmOverride(true);
+        $this->userTaskAssoc->setUsedInternalSessionUniqId(null);
+        $this->userTaskAssoc->setUsedState(null);
+        $this->userTaskAssoc->setState(editor_Workflow_Abstract::STATE_EDIT);
+        $result=$this->userTaskAssoc->save();
+        $this->userTaskAssoc->setId($result);
+    }
+    
+    /***
+     * Init word counter 
+     */
+    public function initWordCount(){
+        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        
+        $langModel->load($this->task->getSourceLang());
+        
+        $this->wordCount=ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
+            $langModel->getRfc5646()
+        ]);
+    }
+    
+    /***
+     * Remove the user assoc
+     */
+    public function removeUserAssoc(){
+        if($this->userTaskAssoc->getId()){
+            $this->userTaskAssoc->deletePmOverride();
+        }
     }
     
     /***
