@@ -119,6 +119,9 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         }
         
         unset($bestTmmtMatches);
+        
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        
         foreach ($results as $res){
         
             //for each tmmt separate array
@@ -184,9 +187,13 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 /* @var $model editor_Plugins_MatchAnalysis_Models_TaskAssoc */
                 $model->load($res['analysisId']);
                 $analysisCreated=$model->getCreated();
+                $internalFuzzy=$model->getInternalFuzzy();
+                $pretranslateMatchrate=$model->getPretranslateMatchrate();
             }
             
             $groupedResults[$res['tmmtid']]['created']=$analysisCreated;
+            $groupedResults[$res['tmmtid']]['internalFuzzy']=filter_var($internalFuzzy, FILTER_VALIDATE_BOOLEAN) ? $translate->_("Ja"): $translate->_("Nein");
+            $groupedResults[$res['tmmtid']]['pretranslateMatchrate']=$pretranslateMatchrate;
         }
         unset($segmentBest);
         return $this->sortByTm($groupedResults);

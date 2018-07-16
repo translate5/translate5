@@ -80,6 +80,16 @@
 		    <target>Die Vorübersetzung löst auch eine neue Analyse aus</target>
 		</trans-unit>
 
+		<trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='>
+		    <source>Interne Fuzzy verwendet</source>
+		    <target>Interne Fuzzy verwendet</target>
+		</trans-unit>
+
+		<trans-unit id='TWF0Y2gtUmF0ZQ=='>
+		    <source>Match-Rate</source>
+		    <target>Match-Rate</target>
+		</trans-unit>
+
     </body>
   </file>
 </xliff>

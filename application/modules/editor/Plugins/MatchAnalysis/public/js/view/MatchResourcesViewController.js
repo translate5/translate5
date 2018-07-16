@@ -60,5 +60,11 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResourcesViewController', {
 		}
 		
 		view.fireEvent('wizardCardFinished');
+    },
+    
+    handleSkipCardClick:function(){
+        var me=this,
+            view=me.getView();
+        view.fireEvent('wizardCardFinished',3);
     }
 });

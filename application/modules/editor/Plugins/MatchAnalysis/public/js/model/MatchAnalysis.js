@@ -65,7 +65,9 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
     			  "created",
     			  "id",
     			  "resourceName",
-    			  "resourceColor"
+    			  "resourceColor",
+    			  "pretranslateMatchrate",
+    			  "internalFuzzy"
     		  ],ts=0;
     		
     		for (var key in row.data) {

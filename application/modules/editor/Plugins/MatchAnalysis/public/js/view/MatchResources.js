@@ -77,7 +77,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
     },
 
     disableSkipButton:function(){
-        return true;
+        return false;
     },
     
     disableContinueButton:function(){

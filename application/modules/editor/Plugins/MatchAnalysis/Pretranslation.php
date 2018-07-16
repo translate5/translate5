@@ -139,6 +139,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $segment->setMatchRateType((string) $matchrateType);
         
+        $segment->setMatchRate($result->matchrate);
         
         //if the task is in state import calculate the autostate
         if($this->task->getState()==editor_Models_Task::STATE_IMPORT){
@@ -157,12 +158,10 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
                 $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
             };
             
-            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-            /* @var $tua editor_Models_TaskUserAssoc */
+            //init the task user association
+            $this->initUsertTaskAssoc();
             
-            //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-            $tua->loadByParams($this->userGuid,$this->task->getTaskGuid());
-            if($tua->getIsPmOverride() == 1){
+            if($this->userTaskAssoc->getIsPmOverride() == 1){
                 
                 $segment->setWorkflowStep(editor_Workflow_Abstract::STEP_PM_CHECK);
             }
@@ -171,7 +170,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
                 $segment->setWorkflowStepNr($this->task->getWorkflowStep());
                 
                 //sets the actual workflow step name, does currently depend only on the userTaskRole!
-                $step = $activeWorkflow->getStepOfRole($tua->getRole());
+                $step = $activeWorkflow->getStepOfRole($this->userTaskAssoc->getRole());
                 $step && $segment->setWorkflowStep($step);
             }
             
@@ -179,7 +178,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             
             //set the autostate as defined in the given Closure
             /* @var $autostates editor_Models_Segment_AutoStates */
-            $updateAutoStates($autostates, $segment, $tua);
+            $updateAutoStates($autostates, $segment, $this->userTaskAssoc);
         }
         
         
@@ -210,6 +209,32 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $history->save();
         $segment->setTimestamp(null);
         $segment->save();
+    }
+    
+    
+    /***
+     * Init the task user assocition if exist. If not a default record will be initialized
+     * @return editor_Models_TaskUserAssoc
+     */
+    public function initUsertTaskAssoc(){
+        if($this->userTaskAssoc){
+            return $this->userTaskAssoc;
+        }
+        
+        $this->userTaskAssoc = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        try {
+            $this->userTaskAssoc->loadByParams($this->userGuid,$this->task->getTaskGuid());
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->userTaskAssoc->setUserGuid($this->userGuid);
+            $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
+            $this->userTaskAssoc->setRole('');
+            $this->userTaskAssoc->setState('');
+            $this->userTaskAssoc->setIsPmOverride(true);
+            $this->userTaskAssoc->setUsedInternalSessionUniqId(null);
+            $this->userTaskAssoc->setUsedState(null);
+            $this->userTaskAssoc->setState(editor_Workflow_Abstract::STATE_EDIT);
+        }
     }
     
     public function setUserGuid($userGuid) {

@@ -107,9 +107,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $repetitionByHash=array();
 
-        //init task user assoc so the segment can be edited
-        $this->initUserAssoc();
-        
         //init the word count calculator
         $this->initWordCount();
         
@@ -146,8 +143,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //remove fuzzy tmmt from opentm2
         $this->removeFuzzyResources();
         
-        //remove the entry in the task user assoc table
-        $this->removeUserAssoc();
         return true;
     }
     
@@ -287,24 +282,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     }
     
     /***
-     * Init user assoc, so we are able to edit segments
-     */
-    public function initUserAssoc(){
-        $this->userTaskAssoc=ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        
-        $this->userTaskAssoc->setUserGuid($this->userGuid);
-        $this->userTaskAssoc->setTaskGuid($this->task->getTaskGuid());
-        $this->userTaskAssoc->setRole('');
-        $this->userTaskAssoc->setState('');
-        $this->userTaskAssoc->setIsPmOverride(true);
-        $this->userTaskAssoc->setUsedInternalSessionUniqId(null);
-        $this->userTaskAssoc->setUsedState(null);
-        $this->userTaskAssoc->setState(editor_Workflow_Abstract::STATE_EDIT);
-        $result=$this->userTaskAssoc->save();
-        $this->userTaskAssoc->setId($result);
-    }
-    
-    /***
      * Init word counter 
      */
     public function initWordCount(){
@@ -316,15 +293,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->wordCount=ZfExtended_Factory::get('editor_Models_Segment_WordCount',[
             $langModel->getRfc5646()
         ]);
-    }
-    
-    /***
-     * Remove the user assoc
-     */
-    public function removeUserAssoc(){
-        if($this->userTaskAssoc->getId()){
-            $this->userTaskAssoc->deletePmOverride();
-        }
     }
     
     /***

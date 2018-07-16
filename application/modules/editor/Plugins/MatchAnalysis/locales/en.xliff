@@ -79,6 +79,16 @@
 		    <source>Die Vorübersetzung löst auch eine neue Analyse aus</source>
 		    <target>Pretranslation also triggers new analysis</target>
 		</trans-unit>
+
+		<trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='>
+		    <source>Interne Fuzzy verwendet</source>
+		    <target>Internal fuzzy used</target>
+		</trans-unit>
+
+		<trans-unit id='TWF0Y2gtUmF0ZQ=='>
+		    <source>Match-Rate</source>
+		    <target>Match-Rate</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

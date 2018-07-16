@@ -104,7 +104,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 	scope:me
                 }
             }
-        },'postimport');      
+        },'postimport');
+        
     },
 
     init : function() {
@@ -133,6 +134,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		task=win.actualTask,
     		storeData=[];
     	
+    	//init the pretranslate matchrate options (from 0-103)
     	for(var i=0;i<=103;i++){
     		storeData.push({
     			id:i,
@@ -155,10 +157,15 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             dock : 'bottom',
             ui: 'footer',
             layout: {
-                type: 'hbox',
-                pack: 'start'
+                type: 'vbox',
+                align: 'left'
             },
             items : [{
+    			xtype:'checkbox',
+    			boxLabel:this.strings.internalFuzzy,
+    			itemId:'cbInternalFuzzy',
+    			dock:'bottom'
+            },{
         		xtype:'combobox',
         		stretch: false,
         		align: 'left',
@@ -174,11 +181,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         		valueField: 'id',
         		queryMode: 'local',
         		dock:'bottom'
-            },{
-    			xtype:'checkbox',
-    			boxLabel:this.strings.internalFuzzy,
-    			itemId:'cbInternalFuzzy',
-    			dock:'bottom'
             }]
         }]);
     },

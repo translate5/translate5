@@ -51,6 +51,8 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         $createdDate=null;
+        $internalFuzzy=null;
+        $pretranslateMatchrate=null;
         //add to all groups 'Group' sufix, php excel does not handle integer keys
         foreach ($rows as $rowKey=>$row){
             $newRows=[];
@@ -59,6 +61,14 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                 $newKey=$key;
                 if($key=="created"){
                     $createdDate=$value;
+                    continue;
+                }
+                if($key=="internalFuzzy"){
+                    $internalFuzzy=$value;
+                    continue;
+                }
+                if($key=="pretranslateMatchrate"){
+                    $pretranslateMatchrate=$value;
                     continue;
                 }
                 //do not use resourceColor in export
@@ -78,6 +88,8 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             }
             
             $newRows['wordCountTotal']=$wordCountTotal;
+            $newRows['pretranslateMatchrate']=$pretranslateMatchrate;
+            $newRows['internalFuzzy']=$internalFuzzy;
             $newRows['created']=$createdDate;
             
             unset($rows[$rowKey]);
@@ -109,6 +121,8 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $excel->setLabel('wordCountTotal', $translate->_("Total Words"));
         
         $excel->setLabel('created', $translate->_("Creation date"));
+        $excel->setLabel('internalFuzzy', $translate->_("Interne Fuzzy verwendet"));
+        $excel->setLabel('pretranslateMatchrate', $translate->_("Match-Rate"));
 
         $rowsCount=count($rows);
         $rowIndex=$rowsCount+2;
