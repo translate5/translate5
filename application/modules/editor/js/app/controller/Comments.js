@@ -91,7 +91,12 @@ Ext.define('Editor.controller.Comments', {
                 }
             },
             global: {
-                editorOpenComments: 'onRequestOpenComments'
+                editorOpenComments: {
+                    fn: 'onRequestOpenComments',
+                    options: {
+                        priority: 100 //the handler here should run as first one, since it inits the segment record, and stops handling if comment is not editable
+                    }
+                }
             }
     },
     
@@ -310,16 +315,16 @@ Ext.define('Editor.controller.Comments', {
         me.record = null;
         
         //use given segment record or get the current used one
-        segment = segment || me.getCurrentSegment();
+        segment = (segment && segment.isModel ? segment : me.getCurrentSegment());
         
         //if we can not find any segment, we can not open the comments
         if(!segment) {
-            return;
+            return false; //stop further comment open handling
         }
         
         //do nothing is segment is not editable or task is readOnly unless isForced is true
         if(!isForced && (!segment.get('editable') || readOnlyMode)) {
-            return;
+            return false; //stop further comment open handling
         }
         //this reference is needed in general, since this controller is used also for comment invocations other as via comment panel 
         me.record = segment;
