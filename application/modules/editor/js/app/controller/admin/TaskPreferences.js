@@ -94,9 +94,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           'editorAdminTaskPreferences #taskWorkflow': {
               change: me.changeWorkflow
           },
-          'adminTaskPreferencesWindow #close-btn': {
-              click: me.handleCloseWindow
-          },
           'editorAdminTaskUserPrefsForm #alternates checkboxgroup': {
               beforerender: me.prepareAlternates
           },
@@ -261,12 +258,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       if(activeTab){
           win.down('tabpanel').setActiveTab(activeTab);
       }
-  },
-  /**
-   * handler if close button is pressed
-   */
-  handleCloseWindow: function () {
-      this.getPrefWindow().close();
   },
   /**
    * adds a new userpref entry

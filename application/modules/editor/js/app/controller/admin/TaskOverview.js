@@ -406,6 +406,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       
       if(skipCards){
           for(var i=1;i < skipCards;i++){
+        	  if(win.isTaskUploadNext()){
+        		  break;
+        	  }
               winLayout.setActiveItem(nextStep);
               nextStep=winLayout.getNext();
           }
