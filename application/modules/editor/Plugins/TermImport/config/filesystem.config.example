@@ -1,5 +1,4 @@
 ;;;; ATTENTION: the below variables need to be placed above the areas [FileMapping] and [CollectionMapping]
-;;;; ATTENTION: the below variables need to be placed above the areas [FileMapping] and [CollectionMapping]
 
 ;import directory of the tbx files
 importDir=/path/to/your/translate5/data/tbx-import/filesystem/;
