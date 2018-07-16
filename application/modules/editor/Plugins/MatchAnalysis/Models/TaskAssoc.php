@@ -34,6 +34,12 @@ END LICENSE AND COPYRIGHT
  * 
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
+ * 
+ * @method boolean getInternalFuzzy() getInternalFuzzy()
+ * @method void setInternalFuzzy() setInternalFuzzy(boolean $internalFuzzy)
+ * 
+ * @method integer getPretranslateMatchrate() getPretranslateMatchrate()
+ * @method void setPretranslateMatchrate() setPretranslateMatchrate(integer $pretranslateMatchrate)
  */
 class editor_Plugins_MatchAnalysis_Models_TaskAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_TaskAssoc';

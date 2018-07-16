@@ -180,6 +180,16 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc->setTaskGuid($task->getTaskGuid());
+        
+        //set flag for internal fuzzy usage
+        if(isset($eventParams['internalFuzzy'])){
+            $analysisAssoc->setInternalFuzzy(filter_var($eventParams['internalFuzzy'], FILTER_VALIDATE_BOOLEAN));
+        }
+        //set pretranslation matchrate used for the anlysis
+        if(isset($eventParams['pretranslateMatchrate'])){
+            $analysisAssoc->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
+        }
+        
         $analysisId=$analysisAssoc->save();
         
         try {

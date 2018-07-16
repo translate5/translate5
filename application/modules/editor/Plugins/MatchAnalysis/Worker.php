@@ -73,6 +73,16 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc->setTaskGuid($task->getTaskGuid());
+        
+        //set flag for internal fuzzy usage
+        if(isset($params['internalFuzzy'])){
+            $analysisAssoc->setInternalFuzzy(filter_var($params['internalFuzzy'], FILTER_VALIDATE_BOOLEAN));
+        }
+        //set pretranslation matchrate used for the anlysis
+        if(isset($params['pretranslateMatchrate'])){
+            $analysisAssoc->setPretranslateMatchrate($params['pretranslateMatchrate']);
+        }
+        
         $analysisId=$analysisAssoc->save();
         
         $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
