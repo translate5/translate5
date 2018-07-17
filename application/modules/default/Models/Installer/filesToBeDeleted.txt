@@ -16,6 +16,7 @@
 /data/dummyTm_5
 /data/dummyTm_4
 /data/dummyTm_7
+/public/assets/js/jquery.min.js
 /data/tbx-import/tbx-for-filesystem-import
 /data/tbx-import/tbx-for-filesystem-import/Term Collection for Task:API Testing::SegmentWorkflowTest;Task Number:;Task Guid:{6de516d8-166f-445d-ba2c-ef20a68931e0}
 /data/tbx-import/tbx-for-filesystem-import/Term Collection for Task:API Testing::SegmentWorkflowTest;Task Number:;Task Guid:{6de516d8-166f-445d-ba2c-ef20a68931e0}/ImportedFile-0.tbx
