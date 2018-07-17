@@ -219,6 +219,14 @@ $dep->dependencies = [[
             "uses" => "JQuery UI",
             "license" => "JQuery UI",
             "relpath" => "docs/third-party-licenses/jquery-ui-license.txt"
+        ],[
+            "uses" => "Future Imperfect by HTML5 UP",
+            "license" => "CCA 3.0",
+            "relpath" => "docs/third-party-licenses/jquery-ui-license.txt"
+        ],[
+            "uses" => "Skel",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/skel-license.txt"
         ]]
     ]
 ];
