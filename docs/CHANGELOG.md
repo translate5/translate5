@@ -3,6 +3,19 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.7.9] - 2018-07-17
+###Changed
+TRANSLATE-1349: Remove the message of saving a segment successfully
+
+###Bugfixes
+TRANSLATE-1337: removing orphaned tags is not working with tag check save anyway
+TRANSLATE-1245: Add missing keyboard shortcuts related to segment commenting
+TRANSLATE-1326: Comments for non-editable segment in visualReview mode and normal mode
+TRANSLATE-1345: Unable to import task with Relais language and terminology
+TRANSLATE-1347: Unknown Term status are not set to the default as configured
+TRANSLATE-1351: Remove jquery from official release and bundle it as dependency
+TRANSLATE-1353: Huge TBX files can not be imported
+
 ## [2.7.8] - 2018-07-04
 ###Changed
 VISUAL-43: VisualReview: Split segments search into long, middle, short
