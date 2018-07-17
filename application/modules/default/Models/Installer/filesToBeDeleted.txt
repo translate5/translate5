@@ -17,6 +17,17 @@
 /data/dummyTm_4
 /data/dummyTm_7
 /public/assets/js/jquery.min.js
+/public/modules/editor/termportal/js/jquery-ui-1.12.1
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.structure.min.css
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.js
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.js
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.theme.css
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.structure.css
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/external/jquery
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/external/jquery/jquery.js
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.css
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.theme.min.css
+/public/modules/editor/termportal/js/jquery-ui-1.12.1/jquery-ui.min.css
 /data/tbx-import/tbx-for-filesystem-import
 /data/tbx-import/tbx-for-filesystem-import/Term Collection for Task:API Testing::SegmentWorkflowTest;Task Number:;Task Guid:{6de516d8-166f-445d-ba2c-ef20a68931e0}
 /data/tbx-import/tbx-for-filesystem-import/Term Collection for Task:API Testing::SegmentWorkflowTest;Task Number:;Task Guid:{6de516d8-166f-445d-ba2c-ef20a68931e0}/ImportedFile-0.tbx
