@@ -96,6 +96,12 @@ class editor_Models_Import {
             }
             
             $this->task->save(); //Task erst Speichern wenn die obigen validates und checks durch sind.
+            $this->task->lock(NOW_ISO, true); //locks the task
+            
+            $this->events->trigger('beforeImport', $this, array(
+                    'task' => $this->task,
+                    'importFolder'=>$this->importConfig->importFolder
+            ));
         }
         catch (Exception $e) {
             //the DP exception handler is only needed before we have a valid task in the database, 
@@ -103,12 +109,6 @@ class editor_Models_Import {
             $dataProvider->handleImportException($e);
             throw $e;
         }
-        $this->task->lock(NOW_ISO, true); //locks the task
-        
-        $this->events->trigger('beforeImport', $this, array(
-                'task' => $this->task,
-                'importFolder'=>$this->importConfig->importFolder
-        ));
         
         $this->queueImportWorkers($dataProvider);
     }
