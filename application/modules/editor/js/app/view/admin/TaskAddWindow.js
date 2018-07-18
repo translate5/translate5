@@ -100,7 +100,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         var me = this,
             langCombo = {
                 xtype: 'combo',
-                typeAhead: true,
+                typeAhead: false,
                 displayField: 'label',
                 forceSelection: true,
                 anyMatch: true,
