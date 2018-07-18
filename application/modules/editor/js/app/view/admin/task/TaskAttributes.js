@@ -159,9 +159,13 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                     value:'{currentTask.pmGuid}'
                 },
                 store: Ext.create('Editor.store.admin.Users',{
+                    pageSize: 0,
                     proxy : {
                         type : 'rest',
                         url: Editor.data.restpath+'user/pm',
+                        extraParams: {
+                            sort: '[{"property":"surName","direction":"ASC"},{"property":"firstName","direction":"ASC"}]'
+                        },
                         reader : {
                             rootProperty: 'rows',
                             type : 'json'
