@@ -37,6 +37,29 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract extends editor_Plugins_MatchResource_Services_Connector_Abstract {
 
+    
+    /***
+     * Exact-exact match percent value.
+     * An exact-exact match is a 100% match, that has the same document name as the currently translated document.
+     * @var integer
+     */
+    const EXACT_EXACT_MATCH_VALUE=101;
+    
+    /***
+     * Context match percent value.
+     * A context match is an exact-exact match,
+     * that in addition has the same context set in TM as in the document - usally an ID,
+     * which often is the line number or segment-id (depends on what the import does)
+     * @var integer
+     */
+    const CONTEXT_MATCH_VALUE=103;
+    
+    /***
+     * A repetition is a segment, that already showed up with the same words and tag order further above in the same task
+     * @var integer
+     */
+    const REPETITION_MATCH_VALUE=102;
+    
     /**
      * @var string
      */
@@ -59,7 +82,7 @@ abstract class editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract
     
     /**
      * Gets the TM file content from the underlying system
-     * @param $mime the desired mimetype of the export
+     * @param string $mime the desired mimetype of the export
      * @return string
      */
     abstract public function getTm($mime);

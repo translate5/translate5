@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.matchResourceTaskAssocPanel',
+    itemId:'matchResourceTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
     cls : 'adminTaskGrid',
     title: '#UT#Matchressourcen zuweisen',
@@ -59,28 +60,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
         var me = this,
         config = {
             title: me.title, //see EXT6UPD-9
-            dockedItems : [{
-                xtype : 'toolbar',
-                dock : 'bottom',
-                ui: 'footer',
-                layout: {
-                    type: 'hbox',
-                    pack: 'start'
-                },
-                items : [{
-                    iconCls: 'ico-refresh',
-                    xtype: 'button',
-                    itemId: 'btnReload',
-                    text: me.strings.reload
-                },{
-                    xtype: 'tbfill'
-                },{
-                    xtype: 'button',
-                    itemId: 'btnSaveChanges',
-                    tooltip: me.strings.save,
-                    text: me.strings.save
-                }]
-            }],
+            dockedItems : [],
             items : [ {
                 xtype : 'grid',
                 itemId : 'tmTaskAssocGrid',
@@ -154,5 +134,5 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
             return label;
         }
         return '';
-    },
+    }
 });

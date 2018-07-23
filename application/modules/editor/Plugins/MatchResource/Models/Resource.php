@@ -56,11 +56,19 @@ class editor_Plugins_MatchResource_Models_Resource {
     protected $searchable = true;
     
     /**
-     * Flag if edited matches can ba saved back to this resource
+     * Flag if edited matches can be saved back to this resource
      * Must be overridden by class extension
      * @var boolean
      */
     protected $writable = true;
+    
+    /***
+     * Flag if the resource can be used by match analysis
+     * 
+     * @var string
+     */
+    protected $analysable=true;
+    
     
     protected $service;
     
@@ -130,6 +138,13 @@ class editor_Plugins_MatchResource_Models_Resource {
         return $this->writable;
     }
     
+    /***
+     * return if resource is analysable
+     * @return string
+     */
+    public function getAnalysable(){
+        return $this->analysable;
+    }
     /**
      * returns the service name
      * @return string
@@ -221,6 +236,7 @@ class editor_Plugins_MatchResource_Models_Resource {
     public function getMetaData() {
         return [
             'writable' => $this->writable,
+            'analysable'=>$this->analysable,
             'searchable' => $this->searchable,
             'filebased' => $this->filebased,
         ];

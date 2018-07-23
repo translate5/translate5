@@ -52,7 +52,8 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	           'Ext.form.Panel',
 	           'Ext.form.field.ComboBox',
 	           'Ext.button.Button',
-	           'Ext.toolbar.Toolbar'
+	           'Ext.toolbar.Toolbar',
+	           'Editor.util.MatchResources'
 	],
 	strings: {
         source: '#UT#Quelltext',
@@ -155,7 +156,9 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
 	              var str = me.assocStore.getById(record.get('tmmtid'));
-				  meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')"';
+				  
+	              meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')'+"<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
+
 				  meta.tdCls  = meta.tdCls  + ' info-icon';
 	              clr = str.get('color');
 	              meta.tdAttr += 'bgcolor="' + clr + '"';
@@ -178,5 +181,12 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	        me.self.getConfigurator().merge(me, config, instanceConfig);
 	    }
 	    return me.callParent([config]);
+	  },
+	  
+	  /***
+	   * Get the match rate tooltip depending of the match rate percent
+	   */
+	  getMatchrateTooltip:function(matchrate){
+		  return Editor.util.MatchResources.getMatchrateTooltip(matchrate);
 	  }
 });

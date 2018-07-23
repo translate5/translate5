@@ -77,14 +77,14 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
             globaleseGroup=view.down('#globaleseGroup');
         
         if(globaleseEngine.isValid() && globaleseGroup.isValid()){
-            me.saveParamsInSession();
+        	me.queueWorker();
         }
     },
     
     /***
-     * saves the auth,engine and group parametars in session so we can use them in back-end
+     * Queue the globalese worker
      */
-    saveParamsInSession:function(){
+    queueWorker:function(){
         var me=this,
             view=me.getView(),
             win=view.up('window'),
@@ -92,17 +92,16 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseSettingsViewCon
             apipassword=win.down('#apiPassword').getValue(),
             globaleseEngine=view.down('#globaleseEngine').getValue(),
             globaleseGroup=view.down('#globaleseGroup').getValue(),
-            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese';
-        
-            //str = me.strings,
+            url = Editor.data.restpath+'plugins_globalesepretranslation_globalese',
             params = {},
-            sessionData = Ext.JSON.encode({
+            extraData = Ext.JSON.encode({
                 apiUsername: apiusername,
                 apiKey: apipassword,
                 group:globaleseGroup,
-                engine:globaleseEngine
+                engine:globaleseEngine,
+                taskGuid:view.task.get('taskGuid')
             }),
-            params = {data: sessionData};
+            params = {data: extraData};
         
         Ext.Ajax.request({
             url:url,

@@ -100,4 +100,36 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
         }
         return $res;
     }
+    
+    /**
+     * checks if the given tmmt (and segmentid - optional) is usable by the given task
+     * 
+     * @param string $taskGuid
+     * @param integer $tmmtId
+     * @param editor_Models_Segment $segment
+     * @throws ZfExtended_Models_Entity_NoAccessException
+     * 
+     */
+    public function checkTaskAndTmmtAccess(string $taskGuid,integer $tmmtId, editor_Models_Segment $segment = null) {
+        
+        //checks if the queried tmmt is associated to the task:
+        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
+        /* @var $tmmtTaskAssoc editor_Plugins_MatchResource_Models_Taskassoc */
+        try {
+            //for security reasons a service can only be queried when a valid task association exists and this task is loaded
+            // that means the user has also access to the service. If not then not!
+            $tmmtTaskAssoc->loadByTaskGuidAndTm($taskGuid, $tmmtId);
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            throw new ZfExtended_Models_Entity_NoAccessException(null, null, $e);
+        }
+        
+        if(is_null($segment)) {
+            return;
+        }
+        
+        //check taskGuid of segment against loaded taskguid for security reasons
+        if ($taskGuid !== $segment->getTaskGuid()) {
+            throw new ZfExtended_Models_Entity_NoAccessException();
+        }
+    }
 }

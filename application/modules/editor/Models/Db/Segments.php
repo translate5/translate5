@@ -47,6 +47,7 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract {
      */
     public function __construct(array $config = array(), $tableName = 'LEK_segments')
     {
+        
         $this->_name = $tableName;
         parent::__construct($config);
     }
@@ -56,5 +57,14 @@ class editor_Models_Db_Segments extends Zend_Db_Table_Abstract {
      */
     public function __toString() {
         return $this->_name;
+    }
+    
+    /**
+     * Is entity a materialized view
+     * 
+     * @return boolean
+     */
+    public function isView() {
+        return $this->_name!="LEK_segments";
     }
 }

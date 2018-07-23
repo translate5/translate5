@@ -247,6 +247,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_never_boxLabel = '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>';
+    Editor.view.preferences.Window.prototype.item_show_on_empty_target = '<?php echo $this->translate->_('Zeige auf leeres Ziel');?>';
     Editor.view.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
@@ -424,7 +425,8 @@ Ext.define('Editor.controller.Localizer', {
             taskDestroy: '<?php echo $this->translate->_('Aufgabe wird gelöscht...');?>',
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
             openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
-            loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>'
+            loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
+            loading: '<?php echo $this->translate->_('Laden');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -653,6 +655,14 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
+    Ext.define("Editor.locale.de.util.MatchResources", {
+        override: "Editor.util.MatchResources",
+        strings: {
+		    exactMatch: '<?php echo $this->translate->_('100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument');?>',
+            repetitionMatch: '<?php echo $this->translate->_('Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte');?>',
+            contextMatch: '<?php echo $this->translate->_('103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist');?>'
+        }
+    });
     Ext.define("Editor.locale.de.view.task.ConfirmationWindow", {
         override: "Editor.view.task.ConfirmationWindow",
         strings: {
