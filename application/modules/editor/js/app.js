@@ -378,5 +378,18 @@ Ext.application({
       if(!supportedBrowser) {
           Ext.MessageBox.alert(me.browserAdviceTextTitle, me.browserAdviceText);
       }
+  },
+  
+  /***
+   * Get all classes with which are using the mixin
+   */
+  getClassesByMixin:function(mixinName){
+      var classes=[];
+      Ext.iterate(Ext.ClassManager.classes,function(className,c){
+          if(c.prototype &&c.prototype.mixins &&  c.prototype.mixins[mixinName]){
+              classes.push(className);
+          }
+      });
+      return classes;
   }
 });

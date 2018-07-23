@@ -27,62 +27,41 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Interface for the Wizard cards
- * 
- * @class Editor.controller.admin.IWizardCard
+ * @class Editor.util.MatchResources
  */
-Ext.define('Editor.controller.admin.IWizardCard', {
-
-	/***
-	 * Index where the card will apear in the group
-	 */
-	groupIndex:-1,
-	
-    /***
-     * There are 3 options for import type:
-     * preimport, import, postimport
-     */
-    importType:"",
+Ext.define('Editor.util.MatchResources', {
+	strings: {
+    	exactMatch:'#UT#100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument',
+        repetitionMatch:'#UT#Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte',
+        contextMatch:'#UT#103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist'
+    },
     
-    /***
-     * called when next button of the card is clicked
-     */
-    triggerNextCard:function(activeItem){
-        
+    statics: {
+    	/***
+    	 * Static function for matchrate tooltip
+    	 */
+    	getMatchrateTooltip:function(matchrate){
+    		return new this().getMatchrateTooltip(matchrate);
+    	}
     },
     
     /***
-     * called when skip button of the card is clicked
+     *  Get the match rate (only for 103,102,101 matches) tooltip depending of the match rate percent
      */
-    triggerSkipCard:function(activeItem){
-        
-    },
-
-    /***
-     * if return true, disable the skip button
-     */
-    disableSkipButton:function(){
-        
-    },
-    
-    /***
-     * if return true, disable the continue button
-     */
-    disableContinueButton:function(){
-        
-    },
-    
-    /***
-     * if return true, disable the add button
-     */
-    disableAddButton:function(){
-        
-    },
-    
-    /***
-     * if return true, disable the cancel button
-     */
-    disableCancelButton:function(){
-        
+    getMatchrateTooltip:function(matchrate){
+    	matchrate=parseInt(matchrate);
+    	switch(matchrate) {
+    		case 101:
+		    	return this.strings.exactMatch;
+		        break;
+		    case 102:
+		    	return this.strings.repetitionMatch;
+		        break;
+		    case 103:
+		    	return this.strings.contextMatch;
+		        break;
+		    default:
+		    	return "";
+		}
     }
 });

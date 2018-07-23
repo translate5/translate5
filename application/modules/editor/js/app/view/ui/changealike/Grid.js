@@ -53,6 +53,11 @@ Ext.define('Editor.view.ui.changealike.Grid', {
   item_sourceMatchColumn: 'Quell-Treffer', 
   item_targetMatchColumn: 'Ziel-Treffer', 
   
+  requires: [
+      'Editor.view.segments.column.Matchrate',
+      'Editor.view.segments.column.AutoState'
+  ],
+  
   initConfig: function(instanceConfig) {
     var me = this,
     segField = Editor.model.segment.Field,
@@ -126,6 +131,10 @@ Ext.define('Editor.view.ui.changealike.Grid', {
           },
           width: 80, 
           text: me.item_targetMatchColumn
+        },{
+        	xtype:'matchrateColumn'
+        },{
+        	xtype:'autoStateColumn'
         }
       ],
       viewConfig: {

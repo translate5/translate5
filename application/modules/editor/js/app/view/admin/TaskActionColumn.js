@@ -46,6 +46,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       actionEnd: '#UT# Aufgabe komplett Beenden',
       actionReOpen: '#UT# beendete Aufgabe wieder öffnen',
       actionDelete: '#UT#Aufgabe komplett löschen',
+      actionAnalysis:'#UT#Match analysis',
       taskPrefs: '#UT# Aufgabenspezifische Einstellungen',
       exp: '#UT# Aufgabe exportieren'
   },
@@ -112,6 +113,14 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
               iconCls: 'ico-task-delete'
           }],itemFilter),
           width = items.length * 18;
+          
+          if(Editor.plugins && Editor.plugins.MatchAnalysis){
+        	  items.push({
+        		  tooltip:me.messages.actionAnalysis,
+                  iconCls: 'ico-task-analysis',
+                  isAllowedFor: 'editorAnalysisTask'	  
+        	  })
+          }
           
       cfg = cfg || {};
       
