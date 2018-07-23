@@ -290,7 +290,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //@todo do this with events
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
-        $wfm->getActive($this->entity->getTaskGuid())->beforeSegmentSave($this->entity);
+        $wfm->getActive($this->entity->getTaskGuid())->beforeSegmentSave($this->entity); 
         
         $wfh = $this->_helper->workflow;
         /* @var $wfh ZfExtended_Controller_Helper_Workflow */
@@ -312,7 +312,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 'model' => $this->entity, //FIXME model usage is deprecated and should be removed in future (today 2016-08-10) 
                 'history' => $history
         ));
-        
         //saving history directly before normal saving, 
         // so no exception between can lead to history entries without changing the master segment
         $history->save();

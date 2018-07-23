@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * Reimports the segments of a task back into the chosen TM
+ */
 class editor_Plugins_MatchResource_Worker extends editor_Models_Import_Worker_Abstract {
     
     /**

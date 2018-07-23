@@ -153,4 +153,34 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
         ->group('assocs.id');
         return $this->db->fetchAll($s)->toArray();
     }
+    
+    /***
+     * Get all available tmms for the language combination as in the provided task.
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getAssocTasksWithResources($taskGuid){
+        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
+        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        
+        $resources = [];
+        
+        $getResource = function(string $serviceType, string $id) use ($resources, $serviceManager) {
+            if (!empty($resources[$id])) {
+                return $resources[$id];
+            }
+            return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
+        };
+        
+        $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
+        
+        foreach($result as &$tmmt) {
+            $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
+            if(!empty($resource)) {
+                $tmmt = array_merge($tmmt, $resource->getMetaData());
+            }
+        }
+        
+        return $result;
+    }
 }

@@ -723,6 +723,17 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @see ZfExtended_Models_Entity_Abstract::save()
      */
     public function save() {
+        if(!empty($this->dbWritable)) {
+            if($this->dbWritable->isView()) {
+                //throw exception that we are saveing the view;
+                //TODO the actual table name in the exception
+                throw new ZfExtended_Exception("Unable to save the segment. The segment table name is set to matirialized view. Segment id:".$this->getId().", taskGuid:".$this->getTaskGuid());
+            }
+            
+            //clean unneded materialized view data
+            $this->unsetMaterializedViewData();
+            $this->row->setTable($this->dbWritable);
+        }
         $oldIdValue = $this->getId();
         $segmentId = parent::save();
         foreach($this->segmentdata as $data) {
@@ -1221,6 +1232,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $mv->setTaskGuid($taskGuid);
         /* @var $mv editor_Models_Segment_MaterializedView */
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
+        $this->dbWritable = ZfExtended_Factory::get($this->dbInstanceClass);
         $db = $this->db;
         $this->tableName = $db->info($db::NAME);
     }
@@ -1281,7 +1293,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return string
      */
     protected function _getAlikesSql(string $viewName) {
-        return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch
+        return 'select id, segmentNrInTask, source, target, sourceMd5=? sourceMatch, targetMd5=? targetMatch, matchRate, autostateId
     from '.$viewName.' 
     where ((sourceMd5 = ? and source != \'\' and source IS NOT NULL) 
         or (targetMd5 = ? and target != \'\' and target IS NOT NULL)) 
@@ -1523,5 +1535,45 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             ->where('targetMd5 != ?', 'd41d8cd98f00b204e9800998ecf8427e');
         $x = $this->db->fetchRow($s);
         return ((int) $x->cnt) == 0;
+    }
+    
+    /***
+     * Get all segment repetitions from the task view.
+     * Segment repetitions are segments with the same sourceMd5 hash value.
+     * If the segment does not have repetition, it will not be returned by this function.
+     * The returned segments are ordered by segment id
+     * 
+     * @param string $taskGuid
+     */
+    public function getRepetitions($taskGuid){
+        $adapter=$this->db->getAdapter();
+        $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
+        /* @var $mv editor_Models_Segment_MaterializedView  */
+        $mv->setTaskGuid($taskGuid);
+        $viewName=$mv->getName();
+        $sql='SELECT v1.id,v1.sourceMd5 FROM '.$viewName.' v1, (
+	          SELECT sourceMd5, count(sourceMd5) cnt
+               FROM '.$viewName.'
+               GROUP BY sourceMd5
+              ) v2
+              WHERE v2.cnt > 1 and v1.sourceMd5 = v2.sourceMd5
+              ORDER by v1.id';
+        return $adapter->query($sql)->fetchAll();
+    }
+    
+    /***
+     * Unset row data collumns which are not existin in the $dbWritable
+     */
+    protected function unsetMaterializedViewData(){
+        $dataColumns=$this->row->toArray();
+        $tableInfo=$this->dbWritable->info();
+        $segmentColumns=$tableInfo['cols'];
+        
+        foreach ($dataColumns as $key=>$value){
+            //unset the rows not existing in the segment table
+            if(!in_array($key,$segmentColumns)){
+                $this->row->__unset($key);
+            }
+        }
     }
 }

@@ -42,6 +42,13 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     protected $api;
     
+    /***
+     * Filename by file id cache
+     * @var array
+     */
+    protected $fileNameCache=array();
+    
+    
     /**
      * {@inheritDoc}
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::connectTo()
@@ -78,7 +85,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      */
     public function addTm(array $fileinfo = null) {
         $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
-        
+
         //to ensure that we get unique TMs Names although of the above stripped content, 
         // we add the TMMT ID and a prefix which can be configured per each translate5 instance 
         $config = Zend_Registry::get('config');
@@ -199,9 +206,16 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
      * @see editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        /* @var $file editor_Models_File */
-        $file->load($segment->getFileId());
+        
+        if(!isset($this->fileNameCache[$segment->getFileId()])){
+            $file = ZfExtended_Factory::get('editor_Models_File');
+            /* @var $file editor_Models_File */
+            $file->load($segment->getFileId());
+            $this->fileNameCache[$segment->getFileId()]=$file->getFileName();
+            
+        }
+        
+        $fileName=$this->fileNameCache[$segment->getFileId()];
         
         $queryString = $this->getQueryString($segment);
         
@@ -221,7 +235,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         $queryString = $internalTag->toXliffPaired($queryString, true, $map);
         $mapCount = count($map);
         
-        if($this->api->lookup($segment, $queryString, $file->getFileName())){
+        if($this->api->lookup($segment, $queryString, $fileName)){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){
                 return $this->resultList; 
@@ -233,7 +247,11 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
                 }
                 $target = $internalTag->reapply2dMap($found->target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
-                $this->resultList->addResult($target, $found->matchRate, $this->getMetaData($found));
+                
+                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $segment, $fileName);
+                
+                $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                
                 $source = $internalTag->reapply2dMap($found->source, $map);
                 $source = $this->replaceAdditionalTags($source, $mapCount);
                 $this->resultList->setSource($source);
@@ -460,5 +478,81 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         }, $this->api->getErrors()));
             
         return self::STATUS_NOCONNECTION;
+    }
+    
+    /***
+     * Calculate the new matchrate value.
+     * Check if the current match is of type context-match or exact-exact match
+     * 
+     * @param integer $matchRate
+     * @param array $metaData
+     * @param editor_Models_Segment $segment
+     * @param string $filename
+     * 
+     * @return integer
+     */
+    protected function calculateMatchRate($matchRate,$metaData,$segment,$filename){
+        
+        if($matchRate<100){
+            return $matchRate;
+        }
+        
+        $isExacExac=false;
+        $isContext=false;
+        foreach ($metaData as $data){
+            
+            //exact-exact match
+            if($data->name=="documentName" && $data->value==$filename){
+                $isExacExac=true;
+            }
+            
+            //context metch
+            if($data->name=="context" && $data->value==$segment->getMid()){
+                $isContext=true;
+            }
+        }
+        
+        if($isExacExac && $isContext){
+            return self::CONTEXT_MATCH_VALUE;
+        }
+        
+        if($isExacExac){
+            return self::EXACT_EXACT_MATCH_VALUE;
+        }
+        
+        return $matchRate;
+    }
+    
+    /***
+     * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
+     * The fuzzy tmmt name format is: oldname+Fuzzy-Analysis
+     * @throws ZfExtended_NotFoundException
+     * @return editor_Plugins_MatchResource_Services_Connector_Abstract
+     */
+    public function initFuzzyAnalysis() {
+        $mime="TM";
+
+        $validExportTypes = $this->getValidFiletypes();
+        
+        if(empty($validExportTypes[$mime])){
+            throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
+        }
+        $data = $this->getTm($validExportTypes[$mime]);
+        $memoryName=$this->tmmt->getName().'-Fuzzy-Analysis';
+        $this->api->createMemory($memoryName, $this->tmmt->getSourceLangRfc5646(), $data);
+        
+        $fuzzyTmmt=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
+        /* @var $fuzzyTmmt editor_Plugins_MatchResource_Models_TmMt  */
+        
+        $fuzzyTmmt=clone $this->tmmt;
+        
+        $fuzzyTmmt->setName($memoryName);
+        $fuzzyTmmt->setFileName($memoryName);
+        $fuzzyTmmt->setId(null);
+        
+        $connector = ZfExtended_Factory::get($fuzzyTmmt->getServiceType().editor_Plugins_MatchResource_Services_Manager::CLS_CONNECTOR);
+        /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
+        $connector->connectTo($fuzzyTmmt);
+        return $connector;
     }
 }
