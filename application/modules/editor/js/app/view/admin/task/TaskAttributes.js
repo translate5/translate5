@@ -152,14 +152,24 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 xtype: 'combo',
                 fieldLabel: me.strings.pmGuid,
                 allowBlank: false,
+                typeAhead: false,
+                forceSelection: true,
+                anyMatch: true,
+                queryMode: 'local',
+                dataIndex: 'pmGuid',
+                itemId: 'pmGuid',
+                displayField: 'longUserName',
+                valueField: 'userGuid',
                 listConfig: {
                     loadMask: false
                 },
                 bind:{
                     value:'{currentTask.pmGuid}'
                 },
-                store: Ext.create('Editor.store.admin.Users',{
-                    pageSize: 0,
+                store: Ext.create('Ext.data.Store',{
+                    autoLoad: true,
+                    model: 'Editor.model.admin.User',
+                    storeId: 'pmUsers',
                     proxy : {
                         type : 'rest',
                         url: Editor.data.restpath+'user/pm',
@@ -169,21 +179,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                         reader : {
                             rootProperty: 'rows',
                             type : 'json'
-                        },
-                        writer: {
-                          encode: true,
-                          rootProperty: 'data',
-                          writeAllFields: false
                         }
-                      },
-                }),
-                forceSelection: true,
-                anyMatch: true,
-                queryMode: 'local',
-                dataIndex: 'pmGuid',
-                itemId: 'pmGuid',
-                displayField: 'longUserName',
-                valueField: 'userGuid'
+                    }
+                })
             });
         }else{
             items.push({

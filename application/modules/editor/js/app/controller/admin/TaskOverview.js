@@ -62,6 +62,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   alias: 'controller.taskOverviewController',
   
   isCardFinished:false,
+  
+  /***
+   * the flag is true, when import workers are started via ajax
+   */
+  isImportStarted:false,
+  
   /**
    * Container for translated task handler confirmation strings
    * Deletion of an entry means to disable confirmation.
@@ -86,6 +92,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht",
       loadingWindowMessage:"#UT#Dateien werden hochgeladen",
+      loading:'#UT#Laden'
   },
   init : function() {
       var me = this;
@@ -119,7 +126,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               click: me.handleTaskAddShow
           },
           '#adminTaskAddWindow': {
-              show:me.onAdminTaskAddWindowShow
+              show:me.onAdminTaskAddWindowShow,
+              close:me.onAdminTaskAddWindowClose
            },
           '#adminTaskAddWindow #add-task-btn': {
               click: me.handleTaskAdd
@@ -335,8 +343,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Editor.util.TaskActions.openTask(task, readonly);
   },
   handleTaskCancel: function() {
-      this.getTaskAddForm().getForm().reset();
-      this.getTaskAddWindow().close();
+	  var me=this;
+	  if(!me.getTaskAddForm()){
+		  return;
+	  }
+      me.getTaskAddForm().getForm().reset();
+      me.getTaskAddWindow().close();
   },
 
   handleTaskAdd: function(button) {
@@ -389,26 +401,55 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           win = me.getTaskAddWindow(),
           winLayout=win.getLayout(),
           nextStep=winLayout.getNext(),
+          activeItem=winLayout.getActiveItem(),
           vm=win.getViewModel();
       
       if(skipCards){
           for(var i=1;i < skipCards;i++){
+        	  if(win.isTaskUploadNext()){
+        		  break;
+        	  }
               winLayout.setActiveItem(nextStep);
               nextStep=winLayout.getNext();
           }
       }
 
+      //check for next step
       if(!nextStep){
-          //me.handleTaskCancel();
-          me.saveTask();
+          
+          //if no next step, and no task, save it and start the import 
+          if(!activeItem.task){
+              me.saveTask(function(task){
+            	  me.startImport(task);
+              });
+          }else{
+              //the task is already saved, start the import 
+        	  me.startImport(activeItem.task);
+          }
           return;
       }
-      if(nextStep.strings && nextStep.strings.wizardTitle){
-          win.setTitle(nextStep.strings.wizardTitle);
-      }
       
-      vm.set('activeItem',nextStep);
-      winLayout.setActiveItem(nextStep);
+      //switch to next card help function
+      var goToNextCard=function(task){
+          if(nextStep.strings && nextStep.strings.wizardTitle){
+              win.setTitle(nextStep.strings.wizardTitle);
+          }
+          //if the task is provided, set the next card task variable
+          if(task){
+              nextStep.task=task;
+          }
+          
+          vm.set('activeItem',nextStep);
+          winLayout.setActiveItem(nextStep);
+      };
+      
+      //when switch from import to postimport, save the task
+      if(activeItem.importType=="import" && nextStep.importType=="postimport"){
+          me.saveTask(goToNextCard);
+          return;
+      }
+      //change the card
+      goToNextCard();
   },
   
   onWizardCardSkiped:function(){
@@ -455,7 +496,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           task = view.getStore().getAt(row),
           confirm;
 
-      if(! me.isAllowed(right) || ! me[action] || ! Ext.isFunction(me[action])){
+      if(! me.isAllowed(right)){
+          return;
+      }
+      
+      if(! me[action] || ! Ext.isFunction(me[action])){
+          //fire event if no handler function for the action button is defined
+          me.fireEvent('taskActionColumnNoHandler',t,task);
           return;
       }
 
@@ -643,6 +690,22 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       //set the default values for the window fields
       this.setTaskAddFieldDefaults(win);
   },
+  
+  /**
+   * On admin add task window close handler
+   */
+  onAdminTaskAddWindowClose:function(win){
+      var me = this,
+	      win = me.getTaskAddWindow(),
+	      winLayout=win.getLayout(),
+	      nextStep=winLayout.getNext(),
+	      activeItem=winLayout.getActiveItem();
+      
+      //if the task exist start it if the import is not started yet
+      if(activeItem.task && !me.isImportStarted){
+    	  me.startImport(activeItem.task);
+      }
+  },
 
   /***
    * Set the default values for the add task window fields. The values are configured zf config
@@ -666,13 +729,16 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 
   /***
    * starts the upload / form submit
+   * 
    */
-  saveTask:function(){
+  saveTask:function(successCallback){
       var me = this,
           win = me.getTaskAddWindow(),
           error = win.down('#feedbackBtn');
       error.hide();
+      
       win.setLoading(me.strings.loadingWindowMessage);
+      
       this.getTaskAddForm().submit({
           //Accept Header of submitted file uploads could not be changed:
           //http://stackoverflow.com/questions/13344082/fileupload-accept-header
@@ -689,8 +755,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               me.fireEvent('taskCreated', task);
               win.setLoading(false);
               me.getAdminTasksStore().load();
-              me.handleTaskCancel();
-              Editor.MessageBox.addSuccess(win.importTaskMessage,2);
+              
+              me.setCardsTask(task);
+              
+              //call the callback if exist
+              if(successCallback){
+                  successCallback(task);
+              }
           },
           failure: function(form, submit) {
               win.setLoading(false);
@@ -700,5 +771,49 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               }
           }
       });
+  },
+  
+  /***
+   * Start the import for the given task
+   */
+  startImport:function(task){
+	  var me=this,
+	  	  url=Editor.data.restpath+"task/"+task.get('id')+"/import",
+	  	  win = me.getTaskAddWindow();
+	  
+	  win.setLoading(me.strings.loading);
+	  
+	  //set the import started flag
+	  me.isImportStarted=true;
+	  
+	  Ext.Ajax.request({
+		 url:url,
+		 method:'GET',
+         success: function(response){
+        	 win.setLoading(false);
+             Editor.MessageBox.addSuccess(win.importTaskMessage,2);
+             me.handleTaskCancel();
+             me.isImportStarted=false;
+         },
+         failure: function(response){
+        	 win.setLoading(false);
+             Editor.app.getController('ServerException').handleException(response);
+             me.isImportStarted=false;
+         }
+	  });
+  },
+  
+  /***
+   * For each card item set a task
+   */
+  setCardsTask:function(task){
+	  var me=this,
+	  	  win = me.getTaskAddWindow(),
+	  	  items=win.items.items;
+	  
+	  items.forEach(function(item){
+		  item.task=task;
+	  });
   }
+  
 });

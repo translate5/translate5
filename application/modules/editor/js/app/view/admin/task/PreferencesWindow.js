@@ -87,20 +87,6 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'tabpanel',
                 activeTab: 0,
                 items: tabs
-            }],
-            dockedItems: [{
-                xtype : 'toolbar',
-                dock : 'bottom',
-                layout: {
-                    type: 'hbox',
-                    pack: 'end'
-                },
-                items : [{
-                    xtype : 'button',
-                    iconCls : 'ico-cancel',
-                    itemId : 'close-btn',
-                    text : me.strings.close
-                }]
             }]
         };
 

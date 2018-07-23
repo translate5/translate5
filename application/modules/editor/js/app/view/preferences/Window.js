@@ -54,6 +54,7 @@ Ext.define('Editor.view.preferences.Window', {
     item_alikeBehaviour_never_boxLabel: 'Nie automatisch ersetzen und Status setzen',
     item_cancelBtn: 'Abbrechen',
     item_saveBtn: 'Speichern',
+    item_show_on_empty_target:'Zeige auf leeres Ziel',
     
     initConfig: function(instanceConfig) {
       var me = this,
@@ -93,6 +94,11 @@ Ext.define('Editor.view.preferences.Window', {
                     width: 426, //needed for long labels to wrap
                     boxLabel: this.item_alikeBehaviour_never_boxLabel,
                     inputValue: 'never'
+                  },{
+            	    xtype:'checkbox',
+            	    name:'showOnEmptyTarget',
+            	    boxLabel:this.item_show_on_empty_target,
+            	    width: 426 //needed for long labels to wrap
                   }
                 ]
               }

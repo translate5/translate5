@@ -74,6 +74,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       forAll: '#UT#für alle'
   },
   actualTask: null,
+  alias: 'controller.taskPreferencesController',
+  
   init : function() {
       var me = this,
           toc = me.application.getController('admin.TaskOverview'),
@@ -91,9 +93,6 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       me.control({
           'editorAdminTaskPreferences #taskWorkflow': {
               change: me.changeWorkflow
-          },
-          'adminTaskPreferencesWindow #close-btn': {
-              click: me.handleCloseWindow
           },
           'editorAdminTaskUserPrefsForm #alternates checkboxgroup': {
               beforerender: me.prepareAlternates
@@ -245,8 +244,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * Opens the Preferences to the choosen Task
    * triggerd by click on the Task Preferences Button / (Cell also => @todo)
    * @param {Editor.model.admin.Task} task
+   * @param  activeTab: the tab in the window which will be focused
    */
-  handleTaskPreferences: function(task) {
+  handleTaskPreferences: function(task,activeTab) {
       this.actualTask = task;
       var win = Ext.widget('adminTaskPreferencesWindow',{
           actualTask: task
@@ -254,12 +254,10 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       win.show();
       win.setLoading(true);
       this.loadAllPreferences(task);
-  },
-  /**
-   * handler if close button is pressed
-   */
-  handleCloseWindow: function () {
-      this.getPrefWindow().close();
+      
+      if(activeTab){
+          win.down('tabpanel').setActiveTab(activeTab);
+      }
   },
   /**
    * adds a new userpref entry
