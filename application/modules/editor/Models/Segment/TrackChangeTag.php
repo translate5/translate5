@@ -170,15 +170,15 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     
     /**
      * removes TrackChanges-Tags:
+     * - INS => markup-Tag ONLY is removed (doing this first is important in order to catch the spaces in the next step:)
      * - DEL => avoid double space after removing a deleted word with one space at both sides
      * - DEL => markup-Tag AND content inbetween is removed
-     * - INS => markup-Tag ONLY is removed
      */
     public function removeTrackChanges(string $segment) {
         $segment = $this->protect($segment);
+        $segment= preg_replace(self::REGEX_INS, '', $segment);
         $segment= preg_replace('/ <'.self::PLACEHOLDER_TAG_DEL.'[^>]+> /', ' ', $segment);
         $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
-        $segment= preg_replace(self::REGEX_INS, '', $segment);
         return $segment;
     }
     
