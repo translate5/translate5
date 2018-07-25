@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.MatchGridViewController
+ * @class Editor.LanguageResources.view.MatchGridViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
+Ext.define('Editor.LanguageResources.view.MatchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.matchResourceMatchGrid',
     strings: {
@@ -84,7 +84,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     	var me = this,
     		firstEditableRow = Ext.StoreManager.get('Segments').getFirsteditableRow();
         me.assocStore = me.getView().assocStore;
-        me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
+        me.SERVER_STATUS=Editor.LanguageResources.model.EditorQuery.prototype;
 		if(firstEditableRow != null) {
 			me.setFirsEditableRow(firstEditableRow);
 		}
@@ -113,7 +113,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewController', {
     },
     calculateRows: function(controller){
         var me = this,
-            maxSegments = Editor.data.plugins.MatchResource.preloadedSegments;
+            maxSegments = Editor.data.LanguageResources.preloadedSegments;
         me.nextSegment = controller.next.nextEditable;
         if(me.nextSegment){
             var retval = controller.findNextRows(controller.next.nextEditable.idx,maxSegments);

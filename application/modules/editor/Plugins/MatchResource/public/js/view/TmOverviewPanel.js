@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.TmOverviewPanel
+ * @class Editor.LanguageResources.view.TmOverviewPanel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
+Ext.define('Editor.LanguageResources.view.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
     alias: 'widget.tmOverviewPanel',
     itemId: 'tmOverviewPanel',
@@ -76,7 +76,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
         var me = this,
             config = {
                 title: me.title, //see EXT6UPD-9
-                store : 'Editor.plugins.MatchResource.store.TmMts',
+                store : 'Editor.LanguageResources.store.TmMts',
                 viewConfig: {
                     getRowClass: function(record) {
                         var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
@@ -181,7 +181,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     dataIndex: 'serviceName',
                     tdCls: 'serviceName',
                     renderer: function(v, meta, rec){
-                        var store = Ext.getStore('Editor.plugins.MatchResource.store.Resources'),
+                        var store = Ext.getStore('Editor.LanguageResources.store.Resources'),
                             resource = store.getById(rec.get('resourceId'));
                         if(resource) {
                             meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
@@ -231,7 +231,7 @@ Ext.define('Editor.plugins.MatchResource.view.TmOverviewPanel', {
                     }]
                 },{
                     xtype: 'pagingtoolbar',
-                    store: 'Editor.plugins.MatchResource.store.TmMts',
+                    store: 'Editor.LanguageResources.store.TmMts',
                     dock: 'bottom',
                     displayInfo: true
             }]

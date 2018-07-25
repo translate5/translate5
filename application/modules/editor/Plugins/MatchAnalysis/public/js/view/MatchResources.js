@@ -33,16 +33,16 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchAnalysis.view.MatchResources
+ * @class Editor.plugins.MatchAnalysis.view.LanguageResources
  * @extends Ext.form.Panel
  */
-Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
+Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     extend:'Ext.panel.Panel',
-    alias: 'widget.matchResourcesPanel',
-    controller: 'matchResourcesPanel',
+    alias: 'widget.languageResourcesPanel',
+    controller: 'languageResourcesPanel',
     requires: [
-        'Editor.plugins.MatchAnalysis.view.MatchResourcesViewController',
-        'Editor.plugins.MatchResource.view.TaskAssocPanel'
+        'Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController',
+        'Editor.view.TaskAssocPanel'
     ],
     mixins:['Editor.controller.admin.IWizardCard'],
     
@@ -58,7 +58,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.MatchResources', {
         var me = this,
             config = {
                     items: [{
-                        xtype: 'matchResourceTaskAssocPanel',
+                        xtype: 'languageResourceTaskAssocPanel',
                         title:null
                     }]
             };

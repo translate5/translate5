@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 /**
  * DB Access for TmMtAssoc
  */
-class editor_Plugins_MatchResource_Models_Db_Taskassoc extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_matchresource_taskassoc';
+class editor_Models_Db_Taskassoc extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_languageresources_taskassoc';
     public $_primary = 'id';
 }

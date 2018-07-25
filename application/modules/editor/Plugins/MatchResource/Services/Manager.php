@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * TmMt Service Manager
  * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
  */
-class editor_Plugins_MatchResource_Services_Manager {
+class editor_Services_LanguageResources_Manager {
     const CLS_SERVICE = '_Service';
     const CLS_CONNECTOR = '_Connector';
     

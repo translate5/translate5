@@ -37,17 +37,17 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.TmOverview
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
+Ext.define('Editor.controller.TmOverview', {
     extend : 'Ext.app.Controller',
     views: [
-        'Editor.plugins.MatchResource.view.TmOverviewPanel',
-        'Editor.plugins.MatchResource.view.AddTmWindow',
-        'Editor.plugins.MatchResource.view.ImportTmWindow',
-        'Editor.plugins.MatchResource.view.EditTmWindow',
-        'Editor.plugins.MatchResource.view.TaskGridWindow'
+        'Editor.view.TmOverviewPanel',
+        'Editor.view.AddTmWindow',
+        'Editor.view.ImportTmWindow',
+        'Editor.view.EditTmWindow',
+        'Editor.view.TaskGridWindow'
     ],
-    models: ['Editor.model.admin.Task', 'Editor.plugins.MatchResource.model.Resource','Editor.plugins.MatchResource.model.TmMt'],
-    stores:['Editor.plugins.MatchResource.store.Resources','Editor.plugins.MatchResource.store.TmMts'],
+    models: ['Editor.model.admin.Task', 'Editor.model.Resource','Editor.model.TmMt'],
+    stores:['Editor.store.Resources','Editor.store.TmMts'],
     strings: {
         matchresource: '#UT#Matchressourcen',
         deleteConfirm: '#UT#Matchressource endgültig löschen?',
@@ -138,7 +138,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TmOverview', {
             }
         },
         store: {
-            '#Editor.plugins.MatchResource.store.TmMts': {
+            '#Editor.store.TmMts': {
                 update: 'addRecordToImportCheck'
             }
         }

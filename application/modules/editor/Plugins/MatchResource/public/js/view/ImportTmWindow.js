@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchResource.view.ImportTmWindow', {
+Ext.define('Editor.LanguageResources.view.ImportTmWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.importTmWindow',
     itemId: 'importTmWindow',

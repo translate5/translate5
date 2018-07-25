@@ -25,5 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DELETE FROM `LEK_matchresource_tmmt`
-WHERE serviceType = 'editor_Plugins_MatchResource_Services_DummyFileTm';
+DELETE FROM `LEK_languageresources_tmmt`
+WHERE serviceType = 'editor_Services_DummyFileTm';
+

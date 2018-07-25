@@ -36,14 +36,14 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.MatchResource.view.EditorPanel', {
+Ext.define('Editor.LanguageResources.view.EditorPanel', {
     extend: 'Ext.tab.Panel',
     alias: 'widget.matchResourceEditorPanel',
     controller: 'matchResourceEditorPanel',
     requires:[
-        'Editor.plugins.MatchResource.view.EditorPanelViewController',
-        'Editor.plugins.MatchResource.view.SearchGrid',
-        'Editor.plugins.MatchResource.view.MatchGrid'
+        'Editor.LanguageResources.view.EditorPanelViewController',
+        'Editor.LanguageResources.view.SearchGrid',
+        'Editor.LanguageResources.view.MatchGrid'
     ],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',

@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
+Ext.define('Editor.LanguageResources.view.AddTmWindow', {
     extend: 'Ext.window.Window',
     requires: [
         'Ext.ux.colorpick.Button',
@@ -82,7 +82,7 @@ Ext.define('Editor.plugins.MatchResource.view.AddTmWindow', {
                     queryMode: 'local',
                     valueField: 'id',
                     displayField: 'name',
-                    store:'Editor.plugins.MatchResource.store.Resources',
+                    store:'Editor.LanguageResources.store.Resources',
                     fieldLabel: me.strings.resource
                 },{
                     xtype: 'textfield',

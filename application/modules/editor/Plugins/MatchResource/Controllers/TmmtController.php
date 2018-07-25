@@ -27,16 +27,16 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Controller for the Plugin MatchResource configured Tmmt 
+ * Controller for the Plugin language resources configured Tmmt 
  */
-class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestController {
+class editor_TmmtController extends ZfExtended_RestController {
 
     const FILE_UPLOAD_NAME = 'tmUpload';
     
-    protected $entityClass = 'editor_Plugins_MatchResource_Models_TmMt';
+    protected $entityClass = 'editor_Models_TmMt';
 
     /**
-     * @var editor_Plugins_MatchResource_Models_TmMt
+     * @var editor_Models_TmMt
      */
     protected $entity;
     
@@ -57,8 +57,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      */
     public function indexAction(){
         parent::indexAction();
-        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $serviceManager editor_Services_LanguageResources_Manager */
         
         $resources = [];
         
@@ -73,13 +73,13 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
-            /* @var $resource editor_Plugins_MatchResource_Models_Resource */
+            /* @var $resource editor_Models_Resource */
             if(!empty($resource)) {
                 $tmmt = array_merge($tmmt, $resource->getMetaData());
             }
             
-            $tmmtInstance = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Tmmt');
-            /* @var $tmmtInstance editor_Plugins_MatchResource_Models_Tmmt */
+            $tmmtInstance = ZfExtended_Factory::get('editor_Models_Tmmt');
+            /* @var $tmmtInstance editor_Models_Tmmt */
             $tmmtInstance->init($tmmt);
             
             $tmmt['taskList'] = $this->getTaskInfos($tmmt['id']);
@@ -95,16 +95,16 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     public function getAction() {
         parent::getAction();
         
-        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $serviceManager editor_Services_LanguageResources_Manager */
         
         $this->prepareTaskInfo([$this->entity->getId()]);
         $this->view->rows->taskList = $this->getTaskInfos($this->entity->getId());
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
-        /* @var $resource editor_Plugins_MatchResource_Models_Resource */
+        /* @var $resource editor_Models_Resource */
         if(empty($resource)) {
-            $this->view->rows->status = editor_Plugins_MatchResource_Services_Connector_Abstract::STATUS_NOCONNECTION;
+            $this->view->rows->status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
             $this->view->rows->statusInfo = 'Configured resource not found!';
             return;
         }
@@ -120,8 +120,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     }
     
     private function prepareTaskInfo($tmmtids) {
-        /* @var $assocs editor_Plugins_MatchResource_Models_Taskassoc */
-        $assocs = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
+        /* @var $assocs editor_Models_Taskassoc */
+        $assocs = ZfExtended_Factory::get('editor_Models_Taskassoc');
         
         $taskinfo = $assocs->getTaskInfoForTmmts($tmmtids);
         if(empty($taskinfo)) {
@@ -178,8 +178,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $type = explode('.', $type);
         $type = strtoupper(end($type));
         
-        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $serviceManager editor_Services_LanguageResources_Manager */
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
@@ -188,7 +188,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
         
         $connector = $serviceManager->getConnector($this->entity);
-        /* @var $connector editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector_FilebasedAbstract */
         
         //just reuse importvalidtypes here, nothing other implemented yet 
         $validExportTypes = $connector->getValidFiletypes();
@@ -210,8 +210,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $this->data = $this->getAllParams();
         $this->setDataInEntity($this->postBlacklist);
         
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $manager editor_Services_LanguageResources_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         //validateLanguages prefills also the lang rfc values! So it must be called before the fileupload, 
@@ -245,8 +245,8 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     public function importAction(){
         $this->getAction();
         
-        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $serviceManager editor_Services_LanguageResources_Manager */
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
@@ -272,21 +272,21 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             $this->decodePutData();
             if(!empty($this->data) && !empty($this->data->toReImport)) {
                 foreach($this->data->toReImport as $taskGuid) {
-                    $worker = ZfExtended_Factory::get('editor_Plugins_MatchResource_Worker');
-                    /* @var $worker editor_Plugins_MatchResource_Worker */
+                    $worker = ZfExtended_Factory::get('editor_Models_LanguageResourcesWorker');
+                    /* @var $worker editor_Models_LanguageResourcesWorker */
             
                     // init worker and queue it
                     // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost 
                     if (!$worker->init($taskGuid, ['tmmtId' => $this->entity->getId()])) {
-                        throw new ZfExtended_Exception('MatchResource ReImport Error on worker init()');
+                        throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
                     }
                     $worker->queue();
                 }
             }
         }
         
-        $assoc = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
-        /* @var $assoc editor_Plugins_MatchResource_Models_Taskassoc */
+        $assoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
+        /* @var $assoc editor_Models_Taskassoc */
         $taskinfo = $assoc->getTaskInfoForTmmts([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;
@@ -296,10 +296,10 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     /**
      * Validates if choosen languages can be used by the choosen resource
      * Validates also the existence of the languages in the Lang DB 
-     * @param editor_Plugins_MatchResource_Models_Resource $resource
+     * @param editor_Models_Resource $resource
      * @return boolean
      */
-    protected function validateLanguages(editor_Plugins_MatchResource_Models_Resource $resource) {
+    protected function validateLanguages(editor_Models_Resource $resource) {
         
         $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $sourceLang editor_Models_Languages */
@@ -340,11 +340,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * Uploads a file into the new TMMT
-     * @param editor_Plugins_MatchResource_Services_Manager $manager
+     * @param editor_Services_LanguageResources_Manager $manager
      */
-    protected function handleInitialFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
+    protected function handleInitialFileUpload(editor_Services_LanguageResources_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
-        /* @var $connector editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector_FilebasedAbstract */
         $importInfo = $this->handleFileUpload($connector);
         
         //currently the initial upload is optional
@@ -365,11 +365,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * Uploads an additional file into the already existing TMMT
-     * @param editor_Plugins_MatchResource_Services_Manager $manager
+     * @param editor_Services_LanguageResources_Manager $manager
      */
-    protected function handleAdditionalFileUpload(editor_Plugins_MatchResource_Services_Manager $manager) {
+    protected function handleAdditionalFileUpload(editor_Services_LanguageResources_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
-        /* @var $connector editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector_FilebasedAbstract */
         $importInfo = $this->handleFileUpload($connector);
         
         if(empty($importInfo)){
@@ -386,7 +386,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
      * handles the fileupload
      * @return array|boolean meta data about the upload or false when there was no file 
      */
-    protected function handleFileUpload(editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract $connector) {
+    protected function handleFileUpload(editor_Services_Connector_FilebasedAbstract $connector) {
         $upload = new Zend_File_Transfer_Adapter_Http();
         
         //check if connector / resource can deal with the uploaded file type
@@ -417,7 +417,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
             $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
         }
         
-        /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
+        /* @var $connector editor_Services_Connector_Abstract */
         if(empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
             $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';
         }
@@ -448,11 +448,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     public function deleteAction(){
         $this->entityLoad();
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $manager editor_Services_LanguageResources_Manager */
         $connector = $manager->getConnector($this->entity);
         $deleteInResource = !$this->getParam('deleteLocally', false);
-        if($deleteInResource && $connector instanceof editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract) {
+        if($deleteInResource && $connector instanceof editor_Services_Connector_FilebasedAbstract) {
             $connector->delete();
         }
         
@@ -492,7 +492,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * performs a tmmt search
-     * example URL /editor/plugins_matchresource_tmmt/14/search
+     * example URL /editor/tmmt/14/search
      * additional POST Parameters: 
      *  query: querystring
      *  field: source or target
@@ -529,11 +529,11 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
     
     /**
      * returns the connector to be used
-     * @return editor_Plugins_MatchResource_Services_Connector_Abstract
+     * @return editor_Services_Connector_Abstract
      */
     protected function getConnector() {
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $manager editor_Services_LanguageResources_Manager */
         return $manager->getConnector($this->entity);
     }
 }

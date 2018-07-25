@@ -131,8 +131,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 $groupedResults[$res['tmmtid']]['resourceColor']="";
                 //set tmmt color and name
                 if($res['tmmtid']>0){
-                    $tmmtModel=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
-                    /* $tmmtModel editor_Plugins_MatchResource_Models_TmMt */
+                    $tmmtModel=ZfExtended_Factory::get('editor_Models_TmMt');
+                    /* $tmmtModel editor_Models_TmMt */
                     $tmmtModel->load($res['tmmtid']);
                     $groupedResults[$res['tmmtid']]['resourceName']=$tmmtModel->getName();
                     $groupedResults[$res['tmmtid']]['resourceColor']=$tmmtModel->getColor();

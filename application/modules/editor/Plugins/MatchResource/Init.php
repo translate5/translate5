@@ -62,8 +62,6 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         }
         
         $this->initEvents();
-        $this->addController('ResourceController');
-        $this->addController('TaskassocController');
         $this->addController('TmmtController');
         $this->initRoutes();
     }
@@ -99,8 +97,8 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $manager editor_Services_LanguageResources_Manager */
         $manager->openForTask($event->getParam('task'));
     }
     
@@ -109,8 +107,8 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterTaskClose(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $manager editor_Services_LanguageResources_Manager */
         $manager->closeForTask($event->getParam('task'));
     }
     
@@ -219,8 +217,8 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     public function handleAfterSegmentPut(Zend_EventManager_Event $event) {
         $segment = $event->getParam('entity');
         /* @var $segment editor_Models_Segment */
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $manager editor_Services_LanguageResources_Manager */
         if(editor_Models_Segment_MatchRateType::isUpdateable($segment->getMatchRateType())) {
             $manager->updateSegment($segment);
         }
@@ -258,8 +256,7 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
         
         $restRoute = new Zend_Rest_Route($f, array(), array(
                 'editor' => array('plugins_matchresource_taskassoc',
-                                  'plugins_matchresource_tmmt',
-                                  'plugins_matchresource_resource',
+                                  'plugins_matchresource_tmmt'
                 ),
         ));
         $r->addRoute('plugins_matchresource_restdefault', $restRoute);
@@ -315,8 +312,8 @@ class editor_Plugins_MatchResource_Init extends ZfExtended_Plugin_Abstract {
     public function handleApplicationState(Zend_EventManager_Event $event) {
         $applicationState = $event->getParam('applicationState');
         
-        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $serviceManager editor_Services_LanguageResources_Manager */
         $applicationState->matchresource = [];
         $resources = $serviceManager->getAllResources();
         foreach($resources as $resource) {

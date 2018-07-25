@@ -38,9 +38,9 @@ END LICENSE AND COPYRIGHT
  * @method boolean getSegmentsUpdateable() getSegmentsUpdateable()
  * @method void setSegmentsUpdateable() setSegmentsUpdateable(boolean $updateable)
  */
-class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_MatchResource_Models_Db_Taskassoc';
-    protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_Taskassoc'; //→ here the new validator class
+class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_Taskassoc';
+    protected $validatorInstanceClass = 'editor_Models_Validator_Taskassoc'; //→ here the new validator class
     /**
      * loads one assoc entry, returns the loaded row as array
      * 
@@ -113,7 +113,7 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
         
         $s = $db->select()
         ->setIntegrityCheck(false)
-        ->from(array("tmmt" => "LEK_matchresource_tmmt"), array("tmmt.*","ta.id AS taskassocid", "ta.segmentsUpdateable"));
+        ->from(array("tmmt" => "LEK_languageresources_tmmt"), array("tmmt.*","ta.id AS taskassocid", "ta.segmentsUpdateable"));
 
         //check filter is set true when editor needs a list of all used TMs/MTs
         if($this->filter->hasFilter('checked')) {
@@ -133,7 +133,7 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
         }
         
         $on = $adapter->quoteInto('ta.tmmtId = tmmt.id AND ta.taskGuid = ?', $taskGuid);
-        $s->joinLeft(["ta"=>"LEK_matchresource_taskassoc"], $on, $checkColumns);
+        $s->joinLeft(["ta"=>"LEK_languageresources_taskassoc"], $on, $checkColumns);
         
         return $this->loadFilterdCustom($s);
     }
@@ -146,7 +146,7 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
             return [];
         }
         $s = $this->db->select()
-        ->from(array("assocs" => "LEK_matchresource_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.state","task.lockingUser","task.taskNr","assocs.tmmtId"))
+        ->from(array("assocs" => "LEK_languageresources_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.state","task.lockingUser","task.taskNr","assocs.tmmtId"))
         ->setIntegrityCheck(false)
         ->join(array("task" => "LEK_task"),"assocs.taskGuid = task.taskGuid","")
         ->where('assocs.tmmtId in (?)', $tmmtids)
@@ -160,8 +160,8 @@ class editor_Plugins_MatchResource_Models_Taskassoc extends ZfExtended_Models_En
      * @return array
      */
     public function getAssocTasksWithResources($taskGuid){
-        $serviceManager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $serviceManager editor_Plugins_MatchResource_Services_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $serviceManager editor_Services_LanguageResources_Manager */
         
         $resources = [];
         

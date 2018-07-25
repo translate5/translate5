@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.SearchGridViewController
+ * @class Editor.LanguageResources.view.SearchGridViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
+Ext.define('Editor.LanguageResources.view.SearchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.matchResourceSearchGrid',
     listen: {
@@ -92,7 +92,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
     searchGridPanelRender: function(){
         var me=this;
         me.assocStore = me.getView().assocStore; 
-        me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
+        me.SERVER_STATUS=Editor.LanguageResources.model.EditorQuery.prototype;
     },
     textFieldTextChange:function(field,event){
         var me=this;

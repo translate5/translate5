@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.plugins.MatchResource.store.EditorQuery
+ * @class Editor.plugins.ChangeLog.store.Changelog
  * @extends Ext.data.Store
  */
 Ext.define('Editor.plugins.ChangeLog.store.Changelog', {

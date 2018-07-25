@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchResource.view.EditTmWindow', {
+Ext.define('Editor.LanguageResources.view.EditTmWindow', {
     extend: 'Ext.window.Window',
     requires: [
         'Ext.ux.colorpick.Button',
@@ -76,7 +76,7 @@ Ext.define('Editor.plugins.MatchResource.view.EditTmWindow', {
                     xtype: 'displayfield',
                     name:'resourceId',
                     renderer: function(id) {
-                        var store = Ext.getStore('Editor.plugins.MatchResource.store.Resources'),
+                        var store = Ext.getStore('Editor.LanguageResources.store.Resources'),
                             resource = store.getById(id);
                         return resource ? resource.get('name') : id;
                     },

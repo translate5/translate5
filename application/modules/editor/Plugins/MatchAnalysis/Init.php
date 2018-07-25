@@ -110,8 +110,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @return void|boolean
      */
     public function queueAnalysis($taskGuid,$pretranlsate=false,$eventParams=array()) {
-        if(!$this->checkMatchResources($taskGuid)){
-            error_log("The associated matchresources can not be used for analysis.");
+        if(!$this->checkLanguageResources($taskGuid)){
+            error_log("The associated language resource can not be used for analysis.");
             return;
         }
         
@@ -161,8 +161,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     public function runAnalysis(editor_Models_Task $task,$pretranslate=false,$eventParams=array()){
         
-        if(!$this->checkMatchResources($task->getTaskGuid())){
-            error_log("The associated matchresources can not be used for analysis.");
+        if(!$this->checkLanguageResources($task->getTaskGuid())){
+            error_log("The associated language resource can not be used for analysis.");
             return;
         }
         
@@ -263,9 +263,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @return boolean
      */
-    private function checkMatchResources($taskGuid){
-        $tmmts=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
-        /* @var $tmmts editor_Plugins_MatchResource_Models_TmMt */
+    private function checkLanguageResources($taskGuid){
+        $tmmts=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $tmmts editor_Models_TmMt */
         
         $assocs=$tmmts->loadByAssociatedTaskGuid($taskGuid);
         
@@ -275,13 +275,13 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         $hasAnalysable=false;
         foreach ($assocs as $assoc){
-            $tmmt=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
-            /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt  */
+            $tmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+            /* @var $tmmt editor_Models_TmMt  */
             
             $tmmt->load($assoc['id']);
             
-            $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-            /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+            $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+            /* @var $manager editor_Services_LanguageResources_Manager */
             $resource=$manager->getResource($tmmt);
             
             //analysable match resource is found

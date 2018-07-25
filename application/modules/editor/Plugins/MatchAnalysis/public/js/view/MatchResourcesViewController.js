@@ -27,12 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.plugins.MatchAnalysis.view.MatchResourcesViewController
+ * @class Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.plugins.MatchAnalysis.view.MatchResourcesViewController', {
+Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.matchResourcesPanel',
+    alias: 'controller.languageResourcesPanel',
 
     handleNextCardClick:function(){
     	var me=this,

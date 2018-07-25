@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.model.EditorQuery
+ * @class Editor.plugins.ChangeLog.model.Changelog
  * @extends Ext.data.Model
  */
 Ext.define('Editor.plugins.ChangeLog.model.Changelog', {

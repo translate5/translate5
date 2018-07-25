@@ -53,9 +53,9 @@ END LICENSE AND COPYRIGHT
  * @method void setFileName() setFileName(string $name)
  * 
  */
-class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Plugins_MatchResource_Models_Db_TmMt';
-    protected $validatorInstanceClass = 'editor_Plugins_MatchResource_Models_Validator_TmMt';
+class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_TmMt';
+    protected $validatorInstanceClass = 'editor_Models_Validator_TmMt';
     
     /**
      * loads the task to tmmt assocs by a taskguid
@@ -72,7 +72,7 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
      * @return array
      */
     public function loadByAssociatedTaskGuidList(array $taskGuidList) {
-        $assocDb = new editor_Plugins_MatchResource_Models_Db_Taskassoc();
+        $assocDb = new editor_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
             ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
@@ -84,18 +84,18 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
     
     /**
      * returns the resource used by this tmmt instance
-     * @return editor_Plugins_MatchResource_Models_Resource
+     * @return editor_Models_Resource
      */
     public function getResource() {
-        $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-        /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+        /* @var $manager editor_Services_LanguageResources_Manager */
         $res = $manager->getResource($this);
         if(empty($res)) {
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $msg = 'Configured MatchResource Resource not found for Tmmt '.$this->getName().' with ID '.$this->getId().' the resource id was: '.$this->getResourceId();
+            $msg = 'Configured LanguageResource Resource not found for Tmmt '.$this->getName().' with ID '.$this->getId().' the resource id was: '.$this->getResourceId();
             $msg .= "\n".'Maybe the resource config of the underlying Match Resource Service was changed / removed.';
-            $log->logError('Configured MatchResource Resource not found', $msg);
+            $log->logError('Configured LanguageResource Resource not found', $msg);
             throw new ZfExtended_Models_Entity_NotFoundException('Die ursprünglich konfigurierte TM / MT Resource ist nicht mehr vorhanden!');
         }
         return $res;
@@ -113,8 +113,8 @@ class editor_Plugins_MatchResource_Models_TmMt extends ZfExtended_Models_Entity_
     public function checkTaskAndTmmtAccess(string $taskGuid,integer $tmmtId, editor_Models_Segment $segment = null) {
         
         //checks if the queried tmmt is associated to the task:
-        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
-        /* @var $tmmtTaskAssoc editor_Plugins_MatchResource_Models_Taskassoc */
+        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
+        /* @var $tmmtTaskAssoc editor_Models_Taskassoc */
         try {
             //for security reasons a service can only be queried when a valid task association exists and this task is loaded
             // that means the user has also access to the service. If not then not!

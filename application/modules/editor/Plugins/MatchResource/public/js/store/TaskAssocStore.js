@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchResource.store.TaskAssocStore', {
+Ext.define('Editor.store.TaskAssocStore', {
   extend : 'Ext.data.Store',
-  model: 'Editor.plugins.MatchResource.model.TaskAssoc',
+  model: 'Editor.model.TaskAssoc',
   groupField: 'serviceName',
   autoLoad: false
 });

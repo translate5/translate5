@@ -124,7 +124,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $repetitionResult=$this->getBestMatchrate($segment,false);
                 
                 //save the repetition analysis
-                $this->saveAnalysis($segment, editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE, 0);
+                $this->saveAnalysis($segment, editor_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE, 0);
                 
                 $this->pretranslateSegment($segment,$repetitionResult);
                 
@@ -160,7 +160,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //query the segment for each assigned tm
         foreach ($this->connectors as $tmmtid => $connector){
-            /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
+            /* @var $connector editor_Services_Connector_Abstract */
             
             $matches=[];
             
@@ -238,8 +238,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     public function initConnectors(){
         
-        $tmmts=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
-        /* @var $tmmts editor_Plugins_MatchResource_Models_TmMt */
+        $tmmts=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $tmmts editor_Models_TmMt */
         
         $assocs=$tmmts->loadByAssociatedTaskGuid($this->task->getTaskGuid());
         
@@ -248,13 +248,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         }
         
         foreach ($assocs as $assoc){
-            $tmmt=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
-            /* @var $tmmt editor_Plugins_MatchResource_Models_TmMt  */
+            $tmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+            /* @var $tmmt editor_Models_TmMt  */
             
             $tmmt->load($assoc['id']);
             
-            $manager = ZfExtended_Factory::get('editor_Plugins_MatchResource_Services_Manager');
-            /* @var $manager editor_Plugins_MatchResource_Services_Manager */
+            $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
+            /* @var $manager editor_Services_LanguageResources_Manager */
             $resource=$manager->getResource($tmmt);
             
             //ignore non analysable resources

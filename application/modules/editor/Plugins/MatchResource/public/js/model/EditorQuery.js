@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.model.EditorQuery
+ * @class Editor.model.EditorQuery
  * @extends Ext.data.Model
  */
-Ext.define('Editor.plugins.MatchResource.model.EditorQuery', {
+Ext.define('Editor.model.EditorQuery', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'string'},

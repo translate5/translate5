@@ -33,11 +33,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.SearchGridViewModel
+ * @class Editor.LanguageResources.view.SearchGridViewModel
  * @extends Ext.app.ViewModel
  */
 
-Ext.define('Editor.plugins.MatchResource.view.SearchGridViewModel', {
+Ext.define('Editor.LanguageResources.view.SearchGridViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.matchResourceSearchGrid',
     requires: [
@@ -57,7 +57,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewModel', {
                     editorsearch: {
                         pageSize: 200,
                         autoLoad: false,
-                        model: 'Editor.plugins.MatchResource.model.EditorQuery',
+                        model: 'Editor.LanguageResources.model.EditorQuery',
                         sorters: [{
                             property: 'matchrate',
                             direction: 'DESC'

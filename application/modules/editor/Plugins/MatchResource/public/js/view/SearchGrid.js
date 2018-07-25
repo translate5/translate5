@@ -33,14 +33,14 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.SearchGrid
+ * @class Editor.LanguageResources.view.SearchGrid
  * @extends Ext.grid.Panel
  */
-Ext.define('Editor.plugins.MatchResource.view.SearchGrid', {
+Ext.define('Editor.LanguageResources.view.SearchGrid', {
     extend : 'Ext.grid.Panel',
     requires: [
-               'Editor.plugins.MatchResource.view.SearchGridViewController',
-               'Editor.plugins.MatchResource.view.SearchGridViewModel'
+               'Editor.LanguageResources.view.SearchGridViewController',
+               'Editor.LanguageResources.view.SearchGridViewModel'
                ],
     alias : 'widget.matchResourceSearchGrid',
     controller: 'matchResourceSearchGrid',

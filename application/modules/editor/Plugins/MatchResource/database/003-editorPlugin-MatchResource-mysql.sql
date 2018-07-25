@@ -26,31 +26,21 @@
 -- */
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MatchResource.opentm2.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of available OpenTM2 Server, example: ["http://win.translate5.net:1984/otmmemoryservice/"]');
+('runtimeOptions.LanguageResources.opentm2.server', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'List of available OpenTM2 Server, example: ["http://win.translate5.net:1984/otmmemoryservice/"]');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MatchResource.lucylt.server', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of available Lucy LT Servers');
+('runtimeOptions.LanguageResources.lucylt.server', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'List of available Lucy LT Servers');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MatchResource.lucylt.credentials', 1, 'editor', 'plugins', '[]', '[]', '', 'list', 'List of Lucy LT credentials to the Lucy LT Servers. Each server entry must have one credential entry. One credential entry looks like: "username:password"');
+('runtimeOptions.LanguageResources.lucylt.credentials', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'List of Lucy LT credentials to the Lucy LT Servers. Each server entry must have one credential entry. One credential entry looks like: "username:password"');
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MatchResource.lucylt.matchrate', 1, 'editor', 'plugins', '80', '80', '', 'integer', 'Lucy LT penalty value, used as default matchrate since in MT no matchrate is available');
+('runtimeOptions.LanguageResources.lucylt.matchrate', 1, 'editor', 'editor', '80', '80', '', 'integer', 'Lucy LT penalty value, used as default matchrate since in MT no matchrate is available');
 
-
-ALTER TABLE `LEK_matchresource_taskassoc` 
-ADD COLUMN `segmentsUpdateable` TINYINT NOT NULL DEFAULT 0 AFTER `taskGuid`;
-
-ALTER TABLE `LEK_matchresource_tmmt` 
-ADD COLUMN `sourceLangRfc5646` VARCHAR(30) NULL DEFAULT NULL COMMENT 'caches the language rfc value, since this value is used more often as the id itself' AFTER `sourceLang`,
-ADD COLUMN `targetLangRfc5646` VARCHAR(30) NULL DEFAULT NULL COMMENT 'caches the language rfc value, since this value is used more often as the id itself' AFTER `targetLang`;
-
-UPDATE `LEK_matchresource_tmmt` tmmt, `LEK_languages` lang 
+UPDATE `LEK_languageresources_tmmt` tmmt, `LEK_languages` lang 
 SET tmmt.sourceLangRfc5646 = lang.rfc5646 
 WHERE lang.id = tmmt.sourceLang;
 
-UPDATE `LEK_matchresource_tmmt` tmmt, `LEK_languages` lang 
+UPDATE `LEK_languageresources_tmmt` tmmt, `LEK_languages` lang 
 SET tmmt.targetLangRfc5646 = lang.rfc5646 
 WHERE lang.id = tmmt.targetLang;
-
-update `Zf_configuration` set `value` = '1', `default` = '1' where name = 'runtimeOptions.plugins.MatchResource.preloadedTranslationSegments';

@@ -27,4 +27,4 @@
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
-('runtimeOptions.worker.editor_Plugins_MatchResource_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the MatchResource ReImport worker');
+('runtimeOptions.worker.editor_Models_LanguageResourcesWorker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the LanguageResourceWorker ReImport worker');

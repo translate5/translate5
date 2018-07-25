@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchResource_Models_Validator_TmMt extends ZfExtended_Models_Validator_Abstract {
+class editor_Models_Validator_TmMt extends ZfExtended_Models_Validator_Abstract {
 
     /**
      * Validators for Task User Assoc Entity

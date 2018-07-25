@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.plugins.MatchResource.store.TmMts', {
+Ext.define('Editor.store.TmMts', {
   extend : 'Ext.data.Store',
-  model: 'Editor.plugins.MatchResource.model.TmMt',
+  model: 'Editor.model.TmMt',
   pageSize: 20,
   autoLoad: true
 });

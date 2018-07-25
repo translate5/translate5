@@ -33,15 +33,15 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.MatchGrid
+ * @class Editor.LanguageResources.view.MatchGrid
  * @extends Ext.grid.Panel
  */
-Ext.define('Editor.plugins.MatchResource.view.TaskGridWindow', {
+Ext.define('Editor.LanguageResources.view.TaskGridWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.matchResourceTaskGridWindow',
     requires: [
-        'Editor.plugins.MatchResource.view.TaskGridWindowViewController',
-        'Editor.plugins.MatchResource.view.TaskGridWindowViewModel',
+        'Editor.LanguageResources.view.TaskGridWindowViewController',
+        'Editor.LanguageResources.view.TaskGridWindowViewModel',
         'Ext.grid.Panel',
         'Ext.grid.filters.filter.String',
         'Ext.grid.filters.filter.List',
@@ -65,7 +65,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskGridWindow', {
         reimportTooltip: '#UT#Ausgewählte Aufgaben erneut ins aktuelle TM importieren',
     },
     stores:[
-        'Editor.plugins.MatchResource.store.TaskAssocStore'
+        'Editor.LanguageResources.store.TaskAssocStore'
     ],
     controller: 'matchResourceTaskGridWindow',
     viewModel: {
@@ -142,7 +142,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskGridWindow', {
     },
     loadRecord: function(record) {
         var tasks = this.getViewModel().getStore('tasklist'),
-            proxy = Editor.plugins.MatchResource.model.TmMt.proxy,
+            proxy = Editor.LanguageResources.model.TmMt.proxy,
             url = proxy.url;
         this.getViewModel().set('record', record);
         if (!url.match(proxy.slashRe)) {

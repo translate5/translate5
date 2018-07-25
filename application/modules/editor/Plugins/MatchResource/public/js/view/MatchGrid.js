@@ -33,15 +33,15 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.MatchGrid
+ * @class Editor.LanguageResources.view.MatchGrid
  * @extends Ext.grid.Panel
  */
-Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
+Ext.define('Editor.LanguageResources.view.MatchGrid', {
 	extend: 'Ext.grid.Panel',
 	alias: 'widget.matchResourceMatchGrid',
 	requires: [
-	           'Editor.plugins.MatchResource.view.MatchGridViewController',
-	           'Editor.plugins.MatchResource.view.MatchGridViewModel',
+	           'Editor.LanguageResources.view.MatchGridViewController',
+	           'Editor.LanguageResources.view.MatchGridViewModel',
 	           'Ext.grid.filters.filter.String',
 	           'Ext.grid.filters.filter.List',
 	           'Ext.grid.column.Number',
@@ -66,7 +66,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
         createdTooltipMsg: '#UT#erstellt:'
     },
 	stores:[
-		'Editor.plugins.MatchResource.store.TaskAssocStore'
+		'Editor.LanguageResources.store.TaskAssocStore'
 	],
     controller: 'matchResourceMatchGrid',
     viewModel: {
@@ -176,7 +176,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGrid', {
 	      */
 	    };
 	    me.assocStore = instanceConfig.assocStore;
-	    me.SERVER_STATUS=Editor.plugins.MatchResource.model.EditorQuery.prototype;
+	    me.SERVER_STATUS=Editor.LanguageResources.model.EditorQuery.prototype;
 	    if (instanceConfig) {
 	        me.self.getConfigurator().merge(me, config, instanceConfig);
 	    }

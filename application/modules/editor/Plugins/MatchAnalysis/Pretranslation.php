@@ -92,7 +92,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if(($segment->getAutoStateId()!=editor_Models_Segment_AutoStates::NOT_TRANSLATED) || !isset($result)){
             return;
         }
-        if($result->matchrate<$this->pretranslateMatchrate || $result->matchrate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
+        if($result->matchrate<$this->pretranslateMatchrate || $result->matchrate==editor_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
             return;
         }
         

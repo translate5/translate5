@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.controller.TaskAssoc
+ * @class Editor.controller.TaskAssoc
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
+Ext.define('Editor.controller.TaskAssoc', {
   extend : 'Ext.app.Controller',
   views: ['Editor.plugins.MatchResource.view.TaskAssocPanel'],
   models: ['Editor.plugins.MatchResource.model.TaskAssoc'],

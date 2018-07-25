@@ -26,4 +26,4 @@
 -- */
 
 INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MatchResource.opentm2.tmprefix', 1, 'editor', 'plugins', '', '', '', 'string', 'When using one OpenTM2 instance for multiple translate5 instances, a unique prefix for each translate5 instance should be configured to avoid filename collisions on the single OpenTM2 instance.');
+('runtimeOptions.LanguageResources.opentm2.tmprefix', 1, 'editor', 'editor', '', '', '', 'string', 'When using one OpenTM2 instance for multiple translate5 instances, a unique prefix for each translate5 instance should be configured to avoid filename collisions on the single OpenTM2 instance.');

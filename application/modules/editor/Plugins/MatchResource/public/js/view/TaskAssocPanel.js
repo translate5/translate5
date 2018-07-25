@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.Panel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
+Ext.define('Editor.LanguageResources.view.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.matchResourceTaskAssocPanel',
     itemId:'matchResourceTaskAssocPanel',
@@ -64,7 +64,7 @@ Ext.define('Editor.plugins.MatchResource.view.TaskAssocPanel', {
             items : [ {
                 xtype : 'grid',
                 itemId : 'tmTaskAssocGrid',
-                store : 'Editor.plugins.MatchResource.store.TaskAssocStore',
+                store : 'Editor.LanguageResources.store.TaskAssocStore',
                 emptyText: me.strings.empty,
                 features : [ {
                     id: 'group',

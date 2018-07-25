@@ -59,9 +59,10 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_file_filter' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
             'LEK_languages' => false,
+            //TODO:TRANSLATE-1342, should we enable this now ?
             // matchresource plugin tables disabled for archiving, since task data is not depending from them, and plugin must not be installed at all
-            'LEK_matchresource_taskassoc' => false,
-            'LEK_matchresource_tmmt' => false,
+            'LEK_languageresources_taskassoc' => false,
+            'LEK_languageresources_tmmt' => false,
             'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
             'LEK_plugin_segmentstatistics' => 'taskGuid',
             'LEK_qmsubsegments' => 'taskGuid',

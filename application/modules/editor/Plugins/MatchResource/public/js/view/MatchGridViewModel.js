@@ -33,11 +33,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.MatchGridViewModel
+ * @class Editor.LanguageResources.view.MatchGridViewModel
  * @extends Ext.app.ViewModel
  */
 
-Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
+Ext.define('Editor.LanguageResources.view.MatchGridViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.matchResourceMatchGrid',
     requires: [
@@ -57,7 +57,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
                 	editorquery: {
                         pageSize: 200,
                         autoLoad: false,
-                        model: 'Editor.plugins.MatchResource.model.EditorQuery',
+                        model: 'Editor.LanguageResources.model.EditorQuery',
                         sorters: [{
                             property: 'matchrate',
                             direction: 'DESC'
@@ -65,7 +65,7 @@ Ext.define('Editor.plugins.MatchResource.view.MatchGridViewModel', {
                     }
                     /*
                     taskassoc: {
-                        model: 'Editor.plugins.MatchResource.model.TaskAssoc',
+                        model: 'Editor.LanguageResources.model.TaskAssoc',
                         autoLoad: false
                     }
                     */

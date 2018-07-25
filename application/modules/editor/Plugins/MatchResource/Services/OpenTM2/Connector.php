@@ -550,7 +550,7 @@ class editor_Plugins_MatchResource_Services_OpenTM2_Connector extends editor_Plu
         $fuzzyTmmt->setFileName($memoryName);
         $fuzzyTmmt->setId(null);
         
-        $connector = ZfExtended_Factory::get($fuzzyTmmt->getServiceType().editor_Plugins_MatchResource_Services_Manager::CLS_CONNECTOR);
+        $connector = ZfExtended_Factory::get($fuzzyTmmt->getServiceType().editor_Services_LanguageResources_Manager::CLS_CONNECTOR);
         /* @var $connector editor_Plugins_MatchResource_Services_Connector_Abstract */
         $connector->connectTo($fuzzyTmmt);
         return $connector;

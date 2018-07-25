@@ -31,16 +31,16 @@ END LICENSE AND COPYRIGHT
   
   Editor.controller.Localizer.addPluginInit('matchResource', function() {
   
-    Ext.define("Editor.locale.plugins.MatchResource.controller.Editor", {
-        override: "Editor.plugins.MatchResource.controller.Editor",
+    Ext.define("Editor.locale.controller.LanguageResources", {
+        override: "Editor.controller.LanguageResources",
         strings: {
             msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>',
             msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>'
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.controller.TaskAssoc", {
-        override: "Editor.plugins.MatchResource.controller.TaskAssoc",
+    Ext.define("Editor.locale.controller.TaskAssoc", {
+        override: "Editor.controller.TaskAssoc",
         strings: {
             assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
             assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
@@ -48,10 +48,10 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.controller.TmOverview", {
-        override: "Editor.plugins.MatchResource.controller.TmOverview",
+    Ext.define("Editor.locale.controller.TmOverview", {
+        override: "Editor.controller.TmOverview",
         strings: {
-            matchresource: '<?php echo $this->translate->_('Matchressourcen');?>',
+            languageresource: '<?php echo $this->translate->_('Matchressourcen');?>',
             deleteConfirm: '<?php echo $this->translate->_('Matchressource endgültig löschen?');?>',
             deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Matchressource "{0}" wirklich endgültig gelöscht werden?');?>',
             deleteConfirmLocal: '<?php echo $this->translate->_('Matchressource löschen?');?>',
@@ -66,8 +66,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.MatchGridViewController", {
-        override: "Editor.plugins.MatchResource.view.MatchGridViewController",
+    Ext.define("Editor.locale.view.LanguageResources.MatchGridViewController", {
+        override: "Editor.view.LanguageResources.MatchGridViewController",
         strings: {
             loading: '<?php echo $this->translate->_('wird geladen...');?>',
             noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
@@ -76,8 +76,8 @@ END LICENSE AND COPYRIGHT
             serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Matchressource dauerte zu lange.');?>',
         }
     });
-    Ext.define("Editor.locale.plugins.MatchResource.view.SearchGridViewController", {
-        override: "Editor.plugins.MatchResource.view.SearchGridViewController",
+    Ext.define("Editor.locale.view.LanguageResources.SearchGridViewController", {
+        override: "Editor.view.LanguageResources.SearchGridViewController",
         strings: {
             loading: '<?php echo $this->translate->_('wird geladen...');?>',
             noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
@@ -88,8 +88,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.AddTmWindow", {
-        override: "Editor.plugins.MatchResource.view.AddTmWindow",
+    Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
+        override: "Editor.view.LanguageResources.AddTmWindow",
         strings: {
             add: '<?php echo $this->translate->_('Matchressource hinzufügen');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
@@ -105,8 +105,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.EditTmWindow", {
-        override: "Editor.plugins.MatchResource.view.EditTmWindow",
+    Ext.define("Editor.locale.view.LanguageResources.EditTmWindow", {
+        override: "Editor.view.LanguageResources.EditTmWindow",
         strings: {
             edit: '<?php echo $this->translate->_('Matchressource bearbeiten');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
@@ -121,8 +121,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.EditorPanel", {
-        override: "Editor.plugins.MatchResource.view.EditorPanel",
+    Ext.define("Editor.locale.view.LanguageResources.EditorPanel", {
+        override: "Editor.view.LanguageResources.EditorPanel",
         strings: {
             searchTitle: '<?php echo $this->translate->_('Konkordanzsuche');?>',
             matchTitle:'<?php echo $this->translate->_('Matches');?>',
@@ -132,8 +132,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.MatchGrid", {
-        override: "Editor.plugins.MatchResource.view.MatchGrid",
+    Ext.define("Editor.locale.view.LanguageResources.MatchGrid", {
+        override: "Editor.view.LanguageResources.MatchGrid",
         strings: {
             source: '<?php echo $this->translate->_('Quelltext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
@@ -146,8 +146,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.SearchGrid", {
-        override: "Editor.plugins.MatchResource.view.SearchGrid",
+    Ext.define("Editor.locale.view.LanguageResources.SearchGrid", {
+        override: "Editor.view.LanguageResources.SearchGrid",
         strings: {
             source: '<?php echo $this->translate->_('Quelltext');?>',
             target: '<?php echo $this->translate->_('Zieltext');?>',
@@ -161,8 +161,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.TaskAssocPanel", {
-        override: "Editor.plugins.MatchResource.view.TaskAssocPanel",
+    Ext.define("Editor.locale.view.LanguageResources.TaskAssocPanel", {
+        override: "Editor.view.LanguageResources.TaskAssocPanel",
         title: '<?php echo $this->translate->_('Matchressourcen zuweisen');?>',
         strings: {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
@@ -177,8 +177,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.TmOverviewPanel", {
-        override: "Editor.plugins.MatchResource.view.TmOverviewPanel",
+    Ext.define("Editor.locale.view.LanguageResources.TmOverviewPanel", {
+        override: "Editor.view.LanguageResources.TmOverviewPanel",
         title: '<?php echo $this->translate->_('Matchressourcen');?>',
         strings: {
             name: '<?php echo $this->translate->_('Name');?>',
@@ -208,8 +208,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.ImportTmWindow", {
-        override: "Editor.plugins.MatchResource.view.ImportTmWindow",
+    Ext.define("Editor.locale.view.LanguageResources.ImportTmWindow", {
+        override: "Editor.view.LanguageResources.ImportTmWindow",
         title: '<?php echo $this->translate->_('Matchressourcen');?>',
         strings: {
             file: '<?php echo $this->translate->_('TMX-Datei');?>',
@@ -222,8 +222,8 @@ END LICENSE AND COPYRIGHT
         }
     });
     
-    Ext.define("Editor.locale.plugins.MatchResource.view.TaskGridWindow", {
-        override: "Editor.plugins.MatchResource.view.TaskGridWindow",
+    Ext.define("Editor.locale.view.LanguageResources.TaskGridWindow", {
+        override: "Editor.view.LanguageResources.TaskGridWindow",
         strings: {
             title: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             task: '<?php echo $this->translate->_('Aufgabe');?>',

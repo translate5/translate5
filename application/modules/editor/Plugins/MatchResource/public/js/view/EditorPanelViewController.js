@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.plugins.MatchResource.view.EditorPanelViewController', {
+Ext.define('Editor.LanguageResources.view.EditorPanelViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.matchResourceEditorPanel',
     requires: [

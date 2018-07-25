@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.model.TmMt
+ * @class Editor.model.TmMt
  * @extends Ext.data.Model
  */
-Ext.define('Editor.plugins.MatchResource.model.TmMt', {
+Ext.define('Editor.model.TmMt', {
   extend: 'Ext.data.Model',
   STATUS_LOADING: 'loading',
   STATUS_ERROR: 'error',

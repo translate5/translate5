@@ -33,13 +33,13 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.controller.Editor
+ * @class Editor.controller.Editor
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.plugins.MatchResource.controller.Editor', {
+Ext.define('Editor.controller.Editor', {
   extend: 'Ext.app.Controller',
-  views: ['Editor.plugins.MatchResource.view.EditorPanel'],
-  models: ['Editor.plugins.MatchResource.model.EditorQuery','Editor.plugins.MatchResource.model.TaskAssoc'],
+  views: ['Editor.view.EditorPanel'],
+  models: ['Editor.model.EditorQuery','Editor.model.TaskAssoc'],
   requires: ['Editor.util.SegmentContent'],
   refs:[{
       ref: 'matchgrid',
@@ -52,7 +52,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       selector: '#roweditor displayfield[name=matchRate]'
   },{
       ref: 'editorPanel',
-      selector:'#matchResourceEditorPanel'
+      selector:'#languageResourceEditorPanel'
   },{
       ref: 'editorViewport',
       selector:'#editorViewport'
@@ -81,7 +81,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
               viewModeChanged:'viewModeChangeEvent'
           },
           '#Editor.plugins.TrackChanges.controller.Editor':{
-              setMatchResourceValueForEditor:'setMatchResourceValueForEditor'
+              setLanguageResourceValueForEditor:'setLanguageResourceValueForEditor'
           }
       }
   },
@@ -116,7 +116,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('pluginMatchResourceMatchQuery') || authUser.isAllowed('pluginMatchResourceSearchQuery'))){
           me.loadAssocStore();
       }
-      me.SERVER_STATUS = Editor.plugins.MatchResource.model.EditorQuery.prototype;
+      me.SERVER_STATUS = Editor.model.EditorQuery.prototype;
   },
   handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
       var me = this;
@@ -160,7 +160,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
               //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
-              rec.set('matchRateType', Editor.data.plugins.MatchResource.matchrateTypeChangedState+';tmmtid='+matchRecord.get('tmmtid')); 
+              rec.set('matchRateType', Editor.data.matchrateTypeChangedState+';tmmtid='+matchRecord.get('tmmtid')); 
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       }
@@ -195,7 +195,7 @@ Ext.define('Editor.plugins.MatchResource.controller.Editor', {
                 scope: me
           };
       me.assocStore = Ext.create('Ext.data.Store', {
-          model: 'Editor.plugins.MatchResource.model.TaskAssoc'
+          model: 'Editor.model.TaskAssoc'
       }),
       me.assocStore.load(prm);
   },

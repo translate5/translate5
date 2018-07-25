@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,38 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
+/**#@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
  *
  */
 /**
- * @class Editor.plugins.MatchResource.model.Resource
- * @extends Ext.data.Model
+ * Dummy File Upload TM Service Base Class
  */
-Ext.define('Editor.plugins.MatchResource.model.Resource', {
-  extend: 'Ext.data.Model',
-  fields: [
-    {name: 'id', type: 'string'},
-    {name: 'name', type: 'string'},
-    {name: 'filebased', type: 'boolean'},
-    {name: 'serviceType', type: 'string'},
-    {name: 'serviceName', type: 'string'},
-    {name: 'defaultColor', type: 'string'}
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'plugins_matchresource_resource', //same as PHP controller name
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+class editor_Services_DummyFileTm_Service extends editor_Services_ServiceAbstract {
+    const DEFAULT_COLOR = '00ff00';
+    
+    protected $resourceClass = 'editor_Services_DummyFileTm_Resource';
+    
+    public function __construct() {
+        $this->addResource([$this->getServiceNamespace(), 'Dummy Filebased TM']); //isfilebased and the only resource
     }
-  }
-});
+    
+    /**
+     * (non-PHPdoc)
+     * @see editor_Services_ServiceAbstract::getName()
+     */
+    public function getName() {
+        return "DummyFile TM";
+    }
+}

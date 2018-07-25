@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_MatchResource_Models_Resource {
+class editor_Models_Resource {
     /**
      * name of the resource
      * @var string
