@@ -181,5 +181,5 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
         return $segment;
     }
-    
+
 }
