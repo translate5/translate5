@@ -17,6 +17,9 @@
 		font: inherit;
 		vertical-align: baseline;
 	}
+	form table th {
+	    border: 1px solid black;
+	}
 
 	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
 		display: block;
@@ -1709,7 +1712,7 @@
 		-webkit-transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 		-ms-transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 		transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-		background-color: transparent;
+        background-color: rgb(221, 221, 221); /*background-color: transparent;*/
 		border: 0;
 		box-shadow: inset 0 0 0 1px rgba(160, 160, 160, 0.3);
 		color: #3c3b3b !important;
@@ -1980,6 +1983,9 @@
 		/* opacity: 0; */
 		width: 1em;
 		z-index: -1;
+	}
+	form table th input[type="checkbox"] {
+	   margin-left: -1px;
 	}
 
 		input[type="checkbox"] + label,
