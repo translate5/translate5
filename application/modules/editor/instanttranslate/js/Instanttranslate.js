@@ -26,6 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+
+/* --------------- toggle instant translation --------------- */
+$('.translationInstantToggle').click(function(){
+    $('.translationInstantToggle').toggle();
+});
+    
 /* --------------- clear source --------------- */
 /* --- https://stackoverflow.com/a/6258628 ---- */
 
