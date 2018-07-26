@@ -48,20 +48,29 @@
             </select>
             <span class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
-                <i class="clearableClear">&times;</i> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
+                <span class="clearableClear">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
             </span>
         </form>
     </div>
     <div id="translations">
         <form id="translationLanguageSelector" name="translationLanguageSelector">
             <select id="translationLocale" name="translationLocale">
-            <option value="en">en-GB</option>
-            <option value="de">de-DE</option>
+                <option value="en">en-GB</option>
+                <option value="de">de-DE</option>
             </select>
         </form>
-        <div class="translationResult">translation 1....</div>
-        <div class="translationResult">translation 2....</div>
-        <div class="translationResult">translation 3....</div>
+        <div class="copyable">
+            <div class="translationResult">translation 1....</div>
+            <span class="copyableCopy"><span class="ui-icon ui-icon-copy"></span></span>
+        </div>
+        <div class="copyable">
+            <div class="translationResult">translation 2....</div>
+            <span class="copyableCopy"><span class="ui-icon ui-icon-copy"></span></span>
+        </div>
+        <div class="copyable">
+            <div class="translationResult">translation 3....</div>
+            <span class="copyableCopy"><span class="ui-icon ui-icon-copy"></span></span>
+        </div>
     </div>
 </div>
 
