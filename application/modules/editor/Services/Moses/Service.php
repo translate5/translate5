@@ -52,7 +52,7 @@ class editor_Services_Moses_Service extends editor_Services_ServiceAbstract {
     public function __construct() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->plugins->LanguageResource->moses->server;
+        $urls = $config->runtimeOptions->LanguageResources->moses->server;
         $this->addResourceForeachUrl('Moses MT', $urls->toArray());
     }
 }

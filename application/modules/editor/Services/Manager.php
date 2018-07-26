@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * TmMt Service Manager
  * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
  */
-class editor_Services_LanguageResources_Manager {
+class editor_Services_Manager {
     const CLS_SERVICE = '_Service';
     const CLS_CONNECTOR = '_Connector';
     
@@ -57,7 +57,7 @@ class editor_Services_LanguageResources_Manager {
 
     /**
      * Creates all configured connector resources
-     * @return [editor_Connector_Abstract]
+     * @return [editor_Services_Connector_Abstract]
      */
     public function getAllResources() {
         $serviceResources = array();

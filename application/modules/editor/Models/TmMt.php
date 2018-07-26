@@ -54,8 +54,16 @@ END LICENSE AND COPYRIGHT
  * 
  */
 class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
+    
+    // set as match rate type when matchrate was changed
+    const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';
+    
+    //set by changealike editor
+    const MATCH_RATE_TYPE_EDITED_AUTO = 'matchresourceusageauto';
+    
     protected $dbInstanceClass = 'editor_Models_Db_TmMt';
     protected $validatorInstanceClass = 'editor_Models_Validator_TmMt';
+    
     
     /**
      * loads the task to tmmt assocs by a taskguid
@@ -87,14 +95,14 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Resource
      */
     public function getResource() {
-        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $manager editor_Services_LanguageResources_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
         $res = $manager->getResource($this);
         if(empty($res)) {
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
             $msg = 'Configured LanguageResource Resource not found for Tmmt '.$this->getName().' with ID '.$this->getId().' the resource id was: '.$this->getResourceId();
-            $msg .= "\n".'Maybe the resource config of the underlying Match Resource Service was changed / removed.';
+            $msg .= "\n".'Maybe the resource config of the underlying Language Resource Service was changed / removed.';
             $log->logError('Configured LanguageResource Resource not found', $msg);
             throw new ZfExtended_Models_Entity_NotFoundException('Die ursprünglich konfigurierte TM / MT Resource ist nicht mehr vorhanden!');
         }

@@ -88,7 +88,7 @@ class editor_TaskassocController extends ZfExtended_RestController {
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             if($task->isUsed($this->entity->getTaskGuid())) {
-                throw new ZfExtended_VersionConflictException("Die Aufgabe wird bearbeitet, die Matchressource kann daher im Moment nicht gelöscht werden!");
+                throw new ZfExtended_VersionConflictException("Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht gelöscht werden!");
             }
             $this->entity->delete();
         }

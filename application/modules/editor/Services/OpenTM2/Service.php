@@ -41,7 +41,7 @@ class editor_Services_OpenTM2_Service extends editor_Services_ServiceAbstract {
     public function __construct() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->plugins->LanguageResource->opentm2->server;
+        $urls = $config->runtimeOptions->LanguageResources->opentm2->server;
         $this->addResourceForeachUrl('OpenTM2', $urls->toArray());
     }
     

@@ -48,8 +48,8 @@ class editor_ResourceController extends ZfExtended_RestController  {
     }
     
     public function indexAction() {
-        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $serviceManager editor_Services_LanguageResources_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
         $resources = $serviceManager->getAllResources();
         $result = array();
         

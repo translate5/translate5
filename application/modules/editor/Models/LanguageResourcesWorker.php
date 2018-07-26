@@ -70,8 +70,8 @@ class editor_Models_LanguageResourcesWorker extends editor_Models_Import_Worker_
         /* @var $tmmt editor_Models_TmMt */
         $tmmt->load($params['tmmtId']);
         
-        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $manager editor_Services_LanguageResources_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
         $connector = $manager->getConnector($tmmt);
         
         foreach($segments as $segment) {

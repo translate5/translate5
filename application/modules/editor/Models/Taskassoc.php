@@ -160,8 +160,8 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getAssocTasksWithResources($taskGuid){
-        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $serviceManager editor_Services_LanguageResources_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
         
         $resources = [];
         

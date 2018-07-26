@@ -46,7 +46,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->LanguageResource->lucylt->matchrate;
+        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->LanguageResources->lucylt->matchrate;
     }
     
     /**

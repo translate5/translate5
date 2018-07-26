@@ -280,11 +280,11 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             
             $tmmt->load($assoc['id']);
             
-            $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-            /* @var $manager editor_Services_LanguageResources_Manager */
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
             $resource=$manager->getResource($tmmt);
             
-            //analysable match resource is found
+            //analysable language resource is found
             if($resource->getAnalysable()){
                $hasAnalysable=true; 
             }

@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * After importing a task a match analysis will be created based on the assigned TM based MatchRessources. 
- * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried MatchRessource the received best match rate is stored in a separate DB table. 
+ * To get the analysis results, each segment is send to the assigned MatchRessources. For each queried Sprachressource the received best match rate is stored in a separate DB table. 
  * Out of this table all desired analysis are calculated. 
  *
  */
@@ -81,7 +81,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     }
     
     /***
-     * Query the match resource service for each segment, calculate the best match rate, and save the match analysis model
+     * Query the language resource service for each segment, calculate the best match rate, and save the match analysis model
      */
     public function calculateMatchrate(){
 
@@ -253,8 +253,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             
             $tmmt->load($assoc['id']);
             
-            $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-            /* @var $manager editor_Services_LanguageResources_Manager */
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
             $resource=$manager->getResource($tmmt);
             
             //ignore non analysable resources

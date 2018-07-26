@@ -271,6 +271,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
       
+      $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
+      $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_TmMt::MATCH_RATE_TYPE_EDITED);
+      
       $this->setJsAppData();
     }
 
@@ -391,6 +394,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $controllers[] = 'admin.Customer';
         }
 
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesTaskassoc')){
+            $controllers[] = 'TaskAssoc';
+        }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesMatchQuery') || $acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesSearchQuery')){
+            $controllers[] = 'LanguageResources';
+        }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesOverview')){
+            $controllers[] = 'TmOverview';
+        }
+        
         //Localizer must be the last one!
         $controllers[] = 'Localizer';
         return $controllers;

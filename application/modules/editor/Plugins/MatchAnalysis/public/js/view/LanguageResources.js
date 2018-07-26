@@ -33,41 +33,63 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.LanguageResources.view.MatchGridViewModel
- * @extends Ext.app.ViewModel
+ * @class Editor.plugins.MatchAnalysis.view.LanguageResources
+ * @extends Ext.form.Panel
  */
-
-Ext.define('Editor.LanguageResources.view.TaskGridWindowViewModel', {
-    extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.matchResourceTaskGridWindow',
+Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
+    extend:'Ext.panel.Panel',
+    alias: 'widget.languageResourcesPanel',
+    controller: 'languageResourcesPanel',
     requires: [
-        'Ext.util.Sorter',
-        'Ext.data.Store',
-        'Ext.data.field.Integer',
-        'Ext.data.field.String'
+        'Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController',
+        'Editor.view.LanguageResources.TaskAssocPanel'
     ],
-    data: {
-        record: null
+    mixins:['Editor.controller.admin.IWizardCard'],
+    
+    //card type, used for card display order
+    importType:'postimport',
+    
+    task:null,
+    
+    strings:{
+        wizardTitle:'#UT#Sprachressourcen zuweisen'
     },
     initConfig: function(instanceConfig) {
         var me = this,
             config = {
-                stores: {
-                    tasklist: {
-                        buffered: true,
-                        pageSize: 200,
-                        autoLoad: false,
-                        model: 'Editor.model.admin.Task',
-                        sorters: [{
-                            property: 'taskName',
-                            direction: 'DESC'
-                        }]
-                    }
-                }
+                    items: [{
+                        xtype: 'languageResourceTaskAssocPanel',
+                        title:null
+                    }]
             };
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
-        return me.callParent([config]);
+        return me.callParent([ config ]);
+    },
+    //called when next button is clicked
+    triggerNextCard:function(activeItem){
+        this.getController().handleNextCardClick();
+    },
+    //called when skip button is clicked
+    triggerSkipCard:function(activeItem){
+        this.getController().handleSkipCardClick();
+    },
+
+    disableSkipButton:function(){
+        return false;
+    },
+    
+    disableContinueButton:function(){
+        return false;
+    },
+    
+    disableAddButton:function(){
+        return true;
+    },
+    
+    disableCancelButton:function(){
+        return true;
     }
+    
 });

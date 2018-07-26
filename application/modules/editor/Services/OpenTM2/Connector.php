@@ -90,7 +90,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we add the TMMT ID and a prefix which can be configured per each translate5 instance 
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $prefix = $config->runtimeOptions->plugins->LanguageResource->opentm2->tmprefix;
+        $prefix = $config->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if(!empty($prefix)) {
             $prefix .= '-';
         }
@@ -110,7 +110,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 }
                 return true;
             }
-            $this->handleOpenTm2Error('LanguageResource - could not create TM in OpenTM2'." TMMT: \n");
+            $this->handleOpenTm2Error('LanguageResources - could not create TM in OpenTM2'." TMMT: \n");
             return false;
         }
         
@@ -119,7 +119,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->tmmt->setFileName($this->api->getResult()->name);
             return true;
         }
-        $this->handleOpenTm2Error('LanguageResource - could not create prefilled TM in OpenTM2'." TMMT: \n");
+        $this->handleOpenTm2Error('LanguageResources - could not create prefilled TM in OpenTM2'." TMMT: \n");
         return false;
         
     }
@@ -133,7 +133,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
-        $this->handleOpenTm2Error('LanguageResource - could not add TMX data to OpenTM2'." TMMT: \n");
+        $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." TMMT: \n");
         return false;
     }
     
@@ -194,7 +194,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $messages->addError($msg, 'core', null, $errors);
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
-        $msg = 'LanguageResource - could not save segment to TM'." TMMT: \n";
+        $msg = 'LanguageResources - could not save segment to TM'." TMMT: \n";
         $data  = print_r($this->tmmt->getDataObject(),1);
         $data .= " \nSegment\n".print_r($segment->getDataObject(),1);
         $data .= " \nError\n".print_r($errors,1);
@@ -386,7 +386,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     protected function throwBadGateway() {
         $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setOrigin('LanguageResource');
+        $e->setOrigin('LanguageResources');
         $e->setErrors($this->api->getErrors());
         throw $e;
     }
@@ -550,7 +550,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyTmmt->setFileName($memoryName);
         $fuzzyTmmt->setId(null);
         
-        $connector = ZfExtended_Factory::get($fuzzyTmmt->getServiceType().editor_Services_LanguageResources_Manager::CLS_CONNECTOR);
+        $connector = ZfExtended_Factory::get($fuzzyTmmt->getServiceType().editor_Services_Manager::CLS_CONNECTOR);
         /* @var $connector editor_Services_Connector_Abstract */
         $connector->connectTo($fuzzyTmmt);
         return $connector;

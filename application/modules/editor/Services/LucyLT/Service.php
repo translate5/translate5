@@ -52,8 +52,8 @@ class editor_Services_LucyLT_Service extends editor_Services_ServiceAbstract {
     public function __construct() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->plugins->LanguageResource->lucylt->server->toArray();
-        $credentials = $config->runtimeOptions->plugins->LanguageResource->lucylt->credentials->toArray();
+        $urls = $config->runtimeOptions->LanguageResources->lucylt->server->toArray();
+        $credentials = $config->runtimeOptions->LanguageResources->lucylt->credentials->toArray();
         
         $i = 1;
         $service = $this->getServiceNamespace();

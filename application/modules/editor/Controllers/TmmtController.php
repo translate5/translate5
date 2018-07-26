@@ -57,8 +57,8 @@ class editor_TmmtController extends ZfExtended_RestController {
      */
     public function indexAction(){
         parent::indexAction();
-        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $serviceManager editor_Services_LanguageResources_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
         
         $resources = [];
         
@@ -95,8 +95,8 @@ class editor_TmmtController extends ZfExtended_RestController {
     public function getAction() {
         parent::getAction();
         
-        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $serviceManager editor_Services_LanguageResources_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
         
         $this->prepareTaskInfo([$this->entity->getId()]);
         $this->view->rows->taskList = $this->getTaskInfos($this->entity->getId());
@@ -178,8 +178,8 @@ class editor_TmmtController extends ZfExtended_RestController {
         $type = explode('.', $type);
         $type = strtoupper(end($type));
         
-        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $serviceManager editor_Services_LanguageResources_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
@@ -210,8 +210,8 @@ class editor_TmmtController extends ZfExtended_RestController {
         $this->data = $this->getAllParams();
         $this->setDataInEntity($this->postBlacklist);
         
-        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $manager editor_Services_LanguageResources_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         //validateLanguages prefills also the lang rfc values! So it must be called before the fileupload, 
@@ -245,8 +245,8 @@ class editor_TmmtController extends ZfExtended_RestController {
     public function importAction(){
         $this->getAction();
         
-        $serviceManager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $serviceManager editor_Services_LanguageResources_Manager */
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
@@ -340,9 +340,9 @@ class editor_TmmtController extends ZfExtended_RestController {
     
     /**
      * Uploads a file into the new TMMT
-     * @param editor_Services_LanguageResources_Manager $manager
+     * @param editor_Services_Manager $manager
      */
-    protected function handleInitialFileUpload(editor_Services_LanguageResources_Manager $manager) {
+    protected function handleInitialFileUpload(editor_Services_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
         /* @var $connector editor_Services_Connector_FilebasedAbstract */
         $importInfo = $this->handleFileUpload($connector);
@@ -365,9 +365,9 @@ class editor_TmmtController extends ZfExtended_RestController {
     
     /**
      * Uploads an additional file into the already existing TMMT
-     * @param editor_Services_LanguageResources_Manager $manager
+     * @param editor_Services_Manager $manager
      */
-    protected function handleAdditionalFileUpload(editor_Services_LanguageResources_Manager $manager) {
+    protected function handleAdditionalFileUpload(editor_Services_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
         /* @var $connector editor_Services_Connector_FilebasedAbstract */
         $importInfo = $this->handleFileUpload($connector);
@@ -448,8 +448,8 @@ class editor_TmmtController extends ZfExtended_RestController {
     
     public function deleteAction(){
         $this->entityLoad();
-        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $manager editor_Services_LanguageResources_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
         $connector = $manager->getConnector($this->entity);
         $deleteInResource = !$this->getParam('deleteLocally', false);
         if($deleteInResource && $connector instanceof editor_Services_Connector_FilebasedAbstract) {
@@ -517,7 +517,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         $this->entity->load($tmmtId);
         
         if(! $this->entity->getResource()->getSearchable()) {
-            throw new ZfExtended_Models_Entity_NoAccessException('search requests are not allowed on this match resource');
+            throw new ZfExtended_Models_Entity_NoAccessException('search requests are not allowed on this language resource');
         }
         
         $connector = $this->getConnector();
@@ -532,8 +532,8 @@ class editor_TmmtController extends ZfExtended_RestController {
      * @return editor_Services_Connector_Abstract
      */
     protected function getConnector() {
-        $manager = ZfExtended_Factory::get('editor_Services_LanguageResources_Manager');
-        /* @var $manager editor_Services_LanguageResources_Manager */
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
         return $manager->getConnector($this->entity);
     }
 }

@@ -46,7 +46,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->plugins->LanguageResource->moses->matchrate;
+        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->LanguageResources->moses->matchrate;
     }
     
     /**
