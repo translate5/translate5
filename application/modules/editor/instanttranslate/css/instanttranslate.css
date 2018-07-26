@@ -79,7 +79,7 @@ h4, p {
 
 /* --------------- header --------------- */
 
-#container-header {
+#containerHeader {
     display: flex;
     flex-flow: row wrap;
     border-bottom: 1px solid #00adef;
@@ -136,18 +136,18 @@ h4, p {
 
 /* --------------- translations --------------- */
 
-.translationResult {
+.translation-result {
     background-color: #eee;
     height: 110px;
     padding: 5px;
     margin-bottom: 10px;
 }
 
-#translationInstantIsOff {
+#instantTranslationIsOff {
     display: none;
 }
 
-.translationInstantToggle a {
+.instant-translation-toggle a {
     color: #757575;
     font-family: "Roboto",sans-serif;
     font-size: 12px;
@@ -166,8 +166,8 @@ h4, p {
 .copyable div {
   box-sizing: border-box;
 }
-.clearableClear,
-.copyableCopy {
+.clearable-clear,
+.copyable-copy {
   position: absolute;
   user-select: none;
   cursor: pointer;
@@ -176,7 +176,7 @@ h4, p {
 .clearable textarea {
   padding-right: 24px;
 }
-.clearableClear {
+.clearable-clear {
   display: none;
   right:0;
   top:0;
@@ -190,7 +190,7 @@ h4, p {
 .copyable div {
   padding-bottom: 24px;
 }
-.copyableCopy {
+.copyable-copy {
   left: 8px;
   bottom: 0;
 }

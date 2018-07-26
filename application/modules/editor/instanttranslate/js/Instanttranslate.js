@@ -28,8 +28,8 @@ END LICENSE AND COPYRIGHT
 
 
 /* --------------- toggle instant translation --------------- */
-$('.translationInstantToggle').click(function(){
-    $('.translationInstantToggle').toggle();
+$('.instant-translation-toggle').click(function(){
+    $('.instant-translation-toggle').toggle();
 });
     
 /* --------------- clear source --------------- */
@@ -37,7 +37,7 @@ $('.translationInstantToggle').click(function(){
 
 $(".clearable").each(function() {
     var elInp = $(this).find("#sourceText"),
-        elCle = $(this).find(".clearableClear");
+        elCle = $(this).find(".clearable-clear");
     elInp.on("input", function(){
         elCle.toggle(!!this.value);
     });
@@ -49,9 +49,9 @@ $(".clearable").each(function() {
 
 /* --------------- copy translation --------------- */
 $(".copyable").each(function() {
-    var elCopy = $(this).find(".copyableCopy");
+    var elCopy = $(this).find(".copyable-copy");
     elCopy.on("touchstart click", function(e) {
-        var content = $(this).closest('.copyable').find('.translationResult').text();
+        var content = $(this).closest('.copyable').find('.translation-result').text();
         alert("TODO: copy '" + content + "'");
     });
 });
