@@ -121,7 +121,7 @@ h4, p {
 /* --------------- translations --------------- */
 
 .translationResult {
-    border: 1px solid #ddd;
+    background-color: #eee;
     height: 110px;
     padding: 5px;
     margin-bottom: 10px;
