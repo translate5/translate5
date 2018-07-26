@@ -28,6 +28,52 @@
 ?>
 
 
-<p>Hallo Welt!</p>
+<div id="container-header" class="container">
+    <div id="logo"></div>
+    <form action="#" method="post" id="userLanguageSelector" name="userLanguageSelector">
+        <select id="userLocale">
+        <option value="de">Deutsch</option>
+        <option value="en">English</option>
+        </select>
+    </form>
+    <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
+</div>
+
+<div id="container-content" class="container wrap">
+	<div id="source">
+        <form id="sourceLanguageSelector" name="sourceLanguageSelector">
+            <select id="sourceLocale" name="sourceLocale">
+                <option value="de">de-DE</option>
+                <option value="en">en-GB</option>
+            </select>
+            <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea>
+        </form>
+    </div>
+    <div id="translations">
+        <form id="translationLanguageSelector" name="translationLanguageSelector">
+            <select id="translationLocale" name="translationLocale">
+            <option value="en">en-GB</option>
+            <option value="de">de-DE</option>
+            </select>
+        </form>
+        <div class="translationResult">translation 1....</div>
+        <div class="translationResult">translation 2....</div>
+        <div class="translationResult">translation 3....</div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$( function() {
+    $('#userLocale').selectmenu({
+        change: function() {
+            var action = $(this).val();
+            $("#userLanguageSelector").attr("action", "?userLocale=" + action);
+            $("#userLanguageSelector").submit();
+        }
+      });
+    $('#sourceLocale').selectmenu();
+    $('#translationLocale').selectmenu();
+} );
+</script>
 
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
