@@ -36,17 +36,17 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.Panel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.LanguageResources.view.TaskAssocPanel', {
+Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.languageResourceTaskAssocPanel',
     itemId:'languageResourceTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
     cls : 'adminTaskGrid',
-    title: '#UT#Matchressourcen zuweisen',
+    title: '#UT#Sprachressourcen zuweisen',
     strings: {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
-        empty: '#UT#Keine Match Resource in der Sprachkombination des geöffneten Tasks verfügbar.',
+        empty: '#UT#Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.',
         groupHeader: '#UT#Ressource: {name}',
         checked: '#UT#Ressource in Aufgabe verwenden',
         name: '#UT#Name',
@@ -64,7 +64,7 @@ Ext.define('Editor.LanguageResources.view.TaskAssocPanel', {
             items : [ {
                 xtype : 'grid',
                 itemId : 'tmTaskAssocGrid',
-                store : 'Editor.LanguageResources.store.TaskAssocStore',
+                store : 'Editor.store.LanguageResources.TaskAssocStore',
                 emptyText: me.strings.empty,
                 features : [ {
                     id: 'group',

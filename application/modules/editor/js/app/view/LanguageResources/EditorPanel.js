@@ -36,14 +36,14 @@ END LICENSE AND COPYRIGHT
  * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.LanguageResources.view.EditorPanel', {
+Ext.define('Editor.view.LanguageResources.EditorPanel', {
     extend: 'Ext.tab.Panel',
     alias: 'widget.languageResourceEditorPanel',
     controller: 'languageResourceEditorPanel',
     requires:[
-        'Editor.LanguageResources.view.EditorPanelViewController',
-        'Editor.LanguageResources.view.SearchGrid',
-        'Editor.LanguageResources.view.MatchGrid'
+        'Editor.view.LanguageResources.EditorPanelViewController',
+        'Editor.view.LanguageResources.SearchGrid',
+        'Editor.view.LanguageResources.MatchGrid'
     ],
     strings: {
         searchTitle: '#UT#Konkordanzsuche',
@@ -62,7 +62,7 @@ Ext.define('Editor.LanguageResources.view.EditorPanel', {
     },
     layout: 'fit',
     plain: false,
-    cls: 'plugin-match-resource-result-panel',
+    cls: 'language-resource-result-panel',
     initConfig: function(instanceConfig) {
         var me = this,
         config = {
@@ -77,7 +77,7 @@ Ext.define('Editor.LanguageResources.view.EditorPanel', {
 		return me.callParent([ config ]);
 	},
 	isAllowedMatchQuery:function(config,instanceConfig){
-		if(Editor.app.authenticatedUser.isAllowed('languageResourceMatchQuery')) {
+		if(Editor.app.authenticatedUser.isAllowed('languageResourcesMatchQuery')) {
 			config.items.push({
 	             title: this.strings.matchTitle,
 	             xtype:'languageResourceMatchGrid',
@@ -87,7 +87,7 @@ Ext.define('Editor.LanguageResources.view.EditorPanel', {
 	},
 	isAllowedSearchQuery:function(config,instanceConfig){
 		var showSearch = instanceConfig.assocStore.find('searchable', true) >= 0;
-		if(showSearch && Editor.app.authenticatedUser.isAllowed('languageResourceSearchQuery')) {
+		if(showSearch && Editor.app.authenticatedUser.isAllowed('languageResourcesSearchQuery')) {
 			config.items.push({
 	             title: this.strings.searchTitle,
             	 xtype:'languageResourceSearchGrid',

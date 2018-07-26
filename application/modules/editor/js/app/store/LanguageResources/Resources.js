@@ -30,8 +30,8 @@ END LICENSE AND COPYRIGHT
  * @class Editor.store.admin.AddTmWindowsStore
  * @extends Ext.data.Store
  */
-Ext.define('Editor.LanguageResources.store.Resources', {
+Ext.define('Editor.store.LanguageResources.Resources', {
 	  extend : 'Ext.data.Store',
-	  model: 'Editor.LanguageResources.model.Resource',
+	  model: 'Editor.model.LanguageResources.Resource',
 	  autoLoad: true
 });

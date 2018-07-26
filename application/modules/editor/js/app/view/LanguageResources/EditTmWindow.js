@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.LanguageResources.view.EditTmWindow', {
+Ext.define('Editor.view.LanguageResources.EditTmWindow', {
     extend: 'Ext.window.Window',
     requires: [
         'Ext.ux.colorpick.Button',
@@ -35,14 +35,14 @@ Ext.define('Editor.LanguageResources.view.EditTmWindow', {
     alias: 'widget.editTmWindow',
     itemId: 'editTmWindow',
     strings: {
-        edit: '#UT#Matchressource hinzufügen',
+        edit: '#UT#Sprachressource hinzufügen',
         resource: '#UT#Ressource',
         name: '#UT#Name',
         source: '#UT#Quellsprache',
         target: '#UT#Zielsprache',
         file: '#UT#TM-Datei',
         color: '#UT#Farbe',
-        colorTooltip: '#UT#Farbe dieser Matchressource',
+        colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen'
     },
@@ -76,7 +76,7 @@ Ext.define('Editor.LanguageResources.view.EditTmWindow', {
                     xtype: 'displayfield',
                     name:'resourceId',
                     renderer: function(id) {
-                        var store = Ext.getStore('Editor.LanguageResources.store.Resources'),
+                        var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                             resource = store.getById(id);
                         return resource ? resource.get('name') : id;
                     },

@@ -30,8 +30,8 @@ END LICENSE AND COPYRIGHT
  * @class Editor.store.EditorQuery
  * @extends Ext.data.Store
  */
-Ext.define('Editor.LanguageResources.store.EditorQuery', {
+Ext.define('Editor.store.LanguageResources.EditorQuery', {
 	  extend : 'Ext.data.Store',
-	  model: 'Editor.LanguageResources.model.EditorQuery',
+	  model: 'Editor.model.LanguageResources.EditorQuery',
 	  autoLoad: true
 });

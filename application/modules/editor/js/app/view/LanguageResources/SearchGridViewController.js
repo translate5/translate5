@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.LanguageResources.view.SearchGridViewController
+ * @class Editor.view.LanguageResources.SearchGridViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.LanguageResources.view.SearchGridViewController', {
+Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.languageResourceSearchGrid',
     listen: {
@@ -75,9 +75,9 @@ Ext.define('Editor.LanguageResources.view.SearchGridViewController', {
         loading: '#UT#wird geladen...',
         noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
         searchResultGridTitle: '#UT#{0} Ergebnisse',
-        serverErrorMsgDefault: '#UT#Die Anfrage an die Matchressource dauerte zu lange.',
+        serverErrorMsgDefault: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
-        serverErrorMsg408: '#UT#Die Anfrage an die Matchressource dauerte zu lange.'
+        serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.'
     },
     assocStore : null,
     executedRequests:new Ext.util.HashMap(),
@@ -92,7 +92,7 @@ Ext.define('Editor.LanguageResources.view.SearchGridViewController', {
     searchGridPanelRender: function(){
         var me=this;
         me.assocStore = me.getView().assocStore; 
-        me.SERVER_STATUS=Editor.LanguageResources.model.EditorQuery.prototype;
+        me.SERVER_STATUS=Editor.model.LanguageResources.EditorQuery.prototype;
     },
     textFieldTextChange:function(field,event){
         var me=this;

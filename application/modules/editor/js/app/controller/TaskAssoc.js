@@ -38,9 +38,9 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.TaskAssoc', {
   extend : 'Ext.app.Controller',
-  views: ['Editor.view.TaskAssocPanel'],
-  models: ['Editor.model.TaskAssoc'],
-  stores:['Editor.store.TaskAssocStore'],
+  views: ['Editor.view.LanguageResources.TaskAssocPanel'],
+  models: ['Editor.model.LanguageResources.TaskAssoc'],
+  stores:['Editor.store.LanguageResources.TaskAssocStore'],
   strings: {
       assocSave: '#UT#Eintrag gespeichert!',
       assocDeleted: '#UT#Eintrag gelöscht!',

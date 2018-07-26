@@ -33,11 +33,11 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.LanguageResources.view.MatchGridViewModel
+ * @class Editor.view.LanguageResources.MatchGridViewModel
  * @extends Ext.app.ViewModel
  */
 
-Ext.define('Editor.LanguageResources.view.TaskGridWindowViewModel', {
+Ext.define('Editor.view.LanguageResources.TaskGridWindowViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.languageResourceTaskGridWindow',
     requires: [

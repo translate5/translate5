@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.model.Resource
+ * @class Editor.model.LanguageResources.Resource
  * @extends Ext.data.Model
  */
-Ext.define('Editor.LanguageResources.model.Resource', {
+Ext.define('Editor.model.LanguageResources.Resource', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'string'},

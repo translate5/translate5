@@ -33,15 +33,15 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.LanguageResources.view.MatchGrid
+ * @class Editor.view.LanguageResources.MatchGrid
  * @extends Ext.grid.Panel
  */
-Ext.define('Editor.LanguageResources.view.TaskGridWindow', {
+Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.languageResourceTaskGridWindow',
     requires: [
-        'Editor.LanguageResources.view.TaskGridWindowViewController',
-        'Editor.LanguageResources.view.TaskGridWindowViewModel',
+        'Editor.view.LanguageResources.TaskGridWindowViewController',
+        'Editor.view.LanguageResources.TaskGridWindowViewModel',
         'Ext.grid.Panel',
         'Ext.grid.filters.filter.String',
         'Ext.grid.filters.filter.List',
@@ -65,7 +65,7 @@ Ext.define('Editor.LanguageResources.view.TaskGridWindow', {
         reimportTooltip: '#UT#Ausgewählte Aufgaben erneut ins aktuelle TM importieren',
     },
     stores:[
-        'Editor.LanguageResources.store.TaskAssocStore'
+        'Editor.store.LanguageResources.TaskAssocStore'
     ],
     controller: 'languageResourceTaskGridWindow',
     viewModel: {
@@ -142,7 +142,7 @@ Ext.define('Editor.LanguageResources.view.TaskGridWindow', {
     },
     loadRecord: function(record) {
         var tasks = this.getViewModel().getStore('tasklist'),
-            proxy = Editor.LanguageResources.model.TmMt.proxy,
+            proxy = Editor.model.LanguageResources.TmMt.proxy,
             url = proxy.url;
         this.getViewModel().set('record', record);
         if (!url.match(proxy.slashRe)) {

@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.LanguageResources.store.TmMts', {
+Ext.define('Editor.store.LanguageResources.TmMts', {
   extend : 'Ext.data.Store',
-  model: 'Editor.LanguageResources.model.TmMt',
+  model: 'Editor.model.LanguageResources.TmMt',
   pageSize: 20,
   autoLoad: true
 });

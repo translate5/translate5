@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.model.TmMt
+ * @class Editor.model.LanguageResources.TmMt
  * @extends Ext.data.Model
  */
-Ext.define('Editor.LanguageResources.model.TmMt', {
+Ext.define('Editor.model.LanguageResources.TmMt', {
   extend: 'Ext.data.Model',
   STATUS_LOADING: 'loading',
   STATUS_ERROR: 'error',

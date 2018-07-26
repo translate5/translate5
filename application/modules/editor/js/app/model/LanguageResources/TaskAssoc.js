@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.model.TaskAssoc
+ * @class Editor.model.LanguageResources..TaskAssoc
  * @extends Ext.data.Model
  */
-Ext.define('Editor.LanguageResources.model.TaskAssoc', {
+Ext.define('Editor.model.LanguageResources.TaskAssoc', {
   extend: 'Ext.data.Model',
   fields: [
     {name: 'id', type: 'int'},

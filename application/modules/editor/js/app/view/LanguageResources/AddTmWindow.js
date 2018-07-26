@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.LanguageResources.view.AddTmWindow', {
+Ext.define('Editor.view.LanguageResources.AddTmWindow', {
     extend: 'Ext.window.Window',
     requires: [
         'Ext.ux.colorpick.Button',
@@ -35,7 +35,7 @@ Ext.define('Editor.LanguageResources.view.AddTmWindow', {
     alias: 'widget.addTmWindow',
     itemId: 'addTmWindow',
     strings: {
-        add: '#UT#Matchressource hinzufügen',
+        add: '#UT#Sprachressource hinzufügen',
         resource: '#UT#Ressource',
         name: '#UT#Name',
         source: '#UT#Quellsprache',
@@ -43,7 +43,7 @@ Ext.define('Editor.LanguageResources.view.AddTmWindow', {
         file: '#UT#TM/TMX-Datei (optional)',
         importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
         color: '#UT#Farbe',
-        colorTooltip: '#UT#Farbe dieser Matchressource',
+        colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen'
     },
@@ -82,7 +82,7 @@ Ext.define('Editor.LanguageResources.view.AddTmWindow', {
                     queryMode: 'local',
                     valueField: 'id',
                     displayField: 'name',
-                    store:'Editor.LanguageResources.store.Resources',
+                    store:'Editor.store.LanguageResources.Resources',
                     fieldLabel: me.strings.resource
                 },{
                     xtype: 'textfield',

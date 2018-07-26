@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.LanguageResources.store.TaskAssocStore', {
+Ext.define('Editor.store.LanguageResources.TaskAssocStore', {
   extend : 'Ext.data.Store',
-  model: 'Editor.LanguageResources.model.TaskAssoc',
+  model: 'Editor.model.LanguageResources.TaskAssoc',
   groupField: 'serviceName',
   autoLoad: false
 });

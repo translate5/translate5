@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.LanguageResources.view.MatchGridViewController
+ * @class Editor.view.LanguageResources.MatchGridViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.LanguageResources.view.TaskGridWindowViewController', {
+Ext.define('Editor.view.LanguageResources.TaskGridWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.languageResourceTaskGridWindow',
     strings: {

@@ -33,14 +33,14 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.LanguageResources.view.TmOverviewPanel
+ * @class Editor.view.LanguageResources.TmOverviewPanel
  * @extends Ext.panel.Panel
  */
-Ext.define('Editor.LanguageResources.view.TmOverviewPanel', {
+Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
     alias: 'widget.tmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title:'#UT#Matchressourcen',
+    title:'#UT#Sprachressourcen',
     strings: {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',
@@ -76,7 +76,7 @@ Ext.define('Editor.LanguageResources.view.TmOverviewPanel', {
         var me = this,
             config = {
                 title: me.title, //see EXT6UPD-9
-                store : 'Editor.LanguageResources.store.TmMts',
+                store : 'Editor.store.LanguageResources.TmMts',
                 viewConfig: {
                     getRowClass: function(record) {
                         var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
@@ -181,7 +181,7 @@ Ext.define('Editor.LanguageResources.view.TmOverviewPanel', {
                     dataIndex: 'serviceName',
                     tdCls: 'serviceName',
                     renderer: function(v, meta, rec){
-                        var store = Ext.getStore('Editor.LanguageResources.store.Resources'),
+                        var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
                             resource = store.getById(rec.get('resourceId'));
                         if(resource) {
                             meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
@@ -231,7 +231,7 @@ Ext.define('Editor.LanguageResources.view.TmOverviewPanel', {
                     }]
                 },{
                     xtype: 'pagingtoolbar',
-                    store: 'Editor.LanguageResources.store.TmMts',
+                    store: 'Editor.store.LanguageResources.TmMts',
                     dock: 'bottom',
                     displayInfo: true
             }]

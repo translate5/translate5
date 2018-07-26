@@ -33,18 +33,18 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.LanguageResources.view.MatchGridViewController
+ * @class Editor.view.LanguageResources.MatchGridViewController
  * @extends Ext.app.ViewController
  */
-Ext.define('Editor.LanguageResources.view.MatchGridViewController', {
+Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.languageResourceMatchGrid',
     strings: {
         loading: '#UT#wird geladen...',
         noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
-        serverErrorMsgDefault: '#UT#Die Anfrage an die Matchressource dauerte zu lange.',
+        serverErrorMsgDefault: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
-        serverErrorMsg408: '#UT#Die Anfrage an die Matchressource dauerte zu lange.'
+        serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.'
     },
     refs:[{
         ref: 'matchgrid',
@@ -84,7 +84,7 @@ Ext.define('Editor.LanguageResources.view.MatchGridViewController', {
     	var me = this,
     		firstEditableRow = Ext.StoreManager.get('Segments').getFirsteditableRow();
         me.assocStore = me.getView().assocStore;
-        me.SERVER_STATUS=Editor.LanguageResources.model.EditorQuery.prototype;
+        me.SERVER_STATUS=Editor.model.LanguageResources.EditorQuery.prototype;
 		if(firstEditableRow != null) {
 			me.setFirsEditableRow(firstEditableRow);
 		}

@@ -36,10 +36,10 @@ END LICENSE AND COPYRIGHT
  * @class Editor.controller.Editor
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.controller.Editor', {
+Ext.define('Editor.controller.LanguageResources', {
   extend: 'Ext.app.Controller',
-  views: ['Editor.view.EditorPanel'],
-  models: ['Editor.model.EditorQuery','Editor.model.TaskAssoc'],
+  views: ['Editor.view.LanguageResources.EditorPanel'],
+  models: ['Editor.model.LanguageResources.EditorQuery','Editor.model.LanguageResources.TaskAssoc'],
   requires: ['Editor.util.SegmentContent'],
   refs:[{
       ref: 'matchgrid',
@@ -116,7 +116,7 @@ Ext.define('Editor.controller.Editor', {
       if(!Editor.data.task.isReadOnly() && (authUser.isAllowed('languageResourcesMatchQuery') || authUser.isAllowed('languageResourcesSearchQuery'))){
           me.loadAssocStore();
       }
-      me.SERVER_STATUS = Editor.model.EditorQuery.prototype;
+      me.SERVER_STATUS = Editor.model.LanguageResources.EditorQuery.prototype;
   },
   handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
       var me = this;
@@ -155,7 +155,7 @@ Ext.define('Editor.controller.Editor', {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           me.setLanguageResourceValueForEditor(matchRecord.get('target'));
           me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added first and then setLanguageResourceValueForEditor is applied from there (= again, but so what)
-          editor.mainEditor.setValueAndMarkup(me.LanguageResourceValueForEditor, rec, editor.columnToEdit);
+          editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
@@ -195,7 +195,7 @@ Ext.define('Editor.controller.Editor', {
                 scope: me
           };
       me.assocStore = Ext.create('Ext.data.Store', {
-          model: 'Editor.model.TaskAssoc'
+          model: 'Editor.model.LanguageResources.TaskAssoc'
       }),
       me.assocStore.load(prm);
   },
