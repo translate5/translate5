@@ -28,7 +28,7 @@
 ?>
 
 
-<div id="container-header" class="container">
+<div id="containerHeader" class="container">
     <div id="logo"></div>
 <?php 
     // see View_Helper_LanguageSelector
@@ -48,7 +48,7 @@
     <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
 </div>
 
-<div id="container-content" class="container wrap">
+<div id="containerContent" class="container wrap">
 	<div id="source">
         <form id="sourceLanguageSelector" name="sourceLanguageSelector">
             <select id="sourceLocale" name="sourceLocale">
@@ -57,7 +57,7 @@
             </select>
             <span class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
-                <span class="clearableClear">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
+                <span class="clearable-clear">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
             </span>
         </form>
     </div>
@@ -68,20 +68,20 @@
                 <option value="de">de-DE</option>
             </select>
             <input id="translationSubmit" name="translationSubmit" value="Übersetzen" type="submit" class="ui-corner-all ui-button ui-widget filled-color">
-            <span id="translationInstantIsOff" class="translationInstantToggle"><a href="#">Sofortübersetzung aktivieren</a></span>
-            <span id="translationInstantIsOn" class="translationInstantToggle"><a href="#">Sofortübersetzung deaktivieren</a></span>
+            <span id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#">Sofortübersetzung aktivieren</a></span>
+            <span id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#">Sofortübersetzung deaktivieren</a></span>
         </form>
         <div class="copyable">
-            <div class="translationResult">translation 1....</div>
-            <span class="copyableCopy"><span class="ui-icon ui-icon-copy"></span></span>
+            <div class="translation-result">translation 1....</div>
+            <span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>
         </div>
         <div class="copyable">
-            <div class="translationResult">translation 2....</div>
-            <span class="copyableCopy"><span class="ui-icon ui-icon-copy"></span></span>
+            <div class="translation-result">translation 2....</div>
+            <span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>
         </div>
         <div class="copyable">
-            <div class="translationResult">translation 3....</div>
-            <span class="copyableCopy"><span class="ui-icon ui-icon-copy"></span></span>
+            <div class="translation-result">translation 3....</div>
+            <span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>
         </div>
     </div>
 </div>
