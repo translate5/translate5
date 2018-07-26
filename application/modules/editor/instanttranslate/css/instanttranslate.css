@@ -79,7 +79,7 @@ h4, p {
     background-size: auto auto;
     background-size: 150px;
 }
-#userLanguageSelector {
+#languageSelector {
     flex: 1 0 auto;
     order: 2;
     text-align: right;
@@ -99,7 +99,7 @@ h4, p {
         margin-right: 0px;
     }
     #logo { order: 1; }
-    #userLanguageSelector { order: 2; text-align: left; margin-top: 5px;}
+    #languageSelector { order: 2; text-align: left; margin-top: 5px;}
     #logout { order: 3; margin-top: 5px;}
 }
 
