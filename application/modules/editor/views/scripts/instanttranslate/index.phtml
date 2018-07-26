@@ -30,12 +30,21 @@
 
 <div id="container-header" class="container">
     <div id="logo"></div>
-    <form action="#" method="post" id="userLanguageSelector" name="userLanguageSelector">
-        <select id="userLocale">
-        <option value="de">Deutsch</option>
-        <option value="en">English</option>
-        </select>
-    </form>
+<?php 
+    // see View_Helper_LanguageSelector
+    $session = new Zend_Session_Namespace();
+    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    $availableTranslations = $translate->getAvailableTranslations();
+    asort($availableTranslations);
+    echo '<form action="#" method="post" name="languageSelector" id="languageSelector">';
+    echo '<select id="locale">';
+    foreach ($availableTranslations as $locale => $translation) {
+        $selected = ($locale == $session->locale) ? ' selected' : '';
+        echo '<option value="'.$locale.'"'.$selected.'>'.$translation.'</option>';
+    }
+    echo '</select>';
+    echo '</form>';
+?>
     <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
 </div>
 
@@ -76,11 +85,11 @@
 
 <script type="text/javascript">
 $( function() {
-    $('#userLocale').selectmenu({
+    $('#locale').selectmenu({
         change: function() {
             var action = $(this).val();
-            $("#userLanguageSelector").attr("action", "?userLocale=" + action);
-            $("#userLanguageSelector").submit();
+            $("#languageSelector").attr("action", "?locale=" + action);
+            $("#languageSelector").submit();
         }
       });
     $('#sourceLocale').selectmenu();
