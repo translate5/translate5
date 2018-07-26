@@ -2519,6 +2519,27 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
  <source>Einstufung</source>     
  <target>Normative Authorization</target> 
  </trans-unit>
+ 
+<trans-unit id='VmVyZsO8Z2JhcmUgTVQtRW5naW5lcw=='>
+<source>Verfügbare MT-Engines</source>
+<target>Available MT-Engines</target>
+</trans-unit>
+ 
+<trans-unit id='w5xiZXJzZXR6ZW4='>
+<source>Übersetzen</source>
+<target>Translate</target>
+</trans-unit>
+
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIGRlYWt0aXZpZXJlbg=='>
+<source>Sofortübersetzung deaktivieren</source>
+<target>Turn off instant translation</target>
+</trans-unit>
+
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIGFrdGl2aWVyZW4='>
+<source>Sofortübersetzung aktivieren</source>
+<target>Turn on instant translation</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>

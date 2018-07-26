@@ -27,6 +27,22 @@
  */
 ?>
 
+<?php
+    // Which languages are available according to the MachinteTranslation-Engines?
+    $machineTranslationEngines = $this->machineTranslationEngines;
+    $mtSourceLanguageLocales = array();
+    $mtTargetLanguagesLocales = array();
+    foreach ($machineTranslationEngines as $mtEngine) {
+        $mtSourceLocale = $mtEngine['source'];
+        $mtTargetLocale = $mtEngine['target'];
+        if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
+            $mtSourceLanguageLocales[] = $mtSourceLocale;
+        }
+        if (!in_array($mtTargetLocale, $mtTargetLanguagesLocales)) {
+            $mtTargetLanguagesLocales[] = $mtTargetLocale;
+        }
+    }
+?>
 
 <div id="containerHeader" class="container">
     <div id="logo"></div>
@@ -48,12 +64,30 @@
     <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
 </div>
 
-<div id="containerContent" class="container wrap">
+
+<div id="containerSelect" class="container">
+  <fieldset>
+    <legend><?php echo $this->translations["availableMTEngines"];?>:</legend>
+    <?php 
+    foreach ($machineTranslationEngines as $mtEngineId => $mtEngine) {
+        echo '<label for="'.$mtEngineId.'">'.$mtEngine['name'].'</label>';
+        echo '<input type="radio" name="mtEngines" id="'.$mtEngineId.'">';
+        }
+    ?>
+  </fieldset>
+</div>
+
+<div id="containerContent" class="container">
 	<div id="source">
         <form id="sourceLanguageSelector" name="sourceLanguageSelector">
             <select id="sourceLocale" name="sourceLocale">
-                <option value="de">de-DE</option>
-                <option value="en">en-GB</option>
+                <option value="-">-</option>
+                <?php 
+                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
+                        $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected' : '';
+                        echo '<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
+                    }
+                ?>
             </select>
             <span class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
@@ -65,12 +99,17 @@
     <div id="translations">
         <form id="translationControls" name="translationControls">
             <select id="translationLocale" name="translationLocale">
-                <option value="en">en-GB</option>
-                <option value="de">de-DE</option>
+                <option value="-">-</option>
+                <?php 
+                    foreach ($mtTargetLanguagesLocales as $targetLangLocale) {
+                        $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected' : '';
+                        echo '<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
+                    }
+                ?>
             </select>
-            <input id="translationSubmit" name="translationSubmit" value="Übersetzen" type="submit" class="ui-corner-all ui-button ui-widget filled-color">
-            <span id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#">Sofortübersetzung aktivieren</a></span>
-            <span id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#">Sofortübersetzung deaktivieren</a></span>
+            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="ui-corner-all ui-button ui-widget filled-color">
+            <span id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></span>
+            <span id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></span>
         </form>
         <div class="copyable">
             <div class="translation-result">translation 1....</div>
@@ -88,6 +127,10 @@
 </div>
 
 <script type="text/javascript">
+    //for later usage
+</script>
+
+<script type="text/javascript">
 $( function() {
     $('#locale').selectmenu({
         change: function() {
@@ -96,6 +139,7 @@ $( function() {
             $("#languageSelector").submit();
         }
       });
+    $("input[type='radio']").checkboxradio();
     $('#sourceLocale').selectmenu();
     $('#translationLocale').selectmenu();
     $('#translationSubmit').button();

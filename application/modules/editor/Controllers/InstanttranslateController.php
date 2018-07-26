@@ -30,6 +30,32 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
     
     public function indexAction(){
         
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts/instanttranslate');
+        
+        // last selected source and target languages for the user (=> new table Zf_users_meta)
+        $sourceSearchLanguagePreselectionLocale= 'de-DE'; // TODO; both content and structure of this content are DUMMY only!
+        $targetSearchLanguagePreselectionLocale= 'en-GB'; // TODO; both content and structure of this content are DUMMY only!
+        
+        $this->view->sourceSearchLanguagePreselectionLocale = $sourceSearchLanguagePreselectionLocale;
+        $this->view->targetSearchLanguagePreselectionLocale = $targetSearchLanguagePreselectionLocale;
+        
+        // available MachineTranslation-Engines
+        $machineTranslationEngines = array(  // TODO; both content and structure of this content are DUMMY only!
+                'mt1' => array('name' => 'MT Engine 1', 'source' => 'de-DE', 'target' => 'en-US'),
+                'mt2' => array('name' => 'MT Engine 2', 'source' => 'de-DE', 'target' => 'en-GB'),
+                'mt3' => array('name' => 'MT Engine 3', 'source' => 'fr-FR', 'target' => 'en-GB')
+        );
+        $this->view->machineTranslationEngines= $machineTranslationEngines;
+        
+        //translated strings
+        $translatedStrings=array(
+                "availableMTEngines"        => $this->translate->_("Verfügbare MT-Engines"),
+                "translate"                 => $this->translate->_("Übersetzen"),
+                "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
+                "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren")
+        );
+        $this->view->translations = $translatedStrings;
     }
 }
