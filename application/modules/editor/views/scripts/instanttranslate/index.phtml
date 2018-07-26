@@ -46,7 +46,10 @@
                 <option value="de">de-DE</option>
                 <option value="en">en-GB</option>
             </select>
-            <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea>
+            <span class="clearable">
+                <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
+                <i class="clearableClear">&times;</i> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
+            </span>
         </form>
     </div>
     <div id="translations">
