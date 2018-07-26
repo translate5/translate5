@@ -26,8 +26,104 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-p {
-    background-color: black;
-    color: white;
+/* --------------- container --------------- */
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#source,
+#translations {
+    flex: 1 300px;
+    min-width: 0;
+    margin: 10px;
+}
+
+.wrap {
+    margin-bottom: 2em;
+}
+
+/* --------------- general --------------- */
+
+h4, p {
+    padding: 3px;
+    margin: 2px 0px;
+    -webkit-margin-before: 0px;
+    -webkit-margin-after: 5px;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+
+#sourceLocale-button,
+#translationLocale-button {
+    width: 6em;
+    margin-bottom: 10px;
+}
+
+/* --------------- header --------------- */
+
+#container-header {
+    display: flex;
+    flex-flow: row wrap;
+    border-bottom: 1px solid #00adef;
+    padding-top: 19px;
+    padding-bottom:  10px;
+    margin: 10px;
+}
+#logo {
+    flex: 0 0 180px;
+    order: 1;
+    height: 110px;
+    background: url(/images/translate5.png?v=1) no-repeat left top;
+    background-size: auto auto;
+    background-size: 150px;
+}
+#userLanguageSelector {
+    flex: 1 0 auto;
+    order: 2;
+    text-align: right;
+    margin-right: 7px;
+}
+#locale-button {width: 9em;}
+#logout {
+    flex: 0 0 80px;
+    order: 3;
+    text-align: right;
+}
+
+@media (max-width: 500px) {
+    #logo {
+        flex: 0 1 100%;
+        text-align:left;
+        margin-right: 0px;
+    }
+    #logo { order: 1; }
+    #userLanguageSelector { order: 2; text-align: left; margin-top: 5px;}
+    #logout { order: 3; margin-top: 5px;}
+}
+
+/* --------------- source --------------- */
+    
+#source textarea {
+    width: 99%;
+    margin-right: 10px;
+    height: 105px;
+    font-family: verdana,helvetica,sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+}
+#source textarea:focus {
+    outline: none !important;
+    border: 1px solid #00adef;
+}
+
+/* --------------- translations --------------- */
+
+.translationResult {
+    border: 1px solid #ddd;
+    height: 110px;
+    padding: 5px;
+    margin-bottom: 10px;
 }
 
