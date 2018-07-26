@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
 $('.instant-translation-toggle').click(function(){
     $('.instant-translation-toggle').toggle();
 });
-    
+
 /* --------------- clear source --------------- */
 /* --- https://stackoverflow.com/a/6258628 ---- */
 
@@ -45,6 +45,11 @@ $(".clearable").each(function() {
         e.preventDefault();
         elInp.val("").trigger("input");
     });
+});
+
+/* --------------- count characters --------------- */
+$('#sourceText').on("input", function(){
+    $('#countedCharacters').html($(this).val().length);
 });
 
 /* --------------- copy translation --------------- */
