@@ -26,17 +26,26 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* --------------- clearable --------------- */
-/* -- https://stackoverflow.com/a/6258628 -- */
+/* --------------- clear source --------------- */
+/* --- https://stackoverflow.com/a/6258628 ---- */
 
 $(".clearable").each(function() {
-    var $elInp = $(this).find("#sourceText"),
-        $elCle = $(this).find(".clearableClear");
-    $elInp.on("input", function(){
-      $elCle.toggle(!!this.value);
+    var elInp = $(this).find("#sourceText"),
+        elCle = $(this).find(".clearableClear");
+    elInp.on("input", function(){
+        elCle.toggle(!!this.value);
     });
-    $elCle.on("touchstart click", function(e) {
-      e.preventDefault();
-      $elInp.val("").trigger("input");
+    elCle.on("touchstart click", function(e) {
+        e.preventDefault();
+        elInp.val("").trigger("input");
     });
-  });
+});
+
+/* --------------- copy translation --------------- */
+$(".copyable").each(function() {
+    var elCopy = $(this).find(".copyableCopy");
+    elCopy.on("touchstart click", function(e) {
+        var content = $(this).closest('.copyable').find('.translationResult').text();
+        alert("TODO: copy '" + content + "'");
+    });
+});

@@ -130,25 +130,41 @@ h4, p {
 /* --------------- clearable --------------- */
 /* -- https://stackoverflow.com/a/6258628 -- */
 
-.clearable {
+.clearable,
+.copyable {
   position: relative;
   display: block;
 }
-.clearable textarea {
-  padding-right: 24px;
+.clearable textarea,
+.copyable div {
   box-sizing: border-box;
 }
-.clearableClear{
-  display: none;
+.clearableClear,
+.copyableCopy {
   position: absolute;
+  user-select: none;
+  cursor: pointer;
+}
+
+.clearable textarea {
+  padding-right: 24px;
+}
+.clearableClear {
+  display: none;
   right:0;
   top:0;
   padding: 0 8px;
   font-style: normal;
-  font-weight:  bold;
+  font-weight: bold;
   font-size: 1em;
   color: #666;
-  user-select: none;
-  cursor: pointer;
+}
+
+.copyable div {
+  padding-bottom: 24px;
+}
+.copyableCopy {
+  left: 8px;
+  bottom: 0;
 }
 
