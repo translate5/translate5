@@ -28,46 +28,46 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- selecting languages and MT-engines ----------------------- */
 $('#mtEngineSelector input[name="mtEngines"]:radio').change(function() {
-    var mtEngine = machineTranslationEngines[this.id];
+    var mtId = this.id;
+    enableMtEnginesAsAvailable();
+    setSingleMtEngineById(mtId);
+});
+function setSingleMtEngineById(mtId) {
+    var mtEngine = machineTranslationEngines[mtId];
+    $("#"+mtId).prop("checked",true).button("refresh");
+    $('#errorNoMtFound').hide();
+    $('#messageMultipleMtFound').hide();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
-});
-function setMtEnginesAccordingToLanguages() {
-    var sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val(),
-        mtIdsFound = getMtEnginesAccordingToLanguages(sourceLocale,targetLocale),
-        mtEngine;
+}
+function enableMtEnginesAsAvailable() {
+    var mtIdsAvailable = getMtEnginesAccordingToLanguages();
     $("#mtEngineSelector input:radio[name='mtEngines']").prop( "disabled", true );
     $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false);
-    for (var i in mtIdsFound) {
-        var mtId = mtIdsFound[i];
-        console.log(mtId);
+    for (var i in mtIdsAvailable) {
+        var mtId = mtIdsAvailable[i];
         $("#"+mtId).button("enable").button("refresh");
       }
     $("#mtEngineSelector input:radio[name='mtEngines']").checkboxradio("refresh");
-    if (mtIdsFound.length === 0) {
+    if (mtIdsAvailable.length === 0) {
         $('#errorNoMtFound').show();
         $('#messageMultipleMtFound').hide();
         return;
     }
-    if (mtIdsFound.length === 1) {
-        mtEngine = machineTranslationEngines[mtIdsFound[0]];
-        $("#"+mtIdsFound[0]).prop("checked",true).button("refresh");
-        $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false);
-        $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
-        $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
-        $('#errorNoMtFound').hide();
-        $('#messageMultipleMtFound').hide();
+    if (mtIdsAvailable.length === 1) {
+        setSingleMtEngineById(mtId);
         return;
     }
-    if (mtIdsFound.length > 1) {
+    if (mtIdsAvailable.length > 1) {
         $('#errorNoMtFound').hide();
         $('#messageMultipleMtFound').show();
         return;
     }
 }
-function getMtEnginesAccordingToLanguages(sourceLocale,targetLocale) {
-    var mtIdsFound = [],
+function getMtEnginesAccordingToLanguages() {
+    var sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val(),
+        mtIdsAvailable = [],
         mtId,
         mtEngineToCheck,
         langIsOK = function(langMT,langSet){
@@ -83,11 +83,11 @@ function getMtEnginesAccordingToLanguages(sourceLocale,targetLocale) {
         if (machineTranslationEngines.hasOwnProperty(mtId)) {
             mtEngineToCheck = machineTranslationEngines[mtId];
             if (langIsOK(mtEngineToCheck.source,sourceLocale) && langIsOK(mtEngineToCheck.target,targetLocale)) {
-                mtIdsFound.push(mtId); 
+                mtIdsAvailable.push(mtId); 
             }
         }
     }
-    return mtIdsFound;
+    return mtIdsAvailable;
 }
 
 /* --------------- toggle instant translation ------------------------------- */
