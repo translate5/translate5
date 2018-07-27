@@ -2525,6 +2525,16 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <target>Available MT-Engines</target>
 </trans-unit>
  
+<trans-unit id='S2VpbmUgcGFzc2VuZGUgTVQtRW5naW5lIHZlcmbDvGdiYXIuIEJpdHRlIGVpbmUgYW5kZXJlIFNwcmFjaGtvbWJpbmF0aW9uIHfDpGhsZW4u'>
+<source>Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen.</source>
+<target>No MT-Engine available. Please choose a different language-combination.</target>
+</trans-unit>
+ 
+<trans-unit id='Qml0dGUgZWluZSBkZXIgdmVyZsO8Z2JhcmVuIE1ULUVuZ2luZXMgYXVzd8OkaGxlbi4'>
+<source>Bitte eine der verfügbaren MT-Engines auswählen.</source>
+<target>Please choose one of the available MT-Engines.</target>
+</trans-unit>
+ 
 <trans-unit id='w5xiZXJzZXR6ZW4='>
 <source>Übersetzen</source>
 <target>Translate</target>

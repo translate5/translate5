@@ -45,13 +45,16 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         $machineTranslationEngines = array(  // TODO; both content and structure of this content are DUMMY only!
                 'mt1' => array('name' => 'MT Engine 1', 'source' => 'de-DE', 'target' => 'en-US'),
                 'mt2' => array('name' => 'MT Engine 2', 'source' => 'de-DE', 'target' => 'en-GB'),
-                'mt3' => array('name' => 'MT Engine 3', 'source' => 'fr-FR', 'target' => 'en-GB')
+                'mt3' => array('name' => 'MT Engine 3', 'source' => 'fr-FR', 'target' => 'en-GB'),
+                'mt4' => array('name' => 'MT Engine 4', 'source' => 'de-DE', 'target' => 'en-GB')
         );
         $this->view->machineTranslationEngines= $machineTranslationEngines;
         
         //translated strings
         $translatedStrings=array(
                 "availableMTEngines"        => $this->translate->_("Verfügbare MT-Engines"),
+                "noMatchingMt"              => $this->translate->_("Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen."),
+                "selectMt"                  => $this->translate->_("Bitte eine der verfügbaren MT-Engines auswählen."),
                 "translate"                 => $this->translate->_("Übersetzen"),
                 "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
                 "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren")

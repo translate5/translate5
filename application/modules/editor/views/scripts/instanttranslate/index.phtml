@@ -65,19 +65,23 @@
 </div>
 
 
-<div id="containerSelect" class="container">
-  <fieldset>
-    <legend><?php echo $this->translations["availableMTEngines"];?>:</legend>
-    <?php 
-    foreach ($machineTranslationEngines as $mtEngineId => $mtEngine) {
-        echo '<label for="'.$mtEngineId.'">'.$mtEngine['name'].'</label>';
-        echo '<input type="radio" name="mtEngines" id="'.$mtEngineId.'">';
-        }
-    ?>
-  </fieldset>
+<div id="containerMtEngineSelect" class="container">
+  <form id="mtEngineSelector" name="mtEngineSelector">
+      <fieldset>
+        <legend><?php echo $this->translations["availableMTEngines"];?>:</legend>
+        <?php 
+        foreach ($machineTranslationEngines as $mtEngineId => $mtEngine) {
+            echo '<label for="'.$mtEngineId.'">'.$mtEngine['name'].'</label>';
+            echo '<input type="radio" name="mtEngines" id="'.$mtEngineId.'">';
+            }
+        ?>
+      <div class="ui-state-error ui-corner-all" id="errorNoMtFound" style="display:none;"><?php echo $this->translations["noMatchingMt"];?></div>
+      <div class="ui-state-error ui-corner-all" id="messageMultipleMtFound" style="display:none;"><?php echo $this->translations["selectMt"];?></div>
+      </fieldset>
+  </form>
 </div>
 
-<div id="containerContent" class="container">
+<div id="containerTranslation" class="container">
 	<div id="source">
         <form id="sourceLanguageSelector" name="sourceLanguageSelector">
             <select id="sourceLocale" name="sourceLocale">
@@ -98,7 +102,7 @@
     </div>
     <div id="translations">
         <form id="translationControls" name="translationControls">
-            <select id="translationLocale" name="translationLocale">
+            <select id="targetLocale" name="targetLocale">
                 <option value="-">-</option>
                 <?php 
                     foreach ($mtTargetLanguagesLocales as $targetLangLocale) {
@@ -127,7 +131,9 @@
 </div>
 
 <script type="text/javascript">
-    //for later usage
+    // for later usage (coming in from PHP)
+    var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
+    machineTranslationEngines = JSON.parse(machineTranslationEngines);
 </script>
 
 <script type="text/javascript">
@@ -140,9 +146,18 @@ $( function() {
         }
       });
     $("input[type='radio']").checkboxradio();
-    $('#sourceLocale').selectmenu();
-    $('#translationLocale').selectmenu();
+    $('#sourceLocale').selectmenu({
+        change: function( event, ui ) {
+            setMtEnginesAccordingToLanguages();
+        }
+      });
+    $('#targetLocale').selectmenu({
+        change: function( event, ui ) {
+            setMtEnginesAccordingToLanguages();
+        }
+      });
     $('#translationSubmit').button();
+    setMtEnginesAccordingToLanguages();
 } );
 </script>
 

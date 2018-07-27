@@ -1293,6 +1293,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>TermCustomerSearch</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'><source>Terminologieportal</source><target>Terminologieportal</target></trans-unit>
 <trans-unit id='VmVyZsO8Z2JhcmUgTVQtRW5naW5lcw=='><source>Verfügbare MT-Engines</source><target>Verfügbare MT-Engines</target></trans-unit>
+<trans-unit id='S2VpbmUgcGFzc2VuZGUgTVQtRW5naW5lIHZlcmbDvGdiYXIuIEJpdHRlIGVpbmUgYW5kZXJlIFNwcmFjaGtvbWJpbmF0aW9uIHfDpGhsZW4u'><source>Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen.</source><target>Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen.</target></trans-unit>
+<trans-unit id='Qml0dGUgZWluZSBkZXIgdmVyZsO8Z2JhcmVuIE1ULUVuZ2luZXMgYXVzd8OkaGxlbi4'><source>Bitte eine der verfügbaren MT-Engines auswählen.</source><target>Bitte eine der verfügbaren MT-Engines auswählen.</target></trans-unit>
 <trans-unit id='w5xiZXJzZXR6ZW4='><source>Übersetzen</source><target>Übersetzen</target></trans-unit>
 <trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIGRlYWt0aXZpZXJlbg=='><source>Sofortübersetzung deaktivieren</source><target>Sofortübersetzung deaktivieren</target></trans-unit>
 <trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIGFrdGl2aWVyZW4='><source>Sofortübersetzung aktivieren</source><target>Sofortübersetzung aktivieren</target></trans-unit>
