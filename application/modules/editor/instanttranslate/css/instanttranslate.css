@@ -56,7 +56,7 @@ h4, p {
     margin-bottom: 10px;
 }
 #sourceLocale-button,
-#translationLocale-button {
+#targetLocale-button {
     width: 6em;
 }
 .filled-color {
@@ -113,18 +113,25 @@ h4, p {
 
 /* --------------- selection  --------------- */
 
-#containerSelect {
+#containerMtEngineSelect {
     padding: 10px;
     text-align: center;
 }
-#containerSelect fieldset {
+#mtEngineSelector {
     width: 100%;
+}
+#containerMtEngineSelect fieldset {
     border-width: 1px;
     border-color: #00adef;
     border-style: solid;
 }
-#containerSelect legend {
+#containerMtEngineSelect legend {
     color: #454545;
+}
+#errorNoMtFound,
+#messageMultipleMtFound {
+    padding: 7px;
+    margin-top: 10px;
 }
 
 /* --------------- source --------------- */

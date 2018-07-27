@@ -26,16 +26,78 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/* --------------- selecting languages and MT-engines ----------------------- */
+$('#mtEngineSelector input[name="mtEngines"]:radio').change(function() {
+    var mtEngine = machineTranslationEngines[this.id];
+    $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
+    $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
+});
+function setMtEnginesAccordingToLanguages() {
+    var sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val(),
+        mtIdsFound = getMtEnginesAccordingToLanguages(sourceLocale,targetLocale),
+        mtEngine;
+    $("#mtEngineSelector input:radio[name='mtEngines']").prop( "disabled", true );
+    $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false);
+    for (var i in mtIdsFound) {
+        var mtId = mtIdsFound[i];
+        console.log(mtId);
+        $("#"+mtId).button("enable").button("refresh");
+      }
+    $("#mtEngineSelector input:radio[name='mtEngines']").checkboxradio("refresh");
+    if (mtIdsFound.length === 0) {
+        $('#errorNoMtFound').show();
+        $('#messageMultipleMtFound').hide();
+        return;
+    }
+    if (mtIdsFound.length === 1) {
+        mtEngine = machineTranslationEngines[mtIdsFound[0]];
+        $("#"+mtIdsFound[0]).prop("checked",true).button("refresh");
+        $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false);
+        $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
+        $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
+        $('#errorNoMtFound').hide();
+        $('#messageMultipleMtFound').hide();
+        return;
+    }
+    if (mtIdsFound.length > 1) {
+        $('#errorNoMtFound').hide();
+        $('#messageMultipleMtFound').show();
+        return;
+    }
+}
+function getMtEnginesAccordingToLanguages(sourceLocale,targetLocale) {
+    var mtIdsFound = [],
+        mtId,
+        mtEngineToCheck,
+        langIsOK = function(langMT,langSet){
+            if (langMT === langSet) {
+                return true;
+            }
+            if (langSet === '-') {
+                return true;
+            }
+            return false;
+        };
+    for (mtId in machineTranslationEngines) {
+        if (machineTranslationEngines.hasOwnProperty(mtId)) {
+            mtEngineToCheck = machineTranslationEngines[mtId];
+            if (langIsOK(mtEngineToCheck.source,sourceLocale) && langIsOK(mtEngineToCheck.target,targetLocale)) {
+                mtIdsFound.push(mtId); 
+            }
+        }
+    }
+    return mtIdsFound;
+}
 
-/* --------------- toggle instant translation --------------- */
+/* --------------- toggle instant translation ------------------------------- */
 $('.instant-translation-toggle').click(function(){
     $('.instant-translation-toggle').toggle();
 });
 
-/* --------------- clear source --------------- */
-/* --- https://stackoverflow.com/a/6258628 ---- */
-
+/* --------------- clear source --------------------------------------------- */
 $(".clearable").each(function() {
+    // idea fom https://stackoverflow.com/a/6258628
     var elInp = $(this).find("#sourceText"),
         elCle = $(this).find(".clearable-clear");
     elInp.on("input", function(){
@@ -47,16 +109,16 @@ $(".clearable").each(function() {
     });
 });
 
-/* --------------- count characters --------------- */
+/* --------------- count characters ----------------------------------------- */
 $('#sourceText').on("input", function(){
     $('#countedCharacters').html($(this).val().length);
 });
 
-/* --------------- copy translation --------------- */
+/* --------------- copy translation ----------------------------------------- */
 $(".copyable").each(function() {
     var elCopy = $(this).find(".copyable-copy");
     elCopy.on("touchstart click", function(e) {
         var content = $(this).closest('.copyable').find('.translation-result').text();
-        alert("TODO: copy '" + content + "'");
+        alert("TODO: copy '" + content + "'"); // TODO
     });
 });
