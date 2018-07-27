@@ -145,19 +145,19 @@ $( function() {
             $("#languageSelector").submit();
         }
       });
-    $("input[type='radio']").checkboxradio();
+    $("#mtEngineSelector input[type='radio']").checkboxradio();
     $('#sourceLocale').selectmenu({
         change: function( event, ui ) {
-            setMtEnginesAccordingToLanguages();
+            enableMtEnginesAsAvailable();
         }
       });
     $('#targetLocale').selectmenu({
         change: function( event, ui ) {
-            setMtEnginesAccordingToLanguages();
+            enableMtEnginesAsAvailable();
         }
       });
     $('#translationSubmit').button();
-    setMtEnginesAccordingToLanguages();
+    enableMtEnginesAsAvailable();
 } );
 </script>
 
