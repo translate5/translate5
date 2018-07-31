@@ -41,13 +41,45 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         $this->view->sourceSearchLanguagePreselectionLocale = $sourceSearchLanguagePreselectionLocale;
         $this->view->targetSearchLanguagePreselectionLocale = $targetSearchLanguagePreselectionLocale;
         
+        
+        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $dummyTmmt editor_Models_TmMt */
+        
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+        
+        
+        $result=null;
+        //load all available engines
+        if($api->getEngines()){
+            $result=$api->getResult();
+        }
+        
+        $machineTranslationEngines=array();
+
+        //if the available engines exist, merge them to frontend var, so they can be used for trans
+        if($result->totalCount>0){
+            $engineCounter=1;
+            foreach($result->translationEngines as $engine){
+                $machineTranslationEngines['mt'.$engineCounter]=array(
+                    'name' =>$engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']', 
+                    'source' => $engine->fromCulture,
+                    'target' => $engine->toCulture,
+                    'domainCode' => $engine->domainCode
+                );
+                
+                $engineCounter++;
+            }
+        }
+        
         // available MachineTranslation-Engines
-        $machineTranslationEngines = array(  // TODO; both content and structure of this content are DUMMY only!
+        /*$machineTranslationEngines = array(  // TODO; both content and structure of this content are DUMMY only!
                 'mt1' => array('name' => 'MT Engine 1', 'source' => 'de-DE', 'target' => 'en-US'),
                 'mt2' => array('name' => 'MT Engine 2', 'source' => 'de-DE', 'target' => 'en-GB'),
                 'mt3' => array('name' => 'MT Engine 3', 'source' => 'fr-FR', 'target' => 'en-GB'),
                 'mt4' => array('name' => 'MT Engine 4', 'source' => 'de-DE', 'target' => 'en-GB')
         );
+        */
         $this->view->machineTranslationEngines= $machineTranslationEngines;
         
         //translated strings
@@ -59,6 +91,68 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
                 "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren")
         );
+        $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         $this->view->translations = $translatedStrings;
+    }
+    
+    public function translateAction(){
+
+        //get all requested params
+        $params=$this->getRequest()->getParams();
+        
+        //validate single params
+        $isValidParam=function($prm,$key){
+          return isset($prm[$key]) && !empty($prm[$key]);
+        };
+        
+        $apiParams=array();
+        
+        if(!$isValidParam($params,'text')){
+            //TODO: translate me
+            $this->_helper->json(array("errors"=>"No string for translation is provided"));
+            return;
+        }
+
+        $apiParams['text']=$params['text'];
+        if($isValidParam($params,'domainCode')){
+            $apiParams['domainCode']=$params['domainCode'];
+            $this->view->rows=$this->searchString($apiParams);
+            return;
+        }
+        
+        if(!$isValidParam($params,'source')){
+            //TODO: translate me
+            $this->_helper->json(array("errors"=>"Source language definition is missing."));
+            return;
+        }
+        
+        $apiParams['from']=$params['source'];
+        
+        if(!$isValidParam($params,'target')){
+            //TODO: translate me
+            $this->_helper->json(array("errors"=>"Target language definition is missing."));
+            return;
+        }
+        
+        $apiParams['to']=$params['target'];
+        
+        $this->_helper->json(array("rows"=>$this->searchString($apiParams)));
+    }
+    
+    /***
+     * Run translation for given params
+     * @param array $params
+     */
+    private function searchString($params){
+        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $dummyTmmt editor_Models_TmMt */
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+        
+        $result=null;
+        if($api->search($params)){
+            $result=$api->getResult();
+        }
+        return isset($result->translation) ? $result->translation : "";
     }
 }

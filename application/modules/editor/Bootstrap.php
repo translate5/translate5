@@ -341,6 +341,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('languageresources_tmmt_tasks', $queryRoute);
         #Language resource rutes end
+        
+        $sdlTranslateCloud= new ZfExtended_Controller_RestLikeRoute(
+            'editor/instanttranslate/translate/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'instanttranslate',
+                'action' => 'translate'
+            ));
+        $this->front->getRouter()->addRoute('instanttranslate_translate', $sdlTranslateCloud);
     }
     
     

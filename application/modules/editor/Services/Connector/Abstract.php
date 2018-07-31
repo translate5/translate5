@@ -124,6 +124,15 @@ abstract class editor_Services_Connector_Abstract {
      */
     abstract public function search(string $searchString, $field = 'source', $offset = null);
     
+    /***
+     * Search resources provided by external api where the params are used by the external api
+     * 
+     * @param string $searchString
+     * @param array $params
+     * @return editor_Services_ServiceResult
+     */
+    abstract public function searchWithParam(string $searchString, array $params);
+    
     /**
      * @return the status of the connected resource and additional information if there is some
      */
