@@ -132,6 +132,47 @@ function getMtEnginesAccordingToLanguages() {
     return mtIdsAvailable;
 }
 
+
+/***
+ * Send a request for translation, this will return translateion result for each associated language resource
+ * INFO: in the current implementation only result from sdlcloud language will be returned
+ * @returns
+ */
+function translateText(){
+    $.ajax({
+        url: REST_PATH+"instanttranslate/translate",
+        dataType: "json",
+        data: {
+            'source':$("#sourceLocale").val(),
+            'target':$("#targetLocale").val(),
+            'domainCode':getSelectedEngineCode(),
+            'text':$('#sourceText').val()
+        },
+        success: function(result){
+        	console.log(result);
+        	debugger
+        	$('#sourceText').val(result.rows);
+        }
+    })
+}
+
+/***
+ * Return the domain code(if exist) of the selected engine or null
+ * TODO: implement me
+ * @returns
+ */
+function getSelectedEngineCode(){
+	//TODO: the engine selector value always is "" ??
+	//var engineId=$("#mtEngineSelector").val();
+	//return machineTranslationEngines[engineId].domainCode;
+	return null;
+}
+
+$('#translationSubmit').click(function(){
+	translateText();
+	return false;
+});
+
 /* --------------- toggle instant translation ------------------------------- */
 $('.instant-translation-toggle').click(function(){
     $('.instant-translation-toggle').toggle();
