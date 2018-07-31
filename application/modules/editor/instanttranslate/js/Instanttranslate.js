@@ -160,7 +160,6 @@ function translateText(){
         },
         success: function(result){
         	console.log(result);
-        	debugger
         	$('#sourceText').val(result.rows);
         }
     })
