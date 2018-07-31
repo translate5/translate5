@@ -652,6 +652,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      */
     protected function handleTerm() {
         if(!$this->isStartTag()){
+            //set the term status to defualt(from the config) if the status is empty/not set
+            $this->handleEmptyTermStatus();
             $this->actualTermIdTbx=null;
             return;
         }
@@ -773,9 +775,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             }
             
             $termAttributes->delete($deleteParams);
-            
-            //set the term status to defualt(from the config) if the status is empty/not set
-            $this->handleEmptyTermStatus();
         }else{
             $this->counterTigInLangSet++;
         }
@@ -857,12 +856,33 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected function handleEmptyTermStatus(){
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
-        $term->load($this->actualTermIdDb);
+
+
+        //if the term exist, load it from the database
+        if(!empty($this->actualTermIdDb)){
+            $term->load($this->actualTermIdDb);
+        }else if(isset($this->termsContainer[$this->actualTermIdTbx]) && !empty($this->termsContainer[$this->actualTermIdTbx])){
+            //the term does not exis, check if it exist in the term container
+            //the terms in the term container are not saved yet
+            $term=$this->termsContainer[$this->actualTermIdTbx];
+        }else{
+            //the term is not found in the database, an not in the term container. Log the info
+            error_log("TermCollection parser message: Unable to set the term status. The term does not exist so far. Collectionid: ".$this->termCollectionId);
+            return;
+        }
+        
+        //if the statzs is empty, set the default status from the zf config
         if(empty($term->getStatus())){
             $config = Zend_Registry::get('config');
             $term->setStatus($config->runtimeOptions->tbx->defaultTermStatus);
-            $term->save();
+
+            //if actualTermIdDb is set -> the term exist in the database -> update
+            //if actualTermIdDb is not set -> the term does not exist in the db, it is in the term container which will be updated later
+            if(!empty($this->actualTermIdDb)){
+                $term->save();
+            }
         }
+        
     }
     
     /***
