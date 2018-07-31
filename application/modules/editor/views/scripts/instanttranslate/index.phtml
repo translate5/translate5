@@ -75,8 +75,7 @@
             echo '<input type="radio" name="mtEngines" id="'.$mtEngineId.'">';
             }
         ?>
-      <div class="ui-state-error ui-corner-all" id="errorNoMtFound" style="display:none;"><?php echo $this->translations["noMatchingMt"];?></div>
-      <div class="ui-state-error ui-corner-all" id="messageMultipleMtFound" style="display:none;"><?php echo $this->translations["selectMt"];?></div>
+      <div class="ui-state-error ui-corner-all" id="mtEngineSelectorError" style="display:none;">xyz</div>
       </fieldset>
   </form>
 </div>
@@ -93,11 +92,11 @@
                     }
                 ?>
             </select>
-            <span class="clearable">
+            <div id="sourceContent" class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
                 <span class="clearable-clear">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
                 <span id="countedCharacters">0</span>
-            </span>
+            </div>
         </form>
     </div>
     <div id="target">
@@ -125,6 +124,9 @@
     // for later usage (coming in from PHP)
     var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
     machineTranslationEngines = JSON.parse(machineTranslationEngines);
+    var translatedStrings = [];
+    translatedStrings['noMatchingMt'] = '<?php echo $this->translations["noMatchingMt"];?>';
+    translatedStrings['selectMt'] = '<?php echo $this->translations["selectMt"];?>';
 </script>
 
 <script type="text/javascript">
@@ -139,12 +141,14 @@ $( function() {
     $("#mtEngineSelector input[type='radio']").checkboxradio();
     $('#sourceLocale').selectmenu({
         change: function( event, ui ) {
-            enableMtEnginesAsAvailable();
+            hideTranslations();
+            enableMtEnginesAsAvailable(); // will show translations again when available
         }
       });
     $('#targetLocale').selectmenu({
         change: function( event, ui ) {
-            enableMtEnginesAsAvailable();
+            hideTranslations();
+            enableMtEnginesAsAvailable(); // will show translations again when available
         }
       });
     $('#translationSubmit').button();
