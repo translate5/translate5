@@ -26,6 +26,48 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/* --------------- start instant (sic!) translation automatically --------------- */
+var editIdleTimer = null,
+    translationInProgressID = false,
+    sourceTextValue;
+
+$('#sourceText').bind('keyup', function() {
+    terminateTranslation();
+    var str = $(this).val();
+    if (str.length > 0) {
+        editIdleTimer = setTimeout(function() {
+            sourceTextValue = str;
+            startTranslation();
+        }, 500);
+    }
+});
+
+function terminateTranslation() {
+    console.log('terminateTranslation.');
+    clearTimeout(editIdleTimer);
+    editIdleTimer = null;
+    translationInProgressID = false;
+}
+
+function startTranslation() {
+    var translationsContent = '';
+    translationInProgressID = Date.now();
+    console.log('startTranslation (' + translationInProgressID + ') for: ' + sourceTextValue);
+    translationsContent += '<div class="copyable">';
+    translationsContent += '<div class="translation-result">translation 1 for ' + sourceTextValue + '</div>';
+    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContent += '</div>';
+    translationsContent += '<div class="copyable">';
+    translationsContent += '<div class="translation-result">translation 2 for ' + sourceTextValue + '</div>';
+    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContent += '</div>';
+    translationsContent += '<div class="copyable">';
+    translationsContent += '<div class="translation-result">translation 3 for ' + sourceTextValue + '</div>';
+    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContent += '</div>';
+    $('#translations').html(translationsContent);
+}
+
 /* --------------- selecting languages and MT-engines ----------------------- */
 $('#mtEngineSelector input[name="mtEngines"]:radio').change(function() {
     var mtId = this.id;
@@ -102,6 +144,8 @@ $(".clearable").each(function() {
         elCle = $(this).find(".clearable-clear");
     elInp.on("input", function(){
         elCle.toggle(!!this.value);
+        $('#translations').html('');
+        elInp.focus();
     });
     elCle.on("touchstart click", function(e) {
         e.preventDefault();

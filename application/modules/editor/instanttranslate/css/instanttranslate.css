@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 }
 
 #source,
-#translations {
+#target {
     flex: 1 300px;
     min-width: 0;
     margin: 10px;
@@ -52,7 +52,7 @@ h4, p {
 }
 
 #sourceLocale-button,
-#translationControls {
+#targetControls {
     margin-bottom: 10px;
 }
 #sourceLocale-button,
@@ -149,19 +149,20 @@ h4, p {
     border: 1px solid #00adef;
 }
 
-/* --------------- translations --------------- */
+/* --------------- target --------------- */
 
+#translations {
+    width: 100%;
+}
 .translation-result {
     background-color: #eee;
     height: 110px;
     padding: 5px;
     margin-bottom: 10px;
 }
-
 #instantTranslationIsOff {
     display: none;
 }
-
 .instant-translation-toggle a {
     color: #757575;
     font-family: "Roboto",sans-serif;
@@ -187,7 +188,6 @@ h4, p {
   user-select: none;
   cursor: pointer;
 }
-
 .clearable textarea {
   padding-right: 24px;
 }
@@ -201,7 +201,6 @@ h4, p {
   font-size: 1em;
   color: #666;
 }
-
 .copyable div {
   padding-bottom: 24px;
 }
