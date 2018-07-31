@@ -100,8 +100,8 @@
             </span>
         </form>
     </div>
-    <div id="translations">
-        <form id="translationControls" name="translationControls">
+    <div id="target">
+        <form id="targetControls" name="targetControls">
             <select id="targetLocale" name="targetLocale">
                 <option value="-">-</option>
                 <?php 
@@ -115,17 +115,8 @@
             <span id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></span>
             <span id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></span>
         </form>
-        <div class="copyable">
-            <div class="translation-result">translation 1....</div>
-            <span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>
-        </div>
-        <div class="copyable">
-            <div class="translation-result">translation 2....</div>
-            <span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>
-        </div>
-        <div class="copyable">
-            <div class="translation-result">translation 3....</div>
-            <span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>
+        <div id="translations">
+            <!-- inject translations here  -->
         </div>
     </div>
 </div>
