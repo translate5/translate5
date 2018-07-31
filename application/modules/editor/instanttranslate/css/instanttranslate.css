@@ -128,8 +128,7 @@ h4, p {
 #containerMtEngineSelect legend {
     color: #454545;
 }
-#errorNoMtFound,
-#messageMultipleMtFound {
+#mtEngineSelectorError {
     padding: 7px;
     margin-top: 10px;
 }

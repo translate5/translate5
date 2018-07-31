@@ -32,27 +32,30 @@ var editIdleTimer = null,
     sourceTextValue;
 
 $('#sourceText').bind('keyup', function() {
+    startTimerForTranslation();
+});
+function startTimerForTranslation() {
+    var mtEngine = $("#mtEngineSelector input:radio[name='mtEngines']:checked").length;
+    if (mtEngine.length > 1) {
+        showMtEngineSelectorError('selectMt');
+        return;
+    }
+    if (mtEngine.length === 0) {
+        showMtEngineSelectorError('noMatchingMt');
+        return;
+    }
     terminateTranslation();
-    var str = $(this).val();
+    var str = $('#sourceText').val();
     if (str.length > 0) {
         editIdleTimer = setTimeout(function() {
             sourceTextValue = str;
             startTranslation();
         }, 500);
     }
-});
-
-function terminateTranslation() {
-    console.log('terminateTranslation.');
-    clearTimeout(editIdleTimer);
-    editIdleTimer = null;
-    translationInProgressID = false;
 }
-
 function startTranslation() {
     var translationsContent = '';
     translationInProgressID = Date.now();
-    console.log('startTranslation (' + translationInProgressID + ') for: ' + sourceTextValue);
     translationsContent += '<div class="copyable">';
     translationsContent += '<div class="translation-result">translation 1 for ' + sourceTextValue + '</div>';
     translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
@@ -66,6 +69,12 @@ function startTranslation() {
     translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
     translationsContent += '</div>';
     $('#translations').html(translationsContent);
+    showTranslations();
+}
+function terminateTranslation() {
+    clearTimeout(editIdleTimer);
+    editIdleTimer = null;
+    translationInProgressID = false;
 }
 
 /* --------------- selecting languages and MT-engines ----------------------- */
@@ -73,18 +82,21 @@ $('#mtEngineSelector input[name="mtEngines"]:radio').change(function() {
     var mtId = this.id;
     enableMtEnginesAsAvailable();
     setSingleMtEngineById(mtId);
+    hideTranslations();
 });
 function setSingleMtEngineById(mtId) {
     var mtEngine = machineTranslationEngines[mtId];
+    $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false).checkboxradio("refresh");
+    $("#"+mtId).prop("disabled",false).button("refresh");
     $("#"+mtId).prop("checked",true).button("refresh");
-    $('#errorNoMtFound').hide();
-    $('#messageMultipleMtFound').hide();
+    clearMtEngineSelectorError();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
+    startTimerForTranslation();
 }
 function enableMtEnginesAsAvailable() {
     var mtIdsAvailable = getMtEnginesAccordingToLanguages();
-    $("#mtEngineSelector input:radio[name='mtEngines']").prop( "disabled", true );
+    $("#mtEngineSelector input:radio[name='mtEngines']").prop("disabled",true);
     $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false);
     for (var i in mtIdsAvailable) {
         var mtId = mtIdsAvailable[i];
@@ -92,8 +104,7 @@ function enableMtEnginesAsAvailable() {
       }
     $("#mtEngineSelector input:radio[name='mtEngines']").checkboxradio("refresh");
     if (mtIdsAvailable.length === 0) {
-        $('#errorNoMtFound').show();
-        $('#messageMultipleMtFound').hide();
+        showMtEngineSelectorError('noMatchingMt');
         return;
     }
     if (mtIdsAvailable.length === 1) {
@@ -101,8 +112,7 @@ function enableMtEnginesAsAvailable() {
         return;
     }
     if (mtIdsAvailable.length > 1) {
-        $('#errorNoMtFound').hide();
-        $('#messageMultipleMtFound').show();
+        showMtEngineSelectorError('selectMt');
         return;
     }
 }
@@ -144,7 +154,6 @@ $(".clearable").each(function() {
         elCle = $(this).find(".clearable-clear");
     elInp.on("input", function(){
         elCle.toggle(!!this.value);
-        $('#translations').html('');
         elInp.focus();
     });
     elCle.on("touchstart click", function(e) {
@@ -166,3 +175,29 @@ $(".copyable").each(function() {
         alert("TODO: copy '" + content + "'"); // TODO
     });
 });
+
+/* --------------- helpers -------------------------------------------------- */
+function clearMtEngineSelectorError() {
+    $('#mtEngineSelectorError').hide();
+    showSourceText();
+    showTranslations();
+}
+function showMtEngineSelectorError(errorMode) {
+    $('#mtEngineSelectorError').html(translatedStrings[errorMode]).show();
+    if ($('#sourceText').val().length === 0) {
+        hideSourceText();
+    }
+}
+function showSourceText() {
+    $('#sourceContent').show();
+}
+function hideSourceText() {
+    $('#sourceContent').hide();
+}
+function showTranslations() {
+    $('#translations').show();
+}
+function hideTranslations() {
+    $('#translations').hide();
+}
+
