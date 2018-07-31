@@ -1,0 +1,223 @@
+
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+/* --------------- container --------------- */
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#source,
+#target {
+    flex: 1 300px;
+    min-width: 0;
+    margin: 10px;
+}
+
+/* --------------- general --------------- */
+
+h4, p {
+    padding: 3px;
+    margin: 2px 0px;
+    -webkit-margin-before: 0px;
+    -webkit-margin-after: 5px;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+}
+
+#sourceLocale-button,
+#targetControls {
+    margin-bottom: 10px;
+}
+#sourceLocale-button,
+#targetLocale-button {
+    width: 6em;
+}
+.filled-color {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    background-color: #4d90fe;
+    background-image: -webkit-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: -moz-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: -ms-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: -o-linear-gradient(top,#4d90fe,#4787ed);
+    background-image: linear-gradient(top,#4d90fe,#4787ed);
+    border: 1px solid #3079ed;
+    color: #fff;
+}
+
+/* --------------- header --------------- */
+
+#containerHeader {
+    padding-top: 19px;
+    margin: 10px;
+}
+#logo {
+    flex: 0 0 180px;
+    order: 1;
+    height: 110px;
+    background: url(/images/translate5.png?v=1) no-repeat left top;
+    background-size: auto auto;
+    background-size: 150px;
+}
+#languageSelector {
+    flex: 1 0 auto;
+    order: 2;
+    text-align: right;
+    margin-right: 7px;
+}
+#locale-button {width: 9em;}
+#logout {
+    flex: 0 0 80px;
+    order: 3;
+    text-align: right;
+}
+
+@media (max-width: 500px) {
+    #logo {
+        flex: 0 1 100%;
+        text-align:left;
+        margin-right: 0px;
+    }
+    #logo { order: 1; }
+    #languageSelector { order: 2; text-align: left; margin-top: 5px;}
+    #logout { order: 3; margin-top: 5px;}
+}
+
+/* --------------- selection  --------------- */
+
+#containerMtEngineSelect {
+    padding: 10px;
+    text-align: center;
+}
+#mtEngineSelector {
+    width: 100%;
+}
+#containerMtEngineSelect fieldset {
+    border-width: 1px;
+    border-color: #00adef;
+    border-style: solid;
+}
+#containerMtEngineSelect legend {
+    color: #454545;
+}
+#errorNoMtFound,
+#messageMultipleMtFound {
+    padding: 7px;
+    margin-top: 10px;
+}
+
+/* --------------- source --------------- */
+    
+#source textarea {
+    width: 99%;
+    margin-right: 10px;
+    height: 105px;
+    font-family: verdana,helvetica,sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+}
+#source textarea:focus {
+    outline: none !important;
+    border: 1px solid #00adef;
+}
+
+/* --------------- target --------------- */
+
+#translations {
+    width: 100%;
+}
+.translation-result {
+    background-color: #eee;
+    height: 110px;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+#instantTranslationIsOff {
+    display: none;
+}
+.instant-translation-toggle a {
+    color: #757575;
+    font-family: "Roboto",sans-serif;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+/* --------------- additional infos --------------- */
+/* -- https://stackoverflow.com/a/6258628 -- */
+
+.clearable,
+.copyable {
+  position: relative;
+  display: block;
+}
+.clearable textarea,
+.copyable div {
+  box-sizing: border-box;
+}
+.clearable-clear,
+.copyable-copy {
+  position: absolute;
+  user-select: none;
+  cursor: pointer;
+}
+.clearable textarea {
+  padding-right: 24px;
+}
+.clearable-clear {
+  display: none;
+  right: 0;
+  top: 0;
+  padding: 0 8px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1em;
+  color: #666;
+}
+.copyable div {
+  padding-bottom: 24px;
+}
+.copyable-copy {
+  left: 8px;
+  bottom: 0;
+}
+
+#countedCharacters {
+  position: absolute;
+  user-select: none;
+  right: 0px;
+  bottom: 16px;
+  padding: 0 10px;
+  font-family: "Roboto",sans-serif;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
