@@ -88,6 +88,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     
     public function _initRestRoutes()
     {
+        
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
             'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker',
@@ -95,6 +96,19 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
+        //this is not standard controller action route
+        //when this route is triggered, a coresponding event from the given controller will be fired
+        //ex: editor/task/123/analysis/operation
+        //    - an event called analysisOperation will be fired from task controller(task entity with id 123)
+        $this->front->getRouter()->addRoute('editorOperationHandler', new ZfExtended_Controller_RestLikeRoute(
+            //'editor/:entity/:id/:operation/operation',
+            'editor/:controller/:id/:operation/operation',
+            array(
+                'module' => 'editor',
+                'action' => '',
+            )
+        ));
+        
         //FIXME convert to RestLikeRoute (remove echo json_encode in action then)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/filemap/*',
@@ -129,6 +143,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'module' => 'editor',
                 'controller' => 'task',
                 'action' => 'clone'
+            )
+        ));
+        
+        $this->front->getRouter()->addRoute('editorTaskImport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/import',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'import'
             )
         ));
         

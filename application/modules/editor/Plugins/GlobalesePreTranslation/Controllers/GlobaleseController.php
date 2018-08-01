@@ -102,17 +102,41 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
     }
     
     public function postAction() {
-        $globaleseSession = new Zend_Session_Namespace('GlobalesePreTranslation');
         if($this->getParam('data') && $this->getParam('data')!=""){
             $data = json_decode($this->getParam('data'));
         }
         if(!$data){
             return;
         }
-        //save the auth and globalese parameters in session
-        $globaleseSession->engine =$data->engine;
-        $globaleseSession->group =$data->group;
-        $globaleseSession->apiUsername =$data->apiUsername;
-        $globaleseSession->apiKey =$data->apiKey;
+        
+        $worker = ZfExtended_Factory::get('editor_Plugins_GlobalesePreTranslation_Worker');
+        /* @var $worker editor_Plugins_GlobalesePreTranslation_Worker */
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($data->taskGuid);
+
+        $params=[
+            'group'=>$data->group,
+            'engine'=>$data->engine,
+            'apiUsername'=>$data->apiUsername,
+            'apiKey'=>$data->apiKey
+        ];
+        
+        // init worker and queue it
+        if (!$worker->init($task->getTaskGuid(), $params)) {
+            $this->log->logError('GlobalesePreTranslation-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        
+        //find the parent worker
+        $parent=ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $parent ZfExtended_Models_Worker */
+        $result=$parent->loadByState("editor_Models_Import_Worker", ZfExtended_Models_Worker::STATE_PREPARE,$task->getTaskGuid());
+        $parentWorkerId=null;
+        if(!empty($result)){
+            $parentWorkerId=$result[0]['id'];
+        }
+        $worker->queue($parentWorkerId);
     }
 }

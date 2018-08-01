@@ -677,6 +677,7 @@ abstract class editor_Workflow_Abstract {
     protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates) {
         $session = new Zend_Session_Namespace();
         $sessionUser = new Zend_Session_Namespace('user');
+        
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         

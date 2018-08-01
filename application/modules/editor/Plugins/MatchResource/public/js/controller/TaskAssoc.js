@@ -51,11 +51,12 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       selector: 'adminTaskPreferencesWindow > tabpanel'
   },{
       ref: 'grid',
-      selector: 'adminTaskPreferencesWindow > tabpanel #tmTaskAssocGrid'
+      selector: '#tmTaskAssocGrid'
   },{
       ref: 'adminTaskWindow',
       selector: 'adminTaskPreferencesWindow'
   }],
+  
   listen: {
       controller: {
           '#admin.TaskPreferences': {
@@ -72,12 +73,6 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   }
                   panel.setLoading(false);
               }
-          },
-          'matchResourceTaskAssocPanel #btnSaveChanges': {
-              click: 'handleOnSaveButtonClick'
-          },
-          'matchResourceTaskAssocPanel #btnReload': {
-              click: 'handleOnReload'
           },
           '#tmTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
               checkchange: 'handleSegmentsUpdateableChange'
@@ -103,16 +98,28 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
                   filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
               }
           };
+      //set the actual task
+      me.actualTask = task;
       me.getGrid().store.removeAll();
       me.getGrid().store.load(tmmtparams);
   },
-  handleOnSaveButtonClick: function(window) {
+  
+  /***
+   * Save each assoc if if it is changed
+   */
+  saveTmAssoc: function(window) {
       var me = this,
           tmpStore = me.getGrid().store;
-      me.getAdminTaskWindow().setLoading(true);
+
+      if(me.getAdminTaskWindow()){
+          me.getAdminTaskWindow().setLoading(true);
+      }
+      
       me.requestsCount = tmpStore.getCount();
+
       tmpStore.each(me.saveOneAssocRecord, me);
   },
+  
   handleOnReload: function(window) {
       var me = this;
       me.getGrid().store.reload();
@@ -125,6 +132,8 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
           record = me.getGrid().store.getAt(rowIdx),
           oldValue = record.isModified('segmentsUpdateable') && record.getModified('segmentsUpdateable');
       record.set('segmentsUpdateable', checked && oldValue);
+      
+      me.saveTmAssoc();
   },
   /**
    * check row when segmentsUpdateable is checked
@@ -135,6 +144,7 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
       if(checked && !record.get('checked')) {
           record.set('checked', true);
       }
+      me.saveTmAssoc();
   },
   /**
    * currently no easy "subentity" versioning is possible here, because of the bulk (store each) like saving / deleting.
@@ -184,6 +194,11 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
               }
               record.commit();
               me.hideLoadingMask();
+              //when all of the records are saved, fire event
+
+              if(me.requestsCount<1){
+            	  me.fireEvent('taskAssocSavingFinished',me.actualTask);
+              }
           },
           failure: function(response){
               me.requestsCount--;
@@ -194,6 +209,9 @@ Ext.define('Editor.plugins.MatchResource.controller.TaskAssoc', {
   },
   hideLoadingMask:function(){
       var me=this;
+      if(!me.getAdminTaskWindow()){
+          return;
+      }
       if(me.requestsCount <= 0){
           var task = me.getAdminTaskWindow().actualTask;
           me.getAdminTaskWindow().setLoading(false);

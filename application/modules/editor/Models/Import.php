@@ -219,12 +219,12 @@ class editor_Models_Import {
         $fileTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_FileTree');
         /* @var $fileTreeWorker editor_Models_Import_Worker_FileTree */
         $fileTreeWorker->init($taskGuid, $params);
-        $fileTreeWorker->queue(0, NULL, false);
+        $fileTreeWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
         
         $refTreeWorker = ZfExtended_Factory::get('editor_Models_Import_Worker_ReferenceFileTree');
         /* @var $refTreeWorker editor_Models_Import_Worker_ReferenceFileTree */
         $refTreeWorker->init($taskGuid, $params);
-        $refTreeWorker->queue(0, NULL, false);
+        $refTreeWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
         
         /**
          * Queue Import Worker
@@ -235,7 +235,7 @@ class editor_Models_Import {
         $importWorker->init($taskGuid, $params);
 
         //prevent the importWorker to be started here. 
-        $parentId = $importWorker->queue(0, NULL, false);
+        $parentId = $importWorker->queue(0, ZfExtended_Models_Worker::STATE_PREPARE, false);
 
         //since none of the above workers are started yet, we can safely update the fileTreeWorkers parentId
         $fileTreeWorker->getModel()->setParentId($parentId);

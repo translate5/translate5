@@ -300,6 +300,7 @@ class editor_TaskController extends ZfExtended_RestController {
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['edit100PercentMatch'], 'integer');
         settype($this->data['lockLocked'], 'integer');
+        settype($this->data['autoStartImport'], 'boolean');
         $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
@@ -321,9 +322,28 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->processUploadedFile();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
+            if($this->data['autoStartImport']) {
+                $this->startImportWorkers();
+            }
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
         }
+    }
+    
+    /**
+     * Starts the import of the task
+     */
+    public function importAction() {
+        $this->getAction();
+        $this->startImportWorkers();
+    }
+    
+    protected function startImportWorkers() {
+        $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+        /* @var $workerModel ZfExtended_Models_Worker */
+        $workerModel->loadFirstOf('editor_Models_Import_Worker', $this->entity->getTaskGuid());
+        $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
+        $worker->schedulePrepared();
     }
 
     /**
@@ -408,6 +428,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         if($this->validate()) {
             $this->processUploadedFile();
+            $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
             $this->view->success = true;

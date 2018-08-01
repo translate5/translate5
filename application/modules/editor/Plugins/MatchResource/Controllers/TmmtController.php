@@ -455,6 +455,10 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         if($deleteInResource && $connector instanceof editor_Plugins_MatchResource_Services_Connector_FilebasedAbstract) {
             $connector->delete();
         }
+        
+        $userSession = new Zend_Session_Namespace('user');
+        
+        error_log("Tmmt with name:".$this->entity->getName()." and id:".$this->entity->getId()." was deleted by:".$userSession->data->firstName." ".$userSession->data->surName);
         $this->processClientReferenceVersion();
         $this->entity->delete();
     }
@@ -472,7 +476,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the tmmt
-        $this->checkTaskAndTmmtAccess($tmmtId, $segment);
+        $this->entity->checkTaskAndTmmtAccess($session->taskGuid,$tmmtId, $segment);
         
         $this->entity->load($tmmtId);
 
@@ -508,7 +512,7 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         }
         
         //checks if the current task is associated to the tmmt
-        $this->checkTaskAndTmmtAccess($tmmtId);
+        $this->entity->checkTaskAndTmmtAccess($session->taskGuid,$tmmtId);
         
         $this->entity->load($tmmtId);
         
@@ -521,36 +525,6 @@ class editor_Plugins_MatchResource_TmmtController extends ZfExtended_RestControl
         $this->view->tmmtId = $this->entity->getId();
         $this->view->nextOffset = $result->getNextOffset();
         $this->view->rows = $result->getResult();
-    }
-    
-    /**
-     * checks if the given tmmt (and segmentid - optional) is usable by the currently loaded task
-     * @param integer $tmmtId
-     * @param editor_Models_Segment $segment
-     * @throws ZfExtended_Models_Entity_NoAccessException
-     */
-    protected function checkTaskAndTmmtAccess(integer $tmmtId, editor_Models_Segment $segment = null) {
-        $session = new Zend_Session_Namespace();
-        
-        //checks if the queried tmmt is associated to the task:
-        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_Taskassoc');
-        /* @var $tmmtTaskAssoc editor_Plugins_MatchResource_Models_Taskassoc */
-        try {
-            //for security reasons a service can only be queried when a valid task association exists and this task is loaded
-            // that means the user has also access to the service. If not then not!
-            $tmmtTaskAssoc->loadByTaskGuidAndTm($session->taskGuid, $tmmtId);
-        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            throw new ZfExtended_Models_Entity_NoAccessException(null, null, $e);
-        }
-        
-        if(is_null($segment)) {
-            return;
-        }
-        
-        //check taskGuid of segment against loaded taskguid for security reasons
-        if ($session->taskGuid !== $segment->getTaskGuid()) {
-            throw new ZfExtended_Models_Entity_NoAccessException();
-        }
     }
     
     /**

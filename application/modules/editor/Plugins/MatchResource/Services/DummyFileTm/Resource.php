@@ -30,5 +30,6 @@ class editor_Plugins_MatchResource_Services_DummyFileTm_Resource extends editor_
     public function __construct(string $id, string $name) {
         $this->id = $id;
         $this->name = $name;
+        $this->analysable=false;//is used by match analysis
     }
 }
