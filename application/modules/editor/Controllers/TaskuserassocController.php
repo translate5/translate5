@@ -203,6 +203,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * adds the extended userinfo to the resultset
      */
     protected function addUserInfoToResult() {
+        if(!$this->wasValid) {
+            return;
+        }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($this->entity->getUserGuid());

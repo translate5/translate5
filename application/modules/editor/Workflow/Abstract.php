@@ -259,8 +259,11 @@ abstract class editor_Workflow_Abstract {
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
             $tua = $event->getParam('entity');
-            $this->recalculateWorkflowStep($tua);
-            $this->doUserAssociationAdd($tua);
+            //if entity could not be saved no ID was given, so check for it
+            if($tua->getId() > 0) {
+                $this->recalculateWorkflowStep($tua);
+                $this->doUserAssociationAdd($tua);
+            }
         });
         
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
