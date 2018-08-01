@@ -116,7 +116,7 @@
                     }
                 ?>
             </select>
-            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="ui-corner-all ui-button ui-widget filled-color">
+            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="ui-corner-all ui-button ui-widget">
             <span id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></span>
             <span id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></span>
         </form>
@@ -149,7 +149,7 @@ $( function() {
       });
     $( "#mtEngines" ).selectmenu({
         create: function( event, ui ) {
-            enableMtEnginesAsAvailable();
+            enableMtEnginesAsAvailable(); // create the first list of mt-engines according to initial source-target-combintaion of the user
         }
       }).selectmenu("menuWidget").addClass("overflow");
     $('#sourceLocale').selectmenu({
