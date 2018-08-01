@@ -26,69 +26,52 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* --------------- start instant (sic!) translation automatically --------------- */
 var editIdleTimer = null,
-    translationInProgressID = false,
-    sourceTextValue;
+    translateTextResponse = '';
 
+/* --------------- start and terminate translations  ------------------------ */
 $('#sourceText').bind('keyup', function() {
-    startTimerForTranslation();
+    // start instant (sic!) translation automatically
+    startTimerForInstantTranslation();
 });
-function startTimerForTranslation() {
-    var mtEngine = $("#mtEngineSelector input:radio[name='mtEngines']:checked").length;
-    if (mtEngine.length > 1) {
-        showMtEngineSelectorError('selectMt');
-        return;
-    }
-    if (mtEngine.length === 0) {
-        showMtEngineSelectorError('noMatchingMt');
-        return;
-    }
+$('#translationSubmit').click(function(){
+    // start translation manually via button
+    startTranslation();
+    return false;
+});
+function startTimerForInstantTranslation() {
     terminateTranslation();
-    var str = $('#sourceText').val();
-    if (str.length > 0) {
+    if ($('#instantTranslationIsOn').is(":visible")) {
         editIdleTimer = setTimeout(function() {
-            sourceTextValue = str;
             startTranslation();
-        }, 500);
+        }, 200);
     }
 }
 function startTranslation() {
-    var translationsContent = '';
-    translationInProgressID = Date.now();
-    translationsContent += '<div class="copyable">';
-    translationsContent += '<div class="translation-result">translation 1 for ' + sourceTextValue + '</div>';
-    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContent += '</div>';
-    translationsContent += '<div class="copyable">';
-    translationsContent += '<div class="translation-result">translation 2 for ' + sourceTextValue + '</div>';
-    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContent += '</div>';
-    translationsContent += '<div class="copyable">';
-    translationsContent += '<div class="translation-result">translation 3 for ' + sourceTextValue + '</div>';
-    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContent += '</div>';
-    $('#translations').html(translationsContent);
-    showTranslations();
+    terminateTranslation();
+    if ($('#sourceText').val().length > 0) {
+        translateText();
+    }
 }
 function terminateTranslation() {
     clearTimeout(editIdleTimer);
     editIdleTimer = null;
-    translationInProgressID = false;
 }
 
 /* --------------- selecting languages and MT-engines ----------------------- */
 $('#mtEngines').on('selectmenuchange', function() {
-    var mtId = $(this).val();
-    setSingleMtEngineById(mtId);
-    hideTranslations();
+    var engineId = $(this).val();
+    setSingleMtEngineById(engineId);
 });
-function setSingleMtEngineById(mtId) {
-    var mtEngine = machineTranslationEngines[mtId];
+function setSingleMtEngineById(engineId) {
+    var mtEngine = machineTranslationEngines[engineId];
+    if(machineTranslationEngines[engineId] === 'undefined') {
+        return;
+    }
     clearMtEngineSelectorError();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
-    startTimerForTranslation();
+    startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
 }
 function enableMtEnginesAsAvailable() {
     var mtIdsAvailable = getMtEnginesAccordingToLanguages(),
@@ -110,6 +93,7 @@ function enableMtEnginesAsAvailable() {
         $('#PlsSelect').remove().end();
         $("#mtEngines").selectmenu("refresh");
         setSingleMtEngineById(mtIdsAvailable[0]);
+        $('#translationSubmit').show();
         return;
     }
     if (mtIdsAvailable.length > 1) {
@@ -121,7 +105,7 @@ function getMtEnginesAccordingToLanguages() {
     var sourceLocale = $("#sourceLocale").val(),
         targetLocale = $("#targetLocale").val(),
         mtIdsAvailable = [],
-        mtId,
+        engineId,
         mtEngineToCheck,
         langIsOK = function(langMT,langSet){
             if (langMT === langSet) {
@@ -132,11 +116,11 @@ function getMtEnginesAccordingToLanguages() {
             }
             return false;
         };
-    for (mtId in machineTranslationEngines) {
-        if (machineTranslationEngines.hasOwnProperty(mtId)) {
-            mtEngineToCheck = machineTranslationEngines[mtId];
+    for (engineId in machineTranslationEngines) {
+        if (machineTranslationEngines.hasOwnProperty(engineId)) {
+            mtEngineToCheck = machineTranslationEngines[engineId];
             if (langIsOK(mtEngineToCheck.source,sourceLocale) && langIsOK(mtEngineToCheck.target,targetLocale)) {
-                mtIdsAvailable.push(mtId); 
+                mtIdsAvailable.push(engineId); 
             }
         }
     }
@@ -145,11 +129,14 @@ function getMtEnginesAccordingToLanguages() {
 
 
 /***
- * Send a request for translation, this will return translateion result for each associated language resource
+ * Send a request for translation, this will return translation result for each associated language resource
  * INFO: in the current implementation only result from sdlcloud language will be returned
  * @returns
  */
 function translateText(){
+    if (getSelectedEngineCode() === false) {
+        return;
+    }
     $.ajax({
         url: REST_PATH+"instanttranslate/translate",
         dataType: "json",
@@ -160,28 +147,43 @@ function translateText(){
             'text':$('#sourceText').val()
         },
         success: function(result){
-        	console.log(result);
-        	$('#sourceText').val(result.rows);
+        	translateTextResponse = result.rows;
+        	fillTranslation();
         }
     })
 }
 
+function fillTranslation() {
+    var translationsContent = '';
+    translationsContent += '<div class="copyable">';
+    translationsContent += '<div class="translation-result">' + translateTextResponse + '</div>';
+    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContent += '</div>';
+    /*
+    translationsContent += '<div class="copyable">';
+    translationsContent += '<div class="translation-result">translation 2...</div>';
+    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContent += '</div>';
+    translationsContent += '<div class="copyable">';
+    translationsContent += '<div class="translation-result">translation 3...</div>';
+    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContent += '</div>';
+    */
+    $('#translations').html(translationsContent);
+    showTranslations();
+}
+
 /***
- * Return the domain code(if exist) of the selected engine or null
- * TODO: implement me
+ * Return the domain code(if exist) of the selected engine or false
  * @returns
  */
 function getSelectedEngineCode(){
-	//TODO: the engine selector value always is "" ??
-	//var engineId=$("#mtEngineSelector").val();
-	//return machineTranslationEngines[engineId].domainCode;
-	return null;
+	var engineId=$("#mtEngines").val();
+	if(machineTranslationEngines[engineId] === undefined) {
+	    return false; 
+	}
+	return machineTranslationEngines[engineId].domainCode;
 }
-
-$('#translationSubmit').click(function(){
-	translateText();
-	return false;
-});
 
 /* --------------- toggle instant translation ------------------------------- */
 $('.instant-translation-toggle').click(function(){
@@ -222,9 +224,11 @@ function clearMtEngineSelectorError() {
     $('#mtEngineSelectorError').hide();
     showSourceText();
     showTranslations();
+    $('#translationSubmit').show();
 }
 function showMtEngineSelectorError(errorMode) {
     $('#mtEngineSelectorError').html(translatedStrings[errorMode]).show();
+    $('#translationSubmit').hide();
     if ($('#sourceText').val().length === 0) {
         hideSourceText();
     }
