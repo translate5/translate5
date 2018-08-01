@@ -49,7 +49,10 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $model=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
         
-        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts/termportal');
+        Zend_Layout::getMvcInstance()->setLayout('termportal');
+        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
+        $this->view->render('termportal/layoutConfig.php');
+        
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
