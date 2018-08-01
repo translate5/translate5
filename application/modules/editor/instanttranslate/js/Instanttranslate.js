@@ -78,37 +78,38 @@ function terminateTranslation() {
 }
 
 /* --------------- selecting languages and MT-engines ----------------------- */
-$('#mtEngineSelector input[name="mtEngines"]:radio').change(function() {
-    var mtId = this.id;
-    enableMtEnginesAsAvailable();
+$('#mtEngines').on('selectmenuchange', function() {
+    var mtId = $(this).val();
     setSingleMtEngineById(mtId);
     hideTranslations();
 });
 function setSingleMtEngineById(mtId) {
     var mtEngine = machineTranslationEngines[mtId];
-    $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false).checkboxradio("refresh");
-    $("#"+mtId).prop("disabled",false).button("refresh");
-    $("#"+mtId).prop("checked",true).button("refresh");
     clearMtEngineSelectorError();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
     startTimerForTranslation();
 }
 function enableMtEnginesAsAvailable() {
-    var mtIdsAvailable = getMtEnginesAccordingToLanguages();
-    $("#mtEngineSelector input:radio[name='mtEngines']").prop("disabled",true);
-    $("#mtEngineSelector input:radio[name='mtEngines']").prop("checked",false);
-    for (var i in mtIdsAvailable) {
-        var mtId = mtIdsAvailable[i];
-        $("#"+mtId).button("enable").button("refresh");
-      }
-    $("#mtEngineSelector input:radio[name='mtEngines']").checkboxradio("refresh");
+    var mtIdsAvailable = getMtEnginesAccordingToLanguages(),
+        mtOptionList = [];
     if (mtIdsAvailable.length === 0) {
+        $('#mtEngines').selectmenu("widget").hide();
         showMtEngineSelectorError('noMatchingMt');
         return;
     }
+    $('#mtEngines').find('option').remove().end();
+    mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+translatedStrings['foundMt']+":</option>");
+    for (i = 0; i < mtIdsAvailable.length; i++) {
+        mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
+    }
+    $('#mtEngines').append(mtOptionList.join(""));
+    $("#mtEngines").selectmenu("refresh");
+    $('#mtEngines').selectmenu("widget").show();
     if (mtIdsAvailable.length === 1) {
-        setSingleMtEngineById(mtId);
+        $('#PlsSelect').remove().end();
+        $("#mtEngines").selectmenu("refresh");
+        setSingleMtEngineById(mtIdsAvailable[0]);
         return;
     }
     if (mtIdsAvailable.length > 1) {
