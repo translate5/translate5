@@ -190,10 +190,10 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @param array $segmentsOfFile
      */
     protected function processAllSegments($filename, Traversable $segmentsOfFile) {
-        if(empty($segmentsOfFile)) {
+        $first = $this->unifySegmentData(reset($segmentsOfFile));
+        if(empty($first)) {
             return;
         }
-        $first = $this->unifySegmentData(reset($segmentsOfFile));
 
         $this->exportParser = $this->getExportFileparser($first['fileId'], $filename);
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve" datatype="x-translate5">';
