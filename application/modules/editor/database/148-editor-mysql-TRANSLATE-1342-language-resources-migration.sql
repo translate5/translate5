@@ -54,7 +54,7 @@ AND `resource` = 'frontend';
 UPDATE `Zf_configuration`
 SET `name` = REPLACE (`name`, '.plugins.MatchResource.', '.LanguageResources.'),
 `category` = 'editor'
-WHERE `name` LIKE '%.plugins.MatchResource.%'
+WHERE `name` LIKE '%.plugins.MatchResource.%';
 
 UPDATE `Zf_configuration` SET `name`='runtimeOptions.worker.editor_Models_LanguageResourcesWorker.maxParallelWorkers' WHERE `name`='runtimeOptions.worker.editor_Plugins_MatchResource_Worker.maxParallelWorkers';
 
