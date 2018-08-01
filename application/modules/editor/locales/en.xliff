@@ -2787,6 +2787,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <source>Verfügbare MT-Engines</source>
 <target>Available MT-Engines</target>
 </trans-unit>
+
+<trans-unit id='TVQtRW5naW5lcyBnZWZ1bmRlbg=='>
+<source>MT-Engines gefunden</source>
+<target>MT-Engines found</target>
+</trans-unit>
  
 <trans-unit id='S2VpbmUgcGFzc2VuZGUgTVQtRW5naW5lIHZlcmbDvGdiYXIuIEJpdHRlIGVpbmUgYW5kZXJlIFNwcmFjaGtvbWJpbmF0aW9uIHfDpGhsZW4u'>
 <source>Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen.</source>

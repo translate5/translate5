@@ -85,6 +85,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         //translated strings
         $translatedStrings=array(
                 "availableMTEngines"        => $this->translate->_("Verfügbare MT-Engines"),
+                "foundMt"                   => $this->translate->_("MT-Engines gefunden"),
                 "noMatchingMt"              => $this->translate->_("Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen."),
                 "selectMt"                  => $this->translate->_("Bitte eine der verfügbaren MT-Engines auswählen."),
                 "translate"                 => $this->translate->_("Übersetzen"),

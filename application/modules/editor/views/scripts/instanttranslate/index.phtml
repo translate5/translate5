@@ -69,12 +69,8 @@
   <form id="mtEngineSelector" name="mtEngineSelector">
       <fieldset>
         <legend><?php echo $this->translations["availableMTEngines"];?>:</legend>
-        <?php 
-        foreach ($machineTranslationEngines as $mtEngineId => $mtEngine) {
-            echo '<label for="'.$mtEngineId.'">'.$mtEngine['name'].'</label>';
-            echo '<input type="radio" name="mtEngines" id="'.$mtEngineId.'">';
-            }
-        ?>
+        <select id="mtEngines" name="mtEngines">
+        </select>
       <div class="ui-state-error ui-corner-all" id="mtEngineSelectorError" style="display:none;">xyz</div>
       </fieldset>
   </form>
@@ -82,11 +78,16 @@
 
 <div id="containerTranslation" class="container">
 	<div id="source">
-        <form id="sourceLanguageSelector" name="sourceLanguageSelector">
+        <form id="sourceLanguageSelector" name="sourceLanguageSelector" class="margin-bottom">
             <select id="sourceLocale" name="sourceLocale">
                 <option value="-">-</option>
-                <?php 
+                <?php
+                    $sourceLangLocalesFound = array();
                     foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
+                        $sourceLangLocalesFound[] = $sourceLangLocale;
+                    }
+                    sort($sourceLangLocalesFound);
+                    foreach ($sourceLangLocalesFound as $sourceLangLocale) {
                         $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected' : '';
                         echo '<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
@@ -103,8 +104,13 @@
         <form id="targetControls" name="targetControls">
             <select id="targetLocale" name="targetLocale">
                 <option value="-">-</option>
-                <?php 
-                    foreach ($mtTargetLanguagesLocales as $targetLangLocale) {
+                <?php
+                    $targetLangLocalesFound = array();
+                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
+                        $targetLangLocalesFound[] = $sourceLangLocale;
+                    }
+                    sort($targetLangLocalesFound);
+                    foreach ($targetLangLocalesFound as $targetLangLocale) {
                         $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected' : '';
                         echo '<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
@@ -121,13 +127,15 @@
 </div>
 
 <script type="text/javascript">
-    // for later usage (coming in from PHP)
     var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
     machineTranslationEngines = JSON.parse(machineTranslationEngines);
     var REST_PATH='<?php echo $this->restPath; ?>';
     var translatedStrings = [];
-    translatedStrings['noMatchingMt'] = '<?php echo $this->translations["noMatchingMt"];?>';
-    translatedStrings['selectMt'] = '<?php echo $this->translations["selectMt"];?>';
+    <?php 
+        foreach ($this->translations as $key => $value) {
+            echo "    translatedStrings['".$key."'] = '".$value."';\n";
+        }
+    ?>
 </script>
 
 <script type="text/javascript">
@@ -139,21 +147,24 @@ $( function() {
             $("#languageSelector").submit();
         }
       });
-    $("#mtEngineSelector input[type='radio']").checkboxradio();
+    $( "#mtEngines" ).selectmenu({
+        create: function( event, ui ) {
+            enableMtEnginesAsAvailable();
+        }
+      }).selectmenu("menuWidget").addClass("overflow");
     $('#sourceLocale').selectmenu({
         change: function( event, ui ) {
             hideTranslations();
             enableMtEnginesAsAvailable(); // will show translations again when available
         }
-      });
+      }).selectmenu("menuWidget").addClass("overflow");
     $('#targetLocale').selectmenu({
         change: function( event, ui ) {
             hideTranslations();
             enableMtEnginesAsAvailable(); // will show translations again when available
         }
-      });
+      }).selectmenu("menuWidget").addClass("overflow");
     $('#translationSubmit').button();
-    enableMtEnginesAsAvailable();
 } );
 </script>
 
