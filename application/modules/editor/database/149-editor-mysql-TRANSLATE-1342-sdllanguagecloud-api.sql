@@ -31,7 +31,3 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.LanguageResources.sdllnaguagecloud.apiKey', '1', 'editor', 'editor', '8wFVYOBiA1YvyX0Px74PsA%3D%3D', '', '', 'string', 'Api key used for authentication to sdl language cloud api');
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'api', 'editor_instanttranslate', 'all');
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'admin', 'editor_instanttranslate', 'all');
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_instanttranslate', 'all');
-
