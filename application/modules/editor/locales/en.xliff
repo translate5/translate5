@@ -2787,6 +2787,16 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <source>Verfügbare MT-Engines</source>
 <target>Available MT-Engines</target>
 </trans-unit>
+    
+<trans-unit id='VGV4dCB6dXLDvGNrc2V0emVu'>
+<source>Text zurücksetzen</source>
+<target>Clear text</target>
+</trans-unit>
+
+<trans-unit id='S29waWVyZW4='>
+<source>Kopieren</source>
+<target>Copy</target>
+</trans-unit>
 
 <trans-unit id='TVQtRW5naW5lcyBnZWZ1bmRlbg=='>
 <source>MT-Engines gefunden</source>
