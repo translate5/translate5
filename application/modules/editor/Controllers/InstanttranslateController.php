@@ -32,7 +32,9 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
-        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts/instanttranslate');
+        Zend_Layout::getMvcInstance()->setLayout('instanttranslate');
+        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
+        $this->view->render('instanttranslate/layoutConfig.php');
         
         // last selected source and target languages for the user (=> new table Zf_users_meta)
         $sourceSearchLanguagePreselectionLocale= 'de-DE'; // TODO; both content and structure of this content are DUMMY only!
