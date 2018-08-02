@@ -138,6 +138,12 @@ function translateText(){
         return;
     }
     $.ajax({
+        statusCode: {
+            500: function() {
+                hideTranslations();
+                showMtEngineSelectorError('serverErrorMsg500');
+                }
+        },
         url: REST_PATH+"instanttranslate/translate",
         dataType: "json",
         data: {
