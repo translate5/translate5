@@ -165,7 +165,7 @@ function renderTranslationContainer() {
     var translationsContainer = '';
     translationsContainer += '<div class="copyable">';
     translationsContainer += '<div class="translation-result" id="'+$("#mtEngines").val()+'"></div>';
-    translationsContainer += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContainer += '<span class="copyable-copy" title="'+translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     translationsContainer += '</div>';
     return translationsContainer;
 }
@@ -213,7 +213,7 @@ $('#sourceText').on("input", function(){
 });
 
 /* --------------- copy translation ----------------------------------------- */
-$('#translations').on('click','.copyable-copy',function(){
+$('#translations').on('touchstart click','.copyable-copy',function(){
     var textToCopy = $(this).closest('.copyable').find('.translation-result').text();
     // https://stackoverflow.com/a/33928558
     if (window.clipboardData && window.clipboardData.setData) {

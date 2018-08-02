@@ -166,6 +166,10 @@ h4, p {
     padding: 5px;
     margin-bottom: 10px;
 }
+#instantTranslationIsOff a:hover,
+#instantTranslationIsOn a:hover {
+    text-decoration: underline;
+}
 #instantTranslationIsOff {
     display: none;
 }
@@ -226,4 +230,12 @@ h4, p {
   color: #666;
   text-align: right;
 }
+
+/* --------------- ui-tooltip --------------- */
+  .ui-tooltip {
+    background: black;
+    padding: 10px;
+    color: white;
+    font: bold 9px "Helvetica Neue", Sans-Serif;
+  }
 
