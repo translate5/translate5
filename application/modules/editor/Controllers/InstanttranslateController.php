@@ -90,6 +90,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "foundMt"                   => $this->translate->_("MT-Engines gefunden"),
                 "noMatchingMt"              => $this->translate->_("Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen."),
                 "selectMt"                  => $this->translate->_("Bitte eine der verfügbaren MT-Engines auswählen."),
+                "serverErrorMsg500"         => $this->translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
                 "translate"                 => $this->translate->_("Übersetzen"),
                 "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
                 "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren")
