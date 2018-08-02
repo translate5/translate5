@@ -217,15 +217,30 @@ $('#sourceText').on("input", function(){
 });
 
 /* --------------- copy translation ----------------------------------------- */
-$(".copyable").each(function() {
-    var elCopy = $(this).find(".copyable-copy");
-    elCopy.on("touchstart click", function(e) {
-        var content = $(this).closest('.copyable').find('.translation-result').text();
-        alert("TODO: copy '" + content + "'"); // TODO
-    });
+$('#translations').on('click','.copyable-copy',function(){
+    var textToCopy = $(this).closest('.copyable').find('.translation-result').text();
+    // https://stackoverflow.com/a/33928558
+    if (window.clipboardData && window.clipboardData.setData) {
+        // IE specific code path to prevent textarea being shown while dialog is visible.
+        return clipboardData.setData("Text", textToCopy); 
+    } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+        var textarea = document.createElement("textarea");
+        textarea.textContent = textToCopy;
+        textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in MS Edge.
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            return document.execCommand("copy");  // Security exception may be thrown by some browsers.
+        } catch (ex) {
+            console.warn("Copy to clipboard failed.", ex);
+            return false;
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    }
 });
 
-/* --------------- helpers -------------------------------------------------- */
+/* --------------- show/hide ------------------------------------------------ */
 function clearMtEngineSelectorError() {
     $('#mtEngineSelectorError').hide();
     showSourceText();
