@@ -137,6 +137,8 @@ function translateText(){
     if (getSelectedEngineCode() === false) {
         return;
     }
+    $('#translations').html(renderTranslationContainer());
+    showTranslations();
     $.ajax({
         statusCode: {
             500: function() {
@@ -154,29 +156,22 @@ function translateText(){
         },
         success: function(result){
         	translateTextResponse = result.rows;
-        	fillTranslation();
+        	fillTranslation($("#mtEngines").val());
         }
     })
 }
 
-function fillTranslation() {
-    var translationsContent = '';
-    translationsContent += '<div class="copyable">';
-    translationsContent += '<div class="translation-result">' + translateTextResponse + '</div>';
-    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContent += '</div>';
-    /*
-    translationsContent += '<div class="copyable">';
-    translationsContent += '<div class="translation-result">translation 2...</div>';
-    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContent += '</div>';
-    translationsContent += '<div class="copyable">';
-    translationsContent += '<div class="translation-result">translation 3...</div>';
-    translationsContent += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContent += '</div>';
-    */
-    $('#translations').html(translationsContent);
-    showTranslations();
+function renderTranslationContainer() {
+    var translationsContainer = '';
+    translationsContainer += '<div class="copyable">';
+    translationsContainer += '<div class="translation-result" id="'+$("#mtEngines").val()+'"></div>';
+    translationsContainer += '<span class="copyable-copy"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContainer += '</div>';
+    return translationsContainer;
+}
+
+function fillTranslation(engineId) {
+    $('#'+engineId).html(translateTextResponse);
 }
 
 /***
@@ -208,6 +203,7 @@ $(".clearable").each(function() {
     elCle.on("touchstart click", function(e) {
         e.preventDefault();
         elInp.val("").trigger("input");
+        hideTranslations();
     });
 });
 
