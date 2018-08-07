@@ -93,10 +93,13 @@
                     }
                 ?>
             </select>
+            <div id="sourceIsText" class="source-toggle show-if-source-is-text"><?php echo $this->translations["enterTextOr"];?> <span><?php echo $this->translations["translateFile"];?></span></div>
+            <div id="sourceIsFile" class="source-toggle show-if-source-is-file"><?php echo $this->translations["uploadFileOr"];?> <span><?php echo $this->translations["translateText"];?></span></div>
             <div id="sourceContent" class="clearable">
-                <textarea id="sourceText" name="sourceText" wrap="SOFT"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
-                <span class="clearable-clear" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
-                <span id="countedCharacters">0</span>
+                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
+                <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
+                <span id="countedCharacters" class="show-if-source-is-text">0</span>
+                <input id="sourceFile" name="sourceFile"size="40" type="file" class="show-if-source-is-file">
             </div>
         </form>
     </div>
@@ -117,8 +120,8 @@
                 ?>
             </select>
             <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="ui-corner-all ui-button ui-widget">
-            <span id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></span>
-            <span id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></span>
+            <div id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
+            <div id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
         <div id="translations">
             <!-- inject translations here  -->
@@ -164,6 +167,7 @@ $( function() {
             enableMtEnginesAsAvailable(); // will show translations again when available
         }
       }).selectmenu("menuWidget").addClass("overflow");
+    $('#sourceFile').button();
     $('#translationSubmit').button();
     $('#sourceContent').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".clearable-clear" }
