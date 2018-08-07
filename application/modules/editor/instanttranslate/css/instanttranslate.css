@@ -163,6 +163,17 @@ h4, p {
     text-decoration: underline;
 }
 
+@media (max-width: 710px) {
+    #sourceFile {
+        width: 94%;
+        font-size: 0.8EM;
+    }
+}@media (max-width: 470px) {
+    #sourceFile {
+        width: 90%;
+    }
+}
+
 /* --------------- target --------------- */
 
 #translationSubmit,
