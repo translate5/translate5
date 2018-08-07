@@ -39,6 +39,9 @@ $('#translationSubmit').click(function(){
     startTranslation();
     return false;
 });
+$('#instantTranslationIsOff').click(function(){
+    startTranslation();
+});
 function startTimerForInstantTranslation() {
     terminateTranslation();
     if ($('#instantTranslationIsOn').is(":visible")) {
@@ -48,10 +51,19 @@ function startTimerForInstantTranslation() {
     }
 }
 function startTranslation() {
-    terminateTranslation();
-    if ($('#sourceText').val().length > 0) {
-        translateText();
+    // translate a file?
+    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
+        alert('TODO...'); // TODO: translate files
+        return;
     }
+    // otherwise: translate Text
+    if ($('#sourceText').val().length === 0) {
+        $("#sourceIsText").addClass('source-text-error');
+        hideTranslations();
+        return;
+    }
+    terminateTranslation();
+    translateText();
 }
 function terminateTranslation() {
     clearTimeout(editIdleTimer);
@@ -65,13 +77,16 @@ $('#mtEngines').on('selectmenuchange', function() {
 });
 function setSingleMtEngineById(engineId) {
     var mtEngine = machineTranslationEngines[engineId];
-    if(machineTranslationEngines[engineId] === 'undefined') {
+    if(machineTranslationEngines[engineId] === undefined) {
+        showMtEngineSelectorError('selectMt');
         return;
     }
     clearMtEngineSelectorError();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
-    startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
+    if ($('#sourceText').val().length > 0) {
+        startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
+    }
 }
 function enableMtEnginesAsAvailable() {
     var mtIdsAvailable = getMtEnginesAccordingToLanguages(),
@@ -93,7 +108,7 @@ function enableMtEnginesAsAvailable() {
         $('#PlsSelect').remove().end();
         $("#mtEngines").selectmenu("refresh");
         setSingleMtEngineById(mtIdsAvailable[0]);
-        $('#translationSubmit').show();
+        showTranslations();
         return;
     }
     if (mtIdsAvailable.length > 1) {
@@ -203,13 +218,19 @@ $(".clearable").each(function() {
     elCle.on("touchstart click", function(e) {
         e.preventDefault();
         elInp.val("").trigger("input");
-        hideTranslations();
     });
 });
 
 /* --------------- count characters ----------------------------------------- */
-$('#sourceText').on("input", function(){
-    $('#countedCharacters').html($(this).val().length);
+$('#sourceText').on("input focus", function(){
+    var sourceTextLength = $(this).val().length;
+    $('#countedCharacters').html(sourceTextLength);
+    if (sourceTextLength === 0) {
+        $(".clearable-clear").hide();
+        hideTranslations();
+    } else {
+        $("#sourceIsText").removeClass('source-text-error');
+    }
 });
 
 /* --------------- copy translation ----------------------------------------- */
@@ -241,7 +262,6 @@ function clearMtEngineSelectorError() {
     $('#mtEngineSelectorError').hide();
     showSourceText();
     showTranslations();
-    $('#translationSubmit').show();
 }
 function showMtEngineSelectorError(errorMode) {
     $('#mtEngineSelectorError').html(translatedStrings[errorMode]).show();
@@ -252,14 +272,39 @@ function showMtEngineSelectorError(errorMode) {
 }
 function showSourceText() {
     $('#sourceContent').show();
+    $('#sourceIsText').show();
 }
 function hideSourceText() {
     $('#sourceContent').hide();
+    $('#sourceIsText').hide();
 }
 function showTranslations() {
+    if ($('#sourceText').val().length === 0) {
+        $('#translations').html('');
+    }
     $('#translations').show();
+    $('#translationSubmit').show();
+    // = "default":
+    $('#instantTranslationIsOn').show();
+    $('#instantTranslationIsOff').hide();
 }
 function hideTranslations() {
     $('#translations').hide();
 }
+
+/* --------------- "toggle" source (text/file) ------------------------------ */
+$('.source-toggle span').click(function(){
+    $('.source-toggle').toggle();
+    if ($('#sourceIsText').is(":visible")) {
+        $('.show-if-source-is-text').show();
+        $('.show-if-source-is-file').hide();
+        showTranslations();
+        $("#sourceIsText").removeClass('source-text-error');
+        $('#sourceText').focus();
+    } else {
+        $('.show-if-source-is-text').hide();
+        $('.show-if-source-is-file').show();
+        hideTranslations();
+    }
+});
 

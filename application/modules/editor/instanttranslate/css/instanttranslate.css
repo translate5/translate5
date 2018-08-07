@@ -52,10 +52,6 @@ h4, p {
 }
 
 #sourceLocale-button,
-#targetControls {
-    margin-bottom: 10px;
-}
-#sourceLocale-button,
 #targetLocale-button {
     width: 6em;
 }
@@ -68,7 +64,7 @@ h4, p {
 
 #containerHeader {
     padding-top: 19px;
-    margin: 10px;
+    margin: 10px 10px 0px 10px;
 }
 #logo {
     flex: 0 0 180px;
@@ -138,6 +134,34 @@ h4, p {
     outline: none !important;
     border: 1px solid #00adef;
 }
+#sourceFile {
+    width: 94%;
+    margin-right: 10px;
+}
+.show-if-source-is-file,
+#sourceIsText {
+    display: none;
+}
+.source-toggle {
+    font-family: "Roboto",sans-serif;
+    font-size: 12px;
+    text-decoration: none;
+    color: #757575;
+    margin-top: 10px;
+}
+.source-toggle span {
+    color: #00adef;
+}
+.source-toggle span:hover  {
+    text-decoration: underline;
+}
+.source-text-error,
+.source-text-error span {
+    color: #f00;
+}
+.source-text-error span {
+    text-decoration: underline;
+}
 
 /* --------------- target --------------- */
 
@@ -170,7 +194,8 @@ h4, p {
 #instantTranslationIsOn a:hover {
     text-decoration: underline;
 }
-#instantTranslationIsOff {
+#instantTranslationIsOff,
+#instantTranslationIsOn {
     display: none;
 }
 .instant-translation-toggle a {
@@ -178,6 +203,7 @@ h4, p {
     font-family: "Roboto",sans-serif;
     font-size: 12px;
     text-decoration: none;
+    margin-top: 10px;
 }
 
 /* --------------- additional infos --------------- */
