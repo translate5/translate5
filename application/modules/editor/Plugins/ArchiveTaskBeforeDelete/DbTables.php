@@ -62,6 +62,8 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             // matchresource plugin tables disabled for archiving, since task data is not depending from them, and plugin must not be installed at all
             'LEK_matchresource_taskassoc' => false,
             'LEK_matchresource_tmmt' => false,
+            'LEK_match_analysis' => 'taskGuid',
+            'LEK_match_analysis_taskassoc' => 'taskGuid',
             'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
             'LEK_plugin_segmentstatistics' => 'taskGuid',
             'LEK_qmsubsegments' => 'taskGuid',
