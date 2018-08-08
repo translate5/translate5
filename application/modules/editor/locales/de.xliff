@@ -1567,6 +1567,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='bGFzc2VuIFNpZSBlaW4gRG9rdW1lbnQgw7xiZXJzZXR6ZW4u'><source>lassen Sie ein Dokument übersetzen.</source><target>lassen Sie ein Dokument übersetzen.</target></trans-unit>
 <trans-unit id='bGFzc2VuIFNpZSBUZXh0IMO8YmVyc2V0emVuLCBkZW4gU2llIGVpbmdlYmVuLg=='><source>lassen Sie Text übersetzen, den Sie eingeben.</source><target>lassen Sie Text übersetzen, den Sie eingeben.</target></trans-unit>
 <trans-unit id='TGFkZW4gU2llIGVpbmUgRGF0ZWkgaG9jaCBvZGVy'><source>Laden Sie eine Datei hoch oder</source><target>Laden Sie eine Datei hoch oder</target></trans-unit>
+<trans-unit id='Qml0dGUgYXVzd8OkaGxlbg=='><source>Bitte auswählen</source><target>Bitte auswählen</target></trans-unit>
+<trans-unit id='QmVpZGUgTGlzdGVuIHp1csO8Y2tzZXR6ZW4='><source>Beide Listen zurücksetzen</source><target>Beide Listen zurücksetzen</target></trans-unit>
+<trans-unit id='QWxsZSBhbnplaWdlbiBmw7xy'><source>Alle anzeigen für</source><target>Alle anzeigen für</target></trans-unit>
+
   </body>
  </file>
 </xliff>

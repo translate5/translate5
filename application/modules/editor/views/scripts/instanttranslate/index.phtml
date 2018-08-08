@@ -28,20 +28,22 @@
 ?>
 
 <?php
-    // Which languages are available according to the MachinteTranslation-Engines?
+    // Which languages are available according to the MachineTranslation-Engines?
     $machineTranslationEngines = $this->machineTranslationEngines;
     $mtSourceLanguageLocales = array();
-    $mtTargetLanguagesLocales = array();
+    $mtTargetLanguageLocales = array();
     foreach ($machineTranslationEngines as $mtEngine) {
         $mtSourceLocale = $mtEngine['source'];
         $mtTargetLocale = $mtEngine['target'];
         if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
             $mtSourceLanguageLocales[] = $mtSourceLocale;
         }
-        if (!in_array($mtTargetLocale, $mtTargetLanguagesLocales)) {
-            $mtTargetLanguagesLocales[] = $mtTargetLocale;
+        if (!in_array($mtTargetLocale, $mtTargetLanguageLocales)) {
+            $mtTargetLanguageLocales[] = $mtTargetLocale;
         }
     }
+    sort($mtSourceLanguageLocales);
+    sort($mtTargetLanguageLocales);
 ?>
 
 <div id="containerHeader" class="container">
@@ -130,6 +132,10 @@
 </div>
 
 <script type="text/javascript">
+    var mtSourceLanguageLocales = '<?php echo json_encode($mtSourceLanguageLocales);?>';
+    mtSourceLanguageLocales = JSON.parse(mtSourceLanguageLocales);
+    var mtTargetLanguageLocales = '<?php echo json_encode($mtTargetLanguageLocales);?>';
+    mtTargetLanguageLocales = JSON.parse(mtTargetLanguageLocales);
     var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
     machineTranslationEngines = JSON.parse(machineTranslationEngines);
     var REST_PATH='<?php echo $this->restPath; ?>';
@@ -152,19 +158,21 @@ $( function() {
       });
     $( "#mtEngines" ).selectmenu({
         create: function( event, ui ) {
-            enableMtEnginesAsAvailable(); // create the first list of mt-engines according to initial source-target-combintaion of the user
+            renderMtEnginesAsAvailable(); // create the first list of mt-engines according to initial source-target-combintaion of the user
         }
       }).selectmenu("menuWidget").addClass("overflow");
     $('#sourceLocale').selectmenu({
         change: function( event, ui ) {
+            renderLocalesAsAvailable('accordingToSourceLocale');
             hideTranslations();
-            enableMtEnginesAsAvailable(); // will show translations again when available
+            renderMtEnginesAsAvailable(); // will show translations again when available
         }
       }).selectmenu("menuWidget").addClass("overflow");
     $('#targetLocale').selectmenu({
         change: function( event, ui ) {
+            renderLocalesAsAvailable('accordingToTargetLocale');
             hideTranslations();
-            enableMtEnginesAsAvailable(); // will show translations again when available
+            renderMtEnginesAsAvailable(); // will show translations again when available
         }
       }).selectmenu("menuWidget").addClass("overflow");
     $('#sourceFile').button();
@@ -175,6 +183,9 @@ $( function() {
     $('#translations').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
     });
+    if ($("#sourceLocale").val() !== '-') {
+        renderLocalesAsAvailable('accordingToSourceLocale');
+    }
 } );
 </script>
 

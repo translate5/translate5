@@ -99,7 +99,11 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "translateText"             => $this->translate->_("lassen Sie Text übersetzen, den Sie eingeben."),
                 "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
                 "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren"),
-                "uploadFileOr"              => $this->translate->_("Laden Sie eine Datei hoch oder")
+                "uploadFileOr"              => $this->translate->_("Laden Sie eine Datei hoch oder"),
+                "pleaseChoose"              => $this->translate->_("Bitte auswählen"),
+                "clearBothLists"            => $this->translate->_("Beide Listen zurücksetzen"),
+                "showAllAvailableFor"       => $this->translate->_("Alle anzeigen für")
+                
         );
         $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         $this->view->translations = $translatedStrings;

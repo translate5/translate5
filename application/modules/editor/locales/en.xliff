@@ -2832,7 +2832,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='bGFzc2VuIFNpZSBlaW4gRG9rdW1lbnQgw7xiZXJzZXR6ZW4u'><source>lassen Sie ein Dokument übersetzen.</source><target>translate a document.</target></trans-unit>
 <trans-unit id='bGFzc2VuIFNpZSBUZXh0IMO8YmVyc2V0emVuLCBkZW4gU2llIGVpbmdlYmVuLg=='><source>lassen Sie Text übersetzen, den Sie eingeben.</source><target>translate text that you enter.</target></trans-unit>
 <trans-unit id='TGFkZW4gU2llIGVpbmUgRGF0ZWkgaG9jaCBvZGVy'><source>Laden Sie eine Datei hoch oder</source><target>Upload a document or</target></trans-unit>
- 
+<trans-unit id='Qml0dGUgYXVzd8OkaGxlbg=='><source>Bitte auswählen</source><target>Please choose</target></trans-unit>
+<trans-unit id='QmVpZGUgTGlzdGVuIHp1csO8Y2tzZXR6ZW4='><source>Beide Listen zurücksetzen</source><target>Clear both lists</target></trans-unit>
+<trans-unit id='QWxsZSBhbnplaWdlbiBmw7xy'><source>Alle anzeigen für</source><target>Show all for</target></trans-unit>
+
  
     </body>
   </file>
