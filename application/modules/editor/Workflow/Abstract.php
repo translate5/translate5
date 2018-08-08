@@ -259,8 +259,11 @@ abstract class editor_Workflow_Abstract {
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
             $tua = $event->getParam('entity');
-            $this->recalculateWorkflowStep($tua);
-            $this->doUserAssociationAdd($tua);
+            //if entity could not be saved no ID was given, so check for it
+            if($tua->getId() > 0) {
+                $this->recalculateWorkflowStep($tua);
+                $this->doUserAssociationAdd($tua);
+            }
         });
         
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
@@ -684,6 +687,7 @@ abstract class editor_Workflow_Abstract {
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
         $tua->loadByParams($sessionUser->data->userGuid,$session->taskGuid);
         if($tua->getIsPmOverride() == 1){
+            $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
         }
         else {

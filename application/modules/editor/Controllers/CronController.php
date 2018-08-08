@@ -61,6 +61,20 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
     public function indexAction() {}
     
     /**
+     * This action should be called periodically between every 5 to 15 minutes, depending on the traffic on the installation. 
+     */
+    public function periodicalAction() {
+        $this->_helper->layout->disableLayout();
+        $this->_helper->viewRenderer->setNoRender();
+        $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
+        /* @var $bootstrap Bootstrap */
+        $gc = $bootstrap->getPluginResource('ZfExtended_Resource_GarbageCollector');
+        /* @var $gc ZfExtended_Resource_GarbageCollector */
+        $gc->cleanUp($gc::ORIGIN_CRON);
+        echo "OK";
+    }
+    
+    /**
      * triggers daily actions
      */
     public function dailyAction() {

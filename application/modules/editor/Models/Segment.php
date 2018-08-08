@@ -84,12 +84,15 @@ END LICENSE AND COPYRIGHT
  * 
  */
 class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
+    const PM_SAME_STEP_INCLUDED = 'sameStepIncluded';
+    const PM_ALL_INCLUDED = 'allIncluded';
+    const PM_NOT_INCLUDED = 'notIncluded';
     
     protected $dbInstanceClass          = 'editor_Models_Db_Segments';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Segment';
     
     /**
-     * @var type Zend_Config
+     * @var Zend_Config
      */
     protected $config           = null;
     
@@ -1041,8 +1044,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * Loads segments by a specific workflowStep, fetch only specific fields.
      * @param string $taskGuid
      * @param string $workflowStep
+     * @param integer $workflowStepNr
      */
-    public function loadByWorkflowStep(string $taskGuid, string $workflowStep) {
+    public function loadByWorkflowStep(string $taskGuid, string $workflowStep, $workflowStepNr) {
+        $config = Zend_Registry::get('config');
+        $pmChanges = $config->runtimeOptions->editor->notification->pmChanges;
         $this->segmentFieldManager->initFields($taskGuid);
         $this->reInitDb($taskGuid);
         
@@ -1055,7 +1061,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $s->from($this->db, $fields);
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
-        $s->where($this->tableName.'.workflowStep = ?', $workflowStep);
+        switch ($pmChanges) {
+            case self::PM_ALL_INCLUDED:
+                $s->where('('.$this->tableName.'.workflowStep = ?', $workflowStep);
+                $s->orWhere($this->tableName.'.workflowStep = ?)', editor_Workflow_Abstract::STEP_PM_CHECK);
+                break;
+            case self::PM_SAME_STEP_INCLUDED:
+                $s->where('('.$this->tableName.'.workflowStep = ?', $workflowStep);
+                $s->orWhere('('.$this->tableName.'.workflowStep = ?', editor_Workflow_Abstract::STEP_PM_CHECK);
+                $s->where($this->tableName.'.workflowStepNr = ?))', $workflowStepNr);
+                break;
+            case self::PM_NOT_INCLUDED:
+            default:
+                $s->where($this->tableName.'.workflowStep = ?', $workflowStep);
+                break;
+        }
         return parent::loadFilterdCustom($s);
     }
 

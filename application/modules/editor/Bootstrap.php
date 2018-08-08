@@ -54,12 +54,23 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         // is currently the main use case for workers
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
         /* @var $eventManager Zend_EventManager_StaticEventManager */
+        
         $eventManager->attach('editor_Models_Import', 'afterImport', function(){
             $worker = ZfExtended_Factory::get('ZfExtended_Worker_GarbageCleaner');
             /* @var $worker ZfExtended_Worker_GarbageCleaner */
             $worker->init();
             $worker->queue(); // not parent ID here, since the GarbageCleaner should run without a parent relation
         }, 0);
+        
+        $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', function(){
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->cleanupLockedJobs();
+            
+            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $tua->cleanupLocked();
+        });
         
     }
     

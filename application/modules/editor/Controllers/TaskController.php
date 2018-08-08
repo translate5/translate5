@@ -219,15 +219,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction() {
-        $unlockedTasks = $this->entity->cleanupLockedJobs();
-        $userGuid = $this->user->data->userGuid;
-        
-        //we clean up ALL tasks belonging to the current user, 
-        //since if this action is called he has left the task (TRANSLATE-91)
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $tua->cleanupLocked();
-        
         //set default sort
         $f = $this->entity->getFilter();
         $f->hasSort() || $f->addSort('orderdate', true);
