@@ -118,6 +118,7 @@ h4, p {
 #mtEngineSelectorError {
     padding: 7px;
     margin-top: 10px;
+    display: none;
 }
 
 /* --------------- source --------------- */

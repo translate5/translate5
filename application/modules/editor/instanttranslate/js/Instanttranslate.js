@@ -70,7 +70,7 @@ function terminateTranslation() {
     editIdleTimer = null;
 }
 
-/* --------------- selecting languages and MT-engines ----------------------- */
+/* --------------- languages and MT-engines --------------------------------- */
 $('#mtEngines').on('selectmenuchange', function() {
     var engineId = $(this).val();
     setSingleMtEngineById(engineId);
@@ -142,7 +142,19 @@ function getMtEnginesAccordingToLanguages() {
     return mtIdsAvailable;
 }
 
+/***
+ * Return the domain code(if exist) of the selected engine or false
+ * @returns
+ */
+function getSelectedEngineCode(){
+    var engineId=$("#mtEngines").val();
+    if(machineTranslationEngines[engineId] === undefined) {
+        return false; 
+    }
+    return machineTranslationEngines[engineId].domainCode;
+}
 
+/* --------------- translation ---------------------------------------------- */
 /***
  * Send a request for translation, this will return translation result for each associated language resource
  * INFO: in the current implementation only result from sdlcloud language will be returned
@@ -187,18 +199,6 @@ function renderTranslationContainer() {
 
 function fillTranslation(engineId) {
     $('#'+engineId).html(translateTextResponse);
-}
-
-/***
- * Return the domain code(if exist) of the selected engine or false
- * @returns
- */
-function getSelectedEngineCode(){
-	var engineId=$("#mtEngines").val();
-	if(machineTranslationEngines[engineId] === undefined) {
-	    return false; 
-	}
-	return machineTranslationEngines[engineId].domainCode;
 }
 
 /* --------------- toggle instant translation ------------------------------- */
