@@ -84,11 +84,12 @@ function setSingleMtEngineById(engineId) {
     clearMtEngineSelectorError();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
+    $("#sourceLocale").click(); // render locale-lists!
     if ($('#sourceText').val().length > 0) {
         startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
     }
 }
-function enableMtEnginesAsAvailable() {
+function renderMtEnginesAsAvailable() {
     var mtIdsAvailable = getMtEnginesAccordingToLanguages(),
         mtOptionList = [];
     if (mtIdsAvailable.length === 0) {
@@ -96,13 +97,13 @@ function enableMtEnginesAsAvailable() {
         showMtEngineSelectorError('noMatchingMt');
         return;
     }
-    $('#mtEngines').find('option').remove().end();
     mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+translatedStrings['foundMt']+":</option>");
     for (i = 0; i < mtIdsAvailable.length; i++) {
         mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
     }
+    $('#mtEngines').find('option').remove().end();
     $('#mtEngines').append(mtOptionList.join(""));
-    $("#mtEngines").selectmenu("refresh");
+    $('#mtEngines').selectmenu("refresh");
     $('#mtEngines').selectmenu("widget").show();
     if (mtIdsAvailable.length === 1) {
         $('#PlsSelect').remove().end();
@@ -140,6 +141,140 @@ function getMtEnginesAccordingToLanguages() {
         }
     }
     return mtIdsAvailable;
+}
+
+/* --------------- locales-list (source, target) ---------------------------- */
+$('#sourceLocale').on('click', function() {
+    renderLocalesAsAvailable('accordingToSourceLocale');
+});
+/**
+ * Include languages for source/target only if there is an Mt-Engine available 
+ * for the resulting source-target-combination.
+ * - accordingToSourceLocale: sourceLocale is set, targetLocales are rendered
+ * - accordingToTargetLocale: targetLocale is set, sourceLocales are rendered
+ * - if the selected text is 'Clear both lists', then both lists are rendered
+ * - if the selected text is 'Show all available for...', then this list is rendered
+ * @param string accordingTo ('accordingToSourceLocale'|'accordingToTargetLocale')
+ */
+function renderLocalesAsAvailable(accordingTo) {
+    var sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val(),
+        selectedText = (accordingTo === 'accordingToSourceLocale') ? $( "#sourceLocale option:selected" ).text() : $( "#targetLocale option:selected" ).text(),
+        localesAvailable = [],
+        sourceLocalesAvailable = [],
+        targetLocalesAvailable = [],
+        sourceLocaleOptions = [],
+        targetLocaleOptions = [],
+        selectedLocale,
+        source = {},
+        target = {};
+    if (sourceLocale != '-' && targetLocale != '-') {
+        // This means that the user has chosen a final combination of source AND target. The list contains only the selected locale and the "clear"-options.
+        sourceLocalesAvailable.push(sourceLocale);
+        targetLocalesAvailable.push(targetLocale);
+        source = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: targetLocale, selectedValue: sourceLocale};
+        target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: sourceLocale, selectedValue: targetLocale};
+    } else if (selectedText === translatedStrings['clearBothLists']) {
+        // This means a "reset" of one or both the lists:
+        sourceLocalesAvailable = mtSourceLanguageLocales;
+        targetLocalesAvailable = mtTargetLanguageLocales;
+        source = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
+        target = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
+    } else {
+        if (selectedText === translatedStrings['showAllAvailableFor']+' '+targetLocale) {
+            accordingTo = 'accordingToTargetLocale';
+        } else if (selectedText === translatedStrings['showAllAvailableFor']+' '+sourceLocale) {
+            accordingTo = 'accordingToSourceLocale';
+        } 
+        // "Default": update the locales according to what is set on the other side
+        selectedLocale = (accordingTo === 'accordingToSourceLocale') ? sourceLocale : targetLocale;
+        localesAvailable = getLocalesAccordingToReference (accordingTo, selectedLocale);
+        if (accordingTo === 'accordingToSourceLocale') {
+            sourceLocalesAvailable.push(sourceLocale);
+            targetLocalesAvailable = localesAvailable;
+            source = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: sourceLocale};
+            target = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: ''};
+        } else {
+            sourceLocalesAvailable = localesAvailable;
+            targetLocalesAvailable.push(targetLocale);
+            source = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: ''};
+            target = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: targetLocale};
+            console.dir(targetLocalesAvailable);
+        }
+    }
+    // render lists as set now:
+    if (sourceLocalesAvailable.length > 0) {
+        source.localeList = sourceLocalesAvailable;
+        sourceLocaleOptions = renderLocaleOptionList(source);
+        refreshSelectList('sourceLocale', sourceLocaleOptions, source.selectedValue);
+    }
+    if (targetLocalesAvailable.length > 0) {
+        target.localeList = targetLocalesAvailable;
+        targetLocaleOptions = renderLocaleOptionList(target);
+        refreshSelectList('targetLocale', targetLocaleOptions, target.selectedValue);
+    }
+}
+function getLocalesAccordingToReference (accordingTo, selectedLocale) {
+    var localesAvailable = [],
+        engineId,
+        mtEngineToCheck,
+        mtEngineLocaleSet,
+        mtEngineLocaleToAdd;
+    for (engineId in machineTranslationEngines) {
+        if (machineTranslationEngines.hasOwnProperty(engineId)) {
+            mtEngineToCheck = machineTranslationEngines[engineId];
+            mtEngineLocaleSet = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheck.source : mtEngineToCheck.target;
+            if (mtEngineLocaleSet === selectedLocale) {
+                mtEngineLocaleToAdd = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheck.target : mtEngineToCheck.source;
+                if ($.inArray(mtEngineLocaleToAdd, localesAvailable) === -1) {
+                    localesAvailable.push(mtEngineLocaleToAdd); 
+                }
+            }
+        }
+    }
+    return localesAvailable;
+}
+function renderLocaleOptionList(list) {
+    var localeOptionsList = []
+        option = {};
+    if (list.hasPlsChoose) {
+        option = {};
+        option.value = '-';
+        option.name = translatedStrings['pleaseChoose'] + ' ('+list.localeList.length+'):';
+        localeOptionsList.push(option);
+    }
+    if (list.hasClearBoth) {
+        option = {};
+        option.value = '-';
+        option.name = translatedStrings['clearBothLists'];
+        localeOptionsList.push(option);
+    }
+    if (list.hasShowAllAvailable) {
+        option = {};
+        option.value = '-';
+        option.name = translatedStrings['showAllAvailableFor']+' '+list.localeForReference;
+        localeOptionsList.push(option);
+    }
+    for (i = 0; i < list.localeList.length; i++) {
+        option = {};
+        option.value = list.localeList[i];
+        option.name = list.localeList[i];
+        localeOptionsList.push(option);
+    }
+    return localeOptionsList;
+}
+function refreshSelectList(selectListId, options, selectedOptionValue) {
+    var optionList = [];
+    for (i = 0; i < options.length; i++) {
+        optionList.push("<option value='" + options[i].value + "'>" + options[i].name + "</option>");
+    }
+    $('#'+selectListId).find('option').remove().end();
+    $('#'+selectListId).append(optionList.join(""));
+    if (selectedOptionValue != '') {
+        $('#'+selectListId).val(selectedOptionValue);
+    }
+    $('#'+selectListId).selectmenu("refresh");
+    $('#'+selectListId).selectmenu("widget").show();
 }
 
 /***

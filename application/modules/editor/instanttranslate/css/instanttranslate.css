@@ -51,13 +51,8 @@ h4, p {
     -webkit-margin-end: 0px;
 }
 
-#sourceLocale-button,
-#targetLocale-button {
-    width: 6em;
-}
-
 .overflow {
-    max-height: 200px;
+    max-height: 220px;
 }
 
 /* --------------- header --------------- */
