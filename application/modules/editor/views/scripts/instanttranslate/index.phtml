@@ -66,19 +66,19 @@
 
 
 <div id="containerMtEngineSelect" class="container">
-  <form id="mtEngineSelector" name="mtEngineSelector">
+  <form id="mtEngineSelector">
       <fieldset>
         <legend><?php echo $this->translations["availableMTEngines"];?>:</legend>
         <select id="mtEngines" name="mtEngines">
         </select>
-      <div class="ui-state-error ui-corner-all" id="mtEngineSelectorError" style="display:none;">xyz</div>
+      <div id="mtEngineSelectorError" class="ui-state-error ui-corner-all"></div>
       </fieldset>
   </form>
 </div>
 
 <div id="containerTranslation" class="container">
 	<div id="source">
-        <form id="sourceLanguageSelector" name="sourceLanguageSelector" class="margin-bottom">
+        <form id="sourceLanguageAndContent">
             <select id="sourceLocale" name="sourceLocale">
                 <option value="-">-</option>
                 <?php
@@ -104,7 +104,7 @@
         </form>
     </div>
     <div id="target">
-        <form id="targetControls" name="targetControls">
+        <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
                 <option value="-">-</option>
                 <?php
