@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+WICHTIG:
+Schmieder Hinweise Anpassung Skin TermPortal → ebenfalls in Doku aufnehmen
+HINWEIS allgemein: http://translate5.example.org/editor/cron/periodical alle 15 Minuten cron
+
 ## [2.7.9] - 2018-07-17
 ###Changed
 TRANSLATE-1349: Remove the message of saving a segment successfully
