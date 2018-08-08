@@ -586,7 +586,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           delegate: 'td.task-users',
           dismissDelay: 0,
           showDelay: 200,
-          maxWidth: 500,
+          maxWidth: 1000,
           renderTo: Ext.getBody(),
           listeners: {
               beforeshow: function updateTipBody(tip) {
