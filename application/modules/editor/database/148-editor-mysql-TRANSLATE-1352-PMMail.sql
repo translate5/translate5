@@ -27,4 +27,4 @@ END LICENSE AND COPYRIGHT
 */
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.editor.notification.pmChanges', '1', 'editor', 'system', 'notIncluded', 'notIncluded', 'allIncluded,sameStepIncluded,notIncluded', 'string', 'Defines how changes of PMs should be included into the notification mails.');
+VALUES ('runtimeOptions.editor.notification.pmChanges', '1', 'editor', 'system', 'sameStepIncluded', 'sameStepIncluded', 'allIncluded,sameStepIncluded,notIncluded', 'string', 'Defines how changes of PMs should be included into the notification mails.');
