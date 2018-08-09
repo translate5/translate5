@@ -745,7 +745,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
           
           params: {
-              format: 'jsontext'
+              format: 'jsontext',
+              autoStartImport: 0
           },
           timeout: 3600,
           url: Editor.data.restpath+'task',
