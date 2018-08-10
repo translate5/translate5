@@ -3,6 +3,25 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.8.1] - 2018-08-08
+###Added
+TRANSLATE-1352: Include PM changes in changes-mail and changes.xliff (xliff 2.1)
+TRANSLATE-884: Implement generic match analysis and pre-translation (on the example of OpenTM2)
+TRANSLATE-392: Systemwide (non-persistent) memory
+
+###Changed
+VISUAL-31: Visual Review: improve segmentation
+TRANSLATE-1360: Make PM dropdown in task properties searchable
+
+###Bugfixes
+TRANSLATE-1383: Additional workflow roles associated to a task prohibit a correct workflow switching
+TRANSLATE-1161: Task locking clean up is only done on listing the task overview
+TRANSLATE-1067: API Usage: 'Zend_Exception' with message 'Indirect modification of overloaded property Zend_View::$rows has no effect
+TRANSLATE-1385: PreFillSession Resource Plugin must be removed
+TRANSLATE-1340: IP based SessionRestriction is to restrictive for users having multiple IPs
+TRANSLATE-1359: PM to task association dropdown in task properties list does not contain all PMs
+
+
 ## [2.7.9] - 2018-07-17
 ###Changed
 TRANSLATE-1349: Remove the message of saving a segment successfully
