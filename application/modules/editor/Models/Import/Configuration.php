@@ -191,9 +191,9 @@ class editor_Models_Import_Configuration {
         }
         
         $_langErrors = array(
-            'source' => 'Die übergebene Quellsprache %s ist ist ungültig.',
-            'target' => 'Die übergebene Zielsprache %s ist ist ungültig.',
-            'relais' => 'Die übergebene Relaissprache %s ist ist ungültig.',
+            'source' => 'The passed source language %s is not valid.',
+            'target' => 'The passed target language  %s is not valid.',
+            'relais' => 'The import did not contain files for the relais language %s.',
         );
         
         $guidValidator = new ZfExtended_Validate_Guid();
