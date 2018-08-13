@@ -3475,7 +3475,7 @@
 
 
 /* CrowdLinks */
-.crowdlinks_container {position: relative; overflow: hidden;}
+.crowdlinks_container {position: relative; overflow: hidden; padding-top: 20px; margin-bottom: -10px;}
 .crowdlinks_container img {width: 100%; height: auto;}
 .crowdlink {display: block; float: left; border-bottom: 0;}
 
