@@ -33,6 +33,18 @@ END LICENSE AND COPYRIGHT
  *
  */
 $session = new Zend_Session_Namespace();
+
+/**
+ * Render a single entry of the supporters list.
+ * @param string $link
+ * @param string $name
+ * @param string $width ['w020', 'w025']
+ */
+function renderSupporterEntrySite($link, $name, $width) {
+    $template = '<li class="%s"><a href="%s" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/transparent_20_10.png" alt="" width="400" height="300" /><span class="ignore">%s</span></a></li>'."\n";
+    return sprintf($template, $width, $link, str_replace('"','&quot;', $name), $name);
+};
+
 ?>
 <article class="post">
     <header>
@@ -86,10 +98,37 @@ $session = new Zend_Session_Namespace();
     <p>The money was used to build a cloud translation tool based on already existing components:</p>
     <ul>
                 <li>The cloud review platform translate5</li>
-                <li><a href="http://commmunity.opentm2.org" target="_blank">The desktop translation tool OpenTM2</a></li>
+                <li><a href="http://community.opentm2.org" target="_blank">The desktop translation tool OpenTM2</a></li>
                 <li><a href="http://www.statmt.org/moses/" target="_blank">Moses Machine Translation</a></li>
             </ul>
     <p>The result is the current translate5 system with its integrations. Of course completed by many more features that have been build into translate5 since 2015 (and before since 2012).</p>
  <p>The following companies supported the crowdfunding and/or funded additional features &mdash; thank you very much!!!</p>
-    <img src="/images/crowd-of-companies-large.png" style="width: 100%">
+    <div class="crowdlinks_container">
+        <ul class="crowdlinks crowdlinks-site">
+            <?php
+                echo renderSupporterEntrySite('https://www.beo-doc.de', 'beo Gesellschaft für "Sprachen" und Technologie mbH', 'w025');
+                echo renderSupporterEntrySite('https://www.itl.eu', 'itl Institut für technische Literatur AG', 'w025');
+                echo renderSupporterEntrySite('https://www.supertext.ch', 'Supertext AG', 'w025');
+                echo renderSupporterEntrySite('https://www.oneword.de', 'oneword GmbH', 'w025');
+                
+                echo renderSupporterEntrySite('https://www.dfki.de/web', 'DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH', 'w025');
+                echo renderSupporterEntrySite('https://soluzione.de', 'soluzione Script GmbH', 'w025');
+                echo renderSupporterEntrySite('https://www.pangeanic.com', 'Pangeanic', 'w025');
+                echo renderSupporterEntrySite('https://lexitech.com', 'Lexitech', 'w025');
+                
+                echo renderSupporterEntrySite('https://www.mt-g.eu', 'mt-g medical translation GmbH & Co. KG', 'w020');
+                echo renderSupporterEntrySite('http://www.globalese-mt.com', 'Globalese MorphoLogic Localisation Ltd.', 'w020');
+                echo renderSupporterEntrySite('http://www.lucysoftware.com', 'Lucy Software and Services GmbH', 'w020');
+                echo renderSupporterEntrySite('https://www.locasoft.com', 'LocaSoft GmbH', 'w020');
+                echo renderSupporterEntrySite('http://www.iolar.com', 'Iolar', 'w020');
+                
+                echo renderSupporterEntrySite('https://www.smartspokes.com', 'SMARTSPOKES AG', 'w020');
+                echo renderSupporterEntrySite('http://www.yavaway.com', 'Yavaway Translation', 'w020');
+                echo renderSupporterEntrySite('http://www.translationprojex.com', 'TranslationProjex', 'w020');
+                echo renderSupporterEntrySite('https://www.swissglobal.ch', 'SwissGlobal Language Services AG', 'w020');
+                echo renderSupporterEntrySite('https://www.textform.com', 'text&amp;form GmbH', 'w020');
+            ?>
+        </ul>
+        <img src="<?php echo APPLICATION_RUNDIR;?>/images/crowd-of-companies-large.png" alt="Crowd of Companies" style="width: 100%" />
+    </div>
 </article>
