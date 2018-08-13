@@ -879,7 +879,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $otherContent = join(array_merge($this->otherContentTarget, $this->otherContentSource));
         if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
             $data = array_merge($this->otherContentTarget, $this->otherContentSource);
-            //$this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
+            $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
         }
         
         if($hasNoTarget || $hasTargetSingle) {
