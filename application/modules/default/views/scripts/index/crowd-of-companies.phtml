@@ -38,16 +38,18 @@ $session = new Zend_Session_Namespace();
  * Render a single entry of the supporters list.
  * @param string $link
  * @param string $name
- * @param unknown $image
- * @param unknown $width
- * @param unknown $height
+ * @param string $image
+ * @param integer $width
+ * @param integer $height
+ * @param boolean $clear
  */
-function renderSupporterEntrySite($link, $name, $image, $width, $height) {
-    $template = '<a href="%s" class="crowdlink image" style="width: %s;" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/supporter2018/%s" width="%d" height="%d"/></a>'."\n";
+function renderSupporterEntrySite($link, $name, $image, $width, $height, $clear = FALSE) {
+    $template = '<a href="%s" class="crowdlink" style="width: %s; %s" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/supporter2018/%s" width="%d" height="%d" alt="%s" /></a>'."\n";
     $name = str_replace('"','&quot;', $name);
     $cssWidth = round(100 * $width / 1150, 5).'%';
+    $cssClear = ($clear) ? 'clear: left;' : '';
     
-    return sprintf($template, $link, $cssWidth, $name, $image, $width, $height, $name);
+    return sprintf($template, $link, $cssWidth, $cssClear, $name, $image, $width, $height, $name);
 };
 
 ?>
@@ -115,18 +117,18 @@ function renderSupporterEntrySite($link, $name, $image, $width, $height) {
             echo renderSupporterEntrySite('https://www.supertext.ch', 'Supertext AG', 'supertext.png', 250, 150);
             echo renderSupporterEntrySite('https://www.oneword.de', 'oneword GmbH', 'oneword.png', 395, 150);
             
-            echo renderSupporterEntrySite('https://www.dfki.de/web', 'DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH', 'dfki.png', 310, 150);
+            echo renderSupporterEntrySite('https://www.dfki.de/web', 'DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH', 'dfki.png', 310, 150, TRUE);
             echo renderSupporterEntrySite('https://soluzione.de', 'soluzione Script GmbH', 'soluzione.png', 240, 150);
             echo renderSupporterEntrySite('https://www.pangeanic.com', 'Pangeanic', 'pangeanic.png', 310, 150);
             echo renderSupporterEntrySite('https://lexitech.com', 'Lexitech', 'lexitech.png', 290, 150);
             
-            echo renderSupporterEntrySite('https://www.mt-g.eu', 'mt-g medical translation GmbH & Co. KG', 'mt-g.png', 255, 150);
+            echo renderSupporterEntrySite('https://www.mt-g.eu', 'mt-g medical translation GmbH & Co. KG', 'mt-g.png', 255, 150, TRUE);
             echo renderSupporterEntrySite('http://www.globalese-mt.com', 'Globalese MorphoLogic Localisation Ltd.', 'globalese.png', 230, 150);
             echo renderSupporterEntrySite('http://www.lucysoftware.com', 'Lucy Software and Services GmbH', 'lucy.png', 200, 150);
             echo renderSupporterEntrySite('https://www.locasoft.com', 'LocaSoft GmbH', 'locasoft.png', 200, 150);
             echo renderSupporterEntrySite('http://www.iolar.com', 'Iolar', 'iolar.png', 265, 150);
             
-            echo renderSupporterEntrySite('https://www.smartspokes.com', 'SMARTSPOKES AG', 'smartspokes.png', 250, 145);
+            echo renderSupporterEntrySite('https://www.smartspokes.com', 'SMARTSPOKES AG', 'smartspokes.png', 250, 145, TRUE);
             echo renderSupporterEntrySite('http://www.yavaway.com', 'Yavaway Translation', 'yavaway.png', 180, 145);
             echo renderSupporterEntrySite('http://www.translationprojex.com', 'TranslationProjex', 'translationprojex.png', 210, 145);
             echo renderSupporterEntrySite('https://www.swissglobal.ch', 'SwissGlobal Language Services AG', 'swissglobal.png', 240, 145);
