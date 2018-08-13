@@ -74,11 +74,16 @@ function renderMenu ($menu, $additionalAttributes = '') {
  * Render a single entry of the supporters list.
  * @param string $link
  * @param string $name
- * @param string $width ['w020', 'w025']
+ * @param unknown $image
+ * @param unknown $width
+ * @param unknown $height
  */
-function renderSupporterEntry($link, $name, $width) {
-    $template = '<li class="%s"><a href="%s" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/transparent_20_10.png" alt="" width="400" height="300" /><span class="ignore">%s</span></a></li>'."\n";
-    return sprintf($template, $width, $link, str_replace('"','&quot;', $name), $name);
+function renderSupporterEntry($link, $name, $image, $width, $height) {
+    $template = '<a href="%s" class="crowdlink image" style="width: %s;" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/supporter2018/%s" width="%d" height="%d"/></a>'."\n";
+    $name = str_replace('"','&quot;', $name);
+    $cssWidth = round(100 * $width / 1150, 5).'%';
+    
+    return sprintf($template, $link, $cssWidth, $name, $image, $width, $height, $name);
 };
 
 //echo $this->doctype()
@@ -164,33 +169,30 @@ function renderSupporterEntry($link, $name, $width) {
                                 <h3><a href="<?php echo APPLICATION_RUNDIR;?>/index/crowd-of-companies">Crowdfunding &amp;<br>Crowd of companies</a></h3>
                                 <a href="<?php echo APPLICATION_RUNDIR;?>/index/crowd-of-companies"><span class="published">Supporters of the development<br>Thank you very much!</span></a>
                             </header>
-                            <div class="image crowdlinks_container">
-                                <ul class="crowdlinks">
-                                    <?php
-                                        echo renderSupporterEntry('https://www.beo-doc.de', 'beo Gesellschaft für "Sprachen" und Technologie mbH', 'w025');
-                                        echo renderSupporterEntry('https://www.itl.eu', 'itl Institut für technische Literatur AG', 'w025');
-                                        echo renderSupporterEntry('https://www.supertext.ch', 'Supertext AG', 'w025');
-                                        echo renderSupporterEntry('https://www.oneword.de', 'oneword GmbH', 'w025');
-                                        
-                                        echo renderSupporterEntry('https://www.dfki.de/web', 'DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH', 'w025');
-                                        echo renderSupporterEntry('https://soluzione.de', 'soluzione Script GmbH', 'w025');
-                                        echo renderSupporterEntry('https://www.pangeanic.com', 'Pangeanic', 'w025');
-                                        echo renderSupporterEntry('https://lexitech.com', 'Lexitech', 'w025');
-                                        
-                                        echo renderSupporterEntry('https://www.mt-g.eu', 'mt-g medical translation GmbH & Co. KG', 'w020');
-                                        echo renderSupporterEntry('http://www.globalese-mt.com', 'Globalese MorphoLogic Localisation Ltd.', 'w020');
-                                        echo renderSupporterEntry('http://www.lucysoftware.com', 'Lucy Software and Services GmbH', 'w020');
-                                        echo renderSupporterEntry('https://www.locasoft.com', 'LocaSoft GmbH', 'w020');
-                                        echo renderSupporterEntry('http://www.iolar.com', 'Iolar', 'w020');
-                                        
-                                        echo renderSupporterEntry('https://www.smartspokes.com', 'SMARTSPOKES AG', 'w020');
-                                        echo renderSupporterEntry('http://www.yavaway.com', 'Yavaway Translation', 'w020');
-                                        echo renderSupporterEntry('http://www.translationprojex.com', 'TranslationProjex', 'w020');
-                                        echo renderSupporterEntry('https://www.swissglobal.ch', 'SwissGlobal Language Services AG', 'w020');
-                                        echo renderSupporterEntry('https://www.textform.com', 'text&amp;form GmbH', 'w020');
-                                    ?>
-                                </ul>
-                                <img src="<?php echo APPLICATION_RUNDIR;?>/images/Community-of-companies.png" alt="Crowd of Companies" />
+                            <div class="crowdlinks_container">
+                                <?php
+                                    echo renderSupporterEntry('https://www.beo-doc.de', 'beo Gesellschaft für Sprachen und Technologie mbH', 'beo.png', 285, 150);
+                                    echo renderSupporterEntry('https://www.itl.eu', 'itl Institut für technische Literatur AG', 'itl.png', 220, 150);
+                                    echo renderSupporterEntry('https://www.supertext.ch', 'Supertext AG', 'supertext.png', 250, 150);
+                                    echo renderSupporterEntry('https://www.oneword.de', 'oneword GmbH', 'oneword.png', 395, 150);
+                                    
+                                    echo renderSupporterEntry('https://www.dfki.de/web', 'DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH', 'dfki.png', 310, 150);
+                                    echo renderSupporterEntry('https://soluzione.de', 'soluzione Script GmbH', 'soluzione.png', 240, 150);
+                                    echo renderSupporterEntry('https://www.pangeanic.com', 'Pangeanic', 'pangeanic.png', 310, 150);
+                                    echo renderSupporterEntry('https://lexitech.com', 'Lexitech', 'lexitech.png', 290, 150);
+                                    
+                                    echo renderSupporterEntry('https://www.mt-g.eu', 'mt-g medical translation GmbH & Co. KG', 'mt-g.png', 255, 150);
+                                    echo renderSupporterEntry('http://www.globalese-mt.com', 'Globalese MorphoLogic Localisation Ltd.', 'globalese.png', 230, 150);
+                                    echo renderSupporterEntry('http://www.lucysoftware.com', 'Lucy Software and Services GmbH', 'lucy.png', 200, 150);
+                                    echo renderSupporterEntry('https://www.locasoft.com', 'LocaSoft GmbH', 'locasoft.png', 200, 150);
+                                    echo renderSupporterEntry('http://www.iolar.com', 'Iolar', 'iolar.png', 265, 150);
+                                    
+                                    echo renderSupporterEntry('https://www.smartspokes.com', 'SMARTSPOKES AG', 'smartspokes.png', 250, 145);
+                                    echo renderSupporterEntry('http://www.yavaway.com', 'Yavaway Translation', 'yavaway.png', 180, 145);
+                                    echo renderSupporterEntry('http://www.translationprojex.com', 'TranslationProjex', 'translationprojex.png', 210, 145);
+                                    echo renderSupporterEntry('https://www.swissglobal.ch', 'SwissGlobal Language Services AG', 'swissglobal.png', 240, 145);
+                                    echo renderSupporterEntry('https://www.textform.com', 'text&amp;form GmbH', 'textform.png', 270, 145);
+                                ?>
                             </div>
                        </article>
                         

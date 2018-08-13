@@ -3475,22 +3475,7 @@
 
 
 /* CrowdLinks */
-.crowdlinks_container {position: relative;}
-.crowdlinks {position: absolute; left: 0; top: 0; width: 100%; z-index: 2;}
-ul.crowdlinks {list-style-type: none;}
-ul.crowdlinks, ul.crowdlinks li {margin: 0; padding: 0;}
-
-ul.crowdlinks li {display: block; float: left; margin: 5px;}
-ul.crowdlinks li.w025 {width: calc(25% - 10px);}
-ul.crowdlinks li.w020 {width: calc(20% - 10px);}
-
-ul.crowdlinks-site li {display: block; float: left; margin: 13px 20px;}
-ul.crowdlinks-site li.w025 {width: calc(25% - 40px);}
-ul.crowdlinks-site li.w020 {width: calc(20% - 40px);}
-
-
-ul.crowdlinks img {width: 100%; height: auto;}
-ul.crowdlinks a {display: block; border-bottom: 0;}
-
-.ignore {position: absolute; left: -2000px; top: -5000px; width: 0px; height: 0px;}
+.crowdlinks_container {position: relative; padding: 10px; overflow: hidden;}
+.crowdlinks_container img {width: 100%; height: auto;}
+.crowdlink {display: block; float: left; border-bottom: 0;}
 
