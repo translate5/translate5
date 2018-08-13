@@ -124,9 +124,14 @@ Ext.define('Editor.util.SegmentEditor', {
      * Adds a placeholder in the Editor if necessary (TRANSLATE-1042).
      */
     addPlaceholderIfEditorIsEmpty: function() {
-        var me = this;
-        if ( (Ext.isGecko  || Ext.isWebKit) && me.isEmptyEditor()) {
-            me.getEditorBody().innerHTML = "&#8203;" + me.getEditorBody().innerHTML;
+        var me = this, 
+            content = me.getEditorBody().innerHTML,
+            emptySpace = "&#8203;",
+            check = /^&#8203;|&#8203;$/;
+        
+        //add emptySpace only once
+        if ((Ext.isGecko || Ext.isWebKit) && me.isEmptyEditor() && check.test(content.trim())) {
+            me.getEditorBody().innerHTML = emptySpace;
             me.consoleLog("Firefox: Editor must never be empty => Placeholder added.");
         }
     },
