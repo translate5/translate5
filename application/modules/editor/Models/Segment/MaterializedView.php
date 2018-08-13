@@ -258,6 +258,7 @@ class editor_Models_Segment_MaterializedView {
         $segmentId = (int)$segmentId;
         $selectSql = '';
         $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), ';
+        $selectSql .= '\',"additionalUnitLength":\', m.additionalUnitLength, \',"additionalMrkLength":\', m.additionalMrkLength, ';
         $selectSql .= '\',"siblingData":{\', ifnull(siblings.siblingData,\'\'), \'}}\') metaCache';
         $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';
         $selectSql .= ' LEFT JOIN LEK_segments_meta m ON m.taskGuid = s.taskGuid AND m.segmentId = s.id ';

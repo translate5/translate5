@@ -746,10 +746,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
             $data->save();
         }
-        $this->meta()->setSiblingData($this);
-        $this->meta()->save();
         //only update the mat view if the segment was already in DB (so do not save mat view on import!)
+        //same for meta data, since on import meta data is saved by the segment processor 
         if(!empty($oldIdValue)) {
+            $this->meta()->setSiblingData($this);
+            $this->meta()->save();
             $matView = $this->segmentFieldManager->getView();
             if($matView->exists()) {
                 $matView->updateSegment($this);

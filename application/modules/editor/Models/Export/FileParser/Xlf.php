@@ -96,6 +96,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             foreach($this->segmentIdsPerUnit as $segmentId) {
                 $segments[] = $this->getSegment($segmentId);
             }
+            //add the additional unit length for the final length calculation (once per transunit)
+            if(!empty($segments)) {
+                $firstSegment = reset($segments);
+                $this->transUnitLength += (int) $firstSegment->meta()->getAdditionalUnitLength();
+            }
             $event = new Zend_EventManager_Event();
             //get origanal attributes:
             if(preg_match_all('/([^\s]+)="([^"]*)"/', $xmlparser->getChunk($opener['openerKey']), $matches)){
