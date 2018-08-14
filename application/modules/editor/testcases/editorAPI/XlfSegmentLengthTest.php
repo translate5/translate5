@@ -88,6 +88,8 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
         require_once 'Models/Segment/TagAbstract.php';
         require_once 'Models/Segment/InternalTag.php';
 
+        //the first three segments remain unedited, since content is getting to long with edited content
+        // why indeed the others segments can be edited is a good question, potentual, because they are parallel
         foreach($segments as $idx => $segToEdit) {
             if(empty($segToEdit->editable)) {
                 continue;
@@ -103,16 +105,14 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);
         }
         
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=20');
         $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
-        file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfSegmentLengthTest/expectedSegmentsEdited-new.json", json_encode($data,JSON_PRETTY_PRINT));
-        return;
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/XlfSegmentLengthTest/expectedSegmentsEdited-new.json", json_encode($data,JSON_PRETTY_PRINT));
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsEdited.json'), $data, 'Imported segments are not as expected!');
         
         $task = $this->api()->getTask();
         //start task export 
-        $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'mrkothercontentlength-en-de.xlf', 'mrkothercontentlength-test.xlf');
-        //start task export with diff
-        // diff export will be disabled for XLF!
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'mrkothercontentlength-en-de.xlf', 'expected-export.xlf');
     }
     
     /**
