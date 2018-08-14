@@ -109,7 +109,8 @@ Ext.define('Editor.util.SegmentEditor', {
                 if (node.parentNode != null && me.isContainerToIgnore(node.parentNode)) {
                     return false;
                 }
-                if (Editor.plugins.TrackChanges && me.regex_FOR_placeholder_empty_INS.test(node.data)) {
+                //its unclear if to use here textContainsEmptyIns or textIsEmptyIns, according to the implementation date the first one makes sense
+                if (Editor.plugins.TrackChanges && me.textContainsEmptyIns(node.data)) {
                     return false;
                 }
                 return node.data != "";
