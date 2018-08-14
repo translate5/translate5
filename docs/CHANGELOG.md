@@ -3,6 +3,16 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.8.2] - 2018-08-14
+###Bugfixes
+TRANSLATE-1376: Segment length calculation does not include length of content outside of mrk tags
+TRANSLATE-1399: Using backspace on empty segment increases segment length
+TRANSLATE-1395: Enhance error message on missing relais folder
+TRANSLATE-1379: TrackChanges: disrupt conversion into japanese characters
+TRANSLATE-1373: TermPortal: TermCollection import stops because of unsaved term
+TRANSLATE-1372: TrackChanges: Multiple empty spaces after export
+
+
 ## [2.8.1] - 2018-08-08
 ###Added
 TRANSLATE-1352: Include PM changes in changes-mail and changes.xliff (xliff 2.1)
