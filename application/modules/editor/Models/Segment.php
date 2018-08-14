@@ -424,7 +424,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * dedicated method to count chars of given segment content
      * does a htmlentitydecode, so that 5 char "&amp;" is converted to one char "&" for counting 
      * Further:
-     * - content in <del> tags is ignored
+     * - content in &gt;del&lt; tags is ignored
      * - all other tags are ignored, if the tag has a length attribute, this length is added
      * @param string $segmentContent
      * @return integer
