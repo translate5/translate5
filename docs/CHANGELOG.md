@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.8.3] - 2018-08-14
+###Bugfixes
+TRANSLATE-1404: TrackChanges: Tracked changes disappear when using backspace/del
+
 ## [2.8.2] - 2018-08-14
 ###Bugfixes
 TRANSLATE-1376: Segment length calculation does not include length of content outside of mrk tags
