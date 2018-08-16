@@ -43,6 +43,12 @@ $termDivParams = function($class, $rtl) {
 <div class="term-box">
 <?php
     $i = 0;
+    $termStatus = [
+        'permitted' => $this->translate->_('erlaubte Benennung'),
+        'forbidden' => $this->translate->_('verbotene Benennung'),
+        'preferred' => $this->translate->_('Vorzugsbenennung'),
+        'unknown' => $this->translate->_('Unbekannter Term Status'),
+    ];
     foreach($this->termGroups as $termGroup) {
         $target = array();
         $source = array();
@@ -50,32 +56,15 @@ $termDivParams = function($class, $rtl) {
         $isTargetRtl = false;
         foreach($termGroup as $term) {
             settype($term->rtl, 'boolean');
-            $src = $this->publicModulePath.'/images/'.$term->status.'.png';
-            switch ($term->status) {
-                case editor_Models_Term::STAT_ADMITTED:
-                    $title = $this->translate->_('erlaubte Benennung');
-                    break;
-                case editor_Models_Term::STAT_LEGAL:
-                    $title = $this->translate->_('erlaubte Benennung');
-                    break;
-                case editor_Models_Term::STAT_REGULATED:
-                    $title = $this->translate->_('erlaubte Benennung');
-                    break;
-                case editor_Models_Term::STAT_STANDARDIZED:
-                    $title = $this->translate->_('erlaubte Benennung');
-                    break;
-                case editor_Models_Term::STAT_DEPRECATED:
-                    $title = $this->translate->_('verbotene Benennung');
-                    break;
-                case editor_Models_Term::STAT_SUPERSEDED:
-                    $title = $this->translate->_('verbotene Benennung');
-                    break;
-                case editor_Models_Term::STAT_PREFERRED:
-                    $title = $this->translate->_('Vorzugsbenennung');
-                    break;
-                default:
-                    $title = $this->translate->_('Unbekannter Term Status');
+            $guiStatus = $term->status;
+            if(empty($this->termStatMap[$guiStatus]) || empty($termStatus[$this->termStatMap[$guiStatus]])) {
+                $guiStatus = 'unknown';
             }
+            else {
+                $guiStatus = $this->termStatMap[$guiStatus];
+            }
+            $title = $termStatus[$guiStatus].' ('.$term->status.')';
+            $src = $this->publicModulePath.'/images/termStatus/'.$guiStatus.'.png';
             $itemStr = sprintf('<img src="%1$s" alt="%2$s" title="%2$s"/>', $src, $title);
             $class = array('term', $term->status);
             if($term->used){
@@ -87,7 +76,7 @@ $termDivParams = function($class, $rtl) {
             $definition = htmlspecialchars($term->definition);
             $itemStr .= sprintf('<span class="%3$s" title="%2$s">%1$s</span>', $term->term, $definition, join(' ', $class));
             if(!empty($term->definition)){
-                $src = $this->publicModulePath.'/images/information-small-white.png';
+                $src = $this->publicModulePath.'/images/termStatus/information-small-white.png';
                 $itemStr .= sprintf(' <img src="%1$s" alt="%2$s" title="%2$s"/>', $src, $definition);
             }
             if($term->isSource) {

@@ -520,7 +520,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         //post term entry
         if(!empty($this->termsContainer)){
             //true = in the current tbx termEntry set, one term is found for merging
-            $isMerged=empty($this->lastMergeTermEntryId) ? false : true;
+            $isMerged=!empty($this->lastMergeTermEntryId);
             
             //get the termEntry id of the merged data and use it for the collectedData
             foreach ($this->termsContainer as $singleTerm){
@@ -671,43 +671,69 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      * Update the status to the current term in the database.
      */
     protected function checkTermStatus() {
-        if(!$this->isStartTag() || $this->xml->getAttribute('type') !== 'normativeAuthorization'){
+        $type = $this->xml->getAttribute('type');
+        $config = Zend_Registry::get('config');
+        $importMap = $config->runtimeOptions->tbx->termImportMap->toArray();
+        $allowedTypes = ['normativeAuthorization', 'administrativeStatus'];
+        //merge system allowed note types with configured ones:
+        if(!empty($importMap)) {
+            $allowedTypes = array_merge($allowedTypes, array_keys($importMap));
+        }
+        //if current termNote is no starttag or type is not allowed to provide a status the we jump out 
+        if(!$this->isStartTag() || !in_array($type, $allowedTypes)){
           return;
         }
-        $actualTermNoteStatus= $this->getMappedStatus($this->xml->readString());
+        $actualTermNoteStatus= $this->getMappedStatus($this->xml->readString(), $type);
 
         //update the term with the status
-        $term=ZfExtended_Factory::get('editor_Models_Term');
+        $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         
-        if($term->loadIfExist($this->actualTermIdDb)){
+        try {
+            $term->load($this->actualTermIdDb);
             $term->setStatus($actualTermNoteStatus);
             $term->setUpdated(date("Y-m-d H:i:s"));
             $term->save();
             return;
-        }
-        //if the term exist in the unsaved terms, update the status there
-        if(isset($this->termsContainer[$this->actualTermIdTbx])){
-            $term=$this->termsContainer[$this->actualTermIdTbx];
-            $term->setStatus($actualTermNoteStatus);
-            $term->setUpdated(date("Y-m-d H:i:s"));
-            $term->save();
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //if the term exist in the unsaved terms, update the status there
+            if(isset($this->termsContainer[$this->actualTermIdTbx])){
+                $term=$this->termsContainer[$this->actualTermIdTbx];
+                $term->setStatus($actualTermNoteStatus);
+                $term->setUpdated(date("Y-m-d H:i:s"));
+                $term->save();
+            }
         }
     }
 
     /**
-     * Gibt den im Editor verwendeten Status zum im TBX gemappten Status zurück
+     * returns the translate5 internal availabable term status to the one given in TBX
      * @param string $tbxStatus
      * @return string
      */
-    protected function getMappedStatus($tbxStatus) {
-        if(!empty($this->statusMap[$tbxStatus])){
-            return $this->statusMap[$tbxStatus];
+    protected function getMappedStatus($tbxStatus, $type) {
+        //termNote type administrativeStatus are similar to normativeAuthorization, 
+        // expect that the values have a suffix which must be removed
+        if($type == 'administrativeStatus') {
+            $tbxStatus = str_replace('-admn-sts$', '', $tbxStatus.'$');
         }
+        
+        //add configured status map
+        $config = Zend_Registry::get('config');
+        $importMap = $config->runtimeOptions->tbx->termImportMap->toArray();
+        $statusMap = $this->statusMap;
+        if(!empty($importMap[$type])) {
+            $statusMap = array_merge($this->statusMap, $importMap[$type]);
+        }
+        
+        if(!empty($statusMap[$tbxStatus])){
+            return $statusMap[$tbxStatus];
+        }
+        
         if(!in_array($tbxStatus, $this->unknownStates)) {
             $this->unknownStates[] = $tbxStatus;
         }
-        return editor_Models_Term::STAT_NOT_FOUND;
+        return $config->runtimeOptions->tbx->defaultTermStatus;
     }
     
     /**
