@@ -3,6 +3,14 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.8.4] - 2018-08-17
+###Added
+TRANSLATE-1375: Map arbitrary term attributes to administrativeStatus
+
+###Bugfixes
+VISUAL-46: Loading screen until everything loaded
+
+
 ## [2.8.3] - 2018-08-14
 ###Bugfixes
 TRANSLATE-1404: TrackChanges: Tracked changes disappear when using backspace/del
