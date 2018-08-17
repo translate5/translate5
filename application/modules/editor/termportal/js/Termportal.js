@@ -565,7 +565,8 @@ function checkTermStatusIcon(attribute){
     if(map[attribute[0].termStatus]) {
         status = map[attribute[0].termStatus];
     }
-    label = labels[status];
+    //FIXME encoding of the string!
+    label = labels[status]+' ('+attribute[0].termStatus+')';
     retVal += ' <img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'">';
 ;
     return retVal;
