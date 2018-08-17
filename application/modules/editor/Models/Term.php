@@ -625,6 +625,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 'term as label',
                 'id as value',
                 'term as desc',
+                'status as termStatus',
                 'id as termId',
                 'collectionId',
                 'language as languageId'

@@ -35,4 +35,6 @@ VALUES ('runtimeOptions.tbx.termLabelMap.preferredTerm', '1', 'editor', 'termtag
 ('runtimeOptions.tbx.termLabelMap.supersededTerm', '1', 'editor', 'termtagger', 'forbidden', 'forbidden', 'preferred,permitted,forbidden', 'string', 'Defines how the Term Status should be visualized in the Frontend');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.tbx.termImportMap.across_ISO_picklist_Usage.do not use', '1', 'editor', 'termtagger', 'supersededTerm', 'supersededTerm', '', 'string', 'Defines a mapping for foreign term status to an internal known status.');
+VALUES ('runtimeOptions.tbx.termImportMap.across_ISO_picklist_Usage.do not use', '1', 'editor', 'termtagger', 'supersededTerm', 'supersededTerm', '', 'string', 'Defines a mapping for foreign term status to an internal known status.'),
+('runtimeOptions.tbx.termImportMap.across_ISO_picklist_Verwendung.Unwort', '1', 'editor', 'termtagger', 'supersededTerm', 'supersededTerm', '', 'string', 'Defines a mapping for foreign term status to an internal known status.'),
+('runtimeOptions.tbx.termImportMap.across_userdef_picklist_Verwendung.Unwort', '1', 'editor', 'termtagger', 'supersededTerm', 'supersededTerm', '', 'string', 'Defines a mapping for foreign term status to an internal known status.');
