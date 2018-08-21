@@ -62,7 +62,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $worker->queue(); // not parent ID here, since the GarbageCleaner should run without a parent relation
         }, 0);
         
-        $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', function(){
+        $cleanUp = function(){
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             $task->cleanupLockedJobs();
@@ -70,9 +70,13 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
             /* @var $tua editor_Models_TaskUserAssoc */
             $tua->cleanupLocked();
-        });
+        };
         
+        $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);
+        $eventManager->attach('LoginController', 'afterLogoutAction', $cleanUp);
+        $eventManager->attach('editor_SessionController', 'afterDeleteAction', $cleanUp);
     }
+    
     
     public function _initController()
     {
