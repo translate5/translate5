@@ -50,7 +50,22 @@ class LoginController extends ZfExtended_Controllers_Login {
         $this->view->lockedUsers = $lock->getLocked();
         return parent::indexAction();
     }
-
+    
+    /**
+     * Add editor module for afterLogoutAction handling to trigger cleanup in translate5
+     * {@inheritDoc}
+     * @see ZfExtended_Controllers_Action::postDispatch()
+     */
+    public function postDispatch() {
+        $base = ZfExtended_BaseIndex::getInstance();
+        $base->setModule('editor');
+        $bootstrap = Zend_Registry::get('bootstrap');
+        require_once 'editor/Bootstrap.php';
+        $module = new Editor_Bootstrap($bootstrap->getApplication());
+        $module->bootstrap();
+        parent::postDispatch();
+    }
+    
     protected function initDataAndRedirect() {
         //@todo do this with events
         if(class_exists('editor_Models_Segment_MaterializedView')) {
