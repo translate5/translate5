@@ -254,7 +254,7 @@ class editor_Plugins_TermImport_Services_Import {
         require_once('AcrossTbxExport.php');
 
         //get all across export files from the dir
-        $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
+        $it = new FilesystemIterator($exportFilesDir, FilesystemIterator::SKIP_DOTS);
         $affectedCollections = [];
         $this->logProfiling('Init FileAcrossApiImport');
         foreach ($it as $fileinfo) {
