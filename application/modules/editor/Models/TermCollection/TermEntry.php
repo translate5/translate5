@@ -47,40 +47,50 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
     /***
      * Remove empty term entries (term entries without any term in it).
      * Only the empty term entries from the same term collection will be removed.
+     * @param array $collectionIds
      * @return boolean
      */
-    public function removeEmptyFromCollection(){
+    public function removeEmptyFromCollection(array $collectionIds){
+        $collectionIds = join(',', array_map(function($i){
+            return (int) $i;
+        }, $collectionIds));
         $sql='SELECT id FROM LEK_term_entry WHERE LEK_term_entry.groupId NOT IN (
                 SELECT LEK_term_entry.groupId from LEK_term_entry
                 JOIN LEK_terms USING(groupId)
                 WHERE LEK_terms.collectionId=LEK_term_entry.collectionId
+                      AND LEK_terms.collectionId in (?)
                 GROUP BY LEK_term_entry.groupId
-            )';
-        $toRemove=$this->db->getAdapter()->query($sql)->fetchAll();
+            ) AND collectionId in (?)';
+        $toRemove=$this->db->getAdapter()->query($sql, [$collectionIds, $collectionIds])->fetchAll();
         
         if(empty($toRemove)){
             return false;
         }
         
-        return $this->db->delete(['id IN (?)'=>$toRemove])>0;
+        return $this->db->delete([
+            'id IN (?)'=>$toRemove,
+            'collectionId IN (?)'=>$collectionIds,
+        ])>0;
     }
     
     
-    /***
-     * Remove term entry older than $olderThan date.
+    /**
+     * Remove term entry older than $olderThan date from a specific term collection
      * The date format should be equivalent to mysql date format 'YYYY-MM-DD HH:MM:SS'
      * 
+     * @param integer $collectionId
      * @param string $olderThan
      * @return boolean : true if rows are removed
      */
-    public function removeOlderThan($olderThan){
+    public function removeOlderThan($collectionId, $olderThan){
         //find all modefied entries older than $olderThan date
         //the query will find the lates modefied term entry attribute, if the term entry attribute update date is older than $olderThan, remove the termEntry
+        $collectionId = (int) $collectionId;
         return $this->db->delete(['id IN (SELECT t.termEntryId
             	FROM LEK_term_entry_attributes t
-            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_entry_attributes GROUP BY termEntryId)
+            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_entry_attributes WHERE collectionId = '.$collectionId.' GROUP BY termEntryId)
             	tm ON t.termEntryId = tm.termEntryId AND t.updated = tm.MaxDate
-            	WHERE t.updated < ?
+            	WHERE t.collectionId = '.$collectionId.' AND t.updated < ?
             	GROUP BY t.termEntryId)'=>$olderThan])>0;
     }
 }

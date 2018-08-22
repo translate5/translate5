@@ -122,29 +122,36 @@ class editor_Plugins_TermImport_Services_Import {
     CONST DELETE_OLDER_IMPORT_ENTRIES_KEY="deleteEntriesOlderThanCurrentImport";
     
     /***
-     * Data from the filesystem config file
+     * Data from the filesystem or cross api config file
      * @var array
      */
-    public $filesystemMap=array();
+    public $configMap=array();
     
+    /**
+     * @var float contains the start time of the last profiling call
+     */
+    protected $profilingStart = null;
     
-    /***
-     * Data from the cross api config file
+    /**
+     * messages return to caller
      * @var array
      */
-    public $crossapiMap=array();
+    protected $returnMessage = [];
     
+    public function __construct() {
+        //init profiling
+        $this->logProfiling();
+    }
     
     /***
      * File system import handler.
      */
     public function handleFileSystemImport(){
-        
-        if(empty($this->filesystemMap)){
-            $this->loadFilesystemConfig();
+        if(empty($this->configMap)){
+            $this->loadConfig(self::FILESYSTEM_CONFIG_NAME);
         }
         //tbx files import folder
-        $importDir = $this->filesystemMap[self::IMPORT_DIR_ARRAY_KEY];
+        $importDir = $this->configMap[self::IMPORT_DIR_ARRAY_KEY];
         
         try {
             if(!file_exists($importDir) && !@mkdir($importDir, 0777, true)){
@@ -158,64 +165,45 @@ class editor_Plugins_TermImport_Services_Import {
             return ["The configured import dir is empty"];
         }
         
+        $this->returnMessage=[];
         
-        //check if delete old entries is configured in the config file
-        if(isset($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
-            //remove old term entries and terms
-            $this->removeEntriesOlderThenImport(date('Y-m-d H:i:s'));
-        }
-        
-        $returnMessage=[];
-        
+        $this->logProfiling('Init FileSystemImport');
         //get all files from the import direcotry
         $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
+        $affectedCollections = [];
         foreach ($it as $fileinfo) {
             $file=$fileinfo->getFilename();
             
-            $params=$this->handleCollectionForFile($file, $this->filesystemMap);
+            $params=$this->handleCollectionForFile($file);
             
             if(!$params){
                 continue;
             }
             
             if(is_string($params)){
-                $returnMessage[]=$params;
+                $this->returnMessage[]=$params;
                 continue;
             }
-                
-            $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $model editor_Models_TermCollection_TermCollection */
+            $affectedCollections[] = $params['collectionId'];
+            $this->logProfiling('Prepared collection '.$params['collectionName'].'('.$params['collectionId'].')');
             
+            //remove old term entries and terms
+            $this->removeEntriesOlderThenImport($params['collectionId']);
+                
             //define the import source, used for storing the file in the disk in the needed location
             $params['importSource']="filesystem";
             
+            $this->importTbx($file, $importDir.$file, $params);
             
-            if(isset($this->filesystemMap[self::IMPORT_MERGE_TERMS_KEY])){
-                $params['mergeTerms']=$this->filesystemMap[self::IMPORT_MERGE_TERMS_KEY] ==="true" || $this->filesystemMap[self::IMPORT_MERGE_TERMS_KEY] ==="1";
-            }
-            
-            if($model->importTbx([$importDir.$file], $params)){
-                $msg="File:".$file.' was imported in the collection:'.$params['collectionName'];
-                $returnMessage[]=$msg;
-                error_log($msg);
-            }else{
-                $msg="Unable to import the file:".$file." into the collection";
-                $returnMessage[]=$msg;
-                error_log("Unable to import the file:".$file." into the collection");
-            }
         }
-        if(empty($returnMessage)){
-            $returnMessage[]="No files where imported";
+        if(empty($this->returnMessage)){
+            $this->returnMessage[]="No files where imported";
         }
 
-        //check if delete old tasks is configured in the config file
-        if(isset($this->filesystemMap[self::DELETE_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_ENTRIES_KEY])){
-            $olderThan=$this->filesystemMap[self::DELETE_ENTRIES_KEY];
-            //remove old term entries and terms
-            $this->removeOldTermsAndEntries($olderThan);
-        }
+        //remove old term entries and terms
+        $this->removeOldTermsAndEntries($affectedCollections);
         
-        return $returnMessage;
+        return $this->returnMessage;
     }
     
     /***
@@ -225,29 +213,29 @@ class editor_Plugins_TermImport_Services_Import {
      * @return string[]
      */
     public function handleAccrossApiImport(){
-        if(empty($this->crossapiMap)){
-            $this->loadAccrossConfg();
+        if(empty($this->configMap)){
+            $this->loadConfig(self::CROSSAPI_CONFIG_NAME);
         }
         
-        $returnMessage=[];
+        $this->returnMessage=[];
         
         //tbx files import folder
-        $apiUrl=$this->crossapiMap[self::IMPORT_ACOSS_API_URL];
-        $apiUser=$this->crossapiMap[self::IMPORT_ACOSS_API_USER];
-        $apiPwd=$this->crossapiMap[self::IMPORT_ACOSS_API_PWD];
+        $apiUrl=$this->configMap[self::IMPORT_ACOSS_API_URL];
+        $apiUser=$this->configMap[self::IMPORT_ACOSS_API_USER];
+        $apiPwd=$this->configMap[self::IMPORT_ACOSS_API_PWD];
         
         if(empty($apiUrl)){
-            $returnMessage[]="Across api url is not defined in the config file";
-            return $returnMessage;
+            $this->returnMessage[]="Across api url is not defined in the config file";
+            return $this->returnMessage;
         }
         
         if(empty($apiUser) || empty($apiPwd)){
-            $returnMessage[]="Authentication parameters are missing";
-            return $returnMessage;
+            $this->returnMessage[]="Authentication parameters are missing";
+            return $this->returnMessage;
         }
         
         //tbx files import folder
-        $exportFilesDir=$this->crossapiMap[self::CROSS_EXPORT_FILES_DIR];
+        $exportFilesDir=$this->configMap[self::CROSS_EXPORT_FILES_DIR];
         
         try {
             if(!file_exists($exportFilesDir) && !@mkdir($exportFilesDir, 0777, true)){
@@ -258,16 +246,8 @@ class editor_Plugins_TermImport_Services_Import {
         }
         
         if($this->isFolderEmpty($exportFilesDir)){
-            $returnMessage[]="Across api export files are not defined";
-            return $returnMessage;
-        }
-        
-        $returnMessage=[];
-        
-        //check if delete old entries is configured in the config file
-        if(isset($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]) && !empty($this->filesystemMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
-            //remove old term entries and terms
-            $this->removeEntriesOlderThenImport(date('Y-m-d H:i:s'));
+            $this->returnMessage[]="Across api export files are not defined";
+            return $this->returnMessage;
         }
         
         //FIXME: split the php file into classes ?
@@ -275,34 +255,40 @@ class editor_Plugins_TermImport_Services_Import {
 
         //get all across export files from the dir
         $it = new FilesystemIterator($importDir, FilesystemIterator::SKIP_DOTS);
+        $affectedCollections = [];
+        $this->logProfiling('Init FileAcrossApiImport');
         foreach ($it as $fileinfo) {
             $file=$fileinfo->getFilename();
             
             $connector=new TbxAcrossSoapConnector($apiUrl,$apiUser,$apiPwd);
             /* @var $connector TbxAcrossSoapConnector */
             
-            $params=$this->handleCollectionForFile($file, $this->crossapiMap);
+            $params=$this->handleCollectionForFile($file);
             
             if(!$params){
                 continue;
             }
             //if it is a string, set the error message
             if(is_string($params)){
-                $returnMessage[]=$params;
+                $this->returnMessage[]=$params;
+                continue;
+            }
+            
+            if(!$params || !isset($params['collectionId'])){
                 continue;
             }
             
             //absolute file path
             $file=$exportFilesDir.$file;
             
-            if(!$params || !isset($params['collectionId'])){
-                continue;
-            }
+            //remove old term entries and terms
+            $this->removeEntriesOlderThenImport($params['collectionId']);
+            $affectedCollections[] = $params['collectionId'];
             
             $respTbxl=$connector->getTbx($file);
             
             if(empty($respTbxl)){
-                $returnMessage[]="Empty tbx file for across config file:".$file;
+                $this->returnMessage[]="Empty tbx file for across config file:".$file;
                 continue;
             }
             
@@ -311,65 +297,64 @@ class editor_Plugins_TermImport_Services_Import {
             //save the tmp file to the disc
             file_put_contents($tmpFile, $respTbxl);
             
-            $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $model editor_Models_TermCollection_TermCollection */
-            
             //define the import source, used for storing the file in the disk in the needed location
             $params['importSource']="crossapi";
             
-            
-            if(isset($this->crossapiMap[self::IMPORT_MERGE_TERMS_KEY])){
-                $params['mergeTerms']=$this->crossapiMap[self::IMPORT_MERGE_TERMS_KEY] ==="true" || $this->crossapiMap[self::IMPORT_MERGE_TERMS_KEY] ==="1";;
-            }
-            
-            if($model->importTbx([$tmpFile], $params)){
-                $msg="File:".$file.' was imported in the collection:'.$params['collectionName'];
-                $returnMessage[]=$msg;
-                error_log($msg);
-            }else{
-                $msg="Unable to import the file:".$file." into the collection";
-                $returnMessage[]=$msg;
-                error_log("Unable to import the file:".$file." into the collection");
-            }
+            $this->importTbx($file, $tmpFile, $params);
             
             //remove the tmp file
             if (file_exists($tmpFile)) {
                 unlink($tmpFile);
             }
         }
-        if(empty($returnMessage)){
-            $returnMessage[]="No files where imported";
+        if(empty($this->returnMessage)){
+            $this->returnMessage[]="No files where imported";
         }
         
-        //check if delete old tasks is configured in the config file
-        if(isset($this->crossapiMap[self::DELETE_ENTRIES_KEY]) && !empty($this->crossapiMap[self::DELETE_ENTRIES_KEY])){
-            $olderThan=$this->crossapiMap[self::DELETE_ENTRIES_KEY];
-            //remove old term entries and terms
-            $this->removeOldTermsAndEntries($olderThan);
+        //remove old term entries and terms
+        $this->removeOldTermsAndEntries($affectedCollections);
+        
+        return $this->returnMessage;
+    }
+    
+    protected function importTbx($file, $absFile, $params) {
+        $this->logProfiling();
+        $model = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $model editor_Models_TermCollection_TermCollection */
+        if(isset($this->configMap[self::IMPORT_MERGE_TERMS_KEY])){
+            $params['mergeTerms']=$this->configMap[self::IMPORT_MERGE_TERMS_KEY] ==="true" || $this->configMap[self::IMPORT_MERGE_TERMS_KEY] ==="1";
         }
         
-        return $returnMessage;
+        if($model->importTbx([$absFile], $params)){
+            $msg="File: ".$file.' was imported in the collection: '.$params['collectionName'];
+            $this->returnMessage[]=$msg;
+            error_log($msg);
+        }else{
+            $msg="Unable to import the file: ".$file." into the collection";
+            $this->returnMessage[]=$msg;
+            error_log("Unable to import the file: ".$file." into the collection");
+        }
+        $this->logProfiling('Imported TBX');
     }
     
     /***
      * Check if for the current file there is config for the termcollection to tbx file association
      * and termcollection to customer number association
      * @param string $file: file to check
-     * @param array $configFile: config file where the associated data is placed
      * @return NULL|string|array
      */
-    private function handleCollectionForFile($file,$configFile){
-        if(!isset($configFile[self::FILE_MAPPING_GROUP]) || !isset($configFile[self::FILE_MAPPING_GROUP][$file])){
+    private function handleCollectionForFile($file){
+        if(!isset($this->configMap[self::FILE_MAPPING_GROUP]) || !isset($this->configMap[self::FILE_MAPPING_GROUP][$file])){
             return null;
         }
         
-        $collectionName=$configFile[self::FILE_MAPPING_GROUP][$file];
+        $collectionName=$this->configMap[self::FILE_MAPPING_GROUP][$file];
         
-        if(!isset($configFile[self::COLLECTION_MAPPING_GROUP][$collectionName])){
+        if(!isset($this->configMap[self::COLLECTION_MAPPING_GROUP][$collectionName])){
             return "No customer is assigned to the collection:".$collectionName;
         }
             
-        $customerNumber=$configFile[self::COLLECTION_MAPPING_GROUP][$collectionName];
+        $customerNumber=$this->configMap[self::COLLECTION_MAPPING_GROUP][$collectionName];
         
         $cm=ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $cm editor_Models_Customer */
@@ -399,41 +384,19 @@ class editor_Plugins_TermImport_Services_Import {
         return ['collectionId'=>$model->getId(),'customerId'=>$customerId,'mergeTerms'=>true,'collectionName'=>$collectionName];
     }
     
-    /**
-     * Load the configuration files into the data holders
-     */
-    private function loadConfigFiles(){
+    private function loadConfig($configName){
         $path=$this->getPluginConfigFolderPath();
-        $fileSystemFile=$path.self::FILESYSTEM_CONFIG_NAME;
-        $crossApiFile=$path.self::CROSSAPI_CONFIG_NAME;
-        
-        $this->initConfigFile($fileSystemFile, $this->filesystemMap);
-        $this->initConfigFile($crossApiFile, $this->crossapiMap);
-    }
-    
-    private function loadFilesystemConfig(){
-        $path=$this->getPluginConfigFolderPath();
-        $fileSystemFile=$path.self::FILESYSTEM_CONFIG_NAME;
-        
-        $this->initConfigFile($fileSystemFile, $this->filesystemMap);
-    }
-    
-    private function loadAccrossConfg(){
-        $path=$this->getPluginConfigFolderPath();
-        $crossApiFile=$path.self::CROSSAPI_CONFIG_NAME;
-        
-        $this->initConfigFile($crossApiFile, $this->crossapiMap);
+        $this->initConfigFile($path.$configName);
     }
     
     /***
      * Init the config array
      *
      * @param string $filePath : absolute path to the config file
-     * @param array $mapArray : array where the config data will be stored
      *
      * @throws ZfExtended_ValidateException
      */
-    private function initConfigFile($filePath,&$mapArray){
+    private function initConfigFile($filePath){
         if(!file_exists($filePath)){
             throw new ZfExtended_ValidateException("Configuration file is missing:".$filePath);
         }
@@ -442,35 +405,51 @@ class editor_Plugins_TermImport_Services_Import {
             throw new ZfExtended_ValidateException("The configuration file:".$filePath.' is empty.');
         }
         
-        $mapArray= parse_ini_file($filePath,true);
-        if(empty($mapArray)){
+        $this->configMap = parse_ini_file($filePath,true);
+        if(empty($this->configMap)){
             throw new ZfExtended_ValidateException("Wrong file structure in :".$filePath);
         }
     }
     
     /***
      * Remove terms older than the configured date in the config file.
-     * Also remove the enpty term entries in the same term collection 
+     * Also remove the empty term entries in the same term collection 
+     * @param array $collectionIds
+     * @param string $olderThan
      */
-    private function removeOldTermsAndEntries($olderThan){
+    private function removeOldTermsAndEntries(array $collectionIds){
+        //check if delete old tasks is configured in the config file
+        if(empty($this->configMap[self::DELETE_ENTRIES_KEY])){
+            return;
+        }
+        $olderThan=$this->configMap[self::DELETE_ENTRIES_KEY];
+        
         $termModel=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $termModel editor_Models_Term */
         
-        $termModel->removeOldTerms($olderThan);
+        $termModel->removeOldTerms($collectionIds, $olderThan);
         
         //remove all empty term entries from the same term collection
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->removeEmptyFromCollection();
+        $termEntry->removeEmptyFromCollection($collectionIds);
+        $this->logProfiling('removeOldTermsAndEntries for collections '.join(',', $collectionIds));
     }
     
     /***
      * Remove term entries older than $importDate
+     * @param integer $collectionId
      */
-    private function removeEntriesOlderThenImport($impotDate){
+    private function removeEntriesOlderThenImport($collectionId){
+        //check if delete old entries is configured in the config file
+        if(empty($this->configMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY])){
+            return;
+        }
+        
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->removeOlderThan($impotDate);
+        $termEntry->removeOlderThan($collectionId, NOW_ISO);
+        $this->logProfiling('removeEntriesOlderThenImport for collection '.$collectionId);
     }
     
     /***
@@ -478,8 +457,7 @@ class editor_Plugins_TermImport_Services_Import {
      * @return string
      */
     private function getPluginConfigFolderPath(){
-        $ds=DIRECTORY_SEPARATOR;
-        return APPLICATION_PATH.$ds."modules".$ds."editor".$ds."Plugins".$ds."TermImport".$ds."config".$ds;
+        return APPLICATION_PATH.'/modules/editor/Plugins/TermImport/config/';
     }
     
     
@@ -490,5 +468,17 @@ class editor_Plugins_TermImport_Services_Import {
      */
     private function isFolderEmpty($dir) {
         return (($files = @scandir($dir)) && count($files) <= 2);
+    }
+    
+    /**
+     * logs a message to the error log and prints the duration needed
+     * @param string $msg if empty just reset start timer and log nothing
+     */
+    protected function logProfiling($msg = null) {
+        if(!empty($msg)) {
+            $duration = microtime(true) - $this->profilingStart;
+            error_log('Profiling TermPortal Import - '.$msg.": \n  Duration (seconds): ".$duration);
+        }
+        $this->profilingStart = microtime(true);
     }
 }
