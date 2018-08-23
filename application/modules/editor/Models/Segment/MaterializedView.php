@@ -276,7 +276,8 @@ class editor_Models_Segment_MaterializedView {
     
     protected function metaCacheCreateTempTable() {
         $db = Zend_Db_Table::getDefaultAdapter();
-        $sql = 'CREATE TEMPORARY TABLE siblings (INDEX (`transunitId`)) AS '.$this->metaCacheInnerSql().';';
+        $sql = 'DROP TEMPORARY TABLE IF EXISTS `siblings`;';
+        $sql .= 'CREATE TEMPORARY TABLE siblings (INDEX (`transunitId`)) AS '.$this->metaCacheInnerSql().';';
         $db->query($sql, [$this->taskGuid]);
     }
     
