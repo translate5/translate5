@@ -441,19 +441,19 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
           $this->config->runtimeOptions->dir->tagImagesBasePath.'/');
       $path = join(DIRECTORY_SEPARATOR, $path);
 
-      /* @var $single ImageTag_Single */
+      /* @var $single editor_ImageTag_Single */
       $single = ZfExtended_Factory::get('editor_ImageTag_Single');
       $single->setSaveBasePath($path);
       
       $singleLocked = ZfExtended_Factory::get('editor_ImageTag_Single');
-      /* @var $singleLocked ImageTag_SingleLocked */
+      /* @var $singleLocked editor_ImageTag_Single */
       $singleLocked->setSaveBasePath($path);
       
-      /* @var $left ImageTag_Left */
+      /* @var $left editor_ImageTag_Left */
       $left = ZfExtended_Factory::get('editor_ImageTag_Left');
       $left->setSaveBasePath($path);
       
-      /* @var $right ImageTag_Right */
+      /* @var $right editor_ImageTag_Right */
       $right = ZfExtended_Factory::get('editor_ImageTag_Right');
       $right->setSaveBasePath($path);
       
