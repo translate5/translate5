@@ -55,11 +55,20 @@ h4, p {
     max-height: 220px;
 }
 
+#source .ui-widget,
+#target .ui-widget,
+#source .ui-menu-item,
+#target .ui-menu-item {
+    font-size: 0.9EM !important;
+}
+
 /* --------------- header --------------- */
 
 #containerHeader {
+    margin: 10px;
+    border-bottom: 1px solid #00adef;
     padding-top: 19px;
-    margin: 10px 10px 0px 10px;
+    padding-bottom:  10px;
 }
 #logo {
     flex: 0 0 180px;
@@ -93,29 +102,6 @@ h4, p {
     #logout { order: 3; margin-top: 5px;}
 }
 
-/* --------------- selection  --------------- */
-
-#containerMtEngineSelect {
-    padding: 10px;
-    text-align: center;
-}
-#mtEngineSelector {
-    width: 100%;
-}
-#containerMtEngineSelect fieldset {
-    border-width: 1px;
-    border-color: #00adef;
-    border-style: solid;
-}
-#containerMtEngineSelect legend {
-    color: #454545;
-}
-#mtEngineSelectorError {
-    padding: 7px;
-    margin-top: 10px;
-    display: none;
-}
-
 /* --------------- source --------------- */
     
 #source textarea {
@@ -134,6 +120,7 @@ h4, p {
     width: 94%;
     margin-right: 10px;
 }
+#sourceContent,
 .show-if-source-is-file,
 #sourceIsText {
     display: none;
@@ -171,6 +158,11 @@ h4, p {
 }
 
 /* --------------- target --------------- */
+
+#mtEngineSelectorError,
+#translationSubmit {
+    display: none;
+}
 
 #translationSubmit,
 #translationSubmit:hover,
