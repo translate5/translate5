@@ -106,7 +106,7 @@ function renderLocalesAsAvailable(accordingTo) {
         targetLocalesAvailable.push(targetLocale);
         source = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: targetLocale, selectedValue: sourceLocale};
         target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: sourceLocale, selectedValue: targetLocale};
-    } else if (selectedText === translatedStrings['clearBothLists']) {
+    } else if (accordingTo === 'reset' || selectedText === translatedStrings['clearBothLists']) {
         // This means a "reset" of one or both the lists:
         sourceLocalesAvailable = mtSourceLanguageLocales;
         targetLocalesAvailable = mtTargetLanguageLocales;
@@ -233,9 +233,6 @@ function setSingleMtEngineById(engineId) {
     setMtEngine(engineId);
     clearAllErrorMessages();
     showTranslationFormsAsReady();
-    $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
-    $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
-    $("#sourceLocale").click(); // render locale-lists!
     if ($('#sourceText').val().length > 0) {
         startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
     }
@@ -264,7 +261,7 @@ function renderMtEnginesAsAvailable() {
             showMtEngineSelectorError('noMatchingMt');
             break;
         case 1:
-            setSingleMtEngineById(mtIdsAvailable[0]); // selectedEngine is set there
+            setSingleMtEngineById(mtIdsAvailable[0]);
             break;
         default:
             unsetMtEngine();
@@ -389,7 +386,7 @@ function translateText(){
             'text':$('#sourceText').val()
         },
         success: function(result){
-            if (result.errors != '') {
+            if (result.errors !== undefined && result.errors != '') {
                 showTranslationError(result.errors);
             } else {
                 clearAllErrorMessages();
@@ -651,7 +648,6 @@ function showTranslationError(errorText) {
     }
 }
 function clearAllErrorMessages() {
-    $('#mtEngineSelectorError').hide();
     $('.translation-error').hide();
 }
 

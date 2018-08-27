@@ -163,7 +163,7 @@ h4, p {
 
 /* --------------- target --------------- */
 
-#mtEngineSelectorError,
+.translation-error,
 #translationSubmit {
     display: none;
 }
