@@ -241,9 +241,11 @@ function setSingleMtEngineById(engineId) {
     extensionsKey = mtEngine.source+","+mtEngine.target;
     if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
         fileTypes = extensionsFileTranslation[extensionsKey].toString();
-    	$("#sourceIsText").html(translatedStrings['enterText']+' <span>'+translatedStrings["orTranslateFile"]+' (' + fileTypes +').</span>');
+        $("#sourceIsText").html(translatedStrings['enterText']+' <span class="change-source-type">'+translatedStrings["orTranslateFile"]+' (' + fileTypes +').</span>');
+        $("#sourceIsFile").html(translatedStrings['uploadFile']+' (' + fileTypes + ') <span class="change-source-type">'+translatedStrings["orTranslateText"]+'</span>');
     }else{
     	$("#sourceIsText").html(translatedStrings["enterText"]+':');
+        $("#sourceIsFile").html(translatedStrings['uploadFile']+' <span class="change-source-type">'+translatedStrings["orTranslateText"]+'</span>');
     }
 }
 function renderMtEnginesAsAvailable() {
@@ -653,20 +655,4 @@ function showTranslationError(errorText) {
 function clearAllErrorMessages() {
     $('.translation-error').hide();
 }
-
-/* --------------- "toggle" source (text/file) ------------------------------ */
-$('.source-toggle span').click(function(){
-    $('.source-toggle').toggle();
-    if ($('#sourceIsText').is(":visible")) {
-        $('.show-if-source-is-text').show();
-        $('.show-if-source-is-file').hide();
-        showTranslations();
-        $("#sourceIsText").removeClass('source-text-error');
-        $('#sourceText').focus();
-    } else {
-        $('.show-if-source-is-text').hide();
-        $('.show-if-source-is-file').show();
-        hideTranslations();
-    }
-});
 
