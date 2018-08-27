@@ -32,17 +32,28 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
+        //$config = Zend_Registry::get('config');
+        
         Zend_Layout::getMvcInstance()->setLayout('instanttranslate');
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
         $this->view->render('instanttranslate/layoutConfig.php');
         
         // last selected source and target languages for the user (=> new table Zf_users_meta)
-        $sourceSearchLanguagePreselectionLocale= 'de-DE'; // TODO; both content and structure of this content are DUMMY only!
-        $targetSearchLanguagePreselectionLocale= 'en-GB'; // TODO; both content and structure of this content are DUMMY only!
+        $sourceSearchLanguagePreselectionLocale= 'en-US'; // TODO; both content and structure of this content are DUMMY only!
+        $targetSearchLanguagePreselectionLocale= 'de-DE'; // TODO; both content and structure of this content are DUMMY only!
         
         $this->view->sourceSearchLanguagePreselectionLocale = $sourceSearchLanguagePreselectionLocale;
         $this->view->targetSearchLanguagePreselectionLocale = $targetSearchLanguagePreselectionLocale;
-        
+
+        //TODO: from config, but this returns always empti obj in frontend
+        //$this->view->Php2JsVars()->set('languageresource.fileExtension',$config->runtimeOptions->LanguageResources->fileExtension);
+        $this->view->Php2JsVars()->set('languageresource.fileExtension',
+            [
+                "de-DE,en-GB"=>["txt","csv"],
+                "en-US,ru-RU"=>["txt","csv"],
+                "en-US,de-DE"=>["txt","csv"]
+                
+            ]);
         
         $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
         /* @var $dummyTmmt editor_Models_TmMt */
@@ -66,10 +77,11 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 $machineTranslationEngines['mt'.$engineCounter]=array(
                     'name' =>$engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']', 
                     'source' => $engine->fromCulture,
+                    'sourceIso' => $engine->from->code,
                     'target' => $engine->toCulture,
+                    'targetIso' => $engine->to->code,
                     'domainCode' => $engine->domainCode
                 );
-                
                 $engineCounter++;
             }
         }
@@ -83,6 +95,16 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         );
         */
         $this->view->machineTranslationEngines= $machineTranslationEngines;
+        
+        $rfcToIsoLanguage=array();
+        $lngModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $lngModel editor_Models_Languages */
+        $lngs=$lngModel->loadAll();
+        foreach($lngs as $l){
+            $rfcToIsoLanguage[$l['rfc5646']]=$l['iso6393'];
+        }
+        
+        $this->view->Php2JsVars()->set('languageresource.rfcToIsoLanguage',$rfcToIsoLanguage);
         
         //translated strings
         $translatedStrings=array(
@@ -114,27 +136,21 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         //get all requested params
         $params=$this->getRequest()->getParams();
         
-        //validate single params
-        $isValidParam=function($prm,$key){
-          return isset($prm[$key]) && !empty($prm[$key]);
-        };
-        
         $apiParams=array();
         
-        if(!$isValidParam($params,'text')){
+        if(!$this->isValidParam($params,'text')){
             //TODO: translate me
             $this->_helper->json(array("errors"=>"No string for translation is provided"));
             return;
         }
 
         $apiParams['text']=$params['text'];
-        if($isValidParam($params,'domainCode')){
+        if($this->isValidParam($params,'domainCode')){
             $apiParams['domainCode']=$params['domainCode'];
-            $this->view->rows=$this->searchString($apiParams);
-            return;
+            $this->_helper->json(array("rows"=>$this->searchString($apiParams)));
         }
         
-        if(!$isValidParam($params,'source')){
+        if(!$this->isValidParam($params,'source')){
             //TODO: translate me
             $this->_helper->json(array("errors"=>"Source language definition is missing."));
             return;
@@ -142,17 +158,105 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         $apiParams['from']=$params['source'];
         
-        if(!$isValidParam($params,'target')){
+        if(!$this->isValidParam($params,'target')){
             //TODO: translate me
             $this->_helper->json(array("errors"=>"Target language definition is missing."));
             return;
         }
         
         $apiParams['to']=$params['target'];
-        
-        $this->_helper->json(array("rows"=>$this->searchString($apiParams)));
+        $trans=$this->searchString($apiParams);
+        $this->_helper->json(array("rows"=>$trans));
     }
     
+    public function fileAction(){
+        
+        $upload = new Zend_File_Transfer();
+        //$upload->addValidator('Extension', false, 'tbx');
+        // Returns all known internal file information
+        $files = $upload->getFileInfo();
+
+        $reqParams=$this->getRequest()->getParams();
+        
+        if(!$this->isValidParam($reqParams,'from') || !$this->isValidParam($reqParams,'to')){
+            $this->_helper->json(array("error"=>"Source or target language parametar is missing"));
+        }
+        
+        if(empty($files)){
+            $this->_helper->json(array("error"=>"No upload files were found"));
+        }
+        
+        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $dummyTmmt editor_Models_TmMt */
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+        
+        $reqParams['file']=$files[0];
+        
+        $response=$api->uploadFile($reqParams);
+        if(!$response){
+            //TODO handle errors to the frontend
+            error_log(print_r($api->getErrors(),1));
+            $this->_helper->json(array("error"=>"Unable to process the request."));
+        }
+        
+        $this->_helper->json(array("fileId"=>$api->getResult()->id));
+    }
+    
+    public function urlAction(){
+        $fileId=$this->getRequest()->getParams()['fileId'];
+        $url=$this->getDownloadUrl($fileId);
+        $this->_helper->json(array("downloadUrl"=>$url));
+    }
+    
+    public function downloadAction(){
+        $url=$this->getRequest()->getParams()['url'];
+        $fileName=$this->getRequest()->getParams()['fileName'];
+        
+        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $dummyTmmt editor_Models_TmMt */
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+        
+        $localFile=$api->downloadFile($url,$fileName);
+
+        $this->view->layout()->disableLayout();
+        $this->_helper->viewRenderer->setNoRender(true);
+        
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="'.$fileName.'"');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        ob_clean();
+        flush();
+        readfile($localFile);
+        unlink($localFile);
+        exit();
+    }
+    
+    /***
+     * Get the download file status from sdl language cloud
+     * @param string $fileId
+     * @return string
+     */
+    private function getDownloadUrl($fileId){
+        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $dummyTmmt editor_Models_TmMt */
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+
+        $api->getFileStatus($fileId);
+        $result=$api->getResult();
+        
+        if(isset($result->result) && isset($result->result->downloadURL)){
+            return $result->result->downloadURL;
+        }
+        
+        return "";
+    }
     /***
      * Run translation for given params
      * @param array $params
@@ -168,5 +272,15 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
             $result=$api->getResult();
         }
         return isset($result->translation) ? $result->translation : "";
+    }
+    
+    /***
+     * Check if the request param is valid in array
+     * @param array $prm
+     * @param string $key
+     * @return boolean
+     */
+    private function isValidParam($prm,$key){
+        return isset($prm[$key]) && !empty($prm[$key]);
     }
 }

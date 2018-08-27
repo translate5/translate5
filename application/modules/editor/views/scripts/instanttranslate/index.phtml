@@ -32,9 +32,21 @@
     $machineTranslationEngines = $this->machineTranslationEngines;
     $mtSourceLanguageLocales = array();
     $mtTargetLanguageLocales = array();
+    
+    $rfcToIsoMap=array();
+    
     foreach ($machineTranslationEngines as $mtEngine) {
         $mtSourceLocale = $mtEngine['source'];
         $mtTargetLocale = $mtEngine['target'];
+        
+        if(!isset($rfcToIsoMap[$mtSourceLocale])){
+            $rfcToIsoMap[$mtSourceLocale]=$mtEngine['sourceIso'];
+        }
+        
+        if(!isset($rfcToIsoMap[$mtTargetLocale])){
+            $rfcToIsoMap[$mtTargetLocale]=$mtEngine['targetIso'];
+        }
+        
         if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
             $mtSourceLanguageLocales[] = $mtSourceLocale;
         }
@@ -91,7 +103,7 @@
                     sort($sourceLangLocalesFound);
                     foreach ($sourceLangLocalesFound as $sourceLangLocale) {
                         $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected' : '';
-                        echo '<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
+                        echo '<option value="'.$rfcToIsoMap[$sourceLangLocale].'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
                 ?>
             </select>
@@ -117,7 +129,7 @@
                     sort($targetLangLocalesFound);
                     foreach ($targetLangLocalesFound as $targetLangLocale) {
                         $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected' : '';
-                        echo '<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
+                        echo '<option value="'.$rfcToIsoMap[$targetLangLocale].'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
                 ?>
             </select>
@@ -185,7 +197,7 @@ $( function() {
     });
     if ($("#sourceLocale").val() !== '-') {
         renderLocalesAsAvailable('accordingToSourceLocale');
-    }
+    }   
 } );
 </script>
 

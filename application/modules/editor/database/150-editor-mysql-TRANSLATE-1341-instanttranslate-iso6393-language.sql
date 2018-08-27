@@ -26,11 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
-('editor', 'pm', 'editor_instanttranslate', 'all'),
-('editor', 'editor', 'editor_instanttranslate', 'all'),
-('editor', 'api', 'editor_instanttranslate', 'all');
+ALTER TABLE `LEK_languages` 
+ADD COLUMN `iso6393` VARCHAR(30) NULL AFTER `rtl`;
 
-INSERT INTO `translate5`.`Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.LanguageResources.fileExtension', '1', 'editor', 'system', '', '', '', 'map', 'Available file types by extension per engine type. The engine type is defined by source rcf5646,target rcf5646. ex: \"en-ge,en-us\"');
+UPDATE `LEK_languages` SET `iso6393`='ger' WHERE `rfc5646`='de';
+UPDATE `LEK_languages` SET `iso6393`='eng' WHERE `rfc5646`='en';
+UPDATE `LEK_languages` SET `iso6393`='spa' WHERE `rfc5646`='es';
+UPDATE `LEK_languages` SET `iso6393`='eng' WHERE `rfc5646`='en-GB';
+UPDATE `LEK_languages` SET `iso6393`='eng' WHERE `rfc5646`='en-US';
+UPDATE `LEK_languages` SET `iso6393`='fra' WHERE `rfc5646`='fr';
+UPDATE `LEK_languages` SET `iso6393`='ita' WHERE `rfc5646`='it';
+UPDATE `LEK_languages` SET `iso6393`='bul' WHERE `rfc5646`='bg';
+UPDATE `LEK_languages` SET `iso6393`='dan' WHERE `rfc5646`='da';
+UPDATE `LEK_languages` SET `iso6393`='est' WHERE `rfc5646`='ee';
+UPDATE `LEK_languages` SET `iso6393`='fin' WHERE `rfc5646`='fi';
+UPDATE `LEK_languages` SET `iso6393`='gre' WHERE `rfc5646`='el';
+UPDATE `LEK_languages` SET `iso6393`='hrv' WHERE `rfc5646`='hr';
+UPDATE `LEK_languages` SET `iso6393`='nld' WHERE `rfc5646`='nl';
 

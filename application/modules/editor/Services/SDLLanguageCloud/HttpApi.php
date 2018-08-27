@@ -107,21 +107,21 @@ class editor_Services_SDLLanguageCloud_HttpApi {
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
         
-        $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        //$this->http->setHeaders('Accept', 'application/json; charset=utf-8');
         $this->http->setHeaders('Authorization','LC apiKey='.$this->apiKey);
         return $this->http;
     }
     
     /**
      * Search the api for given source/target language by domainCode
-     * @param unknown $params
+     * @param array $params
      * @return boolean
      */
     public function search($params) {
         $data = new stdClass();
         
         if(!empty($params['domainCode'])){
-            $data->domainCode = $params['$domainCode'];
+            $data->domainCode = $params['domainCode'];
         }
         $data->text = $params['text'];
         
@@ -136,6 +136,77 @@ class editor_Services_SDLLanguageCloud_HttpApi {
         $http = $this->getHttp('POST', 'translate');
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         return $this->processResponse($this->request($http));
+    }
+    
+    /***
+     * Upload a file for translation
+     * 
+     * @param array $params
+     * @return boolean
+     */
+    public function uploadFile($params){
+        $data = new stdClass();
+        
+        if(!empty($params['domainCode'])){
+            $data->domainCode = $params['$domainCode'];
+        }
+        if(!empty($params['from'])){
+            $data->from = $params['from'];
+        }
+        
+        if(!empty($params['to'])){
+            $data->to = $params['to'];
+        }
+        
+        $http = $this->getHttp('POST', 'file-translations');
+        $http->setParameterPost('from',$data->from);
+        $http->setParameterPost('to',$data->to);
+        
+        //read the uploaded file content
+        $fileContent=file_get_contents($params['file']['tmp_name']);
+        $fileName=$params['file']['name'].'.'.$params['fileExtension'];
+        
+        //set the file upload
+        $http->setFileUpload($fileName, 'file', $fileContent, $params['file']['type']);
+        return $this->processResponse($this->request($http));
+    }
+    
+    /***
+     * Get file staus by file translation id (recieved from sdl language cloud)
+     * @param string $translationId
+     * @return boolean
+     */
+    public function getFileStatus($translationId){
+        $http = $this->getHttp('GET', '/file-translations/'.$translationId);
+        return $this->processResponse($this->request($http));
+    }
+    
+    /***
+     * Download the translated file form the sdl language cloud
+     * @param string $url
+     * @param string $fileName
+     * @return string
+     */
+    public function downloadFile($url,$fileName){
+        $client=new Zend_Http_Client();
+        
+        $client->setUri($url);
+        $client->setHeaders('Authorization','LC apiKey='.$this->apiKey);
+        
+        $client->setStream(); // will use temp file
+        $response = $client->request('GET');
+        
+        $file=APPLICATION_PATH.'/../data/'.$fileName;
+        
+        // copy file
+        copy($response->getStreamName(), $file);
+        // use stream
+        $fp = fopen($file, "w");
+        stream_copy_to_stream($response->getStream(), $fp);
+        // Also can write to known file
+        $client->setStream($file)->request('GET');
+        
+        return $file;
     }
     
     /***
@@ -247,6 +318,7 @@ class editor_Services_SDLLanguageCloud_HttpApi {
             $error->error = $response->getStatus();
             $error->url = $url;
             $error->method = $this->httpMethod;
+            $error->body=$response->getBody();
             $this->error[] = $error;
         }
         $result = json_decode(trim($response->getBody()));
