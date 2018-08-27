@@ -457,7 +457,7 @@ function translateText(){
         data: {
             'source':getIsoByRfcLanguage($("#sourceLocale").val()),
             'target':getIsoByRfcLanguage($("#targetLocale").val()),
-            'domainCode':getSelectedEngineCode(),
+            'domainCode':getSelectedEngineDomainCode(),
             'text':$('#sourceText').val()
         },
         success: function(result){
