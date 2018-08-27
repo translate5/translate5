@@ -433,6 +433,11 @@ function requestFileTranslate(){
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
+    
+    if(getSelectedEngineDomainCode()){
+    	data.append('domainCode', getSelectedEngineDomainCode());
+    }
+    
     data.append('from', getIsoByRfcLanguage($("#sourceLocale").val()));
     data.append('to', getIsoByRfcLanguage($("#targetLocale").val()));
     
