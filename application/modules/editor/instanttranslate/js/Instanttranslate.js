@@ -27,10 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 var editIdleTimer = null,
-    translateTextResponse = '',
     DEFAULT_FILE_EXT='txt',
     uploadedFiles;//Variable to store uploaded files
-
+    selectedEngineDomainCode = undefined,
+    translateTextResponse = '';
 
 /* --------------- start and terminate translations  ------------------------ */
 $('#sourceText').bind('keyup', function() {
@@ -201,7 +201,7 @@ function setSingleMtEngineById(engineId) {
     }
     var extenssions=Editor.data.languageresource.fileExtension,
     	extKey=mtEngine.source+","+mtEngine.target;
-    
+    selectedEngineDomainCode = machineTranslationEngines[engineId].domainCode;
     clearMtEngineSelectorError();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
@@ -217,31 +217,38 @@ function setSingleMtEngineById(engineId) {
     }
 }
 function renderMtEnginesAsAvailable() {
-    var mtIdsAvailable = getMtEnginesAccordingToLanguages(),
-        mtOptionList = [];
-    if (mtIdsAvailable.length === 0) {
+    var mtIdsAvailable,
+        mtOptionList = [],
+        sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val();
+    if (sourceLocale == '-' || targetLocale == '-') {
         $('#mtEngines').selectmenu("widget").hide();
-        showMtEngineSelectorError('noMatchingMt');
         return;
     }
-    mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+translatedStrings['foundMt']+":</option>");
-    for (i = 0; i < mtIdsAvailable.length; i++) {
-        mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
-    }
-    $('#mtEngines').find('option').remove().end();
-    $('#mtEngines').append(mtOptionList.join(""));
-    $('#mtEngines').selectmenu("refresh");
-    $('#mtEngines').selectmenu("widget").show();
-    if (mtIdsAvailable.length === 1) {
-        $('#PlsSelect').remove().end();
-        $("#mtEngines").selectmenu("refresh");
-        setSingleMtEngineById(mtIdsAvailable[0]);
-        showTranslations();
-        return;
-    }
-    if (mtIdsAvailable.length > 1) {
-        showMtEngineSelectorError('selectMt');
-        return;
+    mtIdsAvailable = getMtEnginesAccordingToLanguages();
+    switch(mtIdsAvailable.length) {
+        case 0:
+            $('#mtEngines').selectmenu("widget").hide();
+            selectedEngineDomainCode = undefined;
+            showMtEngineSelectorError('noMatchingMt');
+            break;
+        case 1:
+            $('#mtEngines').selectmenu("widget").hide();
+            setSingleMtEngineById(mtIdsAvailable[0]); // selectedEngineDomainCode is set there
+            showTranslations();
+            break;
+        default:
+            selectedEngineDomainCode = undefined;
+            if (mtIdsAvailable.length > 1) {
+                mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+translatedStrings['foundMt']+":</option>");
+                for (i = 0; i < mtIdsAvailable.length; i++) {
+                    mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
+                }
+                $('#mtEngines').find('option').remove().end();
+                $('#mtEngines').append(mtOptionList.join(""));
+                $('#mtEngines').selectmenu("refresh");
+                $('#mtEngines').selectmenu("widget").show();
+            }
     }
 }
 function getMtEnginesAccordingToLanguages() {
@@ -295,6 +302,7 @@ function renderLocalesAsAvailable(accordingTo) {
         selectedLocale,
         source = {},
         target = {};
+    $('#mtEngineSelectorError').hide();
     if (sourceLocale != '-' && targetLocale != '-') {
         // This means that the user has chosen a final combination of source AND target. The list contains only the selected locale and the "clear"-options.
         sourceLocalesAvailable.push(sourceLocale);
@@ -326,7 +334,6 @@ function renderLocalesAsAvailable(accordingTo) {
             targetLocalesAvailable.push(targetLocale);
             source = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: ''};
             target = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: targetLocale};
-            console.dir(targetLocalesAvailable);
         }
     }
     // render lists as set now:
@@ -405,15 +412,14 @@ function refreshSelectList(selectListId, options, selectedOptionValue) {
 }
 
 /***
- * Return the domain code(if exist) of the selected engine or false
+ * Return the domain code(if exist) of the set engine or false
  * @returns
  */
-function getSelectedEngineCode(){
-    var engineId=$("#mtEngines").val();
-    if(machineTranslationEngines[engineId] === undefined) {
+function getSelectedEngineDomainCode(){
+    if(selectedEngineDomainCode === undefined) {
         return false; 
     }
-    return machineTranslationEngines[engineId].domainCode;
+    return selectedEngineDomainCode;
 }
 
 /***
@@ -432,9 +438,11 @@ function getIsoByRfcLanguage(rfcCode){
  * @returns
  */
 function translateText(){
-    if (getSelectedEngineCode() === false) {
+    if (getSelectedEngineDomainCode() === false) {
+        console.log('translateText stopped; getSelectedEngineDomainCode FALSE!');
         return;
     }
+    console.log('translateText mit domainCode: ' + getSelectedEngineDomainCode() + ' / source: ' + $("#sourceLocale").val() + ' / target: ' + $("#targetLocale").val() + ' / text: ' + $('#sourceText').val());
     $('#translations').html(renderTranslationContainer());
     showTranslations();
     var translateRequest=$.ajax({
@@ -453,6 +461,7 @@ function translateText(){
             'text':$('#sourceText').val()
         },
         success: function(result){
+            clearMtEngineSelectorError(); // TODO: this repeats showTranslations from line 312
         	translateTextResponse = result.rows;
         	fillTranslation($("#mtEngines").val());
         }
@@ -479,7 +488,7 @@ $('.instant-translation-toggle').click(function(){
 
 /* --------------- clear source --------------------------------------------- */
 $(".clearable").each(function() {
-    // idea fom https://stackoverflow.com/a/6258628
+    // idea from https://stackoverflow.com/a/6258628
     var elInp = $(this).find("#sourceText"),
         elCle = $(this).find(".clearable-clear");
     elInp.on("input", function(){
