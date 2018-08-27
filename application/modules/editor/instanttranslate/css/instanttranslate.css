@@ -62,6 +62,11 @@ h4, p {
     font-size: 0.9EM !important;
 }
 
+#source .ui-button,
+#target .ui-button {
+    margin-bottom: 10px;
+}
+
 /* --------------- header --------------- */
 
 #containerHeader {
@@ -130,7 +135,6 @@ h4, p {
     font-size: 12px;
     text-decoration: none;
     color: #757575;
-    margin-top: 10px;
 }
 .source-toggle span {
     color: #00adef;
@@ -197,12 +201,14 @@ h4, p {
 #instantTranslationIsOn {
     display: none;
 }
-.instant-translation-toggle a {
+.instant-translation-toggle {
     color: #757575;
     font-family: "Roboto",sans-serif;
     font-size: 12px;
+}
+.instant-translation-toggle a {
+    color: #757575;
     text-decoration: none;
-    margin-top: 10px;
 }
 
 /* --------------- additional infos --------------- */
