@@ -27,7 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 var editIdleTimer = null,
-    translateTextResponse = '';
+    translateTextResponse = '',
+    DEFAULT_FILE_EXT='txt',
+    uploadedFiles;//Variable to store uploaded files
+
 
 /* --------------- start and terminate translations  ------------------------ */
 $('#sourceText').bind('keyup', function() {
@@ -53,7 +56,8 @@ function startTimerForInstantTranslation() {
 function startTranslation() {
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
-        alert('TODO...'); // TODO: translate files
+    	// TODO: show modal loading window
+    	requestFileTranslate();
         return;
     }
     // otherwise: translate Text
@@ -65,11 +69,125 @@ function startTranslation() {
     terminateTranslation();
     translateText();
 }
+
+// Add events
+$('#sourceFile').on('change', prepareUpload);
+
+// Grab the files and set them to uploadedFiles
+function prepareUpload(event){
+	uploadedFiles = event.target.files;
+}
+
+/***
+ * Request a file translate for the curent uploaded file
+ * @returns
+ */
+function requestFileTranslate(){
+
+	// Create a formdata object and add the files
+    var data = new FormData(),
+    	ext=getFileExtension();
+    
+    $.each(uploadedFiles, function(key, value){
+        data.append(key, value);
+    });
+    data.append('from', getIsoByRfcLanguage($("#sourceLocale").val()));
+    data.append('to', getIsoByRfcLanguage($("#targetLocale").val()));
+    
+    //when no extension in the file is found, use default file extension
+    data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
+    
+    $.ajax({
+        url:REST_PATH+"instanttranslate/file",
+        type: 'POST',
+        data: data,
+        cache: false,
+        dataType: 'json',
+        processData: false, // Don't process the files
+        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+        success: function(data, textStatus, jqXHR){
+            if(typeof data.error === 'undefined'){
+            	getDownloadUrl(data.fileId);
+            }else{
+                // Handle errors here
+                console.log('ERRORS: ' + data.error);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+            // Handle errors here
+            console.log('ERRORS: ' + textStatus);
+            // STOP LOADING SPINNER
+        }
+    });
+}
+
+/***
+ * Request a download url for given sdl file id
+ * @param fileId
+ * @returns
+ */
+function getDownloadUrl(fileId){
+    $.ajax({
+        statusCode: {
+            500: function() {
+                hideTranslations();
+                showMtEngineSelectorError('serverErrorMsg500');
+                }
+        },
+        url: REST_PATH+"instanttranslate/url",
+        dataType: "json",
+        data: {
+            'fileId':fileId
+        },
+        success: function(result){
+        	//when no url from server is provided, the file is not ready yet
+        	if(result.downloadUrl==""){
+        		setTimeout(function(){ getDownloadUrl(fileId); }, 1000);
+        		return;
+        	}
+        	downloadFile(result.downloadUrl);
+        }
+    })
+}
+
+/***
+ * Download the file from the sdl url.
+ * @param url
+ * @returns
+ */
+function downloadFile(url){
+	var hasFileExt=getFileExtension()!="",
+		fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension());
+	//TODO: add loading spiner into the window
+	window.open(REST_PATH+"instanttranslate/download?fileName="+fullFileName+"&url="+url,'_blank');
+	//TODO: stop the global loading spiner
+}
+
 function terminateTranslation() {
     clearTimeout(editIdleTimer);
     editIdleTimer = null;
 }
 
+/***
+ * Get the file name of the uploaded file
+ * @returns
+ */
+function getFileName(){
+	//return without fakepath
+	return $('#sourceFile').val().replace(/.*(\/|\\)/, '');;
+}
+
+/***
+ * Get file extension of the uploaded file
+ * @returns
+ */
+function getFileExtension(){
+	var fileName=getFileName(),
+		found = fileName.lastIndexOf('.') + 1,
+		ext = (found > 0 ? fileName.substr(found) : "");
+	return ext;
+}
 /* --------------- languages and MT-engines --------------------------------- */
 $('#mtEngines').on('selectmenuchange', function() {
     var engineId = $(this).val();
@@ -81,12 +199,21 @@ function setSingleMtEngineById(engineId) {
         showMtEngineSelectorError('selectMt');
         return;
     }
+    var extenssions=Editor.data.languageresource.fileExtension,
+    	extKey=mtEngine.source+","+mtEngine.target;
+    
     clearMtEngineSelectorError();
     $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
     $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
     $("#sourceLocale").click(); // render locale-lists!
     if ($('#sourceText').val().length > 0) {
         startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
+    }
+    
+    if(extenssions.hasOwnProperty(extKey)){
+    	$("#sourceIsText").show();
+    }else{
+    	$("#sourceIsText").hide();
     }
 }
 function renderMtEnginesAsAvailable() {
@@ -289,6 +416,15 @@ function getSelectedEngineCode(){
     return machineTranslationEngines[engineId].domainCode;
 }
 
+/***
+ * Return iso language code for the given rfc language code
+ * @param rfcCode
+ * @returns
+ */
+function getIsoByRfcLanguage(rfcCode){
+	return Editor.data.languageresource.rfcToIsoLanguage[rfcCode];
+}
+
 /* --------------- translation ---------------------------------------------- */
 /***
  * Send a request for translation, this will return translation result for each associated language resource
@@ -301,18 +437,18 @@ function translateText(){
     }
     $('#translations').html(renderTranslationContainer());
     showTranslations();
-    $.ajax({
+    var translateRequest=$.ajax({
         statusCode: {
             500: function() {
                 hideTranslations();
                 showMtEngineSelectorError('serverErrorMsg500');
-                }
+            }
         },
         url: REST_PATH+"instanttranslate/translate",
         dataType: "json",
         data: {
-            'source':$("#sourceLocale").val(),
-            'target':$("#targetLocale").val(),
+            'source':getIsoByRfcLanguage($("#sourceLocale").val()),
+            'target':getIsoByRfcLanguage($("#targetLocale").val()),
             'domainCode':getSelectedEngineCode(),
             'text':$('#sourceText').val()
         },
@@ -320,7 +456,7 @@ function translateText(){
         	translateTextResponse = result.rows;
         	fillTranslation($("#mtEngines").val());
         }
-    })
+    });
 }
 
 function renderTranslationContainer() {
@@ -426,7 +562,6 @@ function showTranslations() {
 function hideTranslations() {
     $('#translations').hide();
 }
-
 /* --------------- "toggle" source (text/file) ------------------------------ */
 $('.source-toggle span').click(function(){
     $('.source-toggle').toggle();
