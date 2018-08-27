@@ -40,7 +40,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         // last selected source and target languages for the user (=> new table Zf_users_meta)
         $sourceSearchLanguagePreselectionLocale= 'en-US'; // TODO; both content and structure of this content are DUMMY only!
-        $targetSearchLanguagePreselectionLocale= 'de-DE'; // TODO; both content and structure of this content are DUMMY only!
+        $targetSearchLanguagePreselectionLocale= 'ru-RU'; // TODO; both content and structure of this content are DUMMY only!
         
         $this->view->sourceSearchLanguagePreselectionLocale = $sourceSearchLanguagePreselectionLocale;
         $this->view->targetSearchLanguagePreselectionLocale = $targetSearchLanguagePreselectionLocale;
@@ -118,10 +118,10 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "serverErrorMsg500"         => $this->translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
                 "translate"                 => $this->translate->_("Übersetzen"),
                 "orTranslateFile"           => $this->translate->_("oder lassen Sie ein Dokument übersetzen"),
-                "translateText"             => $this->translate->_("lassen Sie Text übersetzen, den Sie eingeben."),
+                "orTranslateText"           => $this->translate->_("oder lassen Sie Text übersetzen, den Sie eingeben."),
                 "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
                 "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren"),
-                "uploadFileOr"              => $this->translate->_("Laden Sie eine Datei hoch oder"),
+                "uploadFile"                => $this->translate->_("Laden Sie eine Datei hoch"),
                 "pleaseChoose"              => $this->translate->_("Bitte auswählen"),
                 "clearBothLists"            => $this->translate->_("Beide Listen zurücksetzen"),
                 "showAllAvailableFor"       => $this->translate->_("Alle anzeigen für")

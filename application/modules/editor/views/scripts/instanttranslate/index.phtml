@@ -96,7 +96,7 @@
                 ?>
             </select>
             <div id="sourceIsText" class="source-toggle show-if-source-is-text"><?php echo $this->translations["enterText"];?></div>
-            <div id="sourceIsFile" class="source-toggle show-if-source-is-file"><?php echo $this->translations["uploadFileOr"];?> <span><?php echo $this->translations["translateText"];?></span></div>
+            <div id="sourceIsFile" class="source-toggle show-if-source-is-file"><?php echo $this->translations["uploadFile"];?> <span class="change-source-type"><?php echo $this->translations["orTranslateText"];?></span></div>
             <div id="sourceContent" class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
                 <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
@@ -189,6 +189,21 @@ $( function() {
     } else {
         renderLocalesAsAvailable('reset');
     }
+    // "toggle" source (text/file)
+    $('.source-toggle .change-source-type').click(function(){
+        $('.source-toggle').toggle();
+        if ($('#sourceIsText').is(":visible")) {
+            $('.show-if-source-is-text').show();
+            $('.show-if-source-is-file').hide();
+            showTranslations();
+            $("#sourceIsText").removeClass('source-text-error');
+            $('#sourceText').focus();
+        } else {
+            $('.show-if-source-is-text').hide();
+            $('.show-if-source-is-file').show();
+            hideTranslations();
+        }
+    });
 } );
 </script>
 
