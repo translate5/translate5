@@ -78,18 +78,6 @@
     <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
 </div>
 
-
-<div id="containerMtEngineSelect" class="container">
-  <form id="mtEngineSelector">
-      <fieldset>
-        <legend><?php echo $this->translations["availableMTEngines"];?>:</legend>
-        <select id="mtEngines" name="mtEngines">
-        </select>
-      <div id="mtEngineSelectorError" class="ui-state-error ui-corner-all"></div>
-      </fieldset>
-  </form>
-</div>
-
 <div id="containerTranslation" class="container">
 	<div id="source">
         <form id="sourceLanguageAndContent">
@@ -133,10 +121,12 @@
                     }
                 ?>
             </select>
+            <select id="mtEngines" name="mtEngines"></select>
             <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="ui-corner-all ui-button ui-widget">
             <div id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
             <div id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
+        <div id="mtEngineSelectorError" class="ui-state-error ui-corner-all"></div>
         <div id="translations">
             <!-- inject translations here  -->
         </div>
