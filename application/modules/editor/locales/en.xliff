@@ -2829,7 +2829,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 
 <trans-unit id='R2ViZW4gU2llIFRleHQgZWlu'><source>Geben Sie Text ein</source><target>Enter text</target></trans-unit>
-<trans-unit id='b2RlciBsYXNzZW4gU2llIGVpbiBEb2t1bWVudCDDvGJlcnNldHplbi4='><source>oder lassen Sie ein Dokument übersetzen.</source><target>or translate a document.</target></trans-unit>
+<trans-unit id='b2RlciBsYXNzZW4gU2llIGVpbiBEb2t1bWVudCDDvGJlcnNldHplbi4='><source>oder lassen Sie ein Dokument übersetzen</source><target>or translate a document</target></trans-unit>
 <trans-unit id='bGFzc2VuIFNpZSBlaW4gRG9rdW1lbnQgw7xiZXJzZXR6ZW4u'><source>lassen Sie ein Dokument übersetzen.</source><target>translate a document.</target></trans-unit>
 <trans-unit id='bGFzc2VuIFNpZSBUZXh0IMO8YmVyc2V0emVuLCBkZW4gU2llIGVpbmdlYmVuLg=='><source>lassen Sie Text übersetzen, den Sie eingeben.</source><target>translate text that you enter.</target></trans-unit>
 <trans-unit id='TGFkZW4gU2llIGVpbmUgRGF0ZWkgaG9jaCBvZGVy'><source>Laden Sie eine Datei hoch oder</source><target>Upload a document or</target></trans-unit>

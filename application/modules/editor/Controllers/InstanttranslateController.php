@@ -117,7 +117,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "selectMt"                  => $this->translate->_("Bitte eine der verfügbaren MT-Engines auswählen."),
                 "serverErrorMsg500"         => $this->translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
                 "translate"                 => $this->translate->_("Übersetzen"),
-                "orTranslateFile"           => $this->translate->_("oder lassen Sie ein Dokument übersetzen."),
+                "orTranslateFile"           => $this->translate->_("oder lassen Sie ein Dokument übersetzen"),
                 "translateText"             => $this->translate->_("lassen Sie Text übersetzen, den Sie eingeben."),
                 "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
                 "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren"),
