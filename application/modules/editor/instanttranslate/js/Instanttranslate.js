@@ -28,259 +28,56 @@ END LICENSE AND COPYRIGHT
 
 var editIdleTimer = null,
     DEFAULT_FILE_EXT='txt',
-    uploadedFiles;//Variable to store uploaded files
-    selectedEngineDomainCode = undefined,
+    uploadedFiles,//Variable to store uploaded files
+    selectedEngineId = undefined,
     translateTextResponse = '';
 
-/* --------------- start and terminate translations  ------------------------ */
-$('#sourceText').bind('keyup', function() {
-    // start instant (sic!) translation automatically
-    startTimerForInstantTranslation();
-});
-$('#translationSubmit').click(function(){
-    // start translation manually via button
-    startTranslation();
-    return false;
-});
-$('#instantTranslationIsOff').click(function(){
-    startTranslation();
-});
-function startTimerForInstantTranslation() {
-    terminateTranslation();
-    if ($('#instantTranslationIsOn').is(":visible")) {
-        editIdleTimer = setTimeout(function() {
-            startTranslation();
-        }, 200);
-    }
-}
-function startTranslation() {
-    // translate a file?
-    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
-    	// TODO: show modal loading window
-    	requestFileTranslate();
-        return;
-    }
-    // otherwise: translate Text
-    if ($('#sourceText').val().length === 0) {
-        $("#sourceIsText").addClass('source-text-error');
-        hideTranslations();
-        return;
-    }
-    terminateTranslation();
-    translateText();
-}
+/* --------------- set, unset and get the selected mtEngine  ---------------- */
 
-// Add events
-$('#sourceFile').on('change', prepareUpload);
-
-// Grab the files and set them to uploadedFiles
-function prepareUpload(event){
-	uploadedFiles = event.target.files;
+function setMtEngine(engineId) {
+    selectedEngineId = engineId;
+    console.log('selectedEngineId: ' + selectedEngineId);
 }
-
+function unsetMtEngine() {
+    console.log('unsetMtEngine');
+    selectedEngineId = undefined;
+}
 /***
- * Request a file translate for the curent uploaded file
+ * Return the id of the set engine(if set) or false
  * @returns
  */
-function requestFileTranslate(){
-
-	// Create a formdata object and add the files
-    var data = new FormData(),
-    	ext=getFileExtension();
-    
-    $.each(uploadedFiles, function(key, value){
-        data.append(key, value);
-    });
-    data.append('from', getIsoByRfcLanguage($("#sourceLocale").val()));
-    data.append('to', getIsoByRfcLanguage($("#targetLocale").val()));
-    
-    //when no extension in the file is found, use default file extension
-    data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
-    
-    $.ajax({
-        url:REST_PATH+"instanttranslate/file",
-        type: 'POST',
-        data: data,
-        cache: false,
-        dataType: 'json',
-        processData: false, // Don't process the files
-        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-        success: function(data, textStatus, jqXHR){
-            if(typeof data.error === 'undefined'){
-            	getDownloadUrl(data.fileId);
-            }else{
-                // Handle errors here
-                console.log('ERRORS: ' + data.error);
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown)
-        {
-            // Handle errors here
-            console.log('ERRORS: ' + textStatus);
-            // STOP LOADING SPINNER
-        }
-    });
+function getSelectedEngineId(){
+    if(selectedEngineId === undefined) {
+        return false; 
+    }
+    console.log('getSelectedEngineId: ' + selectedEngineId);
+    return selectedEngineId;
 }
-
 /***
- * Request a download url for given sdl file id
- * @param fileId
+ * Return the domain code(if exist) of the set engine or false
  * @returns
  */
-function getDownloadUrl(fileId){
-    $.ajax({
-        statusCode: {
-            500: function() {
-                hideTranslations();
-                showMtEngineSelectorError('serverErrorMsg500');
-                }
-        },
-        url: REST_PATH+"instanttranslate/url",
-        dataType: "json",
-        data: {
-            'fileId':fileId
-        },
-        success: function(result){
-        	//when no url from server is provided, the file is not ready yet
-        	if(result.downloadUrl==""){
-        		setTimeout(function(){ getDownloadUrl(fileId); }, 1000);
-        		return;
-        	}
-        	downloadFile(result.downloadUrl);
-        }
-    })
+function getSelectedEngineDomainCode(){
+    var engineId = getSelectedEngineId(),
+        selectedEngineDomainCode = machineTranslationEngines[engineId].domainCode;
+    if(engineId === false || selectedEngineDomainCode === undefined) {
+        return false; 
+    }
+    console.log('getSelectedEngineDomainCode: ' + selectedEngineDomainCode);
+    return selectedEngineDomainCode;
 }
 
-/***
- * Download the file from the sdl url.
- * @param url
- * @returns
- */
-function downloadFile(url){
-	var hasFileExt=getFileExtension()!="",
-		fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension());
-	//TODO: add loading spiner into the window
-	window.open(REST_PATH+"instanttranslate/download?fileName="+fullFileName+"&url="+url,'_blank');
-	//TODO: stop the global loading spiner
-}
-
-function terminateTranslation() {
-    clearTimeout(editIdleTimer);
-    editIdleTimer = null;
-}
-
-/***
- * Get the file name of the uploaded file
- * @returns
- */
-function getFileName(){
-	//return without fakepath
-	return $('#sourceFile').val().replace(/.*(\/|\\)/, '');;
-}
-
-/***
- * Get file extension of the uploaded file
- * @returns
- */
-function getFileExtension(){
-	var fileName=getFileName(),
-		found = fileName.lastIndexOf('.') + 1,
-		ext = (found > 0 ? fileName.substr(found) : "");
-	return ext;
-}
-/* --------------- languages and MT-engines --------------------------------- */
-$('#mtEngines').on('selectmenuchange', function() {
-    var engineId = $(this).val();
-    setSingleMtEngineById(engineId);
-});
-function setSingleMtEngineById(engineId) {
-    var mtEngine = machineTranslationEngines[engineId];
-    if(machineTranslationEngines[engineId] === undefined) {
-        showMtEngineSelectorError('selectMt');
-        return;
-    }
-    var extenssions=Editor.data.languageresource.fileExtension,
-    	extKey=mtEngine.source+","+mtEngine.target;
-    selectedEngineDomainCode = machineTranslationEngines[engineId].domainCode;
-    clearMtEngineSelectorError();
-    $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
-    $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
-    $("#sourceLocale").click(); // render locale-lists!
-    if ($('#sourceText').val().length > 0) {
-        startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
-    }
-    
-    if(extenssions.hasOwnProperty(extKey)){
-    	$("#sourceIsText").show();
-    }else{
-    	$("#sourceIsText").hide();
-    }
-}
-function renderMtEnginesAsAvailable() {
-    var mtIdsAvailable,
-        mtOptionList = [],
-        sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val();
-    if (sourceLocale == '-' || targetLocale == '-') {
-        $('#mtEngines').selectmenu("widget").hide();
-        return;
-    }
-    mtIdsAvailable = getMtEnginesAccordingToLanguages();
-    switch(mtIdsAvailable.length) {
-        case 0:
-            $('#mtEngines').selectmenu("widget").hide();
-            selectedEngineDomainCode = undefined;
-            showMtEngineSelectorError('noMatchingMt');
-            break;
-        case 1:
-            $('#mtEngines').selectmenu("widget").hide();
-            setSingleMtEngineById(mtIdsAvailable[0]); // selectedEngineDomainCode is set there
-            showTranslations();
-            break;
-        default:
-            selectedEngineDomainCode = undefined;
-            if (mtIdsAvailable.length > 1) {
-                mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+translatedStrings['foundMt']+":</option>");
-                for (i = 0; i < mtIdsAvailable.length; i++) {
-                    mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
-                }
-                $('#mtEngines').find('option').remove().end();
-                $('#mtEngines').append(mtOptionList.join(""));
-                $('#mtEngines').selectmenu("refresh");
-                $('#mtEngines').selectmenu("widget").show();
-            }
-    }
-}
-function getMtEnginesAccordingToLanguages() {
-    var sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val(),
-        mtIdsAvailable = [],
-        engineId,
-        mtEngineToCheck,
-        langIsOK = function(langMT,langSet){
-            if (langMT === langSet) {
-                return true;
-            }
-            if (langSet === '-') {
-                return true;
-            }
-            return false;
-        };
-    for (engineId in machineTranslationEngines) {
-        if (machineTranslationEngines.hasOwnProperty(engineId)) {
-            mtEngineToCheck = machineTranslationEngines[engineId];
-            if (langIsOK(mtEngineToCheck.source,sourceLocale) && langIsOK(mtEngineToCheck.target,targetLocale)) {
-                mtIdsAvailable.push(engineId); 
-            }
-        }
-    }
-    return mtIdsAvailable;
-}
+/*  -------------------------------------------------------------------------
+ * ORDER OF DISPLAY FOR THE USER:
+ * (1) languages are selected from the locales-lists (renderLocalesAsAvailable)
+ * (2) every change in the language-selection starts a check if/how many mtEngines 
+ *     are available (renderMtEnginesAsAvailable)
+ * (3) As soon as there is exactly ONE mtEngine available or set by the user, source- and 
+ *     (a) translation-forms are shown (showTranslationFormsAsReady)
+ *     (b) mtEngine is set
+ *  ------------------------------------------------------------------------- */
 
 /* --------------- locales-list (source, target) ---------------------------- */
-$('#sourceLocale').on('click', function() {
-    renderLocalesAsAvailable('accordingToSourceLocale');
-});
 /**
  * Include languages for source/target only if there is an Mt-Engine available 
  * for the resulting source-target-combination.
@@ -302,7 +99,7 @@ function renderLocalesAsAvailable(accordingTo) {
         selectedLocale,
         source = {},
         target = {};
-    $('#mtEngineSelectorError').hide();
+    clearAllErrorMessages();
     if (sourceLocale != '-' && targetLocale != '-') {
         // This means that the user has chosen a final combination of source AND target. The list contains only the selected locale and the "clear"-options.
         sourceLocalesAvailable.push(sourceLocale);
@@ -328,11 +125,19 @@ function renderLocalesAsAvailable(accordingTo) {
             sourceLocalesAvailable.push(sourceLocale);
             targetLocalesAvailable = localesAvailable;
             source = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: sourceLocale};
-            target = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: ''};
+            if (localesAvailable.length == 1) {
+                target = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: localesAvailable[0]};
+            } else {
+                target = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: ''};
+            }
         } else {
             sourceLocalesAvailable = localesAvailable;
             targetLocalesAvailable.push(targetLocale);
-            source = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: ''};
+            if (localesAvailable.length == 1) {
+                source = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: localesAvailable[0]};
+            } else {
+                source = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: ''};
+            }
             target = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: targetLocale};
         }
     }
@@ -347,6 +152,7 @@ function renderLocalesAsAvailable(accordingTo) {
         targetLocaleOptions = renderLocaleOptionList(target);
         refreshSelectList('targetLocale', targetLocaleOptions, target.selectedValue);
     }
+    renderMtEnginesAsAvailable();
 }
 function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     var localesAvailable = [],
@@ -411,24 +217,146 @@ function refreshSelectList(selectListId, options, selectedOptionValue) {
     $('#'+selectListId).selectmenu("widget").show();
 }
 
-/***
- * Return the domain code(if exist) of the set engine or false
- * @returns
- */
-function getSelectedEngineDomainCode(){
-    if(selectedEngineDomainCode === undefined) {
-        return false; 
+/* --------------- languages and MT-engines --------------------------------- */
+$('#mtEngines').on('selectmenuchange', function() {
+    var engineId = $(this).val();
+    setSingleMtEngineById(engineId);
+});
+function setSingleMtEngineById(engineId) {
+    var mtEngine = machineTranslationEngines[engineId];
+    if(machineTranslationEngines[engineId] === undefined) {
+        showMtEngineSelectorError('selectMt');
+        return;
     }
-    return selectedEngineDomainCode;
+    var extenssions=Editor.data.languageresource.fileExtension,
+    	extKey=mtEngine.source+","+mtEngine.target;
+    setMtEngine(engineId);
+    clearAllErrorMessages();
+    showTranslationFormsAsReady();
+    $("#sourceLocale").val(mtEngine.source).selectmenu("refresh");
+    $("#targetLocale").val(mtEngine.target).selectmenu("refresh");
+    $("#sourceLocale").click(); // render locale-lists!
+    if ($('#sourceText').val().length > 0) {
+        startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
+    }
+    
+    if(extenssions.hasOwnProperty(extKey)){
+    	$("#sourceIsText").html(translatedStrings['enterText']+' <span>'+translatedStrings["orTranslateFile"]+'</span>');
+    }else{
+    	$("#sourceIsText").html(translatedStrings["enterText"]+':');
+    }
+}
+function renderMtEnginesAsAvailable() {
+    var mtIdsAvailable,
+        mtOptionList = [],
+        sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val();
+    if (sourceLocale == '-' || targetLocale == '-') {
+        unsetMtEngine();
+        showLanguageSelectsOnly();
+        return;
+    }
+    mtIdsAvailable = getMtEnginesAccordingToLanguages();
+    switch(mtIdsAvailable.length) {
+        case 0:
+            unsetMtEngine();
+            showLanguageSelectsOnly();
+            showMtEngineSelectorError('noMatchingMt');
+            break;
+        case 1:
+            setSingleMtEngineById(mtIdsAvailable[0]); // selectedEngine is set there
+            break;
+        default:
+            unsetMtEngine();
+            showLanguageSelectsOnly();
+            // But now also show mtEngine-Select:
+            if (mtIdsAvailable.length > 1) {
+                mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+translatedStrings['foundMt']+":</option>");
+                for (i = 0; i < mtIdsAvailable.length; i++) {
+                    mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
+                }
+                $('#mtEngines').find('option').remove().end();
+                $('#mtEngines').append(mtOptionList.join(""));
+                $('#mtEngines').selectmenu("refresh");
+                $('#mtEngines').selectmenu("widget").show();
+            }
+    }
+}
+function getMtEnginesAccordingToLanguages() {
+    var sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val(),
+        mtIdsAvailable = [],
+        engineId,
+        mtEngineToCheck,
+        langIsOK = function(langMT,langSet){
+            if (langMT === langSet) {
+                return true;
+            }
+            if (langSet === '-') {
+                return true;
+            }
+            return false;
+        };
+    for (engineId in machineTranslationEngines) {
+        if (machineTranslationEngines.hasOwnProperty(engineId)) {
+            mtEngineToCheck = machineTranslationEngines[engineId];
+            if (langIsOK(mtEngineToCheck.source,sourceLocale) && langIsOK(mtEngineToCheck.target,targetLocale)) {
+                mtIdsAvailable.push(engineId); 
+            }
+        }
+    }
+    return mtIdsAvailable;
 }
 
-/***
- * Return iso language code for the given rfc language code
- * @param rfcCode
- * @returns
- */
-function getIsoByRfcLanguage(rfcCode){
-	return Editor.data.languageresource.rfcToIsoLanguage[rfcCode];
+/* --------------- start and terminate translations  ------------------------ */
+$('#sourceText').bind('keyup', function() {
+    // start instant (sic!) translation automatically
+    startTimerForInstantTranslation();
+});
+$('#translationSubmit').click(function(){
+    // start translation manually via button
+    startTranslation();
+    return false;
+});
+$('#instantTranslationIsOff').click(function(){
+    startTranslation();
+});
+function startTimerForInstantTranslation() {
+    terminateTranslation();
+    if ($('#instantTranslationIsOn').is(":visible")) {
+        editIdleTimer = setTimeout(function() {
+            startTranslation();
+        }, 200);
+    }
+}
+function startTranslation() {
+    // translate a file?
+    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
+        // TODO: show modal loading window
+        requestFileTranslate();
+        return;
+    }
+    // otherwise: translate Text
+    if ($('#sourceText').val().length === 0) {
+        $("#sourceIsText").addClass('source-text-error');
+        $('#translations').hide();
+        return;
+    }
+    terminateTranslation();
+    translateText();
+}
+
+function terminateTranslation() {
+    clearTimeout(editIdleTimer);
+    editIdleTimer = null;
+}
+
+// Add events
+$('#sourceFile').on('change', prepareUpload);
+
+// Grab the files and set them to uploadedFiles
+function prepareUpload(event){
+    uploadedFiles = event.target.files;
 }
 
 /* --------------- translation ---------------------------------------------- */
@@ -461,24 +389,150 @@ function translateText(){
             'text':$('#sourceText').val()
         },
         success: function(result){
-            clearMtEngineSelectorError(); // TODO: this repeats showTranslations from line 312
-        	translateTextResponse = result.rows;
-        	fillTranslation($("#mtEngines").val());
+            if (result.errors != '') {
+                showTranslationError(result.errors);
+            } else {
+                clearAllErrorMessages();
+                translateTextResponse = result.rows;
+                fillTranslation($("#mtEngines").val());
+            }
         }
     });
 }
 
 function renderTranslationContainer() {
-    var translationsContainer = '';
-    translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+$("#mtEngines").val()+'"></div>';
-    translationsContainer += '<span class="copyable-copy" title="'+translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContainer += '</div>';
+    var translationsContainer = '',
+        engineId = getSelectedEngineId();
+    if (engineId !== false) {
+        translationsContainer += '<div class="copyable">';
+        translationsContainer += '<div class="translation-result" id="'+engineId+'"></div>';
+        translationsContainer += '<span class="copyable-copy" title="'+translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
+        translationsContainer += '</div>';
+        translationsContainer += '<div id="translationError'+engineId+'" class="translation-error ui-state-error ui-corner-all"></div>';
+    }
     return translationsContainer;
 }
 
-function fillTranslation(engineId) {
-    $('#'+engineId).html(translateTextResponse);
+function fillTranslation() {
+    var engineId = getSelectedEngineId();
+    if (engineId !== false && document.getElementById(engineId) !== null) {
+        $('#'+engineId).html(translateTextResponse);
+    }
+}
+
+/***
+ * Request a file translate for the curent uploaded file
+ * @returns
+ */
+function requestFileTranslate(){
+
+    // Create a formdata object and add the files
+    var data = new FormData(),
+        ext=getFileExtension();
+    
+    $.each(uploadedFiles, function(key, value){
+        data.append(key, value);
+    });
+    data.append('from', getIsoByRfcLanguage($("#sourceLocale").val()));
+    data.append('to', getIsoByRfcLanguage($("#targetLocale").val()));
+    
+    //when no extension in the file is found, use default file extension
+    data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
+    
+    $.ajax({
+        url:REST_PATH+"instanttranslate/file",
+        type: 'POST',
+        data: data,
+        cache: false,
+        dataType: 'json',
+        processData: false, // Don't process the files
+        contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+        success: function(data, textStatus, jqXHR){
+            if(typeof data.error === 'undefined'){
+                getDownloadUrl(data.fileId);
+            }else{
+                // Handle errors here
+                console.log('ERRORS: ' + data.error);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown)
+        {
+            // Handle errors here
+            console.log('ERRORS: ' + textStatus);
+            // STOP LOADING SPINNER
+        }
+    });
+}
+
+/***
+ * Request a download url for given sdl file id
+ * @param fileId
+ * @returns
+ */
+function getDownloadUrl(fileId){
+    $.ajax({
+        statusCode: {
+            500: function() {
+                hideTranslations();
+                showMtEngineSelectorError('serverErrorMsg500');
+                }
+        },
+        url: REST_PATH+"instanttranslate/url",
+        dataType: "json",
+        data: {
+            'fileId':fileId
+        },
+        success: function(result){
+            //when no url from server is provided, the file is not ready yet
+            if(result.downloadUrl==""){
+                setTimeout(function(){ getDownloadUrl(fileId); }, 1000);
+                return;
+            }
+            downloadFile(result.downloadUrl);
+        }
+    })
+}
+
+/***
+ * Download the file from the sdl url.
+ * @param url
+ * @returns
+ */
+function downloadFile(url){
+    var hasFileExt=getFileExtension()!="",
+        fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension());
+    //TODO: add loading spiner into the window
+    window.open(REST_PATH+"instanttranslate/download?fileName="+fullFileName+"&url="+url,'_blank');
+    //TODO: stop the global loading spiner
+}
+
+/***
+ * Get the file name of the uploaded file
+ * @returns
+ */
+function getFileName(){
+    //return without fakepath
+    return $('#sourceFile').val().replace(/.*(\/|\\)/, '');;
+}
+
+/***
+ * Get file extension of the uploaded file
+ * @returns
+ */
+function getFileExtension(){
+    var fileName=getFileName(),
+        found = fileName.lastIndexOf('.') + 1,
+        ext = (found > 0 ? fileName.substr(found) : "");
+    return ext;
+}
+
+/***
+ * Return iso language code for the given rfc language code
+ * @param rfcCode
+ * @returns
+ */
+function getIsoByRfcLanguage(rfcCode){
+    return Editor.data.languageresource.rfcToIsoLanguage[rfcCode];
 }
 
 /* --------------- toggle instant translation ------------------------------- */
@@ -507,9 +561,10 @@ $('#sourceText').on("input focus", function(){
     $('#countedCharacters').html(sourceTextLength);
     if (sourceTextLength === 0) {
         $(".clearable-clear").hide();
-        hideTranslations();
+        $('#translations').hide();
     } else {
         $("#sourceIsText").removeClass('source-text-error');
+        $('#translations').show();
     }
 });
 
@@ -538,21 +593,22 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 });
 
 /* --------------- show/hide ------------------------------------------------ */
-function clearMtEngineSelectorError() {
-    $('#mtEngineSelectorError').hide();
+function showLanguageSelectsOnly() {
+    $('#mtEngines').selectmenu("widget").hide();
+    $('#translationSubmit').hide();
+    hideSourceText();
+    hideTranslations();
+}
+function showTranslationFormsAsReady() {
+    $('#mtEngines').selectmenu("widget").hide();
     showSourceText();
     showTranslations();
 }
-function showMtEngineSelectorError(errorMode) {
-    $('#mtEngineSelectorError').html(translatedStrings[errorMode]).show();
-    $('#translationSubmit').hide();
-    if ($('#sourceText').val().length === 0) {
-        hideSourceText();
-    }
-}
+/* --------------- show/hide: helpers --------------------------------------- */
 function showSourceText() {
     $('#sourceContent').show();
     $('#sourceIsText').show();
+    $('#sourceText').focus();
 }
 function hideSourceText() {
     $('#sourceContent').hide();
@@ -570,7 +626,30 @@ function showTranslations() {
 }
 function hideTranslations() {
     $('#translations').hide();
+    $('#translationSubmit').hide();
+    $('#instantTranslationIsOn').hide();
+    $('#instantTranslationIsOff').hide();
 }
+/* --------------- show/hide: errors --------------------------------------- */
+function showMtEngineSelectorError(errorMode) {
+    $('#mtEngineSelectorError').html(translatedStrings[errorMode]).show();
+    $('#translationSubmit').hide();
+    if ($('#sourceText').val().length === 0) {
+        hideSourceText();
+    }
+}
+function showTranslationError(errorText) {
+    var engineId = getSelectedEngineId(),
+        divId = 'translationError'+engineId;
+    if (engineId !== false && document.getElementById(divId) !== null) {
+        $('#'+divId).html(errorText).show();
+    }
+}
+function clearAllErrorMessages() {
+    $('#mtEngineSelectorError').hide();
+    $('.translation-error').hide();
+}
+
 /* --------------- "toggle" source (text/file) ------------------------------ */
 $('.source-toggle span').click(function(){
     $('.source-toggle').toggle();
