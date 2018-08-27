@@ -176,15 +176,17 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         // Returns all known internal file information
         $files = $upload->getFileInfo();
 
-        $reqParams=$this->getRequest()->getParams();
-        
-        if(!$this->isValidParam($reqParams,'from') || !$this->isValidParam($reqParams,'to')){
-            $this->_helper->json(array("error"=>"Source or target language parametar is missing"));
-        }
-        
         if(empty($files)){
             $this->_helper->json(array("error"=>"No upload files were found"));
         }
+        
+        $reqParams=$this->getRequest()->getParams();
+        
+        //if there is no engine domain defined or source and target language, return an error message
+        if(!$this->isValidParam($reqParams,'domainCode') && (!$this->isValidParam($reqParams,'from') || !$this->isValidParam($reqParams,'to'))){
+            $this->_helper->json(array("error"=>"Engine domainCode or source and target language parametars are missing"));
+        }
+        
         
         $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
         /* @var $dummyTmmt editor_Models_TmMt */
@@ -197,35 +199,55 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         if(!$response){
             //TODO handle errors to the frontend
             error_log(print_r($api->getErrors(),1));
+            $messages='';
+            foreach($api->getErrors() as $error){
+                $messages=$error->body.'\n';
+            }
+            //$ex=new ZfExtended_ValidateException();
+           // $ex->setErrors(["Unable to process the request.".$messages]);
+            //            throw $ex;
+            //$this->_helper->json(array("error"=>"Unable to process the request.".$messages));
+            
             $this->_helper->json(array("error"=>"Unable to process the request."));
         }
-        
         $this->_helper->json(array("fileId"=>$api->getResult()->id));
     }
     
     public function urlAction(){
-        $fileId=$this->getRequest()->getParams()['fileId'];
-        $url=$this->getDownloadUrl($fileId);
+        $requestParams=$this->getRequest()->getParams();
+        
+        if(!$this->isValidParam($requestParams, 'fileId')){
+            $this->_helper->json(array("error"=>"File id parametar is not valid"));
+        }
+        
+        $url=$this->getDownloadUrl($requestParams['fileId']);
         $this->_helper->json(array("downloadUrl"=>$url));
     }
     
     public function downloadAction(){
-        $url=$this->getRequest()->getParams()['url'];
-        $fileName=$this->getRequest()->getParams()['fileName'];
+        $requestParams=$this->getRequest()->getParams();
+        
+        if(!$this->isValidParam($requestParams, 'url')){
+            $this->_helper->json(array("error"=>"Url parametar is not valid"));
+        }
+        
+        if(!$this->isValidParam($requestParams, 'fileName')){
+            $this->_helper->json(array("error"=>"FileName parametar is not valid"));
+        }
         
         $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
         /* @var $dummyTmmt editor_Models_TmMt */
         $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
         /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
         
-        $localFile=$api->downloadFile($url,$fileName);
+        $localFile=$api->downloadFile($requestParams['url'],$requestParams['fileName']);
 
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="'.$fileName.'"');
+        header('Content-Disposition: attachment; filename="'.$requestParams['fileName'].'"');
         header('Content-Transfer-Encoding: binary');
         header('Expires: 0');
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');

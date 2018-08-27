@@ -145,22 +145,18 @@ class editor_Services_SDLLanguageCloud_HttpApi {
      * @return boolean
      */
     public function uploadFile($params){
-        $data = new stdClass();
-        
-        if(!empty($params['domainCode'])){
-            $data->domainCode = $params['$domainCode'];
-        }
-        if(!empty($params['from'])){
-            $data->from = $params['from'];
-        }
-        
-        if(!empty($params['to'])){
-            $data->to = $params['to'];
-        }
-        
         $http = $this->getHttp('POST', 'file-translations');
-        $http->setParameterPost('from',$data->from);
-        $http->setParameterPost('to',$data->to);
+
+        if(!empty($params['domainCode']) && isset($params['domainCode'])){
+            $http->setParameterPost('domainCode',$params['domainCode']);
+        }
+        if(!empty($params['from']) && isset($params['from'])){
+            $http->setParameterPost('from',$params['from']);
+        }
+        
+        if(!empty($params['to']) && isset($params['to'])){
+            $http->setParameterPost('to',$params['to']);
+        }
         
         //read the uploaded file content
         $fileContent=file_get_contents($params['file']['tmp_name']);
