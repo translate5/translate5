@@ -25,7 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
---rename ergonomic to normal and old normal to details
+-- rename ergonomic to normal and old normal to details
 UPDATE `Zf_configuration` SET `value` = 'details' WHERE `value` = 'normal' AND `name` = 'runtimeOptions.editor.startViewMode';
 UPDATE `Zf_configuration` SET `value` = 'normal' WHERE `value` = 'ergonomic' AND `name` = 'runtimeOptions.editor.startViewMode';
 UPDATE `Zf_configuration` SET `default` = 'normal', `defaults` = 'normal,details'
