@@ -223,22 +223,25 @@ $('#mtEngines').on('selectmenuchange', function() {
     setSingleMtEngineById(engineId);
 });
 function setSingleMtEngineById(engineId) {
-    var mtEngine = machineTranslationEngines[engineId];
+    var mtEngine = machineTranslationEngines[engineId],
+        extensionsFileTranslation,
+        extensionsKey,
+        fileTypes;
     if(machineTranslationEngines[engineId] === undefined) {
         showMtEngineSelectorError('selectMt');
         return;
     }
-    var extenssions=Editor.data.languageresource.fileExtension,
-    	extKey=mtEngine.source+","+mtEngine.target;
     setMtEngine(engineId);
     clearAllErrorMessages();
     showTranslationFormsAsReady();
     if ($('#sourceText').val().length > 0) {
         startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
     }
-    
-    if(extenssions.hasOwnProperty(extKey)){
-    	$("#sourceIsText").html(translatedStrings['enterText']+' <span>'+translatedStrings["orTranslateFile"]+'</span>');
+    extensionsFileTranslation = Editor.data.languageresource.fileExtension;
+    extensionsKey = mtEngine.source+","+mtEngine.target;
+    if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
+        fileTypes = extensionsFileTranslation[extensionsKey].toString();
+    	$("#sourceIsText").html(translatedStrings['enterText']+' <span>'+translatedStrings["orTranslateFile"]+' (' + fileTypes +').</span>');
     }else{
     	$("#sourceIsText").html(translatedStrings["enterText"]+':');
     }
