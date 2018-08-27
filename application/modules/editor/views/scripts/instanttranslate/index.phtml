@@ -91,11 +91,11 @@
                     sort($sourceLangLocalesFound);
                     foreach ($sourceLangLocalesFound as $sourceLangLocale) {
                         $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected' : '';
-                        echo '<option value="'.$rfcToIsoMap[$sourceLangLocale].'"'.$selected.'>'.$sourceLangLocale.'</option>';
+                        echo '<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
                 ?>
             </select>
-            <div id="sourceIsText" class="source-toggle show-if-source-is-text"><?php echo $this->translations["enterText"];?> <span><?php echo $this->translations["orTranslateFile"];?></span></div>
+            <div id="sourceIsText" class="source-toggle show-if-source-is-text"><?php echo $this->translations["enterText"];?></div>
             <div id="sourceIsFile" class="source-toggle show-if-source-is-file"><?php echo $this->translations["uploadFileOr"];?> <span><?php echo $this->translations["translateText"];?></span></div>
             <div id="sourceContent" class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
@@ -117,7 +117,7 @@
                     sort($targetLangLocalesFound);
                     foreach ($targetLangLocalesFound as $targetLangLocale) {
                         $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected' : '';
-                        echo '<option value="'.$rfcToIsoMap[$targetLangLocale].'"'.$selected.'>'.$targetLangLocale.'</option>';
+                        echo '<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
                 ?>
             </select>
@@ -126,7 +126,7 @@
             <div id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
             <div id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
-        <div id="mtEngineSelectorError" class="ui-state-error ui-corner-all"></div>
+        <div id="mtEngineSelectorError" class="translation-error ui-state-error ui-corner-all"></div>
         <div id="translations">
             <!-- inject translations here  -->
         </div>
@@ -181,9 +181,14 @@ $( function() {
     $('#translations').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
     });
+    // start with locales as stored for user
     if ($("#sourceLocale").val() !== '-') {
         renderLocalesAsAvailable('accordingToSourceLocale');
-    }   
+    } else if ($("#targetLocale").val() !== '-') {
+        renderLocalesAsAvailable('accordingToTargetLocale');
+    } else {
+        renderLocalesAsAvailable('reset');
+    }
 } );
 </script>
 
