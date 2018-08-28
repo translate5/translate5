@@ -30,7 +30,8 @@ var editIdleTimer = null,
     DEFAULT_FILE_EXT='txt',
     uploadedFiles,//Variable to store uploaded files
     selectedEngineId = undefined,
-    translateTextResponse = '';
+    translateTextResponse = '',
+    latestTranslationInProgressID = false;
 
 /* --------------- set, unset and get the selected mtEngine  ---------------- */
 
@@ -50,7 +51,6 @@ function getSelectedEngineId(){
     if(selectedEngineId === undefined) {
         return false; 
     }
-    console.log('getSelectedEngineId: ' + selectedEngineId);
     return selectedEngineId;
 }
 /***
@@ -63,7 +63,6 @@ function getSelectedEngineDomainCode(){
     if(engineId === false || selectedEngineDomainCode === undefined) {
         return false; 
     }
-    console.log('getSelectedEngineDomainCode: ' + selectedEngineDomainCode);
     return selectedEngineDomainCode;
 }
 
@@ -332,6 +331,8 @@ function startTimerForInstantTranslation() {
     }
 }
 function startTranslation() {
+    var textToTranslate,
+        translationInProgressID;
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
         // TODO: show modal loading window
@@ -345,12 +346,17 @@ function startTranslation() {
         return;
     }
     terminateTranslation();
-    translateText();
+    textToTranslate = $('#sourceText').val();
+    translationInProgressID = new Date().getTime();
+    latestTranslationInProgressID = translationInProgressID;
+    console.log('startTranslation (latestTranslationInProgressID: ' +  latestTranslationInProgressID + ')');
+    translateText(textToTranslate,translationInProgressID);
 }
 
 function terminateTranslation() {
     clearTimeout(editIdleTimer);
     editIdleTimer = null;
+    latestTranslationInProgressID = false;
 }
 
 // Add events
@@ -367,15 +373,15 @@ function prepareUpload(event){
  * INFO: in the current implementation only result from sdlcloud language will be returned
  * @returns
  */
-function translateText(){
+function translateText(textToTranslate,translationInProgressID){
     if (getSelectedEngineDomainCode() === false) {
         console.log('translateText stopped; getSelectedEngineDomainCode FALSE!');
         return;
     }
-    console.log('translateText mit domainCode: ' + getSelectedEngineDomainCode() + ' / source: ' + $("#sourceLocale").val() + ' / target: ' + $("#targetLocale").val() + ' / text: ' + $('#sourceText').val());
+    console.log(translationInProgressID + ': translateText mit domainCode: ' + getSelectedEngineDomainCode() + ' / source: ' + $("#sourceLocale").val() + ' / target: ' + $("#targetLocale").val() + ' / text: ' + textToTranslate);
     $('#translations').html(renderTranslationContainer());
     showTranslations();
-    var translateRequest=$.ajax({
+    var translateRequest = $.ajax({
         statusCode: {
             500: function() {
                 hideTranslations();
@@ -388,15 +394,22 @@ function translateText(){
             'source':getIsoByRfcLanguage($("#sourceLocale").val()),
             'target':getIsoByRfcLanguage($("#targetLocale").val()),
             'domainCode':getSelectedEngineDomainCode(),
-            'text':$('#sourceText').val()
+            'text':textToTranslate
         },
         success: function(result){
+            console.log('result for translationInProgressID: ' + translationInProgressID + ' (latestTranslationInProgressID: ' + latestTranslationInProgressID + '):');
+            console.log(textToTranslate + ' => ' + result.rows);
+            if (translationInProgressID != latestTranslationInProgressID) {
+                console.log('===> result for ' + translationInProgressID + ' is not valid any more; not applied.');
+                return;
+            }
             if (result.errors !== undefined && result.errors != '') {
                 showTranslationError(result.errors);
             } else {
                 clearAllErrorMessages();
                 translateTextResponse = result.rows;
-                fillTranslation($("#mtEngines").val());
+                console.log('===> apply translation for ' + translationInProgressID + ' ("' + textToTranslate + '": ' + translateTextResponse + ')'); 
+                fillTranslation(translationInProgressID);
             }
         }
     });
