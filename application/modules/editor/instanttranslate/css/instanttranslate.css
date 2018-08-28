@@ -107,6 +107,26 @@ h4, p {
     #logout { order: 3; margin-top: 5px;}
 }
 
+/* --------------- spinner --------------- */
+
+#loadingSpinnerLayer {
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    background-color: #ccc;
+    z-index: 1000;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    margin: 0px;
+}
+#loadingSpinnerIndicator {
+    margin: 2px 0px;
+}
+.loadingSpinner {
+    display: none;
+}
+
 /* --------------- source --------------- */
     
 #source textarea {

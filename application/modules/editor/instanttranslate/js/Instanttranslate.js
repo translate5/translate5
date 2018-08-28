@@ -174,6 +174,7 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
             }
         }
     }
+    localesAvailable.sort();
     return localesAvailable;
 }
 function renderLocaleOptionList(list) {
@@ -342,7 +343,7 @@ function startTranslation() {
         translationInProgressID;
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
-        // TODO: show modal loading window
+        startLoadingState();
         requestFileTranslate();
         return;
     }
@@ -375,6 +376,9 @@ $('#sourceFile').on('change', prepareUpload);
 // Grab the files and set them to uploadedFiles
 function prepareUpload(event){
     uploadedFiles = event.target.files;
+    if (instantTranslationIsActive) {
+        startTranslation();
+    }
 }
 
 /* --------------- translation ---------------------------------------------- */
@@ -488,7 +492,7 @@ function requestFileTranslate(){
         {
             // Handle errors here
             console.log('ERRORS: ' + textStatus);
-            // STOP LOADING SPINNER
+            stopLoadingState();
         }
     });
 }
@@ -529,11 +533,17 @@ function getDownloadUrl(fileId){
  */
 function downloadFile(url){
     var hasFileExt=getFileExtension()!="",
-        fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension());
-    //TODO: add loading spiner into the window
-    window.open(REST_PATH+"instanttranslate/download?fileName="+fullFileName+"&url="+url,'_blank');
-    //TODO: stop the global loading spiner
+        fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension()),
+        newTab = window.open("about:blank", "translatedFile"),
+        newTabHref = REST_PATH+"instanttranslate/download?fileName="+fullFileName+"&url="+url;
+    if(newTab == null) { // window.open does not work in Chrome
+        window.location.href = newTabHref;
+    } else {
+        newTab.location = newTabHref;
+    }
+    stopLoadingState();
 }
+
 
 /***
  * Get the file name of the uploaded file
@@ -634,6 +644,12 @@ function showTranslationFormsAsReady() {
     $('#mtEngines').selectmenu("widget").hide();
     showSourceText();
     showTranslations();
+}
+function startLoadingState() {
+    $('.loadingSpinner').show();
+}
+function stopLoadingState() {
+    $('.loadingSpinner').hide();
 }
 /* --------------- show/hide: helpers --------------------------------------- */
 function showSourceText() {
