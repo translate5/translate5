@@ -32,7 +32,8 @@ var editIdleTimer = null,
     selectedEngineId = undefined,
     translateTextResponse = '',
     latestTranslationInProgressID = false,
-    latestTextToTranslate = '';
+    latestTextToTranslate = '',
+    instantTranslationIsActive = true;
 
 /* --------------- set, unset and get the selected mtEngine  ---------------- */
 
@@ -83,9 +84,10 @@ function getSelectedEngineDomainCode(){
  * for the resulting source-target-combination.
  * - accordingToSourceLocale: sourceLocale is set, targetLocales are rendered
  * - accordingToTargetLocale: targetLocale is set, sourceLocales are rendered
+ * - reset: starts the same process as for 'Clear both lists'
  * - if the selected text is 'Clear both lists', then both lists are rendered
  * - if the selected text is 'Show all available for...', then this list is rendered
- * @param string accordingTo ('accordingToSourceLocale'|'accordingToTargetLocale')
+ * @param string accordingTo ('accordingToSourceLocale'|'accordingToTargetLocale'|'reset')
  */
 function renderLocalesAsAvailable(accordingTo) {
     var sourceLocale = $("#sourceLocale").val(),
@@ -329,7 +331,7 @@ $('#instantTranslationIsOff').click(function(){
 });
 function startTimerForInstantTranslation() {
     terminateTranslation();
-    if ($('#instantTranslationIsOn').is(":visible")) {
+    if (instantTranslationIsActive) {
         editIdleTimer = setTimeout(function() {
             startTranslation();
         }, 200);
@@ -565,6 +567,7 @@ function getIsoByRfcLanguage(rfcCode){
 /* --------------- toggle instant translation ------------------------------- */
 $('.instant-translation-toggle').click(function(){
     $('.instant-translation-toggle').toggle();
+    instantTranslationIsActive = !instantTranslationIsActive;
 });
 
 /* --------------- clear source --------------------------------------------- */
@@ -588,6 +591,7 @@ $('#sourceText').on("input focus", function(){
     $('#countedCharacters').html(sourceTextLength);
     if (sourceTextLength === 0) {
         $(".clearable-clear").hide();
+        $('#translations').html('');
         $('#translations').hide();
     } else {
         $("#sourceIsText").removeClass('source-text-error');
@@ -647,9 +651,13 @@ function showTranslations() {
     }
     $('#translations').show();
     $('#translationSubmit').show();
-    // = "default":
-    $('#instantTranslationIsOn').show();
-    $('#instantTranslationIsOff').hide();
+    if (instantTranslationIsActive) {
+        $('#instantTranslationIsOn').show();
+        $('#instantTranslationIsOff').hide();
+    } else {
+        $('#instantTranslationIsOn').hide();
+        $('#instantTranslationIsOff').show();
+    }
 }
 function hideTranslations() {
     $('#translations').hide();
