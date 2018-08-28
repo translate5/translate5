@@ -31,7 +31,8 @@ var editIdleTimer = null,
     uploadedFiles,//Variable to store uploaded files
     selectedEngineId = undefined,
     translateTextResponse = '',
-    latestTranslationInProgressID = false;
+    latestTranslationInProgressID = false,
+    latestTextToTranslate = '';
 
 /* --------------- set, unset and get the selected mtEngine  ---------------- */
 
@@ -312,6 +313,10 @@ function getMtEnginesAccordingToLanguages() {
 /* --------------- start and terminate translations  ------------------------ */
 $('#sourceText').bind('keyup', function() {
     // start instant (sic!) translation automatically
+    if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
+        console.log('latest key-event did not change the text (eg arrow-keys, ...)');
+        return;
+    }
     startTimerForInstantTranslation();
 });
 $('#translationSubmit').click(function(){
@@ -341,6 +346,7 @@ function startTranslation() {
     }
     // otherwise: translate Text
     if ($('#sourceText').val().length === 0) {
+        // no text given
         $("#sourceIsText").addClass('source-text-error');
         $('#translations').hide();
         return;
@@ -348,8 +354,10 @@ function startTranslation() {
     terminateTranslation();
     textToTranslate = $('#sourceText').val();
     translationInProgressID = new Date().getTime();
+    // store both for comparison on other places
+    latestTextToTranslate = textToTranslate;
     latestTranslationInProgressID = translationInProgressID;
-    console.log('startTranslation (latestTranslationInProgressID: ' +  latestTranslationInProgressID + ')');
+    // start translation
     translateText(textToTranslate,translationInProgressID);
 }
 
@@ -397,18 +405,17 @@ function translateText(textToTranslate,translationInProgressID){
             'text':textToTranslate
         },
         success: function(result){
-            console.log('result for translationInProgressID: ' + translationInProgressID + ' (latestTranslationInProgressID: ' + latestTranslationInProgressID + '):');
-            console.log(textToTranslate + ' => ' + result.rows);
             if (translationInProgressID != latestTranslationInProgressID) {
-                console.log('===> result for ' + translationInProgressID + ' is not valid any more; not applied.');
+                console.log('===> ' +translationInProgressID + ': result is not valid any more; not applied.');
                 return;
             }
             if (result.errors !== undefined && result.errors != '') {
+                console.log('===> ' +translationInProgressID + ': error');
                 showTranslationError(result.errors);
             } else {
                 clearAllErrorMessages();
                 translateTextResponse = result.rows;
-                console.log('===> apply translation for ' + translationInProgressID + ' ("' + textToTranslate + '": ' + translateTextResponse + ')'); 
+                console.log('===> ' +translationInProgressID + ': apply translation');
                 fillTranslation(translationInProgressID);
             }
         }
