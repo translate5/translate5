@@ -585,13 +585,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 $this->log('langSet Tag without an xml:lang found and ignored!');
             }
         }
-        //if there is a task(import from 'task import') and the language should not be processed
+        //if there is a task(import from 'task import') and the language should not be processed, we jump to the end of the whole lang tag
         if($this->task && !$this->isLanguageToProcess()) {
             //bis zum Ende des aktuellen LangTags gehen.
             while($this->xml->read() && $this->xml->name !== 'langSet'){}
+            return;
         }
-        
         //If the actualLangId is not set in isLanguageToProcess -> try to set it from actualLang (language(langset tag) rfc value from the tbx file )
+        // if that fails too, ignore that langSet
         if($this->actualLangId<1){
             $langModel=ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $langModel editor_Models_Languages */
@@ -612,6 +613,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      *   de => importiert de-de de de-at etc.pp.
      *   de-de => importiert de-de de
      *   restliche Sprachen ignorieren => return false
+     *   
+     *   FIXME Performance: foreach term this loop is called!
+     *   
      * @return boolean
      */
     protected function isLanguageToProcess() {
