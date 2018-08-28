@@ -16,6 +16,8 @@ TRANSLATE-1416: exception 'PDOException' with message 'SQLSTATE[42S01]: Base tab
 VISUAL-48: VisualReview: Improve visualReview scroll performance on very large VisualReview Projects
 TRANSLATE-1413: TermPortal: Import deletes all old Terms, regardless of the originating TermCollection
 TRANSLATE-1392: Unlock task on logout
+TRANSLATE-1417: Task Import ignored termEntry IDs and produced there fore task mismatch
+
 
 ## [2.8.4] - 2018-08-17
 ###Added
