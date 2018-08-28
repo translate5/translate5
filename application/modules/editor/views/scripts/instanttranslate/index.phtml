@@ -58,6 +58,8 @@
     sort($mtTargetLanguageLocales);
 ?>
 
+<div id="loadingSpinnerLayer" class="loadingSpinner"></div>
+
 <div id="containerHeader" class="container">
     <div id="logo"></div>
 <?php 
@@ -127,6 +129,7 @@
             <div id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
         <div id="mtEngineSelectorError" class="translation-error ui-state-error ui-corner-all"></div>
+        <div id="loadingSpinnerIndicator" class="loadingSpinner"><img src="/images/loading-spinner.gif"></div>
         <div id="translations">
             <!-- inject translations here  -->
         </div>
@@ -189,22 +192,22 @@ $( function() {
     } else {
         renderLocalesAsAvailable('reset');
     }
-    // "toggle" source (text/file)
-    $('.source-toggle .change-source-type').click(function(){
-        $('.source-toggle').toggle();
-        if ($('#sourceIsText').is(":visible")) {
-            $('.show-if-source-is-text').show();
-            $('.show-if-source-is-file').hide();
-            showTranslations();
-            $("#sourceIsText").removeClass('source-text-error');
-            $('#sourceText').focus();
-        } else {
-            $('.show-if-source-is-text').hide();
-            $('.show-if-source-is-file').show();
-            hideTranslations();
-        }
-    });
 } );
+// "toggle" source (text/file)
+$(document).on('click', '.source-toggle .change-source-type' , function() {
+    $('.source-toggle').toggle();
+    if ($('#sourceIsText').is(":visible")) {
+        $('.show-if-source-is-text').show();
+        $('.show-if-source-is-file').hide();
+        $('#translations').show();
+        $("#sourceIsText").removeClass('source-text-error');
+        $('#sourceText').focus();
+    } else {
+        $('.show-if-source-is-text').hide();
+        $('.show-if-source-is-file').show();
+        $('#translations').hide();
+    }
+});
 </script>
 
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
