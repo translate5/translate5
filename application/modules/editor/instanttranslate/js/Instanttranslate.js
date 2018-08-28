@@ -394,7 +394,7 @@ function translateText(textToTranslate,translationInProgressID){
     }
     console.log(translationInProgressID + ': translateText mit domainCode: ' + getSelectedEngineDomainCode() + ' / source: ' + $("#sourceLocale").val() + ' / target: ' + $("#targetLocale").val() + ' / text: ' + textToTranslate);
     $('#translations').html(renderTranslationContainer());
-    showTranslations();
+    startLoadingSign();
     var translateRequest = $.ajax({
         statusCode: {
             500: function() {
@@ -424,6 +424,7 @@ function translateText(textToTranslate,translationInProgressID){
                 console.log('===> ' +translationInProgressID + ': apply translation');
                 fillTranslation(translationInProgressID);
             }
+            stopLoadingSign();
         }
     });
 }
@@ -645,12 +646,6 @@ function showTranslationFormsAsReady() {
     showSourceText();
     showTranslations();
 }
-function startLoadingState() {
-    $('.loadingSpinner').show();
-}
-function stopLoadingState() {
-    $('.loadingSpinner').hide();
-}
 /* --------------- show/hide: helpers --------------------------------------- */
 function showSourceText() {
     $('#sourceContent').show();
@@ -698,5 +693,20 @@ function showTranslationError(errorText) {
 }
 function clearAllErrorMessages() {
     $('.translation-error').hide();
+}
+/* --------------- show/hide: loading spinner ------------------------------- */
+function startLoadingSign() {
+    $('#translations').hide();
+    $('#loadingSpinnerIndicator').show();
+}
+function stopLoadingSign() {
+    $('#translations').show();
+    $('#loadingSpinnerIndicator').hide();
+}
+function startLoadingState() {
+    $('.loadingSpinner').show();
+}
+function stopLoadingState() {
+    $('.loadingSpinner').hide();
 }
 
