@@ -1009,6 +1009,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           });
       }
       
+      //add additional string length of transunit to the calculation
+      if(meta && meta.additionalUnitLength) {
+          additionalLength += meta.additionalUnitLength;
+      }
+      
+      //add additional string length of mrk (after mrk) to the calculation
+      if(meta && meta.additionalMrkLength) {
+          additionalLength += meta.additionalMrkLength;
+      }
+      
       return additionalLength + text.length;
   },
   /**

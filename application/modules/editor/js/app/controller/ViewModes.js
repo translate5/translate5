@@ -139,8 +139,8 @@ Ext.define('Editor.controller.ViewModes', {
         }
     },
     handleViewportReady: function(grid) {
-        //start editor in ergonomic mode if configured, respect before setted readonly mode
-        if(Editor.data.app.startViewMode == 'ergonomic') {
+        //start editor in normal(ergonomic) mode if configured, respect before set readonly mode
+        if(Editor.data.app.startViewMode == 'normal') {
             this.ergonomicMode(grid.lookupViewModel().get('editorIsReadonly'));
         }
     },

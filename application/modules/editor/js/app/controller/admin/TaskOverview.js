@@ -284,7 +284,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           targetLang = this.getTaskAddForm().down('combo[name=targetLang]'),
           langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
       if(name.getValue() == '') {
-          name.setValue(val.replace(/\.[^.]+$/, ''));
+          name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/,''));
       }
       //simple algorithmus to get the language from the filename
       if(langs && langs.length == 3) {
@@ -745,7 +745,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
           
           params: {
-              format: 'jsontext'
+              format: 'jsontext',
+              autoStartImport: 0
           },
           timeout: 3600,
           url: Editor.data.restpath+'task',

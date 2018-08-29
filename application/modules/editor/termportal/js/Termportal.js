@@ -508,26 +508,7 @@ function handleAttributeDrawData(attribute){
  * @returns
  */
 function getAttributeValue(attribute){
-    var attVal=attribute.attrValue ? attribute.attrValue : "",
-        isPicklistUsage = function(attrType) {
-            switch(attrType) {
-                case "across_ISO_picklist_Usage":
-                case "across_ISO_picklist_Verwendung":
-                case "across_userdef_picklist_Verwendung":
-                    return true;
-                default:
-                    return false;
-            }
-        },
-        isUnwort = function(attVal) {
-            switch(attVal) {
-                case "do not use":
-                case "Unwort":
-                    return true;
-                default:
-                    return false;
-            }
-        };
+    var attVal=attribute.attrValue ? attribute.attrValue : "";
     //if it is a date attribute, handle the date format
     if(attribute.name=="date"){
         var dateFormat='dd.mm.yy';
@@ -540,8 +521,6 @@ function getAttributeValue(attribute){
         return '<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
     }else if(attribute.attrType == "processStatus" && attVal == "provisionallyProcessed"){
     	return "-";
-    } else if (isPicklistUsage(attribute.attrType) && isUnwort(attVal) ) {
-        return '<img src="' + moduleFolder + 'images/do_not_use.png" alt="'+attVal+'" title="'+attVal+'">';
     } else {
         return attVal.replace(/$/mg,'<br>');
     }
@@ -571,7 +550,11 @@ function handleAttributeHeaderText(attribute,addColon){
  * @returns
  */
 function checkTermStatusIcon(attribute){
-    var retVal="";
+    var retVal="", 
+        status = 'unknown', 
+        map = Editor.data.termStatusMap,
+        labels = Editor.data.termStatusLabel,
+        label;
     $.each($(attribute), function (i, attr) {
         var statusIcon=getAttributeValue(attr),
         	cmpStr='<img src="';
@@ -579,6 +562,13 @@ function checkTermStatusIcon(attribute){
             retVal+=statusIcon;
         }
     });
+    if(map[attribute[0].termStatus]) {
+        status = map[attribute[0].termStatus];
+    }
+    //FIXME encoding of the string!
+    label = labels[status]+' ('+attribute[0].termStatus+')';
+    retVal += ' <img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'">';
+;
     return retVal;
 }
 
