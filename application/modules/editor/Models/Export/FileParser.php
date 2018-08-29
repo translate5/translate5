@@ -293,6 +293,7 @@ abstract class editor_Models_Export_FileParser {
      */
     protected function getSegmentContent($segmentId, $field) {
         $this->_segmentEntity = $segment = $this->getSegment($segmentId);
+        $segmentMeta = $segment->meta();
         
         $edited = (string) $segment->getFieldEdited($field);
         
@@ -307,8 +308,9 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->tagHelper->unprotect($edited);
         
         //count length after removing removeTrackChanges and removeTermTags 
-        // so that the same removement must not be done again inside of textLength
-        $this->lastSegmentLength = $segment->textLength($edited);
+        // so that the same remove must not be done again inside of textLength
+        //also add additionalMrkLength to the segment length for final length calculation 
+        $this->lastSegmentLength = $segment->textLength($edited) + $segmentMeta->getAdditionalMrkLength();
         
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);

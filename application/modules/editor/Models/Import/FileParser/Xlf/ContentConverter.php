@@ -258,12 +258,12 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * parses the given chunks containing segment source, seg-source or target content, or their child elements content like sub or mrk mtype="seg"
      * the result is not returned as string but as array for post processing of the generated chunks
      * 
-     * @param array $chunks
+     * @param array|string $chunks can be either an array of chunks or a string which then will be parsed
      * @param boolean $source
      * @param boolean $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
      * @return array
      */
-    public function convert(array $chunks, $source, $preserveWhitespace = false) {
+    public function convert($chunks, $source, $preserveWhitespace = false) {
         $this->result = [];
         $this->removeTags = false;
         //this assumes that source tags come always before target tags
@@ -277,8 +277,13 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         }
         $this->source = $source;
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
-        $this->preserveWhitespace = $preserveWhitespace; 
-        $this->xmlparser->parseList($chunks);
+        $this->preserveWhitespace = $preserveWhitespace;
+        if(is_array($chunks)) {
+            $this->xmlparser->parseList($chunks);
+        }
+        else {
+            $this->xmlparser->parse($chunks);
+        }
         
         if(!empty($this->result) && !$this->preserveWhitespace) {
             $lastIdx = count($this->result) - 1;

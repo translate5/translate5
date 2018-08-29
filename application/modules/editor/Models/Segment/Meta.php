@@ -32,11 +32,19 @@ END LICENSE AND COPYRIGHT
  * @method void setId() setId(integer $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method string getSegmentId() getSegmentId()
+ * @method integer getSegmentId() getSegmentId()
  * @method void setSegmentId() setSegmentId(integer $id)
- * @method string getTransunitId() getTransunitId()
+ * @method integer getTransunitId() getTransunitId()
  * @method void setTransunitId() setTransunitId(integer $id)
  * @method string getSiblingData() getSiblingData()
+ * @method integer getMinWidth() getMinWidth()
+ * @method void setMinWidth() setMinWidth(integer $width)
+ * @method integer getMaxWidth() getMaxWidth()
+ * @method void setMaxWidth() setMaxWidth(integer $width)
+ * @method integer getAdditionalUnitLength() getAdditionalUnitLength()
+ * @method void setAdditionalUnitLength() setAdditionalUnitLength(integer $length)
+ * @method integer getAdditionalMrkLength() getAdditionalMrkLength()
+ * @method void setAdditionalMrkLength() setAdditionalMrkLength(integer $length)
  */
 class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_SegmentMeta';
@@ -64,7 +72,10 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
         $data->length = [];
         $editables = $segment->getEditableFieldData();
         foreach($editables as $field => $value){
-            $data->length[$field] = $segment->textLength($value);
+            //the additional mrk length is added here to each field, 
+            // so that it is available in the frontend out of the cached siblings without providing an additional data field
+            // (the additional unit length is added once to the calculation in the frontend!
+            $data->length[$field] = (int)$segment->textLength($value) + (int)$this->getAdditionalMrkLength();
         }
         $this->__call(__FUNCTION__, [json_encode($data)]);
     }

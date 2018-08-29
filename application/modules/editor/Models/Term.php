@@ -625,6 +625,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 'term as label',
                 'id as value',
                 'term as desc',
+                'status as termStatus',
                 'id as termId',
                 'collectionId',
                 'language as languageId'
@@ -669,11 +670,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * Remove old terms by given date.
      * The term attributes also will be removed.
      * 
+     * @param array $collectionIds
      * @param string $olderThan
      * @return boolean
      */
-    public function removeOldTerms($olderThan){
-       return $this->db->delete(['updated < ?'=>$olderThan])>0;
+    public function removeOldTerms(array $collectionIds, $olderThan){
+       return $this->db->delete([
+           'updated < ?' => $olderThan,
+           'collectionId in (?)' => $collectionIds,
+       ])>0;
     }
 
     /**

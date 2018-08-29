@@ -126,6 +126,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $internalTag;
     
     /**
+     * @var editor_Models_Segment
+     */
+    protected $segmentBareInstance;
+    
+    /**
      * contains the info from where current the source contet originates:
      * plain <source>, plain <seg-source> or <seg-source><mrk mtype="seg">
      * This info is important for preparing empty mrk tags with placeholders
@@ -180,6 +185,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->initNamespaces();
         $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->segmentBareInstance = ZfExtended_Factory::get('editor_Models_Segment');
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
     }
     
@@ -251,15 +257,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->sourceProcessOrder = [];
                 $this->currentSource = [];
             }
+            $mid = $this->calculateMid(['tag' => $tag, 'attributes' => $attributes], true);
             if($sourceImportance >= 0){
                 //preset the source segment for sorting purposes
                 // if we just add the content in the end handler, sub tags are added before the surrounding text content,
                 // but it is better if sub content is listed after the content of the corresponding segment
                 // for that we just set the source indizes here in the startHandler, here the order is correct
-                $this->sourceProcessOrder[] = $this->calculateMid(['tag' => $tag, 'attributes' => $attributes], true);
+                $this->sourceProcessOrder[] = $mid;
             }
             if($tag == 'mrk') {
-                $this->otherContentSource[] = ''; //add a new container for the content after the current mrk
+                $this->otherContentSource[$mid] = ''; //add a new container for the content after the current mrk
             }
         }, $sourceEndHandler);
         
@@ -278,7 +285,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->xmlparser->registerOther(null); // unregister other handler
             //if empty targets are given as Single Tags
             $this->currentPlainTarget = $this->getTargetMeta($tag, $key, $opener);
-            if($opener['isSingle']) {
+            if($this->isEmptyTarget($opener, $key)) {
                 return;
             }
             foreach($this->currentTarget as $target) {
@@ -289,18 +296,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
             }
             //add the main target tag to the list of processable targets, needed only without mrk tags and if target is not empty
-            if(strlen(trim($this->xmlparser->getRange($opener['openerKey']+1, $key - 1, true)))){
-                $this->otherContentTarget = []; //if we use the plainTarget (no mrks), the otherContent is the plainTarget and no further checks are needed
-                $this->currentTarget[$this->calculateMid($opener, false)] = $this->currentPlainTarget;
-            }
+            $this->otherContentTarget = []; //if we use the plainTarget (no mrks), the otherContent is the plainTarget and no further checks are needed
+            $this->currentTarget[$this->calculateMid($opener, false)] = $this->currentPlainTarget;
         });
         
         //handling sub segment mrks and sub tags
-        $this->xmlparser->registerElement('trans-unit > target > mrk[mtype=seg], trans-unit > target sub', function($tag) {
+        $this->xmlparser->registerElement('trans-unit > target > mrk[mtype=seg], trans-unit > target sub', function($tag, $attributes) {
             if($tag == 'mrk') {
                 //if we have a mrk we enable the content outside mrk check
                 $this->checkContentOutsideMrk = true;
-                $this->otherContentTarget[] = ''; //add a new container for the content after the current mrk 
+                $this->otherContentTarget[$this->calculateMid(['tag' => $tag, 'attributes' => $attributes], false)] = ''; //add a new container for the content after the current mrk 
             }
         }, function($tag, $key, $opener){
             $this->currentTarget[$this->calculateMid($opener, false)] = $this->getTargetMeta($tag, $key, $opener);
@@ -335,6 +340,55 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         });
         //error_log("Unknown in XLF Parser ". $other); //→ $other evaluates to the tag in the wildcard handler
+    }
+    
+    /**
+     * The length of other content (outside/between mrk mtype seg tags) is also saved for length calculation
+     * Assume the following <target>, where bef, betweenX and aft are assumed as whitespace 
+     *  (since other content as whitespace outside of mrks gices an error)
+     * <target>bef<mrk>text 1</mrk>between1<mrk>text 2</mrk>between1<mrk>text 3</mrk>aft</target>
+     *   the length of "bef" is saved as "additionalUnitLength" to each segment
+     *   the length of each whitespace after a closed mrk is saved to that mrk as "additionalMrkLength"
+     *   each additionalMrkLength is added automatically to the segments content length in siblingData
+     *   the additionalUnitLength instead must be only added once on each length calculation (where siblingData is used)
+     * preserveWhitespace has no influence to the otherContent, so length of otherContent is always the real length, 
+     *   regardless of the preserveWhitespace setting
+     * source and target MRK padding if MRKs are different in source vs target: 
+     *    if $useSourceOtherContent is true, this is no problem since there is no target to compare and add missing MRKs
+     *    if its false and targetOtherContent is used: just use the target otherContent since padded target MRKs could 
+     *      not be edited and are not added as new MRKs in the target. So no otherContent must be considered here.
+     *    This will change with implementing merging and splitting.
+     *    
+     * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
+     * @param boolean $useSourceOtherContent
+     */
+    protected function saveTargetOtherContentLength(editor_Models_Import_FileParser_SegmentAttributes $attributes, $useSourceOtherContent) {
+        $otherContent = $useSourceOtherContent ? $this->otherContentSource : $this->otherContentTarget;
+//debug START
+/*
+        $x = array_map(function($i){
+            return '#'.$i.'#'.strlen($i);
+        }, $otherContent);
+        error_log("\n\n".$attributes->transunitId."\n\n");
+        error_log(print_r($x,1));
+        error_log(print_r($this->currentTarget,1));
+*/
+//debug END        
+
+        $text = function($text) {
+            //for other content length calculation we always assume preserve whitespace true (otherwise the length is ignored)
+            $preserveWhitespace = true; 
+            return $this->xmlparser->join($this->contentConverter->convert($text, true, $preserveWhitespace));
+        };
+        
+        //by definition the first otherContent belongs to the whole transunit - this value is stored in each segment
+        if(!empty($otherContent[0])) {
+            $attributes->additionalUnitLength = $this->segmentBareInstance->textLength($text($otherContent[0]));
+        }
+        //the other lengths are stored per affected segment
+        if(!empty($otherContent[$attributes->mrkMid])) {
+            $attributes->additionalMrkLength = $this->segmentBareInstance->textLength($text($otherContent[$attributes->mrkMid]));
+        }
     }
     
     /**
@@ -657,8 +711,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //find mrk mids missing in target and add them marked as missing
         $this->padTargetMrkTags();
         
+        $hasNoTarget = is_null($this->currentPlainTarget);
+        $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
+        //$hasEmptyTarget includes $hasTargetSingle
+        $hasEmptyTarget = !$hasNoTarget && $this->isEmptyTarget($this->currentPlainTarget['openerMeta'], $this->currentPlainTarget['closer']);
+        
+        if($hasNoTarget || $hasTargetSingle) {
+            $preserveWhitespace = $this->currentPlainSource['openerMeta']['preserveWhitespace'];
+        }
+        else {
+            $preserveWhitespace = $this->currentPlainTarget['openerMeta']['preserveWhitespace'];
+        }
+        
         foreach($this->sourceProcessOrder as $mid) {
-            
             if($mid === '') {
                 //if mid was empty string there was an error, ignore the segment, logging was already done
                 unset($this->currentTarget[$mid]);
@@ -717,8 +782,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             // to exclude tags leading and trailing tags in the segment
             $this->startShiftCount = 0;
             $this->endShiftCount = 0;
-//since we are calling the leading/trailing tag stuff on the already fetched source segments, we have no ability here to conserve content outside the mrk tags. 
-            if(!$this->hasSameStartAndEndTags($sourceChunks, $targetChunks)) {
+            //if preserveWhitespace is enabled, hasSameStartAndEndTags should not hide tags, 
+            // since potential whitespace tags does matter then in the content
+            //since we are calling the leading/trailing tag stuff on the already fetched source segments, 
+            // we have no ability here to conserve content outside the mrk tags - which also should not be on preserveWhitespace 
+            if($preserveWhitespace || !$this->hasSameStartAndEndTags($sourceChunks, $targetChunks)) {
                 //if there is just leading/trailing whitespace but no tags we reset the counter 
                 // since then we dont want to cut off something
                 //if there is whitespace between or before the leading / after the trailing tags,  
@@ -761,6 +829,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             } elseif($currentSource == self::MISSING_MRK) {
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_SOURCE_MRK;
             }
+            
+            //first we save the previous other content length to the previous segment
+            $this->saveTargetOtherContentLength($attributes, $hasNoTarget || $hasEmptyTarget);
             
             //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
             if(strpos($mid, self::PREFIX_SUB) === 0) {
@@ -805,33 +876,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         
-        //it is easier to collect all content not in an mrk and dismiss this content after 
-        // we find out that we don't have any mrk at all instead of trying to collect only the content really outside of mrk tags
-        if(!$this->checkContentOutsideMrk) {
-            $this->otherContentTarget = [];
-            $this->otherContentSource = [];
-        }
-        
-        //if there is any other text content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed 
-        // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
-        // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
-        $otherContent = join(array_merge($this->otherContentTarget, $this->otherContentSource));
-        if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
-            $data = array_merge($this->otherContentTarget, $this->otherContentSource);
-            $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
-        }
-        
-        $hasNoTarget = is_null($this->currentPlainTarget);
-        $hasTargetSingle = !$hasNoTarget && $this->currentPlainTarget['openerMeta']['isSingle'];
-        
-        if($hasNoTarget || $hasTargetSingle) {
-            $preserveWhitespace = $this->currentPlainSource['openerMeta']['preserveWhitespace'];
-            $otherContent = $this->otherContentSource;
-        }
-        else {
-            $preserveWhitespace = $this->currentPlainTarget['openerMeta']['preserveWhitespace'];
-            $otherContent = $this->otherContentTarget;
-        }
+        $otherContent = $this->checkAndPrepareOtherContent($hasNoTarget || $hasEmptyTarget);
         
         if(!$preserveWhitespace) {
             $otherContent = array_map(function($fragment) {
@@ -871,6 +916,36 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 return $placeHolder.$oldChunk;
             });
         }
+    }
+    
+    /**
+     * Prepares and checks the internally stored other content (content outside MRK mtype seg tags)
+     * check: there may not be other content as tags and whitespace
+     * prepare: converts the multidimensional otherContent arrays to onedimensional ones and returns the one to be used.
+     * @return array the other content to be used for skeleton placeholder generation 
+     */
+    protected function checkAndPrepareOtherContent($useSourceContent) {
+        if(!$this->checkContentOutsideMrk) {
+            //if we don't check the mrk outside content, we assume that there is no outside content
+            return [];
+        }
+        //if we need otherContent below for further checks, we have to remove the assoc keys for proper working of the array_merge commands
+        $otherContentSource = array_values($this->otherContentSource);
+        $otherContentTarget = array_values($this->otherContentTarget);
+        
+        //if there is any other text content as whitespace between the mrk type seg tags, this is invalid xliff and therefore not allowed
+        // example: <mrk mtype="seg">allowed</mrk> not allowed <mrk...
+        // we allow tags between the mrk tags, they are preserved too, so we remove them for the check before
+        $otherContent = join(array_merge($otherContentSource, $otherContentTarget));
+        if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
+            $data = array_merge($otherContentSource, $otherContentTarget);
+            $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
+        }
+        
+        if($useSourceContent) {
+            return $otherContentSource;
+        }
+        return $otherContentTarget;
     }
     
     /**
@@ -1000,8 +1075,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *   add missing entries to $this->currentTarget also as special segment (MISSING_MRK)
      */
     protected function padTargetMrkTags() {
-        //if currentTarget is completly empty, there are no single mrks missing, but all. 
-        // This is handled otherwise
+        //if currentTarget is completely empty, there are no single mrks missing, but all. 
+        // This special case is handled otherwise.
         if(empty($this->currentTarget)) {
             return;
         }
@@ -1106,20 +1181,40 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 //error_log("OTHER ".$other);
         $inTarget = $this->xmlparser->getParent('target');
         if(empty($inTarget)) {
-            $l = count($this->otherContentSource);
-            if($l === 0) {
-                $l = 1;
-                $this->otherContentSource[] = '';
-            }
-            $this->otherContentSource[$l-1] .= $other;
+            $this->addOtherContent($this->otherContentSource, $other);
         }
         else {
-            $l = count($this->otherContentTarget);
-            if($l === 0) {
-                $l = 1;
-                $this->otherContentTarget[] = '';
-            }
-            $this->otherContentTarget[$l-1] .= $other;
+            $this->addOtherContent($this->otherContentTarget, $other);
         }
+    }
+    
+    /**
+     * Add other content to the requested container
+     * @param array $container
+     * @param string $other
+     */
+    protected function addOtherContent(&$container, $other) {
+        if(count($container) === 0) {
+            //if there is no content, this is the first content before the first mrk at all
+            $container[] = '';
+        }
+        $keys = array_keys($container);
+        //always add content to the current last element of the array. new elements per MRKs are added elsewhere
+        $container[end($keys)] .= $other;
+    }
+    
+    /**
+     * returns true if target is a single tag (<target/>) or is empty <target></target>, where whitespace between the both targets matters for emptiness depending on preserveWhitespace
+     * @param array $openerMeta
+     * @param integer $closerKey
+     * @return boolean
+     */
+    protected function isEmptyTarget(array $openerMeta, $closerKey) {
+        if($openerMeta['isSingle']) {
+            return true;
+        }
+        $preserveWhitespace = $openerMeta['preserveWhitespace'];
+        $content = $this->xmlparser->getRange($openerMeta['openerKey']+1, $closerKey - 1, true);
+        return $preserveWhitespace ? empty($content) : (strlen(trim($content)) === 0);
     }
 }

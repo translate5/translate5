@@ -396,6 +396,11 @@ abstract class editor_Workflow_Abstract {
      * loads the system user as authenticatedUser, if no user is logged in
      */
     protected function loadAuthenticatedUser(){
+        if(Zend_Session::isDestroyed()) {
+            //if there is no session anymore (in the case of garbage cleanup) we can not load any authenticated user
+            // but this should be no problem since on garbace collection no user specific stuff is done
+            return;
+        }
         $userSession = new Zend_Session_Namespace('user');
         if(isset($userSession->data) && isset($userSession->data->userGuid)) {
             $userGuid = $userSession->data->userGuid;

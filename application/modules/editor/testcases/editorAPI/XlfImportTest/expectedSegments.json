@@ -23,7 +23,7 @@
         "targetToSort": "Apache 2.0 auf Unixsystemen - Manual",
         "targetEdit": "Apache 2.0 auf Unixsystemen - Manual",
         "targetEditToSort": "Apache 2.0 auf Unixsystemen - Manual",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":36}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_1\":{\"nr\":\"1\",\"length\":{\"targetEdit\":36}}}}",
         "isWatched": false
     },
     {
@@ -50,7 +50,7 @@
         "targetToSort": "PHP Manual",
         "targetEdit": "PHP Manual",
         "targetEditToSort": "PHP Manual",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_2\":{\"nr\":\"2\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -77,7 +77,7 @@
         "targetToSort": "Teste einen weichen (Unix) Umbruch",
         "targetEdit": "Teste einen weichen (Unix) Umbruch<div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;1\/&gt;: Newline\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div>",
         "targetEditToSort": "Teste einen weichen (Unix) Umbruch",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":35}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_3\":{\"nr\":\"3\",\"length\":{\"targetEdit\":35}}}}",
         "isWatched": false
     },
     {
@@ -104,7 +104,7 @@
         "targetToSort": "Teste mehrere Leerzeichen undTabs",
         "targetEdit": "Teste mehrere <div class=\"single 73706163652074733d22323032303230323022206c656e6774683d2234222f space internal-tag ownttip\"><span title=\"&lt;2\/&gt;: 4 whitespace characters\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"space\" data-length=\"4\" class=\"full\">\u00b7\u00b7\u00b7\u00b7<\/span><\/div>Leerzeichen und<div class=\"single 7461622074733d223039303922206c656e6774683d2232222f tab internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 2 tab characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"2\" class=\"full\">\u2192\u2192<\/span><\/div>Tabs",
         "targetEditToSort": "Teste mehrere Leerzeichen undTabs",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":39}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_4\":{\"nr\":\"4\",\"length\":{\"targetEdit\":39}}}}",
         "isWatched": false
     },
     {
@@ -131,7 +131,7 @@
         "targetToSort": "Teste dass eine matchratio &lt; 100 editierbar ist",
         "targetEdit": "Teste dass eine matchratio &lt; 100 editierbar ist",
         "targetEditToSort": "Teste dass eine matchratio &lt; 100 editierbar ist",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":47}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_5\":{\"nr\":\"5\",\"length\":{\"targetEdit\":47}}}}",
         "isWatched": false
     },
     {
@@ -158,7 +158,7 @@
         "targetToSort": "Teste unterschiedliche matchinfos",
         "targetEdit": "Teste unterschiedliche matchinfos",
         "targetEditToSort": "Teste unterschiedliche matchinfos",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":33}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_6\":{\"nr\":\"6\",\"length\":{\"targetEdit\":33}}}}",
         "isWatched": false
     },
     {
@@ -185,7 +185,7 @@
         "targetToSort": "Teste &amp;para; Entities \u00b6 und Umlaute \u00f6\u00e4\u00fc\u00b6",
         "targetEdit": "Teste &amp;para; Entities \u00b6 und Umlaute \u00f6\u00e4\u00fc\u00b6",
         "targetEditToSort": "Teste &amp;para; Entities \u00b6 und Umlaute \u00f6\u00e4\u00fc\u00b6",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":40}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_7\":{\"nr\":\"7\",\"length\":{\"targetEdit\":40}}}}",
         "isWatched": false
     },
     {
@@ -212,7 +212,7 @@
         "targetToSort": "Dieses Segment sollte nicht editierbar sein!",
         "targetEdit": "Dieses Segment sollte nicht editierbar sein!",
         "targetEditToSort": "Dieses Segment sollte nicht editierbar sein!",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":44}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_8\":{\"nr\":\"8\",\"length\":{\"targetEdit\":44}}}}",
         "isWatched": false
     },
     {
@@ -239,7 +239,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_9\":{\"nr\":\"9\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -266,7 +266,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_10\":{\"nr\":\"10\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -293,7 +293,7 @@
         "targetToSort": "13 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEdit": "13 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEditToSort": "13 - Teste eine vorhandene \u00dcbersetzung. ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":40}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":18}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":40}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":18}}}}",
         "isWatched": false
     },
     {
@@ -320,7 +320,7 @@
         "targetToSort": "13 - Mit MRK Tags.",
         "targetEdit": "13 - Mit MRK Tags.",
         "targetEditToSort": "13 - Mit MRK Tags.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":40}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":18}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_11\":{\"nr\":\"11\",\"length\":{\"targetEdit\":40}},\"fakeSegId_12\":{\"nr\":\"12\",\"length\":{\"targetEdit\":18}}}}",
         "isWatched": false
     },
     {
@@ -347,7 +347,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":0}},\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":0}},\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":0}},\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":0}},\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -374,7 +374,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":0}},\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":0}},\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":0}},\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":0}},\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -401,7 +401,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":0}},\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":0}},\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_13\":{\"nr\":\"13\",\"length\":{\"targetEdit\":0}},\"fakeSegId_14\":{\"nr\":\"14\",\"length\":{\"targetEdit\":0}},\"fakeSegId_15\":{\"nr\":\"15\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -428,7 +428,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":0}},\"fakeSegId_17\":{\"nr\":\"17\",\"length\":{\"targetEdit\":0}},\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":0}},\"fakeSegId_17\":{\"nr\":\"17\",\"length\":{\"targetEdit\":0}},\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -455,7 +455,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":0}},\"fakeSegId_17\":{\"nr\":\"17\",\"length\":{\"targetEdit\":0}},\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":0}},\"fakeSegId_17\":{\"nr\":\"17\",\"length\":{\"targetEdit\":0}},\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -482,7 +482,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":0}},\"fakeSegId_17\":{\"nr\":\"17\",\"length\":{\"targetEdit\":0}},\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_16\":{\"nr\":\"16\",\"length\":{\"targetEdit\":0}},\"fakeSegId_17\":{\"nr\":\"17\",\"length\":{\"targetEdit\":0}},\"fakeSegId_18\":{\"nr\":\"18\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -509,7 +509,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_19\":{\"nr\":\"19\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_19\":{\"nr\":\"19\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -536,7 +536,7 @@
         "targetToSort": "f2-1 - Teste die Verwendung einer bereits verwendeten ID - was zul\u00e4ssig ist!",
         "targetEdit": "f2-1 - Teste die Verwendung einer bereits verwendeten ID - was zul\u00e4ssig ist!",
         "targetEditToSort": "f2-1 - Teste die Verwendung einer bereits verwendeten ID - was zul\u00e4ssig ist!",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_20\":{\"nr\":\"20\",\"length\":{\"targetEdit\":76}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_20\":{\"nr\":\"20\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false
     },
     {
@@ -563,7 +563,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_21\":{\"nr\":\"21\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_21\":{\"nr\":\"21\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -590,7 +590,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_22\":{\"nr\":\"22\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_22\":{\"nr\":\"22\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -617,7 +617,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_23\":{\"nr\":\"23\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_23\":{\"nr\":\"23\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -644,7 +644,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_24\":{\"nr\":\"24\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_24\":{\"nr\":\"24\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -671,7 +671,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_25\":{\"nr\":\"25\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_25\":{\"nr\":\"25\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -698,7 +698,7 @@
         "targetToSort": "f2-6 - Test mit gegebenen \u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEdit": "f2-6 - Test mit gegebenen <div class=\"single 70682069643d2231223e266c743b696d67207372633d2671756f743b666f6f2671756f743b207469746c653d2671756f743b3c7375623e66322d36202d2074657374652073756220467261676d656e743c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;img src=&quot;foo&quot; title=&quot;f2-6 - teste sub Fragment&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;img src=&quot;foo&quot; title=&quot;f2-6 - teste sub Fragment&quot;\/&gt;<\/span><\/div>\u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEditToSort": "f2-6 - Test mit gegebenen \u00dcbersetzungen mit MRK und SUB Tags.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_26\":{\"nr\":\"26\",\"length\":{\"targetEdit\":61}},\"fakeSegId_28\":{\"nr\":\"28\",\"length\":{\"targetEdit\":57}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_26\":{\"nr\":\"26\",\"length\":{\"targetEdit\":61}},\"fakeSegId_28\":{\"nr\":\"28\",\"length\":{\"targetEdit\":57}}}}",
         "isWatched": false
     },
     {
@@ -725,7 +725,7 @@
         "targetToSort": "f2-6 - teste sub Fragment",
         "targetEdit": "f2-6 - teste sub Fragment",
         "targetEditToSort": "f2-6 - teste sub Fragment",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_27\":{\"nr\":\"27\",\"length\":{\"targetEdit\":25}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_27\":{\"nr\":\"27\",\"length\":{\"targetEdit\":25}}}}",
         "isWatched": false
     },
     {
@@ -752,7 +752,7 @@
         "targetToSort": "f2-6 - Teste das Alignment von Quell- und Zielfragmenten.",
         "targetEdit": "f2-6 - Teste das Alignment von Quell- und Zielfragmenten.",
         "targetEditToSort": "f2-6 - Teste das Alignment von Quell- und Zielfragmenten.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_26\":{\"nr\":\"26\",\"length\":{\"targetEdit\":61}},\"fakeSegId_28\":{\"nr\":\"28\",\"length\":{\"targetEdit\":57}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_26\":{\"nr\":\"26\",\"length\":{\"targetEdit\":61}},\"fakeSegId_28\":{\"nr\":\"28\",\"length\":{\"targetEdit\":57}}}}",
         "isWatched": false
     },
     {
@@ -779,7 +779,7 @@
         "targetToSort": "f2-7 - Test mit gegebenen \u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEdit": "f2-7 - Test mit <div class=\"single 70682069643d2233223e266c743b696d67207469746c653d2671756f743b333c7375623e66322d37202d2073756220333c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;img title=&quot;3f2-7 - sub 3&quot;\/&gt;<\/span><\/div>gegebenen <div class=\"single 70682069643d2231223e266c743b696d67207469746c653d2671756f743b313c7375623e66322d37202d2073756220313c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;img title=&quot;1f2-7 - sub 1&quot;\/&gt;<\/span><\/div>\u00dcbersetzungen mit MRK und SUB Tags.",
         "targetEditToSort": "f2-7 - Test mit gegebenen \u00dcbersetzungen mit MRK und SUB Tags.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_29\":{\"nr\":\"29\",\"length\":{\"targetEdit\":61}},\"fakeSegId_32\":{\"nr\":\"32\",\"length\":{\"targetEdit\":58}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_29\":{\"nr\":\"29\",\"length\":{\"targetEdit\":61}},\"fakeSegId_32\":{\"nr\":\"32\",\"length\":{\"targetEdit\":58}}}}",
         "isWatched": false
     },
     {
@@ -806,7 +806,7 @@
         "targetToSort": "f2-7 - sub 1",
         "targetEdit": "f2-7 - sub 1",
         "targetEditToSort": "f2-7 - sub 1",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_30\":{\"nr\":\"30\",\"length\":{\"targetEdit\":12}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_30\":{\"nr\":\"30\",\"length\":{\"targetEdit\":12}}}}",
         "isWatched": false
     },
     {
@@ -833,7 +833,7 @@
         "targetToSort": "f2-7 - sub 3",
         "targetEdit": "f2-7 - sub 3",
         "targetEditToSort": "f2-7 - sub 3",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_31\":{\"nr\":\"31\",\"length\":{\"targetEdit\":12}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_31\":{\"nr\":\"31\",\"length\":{\"targetEdit\":12}}}}",
         "isWatched": false
     },
     {
@@ -860,7 +860,7 @@
         "targetToSort": "f2-7 - Teste das Alignment von Quell-  und Zielfragmenten.",
         "targetEdit": "f2-7 - Teste das Alignment von Quell- <div class=\"single 70682069643d2232223e266c743b696d67207469746c653d2671756f743b323c7375623e66322d37202d2073756220323c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ph\" data-length=\"-1\" class=\"full\">&lt;img title=&quot;2f2-7 - sub 2&quot;\/&gt;<\/span><\/div> und Zielfragmenten.",
         "targetEditToSort": "f2-7 - Teste das Alignment von Quell-  und Zielfragmenten.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_29\":{\"nr\":\"29\",\"length\":{\"targetEdit\":61}},\"fakeSegId_32\":{\"nr\":\"32\",\"length\":{\"targetEdit\":58}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_29\":{\"nr\":\"29\",\"length\":{\"targetEdit\":61}},\"fakeSegId_32\":{\"nr\":\"32\",\"length\":{\"targetEdit\":58}}}}",
         "isWatched": false
     },
     {
@@ -887,7 +887,7 @@
         "targetToSort": "f2-7 - sub 2",
         "targetEdit": "f2-7 - sub 2",
         "targetEditToSort": "f2-7 - sub 2",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_33\":{\"nr\":\"33\",\"length\":{\"targetEdit\":12}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_33\":{\"nr\":\"33\",\"length\":{\"targetEdit\":12}}}}",
         "isWatched": false
     },
     {
@@ -914,7 +914,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_34\":{\"nr\":\"34\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_34\":{\"nr\":\"34\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -941,7 +941,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_35\":{\"nr\":\"35\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_35\":{\"nr\":\"35\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -968,7 +968,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_36\":{\"nr\":\"36\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_36\":{\"nr\":\"36\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -995,7 +995,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_37\":{\"nr\":\"37\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_37\":{\"nr\":\"37\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1022,7 +1022,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_38\":{\"nr\":\"38\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_38\":{\"nr\":\"38\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1049,7 +1049,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_39\":{\"nr\":\"39\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_39\":{\"nr\":\"39\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1076,7 +1076,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_40\":{\"nr\":\"40\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_40\":{\"nr\":\"40\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1103,7 +1103,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_41\":{\"nr\":\"41\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_41\":{\"nr\":\"41\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1130,7 +1130,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_42\":{\"nr\":\"42\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_42\":{\"nr\":\"42\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1157,7 +1157,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_43\":{\"nr\":\"43\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_43\":{\"nr\":\"43\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1184,7 +1184,7 @@
         "targetToSort": "f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat",
         "targetEdit": "f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat",
         "targetEditToSort": "f2-13 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - wenn das Target die gleiche Tag Struktur hat",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_44\":{\"nr\":\"44\",\"length\":{\"targetEdit\":113}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_44\":{\"nr\":\"44\",\"length\":{\"targetEdit\":113}}}}",
         "isWatched": false
     },
     {
@@ -1211,7 +1211,7 @@
         "targetToSort": "f2-14 -  Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat",
         "targetEdit": "f2-14 - <div class=\"open 6270742069643d223122207269643d223122202f internal-tag ownttip\"><span title=\"&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;1&gt;<\/span><span data-originalid=\"bpt\" data-length=\"-1\" class=\"full\">&lt;bpt id=&quot;1&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div> Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat<div class=\"close 6570742069643d223222207269643d223122202f internal-tag ownttip\"><span title=\"&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;\" class=\"short\">&lt;\/1&gt;<\/span><span data-originalid=\"ept\" data-length=\"-1\" class=\"full\">&lt;ept id=&quot;2&quot; rid=&quot;1&quot; \/&gt;<\/span><\/div>",
         "targetEditToSort": "f2-14 -  Von Tags umgebener Inhalt soll mit Tags importiert werden - wenn das Target eine andere Tag Struktur hat",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_45\":{\"nr\":\"45\",\"length\":{\"targetEdit\":113}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_45\":{\"nr\":\"45\",\"length\":{\"targetEdit\":113}}}}",
         "isWatched": false
     },
     {
@@ -1238,7 +1238,7 @@
         "targetToSort": "f2-15 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - aber importiere single tags",
         "targetEdit": "f2-15 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - aber importiere single tags<div class=\"single 782069643d2234222f internal-tag ownttip\"><span title=\"&lt;x id=&quot;4&quot;\/&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"x\" data-length=\"-1\" class=\"full\">&lt;x id=&quot;4&quot;\/&gt;<\/span><\/div>",
         "targetEditToSort": "f2-15 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - aber importiere single tags",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"siblingData\":{\"fakeSegId_46\":{\"nr\":\"46\",\"length\":{\"targetEdit\":96}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_46\":{\"nr\":\"46\",\"length\":{\"targetEdit\":96}}}}",
         "isWatched": false
     },
     {
@@ -1265,7 +1265,7 @@
         "targetToSort": "f2-16 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - hier fehlt der singletag",
         "targetEdit": "f2-16 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - hier fehlt der singletag",
         "targetEditToSort": "f2-16 - Von Tags umgebener Inhalt soll ohne Tags importiert werden - hier fehlt der singletag",
-        "metaCache": "{\"minWidth\":10,\"maxWidth\":15,\"siblingData\":{\"fakeSegId_47\":{\"nr\":\"47\",\"length\":{\"targetEdit\":93}}}}",
+        "metaCache": "{\"minWidth\":10,\"maxWidth\":15,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_47\":{\"nr\":\"47\",\"length\":{\"targetEdit\":93}}}}",
         "isWatched": false
     }
 ]

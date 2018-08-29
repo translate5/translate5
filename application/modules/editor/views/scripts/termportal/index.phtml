@@ -104,6 +104,7 @@ if(isset($this->error)){
 
 <script type="text/javascript">
 //init the labels here, for later usage
+//FIXME: Refactor the Variable stuff to php2js stuff
 var attributeLabels='<?php echo json_encode($this->labels);?>';
 attributeLabels = JSON.parse(attributeLabels);
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;

@@ -129,6 +129,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
         
+        $this->view->Php2JsVars()->set('termStatusMap', $config->runtimeOptions->tbx->termLabelMap->toArray());
+        $this->view->Php2JsVars()->set('termStatusLabel', [
+            'permitted' => $this->translate->_('erlaubte Benennung'),
+            'forbidden' => $this->translate->_('verbotene Benennung'),
+            'preferred' => $this->translate->_('Vorzugsbenennung'),
+            'unknown' => $this->translate->_('Unbekannter Term Status'),
+        ]);
         
         //translated strings for some of the result tables
         $translatedStrings=array(
@@ -136,7 +143,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "termEntryAttributeTableTitle"=>$this->translate->_("Eigenschaften des Eintrags"),
                 "search" => $this->translate->_('Suche'),
                 "noResults" => $this->translate->_('Keine Ergebnisse für die aktuelle Suche!'),
-                "noExistingAttributes" => $this->translate->_('no existing attributes')
+                "noExistingAttributes" => $this->translate->_('no existing attributes'),
         );
         
         $this->view->translations=$translatedStrings;

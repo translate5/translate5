@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_Attributes extends ZfExtended_Models_Entity_Abstract {
+abstract class editor_Models_TermCollection_Attributes extends ZfExtended_Models_Entity_Abstract {
     
     
     /***

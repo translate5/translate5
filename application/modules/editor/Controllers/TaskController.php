@@ -368,7 +368,14 @@ class editor_TaskController extends ZfExtended_RestController {
         settype($this->data['enableSourceEditing'], 'integer');
         settype($this->data['edit100PercentMatch'], 'integer');
         settype($this->data['lockLocked'], 'integer');
-        settype($this->data['autoStartImport'], 'boolean');
+        if(array_key_exists('autoStartImport', $this->data)) {
+            //if the value exists we assume boolean
+            settype($this->data['autoStartImport'], 'boolean');
+        }
+        else {
+            //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
+            $this->data['autoStartImport'] = true;
+        }
         $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */

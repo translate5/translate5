@@ -105,6 +105,19 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     public $maxWidth = null;
     
     /**
+     * Additional string length in transunit before first mrk tag, to be added to the length calculation of the segment once
+     * @var integer
+     */
+    public $additionalUnitLength = 0;
+    
+    /**
+     * Additional string length of the string between the mrk tag containing that segment and next mrk, or the length of the content after the last mrk tag
+     * This value must be added to the calculated length of each segment on each segment update and on the fly in the frontend
+     * @var integer
+     */
+    public $additionalMrkLength = 0;
+    
+    /**
      * The transunitId and fileId (or in general group id) if some segments are belonging together.
      * For example in XLF there is one transunit with multiple mrk tags. 
      * Each MRK tag is one segment in translate5, through the transunitId the segments are grouped.
