@@ -105,6 +105,7 @@
                 <span id="countedCharacters" class="show-if-source-is-text">0</span>
                 <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file">
             </div>
+        <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         </form>
     </div>
     <div id="target">
@@ -128,7 +129,7 @@
             <div id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
             <div id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
-        <div id="mtEngineSelectorError" class="translation-error ui-state-error ui-corner-all"></div>
+        <div id="mtEngineSelectorError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         <div id="loadingSpinnerIndicator" class="loadingSpinner"><img src="/images/loading-spinner.gif"></div>
         <div id="translations">
             <!-- inject translations here  -->
@@ -193,9 +194,16 @@ $( function() {
         renderLocalesAsAvailable('reset');
     }
 } );
+</script>
+
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
+
+<script type="text/javascript">
 // "toggle" source (text/file)
 $(document).on('click', '.source-toggle .change-source-type' , function() {
     $('.source-toggle').toggle();
+    clearAllErrorMessages();
+    document.getElementById("sourceFile").value = "";
     if ($('#sourceIsText').is(":visible")) {
         $('.show-if-source-is-text').show();
         $('.show-if-source-is-file').hide();
@@ -210,4 +218,3 @@ $(document).on('click', '.source-toggle .change-source-type' , function() {
 });
 </script>
 
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
