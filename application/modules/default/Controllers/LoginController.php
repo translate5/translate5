@@ -50,7 +50,17 @@ class LoginController extends ZfExtended_Controllers_Login {
         $this->view->lockedUsers = $lock->getLocked();
         return parent::indexAction();
     }
-
+    
+    public function doOnLogout() {
+        //init editor module on logout, so that specific logout handling can be triggered via events
+        $base = ZfExtended_BaseIndex::getInstance();
+        $base->setModule('editor');
+        $bootstrap = Zend_Registry::get('bootstrap');
+        require_once 'editor/Bootstrap.php';
+        $module = new Editor_Bootstrap($bootstrap->getApplication());
+        $module->bootstrap();
+    }
+    
     protected function initDataAndRedirect() {
         //@todo do this with events
         if(class_exists('editor_Models_Segment_MaterializedView')) {

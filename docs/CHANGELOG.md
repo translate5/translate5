@@ -3,6 +3,44 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.8.5] - 2018-08-27
+###Added
+VISUAL-50: VisualReview: Improve initial loading performance by accessing images directly and not via PHP proxy
+
+###Changed
+VISUAL-49: VisualReview: Extend default editor mode to support visualReview
+TRANSLATE-1415: Rename startViewMode values in config
+
+###Bugfixes
+TRANSLATE-1416: exception 'PDOException' with message 'SQLSTATE[42S01]: Base table or view already exists: 1050 Table 'siblings' already exists'
+VISUAL-48: VisualReview: Improve visualReview scroll performance on very large VisualReview Projects
+TRANSLATE-1413: TermPortal: Import deletes all old Terms, regardless of the originating TermCollection
+TRANSLATE-1392: Unlock task on logout
+TRANSLATE-1417: Task Import ignored termEntry IDs and produced there fore task mismatch
+
+
+## [2.8.4] - 2018-08-17
+###Added
+TRANSLATE-1375: Map arbitrary term attributes to administrativeStatus
+
+###Bugfixes
+VISUAL-46: Loading screen until everything loaded
+
+
+## [2.8.3] - 2018-08-14
+###Bugfixes
+TRANSLATE-1404: TrackChanges: Tracked changes disappear when using backspace/del
+
+## [2.8.2] - 2018-08-14
+###Bugfixes
+TRANSLATE-1376: Segment length calculation does not include length of content outside of mrk tags
+TRANSLATE-1399: Using backspace on empty segment increases segment length
+TRANSLATE-1395: Enhance error message on missing relais folder
+TRANSLATE-1379: TrackChanges: disrupt conversion into japanese characters
+TRANSLATE-1373: TermPortal: TermCollection import stops because of unsaved term
+TRANSLATE-1372: TrackChanges: Multiple empty spaces after export
+
+
 ## [2.8.1] - 2018-08-08
 ###Added
 TRANSLATE-1352: Include PM changes in changes-mail and changes.xliff (xliff 2.1)

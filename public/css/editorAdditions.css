@@ -28,5 +28,5 @@ END LICENSE AND COPYRIGHT
 
 @CHARSET "UTF-8";
 #head-panel{
-    background: url(/images/translate5.png?v=1) no-repeat left -12px #ffffff; background-size: 150px; background-position: 19px 19px;
+    background: url(/images/translate5.png?v=1) no-repeat 19px 19px #ffffff; background-size: 150px;
 }

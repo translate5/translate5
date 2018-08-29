@@ -33,6 +33,25 @@ END LICENSE AND COPYRIGHT
  *
  */
 $session = new Zend_Session_Namespace();
+
+/**
+ * Render a single entry of the supporters list.
+ * @param string $link
+ * @param string $name
+ * @param string $image
+ * @param integer $width
+ * @param integer $height
+ * @param boolean $clear
+ */
+function renderSupporterEntrySite($link, $name, $image, $width, $height, $clear = FALSE) {
+    $template = '<a href="%s" class="crowdlink" style="width: %s; %s" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/supporter2018/%s" width="%d" height="%d" alt="%s" /></a>'."\n";
+    $name = str_replace('"','&quot;', $name);
+    $cssWidth = round(100 * $width / 1150, 5).'%';
+    $cssClear = ($clear) ? 'clear: left;' : '';
+    
+    return sprintf($template, $link, $cssWidth, $cssClear, $name, $image, $width, $height, $name);
+};
+
 ?>
 <article class="post">
     <header>
@@ -86,10 +105,34 @@ $session = new Zend_Session_Namespace();
     <p>The money was used to build a cloud translation tool based on already existing components:</p>
     <ul>
                 <li>The cloud review platform translate5</li>
-                <li><a href="http://commmunity.opentm2.org" target="_blank">The desktop translation tool OpenTM2</a></li>
+                <li><a href="http://community.opentm2.org" target="_blank">The desktop translation tool OpenTM2</a></li>
                 <li><a href="http://www.statmt.org/moses/" target="_blank">Moses Machine Translation</a></li>
             </ul>
     <p>The result is the current translate5 system with its integrations. Of course completed by many more features that have been build into translate5 since 2015 (and before since 2012).</p>
- <p>The following companies supported the crowdfunding and/or funded additional features &mdash; thank you very much!!!</p>
-    <img src="/images/crowd-of-companies-large.png" style="width: 100%">
+    <p>The following companies supported the crowdfunding and/or funded additional features &mdash; thank you very much!!!</p>
+    <div class="crowdlinks_container">
+        <?php
+            echo renderSupporterEntrySite('https://www.beo-doc.de', 'beo Gesellschaft für Sprachen und Technologie mbH', 'beo.png', 285, 150);
+            echo renderSupporterEntrySite('https://www.itl.eu', 'itl Institut für technische Literatur AG', 'itl.png', 220, 150);
+            echo renderSupporterEntrySite('https://www.supertext.ch', 'Supertext AG', 'supertext.png', 250, 150);
+            echo renderSupporterEntrySite('https://www.oneword.de', 'oneword GmbH', 'oneword.png', 395, 150);
+            
+            echo renderSupporterEntrySite('https://www.dfki.de/web', 'DFKI Deutsches Forschungszentrum für Künstliche Intelligenz GmbH', 'dfki.png', 310, 150, TRUE);
+            echo renderSupporterEntrySite('https://soluzione.de', 'soluzione Script GmbH', 'soluzione.png', 240, 150);
+            echo renderSupporterEntrySite('https://www.pangeanic.com', 'Pangeanic', 'pangeanic.png', 310, 150);
+            echo renderSupporterEntrySite('https://lexitech.com', 'Lexitech', 'lexitech.png', 290, 150);
+            
+            echo renderSupporterEntrySite('https://www.mt-g.eu', 'mt-g medical translation GmbH & Co. KG', 'mt-g.png', 255, 150, TRUE);
+            echo renderSupporterEntrySite('http://www.globalese-mt.com', 'Globalese MorphoLogic Localisation Ltd.', 'globalese.png', 230, 150);
+            echo renderSupporterEntrySite('http://www.lucysoftware.com', 'Lucy Software and Services GmbH', 'lucy.png', 200, 150);
+            echo renderSupporterEntrySite('https://www.locasoft.com', 'LocaSoft GmbH', 'locasoft.png', 200, 150);
+            echo renderSupporterEntrySite('http://www.iolar.com', 'Iolar', 'iolar.png', 265, 150);
+            
+            echo renderSupporterEntrySite('https://www.smartspokes.com', 'SMARTSPOKES AG', 'smartspokes.png', 250, 145, TRUE);
+            echo renderSupporterEntrySite('http://www.yavaway.com', 'Yavaway Translation', 'yavaway.png', 180, 145);
+            echo renderSupporterEntrySite('http://www.translationprojex.com', 'TranslationProjex', 'translationprojex.png', 210, 145);
+            echo renderSupporterEntrySite('https://www.swissglobal.ch', 'SwissGlobal Language Services AG', 'swissglobal.png', 240, 145);
+            echo renderSupporterEntrySite('https://www.textform.com', 'text&amp;form GmbH', 'textform.png', 270, 145);
+        ?>
+    </div>
 </article>
