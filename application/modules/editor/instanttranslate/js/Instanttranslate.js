@@ -67,6 +67,20 @@ function getSelectedEngineDomainCode(){
     }
     return selectedEngineDomainCode;
 }
+/***
+ * Returns an array with the allowed file-types for the set engine or false if none.
+ * @returns
+ */
+function getSelectedEngineFileTypes() {
+    var engineId = getSelectedEngineId(),
+        mtEngine = machineTranslationEngines[engineId]
+        extensionsFileTranslation = Editor.data.languageresource.fileExtension,
+        extensionsKey = mtEngine.source+","+mtEngine.target;
+    if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
+        return extensionsFileTranslation[extensionsKey];
+    }
+    return false;
+}
 
 /*  -------------------------------------------------------------------------
  * ORDER OF DISPLAY FOR THE USER:
@@ -226,10 +240,7 @@ $('#mtEngines').on('selectmenuchange', function() {
     setSingleMtEngineById(engineId);
 });
 function setSingleMtEngineById(engineId) {
-    var mtEngine = machineTranslationEngines[engineId],
-        extensionsFileTranslation,
-        extensionsKey,
-        fileTypes;
+    var fileTypes;
     if(machineTranslationEngines[engineId] === undefined) {
         showMtEngineSelectorError('selectMt');
         return;
@@ -240,10 +251,9 @@ function setSingleMtEngineById(engineId) {
     if ($('#sourceText').val().length > 0) {
         startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
     }
-    extensionsFileTranslation = Editor.data.languageresource.fileExtension;
-    extensionsKey = mtEngine.source+","+mtEngine.target;
-    if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
-        fileTypes = extensionsFileTranslation[extensionsKey].toString();
+    fileTypes = getSelectedEngineFileTypes();
+    if(fileTypes !== false){
+        fileTypes = fileTypes.join();
         $("#sourceIsText").html(translatedStrings['enterText']+' <span class="change-source-type">'+translatedStrings["orTranslateFile"]+' (' + fileTypes +').</span>');
         $("#sourceIsFile").html(translatedStrings['uploadFile']+' (' + fileTypes + ') <span class="change-source-type">'+translatedStrings["orTranslateText"]+'</span>');
     }else{
@@ -375,7 +385,23 @@ $('#sourceFile').on('change', prepareUpload);
 
 // Grab the files and set them to uploadedFiles
 function prepareUpload(event){
+    var fileName,
+        fileType,
+        fileTypesAllowed = getSelectedEngineFileTypes(),
+        fileTypesErrorList = [];
+    clearAllErrorMessages();
     uploadedFiles = event.target.files;
+    $.each(uploadedFiles, function(key, value){
+        fileName = value.name;
+        fileType = fileName.substr(fileName.lastIndexOf('.')+1,fileName.length);
+        if (fileTypesAllowed.indexOf(fileType) === -1) {
+            fileTypesErrorList.push(fileType);
+        }
+    });
+    if (fileTypesErrorList.length > 0) {
+        showSourceError('not allowed: ' + fileTypesErrorList.join());
+        return;
+    }
     if (instantTranslationIsActive) {
         startTranslation();
     }
@@ -459,6 +485,8 @@ function requestFileTranslate(){
     var data = new FormData(),
         ext=getFileExtension();
     
+    console.dir(uploadedFiles);
+    
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
@@ -486,12 +514,15 @@ function requestFileTranslate(){
                 getDownloadUrl(data.fileId);
             }else{
                 // Handle errors here
+                showSourceError('ERRORS: ' + data.error);
                 console.log('ERRORS: ' + data.error);
+                stopLoadingState();
             }
         },
         error: function(jqXHR, textStatus, errorThrown)
         {
             // Handle errors here
+            showSourceError('ERRORS: ' + textStatus);
             console.log('ERRORS: ' + textStatus);
             stopLoadingState();
         }
@@ -687,12 +718,16 @@ function showMtEngineSelectorError(errorMode) {
 function showTranslationError(errorText) {
     var engineId = getSelectedEngineId(),
         divId = 'translationError'+engineId;
+    debugger;
     if (engineId !== false && document.getElementById(divId) !== null) {
         $('#'+divId).html(errorText).show();
     }
 }
+function showSourceError(errorText) {
+    $('#sourceError').html(errorText).show();
+}
 function clearAllErrorMessages() {
-    $('.translation-error').hide();
+    $('.instant-translation-error').hide();
 }
 /* --------------- show/hide: loading spinner ------------------------------- */
 function startLoadingSign() {
