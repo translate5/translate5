@@ -31,6 +31,6 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
 ('editor', 'editor', 'editor_instanttranslate', 'all'),
 ('editor', 'api', 'editor_instanttranslate', 'all');
 
-INSERT INTO `translate5`.`Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.LanguageResources.fileExtension', '1', 'editor', 'system', '', '', '', 'map', 'Available file types by extension per engine type. The engine type is defined by source rcf5646,target rcf5646. ex: \"en-ge,en-us\"');
 
