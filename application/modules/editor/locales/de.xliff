@@ -1570,6 +1570,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='Qml0dGUgYXVzd8OkaGxlbg=='><source>Bitte auswählen</source><target>Bitte auswählen</target></trans-unit>
 <trans-unit id='QmVpZGUgTGlzdGVuIHp1csO8Y2tzZXR6ZW4='><source>Beide Listen zurücksetzen</source><target>Beide Listen zurücksetzen</target></trans-unit>
 <trans-unit id='QWxsZSBhbnplaWdlbiBmw7xy'><source>Alle anzeigen für</source><target>Alle anzeigen für</target></trans-unit>
+<trans-unit id='bmljaHQgZXJsYXVidA=='><source>nicht erlaubt</source><target>nicht erlaubt</target></trans-unit>
+<trans-unit id='TWFzY2hpbmVuw7xiZXJzZXR6dW5n'><source>Maschinenübersetzung</source><target>Maschinenübersetzung</target></trans-unit>
+<trans-unit id='TVQtRW5naW5l'><source>MT-Engine</source><target>MT-Engine</target></trans-unit>
 
   </body>
  </file>

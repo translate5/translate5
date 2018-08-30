@@ -2836,6 +2836,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='Qml0dGUgYXVzd8OkaGxlbg=='><source>Bitte auswählen</source><target>Please choose</target></trans-unit>
 <trans-unit id='QmVpZGUgTGlzdGVuIHp1csO8Y2tzZXR6ZW4='><source>Beide Listen zurücksetzen</source><target>Clear both lists</target></trans-unit>
 <trans-unit id='QWxsZSBhbnplaWdlbiBmw7xy'><source>Alle anzeigen für</source><target>Show all for</target></trans-unit>
+<trans-unit id='bmljaHQgZXJsYXVidA=='><source>nicht erlaubt</source><target>not allowed</target></trans-unit>
+<trans-unit id='TWFzY2hpbmVuw7xiZXJzZXR6dW5n'><source>Maschinenübersetzung</source><target>Machinetranslation</target></trans-unit>
+<trans-unit id='TVQtRW5naW5l'><source>MT-Engine</source><target>selected MT-Engine</target></trans-unit>
 
     </body>
   </file>
