@@ -679,7 +679,6 @@ $('#sourceText').on("input focus", function(){
         $('#translations').hide();
     } else {
         $("#sourceIsText").removeClass('source-text-error');
-        $('#translations').show();
     }
 });
 
