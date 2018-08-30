@@ -40,7 +40,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         // last selected source and target languages for the user (=> new table Zf_users_meta)
         $sourceSearchLanguagePreselectionLocale= 'en-US'; // TODO; both content and structure of this content are DUMMY only!
-        $targetSearchLanguagePreselectionLocale= 'ru-RU'; // TODO; both content and structure of this content are DUMMY only!
+        $targetSearchLanguagePreselectionLocale= 'da-DK'; // TODO; both content and structure of this content are DUMMY only!
         
         $this->view->sourceSearchLanguagePreselectionLocale = $sourceSearchLanguagePreselectionLocale;
         $this->view->targetSearchLanguagePreselectionLocale = $targetSearchLanguagePreselectionLocale;
