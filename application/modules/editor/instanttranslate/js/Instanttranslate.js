@@ -33,7 +33,8 @@ var editIdleTimer = null,
     translateTextResponse = '',
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
-    instantTranslationIsActive = true;
+    instantTranslationIsActive = true,
+    chosenSourceIsText = true;
 
 /* --------------- set, unset and get the selected mtEngine  ---------------- */
 
@@ -46,7 +47,7 @@ function unsetMtEngine() {
     selectedEngineId = undefined;
 }
 /***
- * Return the id of the set engine(if set) or false
+ * Return the id of the set engine (if set) or false
  * @returns
  */
 function getSelectedEngineId(){
@@ -56,16 +57,26 @@ function getSelectedEngineId(){
     return selectedEngineId;
 }
 /***
+ * Return the name of the set engine (if set) or false
+ * @returns
+ */
+function getSelectedEngineName(){
+    var engineId = getSelectedEngineId();
+    if(engineId === false || machineTranslationEngines[engineId] === undefined || machineTranslationEngines[engineId].name === undefined) {
+        return false; 
+    }
+    return machineTranslationEngines[engineId].name;
+}
+/***
  * Return the domain code(if exist) of the set engine or false
  * @returns
  */
 function getSelectedEngineDomainCode(){
-    var engineId = getSelectedEngineId(),
-        selectedEngineDomainCode = machineTranslationEngines[engineId].domainCode;
-    if(engineId === false || selectedEngineDomainCode === undefined) {
+    var engineId = getSelectedEngineId();
+    if(engineId === false || machineTranslationEngines[engineId] === undefined || machineTranslationEngines[engineId].domainCode === undefined) {
         return false; 
     }
-    return selectedEngineDomainCode;
+    return machineTranslationEngines[engineId].domainCode;
 }
 /***
  * Returns an array with the allowed file-types for the set engine or false if none.
@@ -120,8 +131,18 @@ function renderLocalesAsAvailable(accordingTo) {
         // This means that the user has chosen a final combination of source AND target. The list contains only the selected locale and the "clear"-options.
         sourceLocalesAvailable.push(sourceLocale);
         targetLocalesAvailable.push(targetLocale);
-        source = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: targetLocale, selectedValue: sourceLocale};
-        target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: sourceLocale, selectedValue: targetLocale};
+        localesAvailable = getLocalesAccordingToReference ('accordingToTargetLocale', targetLocale);
+        if (localesAvailable.length == 1) {
+            source = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: false, localeForReference: targetLocale, selectedValue: sourceLocale};
+        } else {
+            source = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: targetLocale, selectedValue: sourceLocale};
+        }
+        localesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceLocale);
+        if (localesAvailable.length == 1) {
+            target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: false, localeForReference: sourceLocale, selectedValue: targetLocale};
+        } else {
+            target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: sourceLocale, selectedValue: targetLocale};
+        }
     } else if (accordingTo === 'reset' || selectedText === translatedStrings['clearBothLists']) {
         // This means a "reset" of one or both the lists:
         sourceLocalesAvailable = mtSourceLanguageLocales;
@@ -246,6 +267,7 @@ function setSingleMtEngineById(engineId) {
         return;
     }
     setMtEngine(engineId);
+    $('#selectedMtEngine').html(translatedStrings['selectedMtEngine'] + ':<br>'+getSelectedEngineName());
     clearAllErrorMessages();
     showTranslationFormsAsReady();
     if ($('#sourceText').val().length > 0) {
@@ -338,6 +360,9 @@ $('#translationSubmit').click(function(){
     return false;
 });
 $('#instantTranslationIsOff').click(function(){
+    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible") && $('#sourceFile').val() == "") {
+        return;
+    }
     startTranslation();
 });
 function startTimerForInstantTranslation() {
@@ -399,7 +424,7 @@ function prepareUpload(event){
         }
     });
     if (fileTypesErrorList.length > 0) {
-        showSourceError('not allowed: ' + fileTypesErrorList.join());
+        showSourceError(translatedStrings['notAllowed'] + ': ' + fileTypesErrorList.join());
         return;
     }
     if (instantTranslationIsActive) {
@@ -457,13 +482,15 @@ function translateText(textToTranslate,translationInProgressID){
 
 function renderTranslationContainer() {
     var translationsContainer = '',
-        engineId = getSelectedEngineId();
-    if (engineId !== false) {
+        engineId = getSelectedEngineId(),
+        engineName = getSelectedEngineName();
+    if (engineId !== false && engineName != false) {
+        //translationsContainer += '<h2>' + translatedStrings['machineTranslation'] + ' (' + engineName + ')</h2>';
         translationsContainer += '<div class="copyable">';
         translationsContainer += '<div class="translation-result" id="'+engineId+'"></div>';
         translationsContainer += '<span class="copyable-copy" title="'+translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
         translationsContainer += '</div>';
-        translationsContainer += '<div id="translationError'+engineId+'" class="translation-error ui-state-error ui-corner-all"></div>';
+        translationsContainer += '<div id="translationError'+engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
     }
     return translationsContainer;
 }
@@ -669,29 +696,40 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 function showLanguageSelectsOnly() {
     $('#mtEngines').selectmenu("widget").hide();
     $('#translationSubmit').hide();
-    hideSourceText();
+    hideSource();
     hideTranslations();
 }
 function showTranslationFormsAsReady() {
     $('#mtEngines').selectmenu("widget").hide();
-    showSourceText();
+    showSource();
     showTranslations();
 }
 /* --------------- show/hide: helpers --------------------------------------- */
-function showSourceText() {
-    $('#sourceContent').show();
-    $('#sourceIsText').show();
-    $('#sourceText').focus();
+function showSource() {
+    if (chosenSourceIsText) {
+        $('#sourceContent').show();
+        $('.show-if-source-is-text').show();
+        $('.show-if-source-is-file').hide();
+        $('#translations').show();
+        $("#sourceIsText").removeClass('source-text-error');
+        $('#sourceText').focus();
+    } else {
+        $('.show-if-source-is-text').hide();
+        $('.show-if-source-is-file').show();
+        $('#translations').hide();
+    }
 }
-function hideSourceText() {
+function hideSource() {
     $('#sourceContent').hide();
     $('#sourceIsText').hide();
+    $('.source-toggle').hide();
 }
 function showTranslations() {
     if ($('#sourceText').val().length === 0) {
         $('#translations').html('');
     }
     $('#translations').show();
+    $('#selectedMtEngine').show();
     $('#translationSubmit').show();
     if (instantTranslationIsActive) {
         $('#instantTranslationIsOn').show();
@@ -703,6 +741,7 @@ function showTranslations() {
 }
 function hideTranslations() {
     $('#translations').hide();
+    $('#selectedMtEngine').hide();
     $('#translationSubmit').hide();
     $('#instantTranslationIsOn').hide();
     $('#instantTranslationIsOff').hide();
@@ -712,7 +751,7 @@ function showMtEngineSelectorError(errorMode) {
     $('#mtEngineSelectorError').html(translatedStrings[errorMode]).show();
     $('#translationSubmit').hide();
     if ($('#sourceText').val().length === 0) {
-        hideSourceText();
+        hideSource();
     }
 }
 function showTranslationError(errorText) {
@@ -739,9 +778,9 @@ function stopLoadingSign() {
     $('#loadingSpinnerIndicator').hide();
 }
 function startLoadingState() {
-    $('.loadingSpinner').show();
+    $('#loadingSpinnerLayer').show();
 }
 function stopLoadingState() {
-    $('.loadingSpinner').hide();
+    $('#loadingSpinnerLayer').hide();
 }
 
