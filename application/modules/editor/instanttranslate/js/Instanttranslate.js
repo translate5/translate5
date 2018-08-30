@@ -363,6 +363,9 @@ $('#instantTranslationIsOff').click(function(){
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible") && $('#sourceFile').val() == "") {
         return;
     }
+    if ($('#sourceText').val() === latestTextToTranslate) {
+        return;
+    }
     startTranslation();
 });
 function startTimerForInstantTranslation() {
@@ -485,6 +488,7 @@ function renderTranslationContainer() {
         engineId = getSelectedEngineId(),
         engineName = getSelectedEngineName();
     if (engineId !== false && engineName != false) {
+        //for https://jira.translate5.net/browse/TRANSLATE-1390 :
         //translationsContainer += '<h2>' + translatedStrings['machineTranslation'] + ' (' + engineName + ')</h2>';
         translationsContainer += '<div class="copyable">';
         translationsContainer += '<div class="translation-result" id="'+engineId+'"></div>';
@@ -706,8 +710,9 @@ function showTranslationFormsAsReady() {
 }
 /* --------------- show/hide: helpers --------------------------------------- */
 function showSource() {
-    if (chosenSourceIsText) {
-        $('#sourceContent').show();
+    var fileTypes = getSelectedEngineFileTypes();
+    $('#sourceContent').show();
+    if (chosenSourceIsText || fileTypes === false) {
         $('.show-if-source-is-text').show();
         $('.show-if-source-is-file').hide();
         $('#translations').show();
