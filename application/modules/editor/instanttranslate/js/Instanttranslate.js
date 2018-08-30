@@ -84,7 +84,7 @@ function getSelectedEngineDomainCode(){
  */
 function getSelectedEngineFileTypes() {
     var engineId = getSelectedEngineId(),
-        mtEngine = machineTranslationEngines[engineId]
+        mtEngine = machineTranslationEngines[engineId],
         extensionsFileTranslation = Editor.data.languageresource.fileExtension,
         extensionsKey = mtEngine.source+","+mtEngine.target;
     if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
@@ -127,6 +127,7 @@ function renderLocalesAsAvailable(accordingTo) {
         source = {},
         target = {};
     clearAllErrorMessages();
+    latestTextToTranslate = ''; // when the language changes, former translations are not valid any longer = the text hasn't been translated already.
     if (sourceLocale != '-' && targetLocale != '-') {
         // This means that the user has chosen a final combination of source AND target. The list contains only the selected locale and the "clear"-options.
         sourceLocalesAvailable.push(sourceLocale);
@@ -345,29 +346,65 @@ function getMtEnginesAccordingToLanguages() {
     return mtIdsAvailable;
 }
 
-/* --------------- start and terminate translations  ------------------------ */
+/* --------------- start translation instantly or manually: events  --------- */
+
+//start instant (sic!) translation automatically
 $('#sourceText').bind('keyup', function() {
-    // start instant (sic!) translation automatically
     if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
         console.log('latest key-event did not change the text (eg arrow-keys, ...)');
         return;
     }
     startTimerForInstantTranslation();
 });
-$('#translationSubmit').click(function(){
-    // start translation manually via button
-    startTranslation();
+
+//instantly after uploading a file: grab the files and set them to uploadedFiles
+//(if instantTranslation is on, the translation will start, too)
+$('#sourceFile').on('change', grabUploadedFiles);
+
+//start translation manually via button
+$('.click-starts-translation').click(function(event){
+    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
+        startFileTranslation();
+    } else {
+        startTranslation();
+    }
     return false;
 });
-$('#instantTranslationIsOff').click(function(){
-    if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible") && $('#sourceFile').val() == "") {
+
+/* --------------- prepare file-translations  ------------------------------- */
+
+function grabUploadedFiles(event){
+    uploadedFiles = event.target.files; 
+    if (instantTranslationIsActive) {
+        startFileTranslation();
+    }
+}
+
+function startFileTranslation(){
+    var fileName,
+        fileType,
+        fileTypesAllowed = getSelectedEngineFileTypes(),
+        fileTypesErrorList = [];
+    if ($('#sourceFile').val() == "") {
+        showSourceError('Please upload a file.'); // TODO: translate
         return;
     }
-    if ($('#sourceText').val() === latestTextToTranslate) {
+    clearAllErrorMessages();
+    $.each(uploadedFiles, function(key, value){
+        fileName = value.name;
+        fileType = fileName.substr(fileName.lastIndexOf('.')+1,fileName.length);
+        if (fileTypesAllowed.indexOf(fileType) === -1) {
+            fileTypesErrorList.push(fileType);
+        }
+    });
+    if (fileTypesErrorList.length > 0) {
+        showSourceError(translatedStrings['notAllowed'] + ': ' + fileTypesErrorList.join());
         return;
     }
     startTranslation();
-});
+}
+
+/* --------------- prepare, start and terminate translations  --------------- */
 function startTimerForInstantTranslation() {
     terminateTranslation();
     if (instantTranslationIsActive) {
@@ -386,6 +423,9 @@ function startTranslation() {
         return;
     }
     // otherwise: translate Text
+    if ($('#sourceText').val() === latestTextToTranslate) {
+        return;
+    }
     if ($('#sourceText').val().length === 0) {
         // no text given
         $("#sourceIsText").addClass('source-text-error');
@@ -406,33 +446,6 @@ function terminateTranslation() {
     clearTimeout(editIdleTimer);
     editIdleTimer = null;
     latestTranslationInProgressID = false;
-}
-
-// Add events
-$('#sourceFile').on('change', prepareUpload);
-
-// Grab the files and set them to uploadedFiles
-function prepareUpload(event){
-    var fileName,
-        fileType,
-        fileTypesAllowed = getSelectedEngineFileTypes(),
-        fileTypesErrorList = [];
-    clearAllErrorMessages();
-    uploadedFiles = event.target.files;
-    $.each(uploadedFiles, function(key, value){
-        fileName = value.name;
-        fileType = fileName.substr(fileName.lastIndexOf('.')+1,fileName.length);
-        if (fileTypesAllowed.indexOf(fileType) === -1) {
-            fileTypesErrorList.push(fileType);
-        }
-    });
-    if (fileTypesErrorList.length > 0) {
-        showSourceError(translatedStrings['notAllowed'] + ': ' + fileTypesErrorList.join());
-        return;
-    }
-    if (instantTranslationIsActive) {
-        startTranslation();
-    }
 }
 
 /* --------------- translation ---------------------------------------------- */
@@ -515,8 +528,6 @@ function requestFileTranslate(){
     // Create a formdata object and add the files
     var data = new FormData(),
         ext=getFileExtension();
-    
-    console.dir(uploadedFiles);
     
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
