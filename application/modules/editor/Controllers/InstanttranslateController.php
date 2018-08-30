@@ -124,7 +124,10 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "uploadFile"                => $this->translate->_("Laden Sie eine Datei hoch"),
                 "pleaseChoose"              => $this->translate->_("Bitte auswählen"),
                 "clearBothLists"            => $this->translate->_("Beide Listen zurücksetzen"),
-                "showAllAvailableFor"       => $this->translate->_("Alle anzeigen für")
+                "showAllAvailableFor"       => $this->translate->_("Alle anzeigen für"),
+                "notAllowed"                => $this->translate->_("nicht erlaubt"),
+                "machineTranslation"        => $this->translate->_("Maschinenübersetzung"),
+                "selectedMtEngine"          => $this->translate->_("MT-Engine")
                 
         );
         $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';

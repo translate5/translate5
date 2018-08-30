@@ -58,7 +58,7 @@
     sort($mtTargetLanguageLocales);
 ?>
 
-<div id="loadingSpinnerLayer" class="loadingSpinner"></div>
+<div id="loadingSpinnerLayer" class="loadingSpinner"><img src="/images/loading-spinner.gif"></div>
 
 <div id="containerHeader" class="container">
     <div id="logo"></div>
@@ -97,8 +97,8 @@
                     }
                 ?>
             </select>
-            <div id="sourceIsText" class="source-toggle show-if-source-is-text"><?php echo $this->translations["enterText"];?></div>
-            <div id="sourceIsFile" class="source-toggle show-if-source-is-file"><?php echo $this->translations["uploadFile"];?> <span class="change-source-type"><?php echo $this->translations["orTranslateText"];?></span></div>
+            <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"><?php echo $this->translations["enterText"];?></div>
+            <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"><?php echo $this->translations["uploadFile"];?> <span class="change-source-type"><?php echo $this->translations["orTranslateText"];?></span></div>
             <div id="sourceContent" class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
                 <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
@@ -125,9 +125,10 @@
                 ?>
             </select>
             <select id="mtEngines" name="mtEngines"></select>
+            <div id="selectedMtEngine" class="infotext"></div>
             <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="ui-corner-all ui-button ui-widget">
-            <div id="instantTranslationIsOff" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
-            <div id="instantTranslationIsOn" class="instant-translation-toggle"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
+            <div id="instantTranslationIsOff" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
+            <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
         <div id="mtEngineSelectorError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         <div id="loadingSpinnerIndicator" class="loadingSpinner"><img src="/images/loading-spinner.gif"></div>
@@ -202,19 +203,10 @@ $( function() {
 // "toggle" source (text/file)
 $(document).on('click', '.source-toggle .change-source-type' , function() {
     $('.source-toggle').toggle();
+    chosenSourceIsText = !chosenSourceIsText;
     clearAllErrorMessages();
     document.getElementById("sourceFile").value = "";
-    if ($('#sourceIsText').is(":visible")) {
-        $('.show-if-source-is-text').show();
-        $('.show-if-source-is-file').hide();
-        $('#translations').show();
-        $("#sourceIsText").removeClass('source-text-error');
-        $('#sourceText').focus();
-    } else {
-        $('.show-if-source-is-text').hide();
-        $('.show-if-source-is-file').show();
-        $('#translations').hide();
-    }
+    showSource();
 });
 </script>
 
