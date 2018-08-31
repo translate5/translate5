@@ -49,9 +49,11 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         //$this->view->Php2JsVars()->set('languageresource.fileExtension',$config->runtimeOptions->LanguageResources->fileExtension);
         $this->view->Php2JsVars()->set('languageresource.fileExtension',
             [
-                "de-DE,en-GB"=>["txt","odt"],
-                "en-US,ru-RU"=>["txt","odt"],
-                "en-US,de-DE"=>["txt","odt"]
+                "de-DE,en-GB"=>["txt","odt","docx"],
+                "en-US,ru-RU"=>["txt","odt","docx"],
+                "en-US,de-DE"=>["txt","odt","docx"],
+                "en-US,da-DK"=>["txt","odt","docx"],
+                "en-US,es-ES"=>["txt","odt","docx"],
                 
             ]);
         
