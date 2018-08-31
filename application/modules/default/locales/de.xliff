@@ -230,6 +230,8 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 <trans-unit id='RGVyIFJlc2V0SGFzaCBvZGVyIGRpZSBCcm93c2Vyc2l0enVuZyBpc3QgbmljaHQgKG1laHIpIGfDvGx0aWcuIEJpdHRlIGZvcmRlcm4gU2llIMO8YmVyIGRhcyBuZWJlbnN0ZWhlbmRlIEZvcm11bGFyIGVpbmUgRS1NYWlsIG1pdCBlaW5lbSBuZXVlbiBMaW5rIGFuLg=='><source>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</source><target>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</target></trans-unit>
 <trans-unit id='U3VwcG9ydCB0aGUgcHJvamVjdA=='><source>Support the project</source><target>Support the project</target></trans-unit>
 <trans-unit id='T3V0c3RhbmRpbmcgZmVhdHVyZXM='><source>Outstanding features</source><target>Outstanding features</target></trans-unit>
+<trans-unit id='V2VsY29tZSB0byBXb3JsZCBUcmFuc2xhdGlvbidzIFJldmlldyBQb3J0YWw='><source>Welcome to World Translation's Review Portal</source><target>Welcome to World Translation's Review Portal</target></trans-unit>
+<trans-unit id='V2VsY29tZSB0byBJbnN0YW50VHJhbnNsYXRlIGJ5IFdvcmxkIFRyYW5zbGF0aW9u'><source>Welcome to InstantTranslate by World Translation</source><target>Welcome to InstantTranslate by World Translation</target></trans-unit>
   </body>
  </file>
 </xliff>
