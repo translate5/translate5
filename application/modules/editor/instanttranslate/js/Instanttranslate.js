@@ -423,13 +423,13 @@ function startTranslation() {
         return;
     }
     // otherwise: translate Text
-    if ($('#sourceText').val() === latestTextToTranslate) {
-        return;
-    }
     if ($('#sourceText').val().length === 0) {
         // no text given
         $("#sourceIsText").addClass('source-text-error');
         $('#translations').hide();
+        return;
+    }
+    if ($('#sourceText').val() === latestTextToTranslate) {
         return;
     }
     terminateTranslation();
@@ -661,6 +661,7 @@ $(".clearable").each(function() {
         elCle = $(this).find(".clearable-clear");
     elInp.on("input", function(){
         elCle.toggle(!!this.value);
+        latestTextToTranslate = '';
         elInp.focus();
     });
     elCle.on("touchstart click", function(e) {

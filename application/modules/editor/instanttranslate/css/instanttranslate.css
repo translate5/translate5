@@ -85,6 +85,21 @@ h4, p {
 .infotext span:hover {
     text-decoration: underline;
 }
+.source-text-error.infotext {
+    color: #f00;
+}
+.source-text-error.infotext a,
+.source-text-error.infotext a:hover,
+.source-text-error.infotext span,
+.source-text-error.infotext span:hover {
+    color: #f00;
+    text-decoration: underline;
+}
+.source-text-error.infotext a:hover,
+.source-text-error.infotext span:hover {
+    color: #f00;
+    text-decoration: none;
+}
 
 /* --------------- header --------------- */
 
@@ -176,10 +191,6 @@ h4, p {
 .show-if-source-is-file,
 #sourceIsText {
     display: none;
-}
-.source-text-error,
-.source-text-error .change-source-type {
-    color: #f00;
 }
 
 @media (max-width: 710px) {
