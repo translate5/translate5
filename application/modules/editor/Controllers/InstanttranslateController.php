@@ -26,14 +26,22 @@
  END LICENSE AND COPYRIGHT
  */
 
-class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
+class Editor_InstanttranslateController extends ZfExtended_RestController {
+    
+    public function init() {
+        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        $this->eventManager = Zend_EventManager_StaticEventManager::getInstance();
+        
+        $this->restMessages = ZfExtended_Factory::get('ZfExtended_Models_Messages');
+        Zend_Registry::set('rest_messages', $this->restMessages);
+    }
+    
     
     public function indexAction(){
         
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         //$config = Zend_Registry::get('config');
-        
         Zend_Layout::getMvcInstance()->setLayout('instanttranslate');
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
         $this->view->render('instanttranslate/layoutConfig.php');
@@ -57,36 +65,11 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 
             ]);
         
-        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $dummyTmmt editor_Models_TmMt */
-        
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
-        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
-        
-        
-        $result=null;
-        //load all available engines
-        if($api->getEngines()){
-            $result=$api->getResult();
-        }
-        
         $machineTranslationEngines=array();
-
-        //if the available engines exist, merge them to frontend var, so they can be used for trans
-        if($result->totalCount>0){
-            $engineCounter=1;
-            foreach($result->translationEngines as $engine){
-                $machineTranslationEngines['mt'.$engineCounter]=array(
-                    'name' =>$engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']', 
-                    'source' => $engine->fromCulture,
-                    'sourceIso' => $engine->from->code,
-                    'target' => $engine->toCulture,
-                    'targetIso' => $engine->to->code,
-                    'domainCode' => $engine->domainCode
-                );
-                $engineCounter++;
-            }
-        }
+        
+        $engineModel=ZfExtended_Factory::get('editor_Models_SdlResources');
+        /* @var $engineModel editor_Models_SdlResources */
+        $machineTranslationEngines=$engineModel->getEngines();
         
         // available MachineTranslation-Engines
         /*$machineTranslationEngines = array(  // TODO; both content and structure of this content are DUMMY only!

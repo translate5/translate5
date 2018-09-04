@@ -154,4 +154,9 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         $moreInfo = 'The answer received from Moses is not as expected!';
         return self::STATUS_NOCONNECTION;
     }
+    
+    public function searchWithParam(string $searchString, array $params){
+        throw new BadMethodCallException("The Moses MT Connector does not support search with param requests");
+    }
+
 }

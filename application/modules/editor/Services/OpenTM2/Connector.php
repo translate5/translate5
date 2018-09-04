@@ -555,4 +555,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $connector->connectTo($fuzzyTmmt);
         return $connector;
     }
+    
+    public function searchWithParam(string $searchString, array $params){
+        throw new BadMethodCallException("The OpenTm2 Connector does not support search with param requests");
+    }
 }
