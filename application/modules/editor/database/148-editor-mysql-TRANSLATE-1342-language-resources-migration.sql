@@ -41,12 +41,12 @@ UPDATE `Zf_acl_rules` SET `resource`='editor_tmmt' WHERE `resource`='editor_plug
 
 /* rename from the acl rules the plugin specific rights names */
 UPDATE `Zf_acl_rules`
-SET `right` = REPLACE (`right`, 'pluginMatchResources', 'LanguageResources')
+SET `right` = REPLACE (`right`, 'pluginMatchResources', 'languageResources')
 WHERE `right` LIKE '%pluginMatchResources%'
 AND `resource` = 'frontend';
 
 UPDATE `Zf_acl_rules`
-SET `right` = REPLACE (`right`, 'pluginMatchResource', 'LanguageResources')
+SET `right` = REPLACE (`right`, 'pluginMatchResource', 'languageResources')
 WHERE `right` LIKE '%pluginMatchResource%'
 AND `resource` = 'frontend';
 
