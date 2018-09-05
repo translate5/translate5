@@ -217,7 +217,7 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleButtonRefreshClick : function(){
         this.getTmOverviewPanel().getStore().load();
-        this.getEditorPluginsLanguageResourceStoreResourcesStore().load();
+        Ext.StoreManager.get('Editor.store.LanguageResources.Resources').load();
     },
     handleSaveAddClick:function(button){
         var me = this,
