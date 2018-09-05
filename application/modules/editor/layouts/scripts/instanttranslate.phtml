@@ -54,11 +54,13 @@ $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css');
         <?php echo $this->headStyle() ?>
         <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
 <?php echo $this->headScript() ?>
-
         <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js"></script>
         <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js"></script>
     </head>
     <body>
-        <?php echo $this->layout()->content; ?>
+        <?php 
+            echo $this->render('instanttranslate/index.phtml');
+            //echo $this->layout()->content; 
+        ?>
     </body>
 </html>

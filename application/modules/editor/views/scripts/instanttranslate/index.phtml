@@ -58,7 +58,7 @@
     sort($mtTargetLanguageLocales);
 ?>
 
-<div id="loadingSpinnerLayer" class="loadingSpinner"><img src="/images/loading-spinner.gif"></div>
+<div id="loadingSpinnerLayer" class="loadingSpinner"><img src="/images/loading-spinner.gif"/></div>
 
 <div id="containerHeader" class="container">
     <div id="logo"></div>
@@ -68,14 +68,17 @@
     $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
     $availableTranslations = $translate->getAvailableTranslations();
     asort($availableTranslations);
-    echo '<form action="#" method="post" name="languageSelector" id="languageSelector">';
-    echo '<select id="locale">';
+    $languageSelector=[];
+    
+    $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector">';
+    $languageSelector[]='<select id="locale">';
     foreach ($availableTranslations as $locale => $translation) {
-        $selected = ($locale == $session->locale) ? ' selected' : '';
-        echo '<option value="'.$locale.'"'.$selected.'>'.$translation.'</option>';
+        $selected = ($locale == $session->locale) ? ' selected="selected"' : '';
+        $languageSelector[]='<option value="'.$locale.'"'.$selected.'>'.$translation.'</option>';
     }
-    echo '</select>';
-    echo '</form>';
+    $languageSelector[]='</select>';
+    $languageSelector[]='</form>';
+    echo implode(' ', $languageSelector);
 ?>
     <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
 </div>
@@ -84,17 +87,19 @@
 	<div id="source">
         <form id="sourceLanguageAndContent">
             <select id="sourceLocale" name="sourceLocale">
-                <option value="-">-</option>
                 <?php
                     $sourceLangLocalesFound = array();
                     foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
                         $sourceLangLocalesFound[] = $sourceLangLocale;
                     }
                     sort($sourceLangLocalesFound);
+                    $optionValues=[];
+                    $optionValues[]='<option value="-">-</option>';
                     foreach ($sourceLangLocalesFound as $sourceLangLocale) {
-                        $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected' : '';
-                        echo '<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
+                        $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
+                    echo implode(' ', $optionValues);
                 ?>
             </select>
             <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"><?php echo $this->translations["enterText"];?></div>
@@ -103,7 +108,7 @@
                 <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
                 <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
                 <span id="countedCharacters" class="show-if-source-is-text">0</span>
-                <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file">
+                <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file"/>
             </div>
         <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         </form>
@@ -111,27 +116,29 @@
     <div id="target">
         <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
-                <option value="-">-</option>
                 <?php
                     $targetLangLocalesFound = array();
                     foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
                         $targetLangLocalesFound[] = $sourceLangLocale;
                     }
                     sort($targetLangLocalesFound);
+                    $optionValues=[];
+                    $optionValues[]='<option value="-">-</option>';
                     foreach ($targetLangLocalesFound as $targetLangLocale) {
-                        $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected' : '';
-                        echo '<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
+                        $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
+                    echo implode(' ', $optionValues);
                 ?>
             </select>
             <select id="mtEngines" name="mtEngines"></select>
             <div id="selectedMtEngine" class="infotext"></div>
-            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="click-starts-translation ui-corner-all ui-button ui-widget">
+            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="click-starts-translation ui-corner-all ui-button ui-widget"/>
             <div id="instantTranslationIsOff" class="click-starts-translation instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
             <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
         <div id="mtEngineSelectorError" class="instant-translation-error ui-state-error ui-corner-all"></div>
-        <div id="loadingSpinnerIndicator" class="loadingSpinner"><img src="/images/loading-spinner.gif"></div>
+        <div id="loadingSpinnerIndicator" class="loadingSpinner"><img src="/images/loading-spinner.gif"/></div>
         <div id="translations">
             <!-- inject translations here  -->
         </div>
