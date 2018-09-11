@@ -265,12 +265,15 @@ Ext.override(Ext.data.PageMap, {
 });
 
 /**
- * Fix for TRANSLATE-1041 / EXTJS-24549 / https://www.sencha.com/forum/showthread.php?338435-ext-all-debug-js-206678-Uncaught-TypeError-cell-focus-is-not-a-function
- * needed for ext-6.2.0
- * should be solved natively with next version
+ * Several Fixes for view.Table
  */
 Ext.override(Ext.view.Table, {
     privates: {
+        /**
+         * Fix for TRANSLATE-1041 / EXTJS-24549 / https://www.sencha.com/forum/showthread.php?338435-ext-all-debug-js-206678-Uncaught-TypeError-cell-focus-is-not-a-function
+         * needed for ext-6.2.0
+         * should be solved natively with next version
+         */
         setActionableMode: function(enabled, position) {
             var me = this,
                 navModel = me.getNavigationModel(),
@@ -365,6 +368,17 @@ Ext.override(Ext.view.Table, {
                 }
             }
         }
+    },
+    /**
+     * Fixing TRANSLATE-1422: Uncaught TypeError: Cannot read property 'record' of undefined
+     * needed for ext-6.2.0
+     * no information if fixed in future versions / not searched for native extjs bug since it was clear to be fixed easy with a override
+     */
+    getDefaultFocusPosition: function(fromComponent) {
+        if(fromComponent && !fromComponent.isColumn && fromComponent.isTableView && !fromComponent.lastFocused) {
+            fromComponent = null;
+        }
+        return this.callParent([fromComponent]);
     }
 });
 
