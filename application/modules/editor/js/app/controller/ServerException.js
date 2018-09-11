@@ -96,7 +96,7 @@ Ext.define('Editor.controller.ServerException', {
             _status = status.toString(),
             text = str.text,
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
-            json = Ext.JSON.decode(respText),
+            json = null,
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
             getServerMsg = function() {
@@ -113,6 +113,14 @@ Ext.define('Editor.controller.ServerException', {
                 return msg + tpl.apply(['', getServerMsg()]);
             };
         
+        try {
+            json = Ext.JSON.decode(respText);
+        }
+        catch(e){
+            //if there is no valid JSON, the error is probably not from us. With 0 we pass by the below switch and just print the error
+            status = 0; 
+        }
+            
         switch(status) {
             case -1:
                 //if the XHR was aborted, do nothing here, since this is "wanted" behaviour
@@ -177,7 +185,7 @@ Ext.define('Editor.controller.ServerException', {
                  });
                 return;
         }
-        Ext.Msg.alert(str.title, text+tpl.apply([status, statusText]));
+        Ext.Msg.alert(str.title, text+tpl.apply([_status, statusText]));
     },
     /**
      * Helper to redirect to the login page
