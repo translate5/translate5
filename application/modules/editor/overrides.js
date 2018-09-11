@@ -265,6 +265,23 @@ Ext.override(Ext.data.PageMap, {
 });
 
 /**
+ * Workaround for TRANSLATE-1177
+ * https://www.sencha.com/forum/showthread.php?343381-Grid-rowwidget-error-Uncaught-TypeError-Cannot-read-property-isModel-of-null
+ * EXTJS-26004
+ * needed for ext-6.2.0
+ * seems to be still open in newer versions
+ */
+Ext.override(Ext.grid.CellContext, {
+    setRow: function(row) {
+        if(!row) {
+            //the original method needs undefined for falsy row values
+            return this.callParent([]);
+        }
+        return this.callParent([row]);
+    }
+});
+
+/**
  * Several Fixes for view.Table
  */
 Ext.override(Ext.view.Table, {
