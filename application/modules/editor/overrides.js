@@ -371,8 +371,9 @@ Ext.override(Ext.view.Table, {
     },
     /**
      * Fixing TRANSLATE-1422: Uncaught TypeError: Cannot read property 'record' of undefined
+     * EXTJS-22672 fixed in 6.2.1.167.
+     * https://www.sencha.com/forum/showthread.php?328802-6-2-Crash-when-clicking-grid-view-area-outside-cells
      * needed for ext-6.2.0
-     * no information if fixed in future versions / not searched for native extjs bug since it was clear to be fixed easy with a override
      */
     getDefaultFocusPosition: function(fromComponent) {
         if(fromComponent && !fromComponent.isColumn && fromComponent.isTableView && !fromComponent.lastFocused) {
