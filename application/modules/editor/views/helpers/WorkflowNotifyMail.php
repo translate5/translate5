@@ -145,7 +145,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
             $locale = $this->view->receiver->locale;
         }
         $format = Zend_Locale_Format::getDateFormat($locale);
-        $date = new Zend_Date($date);
+        $date = new Zend_Date($date, Zend_Date::ISO_8601);
         return $date->toString($format);
     }
 }
