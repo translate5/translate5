@@ -2519,6 +2519,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
  <source>Einstufung</source>     
  <target>Normative Authorization</target> 
  </trans-unit>
+ 
+<trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='>
+    <source>Importarchiv herunterladen</source>
+    <target>Download import archive</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

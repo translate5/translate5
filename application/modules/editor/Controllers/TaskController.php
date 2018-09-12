@@ -115,7 +115,13 @@ class editor_TaskController extends ZfExtended_RestController {
                 'Content-Type'          => 'text/xml',
             ]
         ])
+        ->addContext('importArchive', [
+            'headers' => [
+                'Content-Type'          => 'application/zip',
+            ]
+        ])
         ->addActionContext('export', 'xliff2')
+        ->addActionContext('export', 'importArchive')
         ->initContext();
     }
     
@@ -829,6 +835,10 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         switch ($context) {
+            case 'importArchive':
+                $this->downloadImportArchive();
+                return;
+                
             case 'xliff2':
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Xliff2Worker');
                 $diff = false;
@@ -867,7 +877,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $worker->queue($workerId);
         
         //currently we can only strip the directory path for xliff2 exports, since for default exports we need this as legacy code
-        // can be used in general with TRANSLATE-764
+        // can be used in general with implementation of TRANSLATE-764
         if($context == 'xliff2') {
             ZfExtended_Utils::cleanZipPaths(new SplFileInfo($zipFile), basename($exportFolder));
         }
@@ -881,15 +891,41 @@ class editor_TaskController extends ZfExtended_RestController {
             $suffix = '.zip';
         }
         
+        $this->provideZipDownload($zipFile, $suffix);
+        
+        //rename file after usage to export.zip to keep backwards compatibility
+        rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
+        exit;
+    }
+    
+    /**
+     * sends the given $zipFile to the browser, the $nameSuffix is added to the filename provided to the browser
+     * @param string $zipFile
+     * @param string $nameSuffix
+     */
+    protected function provideZipDownload($zipFile, $nameSuffix) {
         // disable layout and view
         $this->view->layout()->disableLayout();
         $this->_helper->viewRenderer->setNoRender(true);
         header('Content-Type: application/zip', TRUE);
-        header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($suffix).'"');
+        header('Content-Disposition: attachment; filename="'.$this->entity->getTasknameForDownload($nameSuffix).'"');
         readfile($zipFile);
-        //rename file after usage to export.zip to keep backwards compatibility
-        rename($zipFile, dirname($zipFile).DIRECTORY_SEPARATOR.'export.zip');
-        exit;
+    }
+    
+    /**
+     * provides the import archive file for download
+     * @throws ZfExtended_NoAccessException
+     * @throws ZfExtended_NotFoundException
+     */
+    protected function downloadImportArchive() {
+        if(!$this->isAllowed('frontend','downloadImportArchive')) {
+            throw new ZfExtended_NoAccessException("The Archive ZIP can not be accessed");
+        }
+        $archiveZip = new SplFileInfo($this->entity->getAbsoluteTaskDataPath().'/'.editor_Models_Import_DataProvider_Abstract::TASK_ARCHIV_ZIP_NAME);
+        if(!$archiveZip->isFile()){
+            throw new ZfExtended_NotFoundException("Archive Zip for task ".$this->entity->getTaskGuid()." could not be found");
+        }
+        $this->provideZipDownload($archiveZip, ' - ImportArchive.zip');
     }
     
     /***

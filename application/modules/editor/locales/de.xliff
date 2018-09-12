@@ -1292,6 +1292,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='WmVpZ2UgYXVmIGxlZXJlcyBaaWVs'><source>Zeige auf leeres Ziel</source><target>Zeige auf leeres Ziel</target></trans-unit>
 <trans-unit id='VGVybUN1c3RvbWVyU2VhcmNo'><source>TermCustomerSearch</source><target>TermCustomerSearch</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'><source>Terminologieportal</source><target>Terminologieportal</target></trans-unit>
+<trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='><source>Importarchiv herunterladen</source><target>Importarchiv herunterladen</target></trans-unit>
   </body>
  </file>
 </xliff>

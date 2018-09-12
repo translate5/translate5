@@ -271,6 +271,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
       
+      //needed for enabling download link of archive zip
+      $this->view->Php2JsVars()->set('import.createArchivZip', (boolean)$rop->import->createArchivZip);
+      
       $this->setJsAppData();
     }
 
