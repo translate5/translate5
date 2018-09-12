@@ -9,19 +9,19 @@
 <target> <mrk mtype="seg" mid="1">Satz 1.</mrk>  <mrk mtype="seg" mid="2">Satz 2.</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39</mrk>    </target>
 </trans-unit>
 
-<trans-unit id="2" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="39" size-unit="char">
+<trans-unit id="2" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="69" size-unit="char">
 <source> Satz 1.  Satz 2.   Länge Soll = 39    </source>
 <seg-source> <mrk mtype="seg" mid="1">Satz 1.</mrk>  <mrk mtype="seg" mid="2">Satz 2.</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39</mrk>    </seg-source>
 <target> <mrk mtype="seg" mid="1">Satz 1. - edited4</mrk>  <mrk mtype="seg" mid="2">Satz 2. - edited5</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39 - edited6</mrk>    </target>
 </trans-unit>
 
-<trans-unit id="3" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="39" size-unit="char">
+<trans-unit id="3" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="69" size-unit="char">
 <source> Satz 1.  Satz 2.   Länge Soll = 39    </source>
 <seg-source> <mrk mtype="seg" mid="1">Satz 1.</mrk>  <mrk mtype="seg" mid="2">Satz 2.</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39</mrk>    </seg-source>
 <target> <mrk mtype="seg" mid="1">Satz 1. - edited7</mrk>  <mrk mtype="seg" mid="2">Satz 2. - edited8</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39 - edited9</mrk>    </target>
 </trans-unit>
 
-<trans-unit id="4" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="39" size-unit="char">
+<trans-unit id="4" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="69" size-unit="char">
 <source> Satz 1.  Satz 2.   Länge Soll = 39    </source>
 <seg-source> <mrk mtype="seg" mid="1">Satz 1.</mrk>  <mrk mtype="seg" mid="2">Satz 2.</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39</mrk>    </seg-source>
         <target> <mrk mtype="seg" mid="1">Satz 1. - edited10</mrk>  <mrk mtype="seg" mid="2">Satz 2. - edited11</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39 - edited12</mrk>    </target>
@@ -69,7 +69,11 @@
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
         </seg-source>
-        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>zacross ztags zoutside zfrom zmrk ztest - edited16</mrk><mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></target>
+        <target>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>zacross ztags zoutside zfrom zmrk ztest - edited16</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+        </target>
         <alt-trans mid="1" match-quality="10%">
           <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
           <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
@@ -82,7 +86,11 @@
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
         </seg-source>
-        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test - edited17</mrk><mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited18</mrk><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></target>
+        <target>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test - edited17</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited18</mrk>
+          <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
+        </target>
         <alt-trans mid="1" match-quality="10%">
           <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
           <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>

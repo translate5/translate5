@@ -115,16 +115,6 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     /**
-     * check if the whitespace between mrk tags on the import are also exported again
-     * @depends testSegmentEditing
-     */
-    public function XXXtestExport() {
-        $task = $this->api()->getTask();
-        //start task export 
-        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '02-preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
-    }
-    
-    /**
      * tests the export results
      * @param stdClass $task
      * @param string $exportUrl
