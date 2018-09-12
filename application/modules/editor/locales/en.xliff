@@ -2042,7 +2042,7 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 <target><b>Task:</b> {task.taskName}<br />
     <b>Source-language:</b> {sourceLanguageTranslated}<br />
     <b>Target-language:</b> {targetLanguageTranslated}<br />
-    {relaisLanguageFragment}<b>Lieferdatum Lektoren:</b> {targetDeliveryDate}<br />
+    {relaisLanguageFragment}<b>Expected proofreading delivery date:</b> {targetDeliveryDate}<br />
     <b>Word-count:</b> {wordCount}<br /></target>
 </trans-unit>
 
