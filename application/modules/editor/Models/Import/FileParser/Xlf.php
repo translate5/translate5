@@ -472,8 +472,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->throwSegmentationException($msg);
             }
         }
-        // FIXME we need the mrk mtype = seg always a MID, if no MID is given, throw an error.
-        //  stop import!
         if(!($opener['tag'] == 'mrk' && $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid'))) {
             $toConsider = $source ? $this->currentSource : $this->currentTarget;
             $toConsider = array_filter(array_keys($toConsider), function($item){

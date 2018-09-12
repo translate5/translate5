@@ -89,7 +89,6 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
         require_once 'Models/Segment/InternalTag.php';
 
         //the first three segments remain unedited, since content is getting to long with edited content
-        // why indeed the others segments can be edited is a good question, potentual, because they are parallel
         foreach($segments as $idx => $segToEdit) {
             if(empty($segToEdit->editable)) {
                 continue;
