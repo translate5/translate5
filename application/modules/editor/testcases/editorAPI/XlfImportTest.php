@@ -48,6 +48,11 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         self::assertNotContains('editor_Plugins_LockSegmentsBasedOnConfig_Bootstrap', $appState->pluginsLoaded, 'Plugin LockSegmentsBasedOnConfig may not be activated for this test case!');
         self::assertNotContains('editor_Plugins_NoMissingTargetTerminology_Bootstrap', $appState->pluginsLoaded, 'Plugin NoMissingTargetTerminology may not be activated for this test case!');
         
+        $tests = array(
+            'runtimeOptions.import.xlf.preserveWhitespace' => 0,
+        );
+        self::$api->testConfig($tests);
+        
         $zipfile = $api->zipTestFiles('testfiles/','XLF-test.zip');
         
         $api->addImportFile($zipfile);
@@ -182,6 +187,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $expectedResult = $this->api()->getFileContent($fileToCompare);
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
         //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
+        //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     
