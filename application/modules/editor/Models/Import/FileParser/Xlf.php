@@ -403,7 +403,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             //<target>additionalUnitLength ignored<mrk>content</mrk> this length is needed<mrk>content</mrk>this length is ignored again</target>
             $mrkMidKeys = array_keys($otherContent);
             if($attributes->mrkMid != end($mrkMidKeys)) {
-                $content = $this->prepareMrkInbetweenContent($otherContent[$attributes->mrkMid]);;
+                $content = $text($this->prepareMrkInbetweenContent($otherContent[$attributes->mrkMid]));
             }
             else {
                 $content = '';
