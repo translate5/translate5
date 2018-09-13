@@ -3,6 +3,17 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.8.6] - 2018-09-13
+###Added
+TRANSLATE-1425: Provide ImportArchiv.zip as download from the export menu for admin users
+
+###Bugfixes
+TRANSLATE-1426: Segment length calculation was not working due not updated metaCache
+TRANSLATE-1370: Xliff Import can not deal with empty source targets as single tags
+TRANSLATE-1427: Date calculation in Notification Mails is wrong
+TRANSLATE-1177: Clicking into empty area of file tree produces sometimes an JS error
+TRANSLATE-1422: Uncaught TypeError: Cannot read property 'record' of undefined
+
 ## [2.8.5] - 2018-08-27
 ###Added
 VISUAL-50: VisualReview: Improve initial loading performance by accessing images directly and not via PHP proxy
