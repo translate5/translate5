@@ -1023,7 +1023,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":9,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":9}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":2}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1050,7 +1050,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":9}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":2}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
