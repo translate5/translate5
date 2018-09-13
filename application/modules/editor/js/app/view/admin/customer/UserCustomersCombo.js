@@ -15,21 +15,28 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.LanguageResources.TmMts', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.TmMt',
-  pageSize: 20,
-  autoLoad: true,
-  remoteFilter:true
+/***
+ * All available customers assigned to the user
+ */
+Ext.define('Editor.view.admin.customer.UserCustomersCombo', {
+    extend: 'Ext.form.field.ComboBox',
+    alias: 'widget.usercustomerscombo',
+    fieldLabel:'#UT#Kunde',
+    displayField: 'name',
+    valueField: 'id',
+    store:'userCustomers',
+    queryMode: 'local',
+    value:null
 });

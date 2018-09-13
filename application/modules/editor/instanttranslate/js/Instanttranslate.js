@@ -469,11 +469,11 @@ function translateText(textToTranslate,translationInProgressID){
                 showMtEngineSelectorError('serverErrorMsg500');
             }
         },
-        url: REST_PATH+"instanttranslate/translate",
+        url: REST_PATH+"instanttranslateapi/translate",
         dataType: "json",
         data: {
-            'source':getIsoByRfcLanguage($("#sourceLocale").val()),
-            'target':getIsoByRfcLanguage($("#targetLocale").val()),
+            'source':$("#sourceLocale").val(),
+            'target':$("#targetLocale").val(),
             'domainCode':getSelectedEngineDomainCode(),
             'text':textToTranslate
         },
@@ -492,6 +492,9 @@ function translateText(textToTranslate,translationInProgressID){
                 fillTranslation(translationInProgressID);
             }
             stopLoadingSign();
+        },
+        fail: function(xhr, textStatus, errorThrown){
+            debugger;
         }
     });
 }
@@ -537,14 +540,14 @@ function requestFileTranslate(){
     	data.append('domainCode', getSelectedEngineDomainCode());
     }
     
-    data.append('from', getIsoByRfcLanguage($("#sourceLocale").val()));
-    data.append('to', getIsoByRfcLanguage($("#targetLocale").val()));
+    data.append('from', $("#sourceLocale").val());
+    data.append('to',$("#targetLocale").val());
     
     //when no extension in the file is found, use default file extension
     data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
     
     $.ajax({
-        url:REST_PATH+"instanttranslate/file",
+        url:REST_PATH+"instanttranslateapi/file",
         type: 'POST',
         data: data,
         cache: false,
@@ -584,7 +587,7 @@ function getDownloadUrl(fileId){
                 showMtEngineSelectorError('serverErrorMsg500');
                 }
         },
-        url: REST_PATH+"instanttranslate/url",
+        url: REST_PATH+"instanttranslateapi/url",
         dataType: "json",
         data: {
             'fileId':fileId
@@ -609,7 +612,7 @@ function downloadFile(url){
     var hasFileExt=getFileExtension()!="",
         fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension()),
         newTab = window.open("about:blank", "translatedFile"),
-        newTabHref = REST_PATH+"instanttranslate/download?fileName="+fullFileName+"&url="+url;
+        newTabHref = REST_PATH+"instanttranslateapi/download?fileName="+fullFileName+"&url="+url;
     if(newTab == null) { // window.open does not work in Chrome
         window.location.href = newTabHref;
     } else {
@@ -637,15 +640,6 @@ function getFileExtension(){
         found = fileName.lastIndexOf('.') + 1,
         ext = (found > 0 ? fileName.substr(found) : "");
     return ext;
-}
-
-/***
- * Return iso language code for the given rfc language code
- * @param rfcCode
- * @returns
- */
-function getIsoByRfcLanguage(rfcCode){
-    return Editor.data.languageresource.rfcToIsoLanguage[rfcCode];
 }
 
 /* --------------- toggle instant translation ------------------------------- */

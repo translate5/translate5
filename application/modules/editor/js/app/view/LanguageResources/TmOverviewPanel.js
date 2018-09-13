@@ -65,6 +65,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             import: '#UT#importiert',
             notloaded: '#UT#verfügbar'
         },
+        customers:'#UT#Kunden',
+        defaultCustomer:'#UT#Standardkunde',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
     cls:'tmOverviewPanel',
@@ -76,7 +78,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         var me = this,
             config = {
                 title: me.title, //see EXT6UPD-9
-                store : 'Editor.store.LanguageResources.TmMts',
+                store :'Editor.store.LanguageResources.TmMts',
+                plugins: ['gridfilters'],
                 viewConfig: {
                     getRowClass: function(record) {
                         var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
@@ -88,7 +91,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     width: 150,
                     dataIndex: 'name',
                     filter: {
-                        type: 'string'
+                        type: 'string',
                     },
                     text: me.strings.name
                 },{
@@ -111,6 +114,24 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         type: 'string'
                     },
                     text: me.strings.targetLang
+                },{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex:'resourcesCustomers',
+                    filter: {
+                        type: 'string'
+                    },
+                    text:me.strings.customers,
+                    renderer:me.resourceCustomersRenderer
+                },{
+                    xtype: 'gridcolumn',
+                    width: 100,
+                    dataIndex:'defaultCustomer',
+                    filter: {
+                        type: 'string'
+                    },
+                    text:me.strings.defaultCustomer,
+                    renderer:me.defaultCustomersRenderer
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
@@ -189,12 +210,16 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         return v;
                     },
                     filter: {
-                        type: 'string'
+                        type: 'list',
+                        options: Editor.data.LanguageResources.serviceNames
                     }
                 },{
                     xtype:'gridcolumn',
                     width: 40,
                     dataIndex:'taskList',
+                    filter: {
+                        type: 'string'
+                    },
                     tdCls: 'taskList',
                     cls: 'taskList',
                     text: me.strings.taskassocgridcell,
@@ -251,4 +276,36 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         }
         return '';
     },
+
+    /**
+     * Renders assigned customers to the resource by name
+     */
+    resourceCustomersRenderer:function(value,meta,record){
+        if(!value || value.length<1){
+            return '';
+        }
+        var count=value.length,
+            tplCustomers=[],
+            customerStore=Ext.StoreManager.get('customersStore');
+
+        for(var i=0;i<value.length;i++){
+            var rec=customerStore.getById(value[i]);
+            tplCustomers.push(rec.get('name'));
+        }
+        meta.tdAttr = 'data-qtip="'+tplCustomers.join(',')+'"';
+        return count;
+    },
+
+    /**
+     * Renders the default assigned customer by name
+     */
+    defaultCustomersRenderer:function(value,meta,record){
+        if(!value){
+            return '';
+        }
+        var customerStore=Ext.StoreManager.get('customersStore'),
+            rec=customerStore.getById(value);
+
+        return rec ? rec.get('name') : '';
+    }
 });

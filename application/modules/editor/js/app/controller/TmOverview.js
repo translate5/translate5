@@ -60,7 +60,8 @@ Ext.define('Editor.controller.TmOverview', {
         noResourcesAssigned: '#UT#Keine Sprachressourcen zugewiesen.',
         taskassocgridcell:'#UT#Zugewiesene Sprachressourcen',
         exportTm: '#UT#als TM Datei exportieren',
-        exportTmx: '#UT#als TMX Datei exportieren'
+        exportTmx: '#UT#als TMX Datei exportieren',
+        defaultCustomerMessage:'#Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?'
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -228,38 +229,45 @@ Ext.define('Editor.controller.TmOverview', {
             return;
         }
 
-        window.setLoading(true);
-        form.submit({
-            timeout: 240,
-            params: {
-                format: 'jsontext'
-            },
-            url: Editor.data.restpath+'tmmt',
-            scope: me,
-            success: function(form, submit) {
-                var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
-                this.getTmOverviewPanel().getStore().load();
-                window.setLoading(false);
-                window.close();
-                Editor.MessageBox.addSuccess(msg);
-            },
-            failure: function(form, submit) {
-                var res = submit.result;
-                window.setLoading(false);
-                //submit results are always state 200.
-                //If success false and errors is an array, this errors are shown in the form directly,
-                // so we dont need the handleException
-                if(!res || res.success || !Ext.isArray(res.errors)) {
-                    Editor.app.getController('ServerException').handleException(submit.response);
-                    return;
+        me.mergeCustomerFieldIds(form);
+
+        var saveCallback=function(){
+            window.setLoading(true);
+            form.submit({
+                timeout: 240,
+                params: {
+                    format: 'jsontext'
+                },
+                url: Editor.data.restpath+'tmmt',
+                scope: me,
+                success: function(form, submit) {
+                    var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
+                    this.getTmOverviewPanel().getStore().load();
+                    window.setLoading(false);
+                    window.close();
+                    Editor.MessageBox.addSuccess(msg);
+                },
+                failure: function(form, submit) {
+                    var res = submit.result;
+                    window.setLoading(false);
+                    //submit results are always state 200.
+                    //If success false and errors is an array, this errors are shown in the form directly,
+                    // so we dont need the handleException
+                    if(!res || res.success || !Ext.isArray(res.errors)) {
+                        Editor.app.getController('ServerException').handleException(submit.response);
+                        return;
+                    }
+                    if(Ext.isArray(res.errors)) {
+                        form.markInvalid(res.errors);
+                        me.showGeneralErrors(res.errors);
+                        return;
+                    }
                 }
-                if(Ext.isArray(res.errors)) {
-                    form.markInvalid(res.errors);
-                    me.showGeneralErrors(res.errors);
-                    return;
-                }
-            }
-        });
+            });
+        };
+
+        me.checkDefaultCustomer(form.getForm(),saveCallback);
+        
     },
     handleSaveEditClick: function(button){
         var me = this,
@@ -268,22 +276,28 @@ Ext.define('Editor.controller.TmOverview', {
             record = form.getRecord();
 
         record.reject();
+
+        me.mergeCustomerFieldIds(form);
         form.updateRecord(record);
 
-        window.setLoading(true);
-        record.save({
-            failure: function(records, op) {
-                window.setLoading(false);
-                Editor.app.getController('ServerException').handleException(op.error.response);
-            },
-            success: function() {
-                var msg = Ext.String.format(me.strings.edited, record.get('name'));
-                me.getTmOverviewPanel().getStore().load();
-                window.setLoading(false);
-                window.close();
-                Editor.MessageBox.addSuccess(msg);
-            }
-        });
+        
+        var saveCallback=function(){
+            window.setLoading(true);
+            record.save({
+                failure: function(records, op) {
+                    window.setLoading(false);
+                    Editor.app.getController('ServerException').handleException(op.error.response);
+                },
+                success: function() {
+                    var msg = Ext.String.format(me.strings.edited, record.get('name'));
+                    me.getTmOverviewPanel().getStore().load();
+                    window.setLoading(false);
+                    window.close();
+                    Editor.MessageBox.addSuccess(msg);
+                }
+            });
+        }
+        me.checkDefaultCustomer(form.getForm(),saveCallback);
     },
     handleSaveImportClick: function(button){
         var me = this,
@@ -522,5 +536,130 @@ Ext.define('Editor.controller.TmOverview', {
                 targetLang.setValue(targetStore.getAt(targetIdx).get('id'));
             }
         }
+    },
+
+    /***
+     * Merge customer field values as comma separated values
+     */
+    mergeCustomerFieldIds:function(form){
+        var form=form.getForm(),
+            record = form.getRecord(),
+            resourcesCustomers=form.findField('resourcesCustomers'),
+            resourcesCustomersHidden=form.findField('resourcesCustomersHidden'),
+            cusomerIds=resourcesCustomers.getValue().join(',');
+
+        resourcesCustomersHidden.setValue(cusomerIds);
+        //if record exist(editTm) -> set it
+        if(record){
+            record.set('resourcesCustomersHidden',cusomerIds);
+        }
+    },
+
+    /**
+     * Chech if for the curent resource type and language combination, there is allready defaultCustomer assigned.
+     */
+    checkDefaultCustomer:function(form,formCallback){
+        var me=this,
+            formRecord = form.getRecord(),
+            isEdit=formRecord!=null,
+            defaultCustomer=isEdit ? formRecord.get('defaultCustomer') : form.findField('defaultCustomer').getValue();
+        
+        if(!defaultCustomer){
+            formCallback();
+            return;
+        }
+
+        var recordId=isEdit ? formRecord.get('id') : false,
+            sourceLang=form.findField('sourceLang').getValue(),
+            targetLang=form.findField('targetLang').getValue(),
+            serviceName=isEdit ? formRecord.get('serviceName') : form.findField('serviceName').getValue(),
+            resStore=Ext.create('Ext.data.Store',{
+                model:'Editor.model.LanguageResources.TmMt',
+                pageSize: 0,
+                limit:0
+            });
+        
+        //filter the store whenre: same source,target,serviceName and defaultCustomer contains a value
+        resStore.load({
+            params:{
+                filter:Ext.encode([{
+                    property: 'sourceLang',
+                    operator:'eq', 
+                    value: sourceLang
+                },{
+                    property: 'targetLang',
+                    operator:'eq', 
+                    value: targetLang
+                },{
+                    property: 'serviceName',
+                    operator:'eq', 
+                    value: serviceName
+                },{
+                    property: 'defaultCustomer',
+                    operator:'notInList', 
+                    value:[""],
+                }])
+            },
+            callback: function(records, operation, success) {
+                if(!success){
+                    Editor.app.getController('ServerException').handleCallback(records, operation, success);
+                    return;
+                }
+
+                if(!records || records.length<1){
+                    formCallback();
+                    return;
+                }
+                
+                var sameRec=null;
+                //check for the matching record
+                for(var i=0;i<records.length;i++){
+                    //is the same record
+                    if(isEdit && records[i].get('id') == recordId){
+                        continue;
+                    }
+                    sameRec=records[i];
+                    //same record exist
+                    break;
+                }
+
+                //if no matching record is found, proceed with saving
+                if(!sameRec){
+                    formCallback();
+                    return;
+                }
+
+                //show message box dialog
+                //if yes -> the existing defaultCustomer(the one in the db) will be removed and the new one updated
+                //if no  -> the current chosen defaultCustomer will be ignored
+                Ext.create('Ext.window.MessageBox').show({
+                    title: "",
+                    msg: Ext.String.format(
+                            me.strings.defaultCustomerMessage, 
+                            sameRec.get('name'),
+                            Ext.StoreManager.get('admin.Languages').getById(sourceLang).get('label'),
+                            Ext.StoreManager.get('admin.Languages').getById(targetLang).get('label')
+                        ),
+                    buttons: Ext.Msg.YESNO,
+                    icon: Ext.MessageBox.WARNING,
+                    fn: function(btn){
+                        if (btn == "no"){
+                            form.findField('defaultCustomer').setValue(null);
+                            if(formRecord){
+                                formRecord.set('defaultCustomer',null);
+                            }
+                            formCallback();
+                        }
+                        if (btn == "yes"){
+                            //find the existing record with the default customer and remove the default customer
+                            resStore.getById(sameRec.get('id')).set('defaultCustomer',null);
+                            resStore.sync();
+                            formCallback();
+                            return;
+                        }
+                    }
+                });
+            }
+        });
     }
 });

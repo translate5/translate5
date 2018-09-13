@@ -57,7 +57,8 @@ Ext.define('Editor.model.LanguageResources.TmMt', {
     {name: 'statusInfo', type: 'string', persist: false},
     {name: 'serviceName', type: 'string'},
     {name: 'serviceType', type: 'string'},
-    {name: 'searchable', type: 'boolean'}
+    {name: 'searchable', type: 'boolean'},
+    {name: 'defaultCustomer',defaultValue:null},
   ],
   idProperty: 'id',
   proxy : {

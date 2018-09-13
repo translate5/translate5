@@ -30,7 +30,9 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
     extend: 'Ext.window.Window',
     requires: [
         'Ext.ux.colorpick.Button',
-        'Ext.ux.colorpick.Field'
+        'Ext.ux.colorpick.Field',
+        'Editor.view.admin.customer.TagField',
+        'Editor.view.admin.customer.UserCustomersCombo'
     ],
     alias: 'widget.editTmWindow',
     itemId: 'editTmWindow',
@@ -44,9 +46,12 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
-        cancel: '#UT#Abbrechen'
+        cancel: '#UT#Abbrechen',
+        customers:'#UT#Kunden',
+        defaultCustomer:'#UT#Standardkunde'
     },
-    height : 360,
+    
+    height : 420,
     width : 500,
     modal : true,
     layout:'fit',
@@ -95,6 +100,21 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     toolTip: me.strings.target,
                     fieldLabel: me.strings.target
                 }, langField),{
+                    xtype:'customers',
+                    fieldLabel:me.strings.customers,
+                    itemId:'resourcesCustomers',
+                    name:'resourcesCustomers',
+                    dataIndex:'resourcesCustomers',
+                    store:'userCustomers'
+                },{
+                    xtype:'hiddenfield',
+                    name:'resourcesCustomersHidden'
+                },{
+                    xtype:'usercustomerscombo',
+                    name:'defaultCustomer',
+                    fieldLabel:me.strings.defaultCustomer,
+                    dataIndex:'defaultCustomer'
+                },{
                     xtype: 'colorfield',
                     fieldLabel: me.strings.color,
                     toolTip: me.strings.colorTooltip, 

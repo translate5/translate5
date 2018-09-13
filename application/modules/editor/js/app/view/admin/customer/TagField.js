@@ -32,9 +32,7 @@ Ext.define('Editor.view.admin.customer.TagField', {
     alias: 'widget.customers',
     itemId:'customers',
     name:'customers',
-    
-    stores:['Editor.store.admin.Customers'],
-    
+
     fieldLabel:'#UT#Endkunde',
 
     allowBlank: true,
