@@ -23,6 +23,44 @@
         <seg-source><mrk mtype="seg" mid="0">2 - Test an existing translation. </mrk><mrk mtype="seg" mid="2">2 - With MRK tags and target additional segments. inbetween.</mrk></seg-source>
         <target state="translated"><mrk mtype="seg" mid="0">2 - Teste eine vorhandene Übersetzung. </mrk><mrk mtype="seg" mid="1">2 - Mit MRK Tags und </mrk><mrk mtype="seg" mid="2">2 - zusätzlichen Target Segmenten. Mittendrin.</mrk></target>
       </trans-unit>
+      <trans-unit id="5" translate="yes">
+        <!-- currently parser ignores whole trans-unit because auf empty source -->
+        <source></source>
+        <target></target>
+      </trans-unit>
+      <trans-unit id="6" translate="yes">
+        <!-- currently parser ignores whole trans-unit because auf empty source -->
+        <source/>
+        <target/>
+      </trans-unit>
+      <trans-unit id="7" translate="yes">
+        <!-- currently parser ignores whole trans-unit because auf empty source -->
+        <source/>
+        <target>Empty Source mit target 1</target>
+      </trans-unit>
+      <trans-unit id="8" translate="yes">
+        <!-- currently parser ignores whole trans-unit because auf empty source -->
+        <source></source>
+        <target>Empty Source mit target 2</target>
+      </trans-unit>
+      <trans-unit id="9" translate="yes">
+        <!-- in this case the trans-unit is imported partly and therefore wrong, but the missing source mrks are displayed wrong, should be fixed with split/merging segments -->
+        <source/>
+        <seg-source/>
+        <target><mrk mtype="seg" mid="1">Empty Source mit target 3</mrk> <mrk mtype="seg" mid="2">foo 1</mrk></target>
+      </trans-unit>
+      <trans-unit id="10" translate="yes">
+        <!-- in this case the trans-unit is imported partly and therefore wrong, but the missing source mrks are displayed wrong, should be fixed with split/merging segments -->
+        <source/>
+        <seg-source><mrk mtype="seg" mid="1"></mrk></seg-source>
+        <target><mrk mtype="seg" mid="2">foo 2</mrk> </target>
+      </trans-unit>
+      <trans-unit id="11" translate="yes">
+        <!-- in this case the trans-unit is imported partly and therefore wrong, but the missing source mrks are displayed wrong, should be fixed with split/merging segments -->
+        <source/>
+        <seg-source><mrk mtype="seg" mid="1"/></seg-source>
+        <target><mrk mtype="seg" mid="2">foo 3</mrk> </target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
