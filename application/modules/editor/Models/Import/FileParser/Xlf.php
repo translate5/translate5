@@ -351,8 +351,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *   the length of each whitespace after a closed mrk is saved to that mrk as "additionalMrkLength"
      *   each additionalMrkLength is added automatically to the segments content length in siblingData
      *   the additionalUnitLength instead must be only added once on each length calculation (where siblingData is used)
-     * preserveWhitespace has no influence to the otherContent, so length of otherContent is always the real length, 
-     *   regardless of the preserveWhitespace setting
+     * preserveWhitespace influences the otherContent: 
+     *   preserveWhitespace = true: length of otherContent is always the real length, 
+     *   preserveWhitespace = false: length of otherContent is always length of the padded whitespace between the MRK tags, 
      * source and target MRK padding if MRKs are different in source vs target: 
      *    if $useSourceOtherContent is true, this is no problem since there is no target to compare and add missing MRKs
      *    if its false and targetOtherContent is used: just use the target otherContent since padded target MRKs could 
@@ -361,8 +362,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *    
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
      * @param boolean $useSourceOtherContent
+     * @param boolean $preserveWhitespace
      */
-    protected function saveTargetOtherContentLength(editor_Models_Import_FileParser_SegmentAttributes $attributes, $useSourceOtherContent) {
+    protected function saveTargetOtherContentLength(editor_Models_Import_FileParser_SegmentAttributes $attributes, $useSourceOtherContent, $preserveWhitespace) {
         $otherContent = $useSourceOtherContent ? $this->otherContentSource : $this->otherContentTarget;
 //debug START
 /*
@@ -376,19 +378,38 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
 //debug END        
 
         $text = function($text) {
-            //for other content length calculation we always assume preserve whitespace true (otherwise the length is ignored)
+            //for other content length calculation we have to convert the othercontent to translate5 content (mainly because of the tags)
+            // this must be done with preserve whitespace true (otherwise the length of tags would be ignored)
             $preserveWhitespace = true; 
             return $this->xmlparser->join($this->contentConverter->convert($text, true, $preserveWhitespace));
         };
         
         //by definition the first otherContent belongs to the whole transunit - this value is stored in each segment
-        if(!empty($otherContent[0])) {
+        // only of preserveWhitespace is true
+        if($preserveWhitespace && !empty($otherContent[0])) {
             $attributes->additionalUnitLength = $this->segmentBareInstance->textLength($text($otherContent[0]));
         }
-        //the other lengths are stored per affected segment
-        if(!empty($otherContent[$attributes->mrkMid])) {
-            $attributes->additionalMrkLength = $this->segmentBareInstance->textLength($text($otherContent[$attributes->mrkMid]));
+        //the other lengths are stored per affected segment, so if there is none, do nothing
+        if(empty($otherContent[$attributes->mrkMid])) {
+            return;
         }
+        
+        if($preserveWhitespace) {
+            //with preserve whitespace we use the original content
+            $content = $text($otherContent[$attributes->mrkMid]);
+        } else {
+            //otherwise we prepare the otherContent like in checkAndPrepareOtherContent, but only if we are not
+            //in the last MRK: here we may not save any additionalLength, since we consider only the content inbetween MRKs
+            //<target>additionalUnitLength ignored<mrk>content</mrk> this length is needed<mrk>content</mrk>this length is ignored again</target>
+            $mrkMidKeys = array_keys($otherContent);
+            if($attributes->mrkMid != end($mrkMidKeys)) {
+                $content = $this->prepareMrkInbetweenContent($otherContent[$attributes->mrkMid]);;
+            }
+            else {
+                $content = '';
+            }
+        }
+        $attributes->additionalMrkLength = $this->segmentBareInstance->textLength($content);
     }
     
     /**
@@ -829,7 +850,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             
             //first we save the previous other content length to the previous segment
-            $this->saveTargetOtherContentLength($attributes, $hasNoTarget || $hasEmptyTarget);
+            $this->saveTargetOtherContentLength($attributes, $hasNoTarget || $hasEmptyTarget, $preserveWhitespace);
             
             //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
             if(strpos($mid, self::PREFIX_SUB) === 0) {
@@ -874,16 +895,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         
-        $otherContent = $this->checkAndPrepareOtherContent($hasNoTarget || $hasEmptyTarget);
+        $otherContent = $this->checkAndPrepareOtherContent($hasNoTarget || $hasEmptyTarget, $preserveWhitespace);
         
-        if(!$preserveWhitespace) {
-            $otherContent = array_map(function($fragment) {
-                //since the regex delete only whitespace before and after possible tags, 
-                // whitespace inside tags (<ph> for example) are preserved here. 
-                // But this should be ok, since the content inside the tag coming from "otherContent" is not editable.
-                return preg_replace('/^[\s]+|[\s]+$/', '', $fragment);
-            }, $otherContent);
-        }
         //the combination of array_merge and array_map combines the otherContent values
         // and the placeholders in a zipper (Reißverschlussverfahren) way 
         $placeHolder = join(array_merge(...array_map(null, $otherContent, array_values($placeHolders))));
@@ -919,10 +932,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * Prepares and checks the internally stored other content (content outside MRK mtype seg tags)
      * check: there may not be other content as tags and whitespace
-     * prepare: converts the multidimensional otherContent arrays to onedimensional ones and returns the one to be used.
+     * prepare: - converts the multidimensional otherContent arrays to onedimensional ones and returns the one to be used.
+     *          - does whitespace handling: preserve completly if configured or defined in trans-unit, 
+     *          or default behaviour: remove all whitespace, keep a single whitepace between MRKs
      * @return array the other content to be used for skeleton placeholder generation 
      */
-    protected function checkAndPrepareOtherContent($useSourceContent) {
+    protected function checkAndPrepareOtherContent($useSourceContent, $preserveWhitespace) {
         if(!$this->checkContentOutsideMrk) {
             //if we don't check the mrk outside content, we assume that there is no outside content
             return [];
@@ -940,10 +955,39 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
         }
         
-        if($useSourceContent) {
-            return $otherContentSource;
+        $otherContent = $useSourceContent ? $otherContentSource : $otherContentTarget;
+        
+        
+        // default behaviour for whitespace hanling in translate5 is:
+        if($preserveWhitespace) {
+            return $otherContent;
         }
-        return $otherContentTarget;
+        
+        $firstIdx = 0;
+        $lastIdx = count($otherContent) - 1;
+        foreach($otherContent as $idx => $content) {
+            //since the below regex deletes only whitespace before and after possible tags,
+            // whitespace inside tags (<ph> for example) are preserved here.
+            // But this should be ok, since the content inside the tag coming from "otherContent" is not editable.
+            if($idx == $firstIdx || $idx == $lastIdx) {
+                //before and after the first / last mrk the whitespace is stripped completly
+                $otherContent[$idx] = preg_replace('/^[\s]+|[\s]+$/', '', $content);
+                continue;
+            }
+            //between MRKs we keep a single whitespace: 
+            $otherContent[$idx] = $this->prepareMrkInbetweenContent($content);
+        }
+        
+        return $otherContent;
+    }
+    
+    /**
+     * prepares whitespace on content inbetween mrk tags, only to be used with preserveWhitespace = false 
+     * @param string $content
+     * @return string
+     */
+    protected function prepareMrkInbetweenContent($content) {
+        return preg_replace('/^[\s]+|[\s]+$/', ' ', $content);
     }
     
     /**
