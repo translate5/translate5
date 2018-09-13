@@ -50,12 +50,22 @@ class editor_TmmtController extends ZfExtended_RestController {
      */
     protected $uploadErrors = array();
     
+    public function init() {
+        //add filter type for languages
+        $this->_filterTypeMap = array(
+            array('sourceLang' => array('string' => 'list')),
+            array('targetLang' => array('string' => 'list')),
+        );
+        parent::init();
+    }
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      * Adds the readonly "filebased" field to the results
      */
     public function indexAction(){
+        $this->handleFilterCustom();
         parent::indexAction();
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
@@ -71,6 +81,11 @@ class editor_TmmtController extends ZfExtended_RestController {
         
         $this->prepareTaskInfo(array_column($this->view->rows, 'id'));
         
+        //get all assocs grouped by language resource id
+        $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
+        /* @var $customerAssocModel editor_Models_LanguageResourcesCustomerAssoc */
+        $custAssoc=$customerAssocModel->loadCustomerIdsGrouped();
+        
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
             /* @var $resource editor_Models_Resource */
@@ -84,6 +99,9 @@ class editor_TmmtController extends ZfExtended_RestController {
             
             $tmmt['taskList'] = $this->getTaskInfos($tmmt['id']);
             $tmmt['status'] = 'loading';
+            
+            //add customer assocs
+            $tmmt['resourcesCustomers']=isset($custAssoc[$tmmt['id']]) ? $custAssoc[$tmmt['id']] : [];
         }
     }
     
@@ -101,6 +119,14 @@ class editor_TmmtController extends ZfExtended_RestController {
         $this->prepareTaskInfo([$this->entity->getId()]);
         $this->view->rows->taskList = $this->getTaskInfos($this->entity->getId());
         
+        //TODO: add one record so the tag field can select
+        //and use another one to display the data
+        
+        //load associated customers to the resource
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResourcesCustomerAssoc */
+        $this->view->rows->resourcesCustomers=$customerAssoc->loadCustomerIds($this->entity->getId());
+        
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         /* @var $resource editor_Models_Resource */
         if(empty($resource)) {
@@ -117,6 +143,112 @@ class editor_TmmtController extends ZfExtended_RestController {
         $connector = $serviceManager->getConnector($this->entity);
         $this->view->rows->status = $connector->getStatus($moreInfo);
         $this->view->rows->statusInfo = $moreInfo;
+    }
+    
+    /***
+     * Handle custom filtering in source,target,defaultCustomer,taskList and resourcesCustomers.
+     * The filters are extended so thay can filter using string values.
+     */
+    private function handleFilterCustom(){
+        $this->entity->getFilter()->hasFilter('sourceLang',$sourceFilter);
+        $this->entity->getFilter()->hasFilter('targetLang',$targetFilter);
+        $this->entity->getFilter()->hasFilter('defaultCustomer',$defaultCustomer);
+        $this->entity->getFilter()->hasFilter('resourcesCustomers',$resourcesCustomers);
+        $this->entity->getFilter()->hasFilter('taskList',$taskList);
+        
+        //search the model for the filter value and set the filter value with the found matches(ids)
+        $searchEntity=function($searchValue,$model,$field='id'){
+            //search the model for the given search string
+            $m=ZfExtended_Factory::get($model);
+            $result=$m->search($searchValue,[$field]);
+            
+            //collect the found $fields in the searched model
+            $ids=[];
+            foreach ($result as $res) {
+                $ids[]=$res[$field];
+            }
+            //set the found ids as search value for the filter
+            return !empty($ids)?$ids:[-1];
+        };
+        
+        //this will handle the resourcesCustomers and taskList filter
+        //the function will search in the given models and from the received results in the assoc table
+        $handleFilter=function($filter,$resultList,$assocModel,$assocFunction,$assocField){
+            //init the filter
+            $idFilter=new stdClass();
+            $idFilter->type='list';
+            $idFilter->field='id';
+            $idFilter->comparison='in';
+            
+            //if no ids are found, set the filter so no results are returned
+            if(empty($resultList)){
+                //remove the filter since the colum does not exist in the table
+                $this->entity->getFilter()->deleteFilter($filter->field);
+                $idFilter->value=[-1];
+                $this->entity->getFilter()->addFilter($idFilter);
+                return;
+            }
+            
+            //for all matching results find the assoc ids
+            $m=ZfExtended_Factory::get($assocModel);
+            $result=$m->$assocFunction($resultList);
+            
+            //if no language resources for the customers are found, set the filter
+            if(empty($result)){
+                //remove the filter since the colum does not exist in the table
+                $this->entity->getFilter()->deleteFilter($filter->field);
+                $idFilter->value=[-1];
+                $this->entity->getFilter()->addFilter($idFilter);
+                return;
+            }
+            
+            //for each results, get the assoc field
+            $resids=[];
+            foreach ($result as $res){
+                $resids[]=$res[$assocField];
+            }
+            
+            //set the found values to the filter value, and apply the filter
+            $idFilter->value=!empty($resids)?$resids:[-1];
+            $this->entity->getFilter()->addFilter($idFilter);
+            
+            //remove the filter since the colum does not exist in the table
+            $this->entity->getFilter()->deleteFilter($filter->field);
+        };
+        
+        //check if the filter exist and if it value is numeric
+        //the default filters are using the numeric value!
+        if(isset($sourceFilter) && !is_numeric($sourceFilter->value)){
+            $sourceFilter->value=$searchEntity($sourceFilter->value,'editor_Models_Languages');
+        }
+        
+        //check if the filter exist and if it value is numeric
+        if(isset($targetFilter) && !is_numeric($targetFilter->value)){
+            $targetFilter->value=$searchEntity($targetFilter->value,'editor_Models_Languages');
+        }
+        
+        //check if custom filtering for the defaultCustomer should be done
+        if(isset($defaultCustomer) && is_string($defaultCustomer->value)){
+            //set the filter mapping for the default customer
+            array_push($this->_filterTypeMap,array('defaultCustomer' => array('string' => 'list')));
+            
+            //update the filter mapping
+            $this->entity->getFilter()->setMappings($this->_sortColMap, $this->_filterTypeMap);
+            
+            $defaultCustomer->value=$searchEntity($defaultCustomer->value,'editor_Models_Customer');
+        }
+        
+        //check if filtering for resourceCustomers should be done
+        if(isset($resourcesCustomers) && is_string($resourcesCustomers->value)){
+            $resultList=$searchEntity($resourcesCustomers->value,'editor_Models_Customer');
+            $handleFilter($resourcesCustomers,$resultList,'editor_Models_LanguageResourcesCustomerAssoc','loadByCustomerIds','languageResourceId');
+        }
+        
+        //check if filtering for taskList should be done
+        if(isset($taskList) && is_string($taskList->value)){
+            $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
+            $handleFilter($taskList,$resultList,'editor_Models_Taskassoc','loadByTaskGuids','tmmtId');
+        }
     }
     
     private function prepareTaskInfo($tmmtids) {
@@ -217,12 +349,23 @@ class editor_TmmtController extends ZfExtended_RestController {
         //validateLanguages prefills also the lang rfc values! So it must be called before the fileupload, 
         // since there will be communication with the underlying resource which needs the RFC values
         $validLanguages = $this->validateLanguages($resource);
-
+        
+        //set the field to null (the form submit does not support a field with null value)
+        if($this->entity->getDefaultCustomer()==''){
+            $this->entity->setDefaultCustomer(null);
+        }
+        
         if(!$validLanguages || !$this->validate()){
             return;
         }
+        
+        
         //save first to generate the TMMT id
-        $this->entity->save();
+        $this->data['id']=$this->entity->save();
+
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResourcesCustomerAssoc */
+        $customerAssoc->saveAssoc($this->data);
         
         if($resource->getFilebased()) {
             $this->handleInitialFileUpload($manager);
@@ -237,6 +380,14 @@ class editor_TmmtController extends ZfExtended_RestController {
         
         $this->view->rows = $this->entity->getDataObject();
         $this->view->success = true;
+    }
+    
+    public function putAction() {
+        $this->decodePutData();
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResourcesCustomerAssoc */
+        $customerAssoc->updateAssoc($this->data);
+        parent::putAction();
     }
 
     /**

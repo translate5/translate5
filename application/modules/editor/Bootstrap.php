@@ -108,7 +108,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','resource','taskassoc',
-                                'tmmt','instanttranslate'),
+                                'tmmt','instanttranslateapi'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -358,14 +358,41 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('languageresources_tmmt_tasks', $queryRoute);
         #Language resource rutes end
         
-        $sdlTranslateCloud= new ZfExtended_Controller_RestLikeRoute(
-            'editor/instanttranslate/translate/*',
+        $instantTranslate= new ZfExtended_Controller_RestLikeRoute(
+            'editor/instanttranslateapi/translate/*',
             array(
                 'module' => 'editor',
-                'controller' => 'instanttranslate',
+                'controller' => 'instanttranslateapi',
                 'action' => 'translate'
             ));
-        $this->front->getRouter()->addRoute('instanttranslate_translate', $sdlTranslateCloud);
+        $this->front->getRouter()->addRoute('instanttranslateapi_translate', $instantTranslate);
+        
+        $instantFile= new ZfExtended_Controller_RestLikeRoute(
+            'editor/instanttranslateapi/file/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'instanttranslateapi',
+                'action' => 'file'
+            ));
+        $this->front->getRouter()->addRoute('instanttranslateapi_file', $instantFile);
+        
+        $instantUrl= new ZfExtended_Controller_RestLikeRoute(
+            'editor/instanttranslateapi/url/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'instanttranslateapi',
+                'action' => 'url'
+            ));
+        $this->front->getRouter()->addRoute('instanttranslateapi_url', $instantUrl);
+        
+        $instantDownload= new ZfExtended_Controller_RestLikeRoute(
+            'editor/instanttranslateapi/download/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'instanttranslateapi',
+                'action' => 'download'
+            ));
+        $this->front->getRouter()->addRoute('instanttranslateapi_download', $instantDownload);
     }
     
     

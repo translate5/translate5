@@ -1003,7 +1003,8 @@ Ext.define('Editor.controller.Localizer', {
             noResourcesAssigned: '<?php echo $this->translate->_('Keine Sprachressourcen zugewiesen.');?>',
             taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Sprachressourcen');?>',
             exportTm: '<?php echo $this->translate->_('als TM Datei exportieren');?>',
-            exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>'
+            exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>',
+            defaultCustomerMessage: '<?php echo $this->translate->_('Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?');?>'
         }
     });
     
@@ -1042,7 +1043,9 @@ Ext.define('Editor.controller.Localizer', {
             color: '<?php echo $this->translate->_('Farbe');?>',
             colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>'
         }
     });
     
@@ -1058,7 +1061,9 @@ Ext.define('Editor.controller.Localizer', {
             color: '<?php echo $this->translate->_('Farbe');?>',
             colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>'
         }
     });
     
@@ -1143,9 +1148,11 @@ Ext.define('Editor.controller.Localizer', {
                 unknown: '<?php echo $this->translate->_('unbekannt');?>',
                 noconnection: '<?php echo $this->translate->_('Keine Verbindung!');?>',
                 import: '<?php echo $this->translate->_('importiert');?>',
-                notloaded: '<?php echo $this->translate->_('verfügbar');?>'
+                notloaded: '<?php echo $this->translate->_('verfügbar');?>',
             },
-            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>'
+            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>',
+        	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>'
         }
     });
     

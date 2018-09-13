@@ -51,6 +51,8 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getFileName() getFileName()
  * @method void setFileName() setFileName(string $name)
+ * @method integer getDefaultCustomer() getDefaultCustomer()
+ * @method void setDefaultCustomer() setDefaultCustomer(integer $defaultCustomer)
  * 
  */
 class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {

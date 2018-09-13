@@ -1573,7 +1573,18 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='bmljaHQgZXJsYXVidA=='><source>nicht erlaubt</source><target>nicht erlaubt</target></trans-unit>
 <trans-unit id='TWFzY2hpbmVuw7xiZXJzZXR6dW5n'><source>Maschinenübersetzung</source><target>Maschinenübersetzung</target></trans-unit>
 <trans-unit id='TVQtRW5naW5l'><source>MT-Engine</source><target>MT-Engine</target></trans-unit>
-
+<trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
+<source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
+<target>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</target>
+</trans-unit>
+<trans-unit id='S3VuZGVu'>
+<source>Kunden</source>
+<target>Customers</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
+<source>Standardkunde</source>
+<target>Default customer</target>
+</trans-unit>
   </body>
  </file>
 </xliff>

@@ -74,6 +74,7 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
         return $this->loadRow('taskGuid = ?', $taskGuid);
     }
     
+    
     /**
      * returns a list of all available tmmt's for one language combination
      * The language combination is determined from the task given by taskGuid
@@ -182,5 +183,19 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
         }
         
         return $result;
+    }
+    
+    /***
+     * Get all assocs by $taskGuids
+     * If no $taskGuids are provided, all assoc will be loaded
+     * @param array $taskGuids
+     * @return array
+     */
+    public function loadByTaskGuids($taskGuids=array()){
+        $s=$this->db->select();
+        if(!empty($taskGuids)){
+            $s->where('taskGuid IN(?)',$taskGuids);
+        }
+        return $this->db->fetchAll($s)->toArray();
     }
 }

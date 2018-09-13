@@ -274,6 +274,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
       $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_TmMt::MATCH_RATE_TYPE_EDITED);
       
+      
+      //find all service names and set it to frontend var
+      $services=ZfExtended_Factory::get('editor_Services_Manager');
+      /* @var $services editor_Services_Manager */
+      $allservices=$services->getAll();
+      $servicenames=[];
+      foreach ($allservices as $s){
+          $sm=ZfExtended_Factory::get($s.'_Service');
+          $servicenames[]=$sm->getName();
+      }
+      $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $servicenames);
+      
       $this->setJsAppData();
     }
 
