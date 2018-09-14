@@ -66,6 +66,32 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TmMt';
     protected $validatorInstanceClass = 'editor_Models_Validator_TmMt';
     
+    /***
+     * Load all resources associated customers of a user
+     * @return array|array
+     */
+    public function loadByUserCustomerAssocs(){
+        $sessionUser = new Zend_Session_Namespace('user');
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $userModel->load($sessionUser->data->id);
+        if($userModel->getCustomers()!==null && !empty($userModel->getCustomers())){
+            //get the customers assigned to the user
+            $customers= trim($userModel->getCustomers(),",");
+            $customers=explode(',', $customers);
+            
+            //load all tmmts associated with the $customers
+            $s = $this->db->select()
+            ->setIntegrityCheck(false)
+            ->from(array('lr' => 'LEK_languageresources_tmmt'))
+            ->join(array('lrca' => 'LEK_languageresources_customerassoc'), 'lr.id = lrca.languageResourceId', [])
+            ->where('lrca.customerid IN(?)',$customers)
+            ->group('lr.id');
+            return $this->db->fetchAll($s)->toArray();
+            
+        }
+        return [];
+    }
     
     /**
      * loads the task to tmmt assocs by a taskguid

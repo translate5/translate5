@@ -65,8 +65,12 @@ class editor_TmmtController extends ZfExtended_RestController {
      * Adds the readonly "filebased" field to the results
      */
     public function indexAction(){
+        //add custom filters
         $this->handleFilterCustom();
-        parent::indexAction();
+        
+        $this->view->rows = $this->entity->loadByUserCustomerAssocs();
+        $this->view->total = count($this->view->rows);
+        
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
         

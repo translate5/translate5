@@ -26,6 +26,9 @@
  END LICENSE AND COPYRIGHT
  */
 
+/***
+ * Provide a interface to the sdl language cloud api
+ */
 class Editor_InstanttranslateapiController extends ZfExtended_RestController{
     
     public function init() {
