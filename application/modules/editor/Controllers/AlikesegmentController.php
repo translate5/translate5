@@ -59,9 +59,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     );
     
     
-    public function init() {
-      parent::init();
-      $this->entity->setEnableWatchlistJoin();
+    public function preDispatch() {
+        parent::preDispatch();
+        $this->entity->setEnableWatchlistJoin();
     }
     
     /**
