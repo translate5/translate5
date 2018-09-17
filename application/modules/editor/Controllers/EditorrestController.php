@@ -28,6 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  * extends ZfExtended_RestController for editor-specific necessities
+ * All Controllers which need a taskGuid in the session for further processing needs this controller as parent!
  */
 abstract class editor_Controllers_EditorrestController extends ZfExtended_RestController {
 
@@ -37,15 +38,16 @@ abstract class editor_Controllers_EditorrestController extends ZfExtended_RestCo
      */
     protected $session;
 
-    /**
-     * checks if current session taskguid matches to loaded segment taskguid
-     * @throws ZfExtended_NotAuthenticatedException
-     */
-    public function init() {
+    protected function initRestControllerSpecific() {
+        parent::initRestControllerSpecific();
         $this->session = new Zend_Session_Namespace();
-        parent::init();
     }
     
+    /**
+     * Editorrest controller checks for a valid taskGuid in the session before proceeding
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::preDispatch()
+     */
     public function preDispatch(){
         $guid = new ZfExtended_Validate_Guid();
         if(!$guid->isValid($this->session->taskGuid)) {
@@ -54,11 +56,6 @@ abstract class editor_Controllers_EditorrestController extends ZfExtended_RestCo
             $e->setLogging(false); //TODO loglevel info
             throw $e;
         }
-        $this->afterTaskGuidCheck();
         parent::preDispatch();
-    }
-    
-    protected function afterTaskGuidCheck() {
-        //do nothing, for overwriting
     }
 }

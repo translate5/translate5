@@ -82,12 +82,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
     
-    protected function afterTaskGuidCheck() {
+    public function preDispatch() {
+        parent::preDispatch();
         $sfm = $this->initSegmentFieldManager($this->session->taskGuid);
+        //overwrite sortColMap
         $this->_sortColMap = $sfm->getSortColMap();
         $this->entity->setEnableWatchlistJoin();
-        $this->entity->getFilter()->setSegmentFields(array_keys($this->_sortColMap));
-        parent::afterTaskGuidCheck();
+        $filter = $this->entity->getFilter();
+        /* @var $filter editor_Models_Filter_SegmentSpecific */
+        //update sortColMap and filterTypeMap in filter instance
+        $filter->setMappings($this->_sortColMap, $this->_filterTypeMap);
+        $filter->setSegmentFields(array_keys($this->_sortColMap));
     }
     
     /**

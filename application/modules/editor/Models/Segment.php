@@ -217,7 +217,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param array $parameters
      * @return boolean|string
      */
-    public function buildSearchString($parameters){
+    protected function buildSearchString($parameters){
         $adapter=$this->db->getAdapter();
 
         $queryString=$parameters['searchField'];

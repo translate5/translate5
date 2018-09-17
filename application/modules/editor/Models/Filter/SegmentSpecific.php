@@ -54,11 +54,12 @@ class editor_Models_Filter_SegmentSpecific extends ZfExtended_Models_Filter_ExtJ
             throw new ZfExtended_Exception(__CLASS__.'::SegmentFields not initialized!');
         }
         
+        $mappedField = empty($this->_sortColMap[$field]) ? $field : $this->_sortColMap[$field];
         if(in_array($field, $this->segmentFields)) {
-            $this->where(' lower('.$field.') like lower(?)', '%'.$value.'%');
+            $this->where(' lower('.$mappedField.') like lower(?) COLLATE utf8_bin', '%'.$value.'%');
         }
         else {
-            parent::applyString($field, $value);
+            parent::applyString($mappedField, $value);
         }
   }
     
