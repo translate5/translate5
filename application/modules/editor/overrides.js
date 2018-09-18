@@ -282,6 +282,20 @@ Ext.override(Ext.grid.CellContext, {
 });
 
 /**
+ * Workaround for TRANSLATE-1431
+ * needed for ext-6.2.0
+ * no info if known as ExtJS issue and if it is fixed in the future
+ * must be rechecked!
+ */
+Ext.override(Ext.panel.Table, {
+    ensureVisible: function(record, options) {
+        if(record) {
+            this.doEnsureVisible(record, options);
+        }
+    }
+});
+
+/**
  * Several Fixes for view.Table
  */
 Ext.override(Ext.view.Table, {
