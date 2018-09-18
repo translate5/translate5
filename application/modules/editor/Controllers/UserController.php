@@ -40,6 +40,7 @@ class Editor_UserController extends ZfExtended_UserController {
         $taskGuids = array_column($tasks, 'taskGuid');
         $e = new ZfExtended_Models_Entity_Conflict('');
         $e->setMessage('Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.', true);
+        $e->setLogging(false);
         $e->setErrors([
             'tasks' => join(', ', $taskGuids),
             'user' => $this->entity->getUserGuid(),
