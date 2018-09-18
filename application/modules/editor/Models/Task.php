@@ -402,7 +402,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         ];
         if($increaseStep) {
             $data['workflowStep'] =  new Zend_Db_Expr('`workflowStep` + 1');
-            //step nr is not updated in task entity!
+            //step nr is not updated in task entity! For correct value we have to reload the task and load the value form DB.
         }
         $this->setWorkflowStepName($stepName);
         $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
