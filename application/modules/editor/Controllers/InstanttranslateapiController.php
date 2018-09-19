@@ -212,6 +212,12 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         exit();
     }
     
+    public function engineAction() {
+        $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
+        /* @var $engineModel editor_Models_LanguageResources_SdlResources */
+        $this->view->rows=$engineModel->getEngines();
+    }
+    
     /***
      * Get the download file status from sdl language cloud
      * @param string $fileId

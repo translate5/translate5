@@ -26,24 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
-class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'aaffff';
-    
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->server;
-        $this->resourceClass='editor_Services_SDLLanguageCloud_Resource';
-        $this->addResourceForeachUrl('SDLLanguageCloud', $urls->toArray());
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_ServiceAbstract::getName()
-     */
-    public function getName() {
-        return "SDLLanguageCloud";
+class editor_Services_SDLLanguageCloud_Resource extends editor_Models_Resource {
+    public function __construct(string $id, string $name, string $url) {
+        parent::__construct($id, $name, $url);
+        $this->filebased = false; //forced to be no filebased
+        $this->searchable = false; //forced to be non searchable
+        $this->writable = false; //forced to be non writeable
+        $this->analysable=false;//is used by match analysis
+        $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
     }
 }

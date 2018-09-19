@@ -33,14 +33,6 @@ END LICENSE AND COPYRIGHT
  * @method void setId() setId(integer $id)
  * @method string getName() getName()
  * @method void setName() setName(string $name)
- * @method string getSourceLang() getSourceLang()
- * @method void setSourceLang() setSourceLang(integer $id)
- * @method string getSourceLangRfc5646() getSourceLangRfc5646()
- * @method void setSourceLangRfc5646() setSourceLangRfc5646(string $lang)
- * @method string getTargetLang() getTargetLang()
- * @method void setTargetLang() setTargetLang(integer $id)
- * @method string getTargetLangRfc5646() getTargetLangRfc5646()
- * @method void setTargetLangRfc5646() setTargetLangRfc5646(string $lang)
  * @method string getColor() getColor()
  * @method void setColor() setColor(string $color)
  * @method string getResourceId() getResourceId()
@@ -53,6 +45,8 @@ END LICENSE AND COPYRIGHT
  * @method void setFileName() setFileName(string $name)
  * @method integer getDefaultCustomer() getDefaultCustomer()
  * @method void setDefaultCustomer() setDefaultCustomer(integer $defaultCustomer)
+ * @method string getLabelText() getLabelText()
+ * @method void setLabelText() setLabelText(string $labelText)
  * 
  */
 class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
@@ -80,14 +74,24 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
             $customers= trim($userModel->getCustomers(),",");
             $customers=explode(',', $customers);
             
-            //load all tmmts associated with the $customers
-            $s = $this->db->select()
-            ->setIntegrityCheck(false)
-            ->from(array('lr' => 'LEK_languageresources_tmmt'))
-            ->join(array('lrca' => 'LEK_languageresources_customerassoc'), 'lr.id = lrca.languageResourceId', [])
-            ->where('lrca.customerid IN(?)',$customers)
-            ->group('lr.id');
-            return $this->db->fetchAll($s)->toArray();
+            //create id filter, so the results will be fildered by user-customer associated language resources 
+            $idFilter=new stdClass();
+            $idFilter->type='list';
+            $idFilter->field='id';
+            $idFilter->comparison='in';
+            
+            //find all language resources for the user customers
+            $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            /* @var $assoc editor_Models_LanguageResources_CustomerAssoc */
+            $result=$assoc->loadByCustomerIds($customers);
+            $result=array_column($result, 'languageResourceId');
+            
+            //set the filter value
+            $idFilter->value=$result;
+            
+            //apply the filter to the entity
+            $this->getFilter()->addFilter($idFilter);
+            return $this->loadAll();
             
         }
         return [];
@@ -167,5 +171,70 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
         if ($taskGuid !== $segment->getTaskGuid()) {
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
+    }
+    
+    /***
+     * Load the exsisting langages for the initialized entity.
+     * @param string $fieldName : field which will be returned
+     * @throws ZfExtended_ValidateException
+     * @return array
+     */
+    public function getLanguageByField($fieldName){
+
+        //check if the filename is defined
+        if(empty($fieldName)){
+            throw new ZfExtended_ValidateException("Missing field name.");
+        }
+        
+        if($this->getId()==null){
+            throw new ZfExtended_ValidateException("Entity id is not set.");
+        }
+        
+        $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $model editor_Models_LanguageResources_Languages */
+        
+        //load the existing languages from the languageresource languages table
+        $res=$model->loadByLanguageResourceId($this->getId());
+        
+        if(count($res)==1){
+            return $res[0][$fieldName];
+        }
+        return $res;
+    }
+    
+    /***
+     * Get the source lang rfc values from the languageresource language table.
+     * Note: the enity id need to be valid
+     * @return array|string
+     */
+    public function getSourceLangRfc5646(){
+        return $this->getLanguageByField('sourceLangRfc5646');
+    }
+    
+    /***
+     * Get the target lang rfc values from the languageresource language table.
+     * Note: the enity id need to be valid
+     * @return array|string
+     */
+    public function getTargetLangRfc5646(){
+        return $this->getLanguageByField('targetLangRfc5646');
+    }
+    
+    /***
+     * Get the source lang id values from the languageresource language table.
+     * Note: the enity id need to be valid
+     * @return array|string
+     */
+    public function getSourceLang(){
+        return $this->getLanguageByField('sourceLangRfc5646');
+    }
+    
+    /***
+     * Get the target lang id values from the languageresource language table.
+     * Note: the enity id need to be valid
+     * @return array|string
+     */
+    public function getTargetLang(){
+        return $this->getLanguageByField('targetLangRfc5646');
     }
 }

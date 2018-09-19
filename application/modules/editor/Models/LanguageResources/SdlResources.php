@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * 
  */
-class editor_Models_SdlResources {
+class editor_Models_LanguageResources_SdlResources {
     
     /***
      * Get all available engines from the sdl language cloud.
@@ -42,10 +42,10 @@ class editor_Models_SdlResources {
      *       target
      *       targetIso
      *       domainCode   -> unique engine code (only available for vertical engines)
-     *       
+     * @param boolean $addArrayId : if true(default true), the array key will be generated in format: 'mt'+autoincrement number       
      * @return array
      */
-    public function getEngines(){
+    public function getEngines($addArrayId=true){
         $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
         /* @var $dummyTmmt editor_Models_TmMt */
         
@@ -61,13 +61,16 @@ class editor_Models_SdlResources {
         
         $engines=array();
         
-        if($result->totalCount<1){
+        //check if results are found
+        if(empty($result) || $result->totalCount<1){
             return $engines;
         }
             
+        //NOTE: the id is generated, since the sdl language cloud does not provide one
         $engineCounter=1;
         foreach($result->translationEngines as $engine){
-            $engines['mt'.$engineCounter]=array(
+            $data=array(
+                'id'=>'mt'.$engineCounter,
                 'name' =>$engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
                 'source' => $engine->fromCulture,
                 'sourceIso' => $engine->from->code,
@@ -75,6 +78,11 @@ class editor_Models_SdlResources {
                 'targetIso' => $engine->to->code,
                 'domainCode' => $engine->domainCode
             );
+            if($addArrayId){
+                $engines['mt'.$engineCounter]=$data;
+            }else{
+                $engines[]=$data;
+            }
             $engineCounter++;
         }
         

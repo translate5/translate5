@@ -26,25 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TmMt extends ZfExtended_Models_Validator_Abstract {
+class editor_Models_Validator_LanguageResources_CustomerAssoc extends ZfExtended_Models_Validator_Abstract {
 
     /**
-     * Validators for TmMt Entity
-     * 
      */
     protected function defineValidators() {
         $this->addValidator('id', 'int');
-        $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('sourceLang', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('targetLang', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('sourceLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
-        $this->addValidator('targetLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
-        $this->addValidator('color', 'stringLength', array('min' => 0, 'max' => 8));
-        $this->addValidator('resourceId', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('serviceName', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('serviceType', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('fileName', 'stringLength', array('min' => 0, 'max' => 1024));
-        $this->addValidator('defaultCustomer', 'int',array(),true);
-        $this->addValidator('labelText', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('languageResourceId', 'int');
+        $this->addValidator('customerId', 'int');
     }
 }

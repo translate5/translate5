@@ -40,30 +40,28 @@ END LICENSE AND COPYRIGHT
  * @method void setDefaultResource() setDefaultResource(integer $defaultResource)
  * 
  */
-class editor_Models_LanguageResourcesCustomerAssoc extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract {
     
-    protected $dbInstanceClass = 'editor_Models_Db_LanguageResourcesCustomerAssoc';
-    protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResourcesCustomerAssoc';
+    protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_CustomerAssoc';
+    protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_CustomerAssoc';
     
     /***
      * Save customer assoc for the given language resource
      * @param mixed $data
      */
     public function saveAssoc($data){
-        if(is_object($data)){
-            $data=json_decode(json_encode($data), true);
-        }
-        if(!isset($data['resourcesCustomersHidden']) || !isset($data['id'])){
+        if(!$this->checkUpdateSaveData($data)){
             return;
         }
+        
         //the data is in comma separated values
         $customers=explode(',',$data['resourcesCustomersHidden']);
         foreach ($customers as $customer){
             if(empty($customer)){
                 continue;
             }
-            $model=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
-            /* @var $model editor_Models_LanguageResourcesCustomerAssoc */
+            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            /* @var $model editor_Models_LanguageResources_CustomerAssoc */
             $model->setCustomerId($customer);
             $model->setLanguageResourceId($data['id']);
             $model->save();
@@ -75,10 +73,9 @@ class editor_Models_LanguageResourcesCustomerAssoc extends ZfExtended_Models_Ent
      * @param mixed $data
      */
     public function updateAssoc($data){
-        if(is_object($data)){
-            $data=json_decode(json_encode($data), true);
+        if(!$this->checkUpdateSaveData($data)){
+            return;
         }
-        
         //remove old assocs for the curen languageResourceId
         $deleteParams=array();
         $deleteParams['languageResourceId IN (?)'] = $data['id'];
@@ -86,6 +83,24 @@ class editor_Models_LanguageResourcesCustomerAssoc extends ZfExtended_Models_Ent
         
         //save the new data
         $this->saveAssoc($data);
+    }
+    
+    /***
+     * Check if the update or save data is valid.
+     * 
+     * @param mixed $data
+     * @return boolean
+     */
+    private function checkUpdateSaveData(&$data){
+        //convert the data to array if it is of object type
+        if(is_object($data)){
+            $data=json_decode(json_encode($data), true);
+        }
+        //ivalida data when not resourceCustomer is set or not assoc id
+        if(!isset($data['resourcesCustomersHidden']) || !isset($data['id'])){
+            return false;;
+        }
+        return true;
     }
     
     /***

@@ -39,7 +39,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::connectTo()
+     * @see editor_Services_Connector_Abstract::connectTo()
      */
     public function connectTo(editor_Models_TmMt $tmmt) {
         parent::connectTo($tmmt);
@@ -49,7 +49,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::open()
+     * @see editor_Services_Connector_Abstract::open()
      */
     public function open() {
         //This call is not necessary, since TMs are opened automatically.
@@ -57,7 +57,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::open()
+     * @see editor_Services_Connector_Abstract::open()
      */
     public function close() {
     /*
@@ -69,7 +69,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     
     /**
      * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::query()
+     * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
         throw new BadMethodCallException("The SLDLanguageCloud TM Connector does not support query requests");
@@ -88,7 +88,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     
     /**
      * (non-PHPdoc)
-     * @see editor_Services_Connector_FilebasedAbstract::search()
+     * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
         throw new BadMethodCallException("The SLDLanguageCloud TM Connector does not support search requests");
@@ -111,14 +111,8 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        $name = $this->tmmt->getFileName();
-        if(empty($name)) {
-            $moreInfo = 'The internal stored filename is invalid';
-            return self::STATUS_NOCONNECTION;
-        }
-        
         try {
-            $apiResult = $this->api->status();
+            $this->api->getStatus();
         }catch (ZfExtended_BadGateway $e){
             $moreInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
@@ -127,21 +121,8 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
             return self::STATUS_NOCONNECTION;
         }
         
-        if($apiResult) {
-            $status = $this->api->getResult()->tmxImportStatus;
-            switch($status) {
-                case 'available':
-                    return self::STATUS_AVAILABLE;
-                case 'import':
-                    $moreInfo = 'TMX wird importiert, TM kann trotzdem benutzt werden';
-                    return self::STATUS_IMPORT;
-                case 'error':
-                case 'failed':
-                    $moreInfo = $this->api->getResult()->ErrorMsg;
-                    return self::STATUS_ERROR;
-            }
-            $moreInfo = 'original OpenTM2 status '.$status;
-            return self::STATUS_UNKNOWN;
+        if($this->api->getResponse()->getStatus()==200) {
+            return self::STATUS_AVAILABLE;
         }
         
         //a 404 response from the status call means: 

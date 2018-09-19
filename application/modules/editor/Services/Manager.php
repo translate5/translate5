@@ -48,6 +48,7 @@ class editor_Services_Manager {
         'editor_Services_OpenTM2',
         'editor_Services_Moses',
         'editor_Services_LucyLT',
+        'editor_Services_SDLLanguageCloud',
         //'editor_Services_DummyFileTm',
     );
 

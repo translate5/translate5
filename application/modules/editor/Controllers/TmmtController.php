@@ -68,7 +68,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         //add custom filters
         $this->handleFilterCustom();
         
-        $this->view->rows = $this->entity->loadByUserCustomerAssocs();
+        $this->view->rows =$this->entity->loadByUserCustomerAssocs();
         $this->view->total = count($this->view->rows);
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -86,9 +86,13 @@ class editor_TmmtController extends ZfExtended_RestController {
         $this->prepareTaskInfo(array_column($this->view->rows, 'id'));
         
         //get all assocs grouped by language resource id
-        $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
-        /* @var $customerAssocModel editor_Models_LanguageResourcesCustomerAssoc */
+        $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssocModel editor_Models_LanguageResources_CustomerAssoc */
         $custAssoc=$customerAssocModel->loadCustomerIdsGrouped();
+        
+        $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $languages=$languages->loadResourceIdsGrouped();
         
         foreach($this->view->rows as &$tmmt) {
             $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
@@ -106,6 +110,8 @@ class editor_TmmtController extends ZfExtended_RestController {
             
             //add customer assocs
             $tmmt['resourcesCustomers']=isset($custAssoc[$tmmt['id']]) ? $custAssoc[$tmmt['id']] : [];
+            $tmmt['sourceLang']=isset($languages[$tmmt['id']]) ? $languages[$tmmt['id']]['sourceLang'] : [];
+            $tmmt['targetLang']=isset($languages[$tmmt['id']]) ? $languages[$tmmt['id']]['targetLang'] : [];
         }
     }
     
@@ -122,13 +128,10 @@ class editor_TmmtController extends ZfExtended_RestController {
         
         $this->prepareTaskInfo([$this->entity->getId()]);
         $this->view->rows->taskList = $this->getTaskInfos($this->entity->getId());
-        
-        //TODO: add one record so the tag field can select
-        //and use another one to display the data
-        
+
         //load associated customers to the resource
-        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResourcesCustomerAssoc */
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         $this->view->rows->resourcesCustomers=$customerAssoc->loadCustomerIds($this->entity->getId());
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
@@ -154,29 +157,37 @@ class editor_TmmtController extends ZfExtended_RestController {
      * The filters are extended so thay can filter using string values.
      */
     private function handleFilterCustom(){
+        $sourceFilter=null;
+        $targetFilter=null;
+        $defaultCustomer=null;
+        $resourcesCustomers=null;
+        $taskList=null;
+        
         $this->entity->getFilter()->hasFilter('sourceLang',$sourceFilter);
         $this->entity->getFilter()->hasFilter('targetLang',$targetFilter);
+        
         $this->entity->getFilter()->hasFilter('defaultCustomer',$defaultCustomer);
         $this->entity->getFilter()->hasFilter('resourcesCustomers',$resourcesCustomers);
         $this->entity->getFilter()->hasFilter('taskList',$taskList);
         
         //search the model for the filter value and set the filter value with the found matches(ids)
         $searchEntity=function($searchValue,$model,$field='id'){
+            
+            if(is_array($searchValue)){
+                return $searchValue;
+            }
+            
             //search the model for the given search string
             $m=ZfExtended_Factory::get($model);
             $result=$m->search($searchValue,[$field]);
             
             //collect the found $fields in the searched model
-            $ids=[];
-            foreach ($result as $res) {
-                $ids[]=$res[$field];
-            }
-            //set the found ids as search value for the filter
+            $ids=array_column($result,$field);
+            //return the result, if now results are found->return -1 as array (this will produce no result in the filter)
             return !empty($ids)?$ids:[-1];
         };
         
-        //this will handle the resourcesCustomers and taskList filter
-        //the function will search in the given models and from the received results in the assoc table
+        //create an languageResources id filter, from the found results in the searched entity
         $handleFilter=function($filter,$resultList,$assocModel,$assocFunction,$assocField){
             //init the filter
             $idFilter=new stdClass();
@@ -207,10 +218,7 @@ class editor_TmmtController extends ZfExtended_RestController {
             }
             
             //for each results, get the assoc field
-            $resids=[];
-            foreach ($result as $res){
-                $resids[]=$res[$assocField];
-            }
+            $resids=array_column($result,$assocField);;
             
             //set the found values to the filter value, and apply the filter
             $idFilter->value=!empty($resids)?$resids:[-1];
@@ -220,15 +228,16 @@ class editor_TmmtController extends ZfExtended_RestController {
             $this->entity->getFilter()->deleteFilter($filter->field);
         };
         
-        //check if the filter exist and if it value is numeric
-        //the default filters are using the numeric value!
-        if(isset($sourceFilter) && !is_numeric($sourceFilter->value)){
-            $sourceFilter->value=$searchEntity($sourceFilter->value,'editor_Models_Languages');
+        //check and handle the sourceLang filter
+        if(isset($sourceFilter) && isset($sourceFilter->value)){
+            $resultList=$searchEntity($sourceFilter->value,'editor_Models_Languages');
+            $handleFilter($sourceFilter,$resultList,'editor_Models_LanguageResources_Languages','loadBySourceLangIds','languageResourceId');
         }
         
-        //check if the filter exist and if it value is numeric
-        if(isset($targetFilter) && !is_numeric($targetFilter->value)){
-            $targetFilter->value=$searchEntity($targetFilter->value,'editor_Models_Languages');
+        //check and handle the targetLang filter
+        if(isset($targetFilter) && isset($targetFilter->value)){
+            $resultList=$searchEntity($targetFilter->value,'editor_Models_Languages');
+            $handleFilter($targetFilter,$resultList,'editor_Models_LanguageResources_Languages','loadByTargetLangIds','languageResourceId');
         }
         
         //check if custom filtering for the defaultCustomer should be done
@@ -245,7 +254,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         //check if filtering for resourceCustomers should be done
         if(isset($resourcesCustomers) && is_string($resourcesCustomers->value)){
             $resultList=$searchEntity($resourcesCustomers->value,'editor_Models_Customer');
-            $handleFilter($resourcesCustomers,$resultList,'editor_Models_LanguageResourcesCustomerAssoc','loadByCustomerIds','languageResourceId');
+            $handleFilter($resourcesCustomers,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIds','languageResourceId');
         }
         
         //check if filtering for taskList should be done
@@ -363,13 +372,17 @@ class editor_TmmtController extends ZfExtended_RestController {
             return;
         }
         
-        
         //save first to generate the TMMT id
         $this->data['id']=$this->entity->save();
 
-        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResourcesCustomerAssoc */
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         $customerAssoc->saveAssoc($this->data);
+        
+        //save the resource languages to
+        $resourceLanguages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $resourceLanguages editor_Models_LanguageResources_Languages */
+        $resourceLanguages->saveLanguages($this->getRequest()->getParam('sourceLang'), $this->getRequest()->getParam('targetLang'), $this->data['id']);
         
         if($resource->getFilebased()) {
             $this->handleInitialFileUpload($manager);
@@ -388,8 +401,8 @@ class editor_TmmtController extends ZfExtended_RestController {
     
     public function putAction() {
         $this->decodePutData();
-        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResourcesCustomerAssoc');
-        /* @var $customerAssoc editor_Models_LanguageResourcesCustomerAssoc */
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         $customerAssoc->updateAssoc($this->data);
         parent::putAction();
     }
@@ -427,8 +440,8 @@ class editor_TmmtController extends ZfExtended_RestController {
             $this->decodePutData();
             if(!empty($this->data) && !empty($this->data->toReImport)) {
                 foreach($this->data->toReImport as $taskGuid) {
-                    $worker = ZfExtended_Factory::get('editor_Models_LanguageResourcesWorker');
-                    /* @var $worker editor_Models_LanguageResourcesWorker */
+                    $worker = ZfExtended_Factory::get('editor_Models_LanguageResources_Worker');
+                    /* @var $worker editor_Models_LanguageResources_Worker */
             
                     // init worker and queue it
                     // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost 
@@ -455,21 +468,20 @@ class editor_TmmtController extends ZfExtended_RestController {
      * @return boolean
      */
     protected function validateLanguages(editor_Models_Resource $resource) {
-        
         $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $sourceLang editor_Models_Languages */
-        $sourceLang->load($this->entity->getSourceLang());
+        $sourceLang->load($this->getRequest()->getParam('sourceLang'));
         
         $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $targetLang editor_Models_Languages */
-        $targetLang->load($this->entity->getTargetLang());
+        $targetLang->load($this->getRequest()->getParam('targetLang'));
         
         $hasSourceLang = $resource->hasSourceLang($sourceLang);
         $hasTargetLang = $resource->hasTargetLang($targetLang);
         
         //cache the RF5646 language key in the TMMT since this value is used more often as our internal ID
-        $this->entity->setSourceLangRfc5646($sourceLang->getRfc5646());
-        $this->entity->setTargetLangRfc5646($targetLang->getRfc5646());
+        //$this->entity->setSourceLangRfc5646($sourceLang->getRfc5646());
+        //$this->entity->setTargetLangRfc5646($targetLang->getRfc5646());
         
         //both languages can be dealed by the resource, all OK
         if($hasSourceLang && $hasTargetLang) {

@@ -28,22 +28,7 @@ END LICENSE AND COPYRIGHT
 
 /**
  */
-class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'aaffff';
-    
-    public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->server;
-        $this->resourceClass='editor_Services_SDLLanguageCloud_Resource';
-        $this->addResourceForeachUrl('SDLLanguageCloud', $urls->toArray());
-    }
-    
-    /**
-     * (non-PHPdoc)
-     * @see editor_Services_ServiceAbstract::getName()
-     */
-    public function getName() {
-        return "SDLLanguageCloud";
-    }
+class editor_Models_Db_LanguageResources_Languages extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_languageresources_languages';
+    public $_primary = 'id';
 }

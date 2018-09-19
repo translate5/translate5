@@ -219,6 +219,15 @@ class editor_Services_SDLLanguageCloud_HttpApi {
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         return $this->processResponse($this->request($http));
     }
+    
+    /***
+     * Check the api status
+     * @return boolean
+     */
+    public function getStatus(){
+        $http = $this->getHttp('GET', 'status');
+        return $this->processResponse($this->request($http));
+    }
 
     
     /**

@@ -67,3 +67,37 @@ CREATE TABLE `LEK_user_meta` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+
+ALTER TABLE `LEK_languageresources_tmmt` 
+ADD COLUMN `labelText` VARCHAR(256) NULL AFTER `defaultCustomer`;
+
+CREATE TABLE `LEK_languageresources_languages` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `sourceLang` INT NULL,
+  `targetLang` INT NULL,
+  `sourceLangRfc5646` VARCHAR(45) NULL,
+  `targetLangRfc5646` VARCHAR(45) NULL,
+  `languageResourceId` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_LEK_languageresources_languages_1_idx` (`languageResourceId` ASC),
+  CONSTRAINT `fk_LEK_languageresources_languages_1`
+    FOREIGN KEY (`languageResourceId`)
+    REFERENCES `LEK_languageresources_tmmt` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE);
+    
+/* move the existing languages into the new table */
+INSERT INTO LEK_languageresources_languages (sourceLang,targetLang,sourceLangRfc5646,targetLangRfc5646,languageResourceId) 
+SELECT  sourceLang, 
+        targetLang, 
+        sourceLangRfc5646, 
+        targetLangRfc5646,
+        id
+FROM LEK_languageresources_tmmt;
+
+ALTER TABLE `LEK_languageresources_tmmt` 
+DROP COLUMN `targetLangRfc5646`,
+DROP COLUMN `targetLang`,
+DROP COLUMN `sourceLangRfc5646`,
+DROP COLUMN `sourceLang`;
+

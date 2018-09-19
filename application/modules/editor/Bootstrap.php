@@ -393,6 +393,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'download'
             ));
         $this->front->getRouter()->addRoute('instanttranslateapi_download', $instantDownload);
+        
+        $instantEngine= new ZfExtended_Controller_RestLikeRoute(
+            'editor/instanttranslateapi/engine/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'instanttranslateapi',
+                'action' => 'engine'
+            ));
+        $this->front->getRouter()->addRoute('instanttranslateapi_engine', $instantEngine);
     }
     
     

@@ -26,9 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
-class editor_Models_Db_LanguageResourcesCustomerAssoc extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_languageresources_customerassoc';
-    public $_primary = 'id';
+class editor_Models_Validator_LanguageResources_Languages extends ZfExtended_Models_Validator_Abstract {
+
+    /**
+     */
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('sourceLang', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('targetLang', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('sourceLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
+        $this->addValidator('targetLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
+        $this->addValidator('languageResourceId', 'int');
+    }
 }
