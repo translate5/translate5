@@ -46,40 +46,18 @@ Ext.define('Editor.view.admin.ExportMenu', {
       return Editor.data.restpath+Ext.String.format(path, task.get('id'), task.get('taskGuid'), field);
   },
   initComponent: function() {
-    var me = this,
-        fields = this.initialConfig.fields;    
-    me.items = [{
-        itemId: 'exportItem',
-        hrefTarget: '_blank',
-        href: me.makePath('task/export/id/{0}'),
-        text: me.messages.exportDef
-    },{
-        itemId: 'exportDiffItem',
-        hrefTarget: '_blank',
-        href: me.makePath('task/export/id/{0}/diff/1'),
-        text : me.messages.exportDiff
-    },{
-        itemId: 'exportItemXliff2',
-        hrefTarget: '_blank',
-        href: me.makePath('task/export/id/{0}?format=xliff2'),
-        text: me.messages.export2Def
-    }];
+    var me = this;
     
-    if(fields !== false) {
-        fields.each(function(field){
-            if(!field.get('editable')) {
-                return;
-            }
-            me.items.push({
-                hrefTarget: '_blank',
-                href: me.makePath('qmstatistics/index/taskGuid/{1}/?type={2}', field.get('name')),
-                text : Ext.String.format(me.messages.exportQmField, field.get('label'))
-            });
-        });
+    if(this.initialConfig.task.isErroneous()) {
+        me.items = [];
+    }
+    else {
+        me.items = me.initExportOptions();
     }
     
+    //add download archive link if allowed
     if(Editor.data.import.createArchivZip && Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
-        me.items.push("-");
+        me.items.length == 0 || me.items.push("-");
         me.items.push({
             itemId: 'exportItemImportArchive',
             hrefTarget: '_blank',
@@ -89,5 +67,42 @@ Ext.define('Editor.view.admin.ExportMenu', {
     } 
     
     me.callParent(arguments);
+  },
+  /**
+   * Add export Links to item list
+   */
+  initExportOptions: function() {
+      var me = this,
+          fields = this.initialConfig.fields;
+          result = [{
+              itemId: 'exportItem',
+              hrefTarget: '_blank',
+              href: me.makePath('task/export/id/{0}'),
+              text: me.messages.exportDef
+          },{
+              itemId: 'exportDiffItem',
+              hrefTarget: '_blank',
+              href: me.makePath('task/export/id/{0}/diff/1'),
+              text : me.messages.exportDiff
+          },{
+              itemId: 'exportItemXliff2',
+              hrefTarget: '_blank',
+              href: me.makePath('task/export/id/{0}?format=xliff2'),
+              text: me.messages.export2Def
+          }];
+      
+      if(fields !== false) {
+          fields.each(function(field){
+              if(!field.get('editable')) {
+                  return;
+              }
+              result.push({
+                  hrefTarget: '_blank',
+                  href: me.makePath('qmstatistics/index/taskGuid/{1}/?type={2}', field.get('name')),
+                  text : Ext.String.format(me.messages.exportQmField, field.get('label'))
+              });
+          });
+      }
+      return result;
   }
 });

@@ -660,8 +660,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           task: task,
           fields: hasQm ? task.segmentFields() : false
       });
-      menu.down('#exportItem').setVisible(exportAllowed);
-      menu.down('#exportDiffItem').setVisible(exportAllowed);
+      menu.down('#exportItem') && menu.down('#exportItem').setVisible(exportAllowed);
+      menu.down('#exportDiffItem') && menu.down('#exportDiffItem').setVisible(exportAllowed);
       menu.showAt(event.getXY());
   },
   
