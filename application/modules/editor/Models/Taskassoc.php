@@ -94,27 +94,15 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
         //this ensures that taskGuid does not contain evil content from userland
         $taskGuid = $task->getTaskGuid();
         
-        $this->filter->addFilter((object)[
-                'field' => 'sourceLang',
-                'type' =>  'numeric',
-                'comparison' => 'eq',
-                'table' => 'tmmt',//only needed for join
-                'value' => $task->getSourceLang(),
-        ]);
-        $this->filter->addFilter((object)[
-                'field' => 'targetLang',
-                'table' => 'tmmt',
-                'comparison' => 'eq',
-                'type' =>  'numeric',
-                'value' => $task->getTargetLang(),
-        ]);
-        
         $db = $this->db;
         $adapter = $db->getAdapter();
         
         $s = $db->select()
         ->setIntegrityCheck(false)
-        ->from(array("tmmt" => "LEK_languageresources_tmmt"), array("tmmt.*","ta.id AS taskassocid", "ta.segmentsUpdateable"));
+        ->from(array("tmmt" => "LEK_languageresources_tmmt"), array("tmmt.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
+        ->join(array("la"=>"LEK_languageresources_languages"), 'tmmt.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
+        ->where('la.sourceLang=?',$task->getSourceLang())
+        ->where('la.targetLang=?',$task->getTargetLang());
 
         //check filter is set true when editor needs a list of all used TMs/MTs
         if($this->filter->hasFilter('checked')) {
