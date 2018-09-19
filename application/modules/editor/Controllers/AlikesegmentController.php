@@ -59,6 +59,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
     );
     
     
+
     public function init() {
       parent::init();
       $this->entity->setEnableWatchlistJoin();
@@ -90,6 +91,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
             $matchRateType->add($matchRateType::TYPE_AUTO_PROPAGATED);
             $alikeSegment->setMatchRateType((string) $matchRateType);
         }
+    }
+
+    public function preDispatch() {
+        parent::preDispatch();
+        $this->entity->setEnableWatchlistJoin();
     }
     
     /**

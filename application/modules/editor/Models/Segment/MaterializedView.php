@@ -268,7 +268,7 @@ class editor_Models_Segment_MaterializedView {
         }
         else {
             $selectSql .= ' LEFT JOIN '.$this->metaCacheInnerSql($segmentId).' siblings ON siblings.transunitId = m.transunitId';
-            $selectSql .= ' WHERE s.taskGuid = ? and m.transunitId = ? and d.segmentId = s.id and s.id = '.$segmentId;
+            $selectSql .= ' WHERE s.taskGuid = ? and m.transunitId = ? and d.segmentId = s.id';
         }
         $selectSql .= ' GROUP BY d.segmentId';
         return $selectSql;

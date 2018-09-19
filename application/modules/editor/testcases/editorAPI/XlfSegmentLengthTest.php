@@ -89,7 +89,6 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
         require_once 'Models/Segment/InternalTag.php';
 
         //the first three segments remain unedited, since content is getting to long with edited content
-        // why indeed the others segments can be edited is a good question, potentual, because they are parallel
         foreach($segments as $idx => $segToEdit) {
             if(empty($segToEdit->editable)) {
                 continue;
@@ -113,16 +112,6 @@ class XlfSegmentLengthTest extends \ZfExtended_Test_ApiTestcase {
         $task = $this->api()->getTask();
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, 'mrkothercontentlength-en-de.xlf', 'expected-export.xlf');
-    }
-    
-    /**
-     * check if the whitespace between mrk tags on the import are also exported again
-     * @depends testSegmentEditing
-     */
-    public function XXXtestExport() {
-        $task = $this->api()->getTask();
-        //start task export 
-        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '02-preserveWhitespace.xlf', 'preserveWhitespace-exporttest.xlf');
     }
     
     /**

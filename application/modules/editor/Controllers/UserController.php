@@ -27,4 +27,26 @@ END LICENSE AND COPYRIGHT
 */
 
 class Editor_UserController extends ZfExtended_UserController {
+    public function deleteAction() {
+        //parent is calling load again, but nevermind, this should be bearable...
+        $this->entityLoad();
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $tasks = $task->loadListByPmGuid($this->entity->getUserGuid());
+        if(empty($tasks)) {
+            parent::deleteAction();
+            return;
+        }
+        $taskGuids = array_column($tasks, 'taskGuid');
+        $e = new ZfExtended_Models_Entity_Conflict('');
+        $e->setMessage('Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.', true);
+        $e->setLogging(false);
+        $e->setErrors([
+            'tasks' => join(', ', $taskGuids),
+            'user' => $this->entity->getUserGuid(),
+            'userLogin' => $this->entity->getLogin(),
+            'userEmail' => $this->entity->getEmail(),
+        ]);
+        throw $e;
+    }
 }

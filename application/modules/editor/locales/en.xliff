@@ -2042,7 +2042,7 @@ The changes made by the formerly active role <b>{previousRole}</b> are listed be
 <target><b>Task:</b> {task.taskName}<br />
     <b>Source-language:</b> {sourceLanguageTranslated}<br />
     <b>Target-language:</b> {targetLanguageTranslated}<br />
-    {relaisLanguageFragment}<b>Lieferdatum Lektoren:</b> {targetDeliveryDate}<br />
+    {relaisLanguageFragment}<b>Expected proofreading delivery date:</b> {targetDeliveryDate}<br />
     <b>Word-count:</b> {wordCount}<br /></target>
 </trans-unit>
 
@@ -2850,6 +2850,13 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
 <target>Default customer</target>
+<trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='>
+    <source>Importarchiv herunterladen</source>
+    <target>Download import archive</target>
+</trans-unit>
+<trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IFBNIGluIGVpbmVyIG9kZXIgbWVocmVyZW4gQXVmZ2FiZW4u'>
+    <source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source>
+    <target>The user cannot be deleted, since it is used as PM in one or more tasks.</target>
 </trans-unit>
     </body>
   </file>

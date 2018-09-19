@@ -39,12 +39,7 @@ class editor_ResourceController extends ZfExtended_RestController  {
      * copied the init method, parent can not be used, since no real entity is used here
      */
     public function init() {
-        $this->_helper->viewRenderer->setNoRender(true);
-        $this->_helper->layout->disableLayout();
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
-        
-        $this->restMessages = ZfExtended_Factory::get('ZfExtended_Models_Messages');
-        Zend_Registry::set('rest_messages', $this->restMessages);
+        $this->initRestControllerSpecific();
     }
     
     public function indexAction() {

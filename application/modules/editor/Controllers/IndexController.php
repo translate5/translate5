@@ -270,7 +270,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
-      
+
       $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
       $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_TmMt::MATCH_RATE_TYPE_EDITED);
       
@@ -290,6 +290,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
       /* @var $engineModel editor_Models_LanguageResources_SdlResources */
       $this->view->Php2JsVars()->set('LanguageResources.sdlEngines', $engineModel->getEngines(false));
+
+      //needed for enabling download link of archive zip
+      $this->view->Php2JsVars()->set('import.createArchivZip', (boolean)$rop->import->createArchivZip);
       
       $this->setJsAppData();
     }

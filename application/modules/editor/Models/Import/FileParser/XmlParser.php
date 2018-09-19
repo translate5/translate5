@@ -189,13 +189,19 @@ class editor_Models_Import_FileParser_XmlParser {
     
     /**
      * return one or more chunks by start index(offset) and end index(offset)
+     * lower end offset as start offset results in empty result
      * @param integer $startOffset
      * @param integer $endOffset
      * @param boolean $asString defaults to false
      * @return array|string depends on parameter $asString
      */
     public function getRange($startOffset, $endOffset, $asString = false) {
-        $chunks = $this->getChunks($startOffset, $endOffset-$startOffset + 1);
+        if($startOffset <= $endOffset) {
+            $chunks = $this->getChunks($startOffset, $endOffset-$startOffset + 1);
+        }
+        else {
+            $chunks = [];
+        }
         if($asString) {
             return $this->join($chunks);
         }
