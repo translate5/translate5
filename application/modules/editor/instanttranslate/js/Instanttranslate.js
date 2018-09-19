@@ -144,16 +144,16 @@ function renderLocalesAsAvailable(accordingTo) {
         } else {
             target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: sourceLocale, selectedValue: targetLocale};
         }
-    } else if (accordingTo === 'reset' || selectedText === translatedStrings['clearBothLists']) {
+    } else if (accordingTo === 'reset' || selectedText === Editor.data.languageresource.translatedStrings['clearBothLists']) {
         // This means a "reset" of one or both the lists:
         sourceLocalesAvailable = mtSourceLanguageLocales;
         targetLocalesAvailable = mtTargetLanguageLocales;
         source = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
         target = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
     } else {
-        if (selectedText === translatedStrings['showAllAvailableFor']+' '+targetLocale) {
+        if (selectedText === Editor.data.languageresource.translatedStrings['showAllAvailableFor']+' '+targetLocale) {
             accordingTo = 'accordingToTargetLocale';
-        } else if (selectedText === translatedStrings['showAllAvailableFor']+' '+sourceLocale) {
+        } else if (selectedText === Editor.data.languageresource.translatedStrings['showAllAvailableFor']+' '+sourceLocale) {
             accordingTo = 'accordingToSourceLocale';
         } 
         // "Default": update the locales according to what is set on the other side
@@ -219,19 +219,19 @@ function renderLocaleOptionList(list) {
     if (list.hasPlsChoose) {
         option = {};
         option.value = '-';
-        option.name = translatedStrings['pleaseChoose'] + ' ('+list.localeList.length+'):';
+        option.name = Editor.data.languageresource.translatedStrings['pleaseChoose'] + ' ('+list.localeList.length+'):';
         localeOptionsList.push(option);
     }
     if (list.hasClearBoth) {
         option = {};
         option.value = '-';
-        option.name = translatedStrings['clearBothLists'];
+        option.name = Editor.data.languageresource.translatedStrings['clearBothLists'];
         localeOptionsList.push(option);
     }
     if (list.hasShowAllAvailable) {
         option = {};
         option.value = '-';
-        option.name = translatedStrings['showAllAvailableFor']+' '+list.localeForReference;
+        option.name = Editor.data.languageresource.translatedStrings['showAllAvailableFor']+' '+list.localeForReference;
         localeOptionsList.push(option);
     }
     for (i = 0; i < list.localeList.length; i++) {
@@ -268,7 +268,7 @@ function setSingleMtEngineById(engineId) {
         return;
     }
     setMtEngine(engineId);
-    $('#selectedMtEngine').html(translatedStrings['selectedMtEngine'] + ':<br>'+getSelectedEngineName());
+    $('#selectedMtEngine').html(Editor.data.languageresource.translatedStrings['selectedMtEngine'] + ':<br>'+getSelectedEngineName());
     clearAllErrorMessages();
     showTranslationFormsAsReady();
     if ($('#sourceText').val().length > 0) {
@@ -277,11 +277,11 @@ function setSingleMtEngineById(engineId) {
     fileTypes = getSelectedEngineFileTypes();
     if(fileTypes !== false){
         fileTypes = fileTypes.join();
-        $("#sourceIsText").html(translatedStrings['enterText']+' <span class="change-source-type">'+translatedStrings["orTranslateFile"]+' (' + fileTypes +').</span>');
-        $("#sourceIsFile").html(translatedStrings['uploadFile']+' (' + fileTypes + ') <span class="change-source-type">'+translatedStrings["orTranslateText"]+'</span>');
+        $("#sourceIsText").html(Editor.data.languageresource.translatedStrings['enterText']+' <span class="change-source-type">'+Editor.data.languageresource.translatedStrings["orTranslateFile"]+' (' + fileTypes +').</span>');
+        $("#sourceIsFile").html(Editor.data.languageresource.translatedStrings['uploadFile']+' (' + fileTypes + ') <span class="change-source-type">'+Editor.data.languageresource.translatedStrings["orTranslateText"]+'</span>');
     }else{
-    	$("#sourceIsText").html(translatedStrings["enterText"]+':');
-        $("#sourceIsFile").html(translatedStrings['uploadFile']+' <span class="change-source-type">'+translatedStrings["orTranslateText"]+'</span>');
+    	$("#sourceIsText").html(Editor.data.languageresource.translatedStrings["enterText"]+':');
+        $("#sourceIsFile").html(Editor.data.languageresource.translatedStrings['uploadFile']+' <span class="change-source-type">'+Editor.data.languageresource.translatedStrings["orTranslateText"]+'</span>');
     }
 }
 function renderMtEnginesAsAvailable() {
@@ -309,7 +309,7 @@ function renderMtEnginesAsAvailable() {
             showLanguageSelectsOnly();
             // But now also show mtEngine-Select:
             if (mtIdsAvailable.length > 1) {
-                mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+translatedStrings['foundMt']+":</option>");
+                mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+Editor.data.languageresource.translatedStrings['foundMt']+":</option>");
                 for (i = 0; i < mtIdsAvailable.length; i++) {
                     mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
                 }
@@ -398,7 +398,7 @@ function startFileTranslation(){
         }
     });
     if (fileTypesErrorList.length > 0) {
-        showSourceError(translatedStrings['notAllowed'] + ': ' + fileTypesErrorList.join());
+        showSourceError(Editor.data.languageresource.translatedStrings['notAllowed'] + ': ' + fileTypesErrorList.join());
         return;
     }
     startTranslation();
@@ -469,7 +469,7 @@ function translateText(textToTranslate,translationInProgressID){
                 showMtEngineSelectorError('serverErrorMsg500');
             }
         },
-        url: REST_PATH+"instanttranslateapi/translate",
+        url: Editor.data.restpath+"instanttranslateapi/translate",
         dataType: "json",
         data: {
             'source':$("#sourceLocale").val(),
@@ -505,10 +505,10 @@ function renderTranslationContainer() {
         engineName = getSelectedEngineName();
     if (engineId !== false && engineName != false) {
         //for https://jira.translate5.net/browse/TRANSLATE-1390 :
-        //translationsContainer += '<h2>' + translatedStrings['machineTranslation'] + ' (' + engineName + ')</h2>';
+        //translationsContainer += '<h2>' + Editor.data.languageresource.translatedStrings['machineTranslation'] + ' (' + engineName + ')</h2>';
         translationsContainer += '<div class="copyable">';
         translationsContainer += '<div class="translation-result" id="'+engineId+'"></div>';
-        translationsContainer += '<span class="copyable-copy" title="'+translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
+        translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
         translationsContainer += '</div>';
         translationsContainer += '<div id="translationError'+engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
     }
@@ -547,7 +547,7 @@ function requestFileTranslate(){
     data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
     
     $.ajax({
-        url:REST_PATH+"instanttranslateapi/file",
+        url:Editor.data.restpath+"instanttranslateapi/file",
         type: 'POST',
         data: data,
         cache: false,
@@ -587,7 +587,7 @@ function getDownloadUrl(fileId){
                 showMtEngineSelectorError('serverErrorMsg500');
                 }
         },
-        url: REST_PATH+"instanttranslateapi/url",
+        url: Editor.data.restpath+"instanttranslateapi/url",
         dataType: "json",
         data: {
             'fileId':fileId
@@ -612,7 +612,7 @@ function downloadFile(url){
     var hasFileExt=getFileExtension()!="",
         fullFileName=hasFileExt ? getFileName():(getFileName()+"."+getFileExtension()),
         newTab = window.open("about:blank", "translatedFile"),
-        newTabHref = REST_PATH+"instanttranslateapi/download?fileName="+fullFileName+"&url="+url;
+        newTabHref = Editor.data.restpath+"instanttranslateapi/download?fileName="+fullFileName+"&url="+url;
     if(newTab == null) { // window.open does not work in Chrome
         window.location.href = newTabHref;
     } else {
@@ -758,7 +758,7 @@ function hideTranslations() {
 }
 /* --------------- show/hide: errors --------------------------------------- */
 function showMtEngineSelectorError(errorMode) {
-    $('#mtEngineSelectorError').html(translatedStrings[errorMode]).show();
+    $('#mtEngineSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
     $('#translationSubmit').hide();
     if ($('#sourceText').val().length === 0) {
         hideSource();
