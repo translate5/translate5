@@ -49,8 +49,6 @@ Ext.define('Editor.model.LanguageResources.TmMt', {
     {name: 'id', type: 'int'},
     {name: 'entityVersion', type: 'integer', critical: true},
     {name: 'name', type: 'string'},
-    {name: 'sourceLang', type: 'string'},
-    {name: 'targetLang', type: 'string'},
     {name: 'color', type: 'string'},
     {name: 'resourceId', type: 'string'},
     {name: 'status', type: 'string', persist: false},

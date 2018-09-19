@@ -32,8 +32,11 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         'Ext.ux.colorpick.Button',
         'Ext.ux.colorpick.Field',
         'Editor.view.admin.customer.TagField',
-        'Editor.view.admin.customer.UserCustomersCombo'
+        'Editor.view.admin.customer.UserCustomersCombo',
+        'Editor.view.LanguageResources.EngineCombo',
+        'Editor.view.LanguageResources.TmWindowViewController'
     ],
+    controller: 'tmwindowviewcontroller',
     alias: 'widget.addTmWindow',
 
     itemId: 'addTmWindow',
@@ -57,13 +60,16 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
     modal : true,
     layout:'fit',
 
+    listeners:{
+        render:'onTmWindowRender'
+    },
+
     initConfig : function(instanceConfig) {
         var me = this,
         langCombo = {
                 xtype: 'combo',
                 typeAhead: true,
                 displayField: 'label',
-                forceSelection: true,
                 queryMode: 'local',
                 valueField: 'id'
             },
@@ -89,7 +95,19 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     valueField: 'id',
                     displayField: 'name',
                     store:'Editor.store.LanguageResources.Resources',
+                    listeners:{
+                        change:'onResourceChange'
+                    },
                     fieldLabel: me.strings.resource
+                },{
+                    xtype:'sdlenginecombo',
+                    itemId:'sdlEngine',
+                    hidden:true,
+                    disabled:true,
+                    allowBlank: false,
+                    listeners:{
+                        change:'onSdlEngineComboChange'
+                    }
                 },{
                     xtype: 'textfield',
                     name: 'name',
@@ -99,6 +117,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     fieldLabel: me.strings.name
                 },Ext.applyIf({
                     name: 'sourceLang',
+                    listeners:{
+                        change:'onLanguageComboChange'
+                    },
                     allowBlank: false,
                     toolTip: me.strings.source,
                     //each combo needs its own store instance, see EXT6UPD-8
@@ -106,6 +127,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     fieldLabel: me.strings.source
                 }, langCombo),Ext.applyIf({
                     name: 'targetLang',
+                    listeners:{
+                        change:'onLanguageComboChange'
+                    },
                     allowBlank: false,
                     toolTip: me.strings.target,
                     //each combo needs its own store instance, see EXT6UPD-8
@@ -138,6 +162,12 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     dataIndex: 'serviceName',
                     maxLength: 255,
                     allowBlank: false
+                },{
+                    xtype: 'hiddenfield',
+                    name: 'labelText'
+                },{
+                    xtype: 'hiddenfield',
+                    name: 'fileName'
                 },{
                     xtype: 'colorfield',
                     fieldLabel: me.strings.color,

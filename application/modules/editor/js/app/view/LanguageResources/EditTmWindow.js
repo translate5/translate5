@@ -59,10 +59,18 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         var me = this,
         langField = {
                 xtype: 'displayfield',
-                renderer: function(id) {
-                    var store = Ext.getStore('admin.Languages'),
-                        resource = store.getById(id);
-                    return resource ? resource.get('label') : id;
+                renderer: function(value,field) {
+                    if(!value){
+                        return '';
+                    }
+                    var retval=[];
+                    for(var i=0;i<value.length;i++){
+                        var lang = Ext.StoreMgr.get('admin.Languages').getById(value[i]);
+                        if (lang) {
+                            retval.push(lang.get('rfc5646'));
+                        }
+                    }
+                    return retval.join(',');
                 }
             },
             config = {},

@@ -47,7 +47,11 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.TaskGridWindow'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.TmMt'],
-    stores:['Editor.store.LanguageResources.Resources','Editor.store.LanguageResources.TmMts'],
+    stores:[
+        'Editor.store.LanguageResources.Resources',
+        'Editor.store.LanguageResources.TmMts',
+        'Editor.store.LanguageResources.SdlEngine'
+    ],
     strings: {
         languageresource: '#UT#Sprachressourcen',
         deleteConfirm: '#UT#Sprachressource endgültig löschen?',
@@ -230,6 +234,9 @@ Ext.define('Editor.controller.TmOverview', {
         }
 
         me.mergeCustomerFieldIds(form);
+
+        //check and update the form fields from the engine
+        me.handleEngineSelect(form);
 
         var saveCallback=function(){
             window.setLoading(true);
@@ -552,6 +559,19 @@ Ext.define('Editor.controller.TmOverview', {
         //if record exist(editTm) -> set it
         if(record){
             record.set('resourcesCustomersHidden',cusomerIds);
+        }
+    },
+
+    /**
+     * Set the labelText(domainCode) when engine with domain code is selected
+     */
+    handleEngineSelect:function(form){
+        var sdlEngine=form.down('#sdlEngine').getSelection();
+        
+        //set the labelText field with the domain code if exist
+        if(sdlEngine){
+            form.getForm().findField('fileName').setValue(sdlEngine.get('domainCode'));
+            form.getForm().findField('labelText').setValue(sdlEngine.get('name'));
         }
     },
 

@@ -268,13 +268,22 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
       return me.callParent([config]);
     },
     langRenderer : function(val, md) {
-        var lang = Ext.StoreMgr.get('admin.Languages').getById(val), label;
-        if (lang) {
-            label = lang.get('label');
-            md.tdAttr = 'data-qtip="' + label + '"';
-            return label;
+        if(!val){
+            return '';
         }
-        return '';
+        var label=[],
+            retval=[];
+        for(var i=0;i<val.length;i++){
+            var lang = Ext.StoreMgr.get('admin.Languages').getById(val[i]),
+                label;
+            if (lang) {
+                label.push(lang.get('label'));
+                retval.push(lang.get('rfc5646'));
+            }
+        }
+        
+        md.tdAttr = 'data-qtip="' + label.join(',') + '"';
+        return retval.join(',');
     },
 
     /**

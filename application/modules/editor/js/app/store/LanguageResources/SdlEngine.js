@@ -26,44 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * @class Editor.model.LanguageResources.Resource
- * @extends Ext.data.Model
- */
-Ext.define('Editor.model.LanguageResources.Resource', {
-  extend: 'Ext.data.Model',
-
-  statics: {
-    //name of the sdl language cloud resource
-    SDL_RESOURCE_NAME: 'SDLLanguageCloud',
-  },
-
+Ext.define('Editor.store.LanguageResources.SdlEngine', {
+  extend : 'Ext.data.ArrayStore',
   fields: [
     {name: 'id', type: 'string'},
     {name: 'name', type: 'string'},
-    {name: 'filebased', type: 'boolean'},
-    {name: 'serviceType', type: 'string'},
-    {name: 'serviceName', type: 'string'},
-    {name: 'defaultColor', type: 'string'}
+    {name: 'source', type: 'string'},
+    {name: 'sourceIso', type: 'string'},
+    {name: 'target', type: 'string'},
+    {name: 'targetIso', type: 'string'},
+    {name: 'domainCode', type: 'string'},
   ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'resource', //same as PHP controller name
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
-    },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
-    }
-  }
+  storeId:'sdlEngine'
 });
