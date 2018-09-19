@@ -102,7 +102,7 @@
                     echo implode(' ', $optionValues);
                 ?>
             </select>
-            <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"><?php echo $this->translations["enterText"];?></div>
+            <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"></div>
             <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"><?php echo $this->translations["uploadFile"];?> <span class="change-source-type"><?php echo $this->translations["orTranslateText"];?></span></div>
             <div id="sourceContent" class="clearable">
                 <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
@@ -152,13 +152,6 @@
     mtTargetLanguageLocales = JSON.parse(mtTargetLanguageLocales);
     var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
     machineTranslationEngines = JSON.parse(machineTranslationEngines);
-    var REST_PATH='<?php echo $this->restPath; ?>';
-    var translatedStrings = [];
-    <?php 
-        foreach ($this->translations as $key => $value) {
-            echo "    translatedStrings['".$key."'] = '".$value."';\n";
-        }
-    ?>
 </script>
 
 <script type="text/javascript">
@@ -201,6 +194,8 @@ $( function() {
     } else {
         renderLocalesAsAvailable('reset');
     }
+
+    $("#sourceIsText").html(Editor.data.languageresource.translatedStrings['enterText']);
 } );
 </script>
 

@@ -2850,6 +2850,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
 <target>Default customer</target>
+</trans-unit>
 <trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='>
     <source>Importarchiv herunterladen</source>
     <target>Download import archive</target>

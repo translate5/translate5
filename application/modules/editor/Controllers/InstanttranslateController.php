@@ -35,7 +35,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
-        //$config = Zend_Registry::get('config');
+        $config = Zend_Registry::get('config');
         Zend_Layout::getMvcInstance()->setLayout('instanttranslate');
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
         $this->view->render('instanttranslate/layoutConfig.php');
@@ -43,17 +43,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         //set the user preselected languages from the user meta table
         $this->setDefaultLanguages();
         
-        //TODO: from config, but this returns always empti obj in frontend
-        //$this->view->Php2JsVars()->set('languageresource.fileExtension',$config->runtimeOptions->LanguageResources->fileExtension);
-        $this->view->Php2JsVars()->set('languageresource.fileExtension',
-            [
-                "de-DE,en-GB"=>["txt","odt","docx"],
-                "en-US,ru-RU"=>["txt","odt","docx"],
-                "en-US,de-DE"=>["txt","odt","docx"],
-                "en-US,da-DK"=>["txt","odt","docx"],
-                "en-US,es-ES"=>["txt","odt","docx"],
-                
-            ]);
+        $this->view->Php2JsVars()->set('languageresource.fileExtension',$config->runtimeOptions->LanguageResources->fileExtension->toArray());
         
         $machineTranslationEngines=array();
         
@@ -61,14 +51,6 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         /* @var $engineModel editor_Models_LanguageResources_SdlResources */
         $machineTranslationEngines=$engineModel->getEngines();
         
-        // available MachineTranslation-Engines
-        /*$machineTranslationEngines = array(  // TODO; both content and structure of this content are DUMMY only!
-                'mt1' => array('name' => 'MT Engine 1', 'source' => 'de-DE', 'target' => 'en-US'),
-                'mt2' => array('name' => 'MT Engine 2', 'source' => 'de-DE', 'target' => 'en-GB'),
-                'mt3' => array('name' => 'MT Engine 3', 'source' => 'fr-FR', 'target' => 'en-GB'),
-                'mt4' => array('name' => 'MT Engine 4', 'source' => 'de-DE', 'target' => 'en-GB')
-        );
-        */
         $this->view->machineTranslationEngines= $machineTranslationEngines;
         
         //translated strings
@@ -95,8 +77,10 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "selectedMtEngine"          => $this->translate->_("MT-Engine")
                 
         );
-        $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
-        $this->view->translations = $translatedStrings;
+        
+        $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
+        
+        $this->view->Php2JsVars()->set('languageresource.translatedStrings',$translatedStrings);
     }
     
     /***
