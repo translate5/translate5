@@ -28,10 +28,6 @@ END LICENSE AND COPYRIGHT
 
 class HelpController extends ZfExtended_Controllers_Action {
 
-    public function init(){
-        parent::init();
-    }
-
     public function indexAction(){
         $this->_helper->layout->disableLayout();
     }

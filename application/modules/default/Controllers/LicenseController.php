@@ -38,10 +38,6 @@ END LICENSE AND COPYRIGHT
  *
  */
 class LicenseController extends ZfExtended_Controllers_Action {
-    public function init(){
-        parent::init();
-    }
-    
     protected function getForm() {
         $form = new Zend_Form;
 
