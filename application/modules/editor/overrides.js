@@ -265,12 +265,46 @@ Ext.override(Ext.data.PageMap, {
 });
 
 /**
- * Fix for TRANSLATE-1041 / EXTJS-24549 / https://www.sencha.com/forum/showthread.php?338435-ext-all-debug-js-206678-Uncaught-TypeError-cell-focus-is-not-a-function
+ * Workaround for TRANSLATE-1177
+ * https://www.sencha.com/forum/showthread.php?343381-Grid-rowwidget-error-Uncaught-TypeError-Cannot-read-property-isModel-of-null
+ * EXTJS-26004
  * needed for ext-6.2.0
- * should be solved natively with next version
+ * seems to be still open in newer versions
+ */
+Ext.override(Ext.grid.CellContext, {
+    setRow: function(row) {
+        if(!row) {
+            //the original method needs undefined for falsy row values
+            return this.callParent([]);
+        }
+        return this.callParent([row]);
+    }
+});
+
+/**
+ * Workaround for TRANSLATE-1431
+ * needed for ext-6.2.0
+ * no info if known as ExtJS issue and if it is fixed in the future
+ * must be rechecked!
+ */
+Ext.override(Ext.panel.Table, {
+    ensureVisible: function(record, options) {
+        if(record) {
+            this.doEnsureVisible(record, options);
+        }
+    }
+});
+
+/**
+ * Several Fixes for view.Table
  */
 Ext.override(Ext.view.Table, {
     privates: {
+        /**
+         * Fix for TRANSLATE-1041 / EXTJS-24549 / https://www.sencha.com/forum/showthread.php?338435-ext-all-debug-js-206678-Uncaught-TypeError-cell-focus-is-not-a-function
+         * needed for ext-6.2.0
+         * should be solved natively with next version
+         */
         setActionableMode: function(enabled, position) {
             var me = this,
                 navModel = me.getNavigationModel(),
@@ -365,6 +399,18 @@ Ext.override(Ext.view.Table, {
                 }
             }
         }
+    },
+    /**
+     * Fixing TRANSLATE-1422: Uncaught TypeError: Cannot read property 'record' of undefined
+     * EXTJS-22672 fixed in 6.2.1.167.
+     * https://www.sencha.com/forum/showthread.php?328802-6-2-Crash-when-clicking-grid-view-area-outside-cells
+     * needed for ext-6.2.0
+     */
+    getDefaultFocusPosition: function(fromComponent) {
+        if(fromComponent && !fromComponent.isColumn && fromComponent.isTableView && !fromComponent.lastFocused) {
+            fromComponent = null;
+        }
+        return this.callParent([fromComponent]);
     }
 });
 

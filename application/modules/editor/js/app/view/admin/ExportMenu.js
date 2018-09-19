@@ -37,7 +37,8 @@ Ext.define('Editor.view.admin.ExportMenu', {
       exportDef: '#UT#exportieren (Orginalformat)',
       exportDiff: '#UT#exportieren (Orginalformat mit Änderungshistorie)',
       export2Def: '#UT#exportieren (XLIFF 2.1)',
-      exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}'
+      exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}',
+      downloadImportArchive: '#UT#Importarchiv herunterladen'
   },
   alias: 'widget.adminExportMenu',
   makePath: function(path, field) {
@@ -46,8 +47,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
   },
   initComponent: function() {
     var me = this,
-        fields = this.initialConfig.fields;
-    
+        fields = this.initialConfig.fields;    
     me.items = [{
         itemId: 'exportItem',
         hrefTarget: '_blank',
@@ -65,21 +65,29 @@ Ext.define('Editor.view.admin.ExportMenu', {
         text: me.messages.export2Def
     }];
     
-    if(fields === false) {
-        me.callParent(arguments);
-        return;
+    if(fields !== false) {
+        fields.each(function(field){
+            if(!field.get('editable')) {
+                return;
+            }
+            me.items.push({
+                hrefTarget: '_blank',
+                href: me.makePath('qmstatistics/index/taskGuid/{1}/?type={2}', field.get('name')),
+                text : Ext.String.format(me.messages.exportQmField, field.get('label'))
+            });
+        });
     }
     
-    fields.each(function(field){
-        if(!field.get('editable')) {
-            return;
-        }
+    if(Editor.data.import.createArchivZip && Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
+        me.items.push("-");
         me.items.push({
+            itemId: 'exportItemImportArchive',
             hrefTarget: '_blank',
-            href: me.makePath('qmstatistics/index/taskGuid/{1}/?type={2}', field.get('name')),
-            text : Ext.String.format(me.messages.exportQmField, field.get('label'))
+            href: me.makePath('task/export/id/{0}?format=importArchive'),
+            text: me.messages.downloadImportArchive
         });
-    });
+    } 
+    
     me.callParent(arguments);
   }
 });

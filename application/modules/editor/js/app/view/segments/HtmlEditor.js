@@ -947,7 +947,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       
       me.segmentLengthStatus = 0;
       
-      //get the characters length and is segment saveble
+      //get the characters length and is segment saveable
       length = me.getTransunitLength(segmentText);
       
       if(length < minWidth) {
@@ -992,6 +992,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       
       //add the length of the text itself 
       text = div.textContent || div.innerText || "";
+      //remove characters with 0 length:
+      text = text.replace(/\u200B/g, '');
+      
       div = null;
       
       //only the segment length + the tag lengths:

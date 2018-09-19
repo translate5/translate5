@@ -80,6 +80,10 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
     border-radius:4px;
 }
 
+.segment-content .x-form-display-field del,
+.segment-content .x-form-display-field img,
+.segment-content .x-form-display-field div.internal-tag,
+.segment-content .x-form-display-field div.internal-tag span,
 .segment-tag-column div.x-grid-cell-inner del,
 .segment-tag-column div.x-grid-cell-inner img,
 .segment-tag-column div.x-grid-cell-inner div.internal-tag,
