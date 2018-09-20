@@ -1294,6 +1294,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'><source>Terminologieportal</source><target>Terminologieportal</target></trans-unit>
 <trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='><source>Importarchiv herunterladen</source><target>Importarchiv herunterladen</target></trans-unit>
 <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IFBNIGluIGVpbmVyIG9kZXIgbWVocmVyZW4gQXVmZ2FiZW4u'><source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source><target>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</target></trans-unit>
+<trans-unit id="VGFnbW9kaQ=="><source>Tagmodi</source><target>Tagmodi</target></trans-unit>
   </body>
  </file>
 </xliff>
