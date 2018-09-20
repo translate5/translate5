@@ -50,9 +50,6 @@ Ext.define('Editor.controller.ViewModes', {
         ref : 'shortTagBtn',
         selector : '#segmentgrid #shortTagBtn'
     },{
-        ref : 'hideTagBtn',
-        selector : '#segmentgrid #hideTagBtn'
-    },{
         ref : 'segmentPager',
         selector : 'editorgridscroller'
     },{
@@ -78,7 +75,7 @@ Ext.define('Editor.controller.ViewModes', {
             'gridpanel segmentsToolbar menucheckitem[group="toggleView"]' : {
                 click : 'handleViewMode'
             },
-            'gridpanel segmentsToolbar button[toggleGroup="tagMode"]' : {
+            'gridpanel segmentsToolbar menucheckitem[group="tagMode"]' : {
                 click : 'handleTagButtonClick'
             },
             'segmentsHtmleditor': {
@@ -247,7 +244,7 @@ Ext.define('Editor.controller.ViewModes', {
         var me = this;
         readonly = me.setReadonly(readonly);
         me.getViewModeMenu().hideMenu();
-        me.getShortTagBtn().toggle(true);
+        me.getShortTagBtn().setChecked(true);
 
         //editMode und viewMode
         me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
@@ -283,7 +280,7 @@ Ext.define('Editor.controller.ViewModes', {
         readonly = me.setReadonly(readonly);
         
         me.getViewModeMenu().hideMenu();
-        me.getShortTagBtn().toggle(true);
+        me.getShortTagBtn().setChecked(true);
         
         wasAlreadyErgo || me.setVisibleElements();
 
@@ -338,6 +335,7 @@ Ext.define('Editor.controller.ViewModes', {
         wasAlreadyErgo || me.setViewMode(me.self.MODE_ERGONOMIC);
 
         grid.view.refresh();
+        me.handleTagButtonClick('short');
         me.toggleEditorErgonomicMode();
         me.saveAlreadyOpened();
 
