@@ -1099,10 +1099,6 @@ E-Mail: service@MittagQI.com</pre>
                 <source>Beginn der Segmente erreicht!</source>
                 <target>Start of the segments reached!</target>
             </trans-unit>
-            <trans-unit id="RWRpdG9ybW9kaQ==">
-                <source>Editormodi</source>
-                <target>Editor modes</target>
-            </trans-unit>
             <trans-unit id="U3BlaWNoZXJuIHVuZCBuw6RjaHN0ZXMgw7ZmZm5lbg==">
                 <source>Speichern und nächstes öffnen</source>
                 <target>Save and open next</target>
