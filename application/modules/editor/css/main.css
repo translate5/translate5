@@ -385,6 +385,9 @@ body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
 .ico-notify-user {background-image: url("../images/email_go.png");}
 
+.ico-zoom-in {background-image: url("../images/magnifier_zoom_in.png");}
+.ico-zoom-out {background-image: url("../images/magnifier_zoom_out.png");}
+
 body.loading {
     color: #404040;
     font-size: 13px;
