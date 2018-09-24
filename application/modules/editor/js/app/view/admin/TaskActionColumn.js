@@ -34,7 +34,7 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
   alias: 'widget.taskActionColumn',
   extend: 'Ext.grid.column.Action',
   width: 90,
-
+  menuText: null,
   messages: {
       actionOpen: '#UT# Aufgabe öffnen (nur Lesemodus)',
       actionEdit: '#UT# Aufgabe bearbeiten',
@@ -130,6 +130,5 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       me.callParent([Ext.apply({
           items: items
       }, cfg)]);
-      me.setText(cfg.text);
   }
 });
