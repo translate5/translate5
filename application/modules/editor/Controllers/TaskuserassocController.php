@@ -153,14 +153,21 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     public function postAction() {
         parent::postAction();
         $this->addUserInfoToResult();
+        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $this->entity->getUserGuid());
         $this->applyEditableAndDeletable();
     }
     
     public function deleteAction(){
         $this->entityLoad();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->entity->getTaskGuid());
+        /* @var $workflow editor_Workflow_Abstract */
         $this->checkAuthenticatedIsParentOfEntity();
         $this->processClientReferenceVersion();
-        $this->entity->delete();
+        $entity = clone $this->entity;
+        $this->entity->setId(0);
+        //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing 
+        $entity->delete();
+        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), "DELETED", $this->entity->getUserGuid());
     }
     
     /**

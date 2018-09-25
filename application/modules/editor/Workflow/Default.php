@@ -180,5 +180,19 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         }
         $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Workflow_Abstract::handleUserAssociationDeleted()
+     */
+    protected function handleUserAssociationDeleted() {
+        $this->doDebug(__FUNCTION__);
+        $tua = $this->newTaskUserAssoc;
+        if(empty($this->newTask)) {
+            $this->newTask = ZfExtended_Factory::get('editor_Models_Task');
+            $this->newTask->loadByTaskGuid($tua->getTaskGuid());
+        }
+        $this->callActions(__FUNCTION__, $this->newTask->getWorkflowStepName(), $tua->getRole(), $tua->getState());
+    }
 
 }

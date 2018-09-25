@@ -268,6 +268,7 @@ abstract class editor_Workflow_Abstract {
         
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
             $this->recalculateWorkflowStep($event->getParam('entity'));
+            $this->doUserAssociationDelete($event->getParam('entity'));
         });
         
         $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
@@ -1034,6 +1035,36 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * is called after a user association is added
+     * @param editor_Models_TaskUserAssoc $tua
+     */
+    public function doUserAssociationDelete(editor_Models_TaskUserAssoc $tua) {
+        $this->doDebug(__FUNCTION__);
+        $this->newTaskUserAssoc = $tua; //"new" is bsicly wrong, but with that entity all calculation is done
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($tua->getTaskGuid());
+        $this->newTask = $task;
+        
+        $originalState = $tua->getState();
+        //if the deleted tua was not finished, we have to recheck the allFinished events after deleting it!
+        $wasNotFinished = ($originalState !== self::STATE_FINISH);
+        $stat = $this->calculateFinish();
+        if($wasNotFinished && $stat['roleAllFinished']) {
+            //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
+            $tua->setState(self::STATE_FINISH);
+            $this->handleAllFinishOfARole();
+        }
+        if($wasNotFinished && $stat['allFinished']) {
+            //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
+            $tua->setState(self::STATE_FINISH);
+            $this->handleAllFinish();
+        }
+        $tua->setState($originalState);
+        $this->handleUserAssociationDeleted();
+    }
+    
+    /**
      * can be triggered via API, valid triggers are currently
      * @param editor_Models_Task $task
      * @param unknown $trigger
@@ -1117,10 +1148,34 @@ abstract class editor_Workflow_Abstract {
      */
     protected function doFinish() {
         $this->doDebug(__FUNCTION__);
+        
+        $stat = $this->calculateFinish();
+        
+        if($stat['roleFirstFinished']) {
+            $this->handleFirstFinishOfARole();
+        }
+        if($stat['firstFinished']) {
+            $this->handleFirstFinish();
+        }
+        if($stat['roleAllFinished']) {
+            $this->handleAllFinishOfARole(); 
+        }
+        if($stat['allFinished']) {
+            $this->handleAllFinish(); 
+        }
+        $this->handleFinish();
+    }
+    
+    /**
+     * calculates which of the "finish" handlers can be called accordingly to the currently existing tuas of a task
+     * @return boolean[]
+     */
+    protected function calculateFinish() {
         $userTaskAssoc = $this->newTaskUserAssoc;
         $stat = $userTaskAssoc->getUsageStat();
         $allFinished = true;
         $roleAllFinished = true;
+        $roleFirstFinished = false;
         $sum = 0;
         foreach($stat as $entry) {
             $isRole = $entry['role'] === $userTaskAssoc->getRole();
@@ -1132,22 +1187,18 @@ abstract class editor_Workflow_Abstract {
                 $allFinished = false;
             }
             if($isRole && $isFinish && (int)$entry['cnt'] === 1) {
-                $this->handleFirstFinishOfARole(); 
+                $roleFirstFinished = true;
             }
             if($isFinish) {
                 $sum += (int)$entry['cnt'];
             }
         }
-        if($sum === 1) {
-            $this->handleFirstFinish();
-        }
-        if($roleAllFinished) {
-            $this->handleAllFinishOfARole(); 
-        }
-        if($allFinished) {
-            $this->handleAllFinish(); 
-        }
-        $this->handleFinish();
+        return [
+            'allFinished' => $allFinished,
+            'roleAllFinished' => $roleAllFinished,
+            'roleFirstFinished' => $roleFirstFinished,
+            'firstFinished' => $sum === 1,
+        ];
     }
     
     /**
@@ -1232,4 +1283,9 @@ abstract class editor_Workflow_Abstract {
      * will be called when a new task user association is created
      */
     abstract protected function handleUserAssociationAdded();
+    
+    /**
+     * will be called when a task user association is deleted
+     */
+    abstract protected function handleUserAssociationDeleted();
 }
