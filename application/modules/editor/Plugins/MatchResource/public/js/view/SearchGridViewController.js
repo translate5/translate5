@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.MatchResource.view.SearchGridViewController', {
         },
         controller:{
             '#ViewModes':{
-                viewModeChanged:'viewModeChangeEvent'
+                viewModeChanged: 'viewModeChangeEvent'
             }
         }
     },
