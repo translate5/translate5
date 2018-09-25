@@ -2536,13 +2536,13 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Tagmodi</source>
     <target>Tag modes</target>
 </trans-unit>
-<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2Vybg==">
-    <source>Segmentschriftgrad vergrößern</source>
-    <target>increase segment font-size</target>
+<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2VybiAoU1RSRyArICsp">
+    <source>Segmentschriftgrad vergrößern (STRG + +)</source>
+    <target>increase segment font-size (STRG + +)</target>
 </trans-unit>
-<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJu">
-    <source>Segmentschriftgrad verkleinern</source>
-    <target>decrease segment font-size</target>
+<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJuIChTVFJHICsgLSk=">
+    <source>Segmentschriftgrad verkleinern (STRG + -)</source>
+    <target>decrease segment font-size (STRG + -)</target>
 </trans-unit>
     </body>
   </file>

@@ -1294,8 +1294,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFs'><source>Terminologieportal</source><target>Terminologieportal</target></trans-unit>
 <trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='><source>Importarchiv herunterladen</source><target>Importarchiv herunterladen</target></trans-unit>
 <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IFBNIGluIGVpbmVyIG9kZXIgbWVocmVyZW4gQXVmZ2FiZW4u'><source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source><target>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</target></trans-unit>
-<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2Vybg=="><source>Segmentschriftgrad vergrößern</source><target>Segmentschriftgrad vergrößern</target></trans-unit>
-<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJu"><source>Segmentschriftgrad verkleinern</source><target>Segmentschriftgrad verkleinern</target></trans-unit>
+<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2VybiAoU1RSRyArICsp"><source>Segmentschriftgrad vergrößern (STRG + +)</source><target>Segmentschriftgrad vergrößern (STRG + +)</target></trans-unit>
+<trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJuIChTVFJHICsgLSk="><source>Segmentschriftgrad verkleinern (STRG + -)</source><target>Segmentschriftgrad verkleinern (STRG + -)</target></trans-unit>
   </body>
  </file>
 </xliff>
