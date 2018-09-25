@@ -222,6 +222,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
                   assoc.remove(toDel);
                   me.updateUsers(assoc);
                   me.fireEvent('removeUserAssoc', me, toDel, assoc);
+                  task.load();//reload only the task, not the whole task prefs, should be OK
                   Editor.MessageBox.addByOperation(op); //does nothing since content is not provided from server :(
                   Editor.MessageBox.addSuccess(me.messages.assocDeleted);
               },
