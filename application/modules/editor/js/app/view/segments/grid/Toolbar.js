@@ -175,7 +175,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
-                    type: 'zoom',
+                    type: 'segment-zoom',
                     itemId: 'zoomInBtn',
                     iconCls: 'ico-zoom-in',
                     tooltip: {
@@ -184,7 +184,7 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     }
                 },{
                     xtype: 'button',
-                    type: 'zoom',
+                    type: 'segment-zoom',
                     itemId: 'zoomOutBtn',
                     iconCls: 'ico-zoom-out',
                     tooltip: {

@@ -78,7 +78,7 @@ Ext.define('Editor.controller.ViewModes', {
             'gridpanel segmentsToolbar menucheckitem[group="tagMode"]' : {
                 click : 'handleTagButtonClick'
             },
-            'gridpanel segmentsToolbar button[type="zoom"]' : {
+            'button[type="segment-zoom"]' : {
                 click : 'handleTagZoomClick'
             },
             'segmentsHtmleditor': {
