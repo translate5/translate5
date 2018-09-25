@@ -39,3 +39,13 @@ span.notRecommended,
 span.supersededTerm,
 span.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
 body.fakedsel strong, body.fakedsel b {font-weight:normal;background:#b0b0b0;}
+
+/* segment grid font sizing */
+body.segment-size-1 {font-size: 7pt !important;line-height: 11px;}
+/* old details mode: */
+body.segment-size-2 {font-size: 9pt !important;line-height: 14px;}
+body.segment-size-3 {font-size: 11pt !important;line-height: 19px;}
+/* old ergonomic mode: */
+body.segment-size-4 {font-size: 13pt !important;line-height: 23px;}
+body.segment-size-5 {font-size: 16pt !important;line-height: 26px;}
+body.segment-size-6 {font-size: 19pt !important;line-height: 30px;}

@@ -130,12 +130,6 @@ div.single + div {
 #segment-grid span.term {
     text-decoration: underline;
 }
-.view-editor-font-size,
-#segment-grid .x-grid-row .x-grid-cell, 
-#segment-grid .x-grid-row-editor .x-form-display-field {
-  font-size:9pt !important;
-  line-height:14px;
-}
 
 #segment-grid .x-grid-row-editor .x-form-display-field {
     text-overflow: initial;
@@ -370,11 +364,25 @@ background-color: #EAF1FB;
 .comments-grid .comment .content {white-space: normal;display:block;}
 .comment .author, .comment .created, .comment .modified {font-size: 7pt; font-style: italic;line-height:10pt;}
 
+/* segment grid font sizing */
+body.segment-size-1 .segment-font-sizable .x-form-display-field,
+body.segment-size-1 .segment-font-sizable {font-size: 7pt !important;line-height: 11px;}
+/* old details mode: */
+body.segment-size-2 .segment-font-sizable .x-form-display-field,
+body.segment-size-2 .segment-font-sizable {font-size: 9pt !important;line-height: 14px;}
+body.segment-size-3 .segment-font-sizable .x-form-display-field,
+body.segment-size-3 .segment-font-sizable {font-size: 11pt !important;line-height: 19px;}
+/* old ergonomic mode: */
+body.segment-size-4 .segment-font-sizable .x-form-display-field,
+body.segment-size-4 .segment-font-sizable {font-size: 13pt !important;line-height: 23px;}
+body.segment-size-5 .segment-font-sizable .x-form-display-field,
+body.segment-size-5 .segment-font-sizable {font-size: 16pt !important;line-height: 26px;}
+body.segment-size-6 .segment-font-sizable .x-form-display-field,
+body.segment-size-6 .segment-font-sizable {font-size: 19pt !important;line-height: 30px;}
+
+/* hier vermutlich anstatt der fontsize die lineheight auf 14px fix dazu! */
 #segment-grid.ergonomic .x-grid-row .x-grid-cell.comments-field {font-size:13pt !important;}
 
-.ergonomic-font,
-#segment-grid.ergonomic .x-grid-row .x-grid-cell, 
-#segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {font-size: 13pt !important;line-height: 23px;}
 
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add, 
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {display:none;}

@@ -41,6 +41,7 @@ Ext.define('Editor.view.segments.RowEditor', {
     ],
 
     itemId: 'roweditor',
+    userCls: 'segment-font-sizable',
     liveDrag: true,
     rowToEditOrigHeight: 0,
     editorExtraHeight:10, // 20,

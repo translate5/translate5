@@ -54,6 +54,8 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_qmsummaryBtn: '#UT#MQM',
     item_qmsummaryTooltip: '#UT#MQM Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
+    item_zoomIn: '#UT#Segmentschriftgrad vergrößern',
+    item_zoomOut: '#UT#Segmentschriftgrad verkleinern',
     item_clearSortAndFilterBtn: '#UT#Tabelle zurücksetzen',
     item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
     item_watchListFilterBtn: '#UT#Lesezeichen',
@@ -168,6 +170,26 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             tagMode: 'full',
                             group: 'tagMode'
                         }]
+                    }
+                },{
+                    xtype: 'tbseparator'
+                },{
+                    xtype: 'button',
+                    type: 'zoom',
+                    itemId: 'zoomInBtn',
+                    iconCls: 'ico-zoom-in',
+                    tooltip: {
+                        text: me.item_zoomIn,
+                        showDelay: 0
+                    }
+                },{
+                    xtype: 'button',
+                    type: 'zoom',
+                    itemId: 'zoomOutBtn',
+                    iconCls: 'ico-zoom-out',
+                    tooltip: {
+                        text: me.item_zoomOut,
+                        showDelay: 0
                     }
                 },{
                     xtype: 'tbseparator'
