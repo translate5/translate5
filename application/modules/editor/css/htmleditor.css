@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 body{box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;cursor:text;font-size:10px;}
-body.ergonomic {font-size:13pt !important; line-height: 23px !important;}
 body.hide-tag img{display:none;}
 img {vertical-align:middle;cursor: pointer;}
 img + img {margin-left:1px;}

@@ -81,9 +81,6 @@ Ext.define('Editor.controller.ViewModes', {
             'button[type="segment-zoom"]' : {
                 click : 'handleTagZoomClick'
             },
-            'segmentsHtmleditor': {
-                initialize: 'toggleEditorErgonomicMode'
-            },
             '#segmentgrid': {
                 beforestartedit: 'checkModeBeforeEdit'
             }
@@ -236,7 +233,6 @@ Ext.define('Editor.controller.ViewModes', {
         me.getShortTagBtn().setChecked(true);
 
         //editMode und viewMode
-        me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
         if(me.isErgonomicMode()){
             me.showNonErgonomicElements();
         }
@@ -318,40 +314,15 @@ Ext.define('Editor.controller.ViewModes', {
         Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID); //delete if already exists!
         Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .segment-tag-column.x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
         
-        //ergoOnly, others remove cls
-        wasAlreadyErgo || grid.addCls(me.self.MODE_ERGONOMIC);
-
         //ergoOnly others, with other mode
         wasAlreadyErgo || me.setViewMode(me.self.MODE_ERGONOMIC);
         wasAlreadyErgo || me.setSegmentSize(4);
 
         grid.view.refresh();
         me.handleTagButtonClick('short');
-        me.toggleEditorErgonomicMode();
         me.saveAlreadyOpened();
 
         wasAlreadyErgo || me.fireEvent('viewModeChanged',me);
-    },
-    /**
-     * sets and removes the ergonomic view for the editor
-     */
-    toggleEditorErgonomicMode: function() {
-        var me = this,
-            editor = me.getSegmentsHtmleditor(),
-            body;
-        
-        if(!editor || !editor.rendered) {
-            return;
-        }
-        
-        body = Ext.fly(editor.getEditorBody());
-        if(!body) {
-            return;
-        }
-        body.removeCls(me.self.MODE_ERGONOMIC);
-        if(me.isErgonomicMode()){
-            body.addCls(me.self.MODE_ERGONOMIC);
-        }
     },
     /**
      * show or expand all columns and areas not needed in ergonomic mode, which have been visible before
@@ -414,7 +385,6 @@ Ext.define('Editor.controller.ViewModes', {
             ed.reposition();
             ed.setEditorHeight();
         }
-        this.toggleEditorErgonomicMode();
     },
     /**
      * Hilfsfunktion zum Setzen des Tag Modus
