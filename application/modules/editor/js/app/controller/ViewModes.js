@@ -121,13 +121,13 @@ Ext.define('Editor.controller.ViewModes', {
         ROW_HEIGHT_DEFAULT: 15,
     },
     isFullTag: function(){
-        return (this.currentTagMode == this.TAG_FULL);
+        return (this.currentTagMode == this.self.TAG_FULL);
     },
     isShortTag: function(){
-        return (this.currentTagMode == this.TAG_SHORT);
+        return (this.currentTagMode == this.self.TAG_SHORT);
     },
     isHideTag: function(){
-        return (this.currentTagMode == this.TAG_HIDE);
+        return (this.currentTagMode == this.self.TAG_HIDE);
     },
     handleViewportReady: function(grid) {
         //start editor in normal(ergonomic) mode if configured, respect before set readonly mode

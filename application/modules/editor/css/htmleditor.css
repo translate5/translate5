@@ -48,3 +48,12 @@ body.segment-size-3 {font-size: 11pt !important;line-height: 19px;}
 body.segment-size-4 {font-size: 13pt !important;line-height: 23px;}
 body.segment-size-5 {font-size: 16pt !important;line-height: 26px;}
 body.segment-size-6 {font-size: 19pt !important;line-height: 30px;}
+
+body.segment-size-1 img {height: 11px;}
+/* old details mode: */
+body.segment-size-2 img {height: 14px;}
+body.segment-size-3 img {height: 19px;}
+/* old ergonomic mode: */
+body.segment-size-4 img {height: 23px;}
+body.segment-size-5 img {height: 26px;}
+body.segment-size-6 img {height: 30px;}

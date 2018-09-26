@@ -148,9 +148,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     var me = this,
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
-        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;"></body></html>',
+        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;" class="{3}"></body></html>',
         additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=16" />'; //disable Img resizing
-    return Ext.String.format(body, me.iframePad, additionalCss, dir);
+    return Ext.String.format(body, me.iframePad, additionalCss, dir, me.currentSegmentSize);
   },
   /**
    * overriding default method since under some circumstances this.getWin() returns null which gives an error in original code
@@ -308,6 +308,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var body = Ext.fly(this.getEditorBody());
       body.removeCls(oldSize);
       body.addCls(size);
+      this.currentSegmentSize = size;
   },
   /**
    * converts the given HTML String to HTML ready for the Editor (div>span to img tags)
