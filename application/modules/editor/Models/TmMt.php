@@ -123,6 +123,32 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * loads the ids and names of all TMs for the given serviceName
+     * @param string $serviceName
+     * @return array
+     */
+    public function loadByServiceName(string $serviceName) {
+        $db = $this->db;
+        $s = $db->select()
+            ->from($db->info($db::NAME), ['id','name'])
+            ->where('LEK_languageresources_tmmt.serviceName LIKE ?', $serviceName);
+        return $this->db->fetchAll($s)->toArray(); 
+    }
+    
+    /**
+     * loads the ids and names of all TMs for the given name
+     * @param string $name
+     * @return array
+     */
+    public function loadByName(string $name) {
+        $db = $this->db;
+        $s = $db->select()
+        ->from($db->info($db::NAME), ['id','name'])
+        ->where('LEK_languageresources_tmmt.name LIKE ?', $name);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /**
      * returns the resource used by this tmmt instance
      * @return editor_Models_Resource
      */
