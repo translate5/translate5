@@ -169,16 +169,16 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
                 'FileName: '.$this->fileName,
                 ''
             ];
-            if(empty($this->errors['source-not-found'])){
+            if(!empty($this->errors['source-not-found'])){
                 $errors[] = 'For the following MIDs the source segment was not found to the MID of relais file. The Relais segment was ignored.';
                 $errors[] = join($this->errors['source-not-found'])."\n";
             }
-            if(empty($this->errors['source-different'])){
+            if(!empty($this->errors['source-different'])){
                 $errors[] = 'Source of relais file is not identical with source of translated file.';
                 $errors[] = 'Relais target is left empty.';
                 $errors[] = join($this->errors['source-different'])."\n";
             }
-            if(empty($this->errors['source-missing'])){
+            if(!empty($this->errors['source-missing'])){
                 $errors[] = 'Errors in adding relais segment: Source of original segment and source of relais segment are identical,';
                 $errors[] = 'but still original Segment not found in the database:';
                 $errors[] = join($this->errors['source-missing'])."\n";
