@@ -64,6 +64,12 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     protected $configuredCompareMode = 0;
     
     /**
+     * Error Container
+     * @var array
+     */
+    protected $errors = [];
+    
+    /**
      * Definitions of the different relais compare mode flags
      * @var integer
      */
@@ -105,8 +111,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         try {
             $this->segment->loadByFileidMid($this->fileId, $mid);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            $log->logError('Source segment to MID of relais file not found.',  'Source segment to MID of relais file not found. Relais segment ignored. FileName: '.$this->fileName.' / mid: '.$parser->getMid());
+            $this->errors[] = 'Source segment to MID of relais file not found. Relais segment ignored. FileName: '.$this->fileName.' / mid: '.$parser->getMid();
             return false;
         }
         $sourceContent = $this->normalizeSegmentData($this->segment->getFieldOriginal($source));
@@ -114,8 +119,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         
         //equal means here, that also the tags must be equal in content and position
         if($sourceContent !== $relaisContent){
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            $log->logError('Source of relais file not identical with source of translated file.',  'Source of relais file is not identical with source of translated file. Relais target is left empty. FileName: '.$this->fileName.' / mid: '.$parser->getMid().' / Source content of translated file: '.$sourceContent.' / Source content of relais file: '.$data[$source]["original"]);
+            $this->errors[] = 'Source of relais file is not identical with source of translated file. Relais target is left empty. FileName: '.$this->fileName.' / mid: '.$parser->getMid().' / Source content of translated file: '.$sourceContent.' / Source content of relais file: '.$data[$source]["original"];
             return false;
         }
         
@@ -123,9 +127,7 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
             $this->segment->addFieldContent($this->relaisField, $this->fileId, $mid, $data[$target]);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError('Errors in adding relais segment: Source of original segment and source of relais segment are identical, but still original Segment not found in the database!',  'Segment Info:'.$e->getMessage());
+            $this->errors[] = 'Errors in adding relais segment: Source of original segment and source of relais segment are identical, but still original Segment not found in the database! Segment Info:'.$e->getMessage();
         }
         return false;
     }
@@ -158,6 +160,12 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser) {
         $this->saveFieldWidth($parser);
+        
+        if(!empty($this->errors)) {
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $log->logError('Errors in processing relais files', join("\n", $this->errors));
+        }
     }
     
     /**
