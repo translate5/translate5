@@ -71,14 +71,14 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
      * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean
      */
-    abstract public function addTm(array $fileinfo = null);
+    abstract public function addTm(array $fileinfo = null,array $params=null);
     
     /**
      * Adds the given file to the underlying system into an already existing TM
      * @param array $fileinfo as given from upload (tmp_name, name, type, size)
      * @return boolean
      */
-    abstract public function addAdditionalTm(array $fileinfo = null);
+    abstract public function addAdditionalTm(array $fileinfo = null,array $params=null);
     
     /**
      * Gets the TM file content from the underlying system

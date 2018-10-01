@@ -681,6 +681,64 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
        ])>0;
     }
 
+    
+    /***
+     * Update language assoc for given collections. The langages are merged from exsisting terms per collection.
+     * @param array $collectionIds
+     */
+    public function updateAssocLanguages(array $collectionIds=null){
+        $s=$this->db->select()
+        ->from(array('t' =>'LEK_terms'), array('t.language','t.collectionId'))
+        ->join(array('l' =>'LEK_languages'), 't.language = l.id', 'rfc5646');
+        
+        if(!empty($collectionIds)){
+            $s->where('t.collectionId IN(?)',$collectionIds);
+        }
+        
+        $s->group('t.collectionId')->group('t.language')->setIntegrityCheck(false);
+        
+        $ret=$this->db->fetchAll($s)->toArray();
+        
+        $data=[];
+        foreach($ret as $lng) {
+            if(!isset($data[$lng['collectionId']])){
+                $data[$lng['collectionId']]=[];
+            }
+            array_push($data[$lng['collectionId']], $lng);
+        }
+        
+        foreach($data as $key=>$value) {
+            $alreadyProcessed = array();
+            foreach ($value as $x) {
+                foreach ($value as $y) {
+                    //keep track of what is already processed
+                    $combination = array($x['language'], $y['language']);
+                    
+                    //it is not the same number and thay are not already processed
+                    if ($x['language'] === $y['language'] || in_array($combination, $alreadyProcessed)) {
+                        continue;
+                    }
+                    //Add it to the list of what you've already processed
+                    $alreadyProcessed[] = $combination;
+                    
+                    //save the language combination
+                    $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+                    /* @var $model editor_Models_LanguageResources_Languages */
+                    
+                    $model->setSourceLang($x['language']);
+                    $model->setSourceLangRfc5646($x['rfc5646']);
+                    
+                    $model->setTargetLang($y['language']);
+                    $model->setTargetLangRfc5646($y['rfc5646']);
+                    
+                    $model->setLanguageResourceId($key);
+                    $model->save();
+                    
+                }
+            }
+        }
+    }
+
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array

@@ -36,8 +36,8 @@ END LICENSE AND COPYRIGHT
  * @method integer getCustomerId() getCustomerId()
  * @method void setCustomerId() setCustomerId(integer $customerId)
  * 
- * @method integer getDefaultResource() getDefaultResource()
- * @method void setDefaultResource() setDefaultResource(integer $defaultResource)
+ * @method integer getUseAsDefault() getUseAsDefault()
+ * @method void setUseAsDefault() setUseAsDefault(integer $useAsDefault)
  * 
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract {
@@ -46,33 +46,25 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_CustomerAssoc';
     
     /***
-     * Save customer assoc for the given language resource
+     * Save customer assoc from the request parametars for the given language resource
      * @param mixed $data
      */
-    public function saveAssoc($data){
+    public function saveAssocRequest($data){
         if(!$this->checkUpdateSaveData($data)){
             return;
         }
         
-        //the data is in comma separated values
-        $customers=explode(',',$data['resourcesCustomersHidden']);
-        foreach ($customers as $customer){
-            if(empty($customer)){
-                continue;
-            }
-            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            /* @var $model editor_Models_LanguageResources_CustomerAssoc */
-            $model->setCustomerId($customer);
-            $model->setLanguageResourceId($data['id']);
-            $model->save();
-        }
+        //the data is in json
+        $customers=json_decode($data['resourcesCustomersHidden']);
+        
+        $this->addAssocs($customers, $data['id']);
     }
     
     /***
-     * Update customer assoc.
+     * Update customer assoc from the request parametars.
      * @param mixed $data
      */
-    public function updateAssoc($data){
+    public function updateAssocRequest($data){
         if(!$this->checkUpdateSaveData($data)){
             return;
         }
@@ -82,9 +74,24 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         $this->db->delete($deleteParams);
         
         //save the new data
-        $this->saveAssoc($data);
+        $this->saveAssocRequest($data);
     }
     
+    /***
+     * Add assoc record to the database
+     * @param mixed $customers
+     * @param int $languageResourceId
+     */
+    public function addAssocs($customers,$languageResourceId){
+        foreach ($customers as $customer){
+            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            /* @var $model editor_Models_LanguageResources_CustomerAssoc */
+            $model->setCustomerId(isset($customer->customerId) ? $customer->customerId : $customer);
+            $model->setLanguageResourceId($languageResourceId);
+            $model->setUseAsDefault(isset($customer->useAsDefault) ? $customer->useAsDefault : 0);
+            $model->save();
+        }
+    }
     /***
      * Check if the update or save data is valid.
      * 
@@ -96,11 +103,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         if(is_object($data)){
             $data=json_decode(json_encode($data), true);
         }
-        //ivalida data when not resourceCustomer is set or not assoc id
-        if(!isset($data['resourcesCustomersHidden']) || !isset($data['id'])){
-            return false;;
-        }
-        return true;
+        return isset($data['resourcesCustomersHidden']) && isset($data['id']);
     }
     
     /***
@@ -131,6 +134,22 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         return $this->db->fetchAll($s)->toArray();
     }
     
+    
+    /***
+     * Get all default assocs by $customerIds
+     * If no $customerIds is provided, all default assoc will be loaded
+     * @param array $customerIds
+     * @return array
+     */
+    public function loadByCustomerIdsDefault($customerIds=array()){
+        $s=$this->db->select();
+        if(!empty($customerIds)){
+            $s->where('customerId IN(?)',$customerIds);
+        }
+        $s->where('useAsDefault=1');
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
     /***
      * Get all customers for $languageResourceId (languageResourceId/tmmtid)
      * @param integer $languageResourceId
@@ -156,7 +175,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
             if(!isset($retval[$assoc['languageResourceId']])){
                 $retval[$assoc['languageResourceId']]=[];
             }
-            array_push($retval[$assoc['languageResourceId']], $assoc['customerId']);
+            array_push($retval[$assoc['languageResourceId']],$assoc);
         }
         return $retval;
     }

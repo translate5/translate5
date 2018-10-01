@@ -43,11 +43,10 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getFileName() getFileName()
  * @method void setFileName() setFileName(string $name)
- * @method integer getDefaultCustomer() getDefaultCustomer()
- * @method void setDefaultCustomer() setDefaultCustomer(integer $defaultCustomer)
  * @method string getLabelText() getLabelText()
  * @method void setLabelText() setLabelText(string $labelText)
- * 
+ * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
+ * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(integer $autoCreatedOnImport)
  */
 class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     
@@ -225,7 +224,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
         if(count($res)==1){
             return $res[0][$fieldName];
         }
-        return $res;
+        return array_column($res, $fieldName);
     }
     
     /***
@@ -252,7 +251,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return array|string
      */
     public function getSourceLang(){
-        return $this->getLanguageByField('sourceLangRfc5646');
+        return $this->getLanguageByField('sourceLang');
     }
     
     /***
@@ -261,6 +260,6 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return array|string
      */
     public function getTargetLang(){
-        return $this->getLanguageByField('targetLangRfc5646');
+        return $this->getLanguageByField('targetLang');
     }
 }

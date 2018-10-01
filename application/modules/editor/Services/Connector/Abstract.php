@@ -53,6 +53,20 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $resultList;
 
+    /***
+     * connector source language
+     * @var integer
+     */
+    protected $sourceLang;
+    
+    
+    /***
+     * connector target language
+     * @var integer
+     */
+    protected $targetLang;
+    
+    
     /**
      * initialises the internal result list
      */
@@ -72,7 +86,9 @@ abstract class editor_Services_Connector_Abstract {
      * Link this Connector Instance to the given Tmmt and its resource
      * @param editor_Models_TmMt $tmmt
      */
-    public function connectTo(editor_Models_TmMt $tmmt) {
+    public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
+        $this->sourceLang=$sourceLang;
+        $this->targetLang=$targetLang;
         $this->tmmt = $tmmt;
         $this->resultList->setTmmt($tmmt);
     }
@@ -123,15 +139,6 @@ abstract class editor_Services_Connector_Abstract {
      * @return editor_Services_ServiceResult
      */
     abstract public function search(string $searchString, $field = 'source', $offset = null);
-    
-    /***
-     * Search resources provided by external api where the params are used by the external api
-     * 
-     * @param string $searchString
-     * @param array $params
-     * @return editor_Services_ServiceResult
-     */
-    abstract public function searchWithParam(string $searchString, array $params);
     
     /**
      * @return the status of the connected resource and additional information if there is some

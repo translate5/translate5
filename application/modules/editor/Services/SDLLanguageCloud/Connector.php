@@ -41,8 +41,8 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::connectTo()
      */
-    public function connectTo(editor_Models_TmMt $tmmt) {
-        parent::connectTo($tmmt);
+    public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($tmmt,$sourceLang=null,$targetLang=null);
         $class = 'editor_Services_SDLLanguageCloud_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$tmmt]);
     }
@@ -74,17 +74,6 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     public function query(editor_Models_Segment $segment) {
         throw new BadMethodCallException("The SLDLanguageCloud TM Connector does not support query requests");
     }
-    
-    
-    /***
-     * Search the api with given params(sengine or source/target language)
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::searchWithParam()
-     */
-    public function searchWithParam(string $searchString, array $params){
-        
-    }
-   
     
     /**
      * (non-PHPdoc)

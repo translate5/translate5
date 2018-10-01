@@ -71,13 +71,17 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * (non-PHPdoc)
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(array $fileinfo){
+    public function addTm(array $fileinfo,array $params=null){
         $this->uploadedFile = $fileinfo['tmp_name'];
         //do nothing here, since we need the entity ID to save the TM
         return true;
     }
     
-    public function addAdditionalTm($filename) {
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::addAdditionalTm()
+     */
+    public function addAdditionalTm(array $fileinfo = null,array $params=null){
         
     }
     

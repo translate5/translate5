@@ -1005,7 +1005,6 @@ Ext.define('Editor.controller.Localizer', {
             taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Sprachressourcen');?>',
             exportTm: '<?php echo $this->translate->_('als TM Datei exportieren');?>',
             exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>',
-            defaultCustomerMessage: '<?php echo $this->translate->_('Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?');?>'
         }
     });
     
@@ -1045,8 +1044,13 @@ Ext.define('Editor.controller.Localizer', {
             colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
-            customers: '<?php echo $this->translate->_('Kunden');?>'
+            useAsDefault: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>',
+            mergeTerms: '<?php echo $this->translate->_('Merge terms');?>',
+            deleteTermEntriesDate: '<?php echo $this->translate->_('Delete old term entries');?>',
+            deleteTermEitriesImport: '<?php echo $this->translate->_('Delete entries older then import');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
         }
     });
     
@@ -1059,12 +1063,18 @@ Ext.define('Editor.controller.Localizer', {
             source: '<?php echo $this->translate->_('Quellsprache');?>',
             target: '<?php echo $this->translate->_('Zielsprache');?>',
             file: '<?php echo $this->translate->_('TM-Datei');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
             colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
-            customers: '<?php echo $this->translate->_('Kunden');?>'
+            useAsDefault: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>',
+            mergeTerms: '<?php echo $this->translate->_('Merge terms');?>',
+            deleteTermEntriesDate: '<?php echo $this->translate->_('Delete old term entries');?>',
+            deleteTermEitriesImport: '<?php echo $this->translate->_('Delete entries older then import');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
         }
     });
     
@@ -1153,7 +1163,9 @@ Ext.define('Editor.controller.Localizer', {
             },
             taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             customers: '<?php echo $this->translate->_('Kunden');?>',
-        	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>'
+        	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
+        	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+        	useAsDefaultTooltip: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>'
         }
     });
     
@@ -1168,6 +1180,22 @@ Ext.define('Editor.controller.Localizer', {
             importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
             cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.ImportCollectionWindow", {
+        override: "Editor.view.LanguageResources.ImportCollectionWindow",
+        strings: {
+            file: '#UT#TBX-Datei',
+            title: '#UT#TBX Datei importieren',
+            importTbx: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen',
+            importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
+            importSuccess: '#UT#Weitere Term-Collection Daten erfolgreich importiert!',
+            save: '#UT#Speichern',
+            cancel: '#UT#Abbrechen',
+            mergeTerms:'#UT#Merge terms',
+            deleteTermEntriesDate:'#UT#Delete old term entries',
+            deleteTermEitriesImport:'#UT#Delete entries older then import'
         }
     });
     
