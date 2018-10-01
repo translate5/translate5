@@ -415,6 +415,16 @@ Ext.override(Ext.view.Table, {
 });
 
 /**
+ * TRANSLATE-1396: Remove "C:\fakepath\" from task name
+ */
+Ext.override(Ext.form.field.File, {
+    onChange: function (newValue, oldValue) {
+        this.callParent([newValue, oldValue]);
+        this.inputEl.dom.value = newValue.replace("C:\\fakepath\\","");
+    }
+});
+
+/**
  * Override BufferedRenderer due Bugs in ExtJS 6.2.0 (TRANSLATE-1128 and TRANSLATE-1233) 
  * Bugs are fixed in the version 6.2.2, so the whole override can be removed on an extjs update 
  */
