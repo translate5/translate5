@@ -66,7 +66,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             notloaded: '#UT#verfügbar'
         },
         customers:'#UT#Kunden',
-        defaultCustomer:'#UT#Standardkunde',
+        useAsDefault:'#UT#Standardmässig aktiv für',
+        useAsDefaultTooltip:'#UT#Language Ressource standardmässig aktiv für',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
     cls:'tmOverviewPanel',
@@ -126,13 +127,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
-                    dataIndex:'defaultCustomer',
+                    dataIndex:'useAsDefault',
                     filter: {
                         type: 'string'
                     },
-                    text:me.strings.defaultCustomer,
+                    text:me.strings.useAsDefault,
+                    tooltip:me.strings.useAsDefaultTooltip,
                     renderer:me.defaultCustomersRenderer
-                },{
+                },
+                {
                     xtype: 'gridcolumn',
                     width: 100,
                     dataIndex: 'color',
@@ -293,28 +296,34 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if(!value || value.length<1){
             return '';
         }
-        var count=value.length,
-            tplCustomers=[],
-            customerStore=Ext.StoreManager.get('customersStore');
-
-        for(var i=0;i<value.length;i++){
-            var rec=customerStore.getById(value[i]);
-            tplCustomers.push(rec.get('name'));
-        }
-        meta.tdAttr = 'data-qtip="'+tplCustomers.join(',')+'"';
-        return count;
+        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value).join(',')+'"';
+        return value.length;
     },
 
     /**
      * Renders the default assigned customer by name
      */
     defaultCustomersRenderer:function(value,meta,record){
-        if(!value){
+        if(!value || value.length<1){
             return '';
         }
-        var customerStore=Ext.StoreManager.get('customersStore'),
-            rec=customerStore.getById(value);
+        return this.getCustomersNames(value).join(',');
+    },
 
-        return rec ? rec.get('name') : '';
+    /**
+     * Get customer names by costomer id
+     */
+    getCustomersNames:function(customerIds){
+        if(!customerIds || customerIds.length<1){
+            return '';
+        }
+        var names=[],
+            customerStore=Ext.StoreManager.get('customersStore');
+
+        for(var i=0;i<customerIds.length;i++){
+            var rec=customerStore.getById(customerIds[i]);
+            names.push(rec.get('name'));
+        }
+        return names
     }
 });

@@ -32,8 +32,14 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         'Ext.ux.colorpick.Button',
         'Ext.ux.colorpick.Field',
         'Editor.view.admin.customer.TagField',
-        'Editor.view.admin.customer.UserCustomersCombo'
+        'Editor.view.admin.customer.UserCustomersCombo',
+        'Editor.view.LanguageResources.TmWindowViewModel',
+        'Editor.view.LanguageResources.TmWindowViewController'
     ],
+    controller: 'tmwindowviewcontroller',
+    viewModel: {
+        type: 'tmwindow'
+    },
     alias: 'widget.editTmWindow',
     itemId: 'editTmWindow',
     strings: {
@@ -48,10 +54,19 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen',
         customers:'#UT#Kunden',
-        defaultCustomer:'#UT#Standardkunde'
+        useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
+        mergeTerms:'#UT#Merge terms',
+        deleteTermEntriesDate:'#UT#Delete old term entries',
+        deleteTermEitriesImport:'#UT#Delete entries older then import',
+        collection:'#UT#TBX-Datei',
+        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },
     
-    height : 420,
+    listeners:{
+        render:'onTmWindowRender'
+    },
+
+    height : 600,
     width : 500,
     modal : true,
     layout:'fit',
@@ -85,6 +100,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                 padding: 5,
                 ui: 'default-frame',
                 defaults: defaults,
+                autoScroll: true,
                 items: [{
                     xtype: 'displayfield',
                     name:'resourceId',
@@ -108,8 +124,37 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     toolTip: me.strings.target,
                     fieldLabel: me.strings.target
                 }, langField),{
+                    xtype:'checkbox',
+                    bind:{
+                        hidden:'{!isTermCollectionResource}',
+                        disabled:'{!isTermCollectionResource}'
+                    },
+                    fieldLabel: me.strings.mergeTerms,
+                    itemId:'mergeTerms',
+                    value:true
+                },{
+                    xtype:'datefield',
+                    fieldLabel: me.strings.deleteTermEntriesDate,
+                    itemId:'deleteEntriesModifiedOlderThan',
+                    bind:{
+                        hidden:'{!isTermCollectionResource}',
+                        disabled:'{!isTermCollectionResource}'
+                    }
+                },{
+                    xtype:'checkbox',
+                    fieldLabel: me.strings.deleteTermEitriesImport,
+                    itemId:'deleteEntriesOlderThanCurrentImport',
+                    value:false,
+                    bind:{
+                        hidden:'{!isTermCollectionResource}',
+                        disabled:'{!isTermCollectionResource}'
+                    }
+                },{
                     xtype:'customers',
                     fieldLabel:me.strings.customers,
+                    listeners:{
+                        change:'onCustomersTagFieldChange'
+                    },
                     itemId:'resourcesCustomers',
                     name:'resourcesCustomers',
                     dataIndex:'resourcesCustomers',
@@ -118,10 +163,17 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     xtype:'hiddenfield',
                     name:'resourcesCustomersHidden'
                 },{
-                    xtype:'usercustomerscombo',
-                    name:'defaultCustomer',
-                    fieldLabel:me.strings.defaultCustomer,
-                    dataIndex:'defaultCustomer'
+                    xtype:'tagfield',
+                    name:'useAsDefault',
+                    itemId:'useAsDefault',
+                    fieldLabel:me.strings.useAsDefault,
+                    store:Ext.create('Ext.data.Store', {
+                        model:'Editor.model.admin.Customer',
+                    }),
+                    displayField: 'name', 
+                    valueField: 'id', 
+                    queryMode: 'local', 
+                    dataIndex:'useAsDefault'
                 },{
                     xtype: 'colorfield',
                     fieldLabel: me.strings.color,
@@ -164,6 +216,10 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
      * @param record
      */
     loadRecord: function(record) {
-        this.down('form').loadRecord(record);
+        var me=this,
+            vm=me.getViewModel();
+
+        me.down('form').loadRecord(record);
+        vm.set('serviceName',record.get('serviceName'));
     }
 });

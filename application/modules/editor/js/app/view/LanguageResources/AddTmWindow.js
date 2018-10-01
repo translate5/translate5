@@ -34,9 +34,13 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         'Editor.view.admin.customer.TagField',
         'Editor.view.admin.customer.UserCustomersCombo',
         'Editor.view.LanguageResources.EngineCombo',
-        'Editor.view.LanguageResources.TmWindowViewController'
+        'Editor.view.LanguageResources.TmWindowViewController',
+        'Editor.view.LanguageResources.TmWindowViewModel'
     ],
     controller: 'tmwindowviewcontroller',
+    viewModel: {
+        type: 'tmwindow'
+    },
     alias: 'widget.addTmWindow',
 
     itemId: 'addTmWindow',
@@ -53,12 +57,20 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen',
         customers:'#UT#Kunden',
-        defaultCustomer:'#UT#Standardkunde'
+        useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
+        mergeTerms:'#UT#Merge terms',
+        deleteTermEntriesDate:'#UT#Delete old term entries',
+        deleteTermEitriesImport:'#UT#Delete entries older then import',
+        collection:'#UT#TBX-Datei',
+        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },
-    height : 420,
+    height : 600,
     width : 500,
     modal : true,
     layout:'fit',
+
+    tmxRegex: /\.(tm|tmx)$/i,
+    tbxRegex: /\.(tbx)$/i,
 
     listeners:{
         render:'onTmWindowRender'
@@ -102,8 +114,10 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                 },{
                     xtype:'sdlenginecombo',
                     itemId:'sdlEngine',
-                    hidden:true,
-                    disabled:true,
+                    bind:{
+                        hidden:'{!isSdlResource}',
+                        disabled:'{!isSdlResource}'
+                    },
                     allowBlank: false,
                     listeners:{
                         change:'onSdlEngineComboChange'
@@ -120,6 +134,10 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     listeners:{
                         change:'onLanguageComboChange'
                     },
+                    bind:{
+                        hidden:'{isTermCollectionResource}',
+                        disabled:'{isTermCollectionResource}'
+                    },
                     allowBlank: false,
                     toolTip: me.strings.source,
                     //each combo needs its own store instance, see EXT6UPD-8
@@ -130,26 +148,69 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     listeners:{
                         change:'onLanguageComboChange'
                     },
+                    bind:{
+                        hidden:'{isTermCollectionResource}',
+                        disabled:'{isTermCollectionResource}'
+                    },
                     allowBlank: false,
                     toolTip: me.strings.target,
                     //each combo needs its own store instance, see EXT6UPD-8
                     store:Ext.create(Editor.store.admin.Languages),
                     fieldLabel: me.strings.target
                 }, langCombo),{
+                    xtype:'checkbox',
+                    bind:{
+                        hidden:'{!isTermCollectionResource}',
+                        disabled:'{!isTermCollectionResource}'
+                    },
+                    fieldLabel: me.strings.mergeTerms,
+                    itemId:'mergeTerms',
+                    name:'mergeTerms',
+                    value:true
+                },{
+                    xtype:'datefield',
+                    fieldLabel: me.strings.deleteTermEntriesDate,
+                    itemId:'deleteEntriesModifiedOlderThan',
+                    name:'deleteEntriesModifiedOlderThan',
+                    bind:{
+                        hidden:'{!isTermCollectionResource}',
+                        disabled:'{!isTermCollectionResource}'
+                    }
+                },{
+                    xtype:'checkbox',
+                    fieldLabel: me.strings.deleteTermEitriesImport,
+                    itemId:'deleteEntriesOlderThanCurrentImport',
+                    name:'deleteEntriesOlderThanCurrentImport',
+                    value:false,
+                    bind:{
+                        hidden:'{!isTermCollectionResource}',
+                        disabled:'{!isTermCollectionResource}'
+                    }
+                },{
                     xtype:'customers',
+                    name:'resourcesCustomers',
+                    listeners:{
+                        change:'onCustomersTagFieldChange'
+                    },
                     fieldLabel:me.strings.customers,
                     itemId:'resourcesCustomers',
-                    name:'resourcesCustomers',
                     dataIndex:'resourcesCustomers',
                     store:'userCustomers'
                 },{
                     xtype:'hiddenfield',
                     name:'resourcesCustomersHidden'
                 },{
-                    xtype:'usercustomerscombo',
-                    name:'defaultCustomer',
-                    fieldLabel:me.strings.defaultCustomer,
-                    dataIndex:'defaultCustomer'
+                    xtype:'tagfield',
+                    //name:'useAsDefault',
+                    itemId:'useAsDefault',
+                    fieldLabel:me.strings.useAsDefault,
+                    store:Ext.create('Ext.data.Store', {
+                        model:'Editor.model.admin.Customer',
+                    }),
+                    displayField: 'name', 
+                    valueField: 'id', 
+                    queryMode: 'local', 
+                    dataIndex:'useAsDefault'
                 },{
                     xtype: 'hiddenfield',
                     name: 'serviceType',
@@ -179,11 +240,14 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     xtype: 'filefield',
                     name: 'tmUpload',
                     allowBlank: true,
-                    toolTip: me.strings.file,
-                    regex: /\.(tm|tmx)$/i,
-                    regexText: me.strings.importTmxType,
                     disabled:true,
-                    fieldLabel: me.strings.file
+                    toolTip: me.strings.file,
+                    regex:me.tmxRegex,
+                    regexText: me.strings.importTmxType,
+                    fieldLabel: me.strings.file,
+                    bind:{
+                        fieldLabel:'{uploadLabel}' //me.strings.file
+                    }
                 }]
             }],
             dockedItems : [{

@@ -44,7 +44,8 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.AddTmWindow',
         'Editor.view.LanguageResources.ImportTmWindow',
         'Editor.view.LanguageResources.EditTmWindow',
-        'Editor.view.LanguageResources.TaskGridWindow'
+        'Editor.view.LanguageResources.TaskGridWindow',
+        'Editor.view.LanguageResources.ImportCollectionWindow'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.TmMt'],
     stores:[
@@ -64,8 +65,7 @@ Ext.define('Editor.controller.TmOverview', {
         noResourcesAssigned: '#UT#Keine Sprachressourcen zugewiesen.',
         taskassocgridcell:'#UT#Zugewiesene Sprachressourcen',
         exportTm: '#UT#als TM Datei exportieren',
-        exportTmx: '#UT#als TMX Datei exportieren',
-        defaultCustomerMessage:'#Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?'
+        exportTmx: '#UT#als TMX Datei exportieren'
     },
     refs:[{
         ref: 'tmOverviewPanel',
@@ -238,44 +238,40 @@ Ext.define('Editor.controller.TmOverview', {
         //check and update the form fields from the engine
         me.handleEngineSelect(form);
 
-        var saveCallback=function(){
-            window.setLoading(true);
-            form.submit({
-                timeout: 240,
-                params: {
-                    format: 'jsontext'
-                },
-                url: Editor.data.restpath+'tmmt',
-                scope: me,
-                success: function(form, submit) {
-                    var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
-                    this.getTmOverviewPanel().getStore().load();
-                    window.setLoading(false);
-                    window.close();
-                    Editor.MessageBox.addSuccess(msg);
-                },
-                failure: function(form, submit) {
-                    var res = submit.result;
-                    window.setLoading(false);
-                    //submit results are always state 200.
-                    //If success false and errors is an array, this errors are shown in the form directly,
-                    // so we dont need the handleException
-                    if(!res || res.success || !Ext.isArray(res.errors)) {
-                        Editor.app.getController('ServerException').handleException(submit.response);
-                        return;
-                    }
-                    if(Ext.isArray(res.errors)) {
-                        form.markInvalid(res.errors);
-                        me.showGeneralErrors(res.errors);
-                        return;
-                    }
+        window.setLoading(true);
+        form.submit({
+            timeout: 240,
+            params: {
+                format: 'jsontext'
+            },
+            url: Editor.data.restpath+'tmmt',
+            scope: me,
+            success: function(form, submit) {
+                var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
+                this.getTmOverviewPanel().getStore().load();
+                window.setLoading(false);
+                window.close();
+                Editor.MessageBox.addSuccess(msg);
+            },
+            failure: function(form, submit) {
+                var res = submit.result;
+                window.setLoading(false);
+                //submit results are always state 200.
+                //If success false and errors is an array, this errors are shown in the form directly,
+                // so we dont need the handleException
+                if(!res || res.success || !Ext.isArray(res.errors)) {
+                    Editor.app.getController('ServerException').handleException(submit.response);
+                    return;
                 }
-            });
-        };
-
-        me.checkDefaultCustomer(form.getForm(),saveCallback);
-        
+                if(Ext.isArray(res.errors)) {
+                    form.markInvalid(res.errors);
+                    me.showGeneralErrors(res.errors);
+                    return;
+                }
+            }
+        });
     },
+    
     handleSaveEditClick: function(button){
         var me = this,
             window = button.up('window');
@@ -286,26 +282,23 @@ Ext.define('Editor.controller.TmOverview', {
 
         me.mergeCustomerFieldIds(form);
         form.updateRecord(record);
-
         
-        var saveCallback=function(){
-            window.setLoading(true);
-            record.save({
-                failure: function(records, op) {
-                    window.setLoading(false);
-                    Editor.app.getController('ServerException').handleException(op.error.response);
-                },
-                success: function() {
-                    var msg = Ext.String.format(me.strings.edited, record.get('name'));
-                    me.getTmOverviewPanel().getStore().load();
-                    window.setLoading(false);
-                    window.close();
-                    Editor.MessageBox.addSuccess(msg);
-                }
-            });
-        }
-        me.checkDefaultCustomer(form.getForm(),saveCallback);
+        window.setLoading(true);
+        record.save({
+            failure: function(records, op) {
+                window.setLoading(false);
+                Editor.app.getController('ServerException').handleException(op.error.response);
+            },
+            success: function() {
+                var msg = Ext.String.format(me.strings.edited, record.get('name'));
+                me.getTmOverviewPanel().getStore().load();
+                window.setLoading(false);
+                window.close();
+                Editor.MessageBox.addSuccess(msg);
+            }
+        });
     },
+    
     handleSaveImportClick: function(button){
         var me = this,
             window = button.up('window'),
@@ -366,14 +359,16 @@ Ext.define('Editor.controller.TmOverview', {
      */
     showGeneralErrors: function (errors){
         Ext.Array.each(errors, function(item){
-            if(!item.id || item.id == -1) {
+            if(!item.id || item.id === -1) {
                 Editor.MessageBox.getInstance().showDirectError(item.msg || item._errorMessage, item.data);
             }
         })
     },
     handleCancelClick: function(button){
-        var window = button.up('window');
-        window.down('form').getForm().reset();
+        var window = button.up('window'),
+            form=window.down('form').getForm();
+
+        form.reset();
         window.close();
     },
     handleEditTm : function(view, cell, cellIdx, rec){
@@ -387,7 +382,15 @@ Ext.define('Editor.controller.TmOverview', {
         win.show();
     },
     handleImportTm : function(view, cell, cellIdx, rec){
-        var win = Ext.widget('importTmWindow');
+        //find the import window from the service name
+        var importWindow='';
+        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME){
+            importWindow='importCollectionWindow';
+        }
+        if(rec.get('serviceName')==Editor.model.LanguageResources.Resource.OPENTM2_SERVICE_NAME){
+            importWindow='importTmWindow';
+        }
+        var win = Ext.widget(importWindow);
         win.loadRecord(rec);
         win.show();
     },
@@ -553,12 +556,22 @@ Ext.define('Editor.controller.TmOverview', {
             record = form.getRecord(),
             resourcesCustomers=form.findField('resourcesCustomers'),
             resourcesCustomersHidden=form.findField('resourcesCustomersHidden'),
-            cusomerIds=resourcesCustomers.getValue().join(',');
+            useAsDefault=form.findField('useAsDefault'),
+            defaultCustomers=useAsDefault.getValue(),
+            customers=resourcesCustomers.getValue(),
+            customersData=[];
 
-        resourcesCustomersHidden.setValue(cusomerIds);
+        Ext.each(customers, function (item) {
+            customersData.push({
+                customerId:item,
+                useAsDefault:Ext.Array.contains(defaultCustomers, item) ? 1 :0
+            });
+        });
+
+        resourcesCustomersHidden.setValue(Ext.encode(customersData));
         //if record exist(editTm) -> set it
         if(record){
-            record.set('resourcesCustomersHidden',cusomerIds);
+            record.set('resourcesCustomersHidden',Ext.encode(customersData));
         }
     },
 
@@ -576,110 +589,14 @@ Ext.define('Editor.controller.TmOverview', {
     },
 
     /**
-     * Chech if for the curent resource type and language combination, there is allready defaultCustomer assigned.
+     * Get language labels joined with "," for given language ids
      */
-    checkDefaultCustomer:function(form,formCallback){
-        var me=this,
-            formRecord = form.getRecord(),
-            isEdit=formRecord!=null,
-            defaultCustomer=isEdit ? formRecord.get('defaultCustomer') : form.findField('defaultCustomer').getValue();
-        
-        if(!defaultCustomer){
-            formCallback();
-            return;
-        }
-
-        var recordId=isEdit ? formRecord.get('id') : false,
-            sourceLang=form.findField('sourceLang').getValue(),
-            targetLang=form.findField('targetLang').getValue(),
-            serviceName=isEdit ? formRecord.get('serviceName') : form.findField('serviceName').getValue(),
-            resStore=Ext.create('Ext.data.Store',{
-                model:'Editor.model.LanguageResources.TmMt',
-                pageSize: 0,
-                limit:0
-            });
-        
-        //filter the store whenre: same source,target,serviceName and defaultCustomer contains a value
-        resStore.load({
-            params:{
-                filter:Ext.encode([{
-                    property: 'sourceLang',
-                    operator:'eq', 
-                    value: sourceLang
-                },{
-                    property: 'targetLang',
-                    operator:'eq', 
-                    value: targetLang
-                },{
-                    property: 'serviceName',
-                    operator:'eq', 
-                    value: serviceName
-                },{
-                    property: 'defaultCustomer',
-                    operator:'notInList', 
-                    value:[""],
-                }])
-            },
-            callback: function(records, operation, success) {
-                if(!success){
-                    Editor.app.getController('ServerException').handleCallback(records, operation, success);
-                    return;
-                }
-
-                if(!records || records.length<1){
-                    formCallback();
-                    return;
-                }
-                
-                var sameRec=null;
-                //check for the matching record
-                for(var i=0;i<records.length;i++){
-                    //is the same record
-                    if(isEdit && records[i].get('id') == recordId){
-                        continue;
-                    }
-                    sameRec=records[i];
-                    //same record exist
-                    break;
-                }
-
-                //if no matching record is found, proceed with saving
-                if(!sameRec){
-                    formCallback();
-                    return;
-                }
-
-                //show message box dialog
-                //if yes -> the existing defaultCustomer(the one in the db) will be removed and the new one updated
-                //if no  -> the current chosen defaultCustomer will be ignored
-                Ext.create('Ext.window.MessageBox').show({
-                    title: "",
-                    msg: Ext.String.format(
-                            me.strings.defaultCustomerMessage, 
-                            sameRec.get('name'),
-                            Ext.StoreManager.get('admin.Languages').getById(sourceLang).get('label'),
-                            Ext.StoreManager.get('admin.Languages').getById(targetLang).get('label')
-                        ),
-                    buttons: Ext.Msg.YESNO,
-                    icon: Ext.MessageBox.WARNING,
-                    fn: function(btn){
-                        if (btn == "no"){
-                            form.findField('defaultCustomer').setValue(null);
-                            if(formRecord){
-                                formRecord.set('defaultCustomer',null);
-                            }
-                            formCallback();
-                        }
-                        if (btn == "yes"){
-                            //find the existing record with the default customer and remove the default customer
-                            resStore.getById(sameRec.get('id')).set('defaultCustomer',null);
-                            resStore.sync();
-                            formCallback();
-                            return;
-                        }
-                    }
-                });
-            }
+    getLanguageLable:function(languageIds){
+        var labels=[],
+            lngStore=Ext.StoreManager.get('admin.Languages');
+        languageIds.forEach(function(id){
+            labels.push(lngStore.getById(id).get('label'));
         });
+        return labels.join(',');
     }
 });

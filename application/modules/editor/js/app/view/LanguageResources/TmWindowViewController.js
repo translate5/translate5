@@ -38,31 +38,47 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      * On add new tm window render handler
      */
     onTmWindowRender:function(){
-        var sdlStore=Ext.StoreManager.get('sdlEngine');
+        var me=this,
+            view=me.getView(),
+            sdlStore=Ext.StoreManager.get('sdlEngine');
 
-        //set the data to the sdl language store
-        sdlStore.setData(Editor.data.LanguageResources.sdlEngines);
+        if(sdlStore){
+            //set the data to the sdl language store
+            sdlStore.setData(Editor.data.LanguageResources.sdlEngines);
+        }
+        
+        view.getViewModel().set('uploadLabel',view.strings.file);
+        me.mergeCustomersToDefault();
     },
 
 
     /**
      * Resource combo handler
      */
-    onResourceChange:function(){
+    onResourceChange:function(field){
         var me=this,
             view=me.getView(),
-            isSdl=me.isSdlResource(),
+            uploadField=view.down('filefield[name="tmUpload"]'),
+            serviceName=field.getSelection() && field.getSelection().get('serviceName'),
+            vm=view.getViewModel(),
             sdlEngineCombo=view.down('#sdlEngine');
         
+        vm.set('serviceName',serviceName);
+
+        var isSdl=me.isSdlResource(),
+            isTermcollection=me.isTermcollectionResource();
+
+        uploadField.tooltip=isTermcollection ? view.strings.collection : view.strings.file;
+        uploadField.regexText=isTermcollection ? view.strings.importTbxType : view.strings.importTmxType;
+        uploadField.regex=isTermcollection ? view.tbxRegex : view.tmxRegex;
+        vm.set('uploadLabel',isTermcollection ? view.strings.collection : view.strings.file);
+
         //is visible when sdl as resource is selected
-        sdlEngineCombo.setVisible(isSdl);
-        sdlEngineCombo.setDisabled(!isSdl);
-
-        if(!isSdl){
-            return;
+        //sdlEngineCombo.setVisible(isSdl);
+        //sdlEngineCombo.setDisabled(!isSdl);
+        if(isSdl){
+            sdlEngineCombo.getStore().clearFilter();
         }
-
-        sdlEngineCombo.getStore().clearFilter();
     },
 
     /**
@@ -119,6 +135,51 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         }
 
         me.filterSdlEngine();
+    },
+
+    onCustomersTagFieldChange:function(field,newValue,oldValue,eOpts){
+        this.mergeCustomersToDefault();
+    },
+
+    /**
+     * Add all selected customers from the customers tag field, as select option to the default customers field
+     */
+    mergeCustomersToDefault:function(){
+        var me=this,
+            resourcesCustomers=me.getView().down('#resourcesCustomers'),
+            asDefaultField=me.getView().down('#useAsDefault'),
+            defaultStore=asDefaultField.getStore(),
+            selection = resourcesCustomers.getPicker().getSelectionModel().getSelection(),
+            asDefaultSelection=asDefaultField.getValue(),
+            records=[],
+            selectedValues=[];
+        
+        //INFO: bevause of extjs bug, unable to use the selected records from the customers as model data to the defaultCustomers store
+        //https://www.sencha.com/forum/showthread.php?304305-Uncaught-TypeError-Cannot-read-property-internalId-of-undefined
+        //collect all selected customers to additional array
+        selection.forEach(function(r){
+            records.push({
+                id:r.get('id'),
+                name:r.get('name'),
+            });
+
+            //find all allready selected available values
+            asDefaultSelection.forEach(function(sv){
+                if(sv==r.get('id')){
+                    selectedValues.push(sv);
+                }
+            });
+        });
+        
+        //clean the selected values
+        asDefaultField.clearValue();
+        //clean the store
+        defaultStore.removeAll();
+
+        //add the available customers
+        defaultStore.add(records);
+        //apply the merged selected values
+        asDefaultField.setValue(selectedValues);
     },
 
     /**
@@ -178,8 +239,16 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      * Is the current selected resource of sdl cloud type
      */
     isSdlResource:function(){
-        var selection=this.getView().down('combo[name="resourceId"]').getSelection();
-        return selection && selection.get('serviceName')==Editor.model.LanguageResources.Resource.SDL_RESOURCE_NAME;
+        var vm=this.getView().getViewModel();
+        return vm.get('serviceName')==Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+    },
+
+    /***
+     * Is the current selected resource of termcollection type
+     */
+    isTermcollectionResource:function(){
+        var vm=this.getView().getViewModel();
+        return vm.get('serviceName')==Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
     }
 
 });

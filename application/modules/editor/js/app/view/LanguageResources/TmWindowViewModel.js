@@ -26,46 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.model.LanguageResources.Resource
- * @extends Ext.data.Model
+ * @class Editor.view.LanguageResources.TmWindowViewModel
+ * @extends Ext.app.ViewModel
  */
-Ext.define('Editor.model.LanguageResources.Resource', {
-  extend: 'Ext.data.Model',
-
-  statics: {
-    //name of the sdl language cloud service
-    SDL_SERVICE_NAME: 'SDLLanguageCloud',
-    TERMCOLLECTION_SERVICE_NAME:'TermCollection',
-    OPENTM2_SERVICE_NAME:'OpenTM2'
-  },
-
-  fields: [
-    {name: 'id', type: 'string'},
-    {name: 'name', type: 'string'},
-    {name: 'filebased', type: 'boolean'},
-    {name: 'serviceType', type: 'string'},
-    {name: 'serviceName', type: 'string'},
-    {name: 'defaultColor', type: 'string'}
-  ],
-  idProperty: 'id',
-  proxy : {
-    type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'resource', //same as PHP controller name
-    reader : {
-      rootProperty: 'rows',
-      type : 'json'
+Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.tmwindow',
+    data: {
+        serviceName: false,
+        uploadLabel:null
     },
-    writer: {
-      encode: true,
-      rootProperty: 'data',
-      writeAllFields: false
+    formulas: {
+        isSdlResource: function(get){
+            return get('serviceName') == Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+        },
+        isTermCollectionResource:function(get){
+            return get('serviceName') == Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+        }
     }
-  }
 });
