@@ -54,18 +54,28 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
      * @param int $languageResourceId
      */
     public function saveLanguages($source,$target,$languageResourceId){
-        $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $sourceLang editor_Models_Languages */
-        $sourceLang->load($source);
+
+        if($source){
+            $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $sourceLang editor_Models_Languages */
+            $sourceLang->load($source);
+            $this->setSourceLang($sourceLang->getId());
+            $this->setSourceLangRfc5646($sourceLang->getRfc5646());
+        }
         
-        $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $targetLang editor_Models_Languages */
-        $targetLang->load($target);
+        if($target){
+            $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $targetLang editor_Models_Languages */
+            $targetLang->load($target);
+            $this->setTargetLang($targetLang->getId());
+            $this->setTargetLangRfc5646($targetLang->getRfc5646());
+        }
+
+        //when both lanugages are nod defined do not save db entry
+        if(!$source && !$target){
+            return;
+        }
         
-        $this->setSourceLang($sourceLang->getId());
-        $this->setTargetLang($targetLang->getId());
-        $this->setSourceLangRfc5646($sourceLang->getRfc5646());
-        $this->setTargetLangRfc5646($targetLang->getRfc5646());
         $this->setLanguageResourceId($languageResourceId);
         $this->save();
     }
@@ -113,6 +123,20 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
     }
     
     /***
+     * Check if language for $field exist for the $languageResourceId
+     * @param mixed $language
+     * @param string $field : sourceLang, targetLang, sourceLangRfc5646, targetLangRfc5646
+     * @param int $languageResourceId
+     * @return boolean
+     */
+    public function isInCollection($language,$field,$languageResourceId){
+        $s=$this->db->select()
+        ->where($field.'=?',$language)
+        ->where('languageResourceId=?',$languageResourceId);
+        return !empty($this->db->fetchAll($s)->toArray());
+    }
+    
+    /***
      * @return array[]
      */
     public function loadResourceIdsGrouped() {
@@ -123,10 +147,24 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
                 $retval[$lang['languageResourceId']]['sourceLang']=[];
                 $retval[$lang['languageResourceId']]['targetLang']=[];
             }
-            array_push($retval[$lang['languageResourceId']]['sourceLang'],$lang['sourceLang']);
-            array_push($retval[$lang['languageResourceId']]['targetLang'],$lang['targetLang']);
+            
+            if(!empty($lang['sourceLang']) && !in_array($lang['sourceLang'], $retval[$lang['languageResourceId']]['sourceLang'])){
+                array_push($retval[$lang['languageResourceId']]['sourceLang'],$lang['sourceLang']);
+            }
+            
+            if(!empty($lang['targetLang']) && !in_array($lang['targetLang'], $retval[$lang['languageResourceId']]['targetLang'])){
+                array_push($retval[$lang['languageResourceId']]['targetLang'],$lang['targetLang']);
+            }
         }
         return $retval;
+    }
+    
+    /***
+     * Remove assoc by languageResourceId
+     * @param array $languageResourceIds
+     */
+    public function removeByResourceId($languageResourceIds){
+        $this->db->delete(array('languageResourceId IN(?)' => $languageResourceIds));
     }
 }
 

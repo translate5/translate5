@@ -49,6 +49,7 @@ class editor_Services_Manager {
         'editor_Services_Moses',
         'editor_Services_LucyLT',
         'editor_Services_SDLLanguageCloud',
+        'editor_Services_TermCollection'
         //'editor_Services_DummyFileTm',
     );
 
@@ -91,17 +92,20 @@ class editor_Services_Manager {
         return $resources->getResourceById($id);
     }
     
-    /**
+    /***
      * returns the desired connector, connection to the given resource
-     * @param string $serviceType
-     * @param editor_Models_Resource $resource
+     * 
+     * @param editor_Models_TmMt $tmmt
+     * @param integer $sourceLang
+     * @param integer $targetLang
+     * @return editor_Services_Connector_Abstract
      */
-    public function getConnector(editor_Models_TmMt $tmmt) {
+    public function getConnector(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
         $serviceType = $tmmt->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
         /* @var $connector editor_Services_Connector_Abstract */
-        $connector->connectTo($tmmt);
+        $connector->connectTo($tmmt,$sourceLang=null,$targetLang=null);
         return $connector;
     }
     

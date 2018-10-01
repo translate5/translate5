@@ -26,10 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermCollection';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermCollection';
-    
+class editor_Models_TermCollection_TermCollection extends editor_Models_TmMt {
+
     /***
      * Import the tbx files in the term collection
      * 
@@ -45,10 +43,36 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         //import source (filesystem or crosspai)
         $import->importSource=isset($params['importSource']) ? $params['importSource'] : "";
         
-        $import->customerId=$params['customerId'];
+        $import->customerIds=$params['customerIds'];
         return $import->parseTbxFile($filePath,$params['collectionId']);
     }
     
+    /***
+     * Create new term collection and return the id
+     * @param string $name
+     * @param array $customers
+     * @return int
+     */
+    public function create($name,$customers){
+        $this->setAutoCreatedOnImport(1);
+        $this->setName($name);
+        
+        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        $nsp=$service->getServiceNamespace();
+        $this->setResourceId($nsp);
+        $this->setServiceType($nsp);
+        $this->setServiceName($service->getName());
+        $this->setColor($service::DEFAULT_COLOR);
+        $resourceId=$this->save();
+        
+        if($customers){
+            $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+            $customerAssoc->addAssocs($customers, $resourceId);
+        }
+        return $resourceId;
+    }
     /***
      * Get all collection associated with the task
      * 
@@ -75,7 +99,10 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
      */
     public function getCollectionsIdsForCustomer($customerIds){
         $s=$this->db->select()
-        ->where('customerId IN(?)',$customerIds);
+        ->setIntegrityCheck(false)
+        ->from(array('lr'=>'LEK_languageresources_tmmt'))
+        ->join(array('ca'=>'LEK_languageresources_customerassoc'), 'ca.languageResourceId=lr.id',array('ca.customerId as customerId'))
+        ->where('ca.customerId IN(?)',$customerIds);
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
             $ids = array_column($rows, 'id');
@@ -99,7 +126,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
     public function getAttributesCountForCollection($collectionId){
         $s=$this->db->select()
         ->setIntegrityCheck(false)
-        ->from(array('tc' => 'LEK_term_collection'), array('id'))
+        ->from(array('tc' => 'LEK_languageresources_tmmt'), array('id'))
         ->join(array('t' => 'LEK_terms'),'tc.id=t.collectionId', array('count(DISTINCT t.id) as termsCount'))
         ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId', array('count(DISTINCT ta.id) as termsAtributeCount'))
         ->join(array('tea' => 'LEK_term_entry_attributes'),'tc.id=tea.collectionId', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
@@ -116,7 +143,7 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
     public function addTermCollectionTaskAssoc($collectionId,$taskGuid){
         $sql='INSERT INTO LEK_term_collection_taskassoc (collectionId,taskGuid) '.
               'VALUES(?,?);';
-        $retval=$this->db->getAdapter()->query($sql,[$collectionId,$taskGuid]);
+        $this->db->getAdapter()->query($sql,[$collectionId,$taskGuid]);
     }
     
     /***
@@ -163,10 +190,10 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
     public function checkAndRemoveTaskImported($taskGuid){
         $s=$this->db->select()
         ->setIntegrityCheck(false)
-        ->from('LEK_term_collection',array('LEK_term_collection.*'))
-        ->join('LEK_term_collection_taskassoc', 'LEK_term_collection_taskassoc.collectionId = LEK_term_collection.id',array('LEK_term_collection_taskassoc.collectionId','LEK_term_collection_taskassoc.taskGuid'))
+        ->from('LEK_languageresources_tmmt',array('LEK_languageresources_tmmt.*'))
+        ->join('LEK_term_collection_taskassoc', 'LEK_term_collection_taskassoc.collectionId = LEK_languageresources_tmmt.id',array('LEK_term_collection_taskassoc.collectionId','LEK_term_collection_taskassoc.taskGuid'))
         ->where('LEK_term_collection_taskassoc.taskGuid=?',$taskGuid)
-        ->where('LEK_term_collection.autoCreatedOnImport=?',1);
+        ->where('LEK_languageresources_tmmt.autoCreatedOnImport=?',1);
         $rows=$this->db->fetchAll($s)->toArray();
         
         if(empty($rows)){
@@ -184,6 +211,27 @@ class editor_Models_TermCollection_TermCollection extends ZfExtended_Models_Enti
         
         //remove the termcollection from the disk
         $this->removeCollectionDir($collectionId);
+    }
+    
+    /***
+     * Add language to the language resources assoc table.
+     * When the language does not exisit for the columng(source/target), entry with null as pair value will be inserted.
+     * @param int $language
+     * @param int $collectionId
+     */
+    public function addCollectionLanguage($language,$collectionId){
+        $lngAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $lngAssoc editor_Models_LanguageResources_Languages */
+        
+        //if the language does not exist in the assoc as source, add entry with the source as $language and empty as target
+        if(!$lngAssoc->isInCollection($language, 'sourceLang', $collectionId)){
+            $lngAssoc->saveLanguages($language, null, $collectionId);
+        }
+        
+        //if the language does not exist in the assoc as target, add entry with the target as $language and empty as source
+        if(!$lngAssoc->isInCollection($language, 'targetLang', $collectionId)){
+            $lngAssoc->saveLanguages(null, $language, $collectionId);
+        }
     }
     
     /***

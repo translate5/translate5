@@ -34,7 +34,7 @@ class editor_Models_Validator_TmMt extends ZfExtended_Models_Validator_Abstract 
      */
     protected function defineValidators() {
         $this->addValidator('id', 'int');
-        $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 1024));
         $this->addValidator('sourceLang', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('targetLang', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('sourceLangRfc5646', 'stringLength', array('min' => 0, 'max' => 7));
@@ -44,7 +44,6 @@ class editor_Models_Validator_TmMt extends ZfExtended_Models_Validator_Abstract 
         $this->addValidator('serviceName', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('serviceType', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('fileName', 'stringLength', array('min' => 0, 'max' => 1024));
-        $this->addValidator('defaultCustomer', 'int',array(),true);
         $this->addValidator('labelText', 'stringLength', array('min' => 0, 'max' => 255));
     }
 }

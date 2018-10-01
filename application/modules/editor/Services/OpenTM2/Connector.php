@@ -53,8 +53,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
-    public function connectTo(editor_Models_TmMt $tmmt) {
-        parent::connectTo($tmmt);
+    public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($tmmt,$sourceLang=null,$targetLang=null);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$tmmt]);
     }
@@ -83,7 +83,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
-    public function addTm(array $fileinfo = null) {
+    public function addTm(array $fileinfo = null,array $params=null) {
         $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
 
         //to ensure that we get unique TMs Names although of the above stripped content, 
@@ -128,7 +128,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::addAdditionalTm()
      */
-    public function addAdditionalTm(array $fileinfo = null) {
+    public function addAdditionalTm(array $fileinfo = null,array $params=null){
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
         if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
@@ -550,13 +550,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyTmmt->setFileName($memoryName);
         $fuzzyTmmt->setId(null);
         
-        $connector = ZfExtended_Factory::get($fuzzyTmmt->getServiceType().editor_Services_Manager::CLS_CONNECTOR);
-        /* @var $connector editor_Services_Connector_Abstract */
-        $connector->connectTo($fuzzyTmmt);
-        return $connector;
-    }
-    
-    public function searchWithParam(string $searchString, array $params){
-        throw new BadMethodCallException("The OpenTm2 Connector does not support search with param requests");
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
+        return $serviceManager->getConnector($fuzzyTmmt);;
     }
 }
