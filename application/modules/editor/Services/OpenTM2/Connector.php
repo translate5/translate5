@@ -54,7 +54,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
     public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($tmmt,$sourceLang=null,$targetLang=null);
+        parent::connectTo($tmmt,$sourceLang,$targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$tmmt]);
     }

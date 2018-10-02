@@ -73,6 +73,23 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_TmMt {
         }
         return $resourceId;
     }
+    
+    /***
+     * Search from term matches the current term collections with the given query string
+     * 
+     * @param string $queryString
+     * @return array
+     */
+    public function searchCollection($queryString,$sourceLang,$targetLang){
+        $sql=' SELECT * FROM LEK_terms '.
+              'WHERE groupId IN ( '.
+              'SELECT `t`.`groupId` FROM `LEK_terms` AS `t` '.
+              'WHERE (lower(term) like lower(?)) COLLATE utf8_bin '.
+              'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`) '.
+              'AND language=?';
+        return $this->db->getAdapter()->query($sql, array('%'.$queryString.'%',$this->getId(),$sourceLang,$targetLang))->fetchAll();
+    }
+    
     /***
      * Get all collection associated with the task
      * 

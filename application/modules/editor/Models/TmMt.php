@@ -61,9 +61,10 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Load all resources associated customers of a user
+     * @param string $serviceName: load by service name
      * @return array|array
      */
-    public function loadByUserCustomerAssocs(){
+    public function loadByUserCustomerAssocs($serviceName=null){
         $sessionUser = new Zend_Session_Namespace('user');
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
@@ -73,24 +74,19 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
             $customers= trim($userModel->getCustomers(),",");
             $customers=explode(',', $customers);
             
-            //create id filter, so the results will be fildered by user-customer associated language resources 
-            $idFilter=new stdClass();
-            $idFilter->type='list';
-            $idFilter->field='id';
-            $idFilter->comparison='in';
-            
-            //find all language resources for the user customers
-            $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-            /* @var $assoc editor_Models_LanguageResources_CustomerAssoc */
-            $result=$assoc->loadByCustomerIds($customers);
-            $result=array_column($result, 'languageResourceId');
-            
-            //set the filter value
-            $idFilter->value=$result;
-            
-            //apply the filter to the entity
-            $this->getFilter()->addFilter($idFilter);
-            return $this->loadAll();
+            //each sdlcloud language resource can have only one language combination
+            $s=$this->db->select()
+            ->from(array('tm' => 'LEK_languageresources_tmmt'),array('tm.*'))
+            ->setIntegrityCheck(false)
+            ->join(array('ca' => 'LEK_languageresources_customerassoc'), 'tm.id = ca.languageResourceId', '')
+            ->join(array('l' => 'LEK_languageresources_languages'), 'tm.id = l.languageResourceId', array('sourceLang','targetLang','sourceLangRfc5646','targetLangRfc5646'))
+            ->where('ca.customerId IN(?)',$customers);
+
+            if($serviceName){
+                $s->where('tm.serviceName=?',$serviceName);
+            }
+            $s->group('tm.id');
+            return $this->db->fetchAll($s)->toArray();
             
         }
         return [];

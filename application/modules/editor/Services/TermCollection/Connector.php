@@ -30,7 +30,6 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Services_TermCollection_Connector extends editor_Services_Connector_FilebasedAbstract {
 
-    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
@@ -87,14 +86,44 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::query()
      */
-    public function query(editor_Models_Segment $segment) {}
+    public function query(editor_Models_Segment $segment) {
+        $queryString = $this->getQueryString($segment);
+        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        if(empty($queryString)) {
+            return $this->resultList;
+        }
+        
+        $this->resultList->setDefaultSource($queryString);
+        
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        
+        $queryString = $internalTag->toXliffPaired($queryString, true);
+        
+        return $this->queryCollectionResults($queryString);
+    }
     
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        throw new BadMethodCallException("The Moses MT Connector does not support search requests");
+        return $this->queryCollectionResults($searchString);
+    }
+    
+    protected function queryCollectionResults($queryString){
+        //TODO: change the entity in the tmmt controller searc/query ?
+        $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $entity editor_Models_TermCollection_TermCollection */
+        $entity->load($this->tmmt->getId());
+        
+        $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
+        
+        foreach ($results as $res){
+            $this->resultList->addResult($res['term']);
+        }
+        
+        return $this->resultList;
     }
 
     

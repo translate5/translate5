@@ -42,7 +42,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::connectTo()
      */
     public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($tmmt,$sourceLang=null,$targetLang=null);
+        parent::connectTo($tmmt,$sourceLang,$targetLang);
         $class = 'editor_Services_SDLLanguageCloud_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$tmmt]);
     }
@@ -72,7 +72,19 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        throw new BadMethodCallException("The SLDLanguageCloud TM Connector does not support query requests");
+        $queryString = $this->getQueryString($segment);
+        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        if(empty($queryString)) {
+            return $this->resultList;
+        }
+        
+        $this->resultList->setDefaultSource($queryString);
+        
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        
+        $queryString = $internalTag->toXliffPaired($queryString, true);
+        return $this->querySdlApi($queryString);
     }
     
     /**
@@ -80,9 +92,34 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        throw new BadMethodCallException("The SLDLanguageCloud TM Connector does not support search requests");
+        return $this->querySdlApi($searchString);
     }
     
+    protected function querySdlApi($searchString){
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
+        
+        $this->resultList->setDefaultSource($searchString);
+        
+        //load all languages (sdl api use iso6393 langage shortcuts)
+        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $lngs=$langModel->loadAllKeyValueCustom('id','iso6393');
+        
+        $result=null;
+        $params=[
+            'domainCode'=>$this->tmmt->getFileName(),
+            'text'=>$searchString,
+            'from'=>$lngs[$this->sourceLang],
+            'to'=>$lngs[$this->targetLang]
+        ];
+        if($this->api->search($params)){
+            $result=$this->api->getResult();
+        }
+        $this->resultList->addResult(isset($result->translation) ? $result->translation : "");
+        return $this->resultList;
+    }
     /**
      * Throws a ZfExtended_BadGateway exception containing the underlying errors
      * @throws ZfExtended_BadGateway

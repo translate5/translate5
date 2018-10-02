@@ -32,60 +32,45 @@ END LICENSE AND COPYRIGHT
 class editor_Models_LanguageResources_SdlResources {
     
     /***
-     * Get all available engines from the sdl language cloud.
-     * Layout of the result array:
-     * 
-     *    customeEngineId -> internaly generated engine id
-     *       name         -> engine name, engineType + from language + target language
-     *       source       -> rfc5646 language code
-     *       sourceIso    -> iso6393 language code
-     *       target
-     *       targetIso
-     *       domainCode   -> unique engine code (only available for vertical engines)
+     * Get all available sdl cloud language resources for customers of loged user
      * @param boolean $addArrayId : if true(default true), the array key will be generated in format: 'mt'+autoincrement number       
      * @return array
      */
     public function getEngines($addArrayId=true){
-        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $dummyTmmt editor_Models_TmMt */
         
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
-        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+        $model=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $model editor_Models_TmMt */
         
-        
-        $result=null;
-        //load all available engines
-        if($api->getEngines()){
-            $result=$api->getResult();
-        }
-        
-        $engines=array();
+        $service=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_Service');
+        /* @var $service editor_Services_SDLLanguageCloud_Service */
+        $engines=$model->loadByUserCustomerAssocs($service->getName());
         
         //check if results are found
-        if(empty($result) || $result->totalCount<1){
+        if(empty($engines)){
             return $engines;
         }
-            
-        //NOTE: the id is generated, since the sdl language cloud does not provide one
-        $engineCounter=1;
-        foreach($result->translationEngines as $engine){
+        //load all languages (sdl api use iso6393 langage shortcuts)
+        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $lngs=$langModel->loadAllKeyValueCustom('id','iso6393');
+        
+        $result=[];
+        foreach($engines as $engine){
             $data=array(
-                'id'=>'mt'.$engineCounter,
-                'name' =>$engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
-                'source' => $engine->fromCulture,
-                'sourceIso' => $engine->from->code,
-                'target' => $engine->toCulture,
-                'targetIso' => $engine->to->code,
-                'domainCode' => $engine->domainCode
+                'id'=>$engine['id'],
+                'name' =>$engine['labelText'],
+                'source' => $engine['sourceLangRfc5646'],
+                'sourceIso' => $lngs[$engine['sourceLang']],
+                'target' => $engine['targetLangRfc5646'],
+                'targetIso' => $lngs[$engine['targetLang']],
+                'domainCode' => $engine['fileName']
             );
             if($addArrayId){
-                $engines['mt'.$engineCounter]=$data;
+                $result[$engine['id']]=$data;
             }else{
-                $engines[]=$data;
+                $result[]=$data;
             }
-            $engineCounter++;
         }
-        
-        return $engines;
+        return $result;
     }
 }

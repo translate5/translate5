@@ -105,7 +105,7 @@ class editor_Services_Manager {
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
         /* @var $connector editor_Services_Connector_Abstract */
-        $connector->connectTo($tmmt,$sourceLang=null,$targetLang=null);
+        $connector->connectTo($tmmt,$sourceLang,$targetLang);
         return $connector;
     }
     
