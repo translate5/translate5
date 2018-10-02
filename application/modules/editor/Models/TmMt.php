@@ -61,10 +61,14 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Load all resources associated customers of a user
-     * @param string $serviceName: load by service name
+     * 
+     * @param string $serviceName: add service name as filter
+     * @param string $sourceLang: add source language as filter
+     * @param string $targetLang: add target language as filter
+     * 
      * @return array|array
      */
-    public function loadByUserCustomerAssocs($serviceName=null){
+    public function loadByUserCustomerAssocs($serviceName=null,$sourceLang=null,$targetLang=null){
         $sessionUser = new Zend_Session_Namespace('user');
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
@@ -84,6 +88,14 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
 
             if($serviceName){
                 $s->where('tm.serviceName=?',$serviceName);
+            }
+            
+            if($sourceLang){
+                $s->where('l.sourceLang=?',$sourceLang);
+            }
+            
+            if($targetLang){
+                $s->where('l.targetLang=?',$targetLang);
             }
             $s->group('tm.id');
             return $this->db->fetchAll($s)->toArray();

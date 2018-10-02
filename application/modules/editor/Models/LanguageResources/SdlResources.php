@@ -33,10 +33,10 @@ class editor_Models_LanguageResources_SdlResources {
     
     /***
      * Get all available sdl cloud language resources for customers of loged user
-     * @param boolean $addArrayId : if true(default true), the array key will be generated in format: 'mt'+autoincrement number       
+     * @param boolean $addArrayId : if true(default true), the array key will be the language resource id  
      * @return array
      */
-    public function getEngines($addArrayId=true){
+    public function getEnginesByAssoc($addArrayId=true){
         
         $model=ZfExtended_Factory::get('editor_Models_TmMt');
         /* @var $model editor_Models_TmMt */
@@ -49,27 +49,69 @@ class editor_Models_LanguageResources_SdlResources {
         if(empty($engines)){
             return $engines;
         }
+        return $this->mergeEngineData($engines,$addArrayId);
+    }
+    
+    /***
+     * Get all available engines
+     * 
+     * @return array
+     */
+    public function getAllEngines(){
+        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $dummyTmmt editor_Models_TmMt */
+        
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+        
+        
+        $result=null;
+        //load all available engines
+        if($api->getEngines()){
+            $result=$api->getResult();
+        }
+        
+        $engines=array();
+        
+        //check if results are found
+        if(empty($result) || $result->totalCount<1){
+            return $engines;
+        }
+        return $this->mergeEngineData($result->translationEngines,false);
+    }
+    
+    /***
+     * Merge engine data required for the frontend layout
+     * @param array $engines
+     * @param boolean $addArrayId : if true(default true), the array key will be the language resource id
+     * @return array[]
+     */
+    private function mergeEngineData($engines,$addArrayId=true) {
         //load all languages (sdl api use iso6393 langage shortcuts)
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */
         $lngs=$langModel->loadAllKeyValueCustom('id','iso6393');
         
         $result=[];
+        //NOTE: the id is generated, since the sdl language cloud does not provide one
+        $engineCounter=1;
         foreach($engines as $engine){
             $data=array(
-                'id'=>$engine['id'],
-                'name' =>$engine['labelText'],
-                'source' => $engine['sourceLangRfc5646'],
-                'sourceIso' => $lngs[$engine['sourceLang']],
-                'target' => $engine['targetLangRfc5646'],
-                'targetIso' => $lngs[$engine['targetLang']],
-                'domainCode' => $engine['fileName']
+                'id'=>is_array($engine) ? $engine['id'] :'mt'.$engineCounter,
+                'name' =>is_array($engine) ? $engine['labelText'] : $engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
+                'source' => is_array($engine) ? $engine['sourceLangRfc5646'] : $engine->fromCulture,
+                'sourceIso' => is_array($engine) ? $lngs[$engine['sourceLang']] : $engine->from->code,
+                'target' => is_array($engine) ? $engine['targetLangRfc5646']: $engine->toCulture,
+                'targetIso' => is_array($engine) ?$lngs[$engine['targetLang']]:$engine->to->code,
+                'domainCode' => is_array($engine) ? $engine['fileName']:$engine->domainCode
             );
+            
             if($addArrayId){
-                $result[$engine['id']]=$data;
+                $result[is_array($engine) ? $engine['id']:'mt'.$engineCounter]=$data;
             }else{
                 $result[]=$data;
             }
+            $engineCounter++;
         }
         return $result;
     }

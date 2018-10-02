@@ -34,3 +34,5 @@ INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.LanguageResources.fileExtension', '1', 'editor', 'system', '', '', '', 'map', 'Available file types by extension per engine type. The engine type is defined by source rcf5646,target rcf5646. ex: \"en-ge,en-us\"');
 
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.InstantTranslate.customersMaxSearchCharacters', '1', 'editor', 'instanttranslate', '[]', '[]', '', 'map', 'Maximum character available in source search field configured by customer');

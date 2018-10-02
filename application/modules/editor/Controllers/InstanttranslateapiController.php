@@ -46,8 +46,6 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         //get all requested params
         $params=$this->getRequest()->getParams();
         
-        $apiParams=array();
-        
         if(!$this->isValidParam($params,'text')){
             
             $e=new ZfExtended_ValidateException();
@@ -56,45 +54,14 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             return;
         }
 
-        $apiParams['text']=$params['text'];
-        if($this->isValidParam($params,'domainCode')){
-            $apiParams['domainCode']=$params['domainCode'];
-            $this->view->rows=$this->searchString($apiParams);
-            return;
-        }
-        
-        if(!$this->isValidParam($params,'source')){
+        if(!$this->isValidParam($params,'id')){
             $e=new ZfExtended_ValidateException();
-            $e->setErrors(["Source language definition is missing."]);
+            $e->setErrors(["Engine id is missing."]);
             $this->handleValidateException($e);
             return;
         }
         
-        $apiParams['from']=$params['source'];
-        
-        if(!$this->isValidParam($params,'target')){
-            $e=new ZfExtended_ValidateException();
-            $e->setErrors(["Target language definition is missing."]);
-            $this->handleValidateException($e);
-            return;
-        }
-        
-        $apiParams['to']=$params['target'];
-        
-        //load all languages (sdl api use iso6393 langage shortcuts)
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $lngs=$langModel->loadAllKeyValueCustom('rfc5646','iso6393');
-        
-        //update the default selected languages for the curent user
-        $this->updateDefaultLanguages($apiParams['from'],$apiParams['to']);
-        
-        //get the iso language value for the given rfc
-        $apiParams['from']=$lngs[$apiParams['from']];
-        $apiParams['to']=$lngs[$apiParams['to']];
-        
-        
-        $trans=$this->searchString($apiParams);
+        $trans=$this->searchResources($params['text'],$params['id']);
         $this->view->rows=$trans;
     }
     
@@ -215,7 +182,7 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
     public function engineAction() {
         $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
         /* @var $engineModel editor_Models_LanguageResources_SdlResources */
-        $this->view->rows=$engineModel->getEngines();
+        $this->view->rows=$engineModel->getAllEngines();
     }
     
     /***
@@ -238,21 +205,48 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         
         return "";
     }
+    
     /***
-     * Run translation for given params
-     * @param array $params
+     * Search all available language resources assigned to customer of a user for a given language combo.
+     * 
+     * @param string $text : query string
+     * @param integer $id : language resource id (engine id)
      */
-    private function searchString($params){
-        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $dummyTmmt editor_Models_TmMt */
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
-        /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
+    private function searchResources($text,$id){
+        $model=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $model editor_Models_TmMt */
+        $model->load($id);
+        $sourceLang=$model->getSourceLang();
+        $targetLang=$model->getTargetLang();
         
-        $result=null;
-        if($api->search($params)){
-            $result=$api->getResult();
+        //update the default selected languages for the curent user
+        $this->updateDefaultLanguages($sourceLang,$targetLang);
+        
+        //get all resources for the customers of the user by language combination
+        $resources=$model->loadByUserCustomerAssocs(null,$sourceLang,$targetLang);
+        
+        if(empty($resources)){
+            return '';
         }
-        return isset($result->translation) ? $result->translation : "";
+        
+        $searchResults=[];
+        //for each assoc resource search the resource for the result
+        foreach ($resources as $res) {
+            
+            $model=ZfExtended_Factory::get('editor_Models_TmMt');
+            /* @var $model editor_Models_TmMt */
+            $model->load($res['id']);
+            
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
+            
+            $connector=$manager->getConnector($model,$sourceLang,$targetLang);
+            /* @var $connector editor_Services_Connector_Abstract */
+            $result = $connector->search($text);
+            $searchResults[$res['serviceName']]=$result->getResult();
+        }
+        
+        return $searchResults;
     }
     
     /***
@@ -267,20 +261,16 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
     
     /***
      * Update the source and target default languages for the curen user
-     * @param string $source
-     * @param string $target
+     * @param integer $source
+     * @param integer $target
      */
     private function updateDefaultLanguages($source,$target){
-        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $lngs=$langModel->loadAllKeyValueCustom('rfc5646','id');
-        
         $sessionUser = new Zend_Session_Namespace('user');
         $sessionUser=$sessionUser->data;
         $userModel=ZfExtended_Factory::get('editor_Models_UserMeta');
         /* @var $userModel editor_Models_UserMeta */
         
         //save the default preselected languages for the curent user
-        $userModel->saveDefaultLanguages($sessionUser->id,$lngs[$source],$lngs[$target]);
+        $userModel->saveDefaultLanguages($sessionUser->id,$source,$target);
     }
 }

@@ -120,7 +120,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
         
         foreach ($results as $res){
-            $this->resultList->addResult($res['term']);
+            $this->resultList->addResult($res['term'],0,$res);
         }
         
         return $this->resultList;
