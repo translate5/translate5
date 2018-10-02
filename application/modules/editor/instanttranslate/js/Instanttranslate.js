@@ -475,6 +475,7 @@ function translateText(textToTranslate,translationInProgressID){
             'source':$("#sourceLocale").val(),
             'target':$("#targetLocale").val(),
             'domainCode':getSelectedEngineDomainCode(),
+            'id':getSelectedEngineId(),
             'text':textToTranslate
         },
         success: function(result){
