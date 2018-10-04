@@ -271,7 +271,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
       return me.callParent([config]);
     },
     langRenderer : function(val, md) {
-        if(!val){
+        if(!val || val.length<1){
             return '';
         }
         var label=[],
@@ -284,7 +284,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 retval.push(lang.get('rfc5646'));
             }
         }
-        
         md.tdAttr = 'data-qtip="' + label.join(',') + '"';
         return retval.join(',');
     },
