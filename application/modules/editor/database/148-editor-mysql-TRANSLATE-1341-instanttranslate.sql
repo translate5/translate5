@@ -36,3 +36,6 @@ VALUES ('runtimeOptions.LanguageResources.fileExtension', '1', 'editor', 'system
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.InstantTranslate.customersMaxSearchCharacters', '1', 'editor', 'instanttranslate', '[]', '[]', '', 'map', 'Maximum character available in source search field configured by customer');
+
+INSERT `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.InstantTranslate.minMatchRateBorder', '1', 'editor', 'instanttranslate', '', '', '', 'integer', 'Minimum matchrate allowed to be displayed in instantranslate result list');

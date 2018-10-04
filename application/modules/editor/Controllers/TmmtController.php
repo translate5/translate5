@@ -108,11 +108,31 @@ class editor_TmmtController extends ZfExtended_RestController {
             $tmmt['taskList'] = $this->getTaskInfos($tmmt['id']);
             $tmmt['status'] = 'loading';
             
+            $customerId=[];
+            if(isset($custAssoc[$tmmt['id']]['customerId']) && !empty($custAssoc[$tmmt['id']]['customerId'])){
+                $customerId[]=$custAssoc[$tmmt['id']]['customerId'];
+            }
+            
+            $sourceLang=[];
+            if(isset($languages[$tmmt['id']]) && !empty($languages[$tmmt['id']]['sourceLang'])){
+                $sourceLang[]=$languages[$tmmt['id']]['sourceLang'];
+            }
+            
+            $targetLang=[];
+            if(isset($languages[$tmmt['id']]) && !empty($languages[$tmmt['id']]['targetLang'])){
+                $targetLang[]=$languages[$tmmt['id']]['targetLang'];
+            }
+            
+            $useAsDefault=[];
+            if(isset($custAssoc[$tmmt['id']]['useAsDefault']) && !empty($custAssoc[$tmmt['id']]['useAsDefault'])){
+                $useAsDefault[]=$custAssoc[$tmmt['id']]['useAsDefault'];
+            }
+            
             //add customer assocs
-            $tmmt['resourcesCustomers']=isset($custAssoc[$tmmt['id']]['customerId']) ? $custAssoc[$tmmt['id']['customerId']] : [];
-            $tmmt['useAsDefault']=isset($custAssoc[$tmmt['id']]['useAsDefault']) ? $custAssoc[$tmmt['id']['useAsDefault']] : [];
-            $tmmt['sourceLang']=isset($languages[$tmmt['id']]) ? $languages[$tmmt['id']]['sourceLang'] : [];
-            $tmmt['targetLang']=isset($languages[$tmmt['id']]) ? $languages[$tmmt['id']]['targetLang'] : [];
+            $tmmt['resourcesCustomers']=$customerId;
+            $tmmt['useAsDefault']=$useAsDefault;
+            $tmmt['sourceLang']=$sourceLang;
+            $tmmt['targetLang']=$targetLang;
         }
     }
     
@@ -123,7 +143,6 @@ class editor_TmmtController extends ZfExtended_RestController {
      */
     public function getAction() {
         parent::getAction();
-        
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
         
@@ -135,14 +154,19 @@ class editor_TmmtController extends ZfExtended_RestController {
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         
         $assocs=$customerAssoc->loadByLanguageResourceId($this->entity->getId());
-        $this->view->rows->resourcesCustomers=array_column($assocs, 'customerId');
+        
         $default=[];
-        //get the default customers
+        $customers=[];
+        //get the customers and the default customers
         foreach ($assocs as $value) {
             if(!empty($value['useAsDefault'])){
                 $default[]=$value['customerId'];
             }
+            if(!empty($value['customerId'])){
+                $customers[]=$value['customerId'];
+            }
         }
+        $this->view->rows->resourcesCustomers=$customers;
         $this->view->rows->useAsDefault=$default;
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
