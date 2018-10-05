@@ -86,8 +86,9 @@ class editor_Models_Segment_TermTagTrackChange {
     
     /**
      * enables / disables debugging (logging), can be enabled by setting runtimeOptions.debug.core.termTagTrackChange = 1 in installation.ini
-     * 0 => disabled
+     * 00 => disabled
      * 1 => log called handler methods (logging must be manually implemented in the handler methods by usage of $this->doDebug)
+     * 2 => log also $this
      * @var integer
      */
     private $debug = 0;
@@ -354,8 +355,16 @@ class editor_Models_Segment_TermTagTrackChange {
      * @param string $name
      */
     private function doDebug($name) {
-        if($this->debug === 1) {
+        if(empty($this->debug)) {
+            return;
+        }
+        if($this->debug == 1) {
+            error_log(get_class($this).'::'.$name);
+            return;
+        }
+        if($this->debug == 2) {
             error_log($name);
+            error_log(print_r($this, 1));
         }
     }
 }
