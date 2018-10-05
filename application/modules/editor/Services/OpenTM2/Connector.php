@@ -46,7 +46,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Filename by file id cache
      * @var array
      */
-    protected $fileNameCache=array();
+    public $fileNameCache=array();
     
     
     /**

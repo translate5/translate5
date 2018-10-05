@@ -235,18 +235,120 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             
             $model=ZfExtended_Factory::get('editor_Models_TmMt');
             /* @var $model editor_Models_TmMt */
-            $model->load($res['id']);
+            $model->init($res);
             
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
             /* @var $manager editor_Services_Manager */
             
             $connector=$manager->getConnector($model,$sourceLang,$targetLang);
             /* @var $connector editor_Services_Connector_Abstract */
-            $result = $connector->search($text);
-            $searchResults[$res['serviceName']]=$result->getResult();
+            
+            //init dummy segment so the query action can be used
+            $segment=ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->setMid(-1);
+            $segment->setFileId(-1);
+            $connector->fileNameCache['-1']="InstantTranslate";
+            
+            $sfm=ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+            /* @var $sfm editor_Models_SegmentFieldManager */
+            
+            $sfm->setByName('source', $text);
+            $segment->setFieldContents($sfm, [
+                'source'=>[
+                    'original'=>$text,
+                    'editable'=>true
+                ]
+            ]);
+            
+            //query the resource
+            $result = $connector->query($segment);
+            
+            //check and filter the results
+            $results = $this->filterResults($text,$result->getResult());
+            
+            if(!isset($searchResults[$model->getServiceName()])){
+                $searchResults[$model->getServiceName()]=[];
+            }
+            
+            $searchResults[$model->getServiceName()][$model->getName()]=$results;
         }
         
         return $searchResults;
+    }
+    
+    /***
+     * Filter results by minimum configured match rate.
+     * The differences between the search string and the result source will be marked with tags.
+     * 
+     * @param string $searchText
+     * @param stdClass $results
+     * @return array
+     */
+    private function filterResults($searchText,$results){
+        
+        $config = Zend_Registry::get('config');
+        $matchRate=$config->runtimeOptions->InstantTranslate->minMatchRateBorder;
+        
+        $collectedResults=[];
+        foreach ($results as $result) {
+            //if 100 matchrate, collect the result
+            if($result->matchrate>=100 || $result->matchrate==0){
+                $collectedResults[]=$result;
+                continue;
+            }
+            
+            //if the matchrate is over or equal to the border, highlight the diff and collect the result
+            if($result->matchrate>=$matchRate){
+                $result->sourceDiff=$this->highlightDif($result->source,$searchText);
+                $collectedResults[]=$result;
+                continue;
+            }
+        }
+        return $collectedResults;
+    }
+    
+    /***
+     * highlight the diff between the search string and the source result
+     * 
+     * @param string $source
+     * @param string $target
+     * @return string
+     */
+    private function highlightDif($source,$target){
+        $difTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
+        /* @var $difTagger editor_Models_Export_DiffTagger_Csv */
+        
+        $sourceArr = $difTagger->tagBreakUp($source);
+        $targetArr = $difTagger->tagBreakUp($target);
+        
+        $sourceArr = $difTagger->wordBreakUp($sourceArr);
+        $targetArr = $difTagger->wordBreakUp($targetArr);
+        
+        $diff = ZfExtended_Factory::get('ZfExtended_Diff');
+        /* @var $diff ZfExtended_Diff */
+        $diffRes = $diff->process($sourceArr, $targetArr);
+
+        //add highlight tag
+        $addTags=function($value){
+            if (count($value) > 0) {
+                
+                $addition = implode('', $value);
+                if($addition === '')return;
+                return '<span class="highlight">' . $addition . '</span>';
+            }
+            return '';
+        };
+        
+        foreach ($diffRes as $key => &$val) {
+            if (is_array($val)) {
+                $val['i'] = $addTags($val['i']);
+                $val['d'] ='';
+                $val = implode('', $val);
+            }
+        }
+        return implode('', $diffRes);
+        
     }
     
     /***
