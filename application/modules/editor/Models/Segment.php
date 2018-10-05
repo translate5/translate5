@@ -613,7 +613,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $row->originalToSort = $this->stripTags($row->original);
             $row->taskGuid = $this->getTaskGuid();
             $row->mid = $this->getMid();
-            if($field->editable) {
+            if(isset($field->editable) && $field->editable) {
                 $row->edited = $row->original;
                 $row->editedToSort = $row->originalToSort;
             }

@@ -93,7 +93,7 @@ abstract class editor_Models_Export_DiffTagger {
      * @param array $segment
      * @return array $segment
      */
-    protected function wordBreakUp($segment){
+    public function wordBreakUp($segment){
         $config = Zend_Registry::get('config');
         $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
         
@@ -117,7 +117,7 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $segment
      * @return array $segment
      */
-    protected function tagBreakUp($segment){
+    public  function tagBreakUp($segment){
         if(is_null($this->_regexTag)){
             throw new Zend_Exception('Regex zur Tagerkennung ist NULL');
         }
