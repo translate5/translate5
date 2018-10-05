@@ -354,12 +354,8 @@ class editor_Models_Segment_TermTagTrackChange {
      * @param string $name
      */
     private function doDebug($name) {
-        if(empty($this->debug)) {
-            return;
-        }
-        if($this->debug == 1) {
+        if($this->debug === 1) {
             error_log($name);
-            return;
         }
     }
 }
