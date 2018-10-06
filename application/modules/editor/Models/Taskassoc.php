@@ -186,4 +186,15 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
         }
         return $this->db->fetchAll($s)->toArray();
     }
+    
+    /***
+     * Get all tasks that are assigned to the provided tmmtId.
+     * @param integer $tmmtId
+     * @return array
+     */
+    public function getAssocTasksByTmmtId($tmmtId){
+        $s = $this->db->select()
+        ->where('tmmtId=?',$tmmtId);
+        return $this->db->fetchAll($s)->toArray();
+    }
 }
