@@ -71,10 +71,37 @@ class editor_Models_LanguageResources_SdlResources {
         /* @var $langModel editor_Models_Languages */
         $lngs=$langModel->loadAllKeyValueCustom('id','iso6393');
         
+        $config = Zend_Registry::get('config');
+        $engineCharacterLimit=$config->runtimeOptions->LanguageResources->searchCharacterLimit->toArray();
+        
+        //get the maximum allowed characters for the engine
+        //always the lowest config will be valid
+        $getCharacterLimit=function($numbers){
+            return min($numbers);
+        };
+        
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
+        
+        $customerLimit=PHP_INT_MAX;
+        
+        //get the minimum search character allowed from all user assoc customers of a user
+        foreach ($customers as $customer){
+            $cm=ZfExtended_Factory::get('editor_Models_Customer');
+            /* @var $cm editor_Models_Customer */
+            $cm->load($customer);
+            $customerLimit=min([$cm->getSearchCharacterLimit(),$customerLimit]);
+        }
+        
         $result=[];
         //NOTE: the id is generated, since the sdl language cloud does not provide one
         $engineCounter=1;
         foreach($engines as $engine){
+            $id=is_array($engine) ? $engine['id'] :'mt'.$engineCounter;
+            //get character limit per engine (if configured)
+            $engineLimit=isset($engineCharacterLimit[$id]) ? $engineCharacterLimit[$id] : PHP_INT_MAX;
+            
             $data=array(
                 'id'=>is_array($engine) ? $engine['id'] :'mt'.$engineCounter,
                 'name' =>is_array($engine) ? $engine['labelText'] : $engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
@@ -82,7 +109,8 @@ class editor_Models_LanguageResources_SdlResources {
                 'sourceIso' => is_array($engine) ? $lngs[$engine['sourceLang']] : $engine->from->code,
                 'target' => is_array($engine) ? $engine['targetLangRfc5646']: $engine->toCulture,
                 'targetIso' => is_array($engine) ?$lngs[$engine['targetLang']]:$engine->to->code,
-                'domainCode' => is_array($engine) ? $engine['fileName']:$engine->domainCode
+                'domainCode' => is_array($engine) ? $engine['fileName']:$engine->domainCode,
+                'characterLimit' => $getCharacterLimit([$customerLimit,$engineLimit]),
             );
             
             if($addArrayId){

@@ -105,14 +105,10 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return array|array
      */
     public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=null,$targetLang=null){
-        $sessionUser = new Zend_Session_Namespace('user');
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
-        $userModel->load($sessionUser->data->id);
-        if($userModel->getCustomers()!==null && !empty($userModel->getCustomers())){
-            //get the customers assigned to the user
-            $customers= trim($userModel->getCustomers(),",");
-            $customers=explode(',', $customers);
+        $customers=$userModel->getUserCustomersFromSession();
+        if(!empty($customers)){
             
             //each sdlcloud language resource can have only one language combination
             $s=$this->db->select()

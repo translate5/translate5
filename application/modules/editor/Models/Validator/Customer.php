@@ -49,5 +49,7 @@ class editor_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstr
         
         //`number` varchar(255) DEFAULT NULL,
         $this->addValidator('number', 'stringLength', array('min' => 0, 'max' => 255));
+        
+        $this->addValidator('searchCharacterLimit', 'int');
     }
 }

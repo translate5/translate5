@@ -46,6 +46,9 @@
  * @method string getNumber() getNumber()
  * @method void setNumber() setNumber(string $number)
  * 
+ * @method integer getSearchCharacterLimit() getSearchCharacterLimit()
+ * @method void setSearchCharacterLimit() setSearchCharacterLimit(integer $searchCharacterLimit)
+ * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';

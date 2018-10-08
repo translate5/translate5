@@ -44,10 +44,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         $this->setDefaultLanguages();
         
         $this->view->Php2JsVars()->set('languageresource.fileExtension',$config->runtimeOptions->LanguageResources->fileExtension->toArray());
-        
-        //TODO: Ines-Paul, handle this in front-end
-        $this->view->Php2JsVars()->set('instanttranslate.customersMaxSearchCharacters',$config->runtimeOptions->InstantTranslate->customersMaxSearchCharacters->toArray());
-        
+
         $machineTranslationEngines=array();
         
         $engineModel=ZfExtended_Factory::get('editor_Models_TmMt');
