@@ -50,8 +50,8 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         $machineTranslationEngines=array();
         
-        $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
-        /* @var $engineModel editor_Models_LanguageResources_SdlResources */
+        $engineModel=ZfExtended_Factory::get('editor_Models_TmMt');
+        /* @var $engineModel editor_Models_TmMt */
         $machineTranslationEngines=$engineModel->getEnginesByAssoc();
         
         $this->view->machineTranslationEngines= $machineTranslationEngines;

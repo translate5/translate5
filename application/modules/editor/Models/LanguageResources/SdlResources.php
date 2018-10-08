@@ -32,27 +32,6 @@ END LICENSE AND COPYRIGHT
 class editor_Models_LanguageResources_SdlResources {
     
     /***
-     * Get all available sdl cloud language resources for customers of loged user
-     * @param boolean $addArrayId : if true(default true), the array key will be the language resource id  
-     * @return array
-     */
-    public function getEnginesByAssoc($addArrayId=true){
-        
-        $model=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $model editor_Models_TmMt */
-        
-        $service=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_Service');
-        /* @var $service editor_Services_SDLLanguageCloud_Service */
-        $engines=$model->loadByUserCustomerAssocs($service->getName());
-        
-        //check if results are found
-        if(empty($engines)){
-            return $engines;
-        }
-        return $this->mergeEngineData($engines,$addArrayId);
-    }
-    
-    /***
      * Get all available engines
      * 
      * @return array
@@ -86,7 +65,7 @@ class editor_Models_LanguageResources_SdlResources {
      * @param boolean $addArrayId : if true(default true), the array key will be the language resource id
      * @return array[]
      */
-    private function mergeEngineData($engines,$addArrayId=true) {
+    public function mergeEngineData($engines,$addArrayId=true) {
         //load all languages (sdl api use iso6393 langage shortcuts)
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */

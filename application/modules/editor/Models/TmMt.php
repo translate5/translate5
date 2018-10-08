@@ -59,16 +59,52 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TmMt';
     protected $validatorInstanceClass = 'editor_Models_Validator_TmMt';
     
+    
+    
+    /***
+     * Get all available language resources for customers of loged user
+     * @param boolean $addArrayId : if true(default true), the array key will be the language resource id
+     * @return array
+     */
+    public function getEnginesByAssoc($addArrayId=true){
+        
+        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $serviceManager editor_Services_Manager */
+        $resources = $serviceManager->getAllResources();
+        $mtRes=[];
+        //get all available tm resources
+        foreach($resources as $resource) {
+            /* @var $resource editor_Models_Resource */
+            if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT && !in_array($resource->getService(), $mtRes)){
+                $mtRes[]=$resource->getService();
+            }
+        }
+        
+        //filter assoc resources by mt
+        $engines=$this->loadByUserCustomerAssocs($mtRes);
+        
+        //check if results are found
+        if(empty($engines)){
+            return $engines;
+        }
+        
+        $sdl=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
+        /* @var $sdl editor_Models_LanguageResources_SdlResources */
+        
+        //merge the data as instanttransalte format
+        return $sdl->mergeEngineData($engines,$addArrayId);
+    }
+    
     /***
      * Load all resources associated customers of a user
      * 
-     * @param string $serviceName: add service name as filter
+     * @param array $serviceNames: add service name as filter
      * @param string $sourceLang: add source language as filter
      * @param string $targetLang: add target language as filter
      * 
      * @return array|array
      */
-    public function loadByUserCustomerAssocs($serviceName=null,$sourceLang=null,$targetLang=null){
+    public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=null,$targetLang=null){
         $sessionUser = new Zend_Session_Namespace('user');
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
@@ -86,8 +122,8 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
             ->join(array('l' => 'LEK_languageresources_languages'), 'tm.id = l.languageResourceId', array('sourceLang','targetLang','sourceLangRfc5646','targetLangRfc5646'))
             ->where('ca.customerId IN(?)',$customers);
 
-            if($serviceName){
-                $s->where('tm.serviceName=?',$serviceName);
+            if(!empty($serviceNames)){
+                $s->where('tm.serviceName IN(?)',$serviceNames);
             }
             
             if($sourceLang){

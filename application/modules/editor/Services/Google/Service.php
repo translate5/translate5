@@ -28,16 +28,13 @@ END LICENSE AND COPYRIGHT
 
 /**
  */
-class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAbstract {
-    const DEFAULT_COLOR = 'aaffff';
+class editor_Services_Google_Service extends editor_Services_ServiceAbstract {
+    const DEFAULT_COLOR = '4584f4';
     
-    protected $resourceClass = 'editor_Services_SDLLanguageCloud_Resource';
+    protected $resourceClass = 'editor_Services_Google_Resource';
     
     public function __construct() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->server;
-        $this->addResourceForeachUrl('SDLLanguageCloud', $urls->toArray());
+        $this->addResource([$this->getServiceNamespace(), $this->getName()]);
     }
     
     /**
@@ -45,6 +42,6 @@ class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAb
      * @see editor_Services_ServiceAbstract::getName()
      */
     public function getName() {
-        return "SDLLanguageCloud";
+        return "Google";
     }
 }
