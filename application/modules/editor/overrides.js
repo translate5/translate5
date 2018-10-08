@@ -425,6 +425,67 @@ Ext.override(Ext.form.field.File, {
 });
 
 /**
+ * TRANSLATE-1129: Missing segments on scrolling with page-down / page-up
+ * The original page-down / page-up handlers can only deal with fixed segment row heights
+ * Therefore this fix counts the rows from the currently focused row till the last visible row in the grid view area and scrolls about that amount  
+ */
+Ext.override(Ext.grid.NavigationModel, {
+    getRowsVisible: function () {
+        var node, 
+            view = this.view,
+            viewHeight = view.getHeight(),
+            scrollY = view.getScrollY(),
+            bodyTop = view.bufferedRenderer.bodyTop, //the hidden offset of buffered renderer
+            focusedIdx = this.recordIndex || 0, //start with the focused one or zero
+            rowsToScroll = 0,
+            idx = focusedIdx,
+            lastOffsetTop = 0,
+            lastVisibleOffsetTop = false,
+            lastVisibleAfterScrollIdx = false,
+            nodeTop, nodeTopAndHeight,
+            keyCode = this.keyNav[0] && this.keyNav[0].lastKeyEvent.keyCode,
+            isPageUP = keyCode == Ext.event.Event.PAGE_UP;
+        
+        do { 
+            node = Ext.fly(view.getRow(idx));
+            if (!node) {
+                continue;
+            }
+            //gets the view item element of the row, which has the correct offsetTop to the view container
+            node = node.parent(view.itemSelector);
+            nodeTop = node.dom.offsetTop + bodyTop;
+            nodeTopAndHeight = node.getHeight() + nodeTop;
+            
+            if(isPageUP) {
+                if(nodeTop < (scrollY - viewHeight)){
+                    //if the current node is not completely visible anymore, the node before is the last completely visible
+                    return Math.max(1, focusedIdx - idx - 2); // -/+ 1 testen!
+                }
+            }
+            else {
+                //page down 1. get last row visible in grid view
+                if(lastVisibleOffsetTop === false && nodeTopAndHeight > (scrollY + viewHeight)){
+                    //if the current node is not completely visible anymore, the node before is the last completely visible
+                    lastVisibleOffsetTop = lastOffsetTop;
+                }
+                //page down 2. get the next row down from the above row, which is still visible from the above row + visible view height
+                if(lastVisibleOffsetTop !== false && nodeTopAndHeight > (lastVisibleOffsetTop + viewHeight) ) {
+                    //page down 3. get the row count between the focused row, and the row found in 2., return that.
+                    return Math.max(1, idx - 1 - focusedIdx);
+                }
+            }
+            
+            isPageUP ? idx-- : idx++;
+            lastOffsetTop = node.dom.offsetTop + bodyTop;
+        } while (node);
+        
+        //if no node is found anymore in the rendered view table, we can not calculate the real offset, 
+        // so we have to stop and jump to last available
+        return isPageUP ? Math.max(1, focusedIdx - idx - 1) : Math.max(1, idx - 1 - focusedIdx);
+    }
+});
+
+/**
  * Override BufferedRenderer due Bugs in ExtJS 6.2.0 (TRANSLATE-1128 and TRANSLATE-1233) 
  * Bugs are fixed in the version 6.2.2, so the whole override can be removed on an extjs update 
  */
