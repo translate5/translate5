@@ -110,7 +110,7 @@ foreach ($tasks as $taskGuid) {
 }
 
 $res = $db->query('SELECT COUNT(*) `cnt` FROM `LEK_skeletonfiles`');
-if($res && ($row = $res->fetchObject()) && $row->cnt === 0) {
+if($res && ($row = $res->fetchObject()) && $row->cnt === "0") {
     $db->query('DROP TABLE `LEK_skeletonfiles`;') && error_log('Table LEK_skeletonfiles dropped!');
 }
 else {
