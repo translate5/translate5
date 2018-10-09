@@ -53,6 +53,7 @@ END LICENSE AND COPYRIGHT
  * @method integer getFileOrder() getFileOrder()
  */
 class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
+    const SKELETON_PATH = '/skeletonfiles/file_%d.zlib';
     protected $dbInstanceClass = 'editor_Models_Db_Files';
     
     /**
@@ -83,5 +84,48 @@ class editor_Models_File extends ZfExtended_Models_Entity_Abstract {
             return $item['cnt'];
         }, $this->db->fetchAll($s)->toArray());
         return array_combine($keys, $values);
+    }
+
+    /**
+     * Saves the skeleton data for the current file to the disk
+     * @param string $data Skeletonfile data
+     * @param editor_Models_Task $task optional, task entity to get the data path from. If not given load one by the internal stored taskGuid
+     */
+    public function saveSkeletonToDisk($data, editor_Models_Task $task = null) {
+        $filePath = $this->getSkeletonPath($task);
+        $skelDir = dirname($filePath);
+        if(!file_exists($skelDir)) {
+            @mkdir($skelDir);
+        }
+        if(!is_writable($skelDir)) {
+            throw new ZfExtended_Exception('Skeleton directory is not writeable! Directory: '.$skelDir);
+        }
+        file_put_contents($filePath, gzcompress($data));
+    }
+    
+    /**
+     * Loads the skeleton data for the current file from the disk and returns it
+     * @param editor_Models_Task $task optional, task entity to get the data path from. If not given load one by the internal stored taskGuid
+     */
+    public function loadSkeletonFromDisk(editor_Models_Task $task = null) {
+        $filePath = $this->getSkeletonPath($task);
+        if(!file_exists($filePath)) {
+            throw new ZfExtended_Exception('Skeleton file does not exist or not readable! File: '.$filePath);
+        }
+        return gzuncompress(file_get_contents($filePath));
+    }
+    
+    /**
+     * Returns the given task or loads one by the internal stored taskGuid
+     * @param editor_Models_Task $task
+     * @return editor_Models_Task
+     */
+    protected function getSkeletonPath(editor_Models_Task $task = null) {
+        if(empty($task)) {
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($this->getTaskGuid());
+        }
+        return $task->getAbsoluteTaskDataPath().sprintf(self::SKELETON_PATH, $this->getId());
     }
 }

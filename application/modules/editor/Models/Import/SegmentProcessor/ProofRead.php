@@ -135,11 +135,11 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
      * @param editor_Models_Import_FileParser $parser
      */
     public function postParseHandler(editor_Models_Import_FileParser $parser) {
-    	$skel = ZfExtended_Factory::get('editor_Models_Skeletonfile');
-    	$skel->setfileName($this->fileName);
-    	$skel->setfileId($this->fileId);
-    	$skel->setFile($parser->getSkeletonFile()); // wird in Sdlxliff.php befüllt
-    	$skel->save();
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($this->fileId);
+        $file->saveSkeletonToDisk($parser->getSkeletonFile(), $this->task);
+        
         $this->saveFieldWidth($parser);
     }
     
