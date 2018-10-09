@@ -529,6 +529,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (strpos($segment, '<')=== false) {
             return $segment;
         }
+        if(preg_match('/<mrk[^>]+mtype="x-sdl-comment"/', $segment)){
+            throw new ZfExtended_Exception('The file "'.$this->_fileName.'" of Task "'.$this->task->getTaskGuid().'" contains SDL comments which are currently not supported!');
+        }
         $segment = $this->parseSegmentUnifyInternalTags($segment);
         $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
         $data->segment = preg_split('"(<[^>]*>)"', $segment, NULL, PREG_SPLIT_DELIM_CAPTURE);

@@ -119,15 +119,15 @@ class editor_Models_Import_FileParser_XmlParser {
                     $this->handleElementEnd($key, $tag);
                     continue;
                 }
-                //find attributes:
-                if(preg_match_all('/([^\s]+)="([^"]*)"/', $chunk, $matches)){
-                    //ensure that all attribute keys are lowercase, original notation can be found in the orignal chunk
-                    $matches[1] = array_map('strtolower', $matches[1]);
-                    $attributes = array_combine($matches[1], $matches[2]);
-                }
-                else {
-                    $attributes = [];
-                }
+                
+                //due the the $matches structure of preg_match_all the array_merge of both results is much easier 
+                //  as trying to use the result of a combined regex
+                $attributes = array_merge(
+                //find attributes with " quotes:
+                    $this->parseAttributes('/([^\s]+)="([^"]*)"/', $chunk),
+                //find attributes with ' quotes:
+                    $this->parseAttributes("/([^\s]+)='([^']*)'/", $chunk)
+                );
                 
                 $this->handleElementStart($key, $tag, $attributes, $isSingle);
                 if($isSingle) {
@@ -139,6 +139,21 @@ class editor_Models_Import_FileParser_XmlParser {
         }
     }
     
+    /**
+     * parses the chunks attributes via the given regex
+     * @param string $regex
+     * @param string $chunk
+     */
+    protected function parseAttributes($regex, $chunk) {
+        $matches = [];
+        //find attributes with " quotes:
+        if(preg_match_all($regex, $chunk, $matches)){
+            //ensure that all attribute keys are lowercase, original notation can be found in the orignal chunk
+            $matches[1] = array_map('strtolower', $matches[1]);
+            return array_combine($matches[1], $matches[2]);
+        }
+        return $matches; //since $matches is empty we can return it here as empty array
+    }
     
     /**
      * return next chunk, null if there is no more

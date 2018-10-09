@@ -906,7 +906,6 @@ class editor_TaskController extends ZfExtended_RestController {
     public function exportAction() {
         parent::getAction();
         
-        $this->entity->checkStateAllowsActions();
         
         $diff = (boolean)$this->getRequest()->getParam('diff');
         
@@ -917,6 +916,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 return;
                 
             case 'xliff2':
+                $this->entity->checkStateAllowsActions();
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Xliff2Worker');
                 $diff = false;
                 /* @var $worker editor_Models_Export_Xliff2Worker */
@@ -924,6 +924,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 break;
             
             default:
+                $this->entity->checkStateAllowsActions();
                 $worker = ZfExtended_Factory::get('editor_Models_Export_Worker');
                 /* @var $worker editor_Models_Export_Worker */
                 $exportFolder = $worker->initExport($this->entity, $diff);
