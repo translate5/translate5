@@ -149,7 +149,9 @@ Ext.define('Editor.controller.Editor', {
             // please check if eventIsTranslate5() still works as expected 
             // in Editor.plugins.TrackChanges.controller.UtilEvent).
             'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
-            'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit]
+            'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
+            'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
+            'ctrl-zoomOut':   [[189, Ext.EventObjectImpl.NUM_MINUS],{ctrl: true, alt: false, shift: false}, me.handleZoomOut, true]
         };
         
         //FIXME let me come from the server out of AutoStates.php
@@ -506,6 +508,20 @@ Ext.define('Editor.controller.Editor', {
             return false;
         } 
     },
+    
+    /**
+     * Keyboard handler for zoom in, calls just the viewmodes function directly
+     */
+    handleZoomIn: function() {
+        Editor.app.getController('ViewModes').setSegmentSize(1, true);
+    },
+    /**
+     * Keyboard handler for zoom out, calls just the viewmodes function directly
+     */
+    handleZoomOut: function() {
+        Editor.app.getController('ViewModes').setSegmentSize(-1, true);
+    },
+    
     /**
      * Moves to the next row without saving current record
      * @return {Boolean} true if there is a next segment, false otherwise

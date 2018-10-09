@@ -130,12 +130,6 @@ div.single + div {
 #segment-grid span.term {
     text-decoration: underline;
 }
-.view-editor-font-size,
-#segment-grid .x-grid-row .x-grid-cell, 
-#segment-grid .x-grid-row-editor .x-form-display-field {
-  font-size:9pt !important;
-  line-height:14px;
-}
 
 #segment-grid .x-grid-row-editor .x-form-display-field {
     text-overflow: initial;
@@ -370,11 +364,25 @@ background-color: #EAF1FB;
 .comments-grid .comment .content {white-space: normal;display:block;}
 .comment .author, .comment .created, .comment .modified {font-size: 7pt; font-style: italic;line-height:10pt;}
 
+/* segment grid font sizing */
+body.segment-size-1 .segment-font-sizable .x-form-display-field,
+body.segment-size-1 .segment-font-sizable {font-size: 7pt !important;line-height: 11px;}
+/* old details mode: */
+body.segment-size-2 .segment-font-sizable .x-form-display-field,
+body.segment-size-2 .segment-font-sizable {font-size: 9pt !important;line-height: 14px;}
+body.segment-size-3 .segment-font-sizable .x-form-display-field,
+body.segment-size-3 .segment-font-sizable {font-size: 11pt !important;line-height: 19px;}
+/* old ergonomic mode: */
+body.segment-size-4 .segment-font-sizable .x-form-display-field,
+body.segment-size-4 .segment-font-sizable {font-size: 13pt !important;line-height: 23px;}
+body.segment-size-5 .segment-font-sizable .x-form-display-field,
+body.segment-size-5 .segment-font-sizable {font-size: 16pt !important;line-height: 26px;}
+body.segment-size-6 .segment-font-sizable .x-form-display-field,
+body.segment-size-6 .segment-font-sizable {font-size: 19pt !important;line-height: 30px;}
+
+/* hier vermutlich anstatt der fontsize die lineheight auf 14px fix dazu! */
 #segment-grid.ergonomic .x-grid-row .x-grid-cell.comments-field {font-size:13pt !important;}
 
-.ergonomic-font,
-#segment-grid.ergonomic .x-grid-row .x-grid-cell, 
-#segment-grid.ergonomic .x-grid-row-editor .x-form-display-field {font-size: 13pt !important;line-height: 23px;}
 
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.add, 
 body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid-cell-inner img.edit {display:none;}
@@ -384,6 +392,9 @@ body.editor-readonly #segment-grid .x-grid-item-selected .comments-field .x-grid
 .autoState-999 {background-position: center;background-repeat: no-repeat;}
 .ico-refresh {background-image: url("../images/arrow_refresh_small.png");}
 .ico-notify-user {background-image: url("../images/email_go.png");}
+
+.ico-zoom-in {background-image: url("../images/magnifier_zoom_in.png");}
+.ico-zoom-out {background-image: url("../images/magnifier_zoom_out.png");}
 
 body.loading {
     color: #404040;
@@ -512,6 +523,7 @@ tr.customState td div {font-style: italic;}
 .adminTaskGrid tr.editorDeleteTask .ico-task-delete {background-image: url("../images/page_delete.png");display:inline-block;}
 .adminTaskGrid tr.editorCloneTask.error .ico-task-clone,
 .adminTaskGrid tr.editorCloneTask .ico-task-clone {background-image: url("../images/page_copy.png");display:inline-block;}
+.adminTaskGrid tr.editorShowexportmenuTask.error.downloadable .ico-task-showexportmenu,
 .adminTaskGrid tr.editorShowexportmenuTask .ico-task-showexportmenu {background-image: url("../images/database_go.png");display:inline-block;}
 .adminTaskGrid tr.pending .x-action-col-icon {display:none !important;}
 .adminTaskGrid tr.pending td.state div {background: url("../images/loading_ico.gif") no-repeat 6px center;}

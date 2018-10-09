@@ -47,12 +47,15 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     item_editModeBtn: '#UT#Details',
     item_ergonomicModeBtn: '#UT#Normal',
     item_ergonomicModeReadonlyBtn: '#UT#Normal (nur Lesemodus)',
+    item_tagModesMenu: '#UT#Tagmodi',
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
     item_qmsummaryBtn: '#UT#MQM',
     item_qmsummaryTooltip: '#UT#MQM Statistik',
     item_optionsTagBtn: '#UT#Einstellungen',
+    item_zoomIn: '#UT#Segmentschriftgrad vergrößern',
+    item_zoomOut: '#UT#Segmentschriftgrad verkleinern',
     item_clearSortAndFilterBtn: '#UT#Tabelle zurücksetzen',
     item_clearSortAndFilterTooltip: '#UT#Sortierung und Filter zurücksetzen',
     item_watchListFilterBtn: '#UT#Lesezeichen',
@@ -139,29 +142,55 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                     xtype: 'tbseparator'
                 },{
                     xtype: 'button',
-                    itemId: 'hideTagBtn',
-                    enableToggle: true,
-                    text: me.item_hideTagBtn,
-                    tagMode: 'hide',
-                    toggleGroup: 'tagMode',
-                    bind: {
-                        disabled: '{!editorIsReadonly}'
+                    text: me.item_tagModesMenu,
+                    itemId: 'tagModeMenu',
+                    menu: {
+                        xtype: 'menu',
+                        items: [{
+                            xtype: 'menucheckitem',
+                            itemId: 'hideTagBtn',
+                            bind: {
+                                disabled: '{!editorIsReadonly}'
+                            },
+                            text: me.item_hideTagBtn,
+                            tagMode: 'hide',
+                            group: 'tagMode'
+                        },{
+                            xtype: 'menucheckitem',
+                            itemId: 'shortTagBtn',
+                            checked: true,
+                            text: me.item_shortTagBtn,
+                            tagMode: 'short',
+                            group: 'tagMode'
+                        },{
+                            xtype: 'menucheckitem',
+                            itemId: 'fullTagBtn',
+                            checked: true,
+                            text: me.item_fullTagBtn,
+                            tagMode: 'full',
+                            group: 'tagMode'
+                        }]
+                    }
+                },{
+                    xtype: 'tbseparator'
+                },{
+                    xtype: 'button',
+                    type: 'segment-zoom',
+                    itemId: 'zoomInBtn',
+                    iconCls: 'ico-zoom-in',
+                    tooltip: {
+                        text: me.item_zoomIn,
+                        showDelay: 0
                     }
                 },{
                     xtype: 'button',
-                    itemId: 'shortTagBtn',
-                    enableToggle: true,
-                    pressed: true,
-                    text: me.item_shortTagBtn,
-                    tagMode: 'short',
-                    toggleGroup: 'tagMode'
-                },{
-                    xtype: 'button',
-                    itemId: 'fullTagBtn',
-                    enableToggle: true,
-                    tagMode: 'full',
-                    text: me.item_fullTagBtn,
-                    toggleGroup: 'tagMode'
+                    type: 'segment-zoom',
+                    itemId: 'zoomOutBtn',
+                    iconCls: 'ico-zoom-out',
+                    tooltip: {
+                        text: me.item_zoomOut,
+                        showDelay: 0
+                    }
                 },{
                     xtype: 'tbseparator'
                 },{

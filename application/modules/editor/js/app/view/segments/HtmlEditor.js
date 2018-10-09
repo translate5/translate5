@@ -99,7 +99,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   
   initComponent: function() {
     var me = this;
-    me.viewModesController = Editor.controller.ViewModes;
+    me.viewModesController = Editor.app.getController('ViewModes');
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
@@ -117,6 +117,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         xtype:'segments.statusstrip',
         htmlEditor: me
     });
+    me.mon(me.viewModesController, 'segmentSizeChanged', me.setSegmentSize, me);
   },
   setHeight: function(height) {
       var me = this,
@@ -147,9 +148,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     var me = this,
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
-        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;line-height:14px;"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=15" />'; //disable Img resizing
-    return Ext.String.format(body, me.iframePad, additionalCss, dir);
+        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;" class="{3}"></body></html>',
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=16" />'; //disable Img resizing
+    return Ext.String.format(body, me.iframePad, additionalCss, dir, me.currentSegmentSize);
   },
   /**
    * overriding default method since under some circumstances this.getWin() returns null which gives an error in original code
@@ -302,6 +303,12 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         range.setEndAfter(lastNode); 
         this.fireEvent('afterInsertMarkup', rangeForNode);
       }
+  },
+  setSegmentSize: function(controller, size, oldSize) {
+      var body = Ext.fly(this.getEditorBody());
+      body.removeCls(oldSize);
+      body.addCls(size);
+      this.currentSegmentSize = size;
   },
   /**
    * converts the given HTML String to HTML ready for the Editor (div>span to img tags)

@@ -112,6 +112,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
               res.push('locked');
           }
           if(task.isErroneous()) {
+              if(Editor.data.import.createArchivZip && user.isAllowed('downloadImportArchive', task)){
+                  res.push('downloadable');
+              }
               res.push('error');
               return res.join(' ');
           }

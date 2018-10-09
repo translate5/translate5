@@ -59,15 +59,10 @@ Ext.define('Editor.view.segments.Grid', {
     ],
     plugins: ['gridfilters'],
     alias: 'widget.segments.grid',
-    stateful: false,
-    
-    store: 'Segments',
-  
-    cls: 'segment-tag-viewer',
     id: 'segment-grid',
-
+    stateful: false,
+    store: 'Segments',
     title: '#UT#Segmentliste und Editor',
-    
     tools: [
         {
             type: 'up',
@@ -295,7 +290,7 @@ Ext.define('Editor.view.segments.Grid', {
                 title: me.title, //see EXT6UPD-9
                 viewConfig: {
                     getRowClass: function(record, rowIndex, rowParams, store){
-                        var newClass = '',
+                        var newClass = 'segment-font-sizable',
                             // only on non sorted list we mark last file segments
                             isDefaultSort = (store.sorters.length == 0),
                             isFirstInFile = false,

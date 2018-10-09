@@ -50,9 +50,6 @@ Ext.define('Editor.controller.ViewModes', {
         ref : 'shortTagBtn',
         selector : '#segmentgrid #shortTagBtn'
     },{
-        ref : 'hideTagBtn',
-        selector : '#segmentgrid #hideTagBtn'
-    },{
         ref : 'segmentPager',
         selector : 'editorgridscroller'
     },{
@@ -78,11 +75,11 @@ Ext.define('Editor.controller.ViewModes', {
             'gridpanel segmentsToolbar menucheckitem[group="toggleView"]' : {
                 click : 'handleViewMode'
             },
-            'gridpanel segmentsToolbar button[toggleGroup="tagMode"]' : {
+            'gridpanel segmentsToolbar menucheckitem[group="tagMode"]' : {
                 click : 'handleTagButtonClick'
             },
-            'segmentsHtmleditor': {
-                initialize: 'toggleEditorErgonomicMode'
+            'button[type="segment-zoom"]' : {
+                click : 'handleTagZoomClick'
             },
             '#segmentgrid': {
                 beforestartedit: 'checkModeBeforeEdit'
@@ -90,6 +87,7 @@ Ext.define('Editor.controller.ViewModes', {
         }
     },
     messageIsViewMode: '#UT#Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.',
+    currentSegmentSize: null,
     /**
      * Flag when true, editor can not be set into a non readonly mode
      */
@@ -100,6 +98,7 @@ Ext.define('Editor.controller.ViewModes', {
      * Columns width for editor in edit mode
      */
     editModeColumnWidth:[],
+    currentTagMode: 'short-tag',
 
     init : function() {
         var me = this;
@@ -117,26 +116,18 @@ Ext.define('Editor.controller.ViewModes', {
         MODE_ERGONOMIC : 'ergonomic',   //ergonomic/big edit mode
         CLS_READONLY: 'editor-readonly',
         
-        currentTagMode: 'short-tag',
         
         ROW_HEIGHT_ERGONOMIC: 60,
         ROW_HEIGHT_DEFAULT: 15,
-        
-        setMode: function(mode){
-            this.currentTagMode = mode; 
-        },
-        getMode: function() {
-            return this.currentTagMode;
-        },
-        isFullTag: function(){
-            return (this.currentTagMode == this.TAG_FULL);
-        },
-        isShortTag: function(){
-            return (this.currentTagMode == this.TAG_SHORT);
-        },
-        isHideTag: function(){
-            return (this.currentTagMode == this.TAG_HIDE);
-        }
+    },
+    isFullTag: function(){
+        return (this.currentTagMode == this.self.TAG_FULL);
+    },
+    isShortTag: function(){
+        return (this.currentTagMode == this.self.TAG_SHORT);
+    },
+    isHideTag: function(){
+        return (this.currentTagMode == this.self.TAG_HIDE);
     },
     handleViewportReady: function(grid) {
         //start editor in normal(ergonomic) mode if configured, respect before set readonly mode
@@ -148,15 +139,7 @@ Ext.define('Editor.controller.ViewModes', {
         this.visibleColumns = [];
     },
     setViewMode: function(mode){
-        var me = this,
-            body = Ext.getBody(),
-            modeToCls = function(mode) {
-                return 'mode-'+mode;
-            };
-        
-        body.removeCls(Ext.Array.map([me.self.MODE_EDIT, me.self.MODE_ERGONOMIC], modeToCls));
-        body.addCls(modeToCls(mode));
-        return me.getViewPort().getViewModel().set('editorViewmode', mode);
+        return this.getViewPort().getViewModel().set('editorViewmode', mode);
     },
     getViewMode: function() {
         return this.getViewPort().getViewModel().get('editorViewmode');
@@ -247,16 +230,16 @@ Ext.define('Editor.controller.ViewModes', {
         var me = this;
         readonly = me.setReadonly(readonly);
         me.getViewModeMenu().hideMenu();
-        me.getShortTagBtn().toggle(true);
+        me.getShortTagBtn().setChecked(true);
 
         //editMode und viewMode
-        me.getSegmentGrid().removeCls(me.self.MODE_ERGONOMIC);
         if(me.isErgonomicMode()){
             me.showNonErgonomicElements();
         }
 
         //nur editMode
         me.setViewMode(me.self.MODE_EDIT);
+        me.setSegmentSize(2);
 
         //editMode und viewMode
         me.getSegmentGrid().view.refresh();
@@ -283,7 +266,7 @@ Ext.define('Editor.controller.ViewModes', {
         readonly = me.setReadonly(readonly);
         
         me.getViewModeMenu().hideMenu();
-        me.getShortTagBtn().toggle(true);
+        me.getShortTagBtn().setChecked(true);
         
         wasAlreadyErgo || me.setVisibleElements();
 
@@ -331,39 +314,15 @@ Ext.define('Editor.controller.ViewModes', {
         Ext.util.CSS.removeStyleSheet(me.self.STYLE_BOX_ID); //delete if already exists!
         Ext.util.CSS.createStyleSheet('#segment-grid .x-grid-row .segment-tag-column.x-grid-cell .x-grid-cell-inner { width: '+me.colWidth+'px; }',me.self.STYLE_BOX_ID);
         
-        //ergoOnly, others remove cls
-        wasAlreadyErgo || grid.addCls(me.self.MODE_ERGONOMIC);
-
         //ergoOnly others, with other mode
         wasAlreadyErgo || me.setViewMode(me.self.MODE_ERGONOMIC);
+        wasAlreadyErgo || me.setSegmentSize(4);
 
         grid.view.refresh();
-        me.toggleEditorErgonomicMode();
+        me.handleTagButtonClick('short');
         me.saveAlreadyOpened();
 
-
         wasAlreadyErgo || me.fireEvent('viewModeChanged',me);
-    },
-    /**
-     * sets and removes the ergonomic view for the editor
-     */
-    toggleEditorErgonomicMode: function() {
-        var me = this,
-            editor = me.getSegmentsHtmleditor(),
-            body;
-        
-        if(!editor || !editor.rendered) {
-            return;
-        }
-        
-        body = Ext.fly(editor.getEditorBody());
-        if(!body) {
-            return;
-        }
-        body.removeCls(me.self.MODE_ERGONOMIC);
-        if(me.isErgonomicMode()){
-            body.addCls(me.self.MODE_ERGONOMIC);
-        }
     },
     /**
      * show or expand all columns and areas not needed in ergonomic mode, which have been visible before
@@ -426,7 +385,6 @@ Ext.define('Editor.controller.ViewModes', {
             ed.reposition();
             ed.setEditorHeight();
         }
-        this.toggleEditorErgonomicMode();
     },
     /**
      * Hilfsfunktion zum Setzen des Tag Modus
@@ -436,7 +394,7 @@ Ext.define('Editor.controller.ViewModes', {
         var me = this;
         Ext.getBody().removeCls([this.self.TAG_FULL, this.self.TAG_SHORT, this.self.TAG_HIDE]);
         Ext.getBody().addCls(mode);
-        me.self.setMode(mode);
+        this.currentTagMode = mode;
     },
     /**
      * saving a segment on switching view mode
@@ -456,5 +414,29 @@ Ext.define('Editor.controller.ViewModes', {
             Editor.MessageBox.addWarning(this.messageIsViewMode);
             return false;
         }
+    },
+    /**
+     * Handles clicking the zoom buttons
+     */
+    handleTagZoomClick: function(btn) {
+        this.setSegmentSize(btn.itemId == 'zoomInBtn' ? 1 : -1, true);
+    },
+    /**
+     * Sets the segment font size via CSS class
+     */
+    setSegmentSize(size, relative) {
+        var me = this,
+            oldSize = me.currentSegmentSize;
+        if(relative) {
+            size = oldSize + size;
+        }
+        size = Math.min(Math.max(size, 1), 6);
+        me.currentSegmentSize = size;
+        sizer = function(size) {return 'segment-size-'+size};
+        size = sizer(size);
+        oldSize = sizer(oldSize);
+        Ext.getBody().removeCls(oldSize);
+        Ext.getBody().addCls(size);
+        me.fireEvent('segmentSizeChanged', me, size, oldSize);
     }
 });

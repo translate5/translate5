@@ -27,7 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 body{box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;cursor:text;font-size:10px;}
-body.ergonomic {font-size:13pt !important; line-height: 23px !important;}
 body.hide-tag img{display:none;}
 img {vertical-align:middle;cursor: pointer;}
 img + img {margin-left:1px;}
@@ -39,3 +38,22 @@ span.notRecommended,
 span.supersededTerm,
 span.deprecatedTerm {border-bottom:none;background-color:#fa51ff;}
 body.fakedsel strong, body.fakedsel b {font-weight:normal;background:#b0b0b0;}
+
+/* segment grid font sizing */
+body.segment-size-1 {font-size: 7pt !important;line-height: 11px;}
+/* old details mode: */
+body.segment-size-2 {font-size: 9pt !important;line-height: 14px;}
+body.segment-size-3 {font-size: 11pt !important;line-height: 19px;}
+/* old ergonomic mode: */
+body.segment-size-4 {font-size: 13pt !important;line-height: 23px;}
+body.segment-size-5 {font-size: 16pt !important;line-height: 26px;}
+body.segment-size-6 {font-size: 19pt !important;line-height: 30px;}
+
+body.segment-size-1 img {height: 11px;}
+/* old details mode: */
+body.segment-size-2 img {height: 14px;}
+body.segment-size-3 img {height: 19px;}
+/* old ergonomic mode: */
+body.segment-size-4 img {height: 23px;}
+body.segment-size-5 img {height: 26px;}
+body.segment-size-6 img {height: 30px;}
