@@ -72,7 +72,7 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
         getRowClass: function(record) {
 			//same class generation in MatchGrid!
             var me=this,
-            result = ['match-state-'+record.get('state')];
+            	result = ['segment-font-sizable', 'match-state-'+record.get('state')];
             
             if(me.lookupViewModel().get('viewmodeIsErgonomic')){
                 result.push('ergonomic-font');
