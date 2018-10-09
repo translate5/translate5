@@ -53,6 +53,9 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 $db = Zend_Db_Table::getDefaultAdapter();
 
 $sql = 'SELECT `taskGuid` FROM `LEK_task` WHERE `taskGuid` NOT IN (SELECT `taskGuid` FROM `LEK_task_migration` WHERE `filename` = ?)';
+
+//FIXME status import und error ausklammern! Oder gleich eine Fehlermeldung?
+
 $res = $db->query($sql, SCRIPT_IDENTIFIER);
 
 $tasks = $res->fetchAll(Zend_Db::FETCH_COLUMN);
@@ -71,8 +74,6 @@ $taskCount = count($tasks);
 $tasksDone = 1;
 error_log('Tasks to be converted: '.$taskCount."\n");
 
-$task = ZfExtended_Factory::get('editor_Models_Task');
-/* @var $task editor_Models_Task */
 
 $stmt = $db->prepare('SELECT `LEK_skeletonfiles`.`file`, `LEK_skeletonfiles`.`fileId`, `LEK_skeletonfiles`.`fileName`
                        FROM `LEK_skeletonfiles`, `LEK_files`
@@ -80,6 +81,8 @@ $stmt = $db->prepare('SELECT `LEK_skeletonfiles`.`file`, `LEK_skeletonfiles`.`fi
 
 //converts skeleton files per task to disk
 foreach ($tasks as $taskGuid) {
+    $task = ZfExtended_Factory::get('editor_Models_Task');
+    /* @var $task editor_Models_Task */
     $task->loadByTaskGuid($taskGuid);
     
     $stmt->execute([
@@ -97,7 +100,7 @@ foreach ($tasks as $taskGuid) {
         $size = file_put_contents($skelFilePath, $row->file);
         
         if($size && file_exists($skelFilePath) && md5($row->file) == md5_file($skelFilePath)) {
-            $db->query('DELETE FROM `LEK_skeletonfiles` WHERE `fileId` = ?', $row->fileId);
+            //$db->query('DELETE FROM `LEK_skeletonfiles` WHERE `fileId` = ?', $row->fileId);
             error_log('  Task '.$taskGuid.': converted file '.$row->fileName); 
         }
         else {
@@ -111,7 +114,8 @@ foreach ($tasks as $taskGuid) {
 
 $res = $db->query('SELECT COUNT(*) `cnt` FROM `LEK_skeletonfiles`');
 if($res && ($row = $res->fetchObject()) && $row->cnt === "0") {
-    $db->query('DROP TABLE `LEK_skeletonfiles`;') && error_log('Table LEK_skeletonfiles dropped!');
+    //$db->query('DROP TABLE `LEK_skeletonfiles`;') && 
+    error_log('Table LEK_skeletonfiles dropped!');
 }
 else {
     error_log('Could not drop table LEK_skeletonfiles since there are still some skeleton file entries which could not be converted Please check that!');
