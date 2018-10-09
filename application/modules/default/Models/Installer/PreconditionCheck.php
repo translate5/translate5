@@ -42,6 +42,12 @@ class Models_Installer_PreconditionCheck {
     protected $errorsEnvironment = array();
     
     /**
+     * Error Messages while checking environment are added here
+     * @var array
+     */
+    protected $infosEnvironment = array();
+    
+    /**
      * Error Messages while checking DB are added here
      * @var array
      */
@@ -53,7 +59,12 @@ class Models_Installer_PreconditionCheck {
     public function checkEnvironment() {
         $this->checkGitInstallation();
         $this->checkPhpVersion();
+        $this->checkLocale();
         $this->checkPhpExtensions();
+        if(!empty($this->infosEnvironment)) {
+            $msg = 'Some system requirements of translate5 are not optimal: ';
+            $this->stop($msg."\n  - ".join("\n  - ", $this->infosEnvironment)."\n");
+        }
         if(!empty($this->errorsEnvironment)) {
             $msg = 'Some system requirements of translate5 are not met: ';
             $this->stop($msg."\n  - ".join("\n  - ", $this->errorsEnvironment)."\n");
@@ -70,6 +81,21 @@ class Models_Installer_PreconditionCheck {
                 $this->errorsEnvironment[] = 'Please update your xampp package manually or reinstall Translate5 with the latest windows installer from http://www.translate5.net';
                 $this->errorsEnvironment[] = 'Warning: Reinstallation can lead to data loss! Please contact support@translate5.net when you need assistance in data conversion!';
             }
+        }
+    }
+    
+    /**
+     * Ensure that the correct locale is set
+     */
+    protected function checkLocale() {
+        $locale = setlocale(LC_CTYPE, 0);
+        $win = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        if(!$win && stripos($locale, 'utf-8') === false) {
+            $this->errorsEnvironment[] = 'Your system locale is not UTF-8 capable, it is set to: LC_CTYPE='.$locale;
+            $this->errorsEnvironment[] = 'Please use a UTF-8 based locale to avoid problems with special characters in filenames.';
+        }
+        if ($win) {
+            $this->infosEnvironment[] = 'You are using WINDOWS as server environment. Please ensure that the configuration runtimeOptions.fileSystemEncoding is set correct.';
         }
     }
     
