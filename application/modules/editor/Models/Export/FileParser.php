@@ -166,9 +166,13 @@ abstract class editor_Models_Export_FileParser {
      * @return string file
      */
     public function getFile() {
-        $this->getSkeleton();
+        $file = ZfExtended_Factory::get('editor_Models_File');
+        /* @var $file editor_Models_File */
+        $file->load($this->_fileId);
+        
+        $this->getSkeleton($file);
         $this->parse();
-        $this->convertEncoding();
+        $this->convertEncoding($file);
         return $this->_exportFile;
     }
     
@@ -375,12 +379,11 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
-     * sets $this->_skeletonFile
+     * Loads the skeleton file from the disk and stores it internally
+     * @param editor_Models_File $file
      */
-    protected function getSkeleton() {
-        $skel = ZfExtended_Factory::get('editor_Models_Skeletonfile');
-        $skel->loadRow('fileId = ?', $this->_fileId);
-        $this->_skeletonFile = $skel->getFile();
+    protected function getSkeleton(editor_Models_File $file) {
+        $this->_skeletonFile = $file->loadSkeletonFromDisk($this->_task);
     }
 
     /**
@@ -394,11 +397,10 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
-     * - converts $this->_exportFile back to the original encoding registered in the LEK_files
+     * converts $this->_exportFile back to the original encoding registered in the LEK_files
+     * @param editor_Models_File $file
      */
-    protected function convertEncoding(){
-        $file = ZfExtended_Factory::get('editor_Models_File');
-        $file->load($this->_fileId);
+    protected function convertEncoding(editor_Models_File $file){
         $enc = $file->getEncoding();
         if(is_null($enc) || $enc === '' || strtolower($enc) === 'utf-8')return;
         $this->_exportFile = iconv('utf-8', $enc, $this->_exportFile);
