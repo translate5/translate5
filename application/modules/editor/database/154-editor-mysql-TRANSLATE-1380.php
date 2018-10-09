@@ -52,12 +52,11 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
 
 $db = Zend_Db_Table::getDefaultAdapter();
 
-$sql = 'SELECT `taskGuid` FROM `LEK_task` WHERE `taskGuid` NOT IN (SELECT `taskGuid` FROM `LEK_task_migration` WHERE `filename` = ?)';
-
-//FIXME status import und error ausklammern! Oder gleich eine Fehlermeldung?
+$sql = 'SELECT `taskGuid` FROM `LEK_task` WHERE `taskGuid` NOT IN (
+    SELECT `taskGuid` FROM `LEK_task_migration` WHERE `filename` = ?
+) AND `state` != "import"';
 
 $res = $db->query($sql, SCRIPT_IDENTIFIER);
-
 $tasks = $res->fetchAll(Zend_Db::FETCH_COLUMN);
 
 /*
@@ -90,33 +89,42 @@ foreach ($tasks as $taskGuid) {
     ]);
     $count = $stmt->rowCount();
     error_log('  Task '.$taskGuid.': '.$count.' skeleton files to be saved to disk by '.basename(__FILE__));
-
+    $allFilesConverted = true;
+    
     while($row = $stmt->fetchObject()) {
         $skelFilePath = $task->getAbsoluteTaskDataPath().sprintf(editor_Models_File::SKELETON_PATH, $row->fileId);
         $skelDir = dirname($skelFilePath);
         if(!file_exists($skelDir)) {
-            @mkdir($skelDir);
+            @mkdir($skelDir, 0777, true);
         }
         $size = file_put_contents($skelFilePath, $row->file);
         
         if($size && file_exists($skelFilePath) && md5($row->file) == md5_file($skelFilePath)) {
-            //$db->query('DELETE FROM `LEK_skeletonfiles` WHERE `fileId` = ?', $row->fileId);
+            $db->query('DELETE FROM `LEK_skeletonfiles` WHERE `fileId` = ?', $row->fileId);
             error_log('  Task '.$taskGuid.': converted file '.$row->fileName); 
         }
         else {
+            $allFilesConverted = false;
             error_log('  Task '.$taskGuid.': file could not be saved completely to disk: '.$row->fileName); 
         }
     }
 
-    error_log('Task '.($tasksDone++).' of '.$taskCount." done.\n");
-    $res = $db->query('INSERT INTO LEK_task_migration (`taskGuid`, `filename`) VALUES (?,?)', [$taskGuid, SCRIPT_IDENTIFIER]);
+    if($allFilesConverted) {
+        error_log('Task '.($tasksDone++).' of '.$taskCount." done.\n");
+        $res = $db->query('INSERT INTO LEK_task_migration (`taskGuid`, `filename`) VALUES (?,?)', [$taskGuid, SCRIPT_IDENTIFIER]);
+    }
 }
 
 $res = $db->query('SELECT COUNT(*) `cnt` FROM `LEK_skeletonfiles`');
 if($res && ($row = $res->fetchObject()) && $row->cnt === "0") {
-    //$db->query('DROP TABLE `LEK_skeletonfiles`;') && 
+    $db->query('DROP TABLE `LEK_skeletonfiles`;') && 
     error_log('Table LEK_skeletonfiles dropped!');
 }
 else {
-    error_log('Could not drop table LEK_skeletonfiles since there are still some skeleton file entries which could not be converted Please check that!');
+    $this->doNotSavePhpForDebugging = false; //enable restart script when conversion was not complete
+    $msg = SCRIPT_IDENTIFIER.': Could not drop table LEK_skeletonfiles since there are still some skeleton file entries which could not be converted!'."\n";
+    $msg .= 'Please check that! Possible reason: a task was in state import while running this script or some skeleton files could not be written to disk.';
+    $msg .= 'This script remains in the DbUpdater todo list, until the LEK_skeletonfiles table is empty.';
+    error_log($msg);
+    echo $msg;
 }
