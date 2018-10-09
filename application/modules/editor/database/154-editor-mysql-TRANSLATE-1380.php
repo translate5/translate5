@@ -90,6 +90,10 @@ foreach ($tasks as $taskGuid) {
 
     while($row = $stmt->fetchObject()) {
         $skelFilePath = $task->getAbsoluteTaskDataPath().sprintf(editor_Models_File::SKELETON_PATH, $row->fileId);
+        $skelDir = dirname($skelFilePath);
+        if(!file_exists($skelDir)) {
+            @mkdir($skelDir);
+        }
         $size = file_put_contents($skelFilePath, $row->file);
         
         if($size && file_exists($skelFilePath) && md5($row->file) == md5_file($skelFilePath)) {
