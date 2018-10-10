@@ -111,16 +111,26 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         return $this->queryCollectionResults($searchString);
     }
     
+    /***
+     * Search the terms in the term collection with the given query string
+     * @param string $queryString
+     * @return editor_Services_ServiceResult
+     */
     protected function queryCollectionResults($queryString){
-        //TODO: change the entity in the tmmt controller searc/query ?
         $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $entity editor_Models_TermCollection_TermCollection */
         $entity->load($this->tmmt->getId());
         
         $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
         
-        foreach ($results as $res){
-            $this->resultList->addResult($res['term'],0,$res);
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $groups=$term->sortTerms([$results]);
+        foreach ($groups as $group){
+            foreach ($group as $res){
+                //convert back to array
+                $this->resultList->addResult($res['term'],0,$res);
+            }
         }
         
         return $this->resultList;

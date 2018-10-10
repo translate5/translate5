@@ -179,5 +179,30 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         }
         return $retval;
     }
+    
+    /***
+     * Find all default resources for user customers
+     * @return array
+     */
+    public function findAsDefaultForUser(){
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
+        
+        if(empty($customers)){
+            return [];
+        }
+        $s=$this->db->select()
+        ->where('customerId IN(?)',$customers)
+        ->where('useAsDefault=1')
+        ->group('languageResourceId');
+        
+        $result=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($result)){
+            return [];
+        }
+        return array_column($result, 'languageResourceId');
+    }
 }
 

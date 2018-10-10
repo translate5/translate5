@@ -42,16 +42,19 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         
         //set the user preselected languages from the user meta table
         $this->setDefaultLanguages();
-        
-        $this->view->Php2JsVars()->set('languageresource.fileExtension',$config->runtimeOptions->LanguageResources->fileExtension->toArray());
 
-        $machineTranslationEngines=array();
+        //supported file uploads and extensions per language combination
+        $this->view->Php2JsVars()->set('languageresource.fileExtension',$config->runtimeOptions->LanguageResources->fileExtension->toArray());
         
+        $cs=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $cs editor_Models_LanguageResources_CustomerAssoc */
+        $this->view->Php2JsVars()->set('languageresource.useAsDefault',$cs->findAsDefaultForUser());
+
         $engineModel=ZfExtended_Factory::get('editor_Models_TmMt');
         /* @var $engineModel editor_Models_TmMt */
-        $machineTranslationEngines=$engineModel->getEnginesByAssoc();
-        
-        $this->view->machineTranslationEngines= $machineTranslationEngines;
+
+        //load all available mt resources(engines)
+        $this->view->machineTranslationEngines= $engineModel->getEnginesByAssoc();
         
         //translated strings
         $translatedStrings=array(
@@ -81,6 +84,14 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
         
         $this->view->Php2JsVars()->set('languageresource.translatedStrings',$translatedStrings);
+        
+        $this->view->Php2JsVars()->set('termStatusMap', $config->runtimeOptions->tbx->termLabelMap->toArray());
+        $this->view->Php2JsVars()->set('termStatusLabel', [
+            'permitted' => $this->translate->_('erlaubte Benennung'),
+            'forbidden' => $this->translate->_('verbotene Benennung'),
+            'preferred' => $this->translate->_('Vorzugsbenennung'),
+            'unknown' => $this->translate->_('Unbekannter Term Status'),
+        ]);
         
         $this->view->publicModulePath = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module');
         

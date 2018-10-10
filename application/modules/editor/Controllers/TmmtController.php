@@ -115,17 +115,17 @@ class editor_TmmtController extends ZfExtended_RestController {
             
             $sourceLang=[];
             if(isset($languages[$tmmt['id']]) && !empty($languages[$tmmt['id']]['sourceLang'])){
-                $sourceLang[]=$languages[$tmmt['id']]['sourceLang'];
+                $sourceLang=$languages[$tmmt['id']]['sourceLang'];
             }
             
             $targetLang=[];
             if(isset($languages[$tmmt['id']]) && !empty($languages[$tmmt['id']]['targetLang'])){
-                $targetLang[]=$languages[$tmmt['id']]['targetLang'];
+                $targetLang=$languages[$tmmt['id']]['targetLang'];
             }
             
             $useAsDefault=[];
             if(isset($custAssoc[$tmmt['id']]['useAsDefault']) && !empty($custAssoc[$tmmt['id']]['useAsDefault'])){
-                $useAsDefault[]=$custAssoc[$tmmt['id']]['useAsDefault'];
+                $useAsDefault=$custAssoc[$tmmt['id']]['useAsDefault'];
             }
             
             //add customer assocs

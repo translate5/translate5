@@ -371,7 +371,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $termGroups
      * @return array
      */
-    protected function sortTerms(array $termGroups) {
+    public function sortTerms(array $termGroups) {
         foreach($termGroups as $groupId => $group) {
             usort($group, array($this, 'compareTerms'));
             $termGroups[$groupId] = $group;
@@ -395,18 +395,23 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         // return > 0 => t1 > t2
         // return = 0 => t1 = t2
         // return < 0 => t1 < t2
-        $status = $this->compareTermStatus($term1->status, $term2->status);
+        
+        $isArray1=is_array($term1);
+        $isArray2=is_array($term2);
+        $status = $this->compareTermStatus($isArray1 ? $term1['status'] : $term1->status, 
+                                           $isArray2 ? $term2['status'] : $term2->status);
         if($status !== 0) {
             return $status;
         }
 
-        $isSource = $this->compareTermLangUsage($term1->isSource, $term2->isSource);
+        $isSource = $this->compareTermLangUsage($isArray1 ? $term1['isSource'] : $term1->isSource, 
+                                                $isArray2 ? $term2['isSource'] : $term2->isSource);
         if($isSource !== 0) {
             return $isSource;
         }
 
         //Kriterium 4 - alphanumerische Sortierung:
-        return strcmp(mb_strtolower($term1->term), mb_strtolower($term2->term));
+        return strcmp(mb_strtolower($isArray1 ? $term1['term'] : $term1->term), mb_strtolower($isArray2 ? $term2['term'] : $term2->term));
     }
 
     /**
