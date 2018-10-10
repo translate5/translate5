@@ -64,7 +64,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },
-    height : 600,
+    height : 500,
     width : 500,
     modal : true,
     layout:'fit',
