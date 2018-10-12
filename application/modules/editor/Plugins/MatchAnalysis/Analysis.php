@@ -133,6 +133,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             
             $bestMatchRateResult=$this->getBestMatchrate($segment,true);
             //add the segment source hash in the array
+
             $repetitionByHash[md5($segment->getFieldOriginal('source'))]=$bestMatchRateResult;
             
             if($this->pretranslate){
@@ -179,31 +180,38 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $connector->update($segment);
             }
             
+            //     tm     100     90               
+            //     tm1    3       0             
+            //     tm2    0       0
             $matchResults=$matches->getResult();
             
-            $matchRateInternal=null;
+            $matchRateInternal=new stdClass();
+            $matchRateInternal->matchrate=null;
             //for each match, find the best match rate, and save it
             foreach ($matchResults as $match){
-                if($matchRateInternal >= $match->matchrate){
+                if($matchRateInternal->matchrate >= $match->matchrate){
                     continue;
                 }
-                $matchRateInternal=$match->matchrate;
+                $matchRateInternal=$match;
                 
                 //store best match rate results
-                if($matchRateInternal>$bestMatchRate){
+                if($matchRateInternal->matchrate>$bestMatchRate){
                     $bestMatchRateResult=$match;
                     $bestMatchRateResult->internalTmmtid=$tmmtid;
                 }
             }
+            
             //no match rate is found in the tmmt result
-            if($matchRateInternal==null){
+            if($matchRateInternal->matchrate==null){
                 $saveAnalysis && $this->saveAnalysis($segment, null, $tmmtid);
                 $matches->resetResult();
                 continue;
             }
             
-            if($matchRateInternal>$bestMatchRate){
-                $bestMatchRate=$matchRateInternal;
+            //$matchRateInternal contains always the highest matchrate from $matchResults
+            //update the bestmatchrate if $matchRateInternal contains highest matchrate
+            if($matchRateInternal->matchrate>$bestMatchRate){
+                $bestMatchRate=$matchRateInternal->matchrate;
             }
             
             //save the match analyses if needed
@@ -213,10 +221,20 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $matches->resetResult();
         }
         
+        //TODO: pretranslate at the end because of the language resources order(last jira issue) (first find the best match rate from all language resources, and based on this pretranslate if active)
+        //Also ignor internal fuzzy matches when pretranslateing
+        
         return $bestMatchRateResult;
     }
     
-    public function saveAnalysis($segment,$matchRate,$tmmtid){
+    /***
+     * Save match analysis to the database
+     * 
+     * @param editor_Models_Segment $segment
+     * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or integer (only the matchrate)
+     * @param integer $tmmtid
+     */
+    public function saveAnalysis($segment,$matchRateResult,$tmmtid){
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
         
@@ -226,7 +244,13 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setAnalysisId($this->analysisId);
         $matchAnalysis->setTmmtid($tmmtid);
         $matchAnalysis->setWordCount($this->wordCount->getSourceCount());
-        $matchAnalysis->setMatchRate($matchRate);
+        $matchAnalysis->setMatchRate(isset($matchRateResult->matchrate) ? $matchRateResult->matchrate : $matchRateResult);
+
+        $isFuzzy=false;
+        if(isset($matchRateResult) && is_object($matchRateResult)){
+            $isFuzzy=$matchRateResult->target == "translate5-unique-id[".$segment->getTaskGuid()."]";
+        }
+        $matchAnalysis->setInternalFuzzy($isFuzzy  ? 1 : 0);
         $matchAnalysis->save();
     }
     
@@ -265,7 +289,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //store the resource type for the tmmt
             $this->resourceType[$tmmt->getId()]=$resource->getType();
             
-            $connector=$manager->getConnector($tmmt);
+            $connector=$manager->getConnector($tmmt,$tmmt->getSourceLang(),$tmmt->getTargetLang());
             $this->connectors[$assoc['id']]=[];
             $this->connectors[$assoc['id']]=$connector;
             

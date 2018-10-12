@@ -53,6 +53,9 @@ END LICENSE AND COPYRIGHT
  * @method integer getAnalysisId() getAnalysisId()
  * @method void setAnalysisId() setAnalysisId(integer $analysisId)
  * 
+ * @method integer getInternalFuzzy() getInternalFuzzy()
+ * @method void setInternalFuzzy() setInternalFuzzy(integer $internalFuzzy)
+ * 
  */
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
@@ -133,9 +136,14 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 if($res['tmmtid']>0){
                     $tmmtModel=ZfExtended_Factory::get('editor_Models_TmMt');
                     /* $tmmtModel editor_Models_TmMt */
-                    $tmmtModel->load($res['tmmtid']);
-                    $groupedResults[$res['tmmtid']]['resourceName']=$tmmtModel->getName();
-                    $groupedResults[$res['tmmtid']]['resourceColor']=$tmmtModel->getColor();
+                    try {
+                        $tmmtModel->load($res['tmmtid']);
+                        $groupedResults[$res['tmmtid']]['resourceName']=$tmmtModel->getName();
+                        $groupedResults[$res['tmmtid']]['resourceColor']=$tmmtModel->getColor();
+                    } catch (Exception $e) {
+                        $groupedResults[$res['tmmtid']]['resourceName']="This resource is removed";
+                        $groupedResults[$res['tmmtid']]['resourceColor']="";
+                    }
                 }
                 
                 

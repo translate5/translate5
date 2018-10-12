@@ -106,7 +106,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $targetResult=$result->target;
         
-        //ignore fuzzy match target
+        //ignore internal fuzzy match target
         if (strpos($targetResult, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false){
             return;
         }
@@ -134,6 +134,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         /* @var $matchrateType editor_Models_Segment_MatchRateType */
+        
+        //TODO: we need new matchrate type, we will look around with THOMAS!!!!
         //set the type
         $matchrateType->initEdited($this->resourceType[$tmmtid]);
         
