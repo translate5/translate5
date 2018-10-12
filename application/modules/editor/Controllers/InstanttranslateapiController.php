@@ -261,8 +261,13 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
                 ]
             ]);
             
-            //query the resource
-            $result = $connector->query($segment);
+            try {
+                //query the resource
+                $result = $connector->query($segment);
+            } catch (Exception $e) {
+                error_log("Unable to use :".$model->getName()." as search resource. More info:".$e->getMessage());
+                continue;
+            }
             
             //check and filter the results
             $results = $this->filterResults($text,$result->getResult());
