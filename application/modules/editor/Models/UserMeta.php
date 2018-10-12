@@ -52,9 +52,11 @@ class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
      * @return mixed|array
      */
     public function saveDefaultLanguages($userId,$source,$target){
-        $this->loadByUser($userId);
-        if($this->getId()===null){
-            $this->setId($userId);
+        try {
+            $this->loadByUser($userId);
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            parent::init();
+            $this->setUserId($userId);
         }
         $this->setSourceLangDefault($source);
         $this->setTargetLangDefault($target);
