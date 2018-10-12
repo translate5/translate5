@@ -86,7 +86,6 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                 }
                 $newRows[$newKey]=$value;
             }
-            
             $newRows['wordCountTotal']=$wordCountTotal;
             $newRows['pretranslateMatchrate']=$pretranslateMatchrate;
             $newRows['internalFuzzy']=$internalFuzzy;
@@ -95,11 +94,11 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             unset($rows[$rowKey]);
             $rows[$rowKey]=$newRows;
         }
-        
         $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         /* @var $excel ZfExtended_Models_Entity_ExcelExport */
         
-        //TODO: translate the strings 
+        $excel->setPreCalculateFormulas(true);
+        
         // set property for export-filename
         $excel->setProperty('filename', 'Match analysis');
         
@@ -107,20 +106,17 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
         $excel->setLabel('resourceName', $translate->_("Name"));
         $excel->setLabel('103Group', $translate->_("Context match (103%)"));
-        $excel->setLabel('102Group', $translate->_("Repetition (102%)"));
+        $excel->setLabel('102Group', $translate->_("Wiederholung (102%)"));
         $excel->setLabel('101Group', $translate->_("Exact-exact match (101%)"));
         $excel->setLabel('100Group', '100%');
-        
         $excel->setLabel('99Group', '99%-90%');
         $excel->setLabel('89Group', '89%-80%');
         $excel->setLabel('79Group', '79%-70%');
         $excel->setLabel('69Group', '69%-60%');
         $excel->setLabel('59Group', '59%-51%');
         $excel->setLabel('noMatch', '50%-0%');
-        
-        $excel->setLabel('wordCountTotal', $translate->_("Total Words"));
-        
-        $excel->setLabel('created', $translate->_("Creation date"));
+        $excel->setLabel('wordCountTotal', $translate->_("Gesamtzahl der Wörter"));
+        $excel->setLabel('created', $translate->_("Erstellungsdatum"));
         $excel->setLabel('internalFuzzy', $translate->_("Interne Fuzzy verwendet"));
         $excel->setLabel('pretranslateMatchrate', $translate->_("Match-Rate"));
 
@@ -129,11 +125,13 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         
         $sheet=$excel->getPhpExcel()->getActiveSheet();
         
+        $sheet->setCellValue("A".$rowIndex,$translate->_("Summe"));
         $sheet->setCellValue("B".$rowIndex, "=SUM(B2:B".($rowIndex-1).")");
         $sheet->setCellValue("C".$rowIndex, "=SUM(C2:C".($rowIndex-1).")");
         $sheet->setCellValue("D".$rowIndex, "=SUM(D2:D".($rowIndex-1).")");
         $sheet->setCellValue("E".$rowIndex, "=SUM(E2:E".($rowIndex-1).")");
         $sheet->setCellValue("F".$rowIndex, "=SUM(F2:F".($rowIndex-1).")");
+        $sheet->setCellValue("G".$rowIndex, "=SUM(G2:G".($rowIndex-1).")");
         $sheet->setCellValue("H".$rowIndex, "=SUM(H2:H".($rowIndex-1).")");
         $sheet->setCellValue("I".$rowIndex, "=SUM(I2:I".($rowIndex-1).")");
         $sheet->setCellValue("J".$rowIndex, "=SUM(J2:J".($rowIndex-1).")");
