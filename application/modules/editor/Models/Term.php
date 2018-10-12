@@ -354,7 +354,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByMid(string $mid,array $collectionIds) {
         $s = $this->db->select(false);
-        $db = $this->db;
         $s->from($this->db);
         $s->where('collectionId IN(?)', $collectionIds)->where('mid = ?', $mid);
         
@@ -403,9 +402,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if($status !== 0) {
             return $status;
         }
+        
+        $isSource=0;
+        //calculate isSource when issort is set for the terms
+        if(!$isArray1 && isset($term1->isSource)){
+            $isSource = $this->compareTermLangUsage($isArray1 ? $term1['isSource'] : $term1->isSource, 
+                                                    $isArray2 ? $term2['isSource'] : $term2->isSource);
+        }
 
-        $isSource = $this->compareTermLangUsage($isArray1 ? $term1['isSource'] : $term1->isSource, 
-                                                $isArray2 ? $term2['isSource'] : $term2->isSource);
         if($isSource !== 0) {
             return $isSource;
         }

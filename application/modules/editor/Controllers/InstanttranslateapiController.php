@@ -226,7 +226,7 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         $resources=$model->loadByUserCustomerAssocs(null,$sourceLang,$targetLang);
         
         if(empty($resources)){
-            return '';
+            return [];
         }
         
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
