@@ -60,6 +60,31 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TmMt';
     
     
+    /***
+     * Source lang id helper property
+     * @var int
+     */
+    public $sourceLang;
+    
+    /***
+     * Target lang id helper property
+     * @var int
+     */
+    public $targetLang;
+    
+    /***
+     * Source lang rfc value helper property 
+     * @var String
+     */
+    public $sourceLangRfc5646;
+    
+    
+    /***
+     * Target lang rfc value helper property
+     * @var String
+     */
+    public $targetLangRfc5646;
+    
     
     /***
      * Get all available language resources for customers of loged user
@@ -273,7 +298,10 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return array|string
      */
     public function getSourceLangRfc5646(){
-        return $this->getLanguageByField('sourceLangRfc5646');
+        if(!$this->sourceLangRfc5646){
+            $this->sourceLangRfc5646=$this->getLanguageByField('sourceLangRfc5646');
+        }
+        return $this->sourceLangRfc5646;
     }
     
     /***
@@ -282,7 +310,10 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return array|string
      */
     public function getTargetLangRfc5646(){
-        return $this->getLanguageByField('targetLangRfc5646');
+        if(!$this->targetLangRfc5646){
+            $this->targetLangRfc5646=$this->getLanguageByField('targetLangRfc5646');
+        }
+        return $this->targetLangRfc5646;
     }
     
     /***
@@ -291,7 +322,10 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return array|string
      */
     public function getSourceLang(){
-        return $this->getLanguageByField('sourceLang');
+        if(!$this->sourceLang){
+            $this->sourceLang=$this->getLanguageByField('sourceLang');
+        }
+        return $this->sourceLang;
     }
     
     /***
@@ -300,6 +334,9 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
      * @return array|string
      */
     public function getTargetLang(){
-        return $this->getLanguageByField('targetLang');
+        if(!$this->targetLang){
+            $this->targetLang=$this->getLanguageByField('targetLang');
+        }
+        return $this->targetLang;
     }
 }

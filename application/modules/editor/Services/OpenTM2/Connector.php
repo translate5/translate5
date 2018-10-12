@@ -241,7 +241,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return $this->resultList; 
             }
             foreach($result->results as $found) {
-                $meta = new stdClass();
                 if(!$this->validateInternalTags($found, $segment)) {
                     continue;
                 }
@@ -256,7 +255,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $source = $this->replaceAdditionalTags($source, $mapCount);
                 $this->resultList->setSource($source);
             }
-            
             return $this->resultList; 
         }
         $this->throwBadGateway();
@@ -552,6 +550,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
-        return $serviceManager->getConnector($fuzzyTmmt);;
+        return $serviceManager->getConnector($fuzzyTmmt,$this->tmmt->getSourceLang(),$this->tmmt->getTargetLang());;
     }
 }

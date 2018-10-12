@@ -362,7 +362,7 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
     }
     
     /***
-     * Update the source and target default languages for the curen user
+     * Update the source and target default languages for the current user
      * @param integer $source
      * @param integer $target
      */

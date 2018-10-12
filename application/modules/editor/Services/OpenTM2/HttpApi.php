@@ -189,8 +189,8 @@ class editor_Services_OpenTM2_HttpApi {
      */
     public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
         $json = new stdClass();
-        $json->sourceLang = $this->tmmt->getSourceLangRfc5646();
-        $json->targetLang = $this->tmmt->getTargetLangRfc5646();
+        $json->sourceLang = $this->tmmt->sourceLangRfc5646;
+        $json->targetLang = $this->tmmt->targetLangRfc5646;
         $json->source = $queryString;
         //In general OpenTM2 can deal with whole paths, not only with filenames.
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible, 
@@ -262,14 +262,8 @@ class editor_Services_OpenTM2_HttpApi {
         $json->type = "Manual";
         $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
         
-        $lang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $lang editor_Models_Languages */
-        
-        $lang->load($this->tmmt->getSourceLang());
-        $json->sourceLang = $lang->getRfc5646();
-        
-        $lang->load($this->tmmt->getTargetLang());
-        $json->targetLang = $lang->getRfc5646();
+        $json->sourceLang = $this->tmmt->getSourceLangRfc5646();
+        $json->targetLang = $this->tmmt->getTargetLangRfc5646();
         
         $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');

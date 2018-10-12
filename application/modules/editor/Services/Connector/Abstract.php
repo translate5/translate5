@@ -91,6 +91,8 @@ abstract class editor_Services_Connector_Abstract {
         $this->targetLang=$targetLang;
         $this->tmmt = $tmmt;
         $this->resultList->setTmmt($tmmt);
+        $this->tmmt->sourceLangRfc5646=$this->tmmt->getSourceLangRfc5646();
+        $this->tmmt->targetLangRfc5646=$this->tmmt->getTargetLangRfc5646();
     }
 
     /**
