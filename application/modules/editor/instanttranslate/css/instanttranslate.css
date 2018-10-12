@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- general --------------- */
 
-h4, p {
+h4, h5, p {
     padding: 3px;
     margin: 2px 0px;
     -webkit-margin-before: 0px;
