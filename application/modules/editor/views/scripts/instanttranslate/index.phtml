@@ -118,8 +118,8 @@
             <select id="targetLocale" name="targetLocale">
                 <?php
                     $targetLangLocalesFound = array();
-                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
-                        $targetLangLocalesFound[] = $sourceLangLocale;
+                    foreach ($mtTargetLanguageLocales as $targetLangLocale) {
+                        $targetLangLocalesFound[] = $targetLangLocale;
                     }
                     sort($targetLangLocalesFound);
                     $optionValues=[];
