@@ -187,14 +187,14 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads the ids and names of all TMs for the given serviceName
+     * loads the ids, names and additional information of all TMs for the given serviceName
      * @param string $serviceName
      * @return array
      */
     public function loadByServiceName(string $serviceName) {
         $db = $this->db;
         $s = $db->select()
-            ->from($db->info($db::NAME), ['id','name'])
+            ->from($db->info($db::NAME), ['id','name','fileName'])
             ->where('LEK_languageresources_tmmt.serviceName LIKE ?', $serviceName);
         return $this->db->fetchAll($s)->toArray(); 
     }

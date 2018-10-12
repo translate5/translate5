@@ -55,9 +55,8 @@ class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
         try {
             $this->loadByUser($userId);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-        }
-        if($this->getId()===null){
-            $this->setId($userId);
+            parent::init();
+            $this->setUserId($userId);
         }
         $this->setSourceLangDefault($source);
         $this->setTargetLangDefault($target);
