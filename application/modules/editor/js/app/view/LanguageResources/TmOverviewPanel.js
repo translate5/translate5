@@ -152,8 +152,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     renderer: function(value, meta, record) {
                         var str = me.strings.tmmtStatus,
                             info = record.get('statusInfo');
-                        if(value === "loading") {
-                            record.load();
+                        if(value === "loading") { // show list as soon as possible, show status later due to different latency of the requested TMs
+                            record.load(); // TODO: handle 404 (= remove from grid)
                             meta.tdCls = 'loading';
                             meta.tdAttr = 'data-qtip="'+str.loading+'"';
                             return ''; //no string since icon set
