@@ -271,30 +271,39 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
 
-      $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
-      $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_TmMt::MATCH_RATE_TYPE_EDITED);
-      
-      
-      //find all service names and set it to frontend var
-      $services=ZfExtended_Factory::get('editor_Services_Manager');
-      /* @var $services editor_Services_Manager */
-      $allservices=$services->getAll();
-      $servicenames=[];
-      foreach ($allservices as $s){
-          $sm=ZfExtended_Factory::get($s.'_Service');
-          $servicenames[]=$sm->getName();
-      }
-      $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $servicenames);
-      
-      //set the available sdl engines to a frontend variable
-      $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
-      /* @var $engineModel editor_Models_LanguageResources_SdlResources */
-      $this->view->Php2JsVars()->set('LanguageResources.sdlEngines', $engineModel->getAllEngines());
-
       //needed for enabling download link of archive zip
       $this->view->Php2JsVars()->set('import.createArchivZip', (boolean)$rop->import->createArchivZip);
       
+      $this->setLanguageResourceJsVars();
+      
       $this->setJsAppData();
+    }
+
+    /***
+     * Set language resources frontend vars
+     */
+    protected function setLanguageResourceJsVars(){
+        
+        $rop = $this->config->runtimeOptions;
+        
+        $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
+        $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_TmMt::MATCH_RATE_TYPE_EDITED);
+        
+        //find all service names and set it to frontend var
+        $services=ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $services editor_Services_Manager */
+        $allservices=$services->getAll();
+        $servicenames=[];
+        foreach ($allservices as $s){
+            $sm=ZfExtended_Factory::get($s.'_Service');
+            $servicenames[]=$sm->getName();
+        }
+        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $servicenames);
+        
+        //set the available sdl engines to a frontend variable
+        $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
+        /* @var $engineModel editor_Models_LanguageResources_SdlResources */
+        $this->view->Php2JsVars()->set('LanguageResources.sdlEngines', $engineModel->getAllEngines());
     }
 
     /**

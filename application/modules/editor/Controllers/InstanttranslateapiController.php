@@ -229,6 +229,12 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             return '';
         }
         
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
+        
+        $sfm=ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        /* @var $sfm editor_Models_SegmentFieldManager */
+        
         $searchResults=[];
         //for each assoc resource search the resource for the result
         foreach ($resources as $res) {
@@ -236,9 +242,6 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             $model=ZfExtended_Factory::get('editor_Models_TmMt');
             /* @var $model editor_Models_TmMt */
             $model->init($res);
-            
-            $manager = ZfExtended_Factory::get('editor_Services_Manager');
-            /* @var $manager editor_Services_Manager */
             
             $connector=$manager->getConnector($model,$sourceLang,$targetLang);
             /* @var $connector editor_Services_Connector_Abstract */
@@ -249,9 +252,6 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             $segment->setMid(-1);
             $segment->setFileId(-1);
             $connector->fileNameCache['-1']="InstantTranslate";
-            
-            $sfm=ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
-            /* @var $sfm editor_Models_SegmentFieldManager */
             
             $sfm->setByName('source', $text);
             $segment->setFieldContents($sfm, [
@@ -305,7 +305,7 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             
             //if the matchrate is over or equal to the border, highlight the diff and collect the result
             if($result->matchrate>=$matchRate){
-                $result->sourceDiff=$this->highlightDif($result->source,$searchText);
+                $result->sourceDiff=$this->highlightDiff($result->source,$searchText);
                 $collectedResults[]=$result;
                 continue;
             }
@@ -320,7 +320,7 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
      * @param string $target
      * @return string
      */
-    private function highlightDif($source,$target){
+    private function highlightDiff($source,$target){
         $difTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
         /* @var $difTagger editor_Models_Export_DiffTagger_Csv */
         
@@ -339,7 +339,9 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             if (count($value) > 0) {
                 
                 $addition = implode('', $value);
-                if($addition === '')return;
+                if($addition === ''){
+                    return;
+                }
                 return '<span class="highlight">' . $addition . '</span>';
             }
             return '';
@@ -358,12 +360,14 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
     
     /***
      * Check if the request param is valid in array
-     * @param array $prm
+     * Valid is when: the $key exist in the $array and it is not empty() 
+     * 
+     * @param array $array
      * @param string $key
      * @return boolean
      */
-    private function isValidParam($prm,$key){
-        return isset($prm[$key]) && !empty($prm[$key]);
+    private function isValidParam($array,$key){
+        return isset($array[$key]) && !empty($array[$key]);
     }
     
     /***

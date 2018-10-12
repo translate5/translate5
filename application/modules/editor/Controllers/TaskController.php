@@ -124,84 +124,6 @@ class editor_TaskController extends ZfExtended_RestController {
         ->addActionContext('export', 'importArchive')
         ->initContext();
         
-        $this->initEvents();
-    }
-    
-    //attach to the events
-    protected function initEvents(){
-        $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
-        $this->eventManager->attach('editor_TaskController', 'afterTaskClose', array($this, 'handleAfterTaskClose'));
-        $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handleAfterTaskIndexAction'));
-        $this->eventManager->attach('editor_TaskController', 'afterGetAction', array($this, 'handleAfterTaskGetAction'));
-    }
-    
-    /**
-     * Handler is called after a task has been opened
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        $manager->openForTask($event->getParam('task'));
-    }
-    
-    /**
-     * Handler is called after a task has been closed
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleAfterTaskClose(Zend_EventManager_Event $event) {
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        $manager->closeForTask($event->getParam('task'));
-    }
-    
-    /***
-     * adding tmmt info to task indexAction
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleAfterTaskIndexAction(Zend_EventManager_Event $event){
-        /*@var $tmmtmodel editor_Models_TmMt */
-        $tmmtmodel = ZfExtended_Factory::get('editor_Models_TmMt');
-        
-        $taskGuids = array_column($this->view->rows, 'taskGuid');
-        if(empty($taskGuids)){
-            return;
-        }
-        $taskassocs = array();
-        
-        $resultlist = $tmmtmodel->loadByAssociatedTaskGuidList($taskGuids);
-        if(empty($resultlist)){
-            return;
-        }
-        foreach ($resultlist as $res){
-            if(!isset($taskassocs[$res['taskGuid']])){
-                $taskassocs[$res['taskGuid']] = array();
-            }
-            array_push($taskassocs[$res['taskGuid']], $res);
-        }
-        foreach($this->view->rows as &$tmmt) {
-            if(isset($taskassocs[$tmmt['taskGuid']])){
-                $tmmt['taskassocs'] = $taskassocs[$tmmt['taskGuid']];
-            }
-        }
-    }
-    
-    /**
-     * adding tmmt data to task getAction
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleAfterTaskGetAction(Zend_EventManager_Event $event){
-        $tmmtmodel = ZfExtended_Factory::get('editor_Models_TmMt');
-        /*@var $tmmtmodel editor_Models_TmMt */
-        
-        $taskguids =$this->view->rows->taskGuid;
-        
-        $resultlist =$tmmtmodel->loadByAssociatedTaskGuidList(array($taskguids));
-        $this->view->rows->taskassocs = array();
-        if(empty($resultlist)){
-            return;
-        }
-        $this->view->rows->taskassocs = $resultlist;
     }
     
     /**
@@ -266,6 +188,20 @@ class editor_TaskController extends ZfExtended_RestController {
         $userAssocInfos = array();
         $allAssocInfos = $this->getUserAssocInfos($taskGuids, $userAssocInfos);
 
+        //load the task assocs
+        $tmmtmodel = ZfExtended_Factory::get('editor_Models_TmMt');
+        /*@var $tmmtmodel editor_Models_TmMt */
+        $resultlist = $tmmtmodel->loadByAssociatedTaskGuidList($taskGuids);
+        
+        //group all assoc by taskguid
+        $taskassocs = array();
+        foreach ($resultlist as $res){
+            if(!isset($taskassocs[$res['taskGuid']])){
+                $taskassocs[$res['taskGuid']] = array();
+            }
+            array_push($taskassocs[$res['taskGuid']], $res);
+        }
+        
         foreach ($rows as &$row) {
             $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
@@ -278,6 +214,11 @@ class editor_TaskController extends ZfExtended_RestController {
             
             $this->addUserInfos($row, $row['taskGuid'], $userAssocInfos, $allAssocInfos);
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
+            
+            //add task assoc if exist
+            if(isset($taskassocs[$row['taskGuid']])){
+                $row['taskassocs'] = $taskassocs[$row['taskGuid']];
+            }
         }
         return $rows;
     }
@@ -720,6 +661,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 'view' => $this->view, 
                 'openState' => $this->data->userState)
             );
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
+            $manager->openForTask($task);
         }
     }
     
@@ -758,14 +702,13 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * unregisters the task from the session and triggers a afterTaskClosed event
+     * unregisters the task from the session and close all open services 
      */
     protected function unregisterTask() {
         $this->entity->unregisterInSession();
-        $this->events->trigger('afterTaskClose', $this, array(
-            'task' => $this->entity, 
-            'view' => $this->view 
-        ));
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
+        $manager->closeForTask($this->entity);
     }
     
     /**
@@ -884,6 +827,12 @@ class editor_TaskController extends ZfExtended_RestController {
             
         $this->view->rows = (object)$row;
         unset($this->view->rows->qmSubsegmentFlags);
+        
+        //add task assoc to the task
+        $tmmtmodel = ZfExtended_Factory::get('editor_Models_TmMt');
+        /*@var $tmmtmodel editor_Models_TmMt */
+        $resultlist =$tmmtmodel->loadByAssociatedTaskGuidList(array($taskguid));
+        $this->view->rows->taskassocs = $resultlist;
         
     }
     

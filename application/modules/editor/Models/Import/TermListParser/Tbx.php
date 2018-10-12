@@ -1143,7 +1143,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     private function createTermCollection(array $customers){
         $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        return $termCollection->create("Term Collection for ".$this->task->getTaskGuid(), $customers);
+        return $termCollection->create("Term Collection for ".$this->task->getTaskName(), $customers);
     }
     
     /***
