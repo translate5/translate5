@@ -80,10 +80,10 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "selectedMtEngine"          => $this->translate->_("MT-Engine")
                 
         );
+        $this->view->Php2JsVars()->set('languageresource.translatedStrings',$translatedStrings);
+        $this->view->translations= $translatedStrings; // we also need some of them outside of javascript
         
         $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
-        
-        $this->view->Php2JsVars()->set('languageresource.translatedStrings',$translatedStrings);
         
         $this->view->Php2JsVars()->set('termStatusMap', $config->runtimeOptions->tbx->termLabelMap->toArray());
         $this->view->Php2JsVars()->set('termStatusLabel', [
