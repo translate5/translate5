@@ -54,7 +54,7 @@ Ext.define('Editor.model.LanguageResources.TaskAssoc', {
   idProperty: 'id',
   proxy : {
     type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'taskassoc', //same as PHP controller name
+    url: Editor.data.restpath+'languageresourcetaskassoc', //same as PHP controller name
     reader : {
       rootProperty: 'rows',
       type : 'json'

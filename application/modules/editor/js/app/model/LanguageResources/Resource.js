@@ -57,7 +57,7 @@ Ext.define('Editor.model.LanguageResources.Resource', {
   idProperty: 'id',
   proxy : {
     type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'resource', //same as PHP controller name
+    url: Editor.data.restpath+'languageresourceresource', //same as PHP controller name
     reader : {
       rootProperty: 'rows',
       type : 'json'

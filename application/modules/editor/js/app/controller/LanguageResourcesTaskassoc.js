@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.controller.TaskAssoc
+ * @class Editor.controller.LanguageResourcesTaskassoc
  * @extends Ext.app.Controller
  */
-Ext.define('Editor.controller.TaskAssoc', {
+Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
   extend : 'Ext.app.Controller',
   views: ['Editor.view.LanguageResources.TaskAssocPanel'],
   models: ['Editor.model.LanguageResources.TaskAssoc'],
