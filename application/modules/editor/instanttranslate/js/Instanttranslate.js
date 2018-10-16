@@ -479,30 +479,12 @@ function translateText(textToTranslate,translationInProgressID){
     });
 }
 
-function renderTranslationContainer(resultData) {
-    var translationsContainer = '';
-    translationsContainer += '<h4>' + resultData.serviceName + ' (' + resultData.resourceName + ')</h4>';
-    if (resultData.fuzzyMatch.sourceDiff != undefined) {
-        translationsContainer += '<div class="translation-sourcediff">Attention! FuzzyMatch (' + resultData.fuzzyMatch.matchRate + '): ';
-        translationsContainer += '<span class="translation-sourcediff-content">' + resultData.fuzzyMatch.sourceDiff + '</span>';
-        translationsContainer += '</div>';
-    }
-    translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+resultData.engineId+'">'+resultData.translationText+'</div>';
-    translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContainer += '</div>';
-    if (resultData.infoText != '') {
-        translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
-    }
-    translationsContainer += '<div id="translationError'+resultData.engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
-    return translationsContainer;
-}
-
 function fillTranslation() {
     var translationHtml = '',
         resultHtml = '',
         fuzzyMatch,
         infoText,
+        termStatus,
         metaData,
         resultData;
     $.each(translateTextResponse, function(serviceName, resource){
@@ -516,17 +498,22 @@ function fillTranslation() {
                                       'sourceDiff': result['sourceDiff']}
                     }
                     infoText = '';
+                    termStatus = '';
                     if (result['metaData'] != undefined) {
                         metaData = result['metaData'];
                         if(metaData['definition'] != undefined) {
                             infoText = metaData['definition'];
                         }
+                        if(metaData['status'] != undefined) {
+                            termStatus = metaData['status'];
+                        }
                     }
                     resultData = {'engineId': result['languageResourceid'],
+                                  'fuzzyMatch': fuzzyMatch,
                                   'infoText': infoText,
                                   'resourceName': resourceName,
                                   'serviceName': serviceName,
-                                  'fuzzyMatch': fuzzyMatch,
+                                  'termStatus': termStatus,
                                   'translationText': result['target']
                                   };
                     resultHtml += renderTranslationContainer(resultData);
@@ -539,6 +526,54 @@ function fillTranslation() {
     });
     $('#translations').html(translationHtml);
     showTranslations();
+}
+
+function renderTranslationContainer(resultData) {
+    var translationsContainer = '';
+    
+    translationsContainer += '<h4>' + resultData.serviceName + ' (' + resultData.resourceName + ')</h4>';
+    
+    if (resultData.fuzzyMatch.sourceDiff != undefined) {
+        translationsContainer += '<div class="translation-sourcediff">Attention! FuzzyMatch (' + resultData.fuzzyMatch.matchRate + '): ';
+        translationsContainer += '<span class="translation-sourcediff-content">' + resultData.fuzzyMatch.sourceDiff + '</span>';
+        translationsContainer += '</div>';
+    }
+    
+    translationsContainer += '<div class="copyable">';
+    translationsContainer += '<div class="translation-result" id="'+resultData.engineId+'">'+resultData.translationText+'</div>';
+    translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContainer += '</div>';
+    
+    if (resultData.infoText != '') {
+        translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
+    }
+    
+    if (resultData.termStatus != '') {
+        translationsContainer += '<div class="translation-infotext">'+renderTermStatusIcon(resultData.termStatus)+resultData.termStatus+'</div>';
+    }
+    
+    translationsContainer += '<div id="translationError'+resultData.engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
+    return translationsContainer;
+}
+
+/***
+ * Render the image-html for TermStatus.
+ * @param string termStatus
+ * @returns string
+ */
+function renderTermStatusIcon(termStatus){
+    var termStatusHtml = '', 
+        status = 'unknown', 
+        map = Editor.data.termStatusMap,
+        labels = Editor.data.termStatusLabel,
+        label,
+        moduleFolder = Editor.data.moduleFolder;
+    if(map[termStatus]) {
+        status = map[termStatus];
+        label = labels[status]+' ('+termStatus+')';
+        termStatusHtml += '<img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'"> ';
+    }
+    return termStatusHtml;
 }
 
 /***
