@@ -480,9 +480,9 @@ function translateText(textToTranslate,translationInProgressID){
     });
 }
 
-function renderTranslationContainer(engineId, resourceName, translationText) {
+function renderTranslationContainer(engineId, serviceName, resourceName, translationText) {
     var translationsContainer = '';
-    translationsContainer += '<h5>' + resourceName + '</h5>';
+    translationsContainer += '<h4>' + serviceName + ' (' + resourceName + ')</h4>';
     translationsContainer += '<div class="copyable">';
     translationsContainer += '<div class="translation-result" id="'+engineId+'">'+translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
@@ -496,19 +496,18 @@ function fillTranslation() {
         translationHtml = '',
         resultHtml = '';
     $.each(translateTextResponse, function(serviceName, resource){
-        serviceNameHtml = '<h4>' + serviceName + '</h4>'; // https://jira.translate5.net/browse/TRANSLATE-1390
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
             $.each(allResults, function(key, result){
                 var engineId = result['languageResourceid'];
                 var translationText = result['target'];
                 if (translationText != '') {
-                    resultHtml += renderTranslationContainer(engineId, resourceName, translationText);
+                    resultHtml += renderTranslationContainer(engineId, serviceName, resourceName, translationText);
                 }
             });
         });
         if (resultHtml != '') {
-            translationHtml += serviceNameHtml + resultHtml;
+            translationHtml += resultHtml;
         }
     });
     $('#translations').html(translationHtml);
