@@ -519,7 +519,7 @@ function fillTranslation() {
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
             $.each(allResults, function(key, result){
-                var engineId = result['tmmtid'];
+                var engineId = result['languageResourceid'];
                 var translationText = result['target'];
                 if (translationText != '') {
                     resultHtml += renderTranslationContainer(engineId, resourceName, translationText);

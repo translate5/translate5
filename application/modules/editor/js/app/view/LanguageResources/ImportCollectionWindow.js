@@ -70,6 +70,6 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
      * @param record
      */
     loadRecord: function(record) {
-        this.tmmtRecord = record;
+        this.languageResourceRecord = record;
     }
 });

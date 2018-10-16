@@ -678,8 +678,8 @@ a.x-btn span.task-confirmation {
 .tmOverviewPanel .x-grid-header-ct .source-lang > div {background:url(../images/sourceLanguage.png) no-repeat 10px 9px;}
 .tmOverviewPanel .x-grid-header-ct .target-lang > div {background:url(../images/targetLanguage.png) no-repeat 10px 9px;}
 .tmOverviewPanel td.loading div {background: url(../images/loading_ico.gif) no-repeat center center;}
-.tmOverviewPanel .tmmt-status-noconnection td.status {color: #ff3232;}
-.tmOverviewPanel .tmmt-status-error td.status {color: #ff3232;}
+.tmOverviewPanel .languageResource-status-noconnection td.status {color: #ff3232;}
+.tmOverviewPanel .languageResource-status-error td.status {color: #ff3232;}
 
 
 .language-resource-result-panel .match-state-loading.x-grid-row .source > div,

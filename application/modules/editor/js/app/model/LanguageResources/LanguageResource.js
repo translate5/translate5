@@ -33,10 +33,10 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.model.LanguageResources.TmMt
+ * @class Editor.model.LanguageResources.LanguageResource
  * @extends Ext.data.Model
  */
-Ext.define('Editor.model.LanguageResources.TmMt', {
+Ext.define('Editor.model.LanguageResources.LanguageResource', {
   extend: 'Ext.data.Model',
   STATUS_LOADING: 'loading',
   STATUS_ERROR: 'error',
@@ -60,7 +60,7 @@ Ext.define('Editor.model.LanguageResources.TmMt', {
   idProperty: 'id',
   proxy : {
     type : 'rest',//POST for create, GET to get a entity, DELETE to delete an entity, PUT call to edit an entity 
-    url: Editor.data.restpath+'tmmt', //same as PHP controller name
+    url: Editor.data.restpath+'languageresourceinstance', //same as PHP controller name
     reader : {
       rootProperty: 'rows',
       type : 'json'

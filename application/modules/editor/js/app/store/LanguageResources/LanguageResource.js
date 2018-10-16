@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.LanguageResources.TmMts', {
+Ext.define('Editor.store.LanguageResources.LanguageResource', {
   extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.TmMt',
+  model: 'Editor.model.LanguageResources.LanguageResource',
   pageSize: 20,
   autoLoad: true,
   remoteFilter:true

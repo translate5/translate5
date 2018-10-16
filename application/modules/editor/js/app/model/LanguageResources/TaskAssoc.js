@@ -48,7 +48,7 @@ Ext.define('Editor.model.LanguageResources.TaskAssoc', {
     {name: 'serviceName', type: 'string'},
     {name: 'serviceType', type: 'string'},
     {name: 'checked', type: 'boolean'},
-    {name: 'writable', type: 'boolean'}, //this is the flag if the associated TMMT is technically able to write data back
+    {name: 'writable', type: 'boolean'}, //this is the flag if the associated LanguageResource is technically able to write data back
     {name: 'segmentsUpdateable', type: 'boolean'} // this is the user choice if write back should be enabled for this assoc
   ],
   idProperty: 'id',

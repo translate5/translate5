@@ -105,6 +105,6 @@ Ext.define('Editor.view.LanguageResources.ImportTmWindow', {
      * @param record
      */
     loadRecord: function(record) {
-        this.tmmtRecord = record;
+        this.languageResourceRecord = record;
     }
 });

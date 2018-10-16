@@ -68,7 +68,10 @@ Ext.define('Editor.controller.LanguageResources', {
           },
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
-          }
+          },
+          'headPanel toolbar#top-menu': {
+            afterrender: 'onHeadPanelAfterRender'
+           }
       },
       controller: {
           '#Editor.$application': {
@@ -88,6 +91,7 @@ Ext.define('Editor.controller.LanguageResources', {
   strings: {
       msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
       msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
+      instantTranslate:'#UT#Sofortübersetzung'
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
@@ -160,7 +164,7 @@ Ext.define('Editor.controller.LanguageResources', {
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
               //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
-              rec.set('matchRateType', Editor.data.matchrateTypeChangedState+';tmmtid='+matchRecord.get('tmmtid')); 
+              rec.set('matchRateType', Editor.data.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid')); 
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       }
@@ -230,5 +234,48 @@ Ext.define('Editor.controller.LanguageResources', {
   getAssocStoreCount: function(){
       var store = this.assocStore;
       return store ? store.getTotalCount() : 0;
-  }
+  },
+  /**
+     * On head panel after render handler
+     */
+    onHeadPanelAfterRender: function(toolbar) {
+        //if we are in edit task mode, do not add the instant translate button
+        if(Ext.ComponentQuery.query('#segmentgrid')[0]){
+            return;
+        }
+        var me=this;
+        
+        if(!me.isInstantTranslateAllowed()){
+            return;
+        }
+        var pos = toolbar.items.length - 2;
+        toolbar.insert(pos, {
+            xtype: 'button',
+            itemId: 'btnInstantTranslate',
+            text:me.strings.instantTranslate,
+            listeners:{
+                click:{
+                    fn:'onInstantTranslateButtonClick',
+                    scope:me
+                }
+            }
+        });
+    },
+
+    /***
+     * Instant translate button handler
+     */
+    onInstantTranslateButtonClick:function(){
+        if(this.isInstantTranslateAllowed()){
+            window.open(Editor.data.restpath+"instanttranslate", '_blank');
+        }
+    },
+
+    /**
+     * Check if the user has right to use the instant translate portal
+     */
+    isInstantTranslateAllowed:function(){
+        var userRoles=Editor.data.app.user.roles.split(",");
+        return (Ext.Array.indexOf(userRoles, "instantTranslate") >= 0);
+    }
 });

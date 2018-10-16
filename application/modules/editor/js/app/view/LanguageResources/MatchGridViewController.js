@@ -142,47 +142,47 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             });
         }
     },
-    cacheMatchPanelResults:function(tmmt, segment){
+    cacheMatchPanelResults:function(languageResource, segment){
         var me = this;
             segmentId = segment.get('id');
-            tmmtid = tmmt.get('id');
+            languageResourceid = languageResource.get('id');
             dummyObj = {
                 rows: [{
                     id: '',
                     source: me.strings.loading,
                     target: me.strings.loading,
                     matchrate: '',
-                    tmmtid: tmmtid,
+                    languageResourceid: languageResourceid,
                     segmentId: '',
                     state: me.SERVER_STATUS.SERVER_STATUS_LOADING
                 }]
             };
-        me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
-        me.loadCachedDataIntoGrid(segmentId,tmmtid);
-        me.sendRequest(segmentId, segment.get('source'), tmmtid);
+        me.cachedResults.get(segmentId).add(languageResourceid,dummyObj);
+        me.loadCachedDataIntoGrid(segmentId,languageResourceid);
+        me.sendRequest(segmentId, segment.get('source'), languageResourceid);
     },
-    cacheSingleMatchPanelResults: function(tmmt,segmentId,query){
+    cacheSingleMatchPanelResults: function(languageResource,segmentId,query){
         var me = this;
-        tmmtid = tmmt.get('id');
+        languageResourceid = languageResource.get('id');
         dummyObj = {
             rows: [{
                 id: '',
                 source: me.strings.loading,
                 target: me.strings.loading,
                 matchrate: '',
-                tmmtid: tmmtid,
+                languageResourceid: languageResourceid,
                 segmentId: '',
                 state:  me.SERVER_STATUS.SERVER_STATUS_LOADING
             }]
         };
-        me.cachedResults.get(segmentId).add(tmmtid,dummyObj);
-        me.loadCachedDataIntoGrid(segmentId,tmmtid);
-        me.sendRequest(segmentId, query, tmmtid);
+        me.cachedResults.get(segmentId).add(languageResourceid,dummyObj);
+        me.loadCachedDataIntoGrid(segmentId,languageResourceid);
+        me.sendRequest(segmentId, query, languageResourceid);
     },
-    sendRequest: function(segmentId,query,tmmtid) {
+    sendRequest: function(segmentId,query,languageResourceid) {
         var me = this;
         Ext.Ajax.request({
-            url:Editor.data.restpath+'tmmt/'+tmmtid+'/query',
+            url:Editor.data.restpath+'languageresourceinstance/'+languageResourceid+'/query',
                 method: "POST",
                 params: {
                     //column for which the search was done (target | source)
@@ -190,16 +190,16 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
                     query: query
                 },
                 success: function(response){
-                    me.handleRequestSuccess(me, response, segmentId, tmmtid);
+                    me.handleRequestSuccess(me, response, segmentId, languageResourceid);
                 }, 
                 failure: function(response){
                     //if failure on server side (HTTP 5?? / HTTP 4??), print a nice error message that failure happend on server side
                     // if we get timeout on the ajax connection, then print a nice timeout message
-                    me.handleRequestFailure(me, response, segmentId, tmmtid);
+                    me.handleRequestFailure(me, response, segmentId, languageResourceid);
                 }
         });
     },
-    loadCachedDataIntoGrid: function(segmentId,tmmtid,query) {
+    loadCachedDataIntoGrid: function(segmentId,languageResourceid,query) {
         if(segmentId != this.editedSegmentId){
             return;
         }
@@ -208,8 +208,8 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             return;
         }
         var res =me.cachedResults.get(segmentId);
-        if(tmmtid > 0 && res.get(tmmtid)){
-            me.getView().getStore('editorquery').loadRawData(res.get(tmmtid).rows,true);
+        if(languageResourceid > 0 && res.get(languageResourceid)){
+            me.getView().getStore('editorquery').loadRawData(res.get(languageResourceid).rows,true);
             return;
         }
         me.assocStore.each(function(record){
@@ -241,13 +241,13 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     chooseMatch: function(view, record) {
         this.getView().fireEvent('chooseMatch', record);
     },
-    handleRequestSuccess: function(controller,response,segmentId,tmmtid,query){
+    handleRequestSuccess: function(controller,response,segmentId,languageResourceid,query){
         var me = controller,
             resp = Ext.util.JSON.decode(response.responseText),
             editorquery = me.getView().getStore('editorquery');
 
         if(segmentId == me.editedSegmentId){
-            editorquery.remove([editorquery.findExact('tmmtid',tmmtid)]);
+            editorquery.remove([editorquery.findExact('languageResourceid',languageResourceid)]);
         }
 
         //when saving a segment before the match requests are loaded, 
@@ -258,23 +258,23 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         }
 
         if(typeof resp.rows !== 'undefined' && resp.rows !== null && resp.rows.length){
-            me.cachedResults.get(segmentId).add(tmmtid,resp);
-            me.loadCachedDataIntoGrid(segmentId,tmmtid);
+            me.cachedResults.get(segmentId).add(languageResourceid,resp);
+            me.loadCachedDataIntoGrid(segmentId,languageResourceid);
             return;
         }
         
         var noresults = {
                 rows: [{
                     source: me.strings.noresults,
-                    tmmtid: tmmtid,
+                    languageResourceid: languageResourceid,
                     state:  me.SERVER_STATUS.SERVER_STATUS_NORESULT
                 }]
             };
-        me.cachedResults.get(segmentId).add(tmmtid,noresults);
-        me.loadCachedDataIntoGrid(segmentId,tmmtid,query);
-        me.cachedResults.get(segmentId).removeAtKey(tmmtid);
+        me.cachedResults.get(segmentId).add(languageResourceid,noresults);
+        me.loadCachedDataIntoGrid(segmentId,languageResourceid,query);
+        me.cachedResults.get(segmentId).removeAtKey(languageResourceid);
     },
-    handleRequestFailure: function(controller,response,segmentId,tmmtid){
+    handleRequestFailure: function(controller,response,segmentId,languageResourceid){
         var me = controller,
             respStatusMsg = me.strings.serverErrorMsgDefault,
             strState =  me.SERVER_STATUS.SERVER_STATUS_SERVERERROR,
@@ -285,7 +285,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             segment;
         if(segmentId == me.editedSegmentId){
             //removing by index is working as array only!
-            store.remove([store.findExact('tmmtid',tmmtid)]);
+            store.remove([store.findExact('languageResourceid',languageResourceid)]);
         }
         switch(response.status){
             case -1:
@@ -313,14 +313,14 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         result.rows = [{
             source: respStatusMsg,
             target: targetMsg,
-            tmmtid: tmmtid,
+            languageResourceid: languageResourceid,
             state: strState
         }];
         segment = me.cachedResults.get(segmentId);
         if(segment) {
-            segment.add(tmmtid, result);
-            me.loadCachedDataIntoGrid(segmentId,tmmtid);
-            segment.removeAtKey(tmmtid);
+            segment.add(languageResourceid, result);
+            me.loadCachedDataIntoGrid(segmentId,languageResourceid);
+            segment.removeAtKey(languageResourceid);
         }
     }
 });

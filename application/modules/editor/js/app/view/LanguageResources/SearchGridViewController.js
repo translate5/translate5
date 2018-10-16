@@ -83,7 +83,7 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
     executedRequests:new Ext.util.HashMap(),
     lastSearch: {
         query:'',
-        tmmtid: null,
+        languageResourceid: null,
         field: null
     },
     offset: new Ext.util.HashMap(),
@@ -119,9 +119,9 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
     /**
      * @param {String} querystring the string searched for in the TM
      * @param {String} field source / target
-     * @param {Integer} tmmtid optional, integer to restrict search to this tmmtid, or falsy to search in all tmmts
+     * @param {Integer} languageResourceid optional, integer to restrict search to this languageResourceid, or falsy to search in all languageResources
      */
-    startSearch: function(querystring, field, tmmtid) {
+    startSearch: function(querystring, field, languageResourceid) {
         var me = this;
         if(!querystring) {
             return;
@@ -129,8 +129,8 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         me.getViewModel().getStore('editorsearch').removeAll();
         me.lastSearch.query= querystring;
         me.lastSearch.field = field;
-        //needed when searching only one tmmt, otherwise a falsy value
-        me.lastSearch.tmmtid = tmmtid;
+        //needed when searching only one languageResource, otherwise a falsy value
+        me.lastSearch.languageResourceid = languageResourceid;
         me.search();
         me.clearTextField(field);
     },
@@ -161,18 +161,18 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         }
         me.assocStore.each(function(record){
             var searchable = record.get('searchable'),
-                searchInTm = !me.lastSearch.tmmtid || (record.get('id') == me.lastSearch.tmmtid);
+                searchInTm = !me.lastSearch.languageResourceid || (record.get('id') == me.lastSearch.languageResourceid);
             if(searchable && searchInTm){
                 me.sendRequest(record.get('id'));
             }
         });
     },
-    sendRequest:function(tmmtid){
+    sendRequest:function(languageResourceid){
         var me = this,
-            offset = me.offset.get(tmmtid),
+            offset = me.offset.get(languageResourceid),
             loadingId;
 
-        //No more results for this TMMT
+        //No more results for this LanguageResource
         if(offset === null) {
             return;
         }
@@ -182,17 +182,17 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
         }
 
 
-        loadingId = 'TM-'+tmmtid+'-offset-'+offset;
+        loadingId = 'TM-'+languageResourceid+'-offset-'+offset;
         me.loadDataIntoGrid({rows: [{
             id: loadingId,
             source: me.strings.loading,
             target: me.strings.loading,
-            tmmtid: tmmtid,
+            languageResourceid: languageResourceid,
             state: me.SERVER_STATUS.SERVER_STATUS_LOADING
         }]}, true);
 
-        me.executedRequests.add(tmmtid,Ext.Ajax.request({
-            url:Editor.data.restpath+'tmmt/'+tmmtid+'/search',
+        me.executedRequests.add(languageResourceid,Ext.Ajax.request({
+            url:Editor.data.restpath+'languageresourceinstance/'+languageResourceid+'/search',
                 method: "POST",
                 scope: this,
                 params: {
@@ -202,14 +202,14 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
                 },
                 success: function(response){
                     me.removeLoadingEntry(loadingId);
-                    me.handleRequestSuccess(response, tmmtid, me.lastSearch.query, offset);
-                    me.executedRequests.removeAtKey(tmmtid);
+                    me.handleRequestSuccess(response, languageResourceid, me.lastSearch.query, offset);
+                    me.executedRequests.removeAtKey(languageResourceid);
                     me.continueSearchToFillGrid();
                 }, 
                 failure: function(response){
                     me.removeLoadingEntry(loadingId);
-                    me.handleRequestFailure(response, tmmtid);
-                    me.executedRequests.removeAtKey(tmmtid);
+                    me.handleRequestFailure(response, languageResourceid);
+                    me.executedRequests.removeAtKey(languageResourceid);
                     me.continueSearchToFillGrid();
                 }
         }));
@@ -223,27 +223,27 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
             this.search(true);
         }
     },
-    handleRequestSuccess: function(response, tmmtid, query, offset){
+    handleRequestSuccess: function(response, languageResourceid, query, offset){
         var me = this,
             resp = Ext.util.JSON.decode(response.responseText);
 
         if(resp.rows && resp.rows.length){            
-            me.offset.add(tmmtid, resp.nextOffset);
+            me.offset.add(languageResourceid, resp.nextOffset);
             me.loadDataIntoGrid(resp);
             return;
         }
 
         //when its a resumed search (with offset) then we don't have to show the "noresult" entry
         if(offset) {
-            me.offset.add(tmmtid, resp.nextOffset);
+            me.offset.add(languageResourceid, resp.nextOffset);
             return;
         }
 
         //when displaying the noresults text, no more entries exist, set offset to null
-        me.offset.add(tmmtid, null);
+        me.offset.add(languageResourceid, null);
         me.loadDataIntoGrid({rows: [{
             source: me.strings.noresults,
-            tmmtid: tmmtid,
+            languageResourceid: languageResourceid,
             state:  me.SERVER_STATUS.SERVER_STATUS_NORESULT
         }]});
     },
@@ -259,12 +259,12 @@ Ext.define('Editor.view.LanguageResources.SearchGridViewController', {
             me.getView().getView().refreshView();
         }
     },
-    handleRequestFailure: function(response,tmmtid){
+    handleRequestFailure: function(response,languageResourceid){
         var me = this,
             errorEntry = {
                 source: me.strings.serverErrorMsgDefault,
                 target: '',
-                tmmtid: tmmtid,
+                languageResourceid: languageResourceid,
                 state: me.SERVER_STATUS.SERVER_STATUS_SERVERERROR
             },
             errors = [errorEntry];

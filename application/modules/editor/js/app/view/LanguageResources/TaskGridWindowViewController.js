@@ -58,8 +58,8 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewController', {
      */
     importTaskIntoTm: function() {
         var me = this, 
-            tmmt = me.getViewModel().get('record'),
-            proxy = tmmt.proxy,
+            languageResource = me.getViewModel().get('record'),
+            proxy = languageResource.proxy,
             url = proxy.url,
             selected = me.getView().down('grid').getSelection();
             
@@ -70,7 +70,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindowViewController', {
         if (!url.match(proxy.slashRe)) {
             url += '/';
         }
-        url += tmmt.get('id')+'/tasks';
+        url += languageResource.get('id')+'/tasks';
         
         me.getView().mask('Start reimport...');
         Ext.Ajax.request({

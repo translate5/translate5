@@ -155,7 +155,7 @@ Ext.define('Editor.view.LanguageResources.MatchGrid', {
 	          dataIndex: 'matchrate',
 	          tdCls: 'matchrate',
 	          renderer: function(matchrate, meta, record) {
-	              var str = me.assocStore.getById(record.get('tmmtid'));
+	              var str = me.assocStore.getById(record.get('languageResourceid'));
 				  
 	              meta.tdAttr += 'data-qtip="'+str.get('name')+' ('+str.get('serviceName')+')'+"<br/>"+ me.getMatchrateTooltip(matchrate)+'"';
 

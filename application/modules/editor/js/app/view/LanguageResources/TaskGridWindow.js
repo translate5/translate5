@@ -142,7 +142,7 @@ Ext.define('Editor.view.LanguageResources.TaskGridWindow', {
     },
     loadRecord: function(record) {
         var tasks = this.getViewModel().getStore('tasklist'),
-            proxy = Editor.model.LanguageResources.TmMt.proxy,
+            proxy = Editor.model.LanguageResources.LanguageResource.proxy,
             url = proxy.url;
         this.getViewModel().set('record', record);
         if (!url.match(proxy.slashRe)) {

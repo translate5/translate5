@@ -47,10 +47,10 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow'
     ],
-    models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.TmMt'],
+    models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
     stores:[
         'Editor.store.LanguageResources.Resources',
-        'Editor.store.LanguageResources.TmMts',
+        'Editor.store.LanguageResources.LanguageResource',
         'Editor.store.LanguageResources.SdlEngine'
     ],
     strings: {
@@ -143,7 +143,7 @@ Ext.define('Editor.controller.TmOverview', {
             }
         },
         store: {
-            '#Editor.store.TmMts': {
+            '#Editor.store.LanguageResources.LanguageResource': {
                 update: 'addRecordToImportCheck'
             }
         }
@@ -244,7 +244,7 @@ Ext.define('Editor.controller.TmOverview', {
             params: {
                 format: 'jsontext'
             },
-            url: Editor.data.restpath+'tmmt',
+            url: Editor.data.restpath+'languageresourceinstance',
             scope: me,
             success: function(form, submit) {
                 var msg = Ext.String.format(me.strings.created, submit.result.rows.name);
@@ -303,7 +303,7 @@ Ext.define('Editor.controller.TmOverview', {
         var me = this,
             window = button.up('window'),
             form = window.down('form'),
-            record = window.tmmtRecord;
+            record = window.languageResourceRecord;
 
         if(!form.isValid()) {
             return;
@@ -314,7 +314,7 @@ Ext.define('Editor.controller.TmOverview', {
             params: {
                 format: 'jsontext'
             },
-            url: Editor.data.restpath+'tmmt/'+record.get('id')+'/import/',
+            url: Editor.data.restpath+'languageresourceinstance/'+record.get('id')+'/import/',
             scope: me,
             success: function(form, submit) {
                 record.load();
@@ -343,7 +343,7 @@ Ext.define('Editor.controller.TmOverview', {
         });
     },
     /**
-     * Checks loaded TMMTs and reloads TMMTs with status import periodically
+     * Checks loaded LanguageResources and reloads LanguageResources with status import periodically
      * @param {Ext.data.Store} store
      */
     addRecordToImportCheck: function(store, record) {
@@ -495,16 +495,16 @@ Ext.define('Editor.controller.TmOverview', {
             text:me.strings.taskassocgridcell,
             renderer: function(v, meta, rec){
                 var strservices = [],
-                    i, tmmt;
+                    i, languageResource;
                 if(!v || v.length == 0){
                     meta.tdAttr = 'data-qtip="'+me.strings.noResourcesAssigned+'"';
                     //meta.tdCls  = meta.tdCls  + ' info-icon';
                     return '';
                 }
                 for(i=0;i<v.length;i++){
-                    tmmt = v[i];
-                    strservices.push(tmmt.name+' ('+tmmt.serviceName+')');
-                    //meta.tdAttr = 'data-qtip="'+tmmt.name+' ('+tmmt.serviceName+')<br/>"';
+                    languageResource = v[i];
+                    strservices.push(languageResource.name+' ('+languageResource.serviceName+')');
+                    //meta.tdAttr = 'data-qtip="'+languageResource.name+' ('+languageResource.serviceName+')<br/>"';
                 }
                 meta.tdAttr = 'data-qtip="'+strservices.join('<br />')+'"';
                 return v.length;

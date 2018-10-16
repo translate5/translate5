@@ -93,7 +93,7 @@ Ext.define('Editor.controller.TaskAssoc', {
   },
   handleLoadPreferences: function(controller,task){
       var me = this,
-          tmmtparams = {
+          languageResourceparams = {
               params: {
                   filter: '[{"operator":"like","value":"'+task.get('taskGuid')+'","property":"taskGuid"}]'
               }
@@ -101,7 +101,7 @@ Ext.define('Editor.controller.TaskAssoc', {
       //set the actual task
       me.actualTask = task;
       me.getGrid().store.removeAll();
-      me.getGrid().store.load(tmmtparams);
+      me.getGrid().store.load(languageResourceparams);
   },
   
   /***
@@ -148,7 +148,7 @@ Ext.define('Editor.controller.TaskAssoc', {
   },
   /**
    * currently no easy "subentity" versioning is possible here, because of the bulk (store each) like saving / deleting.
-   * on the other hand no versioning is needed, master entity tmmt does not contain changeable values which affects the taskassoc entity
+   * on the other hand no versioning is needed, master entity languageResource does not contain changeable values which affects the taskassoc entity
    * The taskassocs itself can be handled by plain 404 already deleted and duplicate entry messages.
    */
   saveOneAssocRecord: function(record){
@@ -163,7 +163,7 @@ Ext.define('Editor.controller.TaskAssoc', {
           method = 'DELETE',
           url = Editor.data.restpath+'taskassoc',
           checkedData = Ext.JSON.encode({
-              tmmtId: record.get('id'),
+              languageResourceId: record.get('id'),
               taskGuid: me.actualTask.get('taskGuid'),
               segmentsUpdateable: record.get('segmentsUpdateable')
           });

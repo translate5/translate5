@@ -55,8 +55,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
-        tmmtStatusColumn: '#UT#Status',
-        tmmtStatus: {
+        languageResourceStatusColumn: '#UT#Status',
+        languageResourceStatus: {
             loading: '#UT#Statusinformationen werden geladen',
             error: '#UT#Fehler',
             available: '#UT#verfügbar',
@@ -79,12 +79,12 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         var me = this,
             config = {
                 title: me.title, //see EXT6UPD-9
-                store :'Editor.store.LanguageResources.TmMts',
+                store :'Editor.store.LanguageResources.LanguageResource',
                 plugins: ['gridfilters'],
                 viewConfig: {
                     getRowClass: function(record) {
                         var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
-                        return cls + ' tmmt-status-'+record.get('status');
+                        return cls + ' languageResource-status-'+record.get('status');
                     }
                 },
                 columns: [{
@@ -146,11 +146,11 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },{
                     xtype: 'gridcolumn',
                     width: 160,
-                    text: me.strings.tmmtStatusColumn,
+                    text: me.strings.languageResourceStatusColumn,
                     dataIndex: 'status',
                     tdCls: 'status',
                     renderer: function(value, meta, record) {
-                        var str = me.strings.tmmtStatus,
+                        var str = me.strings.languageResourceStatus,
                             info = record.get('statusInfo');
                         if(value === "loading") { // show list as soon as possible, show status later due to different latency of the requested TMs
                             record.load(); // TODO: handle 404 (= remove from grid)
@@ -259,7 +259,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     }]
                 },{
                     xtype: 'pagingtoolbar',
-                    store: 'Editor.store.LanguageResources.TmMts',
+                    store: 'Editor.store.LanguageResources.LanguageResource',
                     dock: 'bottom',
                     displayInfo: true
             }]
