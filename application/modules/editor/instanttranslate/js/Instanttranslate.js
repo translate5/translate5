@@ -480,29 +480,57 @@ function translateText(textToTranslate,translationInProgressID){
     });
 }
 
-function renderTranslationContainer(engineId, serviceName, resourceName, translationText) {
+function renderTranslationContainer(resultData) {
     var translationsContainer = '';
-    translationsContainer += '<h4>' + serviceName + ' (' + resourceName + ')</h4>';
+    translationsContainer += '<h4>' + resultData.serviceName + ' (' + resultData.resourceName + ')</h4>';
+    if (resultData.fuzzyMatch.sourceDiff != undefined) {
+        translationsContainer += '<div class="translation-sourcediff">Attention! FuzzyMatch (' + resultData.fuzzyMatch.matchRate + '): ';
+        translationsContainer += '<span class="translation-sourcediff-content">' + resultData.fuzzyMatch.sourceDiff + '</span>';
+        translationsContainer += '</div>';
+    }
     translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+engineId+'">'+translationText+'</div>';
+    translationsContainer += '<div class="translation-result" id="'+resultData.engineId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     translationsContainer += '</div>';
-    translationsContainer += '<div id="translationError'+engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
+    if (resultData.infoText != '') {
+        translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
+    }
+    translationsContainer += '<div id="translationError'+resultData.engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
     return translationsContainer;
 }
 
 function fillTranslation() {
-    var serviceNameHtml = '',
-        translationHtml = '',
-        resultHtml = '';
+    var translationHtml = '',
+        resultHtml = '',
+        fuzzyMatch,
+        infoText,
+        metaData,
+        resultData;
     $.each(translateTextResponse, function(serviceName, resource){
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
             $.each(allResults, function(key, result){
-                var engineId = result['languageResourceid'];
-                var translationText = result['target'];
-                if (translationText != '') {
-                    resultHtml += renderTranslationContainer(engineId, serviceName, resourceName, translationText);
+                if (result['target'] != '') {
+                    fuzzyMatch = {};
+                    if (result['sourceDiff'] != undefined) {
+                        fuzzyMatch = {'matchRate': result['matchrate'], 
+                                      'sourceDiff': result['sourceDiff']}
+                    }
+                    infoText = '';
+                    if (result['metaData'] != undefined) {
+                        metaData = result['metaData'];
+                        if(metaData['definition'] != undefined) {
+                            infoText = metaData['definition'];
+                        }
+                    }
+                    resultData = {'engineId': result['languageResourceid'],
+                                  'infoText': infoText,
+                                  'resourceName': resourceName,
+                                  'serviceName': serviceName,
+                                  'fuzzyMatch': fuzzyMatch,
+                                  'translationText': result['target']
+                                  };
+                    resultHtml += renderTranslationContainer(resultData);
                 }
             });
         });

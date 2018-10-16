@@ -43,8 +43,8 @@ END LICENSE AND COPYRIGHT
 /* --------------- general --------------- */
 
 h4, p {
-    padding: 3px;
-    margin: 2px 0px;
+    padding: 0px 3px;
+    margin: 5px 0px 2px 0px;
     -webkit-margin-before: 0px;
     -webkit-margin-after: 5px;
     -webkit-margin-start: 0px;
@@ -233,10 +233,32 @@ h4, p {
 #translations {
     width: 100%;
 }
+.translation-sourcediff {
+    background: url(../../images/exclamation.png) no-repeat left center;
+    color: #666;
+    font-size: 12px;
+    padding: 3px 5px 3px 20px;
+}
+.translation-sourcediff-content {
+    background-color: #fee202;
+    color: #000;
+    font-style: italic;
+    padding: 3px 5px;
+}
+.translation-sourcediff .highlight {
+    background-color: #fff;
+    padding: 5px;
+}
 .translation-result {
     background-color: #eee;
     padding: 5px;
     margin-bottom: 10px;
+}
+.translation-infotext {
+    font-size: 12px;
+    color: #666;
+    padding: 0px 3px;
+    margin-top: -7px;
 }
 #instantTranslationIsOff a:hover,
 #instantTranslationIsOn a:hover {
