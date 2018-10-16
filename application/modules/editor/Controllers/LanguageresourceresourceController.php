@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Resources are no valid Models/Entitys, we support only a generated Resource listing
  * One Resource is one available configured connector, Languages and Title can be customized in the TM Overview List
  */
-class editor_ResourceController extends ZfExtended_RestController  {
+class editor_LanguageresourceresourceController extends ZfExtended_RestController  {
     
     /**
      * (non-PHPdoc)
@@ -55,7 +55,7 @@ class editor_ResourceController extends ZfExtended_RestController  {
         $isAllowedFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddFilebased');
         $isAllowedNonFilebased = $acl->isInAllowedRoles($userSession->data->roles, 'frontend', 'languageResourcesAddNonFilebased');
         foreach($resources as $resource) {
-            /* @var $resource editor_Models_Resource */
+            /* @var $resource editor_Models_LanguageResources_Resource */
             $isFilebased = $resource->getFilebased();
             if($isFilebased && $isAllowedFilebased || !$isFilebased && $isAllowedNonFilebased) {
                 $result[] = $resource->getDataObject();

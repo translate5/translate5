@@ -47,8 +47,8 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $assoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
-        /* @var $assoc editor_Models_Taskassoc */
+        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
         
         $params = $this->workerModel->getParameters();
         

@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_Moses_Resource extends editor_Models_Resource {
+class editor_Services_Moses_Resource extends editor_Models_LanguageResources_Resource {
     public function __construct(string $id, string $name, string $url) {
         parent::__construct($id, $name, $url);
         $this->filebased = false; //forced to be no filebased

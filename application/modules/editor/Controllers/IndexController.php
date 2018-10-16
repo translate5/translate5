@@ -424,7 +424,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         }
 
         if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesTaskassoc')){
-            $controllers[] = 'TaskAssoc';
+            $controllers[] = 'LanguageResourcesTaskassoc';
         }
         
         if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesMatchQuery') || $acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesSearchQuery')){

@@ -96,7 +96,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         foreach($this->view->rows as &$languageresource) {
             $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
-            /* @var $resource editor_Models_Resource */
+            /* @var $resource editor_Models_LanguageResources_Resource */
             if(!empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
             }
@@ -170,7 +170,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->useAsDefault=$default;
         
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
-        /* @var $resource editor_Models_Resource */
+        /* @var $resource editor_Models_LanguageResources_Resource */
         if(empty($resource)) {
             $this->view->rows->status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
             $this->view->rows->statusInfo = 'Configured resource not found!';
@@ -292,13 +292,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //check if filtering for taskList should be done
         if(isset($taskList) && is_string($taskList->value)){
             $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
-            $handleFilter($taskList,$resultList,'editor_Models_Taskassoc','loadByTaskGuids','languageResourceId');
+            $handleFilter($taskList,$resultList,'editor_Models_LanguageResources_Taskassoc','loadByTaskGuids','languageResourceId');
         }
     }
     
     private function prepareTaskInfo($languageResourceids) {
-        /* @var $assocs editor_Models_Taskassoc */
-        $assocs = ZfExtended_Factory::get('editor_Models_Taskassoc');
+        /* @var $assocs editor_Models_LanguageResources_Taskassoc */
+        $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
         
         $taskinfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
         if(empty($taskinfo)) {
@@ -481,8 +481,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             }
         }
         
-        $assoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
-        /* @var $assoc editor_Models_Taskassoc */
+        $assoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
         $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;
@@ -492,10 +492,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     /**
      * Validates if choosen languages can be used by the choosen resource
      * Validates also the existence of the languages in the Lang DB 
-     * @param editor_Models_Resource $resource
+     * @param editor_Models_LanguageResources_Resource $resource
      * @return boolean
      */
-    protected function validateLanguages(editor_Models_Resource $resource) {
+    protected function validateLanguages(editor_Models_LanguageResources_Resource $resource) {
         
         //when termcollection is a resource, the languages are handled by the tbx import
         if($resource instanceof editor_Services_TermCollection_Resource){

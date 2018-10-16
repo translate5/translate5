@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_Google_Resource extends editor_Models_Resource {
+class editor_Services_Google_Resource extends editor_Models_LanguageResources_Resource {
 
     public function __construct(string $id, string $name) {
         $this->id = $id;
@@ -41,7 +41,7 @@ class editor_Services_Google_Resource extends editor_Models_Resource {
     /***
      * Check if the valid resource language is valid for the api
      * {@inheritDoc}
-     * @see editor_Models_Resource::hasSourceLang()
+     * @see editor_Models_LanguageResources_Resource::hasSourceLang()
      */
     public function hasSourceLang(editor_Models_Languages $sourceLang) {
         $api=ZfExtended_Factory::get('editor_Services_Google_HttpApi',[
@@ -54,7 +54,7 @@ class editor_Services_Google_Resource extends editor_Models_Resource {
     /***
      * Check if the valid resource language is valid for the api
      * {@inheritDoc}
-     * @see editor_Models_Resource::hasTargetLang()
+     * @see editor_Models_LanguageResources_Resource::hasTargetLang()
      */
     public function hasTargetLang(editor_Models_Languages $targetLang) {
         $api=ZfExtended_Factory::get('editor_Services_Google_HttpApi',[

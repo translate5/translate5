@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
 abstract class editor_Services_ServiceAbstract {
     const DEFAULT_COLOR = 'ff0000';
     
-    protected $resourceClass = 'editor_Models_Resource';
+    protected $resourceClass = 'editor_Models_LanguageResources_Resource';
     protected $resources = array();
     
     /**
@@ -60,7 +60,7 @@ abstract class editor_Services_ServiceAbstract {
      */
     protected function addResource(array $constructorArgs) {
         $res = ZfExtended_Factory::get($this->resourceClass, $constructorArgs);
-        /* @var $res editor_Models_Resource */
+        /* @var $res editor_Models_LanguageResources_Resource */
         $res->setService($this->getName(), $this->getServiceNamespace(), static::DEFAULT_COLOR);
         $this->resources[] = $res;
     }
@@ -82,7 +82,7 @@ abstract class editor_Services_ServiceAbstract {
     
     /**
      * returns a list with connector instances, one per resource
-     * @return [editor_Models_Resource]
+     * @return [editor_Models_LanguageResources_Resource]
      */
     public function getResources(){
         return $this->resources;
@@ -91,7 +91,7 @@ abstract class editor_Services_ServiceAbstract {
     /**
      * returns the resource to the given resource id
      * @param string $id
-     * @return editor_Models_Resource|NULL
+     * @return editor_Models_LanguageResources_Resource|NULL
      */
     public function getResourceById(string $id) {
         foreach ($this->resources as $resource) {

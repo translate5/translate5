@@ -29,12 +29,12 @@ END LICENSE AND COPYRIGHT
 /**
  * Controller for the LanguageResources Associations
  */
-class editor_TaskassocController extends ZfExtended_RestController {
+class editor_LanguageresourcetaskassocController extends ZfExtended_RestController {
 
-    protected $entityClass = 'editor_Models_Taskassoc'; //→ _Taskassoc
+    protected $entityClass = 'editor_Models_LanguageResources_Taskassoc'; //→ _Taskassoc
 
     /**
-     * @var editor_Models_Taskassoc
+     * @var editor_Models_LanguageResources_Taskassoc
      */
     protected $entity;
     

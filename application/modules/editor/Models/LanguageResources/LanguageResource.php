@@ -99,7 +99,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $mtRes=[];
         //get all available tm resources
         foreach($resources as $resource) {
-            /* @var $resource editor_Models_Resource */
+            /* @var $resource editor_Models_LanguageResources_Resource */
             if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT && !in_array($resource->getService(), $mtRes)){
                 $mtRes[]=$resource->getService();
             }
@@ -214,7 +214,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     /**
      * returns the resource used by this languageResource instance
-     * @return editor_Models_Resource
+     * @return editor_Models_LanguageResources_Resource
      */
     public function getResource() {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -243,8 +243,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function checkTaskAndLanguageResourceAccess(string $taskGuid,integer $languageResourceId, editor_Models_Segment $segment = null) {
         
         //checks if the queried languageResource is associated to the task:
-        $languageResourceTaskAssoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
-        /* @var $languageResourceTaskAssoc editor_Models_Taskassoc */
+        $languageResourceTaskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $languageResourceTaskAssoc editor_Models_LanguageResources_Taskassoc */
         try {
             //for security reasons a service can only be queried when a valid task association exists and this task is loaded
             // that means the user has also access to the service. If not then not!

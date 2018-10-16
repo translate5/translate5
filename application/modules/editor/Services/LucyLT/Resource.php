@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_LucyLT_Resource extends editor_Models_Resource {
+class editor_Services_LucyLT_Resource extends editor_Models_LanguageResources_Resource {
     
     /**
      * This array maps our internal rfc5646 language keys to the language keys defined by lucy
@@ -66,7 +66,7 @@ class editor_Services_LucyLT_Resource extends editor_Models_Resource {
     
     /**
      * {@inheritDoc}
-     * @see editor_Models_Resource::hasSourceLang()
+     * @see editor_Models_LanguageResources_Resource::hasSourceLang()
      */
     public function hasSourceLang(editor_Models_Languages $sourceLang) {
         return $this->hasLanguage($sourceLang->getRfc5646());
@@ -74,7 +74,7 @@ class editor_Services_LucyLT_Resource extends editor_Models_Resource {
 
     /**
      * {@inheritDoc}
-     * @see editor_Models_Resource::hasTargetLang()
+     * @see editor_Models_LanguageResources_Resource::hasTargetLang()
      */
     public function hasTargetLang(editor_Models_Languages $targetLang) {
         return $this->hasLanguage($targetLang->getRfc5646());

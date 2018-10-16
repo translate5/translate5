@@ -32,9 +32,9 @@ RENAME TABLE `LEK_matchresource_tmmt` TO `LEK_languageresources`;
 RENAME TABLE `LEK_matchresource_taskassoc` TO `LEK_languageresources_taskassoc`;
 
 /* rename the acl resources from the plugin to the core code classes */
-UPDATE `Zf_acl_rules` SET `resource`='editor_resource' WHERE `resource`='editor_plugins_matchresource_resource';
+UPDATE `Zf_acl_rules` SET `resource`='editor_languageresourceresource' WHERE `resource`='editor_plugins_matchresource_resource';
 
-UPDATE `Zf_acl_rules` SET `resource`='editor_taskassoc' WHERE `resource`='editor_plugins_matchresource_taskassoc';
+UPDATE `Zf_acl_rules` SET `resource`='editor_languageresourcetaskassoc' WHERE `resource`='editor_plugins_matchresource_taskassoc';
 
 UPDATE `Zf_acl_rules` SET `resource`='editor_languageresourceinstance' WHERE `resource`='editor_plugins_matchresource_tmmt';
 

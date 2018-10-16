@@ -38,7 +38,7 @@ END LICENSE AND COPYRIGHT
  * @method boolean getSegmentsUpdateable() getSegmentsUpdateable()
  * @method void setSegmentsUpdateable() setSegmentsUpdateable(boolean $updateable)
  */
-class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Taskassoc';
     protected $validatorInstanceClass = 'editor_Models_Validator_Taskassoc'; //→ here the new validator class
     /**

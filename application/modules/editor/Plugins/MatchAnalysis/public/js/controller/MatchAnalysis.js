@@ -226,7 +226,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     loadTaskAssoc:function(task){
         var me=this,
-	        taskAssoc=Editor.app.getController('Editor.controller.TaskAssoc');
+	        taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
 	    
 	    //load the task assoc store
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);

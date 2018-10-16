@@ -75,7 +75,7 @@ class editor_Services_Manager {
     /**
      * gets the reosurce to the given languageResource
      * @param editor_Models_LanguageResources_LanguageResource $languageresource
-     * @return editor_Models_Resource
+     * @return editor_Models_LanguageResources_Resource
      */
     public function getResource(editor_Models_LanguageResources_LanguageResource $languageresource) {
         return $this->getResourceById($languageresource->getServiceType(), $languageresource->getResourceId());
@@ -84,7 +84,7 @@ class editor_Services_Manager {
     /**
      * @param string $serviceType
      * @param string $id
-     * @return editor_Models_Resource
+     * @return editor_Models_LanguageResources_Resource
      */
     public function getResourceById(string $serviceType, string $id) {
         $this->checkService($serviceType);
