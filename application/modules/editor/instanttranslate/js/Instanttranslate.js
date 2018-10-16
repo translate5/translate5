@@ -455,7 +455,6 @@ function translateText(textToTranslate,translationInProgressID){
         data: {
             'source':$("#sourceLocale").val(),
             'target':$("#targetLocale").val(),
-            'id':6, // TODO: remove id from data
             'text':textToTranslate
         },
         success: function(result){
