@@ -54,7 +54,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         //2.
         //full source match
         //target text different
-        ['This <b><br>is a</b> red house.','Dies <b>ist</b> ein<br> grünes Haus.'],
+        ['This <i><br>is a</i> red house.','Dies <i>ist</i> ein<br> grünes Haus.'],
             
         //3.
         //no full source match, since target tag count differs
@@ -103,6 +103,12 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
             
         //12 no match at all, just to test tag less segments
         ['This is a green house.','Dies ist ein rotes Haus.'],
+        ["\n","\n"],
+        ['<br>','<br>'],
+        ["\r",''],
+        ['<hr>',''],
+        ['<br>','<br><br>'], // no repetition of above sources with a single tag
+        //testing the correct replacement of the tags
     );
     
     /**
@@ -270,6 +276,41 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
             $this->assertEquals($originalTags, $editedTags, 'Source segment (Nr. '.$nr.') tags were changed, that must not be!');
             $this->assertStringEndsWith('house - edited.', $segment->sourceEdit, 'Source of segment Nr. '.$nr.' was not edited');
         }
+    }
+    
+    /**
+     * See TRANSLATE-1442
+     */
+    public function testTagOnlyReplacement() {
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $segToTest = $segments[12];
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit.'Test', $segToTest->id);
+        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
+        //fetch alikes and assert correct segments found by segmentNrInTask
+        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        
+        $alikeNrs = array_map(function($item){
+            return $item->segmentNrInTask;
+        },$alikes);
+        $this->assertEquals([14,15,16], $alikeNrs, 'The found repetitions are not as expected!');
+        
+        //save repetitions
+        $alikeIds = array_map(function($item){
+            return $item->id;
+        },$alikes);
+            
+        $alikePutData = [
+            'duration' => 777, //faked duration value
+            'alikes' => json_encode($alikeIds)
+        ];
+        //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
+        $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
+            
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/ChangeAlikeTranslate680Test/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass() {
