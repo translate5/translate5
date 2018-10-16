@@ -54,14 +54,21 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             return;
         }
 
-        if(!$this->isValidParam($params,'id')){
+        if(!$this->isValidParam($params,'source')){
             $e=new ZfExtended_ValidateException();
-            $e->setErrors(["Engine id is missing."]);
+            $e->setErrors(["Source language parametar is missing."]);
             $this->handleValidateException($e);
             return;
         }
         
-        $trans=$this->searchResources($params['text'],$params['id']);
+        if(!$this->isValidParam($params,'target')){
+            $e=new ZfExtended_ValidateException();
+            $e->setErrors(["Target language parametar is missing."]);
+            $this->handleValidateException($e);
+            return;
+        }
+        
+        $trans=$this->searchResources($params['text'],$params['source'],$params['target']);
         $this->view->rows=$trans;
     }
     
@@ -210,14 +217,21 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
      * Search all available language resources assigned to customer of a user for a given language combo.
      * 
      * @param string $text : query string
-     * @param integer $id : language resource id (engine id)
+     * @param string $sourceLang : source language rfc5646 value
+     * @param string $targetLang : target language rfc5646 value
      */
-    private function searchResources($text,$id){
+    private function searchResources($text,$sourceLang,$targetLang){
         $model=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $model editor_Models_LanguageResources_LanguageResource */
-        $model->load($id);
-        $sourceLang=$model->getSourceLang();
-        $targetLang=$model->getTargetLang();
+        
+        $languages=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languages editor_Models_Languages */
+        
+        //get the language ids
+        $languages->loadByRfc5646($sourceLang);
+        $sourceLang=$languages->getId();
+        $languages->loadByRfc5646($targetLang);
+        $targetLang=$languages->getId();
         
         //update the default selected languages for the curent user
         $this->updateDefaultLanguages($sourceLang,$targetLang);
