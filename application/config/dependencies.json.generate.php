@@ -91,8 +91,8 @@ $dep->dependencies = [[
     ],[
         "name" => "querypath",
         "label" => "QueryPath",
-        "url" => "RELEASE:querypath-3.0.3.zip",
-        "version" => "3.0.3",
+        "url" => "RELEASE:querypath-3.0.3-p1.zip",
+        "version" => "3.0.3-p1",
         "target" => "library/querypath/",
         "licenses" => [[
             "uses" => "the QueryPath library",
