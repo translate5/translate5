@@ -37,10 +37,10 @@ class editor_Models_LanguageResources_SdlResources {
      * @return array
      */
     public function getAllEngines(){
-        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $dummyTmmt editor_Models_TmMt */
+        $dummy=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $dummy editor_Models_LanguageResources_LanguageResource */
         
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummy]);
         /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
         
         

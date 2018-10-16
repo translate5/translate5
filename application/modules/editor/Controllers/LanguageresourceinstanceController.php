@@ -26,17 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Controller for the Plugin language resources configured Tmmt 
+/***
+ * Language resource controller
  */
-class editor_TmmtController extends ZfExtended_RestController {
+class editor_LanguageresourceinstanceController extends ZfExtended_RestController {
 
     const FILE_UPLOAD_NAME = 'tmUpload';
     
-    protected $entityClass = 'editor_Models_TmMt';
+    protected $entityClass = 'editor_Models_LanguageResources_LanguageResource';
 
     /**
-     * @var editor_Models_TmMt
+     * @var editor_Models_LanguageResources_LanguageResource
      */
     protected $entity;
     
@@ -94,45 +94,45 @@ class editor_TmmtController extends ZfExtended_RestController {
         /* @var $languages editor_Models_LanguageResources_Languages */
         $languages=$languages->loadResourceIdsGrouped();
         
-        foreach($this->view->rows as &$tmmt) {
-            $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
+        foreach($this->view->rows as &$languageresource) {
+            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
             /* @var $resource editor_Models_Resource */
             if(!empty($resource)) {
-                $tmmt = array_merge($tmmt, $resource->getMetaData());
+                $languageresource = array_merge($languageresource, $resource->getMetaData());
             }
             
-            $tmmtInstance = ZfExtended_Factory::get('editor_Models_Tmmt');
-            /* @var $tmmtInstance editor_Models_Tmmt */
-            $tmmtInstance->init($tmmt);
+            $languageResourceInstance = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $languageResourceInstance editor_Models_LanguageResources_LanguageResource */
+            $languageResourceInstance->init($languageresource);
             
-            $tmmt['taskList'] = $this->getTaskInfos($tmmt['id']);
-            $tmmt['status'] = 'loading';
+            $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
+            $languageresource['status'] = 'loading';
             
             $customerId=[];
-            if(isset($custAssoc[$tmmt['id']]['customerId']) && !empty($custAssoc[$tmmt['id']]['customerId'])){
-                $customerId[]=$custAssoc[$tmmt['id']]['customerId'];
+            if(isset($custAssoc[$languageresource['id']]['customerId']) && !empty($custAssoc[$languageresource['id']]['customerId'])){
+                $customerId[]=$custAssoc[$languageresource['id']]['customerId'];
             }
             
             $sourceLang=[];
-            if(isset($languages[$tmmt['id']]) && !empty($languages[$tmmt['id']]['sourceLang'])){
-                $sourceLang=$languages[$tmmt['id']]['sourceLang'];
+            if(isset($languages[$languageresource['id']]) && !empty($languages[$languageresource['id']]['sourceLang'])){
+                $sourceLang=$languages[$languageresource['id']]['sourceLang'];
             }
             
             $targetLang=[];
-            if(isset($languages[$tmmt['id']]) && !empty($languages[$tmmt['id']]['targetLang'])){
-                $targetLang=$languages[$tmmt['id']]['targetLang'];
+            if(isset($languages[$languageresource['id']]) && !empty($languages[$languageresource['id']]['targetLang'])){
+                $targetLang=$languages[$languageresource['id']]['targetLang'];
             }
             
             $useAsDefault=[];
-            if(isset($custAssoc[$tmmt['id']]['useAsDefault']) && !empty($custAssoc[$tmmt['id']]['useAsDefault'])){
-                $useAsDefault=$custAssoc[$tmmt['id']]['useAsDefault'];
+            if(isset($custAssoc[$languageresource['id']]['useAsDefault']) && !empty($custAssoc[$languageresource['id']]['useAsDefault'])){
+                $useAsDefault=$custAssoc[$languageresource['id']]['useAsDefault'];
             }
             
             //add customer assocs
-            $tmmt['resourcesCustomers']=$customerId;
-            $tmmt['useAsDefault']=$useAsDefault;
-            $tmmt['sourceLang']=$sourceLang;
-            $tmmt['targetLang']=$targetLang;
+            $languageresource['resourcesCustomers']=$customerId;
+            $languageresource['useAsDefault']=$useAsDefault;
+            $languageresource['sourceLang']=$sourceLang;
+            $languageresource['targetLang']=$targetLang;
         }
     }
     
@@ -292,50 +292,50 @@ class editor_TmmtController extends ZfExtended_RestController {
         //check if filtering for taskList should be done
         if(isset($taskList) && is_string($taskList->value)){
             $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
-            $handleFilter($taskList,$resultList,'editor_Models_Taskassoc','loadByTaskGuids','tmmtId');
+            $handleFilter($taskList,$resultList,'editor_Models_Taskassoc','loadByTaskGuids','languageResourceId');
         }
     }
     
-    private function prepareTaskInfo($tmmtids) {
+    private function prepareTaskInfo($languageResourceids) {
         /* @var $assocs editor_Models_Taskassoc */
         $assocs = ZfExtended_Factory::get('editor_Models_Taskassoc');
         
-        $taskinfo = $assocs->getTaskInfoForTmmts($tmmtids);
+        $taskinfo = $assocs->getTaskInfoForLanguageResources($languageResourceids);
         if(empty($taskinfo)) {
             return;
         }
-        //group array by tmmtid
+        //group array by languageResourceid
         $this->groupedTaskInfo = $this->convertTasknames($taskinfo);
     }
     
     /**
-     * receives a list of task and task assoc data, returns a list of taskNames grouped by tmmt
+     * receives a list of task and task assoc data, returns a list of taskNames grouped by languageResource
      * @param array $taskInfoList
      * @return string[]
      */
     protected function convertTasknames(array $taskInfoList) {
         $result = [];
         foreach($taskInfoList as $one) {
-            if(!isset($result[$one['tmmtId']])) {
-                $result[$one['tmmtId']] = array();
+            if(!isset($result[$one['languageResourceId']])) {
+                $result[$one['languageResourceId']] = array();
             }
             $taskToPrint = $one['taskName'];
             if(!empty($one['taskNr'])) {
                 $taskToPrint .= ' ('.$one['taskNr'].')';
             }
-            $result[$one['tmmtId']][] = $taskToPrint;
+            $result[$one['languageResourceId']][] = $taskToPrint;
         }
         return $result;
     }
 
     /***
-     * return array with task info (taskName's) for the given tmmtids 
+     * return array with task info (taskName's) for the given languageResourceids 
      */
-    private function getTaskInfos($tmmtid){
-        if(empty($this->groupedTaskInfo[$tmmtid])) {
+    private function getTaskInfos($languageResourceid){
+        if(empty($this->groupedTaskInfo[$languageResourceid])) {
             return [];
         }
-        return $this->groupedTaskInfo[$tmmtid];
+        return $this->groupedTaskInfo[$languageResourceid];
     }
     
     /**
@@ -361,7 +361,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         if(! $resource->getFilebased()) {
-            throw new ZfExtended_Models_Entity_NotFoundException('Requested tmmt is not filebased!');
+            throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
         }
         
         $connector = $serviceManager->getConnector($this->entity);
@@ -399,7 +399,7 @@ class editor_TmmtController extends ZfExtended_RestController {
             return;
         }
         
-        //save first to generate the TMMT id
+        //save first to generate the languageResource id
         $this->data['id']=$this->entity->save();
 
         //check and save customer assoc db entry
@@ -436,7 +436,7 @@ class editor_TmmtController extends ZfExtended_RestController {
     }
 
     /**
-     * Imports an additional file which is transfered to the desired TMMT
+     * Imports an additional file which is transfered to the desired languageResource
      */
     public function importAction(){
         $this->getAction();
@@ -447,7 +447,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         if(!$resource->getFilebased()) {
-            throw new ZfExtended_Models_Entity_NotFoundException('Requested tmmt is not filebased!');
+            throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
         }
         
         //upload errors are handled in handleAdditionalFileUpload
@@ -458,7 +458,7 @@ class editor_TmmtController extends ZfExtended_RestController {
     }
     
     /**
-     * Loads all task information entities for the given TMMT
+     * Loads all task information entities for the given languageResource
      * The returned data is no real task entity, although the task model is used in the frontend!
      */
     public function tasksAction() {
@@ -473,7 +473,7 @@ class editor_TmmtController extends ZfExtended_RestController {
             
                     // init worker and queue it
                     // Since it has to be done in a none worker request to have session access, we have to insert the worker before the taskPost 
-                    if (!$worker->init($taskGuid, ['tmmtId' => $this->entity->getId()])) {
+                    if (!$worker->init($taskGuid, ['languageResourceId' => $this->entity->getId()])) {
                         throw new ZfExtended_Exception('LanguageResource ReImport Error on worker init()');
                     }
                     $worker->queue();
@@ -483,7 +483,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         
         $assoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
         /* @var $assoc editor_Models_Taskassoc */
-        $taskinfo = $assoc->getTaskInfoForTmmts([$this->entity->getId()]);
+        $taskinfo = $assoc->getTaskInfoForLanguageResources([$this->entity->getId()]);
         //FIXME replace lockingUser guid with concrete username and show it in the frontend!
         $this->view->rows = $taskinfo;
         $this->view->total = count($taskinfo);
@@ -513,7 +513,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         $hasSourceLang = $resource->hasSourceLang($sourceLang);
         $hasTargetLang = $resource->hasTargetLang($targetLang);
         
-        //cache the RF5646 language key in the TMMT since this value is used more often as our internal ID
+        //cache the RF5646 language key in the languageResource since this value is used more often as our internal ID
         //$this->entity->setSourceLangRfc5646($sourceLang->getRfc5646());
         //$this->entity->setTargetLangRfc5646($targetLang->getRfc5646());
         
@@ -540,7 +540,7 @@ class editor_TmmtController extends ZfExtended_RestController {
     }
     
     /**
-     * Uploads a file into the new TMMT
+     * Uploads a file into the new languageResource
      * @param editor_Services_Manager $manager
      */
     protected function handleInitialFileUpload(editor_Services_Manager $manager) {
@@ -565,7 +565,7 @@ class editor_TmmtController extends ZfExtended_RestController {
     }
     
     /**
-     * Uploads an additional file into the already existing TMMT
+     * Uploads an additional file into the already existing languageResource
      * @param editor_Services_Manager $manager
      */
     protected function handleAdditionalFileUpload(editor_Services_Manager $manager) {
@@ -659,41 +659,41 @@ class editor_TmmtController extends ZfExtended_RestController {
         
         $userSession = new Zend_Session_Namespace('user');
         
-        error_log("Tmmt with name:".$this->entity->getName()." and id:".$this->entity->getId()." was deleted by:".$userSession->data->firstName." ".$userSession->data->surName);
+        error_log("LanguageResource with name:".$this->entity->getName()." and id:".$this->entity->getId()." was deleted by:".$userSession->data->firstName." ".$userSession->data->surName);
         $this->processClientReferenceVersion();
         $this->entity->delete();
     }
     
     /**
-     * performs a tmmt query
+     * performs a languageResource query
      */
     public function queryAction() {
         $session = new Zend_Session_Namespace();
-        $tmmtId = (int) $this->_getParam('tmmtId');
+        $languageResourceId = (int) $this->_getParam('languageResourceId');
         
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */
         $segment->load((int) $this->_getParam('segmentId'));
         
         //check taskGuid of segment against loaded taskguid for security reasons
-        //checks if the current task is associated to the tmmt
-        $this->entity->checkTaskAndTmmtAccess($session->taskGuid,$tmmtId, $segment);
+        //checks if the current task is associated to the languageResource
+        $this->entity->checkTaskAndLanguageResourceAccess($session->taskGuid,$languageResourceId, $segment);
         
-        $this->entity->load($tmmtId);
+        $this->entity->load($languageResourceId);
 
         $connector = $this->getConnector();
 
         $result = $connector->query($segment);
         
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
-        $this->view->tmmtId = $this->entity->getId();
+        $this->view->languageResourceId = $this->entity->getId();
         $this->view->rows = $result->getResult();
         $this->view->total = count($this->view->rows);
     }
     
     /**
-     * performs a tmmt search
-     * example URL /editor/tmmt/14/search
+     * performs a languageResource search
+     * example URL /editor/languageResource/14/search
      * additional POST Parameters: 
      *  query: querystring
      *  field: source or target
@@ -703,7 +703,7 @@ class editor_TmmtController extends ZfExtended_RestController {
     public function searchAction() {
         $session = new Zend_Session_Namespace();
         $query = $this->_getParam('query');
-        $tmmtId = (int) $this->_getParam('tmmtId');
+        $languageResourceId = (int) $this->_getParam('languageResourceId');
         $field = $this->_getParam('field');
         $offset = $this->_getParam('offset', null);
         
@@ -712,10 +712,10 @@ class editor_TmmtController extends ZfExtended_RestController {
             $field == 'target';
         }
         
-        //checks if the current task is associated to the tmmt
-        $this->entity->checkTaskAndTmmtAccess($session->taskGuid,$tmmtId);
+        //checks if the current task is associated to the languageResource
+        $this->entity->checkTaskAndLanguageResourceAccess($session->taskGuid,$languageResourceId);
         
-        $this->entity->load($tmmtId);
+        $this->entity->load($languageResourceId);
         
         if(! $this->entity->getResource()->getSearchable()) {
             throw new ZfExtended_Models_Entity_NoAccessException('search requests are not allowed on this language resource');
@@ -723,7 +723,7 @@ class editor_TmmtController extends ZfExtended_RestController {
         
         $connector = $this->getConnector();
         $result = $connector->search($query, $field, $offset);
-        $this->view->tmmtId = $this->entity->getId();
+        $this->view->languageResourceId = $this->entity->getId();
         $this->view->nextOffset = $result->getNextOffset();
         $this->view->rows = $result->getResult();
     }

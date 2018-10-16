@@ -60,7 +60,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         //query moses without tags
         $queryString = $segment->stripTags($queryString);
         
-        $res = $this->tmmt->getResource();
+        $res = $this->languageResource->getResource();
         /* @var $res editor_Services_Moses_Resource */
 
         $rpc = new Zend_XmlRpc_Client($res->getUrl());
@@ -128,7 +128,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        $res = $this->tmmt->getResource();
+        $res = $this->languageResource->getResource();
         /* @var $res editor_Services_Moses_Resource */
         
         $http = ZfExtended_Factory::get('Zend_Http_Client');

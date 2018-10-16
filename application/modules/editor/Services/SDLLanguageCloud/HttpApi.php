@@ -28,9 +28,9 @@ END LICENSE AND COPYRIGHT
 
 class editor_Services_SDLLanguageCloud_HttpApi {
     /**
-     * @var editor_Models_TmMt
+     * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $tmmt;
+    protected $languageresource;
     
     /**
      * @var Zend_Http_Response
@@ -69,8 +69,8 @@ class editor_Services_SDLLanguageCloud_HttpApi {
      */
     protected $apiUrl;
     
-    public function __construct(editor_Models_TmMt $tmmt) {
-        $this->tmmt = $tmmt;
+    public function __construct(editor_Models_LanguageResources_LanguageResource $languageresource) {
+        $this->languageResource = $languageresource;
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $urls = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->server;

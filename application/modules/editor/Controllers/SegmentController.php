@@ -341,7 +341,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $givenType = $segment->getMatchRateType();
         
         //if it was a normal segment edit, without overtaking the match we have to do nothing here
-        if(!$segment->isModified('matchRateType') || strpos($givenType, editor_Models_TmMt::MATCH_RATE_TYPE_EDITED) !== 0) {
+        if(!$segment->isModified('matchRateType') || strpos($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) !== 0) {
             return;
         }
         
@@ -354,24 +354,24 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         };
         
         //if it was an invalid type set it to unknown
-        if(! preg_match('/'.editor_Models_TmMt::MATCH_RATE_TYPE_EDITED.';tmmtid=([0-9]+)/', $givenType, $matches)) {
+        if(! preg_match('/'.editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED.';languageResourceid=([0-9]+)/', $givenType, $matches)) {
             $unknown();
             return;
         }
         
-        //load the used TMMT to get more information about it (TM or MT)
-        $tmmtid = $matches[1];
-        $tmmt = ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $tmmt editor_Models_TmMt */
+        //load the used languageResource to get more information about it (TM or MT)
+        $languageResourceid = $matches[1];
+        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
         try {
-            $tmmt->load($tmmtid);
+            $languageresource->load($languageResourceid);
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
             $unknown();
             return;
         }
         
         //set the type
-        $matchrateType->initEdited($tmmt->getResource()->getType());
+        $matchrateType->initEdited($languageresource->getResource()->getType());
         
         //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
         //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);

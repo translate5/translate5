@@ -62,7 +62,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     protected $userName;
     
     /***
-     * Collection of assigned tmmt resources types where key is tmmtid and resource type is the value
+     * Collection of assigned languageResource resources types where key is languageResourceid and resource type is the value
      *
      * @var array
      */
@@ -96,8 +96,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return;
         }
         
-        //the internalTmmtid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
-        $tmmtid=$result->internalTmmtid;
+        //the internalLanguageResourceid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
+        $languageResourceid=$result->internalLanguageResourceid;
         
         $history = $segment->getNewHistoryEntity();
         
@@ -137,7 +137,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         //TODO: we need new matchrate type, we will look around with THOMAS!!!!
         //set the type
-        $matchrateType->initEdited($this->resourceType[$tmmtid]);
+        $matchrateType->initEdited($this->resourceType[$languageResourceid]);
         
         $segment->setMatchRateType((string) $matchrateType);
         

@@ -27,12 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Tmmt TaskAssoc Entity Object
+ * LanguageResource TaskAssoc Entity Object
  * 
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
- * @method integer getTmmtId() getTmmtId()
- * @method void setTmmtId() setTmmtId(integer $tmmtid)
+ * @method integer getLanguageResourceId() getLanguageResourceId()
+ * @method void setLanguageResourceId() setLanguageResourceId(integer $languageResourceid)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method boolean getSegmentsUpdateable() getSegmentsUpdateable()
@@ -45,20 +45,20 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
      * loads one assoc entry, returns the loaded row as array
      * 
      * @param string $taskGuid
-     * @param integer $tmmtId
+     * @param integer $languageResourceId
      * @return Ambigous <multitype:, array>
      */
-    public function loadByTaskGuidAndTm(string $taskGuid, $tmmtId) {
+    public function loadByTaskGuidAndTm(string $taskGuid, $languageResourceId) {
         try {
             $s = $this->db->select()
-                ->where('tmmtId = ?', $tmmtId)
+                ->where('languageResourceId = ?', $languageResourceId)
                 ->where('taskGuid = ?', $taskGuid);
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
         }
         if (!$row) {
-            $this->notFound(__CLASS__ . '#taskGuid + tmmtId', $taskGuid.' + '.$tmmtId);
+            $this->notFound(__CLASS__ . '#taskGuid + languageResourceId', $taskGuid.' + '.$languageResourceId);
         }
         //load implies loading one Row, so use only the first row
         $this->row = $row;
@@ -66,7 +66,7 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads all associated tmmt's to one taskGuid
+     * loads all associated languageResource's to one taskGuid
      * @param unknown $taskGuid
      * @return Ambigous <Zend_Db_Table_Row_Abstract, NULL>
      */
@@ -76,11 +76,11 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     
     
     /**
-     * returns a list of all available tmmt's for one language combination
+     * returns a list of all available languageResource's for one language combination
      * The language combination is determined from the task given by taskGuid
-     * If a filter "checked" is set, then only the associated tmmt's to the given task are listed
-     * If the "checked" filter is omitted, all available tmmt's for the language are listed, 
-     *      the boolean field checked provides the info if the tmmt is associated to the task or not 
+     * If a filter "checked" is set, then only the associated languageResource's to the given task are listed
+     * If the "checked" filter is omitted, all available languageResource's for the language are listed, 
+     *      the boolean field checked provides the info if the languageResource is associated to the task or not 
      *        
      * @param string $taskGuid
      * @return multitype:
@@ -99,8 +99,8 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
         
         $s = $db->select()
         ->setIntegrityCheck(false)
-        ->from(array("tmmt" => "LEK_languageresources_tmmt"), array("tmmt.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
-        ->join(array("la"=>"LEK_languageresources_languages"), 'tmmt.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
+        ->from(array("languageResource" => "LEK_languageresources"), array("languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
+        ->join(array("la"=>"LEK_languageresources_languages"), 'languageResource.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
         ->where('la.sourceLang=?',$task->getSourceLang())
         ->where('la.targetLang=?',$task->getTargetLang());
 
@@ -121,24 +121,24 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
             ];
         }
         
-        $on = $adapter->quoteInto('ta.tmmtId = tmmt.id AND ta.taskGuid = ?', $taskGuid);
+        $on = $adapter->quoteInto('ta.languageResourceId = languageResource.id AND ta.taskGuid = ?', $taskGuid);
         $s->joinLeft(["ta"=>"LEK_languageresources_taskassoc"], $on, $checkColumns);
         
         return $this->loadFilterdCustom($s);
     }
     /**
-     * Returns join between taskassoc table and task table for tmmt's id list
-     * @param array $tmmtids
+     * Returns join between taskassoc table and task table for languageResource's id list
+     * @param array $languageResourceids
      */
-    public function getTaskInfoForTmmts($tmmtids){
-        if(empty($tmmtids)) {
+    public function getTaskInfoForLanguageResources($languageResourceids){
+        if(empty($languageResourceids)) {
             return [];
         }
         $s = $this->db->select()
-        ->from(array("assocs" => "LEK_languageresources_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.state","task.lockingUser","task.taskNr","assocs.tmmtId"))
+        ->from(array("assocs" => "LEK_languageresources_taskassoc"), array("assocs.id","assocs.taskGuid","task.taskName","task.state","task.lockingUser","task.taskNr","assocs.languageResourceId"))
         ->setIntegrityCheck(false)
         ->join(array("task" => "LEK_task"),"assocs.taskGuid = task.taskGuid","")
-        ->where('assocs.tmmtId in (?)', $tmmtids)
+        ->where('assocs.languageResourceId in (?)', $languageResourceids)
         ->group('assocs.id');
         return $this->db->fetchAll($s)->toArray();
     }
@@ -163,10 +163,10 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
         
         $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
         
-        foreach($result as &$tmmt) {
-            $resource = $getResource($tmmt['serviceType'], $tmmt['resourceId']);
+        foreach($result as &$languageresource) {
+            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
             if(!empty($resource)) {
-                $tmmt = array_merge($tmmt, $resource->getMetaData());
+                $languageresource = array_merge($languageresource, $resource->getMetaData());
             }
         }
         
@@ -188,13 +188,13 @@ class editor_Models_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Get all tasks that are assigned to the provided tmmtId.
-     * @param integer $tmmtId
+     * Get all tasks that are assigned to the provided languageResourceId.
+     * @param integer $languageResourceId
      * @return array
      */
-    public function getAssocTasksByTmmtId($tmmtId){
+    public function getAssocTasksByLanguageResourceId($languageResourceId){
         $s = $this->db->select()
-        ->where('tmmtId=?',$tmmtId);
+        ->where('languageResourceId=?',$languageResourceId);
         return $this->db->fetchAll($s)->toArray();
     }
 }

@@ -77,7 +77,7 @@ class editor_TaskassocController extends ZfExtended_RestController {
                 throw $e;
             }
             //but we have to load and return the already existing duplicate 
-            $this->entity->loadByTaskGuidAndTm($this->data->taskGuid, $this->data->tmmtId);
+            $this->entity->loadByTaskGuidAndTm($this->data->taskGuid, $this->data->languageResourceId);
             $this->view->rows = $this->entity->getDataObject();
         }
     }
@@ -104,15 +104,15 @@ class editor_TaskassocController extends ZfExtended_RestController {
      */
     protected function decodePutData() {
         parent::decodePutData();
-        $tmmt = ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $tmmt editor_Models_TmMt */
+        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
         try{
-            $tmmt->load($this->data->tmmtId);
+            $languageresource->load($this->data->languageResourceId);
         }
         catch(ZfExtended_NotFoundException $e) {
-            throw new ZfExtended_Conflict('Die gewünschte TMMT Resource gibt es nicht! ID:'.$this->data->tmmtId);
+            throw new ZfExtended_Conflict('Die gewünschte languageResource Resource gibt es nicht! ID:'.$this->data->languageResourceId);
         }
-        $resource = $tmmt->getResource();
+        $resource = $languageresource->getResource();
         
         //segments can only be updated when resource is writable:
         $this->data->segmentsUpdateable = $resource->getWritable() && $this->data->segmentsUpdateable;

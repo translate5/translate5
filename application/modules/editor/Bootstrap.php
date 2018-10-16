@@ -108,7 +108,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','resource','taskassoc',
-                                'tmmt','instanttranslateapi'),
+                                'languageresourceinstance','instanttranslateapi'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -313,49 +313,49 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         //WARNING: Order of the route definition is important!
         // the catchall like download route must be defined before the more specific query/search routes!
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/tmmt/:id/:type',
+            'editor/languageresourceinstance/:id/:type',
             array(
                 'module' => 'editor',
-                'controller' => 'tmmt',
+                'controller' => 'languageresourceinstance',
                 'action' => 'download'
             ));
-        $this->front->getRouter()->addRoute('languageresources_tmmt_download', $queryRoute);
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_download', $queryRoute);
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/tmmt/:tmmtId/query',
+            'editor/languageresourceinstance/:languageresourceinstanceId/query',
             array(
                 'module' => 'editor',
-                'controller' => 'tmmt',
+                'controller' => 'languageresourceinstance',
                 'action' => 'query'
             ));
-        $this->front->getRouter()->addRoute('languageresources_tmmt_query', $queryRoute);
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_query', $queryRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/tmmt/:tmmtId/search',
+            'editor/languageresourceinstance/:languageresourceinstanceId/search',
             array(
                 'module' => 'editor',
-                'controller' => 'tmmt',
+                'controller' => 'languageresourceinstance',
                 'action' => 'search'
             ));
-        $this->front->getRouter()->addRoute('languageresources_tmmt_search', $queryRoute);
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_search', $queryRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/tmmt/:id/import',
+            'editor/languageresourceinstance/:id/import',
             array(
                 'module' => 'editor',
-                'controller' => 'tmmt',
+                'controller' => 'languageresourceinstance',
                 'action' => 'import'
             ));
-        $this->front->getRouter()->addRoute('languageresources_tmmt_import', $queryRoute);
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_import', $queryRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/tmmt/:id/tasks',
+            'editor/languageresourceinstance/:id/tasks',
             array(
                 'module' => 'editor',
-                'controller' => 'tmmt',
+                'controller' => 'languageresourceinstance',
                 'action' => 'tasks'
             ));
-        $this->front->getRouter()->addRoute('languageresources_tmmt_tasks', $queryRoute);
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
         #Language resource rutes end
         
         $instantTranslate= new ZfExtended_Controller_RestLikeRoute(

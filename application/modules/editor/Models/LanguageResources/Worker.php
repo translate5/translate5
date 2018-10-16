@@ -36,7 +36,7 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if(empty($parameters['tmmtId'])) {
+        if(empty($parameters['languageResourceId'])) {
             return false;
         }
         return true;
@@ -64,15 +64,15 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker
         
         $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
         /* @var $segments editor_Models_Segment_Iterator */
-        $assoc->loadByTaskGuidAndTm($task->getTaskGuid(), $params['tmmtId']);
+        $assoc->loadByTaskGuidAndTm($task->getTaskGuid(), $params['languageResourceId']);
         
-        $tmmt = ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $tmmt editor_Models_TmMt */
-        $tmmt->load($params['tmmtId']);
+        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+        $languageresource->load($params['languageResourceId']);
         
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
-        $connector = $manager->getConnector($tmmt);
+        $connector = $manager->getConnector($languageresource);
         
         foreach($segments as $segment) {
             if(empty($segment->getTargetEdit()) || mb_strpos($segment->getTargetEdit(), "\n") !== false){

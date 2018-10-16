@@ -101,9 +101,9 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         $reqParams['from']=$lngs[$reqParams['from']];
         $reqParams['to']=$lngs[$reqParams['to']];
         
-        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $dummyTmmt editor_Models_TmMt */
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        $dummy=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $dummy editor_Models_LanguageResources_LanguageResource */
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummy]);
         /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
         
         $reqParams['file']=$files[0];
@@ -155,9 +155,9 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
             return;
         }
         
-        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $dummyTmmt editor_Models_TmMt */
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        $dummy=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $dummy editor_Models_LanguageResources_LanguageResource */
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummy]);
         /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
         
         $localFile=$api->downloadFile($requestParams['url'],$requestParams['fileName']);
@@ -191,9 +191,9 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
      * @return string
      */
     private function getDownloadUrl($fileId){
-        $dummyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $dummyTmmt editor_Models_TmMt */
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummyTmmt]);
+        $dummy=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $dummy editor_Models_LanguageResources_LanguageResource */
+        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummy]);
         /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
 
         $api->getFileStatus($fileId);
@@ -213,8 +213,8 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
      * @param integer $id : language resource id (engine id)
      */
     private function searchResources($text,$id){
-        $model=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $model editor_Models_TmMt */
+        $model=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $model editor_Models_LanguageResources_LanguageResource */
         $model->load($id);
         $sourceLang=$model->getSourceLang();
         $targetLang=$model->getTargetLang();
@@ -239,8 +239,8 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         //for each assoc resource search the resource for the result
         foreach ($resources as $res) {
             
-            $model=ZfExtended_Factory::get('editor_Models_TmMt');
-            /* @var $model editor_Models_TmMt */
+            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $model editor_Models_LanguageResources_LanguageResource */
             $model->init($res);
             
             $connector=$manager->getConnector($model,$sourceLang,$targetLang);

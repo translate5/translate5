@@ -264,10 +264,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @return boolean
      */
     private function checkLanguageResources($taskGuid){
-        $tmmts=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $tmmts editor_Models_TmMt */
+        $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
         
-        $assocs=$tmmts->loadByAssociatedTaskGuid($taskGuid);
+        $assocs=$languageResources->loadByAssociatedTaskGuid($taskGuid);
         
         if(empty($assocs)){
             return false;
@@ -275,14 +275,14 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         
         $hasAnalysable=false;
         foreach ($assocs as $assoc){
-            $tmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-            /* @var $tmmt editor_Models_TmMt  */
+            $languageresource=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $languageresource editor_Models_LanguageResources_LanguageResource  */
             
-            $tmmt->load($assoc['id']);
+            $languageresource->load($assoc['id']);
             
             $manager = ZfExtended_Factory::get('editor_Services_Manager');
             /* @var $manager editor_Services_Manager */
-            $resource=$manager->getResource($tmmt);
+            $resource=$manager->getResource($languageresource);
             
             //analysable language resource is found
             if($resource->getAnalysable()){

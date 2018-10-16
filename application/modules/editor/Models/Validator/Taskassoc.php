@@ -33,7 +33,7 @@ class editor_Models_Validator_Taskassoc extends ZfExtended_Models_Validator_Abst
      */
     protected function defineValidators() {
         $this->addValidator('taskGuid', 'guid');
-        $this->addValidator('tmmtId', 'int');
+        $this->addValidator('languageResourceId', 'int');
         $this->addValidator('segmentsUpdateable', 'boolean');
     }
 }

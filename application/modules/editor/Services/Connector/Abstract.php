@@ -43,9 +43,9 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_NOCONNECTION = 'noconnection';
     
     /**
-     * @var editor_Models_TmMt
+     * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $tmmt;
+    protected $languageresource;
     
     /**
      * Container for the connector results
@@ -79,20 +79,20 @@ abstract class editor_Services_Connector_Abstract {
      * @param string $msg
      */
     protected function log($method, $msg = '') {
-        error_log($method." Tmmt ".$this->tmmt->getName().' - '.$this->tmmt->getServiceName().$msg);
+        error_log($method." LanguageResource ".$this->languageResource->getName().' - '.$this->languageResource->getServiceName().$msg);
     }
     
     /**
-     * Link this Connector Instance to the given Tmmt and its resource
-     * @param editor_Models_TmMt $tmmt
+     * Link this Connector Instance to the given LanguageResource and its resource
+     * @param editor_Models_LanguageResources_LanguageResource $languageresource
      */
-    public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
         $this->sourceLang=$sourceLang;
         $this->targetLang=$targetLang;
-        $this->tmmt = $tmmt;
-        $this->resultList->setTmmt($tmmt);
-        $this->tmmt->sourceLangRfc5646=$this->tmmt->getSourceLangRfc5646();
-        $this->tmmt->targetLangRfc5646=$this->tmmt->getTargetLangRfc5646();
+        $this->languageResource = $languageresource;
+        $this->resultList->setLanguageResource($languageresource);
+        $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
+        $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
     }
 
     /**
@@ -149,7 +149,7 @@ abstract class editor_Services_Connector_Abstract {
     
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
-     * @param editor_Models_TmMt $tmmt
+     * @param editor_Models_LanguageResources_LanguageResource $languageresource
      */
     public function open() {
         //to be implemented if needed

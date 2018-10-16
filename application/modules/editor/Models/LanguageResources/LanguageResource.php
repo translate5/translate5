@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Tmmt Entity Object
+ * Languageresources Entity Object
  * 
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
@@ -48,7 +48,7 @@ END LICENSE AND COPYRIGHT
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(integer $autoCreatedOnImport)
  */
-class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
     
     // set as match rate type when matchrate was changed
     const MATCH_RATE_TYPE_EDITED = 'matchresourceusage';
@@ -56,8 +56,8 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     //set by changealike editor
     const MATCH_RATE_TYPE_EDITED_AUTO = 'matchresourceusageauto';
     
-    protected $dbInstanceClass = 'editor_Models_Db_TmMt';
-    protected $validatorInstanceClass = 'editor_Models_Validator_TmMt';
+    protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_LanguageResource';
+    protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_LanguageResource';
     
     
     /***
@@ -137,7 +137,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
             
             //each sdlcloud language resource can have only one language combination
             $s=$this->db->select()
-            ->from(array('tm' => 'LEK_languageresources_tmmt'),array('tm.*'))
+            ->from(array('tm' => 'LEK_languageresources'),array('tm.*'))
             ->setIntegrityCheck(false)
             ->join(array('ca' => 'LEK_languageresources_customerassoc'), 'tm.id = ca.languageResourceId', '')
             ->join(array('l' => 'LEK_languageresources_languages'), 'tm.id = l.languageResourceId', array('sourceLang','targetLang','sourceLangRfc5646','targetLangRfc5646'))
@@ -162,7 +162,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads the task to tmmt assocs by a taskguid
+     * loads the task to languageResource assocs by a taskguid
      * @param string $taskGuid
      * @return array
      */
@@ -171,7 +171,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads the task to tmmt assocs by taskguid
+     * loads the task to languageResource assocs by taskguid
      * @param string $taskGuid
      * @return array
      */
@@ -181,7 +181,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
             ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
             ->setIntegrityCheck(false)
-            ->join($assocName, $assocName.'.`tmmtId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
+            ->join($assocName, $assocName.'.`languageResourceId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
             ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);
         return $this->db->fetchAll($s)->toArray(); 
     }
@@ -195,7 +195,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db;
         $s = $db->select()
             ->from($db->info($db::NAME), ['id','name','fileName'])
-            ->where('LEK_languageresources_tmmt.serviceName LIKE ?', $serviceName);
+            ->where('LEK_languageresources.serviceName LIKE ?', $serviceName);
         return $this->db->fetchAll($s)->toArray(); 
     }
     
@@ -208,12 +208,12 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
         $db = $this->db;
         $s = $db->select()
         ->from($db->info($db::NAME), ['id','name'])
-        ->where('LEK_languageresources_tmmt.name LIKE ?', $name);
+        ->where('LEK_languageresources.name LIKE ?', $name);
         return $this->db->fetchAll($s)->toArray();
     }
     
     /**
-     * returns the resource used by this tmmt instance
+     * returns the resource used by this languageResource instance
      * @return editor_Models_Resource
      */
     public function getResource() {
@@ -223,7 +223,7 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
         if(empty($res)) {
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $msg = 'Configured LanguageResource Resource not found for Tmmt '.$this->getName().' with ID '.$this->getId().' the resource id was: '.$this->getResourceId();
+            $msg = 'Configured LanguageResource Resource not found for LanguageResource '.$this->getName().' with ID '.$this->getId().' the resource id was: '.$this->getResourceId();
             $msg .= "\n".'Maybe the resource config of the underlying Language Resource Service was changed / removed.';
             $log->logError('Configured LanguageResource Resource not found', $msg);
             throw new ZfExtended_Models_Entity_NotFoundException('Die ursprünglich konfigurierte TM / MT Resource ist nicht mehr vorhanden!');
@@ -232,23 +232,23 @@ class editor_Models_TmMt extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * checks if the given tmmt (and segmentid - optional) is usable by the given task
+     * checks if the given languageResource (and segmentid - optional) is usable by the given task
      * 
      * @param string $taskGuid
-     * @param integer $tmmtId
+     * @param integer $languageResourceId
      * @param editor_Models_Segment $segment
      * @throws ZfExtended_Models_Entity_NoAccessException
      * 
      */
-    public function checkTaskAndTmmtAccess(string $taskGuid,integer $tmmtId, editor_Models_Segment $segment = null) {
+    public function checkTaskAndLanguageResourceAccess(string $taskGuid,integer $languageResourceId, editor_Models_Segment $segment = null) {
         
-        //checks if the queried tmmt is associated to the task:
-        $tmmtTaskAssoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
-        /* @var $tmmtTaskAssoc editor_Models_Taskassoc */
+        //checks if the queried languageResource is associated to the task:
+        $languageResourceTaskAssoc = ZfExtended_Factory::get('editor_Models_Taskassoc');
+        /* @var $languageResourceTaskAssoc editor_Models_Taskassoc */
         try {
             //for security reasons a service can only be queried when a valid task association exists and this task is loaded
             // that means the user has also access to the service. If not then not!
-            $tmmtTaskAssoc->loadByTaskGuidAndTm($taskGuid, $tmmtId);
+            $languageResourceTaskAssoc->loadByTaskGuidAndTm($taskGuid, $languageResourceId);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
             throw new ZfExtended_Models_Entity_NoAccessException(null, null, $e);
         }

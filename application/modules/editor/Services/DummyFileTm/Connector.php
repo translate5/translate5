@@ -63,7 +63,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
 
     public function __construct() {
         $eventManager = Zend_EventManager_StaticEventManager::getInstance();
-        $eventManager->attach('editor_TmmtController', 'afterPostAction', array($this, 'handleAfterTmmtSaved'));
+        $eventManager->attach('editor_Languageresourceinstance', 'afterPostAction', array($this, 'handleAfterLanguageResourceSaved'));
         parent::__construct();
     }
 
@@ -90,9 +90,9 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @see editor_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm(& $mime) {
-        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
+        $file = new SplFileInfo($this->getTmFile($this->languageResource->getId()));
         if(!$file->isFile() || !$file->isReadable()) {
-            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tmmt->getId().' not found!');
+            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the languageResourceId '.$this->languageResource->getId().' not found!');
         }
         $mime = 'application/csv';
         return file_get_contents($file);
@@ -101,8 +101,8 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
     /**
      * in our dummy file TM the TM can only be saved after the TM is in the DB, since the ID is needed for the filename
      */
-    public function handleAfterTmmtSaved() {
-        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->tmmt->getId()));
+    public function handleAfterLanguageResourceSaved() {
+        move_uploaded_file($this->uploadedFile, $this->getTmFile($this->languageResource->getId()));
     }
 
     protected function getTmFile($id) {
@@ -142,13 +142,13 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @return editor_Services_ServiceResult
      */
     protected function loopData(string $queryString, string $field = null) {
-        if(stripos($this->tmmt->getName(), 'slow') !== false) {
+        if(stripos($this->languageResource->getName(), 'slow') !== false) {
             sleep(rand(5, 15));
         }
         
-        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
+        $file = new SplFileInfo($this->getTmFile($this->languageResource->getId()));
         if(!$file->isFile() || !$file->isReadable()) {
-            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the tmmtId '.$this->tmmt->getId().' not found!');
+            throw new ZfExtended_NotFoundException('requested TM file for dummy TM with the languageResourceId '.$this->languageResource->getId().' not found!');
         }
         $file = $file->openFile();
 
@@ -232,7 +232,7 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @see editor_Services_Connector_FilebasedAbstract::delete()
      */
     public function delete() {
-        $file = new SplFileInfo($this->getTmFile($this->tmmt->getId()));
+        $file = new SplFileInfo($this->getTmFile($this->languageResource->getId()));
         if($file->isFile()) {
             unlink($file);
         }

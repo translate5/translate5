@@ -53,10 +53,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
-    public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($tmmt,$sourceLang,$targetLang);
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($languageresource,$sourceLang,$targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$tmmt]);
+        $this->api = ZfExtended_Factory::get($class, [$languageresource]);
     }
     
     /**
@@ -84,42 +84,42 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null,array $params=null) {
-        $sourceLang = $this->tmmt->getSourceLangRfc5646(); 
+        $sourceLang = $this->languageResource->getSourceLangRfc5646(); 
 
         //to ensure that we get unique TMs Names although of the above stripped content, 
-        // we add the TMMT ID and a prefix which can be configured per each translate5 instance 
+        // we add the LanguageResource ID and a prefix which can be configured per each translate5 instance 
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $prefix = $config->runtimeOptions->LanguageResources->opentm2->tmprefix;
         if(!empty($prefix)) {
             $prefix .= '-';
         }
-        $name = $prefix.'ID'.$this->tmmt->getId().'-'.$this->filterName($this->tmmt->getName());
-        $this->tmmt->setFileName($name);
+        $name = $prefix.'ID'.$this->languageResource->getId().'-'.$this->filterName($this->languageResource->getName());
+        $this->languageResource->setFileName($name);
         
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile && $fileinfo['type'] == 'application/xml' && preg_match('/\.tmx$/', $fileinfo['name']);
         
         if($noFile || $tmxUpload) {
             if($this->api->createEmptyMemory($name, $sourceLang)){
-                $this->tmmt->setFileName($this->api->getResult()->name);
-                $this->tmmt->save(); //saving it here makes the TM available even when the TMX import was crashed
+                $this->languageResource->setFileName($this->api->getResult()->name);
+                $this->languageResource->save(); //saving it here makes the TM available even when the TMX import was crashed
                 //if initial upload is a TMX file, we have to import it. 
                 if($tmxUpload) {
                     return $this->addAdditionalTm($fileinfo);
                 }
                 return true;
             }
-            $this->handleOpenTm2Error('LanguageResources - could not create TM in OpenTM2'." TMMT: \n");
+            $this->handleOpenTm2Error('LanguageResources - could not create TM in OpenTM2'." LanguageResource: \n");
             return false;
         }
         
         //initial upload is a TM file
         if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
-            $this->tmmt->setFileName($this->api->getResult()->name);
+            $this->languageResource->setFileName($this->api->getResult()->name);
             return true;
         }
-        $this->handleOpenTm2Error('LanguageResources - could not create prefilled TM in OpenTM2'." TMMT: \n");
+        $this->handleOpenTm2Error('LanguageResources - could not create prefilled TM in OpenTM2'." LanguageResource: \n");
         return false;
         
     }
@@ -133,7 +133,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
-        $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." TMMT: \n");
+        $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." LanguageResource: \n");
         return false;
     }
     
@@ -194,8 +194,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $messages->addError($msg, 'core', null, $errors);
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
-        $msg = 'LanguageResources - could not save segment to TM'." TMMT: \n";
-        $data  = print_r($this->tmmt->getDataObject(),1);
+        $msg = 'LanguageResources - could not save segment to TM'." LanguageResource: \n";
+        $data  = print_r($this->languageResource->getDataObject(),1);
         $data .= " \nSegment\n".print_r($segment->getDataObject(),1);
         $data .= " \nError\n".print_r($errors,1);
         $log->logError($msg, $data);
@@ -295,7 +295,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $msg = 'The <ph> or <it> tag could not be reconverted to a usable tag, so that match result was ignored! '."\n\n";
             $msg .= 'OpenTM2 Result: '.print_r($result,1)."\n";
             $msg .= 'Segment: '.print_r($seg->getDataObject(),1)."\n";
-            $msg .= 'TMMT: '.print_r($this->tmmt->getDataObject(),1)."\n";
+            $msg .= 'LanguageResource: '.print_r($this->languageResource->getDataObject(),1)."\n";
             $log->log($sub,$msg);
             return false;
         }
@@ -405,7 +405,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
-        $data  = print_r($this->tmmt->getDataObject(),1);
+        $data  = print_r($this->languageResource->getDataObject(),1);
         $data .= " \nError\n".print_r($errors,1);
         $log->logError($logMsg, $data);
     }
@@ -429,7 +429,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        $name = $this->tmmt->getFileName();
+        $name = $this->languageResource->getFileName();
         if(empty($name)) {
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
@@ -441,7 +441,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $moreInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $log->logError($moreInfo, $this->tmmt->getResource()->getUrl());
+            $log->logError($moreInfo, $this->languageResource->getResource()->getUrl());
             return self::STATUS_NOCONNECTION;
         }
         
@@ -523,7 +523,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     
     /***
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
-     * The fuzzy tmmt name format is: oldname+Fuzzy-Analysis
+     * The fuzzy languageResource name format is: oldname+Fuzzy-Analysis
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */
@@ -536,20 +536,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
         }
         $data = $this->getTm($validExportTypes[$mime]);
-        $memoryName=$this->tmmt->getName().'-Fuzzy-Analysis';
-        $this->api->createMemory($memoryName, $this->tmmt->getSourceLangRfc5646(), $data);
+        $memoryName=$this->languageResource->getName().'-Fuzzy-Analysis';
+        $this->api->createMemory($memoryName, $this->languageResource->getSourceLangRfc5646(), $data);
         
-        $fuzzyTmmt=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $fuzzyTmmt editor_Models_TmMt  */
+        $fuzzyLanguageResource=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
         
-        $fuzzyTmmt=clone $this->tmmt;
+        $fuzzyLanguageResource=clone $this->languageResource;
         
-        $fuzzyTmmt->setName($memoryName);
-        $fuzzyTmmt->setFileName($memoryName);
-        $fuzzyTmmt->setId(null);
+        $fuzzyLanguageResource->setName($memoryName);
+        $fuzzyLanguageResource->setFileName($memoryName);
+        $fuzzyLanguageResource->setId(null);
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
-        return $serviceManager->getConnector($fuzzyTmmt,$this->tmmt->getSourceLang(),$this->tmmt->getTargetLang());;
+        return $serviceManager->getConnector($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());;
     }
 }

@@ -37,9 +37,9 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Services_OpenTM2_HttpApi {
     /**
-     * @var editor_Models_TmMt
+     * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $tmmt;
+    protected $languageresource;
     
     /**
      * @var Zend_Http_Response
@@ -65,8 +65,8 @@ class editor_Services_OpenTM2_HttpApi {
      */
     protected $httpMethod;
     
-    public function __construct(editor_Models_TmMt $tmmt) {
-        $this->tmmt = $tmmt;
+    public function __construct(editor_Models_LanguageResources_LanguageResource $languageresource) {
+        $this->languageResource = $languageresource;
     }
     
     /**
@@ -123,7 +123,7 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttp($method, $urlSuffix = '') {
-        $url = rtrim($this->tmmt->getResource()->getUrl(), '/');
+        $url = rtrim($this->languageResource->getResource()->getUrl(), '/');
         $urlSuffix = ltrim($urlSuffix, '/');
         $this->http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
@@ -142,7 +142,7 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttpWithMemory($method, $urlSuffix = '') {
-        return $this->getHttp($method, urlencode($this->tmmt->getFileName()).'/'.ltrim($urlSuffix, '/'));
+        return $this->getHttp($method, urlencode($this->languageResource->getFileName()).'/'.ltrim($urlSuffix, '/'));
     }
     
     /**
@@ -189,8 +189,8 @@ class editor_Services_OpenTM2_HttpApi {
      */
     public function lookup(editor_Models_Segment $segment, string $queryString, string $filename) {
         $json = new stdClass();
-        $json->sourceLang = $this->tmmt->sourceLangRfc5646;
-        $json->targetLang = $this->tmmt->targetLangRfc5646;
+        $json->sourceLang = $this->languageResource->sourceLangRfc5646;
+        $json->targetLang = $this->languageResource->targetLangRfc5646;
         $json->source = $queryString;
         //In general OpenTM2 can deal with whole paths, not only with filenames.
         // But we hold the filepaths in the FileTree JSON, so this value is not easily accessible, 
@@ -262,8 +262,8 @@ class editor_Services_OpenTM2_HttpApi {
         $json->type = "Manual";
         $json->markupTable = "OTMXUXLF"; //fixed markup table for our XLIFF subset
         
-        $json->sourceLang = $this->tmmt->getSourceLangRfc5646();
-        $json->targetLang = $this->tmmt->getTargetLangRfc5646();
+        $json->sourceLang = $this->languageResource->getSourceLangRfc5646();
+        $json->targetLang = $this->languageResource->getTargetLangRfc5646();
         
         $http = $this->getHttpWithMemory('POST', 'entry');
         $http->setRawData(json_encode($json), 'application/json; charset=utf-8');

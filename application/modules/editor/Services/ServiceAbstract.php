@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * Abstract Base Tmmt Resources manager
+ * Abstract Base LanguageResource Resources manager
  * Not one instance per resource, but one instance providing data to all resources of one service
  */
 abstract class editor_Services_ServiceAbstract {

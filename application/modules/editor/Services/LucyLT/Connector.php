@@ -94,7 +94,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
      * @return boolean|string
      */
     protected function rawRequest(string $queryString) {
-        $res = $this->tmmt->getResource();
+        $res = $this->languageResource->getResource();
         /* @var $res editor_Services_LucyLT_Resource */
 
         $http = ZfExtended_Factory::get('Zend_Http_Client');
@@ -203,14 +203,14 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
      * @return string
      */
     protected function getLanguageParameter() {
-        $resource = $this->tmmt->getResource();
+        $resource = $this->languageResource->getResource();
         /* @var $resource editor_Services_LucyLT_Resource */
         
         $result = [
-            'source' => $resource->getMappedLanguage($this->tmmt->getSourceLangRfc5646())
+            'source' => $resource->getMappedLanguage($this->languageResource->getSourceLangRfc5646())
         ];
         
-        $result['target'] = $resource->getMappedLanguage($this->tmmt->getTargetLangRfc5646());
+        $result['target'] = $resource->getMappedLanguage($this->languageResource->getTargetLangRfc5646());
         
         return join('-', $result);
     }
@@ -232,7 +232,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
     }
     
     public function getStatus(& $moreInfo){
-        $res = $this->tmmt->getResource();
+        $res = $this->languageResource->getResource();
         /* @var $res editor_Services_Moses_Resource */
         
         $http = ZfExtended_Factory::get('Zend_Http_Client');

@@ -980,7 +980,8 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.controller.LanguageResources",
         strings: {
             msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>',
-            msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>'
+            msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>',
+            instantTranslate: '<?php echo $this->translate->_('Sofortübersetzung');?>'
         }
     });
     
@@ -1154,8 +1155,8 @@ Ext.define('Editor.controller.Localizer', {
             noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
-            tmmtStatusColumn: '<?php echo $this->translate->_('Status');?>',
-            tmmtStatus: {
+            languageResourceStatusColumn: '<?php echo $this->translate->_('Status');?>',
+            languageResourceStatus: {
                 loading: '<?php echo $this->translate->_('Statusinformationen werden geladen');?>',
                 error: '<?php echo $this->translate->_('Fehler');?>',
                 available: '<?php echo $this->translate->_('verfügbar');?>',

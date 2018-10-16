@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermCollection extends editor_Models_TmMt {
+class editor_Models_TermCollection_TermCollection extends editor_Models_LanguageResources_LanguageResource {
 
     /***
      * Import the tbx files in the term collection
@@ -117,7 +117,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_TmMt {
     public function getCollectionsIdsForCustomer($customerIds){
         $s=$this->db->select()
         ->setIntegrityCheck(false)
-        ->from(array('lr'=>'LEK_languageresources_tmmt'))
+        ->from(array('lr'=>'LEK_languageresources'))
         ->join(array('ca'=>'LEK_languageresources_customerassoc'), 'ca.languageResourceId=lr.id',array('ca.customerId as customerId'))
         ->where('ca.customerId IN(?)',$customerIds);
         $rows=$this->db->fetchAll($s)->toArray();
@@ -143,7 +143,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_TmMt {
     public function getAttributesCountForCollection($collectionId){
         $s=$this->db->select()
         ->setIntegrityCheck(false)
-        ->from(array('tc' => 'LEK_languageresources_tmmt'), array('id'))
+        ->from(array('tc' => 'LEK_languageresources'), array('id'))
         ->join(array('t' => 'LEK_terms'),'tc.id=t.collectionId', array('count(DISTINCT t.id) as termsCount'))
         ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId', array('count(DISTINCT ta.id) as termsAtributeCount'))
         ->join(array('tea' => 'LEK_term_entry_attributes'),'tc.id=tea.collectionId', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
@@ -207,10 +207,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_TmMt {
     public function checkAndRemoveTaskImported($taskGuid){
         $s=$this->db->select()
         ->setIntegrityCheck(false)
-        ->from('LEK_languageresources_tmmt',array('LEK_languageresources_tmmt.*'))
-        ->join('LEK_term_collection_taskassoc', 'LEK_term_collection_taskassoc.collectionId = LEK_languageresources_tmmt.id',array('LEK_term_collection_taskassoc.collectionId','LEK_term_collection_taskassoc.taskGuid'))
+        ->from('LEK_languageresources',array('LEK_languageresources.*'))
+        ->join('LEK_term_collection_taskassoc', 'LEK_term_collection_taskassoc.collectionId = LEK_languageresources.id',array('LEK_term_collection_taskassoc.collectionId','LEK_term_collection_taskassoc.taskGuid'))
         ->where('LEK_term_collection_taskassoc.taskGuid=?',$taskGuid)
-        ->where('LEK_languageresources_tmmt.autoCreatedOnImport=?',1);
+        ->where('LEK_languageresources.autoCreatedOnImport=?',1);
         $rows=$this->db->fetchAll($s)->toArray();
         
         if(empty($rows)){

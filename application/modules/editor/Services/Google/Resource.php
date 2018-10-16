@@ -45,7 +45,7 @@ class editor_Services_Google_Resource extends editor_Models_Resource {
      */
     public function hasSourceLang(editor_Models_Languages $sourceLang) {
         $api=ZfExtended_Factory::get('editor_Services_Google_HttpApi',[
-            new editor_Models_TmMt()
+            new editor_Models_LanguageResources_LanguageResource()
         ]);
         /* @var $api editor_Services_Google_HttpApi */
         return $api->isValidLanguage($sourceLang->getRfc5646());
@@ -58,7 +58,7 @@ class editor_Services_Google_Resource extends editor_Models_Resource {
      */
     public function hasTargetLang(editor_Models_Languages $targetLang) {
         $api=ZfExtended_Factory::get('editor_Services_Google_HttpApi',[
-            new editor_Models_TmMt()
+            new editor_Models_LanguageResources_LanguageResource()
         ]);
         /* @var $api editor_Services_Google_HttpApi */
         return $api->isValidLanguage($targetLang->getRfc5646());

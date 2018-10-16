@@ -36,7 +36,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      */
     public function addTm(array $fileinfo = null,array $params=null) {
         if(empty($fileinfo)){
-            $this->handleError("LanguageResources - termcollection import file does not exisit TMMT: \n");
+            $this->handleError("LanguageResources - termcollection import file does not exisit LanguageResource: \n");
             return false;
         }
         
@@ -46,7 +46,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $import->mergeTerms=isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
         
         //import the term collection
-        if(!$import->parseTbxFile([$fileinfo],$this->tmmt->getId())){
+        if(!$import->parseTbxFile([$fileinfo],$this->languageResource->getId())){
             $this->handleError("LanguageResources - Error on termcollection import \n");
             return false;
         }
@@ -63,20 +63,20 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             $termModel=ZfExtended_Factory::get('editor_Models_Term');
             /* @var $termModel editor_Models_Term */
             
-            $termModel->removeOldTerms([$this->tmmt->getId()], $params['deleteEntriesModifiedOlderThan']);
+            $termModel->removeOldTerms([$this->languageResource->getId()], $params['deleteEntriesModifiedOlderThan']);
             
             //remove all empty term entries from the same term collection
             $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
             /* @var $termEntry editor_Models_TermCollection_TermEntry */
             
-            $termEntry->removeEmptyFromCollection([$this->tmmt->getId()]);
+            $termEntry->removeEmptyFromCollection([$this->languageResource->getId()]);
         }
         
         //delete termcollection entries older then current import date
         if(isset($params['deleteEntriesOlderThanCurrentImport']) && filter_var($params['deleteEntriesOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN)){
             $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
             /* @var $termEntry editor_Models_TermCollection_TermEntry */
-            $termEntry->removeOlderThan($this->tmmt->getId(), NOW_ISO);
+            $termEntry->removeOlderThan($this->languageResource->getId(), NOW_ISO);
         }
         
         return true;
@@ -119,7 +119,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     protected function queryCollectionResults($queryString){
         $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $entity editor_Models_TermCollection_TermCollection */
-        $entity->load($this->tmmt->getId());
+        $entity->load($this->languageResource->getId());
         
         $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
         
@@ -187,7 +187,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $log = ZfExtended_Factory::get('ZfExtended_Log');
         /* @var $log ZfExtended_Log */
-        $data  = print_r($this->tmmt->getDataObject(),1);
+        $data  = print_r($this->languageResource->getDataObject(),1);
         $log->logError($logMsg, $data);
     }
 

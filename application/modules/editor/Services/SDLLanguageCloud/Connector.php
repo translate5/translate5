@@ -41,10 +41,10 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::connectTo()
      */
-    public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($tmmt,$sourceLang,$targetLang);
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($languageresource,$sourceLang,$targetLang);
         $class = 'editor_Services_SDLLanguageCloud_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$tmmt]);
+        $this->api = ZfExtended_Factory::get($class, [$languageresource]);
     }
     
     /**
@@ -109,7 +109,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         
         $result=null;
         $params=[
-            'domainCode'=>$this->tmmt->getFileName(),
+            'domainCode'=>$this->languageResource->getFileName(),
             'text'=>$searchString,
             'from'=>$lngs[$this->sourceLang],
             'to'=>$lngs[$this->targetLang]
@@ -143,7 +143,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
             $moreInfo = $e->getMessage();
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $log->logError($moreInfo, $this->tmmt->getResource()->getUrl());
+            $log->logError($moreInfo, $this->languageResource->getResource()->getUrl());
             return self::STATUS_NOCONNECTION;
         }
         

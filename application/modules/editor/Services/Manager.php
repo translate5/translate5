@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * TmMt Service Manager
+ * LanguageResource Service Manager
  * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
  */
 class editor_Services_Manager {
@@ -73,12 +73,12 @@ class editor_Services_Manager {
     }
     
     /**
-     * gets the reosurce to the given tmmt
-     * @param editor_Models_TmMt $tmmt
+     * gets the reosurce to the given languageResource
+     * @param editor_Models_LanguageResources_LanguageResource $languageresource
      * @return editor_Models_Resource
      */
-    public function getResource(editor_Models_TmMt $tmmt) {
-        return $this->getResourceById($tmmt->getServiceType(), $tmmt->getResourceId());
+    public function getResource(editor_Models_LanguageResources_LanguageResource $languageresource) {
+        return $this->getResourceById($languageresource->getServiceType(), $languageresource->getResourceId());
     }
     
     /**
@@ -96,17 +96,17 @@ class editor_Services_Manager {
     /***
      * returns the desired connector, connection to the given resource
      * 
-     * @param editor_Models_TmMt $tmmt
+     * @param editor_Models_LanguageResources_LanguageResource $languageresource
      * @param integer $sourceLang
      * @param integer $targetLang
      * @return editor_Services_Connector_Abstract
      */
-    public function getConnector(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
-        $serviceType = $tmmt->getServiceType();
+    public function getConnector(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
+        $serviceType = $languageresource->getServiceType();
         $this->checkService($serviceType);
         $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
         /* @var $connector editor_Services_Connector_Abstract */
-        $connector->connectTo($tmmt,$sourceLang,$targetLang);
+        $connector->connectTo($languageresource,$sourceLang,$targetLang);
         return $connector;
     }
     
@@ -117,7 +117,7 @@ class editor_Services_Manager {
      */
     protected function checkService(string $serviceType) {
         if(!$this->hasService($serviceType)) {
-            throw new ZfExtended_Exception("Given Service ".$serviceType." is not registered in the Tmmt Service Manager!");
+            throw new ZfExtended_Exception("Given Service ".$serviceType." is not registered in the LanguageResource Service Manager!");
         }
     }
     
@@ -157,7 +157,7 @@ class editor_Services_Manager {
         if(empty($segment->getTargetEdit())){
             return;
         }
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Services_Connector_Abstract $connector, $tmmt, $assoc) use ($segment) {
+        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Services_Connector_Abstract $connector, $languageresource, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
                 $connector->update($segment);
             }
@@ -165,16 +165,16 @@ class editor_Services_Manager {
     }
     
     protected function visitAllAssociatedTms($taskGuid, Closure $todo) {
-        $tmmts = ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $tmmts editor_Models_TmMt */
-        $list = $tmmts->loadByAssociatedTaskGuid($taskGuid);
+        $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
+        $list = $languageResources->loadByAssociatedTaskGuid($taskGuid);
         foreach($list as $one){
-            $tmmt = ZfExtended_Factory::get('editor_Models_TmMt');
-            /* @var $tmmt editor_Models_TmMt */
-            $tmmt->init($one);
-            $connector = $this->getConnector($tmmt);
+            $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+            $languageresource->init($one);
+            $connector = $this->getConnector($languageresource);
             /* @var $connector editor_Services_Connector_Abstract */
-            $todo($connector, $tmmt, $one);
+            $todo($connector, $languageresource, $one);
         }
     }
 }

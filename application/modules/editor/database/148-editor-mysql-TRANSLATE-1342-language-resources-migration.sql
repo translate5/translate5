@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 
-RENAME TABLE `LEK_matchresource_tmmt` TO `LEK_languageresources_tmmt`;
+RENAME TABLE `LEK_matchresource_tmmt` TO `LEK_languageresources`;
 
 RENAME TABLE `LEK_matchresource_taskassoc` TO `LEK_languageresources_taskassoc`;
 
@@ -36,7 +36,7 @@ UPDATE `Zf_acl_rules` SET `resource`='editor_resource' WHERE `resource`='editor_
 
 UPDATE `Zf_acl_rules` SET `resource`='editor_taskassoc' WHERE `resource`='editor_plugins_matchresource_taskassoc';
 
-UPDATE `Zf_acl_rules` SET `resource`='editor_tmmt' WHERE `resource`='editor_plugins_matchresource_tmmt';
+UPDATE `Zf_acl_rules` SET `resource`='editor_languageresourceinstance' WHERE `resource`='editor_plugins_matchresource_tmmt';
 
 
 /* rename from the acl rules the plugin specific rights names */
@@ -59,11 +59,21 @@ WHERE `name` LIKE '%.plugins.MatchResource.%';
 UPDATE `Zf_configuration` SET `name`='runtimeOptions.worker.editor_Models_LanguageResourcesWorker.maxParallelWorkers' WHERE `name`='runtimeOptions.worker.editor_Plugins_MatchResource_Worker.maxParallelWorkers';
 
 /* rename the plugin specific match resources class names from the tmmt table */
-UPDATE `LEK_languageresources_tmmt`
+UPDATE `LEK_languageresources`
 SET `resourceId` = REPLACE (`resourceId`, '_Plugins_MatchResource_', '_')
 WHERE `resourceId` LIKE '%_Plugins_MatchResource_%';
             
-UPDATE `LEK_languageresources_tmmt`
+UPDATE `LEK_languageresources`
 SET `serviceType` = REPLACE (`serviceType`, '_Plugins_MatchResource_', '_')
 WHERE `serviceType` LIKE '%_Plugins_MatchResource_%';
+
+ALTER TABLE `LEK_languageresources_taskassoc` 
+DROP FOREIGN KEY `LEK_languageresources_taskassoc_ibfk_1`;
+ALTER TABLE `LEK_languageresources_taskassoc` 
+CHANGE COLUMN `tmmtId` `languageResourceId` INT(11) NULL DEFAULT NULL ;
+ALTER TABLE `LEK_languageresources_taskassoc` 
+ADD CONSTRAINT `LEK_languageresources_taskassoc_ibfk_1`
+  FOREIGN KEY (`languageResourceId`)
+  REFERENCES `LEK_languageresources` (`id`)
+  ON DELETE CASCADE;
 

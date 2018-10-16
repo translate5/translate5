@@ -107,7 +107,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     }
     
     /***
-     * Get all assocs by $languageResourceId (languageResourceId/tmmtid).
+     * Get all assocs by $languageResourceId (languageResourceId).
      * If no $languageResourceId is provided, all assoc will be loaded
      * @param integer $languageResourceId
      * @return array
@@ -151,7 +151,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     }
     
     /***
-     * Get all customers for $languageResourceId (languageResourceId/tmmtid)
+     * Get all customers for $languageResourceId (languageResourceId)
      * @param integer $languageResourceId
      * @return array
      */

@@ -189,9 +189,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $allAssocInfos = $this->getUserAssocInfos($taskGuids, $userAssocInfos);
 
         //load the task assocs
-        $tmmtmodel = ZfExtended_Factory::get('editor_Models_TmMt');
-        /*@var $tmmtmodel editor_Models_TmMt */
-        $resultlist = $tmmtmodel->loadByAssociatedTaskGuidList($taskGuids);
+        $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /*@var $languageResourcemodel editor_Models_LanguageResources_LanguageResource */
+        $resultlist = $languageResourcemodel->loadByAssociatedTaskGuidList($taskGuids);
         
         //group all assoc by taskguid
         $taskassocs = array();
@@ -829,9 +829,9 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($this->view->rows->qmSubsegmentFlags);
         
         //add task assoc to the task
-        $tmmtmodel = ZfExtended_Factory::get('editor_Models_TmMt');
-        /*@var $tmmtmodel editor_Models_TmMt */
-        $resultlist =$tmmtmodel->loadByAssociatedTaskGuidList(array($taskguid));
+        $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /*@var $languageResourcemodel editor_Models_LanguageResources_LanguageResource */
+        $resultlist =$languageResourcemodel->loadByAssociatedTaskGuidList(array($taskguid));
         $this->view->rows->taskassocs = $resultlist;
         
     }

@@ -2875,6 +2875,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Segmentschriftgrad verkleinern (STRG + -)</source>
     <target>decrease segment font-size (STRG + -)</target>
 </trans-unit>
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5n'>
+    <source>Sofortübersetzung</source>
+    <target>Instant-Translate</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

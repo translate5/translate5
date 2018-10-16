@@ -32,12 +32,12 @@ CREATE TABLE `LEK_languageresources_customerassoc` (
   PRIMARY KEY (`id`),
   KEY `fk_LEK_languageresources_customerassoc_1_idx` (`languageResourceId`),
   KEY `fk_LEK_languageresources_customerassoc_2_idx` (`customerId`),
-  CONSTRAINT `fk_LEK_languageresources_customerassoc_1` FOREIGN KEY (`languageResourceId`) REFERENCES `LEK_languageresources_tmmt` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_LEK_languageresources_customerassoc_1` FOREIGN KEY (`languageResourceId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `fk_LEK_languageresources_customerassoc_2` FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 
-ALTER TABLE `LEK_languageresources_tmmt` 
+ALTER TABLE `LEK_languageresources` 
 ADD COLUMN `defaultCustomer` INT(11) NULL AFTER `fileName`;
 
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_instanttranslateapi', 'all');
@@ -68,7 +68,7 @@ CREATE TABLE `LEK_user_meta` (
     ON UPDATE NO ACTION);
 
 
-ALTER TABLE `LEK_languageresources_tmmt` 
+ALTER TABLE `LEK_languageresources` 
 ADD COLUMN `labelText` VARCHAR(256) NULL AFTER `defaultCustomer`;
 
 CREATE TABLE `LEK_languageresources_languages` (
@@ -82,7 +82,7 @@ CREATE TABLE `LEK_languageresources_languages` (
   INDEX `fk_LEK_languageresources_languages_1_idx` (`languageResourceId` ASC),
   CONSTRAINT `fk_LEK_languageresources_languages_1`
     FOREIGN KEY (`languageResourceId`)
-    REFERENCES `LEK_languageresources_tmmt` (`id`)
+    REFERENCES `LEK_languageresources` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
     
@@ -93,9 +93,9 @@ SELECT  sourceLang,
         sourceLangRfc5646, 
         targetLangRfc5646,
         id
-FROM LEK_languageresources_tmmt;
+FROM LEK_languageresources;
 
-ALTER TABLE `LEK_languageresources_tmmt` 
+ALTER TABLE `LEK_languageresources` 
 DROP COLUMN `targetLangRfc5646`,
 DROP COLUMN `targetLang`,
 DROP COLUMN `sourceLangRfc5646`,

@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * 
  */
 /**
- * DB Access for TmMtAssoc
+ * DB Access for Languageresources Assoc
  */
 class editor_Models_Db_Taskassoc extends Zend_Db_Table_Abstract {
     protected $_name = 'LEK_languageresources_taskassoc';

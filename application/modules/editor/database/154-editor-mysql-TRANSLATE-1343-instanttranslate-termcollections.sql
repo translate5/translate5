@@ -26,15 +26,15 @@
 -- */
 
 
-ALTER TABLE `LEK_languageresources_tmmt` 
+ALTER TABLE `LEK_languageresources` 
 ADD COLUMN `autoCreatedOnImport` TINYINT(1) NULL DEFAULT 0 AFTER `labelText`,
 ADD COLUMN `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `autoCreatedOnImport`,
 ADD COLUMN `oldCollectionId` INT(11) NULL AFTER `timestamp`;
 
-ALTER TABLE `LEK_languageresources_tmmt` 
+ALTER TABLE `LEK_languageresources` 
 CHANGE COLUMN `name` `name` VARCHAR(1024) NULL DEFAULT NULL COMMENT 'human readable name of the service' ;
 
-INSERT INTO LEK_languageresources_tmmt(name,color,resourceId,serviceType,serviceName,autoCreatedOnImport,timestamp,oldCollectionId)
+INSERT INTO LEK_languageresources(name,color,resourceId,serviceType,serviceName,autoCreatedOnImport,timestamp,oldCollectionId)
 SELECT  name, 
         '19737d', 
         'editor_Services_TermCollection', 
@@ -45,14 +45,14 @@ SELECT  name,
         id
 FROM LEK_term_collection;
 
-/* Update the new collection id value to all related tables. The new value is the one in the tmmt id*/
+/* Update the new collection id value to all related tables. The new value is the one in the languageResource id*/
 ALTER TABLE `LEK_terms` 
 DROP FOREIGN KEY `fk_LEK_terms_2`;
 ALTER TABLE `LEK_terms` 
 DROP INDEX `fk_LEK_terms_2_idx` ;
 
 UPDATE LEK_terms t
-INNER JOIN LEK_languageresources_tmmt tm ON tm.oldCollectionId=t.collectionId 
+INNER JOIN LEK_languageresources tm ON tm.oldCollectionId=t.collectionId 
 SET t.collectionId = tm.id;
 
 ALTER TABLE `LEK_terms` 
@@ -60,12 +60,12 @@ ADD INDEX `fk_LEK_terms_2_idx` (`collectionId` ASC);
 ALTER TABLE `LEK_terms` 
 ADD CONSTRAINT `fk_LEK_terms_2`
   FOREIGN KEY (`collectionId`)
-  REFERENCES `LEK_languageresources_tmmt` (`id`)
+  REFERENCES `LEK_languageresources` (`id`)
   ON DELETE CASCADE
   ON UPDATE CASCADE;
   
 INSERT INTO LEK_languageresources_customerassoc(languageResourceId,customerId)
-SELECT tm.id,tc.customerId FROM LEK_languageresources_tmmt tm
+SELECT tm.id,tc.customerId FROM LEK_languageresources tm
 INNER JOIN LEK_term_collection tc ON tc.id=tm.oldCollectionId;
   
 ALTER TABLE `LEK_term_entry_attributes` 
@@ -74,7 +74,7 @@ ALTER TABLE `LEK_term_entry_attributes`
 DROP INDEX `fk_LEK_term_entry_attributes_1_idx` ;
 
 UPDATE LEK_term_entry_attributes t
-INNER JOIN LEK_languageresources_tmmt tm ON tm.oldCollectionId=t.collectionId 
+INNER JOIN LEK_languageresources tm ON tm.oldCollectionId=t.collectionId 
 SET t.collectionId = tm.id;
 
 ALTER TABLE `LEK_term_entry_attributes` 
@@ -82,7 +82,7 @@ ADD INDEX `fk_LEK_term_entry_attributes_1_idx` (`collectionId` ASC);
 ALTER TABLE `LEK_term_entry_attributes` 
 ADD CONSTRAINT `fk_LEK_term_entry_attributes_1`
   FOREIGN KEY (`collectionId`)
-  REFERENCES `LEK_languageresources_tmmt` (`id`)
+  REFERENCES `LEK_languageresources` (`id`)
   ON DELETE CASCADE
   ON UPDATE CASCADE;
  
@@ -93,7 +93,7 @@ ALTER TABLE `LEK_term_entry`
 DROP INDEX `fk_LEK_term_entry_1_idx` ;
 
 UPDATE LEK_term_entry t
-INNER JOIN LEK_languageresources_tmmt tm ON tm.oldCollectionId=t.collectionId 
+INNER JOIN LEK_languageresources tm ON tm.oldCollectionId=t.collectionId 
 SET t.collectionId = tm.id;
 
 ALTER TABLE `LEK_term_entry` 
@@ -101,12 +101,12 @@ ADD INDEX `fk_LEK_term_entry_1_idx` (`collectionId` ASC);
 ALTER TABLE `LEK_term_entry` 
 ADD CONSTRAINT `fk_LEK_term_entry_1`
   FOREIGN KEY (`collectionId`)
-  REFERENCES `LEK_languageresources_tmmt` (`id`)
+  REFERENCES `LEK_languageresources` (`id`)
   ON DELETE CASCADE
   ON UPDATE CASCADE;
   
 UPDATE LEK_term_collection_taskassoc t
-INNER JOIN LEK_languageresources_tmmt tm ON tm.oldCollectionId=t.collectionId 
+INNER JOIN LEK_languageresources tm ON tm.oldCollectionId=t.collectionId 
 SET t.collectionId = tm.id;
 
 ALTER TABLE `LEK_term_attributes` 
@@ -115,7 +115,7 @@ ALTER TABLE `LEK_term_attributes`
 DROP INDEX `fk_LEK_term_attributes_1_idx` ;
 
 UPDATE LEK_term_attributes t
-INNER JOIN LEK_languageresources_tmmt tm ON tm.oldCollectionId=t.collectionId 
+INNER JOIN LEK_languageresources tm ON tm.oldCollectionId=t.collectionId 
 SET t.collectionId = tm.id;
 
 ALTER TABLE `LEK_term_attributes` 
@@ -123,17 +123,17 @@ ADD INDEX `fk_LEK_term_attributes_1_idx` (`collectionId` ASC);
 ALTER TABLE `LEK_term_attributes` 
 ADD CONSTRAINT `fk_LEK_term_attributes_1`
   FOREIGN KEY (`collectionId`)
-  REFERENCES `LEK_languageresources_tmmt` (`id`)
+  REFERENCES `LEK_languageresources` (`id`)
   ON DELETE CASCADE
   ON UPDATE CASCADE;
   
   
-ALTER TABLE `LEK_languageresources_tmmt` 
+ALTER TABLE `LEK_languageresources` 
 DROP COLUMN `oldCollectionId`;
   
 DROP TABLE `LEK_term_collection`;
 
-ALTER TABLE `LEK_languageresources_tmmt` 
+ALTER TABLE `LEK_languageresources` 
 DROP COLUMN `defaultCustomer`;
 
 ALTER TABLE `LEK_languageresources_customerassoc` 

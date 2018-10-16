@@ -50,8 +50,8 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         /* @var $cs editor_Models_LanguageResources_CustomerAssoc */
         $this->view->Php2JsVars()->set('languageresource.useAsDefault',$cs->findAsDefaultForUser());
 
-        $engineModel=ZfExtended_Factory::get('editor_Models_TmMt');
-        /* @var $engineModel editor_Models_TmMt */
+        $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $engineModel editor_Models_LanguageResources_LanguageResource */
 
         //load all available mt resources(engines)
         $this->view->machineTranslationEngines= $engineModel->getEnginesByAssoc();

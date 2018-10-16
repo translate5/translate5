@@ -45,9 +45,9 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::connectTo()
      */
-    public function connectTo(editor_Models_TmMt $tmmt,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($tmmt,$sourceLang,$targetLang);
-        $this->api = ZfExtended_Factory::get($this->apiClass, [$tmmt]);
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($languageresource,$sourceLang,$targetLang);
+        $this->api = ZfExtended_Factory::get($this->apiClass, [$languageresource]);
     }
     
     /**

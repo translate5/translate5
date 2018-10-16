@@ -93,19 +93,8 @@ abstract class editor_Models_Export_DiffTagger {
      * @param array $segment
      * @return array $segment
      */
-    public function wordBreakUp($segment){
-        $config = Zend_Registry::get('config');
-        $regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
-        
-        //by adding the count($split) and the $i++ only the array entries containing text (no tags) are parsed
-        //this implies that only tagBreakUp may be called before and 
-        // no other array structure manipulating method may be called between tagBreakUp and wordBreakUp!!!
-        for ($i = 0; $i < count($segment); $i++) {
-            $split = preg_split($regexWordBreak, $segment[$i], NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-            array_splice($segment, $i, 1, $split);
-            $i = $i + count($split);
-        }
-        return $segment;
+    protected function wordBreakUp($segment){
+        return ZfExtended_Utils::wordBreakUp($segment);
     }
     
     /**
@@ -117,11 +106,8 @@ abstract class editor_Models_Export_DiffTagger {
      * @param string $segment
      * @return array $segment
      */
-    public  function tagBreakUp($segment){
-        if(is_null($this->_regexTag)){
-            throw new Zend_Exception('Regex zur Tagerkennung ist NULL');
-        }
-        return preg_split($this->_regexTag, $segment, NULL,  PREG_SPLIT_DELIM_CAPTURE);
+    protected  function tagBreakUp($segment){
+        return ZfExtended_Utils::tagBreakUp($this->_regexTag, $segment);
     }
     /**
      * Generiert ein UUID gibt diese zurück

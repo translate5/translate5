@@ -41,9 +41,9 @@ class editor_Services_ServiceResult {
     protected $lastAdded;
     
     /**
-     * @var editor_Models_TmMt
+     * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $tmmt;
+    protected $languageresource;
     
     /**
      * next offset with found data, needed for paging
@@ -120,7 +120,7 @@ class editor_Services_ServiceResult {
         $result->target = $target.join('', $missingTags);
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
-        $result->tmmtid = $this->tmmt->getId();
+        $result->languageResourceid = $this->languageResource->getId();
         
         $result->state = self::STATUS_LOADED;
         
@@ -152,9 +152,9 @@ class editor_Services_ServiceResult {
     }
     
     /**
-     * @param editor_Models_TmMt $tmmt
+     * @param editor_Models_LanguageResources_LanguageResource $languageresource
      */
-    public function setTmmt(editor_Models_TmMt $tmmt){
-        $this->tmmt = $tmmt;
+    public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageresource){
+        $this->languageResource = $languageresource;
     }
 }

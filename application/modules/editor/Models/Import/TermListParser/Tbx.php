@@ -339,13 +339,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 //$this->xml->open(self::getTbxPath($task));
                 $this->xml->open($tmpName, null, LIBXML_PARSEHUGE);
                 
-                //TODO: i dont see any reason for this code, if the customers are needed, load them up
-                //find the customer for this term collection
-                //$termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-                /* @var $termCollection editor_Models_TermCollection_TermCollection */
-                //$termCollection->load($this->termCollectionId);
-                //$this->customerId=$termCollection->getCustomerId();
-                
                 $this->termCollectionId=$termCollectionId;
                 
                 //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
