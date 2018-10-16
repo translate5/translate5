@@ -3,6 +3,29 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.8.7] - 2018-10-16
+###Added
+TRANSLATE-1433: Trigger workflow actions also on removing a user from a task
+VISUAL-26: VisualReview: Add buttons to resize layout
+TRANSLATE-1207: Add buttons to resize/zoom segment table
+TRANSLATE-1135: Highlight and Copy text in source and target columns
+
+###Changed
+TRANSLATE-1380: Change skeleton-files location from DB to filesystem
+TRANSLATE-1381: Print proper error message if SDLXLIFF with comments is imported
+TRANSLATE-1437: Collect relais file alignment errors instead mail and log each error separately
+TRANSLATE-1396: Remove the misleading "C:\fakepath\" from task name
+
+###Bugfixes
+TRANSLATE-1442: Repetition editor uses sometimes wrong tag 
+TRANSLATE-1441: Exception about missing segment materialized view on XLIFF2 export
+TRANSLATE-1382: Deleting PM users associated to tasks can lead to workflow errors
+TRANSLATE-1335: Wrong segment sorting and filtering because of internal tags
+TRANSLATE-1129: Missing segments on scrolling with page-down / page-up
+TRANSLATE-1431: Deleting a comment can lead to a JS exception
+VISUAL-55: VisualReview: Replace special Whitespace-Chars
+TRANSLATE-1438: Okapi conversion did not work anymore due to Okapi Longhorn bug
+
 ## [2.8.6] - 2018-09-13
 ###Added
 TRANSLATE-1425: Provide ImportArchiv.zip as download from the export menu for admin users
