@@ -206,13 +206,6 @@ h4, h5, p {
 
 /* --------------- target --------------- */
 
-#selectedMtEngine {
-    display: inline-block;
-    height: 2EM;
-    padding-right: 10px;
-    line-height: 1.3EM;
-}
-
 #target h2 {
     font-size: 0.9EM;
 }

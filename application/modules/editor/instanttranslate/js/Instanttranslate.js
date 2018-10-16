@@ -34,63 +34,131 @@ var editIdleTimer = null,
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
     instantTranslationIsActive = true,
-    chosenSourceIsText = true;
+    chosenSourceIsText = true,
+    fileTypesAllowedAndAvailable = [];
 
-/* --------------- set, unset and get the selected mtEngine  ---------------- */
-
-function setMtEngine(engineId) {
-    selectedEngineId = engineId;
-    console.log('selectedEngineId: ' + selectedEngineId);
-}
-function unsetMtEngine() {
-    console.log('unsetMtEngine');
-    selectedEngineId = undefined;
-}
 /***
- * Return the id of the set engine (if set) or false
- * @returns
+ * Stores an array with the allowed file-types according to the available engines.
  */
-function getSelectedEngineId(){
-    if(selectedEngineId === undefined) {
-        return false; 
-    }
-    return selectedEngineId;
-}
-/***
- * Return the name of the set engine (if set) or false
- * @returns
- */
-function getSelectedEngineName(){
-    var engineId = getSelectedEngineId();
-    if(engineId === false || machineTranslationEngines[engineId] === undefined || machineTranslationEngines[engineId].name === undefined) {
-        return false; 
-    }
-    return machineTranslationEngines[engineId].name;
-}
-/***
- * Return the domain code(if exist) of the set engine or false
- * @returns
- */
-function getSelectedEngineDomainCode(){
-    var engineId = getSelectedEngineId();
-    if(engineId === false || machineTranslationEngines[engineId] === undefined || machineTranslationEngines[engineId].domainCode === undefined) {
-        return false; 
-    }
-    return machineTranslationEngines[engineId].domainCode;
-}
-/***
- * Returns an array with the allowed file-types for the set engine or false if none.
- * @returns
- */
-function getSelectedEngineFileTypes() {
-    var engineId = getSelectedEngineId(),
-        mtEngine = machineTranslationEngines[engineId],
+function setFileTypesAllowedAndAvailable() {
+    var engineId,
+        mtEngine,
         extensionsFileTranslation = Editor.data.languageresource.fileExtension,
-        extensionsKey = mtEngine.source+","+mtEngine.target;
-    if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
-        return extensionsFileTranslation[extensionsKey];
+        extensionsKey,
+        filesTypesForLanguageCombination;
+    for (engineId in machineTranslationEngines) {
+        if(machineTranslationEngines.hasOwnProperty(engineId)){
+            mtEngine = machineTranslationEngines[engineId];
+            extensionsKey = mtEngine.source+","+mtEngine.target;
+            if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
+                console.log('fileTypes AllowedAndAvailable for ' + extensionsKey + ': ' + extensionsFileTranslation[extensionsKey]);
+                filesTypesForLanguageCombination = [];
+                if(fileTypesAllowedAndAvailable[extensionsKey] === -1) {
+                    filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[extensionsKey];
+                }
+                extensionsFileTranslation[extensionsKey].forEach(function(fileType) {
+                    if(filesTypesForLanguageCombination.indexOf(fileType) === -1) {
+                        filesTypesForLanguageCombination.push(fileType);
+                    }
+                  });
+                if(filesTypesForLanguageCombination.length > 0) {
+                    var item = {'sourceLocale': mtEngine.source,
+                                'targetLocale': mtEngine.target,
+                                'filyTypes': filesTypesForLanguageCombination};
+                    fileTypesAllowedAndAvailable[extensionsKey] = item;
+                }
+            }
+        }
     }
-    return false;
+}
+/**
+ * Which fileTypes are allowed for the current language-combination?
+ * @returns array
+ */
+function getAllowedFileTypes() {
+    var sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val(),
+        filesTypesForLanguageCombination,
+        addFileTypes,
+        allowedFileTypes = [],
+        allowedFileTypesUnique;
+    for (var key in fileTypesAllowedAndAvailable) {
+        if (fileTypesAllowedAndAvailable.hasOwnProperty(key)) {
+            filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[key];
+            addFileTypes = false;
+            if (sourceLocale == '-' && targetLocale == '-') {
+                addFileTypes = true;
+            } else if (targetLocale == '-' && filesTypesForLanguageCombination.sourceLocale === sourceLocale) {
+                addFileTypes = true;
+            } else if (sourceLocale == '-' && filesTypesForLanguageCombination.targetLocale === targetLocale) {
+                addFileTypes = true;
+            } else if (filesTypesForLanguageCombination.sourceLocale === sourceLocale && filesTypesForLanguageCombination.targetLocale === targetLocale) {
+                addFileTypes = true;
+            }
+            if (addFileTypes) {
+                allowedFileTypes = allowedFileTypes.concat(filesTypesForLanguageCombination.filyTypes);
+            }
+        }
+    }
+    allowedFileTypesUnique = allowedFileTypes.filter(function(elem, index, self) {
+        return index == self.indexOf(elem);
+    });
+    return allowedFileTypesUnique;
+}
+/***
+ * Check if files can be translated for the current language-combination.
+ * @returns boolean
+ */
+function fileTranslationIsPossible() {
+    var sourceLocale = $("#sourceLocale").val(),
+        targetLocale = $("#targetLocale").val(),
+        filesTypesForLanguageCombination,
+        fileTranslationIsPossible = false;
+    if (sourceLocale == '-' && targetLocale == '-') {
+        fileTranslationIsPossible = true;
+    } else {
+        for (var key in fileTypesAllowedAndAvailable) {
+            if (fileTypesAllowedAndAvailable.hasOwnProperty(key)) {
+                filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[key];
+                if (targetLocale == '-' && filesTypesForLanguageCombination.sourceLocale === sourceLocale) {
+                    fileTranslationIsPossible = true;
+                } else if (sourceLocale == '-' && filesTypesForLanguageCombination.targetLocale === targetLocale) {
+                    fileTranslationIsPossible = true;
+                } else if (filesTypesForLanguageCombination.sourceLocale === sourceLocale && filesTypesForLanguageCombination.targetLocale === targetLocale) {
+                    fileTranslationIsPossible = true;
+                }
+            }
+            if (fileTranslationIsPossible) break;
+        }
+    }
+    return fileTranslationIsPossible;
+}
+/***
+ * If files are allowed for the current language-combination, show text accordingly.
+ */
+function setTextForSource() {
+    var textForSourceIsText = Editor.data.languageresource.translatedStrings['enterText'],
+        textForSourceIsFile = '',
+        allowedFileTypes;
+    if (fileTranslationIsPossible()) {
+        allowedFileTypes = getAllowedFileTypes();
+        
+        textForSourceIsText += ' <span class="change-source-type">';
+        textForSourceIsText += Editor.data.languageresource.translatedStrings['orTranslateFile'];
+        textForSourceIsText += ' (' + allowedFileTypes.join(', ') + ')';
+        textForSourceIsText += '</span>';
+
+        textForSourceIsFile = Editor.data.languageresource.translatedStrings['uploadFile'];
+        textForSourceIsFile += ' (' + allowedFileTypes.join(', ') + ')';
+        textForSourceIsFile += ' <span class="change-source-type">';
+        textForSourceIsFile += Editor.data.languageresource.translatedStrings['orTranslateText'];
+        textForSourceIsFile += '</span>';
+    } else {
+        chosenSourceIsText = true;
+        showSource();
+    }
+    $("#sourceIsText").html(textForSourceIsText);
+    $("#sourceIsFile").html(textForSourceIsFile);
 }
 
 /*  -------------------------------------------------------------------------
@@ -98,9 +166,9 @@ function getSelectedEngineFileTypes() {
  * (1) languages are selected from the locales-lists (renderLocalesAsAvailable)
  * (2) every change in the language-selection starts a check if/how many mtEngines 
  *     are available (renderMtEnginesAsAvailable)
- * (3) As soon as there is exactly ONE mtEngine available or set by the user, source- and 
- *     (a) translation-forms are shown (showTranslationFormsAsReady)
- *     (b) mtEngine is set
+ * (3) As soon as there is exactly ONE mtEngine available:
+ *     - source- and target-language are set
+ *     - (if text is already entered:) translation starts
  *  ------------------------------------------------------------------------- */
 
 /* --------------- locales-list (source, target) ---------------------------- */
@@ -190,7 +258,15 @@ function renderLocalesAsAvailable(accordingTo) {
         targetLocaleOptions = renderLocaleOptionList(target);
         refreshSelectList('targetLocale', targetLocaleOptions, target.selectedValue);
     }
-    renderMtEnginesAsAvailable();
+    // if fileUpload is possible for currently chosen languages, show text accordingly.
+    setTextForSource();
+    // start translation?
+    if (sourceLocalesAvailable.length == 1 && targetLocalesAvailable.length == 1) {
+        $('#translationSubmit').show();
+        startTimerForInstantTranslation();
+    } else {
+        $('#translationSubmit').hide();
+    }
 }
 function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     var localesAvailable = [],
@@ -256,96 +332,6 @@ function refreshSelectList(selectListId, options, selectedOptionValue) {
     $('#'+selectListId).selectmenu("widget").show();
 }
 
-/* --------------- languages and MT-engines --------------------------------- */
-$('#mtEngines').on('selectmenuchange', function() {
-    var engineId = $(this).val();
-    setSingleMtEngineById(engineId);
-});
-function setSingleMtEngineById(engineId) {
-    var fileTypes;
-    if(machineTranslationEngines[engineId] === undefined) {
-        showMtEngineSelectorError('selectMt');
-        return;
-    }
-    setMtEngine(engineId);
-    $('#selectedMtEngine').html(Editor.data.languageresource.translatedStrings['selectedMtEngine'] + ':<br>'+getSelectedEngineName());
-    clearAllErrorMessages();
-    showTranslationFormsAsReady();
-    if ($('#sourceText').val().length > 0) {
-        startTranslation(); // Google stops instant translations only for typing, not after changing the source- or target-language
-    }
-    fileTypes = getSelectedEngineFileTypes();
-    if(fileTypes !== false){
-        fileTypes = fileTypes.join();
-        $("#sourceIsText").html(Editor.data.languageresource.translatedStrings['enterText']+' <span class="change-source-type">'+Editor.data.languageresource.translatedStrings["orTranslateFile"]+' (' + fileTypes +').</span>');
-        $("#sourceIsFile").html(Editor.data.languageresource.translatedStrings['uploadFile']+' (' + fileTypes + ') <span class="change-source-type">'+Editor.data.languageresource.translatedStrings["orTranslateText"]+'</span>');
-    }else{
-    	$("#sourceIsText").html(Editor.data.languageresource.translatedStrings["enterText"]+':');
-        $("#sourceIsFile").html(Editor.data.languageresource.translatedStrings['uploadFile']+' <span class="change-source-type">'+Editor.data.languageresource.translatedStrings["orTranslateText"]+'</span>');
-    }
-}
-function renderMtEnginesAsAvailable() {
-    var mtIdsAvailable,
-        mtOptionList = [],
-        sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val();
-    if (sourceLocale == '-' || targetLocale == '-') {
-        unsetMtEngine();
-        showLanguageSelectsOnly();
-        return;
-    }
-    mtIdsAvailable = getMtEnginesAccordingToLanguages();
-    switch(mtIdsAvailable.length) {
-        case 0:
-            unsetMtEngine();
-            showLanguageSelectsOnly();
-            showMtEngineSelectorError('noMatchingMt');
-            break;
-        case 1:
-            setSingleMtEngineById(mtIdsAvailable[0]);
-            break;
-        default:
-            unsetMtEngine();
-            showLanguageSelectsOnly();
-            // But now also show mtEngine-Select:
-            if (mtIdsAvailable.length > 1) {
-                mtOptionList.push("<option id='PlsSelect'>"+mtIdsAvailable.length+" "+Editor.data.languageresource.translatedStrings['foundMt']+":</option>");
-                for (i = 0; i < mtIdsAvailable.length; i++) {
-                    mtOptionList.push("<option value='" + mtIdsAvailable[i] + "'>" + machineTranslationEngines[mtIdsAvailable[i]].name + "</option>");
-                }
-                $('#mtEngines').find('option').remove().end();
-                $('#mtEngines').append(mtOptionList.join(""));
-                $('#mtEngines').selectmenu("refresh");
-                $('#mtEngines').selectmenu("widget").show();
-            }
-    }
-}
-function getMtEnginesAccordingToLanguages() {
-    var sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val(),
-        mtIdsAvailable = [],
-        engineId,
-        mtEngineToCheck,
-        langIsOK = function(langMT,langSet){
-            if (langMT === langSet) {
-                return true;
-            }
-            if (langSet === '-') {
-                return true;
-            }
-            return false;
-        };
-    for (engineId in machineTranslationEngines) {
-        if (machineTranslationEngines.hasOwnProperty(engineId)) {
-            mtEngineToCheck = machineTranslationEngines[engineId];
-            if (langIsOK(mtEngineToCheck.source,sourceLocale) && langIsOK(mtEngineToCheck.target,targetLocale)) {
-                mtIdsAvailable.push(engineId); 
-            }
-        }
-    }
-    return mtIdsAvailable;
-}
-
 /* --------------- start translation instantly or manually: events  --------- */
 
 //start instant (sic!) translation automatically
@@ -383,7 +369,7 @@ function grabUploadedFiles(event){
 function startFileTranslation(){
     var fileName,
         fileType,
-        fileTypesAllowed = getSelectedEngineFileTypes(),
+        fileTypesAllowed = getAllowedFileTypes(),
         fileTypesErrorList = [];
     if ($('#sourceFile').val() == "") {
         showSourceError('Please upload a file.'); // TODO: translate
@@ -407,7 +393,7 @@ function startFileTranslation(){
 /* --------------- prepare, start and terminate translations  --------------- */
 function startTimerForInstantTranslation() {
     terminateTranslation();
-    if (instantTranslationIsActive) {
+    if (instantTranslationIsActive && $("#sourceLocale").val() != '-' && $("#targetLocale").val() != '-') {
         editIdleTimer = setTimeout(function() {
             startTranslation();
         }, 200);
@@ -455,11 +441,7 @@ function terminateTranslation() {
  * @returns
  */
 function translateText(textToTranslate,translationInProgressID){
-    if (getSelectedEngineDomainCode() === false) {
-        console.log('translateText stopped; getSelectedEngineDomainCode FALSE!');
-        return;
-    }
-    console.log(translationInProgressID + ': translateText mit domainCode: ' + getSelectedEngineDomainCode() + ' / source: ' + $("#sourceLocale").val() + ' / target: ' + $("#targetLocale").val() + ' / text: ' + textToTranslate);
+    console.log(translationInProgressID + ': translateText; source: ' + $("#sourceLocale").val() + ' / target: ' + $("#targetLocale").val() + ' / text: ' + textToTranslate);
     startLoadingSign();
     var translateRequest = $.ajax({
         statusCode: {
@@ -473,8 +455,7 @@ function translateText(textToTranslate,translationInProgressID){
         data: {
             'source':$("#sourceLocale").val(),
             'target':$("#targetLocale").val(),
-            'domainCode':getSelectedEngineDomainCode(),
-            'id':getSelectedEngineId(),
+            'id':6, // TODO: remove id from data
             'text':textToTranslate
         },
         success: function(result){
@@ -531,6 +512,7 @@ function fillTranslation() {
         }
     });
     $('#translations').html(translationHtml);
+    showTranslations();
 }
 
 /***
@@ -546,10 +528,6 @@ function requestFileTranslate(){
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
-    
-    if(getSelectedEngineDomainCode()){
-    	data.append('domainCode', getSelectedEngineDomainCode());
-    }
     
     data.append('from', $("#sourceLocale").val());
     data.append('to',$("#targetLocale").val());
@@ -657,6 +635,7 @@ function getFileExtension(){
 $('.instant-translation-toggle').click(function(){
     $('.instant-translation-toggle').toggle();
     instantTranslationIsActive = !instantTranslationIsActive;
+    clearAllErrorMessages();
 });
 
 /* --------------- clear source --------------------------------------------- */
@@ -712,23 +691,15 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
     }
 });
 
-/* --------------- show/hide ------------------------------------------------ */
+/* --------------- show/hide: helpers --------------------------------------- */
 function showLanguageSelectsOnly() {
-    $('#mtEngines').selectmenu("widget").hide();
     $('#translationSubmit').hide();
-    hideSource();
     hideTranslations();
 }
-function showTranslationFormsAsReady() {
-    $('#mtEngines').selectmenu("widget").hide();
-    showSource();
-    showTranslations();
-}
-/* --------------- show/hide: helpers --------------------------------------- */
 function showSource() {
-    var fileTypes = getSelectedEngineFileTypes();
     $('#sourceContent').show();
-    if (chosenSourceIsText || fileTypes === false) {
+    $('#instantTranslationIsOn').show();
+    if (chosenSourceIsText || fileTranslationIsPossible() === false) {
         $('.show-if-source-is-text').show();
         $('.show-if-source-is-file').hide();
         $('#translations').show();
@@ -740,17 +711,11 @@ function showSource() {
         $('#translations').hide();
     }
 }
-function hideSource() {
-    $('#sourceContent').hide();
-    $('#sourceIsText').hide();
-    $('.source-toggle').hide();
-}
 function showTranslations() {
     if ($('#sourceText').val().length === 0) {
         $('#translations').html('');
     }
     $('#translations').show();
-    $('#selectedMtEngine').show();
     $('#translationSubmit').show();
     if (instantTranslationIsActive) {
         $('#instantTranslationIsOn').show();
@@ -762,7 +727,6 @@ function showTranslations() {
 }
 function hideTranslations() {
     $('#translations').hide();
-    $('#selectedMtEngine').hide();
     $('#translationSubmit').hide();
     $('#instantTranslationIsOn').hide();
     $('#instantTranslationIsOff').hide();
@@ -771,9 +735,6 @@ function hideTranslations() {
 function showMtEngineSelectorError(errorMode) {
     $('#mtEngineSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
     $('#translationSubmit').hide();
-    if ($('#sourceText').val().length === 0) {
-        hideSource();
-    }
 }
 function showTranslationError(errorText) {
     var engineId = getSelectedEngineId(),
@@ -788,6 +749,7 @@ function showSourceError(errorText) {
 }
 function clearAllErrorMessages() {
     $('.instant-translation-error').hide();
+    $("#sourceIsText").removeClass('source-text-error');
 }
 /* --------------- show/hide: loading spinner ------------------------------- */
 function startLoadingSign() {
