@@ -94,6 +94,7 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
         ]);
         
         $this->view->publicModulePath = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module');
+        $this->view->Php2JsVars()->set('moduleFolder', $this->view->publicModulePath.'/');
         
     }
     
