@@ -30,16 +30,16 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
     alias: 'widget.importCollectionWindow',
     itemId: 'importCollectionWindow',
     strings: {
-        file: '#UT#TBX-Datei',
         title: '#UT#TBX Datei importieren',
+        file: '#UT#TBX-Datei',
         importTbx: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
         importSuccess: '#UT#Weitere Term-Collection Daten erfolgreich importiert!',
-        save: '#UT#Speichern',
+        save: '#UT#Importieren',
         cancel: '#UT#Abbrechen',
-        mergeTerms:'#UT#Merge terms',
-        deleteTermEntriesDate:'#UT#Delete old term entries',
-        deleteTermEitriesImport:'#UT#Delete entries older then import'
+        mergeTerms:'#UT#Termeinträge verschmelzen',
+        deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
+        deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import'
     },
 
     constructor: function (config) {
@@ -64,6 +64,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             value:false
         });
         me.down('filefield[name="tmUpload"]').regex=/\.tbx$/i;
+        me.setTitle(me.strings.title);
     },
     /**
      * loads the record into the form

@@ -583,8 +583,10 @@ Ext.define('Editor.controller.TmOverview', {
         
         //set the labelText field with the domain code if exist
         if(sdlEngine){
-            form.getForm().findField('fileName').setValue(sdlEngine.get('domainCode'));
-            form.getForm().findField('labelText').setValue(sdlEngine.get('name'));
+            form.getForm().findField('specificData').setValue(JSON.stringify({
+            	domainCode:sdlEngine.get('domainCode'),
+        		engineName:sdlEngine.get('name')
+            }));
         }
     },
 

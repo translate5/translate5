@@ -225,10 +225,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     allowBlank: false
                 },{
                     xtype: 'hiddenfield',
-                    name: 'labelText'
-                },{
-                    xtype: 'hiddenfield',
-                    name: 'fileName'
+                    name: 'specificData'
                 },{
                     xtype: 'colorfield',
                     fieldLabel: me.strings.color,

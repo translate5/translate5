@@ -161,7 +161,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
       var str = me.strings,
           params = {},
           method = 'DELETE',
-          url = Editor.data.restpath+'taskassoc',
+          url = Editor.data.restpath+'languageresourcetaskassoc',
           checkedData = Ext.JSON.encode({
               languageResourceId: record.get('id'),
               taskGuid: me.actualTask.get('taskGuid'),
