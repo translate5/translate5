@@ -53,10 +53,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageresource,$sourceLang,$targetLang);
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($languageResource,$sourceLang,$targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$languageresource]);
+        $this->api = ZfExtended_Factory::get($class, [$languageResource]);
     }
     
     /**
@@ -95,14 +95,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $prefix .= '-';
         }
         $name = $prefix.'ID'.$this->languageResource->getId().'-'.$this->filterName($this->languageResource->getName());
-        $this->languageResource->setFileName($name);
+        
+        $this->languageResource->addSpecificData('fileName',$name);
         
         $noFile = empty($fileinfo);
         $tmxUpload = !$noFile && $fileinfo['type'] == 'application/xml' && preg_match('/\.tmx$/', $fileinfo['name']);
         
         if($noFile || $tmxUpload) {
             if($this->api->createEmptyMemory($name, $sourceLang)){
-                $this->languageResource->setFileName($this->api->getResult()->name);
+                $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
                 $this->languageResource->save(); //saving it here makes the TM available even when the TMX import was crashed
                 //if initial upload is a TMX file, we have to import it. 
                 if($tmxUpload) {
@@ -116,7 +117,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         //initial upload is a TM file
         if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
-            $this->languageResource->setFileName($this->api->getResult()->name);
+            $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
             return true;
         }
         $this->handleOpenTm2Error('LanguageResources - could not create prefilled TM in OpenTM2'." LanguageResource: \n");
@@ -429,7 +430,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        $name = $this->languageResource->getFileName();
+        $name = $this->languageResource->getSpecificDataByProperty('fileName');
         if(empty($name)) {
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
@@ -545,7 +546,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyLanguageResource=clone $this->languageResource;
         
         $fuzzyLanguageResource->setName($memoryName);
-        $fuzzyLanguageResource->setFileName($memoryName);
+        $fuzzyLanguageResource->addSpecificData('fileName',$memoryName);
         $fuzzyLanguageResource->setId(null);
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');

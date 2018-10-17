@@ -43,7 +43,6 @@ class editor_Models_Validator_LanguageResources_LanguageResource extends ZfExten
         $this->addValidator('resourceId', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('serviceName', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('serviceType', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('fileName', 'stringLength', array('min' => 0, 'max' => 1024));
-        $this->addValidator('labelText', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('specificData', 'stringLength', array('min' => 0, 'max' => 1024));
     }
 }

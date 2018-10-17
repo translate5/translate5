@@ -41,10 +41,8 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceType() setServiceType(string $type)
  * @method string getServiceName() getServiceName()
  * @method void setServiceName() setServiceName(string $resName)
- * @method string getFileName() getFileName()
- * @method void setFileName() setFileName(string $name)
- * @method string getLabelText() getLabelText()
- * @method void setLabelText() setLabelText(string $labelText)
+ * @method string getSpecificData() getSpecificData()
+ * @method void setSpecificData() setSpecificData(string $specificData)
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(integer $autoCreatedOnImport)
  */
@@ -194,7 +192,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function loadByServiceName(string $serviceName) {
         $db = $this->db;
         $s = $db->select()
-            ->from($db->info($db::NAME), ['id','name','fileName'])
+            ->from($db->info($db::NAME), ['id','name','specificData'])
             ->where('LEK_languageresources.serviceName LIKE ?', $serviceName);
         return $this->db->fetchAll($s)->toArray(); 
     }
@@ -271,7 +269,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      */
     public function getLanguageByField($fieldName){
 
-        //check if the filename is defined
+        //check if the fieldName is defined
         if(empty($fieldName)){
             throw new ZfExtended_ValidateException("Missing field name.");
         }
@@ -338,5 +336,49 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             $this->targetLang=$this->getLanguageByField('targetLang');
         }
         return $this->targetLang;
+    }
+    
+    /***
+     * Get property value from the specific data json text
+     * @param string $propertyName
+     * @return mixed|NULL
+     */
+    public function getSpecificDataByProperty($propertyName){
+        $specificData=$this->getSpecificData();
+        //try to decode the data, and set the domainCode if exist
+        if(!empty($specificData)){
+            try {
+                $specificData=json_decode($specificData);
+                return $specificData->$propertyName;
+            } catch (Exception $e) {
+            }
+        }
+        return null;
+    }
+    
+    /***
+     * Add specific data by propert name and value. The result will be encoded back to json
+     * @param string $propertyName
+     * @param mixed $value
+     * @return boolean
+     */
+    public function addSpecificData($propertyName,$value) {
+        $specificData=$this->getSpecificData();
+        if(empty($specificData)){
+            $this->setSpecificData(json_encode(array($propertyName=>$value)));
+            return true;
+        }
+        
+        //try to decude the database json
+        try {
+            $specificData=json_decode($specificData);
+        } catch (Exception $e) {
+            //it is invalide json
+            $specificData=new stdClass();
+        }
+        //set the property name into the specific data
+        $specificData->$propertyName=$value;
+        $this->setSpecificData(json_encode($specificData));
+        return true;
     }
 }

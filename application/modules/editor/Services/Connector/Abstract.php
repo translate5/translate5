@@ -45,7 +45,7 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $languageresource;
+    protected $languageResource;
     
     /**
      * Container for the connector results
@@ -84,13 +84,13 @@ abstract class editor_Services_Connector_Abstract {
     
     /**
      * Link this Connector Instance to the given LanguageResource and its resource
-     * @param editor_Models_LanguageResources_LanguageResource $languageresource
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
         $this->sourceLang=$sourceLang;
         $this->targetLang=$targetLang;
-        $this->languageResource = $languageresource;
-        $this->resultList->setLanguageResource($languageresource);
+        $this->languageResource = $languageResource;
+        $this->resultList->setLanguageResource($languageResource);
         $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
         $this->languageResource->targetLangRfc5646=$this->languageResource->getTargetLangRfc5646();
     }
@@ -149,7 +149,7 @@ abstract class editor_Services_Connector_Abstract {
     
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
-     * @param editor_Models_LanguageResources_LanguageResource $languageresource
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
     public function open() {
         //to be implemented if needed

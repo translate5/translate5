@@ -41,10 +41,10 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::connectTo()
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageresource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageresource,$sourceLang,$targetLang);
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($languageResource,$sourceLang,$targetLang);
         $class = 'editor_Services_SDLLanguageCloud_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$languageresource]);
+        $this->api = ZfExtended_Factory::get($class, [$languageResource]);
     }
     
     /**
@@ -109,7 +109,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         
         $result=null;
         $params=[
-            'domainCode'=>$this->languageResource->getFileName(),
+            'domainCode'=>$this->languageResource->getSpecificDataByProperty('domainCode'),
             'text'=>$searchString,
             'from'=>$lngs[$this->sourceLang],
             'to'=>$lngs[$this->targetLang]

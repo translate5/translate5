@@ -85,4 +85,19 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
         $s->where('lower(name) LIKE lower(?)','%'.$searchString.'%');
         return $this->db->fetchAll($s)->toArray();
     }
+
+    /***
+     * Get min characters from given customers
+     * @param array $customers
+     * @return array
+     */
+    public function getMinSearchCharacters(array $customers) {
+        if(empty($customers)){
+            return array();
+        }
+        $s = $this->db->select()
+        ->from($this->tableName,array('MIN(searchCharacterLimit) as searchCharacterLimit'))
+        ->where('id IN(?)', $customers);
+        return $this->db->fetchRow($s)->toArray();
+    }
 }

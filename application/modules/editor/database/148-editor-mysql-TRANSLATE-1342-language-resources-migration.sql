@@ -76,4 +76,7 @@ ADD CONSTRAINT `LEK_languageresources_taskassoc_ibfk_1`
   FOREIGN KEY (`languageResourceId`)
   REFERENCES `LEK_languageresources` (`id`)
   ON DELETE CASCADE;
+  
+/* Update the fileName fields as json. Later this field will be renamed to specificData */
+UPDATE `LEK_languageresources` SET `fileName` = CONCAT('{"fileName":"',fileName,'"}') WHERE serviceName='OpenTM2';
 

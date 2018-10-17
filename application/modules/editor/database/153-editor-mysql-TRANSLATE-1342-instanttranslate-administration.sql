@@ -40,6 +40,10 @@ CREATE TABLE `LEK_languageresources_customerassoc` (
 ALTER TABLE `LEK_languageresources` 
 ADD COLUMN `defaultCustomer` INT(11) NULL AFTER `fileName`;
 
+ALTER TABLE `LEK_languageresources` 
+CHANGE COLUMN `fileName` `specificInfos` VARCHAR(1024) NULL DEFAULT NULL COMMENT 'Language resource specific info data' ;
+
+
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_instanttranslateapi', 'all');
 
 CREATE TABLE `LEK_user_meta` (
@@ -67,9 +71,6 @@ CREATE TABLE `LEK_user_meta` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
-
-ALTER TABLE `LEK_languageresources` 
-ADD COLUMN `labelText` VARCHAR(256) NULL AFTER `defaultCustomer`;
 
 CREATE TABLE `LEK_languageresources_languages` (
   `id` INT NOT NULL AUTO_INCREMENT,

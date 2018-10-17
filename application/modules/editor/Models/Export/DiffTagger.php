@@ -38,10 +38,6 @@ END LICENSE AND COPYRIGHT
  */
 
 abstract class editor_Models_Export_DiffTagger {
-    /**
-     * @var string Regex zur Tagerkennung, bereits mit Delimitern und Modifikatoren
-     */
-    protected $_regexTag;
     
     /**
      * @var array Regexes which define the opening and closing add changemarks
@@ -94,7 +90,7 @@ abstract class editor_Models_Export_DiffTagger {
      * @return array $segment
      */
     protected function wordBreakUp($segment){
-        return ZfExtended_Utils::wordBreakUp($segment);
+        return editor_Utils::wordBreakUp($segment);
     }
     
     /**
@@ -107,7 +103,7 @@ abstract class editor_Models_Export_DiffTagger {
      * @return array $segment
      */
     protected  function tagBreakUp($segment){
-        return ZfExtended_Utils::tagBreakUp($this->_regexTag, $segment);
+        return editor_Utils::tagBreakUp($segment);
     }
     /**
      * Generiert ein UUID gibt diese zurück

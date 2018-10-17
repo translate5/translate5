@@ -1590,6 +1590,42 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2VybiAoU1RSRyArICsp"><source>Segmentschriftgrad vergrößern (STRG + +)</source><target>Segmentschriftgrad vergrößern (STRG + +)</target></trans-unit>
 <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJuIChTVFJHICsgLSk="><source>Segmentschriftgrad verkleinern (STRG + -)</source><target>Segmentschriftgrad verkleinern (STRG + -)</target></trans-unit>
 <trans-unit id='U29mb3J0w7xiZXJzZXR6dW5n'><source>Sofortübersetzung</source><target>Sofortübersetzung</target></trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBiZXN0ZWhlbmRlbiBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
+    <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</source>
+    <target>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</target>
+</trans-unit>
+<trans-unit id='VEJYLURhdGVp'>
+    <source>TBX-Datei</source>
+    <target>TBX-Datei</target>
+</trans-unit>
+<trans-unit id='VEJYIERhdGVpIGltcG9ydGllcmVu'>
+    <source>TBX Datei importieren</source>
+    <target>TBX Datei importieren</target>
+</trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
+    <source>Bitte verwenden Sie eine TBX Datei!</source>
+    <target>Bitte verwenden Sie eine TBX Datei!</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gZXJmb2xncmVpY2ggaW1wb3J0aWVydCE='>
+    <source>Weitere Term-Collection Daten erfolgreich importiert!</source>
+    <target>Weitere Term-Collection Daten erfolgreich importiert!</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='>
+    <source>Termeinträge verschmelzen</source>
+    <target>Termeinträge verschmelzen</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='>
+    <source>Termeinträge verschmelzen</source>
+    <target>Termeinträge verschmelzen</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'>
+    <source>Termeinträge löschen älter als</source>
+    <target>Termeinträge löschen älter als</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='>
+    <source>Termeinträge löschen älter als aktueller Import</source>
+    <target>Termeinträge löschen älter als aktueller Import</target>
+</trans-unit>
   </body>
  </file>
 </xliff>

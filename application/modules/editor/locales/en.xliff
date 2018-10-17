@@ -2879,6 +2879,43 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Sofortübersetzung</source>
     <target>Instant-Translate</target>
 </trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBiZXN0ZWhlbmRlbiBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
+    <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</source>
+    <target>Import additional Term-Collection data as TBX file and add the data to the already existing Term-Collection</target>
+</trans-unit>
+<trans-unit id='VEJYLURhdGVp'>
+    <source>TBX-Datei</source>
+    <target>TBX file</target>
+</trans-unit>
+<trans-unit id='VEJYIERhdGVpIGltcG9ydGllcmVu'>
+    <source>TBX Datei importieren</source>
+    <target>Import TBX file</target>
+</trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
+    <source>Bitte verwenden Sie eine TBX Datei!</source>
+    <target>Please use a TBX file!</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gZXJmb2xncmVpY2ggaW1wb3J0aWVydCE='>
+    <source>Weitere Term-Collection Daten erfolgreich importiert!</source>
+    <target>Imported additional Term-Collection data successfully!</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='>
+    <source>Termeinträge verschmelzen</source>
+    <target>Merge term entries</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='>
+    <source>Termeinträge verschmelzen</source>
+    <target>Merge term entries</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'>
+    <source>Termeinträge löschen älter als</source>
+    <target>Delete term entries older than</target>
+</trans-unit>
+
+<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='>
+    <source>Termeinträge löschen älter als aktueller Import</source>
+    <target>Delete term entries older than current import</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

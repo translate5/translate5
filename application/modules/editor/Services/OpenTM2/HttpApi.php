@@ -39,7 +39,7 @@ class editor_Services_OpenTM2_HttpApi {
     /**
      * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $languageresource;
+    protected $languageResource;
     
     /**
      * @var Zend_Http_Response
@@ -65,8 +65,8 @@ class editor_Services_OpenTM2_HttpApi {
      */
     protected $httpMethod;
     
-    public function __construct(editor_Models_LanguageResources_LanguageResource $languageresource) {
-        $this->languageResource = $languageresource;
+    public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource) {
+        $this->languageResource = $languageResource;
     }
     
     /**
@@ -142,7 +142,7 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttpWithMemory($method, $urlSuffix = '') {
-        return $this->getHttp($method, urlencode($this->languageResource->getFileName()).'/'.ltrim($urlSuffix, '/'));
+        return $this->getHttp($method, urlencode($this->languageResource->getSpecificDataByProperty('fileName')).'/'.ltrim($urlSuffix, '/'));
     }
     
     /**

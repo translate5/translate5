@@ -27,7 +27,7 @@
 
 
 ALTER TABLE `LEK_languageresources` 
-ADD COLUMN `autoCreatedOnImport` TINYINT(1) NULL DEFAULT 0 AFTER `labelText`,
+ADD COLUMN `autoCreatedOnImport` TINYINT(1) NULL DEFAULT 0,
 ADD COLUMN `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `autoCreatedOnImport`,
 ADD COLUMN `oldCollectionId` INT(11) NULL AFTER `timestamp`;
 

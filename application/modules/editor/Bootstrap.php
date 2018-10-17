@@ -322,7 +322,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_download', $queryRoute);
 
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/languageresourceinstance/:languageresourceinstanceId/query',
+            'editor/languageresourceinstance/:languageResourceId/query',
             array(
                 'module' => 'editor',
                 'controller' => 'languageresourceinstance',
@@ -331,7 +331,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_query', $queryRoute);
         
         $queryRoute = new ZfExtended_Controller_RestLikeRoute(
-            'editor/languageresourceinstance/:languageresourceinstanceId/search',
+            'editor/languageresourceinstance/:languageResourceId/search',
             array(
                 'module' => 'editor',
                 'controller' => 'languageresourceinstance',

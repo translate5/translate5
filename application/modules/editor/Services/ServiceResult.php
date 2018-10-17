@@ -43,7 +43,7 @@ class editor_Services_ServiceResult {
     /**
      * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $languageresource;
+    protected $languageResource;
     
     /**
      * next offset with found data, needed for paging
@@ -152,9 +152,9 @@ class editor_Services_ServiceResult {
     }
     
     /**
-     * @param editor_Models_LanguageResources_LanguageResource $languageresource
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
-    public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageresource){
-        $this->languageResource = $languageresource;
+    public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource){
+        $this->languageResource = $languageResource;
     }
 }

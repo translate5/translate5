@@ -35,7 +35,7 @@ class editor_Services_Google_HttpApi {
     /**
      * @var editor_Models_LanguageResources_LanguageResource
      */
-    protected $languageresource;
+    protected $languageResource;
     
     /**
      * @var stdClass
@@ -63,8 +63,8 @@ class editor_Services_Google_HttpApi {
      */
     protected $projectId;
     
-    public function __construct(editor_Models_LanguageResources_LanguageResource $languageresource) {
-        $this->languageResource = $languageresource;
+    public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource) {
+        $this->languageResource = $languageResource;
         $this->initApi();
     }
     

@@ -335,14 +335,11 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
      * @return string
      */
     private function highlightDiff($source,$target){
-        $difTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
-        /* @var $difTagger editor_Models_Export_DiffTagger_Csv */
+        $sourceArr = editor_Utils::tagBreakUp($source);
+        $targetArr = editor_Utils::tagBreakUp($target);
         
-        $sourceArr = $difTagger->tagBreakUp($source);
-        $targetArr = $difTagger->tagBreakUp($target);
-        
-        $sourceArr = $difTagger->wordBreakUp($sourceArr);
-        $targetArr = $difTagger->wordBreakUp($targetArr);
+        $sourceArr = editor_Utils::wordBreakUp($sourceArr);
+        $targetArr = editor_Utils::wordBreakUp($targetArr);
         
         $diff = ZfExtended_Factory::get('ZfExtended_Diff');
         /* @var $diff ZfExtended_Diff */

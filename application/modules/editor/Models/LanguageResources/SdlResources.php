@@ -80,20 +80,24 @@ class editor_Models_LanguageResources_SdlResources {
             return min($numbers);
         };
         
+        //get the domain code from the specific data json
+        $getDomainCode=function($specificData){
+            try {
+                $specificData=json_decode($specificData);
+                return $specificData->domainCode;
+            } catch (Exception $e) {
+                return null;
+            }
+        };
+        
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
-        $customers=$userModel->getUserCustomersFromSession();
+        $customerLimit=$userModel->getUserCustomerMinCharacters();
         
-        $customerLimit=PHP_INT_MAX;
-        
-        //get the minimum search character allowed from all user assoc customers of a user
-        foreach ($customers as $customer){
-            $cm=ZfExtended_Factory::get('editor_Models_Customer');
-            /* @var $cm editor_Models_Customer */
-            $cm->load($customer);
-            $customerLimit=min([$cm->getSearchCharacterLimit(),$customerLimit]);
+        //if the customer config is not defined, set the customer limit to max int, so it is compared against engine limit
+        if($customerLimit < 1){
+            $customerLimit=PHP_INT_MAX;
         }
-        
         $result=[];
         //NOTE: the id is generated, since the sdl language cloud does not provide one
         $engineCounter=1;
@@ -109,7 +113,7 @@ class editor_Models_LanguageResources_SdlResources {
                 'sourceIso' => is_array($engine) ? $lngs[$engine['sourceLang']] : $engine->from->code,
                 'target' => is_array($engine) ? $engine['targetLangRfc5646']: $engine->toCulture,
                 'targetIso' => is_array($engine) ?$lngs[$engine['targetLang']]:$engine->to->code,
-                'domainCode' => is_array($engine) ? $engine['fileName']:$engine->domainCode,
+                'domainCode' => is_array($engine) ? $getDomainCode($engine['specificData']):$engine->domainCode,
                 'characterLimit' => $getCharacterLimit([$customerLimit,$engineLimit]),
             );
             

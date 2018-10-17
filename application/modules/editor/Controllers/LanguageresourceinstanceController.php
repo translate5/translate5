@@ -377,7 +377,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $data = $connector->getTm($validExportTypes[$type]);
         header('Content-Type: '.$validExportTypes[$type], TRUE);
         $type = '.'.strtolower($type);
-        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getFileName()).$type.'"');
+        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getSpecificDataByProperty('fileName')).$type.'"');
         echo $data;
         exit;
     }
@@ -557,7 +557,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //setting the TM filename here, but can be overwritten in the connectors addTm method
         // for example when we get a new name from the service
-        $this->entity->setFileName($importInfo[self::FILE_UPLOAD_NAME]['name']);
+        $this->entity->addSpecificData('fileName', $importInfo[self::FILE_UPLOAD_NAME]['name']);
         
         if(empty($this->uploadErrors) && !$connector->addTm($importInfo[self::FILE_UPLOAD_NAME],$this->getAllParams())) {
             $this->uploadErrors[] = 'Hochgeladene TM Datei konnte nicht hinzugefügt werden.';
