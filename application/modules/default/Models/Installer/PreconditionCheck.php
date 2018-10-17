@@ -63,7 +63,7 @@ class Models_Installer_PreconditionCheck {
         $this->checkPhpExtensions();
         if(!empty($this->infosEnvironment)) {
             $msg = 'Some system requirements of translate5 are not optimal: ';
-            $this->stop($msg."\n  - ".join("\n  - ", $this->infosEnvironment)."\n");
+            echo("\n".$msg."\n\n\n  - ".join("\n  - ", $this->infosEnvironment)."\n");
         }
         if(!empty($this->errorsEnvironment)) {
             $msg = 'Some system requirements of translate5 are not met: ';
