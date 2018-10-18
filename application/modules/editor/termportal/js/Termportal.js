@@ -40,6 +40,24 @@ var termAttributeContainer=[],
     termGroupsCache=[];//cache the groups results
 
 /***
+ * If the parameter 'term' is given in the URL, we start a search directly.
+ */
+function checkDirectSearch() {
+    var givenTerm = getUrlParamValue('term');
+    if (givenTerm != '') {
+        $('#search').val(givenTerm);
+        $('#searchButton').click();
+    }
+}
+function getUrlParamValue(paramName) {
+    // https://davidwalsh.name/query-string-javascript
+    paramName = paramName.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + paramName + '=([^&#]*)');
+    var results = regex.exec(window.location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+/***
  * On dropdown select function handler
  */
 var selectItem = function (event, ui) {

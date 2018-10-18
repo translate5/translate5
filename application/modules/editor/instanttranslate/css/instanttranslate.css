@@ -240,13 +240,13 @@ h4, p {
     padding: 3px 5px 3px 20px;
 }
 .translation-sourcediff-content {
-    background-color: #fee202;
+    background-color: #fff;
     color: #000;
     font-style: italic;
     padding: 3px 5px;
 }
 .translation-sourcediff .highlight {
-    background-color: #fff;
+    background-color: #fee202;
     padding: 5px;
 }
 .translation-result {
@@ -282,7 +282,8 @@ h4, p {
   box-sizing: border-box;
 }
 .clearable-clear,
-.copyable-copy {
+.copyable-copy,
+.term-info {
   position: absolute;
   user-select: none;
   cursor: pointer;
@@ -292,9 +293,9 @@ h4, p {
 }
 .clearable-clear {
   display: none;
-  right: 0;
-  top: 0;
-  padding: 0 8px;
+  right: 0px;
+  top: 0px;
+  padding: 0px 8px;
   font-style: normal;
   font-weight: bold;
   font-size: 1em;
@@ -305,7 +306,12 @@ h4, p {
 }
 .copyable-copy {
   left: 8px;
-  bottom: 0;
+  bottom: 1px;
+}
+.term-info {
+  left: 25px;
+  bottom: 0px;
+  padding: 0px 4px;
 }
 
 #countedCharacters {

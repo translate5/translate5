@@ -372,7 +372,7 @@ function startFileTranslation(){
         fileTypesAllowed = getAllowedFileTypes(),
         fileTypesErrorList = [];
     if ($('#sourceFile').val() == "") {
-        showSourceError('Please upload a file.'); // TODO: translate
+        showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
         return;
     }
     clearAllErrorMessages();
@@ -531,10 +531,11 @@ function fillTranslation() {
 function renderTranslationContainer(resultData) {
     var translationsContainer = '';
     
-    translationsContainer += '<h4>' + resultData.serviceName + ' (' + resultData.resourceName + ')</h4>';
+    translationsContainer += '<h4>' + resultData.resourceName + ' (' + resultData.serviceName + ')</h4>';
     
     if (resultData.fuzzyMatch.sourceDiff != undefined) {
-        translationsContainer += '<div class="translation-sourcediff">Attention! FuzzyMatch (' + resultData.fuzzyMatch.matchRate + '): ';
+        var fuzzyMatchTranslatedString = Editor.data.languageresource.translatedStrings['attentionFuzzyMatch'].replace("{0}", resultData.fuzzyMatch.matchRate);
+        translationsContainer += '<div class="translation-sourcediff" title="'+Editor.data.languageresource.translatedStrings['differenceIsHighlighted']+'">'+fuzzyMatchTranslatedString+': ';
         translationsContainer += '<span class="translation-sourcediff-content">' + resultData.fuzzyMatch.sourceDiff + '</span>';
         translationsContainer += '</div>';
     }
@@ -542,6 +543,7 @@ function renderTranslationContainer(resultData) {
     translationsContainer += '<div class="copyable">';
     translationsContainer += '<div class="translation-result" id="'+resultData.engineId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
+    translationsContainer += '<span class="term-info" title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
     translationsContainer += '</div>';
     
     if (resultData.infoText != '') {
@@ -750,6 +752,12 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
             document.body.removeChild(textarea);
         }
     }
+});
+
+/* --------------- open TermPortal ------------------------------------------ */
+$('#translations').on('touchstart click','.term-info',function(){
+    var termInTarget = $(this).closest('.copyable').find('.translation-result').text();
+    window.open(Editor.data.restpath+"termportal?term="+termInTarget, '_blank');
 });
 
 /* --------------- show/hide: helpers --------------------------------------- */
