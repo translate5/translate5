@@ -137,7 +137,8 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     
     /***
      * Get all default assocs by $customerIds
-     * If no $customerIds is provided, all default assoc will be loaded
+     * If no $customerIds is provided, all default assoc will be loaded.
+     * INFO: this function is used by useAsDefault filter in the language resources. Do not change the layout.
      * @param array $customerIds
      * @return array
      */

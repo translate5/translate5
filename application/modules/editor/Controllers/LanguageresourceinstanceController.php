@@ -398,6 +398,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(!$validLanguages || !$this->validate()){
             return;
         }
+        //set the entity resource type from the $resource
+        $this->entity->setResourceType($resource->getType());
         
         //save first to generate the languageResource id
         $this->data['id']=$this->entity->save();

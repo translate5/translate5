@@ -36,17 +36,12 @@ END LICENSE AND COPYRIGHT
  * Moses Connector
  */
 class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract {
-    /**
-     * We assume that the best MT Match correlate this matchrate, given by config
-     * @var integer
-     */
-    protected $MT_BASE_MATCHRATE;
 
     public function __construct() {
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->MT_BASE_MATCHRATE = $config->runtimeOptions->LanguageResources->moses->matchrate;
+        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->moses->matchrate;
     }
     
     /**
@@ -120,7 +115,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * @param string $score
      */
     protected function calculateMatchrate($score = null) {
-        return $this->MT_BASE_MATCHRATE;
+        return $this->DEFAULT_MATCHRATE;
     }
     
     /**

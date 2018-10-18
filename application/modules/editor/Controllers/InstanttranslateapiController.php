@@ -249,7 +249,20 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         $sfm=ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         /* @var $sfm editor_Models_SegmentFieldManager */
         
+        /*
+         * TODO: the result order will be definable with TRANSLATE-1252
+         *  #termcollection - TermCollection
+         *  #tm - OpenTM2
+         *  #mt - SDLLanguageCloud,GroupShare,Google,Moses,Lucy LT
+         */
         $searchResults=[];
+        $searchResults['TermCollection']=[];
+        $searchResults['OpenTM2']=[];
+        $searchResults['SDLLanguageCloud']=[];
+        $searchResults['GroupShare']=[];
+        $searchResults['Google']=[];
+        $searchResults['Moses']=[];
+        $searchResults['Lucy LT']=[];
         //for each assoc resource search the resource for the result
         foreach ($resources as $res) {
             
@@ -283,11 +296,12 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
                 continue;
             }
             
-            //check and filter the results
-            $results = $this->filterResults($text,$result->getResult());
+            $results = $result->getResult();
             
-            if(!isset($searchResults[$model->getServiceName()])){
-                $searchResults[$model->getServiceName()]=[];
+            //add diff tags and check the min matchrate only for the translation memory resources
+            if($model->getResourceType()==editor_Models_Segment_MatchRateType::TYPE_TM){
+                //check and filter the results
+                $results = $this->filterTmResults($text,$results);
             }
             
             $searchResults[$model->getServiceName()][$model->getName()]=$results;
@@ -297,14 +311,14 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
     }
     
     /***
-     * Filter results by minimum configured match rate.
+     * Filter tm results by minimum configured match rate.
      * The differences between the search string and the result source will be marked with tags.
      * 
      * @param string $searchText
      * @param stdClass $results
      * @return array
      */
-    private function filterResults($searchText,$results){
+    private function filterTmResults($searchText,$results){
         
         $config = Zend_Registry::get('config');
         $matchRate=$config->runtimeOptions->InstantTranslate->minMatchRateBorder;
@@ -312,14 +326,14 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         $collectedResults=[];
         foreach ($results as $result) {
             //if 100 matchrate, collect the result
-            if($result->matchrate>=100 || $result->matchrate==0){
+            if($result->matchrate>=100){
                 $collectedResults[]=$result;
                 continue;
             }
             
             //if the matchrate is over or equal to the border, highlight the diff and collect the result
             if($result->matchrate>=$matchRate){
-                $result->sourceDiff=$this->highlightDiff($result->source,$searchText);
+                $result->sourceDiff=$this->highlightDiff($searchText,$result->source);
                 $collectedResults[]=$result;
                 continue;
             }

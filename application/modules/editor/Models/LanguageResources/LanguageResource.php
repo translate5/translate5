@@ -45,6 +45,8 @@ END LICENSE AND COPYRIGHT
  * @method void setSpecificData() setSpecificData(string $specificData)
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(integer $autoCreatedOnImport)
+ * @method string getResourceType() getResourceType()
+ * @method void setResourceType() setResourceType(string $resourceType)
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
     

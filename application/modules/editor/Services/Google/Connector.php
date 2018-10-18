@@ -48,6 +48,9 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
         parent::connectTo($languageResource,$sourceLang,$targetLang);
         $this->api = ZfExtended_Factory::get($this->apiClass, [$languageResource]);
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->google->matchrate;
     }
     
     /**
@@ -114,7 +117,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang])){
             $result=$this->api->getResult();
         }
-        $this->resultList->addResult(isset($result['text']) ? $result['text'] : '');
+        $this->resultList->addResult(isset($result['text']) ? $result['text'] : '',$this->DEFAULT_MATCHRATE);
         return $this->resultList;
     }
     

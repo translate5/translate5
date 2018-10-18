@@ -42,6 +42,12 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_UNKNOWN = 'unknown';
     const STATUS_NOCONNECTION = 'noconnection';
     
+    /*** 
+     * Default resource matchrate
+     * @var integer
+     */
+    protected $DEFAULT_MATCHRATE=0;
+    
     /**
      * @var editor_Models_LanguageResources_LanguageResource
      */

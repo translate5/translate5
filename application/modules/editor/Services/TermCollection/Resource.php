@@ -31,6 +31,6 @@ class editor_Services_TermCollection_Resource extends editor_Models_LanguageReso
         $this->id = $id;
         $this->name = $name;
         $this->analysable=false;//is used by match analysis
-        $this->type = editor_Models_Segment_MatchRateType::TYPE_TM;
+        $this->type = editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
     }
 }

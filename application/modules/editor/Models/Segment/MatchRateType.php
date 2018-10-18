@@ -46,6 +46,12 @@ class editor_Models_Segment_MatchRateType {
     const TYPE_MT = 'mt';
     
     /**
+     * When the target was from a termcollection
+     * @var string
+     */
+    const TYPE_TERM_COLLECTION = 'termcollection';
+    
+    /**
      * When the target was copied from source
      * @var string
      */

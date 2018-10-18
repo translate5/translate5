@@ -36,7 +36,6 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      */
     protected $api;
     
-    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_Abstract::connectTo()
@@ -45,6 +44,9 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         parent::connectTo($languageResource,$sourceLang,$targetLang);
         $class = 'editor_Services_SDLLanguageCloud_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate;
     }
     
     /**
@@ -117,7 +119,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         if($this->api->search($params)){
             $result=$this->api->getResult();
         }
-        $this->resultList->addResult(isset($result->translation) ? $result->translation : "");
+        $this->resultList->addResult(isset($result->translation) ? $result->translation : "",$this->DEFAULT_MATCHRATE);
         return $this->resultList;
     }
     /**

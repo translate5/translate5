@@ -1626,6 +1626,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <source>Termeinträge löschen älter als aktueller Import</source>
     <target>Termeinträge löschen älter als aktueller Import</target>
 </trans-unit>
+<trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'>
+    <source>Info zum Term-Collection</source>
+    <target>Info zum Term-Collection</target>
+</trans-unit>
   </body>
  </file>
 </xliff>

@@ -32,6 +32,16 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
 
     /**
      * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::connectTo()
+     */
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
+        parent::connectTo($languageResource,$sourceLang,$targetLang);
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->termcollection->matchrate;
+    }
+    /**
+     * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
      */
     public function addTm(array $fileinfo = null,array $params=null) {
@@ -129,7 +139,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         foreach ($groups as $group){
             foreach ($group as $res){
                 //convert back to array
-                $this->resultList->addResult($res['term'],0,$res);
+                $this->resultList->addResult($res['term'],$this->DEFAULT_MATCHRATE,$res);
             }
         }
         

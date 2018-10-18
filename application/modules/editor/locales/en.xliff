@@ -2916,6 +2916,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Termeinträge löschen älter als aktueller Import</source>
     <target>Delete term entries older than current import</target>
 </trans-unit>
+<trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'>
+    <source>Info zum Term-Collection</source>
+    <target>Term-Collection info</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
