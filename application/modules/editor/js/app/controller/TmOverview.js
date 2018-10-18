@@ -144,7 +144,8 @@ Ext.define('Editor.controller.TmOverview', {
         },
         store: {
             '#Editor.store.LanguageResources.LanguageResource': {
-                update: 'addRecordToImportCheck'
+                update: 'addRecordToImportCheck',
+                load:'onLanguageResourcesLoad'
             }
         }
     },
@@ -354,6 +355,21 @@ Ext.define('Editor.controller.TmOverview', {
             me.checkImportingRecordsTask.start();
         }
     },
+
+    /***
+     * Language resources store load event landler
+     */
+    onLanguageResourcesLoad:function(store){
+        var overviewPanel=Ext.ComponentQuery.query('#tmOverviewPanel').length>0 ? Ext.ComponentQuery.query('#tmOverviewPanel')[0] : null;
+        //reload the store record(get the resource status) when the resource panel is visible
+        if(!overviewPanel || !overviewPanel.isVisible()){
+            return;
+        }
+        store.each(function(record,id){
+            record.load();
+        });
+    },
+
     /**
      * Loops over the given error array and shows additional non formfield specfific errors
      */

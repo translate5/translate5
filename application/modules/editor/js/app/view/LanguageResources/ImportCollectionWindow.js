@@ -39,12 +39,32 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         cancel: '#UT#Abbrechen',
         mergeTerms:'#UT#Termeinträge verschmelzen',
         deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
-        deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import'
+        deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
+        helpButtonTooltip:'#UT#Info zum Term-Collection'
     },
+    tools:[{
+        type:'help',
+        handler:function(){
+            window.open('https://confluence.translate5.net/display/TAD/Term+Collection#TermCollection-Importtermstothetermcollection ','_blank');
+        }
+    }],
+    constructor: function (instanceConfig) {
+        var me = this,
+            config = {
+                title:me.strings.title,
+                tools:[{
+                    type:'help',
+                    tooltip:me.strings.helpButtonTooltip,
+                    handler:function(){
+                        window.open('https://confluence.translate5.net/display/TAD/Term+Collection#TermCollection-Importtermstothetermcollection ','_blank');
+                    }
+                }]
+        };
 
-    constructor: function (config) {
-        var me=this;
-        me.callParent(arguments);
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        me.callParent([config]);
         me.down('form').add({
             xtype:'checkbox',
             fieldLabel: me.strings.mergeTerms,
@@ -64,7 +84,6 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             value:false
         });
         me.down('filefield[name="tmUpload"]').regex=/\.tbx$/i;
-        me.setTitle(me.strings.title);
     },
     /**
      * loads the record into the form

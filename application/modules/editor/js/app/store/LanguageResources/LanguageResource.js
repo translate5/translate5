@@ -30,6 +30,6 @@ Ext.define('Editor.store.LanguageResources.LanguageResource', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.LanguageResources.LanguageResource',
   pageSize: 20,
-  autoLoad: true,
+  autoLoad: false,
   remoteFilter:true
 });

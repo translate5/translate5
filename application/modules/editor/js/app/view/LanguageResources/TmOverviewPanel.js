@@ -89,12 +89,54 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 },
                 columns: [{
                     xtype: 'gridcolumn',
-                    width: 150,
+                    width: 170,
+                    text: me.strings.resource,
+                    dataIndex: 'serviceName',
+                    tdCls: 'serviceName',
+                    renderer: function(v, meta, rec){
+                        var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
+                            resource = store.getById(rec.get('resourceId'));
+                        if(resource) {
+                            meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
+                        }
+                        return v;
+                    },
+                    filter: {
+                        type: 'list',
+                        options: Editor.data.LanguageResources.serviceNames
+                    }
+                },{
+                    xtype: 'gridcolumn',
+                    width: 390,
                     dataIndex: 'name',
                     filter: {
                         type: 'string',
                     },
                     text: me.strings.name
+                },{
+                    xtype: 'actioncolumn',
+                    width: 98,
+                    items: [{
+                        tooltip: me.strings.edit,
+                        action: 'edit',
+                        iconCls: 'ico-tm-edit'
+                    },{
+                        tooltip: me.strings.erase,
+                        action: 'delete',
+                        iconCls: 'ico-tm-delete'
+                    },{
+                        tooltip: me.strings.tasks,
+                        action: 'tasks',
+                        iconCls: 'ico-tm-tasks'
+                    },{
+                        tooltip: me.strings.import,
+                        action: 'import',
+                        iconCls: 'ico-tm-import'
+                    },{
+                        tooltip: me.strings.download,
+                        action: 'download',
+                        iconCls: 'ico-tm-download'
+                    }]
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
@@ -126,7 +168,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     renderer:me.resourceCustomersRenderer
                 },{
                     xtype: 'gridcolumn',
-                    width: 100,
+                    width: 190,
                     dataIndex:'useAsDefault',
                     filter: {
                         type: 'string'
@@ -153,7 +195,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         var str = me.strings.languageResourceStatus,
                             info = record.get('statusInfo');
                         if(value === "loading") { // show list as soon as possible, show status later due to different latency of the requested TMs
-                            record.load(); // TODO: handle 404 (= remove from grid)
+                            //record.load(); // TODO: handle 404 (= remove from grid)
                             meta.tdCls = 'loading';
                             meta.tdAttr = 'data-qtip="'+str.loading+'"';
                             return ''; //no string since icon set
@@ -173,48 +215,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                         return value;
 
-                    }
-                },{
-                    xtype: 'actioncolumn',
-                    width: 98,
-                    items: [{
-                        tooltip: me.strings.edit,
-                        action: 'edit',
-                        iconCls: 'ico-tm-edit'
-                    },{
-                        tooltip: me.strings.erase,
-                        action: 'delete',
-                        iconCls: 'ico-tm-delete'
-                    },{
-                        tooltip: me.strings.tasks,
-                        action: 'tasks',
-                        iconCls: 'ico-tm-tasks'
-                    },{
-                        tooltip: me.strings.import,
-                        action: 'import',
-                        iconCls: 'ico-tm-import'
-                    },{
-                        tooltip: me.strings.download,
-                        action: 'download',
-                        iconCls: 'ico-tm-download'
-                    }]
-                },{
-                    xtype: 'gridcolumn',
-                    width: 100,
-                    text: me.strings.resource,
-                    dataIndex: 'serviceName',
-                    tdCls: 'serviceName',
-                    renderer: function(v, meta, rec){
-                        var store = Ext.getStore('Editor.store.LanguageResources.Resources'),
-                            resource = store.getById(rec.get('resourceId'));
-                        if(resource) {
-                            meta.tdAttr = 'data-qtip="'+resource.get('name')+'"';
-                        }
-                        return v;
-                    },
-                    filter: {
-                        type: 'list',
-                        options: Editor.data.LanguageResources.serviceNames
                     }
                 },{
                     xtype:'gridcolumn',
