@@ -592,8 +592,8 @@ function requestFileTranslate(){
         data.append(key, value);
     });
     
-    data.append('from', $("#sourceLocale").val());
-    data.append('to',$("#targetLocale").val());
+    data.append('source', $("#sourceLocale").val());
+    data.append('target',$("#targetLocale").val());
     
     //when no extension in the file is found, use default file extension
     data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
