@@ -113,7 +113,7 @@ h4, p {
     flex: 0 0 180px;
     order: 1;
     height: 110px;
-    background: url(/client-specific/worldtranslation.png?v=1) no-repeat left top;
+    background: url(/images/translate5.png?v=1) no-repeat left top;
     background-size: auto auto;
     background-size: 150px;
 }
