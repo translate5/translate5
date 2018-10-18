@@ -440,6 +440,16 @@ class editor_TaskController extends ZfExtended_RestController {
         }
     }
     
+    /**
+     * returns the tasks events
+     */
+    public function eventsAction() {
+        $this->getAction();
+        $events = ZfExtended_Factory::get('editor_Models_Logger_Task');
+        /* @var $events editor_Models_Logger_Task */
+        $this->view->rows = $events->loadByTaskGuid($this->entity->getTaskGuid());
+        $this->view->total = $events->getTotalByTaskGuid($this->entity->getTaskGuid());
+    }
     
     /**
      * 
@@ -493,7 +503,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->workflow->doWithTask($oldTask, $this->entity);
         
         if($oldTask->getState() != $this->entity->getState()) {
-            editor_Models_LogTask::createWithUserGuid($taskguid, $this->entity->getState(), $this->user->data->userGuid);
+            $log = Zend_Registry::get('logger');
+            /* @var $log ZfExtended_Logger */
+            $log->info('E1011', 'Status change to {status}', [
+                'task' => $this->entity->getDataObject(),
+                'status' => $this->entity->getState(),
+            ], ['tasklog']); //if logger is used at other places here too, consider to make a own instance with just the tasklog writer!
         }
         
         //updateUserState does also call workflow "do" methods!

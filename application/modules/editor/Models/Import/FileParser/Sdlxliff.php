@@ -154,7 +154,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if ($added || $deleted || $refs) {
             //There are change Markers in the sdlxliff-file which are not supported!
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1003', [
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'filename' => $this->_fileName,
             ]);
         }
@@ -181,7 +181,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (strstr($tag, 'xid=')=== false) {
             //Locked-tag-content was requested but tag does not contain a xid attribute.',
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1004', [
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'filename' => $this->_fileName,
                 'tagId' => $tagId,
                 'tag' => $tag,
@@ -279,7 +279,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if ($start === false || $end === false) {
             //<sdl:seg-defs was not found in the current transunit
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1005', [
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'filename' => $this->_fileName,
                 'transunit' => $transunit,
             ]);
@@ -342,7 +342,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (!$dom->loadXML($tags)) {
             //loading the taginformation from the SDLXLIFF header has failed!
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1006', [
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'filename' => $this->_fileName,
             ]);
         }
@@ -364,7 +364,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             if (!isset($this->_tagDefMapping[$name])) {
                 //the tag is not defined in _tagDefMapping array
                 throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1007', [
-                    'task' => $this->task->getDataObject(),
+                    'task' => $this->task,
                     'filename' => $this->_fileName,
                     'tagname' => $name,
                 ]);
@@ -373,7 +373,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             if (strpos($id, '-')!== false) {
                 //the tag id contains a dash - which is not allowed since this may interfere with the GUI 
                 throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1008', [
-                    'task' => $this->task->getDataObject(),
+                    'task' => $this->task,
                     'filename' => $this->_fileName,
                     'tagId' => $id,
                 ]);
@@ -445,7 +445,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //source and target segment count does not match 
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1009', [
                 'filename' => $this->_fileName,
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'transunit' => $transUnit
             ]);
         }
@@ -533,7 +533,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //the tag in the segment was not defined in the tag mapping list
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1010', [
                 'filename' => $this->_fileName,
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'tagname' => $tagName,
                 'segment' => implode('', $data->segment),
             ]);
@@ -567,7 +567,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             //The file contains SDL comments which are currently not supported!
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1000', [
                 'filename' => $this->_fileName,
-                'task' => $this->task->getDataObject()
+                'task' => $this->task
             ]);
         }
         $segment = $this->parseSegmentUnifyInternalTags($segment);
@@ -633,7 +633,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if (strpos($tagId, 'locked')!== false) {
             //The opening tag $tagName contains a non valid tagId according to our reverse engineering
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1001', [
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'filename' => $this->_fileName,
                 'tagName' => $tagName,
                 'tagId' => $tagId,
@@ -662,7 +662,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         if(empty($data->openTags[$data->openCounter])){
             //Found a closing tag without an opening one!
             throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1002', [
-                'task' => $this->task->getDataObject(),
+                'task' => $this->task,
                 'filename' => $this->_fileName,
                 'mid' => $this->_mid,
                 'currentTag' => join('', $data->segment),

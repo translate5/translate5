@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /* @var $translate ZfExtended_Zendoverwrites_Translate */
-
+/* @var $this Zend_View */
 $this->translate->setJsonEncode(true);
 //Datei muss als Javascript ausgespielt werden.
   header('Content-Type: text/javascript', TRUE);
@@ -591,6 +591,19 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>',
         strings: {
             close: '<?php echo $this->translate->_('Fenster schließen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.LogGrid", {
+        override: "Editor.view.admin.task.LogGrid",
+        strings: {
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            level: '<?php echo $this->translate->_('Typ');?>',
+            colUsername: '<?php echo $this->translate->_('Benutzer');?>',
+            eventCode: '<?php echo $this->translate->_('Fehlercode');?>',
+            domain: '<?php echo $this->translate->_('Bereich');?>',
+            message: '<?php echo $this->translate->_('Fehler');?>',
+            created: '<?php echo $this->translate->_('Zeitpunkt');?>'
         }
     });
     
