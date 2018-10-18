@@ -92,9 +92,9 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         $reqParams=$this->getRequest()->getParams();
         
         //if there is no engine domain defined or source and target language, return an error message
-        if(!$this->isValidParam($reqParams,'domainCode') && (!$this->isValidParam($reqParams,'from') || !$this->isValidParam($reqParams,'to'))){
+        if(!$this->isValidParam($reqParams,'domainCode') && (!$this->isValidParam($reqParams,'source') || !$this->isValidParam($reqParams,'target'))){
             $e=new ZfExtended_ValidateException();
-            $e->setErrors("Engine domainCode or source and target language parametars are missing");
+            $e->setErrors(["Engine domainCode or source and target language parametars are missing"]);
             $this->handleValidateException($e);
             return;
         }
@@ -105,8 +105,8 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         $lngs=$langModel->loadAllKeyValueCustom('rfc5646','iso6393');
 
         //get the iso language value for the given rfc
-        $reqParams['from']=$lngs[$reqParams['from']];
-        $reqParams['to']=$lngs[$reqParams['to']];
+        $reqParams['from']=$lngs[$reqParams['source']];
+        $reqParams['to']=$lngs[$reqParams['target']];
         
         $dummy=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $dummy editor_Models_LanguageResources_LanguageResource */
@@ -118,7 +118,7 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         $response=$api->uploadFile($reqParams);
         if(!$response){
             $e=new ZfExtended_ValidateException();
-            $e->setErrors($api->getErrors());
+            $e->setErrors([$api->getErrors()]);
             $this->handleValidateException($e);
             return;
         }
@@ -133,7 +133,7 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         
         if(!$this->isValidParam($requestParams, 'fileId')){
             $e=new ZfExtended_ValidateException();
-            $e->setErrors("File id parametar is not valid");
+            $e->setErrors(["File id parametar is not valid"]);
             $this->handleValidateException($e);
             return;
         }
@@ -150,14 +150,14 @@ class Editor_InstanttranslateapiController extends ZfExtended_RestController{
         
         if(!$this->isValidParam($requestParams, 'url')){
             $e=new ZfExtended_ValidateException();
-            $e->setErrors("Url parametar is not valid");
+            $e->setErrors(["Url parametar is not valid"]);
             $this->handleValidateException($e);
             return;
         }
         
         if(!$this->isValidParam($requestParams, 'fileName')){
             $e=new ZfExtended_ValidateException();
-            $e->setErrors("FileName parametar is not valid");
+            $e->setErrors(["FileName parametar is not valid"]);
             $this->handleValidateException($e);
             return;
         }
