@@ -178,8 +178,14 @@ $( function() {
     $('#sourceContent').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".clearable-clear" }
     });
-    $('#translations').tooltip({
+    $('#translations .translation-sourcediff').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".translation-sourcediff" }
+    });
+    $('#translations .copyable-copy').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
+    });
+    $('#translations .term-info').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
     });
     // start with locales as stored for user
     if ($("#sourceLocale").val() !== '-') {

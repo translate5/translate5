@@ -72,13 +72,16 @@ class Editor_InstanttranslateController extends ZfExtended_Controllers_Action {
                 "turnOffInstantTranslation" => $this->translate->_("Sofortübersetzung deaktivieren"),
                 "turnOnInstantTranslation"  => $this->translate->_("Sofortübersetzung aktivieren"),
                 "uploadFile"                => $this->translate->_("Laden Sie eine Datei hoch"),
+                "uploadFileNotFound"        => $this->translate->_("Bitte wählen Sie eine Datei aus."),
                 "pleaseChoose"              => $this->translate->_("Bitte auswählen"),
                 "clearBothLists"            => $this->translate->_("Beide Listen zurücksetzen"),
                 "showAllAvailableFor"       => $this->translate->_("Alle anzeigen für"),
                 "notAllowed"                => $this->translate->_("nicht erlaubt"),
                 "machineTranslation"        => $this->translate->_("Maschinenübersetzung"),
-                "selectedMtEngine"          => $this->translate->_("MT-Engine")
-                
+                "selectedMtEngine"          => $this->translate->_("MT-Engine"),
+                "openInTermPortal"          => $this->translate->_("Term in Terminologie-Portal öffnen"),
+                "attentionFuzzyMatch"       => $this->translate->_("Achtung! FuzzyMatch ({0})"),
+                "differenceIsHighlighted"   => $this->translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben")
         );
         $this->view->Php2JsVars()->set('languageresource.translatedStrings',$translatedStrings);
         $this->view->translations= $translatedStrings; // we also need some of them outside of javascript
