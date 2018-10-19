@@ -87,7 +87,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
               'WHERE (lower(term) like lower(?)) COLLATE utf8_bin '.
               'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`) '.
               'AND language=?';
-        return $this->db->getAdapter()->query($sql, array('%'.$queryString.'%',$this->getId(),$sourceLang,$targetLang))->fetchAll();
+        return $this->db->getAdapter()->query($sql, array($queryString,$this->getId(),$sourceLang,$targetLang))->fetchAll();
     }
     
     /***

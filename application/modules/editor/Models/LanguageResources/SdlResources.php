@@ -72,7 +72,11 @@ class editor_Models_LanguageResources_SdlResources {
         $lngs=$langModel->loadAllKeyValueCustom('id','iso6393');
         
         $config = Zend_Registry::get('config');
-        $engineCharacterLimit=$config->runtimeOptions->LanguageResources->searchCharacterLimit->toArray();
+        
+        $engineCharacterLimit=null;
+        if(isset($config->runtimeOptions->LanguageResources->searchCharacterLimit)){
+            $engineCharacterLimit=$config->runtimeOptions->LanguageResources->searchCharacterLimit->toArray();
+        }
         
         //get the maximum allowed characters for the engine
         //always the lowest config will be valid

@@ -299,11 +299,6 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $servicenames[]=$sm->getName();
         }
         $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $servicenames);
-        
-        //set the available sdl engines to a frontend variable
-        $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_SdlResources');
-        /* @var $engineModel editor_Models_LanguageResources_SdlResources */
-        $this->view->Php2JsVars()->set('LanguageResources.sdlEngines', $engineModel->getAllEngines());
     }
 
     /**
