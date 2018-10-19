@@ -68,10 +68,7 @@ Ext.define('Editor.controller.LanguageResources', {
           },
           '#matchGrid': {
               chooseMatch: 'setMatchInEditor'
-          },
-          'headPanel toolbar#top-menu': {
-            afterrender: 'onHeadPanelAfterRender'
-           }
+          }
       },
       controller: {
           '#Editor.$application': {
@@ -234,48 +231,5 @@ Ext.define('Editor.controller.LanguageResources', {
   getAssocStoreCount: function(){
       var store = this.assocStore;
       return store ? store.getTotalCount() : 0;
-  },
-  /**
-     * On head panel after render handler
-     */
-    onHeadPanelAfterRender: function(toolbar) {
-        //if we are in edit task mode, do not add the instant translate button
-        if(Ext.ComponentQuery.query('#segmentgrid')[0]){
-            return;
-        }
-        var me=this;
-        
-        if(!me.isInstantTranslateAllowed()){
-            return;
-        }
-        var pos = toolbar.items.length - 2;
-        toolbar.insert(pos, {
-            xtype: 'button',
-            itemId: 'btnInstantTranslate',
-            text:me.strings.instantTranslate,
-            listeners:{
-                click:{
-                    fn:'onInstantTranslateButtonClick',
-                    scope:me
-                }
-            }
-        });
-    },
-
-    /***
-     * Instant translate button handler
-     */
-    onInstantTranslateButtonClick:function(){
-        if(this.isInstantTranslateAllowed()){
-            window.open(Editor.data.restpath+"instanttranslate", '_blank');
-        }
-    },
-
-    /**
-     * Check if the user has right to use the instant translate portal
-     */
-    isInstantTranslateAllowed:function(){
-        var userRoles=Editor.data.app.user.roles.split(",");
-        return (Ext.Array.indexOf(userRoles, "instantTranslate") >= 0);
-    }
+  }
 });
