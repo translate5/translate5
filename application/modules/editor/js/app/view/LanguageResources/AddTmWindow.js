@@ -58,9 +58,9 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         cancel: '#UT#Abbrechen',
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
-        mergeTerms:'#UT#Merge terms',
-        deleteTermEntriesDate:'#UT#Delete old term entries',
-        deleteTermEitriesImport:'#UT#Delete entries older then import',
+        mergeTerms:'#UT#Termeinträge verschmelzen',
+        deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
+        deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },

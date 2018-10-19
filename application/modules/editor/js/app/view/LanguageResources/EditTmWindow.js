@@ -55,9 +55,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         cancel: '#UT#Abbrechen',
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
-        mergeTerms:'#UT#Merge terms',
-        deleteTermEntriesDate:'#UT#Delete old term entries',
-        deleteTermEitriesImport:'#UT#Delete entries older then import',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!'
     },
@@ -124,32 +121,6 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     toolTip: me.strings.target,
                     fieldLabel: me.strings.target
                 }, langField),{
-                    xtype:'checkbox',
-                    bind:{
-                        hidden:'{!isTermCollectionResource}',
-                        disabled:'{!isTermCollectionResource}'
-                    },
-                    fieldLabel: me.strings.mergeTerms,
-                    itemId:'mergeTerms',
-                    value:true
-                },{
-                    xtype:'datefield',
-                    fieldLabel: me.strings.deleteTermEntriesDate,
-                    itemId:'deleteEntriesModifiedOlderThan',
-                    bind:{
-                        hidden:'{!isTermCollectionResource}',
-                        disabled:'{!isTermCollectionResource}'
-                    }
-                },{
-                    xtype:'checkbox',
-                    fieldLabel: me.strings.deleteTermEitriesImport,
-                    itemId:'deleteEntriesOlderThanCurrentImport',
-                    value:false,
-                    bind:{
-                        hidden:'{!isTermCollectionResource}',
-                        disabled:'{!isTermCollectionResource}'
-                    }
-                },{
                     xtype:'customers',
                     fieldLabel:me.strings.customers,
                     listeners:{
