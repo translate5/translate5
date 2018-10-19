@@ -41,8 +41,8 @@ END LICENSE AND COPYRIGHT
  * @method integer getSegmentNrInTask() getSegmentNrInTask()
  * @method void setSegmentNrInTask() setSegmentNrInTask(integer $segmentNrInTask)
  * 
- * @method integer getTmmtId() getTmmtId()
- * @method void setTmmtId() setTmmtId(integer $tmmtid)
+ * @method integer getLanguageResourceid() getLanguageResourceid()
+ * @method void setLanguageResourceid() setLanguageResourceid(integer $languageResourceid)
  * 
  * @method integer getMatchRate() getMatchRate()
  * @method void setMatchRate() setMatchRate(integer $matchrate)
@@ -52,6 +52,9 @@ END LICENSE AND COPYRIGHT
  * 
  * @method integer getAnalysisId() getAnalysisId()
  * @method void setAnalysisId() setAnalysisId(integer $analysisId)
+ * 
+ * @method integer getInternalFuzzy() getInternalFuzzy()
+ * @method void setInternalFuzzy() setInternalFuzzy(integer $internalFuzzy)
  * 
  */
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract {
@@ -74,7 +77,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         $sql='SELECT m.*
               FROM LEK_match_analysis m 
                   LEFT JOIN LEK_match_analysis b
-                      ON m.tmmtid = b.tmmtid and m.segmentId = b.segmentId 
+                      ON m.languageResourceid = b.languageResourceid and m.segmentId = b.segmentId 
                       AND b.matchRate > m.matchRate 
               WHERE b.matchRate IS NULL 
               AND m.taskGuid=? 
@@ -105,37 +108,42 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         
         $analysisCreated=null;
         
-        $bestTmmtMatches=[];
+        $bestLanguageResourceMatches=[];
         $segmentBest=[];
         //count only the best match rate from the tm
         foreach ($results as $res){
-            if(!isset($bestTmmtMatches[$res['segmentNrInTask']])){
-                $bestTmmtMatches[$res['segmentNrInTask']]=$res['matchRate'];
-                $segmentBest[$res['segmentNrInTask']]=$res['tmmtid'];
+            if(!isset($bestLanguageResourceMatches[$res['segmentNrInTask']])){
+                $bestLanguageResourceMatches[$res['segmentNrInTask']]=$res['matchRate'];
+                $segmentBest[$res['segmentNrInTask']]=$res['languageResourceid'];
             }
-            if($bestTmmtMatches[$res['segmentNrInTask']]<$res['matchRate']){
-                $segmentBest[$res['segmentNrInTask']]=$res['tmmtid'];
+            if($bestLanguageResourceMatches[$res['segmentNrInTask']]<$res['matchRate']){
+                $segmentBest[$res['segmentNrInTask']]=$res['languageResourceid'];
             }
         }
         
-        unset($bestTmmtMatches);
+        unset($bestLanguageResourceMatches);
         
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         foreach ($results as $res){
         
-            //for each tmmt separate array
-            if(!isset($groupedResults[$res['tmmtid']])){
-                $groupedResults[$res['tmmtid']]=[];
-                $groupedResults[$res['tmmtid']]['resourceName']="";
-                $groupedResults[$res['tmmtid']]['resourceColor']="";
-                //set tmmt color and name
-                if($res['tmmtid']>0){
-                    $tmmtModel=ZfExtended_Factory::get('editor_Plugins_MatchResource_Models_TmMt');
-                    /* $tmmtModel editor_Plugins_MatchResource_Models_TmMt */
-                    $tmmtModel->load($res['tmmtid']);
-                    $groupedResults[$res['tmmtid']]['resourceName']=$tmmtModel->getName();
-                    $groupedResults[$res['tmmtid']]['resourceColor']=$tmmtModel->getColor();
+            //for each languageResource separate array
+            if(!isset($groupedResults[$res['languageResourceid']])){
+                $groupedResults[$res['languageResourceid']]=[];
+                $groupedResults[$res['languageResourceid']]['resourceName']="";
+                $groupedResults[$res['languageResourceid']]['resourceColor']="";
+                //set languageResource color and name
+                if($res['languageResourceid']>0){
+                    $languageResourceModel=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+                    /* $languageResourceModel editor_Models_LanguageResources_LanguageResource */
+                    try {
+                        $languageResourceModel->load($res['languageResourceid']);
+                        $groupedResults[$res['languageResourceid']]['resourceName']=$languageResourceModel->getName();
+                        $groupedResults[$res['languageResourceid']]['resourceColor']=$languageResourceModel->getColor();
+                    } catch (Exception $e) {
+                        $groupedResults[$res['languageResourceid']]['resourceName']="This resource is removed";
+                        $groupedResults[$res['languageResourceid']]['resourceColor']="";
+                    }
                 }
                 
                 
@@ -147,37 +155,37 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //check on which border group this result belongs to
             foreach ($groupBorder as $border=>$value){
                 
-                if(!isset($groupedResults[$res['tmmtid']][$value])){
+                if(!isset($groupedResults[$res['languageResourceid']][$value])){
                     if(!$isExport){
-                        $groupedResults[$res['tmmtid']][$value]=[];
-                        $groupedResults[$res['tmmtid']][$value]['rateCount']=0;
-                        $groupedResults[$res['tmmtid']][$value]['wordCount']=0;
+                        $groupedResults[$res['languageResourceid']][$value]=[];
+                        $groupedResults[$res['languageResourceid']][$value]['rateCount']=0;
+                        $groupedResults[$res['languageResourceid']][$value]['wordCount']=0;
                     }else{
-                        $groupedResults[$res['tmmtid']][$value]=0;
+                        $groupedResults[$res['languageResourceid']][$value]=0;
                     }
                 }
                 //if result is found, create only empty column
-                if($resultFound || $segmentBest[$res['segmentNrInTask']]!=$res['tmmtid']){
+                if($resultFound || $segmentBest[$res['segmentNrInTask']]!=$res['languageResourceid']){
                     continue;
                 }
 
                 //check matchrate border
                 if($res['matchRate']>$border){
                     if(!$isExport){
-                        $groupedResults[$res['tmmtid']][$value]['rateCount']++;
-                        $groupedResults[$res['tmmtid']][$value]['wordCount']+=$res['wordCount'];
+                        $groupedResults[$res['languageResourceid']][$value]['rateCount']++;
+                        $groupedResults[$res['languageResourceid']][$value]['wordCount']+=$res['wordCount'];
                     }else{
-                        $groupedResults[$res['tmmtid']][$value]+=$res['wordCount'];
+                        $groupedResults[$res['languageResourceid']][$value]+=$res['wordCount'];
                     }
                     $resultFound=true;
                 }
             }
             if(!$resultFound){
                 if(!$isExport){
-                    $groupedResults[$res['tmmtid']]['noMatch']['rateCount']++;
-                    $groupedResults[$res['tmmtid']]['noMatch']['wordCount']+=$res['wordCount'];
+                    $groupedResults[$res['languageResourceid']]['noMatch']['rateCount']++;
+                    $groupedResults[$res['languageResourceid']]['noMatch']['wordCount']+=$res['wordCount'];
                 }else{
-                    $groupedResults[$res['tmmtid']]['noMatch']+=$res['wordCount'];
+                    $groupedResults[$res['languageResourceid']]['noMatch']+=$res['wordCount'];
                 }
             }
             
@@ -191,24 +199,24 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 $pretranslateMatchrate=$model->getPretranslateMatchrate();
             }
             
-            $groupedResults[$res['tmmtid']]['created']=$analysisCreated;
-            $groupedResults[$res['tmmtid']]['internalFuzzy']=filter_var($internalFuzzy, FILTER_VALIDATE_BOOLEAN) ? $translate->_("Ja"): $translate->_("Nein");
-            $groupedResults[$res['tmmtid']]['pretranslateMatchrate']=$pretranslateMatchrate;
+            $groupedResults[$res['languageResourceid']]['created']=$analysisCreated;
+            $groupedResults[$res['languageResourceid']]['internalFuzzy']=filter_var($internalFuzzy, FILTER_VALIDATE_BOOLEAN) ? $translate->_("Ja"): $translate->_("Nein");
+            $groupedResults[$res['languageResourceid']]['pretranslateMatchrate']=$pretranslateMatchrate;
         }
         unset($segmentBest);
         return $this->sortByTm($groupedResults);
     }
 
     /***
-     * Sort by best  tmmt
+     * Sort by best  languageResource
      * TODO: implement me
      * @param array $groupedResults
      * @return array
      */
     private function sortByTm($groupedResults){
         $retArray=[];
-        foreach ($groupedResults as $tmmtgroup){
-            array_push($retArray, $tmmtgroup);
+        foreach ($groupedResults as $languageResourcegroup){
+            array_push($retArray, $languageResourcegroup);
         }
         return $retArray;
     }

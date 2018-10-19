@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.MatchResource.view.SearchGrid
+ * @class Editor.plugins.MatchAnalysis.view.AnalysisPanel
  * @extends Ext.grid.Panel
  */
 Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
@@ -41,7 +41,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     alias : 'widget.matchAnalysisPanel',
     
     requires: [
-        'Editor.util.MatchResources'
+        'Editor.util.LanguageResources'
     ],
 
     itemId:'matchAnalysisPanel',
@@ -52,9 +52,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
 	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
-	  matchResources:'#UT#Matchressourcen',
+	  languageResources:'#UT#Sprachressourcen',
 	  analysisDate:'#UT#Datum',
-	  matchResourceName: '#UT#Name',
+	  languageResourceName: '#UT#Name',
 	  repetitions:'#UT#Wiederholungen:',
 	  totalSum:'#UT#Summe',
 	  internalFuzzy:"#UT#Interne Fuzzy verwendet",
@@ -95,7 +95,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     }],
                     columns: [{
                         xtype: 'gridcolumn',
-                        text: me.strings.matchResourceName,
+                        text: me.strings.languageResourceName,
                         renderer: function(value, metaData, record) {
                         	if(!value){
                         		return me.strings.repetitions;
@@ -114,7 +114,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '103',
                         cellWrap: true,
                         text: "103%",
-                        tooltip:Editor.util.MatchResources.getMatchrateTooltip(103),
+                        tooltip:Editor.util.LanguageResources.getMatchrateTooltip(103),
                         //summaryType: 'sum',
                         summaryRenderer: function(value, summaryData, dataIndex) {
                             return me.calculateRowSum(103,analysisStore);
@@ -126,7 +126,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '102',
                         cellWrap: true,
                         text: "102%",
-                        tooltip:Editor.util.MatchResources.getMatchrateTooltip(102),
+                        tooltip:Editor.util.LanguageResources.getMatchrateTooltip(102),
                         //summaryType: 'sum',
                         summaryRenderer: function(value, summaryData, dataIndex) {
                         	return me.calculateRowSum(102,analysisStore); 
@@ -138,7 +138,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         dataIndex: '101',
                         cellWrap: true,
                         text: "101%",
-                        tooltip:Editor.util.MatchResources.getMatchrateTooltip(101),
+                        tooltip:Editor.util.LanguageResources.getMatchrateTooltip(101),
                         //summaryType: 'sum',
                         summaryRenderer: function(value, summaryData, dataIndex) {
                         	return me.calculateRowSum(101,analysisStore);

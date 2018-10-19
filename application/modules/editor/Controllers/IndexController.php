@@ -270,11 +270,35 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       //flag if the segment count status strip component should be displayed
       $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
-      
+
       //needed for enabling download link of archive zip
       $this->view->Php2JsVars()->set('import.createArchivZip', (boolean)$rop->import->createArchivZip);
       
+      $this->setLanguageResourceJsVars();
+      
       $this->setJsAppData();
+    }
+
+    /***
+     * Set language resources frontend vars
+     */
+    protected function setLanguageResourceJsVars(){
+        
+        $rop = $this->config->runtimeOptions;
+        
+        $this->view->Php2JsVars()->set('LanguageResources.preloadedSegments', $rop->LanguageResources->preloadedTranslationSegments);
+        $this->view->Php2JsVars()->set('LanguageResources.matchrateTypeChangedState', editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED);
+        
+        //find all service names and set it to frontend var
+        $services=ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $services editor_Services_Manager */
+        $allservices=$services->getAll();
+        $servicenames=[];
+        foreach ($allservices as $s){
+            $sm=ZfExtended_Factory::get($s.'_Service');
+            $servicenames[]=$sm->getName();
+        }
+        $this->view->Php2JsVars()->set('LanguageResources.serviceNames', $servicenames);
     }
 
     /**
@@ -362,7 +386,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments','SearchReplace','Termportal');
+            'ChangeAlike', 'Comments','SearchReplace','Termportal','Instanttranslate');
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
@@ -394,6 +418,18 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $controllers[] = 'admin.Customer';
         }
 
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesTaskassoc')){
+            $controllers[] = 'LanguageResourcesTaskassoc';
+        }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesMatchQuery') || $acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesSearchQuery')){
+            $controllers[] = 'LanguageResources';
+        }
+        
+        if($acl->isInAllowedRoles($userSession->data->roles,'frontend','languageResourcesOverview')){
+            $controllers[] = 'TmOverview';
+        }
+        
         //Localizer must be the last one!
         $controllers[] = 'Localizer';
         return $controllers;

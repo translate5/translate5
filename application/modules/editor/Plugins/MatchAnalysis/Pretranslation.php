@@ -62,7 +62,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     protected $userName;
     
     /***
-     * Collection of assigned tmmt resources types where key is tmmtid and resource type is the value
+     * Collection of assigned languageResource resources types where key is languageResourceid and resource type is the value
      *
      * @var array
      */
@@ -92,12 +92,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if(($segment->getAutoStateId()!=editor_Models_Segment_AutoStates::NOT_TRANSLATED) || !isset($result)){
             return;
         }
-        if($result->matchrate<$this->pretranslateMatchrate || $result->matchrate==editor_Plugins_MatchResource_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
+        if($result->matchrate<$this->pretranslateMatchrate || $result->matchrate==editor_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
             return;
         }
         
-        //the internalTmmtid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
-        $tmmtid=$result->internalTmmtid;
+        //the internalLanguageResourceid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
+        $languageResourceid=$result->internalLanguageResourceid;
         
         $history = $segment->getNewHistoryEntity();
         
@@ -106,7 +106,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $targetResult=$result->target;
         
-        //ignore fuzzy match target
+        //ignore internal fuzzy match target
         if (strpos($targetResult, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false){
             return;
         }
@@ -134,8 +134,10 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         /* @var $matchrateType editor_Models_Segment_MatchRateType */
+        
+        //TODO: we need new matchrate type, we will look around with THOMAS!!!!
         //set the type
-        $matchrateType->initEdited($this->resourceType[$tmmtid]);
+        $matchrateType->initEdited($this->resourceType[$languageResourceid]);
         
         $segment->setMatchRateType((string) $matchrateType);
         

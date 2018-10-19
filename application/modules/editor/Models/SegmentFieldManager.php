@@ -190,6 +190,17 @@ class editor_Models_SegmentFieldManager {
         }
         return $this->segmentfields[$name];
     }
+
+    /***
+     * Set segment field by name and value
+     * @param string $name
+     * @param array $value
+     */
+    public function setByName($name,$value) {
+        if(! array_key_exists($name, $this->segmentfields)){
+            $this->segmentfields[$name]=$value;
+        }
+    }
     
     /**
      * returns an array with the segment field and the DB Col name to the given get / set key (dataindex)

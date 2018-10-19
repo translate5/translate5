@@ -106,8 +106,9 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
             'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
-                                'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker',
-                    'taskmeta', 'config', 'segmentuserassoc', 'session', 'language','termcollection'),
+                                'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
+                                'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
+                                'languageresourceinstance'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -307,6 +308,55 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                         'action' => 'searchattribute'
                 ));
         $this->front->getRouter()->addRoute('searchattributetermcollection', $searchAttributeTermCollection);
+        
+        # Language resources rutes start
+        //WARNING: Order of the route definition is important!
+        // the catchall like download route must be defined before the more specific query/search routes!
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:id/:type',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'download'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_download', $queryRoute);
+
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:languageResourceId/query',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'query'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_query', $queryRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:languageResourceId/search',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'search'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_search', $queryRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:id/import',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'import'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_import', $queryRoute);
+        
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:id/tasks',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'tasks'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
+        #Language resource rutes end
     }
     
     

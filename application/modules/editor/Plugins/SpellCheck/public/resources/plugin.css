@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
 @CHARSET "UTF-8";
 
 /* 
-Images to the plugins image path are adressed relativly, for example (from matchResource plugin):
+Images to the plugins image path are adressed relativly
 .ico-tm-edit {background-image: url("images/book_edit.png");background-repeat:no-repeat;background-position:center;}
  */
  

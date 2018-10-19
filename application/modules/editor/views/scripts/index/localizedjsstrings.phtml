@@ -659,8 +659,8 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
-    Ext.define("Editor.locale.de.util.MatchResources", {
-        override: "Editor.util.MatchResources",
+    Ext.define("Editor.locale.de.util.LanguageResources", {
+        override: "Editor.util.LanguageResources",
         strings: {
 		    exactMatch: '<?php echo $this->translate->_('100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument');?>',
             repetitionMatch: '<?php echo $this->translate->_('Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte');?>',
@@ -974,6 +974,245 @@ Ext.define('Editor.controller.Localizer', {
     	override: "Editor.view.admin.customer.TagField",
         fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
     });
+    
+    
+     Ext.define("Editor.locale.controller.LanguageResources", {
+        override: "Editor.controller.LanguageResources",
+        strings: {
+            msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>',
+            msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.controller.TaskAssoc", {
+        override: "Editor.controller.LanguageResourcesTaskassoc",
+        strings: {
+            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.controller.TmOverview", {
+        override: "Editor.controller.TmOverview",
+        strings: {
+            languageresource: '<?php echo $this->translate->_('Sprachressourcen');?>',
+            deleteConfirm: '<?php echo $this->translate->_('Sprachressource endgültig löschen?');?>',
+            deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?');?>',
+            deleteConfirmLocal: '<?php echo $this->translate->_('Sprachressource löschen?');?>',
+            deleteConfirmLocalText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.');?>',
+            deleted: '<?php echo $this->translate->_('Sprachressource gelöscht.');?>',
+            edited: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich geändert.');?>',
+            created: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich erstellt.');?>',
+            noResourcesAssigned: '<?php echo $this->translate->_('Keine Sprachressourcen zugewiesen.');?>',
+            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Sprachressourcen');?>',
+            exportTm: '<?php echo $this->translate->_('als TM Datei exportieren');?>',
+            exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.MatchGridViewController", {
+        override: "Editor.view.LanguageResources.MatchGridViewController",
+        strings: {
+            loading: '<?php echo $this->translate->_('wird geladen...');?>',
+            noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
+            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+            serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
+            serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+        }
+    });
+    Ext.define("Editor.locale.view.LanguageResources.SearchGridViewController", {
+        override: "Editor.view.LanguageResources.SearchGridViewController",
+        strings: {
+            loading: '<?php echo $this->translate->_('wird geladen...');?>',
+            noresults: '<?php echo $this->translate->_('Es wurden keine Ergebnisse gefunden.');?>',
+            searchResultGridTitle: '<?php echo $this->translate->_('{0} Ergebnisse');?>',
+            serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+            serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
+            serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
+        override: "Editor.view.LanguageResources.AddTmWindow",
+        strings: {
+            add: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            useAsDefault: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>',
+            mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
+            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
+            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.EditTmWindow", {
+        override: "Editor.view.LanguageResources.EditTmWindow",
+        strings: {
+            edit: '<?php echo $this->translate->_('Sprachressource bearbeiten');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('TM-Datei');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            useAsDefault: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.EditorPanel", {
+        override: "Editor.view.LanguageResources.EditorPanel",
+        strings: {
+            searchTitle: '<?php echo $this->translate->_('Konkordanzsuche');?>',
+            matchTitle:'<?php echo $this->translate->_('Matches');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+            panelTitle:'<?php echo $this->translate->_('Matches und Konkordanz-Suche');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.MatchGrid", {
+        override: "Editor.view.LanguageResources.MatchGrid",
+        strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            ctrl: '<?php echo $this->translate->_('STRG');?>',
+            tooltipMsg: '<?php echo $this->translate->_('Diesen Match in das geöffnete Segment übernehmen.');?>',
+            atributeTooltipMsg: '<?php echo $this->translate->_('Attribute:');?>',
+            lastEditTooltipMsg: '<?php echo $this->translate->_('letzte Änderung:');?>',
+            createdTooltipMsg: '<?php echo $this->translate->_('erstellt:');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.SearchGrid", {
+        override: "Editor.view.LanguageResources.SearchGrid",
+        strings: {
+            source: '<?php echo $this->translate->_('Quelltext');?>',
+            target: '<?php echo $this->translate->_('Zieltext');?>',
+            match: '<?php echo $this->translate->_('Matchrate');?>',
+            ctrl: '<?php echo $this->translate->_('STRG');?>',
+            tmresource: '<?php echo $this->translate->_('TM-Ressource');?>',
+            sourceEmptyText:'<?php echo $this->translate->_('Quelltextsuche');?>',
+            targetEmptyText:'<?php echo $this->translate->_('Zieltextsuche');?>',
+            search:'<?php echo $this->translate->_('Alle durchsuchen');?>',
+            singleSearch:'<?php echo $this->translate->_('Suche in {0}');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.TaskAssocPanel", {
+        override: "Editor.view.LanguageResources.TaskAssocPanel",
+        title: '<?php echo $this->translate->_('Sprachressourcen zuweisen');?>',
+        strings: {
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.');?>',
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            segmentsUpdateable: '<?php echo $this->translate->_('Segmente zurückspeichern');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.TmOverviewPanel", {
+        override: "Editor.view.LanguageResources.TmOverviewPanel",
+        title: '<?php echo $this->translate->_('Sprachressourcen');?>',
+        strings: {
+            name: '<?php echo $this->translate->_('Name');?>',
+            edit: '<?php echo $this->translate->_('Bearbeiten');?>',
+            tasks: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            erase: '<?php echo $this->translate->_('Löschen');?>',
+            download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            add: '<?php echo $this->translate->_('Hinzufügen');?>',
+            import: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+            noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',
+            sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
+            targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
+            languageResourceStatusColumn: '<?php echo $this->translate->_('Status');?>',
+            languageResourceStatus: {
+                loading: '<?php echo $this->translate->_('Statusinformationen werden geladen');?>',
+                error: '<?php echo $this->translate->_('Fehler');?>',
+                available: '<?php echo $this->translate->_('verfügbar');?>',
+                unknown: '<?php echo $this->translate->_('unbekannt');?>',
+                noconnection: '<?php echo $this->translate->_('Keine Verbindung!');?>',
+                import: '<?php echo $this->translate->_('importiert');?>',
+                notloaded: '<?php echo $this->translate->_('verfügbar');?>',
+            },
+            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            customers: '<?php echo $this->translate->_('Kunden');?>',
+        	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
+        	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+        	useAsDefaultTooltip: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.ImportTmWindow", {
+        override: "Editor.view.LanguageResources.ImportTmWindow",
+        title: '<?php echo $this->translate->_('Sprachressourcen');?>',
+        strings: {
+            file: '<?php echo $this->translate->_('TMX-Datei');?>',
+            title: '<?php echo $this->translate->_('TMX Datei importieren');?>',
+            importTmx: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TMX Datei!');?>',
+            importSuccess: '<?php echo $this->translate->_('Weitere TM Daten erfolgreich importiert!');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>'
+        }
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.ImportCollectionWindow", {
+        override: "Editor.view.LanguageResources.ImportCollectionWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('TBX Datei importieren');?>',
+            file: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbx: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
+            importSuccess: '<?php echo $this->translate->_('Weitere Term-Collection Daten erfolgreich importiert!');?>',
+            save: '<?php echo $this->translate->_('Importieren');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
+            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
+            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
+            helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.TaskGridWindow", {
+        override: "Editor.view.LanguageResources.TaskGridWindow",
+        strings: {
+            title: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
+            task: '<?php echo $this->translate->_('Aufgabe');?>',
+            state: '<?php echo $this->translate->_('Status');?>',
+            inUse: '<?php echo $this->translate->_('Status "{0}" durch einen anderen Benutzer');?>',
+            close: '<?php echo $this->translate->_('Schließen');?>',
+            reimport: '<?php echo $this->translate->_('Aufgaben reimportieren');?>',
+            reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>'
+        }
+    });
+    
 <?php 
     }; //if($hasFrontendController('Editor.controller.admin.Customer')){
 ?>

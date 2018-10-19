@@ -48,16 +48,6 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
      */
     protected $_userName = NULL;
 
-    public function __construct() {
-        parent::__construct();
-    }
-    
-    /**
-     * Regular expression for tag and html entity recognition.
-     * @var string
-     */
-    protected $_regexTag = '/(<[^<>]*>|&[^;]+;)/';
-    
     /**
      * @var array Regexes which define the opening and closing add changemarks
      */

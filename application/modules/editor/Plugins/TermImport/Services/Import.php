@@ -371,17 +371,26 @@ class editor_Plugins_TermImport_Services_Import {
         
         $tc=$model->loadByName($collectionName);
         
-        //if the term collection does not exist, create a new one
+        //if the term collection exist, return the config import array array
         if(!empty($tc)){
-            return ['collectionId'=>$tc['id'],'customerId'=>$tc['customerId'],'mergeTerms'=>true,'collectionName'=>$tc['name']];
-        }
+            $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+            /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+            $customers=$customerAssoc->loadByLanguageResourceId($tc['id']);
+            $customers=array_column($customers, 'customerId');
             
-        $model->setName($collectionName);
-        $model->setCustomerId($customerId);
+            //check if the customer exist in the assoc table
+            if(!in_array($customerId, $customers)){
+                $customers[]=$customerId;
+                //add the customer to the assoc table for the term collection
+                $customerAssoc->addAssocs([$customerId], $tc['id']);
+            }
+            return ['collectionId'=>$tc['id'],'customerIds'=>$customers,'mergeTerms'=>true,'collectionName'=>$tc['name']];
+        }
         
-        $model->save();
+        //create new term collection/language resource
+        $collectionId=$model->create($collectionName, [$customerId]);
         
-        return ['collectionId'=>$model->getId(),'customerId'=>$customerId,'mergeTerms'=>true,'collectionName'=>$collectionName];
+        return ['collectionId'=>$collectionId,'customerIds'=>[$customerId],'mergeTerms'=>true,'collectionName'=>$collectionName];
     }
     
     private function loadConfig($configName){

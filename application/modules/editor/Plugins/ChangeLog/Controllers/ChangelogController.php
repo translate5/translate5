@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Controller for the Plugin MatchResource configured Tmmt 
+ * Controller for the Plugin ChangeLog configured LanguageResource 
  */
 	  
 class editor_Plugins_ChangeLog_ChangelogController extends ZfExtended_RestController {

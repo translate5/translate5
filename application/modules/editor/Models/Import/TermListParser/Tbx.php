@@ -170,11 +170,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     protected $addTermIds = true;
     
     /***
-     * The customer of the term collection
+     * The customers of the term collection
      * 
-     * @var mixed
+     * @var array
      */
-    public $customerId=null;
+    public $customerIds=array();
     
     /***
      * if the current node is inside ntig
@@ -262,6 +262,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
      */
     public $importSource="";
     
+    
     public function __construct() {
         if(!defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
             //Mindestversion siehe http://www.php.net/manual/de/xmlreader.readstring.php
@@ -284,11 +285,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $this->task = $task;
 
         //create term collection for the task and customer
-        $termCollectionId=$this->createTermCollection($this->customerId);
+        $termCollectionId=$this->createTermCollection($this->customerIds);
         //add termcollection to task assoc
         $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $model editor_Models_TermCollection_TermCollection */
         $model->addTermCollectionTaskAssoc($termCollectionId, $task->getTaskGuid());
+        
+        $this->termCollectionId=$termCollectionId;
         
         //all tbx files in the same term collection
         /* @var $importer editor_Models_Import_TermListParser_Tbx */
@@ -329,17 +332,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         try {
             foreach ($filePath as $path){
                 
+                $tmpName=isset($path['tmp_name']) ? $path['tmp_name'] : $path;
+                $fileName=isset($path['name']) ? $path['name'] : null;;
+                
                 $this->xml = new XmlReader();
                 //$this->xml->open(self::getTbxPath($task));
-                $this->xml->open($path, null, LIBXML_PARSEHUGE);
+                $this->xml->open($tmpName, null, LIBXML_PARSEHUGE);
                 
-                $this->termCollectionId = $termCollectionId;
-                
-                //find the customer for this term collection
-                $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-                /* @var $termCollection editor_Models_TermCollection_TermCollection */
-                $termCollection->load($this->termCollectionId);
-                $this->customerId=$termCollection->getCustomerId();
+                $this->termCollectionId=$termCollectionId;
                 
                 //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
                 while($this->fastForwardTo('termEntry')) {
@@ -349,7 +349,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
                 
                 $this->xml->close();
                 
-                $this->saveFileLocal($path,$termCollection->getId());
+                //save the imported tbx to the disc
+                $this->saveFileLocal($tmpName,$fileName);
+                
+                //update termcollection languages in the assoc table
+                $this->updateCollectionLanguage();
             }
         }catch (Exception $e){
             error_log("Something went wrong with tbx file parsing. Error message:".$e->getMessage());
@@ -1127,18 +1131,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     
     /***
      * Create the term collection and return the id
-     * @param mixed $customerId
+     * @param array $customers
      */
-    private function createTermCollection($costumerId){
+    private function createTermCollection(array $customers){
         $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        
-        if($costumerId){
-            $termCollection->setCustomerId((integer)$costumerId);
-        }
-        $termCollection->setAutoCreatedOnImport(1);
-        $termCollection->setName("Term Collection for ".$this->task->getTaskGuid());
-        return $termCollection->save();
+        return $termCollection->create("Term Collection for ".$this->task->getTaskName(), $customers);
     }
     
     /***
@@ -1282,7 +1280,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             $term->setUpdated(date("Y-m-d H:i:s"));
             
             $this->actualTermIdDb=$term->save();
-
+            
             //collect the term so later can be updated
             $this->termsContainer[$this->actualTermIdTbx]=$term;
             return;
@@ -1357,13 +1355,29 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
     
     /***
+     * Update term collection lanugages assoc.
+     */
+    protected  function updateCollectionLanguage(){
+        //remove old language assocs
+        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $assoc editor_Models_LanguageResources_Languages */
+        $assoc->removeByResourceId([$this->termCollectionId]);
+        
+        //add the new language assocs
+        $model=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $model editor_Models_Term */
+        $model->updateAssocLanguages([$this->termCollectionId]);
+        
+    }
+    
+    /***
      * Save the imported file to the disk.
      * The file location will be "trasnalte5 parh" /data/tbx-import/tbx-for-filesystem-import/tc_"collectionId"/the file"
      * 
      * @param string $filepath: source file location
-     * @param string $collectionId: termcollectin id
+     * @param string $name: source file name
      */
-    private function saveFileLocal($filepath,$collectionId) {
+    private function saveFileLocal($filepath,$name=null) {
         
         //if import source is not defined save it in filesystem folder
         if(!$this->importSource){
@@ -1371,32 +1385,39 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         }
         
         $tbxImportDirectoryPath=APPLICATION_PATH.'/../data/tbx-import/';
-        $newFilePath=$tbxImportDirectoryPath.'tbx-for-'.$this->importSource.'-import/tc_'.$collectionId;
+        $newFilePath=$tbxImportDirectoryPath.'tbx-for-'.$this->importSource.'-import/tc_'.$this->termCollectionId;
         
         //check if the directory exist and it is writable
         if(is_dir($tbxImportDirectoryPath) && !is_writable($tbxImportDirectoryPath)){
-            error_log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$collectionId);
+            error_log("Unable to save the tbx file to the tbx import path. The file is not writable. Import path: ".$tbxImportDirectoryPath." , termcollectionId: ".$this->termCollectionId);
             return;
         }
         
         try {
             if(!file_exists($newFilePath) && !@mkdir($newFilePath, 0777, true)){
-                error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$collectionId);
+                error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollectionId);
                 return;
             }
         } catch (Exception $e) {
-            error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$collectionId);
+            error_log("Unable to create directory for imported tbx files. Directory path: ".$newFilePath." , termcollectionId: ".$this->termCollectionId);
             return;
         }
         
         $fi = new FilesystemIterator($newFilePath, FilesystemIterator::SKIP_DOTS);
         
-        $fileName=iterator_count($fi).'-'.basename($filepath);
+        $fileName=null;
+        //if the name is set, use it as filename
+        if($name){
+            $fileName=iterator_count($fi).'-'.$name;
+        }else{
+            $fileName=iterator_count($fi).'-'.basename($filepath);
+        }
         
         $newFileName=$newFilePath.'/'.$fileName;
         
         //copy the new file (rename probably not possible, if whole import folder is readonly in folder based imports)
         copy($filepath, $newFileName);
+        
     }
     
     /***
