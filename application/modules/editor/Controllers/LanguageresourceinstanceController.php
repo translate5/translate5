@@ -68,7 +68,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //add custom filters
         $this->handleFilterCustom();
         
-        $this->view->rows =$this->entity->loadAll();
+        $this->view->rows =$this->entity->loadAllByServices();
         $this->view->total =$this->entity->getTotalCount();
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');

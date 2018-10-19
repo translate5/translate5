@@ -87,6 +87,20 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     
     /***
+     * Load all resources for all available services
+     * 
+     * @return array
+     */
+    public function loadAllByServices(){
+        $services=ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $services editor_Services_Manager */
+        $allservices=$services->getAll();
+        $s=$this->db->select()
+        ->where('serviceType IN(?)',$allservices);
+        return $this->loadFilterdCustom($s);
+    }
+    
+    /***
      * Get all available language resources for customers of loged user
      * @param boolean $addArrayId : if true(default true), the array key will be the language resource id
      * @return array
