@@ -891,9 +891,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadFirst($taskGuid, $fileId = null) {
         $this->segmentFieldManager->initFields($taskGuid);
-        $this->reInitDb($taskGuid);
         //ensure that view exists (does nothing if already):
         $this->segmentFieldManager->getView()->create();
+        $this->reInitDb($taskGuid);
 
         $seg = $this->loadNext($taskGuid, 0, $fileId);
         

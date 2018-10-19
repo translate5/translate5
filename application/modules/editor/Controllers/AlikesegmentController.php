@@ -197,7 +197,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 }
 
                 //if source editing = true, then fieldLoop loops also over the source field
-                $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes, $tagHelper, $trackChangesTagHelper){
+                $fieldLoopResult = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes, $tagHelper, $trackChangesTagHelper){
                     $getOriginal = 'get'.ucfirst($field);
                     //Entity befüllen:
                     if($config->runtimeOptions->editor->enableQmSubSegments) {
@@ -207,18 +207,39 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                         $segmentContent = $this->entity->{$getter}();
                     }
                     //replace the masters tags with the original repetition ones
-                    $originalTags = $tagHelper->get($entity->{$getOriginal}());
-                    if(!empty($originalTags)) {
+                    $originalContent = $entity->{$getOriginal}();
+                    $useSourceTags = empty($originalContent);
+                    if($useSourceTags) {
+                        //if the original had no content, we have to load the source tags. 
+                        $originalContent = $entity->getSource();
+                    }
+                    $originalTags = $tagHelper->get($originalContent);
+                    if(empty($originalTags)) {
+                        //if there are no original tags we have to init $i with the realTagCount in the targetEdit for below check
+                        $i = $tagHelper->count($trackChangesTagHelper->protect($segmentContent));
+                    }
+                    else {
                         $i = 0;
                         $segmentContent = $trackChangesTagHelper->protect($segmentContent);
                         $segmentContent = $tagHelper->replace($segmentContent, function($foo) use (&$i, $originalTags){
                             return $originalTags[$i++];
                         });
+                        //if we use the source tags, the count of tags in source and target content to be used must be equal! 
+                        // If this is not the case, the segment can not be processed as repetition! 
                         $segmentContent = $trackChangesTagHelper->unprotect($segmentContent);
+                    }
+                    //if we use the tags from the source, and their count is different to the tag count in the targetEdit to be used, 
+                      // then return false to prevent the saving of that repetition to prevent wrong tags to be used 
+                    if($useSourceTags && count($originalTags) !== $i) {
+                        return false;
                     }
                     $entity->{$setter}($segmentContent);
                     $entity->updateToSort($editField);
                 });
+                if($fieldLoopResult['target'] === false || $this->isSourceEditable && $fieldLoopResult['source'] === false ) {
+                    //the segment has to be ignored!
+                    continue;
+                }
                 
                 $entity->setQmId((string) $this->entity->getQmId());
                 if(!is_null($this->entity->getStateId())) {
@@ -325,7 +346,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         //the current targetMd5 hash is valid in any case
         $validTargetMd5[] = $this->entity->getTargetMd5();
         
-        //if neither source nor target hashes are matchting,
+        //if neither source nor target hashes are matching,
         // then the segment is no alike of the edited segment => we ignore and log it
         $sourceMatch = $this->entity->getSourceMd5() === $entity->getSourceMd5();
         //either the targets are different, or both targets are empty => the empty target case is also no alike match!

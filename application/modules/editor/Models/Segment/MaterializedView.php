@@ -237,9 +237,11 @@ class editor_Models_Segment_MaterializedView {
      */
     public function updateSiblingMetaCache(editor_Models_Segment $segment) {
         $groupId = $segment->meta()->getTransunitId();
-        $sql = 'update '.$this->viewName.' view, (SELECT m.segmentId,';
+        //using two selects to force the optimizer to run first the very inner SELECT and after that make a join with the outer view. 
+        // without that, it can happen, that MySQL first runs over each view entry, and over each segments content, which is then very long 
+        $sql = 'update '.$this->viewName.' view, (SELECT * FROM (SELECT m.segmentId,';
         $sql .= $this->buildMetaCacheSql($segment->getId());
-        $sql .= ') data';
+        $sql .= ') innerData ) data';
         $sql .= ' SET view.metaCache = data.metaCache';
         $sql .= ' WHERE view.id = data.segmentId';
         $db = Zend_Db_Table::getDefaultAdapter();

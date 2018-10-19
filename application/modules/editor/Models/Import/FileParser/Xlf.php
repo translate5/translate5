@@ -805,7 +805,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             // since potential whitespace tags does matter then in the content
             //since we are calling the leading/trailing tag stuff on the already fetched source segments, 
             // we have no ability here to conserve content outside the mrk tags - which also should not be on preserveWhitespace 
-            if($preserveWhitespace || !$this->hasSameStartAndEndTags($sourceChunks, $targetChunks)) {
+            if(!$this->hasSameStartAndEndTags($preserveWhitespace, $sourceChunks, $targetChunks)) {
                 //if there is just leading/trailing whitespace but no tags we reset the counter 
                 // since then we dont want to cut off something
                 //if there is whitespace between or before the leading / after the trailing tags,  
@@ -1139,12 +1139,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * Checks recursivly if target and source starts/ends with the same chunks, 
      *   if there are some tags in the start/end chunks it checks if they are paired tags. 
      *   if source and target start and ends just with that paired tags (no other content expect whitespace) then the tags are ignored in import 
+     * @param boolean $preserveWhitespace 
      * @param array $source
      * @param array $target
      * @param boolean $foundTag used for recursive call
      * @return boolean returns false if there are no matching leading/trailing tags at all 
      */
-    protected function hasSameStartAndEndTags(array $source, array $target, $foundTag = false) {
+    protected function hasSameStartAndEndTags($preserveWhitespace, array $source, array $target, $foundTag = false) {
         //source and target must have at least a start tag, text content, and an end tag, that means at least 3 chunks:
         if(count($source) < 4 || count($target) < 4){
             return $foundTag;
@@ -1163,8 +1164,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             return $foundTag; 
         }
         
-        //if sourceStart is an empty string or whitespace, get the next pairs
-        while(!is_null($sourceStart) && empty($sourceStart) || preg_match('#^\s+$#', $sourceStart)) {
+        //if sourceStart is an empty string, get the next pairs
+        // if we do NOT preserveWhitespace, and sourceStart is whitespace then we also get the next pair
+        // or in other words: if we preserveWhitespace only tags without whitespace inbetween are considered as having sameStartAndEndTags
+        while(!is_null($sourceStart) && empty($sourceStart) || (!$preserveWhitespace && preg_match('#^\s+$#', $sourceStart))) {
             $sourceStart = array_shift($source);
             $targetStart = array_shift($target);
             if($sourceStart != $targetStart) {
@@ -1180,7 +1183,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             return $foundTag;
         }
         
-        while(!is_null($sourceEnd) && empty($sourceEnd) || preg_match('#^\s+$#', $sourceEnd)) {
+        while(!is_null($sourceEnd) && empty($sourceEnd) || (!$preserveWhitespace && preg_match('#^\s+$#', $sourceEnd))) {
             $sourceEnd = array_pop($source);
             $targetEnd = array_pop($target);
             if($sourceEnd != $targetEnd) {
@@ -1206,7 +1209,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         
         //start recursivly for more than one tag pair, 
         // we have found at least one tag pair so set $foundTag to true for next iteration
-        return $this->hasSameStartAndEndTags($source, $target, true);
+        return $this->hasSameStartAndEndTags($preserveWhitespace, $source, $target, true);
     }
     
     /**

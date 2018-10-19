@@ -75,7 +75,25 @@ class editor_Models_Import_SegmentProcessor_RepetitionHash extends editor_Models
         //originalMd5 is prefilled with the original string value and is modified by other processors (for example MQM parser).
         //here it will finally converted to the md5 hash
         $target['originalMd5'] = $this->hasher->hashTarget($target['originalMd5'], $source['original']);
-        $source['originalMd5'] = $this->hasher->hashSource($source['originalMd5'], $target['original']);
+        
+        // initially also for empty targets a count must be set in the sourceHash
+        //  so we just use the source to count the tags there
+        // Example:
+        //          Source              Target
+        // Seg1     <t>                 <t>         will be edited to: <t>Test
+        // Seg1Hash <t>#1               <t>
+        // Seg2     <t>                 - empty -   the 2. Segments target is empty 
+        // Seg2Hash <t>                 - empty -   so no tag count or just 0 from target could be added to the sourceHash
+        // 
+        // The result ist Seg1Hash != Seg2Hash although they are the same. 
+        // The solution is to use the sourceTagCount for empty targets on import!
+        if(empty($target['original'])) {
+            $contentToGetTags = $source['original'];
+        }
+        else {
+            $contentToGetTags = $target['original'];
+        }
+        $source['originalMd5'] = $this->hasher->hashSource($source['originalMd5'], $contentToGetTags);
         return false;
     }
 }

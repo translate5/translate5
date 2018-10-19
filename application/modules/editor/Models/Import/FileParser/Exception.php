@@ -26,24 +26,30 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * Foldertree Object Instanz wie in der Applikation benötigt
- * 
  */
-class editor_Models_Skeletonfile extends ZfExtended_Models_Entity_Abstract {
-  protected $dbInstanceClass = 'editor_Models_Db_Skeletonfiles';
-  
-  public function setFile($file) {
-      return $this->__call('setFile', array(gzcompress($file)));
-  }
-  
-  public function getFile() {
-      return gzuncompress($this->__call('getFile', array()));
-  }
+class editor_Models_Import_FileParser_Exception extends ZfExtended_Exception {
+    /**
+     * @var string
+     */
+    protected $origin = 'import.fileparser';
+    
+    /**
+     * the error/event level of this exception (how "important" that error is)
+     * By default all Exceptions are of level error
+     * @var integer
+     */
+    protected $level = ZfExtended_Logger::LEVEL_ERROR;
+    
+    /**
+     * 
+     * @param string $msg
+     * @param string $code
+     * @param array $extra
+     * @param Exception $previous
+     */
+    public function __construct($msg, $code, array $extra = null, Exception $previous = null) {
+        parent::__construct($msg, $code, $previous);
+        $this->setErrors($extra);
+    }
 }

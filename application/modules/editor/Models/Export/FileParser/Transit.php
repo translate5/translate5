@@ -82,10 +82,12 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     }
     
     /**
-     * sets $this->_skeletonFile
+     * {@inheritDoc}
+     * @see editor_Models_Export_FileParser::getSkeleton()
+     * Does additional transit specific handling of the skel file
      */
-    protected function getSkeleton() {
-        parent::getSkeleton();
+    protected function getSkeleton(editor_Models_File $file) {
+        parent::getSkeleton($file);
         $extractDir = $this->extractSkeletonZip();
         $this->setSkeletonFiles($extractDir);
         $recursivedircleaner = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('Recursivedircleaner');
