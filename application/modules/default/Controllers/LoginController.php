@@ -85,6 +85,10 @@ class LoginController extends ZfExtended_Controllers_Login {
             header ('HTTP/1.1 302 Moved Temporarily');
             //same check for new term search page
             header ('Location: '.APPLICATION_RUNDIR.'/editor/termportal');
+        }//check if the user contains the instanttranslate right
+        elseif($acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal')) {
+            header ('HTTP/1.1 302 Moved Temporarily');
+            header ('Location: '.APPLICATION_RUNDIR.'/editor/instanttranslate');
         }else {
             throw new ZfExtended_NoAccessException("No initial_page resource is found.");
         }
