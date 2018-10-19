@@ -40,7 +40,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
     extend: 'Ext.grid.column.Column',
     alias: 'widget.matchrateTypeColumn',
     requires:[
-    	'Editor.util.MatchResources'
+    	'Editor.util.LanguageResources'
 	],
     mixins: ['Editor.view.segments.column.BaseMixin'],
     dataIndex: 'matchRateType',
@@ -179,13 +179,13 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
                 meta.myLabel = msg; //as ref for the list filter renderer
                 
                 if(record && record.get('matchRate')){
-                	meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'<br/>'+Editor.util.MatchResources.getMatchrateTooltip(record.get('matchRate'))+'"';
+                	meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'<br/>'+Editor.util.LanguageResources.getMatchrateTooltip(record.get('matchRate'))+'"';
                 	return;
                 }
             	meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
             };
             
-        if(Editor.plugins.MatchResource && prefix == Editor.plugins.MatchResource.matchrateTypeChangedState) {
+        if(Editor.LanguageResource && prefix == Editor.LanguageResource.matchrateTypeChangedState) {
             return '...'; //do nothing here since pending save
         }
         

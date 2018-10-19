@@ -27,9 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.util.MatchResources
+ * @class Editor.util.LanguageResources
  */
-Ext.define('Editor.util.MatchResources', {
+Ext.define('Editor.util.LanguageResources', {
 	strings: {
     	exactMatch:'#UT#100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument',
         repetitionMatch:'#UT#Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte',

@@ -658,3 +658,68 @@ a.x-btn span.task-confirmation {
 */
 
 .searchreplace-hide-element {display: none !important;}
+
+/* TM Overview */
+.ico-tm-edit {background-image: url(../images/book_edit.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-tasks {background-image: url(../images/tasks_assoc.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-delete {background-image: url(../images/book_delete.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-add {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-information {background-image: url(../images/information.png); background-repeat:no-repeat; background-position:50% 50%;}
+.ico-tm-show-more {background-image: url(../images/show_more.png); background-repeat:no-repeat; background-position:50% 50%;}
+.match-ressource-filebased .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
+.match-ressource-filebased .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
+/*
+.matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+*/
+.matchGrid tr.match-state-loaded:hover td.info-icon > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:85% 15%;}
+
+/* Tm Overviw grid */
+.tmOverviewPanel .x-grid-header-ct .source-lang > div {background:url(../images/sourceLanguage.png) no-repeat 10px 9px;}
+.tmOverviewPanel .x-grid-header-ct .target-lang > div {background:url(../images/targetLanguage.png) no-repeat 10px 9px;}
+.tmOverviewPanel td.loading div {background: url(../images/loading_ico.gif) no-repeat center center;}
+.tmOverviewPanel .languageResource-status-noconnection td.status {color: #ff3232;}
+.tmOverviewPanel .languageResource-status-error td.status {color: #ff3232;}
+
+
+.language-resource-result-panel .match-state-loading.x-grid-row .source > div,
+.language-resource-result-panel .match-state-loading.x-grid-row .target > div {
+    background:url(../../../../modules/editor/images/loading_ico.gif) no-repeat 10px center;
+    padding-left:30px;
+}
+
+.language-resource-result-panel .match-state-servererror.x-grid-row .source > div {
+    background:url(../../../../modules/editor/images/exclamation.png) no-repeat 10px center;
+    padding-left:30px;
+}
+
+.language-resource-result-panel .x-grid-row span.highlight {
+    font-weight: bold;
+    font-style: italic;
+}
+
+.adminTaskGrid tr:hover td.taskassocs > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
+.adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(../images/share.png) no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .segmentsUpdateable > div {background:url(../images/book_edit.png) no-repeat 10px 9px;}
+
+.tmOverviewPanel tr:hover td.infoIcon > div,
+.tmOverviewPanel tr:hover td.taskList > div,
+.tmOverviewPanel tr:hover td.serviceName > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:right center;}
+.tmOverviewPanel .x-grid-header-ct .taskList > div {background:url(../images/share.png) no-repeat 10px 9px;}
+
+.adminTaskGrid .x-grid-header-ct .taskassocs span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .source-lang span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .target-lang span.x-column-header-text-inner,
+.tmOverviewPanel .x-grid-header-ct .taskList span.x-column-header-text-inner{
+    display: block;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+}
+
+/**
+ * FIXME must be removed with next ext update, fixes T5DEV-181 / https://www.sencha.com/forum/showthread.php?330718-6-2-ColorField-color-preview-doesn-t-match-color
+ */
+.x-colorpicker-field input {
+    background-color: inherit;
+}

@@ -38,7 +38,7 @@ Ext.define('Editor.controller.admin.Customer', {
         'Editor.view.admin.customer.TagField',
     ],
     models:['Editor.model.admin.Customer'],
-    stores:['Editor.store.admin.Customers'],
+    stores:['Editor.store.admin.Customers','Editor.store.admin.UserCustomers'],
 
     refs:[{
         ref: 'customerPanel',
@@ -75,6 +75,11 @@ Ext.define('Editor.controller.admin.Customer', {
         controller:{
             '#Editor.$application': {
                 editorViewportOpen: 'onEditorViewportOpen'
+            }
+        },
+        store:{
+            '#admin.Users':{
+                load:'onUserStoreLoad'
             }
         }
     },
@@ -239,5 +244,13 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     isCustomerOverviewAllowed:function(){
         return Editor.app.authenticatedUser.isAllowed('customerAdministration');
+    },
+
+    /**
+     * Users store load handler
+     */
+    onUserStoreLoad:function(){
+        //after the users store is loaded, load the usersCustomers store
+        Ext.StoreManager.get('userCustomers').loadCustom();
     }
 });

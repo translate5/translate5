@@ -27,20 +27,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.customer.TagField', {
-    extend: 'Ext.form.field.Tag',
-    alias: 'widget.customers',
-    itemId:'customers',
-    name:'customers',
-
-    fieldLabel:'#UT#Endkunde',
-
-    allowBlank: true,
-    typeAhead: true,
-    anyMatch: true,
-    forceSelection: true,
+/***
+ * All available customers assigned to the user
+ */
+Ext.define('Editor.view.admin.customer.UserCustomersCombo', {
+    extend: 'Ext.form.field.ComboBox',
+    alias: 'widget.usercustomerscombo',
+    fieldLabel:'#UT#Kunde',
     displayField: 'name',
     valueField: 'id',
-    store:'customersStore',
-    queryMode: 'local'
+    store:'userCustomers',
+    queryMode: 'local',
+    value:null
 });
