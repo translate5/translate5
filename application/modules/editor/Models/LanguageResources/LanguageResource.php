@@ -176,6 +176,9 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * @return array
      */
     public function loadByAssociatedTaskGuidList(array $taskGuidList) {
+        if(empty($taskGuidList)){
+            return $taskGuidList;
+        }
         $assocDb = new editor_Models_Db_Taskassoc();
         $assocName = $assocDb->info($assocDb::NAME);
         $s = $this->db->select()
