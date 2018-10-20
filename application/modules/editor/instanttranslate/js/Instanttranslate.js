@@ -484,6 +484,7 @@ function fillTranslation() {
         resultHtml = '',
         fuzzyMatch,
         infoText,
+        term,
         termStatus,
         metaData,
         resultData;
@@ -498,11 +499,15 @@ function fillTranslation() {
                                       'sourceDiff': result['sourceDiff']}
                     }
                     infoText = '';
+                    term = '';
                     termStatus = '';
                     if (result['metaData'] != undefined) {
                         metaData = result['metaData'];
                         if(metaData['definition'] != undefined) {
                             infoText = metaData['definition'];
+                        }
+                        if(metaData['term'] != undefined) {
+                            term = metaData['term'];
                         }
                         if(metaData['status'] != undefined) {
                             termStatus = metaData['status'];
@@ -513,6 +518,7 @@ function fillTranslation() {
                                   'infoText': infoText,
                                   'resourceName': resourceName,
                                   'serviceName': serviceName,
+                                  'term': term,
                                   'termStatus': termStatus,
                                   'translationText': result['target']
                                   };
@@ -531,7 +537,10 @@ function fillTranslation() {
 function renderTranslationContainer(resultData) {
     var translationsContainer = '';
     
-    translationsContainer += '<h4>' + resultData.resourceName + ' (' + resultData.serviceName + ')</h4>';
+    translationsContainer += '<h4>';
+    translationsContainer += resultData.resourceName + ' (' + resultData.serviceName + ')';
+    translationsContainer += '<span class="loadingSpinnerIndicator"><img src="'+Editor.data.publicModulePath+'images/loading-spinner.gif"/></span>';
+    translationsContainer += '</h4>';
     
     if (resultData.fuzzyMatch.sourceDiff != undefined) {
         var fuzzyMatchTranslatedString = Editor.data.languageresource.translatedStrings['attentionFuzzyMatch'].replace("{0}", resultData.fuzzyMatch.matchRate);
@@ -543,15 +552,16 @@ function renderTranslationContainer(resultData) {
     translationsContainer += '<div class="copyable">';
     translationsContainer += '<div class="translation-result" id="'+resultData.engineId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
-    translationsContainer += '<span class="term-info" title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
+    if (resultData.term != '') {
+        translationsContainer += '<span class="term-info" id="'+resultData.term+'" title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
+    }
+    if (resultData.termStatus != '') {
+        translationsContainer += '<span class="term-status">'+renderTermStatusIcon(resultData.termStatus)+'</span>';
+    }
     translationsContainer += '</div>';
     
     if (resultData.infoText != '') {
         translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
-    }
-    
-    if (resultData.termStatus != '') {
-        translationsContainer += '<div class="translation-infotext">'+renderTermStatusIcon(resultData.termStatus)+resultData.termStatus+'</div>';
     }
     
     translationsContainer += '<div id="translationError'+resultData.engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
@@ -568,12 +578,11 @@ function renderTermStatusIcon(termStatus){
         status = 'unknown', 
         map = Editor.data.termStatusMap,
         labels = Editor.data.termStatusLabel,
-        label,
-        moduleFolder = Editor.data.moduleFolder;
+        label;
     if(map[termStatus]) {
         status = map[termStatus];
         label = labels[status]+' ('+termStatus+')';
-        termStatusHtml += '<img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'"> ';
+        termStatusHtml += '<img src="' + Editor.data.publicModulePath + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'"> ';
     }
     return termStatusHtml;
 }
@@ -756,8 +765,7 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 
 /* --------------- open TermPortal ------------------------------------------ */
 $('#translations').on('touchstart click','.term-info',function(){
-    var termInTarget = $(this).closest('.copyable').find('.translation-result').text();
-    window.open(Editor.data.restpath+"termportal?term="+termInTarget, '_blank');
+    window.open(Editor.data.restpath+"termportal?term="+$(this).attr('id'), '_blank');
 });
 
 /* --------------- show/hide: helpers --------------------------------------- */
@@ -821,18 +829,22 @@ function clearAllErrorMessages() {
     $("#sourceIsText").removeClass('source-text-error');
 }
 /* --------------- show/hide: loading spinner ------------------------------- */
+// 'sign' = show indicator in addition to content (currently used for text-translations)
+// 'state' = shown layer upon content (currently used for file-translations)
 function startLoadingSign() {
-    $('#translations').hide();
-    $('#loadingSpinnerIndicator').show();
+    if ($('#translations').is(":visible")) {
+        $('#translations').find('.loadingSpinnerIndicator').show();
+    } else {
+        $('#target').children('.loadingSpinnerIndicator').show();
+    }
 }
 function stopLoadingSign() {
-    $('#translations').show();
-    $('#loadingSpinnerIndicator').hide();
+    $('.loadingSpinnerIndicator').hide();
 }
 function startLoadingState() {
-    $('#loadingSpinnerLayer').show();
+    $('.loadingSpinnerLayer').show();
 }
 function stopLoadingState() {
-    $('#loadingSpinnerLayer').hide();
+    $('.loadingSpinnerLayer').hide();
 }
 

@@ -143,7 +143,11 @@ h4, p {
 
 /* --------------- spinner --------------- */
 
-#loadingSpinnerLayer {
+.loadingSpinnerLayer,
+.loadingSpinnerIndicator {
+    display: none;
+}
+.loadingSpinnerLayer {
     width: 100%;
     height: 100%;
     opacity: 0.8;
@@ -155,18 +159,21 @@ h4, p {
     margin: 0px;
     text-align: center;
 }
-#loadingSpinnerLayer img {
+.loadingSpinnerLayer img {
     margin: 30%;
     padding: 20px;
     border: 1px solid #00adef;
     background-color: #fff;
     z-index: 900;
 }
-#loadingSpinnerIndicator {
+.loadingSpinnerIndicator {
     margin: 2px 0px;
 }
-.loadingSpinner {
-    display: none;
+#translations .loadingSpinnerIndicator img {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    margin-bottom: -4px;
 }
 
 /* --------------- source --------------- */
@@ -283,7 +290,8 @@ h4, p {
 }
 .clearable-clear,
 .copyable-copy,
-.term-info {
+.term-info,
+.term-status {
   position: absolute;
   user-select: none;
   cursor: pointer;
@@ -293,7 +301,7 @@ h4, p {
 }
 .clearable-clear {
   display: none;
-  right: 0px;
+  right: 2px;
   top: 0px;
   padding: 0px 8px;
   font-style: normal;
@@ -313,11 +321,16 @@ h4, p {
   bottom: 0px;
   padding: 0px 4px;
 }
+.term-status {
+  left: 45px;
+  bottom: 0px;
+  padding: 0px 4px;
+}
 
 #countedCharacters {
   position: absolute;
   user-select: none;
-  right: 0px;
+  right: 2px;
   bottom: 16px;
   padding: 0 10px;
   font-family: "Roboto",sans-serif;
