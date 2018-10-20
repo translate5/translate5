@@ -60,7 +60,7 @@
     sort($mtTargetLanguageLocales);
 ?>
 
-<div id="loadingSpinnerLayer" class="loadingSpinner"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+<div class="loadingSpinnerLayer"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
 
 <div id="containerHeader" class="container">
     <div id="logo"></div>
@@ -138,7 +138,7 @@
             <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
         <div id="mtEngineSelectorError" class="instant-translation-error ui-state-error ui-corner-all"></div>
-        <div id="loadingSpinnerIndicator" class="loadingSpinner"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+        <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
         <div id="translations">
             <!-- inject translations here  -->
         </div>
@@ -185,6 +185,9 @@ $( function() {
         position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
     });
     $('#translations .term-info').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
+    });
+    $('#translations .term-status').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".term-info" }
     });
     // start with locales as stored for user
