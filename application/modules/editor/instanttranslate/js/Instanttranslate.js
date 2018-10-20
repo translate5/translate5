@@ -51,7 +51,6 @@ function setFileTypesAllowedAndAvailable() {
             mtEngine = machineTranslationEngines[engineId];
             extensionsKey = mtEngine.source+","+mtEngine.target;
             if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
-                console.log('fileTypes AllowedAndAvailable for ' + extensionsKey + ': ' + extensionsFileTranslation[extensionsKey]);
                 filesTypesForLanguageCombination = [];
                 if(fileTypesAllowedAndAvailable[extensionsKey] === -1) {
                     filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[extensionsKey];
@@ -337,7 +336,6 @@ function refreshSelectList(selectListId, options, selectedOptionValue) {
 //start instant (sic!) translation automatically
 $('#sourceText').bind('keyup', function() {
     if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
-        console.log('latest key-event did not change the text (eg arrow-keys, ...)');
         return;
     }
     startTimerForInstantTranslation();
@@ -441,7 +439,6 @@ function terminateTranslation() {
  * @returns
  */
 function translateText(textToTranslate,translationInProgressID){
-    console.log(translationInProgressID + ': translateText; source: ' + $("#sourceLocale").val() + ' / target: ' + $("#targetLocale").val() + ' / text: ' + textToTranslate);
     startLoadingSign();
     var translateRequest = $.ajax({
         statusCode: {
@@ -459,16 +456,13 @@ function translateText(textToTranslate,translationInProgressID){
         },
         success: function(result){
             if (translationInProgressID != latestTranslationInProgressID) {
-                console.log('===> ' +translationInProgressID + ': result is not valid any more; not applied.');
                 return;
             }
             if (result.errors !== undefined && result.errors != '') {
-                console.log('===> ' +translationInProgressID + ': error');
                 showTranslationError(result.errors);
             } else {
                 clearAllErrorMessages();
                 translateTextResponse = result.rows;
-                console.log('===> ' +translationInProgressID + ': apply translation');
                 fillTranslation();
             }
             stopLoadingSign();
@@ -621,7 +615,6 @@ function requestFileTranslate(){
             }else{
                 // Handle errors here
                 showSourceError('ERRORS: ' + data.error);
-                console.log('ERRORS: ' + data.error);
                 stopLoadingState();
             }
         },
@@ -629,7 +622,6 @@ function requestFileTranslate(){
         {
             // Handle errors here
             showSourceError('ERRORS: ' + textStatus);
-            console.log('ERRORS: ' + textStatus);
             stopLoadingState();
         }
     });
@@ -775,7 +767,7 @@ function showLanguageSelectsOnly() {
 }
 function showSource() {
     $('#sourceContent').show();
-    $('#instantTranslationIsOn').show();
+    showInstantTranslationOffOn();
     if (chosenSourceIsText || fileTranslationIsPossible() === false) {
         $('.show-if-source-is-text').show();
         $('.show-if-source-is-file').hide();
@@ -794,6 +786,15 @@ function showTranslations() {
     }
     $('#translations').show();
     $('#translationSubmit').show();
+    showInstantTranslationOffOn();
+}
+function hideTranslations() {
+    $('#translations').hide();
+    $('#translationSubmit').hide();
+    $('#instantTranslationIsOn').hide();
+    $('#instantTranslationIsOff').hide();
+}
+function showInstantTranslationOffOn() {
     if (instantTranslationIsActive) {
         $('#instantTranslationIsOn').show();
         $('#instantTranslationIsOff').hide();
@@ -801,12 +802,6 @@ function showTranslations() {
         $('#instantTranslationIsOn').hide();
         $('#instantTranslationIsOff').show();
     }
-}
-function hideTranslations() {
-    $('#translations').hide();
-    $('#translationSubmit').hide();
-    $('#instantTranslationIsOn').hide();
-    $('#instantTranslationIsOff').hide();
 }
 /* --------------- show/hide: errors --------------------------------------- */
 function showMtEngineSelectorError(errorMode) {
