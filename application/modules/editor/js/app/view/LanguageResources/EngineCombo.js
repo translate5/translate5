@@ -27,20 +27,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.customer.TagField', {
-    extend: 'Ext.form.field.Tag',
-    alias: 'widget.customers',
-    itemId:'customers',
-    name:'customers',
-
-    fieldLabel:'#UT#Endkunde',
-
-    allowBlank: true,
-    typeAhead: true,
-    anyMatch: true,
-    forceSelection: true,
+/***
+ * All available engines from the sdl language cloud
+ */
+Ext.define('Editor.view.LanguageResources.EngineCombo', {
+    extend: 'Ext.form.field.ComboBox',
+    alias: 'widget.sdlenginecombo',
+    fieldLabel:'Engine',
     displayField: 'name',
     valueField: 'id',
-    store:'customersStore',
-    queryMode: 'local'
+    store:'sdlEngine',
+    queryMode: 'local',
+    selectOnFocus:true
 });

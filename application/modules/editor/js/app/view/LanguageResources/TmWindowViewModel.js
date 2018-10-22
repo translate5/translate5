@@ -15,32 +15,34 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
- Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
- folder of translate5.
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.customer.TagField', {
-    extend: 'Ext.form.field.Tag',
-    alias: 'widget.customers',
-    itemId:'customers',
-    name:'customers',
-
-    fieldLabel:'#UT#Endkunde',
-
-    allowBlank: true,
-    typeAhead: true,
-    anyMatch: true,
-    forceSelection: true,
-    displayField: 'name',
-    valueField: 'id',
-    store:'customersStore',
-    queryMode: 'local'
+/**
+ * @class Editor.view.LanguageResources.TmWindowViewModel
+ * @extends Ext.app.ViewModel
+ */
+Ext.define('Editor.view.LanguageResources.TmWindowViewModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.tmwindow',
+    data: {
+        serviceName: false,
+        uploadLabel:null
+    },
+    formulas: {
+        isSdlResource: function(get){
+            return get('serviceName') == Editor.model.LanguageResources.Resource.SDL_SERVICE_NAME;
+        },
+        isTermCollectionResource:function(get){
+            return get('serviceName') == Editor.model.LanguageResources.Resource.TERMCOLLECTION_SERVICE_NAME;
+        }
+    }
 });
