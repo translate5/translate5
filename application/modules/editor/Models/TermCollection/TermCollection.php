@@ -64,6 +64,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $this->setServiceType($nsp);
         $this->setServiceName($service->getName());
         $this->setColor($service::DEFAULT_COLOR);
+        $this->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
         $resourceId=$this->save();
         
         if($customers){
@@ -86,8 +87,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
               'SELECT `t`.`groupId` FROM `LEK_terms` AS `t` '.
               'WHERE (lower(term) like lower(?)) COLLATE utf8_bin '.
               'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`) '.
-              'AND language=?';
-        return $this->db->getAdapter()->query($sql, array($queryString,$this->getId(),$sourceLang,$targetLang))->fetchAll();
+              'AND language=? AND collectionId=?';
+        return $this->db->getAdapter()->query($sql, array($queryString,$this->getId(),$sourceLang,$targetLang,$this->getId()))->fetchAll();
     }
     
     /***
