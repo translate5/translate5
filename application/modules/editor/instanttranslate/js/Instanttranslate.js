@@ -757,7 +757,7 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 
 /* --------------- open TermPortal ------------------------------------------ */
 $('#translations').on('touchstart click','.term-info',function(){
-    window.open(Editor.data.restpath+"termportal?term="+$(this).attr('id'), '_blank');
+    window.open(Editor.data.restpath+"termportal?term="+$(this).attr('id')+"&lang="+$("#targetLocale").val(), '_blank');
 });
 
 /* --------------- show/hide: helpers --------------------------------------- */
