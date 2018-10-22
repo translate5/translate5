@@ -369,6 +369,10 @@ function startFileTranslation(){
         fileType,
         fileTypesAllowed = getAllowedFileTypes(),
         fileTypesErrorList = [];
+    if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
+        showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
+        return;
+    }
     if ($('#sourceFile').val() == "") {
         showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
         return;
@@ -461,7 +465,7 @@ function translateText(textToTranslate,translationInProgressID){
                 return;
             }
             if (result.errors !== undefined && result.errors != '') {
-                showTranslationError(result.errors);
+                showTargetError(result.errors);
             } else {
                 clearAllErrorMessages();
                 translateTextResponse = result.rows;
@@ -810,13 +814,8 @@ function showMtEngineSelectorError(errorMode) {
     $('#mtEngineSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
     $('#translationSubmit').hide();
 }
-function showTranslationError(errorText) {
-    var engineId = getSelectedEngineId(),
-        divId = 'translationError'+engineId;
-    debugger;
-    if (engineId !== false && document.getElementById(divId) !== null) {
-        $('#'+divId).html(errorText).show();
-    }
+function showTargetError(errorText) {
+    $('#targetError').html(errorText).show();
 }
 function showSourceError(errorText) {
     $('#sourceError').html(errorText).show();
