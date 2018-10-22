@@ -64,7 +64,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::open()
      */
     public function open() {
-        //This call is not necessary, since TMs are opened automatically.
+        //This call is not necessary, since this resource is opened automatically.
     }
     
     /**
@@ -72,11 +72,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::open()
      */
     public function close() {
-    /*
-     * This call deactivated, since openTM2 has a access time based garbage collection
-     * If we close a TM and another Task still uses this TM this bad for performance,
-     *  since the next request to the TM has to reopen it
-     */
+        //This call is not necessary, since this resource is closed automatically.
     }
     
     /**
@@ -236,7 +232,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $queryString = $internalTag->toXliffPaired($queryString, true, $map);
         $mapCount = count($map);
         
-        if($this->api->lookup($segment, $queryString, $fileName)){
+        if($this->api->lookup($segment,$queryString, $fileName)){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){
                 return $this->resultList; 
@@ -248,7 +244,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $target = $internalTag->reapply2dMap($found->target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
                 
-                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $segment, $fileName);
+                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
                 
                 $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
                 
@@ -365,6 +361,57 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             }
             
             return $this->resultList; 
+        }
+        $this->throwBadGateway();
+    }
+    
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
+        //return empty result when no search string
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
+        
+        $this->resultList->setDefaultSource($searchString);
+        
+        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        /* @var $internalTag editor_Models_Segment_InternalTag */
+        
+        //$map is returned by reference
+        $searchString = $internalTag->toXliffPaired($searchString, true, $map);
+        $mapCount = count($map);
+        
+        //create dummy segment so we can use the lookup
+        $dummySegment=ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $dummySegment editor_Models_Segment */
+        $dummySegment->init();
+        
+        if($this->api->lookup($dummySegment,$searchString, 'source')){
+            $result = $this->api->getResult();
+            if((int)$result->NumOfFoundProposals === 0){
+                return $this->resultList;
+            }
+            foreach($result->results as $found) {
+                if(!$this->validateInternalTags($found, $dummySegment)) {
+                    continue;
+                }
+                $target = $internalTag->reapply2dMap($found->target, $map);
+                $target = $this->replaceAdditionalTags($target, $mapCount);
+                
+                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$dummySegment,'InstantTranslate');
+                
+                $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                
+                $source = $internalTag->reapply2dMap($found->source, $map);
+                $source = $this->replaceAdditionalTags($source, $mapCount);
+                $this->resultList->setSource($source);
+            }
+            return $this->resultList;
         }
         $this->throwBadGateway();
     }

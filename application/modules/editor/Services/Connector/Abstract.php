@@ -153,6 +153,15 @@ abstract class editor_Services_Connector_Abstract {
      */
     abstract public function getStatus(& $moreInfo);
     
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language 
+     * 
+     * @param string $searchString
+     * @return editor_Services_ServiceResult
+     */
+    abstract public function translate(string $searchString);
+    
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
      * @param editor_Models_LanguageResources_LanguageResource $languageResource

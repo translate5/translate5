@@ -72,6 +72,29 @@
     asort($availableTranslations);
     $languageSelector=[];
     
+    //translated strings
+    $this->translations=array(
+        "clearText"                 => $translate->_("Text zurücksetzen"),
+        "copy"                      => $translate->_("Kopieren"),
+        "enterText"                 => $translate->_("Geben Sie Text ein"),
+        "serverErrorMsg500"         => $translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
+        "translate"                 => $translate->_("Übersetzen"),
+        "orTranslateFile"           => $translate->_("oder lassen Sie ein Dokument übersetzen"),
+        "orTranslateText"           => $translate->_("oder lassen Sie Text übersetzen, den Sie eingeben."),
+        "turnOffInstantTranslation" => $translate->_("Sofortübersetzung deaktivieren"),
+        "turnOnInstantTranslation"  => $translate->_("Sofortübersetzung aktivieren"),
+        "uploadFile"                => $translate->_("Laden Sie eine Datei hoch"),
+        "uploadFileNotFound"        => $translate->_("Bitte wählen Sie eine Datei aus."),
+        "pleaseChoose"              => $translate->_("Bitte auswählen"),
+        "clearBothLists"            => $translate->_("Beide Listen zurücksetzen"),
+        "showAllAvailableFor"       => $translate->_("Alle anzeigen für"),
+        "notAllowed"                => $translate->_("nicht erlaubt"),
+        "openInTermPortal"          => $translate->_("Term in Terminologie-Portal öffnen"),
+        "attentionFuzzyMatch"       => $translate->_("Achtung! FuzzyMatch ({0})"),
+        "differenceIsHighlighted"   => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben")
+    );
+    $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
+    
     $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector">';
     $languageSelector[]='<select id="locale">';
     foreach ($availableTranslations as $locale => $translation) {

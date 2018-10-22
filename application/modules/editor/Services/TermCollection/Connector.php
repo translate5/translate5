@@ -98,7 +98,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        
+        //return empty result when no query string exisit
         if(empty($queryString)) {
             return $this->resultList;
         }
@@ -118,6 +119,16 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
+        return $this->queryCollectionResults($searchString);
+    }
+    
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
         return $this->queryCollectionResults($searchString);
     }
     
@@ -179,12 +190,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
     }
     
-    protected function handleCollectionImport(){
-        
-    }
-    
     /**
-     * In difference to $this->throwBadGateway this method generates an 400 error
+     * This method generates an 400 error
      *   which shows additional error information in the frontend
      *
      * @param string $logMsg
@@ -200,6 +207,4 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $data  = print_r($this->languageResource->getDataObject(),1);
         $log->logError($logMsg, $data);
     }
-
-
 }

@@ -100,4 +100,32 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
         ->where('id IN(?)', $customers);
         return $this->db->fetchRow($s)->toArray();
     }
+    
+    /***
+     * Return minimum search characters for user customers.
+     * If no user model is provided, the session user customers will be used
+     * 
+     * @param ZfExtended_Models_User $user
+     */
+    public function getMinCharactersByUser(ZfExtended_Models_User $user=null){
+        $customers=array();
+        //no user, use the session user
+        if(!isset($user)){
+            $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $user ZfExtended_Models_User */
+            $customers=$user->getUserCustomersFromSession();
+        }else{
+            $customers=$user->getCustomers();
+            if(!empty($customers)){
+                $customers=trim($customers,",");
+                $customers=explode(',', $customers);
+            }
+        }
+        
+        $ret=$this->getMinSearchCharacters($customers);
+        if(!empty($ret) && isset($ret['searchCharacterLimit'])){
+            return $ret['searchCharacterLimit'];
+        }
+        return 0;
+    }
 }

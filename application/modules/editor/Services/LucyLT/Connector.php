@@ -217,6 +217,10 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
     public function search(string $searchString, $field = 'source', $offset = null) {
         throw new BadMethodCallException("The Lucy LT Connector does not support search requests");
     }
+    
+    public function translate(string $searchString){
+        throw new BadMethodCallException("The Lucy LT Connector does not support translate requests");
+    }
 
     /**
      * intended to calculate a matchrate out of the MT score

@@ -237,4 +237,14 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
             unlink($file);
         }
     }
+    public function getValidFiletypes()
+    {}
+
+    public function getStatus($moreInfo)
+    {}
+
+    public function translate(string $searchString){
+        throw new BadMethodCallException("DummyFileTm Connector does not support search requests");
+    }
+
 }
