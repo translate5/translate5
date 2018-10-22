@@ -41,7 +41,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     requires: [
         'Editor.plugins.MatchAnalysis.view.AnalysisPanel',
-        'Editor.plugins.MatchAnalysis.view.MatchResources'
+        'Editor.plugins.MatchAnalysis.view.LanguageResources'
     ],
     
     models: ['Editor.plugins.MatchAnalysis.model.MatchAnalysis'],
@@ -78,10 +78,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             '#adminTaskAddWindow': {
                 beforerender:'onAdminTaskWindowBeforeRender'
             },
-            '#matchResourceTaskAssocPanel':{
-            	render:'onMatchResourcesPanelRender'
+            '#languageResourceTaskAssocPanel':{
+            	render:'onLanguageResourcesPanelRender'
             },
-            'matchResourcesPanel':{
+            'LanguageResourcesPanel':{
             	startMatchAnalysis:'onStartMatchAnalysis'
             }
         },
@@ -95,12 +95,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     onAdminTaskWindowBeforeRender:function(window,eOpts){
         var me=this;
         window.insertCard({
-            xtype:'matchResourcesPanel',
+            xtype:'languageResourcesPanel',
             //index where the card should appear in the group
             groupIndex:1,
             listeners:{
                 activate:{
-                	fn:me.onMatchResourcesPanelActivate,
+                	fn:me.onLanguageResourcesPanelActivate,
                 	scope:me
                 }
             }
@@ -128,7 +128,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         });
     },
     
-    onMatchResourcesPanelRender:function(panel){
+    onLanguageResourcesPanelRender:function(panel){
     	var me=this,
     		win=panel.up('window'),
     		task=win.actualTask,
@@ -206,7 +206,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	this.loadTaskAssoc(task);
     },
     
-    onMatchResourcesPanelActivate:function(panel){
+    onLanguageResourcesPanelActivate:function(panel){
     	if(!panel.task){
     		return;
     	}
@@ -226,7 +226,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     loadTaskAssoc:function(task){
         var me=this,
-	        taskAssoc=Editor.app.getController('Editor.plugins.MatchResource.controller.TaskAssoc');
+	        taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
 	    
 	    //load the task assoc store
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);

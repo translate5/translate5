@@ -2519,7 +2519,281 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
  <source>Einstufung</source>     
  <target>Normative Authorization</target> 
  </trans-unit>
- 
+<trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='>
+  <source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source>
+  <target>The task contains alternative translations. When using matches the segment matchrate will not be changed.</target>
+</trans-unit>
+<trans-unit id='QmVpbSBCZWFyYmVpdGVuIGRlciBRdWVsbHNwYWx0ZSBrw7ZubmVuIE1hdGNoZXMgbmljaHQgw7xiZXJub21tZW4gd2VyZGVuLg=='>
+  <source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source>
+  <target>On editing the source language column no matches can be taken over.</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlbg=='>
+  <source>Sprachressourcen</source>
+  <target>Language resources</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlIGVuZGfDvGx0aWcgbMO2c2NoZW4/'>
+  <source>Sprachressource endgültig löschen?</source>
+  <target>Delete language resource completly?</target>
+</trans-unit>
+<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3aXJrbGljaCBlbmRnw7xsdGlnIGdlbMO2c2NodCB3ZXJkZW4/'>
+  <source>Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?</source>
+  <target>Do you really want to delete completely the language resource &quot;{0}&quot;?</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlIGdlbMO2c2NodC4='>
+  <source>Sprachressource gelöscht.</source>
+  <target>Language resource deleted.</target>
+</trans-unit>
+<trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3dXJkZSBlcmZvbGdyZWljaCBnZcOkbmRlcnQu'>
+  <source>Die Sprachressource "{0}" wurde erfolgreich geändert.</source>
+  <target>The language resource &quot;{0}&quot; was successfully changed.</target>
+</trans-unit>
+<trans-unit id='RGllIFNwcmFjaHJlc3NvdXJjZSAiezB9IiB3dXJkZSBlcmZvbGdyZWljaCBlcnN0ZWxsdC4='>
+  <source>Die Sprachressource "{0}" wurde erfolgreich erstellt.</source>
+  <target>The language resource &quot;{0}&quot; was successfully created.</target>
+</trans-unit>
+<trans-unit id='d2lyZCBnZWxhZGVuLi4u'>
+  <source>wird geladen...</source>
+  <target>loading...</target>
+</trans-unit>
+<trans-unit id='RXMgd3VyZGVuIGtlaW5lIEVyZ2Vibmlzc2UgZ2VmdW5kZW4u'>
+  <source>Es wurden keine Ergebnisse gefunden.</source>
+  <target>No results found.</target>
+</trans-unit>
+<trans-unit id='RGllIEFuZnJhZ2UgYW4gZGllIFNwcmFjaHJlc3NvdXJjZSBkYXVlcnRlIHp1IGxhbmdlLg=='>
+  <source>Die Anfrage an die Sprachressource dauerte zu lange.</source>
+  <target>The language resource did not respond in a reasonable time.</target>
+</trans-unit>
+<trans-unit id='RGllIEFuZnJhZ2UgZsO8aHJ0ZSB6dSBlaW5lbSBGZWhsZXIgaW0gYW5nZWZyYWd0ZW4gRGllbnN0Lg=='>
+  <source>Die Anfrage führte zu einem Fehler im angefragten Dienst.</source>
+  <target>The request produced an error in the queried service.</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlIGhpbnp1ZsO8Z2Vu'>
+  <source>Sprachressource hinzufügen</source>
+  <target>Add language resource</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNl'>
+  <source>Ressource</source>
+  <target>Resource</target>
+</trans-unit>
+<trans-unit id='TmFtZQ=='>
+  <source>Name</source>
+  <target>Name</target>
+</trans-unit>
+<trans-unit id='VE0tRGF0ZWk='>
+  <source>TM-Datei</source>
+  <target>TM-file</target>
+</trans-unit>
+<trans-unit id='RmFyYmUgZGllc2VyIFNwcmFjaHJlc3NvdXJjZQ=='>
+  <source>Farbe dieser Sprachressource</source>
+  <target>Color of this language resource</target>
+</trans-unit>
+<trans-unit id='RmFyYmU='>
+  <source>Farbe</source>
+  <target>Color</target>
+</trans-unit>
+<trans-unit id='S29ua29yZGFuenN1Y2hl'>
+  <source>Konkordanzsuche</source>
+  <target>concordance search</target>
+</trans-unit>
+<trans-unit id='TWF0Y2hlcw=='>
+  <source>Matches</source>
+  <target>matches</target>
+</trans-unit>
+<trans-unit id='UXVlbGx0ZXh0c3VjaGU='>
+  <source>Quelltextsuche</source>
+  <target>search source text</target>
+</trans-unit>
+<trans-unit id='WmllbHRleHRzdWNoZQ=='>
+  <source>Zieltextsuche</source>
+  <target>search target text</target>
+</trans-unit>
+<trans-unit id='TWF0Y2hlcyB1bmQgS29ua29yZGFuei1TdWNoZQ=='>
+  <source>Matches und Konkordanz-Suche</source>
+  <target>Matches and concordance search</target>
+</trans-unit>
+<trans-unit id='UXVlbGx0ZXh0'>
+  <source>Quelltext</source>
+  <target>Source text</target>
+</trans-unit>
+<trans-unit id='RGllc2VuIE1hdGNoIGluIGRhcyBnZcO2ZmZuZXRlIFNlZ21lbnQgw7xiZXJuZWhtZW4u'>
+  <source>Diesen Match in das geöffnete Segment übernehmen.</source>
+  <target>Take over this match into the opened segment.</target>
+</trans-unit>
+<trans-unit id='QXR0cmlidXRlOg=='>
+  <source>Attribute:</source>
+  <target>Attribute:</target>
+</trans-unit>
+<trans-unit id='bGV0enRlIMOEbmRlcnVuZzo='>
+  <source>letzte Änderung:</source>
+  <target>last change:</target>
+</trans-unit>
+<trans-unit id='ZXJzdGVsbHQ6'>
+  <source>erstellt:</source>
+  <target>created:</target>
+</trans-unit>
+<trans-unit id='VE0tUmVzc291cmNl'>
+  <source>TM-Ressource</source>
+  <target>TM resource</target>
+</trans-unit>
+<trans-unit id='QWxsZSBkdXJjaHN1Y2hlbg=='>
+    <source>Alle durchsuchen</source>
+    <target>Search in all</target>
+</trans-unit>
+<trans-unit id='U3VjaGUgaW4gezB9'>
+    <source>Suche in {0}</source>
+    <target>Search in {0}</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlbiB6dXdlaXNlbg=='>
+  <source>Sprachressourcen zuweisen</source>
+  <target>Associate language resources</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
+  <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
+  <target>No language resource available for the language combination of the opened task.</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
+  <source>Ressource: {name}</source>
+  <target>Resource: {name}</target>
+</trans-unit>
+<trans-unit id='RGF0ZWliYXNpZXJ0ZXMgVE0gaGVydW50ZXJsYWRlbiB1bmQgbG9rYWwgc3BlaWNoZXJu'>
+  <source>Dateibasiertes TM herunterladen und lokal speichern</source>
+  <target>Download and save locally the filebased TM</target>
+</trans-unit>
+<trans-unit id='SGluenVmw7xnZW4='>
+  <source>Hinzufügen</source>
+  <target>Add</target>
+</trans-unit>
+<trans-unit id='ezB9IEVyZ2Vibmlzc2U='>
+  <source>{0} Ergebnisse</source>
+  <target>{0} results</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlbiB6dWdld2llc2VuLg=='>
+  <source>Keine Sprachressourcen zugewiesen.</source>
+  <target>No match resources associated.</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
+  <source>Keine Aufgaben zugewiesen.</source>
+  <target>No tasks associated.</target>
+</trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
+    <source>Zugewiesene Sprachressourcen</source>
+    <target>Associated language resources</target>
+</trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
+    <source>Zugewiesene Aufgaben</source>
+    <target>Associated tasks</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlIGJlYXJiZWl0ZW4='>
+    <source>Sprachressource bearbeiten</source>
+    <target>edit language resource</target>
+</trans-unit>
+<trans-unit id='U1RSRw=='>
+    <source>STRG</source>
+    <target>CTRL</target>
+</trans-unit>
+<trans-unit id='UmVzc291cmNlIGluIEF1ZmdhYmUgdmVyd2VuZGVu'>
+    <source>Ressource in Aufgabe verwenden</source>
+    <target>Use resource in task</target>
+</trans-unit>
+<trans-unit id='U2VnbWVudGUgenVyw7xja3NwZWljaGVybg=='>
+    <source>Segmente zurückspeichern</source>
+    <target>save back segments to TM</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIFRNIGhpbnp1ZsO8Z2Vu'>
+    <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
+    <target>Import TMX to TM</target>
+</trans-unit>
+<trans-unit id='VE1YLURhdGVp'>
+    <source>TMX-Datei</source>
+    <target>TMX-file</target>
+</trans-unit>
+<trans-unit id='VE1YIERhdGVpIGltcG9ydGllcmVu'>
+    <source>TMX Datei importieren</source>
+    <target>TMX file imported</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIGJlc3RlaGVuZGVuIFRNIGhpbnp1ZsO8Z2Vu'>
+    <source>Weitere TM Daten in Form einer TMX Datei importieren und dem bestehenden TM hinzufügen</source>
+    <target>Import additional TM data as TMX file and add the data to the already existing TM</target>
+</trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNWCBEYXRlaSE='>
+    <source>Bitte verwenden Sie eine TMX Datei!</source>
+    <target>Please use a TMX file!</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBlcmZvbGdyZWljaCBpbXBvcnRpZXJ0IQ=='>
+    <source>Weitere TM Daten erfolgreich importiert!</source>
+    <target>Imported additional TM data successfully!</target>
+</trans-unit>
+<trans-unit id='VE0vVE1YLURhdGVpIChvcHRpb25hbCk='>
+    <source>TM/TMX-Datei (optional)</source>
+    <target>TM/TMX-file (optional)</target>
+</trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRNIG9kZXIgVE1YIERhdGVpIQ=='>
+    <source>Bitte verwenden Sie eine TM oder TMX Datei!</source>
+    <target>Please use a TM or TMX file!</target>
+</trans-unit>
+<trans-unit id='YWxzIFRNIERhdGVpIGV4cG9ydGllcmVu'>
+    <source>als TM Datei exportieren</source>
+    <target>export as TM file</target>
+</trans-unit>
+<trans-unit id='YWxzIFRNWCBEYXRlaSBleHBvcnRpZXJlbg=='>
+    <source>als TMX Datei exportieren</source>
+    <target>export as TMX file</target>
+</trans-unit>
+<trans-unit id='U3ByYWNocmVzc291cmNlIGzDtnNjaGVuPw=='>
+    <source>Sprachressource löschen?</source>
+    <target>Delete language resource?</target>
+</trans-unit>
+<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaHJlc3NvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
+    <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
+    <target>Do you really want to remove the language resource &quot;{0}&quot; from the here listed language resources? <br /> No data will be deleted in the associated TM system, since there is currently no connection to the TM system.</target>
+    
+</trans-unit>
+<trans-unit id='U3RhdHVzaW5mb3JtYXRpb25lbiB3ZXJkZW4gZ2VsYWRlbg=='>
+    <source>Statusinformationen werden geladen</source>
+    <target>Status information is loaded</target>
+</trans-unit>
+<trans-unit id='dmVyZsO8Z2Jhcg=='>
+    <source>verfügbar</source>
+    <target>available</target>
+</trans-unit>
+<trans-unit id='dW5iZWthbm50'>
+    <source>unbekannt</source>
+    <target>unknown</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgVmVyYmluZHVuZyE='>
+    <source>Keine Verbindung!</source>
+    <target>No connection!</target>
+</trans-unit>
+<trans-unit id='aW1wb3J0aWVydA=='>
+    <source>importiert</source>
+    <target>importing</target>
+</trans-unit>
+
+<trans-unit id='U2VnbWVudCBpbSBUTSBha3R1YWxpc2llcnQh'>
+    <source>Segment im TM aktualisiert!</source>
+    <target>Segment updated in the TM!</target>
+</trans-unit>
+
+<trans-unit id='RGllIGFuZ2VmcmFndGUgT3BlblRNMiBJbnN0YW56IGlzdCBuaWNodCBlcnJlaWNoYmFy'>
+    <source>Die angefragte OpenTM2 Instanz ist nicht erreichbar</source>
+    <target>The queried OpenTM2 instance is not available</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZW4gcmVpbXBvcnRpZXJlbg=='>
+    <source>Aufgaben reimportieren</source>
+    <target>Reimport tasks</target>
+</trans-unit>
+<trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
+<source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
+<target>Customer already assigned to resource {0} as default for {1} to {2} - Remove assignment and assign to current resource?</target>
+</trans-unit>
+<trans-unit id='S3VuZGVu'>
+<source>Kunden</source>
+<target>Customers</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
+<source>Standardkunde</source>
+<target>Default customer</target>
+</trans-unit>
 <trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='>
     <source>Importarchiv herunterladen</source>
     <target>Download import archive</target>
@@ -2543,6 +2817,51 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmtsZWluZXJuIChTVFJHICsgLSk=">
     <source>Segmentschriftgrad verkleinern (STRG + -)</source>
     <target>decrease segment font-size (STRG + -)</target>
+</trans-unit>
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5n'>
+    <source>Sofortübersetzung</source>
+    <target>Instant-Translate</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBiZXN0ZWhlbmRlbiBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
+    <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem bestehenden Term-Collection hinzufügen</source>
+    <target>Import additional Term-Collection data as TBX file and add the data to the already existing Term-Collection</target>
+</trans-unit>
+<trans-unit id='VEJYLURhdGVp'>
+    <source>TBX-Datei</source>
+    <target>TBX file</target>
+</trans-unit>
+<trans-unit id='VEJYIERhdGVpIGltcG9ydGllcmVu'>
+    <source>TBX Datei importieren</source>
+    <target>Import TBX file</target>
+</trans-unit>
+<trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
+    <source>Bitte verwenden Sie eine TBX Datei!</source>
+    <target>Please use a TBX file!</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gZXJmb2xncmVpY2ggaW1wb3J0aWVydCE='>
+    <source>Weitere Term-Collection Daten erfolgreich importiert!</source>
+    <target>Imported additional Term-Collection data successfully!</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='>
+    <source>Termeinträge verschmelzen</source>
+    <target>Merge term entries</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSB2ZXJzY2htZWx6ZW4='>
+    <source>Termeinträge verschmelzen</source>
+    <target>Merge term entries</target>
+</trans-unit>
+<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxz'>
+    <source>Termeinträge löschen älter als</source>
+    <target>Delete term entries older than</target>
+</trans-unit>
+
+<trans-unit id='VGVybWVpbnRyw6RnZSBsw7ZzY2hlbiDDpGx0ZXIgYWxzIGFrdHVlbGxlciBJbXBvcnQ='>
+    <source>Termeinträge löschen älter als aktueller Import</source>
+    <target>Delete term entries older than current import</target>
+</trans-unit>
+<trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'>
+    <source>Info zum Term-Collection</source>
+    <target>Term-Collection info</target>
 </trans-unit>
     </body>
   </file>

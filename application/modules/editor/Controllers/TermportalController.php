@@ -30,6 +30,11 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
     
     public function indexAction(){
 
+        //if term param exist, open this term on portal load
+        if($this->getRequest()->getParam('term')!=null){
+            $this->view->Php2JsVars()->set('term', $this->getRequest()->getParam('term'));
+        }
+        
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();

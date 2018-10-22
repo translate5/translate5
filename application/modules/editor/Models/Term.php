@@ -354,7 +354,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByMid(string $mid,array $collectionIds) {
         $s = $this->db->select(false);
-        $db = $this->db;
         $s->from($this->db);
         $s->where('collectionId IN(?)', $collectionIds)->where('mid = ?', $mid);
         
@@ -371,7 +370,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $termGroups
      * @return array
      */
-    protected function sortTerms(array $termGroups) {
+    public function sortTerms(array $termGroups) {
         foreach($termGroups as $groupId => $group) {
             usort($group, array($this, 'compareTerms'));
             $termGroups[$groupId] = $group;
@@ -395,16 +394,22 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         // return > 0 => t1 > t2
         // return = 0 => t1 = t2
         // return < 0 => t1 < t2
+        $term1=is_array($term1) ? (object)$term1 : $term1;
+        $term2=is_array($term2) ? (object)$term2 : $term2;
         $status = $this->compareTermStatus($term1->status, $term2->status);
         if($status !== 0) {
             return $status;
         }
-
-        $isSource = $this->compareTermLangUsage($term1->isSource, $term2->isSource);
+        
+        $isSource=0;
+        if(isset($term1->isSource)){
+            $isSource = $this->compareTermLangUsage($term1->isSource, $term2->isSource);
+        }
+        
         if($isSource !== 0) {
             return $isSource;
         }
-
+        
         //Kriterium 4 - alphanumerische Sortierung:
         return strcmp(mb_strtolower($term1->term), mb_strtolower($term2->term));
     }
@@ -679,6 +684,64 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
            'updated < ?' => $olderThan,
            'collectionId in (?)' => $collectionIds,
        ])>0;
+    }
+
+    
+    /***
+     * Update language assoc for given collections. The langages are merged from exsisting terms per collection.
+     * @param array $collectionIds
+     */
+    public function updateAssocLanguages(array $collectionIds=null){
+        $s=$this->db->select()
+        ->from(array('t' =>'LEK_terms'), array('t.language','t.collectionId'))
+        ->join(array('l' =>'LEK_languages'), 't.language = l.id', 'rfc5646');
+        
+        if(!empty($collectionIds)){
+            $s->where('t.collectionId IN(?)',$collectionIds);
+        }
+        
+        $s->group('t.collectionId')->group('t.language')->setIntegrityCheck(false);
+        
+        $ret=$this->db->fetchAll($s)->toArray();
+        
+        $data=[];
+        foreach($ret as $lng) {
+            if(!isset($data[$lng['collectionId']])){
+                $data[$lng['collectionId']]=[];
+            }
+            array_push($data[$lng['collectionId']], $lng);
+        }
+        
+        foreach($data as $key=>$value) {
+            $alreadyProcessed = array();
+            foreach ($value as $x) {
+                foreach ($value as $y) {
+                    //keep track of what is already processed
+                    $combination = array($x['language'], $y['language']);
+                    
+                    //it is not the same number and thay are not already processed
+                    if ($x['language'] === $y['language'] || in_array($combination, $alreadyProcessed)) {
+                        continue;
+                    }
+                    //Add it to the list of what you've already processed
+                    $alreadyProcessed[] = $combination;
+                    
+                    //save the language combination
+                    $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+                    /* @var $model editor_Models_LanguageResources_Languages */
+                    
+                    $model->setSourceLang($x['language']);
+                    $model->setSourceLangRfc5646($x['rfc5646']);
+                    
+                    $model->setTargetLang($y['language']);
+                    $model->setTargetLangRfc5646($y['rfc5646']);
+                    
+                    $model->setLanguageResourceId($key);
+                    $model->save();
+                    
+                }
+            }
+        }
     }
 
     /**

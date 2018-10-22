@@ -317,12 +317,79 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                 'model' => $this->entity, //FIXME model usage is deprecated and should be removed in future (today 2016-08-10) 
                 'history' => $history
         ));
+        
+        //call before segment put
+        $this->handleBeforePutSave();
+        
         //saving history directly before normal saving, 
         // so no exception between can lead to history entries without changing the master segment
         $history->save();
         $this->entity->setTimestamp(null); //see TRANSLATE-922
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
+        
+        //call after segment put handler
+        $this->handleAfterSegmentPut();
+    }
+    
+    /**
+     * Before a segment is saved, the matchrate type has to be fixed to valid value
+     */
+    protected function handleBeforePutSave() {
+        $segment =$this->entity;
+        /* @var $segment editor_Models_Segment */
+        $givenType = $segment->getMatchRateType();
+        
+        //if it was a normal segment edit, without overtaking the match we have to do nothing here
+        if(!$segment->isModified('matchRateType') || strpos($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) !== 0) {
+            return;
+        }
+        
+        $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+        /* @var $matchrateType editor_Models_Segment_MatchRateType */
+        
+        $unknown = function() use ($matchrateType, $givenType, $segment){
+            $matchrateType->initEdited($matchrateType::TYPE_UNKNOWN, $givenType);
+            $segment->setMatchRateType((string) $matchrateType);
+        };
+        
+        //if it was an invalid type set it to unknown
+        if(! preg_match('/'.editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED.';languageResourceid=([0-9]+)/', $givenType, $matches)) {
+            $unknown();
+            return;
+        }
+        
+        //load the used languageResource to get more information about it (TM or MT)
+        $languageResourceid = $matches[1];
+        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
+        try {
+            $languageresource->load($languageResourceid);
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $unknown();
+            return;
+        }
+        
+        //set the type
+        $matchrateType->initEdited($languageresource->getResource()->getType());
+        
+        //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
+        //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);
+        
+        //save the type
+        $segment->setMatchRateType((string) $matchrateType);
+    }
+    
+    /**
+     * After a segment is changed we inform the services about that. What they do with this information is the service's problem.
+     */
+    protected function handleAfterSegmentPut() {
+        /* @var $segment editor_Models_Segment */
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
+        if(editor_Models_Segment_MatchRateType::isUpdateable($this->entity->getMatchRateType())) {
+            $manager->updateSegment($this->entity);
+        }
     }
     
     /***

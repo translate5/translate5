@@ -46,6 +46,9 @@
  * @method string getNumber() getNumber()
  * @method void setNumber() setNumber(string $number)
  * 
+ * @method integer getSearchCharacterLimit() getSearchCharacterLimit()
+ * @method void setSearchCharacterLimit() setSearchCharacterLimit(integer $searchCharacterLimit)
+ * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
@@ -65,5 +68,36 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
             return $res;
         }
         return $res->toArray();
+    }
+    
+    /***
+     * Search customers by given search string.
+     * The search will provide any match on name field.
+     *
+     * @param string $searchString
+     * @return array|array
+     */
+    public function search($searchString,$fields=array()) {
+        $s = $this->db->select();
+        if(!empty($fields)){
+            $s->from($this->tableName,$fields);
+        }
+        $s->where('lower(name) LIKE lower(?)','%'.$searchString.'%');
+        return $this->db->fetchAll($s)->toArray();
+    }
+
+    /***
+     * Get min characters from given customers
+     * @param array $customers
+     * @return array
+     */
+    public function getMinSearchCharacters(array $customers) {
+        if(empty($customers)){
+            return array();
+        }
+        $s = $this->db->select()
+        ->from($this->tableName,array('MIN(searchCharacterLimit) as searchCharacterLimit'))
+        ->where('id IN(?)', $customers);
+        return $this->db->fetchRow($s)->toArray();
     }
 }

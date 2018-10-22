@@ -728,4 +728,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         error_log("Tasks removed by taskname: ".implode(',', $removedTasks));
     }
     
+    /***
+     * Search task by given search string.
+     * The search will provide any match on taskName field.
+     *
+     * @param string $searchString
+     * @return array|array
+     */
+    public function search($searchString,$fields=array()) {
+        $s = $this->db->select();
+        if(!empty($fields)){
+            $s->from($this->tableName,$fields);
+        }
+        $s->where('lower(taskName) LIKE lower(?)','%'.$searchString.'%');
+        return $this->db->fetchAll($s)->toArray();
+    }
 }

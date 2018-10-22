@@ -1,0 +1,221 @@
+<?php
+/*
+ START LICENSE AND COPYRIGHT
+ 
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+ 
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+ 
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+ 
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
+ plugin-exception.txt in the root folder of translate5.
+ 
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
+?>
+
+<?php
+    // Which languages are available according to the MachineTranslation-Engines?
+    // (The result might add translations from resources with more langauges, e.g. TermCollections,
+    //  but their language-combinations are not taken into account here.)
+    $machineTranslationEngines = $this->machineTranslationEngines;
+    $mtSourceLanguageLocales = array();
+    $mtTargetLanguageLocales = array();
+    
+    $rfcToIsoMap=array();
+    
+    foreach ($machineTranslationEngines as $mtEngine) {
+        $mtSourceLocale = $mtEngine['source'];
+        $mtTargetLocale = $mtEngine['target'];
+        
+        if(!isset($rfcToIsoMap[$mtSourceLocale])){
+            $rfcToIsoMap[$mtSourceLocale]=$mtEngine['sourceIso'];
+        }
+        
+        if(!isset($rfcToIsoMap[$mtTargetLocale])){
+            $rfcToIsoMap[$mtTargetLocale]=$mtEngine['targetIso'];
+        }
+        
+        if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
+            $mtSourceLanguageLocales[] = $mtSourceLocale;
+        }
+        if (!in_array($mtTargetLocale, $mtTargetLanguageLocales)) {
+            $mtTargetLanguageLocales[] = $mtTargetLocale;
+        }
+    }
+    sort($mtSourceLanguageLocales);
+    sort($mtTargetLanguageLocales);
+?>
+
+<div class="loadingSpinnerLayer"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+
+<div id="containerHeader" class="container">
+    <div id="logo"></div>
+<?php 
+    // see View_Helper_LanguageSelector
+    $session = new Zend_Session_Namespace();
+    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    $availableTranslations = $translate->getAvailableTranslations();
+    asort($availableTranslations);
+    $languageSelector=[];
+    
+    $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector">';
+    $languageSelector[]='<select id="locale">';
+    foreach ($availableTranslations as $locale => $translation) {
+        $selected = ($locale == $session->locale) ? ' selected="selected"' : '';
+        $languageSelector[]='<option value="'.$locale.'"'.$selected.'>'.$translation.'</option>';
+    }
+    $languageSelector[]='</select>';
+    $languageSelector[]='</form>';
+    echo implode(' ', $languageSelector);
+?>
+    <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
+</div>
+
+<div id="containerTranslation" class="container">
+	<div id="source">
+        <form id="sourceLanguageAndContent">
+            <select id="sourceLocale" name="sourceLocale">
+                <?php
+                    $sourceLangLocalesFound = array();
+                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
+                        $sourceLangLocalesFound[] = $sourceLangLocale;
+                    }
+                    sort($sourceLangLocalesFound);
+                    $optionValues=[];
+                    $optionValues[]='<option value="-">-</option>';
+                    foreach ($sourceLangLocalesFound as $sourceLangLocale) {
+                        $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
+                    }
+                    echo implode(' ', $optionValues);
+                ?>
+            </select>
+            <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"></div>
+            <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"></div>
+            <div id="sourceContent" class="clearable">
+                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
+                <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
+                <span id="countedCharacters" class="show-if-source-is-text">0</span>
+                <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file"/>
+            </div>
+        <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+        </form>
+    </div>
+    <div id="target">
+        <form id="targetControls">
+            <select id="targetLocale" name="targetLocale">
+                <?php
+                    $targetLangLocalesFound = array();
+                    foreach ($mtTargetLanguageLocales as $targetLangLocale) {
+                        $targetLangLocalesFound[] = $targetLangLocale;
+                    }
+                    sort($targetLangLocalesFound);
+                    $optionValues=[];
+                    $optionValues[]='<option value="-">-</option>';
+                    foreach ($targetLangLocalesFound as $targetLangLocale) {
+                        $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
+                    }
+                    echo implode(' ', $optionValues);
+                ?>
+            </select>
+            <input id="translationSubmit" name="translationSubmit" value="<?php echo $this->translations["translate"];?>" type="submit" class="click-starts-translation ui-corner-all ui-button ui-widget"/>
+            <div id="instantTranslationIsOff" class="click-starts-translation instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
+            <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
+        </form>
+        <div id="mtEngineSelectorError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+        <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
+        <div id="translations">
+            <!-- inject translations here  -->
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var mtSourceLanguageLocales = '<?php echo json_encode($mtSourceLanguageLocales);?>';
+    mtSourceLanguageLocales = JSON.parse(mtSourceLanguageLocales);
+    var mtTargetLanguageLocales = '<?php echo json_encode($mtTargetLanguageLocales);?>';
+    mtTargetLanguageLocales = JSON.parse(mtTargetLanguageLocales);
+    var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
+    machineTranslationEngines = JSON.parse(machineTranslationEngines);
+</script>
+
+<script type="text/javascript">
+$( function() {
+    $('#locale').selectmenu({
+        change: function() {
+            var action = $(this).val();
+            $("#languageSelector").attr("action", "?locale=" + action);
+            $("#languageSelector").submit();
+        }
+      });
+    $('#sourceLocale').selectmenu({
+        change: function( event, ui ) {
+            renderLocalesAsAvailable('accordingToSourceLocale');
+        }
+      }).selectmenu("menuWidget").addClass("overflow");
+    $('#targetLocale').selectmenu({
+        change: function( event, ui ) {
+            renderLocalesAsAvailable('accordingToTargetLocale');
+        }
+      }).selectmenu("menuWidget").addClass("overflow");
+    $('#sourceFile').button();
+    $('#translationSubmit').button();
+    $('#sourceContent').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".clearable-clear" }
+    });
+    $('#translations .translation-sourcediff').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".translation-sourcediff" }
+    });
+    $('#translations .copyable-copy').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".copyable-copy" }
+    });
+    $('#translations .term-info').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
+    });
+    $('#translations .term-status').tooltip({
+        position: { my: "left+15 center", at: "bottom", of: ".term-info" }
+    });
+    // start with locales as stored for user
+    if ($("#sourceLocale").val() !== '-') {
+        renderLocalesAsAvailable('accordingToSourceLocale');
+    } else if ($("#targetLocale").val() !== '-') {
+        renderLocalesAsAvailable('accordingToTargetLocale');
+    } else {
+        renderLocalesAsAvailable('reset');
+    }
+    
+    clearAllErrorMessages();
+    setFileTypesAllowedAndAvailable();
+    setTextForSource();
+    showSource();
+} );
+</script>
+
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/instanttranslate/js/Instanttranslate.js"></script>
+
+<script type="text/javascript">
+// "toggle" source (text/file)
+$(document).on('click', '.source-toggle .change-source-type' , function() {
+    $('.source-toggle').toggle();
+    chosenSourceIsText = !chosenSourceIsText;
+    clearAllErrorMessages();
+    document.getElementById("sourceFile").value = "";
+    showSource();
+});
+</script>
+

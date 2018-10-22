@@ -72,9 +72,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     public function importAction(){
         $params=$this->getRequest()->getParams();
         
-        if(!isset($params['collectionId']) || !isset($params['customerId'])){
-            //TODO: missing api parameter exception ?
-            throw new ZfExtended_Exception();
+        if(!isset($params['collectionId'])){
+            throw new ZfExtended_ValidateException("The import term collection is not defined.");
         }
         
         $filePath=$this->getUploadedTbxFilePaths();
@@ -84,7 +83,6 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             //the return is needed for the tests
             $this->view->success=$this->entity->importTbx($filePath,$params);
         }
-        
     }
     
     /***

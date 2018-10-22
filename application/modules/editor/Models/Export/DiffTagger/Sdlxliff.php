@@ -39,12 +39,6 @@ END LICENSE AND COPYRIGHT
 class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_DiffTagger {
 
     /**
-     * Regular expression for tag and html entity recognition.
-     * @var string 
-     */
-    protected $_regexTag = '/(<[^>]*>|&[^;]+;)/';
-
-    /**
      * @var string Regex which returns in the matches array of a preg_match the id and the type (closing or opening) of a g-tag
      */
     public $_findGTagsIdAndTypeRegex = '"^<(/?)g [^>]*id=\"([^\"]+)\"[^>]*>$"';
@@ -641,5 +635,20 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
             $open--;
         }
         return $segment;
+    }
+    
+    /**
+     * splits the segment up into HTML tags / entities on one side and plain text on the other side
+     * The order in the array is important for the following wordBreakUp, since there are HTML tags and entities ignored.
+     * Caution: The ignoring is done by the array index calculation there!
+     * So make no array structure changing things between word and tag break up!
+     * 
+     * Sdlxliff has different regex as the csv.
+     *
+     * @param string $segment
+     * @return array $segment
+     */
+    protected  function tagBreakUp($segment){
+        return editor_Utils::tagBreakUp($segment,'/(<[^>]*>|&[^;]+;)/');
     }
 }

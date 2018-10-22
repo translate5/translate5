@@ -123,9 +123,8 @@ class editor_TaskController extends ZfExtended_RestController {
         ->addActionContext('export', 'xliff2')
         ->addActionContext('export', 'importArchive')
         ->initContext();
+        
     }
-    
-    
     
     /**
      * init the internal used workflow
@@ -189,6 +188,20 @@ class editor_TaskController extends ZfExtended_RestController {
         $userAssocInfos = array();
         $allAssocInfos = $this->getUserAssocInfos($taskGuids, $userAssocInfos);
 
+        //load the task assocs
+        $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /*@var $languageResourcemodel editor_Models_LanguageResources_LanguageResource */
+        $resultlist = $languageResourcemodel->loadByAssociatedTaskGuidList($taskGuids);
+        
+        //group all assoc by taskguid
+        $taskassocs = array();
+        foreach ($resultlist as $res){
+            if(!isset($taskassocs[$res['taskGuid']])){
+                $taskassocs[$res['taskGuid']] = array();
+            }
+            array_push($taskassocs[$res['taskGuid']], $res);
+        }
+        
         foreach ($rows as &$row) {
             $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
@@ -201,6 +214,11 @@ class editor_TaskController extends ZfExtended_RestController {
             
             $this->addUserInfos($row, $row['taskGuid'], $userAssocInfos, $allAssocInfos);
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
+            
+            //add task assoc if exist
+            if(isset($taskassocs[$row['taskGuid']])){
+                $row['taskassocs'] = $taskassocs[$row['taskGuid']];
+            }
         }
         return $rows;
     }
@@ -658,6 +676,9 @@ class editor_TaskController extends ZfExtended_RestController {
                 'view' => $this->view, 
                 'openState' => $this->data->userState)
             );
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
+            $manager->openForTask($task);
         }
     }
     
@@ -696,14 +717,13 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * unregisters the task from the session and triggers a afterTaskClosed event
+     * unregisters the task from the session and close all open services 
      */
     protected function unregisterTask() {
         $this->entity->unregisterInSession();
-        $this->events->trigger('afterTaskClose', $this, array(
-            'task' => $this->entity, 
-            'view' => $this->view 
-        ));
+        $manager = ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $manager editor_Services_Manager */
+        $manager->closeForTask($this->entity);
     }
     
     /**
@@ -822,6 +842,12 @@ class editor_TaskController extends ZfExtended_RestController {
             
         $this->view->rows = (object)$row;
         unset($this->view->rows->qmSubsegmentFlags);
+        
+        //add task assoc to the task
+        $languageResourcemodel = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /*@var $languageResourcemodel editor_Models_LanguageResources_LanguageResource */
+        $resultlist =$languageResourcemodel->loadByAssociatedTaskGuidList(array($taskguid));
+        $this->view->rows->taskassocs = $resultlist;
         
     }
     
@@ -1017,4 +1043,5 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->view->validTrigger = $this->workflow->getDirectTrigger();
         $this->handleValidateException($e);
     }
+    
 }
