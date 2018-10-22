@@ -1554,29 +1554,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
         <source>Aufgaben reimportieren</source>
         <target>Aufgaben reimportieren</target>
     </trans-unit>
-<trans-unit id='VmVyZsO8Z2JhcmUgTVQtRW5naW5lcw=='><source>Verfügbare MT-Engines</source><target>Verfügbare MT-Engines</target></trans-unit>unit>
-<trans-unit id='VGV4dCB6dXLDvGNrc2V0emVu'><source>Text zurücksetzen</source><target>Text zurücksetzen</target></trans-unit>
-<trans-unit id='S29waWVyZW4='><source>Kopieren</source><target>Kopieren</target></trans-unit>
-<trans-unit id='TVQtRW5naW5lcyBnZWZ1bmRlbg=='><source>MT-Engines gefunden</source><target>MT-Engines gefunden</target></trans-unit>
-<trans-unit id='S2VpbmUgcGFzc2VuZGUgTVQtRW5naW5lIHZlcmbDvGdiYXIuIEJpdHRlIGVpbmUgYW5kZXJlIFNwcmFjaGtvbWJpbmF0aW9uIHfDpGhsZW4u'><source>Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen.</source><target>Keine passende MT-Engine verfügbar. Bitte eine andere Sprachkombination wählen.</target></trans-unit>
-<trans-unit id='Qml0dGUgZWluZSBkZXIgdmVyZsO8Z2JhcmVuIE1ULUVuZ2luZXMgYXVzd8OkaGxlbi4'><source>Bitte eine der verfügbaren MT-Engines auswählen.</source><target>Bitte eine der verfügbaren MT-Engines auswählen.</target></trans-unit>
-<trans-unit id='w5xiZXJzZXR6ZW4='><source>Übersetzen</source><target>Übersetzen</target></trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIGRlYWt0aXZpZXJlbg=='><source>Sofortübersetzung deaktivieren</source><target>Sofortübersetzung deaktivieren</target></trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIGFrdGl2aWVyZW4='><source>Sofortübersetzung aktivieren</source><target>Sofortübersetzung aktivieren</target></trans-unit>
-<trans-unit id='R2ViZW4gU2llIFRleHQgZWlu'><source>Geben Sie Text ein</source><target>Geben Sie Text ein</target></trans-unit>
-<trans-unit id='b2RlciBsYXNzZW4gU2llIGVpbiBEb2t1bWVudCDDvGJlcnNldHplbg=='><source>oder lassen Sie ein Dokument übersetzen</source><target>oder lassen Sie ein Dokument übersetzen</target></trans-unit>
-<trans-unit id='b2RlciBsYXNzZW4gU2llIFRleHQgw7xiZXJzZXR6ZW4sIGRlbiBTaWUgZWluZ2ViZW4u'><source>oder lassen Sie Text übersetzen, den Sie eingeben.</source><target>oder lassen Sie Text übersetzen, den Sie eingeben.</target></trans-unit>
-<trans-unit id='TGFkZW4gU2llIGVpbmUgRGF0ZWkgaG9jaA=='><source>Laden Sie eine Datei hoch</source><target>Laden Sie eine Datei hoch</target></trans-unit>
-<trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgZWluZSBEYXRlaSBhdXMu'><source>Bitte wählen Sie eine Datei aus.</source><target>Bitte wählen Sie eine Datei aus.</target></trans-unit>
-<trans-unit id='Qml0dGUgYXVzd8OkaGxlbg=='><source>Bitte auswählen</source><target>Bitte auswählen</target></trans-unit>
-<trans-unit id='QmVpZGUgTGlzdGVuIHp1csO8Y2tzZXR6ZW4='><source>Beide Listen zurücksetzen</source><target>Beide Listen zurücksetzen</target></trans-unit>
-<trans-unit id='QWxsZSBhbnplaWdlbiBmw7xy'><source>Alle anzeigen für</source><target>Alle anzeigen für</target></trans-unit>
-<trans-unit id='bmljaHQgZXJsYXVidA=='><source>nicht erlaubt</source><target>nicht erlaubt</target></trans-unit>
-<trans-unit id='TWFzY2hpbmVuw7xiZXJzZXR6dW5n'><source>Maschinenübersetzung</source><target>Maschinenübersetzung</target></trans-unit>
-<trans-unit id='TVQtRW5naW5l'><source>MT-Engine</source><target>MT-Engine</target></trans-unit>
-<trans-unit id='VGVybSBpbiBUZXJtaW5vbG9naWUtUG9ydGFsIMO2ZmZuZW4='><source>Term in Terminologie-Portal öffnen</source><target>Term in Terminologie-Portal öffnen</target></trans-unit>
-<trans-unit id='QWNodHVuZyEgRnV6enlNYXRjaCAoezB9KQ=='><source>Achtung! FuzzyMatch ({0})</source><target>Achtung! FuzzyMatch ({0})</target></trans-unit>
-<trans-unit id='UXVlbGxzZWdtZW50IHp1bSBUTS1NYXRjaDogVW50ZXJzY2hpZWQgenUgSWhyZXIgVGV4dGVpbmdhYmUgaGVydm9yZ2Vob2Jlbg=='><source>Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben</source><target>Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben</target></trans-unit>
 <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
 <target>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</target>
