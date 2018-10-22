@@ -402,8 +402,10 @@ function startTranslation() {
         translationInProgressID;
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
-        startLoadingState();
-        requestFileTranslate();
+        if (uploadedFiles != undefined) {
+            startLoadingState();
+            requestFileTranslate();
+        }
         return;
     }
     // otherwise: translate Text
