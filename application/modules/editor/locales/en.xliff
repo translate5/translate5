@@ -2764,6 +2764,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Keine Verbindung!</source>
     <target>No connection!</target>
 </trans-unit>
+<trans-unit id='S2VpbmUgZ8O8bHRpZ2UgTGl6ZW56Lg=='>
+    <source>Keine gültige Lizenz.</source>
+    <target>No valid license.</target>
+</trans-unit>
 <trans-unit id='aW1wb3J0aWVydA=='>
     <source>importiert</source>
     <target>importing</target>
