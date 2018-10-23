@@ -26,6 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * FIXME: use DOMDocument or similar to create the XML to deal correctly with escaping of strings!
+ */
 class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_SegmentsToXliffAbstract {
     /***
      * xlif2 segment state
@@ -281,8 +284,8 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         /* @var $languagesModel editor_Models_Languages */
         $sourceLang=$languagesModel->loadLangRfc5646($this->task->getSourceLang());
         $targetLang=$languagesModel->loadLangRfc5646($this->task->getTargetLang());
-        $headParams[] = 'srcLang="'.htmlspecialchars($sourceLang).'"';
-        $headParams[] = 'trgLang="'.htmlspecialchars($targetLang).'"';
+        $headParams[] = 'srcLang="'.$this->escape($sourceLang).'"';
+        $headParams[] = 'trgLang="'.$this->escape($targetLang).'"';
         
         $headParams[] = 'xmlns:its="https://www.w3.org/2005/11/its/"';
         $this->enabledNamespaces['its'] = 'its';
@@ -292,8 +295,8 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $headParams[] = 'xmlns:translate5="http://www.translate5.net/"';
         $this->enabledNamespaces['translate5'] = 'translate5';
         
-        $headParams[] = 'translate5:taskguid="'.htmlspecialchars($this->task->getTaskGuid()).'"';
-        $headParams[] = 'translate5:taskname="'.htmlspecialchars($this->task->getTaskName()).'"';
+        $headParams[] = 'translate5:taskguid="'.$this->escape($this->task->getTaskGuid()).'"';
+        $headParams[] = 'translate5:taskname="'.$this->escape($this->task->getTaskName()).'"';
         $this->result[] = '<'.join(' ', $headParams).'>';
         
         $this->result[] = '<!-- For attributes or elements in translate5 that have no matching xliff 2 representation are the translate5 namespace is used -->';
@@ -314,7 +317,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $first = $this->unifySegmentData($segmentsOfFile->current());
         
         $file = '<file id="%s" translate5:filename="%s">';
-        $this->result[] = sprintf($file,$first['fileId'],htmlspecialchars($filename));
+        $this->result[] = sprintf($file,$first['fileId'],$this->escape($filename));
         
         $this->addComments('unitComment');
         
@@ -341,25 +344,25 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         //set the person attributes in unit tag
         if($this->itsPerson){
-            $unitTag[]='its:person="'.$this->itsPerson.'"';
+            $unitTag[]='its:person="'.$this->escape($this->itsPerson).'"';
         }
         
         if($this->itsPersonGuid){
-            $unitTag[]='translate5:personGuid="'.$this->itsPersonGuid.'"';
+            $unitTag[]='translate5:personGuid="'.$this->escape($this->itsPersonGuid).'"';
         }
         
         if($this->itsRevPerson){
-            $unitTag[]='its:revPerson="'.$this->itsRevPerson.'"';
+            $unitTag[]='its:revPerson="'.$this->escape($this->itsRevPerson).'"';
         }
         
         if($this->itsRevPersonGuid){
-            $unitTag[]='translate5:revPersonGuid="'.$this->itsRevPersonGuid.'"';
+            $unitTag[]='translate5:revPersonGuid="'.$this->escape($this->itsRevPersonGuid).'"';
         }
         
         //state start
         if(isset($this->data['manualStatus'][$segment['stateId']])) {
             $stateText =  $this->data['manualStatus'][$segment['stateId']];
-            $unitTag[]='translate5:manualStatus="'.$stateText.'" '.'translate5:manualStatusId="'.$segment['stateId'].'"';
+            $unitTag[]='translate5:manualStatus="'.$this->escape($stateText).'" '.'translate5:manualStatusId="'.$this->escape($segment['stateId']).'"';
         }
         
         $this->result[] = '<'.join(' ', $unitTag).'>';
@@ -384,7 +387,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $stateText =  $this->data['autostates'][$segment['autoStateId']];
         }
         
-        $this->result[] = '<segment id="'.self::SEGMENT_ID_PREFIX.$segment['segmentNrInTask'].'" state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$stateText.'">';
+        $this->result[] = '<segment id="'.$this->escape(self::SEGMENT_ID_PREFIX.$segment['segmentNrInTask']).'" state="'.$this->segmentStateMap[$segment['autoStateId']].'" subState="translate5Autostate:'.$this->escape($stateText).'">';
         
         
         //add the comment only once
@@ -427,12 +430,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             $modified = $modified->format($modified::ATOM);
             $created= $created->format($created::ATOM);
             $this->result[] = sprintf($note,
-                                      htmlspecialchars($comment['id']),
-                                      htmlspecialchars($comment['userGuid']),
-                                      htmlspecialchars($comment['userName']),
-                                      $created,
-                                      $modified, 
-                                      htmlspecialchars($comment['comment']));
+                $this->escape($comment['id']),
+                $this->escape($comment['userGuid']),
+                $this->escape($comment['userName']),
+                $created,
+                $modified, 
+                $this->escape($comment['comment']));
         }
         $this->result[] = '</notes>';
     }
@@ -463,7 +466,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             
             //if there are qms for the segment add the mrk tag
             if(!empty($qms)){
-                $this->result[] ='<mrk id="'.self::QM_ID_PREFIX.implode('_',array_keys($qms)).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.self::QM_ID_PREFIX.implode('_', array_keys($qms)).'">';
+                $this->result[] ='<mrk id="'.$this->escape(self::QM_ID_PREFIX.implode('_',array_keys($qms))).'" its:type="generic" translate="yes" its:locQualityIssuesRef="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qms))).'">';
             }
             //add the target edit text
             $this->result[] = $targetEdit;
@@ -666,11 +669,11 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                 }
                 
                 if(!empty($transStatus[$class])) {
-                    $translation = ' translate5:translated="'.$transStatus[$class].'"';
+                    $translation = ' translate5:translated="'.$this->escape($transStatus[$class]).'"';
                 }
             }
             
-            return '<mrk id="'.$tbxId.'" type="term" translate5:status="'.$status.'"'.$translation.'>';
+            return '<mrk id="'.$this->escape($tbxId).'" type="term" translate5:status="'.$this->escape($status).'"'.$translation.'>';
         }, '</mrk>', $protectInternalTags);
     }
     
@@ -762,7 +765,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         
         $this->addComments('qmComment');
         
-        $this->result[]='<its:locQualityIssues xml:id="'.self::QM_ID_PREFIX.implode('_', array_keys($qms)).'">';
+        $this->result[]='<its:locQualityIssues xml:id="'.$this->escape(self::QM_ID_PREFIX.implode('_', array_keys($qms))).'">';
         $qmXml = '<its:locQualityIssue locQualityIssueType="%1$s" />';
         foreach ($qms as $qmid => $qm) {
             $this->result[] = sprintf($qmXml,$qm);
