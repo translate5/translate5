@@ -80,7 +80,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
         
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        //return empty result when no query string exisit
         if(empty($queryString)) {
             return $this->resultList;
         }
@@ -93,6 +93,16 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
+        return $this->queryGoogleApi($searchString);
+    }
+    
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language 
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
         return $this->queryGoogleApi($searchString);
     }
     
@@ -120,18 +130,6 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         $this->resultList->addResult(isset($result['text']) ? $result['text'] : '',$this->DEFAULT_MATCHRATE);
         return $this->resultList;
     }
-    
-    /**
-     * Throws a ZfExtended_BadGateway exception containing the underlying errors
-     * @throws ZfExtended_BadGateway
-     */
-    protected function throwBadGateway() {
-        $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setOrigin('LanguageResources');
-        $e->setErrors($this->api->getErrors());
-        throw $e;
-    }
-    
     
     /**
      * {@inheritDoc}

@@ -72,6 +72,30 @@
     asort($availableTranslations);
     $languageSelector=[];
     
+    //translated strings
+    $this->translations=array(
+        "clearText"                 => $translate->_("Text zurücksetzen"),
+        "copy"                      => $translate->_("Kopieren"),
+        "enterText"                 => $translate->_("Geben Sie Text ein"),
+        "serverErrorMsg500"         => $translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
+        "translate"                 => $translate->_("Übersetzen"),
+        "orTranslateFile"           => $translate->_("oder lassen Sie ein Dokument übersetzen"),
+        "orTranslateText"           => $translate->_("oder lassen Sie Text übersetzen, den Sie eingeben."),
+        "turnOffInstantTranslation" => $translate->_("Sofortübersetzung deaktivieren"),
+        "turnOnInstantTranslation"  => $translate->_("Sofortübersetzung aktivieren"),
+        "uploadFile"                => $translate->_("Laden Sie eine Datei hoch"),
+        "uploadFileNotFound"        => $translate->_("Bitte wählen Sie eine Datei aus."),
+        "pleaseChoose"              => $translate->_("Bitte auswählen"),
+        "clearBothLists"            => $translate->_("Beide Listen zurücksetzen"),
+        "showAllAvailableFor"       => $translate->_("Alle anzeigen für"),
+        "notAllowed"                => $translate->_("nicht erlaubt"),
+        "openInTermPortal"          => $translate->_("Term in Terminologie-Portal öffnen"),
+        "attentionFuzzyMatch"       => $translate->_("Achtung! FuzzyMatch ({0})"),
+        "differenceIsHighlighted"   => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben"),
+        "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung.")
+    );
+    $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
+    
     $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector">';
     $languageSelector[]='<select id="locale">';
     foreach ($availableTranslations as $locale => $translation) {
@@ -137,7 +161,7 @@
             <div id="instantTranslationIsOff" class="click-starts-translation instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
             <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
-        <div id="mtEngineSelectorError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+        <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
         <div id="translations">
             <!-- inject translations here  -->

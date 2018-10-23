@@ -54,7 +54,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::open()
      */
     public function open() {
-        //This call is not necessary, since TMs are opened automatically.
+        //This call is not necessary, since this resource is opened automatically.
     }
     
     /**
@@ -62,11 +62,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::open()
      */
     public function close() {
-    /*
-     * This call deactivated, since openTM2 has a access time based garbage collection
-     * If we close a TM and another Task still uses this TM this bad for performance,
-     *  since the next request to the TM has to reopen it
-     */
+        //This call is not necessary, since this resource is closed automatically.
     }
     
     /**
@@ -75,7 +71,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
+        //return empty result when no query string exisit
         if(empty($queryString)) {
             return $this->resultList;
         }
@@ -97,6 +93,22 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         return $this->querySdlApi($searchString);
     }
     
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
+        return $this->querySdlApi($searchString);
+    }
+    
+    
+    /***
+     * Query the sdl cloud api and get the available results as editor_Services_ServiceResult
+     * @param string $searchString
+     * @return editor_Services_ServiceResult
+     */
     protected function querySdlApi($searchString){
         if(empty($searchString)) {
             return $this->resultList;
@@ -122,17 +134,6 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         $this->resultList->addResult(isset($result->translation) ? $result->translation : "",$this->DEFAULT_MATCHRATE);
         return $this->resultList;
     }
-    /**
-     * Throws a ZfExtended_BadGateway exception containing the underlying errors
-     * @throws ZfExtended_BadGateway
-     */
-    protected function throwBadGateway() {
-        $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setOrigin('LanguageResources');
-        $e->setErrors($this->api->getErrors());
-        throw $e;
-    }
-    
     
     /**
      * {@inheritDoc}
