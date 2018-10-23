@@ -63,7 +63,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             unknown: '#UT#unbekannt',
             noconnection: '#UT#Keine Verbindung!',
             import: '#UT#importiert',
-            notloaded: '#UT#verfügbar'
+            notloaded: '#UT#verfügbar',
+            novalidlicense: '#UT#Keine gültige Lizenz.'
         },
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Standardmässig aktiv für',

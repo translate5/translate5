@@ -680,6 +680,7 @@ a.x-btn span.task-confirmation {
 .tmOverviewPanel td.loading div {background: url(../images/loading_ico.gif) no-repeat center center;}
 .tmOverviewPanel .languageResource-status-noconnection td.status {color: #ff3232;}
 .tmOverviewPanel .languageResource-status-error td.status {color: #ff3232;}
+.tmOverviewPanel .languageResource-status-novalidlicense td.status {color: #ff3232;}
 
 
 .language-resource-result-panel .match-state-loading.x-grid-row .source > div,
