@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  * Converts a List with Segments to XML
  * 
  * TODO: MQM and Terminology markup export is missing! 
+ * FIXME: use DOMDocument or similar to create the XML to deal correctly with escaping of strings!
  */
 abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     /**
@@ -367,9 +368,9 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     }
     
     protected function addAltTransToResult($targetText, $lang, $label, $type = null) {
-        $alttranstype = empty($type) ? '' : ' alttranstype="'.$type.'"';
-        $this->result[] = '<alt-trans dx:origin-shorttext="'.$label.'"'.$alttranstype.'>';
-        $this->result[] = '<target xml:lang="'.$lang.'">'.$targetText.'</target></alt-trans>';
+        $alttranstype = empty($type) ? '' : ' alttranstype="'.$this->escape($type).'"';
+        $this->result[] = '<alt-trans dx:origin-shorttext="'.$this->escape($label).'"'.$alttranstype.'>';
+        $this->result[] = '<target xml:lang="'.$this->escape($lang).'">'.$targetText.'</target></alt-trans>';
     }
     
     protected function addDiffToResult($targetEdit, $targetOriginal, $label, $segment) {
@@ -410,5 +411,18 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
         if(empty($this->taghelperTrackChanges)) {
             $this->taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
         }
+    }
+    
+    /**
+     * escapes a string to be used in XML
+     * @param string $text
+     * @param boolean $isAttribute set to false, if value is not used as attribute (no double quote escaping)
+     * @return string
+     */
+    protected function escape($text, $isAttribute = true) {
+        if($isAttribute) {
+            return htmlspecialchars($string, ENT_XML1 | ENT_COMPAT, 'UTF-8');
+        }
+        return htmlspecialchars($text, ENT_XML1, 'UTF-8');
     }
 }
