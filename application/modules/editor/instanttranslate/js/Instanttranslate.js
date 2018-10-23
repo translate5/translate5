@@ -39,32 +39,46 @@ var editIdleTimer = null,
 
 /***
  * Stores an array with the allowed file-types according to the available engines.
+ * - If two engines for the same language-combination are available and allow fileUploads,
+ *   the one with a domainCode is prioritized.
+ * - Other cases are not defined so far (e.g. what if we have THREE engines for the same 
+ *   language-combination and TWO of them have a domainCode / what if they belong to different 
+ *   services / ...).
  */
 function setFileTypesAllowedAndAvailable() {
     var engineId,
         mtEngine,
         extensionsFileTranslation = Editor.data.languageresource.fileExtension,
-        extensionsKey,
+        serviceFileExtensions,
+        languageCombination,
         filesTypesForLanguageCombination;
     for (engineId in machineTranslationEngines) {
         if(machineTranslationEngines.hasOwnProperty(engineId)){
             mtEngine = machineTranslationEngines[engineId];
-            extensionsKey = mtEngine.source+","+mtEngine.target;
-            if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
+            if(mtEngine.fileUpload == true && extensionsFileTranslation.hasOwnProperty(mtEngine.serviceName)){
+                serviceFileExtensions = extensionsFileTranslation[mtEngine.serviceName];
+                languageCombination = mtEngine.source+","+mtEngine.target;
                 filesTypesForLanguageCombination = [];
-                if(fileTypesAllowedAndAvailable[extensionsKey] === -1) {
-                    filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[extensionsKey];
+                if(fileTypesAllowedAndAvailable.hasOwnProperty(languageCombination)) {
+                    // Do we already have file-types stored for this language-combination? Then check the domainCode and prioritize accordingly.
+                    var domainCodeStored = fileTypesAllowedAndAvailable[languageCombination].domainCode,
+                        isEmptyEngineDomainCode = (mtEngine.domainCode == '' || mtEngine.domainCode == null) ? true : false;
+                    if (domainCodeStored != '' && isEmptyEngineDomainCode) {
+                        continue;
+                    } 
                 }
-                extensionsFileTranslation[extensionsKey].forEach(function(fileType) {
-                    if(filesTypesForLanguageCombination.indexOf(fileType) === -1) {
+                serviceFileExtensions.forEach(function(fileType) {
+                    // Add file-extensions (but only if they are not stored already).
+                    if ($.inArray(fileType, filesTypesForLanguageCombination) === -1) {
                         filesTypesForLanguageCombination.push(fileType);
                     }
                   });
                 if(filesTypesForLanguageCombination.length > 0) {
-                    var item = {'sourceLocale': mtEngine.source,
-                                'targetLocale': mtEngine.target,
-                                'filyTypes': filesTypesForLanguageCombination};
-                    fileTypesAllowedAndAvailable[extensionsKey] = item;
+                    var dataForLanguageCombination = {'domainCode': mtEngine.domainCode,
+                                                      'sourceLocale': mtEngine.source,
+                                                      'targetLocale': mtEngine.target,
+                                                      'fileTypes': filesTypesForLanguageCombination};
+                    fileTypesAllowedAndAvailable[languageCombination] = dataForLanguageCombination;
                 }
             }
         }
@@ -79,8 +93,7 @@ function getAllowedFileTypes() {
         targetLocale = $("#targetLocale").val(),
         filesTypesForLanguageCombination,
         addFileTypes,
-        allowedFileTypes = [],
-        allowedFileTypesUnique;
+        allowedFileTypes = [];
     for (var key in fileTypesAllowedAndAvailable) {
         if (fileTypesAllowedAndAvailable.hasOwnProperty(key)) {
             filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[key];
@@ -95,14 +108,11 @@ function getAllowedFileTypes() {
                 addFileTypes = true;
             }
             if (addFileTypes) {
-                allowedFileTypes = allowedFileTypes.concat(filesTypesForLanguageCombination.filyTypes);
+                allowedFileTypes = allowedFileTypes.concat(filesTypesForLanguageCombination.fileTypes);
             }
         }
     }
-    allowedFileTypesUnique = allowedFileTypes.filter(function(elem, index, self) {
-        return index == self.indexOf(elem);
-    });
-    return allowedFileTypesUnique;
+    return allowedFileTypes;
 }
 /***
  * Check if files can be translated for the current language-combination.
@@ -369,19 +379,18 @@ function startFileTranslation(){
         fileType,
         fileTypesAllowed = getAllowedFileTypes(),
         fileTypesErrorList = [];
-    if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
-        showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
-        return;
-    }
-    if ($('#sourceFile').val() == "") {
+    if ($('#sourceFile').val() == "" && ($("#sourceLocale").val() != '-' || $("#targetLocale").val() != '-')) {
         showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
+        return;
+    } else if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
+        showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
         return;
     }
     clearAllErrorMessages();
     $.each(uploadedFiles, function(key, value){
         fileName = value.name;
         fileType = fileName.substr(fileName.lastIndexOf('.')+1,fileName.length);
-        if (fileTypesAllowed.indexOf(fileType) === -1) {
+        if ($.inArray(fileType, fileTypesAllowed) === -1) {
             fileTypesErrorList.push(fileType);
         }
     });
@@ -397,7 +406,7 @@ function startTimerForInstantTranslation() {
     terminateTranslation();
     if (instantTranslationIsActive && $("#sourceLocale").val() != '-' && $("#targetLocale").val() != '-') {
         editIdleTimer = setTimeout(function() {
-            startTranslation();
+            startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
         }, 200);
     }
 }
@@ -406,6 +415,16 @@ function startTranslation() {
         translationInProgressID;
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
+        // --------------- TODO start: we can get here via startTimerForInstantTranslation (= without calling startFileTranslation() first),
+        // ---------------             so we have to run the same validations. Bad!
+        if ($('#sourceFile').val() == "" && ($("#sourceLocale").val() != '-' || $("#targetLocale").val() != '-')) {
+            showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
+            return;
+        } else if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
+            showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
+            return;
+        }
+        // --------------- TODO end
         if (uploadedFiles != undefined) {
             startLoadingState();
             requestFileTranslate();
@@ -595,14 +614,17 @@ function requestFileTranslate(){
 
     // Create a formdata object and add the files
     var data = new FormData(),
-        ext=getFileExtension();
+        ext=getFileExtension(),
+        languageCombination = $("#sourceLocale").val()+','+$("#targetLocale").val(),
+        dataForLanguageCombination = fileTypesAllowedAndAvailable[languageCombination];
     
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
-    
+
+    data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO
     data.append('source', $("#sourceLocale").val());
-    data.append('target',$("#targetLocale").val());
+    data.append('target', $("#targetLocale").val());
     
     //when no extension in the file is found, use default file extension
     data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
