@@ -41,9 +41,6 @@ Ext.define('Editor.view.admin.task.LogGrid', {
         message: '#UT# Fehler',
         created: '#UT# Zeitpunkt'
     },
-    viewConfig: {
-        loadMask: false
-    },
     initConfig: function(instanceConfig) {
         var me = this,
             config;
