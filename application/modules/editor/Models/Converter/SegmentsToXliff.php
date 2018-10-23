@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  * and http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html
  * 
  * TODO: MQM and Terminology markup export is missing! 
+ * FIXME: use DOMDocument or similar to create the XML to deal correctly with escaping of strings!
  */
 class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_SegmentsToXliffAbstract{
     /**
@@ -172,8 +173,8 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
         }
         $headParams[] = 'xmlns:translate5="http://www.translate5.net/"';
         $this->enabledNamespaces['translate5'] = 'translate5';
-        $headParams[] = 'translate5:taskname="'.htmlspecialchars($this->task->getTaskName()).'"';
-        $headParams[] = 'translate5:taskguid="'.htmlspecialchars($this->task->getTaskGuid()).'"';
+        $headParams[] = 'translate5:taskname="'.$this->escape($this->task->getTaskName()).'"';
+        $headParams[] = 'translate5:taskguid="'.$this->escape($this->task->getTaskGuid()).'"';
         $this->result[] = '<'.join(' ', $headParams).'>';
         
         if($this->options[self::CONFIG_ADD_DISCLAIMER]) {
@@ -197,7 +198,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
 
         $this->exportParser = $this->getExportFileparser($first['fileId'], $filename);
         $file = '<file original="%1$s" source-language="%2$s" target-language="%3$s" xml:space="preserve" datatype="x-translate5">';
-        $this->result[] = sprintf($file, htmlspecialchars($filename), $this->data['sourceLang'], $this->data['targetLang']);
+        $this->result[] = sprintf($file, $this->escape($filename), $this->data['sourceLang'], $this->data['targetLang']);
         $this->result[] = '<body>';
         
         $fileMapKey = $this->prepareTagsStorageInHeader();
@@ -261,7 +262,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
         }
 
         //segmentNrInTask is the segment id of the generated segment
-        $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $autoStateText, $additionalAttributes);
+        $this->result[] = "\n".sprintf($segStart, $segment['segmentNrInTask'], $segment['autoStateId'], $this->escape($autoStateText), $additionalAttributes);
         
         /*
          * <!-- attention: regarding internal tags the source and the target-content are in the same format as the contents of the original source formats would have been. For SDLXLIFF this means: No mqm-Tags; Terms marked with <mrk type="x-term-...">-Tags; Internal Tags marked with g- and x-tags; For CSV this means: No internal tags except mqm-tags -->
@@ -299,7 +300,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
             return; //handled before
         }
         if($field->type == editor_Models_SegmentField::TYPE_RELAIS && $this->data['relaisLang'] !== false) {
-            $this->result[] = '<alt-trans dx:origin-shorttext="'.$field->label.'"><target xml:lang="'.$this->data['relaisLang'].'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
+            $this->result[] = '<alt-trans dx:origin-shorttext="'.$this->escape($field->label).'"><target xml:lang="'.$this->escape($this->data['relaisLang']).'">'.$this->prepareText($segment[$field->name]).'</target></alt-trans>';
             return;
         }
         if($field->type != editor_Models_SegmentField::TYPE_TARGET) {
@@ -346,9 +347,9 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
     }
     
     protected function addAltTransToResult($targetText, $lang, $label, $type = null) {
-        $alttranstype = empty($type) ? '' : ' alttranstype="'.$type.'"';
-        $this->result[] = '<alt-trans dx:origin-shorttext="'.$label.'"'.$alttranstype.'>';
-        $this->result[] = '<target xml:lang="'.$lang.'">'.$targetText.'</target></alt-trans>';
+        $alttranstype = empty($type) ? '' : ' alttranstype="'.$this->escape($type).'"';
+        $this->result[] = '<alt-trans dx:origin-shorttext="'.$this->escape($label).'"'.$alttranstype.'>';
+        $this->result[] = '<target xml:lang="'.$this->escape($lang).'">'.$targetText.'</target></alt-trans>';
     }
     
     protected function addDiffToResult($targetEdit, $targetOriginal, $label, $segment) {
@@ -368,7 +369,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
             //if the +0200 at the end makes trouble use the following
             //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
             $modified = $modified->format($modified::ATOM);
-            $this->result[] = sprintf($note, htmlspecialchars($comment['userName']), $modified, htmlspecialchars($comment['comment']));
+            $this->result[] = sprintf($note, $this->escape($comment['userName']), $modified, $this->escape($comment['comment']));
         }
     }
     
@@ -377,7 +378,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @param array $segment
      */
     protected function processStateAndQm(array $segment) {
-        $this->result[] = '<state stateid="'.$segment['stateId'].'">'.$this->segmentUtility->convertStateId($segment['stateId']).'</state>';
+        $this->result[] = '<state stateid="'.$this->escape($segment['stateId']).'">'.$this->escape($this->segmentUtility->convertStateId($segment['stateId']),false).'</state>';
         $qms = $this->segmentUtility->convertQmIds($segment['qmId']);
         if(empty($qms)) {
             $this->result[] = '<dx:qa-hits></dx:qa-hits>';
@@ -386,7 +387,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
             $this->result[] = '<dx:qa-hits>';
             $qmXml = '<dx:qa-hit dx:qa-origin="target" dx:qa-code="%1$s" dx:qa-shorttext="%2$s" />';
             foreach ($qms as $qmid => $qm) {
-                $this->result[] = sprintf($qmXml, $qmid, $qm);
+                $this->result[] = sprintf($qmXml, $this->escape($qmid), $this->escape($qm));
             }
             $this->result[] = '</dx:qa-hits>';
         }
@@ -438,10 +439,10 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
                     continue;
                 }
                 if(!empty($transStatus[$class])) {
-                    $translation = ' translate5:translated="'.$transStatus[$class].'"';
+                    $translation = ' translate5:translated="'.$this->escape($transStatus[$class]).'"';
                 }
             }
-            return '<mrk mtype="term" translate5:status="'.$status.'"'.$translation.'>';
+            return '<mrk mtype="term" translate5:status="'.$this->escape($status).'"'.$translation.'>';
         }, '</mrk>', $protectInternalTags);
     }
 }
