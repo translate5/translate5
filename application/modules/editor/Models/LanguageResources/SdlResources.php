@@ -74,8 +74,15 @@ class editor_Models_LanguageResources_SdlResources {
         $config = Zend_Registry::get('config');
         
         $engineCharacterLimit=null;
+        //set the character limit as languageResourceId as key an characterlimit as value so easy can be accesed
         if(isset($config->runtimeOptions->LanguageResources->searchCharacterLimit)){
-            $engineCharacterLimit=$config->runtimeOptions->LanguageResources->searchCharacterLimit->toArray();
+            $charLimit=$config->runtimeOptions->LanguageResources->searchCharacterLimit->toArray();
+            foreach ($charLimit as $limit){
+                $limit = json_decode(json_encode($limit),true);
+                foreach ($limit as $key=>$value) {
+                    $engineCharacterLimit[$key]=$value;
+                }
+            }
         }
         
         //get the maximum allowed characters for the engine

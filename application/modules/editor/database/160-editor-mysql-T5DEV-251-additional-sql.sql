@@ -78,3 +78,10 @@ ADD CONSTRAINT `fk_LEK_term_entry_attributes_1`
 DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.LanguageResources.groupshare.matchrate';
 
 DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.LanguageResources.termcollection.matchrate';
+
+/* remove the match resources from the active plugin */
+UPDATE `Zf_configuration` SET `value` = 
+REPLACE(`value`, ',"editor_Plugins_MatchResource_Init"', '') WHERE `name` = 'runtimeOptions.plugins.active' AND `value` != '[]';
+
+UPDATE `Zf_configuration` SET `value` = 
+REPLACE(`value`, '"editor_Plugins_MatchResource_Init",', '') WHERE `name` = 'runtimeOptions.plugins.active' AND `value` != '[]';
