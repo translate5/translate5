@@ -85,6 +85,10 @@ h4, p {
 .infotext span:hover {
     text-decoration: underline;
 }
+#sourceText.source-text-error,
+#sourceText.source-text-error:focus {
+    border: 1px solid #f00;
+}
 .source-text-error.infotext {
     color: #f00;
 }
@@ -337,6 +341,13 @@ h4, p {
   font-size: 12px;
   color: #666;
   text-align: right;
+}
+#countedCharacters.source-text-error {
+    background-color: #f00;
+    color: #fff;
+    font-weight: bold;
+    font-size: 15px;
+    right: 14px;
 }
 
 /* --------------- ui-tooltip --------------- */
