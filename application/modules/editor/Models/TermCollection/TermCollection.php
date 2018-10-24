@@ -86,7 +86,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $sql=' SELECT * FROM LEK_terms '.
               'WHERE groupId IN ( '.
               'SELECT `t`.`groupId` FROM `LEK_terms` AS `t` '.
-              'WHERE (lower(term) like lower(?)) COLLATE utf8_bin '.
+              'WHERE lower(term) like lower(?) COLLATE utf8_bin '.
               'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`) '.
               'AND language=? AND collectionId=?';
         return $this->db->getAdapter()->query($sql, array($queryString,$this->getId(),$sourceLang,$targetLang,$this->getId()))->fetchAll();
