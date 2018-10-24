@@ -54,16 +54,16 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.store.LanguageResources.SdlEngine'
     ],
     strings: {
-        languageresource: '#UT#Sprachressourcen',
+        languageresource: '#UT#Sprach-Resourcen',
         deleteConfirm: '#UT#Sprachressource endgültig löschen?',
         deleteConfirmText: '#UT#Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?',
         deleteConfirmLocal: '#UT#Sprachressource löschen?',
-        deleteConfirmLocalText: '#UT#Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.',
+        deleteConfirmLocalText: '#UT#Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.',
         deleted: '#UT#Sprachressource gelöscht.',
         edited: '#UT#Die Sprachressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Sprachressource "{0}" wurde erfolgreich erstellt.',
-        noResourcesAssigned: '#UT#Keine Sprachressourcen zugewiesen.',
-        taskassocgridcell:'#UT#Zugewiesene Sprachressourcen',
+        noResourcesAssigned: '#UT#Keine Sprach-Resourcen zugewiesen.',
+        taskassocgridcell:'#UT#Zugewiesene Sprach-Resourcen',
         exportTm: '#UT#als TM Datei exportieren',
         exportTmx: '#UT#als TMX Datei exportieren'
     },
@@ -412,9 +412,13 @@ Ext.define('Editor.controller.TmOverview', {
     },
     handleTmGridActionColumnClick:function(view, cell, row, col, ev, evObj) {
         var me = this,
+            grid=view.up('tmOverviewPanel'),
             store = view.getStore(),
             record = store.getAt(row),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
+        
+        //call the selection row handler
+        grid.onGridRowSelect(grid,[record]);
 
         switch(f && f[1] || '') {
             case 'edit':

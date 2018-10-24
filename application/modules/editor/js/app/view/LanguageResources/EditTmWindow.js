@@ -108,10 +108,13 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     },
                     fieldLabel: me.strings.resource
                 },{
-                    xtype: 'displayfield',
+                    xtype: 'textfield',
                     name: 'name',
                     toolTip: me.strings.name,
-                    fieldLabel: me.strings.name
+                    fieldLabel: me.strings.name,
+                    maxLength: 255,
+                    allowBlank: false,
+                    toolTip:'Name'
                 },Ext.applyIf({
                     name: 'sourceLang',
                     toolTip: me.strings.source,

@@ -40,7 +40,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
     alias: 'widget.tmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title:'#UT#Sprachressourcen',
+    title:'#UT#Sprach-Resourcen',
     strings: {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',
@@ -63,11 +63,11 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             unknown: '#UT#unbekannt',
             noconnection: '#UT#Keine Verbindung!',
             import: '#UT#importiert',
-            notloaded: '#UT#verfügbar'
+            notloaded: '#UT#verfügbar',
+            notchecked:'#UT#Nicht geprüft'
         },
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Standardmässig aktiv für',
-        useAsDefaultTooltip:'#UT#Language Ressource standardmässig aktiv für',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben'
     },
     cls:'tmOverviewPanel',
@@ -85,6 +85,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     getRowClass: function(record) {
                         var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
                         return cls + ' languageResource-status-'+record.get('status');
+                    }
+                },
+                selModel: {
+                    pruneRemoved: false,
+                    listeners: {
+                        selectionchange: {
+                            fn: 'onGridRowSelect',
+                            scope: me
+                        }
                     }
                 },
                 columns: [{
@@ -168,13 +177,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     renderer:me.resourceCustomersRenderer
                 },{
                     xtype: 'gridcolumn',
-                    width: 190,
+                    width: 270,
                     dataIndex:'useAsDefault',
                     filter: {
                         type: 'string'
                     },
                     text:me.strings.useAsDefault,
-                    tooltip:me.strings.useAsDefaultTooltip,
+                    tooltip:me.strings.useAsDefault,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
@@ -257,12 +266,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         text: me.strings.refresh,
                         tooltip: me.strings.refresh
                     }]
-                },{
-                    xtype: 'pagingtoolbar',
-                    store: 'Editor.store.LanguageResources.LanguageResource',
-                    dock: 'bottom',
-                    displayInfo: true
-            }]
+                }]
       };
 
       if (instanceConfig) {
@@ -295,7 +299,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if(!value || value.length<1){
             return '';
         }
-        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value).join(',')+'"';
+        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value,true).join('</br>')+'"';
         return value.length;
     },
 
@@ -310,9 +314,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     },
 
     /**
-     * Get customer names by costomer id
+     * Get customer names by costomer id.
+     * When addCustomerNumber is true, the customer number will be concatanate to the result in format [customerNumber] customerName
      */
-    getCustomersNames:function(customerIds){
+    getCustomersNames:function(customerIds,addCustomerNumber){
         if(!customerIds || customerIds.length<1){
             return '';
         }
@@ -321,8 +326,27 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
 
         for(var i=0;i<customerIds.length;i++){
             var rec=customerStore.getById(customerIds[i]);
-            names.push(rec.get('name'));
+            if(addCustomerNumber){
+                names.push('['+rec.get('number')+'] '+rec.get('name'));
+            }else{
+                names.push(rec.get('name'));
+            }
         }
         return names
+    },
+
+    /***
+     * Grid row select handler
+     */
+    onGridRowSelect:function(grid,selected){
+        if(selected.length<1){
+            return;
+        }
+        var record=selected[0];
+        if(record.get('status')=='loaded'){
+            return;
+        }
+        record.set('status','loading');
+        record.load();
     }
 });

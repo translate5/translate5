@@ -42,7 +42,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
     itemId:'languageResourceTaskAssocPanel',
     requires: ['Editor.view.admin.TaskActionColumn'],
     cls : 'adminTaskGrid',
-    title: '#UT#Sprachressourcen zuweisen',
+    title: '#UT#Sprach-Resourcen zuweisen',
     strings: {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',

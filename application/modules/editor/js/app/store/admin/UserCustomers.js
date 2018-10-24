@@ -38,8 +38,6 @@ Ext.define('Editor.store.admin.UserCustomers', {
     model: 'Editor.model.admin.Customer',
     autoLoad: false,
     storeId:'userCustomers',
-
-
     /**
      * Load the customers assigned to the user
      */
@@ -52,9 +50,8 @@ Ext.define('Editor.store.admin.UserCustomers', {
                 Editor.app.getController('ServerException').handleCallback(arguments);
             },
             success: function(record, operation) {
-
                 var userCustomers=record.get('customers').split(',');//get the user customers as array
-                    userCustomers=userCustomers.filter(v=>v!='');//remove the empty array fields
+                    userCustomers=userCustomers.filter(function(v){return v!=''});//remove the empty array fields
     
                 //if no customers to the user are assigned, set empty store
                 if(userCustomers.length<1){

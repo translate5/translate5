@@ -56,7 +56,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen',
-        customers:'#UT#Kunden',
+        customers:'#UT#Für diese Kunden nutzen',
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
         mergeTerms:'#UT#Termeinträge verschmelzen',
         deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',

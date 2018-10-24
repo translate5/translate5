@@ -29,7 +29,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.LanguageResources.LanguageResource', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.LanguageResources.LanguageResource',
-  pageSize: 20,
-  autoLoad: false,
+  autoLoad: true,
   remoteFilter:true
+  //INFO:remote sort is not needed since the pageing is removed
+  //pageSize: 20,
+  //remoteSort:true
 });
