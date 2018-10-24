@@ -38,7 +38,10 @@ set_time_limit(0);
 
 //uncomment the following line, so that the file is not marked as processed:
 //$this->doNotSavePhpForDebugging = false;
-define('SCRIPT_IDENTIFIER', '154-editor-mysql-TRANSLATE-1380.php'); //should be not __FILE__ in the case of wanted restarts / renamings etc
+
+//should be not __FILE__ in the case of wanted restarts / renamings etc
+// and must not be a constant since in installation the same named constant would we defined multiple times then
+$SCRIPT_IDENTIFIER = '154-editor-mysql-TRANSLATE-1380.php'; 
 
 /* @var $this ZfExtended_Models_Installer_DbUpdater */
 
@@ -56,7 +59,7 @@ $sql = 'SELECT `taskGuid` FROM `LEK_task` WHERE `taskGuid` NOT IN (
     SELECT `taskGuid` FROM `LEK_task_migration` WHERE `filename` = ?
 ) AND `state` != "import"';
 
-$res = $db->query($sql, SCRIPT_IDENTIFIER);
+$res = $db->query($sql, $SCRIPT_IDENTIFIER);
 $tasks = $res->fetchAll(Zend_Db::FETCH_COLUMN);
 
 /*
@@ -111,7 +114,7 @@ foreach ($tasks as $taskGuid) {
 
     if($allFilesConverted) {
         error_log('Task '.($tasksDone++).' of '.$taskCount." done.\n");
-        $res = $db->query('INSERT INTO LEK_task_migration (`taskGuid`, `filename`) VALUES (?,?)', [$taskGuid, SCRIPT_IDENTIFIER]);
+        $res = $db->query('INSERT INTO LEK_task_migration (`taskGuid`, `filename`) VALUES (?,?)', [$taskGuid, $SCRIPT_IDENTIFIER]);
     }
 }
 
@@ -122,7 +125,7 @@ if($res && ($row = $res->fetchObject()) && $row->cnt === "0") {
 }
 else {
     $this->doNotSavePhpForDebugging = false; //enable restart script when conversion was not complete
-    $msg = SCRIPT_IDENTIFIER.': Could not drop table LEK_skeletonfiles since there are still some skeleton file entries which could not be converted!'."\n";
+    $msg = $SCRIPT_IDENTIFIER.': Could not drop table LEK_skeletonfiles since there are still some skeleton file entries which could not be converted!'."\n";
     $msg .= 'Please check that! Possible reason: a task was in state import while running this script or some skeleton files could not be written to disk.';
     $msg .= 'This script remains in the DbUpdater todo list, until the LEK_skeletonfiles table is empty.';
     error_log($msg);

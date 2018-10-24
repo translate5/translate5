@@ -37,9 +37,6 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 VALUES ('runtimeOptions.LanguageResources.google.matchrate', '1', 'editor', 'editor', '70', '70', '', 'integer', 'Google penalty value, used as default matchrate since in MT no matchrate is available');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.LanguageResources.groupshare.matchrate', '1', 'editor', 'editor', '70', '70', '', 'integer', 'GroupShare penalty value, used as default matchrate since in MT no matchrate is available');
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.LanguageResources.sdllanguagecloud.matchrate', '1', 'editor', 'editor', '70', '70', '', 'integer', 'SDLLanguageCloud penalty value, used as default matchrate since in MT no matchrate is available');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
