@@ -184,8 +184,8 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
                 }
             	meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
             };
-            
-        if(Editor.LanguageResource && prefix == Editor.LanguageResource.matchrateTypeChangedState) {
+           
+        if(prefix == Editor.data.LanguageResources.matchrateTypeChangedState) {
             return '...'; //do nothing here since pending save
         }
         

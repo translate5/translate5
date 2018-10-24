@@ -161,7 +161,7 @@ Ext.define('Editor.controller.LanguageResources', {
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
               //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
-              rec.set('matchRateType', Editor.data.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid')); 
+              rec.set('matchRateType', Editor.data.LanguageResources.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid')); 
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       }
