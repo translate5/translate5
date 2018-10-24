@@ -29,8 +29,7 @@
 
 /*
   README:
-    Move all available languages in the term collection to the languageresources languages table.
-    Each available language per termCollection(languageResource) will exist as unique source target combination
+    Update the long language resources names from the task import to short verssion.
  */
 set_time_limit(0);
 
@@ -47,38 +46,30 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
-//check for terms with null term collection
+
 $db = Zend_Db_Table::getDefaultAdapter();
-$s=$db->select()->from('LEK_terms',array('id'))->where('collectionId IS NULL');
-$result=$db->fetchAll($s);
-if(!empty($result)){
-    $result=array_column($result, 'id');
 
-    //create the term collection which will hold the terms without termcollection
-    $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-    /* @var $collection editor_Models_TermCollection_TermCollection */
-    $collection->setName('Lost and Found Terms');
-    
-    $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
-    /* @var $service editor_Services_TermCollection_Service */
-    $nsp=$service->getServiceNamespace();
-    $collection->setResourceId($nsp);
-    $collection->setServiceType($nsp);
-    $collection->setServiceName($service->getName());
-    $collection->setColor($service::DEFAULT_COLOR);
-    $collection->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
-    $resourceId=$collection->save();
-    
-    //add the terms to the new termcollection
-    $termDb=ZfExtended_Factory::get('editor_Models_Db_Terms');
-    /* @var $termDb editor_Models_Db_Terms */
-    $data = array(
-        'collectionId'      => $resourceId
-    );
-    $where = $termDb->getAdapter()->quoteInto('id IN(?)', $result);
-    $termDb->update($data, $where);
+//load alll termcollections which where imported on task import
+$sql = 'SELECT id,name FROM `LEK_languageresources` WHERE `name` LIKE "Term Collection for Task:%" AND `name` REGEXP "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"';
+$res = $db->query($sql);
+$resources = $res->fetchAll();
+
+$count = count($resources);
+error_log('LanguageResources to be converted: '.$count."\n");
+$convertedCount=0;
+foreach ($resources as $resource) {
+    //get the guid from the resource name
+    $re = '/(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})/i';
+    preg_match($re, $resource['name'], $matches);
+    if(!empty($matches) && isset($matches[0])){
+        $guid=$matches[0];
+        //update the resource name
+        $resModel=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $resModell editor_Models_LanguageResources_LanguageResource */
+        $resModel->load($resource['id']);
+        $resModel->setName('Term Collection for '.$guid);
+        $resModel->save();
+        $convertedCount++;
+    }
 }
-
-$model=ZfExtended_Factory::get('editor_Models_Term');
-/* @var $model editor_Models_Term */
-$model->updateAssocLanguages();
+error_log('LanguageResources converted: '.$convertedCount."\n");

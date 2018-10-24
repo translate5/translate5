@@ -52,7 +52,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     task:null,
     
     strings:{
-        wizardTitle:'#UT#Sprachressourcen zuweisen'
+        wizardTitle:'#UT#Sprach-Resourcen zuweisen'
     },
     initConfig: function(instanceConfig) {
         var me = this,

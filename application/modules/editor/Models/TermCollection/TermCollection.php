@@ -48,7 +48,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
-     * Create new term collection and return the id
+     * Create new term collection and return the id.
+     * The autoCreatedOnImport flag is set to true.
      * @param string $name
      * @param array $customers
      * @return int

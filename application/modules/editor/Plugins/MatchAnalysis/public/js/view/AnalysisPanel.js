@@ -52,7 +52,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
 	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
-	  languageResources:'#UT#Sprachressourcen',
+	  languageResources:'#UT#Sprach-Resourcen',
 	  analysisDate:'#UT#Datum',
 	  languageResourceName: '#UT#Name',
 	  repetitions:'#UT#Wiederholungen:',

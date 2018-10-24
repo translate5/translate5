@@ -2527,8 +2527,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source>
   <target>On editing the source language column no matches can be taken over.</target>
 </trans-unit>
-<trans-unit id='U3ByYWNocmVzc291cmNlbg=='>
-  <source>Sprachressourcen</source>
+<trans-unit id='U3ByYWNoLVJlc291cmNlbg=='>
+  <source>Sprach-Resourcen</source>
   <target>Language resources</target>
 </trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGVuZGfDvGx0aWcgbMO2c2NoZW4/'>
@@ -2643,8 +2643,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Suche in {0}</source>
     <target>Search in {0}</target>
 </trans-unit>
-<trans-unit id='U3ByYWNocmVzc291cmNlbiB6dXdlaXNlbg=='>
-  <source>Sprachressourcen zuweisen</source>
+<trans-unit id='U3ByYWNoLVJlc291cmNlbiB6dXdlaXNlbg=='>
+  <source>Sprach-Resourcen zuweisen</source>
   <target>Associate language resources</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
@@ -2667,16 +2667,16 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>{0} Ergebnisse</source>
   <target>{0} results</target>
 </trans-unit>
-<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlbiB6dWdld2llc2VuLg=='>
-  <source>Keine Sprachressourcen zugewiesen.</source>
+<trans-unit id='S2VpbmUgU3ByYWNoLVJlc291cmNlbiB6dWdld2llc2VuLg=='>
+  <source>Keine Sprach-Resourcen zugewiesen.</source>
   <target>No match resources associated.</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
   <source>Keine Aufgaben zugewiesen.</source>
   <target>No tasks associated.</target>
 </trans-unit>
-<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
-    <source>Zugewiesene Sprachressourcen</source>
+<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNoLVJlc291cmNlbg=='>
+    <source>Zugewiesene Sprach-Resourcen</source>
     <target>Associated language resources</target>
 </trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
@@ -2743,14 +2743,17 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Sprachressource löschen?</source>
     <target>Delete language resource?</target>
 </trans-unit>
-<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaHJlc3NvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
-    <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
+<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaC1SZXNvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
+    <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
     <target>Do you really want to remove the language resource &quot;{0}&quot; from the here listed language resources? <br /> No data will be deleted in the associated TM system, since there is currently no connection to the TM system.</target>
-    
 </trans-unit>
 <trans-unit id='U3RhdHVzaW5mb3JtYXRpb25lbiB3ZXJkZW4gZ2VsYWRlbg=='>
     <source>Statusinformationen werden geladen</source>
     <target>Status information is loaded</target>
+</trans-unit>
+<trans-unit id='TmljaHQgZ2VwcsO8ZnQ='>
+    <source>Nicht geprüft</source>
+    <target>Not checked</target>
 </trans-unit>
 <trans-unit id='dmVyZsO8Z2Jhcg=='>
     <source>verfügbar</source>
@@ -2866,6 +2869,14 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'>
     <source>Info zum Term-Collection</source>
     <target>Term-Collection info</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='>
+    <source>Standardmässig aktiv für</source>
+    <target>Language Ressource used by default for</target>
+</trans-unit>
+<trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'>
+    <source>Für diese Kunden nutzen</source>
+    <target>Use for selected customers</target>
 </trans-unit>
     </body>
   </file>

@@ -42,6 +42,7 @@ abstract class editor_Services_Connector_Abstract {
     const STATUS_UNKNOWN = 'unknown';
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
+    const STATUS_CHECKED = 'notchecked';
     
     /*** 
      * Default resource matchrate

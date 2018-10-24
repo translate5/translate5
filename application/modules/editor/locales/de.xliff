@@ -1300,9 +1300,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
       <source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source>
       <target>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</target>
     </trans-unit>
-    <trans-unit id='U3ByYWNocmVzc291cmNlbg=='>
-      <source>Sprachressourcen</source>
-      <target>Sprachressourcen</target>
+    <trans-unit id='U3ByYWNoLVJlc291cmNlbg=='>
+      <source>Sprach-Resourcen</source>
+      <target>Sprach-Resourcen</target>
     </trans-unit>
     <trans-unit id='U3ByYWNocmVzc291cmNlIGVuZGfDvGx0aWcgbMO2c2NoZW4/'>
       <source>Sprachressource endgültig löschen?</source>
@@ -1416,9 +1416,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
         <source>Suche in {0}</source>
         <target>Suche in {0}</target>
     </trans-unit>
-    <trans-unit id='U3ByYWNocmVzc291cmNlbiB6dXdlaXNlbg=='>
-      <source>Sprachressourcen zuweisen</source>
-      <target>Sprachressourcen zuweisen</target>
+    <trans-unit id='U3ByYWNoLVJlc291cmNlbiB6dXdlaXNlbg=='>
+      <source>Sprach-Resourcen zuweisen</source>
+      <target>Sprach-Resourcen zuweisen</target>
     </trans-unit>
     <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
       <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
@@ -1440,17 +1440,17 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
       <source>{0} Ergebnisse</source>
       <target>{0} Ergebnisse</target>
     </trans-unit>
-    <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlbiB6dWdld2llc2VuLg=='>
-      <source>Keine Sprachressourcen zugewiesen.</source>
-      <target>Keine Sprachressourcen zugewiesen.</target>
+    <trans-unit id='S2VpbmUgU3ByYWNoLVJlc291cmNlbiB6dWdld2llc2VuLg=='>
+      <source>Keine Sprach-Resourcen zugewiesen.</source>
+      <target>Keine Sprach-Resourcen zugewiesen.</target>
     </trans-unit>
     <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
       <source>Keine Aufgaben zugewiesen.</source>
       <target>Keine Aufgaben zugewiesen.</target>
     </trans-unit>
-    <trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
-        <source>Zugewiesene Sprachressourcen</source>
-        <target>Zugewiesene Sprachressourcen</target>
+    <trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNoLVJlc291cmNlbg=='>
+        <source>Zugewiesene Sprach-Resourcen</source>
+        <target>Zugewiesene Sprach-Resourcen</target>
     </trans-unit>
     <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
         <source>Zugewiesene Aufgaben</source>
@@ -1516,13 +1516,17 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
         <source>Sprachressource löschen?</source>
         <target>Sprachressource löschen?</target>
     </trans-unit>
-    <trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaHJlc3NvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
-        <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
-        <target>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</target>
+    <trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaC1SZXNvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
+        <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
+        <target>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</target>
     </trans-unit>
     <trans-unit id='U3RhdHVzaW5mb3JtYXRpb25lbiB3ZXJkZW4gZ2VsYWRlbg=='>
         <source>Statusinformationen werden geladen</source>
         <target>Statusinformationen werden geladen</target>
+    </trans-unit>
+    <trans-unit id='TmljaHQgZ2VwcsO8ZnQ='>
+        <source>Nicht geprüft</source>
+        <target>Nicht geprüft</target>
     </trans-unit>
     <trans-unit id='dmVyZsO8Z2Jhcg=='>
         <source>verfügbar</source>
@@ -1614,6 +1618,14 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='SW5mbyB6dW0gVGVybS1Db2xsZWN0aW9u'>
     <source>Info zum Term-Collection</source>
     <target>Info zum Term-Collection</target>
+</trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='>
+    <source>Standardmässig aktiv für</source>
+    <target>Standardmässig aktiv für</target>
+</trans-unit>
+<trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'>
+    <source>Für diese Kunden nutzen</source>
+    <target>Für diese Kunden nutzen</target>
 </trans-unit>
   </body>
  </file>

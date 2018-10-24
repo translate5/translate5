@@ -106,7 +106,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageResourceInstance->init($languageresource);
             
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
-            $languageresource['status'] = 'loading';
+            $languageresource['status'] = editor_Services_Connector_Abstract::STATUS_CHECKED;
             
             $customerId=[];
             if(isset($custAssoc[$languageresource['id']]['customerId']) && !empty($custAssoc[$languageresource['id']]['customerId'])){

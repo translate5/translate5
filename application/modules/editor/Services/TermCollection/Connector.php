@@ -36,9 +36,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
         parent::connectTo($languageResource,$sourceLang,$targetLang);
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->termcollection->matchrate;
     }
     /**
      * {@inheritDoc}
@@ -150,7 +147,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         foreach ($groups as $group){
             foreach ($group as $res){
                 //convert back to array
-                $this->resultList->addResult($res['term'],$this->DEFAULT_MATCHRATE,$res);
+                $this->resultList->addResult($res['term'],0,$res);
             }
         }
         
