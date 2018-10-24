@@ -424,7 +424,7 @@ Ext.define('Editor.controller.ViewModes', {
     /**
      * Sets the segment font size via CSS class
      */
-    setSegmentSize(size, relative) {
+    setSegmentSize: function(size, relative) {
         var me = this,
             oldSize = me.currentSegmentSize;
         if(relative) {

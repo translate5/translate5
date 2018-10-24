@@ -54,7 +54,9 @@ Ext.define('Editor.store.admin.UserCustomers', {
             success: function(record, operation) {
 
                 var userCustomers=record.get('customers').split(',');//get the user customers as array
-                    userCustomers=userCustomers.filter(v=>v!='');//remove the empty array fields
+                    userCustomers=userCustomers.filter(function(v){
+                        return v!='';
+                    });//remove the empty array fields
     
                 //if no customers to the user are assigned, set empty store
                 if(userCustomers.length<1){
