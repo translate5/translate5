@@ -129,24 +129,39 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
-                        iconCls: 'ico-tm-edit'
+                        iconCls: 'ico-tm-edit',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
                     },{
                         tooltip: me.strings.erase,
                         action: 'delete',
-                        iconCls: 'ico-tm-delete'
+                        iconCls: 'ico-tm-delete',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
                     },{
                         tooltip: me.strings.tasks,
                         action: 'tasks',
-                        iconCls: 'ico-tm-tasks'
+                        iconCls: 'ico-tm-tasks',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
                     },{
                         tooltip: me.strings.import,
                         action: 'import',
-                        iconCls: 'ico-tm-import'
+                        iconCls: 'ico-tm-import',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
                     },{
                         tooltip: me.strings.download,
                         action: 'download',
-                        iconCls: 'ico-tm-download'
-                    }]
+                        iconCls: 'ico-tm-download',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
+                    }],
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
