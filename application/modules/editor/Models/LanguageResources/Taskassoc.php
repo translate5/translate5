@@ -97,12 +97,18 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $db = $this->db;
         $adapter = $db->getAdapter();
         
+        //get all available services
+        $services=ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $services editor_Services_Manager */
+        $allservices=$services->getAll();
+        
         $s = $db->select()
         ->setIntegrityCheck(false)
         ->from(array("languageResource" => "LEK_languageresources"), array("languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
         ->join(array("la"=>"LEK_languageresources_languages"), 'languageResource.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
         ->where('la.sourceLang=?',$task->getSourceLang())
-        ->where('la.targetLang=?',$task->getTargetLang());
+        ->where('la.targetLang=?',$task->getTargetLang())
+        ->where('languageResource.serviceType IN(?)',$allservices);
 
         //check filter is set true when editor needs a list of all used TMs/MTs
         if($this->filter->hasFilter('checked')) {
@@ -162,9 +168,8 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         };
         
         $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
-        
         foreach($result as &$languageresource) {
-            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
+            $resource =$getResource($languageresource['serviceType'], $languageresource['resourceId']);
             if(!empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
             }

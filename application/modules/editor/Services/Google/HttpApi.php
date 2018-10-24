@@ -78,7 +78,7 @@ class editor_Services_Google_HttpApi {
         
         $this->apiKey = isset($config->runtimeOptions->LanguageResources->google->apiKey) ?$config->runtimeOptions->LanguageResources->google->apiKey:null ;
         if(empty($this->apiKey)){
-            throw new ZfExtended_ValidateException("Google translate api json path is not defined");
+            throw new ZfExtended_ValidateException("Google translate api key is not defined");
         }
         
         $this->projectId=isset($config->runtimeOptions->LanguageResources->google->projectId) ?$config->runtimeOptions->LanguageResources->google->projectId:null ;
