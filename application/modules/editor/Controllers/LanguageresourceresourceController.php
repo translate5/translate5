@@ -70,8 +70,7 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
             return ($a->name<$b->name)?-1:1;
         };
         usort($result,$customSort);
-        
-        $this->view->rows = $result;
+		$this->view->rows = array_values($result);
         $this->view->total = count($result);
     }
     public function getAction() {
