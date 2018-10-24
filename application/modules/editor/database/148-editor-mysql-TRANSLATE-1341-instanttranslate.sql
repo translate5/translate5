@@ -35,10 +35,10 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 VALUES ('runtimeOptions.LanguageResources.fileExtension', '1', 'editor', 'system', '', '', '', 'map', 'Available file types by extension per engine type. The engine type is defined by source rcf5646,target rcf5646. ex: \"en-ge,en-us\"');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.LanguageResources.searchCharacterLimit', '1', 'editor', 'instanttranslate', '[]', '[]', '', 'map', 'Maximum character per language resource allowed for search');
+VALUES ('runtimeOptions.LanguageResources.searchCharacterLimit', '1', 'editor', 'instanttranslate', '[]', '[]', '', 'map', 'Maximum character per language resource allowed for search. The configuration key is the language resource id, and the value is the character limit. Ex: {{\"1\": 100},{\"2\": 300}}');
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.InstantTranslate.minMatchRateBorder', '1', 'editor', 'instanttranslate', '', '', '', 'integer', 'Minimum matchrate allowed to be displayed in instantranslate result list');
+VALUES ('runtimeOptions.InstantTranslate.minMatchRateBorder', '1', 'editor', 'instanttranslate', '', 50, '', 'integer', 'Minimum matchrate allowed to be displayed in InstantTranslate result list for TM language resources');
 
 ALTER TABLE `LEK_customer` 
 ADD COLUMN `searchCharacterLimit` INT(11) NULL DEFAULT 100000 COMMENT 'Maximum number of search characters in language resources of this customer' AFTER `number`;
