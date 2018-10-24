@@ -159,7 +159,7 @@ abstract class editor_Services_Connector_Abstract {
      * Search the resource for available translation. Where the source text is in resource source language and the received results
      * are in the resource target language 
      * 
-     * @param string $searchString
+     * @param string $searchString plain text without tags
      * @return editor_Services_ServiceResult
      */
     abstract public function translate(string $searchString);
