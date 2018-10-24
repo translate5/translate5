@@ -30,8 +30,8 @@ Ext.define('Editor.store.LanguageResources.LanguageResource', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.LanguageResources.LanguageResource',
   autoLoad: true,
-  remoteFilter:true
+  remoteFilter:true,
   //INFO:remote sort is not needed since the pageing is removed
-  //pageSize: 20,
+  pageSize: 0
   //remoteSort:true
 });
