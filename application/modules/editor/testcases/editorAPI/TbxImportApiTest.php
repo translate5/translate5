@@ -56,7 +56,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testTbxImport(){
         
-        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerId' => $this->api()->getCustomer()->id));
+        $termCollection = $this->api()->requestJson('editor/termcollection', 'POST', array('name' => 'Test api collection', 'customerIds' => $this->api()->getCustomer()->id));
         $this->assertTrue(is_object($termCollection), 'Unable to create a test collection');
         $this->assertEquals('Test api collection', $termCollection->name);
         
@@ -94,7 +94,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     private function singleTest($fileName,$termCount,$termsAtributeCount,$termsEntryAtributeCount){
         $this->api()->addFile($fileName, $this->api()->getFile($fileName), "application/xml");
-        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>self::$collId, 'customerId' => $this->api()->getCustomer()->id,'mergeTerms'=>true));
+        $this->api()->requestJson('editor/termcollection/import', 'POST', array('collectionId' =>self::$collId, 'customerIds' => $this->api()->getCustomer()->id,'mergeTerms'=>true));
         
         //export the generated file
         $response=$this->api()->requestJson('editor/termcollection/export', 'POST', array('collectionId' =>self::$collId));
@@ -105,7 +105,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         //file_put_contents($this->api()->getFile('/E_'.$fileName, null, false), $response->filedata);
         $expected=$this->api()->getFileContent('E_'.$fileName);
         $actual=$response->filedata;
-        
+
         //check for differences between the expected and the actual content
         $this->assertEquals($expected, $actual,"The expected file an the result file does not match.Test file name:".$fileName);
         
