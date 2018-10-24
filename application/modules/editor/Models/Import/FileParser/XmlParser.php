@@ -250,7 +250,7 @@ class editor_Models_Import_FileParser_XmlParser {
         $tag = $this->parseSelector($selector, $filter);
         if($tag === false) {
             //see parseSelector for possible selectors!
-            throw new ZfExtended_Exception('The given XLF tag selector could not be parsed: '.$selector);
+            throw new ZfExtended_Exception('The given XML tag selector could not be parsed: '.$selector);
         }
         if(!empty($opener)) {
             settype($this->handlerElementOpener[$tag], 'array');
