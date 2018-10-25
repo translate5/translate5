@@ -44,7 +44,6 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
-        $appState = $api->requestJson('editor/index/applicationstate');
         self::assertCustomer();
     }
     
@@ -107,7 +106,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $actual=$response->filedata;
 
         //check for differences between the expected and the actual content
-        $this->assertEquals($expected, $actual,"The expected file an the result file does not match.Test file name:".$fileName);
+        $this->assertEquals($expected, $actual, "The expected file an the result file does not match.Test file name: ".$fileName);
         
         $attributes=$this->api()->requestJson('editor/termcollection/testgetattributes', 'GET', array('collectionId' =>self::$collId));
         
