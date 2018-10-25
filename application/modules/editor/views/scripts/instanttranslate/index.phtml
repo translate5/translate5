@@ -64,7 +64,12 @@
     
     // the lowest number of characters that any of the mtEngines can handle 
     // is our limit for what the user is allowed to enter:
-    $characterLimit = min($allCharacterLimits);
+    if(empty($allCharacterLimits)) {
+        $characterLimit = 3;
+    }
+    else {
+        $characterLimit = min($allCharacterLimits);
+    }
 ?>
 
 <div class="loadingSpinnerLayer"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
