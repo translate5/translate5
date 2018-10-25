@@ -67,7 +67,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
         pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
-        pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist'
+        pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist',
+        pretranslateTmAndTerm:'#UT#Vorübersetzen (TM & Terme)',
+        pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
+        pretranslateMt:'#UT#Vorübersetzen (MT)',
+        pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt'
     },
     
     listen:{
@@ -166,21 +170,48 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     			itemId:'cbInternalFuzzy',
     			dock:'bottom'
             },{
-        		xtype:'combobox',
-        		stretch: false,
-        		align: 'left',
-        		itemId:'cbMinMatchrate',
-        		fieldLabel: me.strings.pretranslateMatchRate,
-        		tooltip:me.strings.pretranslateMatchRateTooltip,
-        		store: Ext.create('Ext.data.Store', {
-        			fields: ['id', 'value'],
-        			data : storeData
-        		}),
-        		value:100,
-        		displayField: 'value',
-        		valueField: 'id',
-        		queryMode: 'local',
-        		dock:'bottom'
+                dock:'bottom',
+                xtype:'container',
+                layout: {
+                    type: 'hbox',
+                    align: 'left'
+                },
+                items:[
+                    {
+                        xtype:'checkbox',
+                        cls:'pretranslateCheckboxIcon',
+                        boxLabel:me.strings.pretranslateTmAndTerm,
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.pretranslateTmAndTermTooltip
+                        },
+                        itemId:'pretranslateTmAndTerm'
+                    },{
+                        xtype:'combobox',
+                        stretch: false,
+                        align: 'left',
+                        itemId:'cbMinMatchrate',
+                        fieldLabel: me.strings.pretranslateMatchRate,
+                        tooltip:me.strings.pretranslateMatchRateTooltip,
+                        store: Ext.create('Ext.data.Store', {
+                            fields: ['id', 'value'],
+                            data : storeData
+                        }),
+                        value:100,
+                        displayField: 'value',
+                        valueField: 'id',
+                        queryMode: 'local',
+                    }
+                ]
+            },{
+                xtype:'checkbox',
+                cls:'pretranslateCheckboxIcon',
+                boxLabel:me.strings.pretranslateMt,
+                autoEl: {
+                    tag: 'div',
+                    'data-qtip': me.strings.pretranslateMtTooltip
+                },
+                itemId:'pretranslateTmAndTerm',
             }]
         }]);
     },
