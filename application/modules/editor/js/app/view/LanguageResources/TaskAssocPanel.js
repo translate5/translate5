@@ -79,6 +79,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     tooltip : me.strings.checked,
                     dataIndex : 'checked',
                     sortable : true,
+                    cls: 'taskAssocChecked',
                     width:60,
                 }, {
                     xtype : 'checkcolumn',
@@ -87,10 +88,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     dataIndex : 'segmentsUpdateable',
                     sortable : true,
                     renderer: function(value, meta, record) {
-                        this.disabled = !record.get('writable'); //disable checkbox casually
-                        var res = this.defaultRenderer(value, meta, record);
-                        this.disabled = false; //if disabled remains true, the whole column is not clickable
-                        return res;
+                        return record.get('writable') ? this.defaultRenderer(value, meta, record) : '';
                     },
                     width:60,
                 }, {
