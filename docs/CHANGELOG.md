@@ -3,6 +3,19 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.9.1] - 2018-10-25
+###Added
+TRANSLATE-1339: InstantTranslate-Portal: integration of SDL Language Cloud, Terminology, TM and MT resources and similar
+TRANSLATE-1362: Integrate Google Translate as language resource
+TRANSLATE-1162: GroupShare Plugin: Use SDL Trados GroupShare as Language-Resource
+
+###Changed
+VISUAL-56: VisualReview: Change text that is shown, when segment is not connected
+
+###Bugfixes
+TRANSLATE-1447: Escaping XML Entities in XLIFF 2.1 export (like attribute its:person)
+TRANSLATE-1448: translate5 stops loading with Internet Explorer 11
+
 ## [2.8.7] - 2018-10-16
 ###Added
 TRANSLATE-1433: Trigger workflow actions also on removing a user from a task
