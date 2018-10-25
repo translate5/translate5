@@ -219,8 +219,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     renderer: function(value, meta, record) {
                         var str = me.strings.languageResourceStatus,
                             info = record.get('statusInfo');
-                        if(value === "loading") { // show list as soon as possible, show status later due to different latency of the requested TMs
-                            //record.load(); // TODO: handle 404 (= remove from grid)
+                        if(value === "loading") { 
+                            // show list as soon as possible, so show status on click only due to different latency of the requested TMs
                             meta.tdCls = 'loading';
                             meta.tdAttr = 'data-qtip="'+str.loading+'"';
                             return ''; //no string since icon set
@@ -330,25 +330,28 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     },
 
     /**
-     * Get customer names by costomer id.
-     * When addCustomerNumber is true, the customer number will be concatanate to the result in format [customerNumber] customerName
+     * Get customer names by customer id.
+     * When addCustomerNumber is true, the customer number will be concatenate to the result in format [customerNumber] customerName
      */
-    getCustomersNames:function(customerIds,addCustomerNumber){
+    getCustomersNames:function(customerIds, addCustomerNumber){
         if(!customerIds || customerIds.length<1){
             return '';
         }
-        var names=[],
-            customerStore=Ext.StoreManager.get('customersStore');
-
-        for(var i=0;i<customerIds.length;i++){
-            var rec=customerStore.getById(customerIds[i]);
+        
+        var names = [], 
+            customerStore = Ext.StoreManager.get('customersStore');
+        
+        Ext.Array.each(customerIds, function(id) {
+            var rec = customerStore.getById(id);
+            if(!rec) {
+                return;
+            }
             if(addCustomerNumber){
                 names.push('['+rec.get('number')+'] '+rec.get('name'));
-            }else{
-                names.push(rec.get('name'));
             }
-        }
-        return names
+            names.push(rec.get('name'));
+        });
+        return names;
     },
 
     /***
@@ -358,11 +361,12 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if(selected.length<1){
             return;
         }
-        var record=selected[0];
-        if(record.get('status')=='loaded'){
+        var record = selected[0],
+            status = record.get('status');
+        if(status != record.STATUS_NOTCHECKED){
             return;
         }
-        record.set('status','loading');
+        record.set('status',record.STATUS_LOADING);
         record.load();
     }
 });

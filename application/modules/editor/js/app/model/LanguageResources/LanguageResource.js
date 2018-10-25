@@ -39,6 +39,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.model.LanguageResources.LanguageResource', {
   extend: 'Ext.data.Model',
   STATUS_LOADING: 'loading',
+  STATUS_NOTCHECKED: 'notchecked',
   STATUS_ERROR: 'error',
   STATUS_AVAILABLE: 'available',
   STATUS_UNKNOWN: 'unknown',
