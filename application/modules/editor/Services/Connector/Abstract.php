@@ -37,12 +37,12 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Services_Connector_Abstract {
     
+    const STATUS_NOTCHECKED = 'notchecked';
     const STATUS_ERROR = 'error';
     const STATUS_AVAILABLE = 'available';
     const STATUS_UNKNOWN = 'unknown';
     const STATUS_NOCONNECTION = 'noconnection';
     const STATUS_NOVALIDLICENSE = 'novalidlicense';
-    const STATUS_CHECKED = 'notchecked';
     
     /*** 
      * Default resource matchrate
@@ -60,6 +60,7 @@ abstract class editor_Services_Connector_Abstract {
      * @var editor_Services_ServiceResult
      */
     protected $resultList;
+    
 
     /***
      * connector source language

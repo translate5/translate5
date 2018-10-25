@@ -106,34 +106,44 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageResourceInstance->init($languageresource);
             
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
-            $languageresource['status'] = editor_Services_Connector_Abstract::STATUS_CHECKED;
+            $languageresource['status'] = $resource->getInitialStatus();
             
-            $customerId=[];
-            if(isset($custAssoc[$languageresource['id']]['customerId']) && !empty($custAssoc[$languageresource['id']]['customerId'])){
-                $customerId[]=$custAssoc[$languageresource['id']]['customerId'];
-            }
-            
-            $sourceLang=[];
-            if(isset($languages[$languageresource['id']]) && !empty($languages[$languageresource['id']]['sourceLang'])){
-                $sourceLang=$languages[$languageresource['id']]['sourceLang'];
-            }
-            
-            $targetLang=[];
-            if(isset($languages[$languageresource['id']]) && !empty($languages[$languageresource['id']]['targetLang'])){
-                $targetLang=$languages[$languageresource['id']]['targetLang'];
-            }
-            
-            $useAsDefault=[];
-            if(isset($custAssoc[$languageresource['id']]['useAsDefault']) && !empty($custAssoc[$languageresource['id']]['useAsDefault'])){
-                $useAsDefault=$custAssoc[$languageresource['id']]['useAsDefault'];
-            }
-            
+            $id = $languageresource['id'];
             //add customer assocs
-            $languageresource['resourcesCustomers']=$customerId;
-            $languageresource['useAsDefault']=$useAsDefault;
-            $languageresource['sourceLang']=$sourceLang;
-            $languageresource['targetLang']=$targetLang;
+            $languageresource['resourcesCustomers'] = $this->getCustassoc($custAssoc, 'customerId', $id);
+            $languageresource['useAsDefault'] = $this->getCustassoc($custAssoc, 'useAsDefault', $id);
+            $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
+            $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
         }
+    }
+    
+    /**
+     * Retrieves specific language from the given language container
+     * @param array $data
+     * @param string $index the datafield to get
+     * @param integer $id the language resource id 
+     * @return array
+     */
+    protected function getLanguage(array $languages, $index, $id) {
+        if(empty($languages[$id]) || empty($languages[$id][$index])){
+            return  [];
+        }
+        return $languages[$id][$index];
+    }
+    
+    /**
+     * Retrieves specific data from the given data container
+     * @param array $data
+     * @param string $index the datafield to get
+     * @param integer $id the language resource id 
+     * @return array
+     */
+    protected function getCustassoc(array $data, $index, $id) {
+        if(empty($data[$id])){
+            return [];
+        }
+        //remove 0 and null values
+        return array_filter(array_column($data[$id], $index));
     }
     
     /**

@@ -63,11 +63,11 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
         }
         
         //sort the results alphabetically by name
-        $customSort=function($a,$b){
-            if ($a->name==$b->name){
+        $customSort = function($a,$b){
+            if ($a->name == $b->name){
                 return 0;
             }
-            return ($a->name<$b->name)?-1:1;
+            return ($a->name<$b->name) ? -1 : 1;
         };
         usort($result,$customSort);
 		$this->view->rows = array_values($result);

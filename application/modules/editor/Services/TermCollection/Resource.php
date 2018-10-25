@@ -33,4 +33,11 @@ class editor_Services_TermCollection_Resource extends editor_Models_LanguageReso
         $this->analysable=false;//is used by match analysis
         $this->type = editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
     }
+    
+    /**
+     * returns the initial status for that resource type for the overview list
+     */
+    public function getInitialStatus() {
+        return editor_Services_Connector_Abstract::STATUS_AVAILABLE;
+    }
 }
