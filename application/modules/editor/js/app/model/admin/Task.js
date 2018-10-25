@@ -120,6 +120,11 @@ Ext.define('Editor.model.admin.Task', {
    * @return {Boolean}
    */
   isLocked: function() {
+      // TODO: A task must also be locked if not all language-resources that are assigned to the task are available.
+      // - 'not available' can be: STATUS_NOVALIDLICENSE, STATUS_ERROR, STATUS_NOCONNECTION; see also: checkStatusForAction() in editor_Plugins_GroupShare_Init
+      // - result for status: comes from getStatus() in editor_Plugins_GroupShare_Connector
+      // => (1) create a new check hasOnlyAvailableLangugeResources() or so
+      //    (2) add this check either for this.get('locked') or do it extra at all places where needed
       return !!this.get('locked') && this.get('lockingUser') != Editor.app.authenticatedUser.get('userGuid');
   },
   /**

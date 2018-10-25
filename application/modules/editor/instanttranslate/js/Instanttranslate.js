@@ -749,13 +749,20 @@ $(".clearable").each(function() {
 /* --------------- count characters ----------------------------------------- */
 $('#sourceText').on("input focus", function(){
     var sourceTextLength = $(this).val().length;
-    $('#countedCharacters').html(sourceTextLength);
+    $('#countedCharacters').html(sourceTextLength+'/'+characterLimit);
     if (sourceTextLength === 0) {
         $(".clearable-clear").hide();
         $('#translations').html('');
         $('#translations').hide();
     } else {
         $("#sourceIsText").removeClass('source-text-error');
+    }
+    if (sourceTextLength >= characterLimit) {
+        $("#sourceText").addClass('source-text-error');
+        $("#countedCharacters").addClass('source-text-error');
+    } else {
+        $("#sourceText").removeClass('source-text-error');
+        $("#countedCharacters").removeClass('source-text-error');
     }
 });
 
