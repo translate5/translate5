@@ -94,6 +94,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $languages editor_Models_LanguageResources_Languages */
         $languages=$languages->loadResourceIdsGrouped();
         
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */
+        
         foreach($this->view->rows as &$languageresource) {
             $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
             /* @var $resource editor_Models_LanguageResources_Resource */
@@ -106,7 +109,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageResourceInstance->init($languageresource);
             
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
-            $languageresource['status'] = $resource->getInitialStatus();
+            $moreInfo = '';
+            $languageresource['status'] = $resource->getInitialStatus($moreInfo);
+            $languageresource['statusInfo'] = $t->_($moreInfo);
             
             $id = $languageresource['id'];
             //add customer assocs
@@ -179,11 +184,14 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->resourcesCustomers=$customers;
         $this->view->rows->useAsDefault=$default;
         
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */
+        
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         /* @var $resource editor_Models_LanguageResources_Resource */
         if(empty($resource)) {
             $this->view->rows->status = editor_Services_Connector_Abstract::STATUS_NOCONNECTION;
-            $this->view->rows->statusInfo = 'Configured resource not found!';
+            $this->view->rows->statusInfo = $t->_('Keine Verbindung zur Ressource oder Ressource nicht gefunden.');
             return;
         }
         $meta = $resource->getMetaData();
@@ -194,7 +202,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $moreInfo = ''; //init as empty string, filled on demand by reference
         $connector = $serviceManager->getConnector($this->entity);
         $this->view->rows->status = $connector->getStatus($moreInfo);
-        $this->view->rows->statusInfo = $moreInfo;
+        $this->view->rows->statusInfo = $t->_($moreInfo);
     }
     
     /***
