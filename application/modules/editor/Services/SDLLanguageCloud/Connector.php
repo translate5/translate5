@@ -123,7 +123,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         
         $result=null;
         $params=[
-            'domainCode'=>$this->languageResource->getSpecificDataByProperty('domainCode'),
+            'domainCode'=>$this->languageResource->getSpecificData('domainCode'),
             'text'=>$searchString,
             'from'=>$lngs[$this->sourceLang],
             'to'=>$lngs[$this->targetLang]
