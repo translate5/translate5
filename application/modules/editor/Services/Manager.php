@@ -172,9 +172,14 @@ class editor_Services_Manager {
             $languageResource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
             /* @var $languageResource editor_Models_LanguageResources_LanguageResource */
             $languageResource->init($one);
-            $connector = $this->getConnector($languageResource);
-            /* @var $connector editor_Services_Connector_Abstract */
-            $todo($connector, $languageResource, $one);
+            try {
+                $connector = $this->getConnector($languageResource);
+                /* @var $connector editor_Services_Connector_Abstract */
+                $todo($connector, $languageResource, $one);
+            }
+            catch(ZfExtended_BadGateway $e) {
+                continue;
+            }
         }
     }
 }

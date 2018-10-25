@@ -246,7 +246,8 @@ class editor_Models_LanguageResources_Resource {
      * returns the initial status for that resource type for the overview list
      * @return string
      */
-    public function getInitialStatus() {
+    public function getInitialStatus(&$statusInfo) {
+        $statusInfo = 'Wählen Sie die Ressource aus um weitere Infos zu bekommen.';
         return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
     }
 }
