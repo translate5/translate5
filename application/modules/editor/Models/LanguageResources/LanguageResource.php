@@ -366,23 +366,28 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function getSpecificData($propertyName=null){
         $specificData=$this->__call('getSpecificData', array());
         
+        if(empty($specificData)){
+            return null;
+        }
         //try to decode the data
-        if(!empty($specificData)){
-            try {
-                $specificData=json_decode($specificData);
-                
-                //return the property name value if exist
-                if(isset($propertyName)){
-                    return isset($specificData->$propertyName) ? $specificData->$propertyName : null;
-                }
-                return $specificData;
-            } catch (Exception $e) {
-                
+        try {
+            $specificData=json_decode($specificData);
+            
+            //return the property name value if exist
+            if(isset($propertyName)){
+                return isset($specificData->$propertyName) ? $specificData->$propertyName : null;
             }
+            return $specificData;
+        } catch (Exception $e) {
+            
         }
         return null;
     }
     
+    /***
+     * Set the specificData field. The given value will be json encoded.
+     * @param string $value
+     */
     public function setSpecificData($value){
         $this->__call('setSpecificData', array(
             json_encode($value)
