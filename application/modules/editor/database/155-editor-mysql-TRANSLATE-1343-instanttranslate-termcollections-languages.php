@@ -66,7 +66,6 @@ if(!empty($result)){
     $collection->setServiceType($nsp);
     $collection->setServiceName($service->getName());
     $collection->setColor($service::DEFAULT_COLOR);
-    $collection->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
     $resourceId=$collection->save();
     
     //add the terms to the new termcollection
