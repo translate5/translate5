@@ -3,6 +3,12 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [2.9.2] - 2018-10-30
+###Bugfixes
+Fixing Problems in IE11
+TRANSLATE-1451: Missing customer frontend right blocks whole language resources
+TRANSLATE-1453: Updating from an older version of translate5 led to errors in updating
+
 ## [2.9.1] - 2018-10-25
 ###Added
 TRANSLATE-1339: InstantTranslate-Portal: integration of SDL Language Cloud, Terminology, TM and MT resources and similar
