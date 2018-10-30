@@ -306,8 +306,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   },
   setSegmentSize: function(controller, size, oldSize) {
       var body = Ext.fly(this.getEditorBody());
-      body.removeCls(oldSize);
-      body.addCls(size);
+      if(body) {
+          body.removeCls(oldSize);
+          body.addCls(size);
+      }
       this.currentSegmentSize = size;
   },
   /**
