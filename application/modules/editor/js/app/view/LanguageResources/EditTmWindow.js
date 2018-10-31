@@ -132,7 +132,10 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     itemId:'resourcesCustomers',
                     name:'resourcesCustomers',
                     dataIndex:'resourcesCustomers',
-                    store:'userCustomers'
+                    store:Ext.create('Ext.data.Store', {
+                        model:'Editor.model.admin.Customer',
+                        autoLoad:true
+                    })
                 },{
                     xtype:'hiddenfield',
                     name:'resourcesCustomersHidden'

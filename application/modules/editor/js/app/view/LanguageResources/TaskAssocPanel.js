@@ -40,7 +40,13 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.languageResourceTaskAssocPanel',
     itemId:'languageResourceTaskAssocPanel',
-    requires: ['Editor.view.admin.TaskActionColumn'],
+    viewModel: {
+        type: 'languageResourceTaskAssocPanel'
+    },
+    requires: [
+        'Editor.view.admin.TaskActionColumn',
+        'Editor.view.LanguageResources.TaskAssocPanelViewModel'
+    ],
     cls : 'adminTaskGrid',
     title: '#UT#Sprach-Resourcen zuweisen',
     strings: {
@@ -63,7 +69,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
             dockedItems : [],
             items : [ {
                 xtype : 'grid',
-                itemId : 'tmTaskAssocGrid',
+                itemId : 'languageResourcesTaskAssocGrid',
                 store : 'Editor.store.LanguageResources.TaskAssocStore',
                 emptyText: me.strings.empty,
                 features : [ {

@@ -40,6 +40,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     onTmWindowRender:function(){
         var me=this,
             view=me.getView(),
+            resourcesCustomers=view.down('#resourcesCustomers'),
             sdlStore=Ext.StoreManager.get('sdlEngine');
 
         if(sdlStore){
@@ -49,9 +50,21 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         
         view.getViewModel().set('uploadLabel',view.strings.file);
         me.mergeCustomersToDefault();
+        resourcesCustomers.getStore().on({
+            load:{
+                fn:me.onResourceCustomersStoreLoad,
+                scope:me
+            }
+        })
     },
 
-
+    /***
+     * On resource customers load event handler
+     */
+    onResourceCustomersStoreLoad:function(){
+        this.mergeCustomersToDefault();
+    },
+    
     /**
      * Resource combo handler
      */

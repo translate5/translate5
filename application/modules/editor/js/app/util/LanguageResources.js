@@ -31,9 +31,9 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.LanguageResources', {
 	strings: {
-    	exactMatch:'#UT#100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument',
-        repetitionMatch:'#UT#Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte',
-        contextMatch:'#UT#103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist'
+		exactMatch:'#UT#101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.',
+        repetitionMatch:'#UT#Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.',
+		contextMatch:'#UT#103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.'
     },
     
     statics: {
@@ -42,7 +42,13 @@ Ext.define('Editor.util.LanguageResources', {
     	 */
     	getMatchrateTooltip:function(matchrate){
     		return new this().getMatchrateTooltip(matchrate);
-    	}
+		},
+		
+		resourceType:{
+			TM:'tm',
+			MT:'mt',
+			TERM_COLLECTION:'termcollection'
+		}
     },
     
     /***
