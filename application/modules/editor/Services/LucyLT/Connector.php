@@ -41,7 +41,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->lucylt->matchrate;
+        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->lucylt->matchrate;
     }
     
     /**
@@ -227,7 +227,7 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
      * @param string $score
      */
     protected function calculateMatchrate($score = null) {
-        return $this->DEFAULT_MATCHRATE;
+        return $this->defaultMatchRate;
     }
     
     public function getStatus(& $moreInfo){

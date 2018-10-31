@@ -94,7 +94,15 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function loadAllByServices(){
         $services=ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $services editor_Services_Manager */
-        $allservices=$services->getAll();
+        
+        //get all service types from the available resources
+        $resources=$services->getAllResources();
+        $allservices=[];
+        foreach ($resources as $resource) {
+            /* @var $resource editor_Models_LanguageResources_Resource */
+            $allservices[]=$resource->getServiceType();
+        }
+        $allservices=array_unique($allservices);
         $s=$this->db->select()
         ->where('serviceType IN(?)',$allservices);
         return $this->loadFilterdCustom($s);
@@ -201,6 +209,28 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             ->join($assocName, $assocName.'.`languageResourceId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
             ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);
         return $this->db->fetchAll($s)->toArray(); 
+    }
+    
+    /**
+     * loads the task to languageResource assocs by list of taskGuids and resourceTypes
+     * @param array $taskGuid
+     * @param array $resourceTypes
+     * @return array
+     */
+    public function loadByAssociatedTaskGuidListAndResourcesType(array $taskGuidList,array $resourceTypes) {
+        if(empty($taskGuidList)){
+            return $taskGuidList;
+        }
+        $assocDb = new editor_Models_Db_Taskassoc();
+        $tableName=$this->db->info($assocDb::NAME);
+        $assocName = $assocDb->info($assocDb::NAME);
+        $s = $this->db->select()
+        ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
+        ->setIntegrityCheck(false)
+        ->join($assocName, $assocName.'.`languageResourceId` = '.$tableName.'.`id`', '')
+        ->where($assocName.'.`taskGuid` IN (?)', $taskGuidList)
+        ->where($tableName.'.resourceType IN(?)',$resourceTypes);
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**

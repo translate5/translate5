@@ -38,8 +38,9 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     extend:'Ext.panel.Panel',
-    alias: 'widget.languageResourcesPanel',
-    controller: 'languageResourcesPanel',
+    alias: 'widget.languageResourcesWizardPanel',
+    controller: 'languageResourcesWizardPanel',
+    itemId:'languageResourcesWizardPanel',
     requires: [
         'Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController',
         'Editor.view.LanguageResources.TaskAssocPanel'
@@ -50,6 +51,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     importType:'postimport',
     
     task:null,
+    autoScroll: true,
     
     strings:{
         wizardTitle:'#UT#Sprach-Resourcen zuweisen'

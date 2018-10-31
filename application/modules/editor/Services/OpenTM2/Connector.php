@@ -57,6 +57,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         parent::connectTo($languageResource,$sourceLang,$targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+        $this->isInternalFuzzy=true;
     }
     
     /**

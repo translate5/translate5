@@ -110,6 +110,11 @@
 		    <target>Pretranslate (MT)</target>
 		</trans-unit>
 
+		<trans-unit id='QW5hbHlzZQ=='>
+		    <source>Analyse</source>
+		    <target>Analysis</target>
+		</trans-unit>
+
     </body>
   </file>
 </xliff>

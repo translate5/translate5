@@ -107,6 +107,11 @@
 		    <source>Vorübersetzen (MT)</source>
 		    <target>Vorübersetzen (MT)</target>
 		</trans-unit>
+
+		<trans-unit id='QW5hbHlzZQ=='>
+		    <source>Analyse</source>
+		    <target>Analyse</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

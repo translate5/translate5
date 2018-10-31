@@ -34,6 +34,21 @@ class editor_Services_Google_Service extends editor_Services_ServiceAbstract {
     protected $resourceClass = 'editor_Services_Google_Resource';
     
     public function __construct() {
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $googleConfig=isset($config->runtimeOptions->LanguageResources->google) ? $config->runtimeOptions->LanguageResources->google : null;
+        if(!isset($googleConfig)){
+            return;
+        }
+        $apiKey = isset($googleConfig->apiKey) ? $googleConfig->apiKey:null ;
+        if(empty($apiKey)){
+            return;
+        }
+        
+        $projectId=isset($googleConfig->projectId) ?$googleConfig->projectId:null ;
+        if(empty($projectId)){
+            return;
+        }
         $this->addResource([$this->getServiceNamespace(), $this->getName()]);
     }
     

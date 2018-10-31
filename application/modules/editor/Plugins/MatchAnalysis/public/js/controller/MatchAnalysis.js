@@ -56,6 +56,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
         ref:'matchAnalysisPanel',
         selector: 'matchAnalysisPanel'
+    },{
+        ref:'languageResourceTaskAssocPanel',
+        selector:'languageResourceTaskAssocPanel'
+    },{
+        ref: 'taskAssocGrid',
+        selector: '#languageResourcesTaskAssocGrid'
     }],
         
     strings:{
@@ -83,28 +89,36 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 beforerender:'onAdminTaskWindowBeforeRender'
             },
             '#languageResourceTaskAssocPanel':{
-            	render:'onLanguageResourcesPanelRender'
+                render:'onLanguageResourcesPanelRender'
             },
-            'LanguageResourcesPanel':{
+            '#languageResourcesWizardPanel':{
             	startMatchAnalysis:'onStartMatchAnalysis'
             }
         },
         controller:{
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated'
-        	}
+            },
+            '#LanguageResourcesTaskassoc':{
+                taskAssocSavingFinished:'onTaskAssocSavingFinished'
+            }
+        },
+        store:{
+            '#Editor.store.LanguageResources.TaskAssocStore':{
+                load:'onLanguageResourcesTaskAssocStoreLoad'
+            }
         }
     },
     
     onAdminTaskWindowBeforeRender:function(window,eOpts){
         var me=this;
         window.insertCard({
-            xtype:'languageResourcesPanel',
+            xtype:'languageResourcesWizardPanel',
             //index where the card should appear in the group
             groupIndex:1,
             listeners:{
                 activate:{
-                	fn:me.onLanguageResourcesPanelActivate,
+                	fn:me.onLanguageResourcesWizardPanelActivate,
                 	scope:me
                 }
             }
@@ -155,7 +169,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 type: 'hbox',
                 pack: 'start'
             },
-            items:[this.getAnalysisConfig(task),this.getPretranslationConfig(task)]
+            items:[
+                this.getAnalysisConfig(task)
+            ]
         },{
             xtype : 'toolbar',
             dock : 'bottom',
@@ -165,7 +181,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 align: 'left'
             },
             items : [{
-    			xtype:'checkbox',
+                xtype:'checkbox',
+                value:true,
     			boxLabel:this.strings.internalFuzzy,
     			itemId:'cbInternalFuzzy',
     			dock:'bottom'
@@ -179,6 +196,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 items:[
                     {
                         xtype:'checkbox',
+                        bind:{
+                            disabled:'{!hasTmOrCollection}'
+                        },
+                        value:true,
                         cls:'pretranslateCheckboxIcon',
                         boxLabel:me.strings.pretranslateTmAndTerm,
                         autoEl: {
@@ -205,13 +226,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 ]
             },{
                 xtype:'checkbox',
+                bind:{
+                    disabled:'{!hasMt}'
+                },
                 cls:'pretranslateCheckboxIcon',
                 boxLabel:me.strings.pretranslateMt,
                 autoEl: {
                     tag: 'div',
                     'data-qtip': me.strings.pretranslateMtTooltip
                 },
-                itemId:'pretranslateTmAndTerm',
+                itemId:'pretranslateMt',
             }]
         }]);
     },
@@ -237,19 +261,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	this.loadTaskAssoc(task);
     },
     
-    onLanguageResourcesPanelActivate:function(panel){
+    onLanguageResourcesWizardPanelActivate:function(panel){
     	if(!panel.task){
     		return;
     	}
-    	var me=this,
-    		addWindow=panel.up('#adminTaskAddWindow'),
-    		continueBtn=addWindow.down('#continue-wizard-btn');
-
+    	var me=this;
     	me.loadTaskAssoc(panel.task);
-        
-        //set the finish icon text and cls
-        //continueBtn.setIconCls('ico-task-add');
-        //continueBtn.setText(me.strings.finishTask);
     },
     
     /***
@@ -263,6 +280,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);
     },
     
+    /***
+     * On language resource task assoc store load event handler
+     */
+    onLanguageResourcesTaskAssocStoreLoad:function(store){
+        this.updateTaskAssocPanelViewModel(store);
+    },
+
     onStartMatchAnalysis:function(taskId,operation){
     	this.startAnalysis(taskId,operation);
     },
@@ -292,9 +316,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     
     matchAnalysisButtonHandler:function(button){
     	var me=this,
-			win=button.up('window'),
+            win=button.up('window'),
+            tmAndTermChecked=me.getComponentByItemId('pretranslateTmAndTerm').checked,
+            mTChecked=me.getComponentByItemId('pretranslateMt').checked,
 			task=win.actualTask,
-			operation=button.itemId=="btnAnalysis" ? "analysis" : "pretranslation";
+			operation=(mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
     	
     	me.startAnalysis(task.get('id'),operation);
     },
@@ -309,15 +335,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	//'editor/:entity/:id/operation/:operation',
         var me=this;
         			
-		me.reloadTaskRecord(taskId);
-		
+        me.reloadTaskRecord(taskId);
+        
     	Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
     	Ext.Ajax.request({
             url:Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
                 method: "PUT",
                 params:{
                 	internalFuzzy:me.getComponentByItemId('cbInternalFuzzy').checked,
-                	pretranslateMatchrate:me.getComponentByItemId('cbMinMatchrate').getValue()
+                    pretranslateMatchrate:me.getComponentByItemId('cbMinMatchrate').getValue(),
+                    pretranslateTmAndTerm:me.getComponentByItemId('pretranslateTmAndTerm').checked,
+                    pretranslateMt:me.getComponentByItemId('pretranslateMt').checked,
                 },
                 scope: this,
                 timeout:120000,
@@ -340,6 +368,28 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		taskStore=taskOverview.getAdminTasksStore();
 		//TODO reload only one row
     	taskStore.reload();
+    },
+
+    /***
+     * Language resource to task assoc after save event handler
+     */
+    onTaskAssocSavingFinished:function(record,store){
+        var me=this;
+        me.updateTaskAssocPanelViewModel(store);
+    },
+
+    /***
+     * Update the language resources task assoc panel view model
+     */
+    updateTaskAssocPanelViewModel:function(assocStore){
+        var me=this,
+            pnl=me.getLanguageResourceTaskAssocPanel(),
+            store=assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null);
+        if(!pnl || !store){
+            return;
+        }
+        //set the view model items variable
+        pnl.getViewModel().set('items',(store.getData().getSource() || store.getData()).getRange());
     },
     
     /***
@@ -376,45 +426,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
 			text:this.strings.analysis,
 			itemId:'btnAnalysis',
 			width:150,
-			dock:'bottom',
-			//TODO icon
-			listeners:{
-				click:{
-					fn:this.matchAnalysisButtonHandler,
-					scope:this
-				}
-			}
-    	};
-    },
-    
-    /***
-     * Get the pretranslation config. It can be checkbox or button depending if the task exist or not.
-     */
-    getPretranslationConfig:function(task){
-    	if(!task || task.isImporting()){
-    		return {
-    			xtype:'checkbox',
-    			boxLabel:this.strings.preTranslation,
-    		    autoEl: {
-    		        tag: 'div',
-    		        'data-qtip': this.strings.preTranslationTooltip
-    		    },
-    			itemId:'cbPreTranslation',
-    			dock:'bottom',
-    			listeners:{
-    				change:{
-    					fn:this.onCbPreTranslationChecked,
-    					scope:this
-    				}
-    			}
-    		};
-    	}
-    	return {
-    		xtype:'button',
-			text:this.strings.preTranslation,
-			tooltip:this.strings.preTranslationTooltip,
-			itemId:'btnPreTranslation',
-			width:170,
 			dock:'bottom',
 			//TODO icon
 			listeners:{

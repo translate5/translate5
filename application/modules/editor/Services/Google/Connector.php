@@ -50,7 +50,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         $this->api = ZfExtended_Factory::get($this->apiClass, [$languageResource]);
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->google->matchrate;
+        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->google->matchrate;
     }
     
     /**
@@ -127,7 +127,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang])){
             $result=$this->api->getResult();
         }
-        $this->resultList->addResult(isset($result['text']) ? $result['text'] : '',$this->DEFAULT_MATCHRATE);
+        $this->resultList->addResult(isset($result['text']) ? $result['text'] : '',$this->defaultMatchRate);
         return $this->resultList;
     }
     

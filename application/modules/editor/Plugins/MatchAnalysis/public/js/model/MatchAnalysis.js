@@ -80,7 +80,7 @@ Ext.define('Editor.plugins.MatchAnalysis.model.MatchAnalysis', {
     		    if(Ext.Array.contains(ignoreSumColumns,key)){
     		    	continue
 		    	}
-	        	ts+=row.data[key].wordCount;
+	        	ts+=row.data[key];
     		}
     		delete ignoreSumColumns;
     		return ts;
