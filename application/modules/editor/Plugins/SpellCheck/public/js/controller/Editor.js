@@ -407,7 +407,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     startSpellCheck: function() {
         var me = this,
             spellCheckProcessID,
-            editorText;
+            editorContentAsText;
         
         if (me.isSupportedLanguage !== true) { // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
             me.consoleLog('startSpellCheck failed eg because language is not supported or SpellCheck-Tool does not run.');
@@ -428,9 +428,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.allMatches = null;
         me.allMatchesRanges = null;
         
-        editorText = me.getEditorContentAsText(false);
-        me.consoleLog('editorText: ' + editorText);
-        me.runSpellCheck(editorText, spellCheckProcessID);
+        editorContentAsText = me.getEditorContentAsText(false);
+        me.consoleLog('editorContentAsText: ' + editorContentAsText);
+        me.runSpellCheck(editorContentAsText, spellCheckProcessID);
         // => runSpellCheck with the tool calls applySpellCheck() when the results arrive.
     },
     /**
