@@ -348,7 +348,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     pretranslateMt:me.getComponentByItemId('pretranslateMt').checked,
                 },
                 scope: this,
-                timeout:120000,
+                timeout:600000,
                 success: function(response){
                 	me.reloadTaskRecord(taskId);
                 }, 
