@@ -234,6 +234,15 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /**
+     * Get language resource by given resourceId
+     * @param string $resourceId
+     * @return Ambigous <Zend_Db_Table_Row_Abstract, NULL>
+     */
+    public function loadByResourceId($resourceId) {
+        return $this->loadRow('resourceId = ?', $resourceId);
+    }
+    
+    /**
      * loads the ids, names and additional information of all TMs for the given serviceName
      * @param string $serviceName
      * @return array
