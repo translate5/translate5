@@ -403,7 +403,7 @@ Ext.define('Editor.util.Range', {
         });
         Ext.Array.each(allWhitespaceImages, function(imgNode) {
             rangeForWhitespace.selectNode(imgNode);
-            htmlForImage = rangeForWhitespace.toHtml(),
+            htmlForImage = rangeForWhitespace.toHtml();
             html = html.replace(imgNode.outerHTML, ' ');
         });
         return html;
