@@ -76,6 +76,8 @@ Ext.define('Editor.controller.Editor', {
     generalKeyMap: null,
     prevNextSegment: null,
     sourceTags: null,
+    lastClipboardData: '',
+    copiedContentFromSource: null,
     listen: {
         controller: {
             '#Editor.$application': {
@@ -186,6 +188,8 @@ Ext.define('Editor.controller.Editor', {
         plug.on('beforeedit', me.handleStartEdit, me);
         plug.on('canceledit', disableEditing);
         plug.on('edit', disableEditing)
+        
+        Ext.getDoc().on('copy', me.copySelectionWithInternalTags, me, {priority: 9999, delegated: false});
         
         me.tooltip = Ext.create('Editor.view.ToolTip', {
             target: me.getSegmentGrid().getEl()
@@ -412,7 +416,30 @@ Ext.define('Editor.controller.Editor', {
         docEl.on('paste', function(e){
             e.stopPropagation();
             e.preventDefault();
-            editor.insertAtCursor((e.browserEvent.clipboardData || window.clipboardData).getData('Text'));
+            var plug = me.getEditPlugin(),
+                htmlEditor = plug.editor.mainEditor,
+                segmentId = plug.context.record.get('id'),
+                data,
+                clipboardData = (e.browserEvent.clipboardData || window.clipboardData).getData('Text');
+            if (me.copiedContentFromSource != null ) {
+                // Segment A must not copy internal tags into Segment B
+                if (segmentId != me.copiedContentFromSource.selSegmentId) {
+                    data = me.copiedContentFromSource.selDataText;
+                } else {
+                    data = me.copiedContentFromSource.selDataHtml;
+                }
+                // handle CTRL+C within the document (= in copiedContentFromSource) and 
+                // outside of the document (= in clipboard):
+                // if the clipboard-data isn't the same as before copying from the source,
+                // we use the new clipboard-data
+                if (clipboardData != '' && me.lastClipboardData != '' && clipboardData != me.lastClipboardData) {
+                    data = clipboardData;
+                }
+                editor.insertMarkup(data);
+            } else {
+                editor.insertAtCursor(clipboardData);
+            }
+            me.lastClipboardData = clipboardData;
         }, me, {delegated: false});
         if(me.editorTooltip){
             me.editorTooltip.setTarget(editor.getEditorBody());
@@ -962,6 +989,44 @@ Ext.define('Editor.controller.Editor', {
                 notScrollCallback: callback
             });
         }
+    },
+    copySelectionWithInternalTags: function(event) {
+        // CTRL+C gets the selected text (including internal tags)
+        var me = this,
+            plug = me.getEditPlugin(),
+            htmlEditor,
+            segmentId,
+            sel,
+            selRange,
+            selDataHtml,
+            selInternalTags,
+            selDataText;
+        //do only something when editing targets:
+        if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
+            return;
+        }
+        htmlEditor = plug.editor.mainEditor;
+        segmentId = plug.context.record.get('id');
+        sel = rangy.getSelection();
+        selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+        selDataHtml = selRange.toHtml();
+        
+        // internal tags are contained as divs; selRange.toString() would not remove them.
+        selDataText = selDataHtml;
+        selInternalTags = selRange.getNodes([1], function(node) {
+            return node.classList.contains('internal-tag');
+        });
+        Ext.Array.each(selInternalTags, function(internalTag) {
+            selDataText = selDataText.replace(internalTag.outerHTML, '');
+        });
+        
+        me.copiedContentFromSource = {
+                'selDataHtml': selDataHtml, // = selected content WITH internal tags
+                'selDataText': selDataText, // = selected content WITHOUT internal tags
+                'selSegmentId': segmentId
+        }
+        
+        event.preventDefault();
     },
     copySourceToTarget: function() {
         var plug = this.getEditPlugin();

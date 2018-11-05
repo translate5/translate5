@@ -82,8 +82,6 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 
 .segment-content .x-form-display-field del,
 .segment-content .x-form-display-field img,
-.segment-content .x-form-display-field div.internal-tag,
-.segment-content .x-form-display-field div.internal-tag span,
 .segment-tag-column div.x-grid-cell-inner del,
 .segment-tag-column div.x-grid-cell-inner img,
 .segment-tag-column div.x-grid-cell-inner div.internal-tag,
@@ -698,10 +696,20 @@ a.x-btn span.task-confirmation {
     font-weight: bold;
     font-style: italic;
 }
-
+.pretranslateCheckboxIcon:before {
+    content: "";
+    display: block;
+    background-image:url(../images/information.png); 
+    background-repeat:no-repeat; 
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin: 0 0 0 0;
+}
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(../images/share.png) no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .segmentsUpdateable > div {background:url(../images/book_edit.png) no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .taskAssocChecked > div {background:url(../images/tasks_assoc.png) no-repeat 10px 9px;}
 
 .tmOverviewPanel tr:hover td.infoIcon > div,
 .tmOverviewPanel tr:hover td.taskList > div,

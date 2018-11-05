@@ -388,6 +388,26 @@ Ext.define('Editor.util.Range', {
     // Helpers for the content of/in a range
     // =========================================================================
     
+    /** 
+     * Replace whitespace-images in given range with whitespace-text. Returns the new html.
+     * @params {Object} range
+     * @returns {String} html 
+     */
+    getContentWithWhitespaceImagesAsText: function(range) {
+        var allWhitespaceImages,
+            htmlForImage,
+            html = range.toHtml(),
+            rangeForWhitespace = rangy.createRange();
+        allWhitespaceImages = range.getNodes([1], function(node) {
+            return (node.nodeName == 'IMG' && node.classList.contains('whitespace'));
+        });
+        Ext.Array.each(allWhitespaceImages, function(imgNode) {
+            rangeForWhitespace.selectNode(imgNode);
+            htmlForImage = rangeForWhitespace.toHtml();
+            html = html.replace(imgNode.outerHTML, ' ');
+        });
+        return html;
+    },
     /**
      * Returns true if all the relevant content in the editor is selected.
      * (CAUTION: CTRL+A does NOT select everything in this sense.)

@@ -45,6 +45,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
     viewModel: {
         type: 'taskpreferences'
     },
+    autoScroll: true,
     initComponent: function() {
         var me = this,
             vm = me.lookupViewModel();
