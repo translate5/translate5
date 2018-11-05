@@ -57,6 +57,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         parent::connectTo($languageResource,$sourceLang,$targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+        $this->isInternalFuzzy=true;
     }
     
     /**
@@ -477,7 +478,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        $name = $this->languageResource->getSpecificDataByProperty('fileName');
+        $name = $this->languageResource->getSpecificData('fileName');
         if(empty($name)) {
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;

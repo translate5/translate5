@@ -30,7 +30,7 @@ class editor_Services_TermCollection_Resource extends editor_Models_LanguageReso
     public function __construct(string $id, string $name) {
         $this->id = $id;
         $this->name = $name;
-        $this->analysable=false;//is used by match analysis
+        $this->analysable=true;//is used by match analysis
         $this->type = editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
     }
     

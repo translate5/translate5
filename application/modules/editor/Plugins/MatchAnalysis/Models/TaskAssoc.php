@@ -40,9 +40,26 @@ END LICENSE AND COPYRIGHT
  * 
  * @method integer getPretranslateMatchrate() getPretranslateMatchrate()
  * @method void setPretranslateMatchrate() setPretranslateMatchrate(integer $pretranslateMatchrate)
+ * 
+ * @method integer getCreated() getCreated()
+ * @method void setCreated() setCreated(string $created)
  */
 class editor_Plugins_MatchAnalysis_Models_TaskAssoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_TaskAssoc';
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_TaskAssoc';
     
+    /***
+     * Load the newest analysis for given taskGuid
+     * @param string $taskGuid
+     * @return Zend_Db_Table_Row_Abstract|NULL
+     */
+    public function loadNewestByTaskGuid($taskGuid) {
+        $s=$this->db->select()
+        ->where('taskGuid=?',$taskGuid)->order('id DESC')->limit(1);
+        $row=$this->db->fetchRow($s);
+        if(!$row){
+            return null;
+        }
+        return $row->toArray();
+    }
 }

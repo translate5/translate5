@@ -67,8 +67,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         var me = this,
             config,
             columnRenderer=function(val, meta, record) {
-        		if(val && val.wordCount){
-        			return val.wordCount;
+        		if(val){
+        			return val;
         		}
                 return 0;
             },
@@ -263,10 +263,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 	                        xtype: 'displayfield',
 	                        fieldLabel: me.strings.internalFuzzy,
 	                        itemId:'internalFuzzy'
-                        },{
-	                        xtype: 'displayfield',
-	                        fieldLabel: me.strings.matchRate,
-	                        itemId:'pretranslateMatchrate'
                         }]
                     
                     }]
@@ -287,7 +283,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     	var totalSum=0;
     	store.each(function(record){
     		if(record.get(group)){
-    			totalSum+=record.get(group).wordCount;
+    			totalSum+=record.get(group);
     		}
     	});
     	return totalSum;
@@ -306,9 +302,5 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 		var rec=records[0];
 		me.down('#analysisDatum').setValue(rec.get('created'));
 		me.down('#internalFuzzy').setValue(rec.get('internalFuzzy'));
-		
-		if(rec.get('pretranslateMatchrate')){
-			me.down('#pretranslateMatchrate').setValue(rec.get('pretranslateMatchrate') +"%");
-		}
     }
 });

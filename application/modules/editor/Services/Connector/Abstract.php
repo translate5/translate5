@@ -48,7 +48,7 @@ abstract class editor_Services_Connector_Abstract {
      * Default resource matchrate
      * @var integer
      */
-    protected $DEFAULT_MATCHRATE=0;
+    protected $defaultMatchRate=0;
     
     /**
      * @var editor_Models_LanguageResources_LanguageResource
@@ -75,6 +75,12 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $targetLang;
     
+
+    /***
+     * Flag for if the current connector supports internal fuzzy calculations
+     * @var boolean
+     */
+    protected $isInternalFuzzy=false;
     
     /**
      * initialises the internal result list
@@ -120,6 +126,22 @@ abstract class editor_Services_Connector_Abstract {
     public function resetResultList(){
         $this->resultList->resetResult();
     }
+    
+    /***
+     * Get the connector language ressource
+     * @return editor_Models_LanguageResources_LanguageResource
+     */
+    public function getLanguageResource(){
+        return $this->languageResource;
+    }
+    
+    /***
+     * Return the connectors default matchrate.(this should be configured in the zf config)
+     * @return number
+     */
+    public function getDefaultMatchRate(){
+        return $this->defaultMatchRate;
+    }
 
     /**
      * makes a tm / mt / file query to find a match / translation
@@ -135,7 +157,7 @@ abstract class editor_Services_Connector_Abstract {
      * @param editor_Models_Segment $segment
      * @return string
      */
-    protected function getQueryString(editor_Models_Segment $segment) {
+    public function getQueryString(editor_Models_Segment $segment) {
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($segment->getTaskGuid());
         $source = editor_Models_SegmentField::TYPE_SOURCE;
         $sourceMeta = $sfm->getByName($source);
@@ -188,5 +210,13 @@ abstract class editor_Services_Connector_Abstract {
      */
     public function initFuzzyAnalysis() {
         return null;
+    }
+    
+    /***
+     * Is internal fuzzy connector
+     * @return boolean
+     */
+    public function isInternalFuzzy() {
+        return $this->isInternalFuzzy;
     }
 }

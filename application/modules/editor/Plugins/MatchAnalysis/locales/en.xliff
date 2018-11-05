@@ -89,6 +89,32 @@
 		    <source>Match-Rate</source>
 		    <target>Match-Rate</target>
 		</trans-unit>
+
+		<trans-unit id='VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu'>
+		    <source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source>
+		    <target>Search results from the terminology are preferably pretranslated.</target>
+		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKFRNICYgVGVybWUp'>
+		    <source>Vorübersetzen (TM & Terme)</source>
+		    <target>Pretranslate (TM & Terms)</target>
+		</trans-unit>
+
+		<trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='>
+		    <source>Treffer aus dem TM werden bevorzugt vorübersetzt</source>
+		    <target>Hits from the TM are preferably pretranslated</target>
+		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKE1UKQ=='>
+		    <source>Vorübersetzen (MT)</source>
+		    <target>Pretranslate (MT)</target>
+		</trans-unit>
+
+		<trans-unit id='QW5hbHlzZQ=='>
+		    <source>Analyse</source>
+		    <target>Analysis</target>
+		</trans-unit>
+
     </body>
   </file>
 </xliff>

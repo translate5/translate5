@@ -41,7 +41,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->moses->matchrate;
+        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->moses->matchrate;
     }
     
     /**
@@ -133,7 +133,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * @param string $score
      */
     protected function calculateMatchrate($score = null) {
-        return $this->DEFAULT_MATCHRATE;
+        return $this->defaultMatchRate;
     }
     
     /**

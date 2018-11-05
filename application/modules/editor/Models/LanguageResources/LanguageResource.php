@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
  * @method string getServiceName() getServiceName()
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getSpecificData() getSpecificData()
- * @method void setSpecificData() setSpecificData(string $specificData)
+ * @method void setSpecificData() setSpecificData(string $value)
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(integer $autoCreatedOnImport)
  * @method string getResourceType() getResourceType()
@@ -94,7 +94,15 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function loadAllByServices(){
         $services=ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $services editor_Services_Manager */
-        $allservices=$services->getAll();
+        
+        //get all service types from the available resources
+        $resources=$services->getAllResources();
+        $allservices=[];
+        foreach ($resources as $resource) {
+            /* @var $resource editor_Models_LanguageResources_Resource */
+            $allservices[]=$resource->getServiceType();
+        }
+        $allservices=array_unique($allservices);
         $s=$this->db->select()
         ->where('serviceType IN(?)',$allservices);
         return $this->loadFilterdCustom($s);
@@ -201,6 +209,37 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             ->join($assocName, $assocName.'.`languageResourceId` = '.$this->db->info($assocDb::NAME).'.`id`', '')
             ->where($assocName.'.`taskGuid` in (?)', $taskGuidList);
         return $this->db->fetchAll($s)->toArray(); 
+    }
+    
+    /**
+     * loads the task to languageResource assocs by list of taskGuids and resourceTypes
+     * @param array $taskGuid
+     * @param array $resourceTypes
+     * @return array
+     */
+    public function loadByAssociatedTaskGuidListAndResourcesType(array $taskGuidList,array $resourceTypes) {
+        if(empty($taskGuidList)){
+            return $taskGuidList;
+        }
+        $assocDb = new editor_Models_Db_Taskassoc();
+        $tableName=$this->db->info($assocDb::NAME);
+        $assocName = $assocDb->info($assocDb::NAME);
+        $s = $this->db->select()
+        ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
+        ->setIntegrityCheck(false)
+        ->join($assocName, $assocName.'.`languageResourceId` = '.$tableName.'.`id`', '')
+        ->where($assocName.'.`taskGuid` IN (?)', $taskGuidList)
+        ->where($tableName.'.resourceType IN(?)',$resourceTypes);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /**
+     * Get language resource by given resourceId
+     * @param string $resourceId
+     * @return Ambigous <Zend_Db_Table_Row_Abstract, NULL>
+     */
+    public function loadByResourceId($resourceId) {
+        return $this->loadRow('resourceId = ?', $resourceId);
     }
     
     /**
@@ -358,21 +397,40 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /***
-     * Get property value from the specific data json text
+     * Get specificData field value. The returned value will be json decoded.
+     * If $propertyName is provided, only the value for this field will be returned if exisit.
      * @param string $propertyName
      * @return mixed|NULL
      */
-    public function getSpecificDataByProperty($propertyName){
-        $specificData=$this->getSpecificData();
-        //try to decode the data, and set the domainCode if exist
-        if(!empty($specificData)){
-            try {
-                $specificData=json_decode($specificData);
-                return $specificData->$propertyName;
-            } catch (Exception $e) {
+    public function getSpecificData($propertyName=null){
+        $specificData=$this->__call('getSpecificData', array());
+        
+        if(empty($specificData)){
+            return null;
+        }
+        //try to decode the data
+        try {
+            $specificData=json_decode($specificData);
+            
+            //return the property name value if exist
+            if(isset($propertyName)){
+                return isset($specificData->$propertyName) ? $specificData->$propertyName : null;
             }
+            return $specificData;
+        } catch (Exception $e) {
+            
         }
         return null;
+    }
+    
+    /***
+     * Set the specificData field. The given value will be json encoded.
+     * @param string $value
+     */
+    public function setSpecificData($value){
+        $this->__call('setSpecificData', array(
+            json_encode($value)
+        ));
     }
     
     /***
@@ -384,20 +442,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function addSpecificData($propertyName,$value) {
         $specificData=$this->getSpecificData();
         if(empty($specificData)){
-            $this->setSpecificData(json_encode(array($propertyName=>$value)));
+            $this->setSpecificData(array($propertyName=>$value));
             return true;
-        }
-        
-        //try to decude the database json
-        try {
-            $specificData=json_decode($specificData);
-        } catch (Exception $e) {
-            //it is invalide json
-            $specificData=new stdClass();
         }
         //set the property name into the specific data
         $specificData->$propertyName=$value;
-        $this->setSpecificData(json_encode($specificData));
+        $this->setSpecificData($specificData);
         return true;
     }
 }

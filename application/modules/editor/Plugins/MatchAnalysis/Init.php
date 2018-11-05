@@ -201,9 +201,19 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             if(isset($eventParams['internalFuzzy'])){
                 $analysis->setInternalFuzzy($eventParams['internalFuzzy']);
             }
+            
             if(isset($eventParams['pretranslateMatchrate'])){
                 $analysis->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
             }
+            
+            if(isset($eventParams['pretranslateMt'])){
+                $analysis->setPretranslateMt($eventParams['pretranslateMt']);
+            }
+            
+            if(isset($eventParams['pretranslateTmAndTerm'])){
+                $analysis->setPretranslateTmAndTerm($eventParams['pretranslateTmAndTerm']);
+            }
+            
             $analysis->setUserGuid($user->data->userGuid);
             $analysis->setUserName($user->data->userName);
             $analysis->calculateMatchrate();

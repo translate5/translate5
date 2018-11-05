@@ -2460,19 +2460,20 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source>
     <target>ATTENTION: TARGET CONTENT CONTAINED IN PREVIOUS OR FOLLOWING SEGMENT</target>
 </trans-unit>
-<trans-unit id='MTAwJSBtYXRjaGVzIG1pdCBkZW1zZWxiZW4gRG9rdW1lbnRuYW1lbiB3aWUgZGFzIGFrdHVlbGwgw7xiZXJzZXR6dGUgRG9rdW1lbnQ='>
-    <source>100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument</source>
-    <target>100% matches with the same document name as the currently translated document</target>
+
+<trans-unit id='MTAxJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdC4='>
+  <source>101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.</source>
+  <target>101% is a 100% match, that originates from a file with the same name.</target>
 </trans-unit>
 
-<trans-unit id='RWluZSBXaWVkZXJob2x1bmcgaXN0IGVpbiBTZWdtZW50LCBkYXMgYmVyZWl0cyBiZWkgZGVyc2VsYmVuIEF1ZmdhYmUgbWl0IGRlciBnbGVpY2hlbiBXb3J0LSB1bmQgVGFnLVJlaWhlbmZvbGdlIHdlaXRlciBvYmVuIGF1ZnRhdWNodGU='>
-    <source>Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte</source>
-    <target>A repetition is a segment, that already showed up with the same words and tag order further above in the same task</target>
+<trans-unit id='V2llZGVyaG9sdW5nLiBFaW5lIFdpZWRlcmhvbHVuZyBpc3QgZWluIFRyZWZmZXIsIGRlciBpZGVudGlzY2ggaW4gZGVyIGFrdHVlbGxlbiBBdWZnYWJlIG5vY2htYWxzIHZvcmtvbW10Lg=='>
+<source>Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
+<target>Repetition. A repetition is a match that occurs identically in the current task again.</target>
 </trans-unit>
 
-<trans-unit id='MTAzJSBpc3QgZWluZSBleGFjdC1leGFjdC1tYXRjaCgxMDElIG1hdGNoKSwgYmVpIGRlciB6dXPDpHR6bGljaCBkZXIgZ2xlaWNoZSBLb250ZXh0IGluIFRNIHdpZSBpbSBEb2t1bWVudCBmZXN0Z2VsZWd0IGlzdA=='>
-    <source>103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist</source>
-    <target>103% match is an exact-exact match (101% match), that in addition has the same context set in TM as in the document</target>
+<trans-unit id='MTAzJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdCAod2llIGVpbiAxMDElIFRyZWZmZXIpLiBadXPDpHR6bGljaCB6dW0gMTAxJSBUcmVmZmVyIGlzdCBkaWUgU2VnbWVudC1JRCBub2NoIGlkZW50aXNjaCBvZGVyIGdsZWljaCBtaXQgZGVyIFNlZ21lbnQtSUQgaW4gZGVyIGFrdHVlbGxlbiBEYXRlaS4='>
+<source>103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.</source>
+<target>103% is a 100% match that originally came from a file with the same name (like a 101% match). In addition to the 101% match, the segment ID is still the same or equal to the segment ID in the current file.</target>
 </trans-unit>
 
 <trans-unit id='RXJzdGVsbHVuZw=='>     
