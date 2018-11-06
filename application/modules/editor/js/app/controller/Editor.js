@@ -79,6 +79,7 @@ Ext.define('Editor.controller.Editor', {
     prevNextSegment: null,
     sourceTags: null,
     lastClipboardData: '',
+    lastCopiedFromSourceData: '',
     copiedContentFromSource: null,
     listen: {
         controller: {
@@ -433,10 +434,15 @@ Ext.define('Editor.controller.Editor', {
                 // handle CTRL+C within the document (= in copiedContentFromSource) and 
                 // outside of the document (= in clipboard):
                 // if the clipboard-data isn't the same as before copying from the source,
-                // we use the new clipboard-data
-                if (clipboardData != '' && me.lastClipboardData != '' && clipboardData != me.lastClipboardData) {
+                // we use the new clipboard-data.
+                // But only if what has been copied from the source has not changed meanwhile.
+                if (me.lastCopiedFromSourceData == me.copiedContentFromSource.selDataHtml
+                        && clipboardData != ''
+                        && me.lastClipboardData != ''
+                        && clipboardData != me.lastClipboardData) {
                     data = clipboardData;
                 }
+                me.lastCopiedFromSourceData = me.copiedContentFromSource.selDataHtml;
                 editor.insertMarkup(data);
             } else {
                 editor.insertAtCursor(clipboardData);
