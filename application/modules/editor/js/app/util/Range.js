@@ -424,27 +424,17 @@ Ext.define('Editor.util.Range', {
         var startContainer = selRange.startContainer,
             endContainer = selRange.endContainer,
             commonAncestorContainer = selRange.commonAncestorContainer,
-            allOpenTags,
-            allCloseTags;
+            allDivTags;
         if (commonAncestorContainer.nodeType == 3) {
             return selRange;
         }
-        allOpenTags = commonAncestorContainer.getElementsByClassName('open'),
-        allCloseTags = commonAncestorContainer.getElementsByClassName('close');
-        Ext.Array.each(allOpenTags, function(openTag) {
-            if (rangy.dom.isOrIsAncestorOf(openTag, startContainer)) {
-                selRange.setStartBefore(openTag);
+        allDivTags = commonAncestorContainer.getElementsByTagName('div');
+        Ext.Array.each(allDivTags, function(divTag) {
+            if (rangy.dom.isOrIsAncestorOf(divTag, startContainer)) {
+                selRange.setStartBefore(divTag);
             }
-            if (rangy.dom.isOrIsAncestorOf(openTag, endContainer)) {
-                selRange.setEndAfter(openTag);
-            }
-        });
-        Ext.Array.each(allCloseTags, function(closeTag) {
-            if (rangy.dom.isOrIsAncestorOf(closeTag, startContainer)) {
-                selRange.setStartBefore(closeTag);
-            }
-            if (rangy.dom.isOrIsAncestorOf(closeTag, endContainer)) {
-                selRange.setEndAfter(closeTag);
+            if (rangy.dom.isOrIsAncestorOf(divTag, endContainer)) {
+                selRange.setEndAfter(divTag);
             }
         });
         return selRange;
