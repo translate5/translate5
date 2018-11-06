@@ -701,7 +701,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if(ignoreWhitespace && /whitespace/.test(img.className)) {
               return;
           }
-          if(Ext.Array.contains(foundIds, img.id) && !img.parentNode.nodeName.toLowerCase()==="del") {
+          if(Ext.Array.contains(foundIds, img.id) && img.parentNode.nodeName.toLowerCase()!=="del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
