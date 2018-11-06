@@ -296,7 +296,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         me.consoleLog('SpellCheck: handleKeyDown...');
         me.initKeyDownEvent(event);
-        if(me.eventHasToBeIgnored()){
+        if(me.eventHasToBeIgnored() || me.eventIsCtrlV()){ // CTRL+V: SpellCheck will run anyway after insert markup (afterInsertMarkup); don't start it twice
             me.consoleLog(" => Ignored for SpellCheck.");
             me.ignoreEvent = true;
             me.stopEvent = false;
