@@ -158,7 +158,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'bx':
             case 'ex':
                 $type = '_singleTag';
-                $rid = 0;
+                $rid = md5($originalContent); //we use the content as rid, so we can match tag numbers in source and target
                 break;
             case 'bpt':
                 //the tagNr depends here on the existence of an entry with the same RID 
@@ -273,7 +273,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         }
         else {
             //if we parse the target, we have to reuse the tagNrs found in source
-            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : max($this->shortTagNumbers);
+            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : (max($this->shortTagNumbers) + 1);
         }
         $this->source = $source;
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
