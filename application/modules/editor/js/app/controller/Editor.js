@@ -44,6 +44,8 @@ Ext.define('Editor.controller.Editor', {
         'Editor.controller.editor.PrevNextSegment',
         'Editor.view.task.ConfirmationWindow'
     ],
+    mixins: ['Editor.util.Range'
+        ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
         segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
@@ -1009,6 +1011,7 @@ Ext.define('Editor.controller.Editor', {
         segmentId = plug.context.record.get('id');
         sel = rangy.getSelection();
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+        selRange = me.getRangeWithFullInternalTags(selRange);
         selDataHtml = selRange.toHtml();
         
         // internal tags are contained as divs; selRange.toString() would not remove them.

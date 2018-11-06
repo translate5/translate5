@@ -353,8 +353,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         };
     
     Ext.each(rootnode.childNodes, function(item){
-      var termFoundCls,
-          markupImagesBeforeInsertOfItem = Ext.Object.getKeys(me.markupImages);
+      var termFoundCls;
       if(Ext.isTextNode(item)){
         var text = item.data.replace(new RegExp(Editor.TRANSTILDE, "g"), ' ');
         me.result.push(Ext.htmlEncode(text));
@@ -397,14 +396,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName != 'DIV'){
         return;
       }
-      data = me.getData(item,data);
-      
-      // don't insert a tag if it already exists
-      // - e.g. when copying from source
-      // - if a target contains the same internal tag more than once, it's only inserted once
-      if (Ext.Array.contains(markupImagesBeforeInsertOfItem,data.key)) {
-          return;
-      }
+      data = me.getData(item,data); 
       
       if(me.viewModesController.isFullTag() || data.whitespaceTag) {
         data.path = me.getSvg(data.text, data.fullWidth);

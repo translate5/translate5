@@ -409,6 +409,47 @@ Ext.define('Editor.util.Range', {
         return html;
     },
     /**
+     * Fix selections when they start or end in/at an internal tag. 
+     * = Workaround because selected tags might not be fully fetched for ranges,
+     * which will cause errors in getData() of Editor.view.segments.HtmlEditor.
+     * Example:
+     * <div class="close"><span class="short">&lt;/1&gt;</span><span class="full">&lt;/span&gt;</span></div>
+     * Example 1: the selections covers the tag fully, but the range will only fetch:
+     * <div class="close"><span class="short">&lt;/1&gt;</span>
+     * Example 2: user might only select "<1"
+     * @param {Object} selRange
+     * @returns {Object} selRange
+     */
+    getRangeWithFullInternalTags: function(selRange) {
+        var startContainer = selRange.startContainer,
+            endContainer = selRange.endContainer,
+            commonAncestorContainer = selRange.commonAncestorContainer,
+            allOpenTags,
+            allCloseTags;
+        if (commonAncestorContainer.nodeType == 3) {
+            return selRange;
+        }
+        allOpenTags = commonAncestorContainer.getElementsByClassName('open'),
+        allCloseTags = commonAncestorContainer.getElementsByClassName('close');
+        Ext.Array.each(allOpenTags, function(openTag) {
+            if (rangy.dom.isOrIsAncestorOf(openTag, startContainer)) {
+                selRange.setStartBefore(openTag);
+            }
+            if (rangy.dom.isOrIsAncestorOf(openTag, endContainer)) {
+                selRange.setEndAfter(openTag);
+            }
+        });
+        Ext.Array.each(allCloseTags, function(closeTag) {
+            if (rangy.dom.isOrIsAncestorOf(closeTag, startContainer)) {
+                selRange.setStartBefore(closeTag);
+            }
+            if (rangy.dom.isOrIsAncestorOf(closeTag, endContainer)) {
+                selRange.setEndAfter(closeTag);
+            }
+        });
+        return selRange;
+    },
+    /**
      * Returns true if all the relevant content in the editor is selected.
      * (CAUTION: CTRL+A does NOT select everything in this sense.)
      * @returns {Boolean} 
