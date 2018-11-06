@@ -41,6 +41,9 @@ $data = [
 $this->htmlOnly = $this->translate->_('- Die Daten sind nur in der HTML-Ansicht der E-Mail verfügbar! -');
 
 //prepare the default taskFragment if a task is provided
+if(!empty($this->pm)) {
+    $data['pm'] = $this->pm->getDataObject();
+}
 if(!empty($this->task)) {
     $taskData = $this->workflowNotifyMail()->getTaskLanguages($this->task);
     $taskData['task'] = $this->task->getDataObject();

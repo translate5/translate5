@@ -235,11 +235,14 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
+        $pm = clone $user;
+        $pm->loadByGuid($this->config->task->getPmGuid());
         $user->loadByGuid($tua->getUserGuid());
         $workflow = $this->config->workflow;
         $labels = $workflow->getLabels(false);
         $roles = $workflow->getRoles();
         $params = [
+            'pm' => $pm,
             'task' => $this->config->task,
             'role' => $labels[array_search($tua->getRole(), $roles)],
         ];
@@ -282,8 +285,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
+        $pm = clone $user;
+        $pm->loadByGuid($task->getPmGuid());
         
         $params = [
+            'pm' => $pm,
             'task' => $this->config->task,
             'associatedUsers' => $tuas,
         ];
