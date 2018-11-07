@@ -28,3 +28,6 @@
 
 -- disable export menu for editor users
 update `Zf_acl_rules` set `role` = 'pm' where  `resource` = 'frontend' and `right` = 'editorShowexportmenuTask';
+
+-- fix missing stateId in language resource assoc column in the GUI
+update `Zf_configuration` set `value` = replace(`value`, "h21", "taskassocColumn") where `name` = 'runtimeOptions.frontend.defaultState';
