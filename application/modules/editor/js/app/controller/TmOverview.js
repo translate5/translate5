@@ -493,6 +493,7 @@ Ext.define('Editor.controller.TmOverview', {
             xtype: 'gridcolumn',
             width: 45,
             dataIndex:'taskassocs',
+            stateId: 'taskassocColumn',
             tdCls: 'taskassocs',
             sortable: false,
             cls: 'taskassocs',
