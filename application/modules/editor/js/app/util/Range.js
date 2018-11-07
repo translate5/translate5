@@ -409,6 +409,37 @@ Ext.define('Editor.util.Range', {
         return html;
     },
     /**
+     * Fix selections when they start or end in/at an internal tag. 
+     * = Workaround because selected tags might not be fully fetched for ranges,
+     * which will cause errors in getData() of Editor.view.segments.HtmlEditor.
+     * Example:
+     * <div class="close"><span class="short">&lt;/1&gt;</span><span class="full">&lt;/span&gt;</span></div>
+     * Example 1: the selections covers the tag fully, but the range will only fetch:
+     * <div class="close"><span class="short">&lt;/1&gt;</span>
+     * Example 2: user might only select "<1"
+     * @param {Object} selRange
+     * @returns {Object} selRange
+     */
+    getRangeWithFullInternalTags: function(selRange) {
+        var startContainer = selRange.startContainer,
+            endContainer = selRange.endContainer,
+            commonAncestorContainer = selRange.commonAncestorContainer,
+            allDivTags;
+        if (commonAncestorContainer.nodeType == 3) {
+            return selRange;
+        }
+        allDivTags = commonAncestorContainer.getElementsByTagName('div');
+        Ext.Array.each(allDivTags, function(divTag) {
+            if (rangy.dom.isOrIsAncestorOf(divTag, startContainer)) {
+                selRange.setStartBefore(divTag);
+            }
+            if (rangy.dom.isOrIsAncestorOf(divTag, endContainer)) {
+                selRange.setEndAfter(divTag);
+            }
+        });
+        return selRange;
+    },
+    /**
      * Returns true if all the relevant content in the editor is selected.
      * (CAUTION: CTRL+A does NOT select everything in this sense.)
      * @returns {Boolean} 
