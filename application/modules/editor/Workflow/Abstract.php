@@ -1040,7 +1040,7 @@ abstract class editor_Workflow_Abstract {
      */
     public function doUserAssociationDelete(editor_Models_TaskUserAssoc $tua) {
         $this->doDebug(__FUNCTION__);
-        $this->newTaskUserAssoc = $tua; //"new" is bsicly wrong, but with that entity all calculation is done
+        $this->newTaskUserAssoc = $tua; //"new" is basicly wrong, but with that entity all calculation is done
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($tua->getTaskGuid());
@@ -1173,8 +1173,9 @@ abstract class editor_Workflow_Abstract {
     protected function calculateFinish() {
         $userTaskAssoc = $this->newTaskUserAssoc;
         $stat = $userTaskAssoc->getUsageStat();
-        $allFinished = true;
-        $roleAllFinished = true;
+        //we have to initialize the following two values with true for proper working but with false if there is no tua at all
+        $allFinished = !empty($stat); 
+        $roleAllFinished = !empty($stat);
         $roleFirstFinished = false;
         $sum = 0;
         foreach($stat as $entry) {
