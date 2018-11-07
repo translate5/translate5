@@ -127,7 +127,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         $missingInSystem = array_diff($configuredTables, $filtered);  //gib die vom ersten die nicht im zweiten
         
         if(empty($addedToSystem) && empty($missingInSystem)){
-            exit(0); //since used as CLI use CLI exit codes here, 0 is true, other than 0 is error
+            return; //since other checks will follow we can not exit(0) here
         }
         
         if(!empty($addedToSystem)) {
