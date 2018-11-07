@@ -158,7 +158,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'bx':
             case 'ex':
                 $type = '_singleTag';
-                $rid = md5($originalContent); //we use the content as rid, so we can match tag numbers in source and target
+                
+                //we use the content as rid, so we can match tag numbers in source and target
+                // if there is sub content, it must be removed since the sub content in different languages produces different md5 hashes
+                // since sub tags can contained nested content wthe greedy approach is ok to remove from first <sub> to last </sub>
+                $rid = md5(preg_replace('#<sub>.*</sub>#','<sub/>',$originalContent));
                 break;
             case 'bpt':
                 //the tagNr depends here on the existence of an entry with the same RID 
