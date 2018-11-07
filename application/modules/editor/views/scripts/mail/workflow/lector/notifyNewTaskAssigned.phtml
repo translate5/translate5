@@ -42,7 +42,11 @@ $params = [
         'proofreadersFragment' => '',
 ];
 
-$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
+$taskNr = $this->task->getTaskNr();
+if(!empty($taskNr)) {
+    $taskNr .= ' - ';
+}
+$this->subject = $this->translate->_('Translate5 - Aufgabe zugewiesen').' "'.$taskNr.$this->task->getTaskName().'"';
 
 
 $template = '{header}
