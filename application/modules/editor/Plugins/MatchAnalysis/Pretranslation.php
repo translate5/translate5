@@ -66,7 +66,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      *
      * @var array
      */
-    protected $resourceType=array();
+    protected $resources=array();
     
     
     /***
@@ -180,9 +180,13 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
         /* @var $matchrateType editor_Models_Segment_MatchRateType */
         
-        //TODO: we need new matchrate type, we will look around with THOMAS!!!!
         //set the type
-        $matchrateType->initEdited($this->resourceType[$languageResourceid]);
+        $langRes = $this->resources[$languageResourceid];
+        /* @var $langRes editor_Models_LanguageResources_LanguageResource */
+        
+        //just to display the TM name too, we add it here to the type 
+        $type = $langRes->getServiceName().' - '.$langRes->getName();
+        $matchrateType->initPretranslated($langRes->getResourceType(), $type);
         
         $segment->setMatchRateType((string) $matchrateType);
         
@@ -313,10 +317,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     public function setUserName($userName) {
         $this->userName=$userName;
-    }
-    
-    public function setResourceType(array $resType) {
-        $this->resourceType=$resType;
     }
     
     public function setPretranslateMatchrate($pretranslateMatchrate) {

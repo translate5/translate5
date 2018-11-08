@@ -166,7 +166,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $isMtResource=false;
             
             //if the current resource type is not MT, query the tm or termcollection
-            if($this->resourceType[$languageResourceid] != editor_Models_Segment_MatchRateType::TYPE_MT){
+            if($this->resources[$languageResourceid]->getResourceType() != editor_Models_Segment_MatchRateType::TYPE_MT){
                 $matches=$connector->query($segment);
                 
                 //update the segment with custom target in fuzzy tm
@@ -305,8 +305,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT && $connector->getDefaultMatchRate()>=$this->pretranslateMatchrate){
                     $this->mtConnectors[]=$connector;
                 }
-                //store the resource type for the languageResource
-                $this->resourceType[$languageresource->getId()]=$resource->getType();
+                //store the languageResource
+                $this->resources[$languageresource->getId()] = $languageresource;
             } catch (ZfExtended_Exception $e) {
                 error_log("Unable to use connector from Language Resource: resourceName:".$languageresource->getName().', resourceId:'.$languageresource->getId().'. Error was:'.$e->getMessage());
                 continue;

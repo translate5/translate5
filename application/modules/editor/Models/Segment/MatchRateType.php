@@ -122,6 +122,12 @@ class editor_Models_Segment_MatchRateType {
     const PREFIX_EDITED = 'edited';
     
     /**
+     * Uses as match rate prefix when the value was changed in translate5
+     * @var string
+     */
+    const PREFIX_PRETRANSLATED = 'pretranslated';
+    
+    /**
      * internal map for import conversion 
      * @var array
      */
@@ -249,6 +255,28 @@ class editor_Models_Segment_MatchRateType {
             }
         }
         array_unshift($types, self::PREFIX_EDITED);
+        $this->data = $types;
+        return $this;
+    }
+    
+    /**
+     * creates the match rate type string usable when pretranslated by translate5 or its plugins
+     * @param string $type
+     * @param string $plugin
+     * @return editor_Models_Segment_MatchRateType
+     */
+    public function initPretranslated(... $types) {
+        //fallback when no type was given
+        if(empty($types)) {
+            $types = [self::TYPE_UNKNOWN];
+        }
+        else {
+            $type = reset($types);
+            if(!$this->isValidType($type)) {
+                array_unshift($types, self::TYPE_UNKNOWN);
+            }
+        }
+        array_unshift($types, self::PREFIX_PRETRANSLATED);
         $this->data = $types;
         return $this;
     }

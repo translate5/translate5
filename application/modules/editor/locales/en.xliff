@@ -1413,6 +1413,10 @@
     <source>{0} (translate5)</source>
     <target>{0} (translate5)</target>
 </trans-unit>
+<trans-unit id='ezB9ICh2b3LDvGJlcnNldHp0KQ=='>
+    <source>{0} (vorübersetzt)</source>
+    <target>{0} (pre-translated)</target>
+</trans-unit>
 <trans-unit id='S2VpbiBaaWVsdGV4dCB2b3JoYW5kZW4='>
     <source>Kein Zieltext vorhanden</source>
     <target>No target-text available</target>
@@ -1436,6 +1440,10 @@
 <trans-unit id='TVQtTWF0Y2g='>
     <source>MT-Match</source>
     <target>MT-Match</target>
+</trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9u'>
+    <source>Term-Collection</source>
+    <target>Term-Collection</target>
 </trans-unit>
 <trans-unit id='ZWRpdGllcnQ='>
     <source>editiert</source>
@@ -1496,6 +1504,22 @@
 <trans-unit id='SW0gQnJvd3NlciBhdXMgTVQgw7xiZXJub21tZW4='>
     <source>Im Browser aus MT übernommen</source>
     <target>Taken over in the browser from a MT</target>
+</trans-unit>
+<trans-unit id='SW0gQnJvd3NlciBhdXMgVGVybS1Db2xsZWN0aW9uIMO8YmVybm9tbWVu'>
+    <source>Im Browser aus Term-Collection übernommen</source>
+    <target>Taken over in the browser from a Term-Collection</target>
+</trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIFRNIMO8YmVybm9tbWVu'>
+    <source>Bei der Vorübersetzung aus TM übernommen</source>
+    <target>Pre-translated from a TM</target>
+</trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIE1UIMO8YmVybm9tbWVu'>
+    <source>Bei der Vorübersetzung aus MT übernommen</source>
+    <target>Pre-translated from a MT</target>
+</trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIFRlcm0tQ29sbGVjdGlvbiDDvGJlcm5vbW1lbg=='>
+    <source>Bei der Vorübersetzung aus Term-Collection übernommen</source>
+    <target>Pre-translated from a Term-Collection</target>
 </trans-unit>
 <trans-unit id='VHlw'>
     <source>Typ</source>

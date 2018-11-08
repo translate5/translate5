@@ -175,12 +175,14 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             import: '<?php echo $this->translate->_('{0} (importiert)');?>',
             edited: '<?php echo $this->translate->_('{0} (translate5)');?>',
+            pretranslated: '<?php echo $this->translate->_('{0} (vorübersetzt)');?>',
             noTarget: '<?php echo $this->translate->_('Kein Zieltext vorhanden');?>',
             noValueDefined: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
             noValueDefinedDesc: '<?php echo $this->translate->_('Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.');?>',
             olddata: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
             olddataDesc: '<?php echo $this->translate->_('Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.');?>',
             type: {
+                "termcollection": '<?php echo $this->translate->_('Term-Collection');?>',
                 "tm": '<?php echo $this->translate->_('TM-Match');?>',
                 "mt": '<?php echo $this->translate->_('MT-Match');?>',
                 "interactive": '<?php echo $this->translate->_('editiert');?>',
@@ -201,7 +203,13 @@ Ext.define('Editor.controller.Localizer', {
             },
             editedDesc: {
                 "tm": '<?php echo $this->translate->_('Im Browser aus TM übernommen');?>',
-                "mt": '<?php echo $this->translate->_('Im Browser aus MT übernommen');?>'
+                "mt": '<?php echo $this->translate->_('Im Browser aus MT übernommen');?>',
+                "termcollection": '<?php echo $this->translate->_('Im Browser aus Term-Collection übernommen');?>'
+            },
+            pretranslatedDesc: {
+                "tm": '<?php echo $this->translate->_('Bei der Vorübersetzung aus TM übernommen');?>',
+                "mt": '<?php echo $this->translate->_('Bei der Vorübersetzung aus MT übernommen');?>',
+                "termcollection": '<?php echo $this->translate->_('Bei der Vorübersetzung aus Term-Collection übernommen');?>'
             }
         }
     });

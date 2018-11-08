@@ -798,12 +798,14 @@
 <trans-unit id='RW5nbGlzaCBHQg=='><source>English GB</source><target>English GB</target></trans-unit>
 <trans-unit id='ezB9IChpbXBvcnRpZXJ0KQ=='><source>{0} (importiert)</source><target>{0} (importiert)</target></trans-unit>
 <trans-unit id='ezB9ICh0cmFuc2xhdGU1KQ=='><source>{0} (translate5)</source><target>{0} (translate5)</target></trans-unit>
+<trans-unit id='ezB9ICh2b3LDvGJlcnNldHp0KQ=='><source>{0} (vorübersetzt)</source><target>{0} (vorübersetzt)</target></trans-unit>
 <trans-unit id='S2VpbiBaaWVsdGV4dCB2b3JoYW5kZW4='><source>Kein Zieltext vorhanden</source><target>Kein Zieltext vorhanden</target></trans-unit>
 <trans-unit id='S2VpbmUgSW5mb3JtYXRpb24gdm9yaGFuZGVu'><source>Keine Information vorhanden</source><target>Keine Information vorhanden</target></trans-unit>
 <trans-unit id='RGFzIHZlcndlbmRldGUgw5xiZXJzZXR6dW5nc3dlcmt6ZXVnIGhhdCBrZWluZSBJbmZvcm1hdGlvbiB6dXIgSGVya3VuZnQgZGVzIE1hdGNoZXMgenVyIFZlcmbDvGd1bmcgZ2VzdGVsbHQu'><source>Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.</source><target>Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.</target></trans-unit>
 <trans-unit id='RGllc2VyIFRhc2sgd3VyZGUgaW1wb3J0aWVydCwgYmV2b3IgZGFzIE1hdGNoIFJhdGUgVHlwLUZlYXR1cmUgaW1wbGVtZW50aWVydCB3dXJkZS4='><source>Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.</source><target>Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.</target></trans-unit>
 <trans-unit id='VE0tTWF0Y2g='><source>TM-Match</source><target>TM-Match</target></trans-unit>
 <trans-unit id='TVQtTWF0Y2g='><source>MT-Match</source><target>MT-Match</target></trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9u'><source>Term-Collection</source><target>Term-Collection</target></trans-unit>
 <trans-unit id='ZWRpdGllcnQ='><source>editiert</source><target>editiert</target></trans-unit>
 <trans-unit id='UXVlbGxlIMO8YmVybm9tbWVu'><source>Quelle übernommen</source><target>Quelle übernommen</target></trans-unit>
 <trans-unit id='V2llZGVyaG9sdW5n'><source>Wiederholung</source><target>Wiederholung</target></trans-unit>
@@ -819,6 +821,10 @@
 <trans-unit id='SW0gdXJzcHLDvG5nbGljaGVuIMOcYmVyc2V0enVuZ3N3ZXJremV1ZyBhdcOfZXJoYWxiIHZvbiB0cmFuc2xhdGU1IGdlc2V0enRlciBTdGF0dXMsIGRlciBkZXJ6ZWl0IHRyYW5zbGF0ZTUgdW5iZWthbm50IGlzdA=='><source>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 gesetzter Status, der derzeit translate5 unbekannt ist</source><target>Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 gesetzter Status, der derzeit translate5 unbekannt ist</target></trans-unit>
 <trans-unit id='SW0gQnJvd3NlciBhdXMgVE0gw7xiZXJub21tZW4='><source>Im Browser aus TM übernommen</source><target>Im Browser aus TM übernommen</target></trans-unit>
 <trans-unit id='SW0gQnJvd3NlciBhdXMgTVQgw7xiZXJub21tZW4='><source>Im Browser aus MT übernommen</source><target>Im Browser aus MT übernommen</target></trans-unit>
+<trans-unit id='SW0gQnJvd3NlciBhdXMgVGVybS1Db2xsZWN0aW9uIMO8YmVybm9tbWVu'><source>Im Browser aus Term-Collection übernommen</source><target>Im Browser aus Term-Collection übernommen</target></trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIFRNIMO8YmVybm9tbWVu'><source>Bei der Vorübersetzung aus TM übernommen</source><target>Bei der Vorübersetzung aus TM übernommen</target></trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIE1UIMO8YmVybm9tbWVu'><source>Bei der Vorübersetzung aus MT übernommen</source><target>Bei der Vorübersetzung aus MT übernommen</target></trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIFRlcm0tQ29sbGVjdGlvbiDDvGJlcm5vbW1lbg=='><source>Bei der Vorübersetzung aus Term-Collection übernommen</source><target>Bei der Vorübersetzung aus Term-Collection übernommen</target></trans-unit>
 <trans-unit id='SW4gS8O8cnplIHdpcmQgZWluZSBTeXN0ZW13YXJ0dW5nIGR1cmNoZ2Vmw7xocnQgd2VyZGVuLiBEaWUgQW53ZW5kdW5nIGlzdCBkYW5uIGbDvHIgZWluaWdlIFplaXQgZ2VzcGVycnQuIERhdHVtIHVuZCBVaHJ6ZWl0IGRlcyBTdGFydHMgZGVyIFN5c3RlbXdhcnR1bmc6ICVz'><source>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</source><target>In Kürze wird eine Systemwartung durchgeführt werden. Die Anwendung ist dann für einige Zeit gesperrt. Datum und Uhrzeit des Starts der Systemwartung: %s</target></trans-unit>
 <trans-unit id='PHA+QWNodHVuZyEgSW4gS8O8cnplIHdpcmQgZWluZSBXYXJ0dW5nIGFtIFN5c3RlbSBkdXJjaGdlZsO8aHJ0LjwvcD48cD5UcmFuc2xhdGU1IHdpcmQgYWIgZGllc2VtIFplaXRwdW5rdCBmw7xyIGt1cnplIFplaXQgbmljaHQgZXJyZWljaGJhciBzZWluLjwvcD48cD5HZXBsYW50ZXIgWmVpdHB1bmt0OiB7MH08L3A+'><source><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></source><target><p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p></target></trans-unit>
 <trans-unit id='VHlw'><source>Typ</source><target>Typ</target></trans-unit>
