@@ -206,7 +206,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                             tag: 'div',
                             'data-qtip': me.strings.pretranslateTmAndTermTooltip
                         },
-                        itemId:'pretranslateTmAndTerm'
+                        itemId:'pretranslateTmAndTerm',
+                        padding: '0 20 0 0'
                     },{
                         xtype:'combobox',
                         stretch: false,
