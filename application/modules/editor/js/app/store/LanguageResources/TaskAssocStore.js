@@ -30,5 +30,6 @@ Ext.define('Editor.store.LanguageResources.TaskAssocStore', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.LanguageResources.TaskAssoc',
   groupField: 'serviceName',
-  autoLoad: false
+  autoLoad: false,
+  pageSize: 0
 });
