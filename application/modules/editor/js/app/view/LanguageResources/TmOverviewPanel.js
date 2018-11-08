@@ -84,8 +84,9 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 plugins: ['gridfilters'],
                 viewConfig: {
                     getRowClass: function(record) {
-                        var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
-                        return cls + ' languageResource-status-'+record.get('status');
+                        //adds service specific handled css to the row 
+                        var service = Editor.util.LanguageResources.getService(record.get('serviceName'));
+                        return service.getTmOverviewRowCls(record).join(' ');
                     }
                 },
                 selModel: {

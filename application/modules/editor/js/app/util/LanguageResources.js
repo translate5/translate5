@@ -48,6 +48,31 @@ Ext.define('Editor.util.LanguageResources', {
 			TM:'tm',
 			MT:'mt',
 			TERM_COLLECTION:'termcollection'
+		},
+		
+		/**
+		 * Adds a service instance to the internal list. Usable for Plugins which deliver LanguageResource services. 
+		 * The core languageResources are added by the LanguageResource controller
+		 * addService and getService are used similar to the ServiceManager in the backend
+		 * @param {Editor.view.LanguageResources.services.Default} serviceTypeInstance
+		 */
+		addService: function (serviceTypeInstance) {
+		    if(!this.serviceInstances) {
+		        this.serviceInstances = new Ext.util.Collection();
+		    }
+		    this.serviceInstances.add(serviceTypeInstance);
+		},
+		/**
+		 * returns the service instance to the given service type, if no specific found the Default instance is returned
+		 * @return {Editor.view.LanguageResources.services.Default}
+		 */
+		getService: function (serviceType) {
+            var service = this.serviceInstances,
+                result = service.get(serviceType);
+            if(!result) {
+                return service.get('Default');
+            }
+            return result;
 		}
     },
     
