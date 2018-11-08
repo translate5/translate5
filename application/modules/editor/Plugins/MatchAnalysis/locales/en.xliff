@@ -52,7 +52,7 @@
 
 		<trans-unit id='TWF0Y2gtQW5hbHlzZSB1bmQgVm9yw7xiZXJzZXR6dW5nZW4gd2VyZGVuIGF1c2dlZsO8aHJ0Lg=='>
 		    <source>Match-Analyse und Vorübersetzungen werden ausgeführt.</source>
-		    <target>Match analysis and pretranslations are running.</target>
+		    <target>Match analysis and pre-translations are running.</target>
 		</trans-unit>
 
 		<trans-unit id='WsOkaGxlIGludGVybmUgRnV6enk='>
@@ -62,12 +62,12 @@
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
 		    <source>Vorübersetzungs Match-Rate</source>
-		    <target>Pretranslation match rate</target>
+		    <target>Pre-translation match rate</target>
 		</trans-unit>
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0'>
 		    <source>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</source>
-		    <target>Pretranslation with TM-Match greater than or equal to the selected value</target>
+		    <target>Pre-translation with TM-Match greater than or equal to the selected value</target>
 		</trans-unit>
 
 		<trans-unit id='QW5hbHlzZSAmIFZvcsO8YmVyc2V0enVuZ2VuIFN0YXJ0ZW4='>
@@ -77,7 +77,7 @@
 
 		<trans-unit id='RGllIFZvcsO8YmVyc2V0enVuZyBsw7ZzdCBhdWNoIGVpbmUgbmV1ZSBBbmFseXNlIGF1cw=='>
 		    <source>Die Vorübersetzung löst auch eine neue Analyse aus</source>
-		    <target>Pretranslation also triggers new analysis</target>
+		    <target>Pre-translation also triggers new analysis</target>
 		</trans-unit>
 
 		<trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='>
@@ -92,22 +92,22 @@
 
 		<trans-unit id='VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu'>
 		    <source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source>
-		    <target>Search results from the terminology are preferably pretranslated.</target>
+		    <target>Search results from the terminology are preferably pre-translated.</target>
 		</trans-unit>
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKFRNICYgVGVybWUp'>
 		    <source>Vorübersetzen (TM & Terme)</source>
-		    <target>Pretranslate (TM & Terms)</target>
+		    <target>Pre-translate (TM & Terms)</target>
 		</trans-unit>
 
 		<trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='>
 		    <source>Treffer aus dem TM werden bevorzugt vorübersetzt</source>
-		    <target>Hits from the TM are preferably pretranslated</target>
+		    <target>Hits from the TM are preferably pre-translated</target>
 		</trans-unit>
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKE1UKQ=='>
 		    <source>Vorübersetzen (MT)</source>
-		    <target>Pretranslate (MT)</target>
+		    <target>Pre-translate (MT)</target>
 		</trans-unit>
 
 		<trans-unit id='QW5hbHlzZQ=='>
