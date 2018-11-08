@@ -168,9 +168,8 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         var me = this,
             value = value && value.split(';') || [],
             firstType, useAsLabel,
-            prefix = value.shift(),
+            prefix = value.shift(), //import, edited, pretranslated
             isImport = (prefix == 'import'),
-            mode = isImport ? 'import' : 'edited',
             translate = function(value) {
                 return me.strings.type[value] || value;
             },
@@ -210,17 +209,17 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             return '';
         }
         //unknown, when the given value is not registered in translate5
-        if(firstType == 'unknown') {
+        if(firstType == 'unknown' || prefix == 'pretranslated') {
             useAsLabel = value.shift(); //when unknown remove it to prevent a not found image, the real value is in the next field
         }
         
         //translating and formatting known types 
-        label = Ext.String.format(me.strings[mode], translate(useAsLabel));
+        label = Ext.String.format(me.strings[prefix], translate(useAsLabel));
         if(value.length > 0) {
             label = label + ' (' + value.join(';') + ')';
         }
         //using tooltip 
-        qtip(meta, label, me.strings[mode+'Desc'][firstType]);
+        qtip(meta, label, me.strings[prefix+'Desc'][firstType]);
         value.unshift(firstType);
         //and image
         Ext.Array.each(value, function(val, idx){
