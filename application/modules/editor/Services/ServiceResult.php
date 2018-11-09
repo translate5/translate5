@@ -115,9 +115,7 @@ class editor_Services_ServiceResult {
     public function addResult($target, $matchrate = 0, array $metaData = null) {
         $result = new stdClass();
         
-        $missingTags = $this->internalTag->diff($this->defaultSource, $target);
-        
-        $result->target = $target.join('', $missingTags);
+        $result->target = $target;
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
         $result->languageResourceid = $this->languageResource->getId();
