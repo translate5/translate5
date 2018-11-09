@@ -182,7 +182,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             items : [{
                 xtype:'checkbox',
-                value:true,
+                value: 1,
     			boxLabel:this.strings.internalFuzzy,
     			itemId:'cbInternalFuzzy',
     			dock:'bottom'
@@ -199,7 +199,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                         bind:{
                             disabled:'{!hasTmOrCollection}'
                         },
-                        value:true,
+                        value: 1,
                         cls:'pretranslateCheckboxIcon',
                         boxLabel:me.strings.pretranslateTmAndTerm,
                         autoEl: {
@@ -230,6 +230,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 bind:{
                     disabled:'{!hasMt}'
                 },
+                value: 1,
                 cls:'pretranslateCheckboxIcon',
                 boxLabel:me.strings.pretranslateMt,
                 autoEl: {
@@ -340,23 +341,23 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         
     	Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
     	Ext.Ajax.request({
-            url:Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
-                method: "PUT",
-                params:{
-                	internalFuzzy:me.getComponentByItemId('cbInternalFuzzy').checked,
-                    pretranslateMatchrate:me.getComponentByItemId('cbMinMatchrate').getValue(),
-                    pretranslateTmAndTerm:me.getComponentByItemId('pretranslateTmAndTerm').checked,
-                    pretranslateMt:me.getComponentByItemId('pretranslateMt').checked,
-                },
-                scope: this,
-                timeout:600000,
-                success: function(response){
-                	me.reloadTaskRecord(taskId);
-                }, 
-                failure: function(response){
-                	Editor.app.getController('ServerException').handleException(response);
-                	me.reloadTaskRecord(taskId);
-                }
+            url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
+            method: "PUT",
+            params: {
+            	internalFuzzy: me.getComponentByItemId('cbInternalFuzzy').getValue() ? 1 : 0,
+                pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
+                pretranslateTmAndTerm: me.getComponentByItemId('pretranslateTmAndTerm').getValue() ? 1 : 0,
+                pretranslateMt: me.getComponentByItemId('pretranslateMt').getValue() ? 1 : 0
+            },
+            scope: this,
+            timeout:600000,
+            success: function(response){
+            	me.reloadTaskRecord(taskId);
+            }, 
+            failure: function(response){
+            	Editor.app.getController('ServerException').handleException(response);
+            	me.reloadTaskRecord(taskId);
+            }
         })
     },
     

@@ -80,7 +80,7 @@ abstract class editor_Services_Connector_Abstract {
      * Flag for if the current connector supports internal fuzzy calculations
      * @var boolean
      */
-    protected $isInternalFuzzy=false;
+    protected $isInternalFuzzy = false;
     
     /**
      * initialises the internal result list
@@ -100,6 +100,8 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * Link this Connector Instance to the given LanguageResource and its resource
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     * @param integer $sourceLang language id, optional 
+     * @param integer $targetLang language id, optional 
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
         $this->sourceLang=$sourceLang;
@@ -205,11 +207,11 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /***
-     * Initialyze fuzzy connectors. Currently only is used in opentm2
-     * @return boolean|editor_Services_Connector_Abstract
+     * Initialize fuzzy connectors. Returns the current instance if not supported.
+     * @return editor_Services_Connector_Abstract
      */
-    public function initFuzzyAnalysis() {
-        return null;
+    public function initForFuzzyAnalysis() {
+        return $this;
     }
     
     /***

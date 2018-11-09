@@ -57,7 +57,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         parent::connectTo($languageResource,$sourceLang,$targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$languageResource]);
-        $this->isInternalFuzzy=true;
     }
     
     /**
@@ -576,29 +575,29 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */
-    public function initFuzzyAnalysis() {
+    public function initForFuzzyAnalysis() {
         $mime="TM";
-
+        $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidFiletypes();
         
         if(empty($validExportTypes[$mime])){
             throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
         }
         $data = $this->getTm($validExportTypes[$mime]);
-        $memoryName=$this->languageResource->getName().'-Fuzzy-Analysis';
-        $this->api->createMemory($memoryName, $this->languageResource->getSourceLangRfc5646(), $data);
+        $fuzzyName = $this->languageResource->getSpecificData('fileName').'-Fuzzy-Analysis';
+        $this->api->createMemory($fuzzyName, $this->languageResource->getSourceLangRfc5646(), $data);
         
-        $fuzzyLanguageResource=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        $fuzzyLanguageResource = clone $this->languageResource;
         /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
         
-        $fuzzyLanguageResource=clone $this->languageResource;
-        
-        $fuzzyLanguageResource->setName($memoryName);
-        $fuzzyLanguageResource->addSpecificData('fileName',$memoryName);
+        $fuzzyLanguageResource->setName($this->languageResource->getName().'-Fuzzy-Analysis');
+        $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyName);
         $fuzzyLanguageResource->setId(null);
         
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
-        return $serviceManager->getConnector($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());;
+        $connector = ZfExtended_Factory::get(get_class($this));
+        /* @var $connector editor_Services_Connector_Abstract */
+        $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        $connector->isInternalFuzzy = true;
+        return $connector;
     }
 }

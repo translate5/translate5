@@ -60,6 +60,12 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
      */
     const REPETITION_MATCH_VALUE=102;
     
+    /***
+     * Matches from term collections are highest rated
+     * @var integer
+     */
+    const TERMCOLLECTION_MATCH_VALUE = 104;
+    
     /**
      * @var string
      */

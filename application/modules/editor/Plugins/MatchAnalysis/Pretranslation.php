@@ -80,14 +80,14 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      * Pretranslate with translation memory and term collection priority
      * @var boolean
      */
-    protected $pretranslateTmAndTerm=false;
+    protected $usePretranslateTMAndTerm=false;
     
     
     /***
      * Pretranslate with mt priority only when the tm pretranslation matchrate is not over the $pretranslateMatchrate
      * @var boolean
      */
-    protected $pretranslateMt=false;
+    protected $usePretranslateMT=false;
     
     
     /***
@@ -98,49 +98,22 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     
     /***
-     * Pretranslate the given segment from the given resource
+     * Use the given TM analyse (or MT if analyse was empty) result to update the segment
+     * Update the segment only if it is not TRANSLATED  
      * 
      * @param editor_Models_Segment $segment
      * @param stdClass $result - match resources result
      */
-    public function pretranslateSegment(editor_Models_Segment $segment, $result){
+    protected function updateSegment(editor_Models_Segment $segment, $result){
         
         //if the segment target is not empty or best match rate is not found do not pretranslate
         //pretranslation only for editable segments
         if(($segment->getAutoStateId()!=editor_Models_Segment_AutoStates::NOT_TRANSLATED)){
             return;
         }
-        $checkMt=false;
-        //the result is not set, try to get the results from the mt resources
-        if(!isset($result)){
-            $result=$this->getMtResult($segment);
-            //no results afte mt results check, no pretranslation
-            if(!isset($result)){
-                return;
-            }
-            $checkMt=true;
-        }
-        
-        if($result->matchrate==editor_Services_OpenTM2_Connector::REPETITION_MATCH_VALUE){
-            return;
-        }
-        
-        //the matchrate is lower then the allowed matchrate
-        if($result->matchrate<$this->pretranslateMatchrate){
-            
-            //the results from the are also lower than the allowed matchrate, do not pretranslate
-            if($checkMt){
-                return;
-            }
-            //try to query mt resources if exist
-            $result=$this->getMtResult($segment);
-            
-            //no results are found, or no mt engines exist, do not pretranslate
-            if(!isset($result)){
-                return;
-            }
-        }
-        
+        //if($result->matchrate==editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE){
+            //return;
+        //}
         //the internalLanguageResourceid is set when the segment bestmatchrate is found(see analysis getbestmatchrate function)
         $languageResourceid=$result->internalLanguageResourceid;
         
@@ -152,6 +125,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $targetResult=$result->target;
         
         //ignore internal fuzzy match target
+        //FIXME hier Wechselwirkung mit Vorübersetzung von Wiederholungen, diese wurden nicht vorübersetzt!
         if (strpos($targetResult, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false){
             return;
         }
@@ -299,9 +273,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return null;
         }
         //INFO: use the first connector, since no mt engine priority exist
-        $connector=$this->mtConnectors[0];
+        $connector = $this->mtConnectors[0];
         /* @var $connector editor_Services_Connector_Abstract */
-        $matches=$connector->query($segment);
+        $matches = $connector->query($segment);
         $matchResults=$matches->getResult();
         if(!empty($matchResults)){
             $result=$matchResults[0];
@@ -325,17 +299,17 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Set pretranslate from Mt priority flag
-     * @param boolean $pretranslateMt
+     * @param boolean $usePretranslateMT
      */
-    public function setPretranslateMt($pretranslateMt) {
-        $this->pretranslateMt=$pretranslateMt;
+    public function setPretranslateMt($usePretranslateMT) {
+        $this->usePretranslateMT=$usePretranslateMT;
     }
     
     /***
      * Set the pretranslate from the Tm and termcollection priority flag. This flag also will run the pretranslations
-     * @param boolean $pretranslateTmAndTerm
+     * @param boolean $usePretranslateTMAndTerm
      */
-    public function setPretranslateTmAndTerm($pretranslateTmAndTerm) {
-        $this->pretranslateTmAndTerm=$pretranslateTmAndTerm;
+    public function setPretranslateTmAndTerm($usePretranslateTMAndTerm) {
+        $this->usePretranslateTMAndTerm=$usePretranslateTMAndTerm;
     }
 }

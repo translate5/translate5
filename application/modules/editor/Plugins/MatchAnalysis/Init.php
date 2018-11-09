@@ -129,13 +129,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $params['pretranslate']=$pretranlsate;
         }
         
-        if(isset($eventParams['internalFuzzy'])){
-            $params['internalFuzzy']=$eventParams['internalFuzzy'];
-        }
-        
-        if(isset($eventParams['pretranslateMatchrate'])){
-            $params['pretranslateMatchrate']=$eventParams['pretranslateMatchrate'];
-        }
+        $params['internalFuzzy']=$eventParams['internalFuzzy'];
+        $params['pretranslateMatchrate']=$eventParams['pretranslateMatchrate'];
         
         // init worker and queue it
         if (!$worker->init($taskGuid, $params)) {
@@ -159,7 +154,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @param boolean $pretranslate
      * @param array $eventParams
      */
-    public function runAnalysis(editor_Models_Task $task,$pretranslate=false,$eventParams=array()){
+    protected function runAnalysis(editor_Models_Task $task,$pretranslate=false,$eventParams=array()){
         
         if(!$this->checkLanguageResources($task->getTaskGuid())){
             error_log("The associated language resource can not be used for analysis.");
@@ -182,13 +177,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $analysisAssoc->setTaskGuid($task->getTaskGuid());
         
         //set flag for internal fuzzy usage
-        if(isset($eventParams['internalFuzzy'])){
-            $analysisAssoc->setInternalFuzzy(filter_var($eventParams['internalFuzzy'], FILTER_VALIDATE_BOOLEAN));
-        }
+        $analysisAssoc->setInternalFuzzy($eventParams['internalFuzzy']);
+        
         //set pretranslation matchrate used for the anlysis
-        if(isset($eventParams['pretranslateMatchrate'])){
-            $analysisAssoc->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
-        }
+        $analysisAssoc->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
         
         $analysisId=$analysisAssoc->save();
         
@@ -198,21 +190,10 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
             $analysis->setPretranslate($pretranslate);
             $user = new Zend_Session_Namespace('user');
             
-            if(isset($eventParams['internalFuzzy'])){
-                $analysis->setInternalFuzzy($eventParams['internalFuzzy']);
-            }
-            
-            if(isset($eventParams['pretranslateMatchrate'])){
-                $analysis->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
-            }
-            
-            if(isset($eventParams['pretranslateMt'])){
-                $analysis->setPretranslateMt($eventParams['pretranslateMt']);
-            }
-            
-            if(isset($eventParams['pretranslateTmAndTerm'])){
-                $analysis->setPretranslateTmAndTerm($eventParams['pretranslateTmAndTerm']);
-            }
+            $analysis->setInternalFuzzy($eventParams['internalFuzzy']);
+            $analysis->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
+            $analysis->setPretranslateMt($eventParams['pretranslateMt']);
+            $analysis->setPretranslateTmAndTerm($eventParams['pretranslateTmAndTerm']);
             
             $analysis->setUserGuid($user->data->userGuid);
             $analysis->setUserName($user->data->userName);
@@ -254,7 +235,12 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      */
     private function handleOperation(Zend_EventManager_Event $event,$pretranlsate=false){
         $task = $event->getParam('entity');
-        $params=$event->getParam('params');
+        $params = $event->getParam('params');
+        
+        settype($params['internalFuzzy'], 'boolean');
+        settype($params['pretranslateMatchrate'], 'integer');
+        settype($params['pretranslateTmAndTerm'], 'boolean');
+        settype($params['pretranslateMt'], 'boolean');
         
         /* @var $task editor_Models_Task */
         //if the task is in import state -> queue the worker
