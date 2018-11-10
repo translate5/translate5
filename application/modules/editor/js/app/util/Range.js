@@ -421,22 +421,38 @@ Ext.define('Editor.util.Range', {
      * @returns {Object} selRange
      */
     getRangeWithFullInternalTags: function(selRange) {
-        var startContainer = selRange.startContainer,
+        var me = this,
+            startContainer = selRange.startContainer,
             endContainer = selRange.endContainer,
-            commonAncestorContainer = selRange.commonAncestorContainer,
-            allDivTags;
-        if (commonAncestorContainer.nodeType == 3) {
-            return selRange;
+            commonContainer = me.getContainerForRange(selRange),
+            commonDivTag,
+            allDivTags,
+            getCommonDivTag = function(node){
+                while (node) {
+                    if (node.nodeName.toLowerCase() == 'div' && 
+                            ( node.classList.contains('open') || node.classList.contains('close') || node.classList.contains('single') ) ) {
+                        return node;
+                    }
+                    node = node.parentNode;
+                }
+                return null;
+            };
+        commonDivTag = getCommonDivTag(commonContainer);
+        if (commonDivTag != null) {
+            // Is the selection completely within a divTag?
+            selRange.selectNode(commonDivTag);
+        } else {
+            // Does the selection start or end within a divTag?
+            allDivTags = commonContainer.getElementsByTagName('div');
+            Ext.Array.each(allDivTags, function(divTag) {
+                if (rangy.dom.isOrIsAncestorOf(divTag, startContainer)) {
+                    selRange.setStartBefore(divTag);
+                }
+                if (rangy.dom.isOrIsAncestorOf(divTag, endContainer)) {
+                    selRange.setEndAfter(divTag);
+                }
+            });
         }
-        allDivTags = commonAncestorContainer.getElementsByTagName('div');
-        Ext.Array.each(allDivTags, function(divTag) {
-            if (rangy.dom.isOrIsAncestorOf(divTag, startContainer)) {
-                selRange.setStartBefore(divTag);
-            }
-            if (rangy.dom.isOrIsAncestorOf(divTag, endContainer)) {
-                selRange.setEndAfter(divTag);
-            }
-        });
         return selRange;
     },
     /**
