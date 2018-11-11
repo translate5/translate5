@@ -90,7 +90,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
               'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`) '.
               'AND language=? AND collectionId=?';
         $sql2= 'SELECT * FROM `LEK_terms` AS `t` '.
-              'WHERE lower(term) like lower(?)  '.
+              'WHERE lower(term) like lower(?) COLLATE utf8_bin '.
               'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`';
 		$groupIds = array();
         $results = $this->db->getAdapter()->query($sql2, array($queryString,$this->getId(),$sourceLang))->fetchAll();
