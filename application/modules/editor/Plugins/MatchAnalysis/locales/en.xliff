@@ -70,9 +70,9 @@
 		    <target>Pre-translation with TM-Match greater than or equal to the selected value</target>
 		</trans-unit>
 
-		<trans-unit id='QW5hbHlzZSAmIFZvcsO8YmVyc2V0enVuZ2VuIFN0YXJ0ZW4='>
-		    <source>Analyse & Vorübersetzungen Starten</source>
-		    <target>Start analysis & pre-translation</target>
+		<trans-unit id='QW5hbHlzZSAmYW1wOyBWb3LDvGJlcnNldHp1bmdlbiBzdGFydGVu'>
+		    <source>Analyse &amp; Vorübersetzungen Starten</source>
+		    <target>Start analysis &amp; pre-translation</target>
 		</trans-unit>
 
 		<trans-unit id='RGllIFZvcsO8YmVyc2V0enVuZyBsw7ZzdCBhdWNoIGVpbmUgbmV1ZSBBbmFseXNlIGF1cw=='>
@@ -95,9 +95,9 @@
 		    <target>Search results from the terminology are preferably pre-translated.</target>
 		</trans-unit>
 
-		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKFRNICYgVGVybWUp'>
-		    <source>Vorübersetzen (TM & Terme)</source>
-		    <target>Pre-translate (TM & Terms)</target>
+		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKFRNICZhbXA7IFRlcm1lKQ=='>
+		    <source>Vorübersetzen (TM &amp; Terme)</source>
+		    <target>Pre-translate (TM &amp; Terms)</target>
 		</trans-unit>
 
 		<trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='>
