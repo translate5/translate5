@@ -395,7 +395,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $data = $connector->getTm($validExportTypes[$type]);
         header('Content-Type: '.$validExportTypes[$type], TRUE);
         $type = '.'.strtolower($type);
-        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getSpecificData('fileName')).$type.'"');
+        header('Content-Disposition: attachment; filename="'.rawurlencode($this->entity->getName()).$type.'"');
         echo $data;
         exit;
     }
