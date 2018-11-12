@@ -1325,11 +1325,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             return true;
         }
 
-        $langsDb = array();
-        foreach ($notProcessed as $value) {
-            $langsDb[]= $langsDb[$value];
-        }
-        error_log('For the following languages no term has been found in the tbx file: '.implode(', ', $langsDb));
+        error_log('For the following languages no term has been found in the tbx file: '.implode(', ', $notProcessed));
         $this->task->setTerminologie(0);
         return false;
     }
