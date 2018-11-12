@@ -505,7 +505,6 @@ tr.customState td div {font-style: italic;}
 .adminTaskGrid tr.error td .x-action-col-icon,
 .adminTaskGrid tr.import td .x-action-col-icon {display:none;background-repeat:no-repeat;background-position:center;}
 .adminTaskGrid tr.editorOpenTask .ico-task-open {background-image: url("../images/page_view.png");display:inline-block;}
-.adminTaskGrid tr.editorAnalysisTask .ico-task-analysis {background-image: url("../images/chart_pie.png");display:inline-block;}
 .adminTaskGrid tr.editorEditTask .ico-task-edit {background-image: url("../images/page_edit.png");display:inline-block;}
 .x-menu .ico-task-finish,
 .adminTaskGrid tr.editorFinishTask .ico-task-finish {background-image: url("../images/tick.png");display:inline-block;}

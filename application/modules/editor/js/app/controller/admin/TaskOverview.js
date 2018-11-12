@@ -502,7 +502,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       
       if(! me[action] || ! Ext.isFunction(me[action])){
           //fire event if no handler function for the action button is defined
-          me.fireEvent('taskActionColumnNoHandler',t,task);
+          me.fireEvent('taskUnhandledAction', action, t, task);
           return;
       }
 
