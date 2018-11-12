@@ -441,7 +441,7 @@ Ext.define('Editor.util.Range', {
         if (commonDivTag != null) {
             // Is the selection completely within a divTag?
             selRange.selectNode(commonDivTag);
-        } else {
+        } else if (commonContainer.nodeType == 1) {
             // Does the selection start or end within a divTag?
             allDivTags = commonContainer.getElementsByTagName('div');
             Ext.Array.each(allDivTags, function(divTag) {
