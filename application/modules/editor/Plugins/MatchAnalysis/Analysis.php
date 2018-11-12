@@ -119,15 +119,20 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $repetitionRate = editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE;
                 //get the best match rate for the repetition segment, 
                 // it can be context match (103%) which is better as the 102% repetition one
+                // or the one stored for the repetition could be from a MT. So recalc here always.
                 $bestMatchRateResult = $this->getBestMatchrate($segment,false);
-                
+                $foundRate = empty($bestMatchRateResult) ? 0 : $bestMatchRateResult->matchrate;
                 //save the repetition analysis with either 102% or 103% matchrate
-                $this->saveAnalysis($segment, max($repetitionRate, $bestMatchRateResult->matchrate), 0);
+                $this->saveAnalysis($segment, max($repetitionRate, $foundRate), 0);
+                
+                //the returning result must be the one from the first of the repetition group.
+                // that ensures that the repeated segments are pre-translated the same way as the first found one 
+                $bestMatchRateResult = $repetitionByHash[$segmentHash];
             }
             else {
                 $bestMatchRateResult = $this->getBestMatchrate($segment,true);
-                //add the segment source hash in the array
-                $repetitionByHash[$segmentHash]=$bestMatchRateResult;
+                //store the found match for repetition reusage
+                $repetitionByHash[$segmentHash] = $bestMatchRateResult;
             }
             
             if(!$this->pretranslate){
@@ -140,6 +145,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             $useMt = empty($bestMatchRateResult) || $bestMatchRateResult->matchrate < $this->pretranslateMatchrate;
             if($this->usePretranslateMT && $useMt) {
                 $bestMatchRateResult = $this->getMtResult($segment);
+                // since nothing other was found, we have to store the result for the repetitions too
+                $repetitionByHash[$segmentHash] = $bestMatchRateResult;
             }
             if(!empty($bestMatchRateResult)) {
                 $this->updateSegment($segment, $bestMatchRateResult);

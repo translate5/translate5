@@ -125,7 +125,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $targetResult=$result->target;
         
         //ignore internal fuzzy match target
-        //FIXME hier Wechselwirkung mit Vorübersetzung von Wiederholungen, diese wurden nicht vorübersetzt!
         if (strpos($targetResult, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false){
             return;
         }
@@ -219,7 +218,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         }
         
         //lock the pretranslations if 100 matches in the task are not editable
-        if(!$this->task->getEdit100PercentMatch()){
+        if($result->matchrate >= 100 && !$this->task->getEdit100PercentMatch()){
             $segment->setEditable(false);
         }
         
