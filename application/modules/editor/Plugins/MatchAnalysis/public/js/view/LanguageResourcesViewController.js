@@ -49,28 +49,22 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController', 
     	var me=this,
 			view=me.getView(),
 			pretranslateMt=view.down('#pretranslateMt'),
-			pretranslateTmAndTerm=view.down('#pretranslateTmAndTerm'),
-			cbAnalysis=view.down('#cbAnalysis');
+			pretranslateTmAndTerm=view.down('#pretranslateTmAndTerm');
 		
-		if(!pretranslateMt || !pretranslateTmAndTerm || !cbAnalysis){
-			view.fireEvent('wizardCardFinished',skipSteps);
+		if(!pretranslateMt || !pretranslateTmAndTerm){
+			view.fireEvent('wizardCardFinished', skipSteps);
 			return;
 		}
 		
 		//if one of the pretranslation priority cb is checked, run the pretranslations
 		if(pretranslateMt.checked || pretranslateTmAndTerm.checked){
 			view.fireEvent('startMatchAnalysis',view.task.get('id'),"pretranslation");
-			view.fireEvent('wizardCardFinished',skipSteps);
+			view.fireEvent('wizardCardFinished', skipSteps);
 			return;
 		}
 		
-		//if the analysis is checked, start the analysis operation
-		if(cbAnalysis.checked){
-			view.fireEvent('startMatchAnalysis',view.task.get('id'),"analysis");
-			view.fireEvent('wizardCardFinished',skipSteps);
-			return;
-		}
-		
-		view.fireEvent('wizardCardFinished',skipSteps);
+		//always start analysis
+		view.fireEvent('startMatchAnalysis',view.task.get('id'),"analysis");
+		view.fireEvent('wizardCardFinished', skipSteps);
 	}
 });

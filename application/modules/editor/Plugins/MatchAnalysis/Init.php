@@ -109,7 +109,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @param array $eventParams
      * @return void|boolean
      */
-    public function queueAnalysis($taskGuid,$pretranlsate=false,$eventParams=array()) {
+    public function queueAnalysis($taskGuid, $pretranlsate = false, $eventParams = []) {
         if(!$this->checkLanguageResources($taskGuid)){
             error_log("The associated language resource can not be used for analysis.");
             return;
@@ -118,22 +118,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
         
-        $params=[];
         
         $user = new Zend_Session_Namespace('user');
-        $params['userGuid']=$user->data->userGuid;
-        $params['userName']=$user->data->userName;
+        $eventParams['userGuid']=$user->data->userGuid;
+        $eventParams['userName']=$user->data->userName;
         
         //pretranslate flag
         if($pretranlsate){
-            $params['pretranslate']=$pretranlsate;
+            $eventParams['pretranslate'] = $pretranlsate;
         }
         
-        $params['internalFuzzy']=$eventParams['internalFuzzy'];
-        $params['pretranslateMatchrate']=$eventParams['pretranslateMatchrate'];
-        
         // init worker and queue it
-        if (!$worker->init($taskGuid, $params)) {
+        if (!$worker->init($taskGuid, $eventParams)) {
             error_log('MatchAnalysis-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
             return false;
         }
