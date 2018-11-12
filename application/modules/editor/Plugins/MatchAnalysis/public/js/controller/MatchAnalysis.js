@@ -68,13 +68,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
         analysis:'#UT#Analyse Starten',
-        preTranslation:'#UT#Analyse & Vorübersetzungen Starten',
+        preTranslation:'#UT#Analyse &amp; Vorübersetzungen starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
         pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
         pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist',
-        pretranslateTmAndTerm:'#UT#Vorübersetzen (TM & Terme)',
+        pretranslateTmAndTerm:'#UT#Vorübersetzen (TM &amp; Terme)',
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
         pretranslateMt:'#UT#Vorübersetzen (MT)',
         pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt'
@@ -93,11 +93,15 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             },
             '#languageResourcesWizardPanel':{
             	startMatchAnalysis:'onStartMatchAnalysis'
+            },
+            'taskActionColumn': {
+                added: 'addTaskOverviewActionIcon'
             }
         },
         controller:{
         	'#admin.TaskOverview':{
-        		taskCreated:'onTaskCreated'
+        		taskCreated:'onTaskCreated',
+        		taskUnhandledAction: 'onTaskActionColumnNoHandler'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -110,6 +114,20 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         }
     },
     
+    /**
+     * Add the pie icon to the task overview action column
+     * @var {Editor.view.admin.TaskActionColumn} column
+     */
+    addTaskOverviewActionIcon: function(column) {
+        column.items.push({
+            tooltip:this.strings.taskGridIconTooltip,
+            iconCls: 'ico-task-analysis',
+            isAllowedFor: 'editorAnalysisTask'      
+        });
+    },
+    /**
+     * Inserts the language resource card into the task import wizard
+     */
     onAdminTaskWindowBeforeRender:function(window,eOpts){
         var me=this;
         window.insertCard({
@@ -123,15 +141,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 }
             }
         },'postimport');
-        
     },
 
-    init : function() {
-        var me = this,
-            toc = me.application.getController('admin.TaskOverview');
-        toc.on('taskActionColumnNoHandler', me.onTaskActionColumnNoHandler, me);
-    },
-    
     /***
      * On task preferences window tabpanel render
      */
@@ -150,7 +161,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	var me=this,
     		win=panel.up('window'),
     		task=win.actualTask,
-    		storeData=[];
+    		storeData=[], buttons = [];
     	
     	//init the pretranslate matchrate options (from 0-103)
     	for(var i=0;i<=103;i++){
@@ -158,6 +169,23 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     			id:i,
     			value:i+"%"
     		});
+    	}
+    	
+    	if(task && !task.isImporting()){
+        	buttons = [{
+                xtype:'button',
+                text:this.strings.analysis,
+                itemId:'btnAnalysis',
+                width:150,
+                dock:'bottom',
+                //TODO icon
+                listeners:{
+                    click:{
+                        fn:this.matchAnalysisButtonHandler,
+                        scope:this
+                    }
+                }
+            }];
     	}
     	
     	//the task exist->add buttons in the task assoc panel
@@ -169,9 +197,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 type: 'hbox',
                 pack: 'start'
             },
-            items:[
-                this.getAnalysisConfig(task)
-            ]
+            items: buttons
         },{
             xtype : 'toolbar',
             dock : 'bottom',
@@ -245,8 +271,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * When action column click with no click handler is found
      */
-    onTaskActionColumnNoHandler:function(column,task){
-        if(this.getAdminTaskPreferencesWindow()){
+    onTaskActionColumnNoHandler:function(action, column, task){
+        if(action != 'handleTaskAnalysis' || this.getAdminTaskPreferencesWindow()){
             return;
         }
         var me=this,
@@ -291,29 +317,6 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
 
     onStartMatchAnalysis:function(taskId,operation){
     	this.startAnalysis(taskId,operation);
-    },
-    
-    /***
-     * analysis checkbox check change handler
-     */
-    onCbAnalysisChecked:function(field,newValue,oldValue,eOpts){ 
-    	var me=this,
-    		cbPreTranslation=me.getComponentByItemId('cbPreTranslation'),
-    		win=me.getAdminTaskPreferencesWindow();
-    	if(!newValue){
-    		cbPreTranslation.setValue(newValue);
-    	}
-    },
-    
-    /***
-     * pre translation checkbox check change handler
-     */
-    onCbPreTranslationChecked:function(field,newValue,oldValue,eOpts){ 
-    	var me=this,
-    		cbAnalysis=me.getComponentByItemId('cbAnalysis');
-    	if(newValue){
-    		cbAnalysis.setValue(newValue);
-    	}
     },
     
     matchAnalysisButtonHandler:function(button){
@@ -403,39 +406,5 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		return;
     	}
     	return cmp[0];
-    },
-    
-    /***
-     * Get the analysis config. It can be checkbox or button depending if the task exist or not.
-     */
-    getAnalysisConfig:function(task){
-    	if(!task || task.isImporting()){
-    		return {
-    			xtype:'checkbox',
-    			boxLabel:this.strings.analysis,
-    			itemId:'cbAnalysis',
-    			dock:'bottom',
-    			listeners:{
-    				change:{
-    					fn:this.onCbAnalysisChecked,
-    					scope:this
-    				}
-    			}
-    		};
-    	}
-    	return {
-    		xtype:'button',
-			text:this.strings.analysis,
-			itemId:'btnAnalysis',
-			width:150,
-			dock:'bottom',
-			//TODO icon
-			listeners:{
-				click:{
-					fn:this.matchAnalysisButtonHandler,
-					scope:this
-				}
-			}
-    	};
     }
 });
