@@ -346,13 +346,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.destroy(me.measure);
     return me.result;
   },
-
+  getIntitalData: function() {
+      return {
+              fullPath: Editor.data.segments.fullTagPath,
+              shortPath: Editor.data.segments.shortTagPath
+          };
+  },
   replaceTagToImage: function(rootnode, plainContent) {
     var me = this,
-        data = {
-            fullPath: Editor.data.segments.fullTagPath,
-            shortPath: Editor.data.segments.shortTagPath
-        };
+        data = me.getIntitalData();
     
     Ext.each(rootnode.childNodes, function(item){
       var termFoundCls;
@@ -459,29 +461,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           data.nr = 'locked'+data.nr;
       }
       //Fallunterscheidung Tag Typ
-      switch(true){
-        case /open/.test(item.className):
-          data.type = 'open';
-          data.suffix = '-left';
-          data.shortTag = data.nr;
-          break;
-        case /close/.test(item.className):
-          data.type = 'close';
-          data.suffix = '-right';
-          data.shortTag = '/'+data.nr;
-          break;
-        case /single/.test(item.className):
-          data.type = 'single';
-          data.suffix = '-single';
-          data.shortTag = data.nr+'/';
-          break;
-      }
-      data.key = data.type+data.nr;
-      data.shortTag = '&lt;'+data.shortTag+'&gt;';
-      data.whitespaceTag = /nbsp|tab|space|newline/.test(item.className);
-      if(data.whitespaceTag) {
-          data.type += ' whitespace';
-      }
+      data = me.renderTagTypeInData(item.className, data);
 
       //zusammengesetzte img Pfade:
       this.measure.setHtml(data.text);
@@ -495,10 +475,102 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           fullWidth: data.fullWidth,
           shortWidth: data.shortWidth,
           whitespaceTag: data.whitespaceTag,
-          html: '<div class="'+item.className+'">'+me.spanTemplate.apply(data)+'</div>'
+          html: me.renderInternalTags(item.className, data)
       };
 
       return data;
+  },
+  /**
+   * Add type etc. to data according to tag-type.
+   * @param string className
+   * @param object data
+   * @return object data
+   */
+  renderTagTypeInData: function (className, data) {
+      //Fallunterscheidung Tag Typ
+      switch(true){
+        case /open/.test(className):
+          data.type = 'open';
+          data.suffix = '-left';
+          data.shortTag = data.nr;
+          break;
+        case /close/.test(className):
+          data.type = 'close';
+          data.suffix = '-right';
+          data.shortTag = '/'+data.nr;
+          break;
+        case /single/.test(className):
+          data.type = 'single';
+          data.suffix = '-single';
+          data.shortTag = data.nr+'/';
+          break;
+      }
+      data.key = data.type+data.nr;
+      data.shortTag = '&lt;'+data.shortTag+'&gt;';
+      data.whitespaceTag = /nbsp|tab|space|newline/.test(className);
+      if(data.whitespaceTag) {
+          data.type += ' whitespace';
+      }
+      return data;
+  },
+  /**
+   * Render html for internal Tags displayed as div-Tags.
+   * In case of changes, also check $htmlTagTpl in ImageTag.php
+   * @param string className
+   * @param object data
+   * @return String
+   */
+  renderInternalTags: function(className,data) {
+      var me = this;
+      return '<div class="'+className+'">'+me.spanTemplate.apply(data)+'</div>';
+  },
+  /**
+   * Insert whitespace; we use the ("internal-tag"-)divs here, because insertMarkup() 
+   * will render ("internal-tag"-)divs to the ("tag-image"-)images we finally need.
+   * For titles etc, see also whitespaceTagReplacer() in TagTrait.php
+   * @param string whitespaceType ('nbsp'|'newline'|'tab')
+   * @param number tagNr
+   */
+  insertWhitespaceInEditor: function (whitespaceType, tagNr) {
+      var me = this,
+          userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
+          userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+          classNameForTagType,
+          data,
+          className,
+          html;
+      if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+          return;
+      }
+      data = me.getIntitalData();
+      data.nr = tagNr;
+      switch(whitespaceType){
+          case 'nbsp':
+              classNameForTagType = 'single 636861722074733d226332613022206c656e6774683d2231222f nbsp';
+              data.title = '&lt;'+data.nr+'/&gt;: Non breaking space';
+              data.id = 'char';
+              data.length = '1';
+              data.text = '⎵';
+              break;
+          case 'newline':
+              classNameForTagType = 'single 6861726452657475726e2f newline';
+              data.title = '&lt;'+data.nr+'/&gt;: Newline';
+              data.id = 'hardReturn';
+              data.length = '1';
+              data.text = '↵';
+              break;
+          case 'tab':
+              classNameForTagType = 'single 7461622074733d2230393039303922206c656e6774683d2233222f tab';
+              data.title = '&lt;'+data.nr+'/&gt;: 1 tab character';
+              data.id = 'tab';
+              data.length = '1';
+              data.text = '→';
+              break;
+        }
+      className = classNameForTagType + ' internal-tag ownttip';
+      data = me.renderTagTypeInData(className, data);
+      html = me.renderInternalTags(className, data);
+      me.insertMarkup(html);
   },
   /**
    * ersetzt die images durch div und spans im string 

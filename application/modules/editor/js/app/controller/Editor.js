@@ -115,6 +115,15 @@ Ext.define('Editor.controller.Editor', {
             
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceNbsp': {
+                click: 'insertWhitespaceNbsp'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceNewline': {
+                click: 'insertWhitespaceNewline'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceTab': {
+                click: 'insertWhitespaceTab'
             }
         }
     },
@@ -411,6 +420,12 @@ Ext.define('Editor.controller.Editor', {
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
+        
+        // insert whitespace
+        me.keyMapConfig['ctrl-shift-space'] = [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true];
+        me.keyMapConfig['shift-enter'] = [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true];
+        me.keyMapConfig['tab'] = [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true];
+        
         editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: docEl,
             binding: me.getKeyMapConfig()
@@ -1018,9 +1033,14 @@ Ext.define('Editor.controller.Editor', {
         sel = rangy.getSelection();
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
         selRange = me.getRangeWithFullInternalTags(selRange);
-        selDataHtml = selRange.toHtml();
         
-        // internal tags are contained as divs; selRange.toString() would not remove them.
+        // for insert as html
+        // (must not include element-ids that already exist in Ext.cache!)
+        selDataHtml = selRange.toHtml();
+        selDataHtml = selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
+        
+        // for insert as text only
+        // (internal tags are contained as divs; selRange.toString() would not remove them)
         selDataText = selDataHtml;
         selInternalTags = selRange.getNodes([1], function(node) {
             return node.classList.contains('internal-tag');
@@ -1044,6 +1064,64 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
         plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
+    },
+    insertWhitespaceNbsp: function(key,e) {
+        this.insertWhitespace(key,e,'nbsp');
+    },
+    insertWhitespaceNewline: function(key,e) {
+        this.insertWhitespace(key,e,'newline');
+    },
+    insertWhitespaceTab: function(key,e) {
+        this.insertWhitespace(key,e,'tab');
+    },
+    insertWhitespace: function(key,e,whitespaceType) {
+        var me = this,
+            userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
+            userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+            tagNr,
+            plug,
+            editor;
+        if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+            return;
+        }
+        tagNr = me.getNextWhitespaceTagNumber();
+        plug = me.getEditPlugin();
+        editor = plug.editor.mainEditor;
+        editor.insertWhitespaceInEditor(whitespaceType, tagNr);
+        if (e.delegatedTarget.nodeName.toLowerCase() == 'a') {
+            e.delegatedTarget.blur();
+        }
+        e.stopEvent();
+    },
+    /**
+     * What's the number for the next Whitespace-Tag?
+     * @return number nextTagNr
+     */
+    getNextWhitespaceTagNumber: function () {
+        var me = this,
+            plug = this.getEditPlugin(),
+            editor = plug.editor.mainEditor,
+            imgInTarget = editor.getDoc().getElementsByTagName("img"),
+            nrTagsInSrc,
+            nrTagsInTarget,
+            nrTagsInSegment;
+        // source
+        if(!me.sourceTags){
+            nrTagsInSrc = 0;
+        } else {
+            nrTagsInSrc = me.sourceTags.length;
+        }
+        // target
+        nrTagsInTarget = 0;
+        Ext.Object.each(imgInTarget, function(key, imgNode){
+            var imgClassList = imgNode.classList;
+            if (imgClassList.contains('single') || imgClassList.contains('open')) {
+                nrTagsInTarget++;
+            }
+        });
+        // use the highest
+        nrTagsInSegment = (nrTagsInSrc >= nrTagsInTarget) ? nrTagsInSrc : nrTagsInTarget;
+        return nrTagsInSegment + 1;
     },
 
         handleInsertTagShift: function(key, e) {

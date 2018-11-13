@@ -30,6 +30,7 @@ Ext.define('Editor.view.segments.StatusStrip', {
     extend: 'Ext.container.Container',
     alias: 'widget.segments.statusstrip',
     itemId:'segmentStatusStrip',
+    cls: 'segment-statusstrip',
     
     requires:[
         'Editor.view.segments.MinMaxLength'
@@ -51,13 +52,47 @@ Ext.define('Editor.view.segments.StatusStrip', {
     initConfig : function(instanceConfig) {
         var me = this,
             config = {
-            };
+            },
+            configItems = [],
+            userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
+            userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+            whitespaceIcons = '';
         //add the minmaxlength component if the config is provided
         if(Editor.data.segments.enableCountSegmentLength){
-            config.items=[{
+            configItems.push({
                     xtype:'segment.minmaxlength',
                     htmlEditor:instanceConfig.htmlEditor
-                }];
+                });
+        }
+        // whitespace-icons
+        if (userCanModifyWhitespaceTags && userCanInsertWhitespaceTags) {
+            configItems.push({
+                    xtype: 'button',
+                    cls: 'whitespaceIcon',
+                    text: '→',
+                    itemId: 'btnInsertWhitespaceTab',
+                    tooltip: 'TAB'
+                });
+            configItems.push({
+                    xtype: 'button',
+                    cls: 'whitespaceIcon',
+                    text: '↵',
+                    itemId: 'btnInsertWhitespaceNewline',
+                    tooltip: 'SHIFT+ENTER'
+                });
+            configItems.push({
+                    xtype: 'button',
+                    cls: 'whitespaceIcon',
+                    text: '⎵',
+                    itemId: 'btnInsertWhitespaceNbsp',
+                    tooltip: 'CTRL+SHIFT+Space'
+                });
+        }
+        
+        if (configItems.length > 0) {
+            config = {
+                items: configItems
+            };
         }
 
         if (instanceConfig) {
