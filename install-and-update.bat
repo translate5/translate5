@@ -32,6 +32,40 @@ echo   using as mysql.exe on installation:  %INSTALL_MYSQL_PATH%
 echo.
 echo   for mysql.exe on updates see instructions in windows-installer-config.ini
 echo.
-"%INSTALL_PHP_PATH%" -r "require_once('application/modules/default/Models/Installer/Standalone.php'); Models_Installer_Standalone::mainLinux(array('mysql_bin' => '%INSTALL_MYSQL_PATH%'));"
+
+set "CONFIG="
+if "%~1" == "--check" (
+    set "CONFIG=,'updateCheck' => '1'"
+	goto run
+)
+if "%~1" == "--database" (
+    set "CONFIG=,'dbOnly' => '1'"
+	goto run
+)
+if "%~1" == "--help" (
+    set "CONFIG=,'help' => '1'"
+	goto run
+)
+if "%~1" == "--appState" (
+    set "CONFIG=,'applicationState' => '1'"
+	goto run
+)
+set "SECOND=%2"
+if "%~1" == "--maintenance" (
+	goto maintain
+)
+if NOT "%~1" == "" (
+	set "CONFIG=,'applicationZipOverride' => '%~1'"
+)
+goto run
+:maintain
+if "%~2" == "" (
+	set "CONFIG=,'maintenance' => 'show'"
+)
+if NOT "%~2" == "" (
+	set "CONFIG=,'maintenance' => '%~2'"
+)
+:run 
+"%INSTALL_PHP_PATH%" -r "require_once('application/modules/default/Models/Installer/Standalone.php'); Models_Installer_Standalone::mainLinux(array('mysql_bin' => '%INSTALL_MYSQL_PATH%'%CONFIG%));"
 echo.
 pause
