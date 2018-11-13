@@ -206,6 +206,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
       $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (boolean)$rop->segments->userCanIgnoreTagValidation);
       $this->view->Php2JsVars()->set('segments.userCanModifyWhitespaceTags', (boolean)$rop->segments->userCanModifyWhitespaceTags);
+      $this->view->Php2JsVars()->set('segments.userCanInsertWhitespaceTags', (boolean)$rop->segments->userCanInsertWhitespaceTags);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
