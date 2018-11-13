@@ -679,7 +679,7 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             lockingPartner = (view.lockingPartner && !fromLockingPartner && !me.doNotMirror) && view.lockingPartner.bufferedRenderer,
             variableRowHeight = me.variableRowHeight,
             activeEl, containsFocus, i, newRows, newTop, newFocus, noOverlap,
-            oldStart, partnerNewRows, pos, removeCount, topAdditionSize, topBufferZone;
+            oldStart, partnerNewRows, pos, removeCount, topAdditionSize, topBufferZone, topNode;
  
         // View may have been destroyed since the DelayedTask was kicked off. 
         if (view.destroyed) {
@@ -757,7 +757,8 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
                 // Adjust the bodyTop to place the data correctly around the scroll vieport 
                 if (noOverlap && variableRowHeight) {
                     topBufferZone = me.scrollTop < me.position ? me.leadingBufferZone : me.trailingBufferZone;
-                    newTop = Math.max(me.scrollTop - rows.item(rows.startIndex + topBufferZone - 1, true).offsetTop, 0);
+                    topNode = rows.item(rows.startIndex + topBufferZone - 1, true);
+                    newTop = Math.max(me.scrollTop - (topNode ? topNode.offsetTop : 0), 0);
                 }
             }
             // Moved down the dataset (content moved up): remove rows from top, add to end 
