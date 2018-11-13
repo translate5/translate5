@@ -115,6 +115,15 @@ Ext.define('Editor.controller.Editor', {
             
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceNbsp': {
+                click: 'insertWhitespaceNbsp'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceNewline': {
+                click: 'insertWhitespaceNewline'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceTab': {
+                click: 'insertWhitespaceTab'
             }
         }
     },
