@@ -546,22 +546,21 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.nr = tagNr;
       switch(whitespaceType){
           case 'nbsp':
-              classNameForTagType = 'single nbsp';
+              classNameForTagType = 'single 636861722074733d226332613022206c656e6774683d2231222f nbsp';
               data.title = '&lt;'+data.nr+'/&gt;: Non breaking space';
               data.id = 'char';
               data.length = '1';
               data.text = '⎵';
               break;
           case 'newline':
-              classNameForTagType = 'single newline';
+              classNameForTagType = 'single 6861726452657475726e2f newline';
               data.title = '&lt;'+data.nr+'/&gt;: Newline';
-              data.id = '"hardReturn"';
+              data.id = 'hardReturn';
               data.length = '1';
               data.text = '↵';
               break;
           case 'tab':
-              // TODO: translate5 turns e.g. three 1-tabs into one 3-tab
-              classNameForTagType = 'single tab';
+              classNameForTagType = 'single 7461622074733d2230393039303922206c656e6774683d2233222f tab';
               data.title = '&lt;'+data.nr+'/&gt;: 1 tab character';
               data.id = 'tab';
               data.length = '1';
