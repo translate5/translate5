@@ -1024,9 +1024,14 @@ Ext.define('Editor.controller.Editor', {
         sel = rangy.getSelection();
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
         selRange = me.getRangeWithFullInternalTags(selRange);
-        selDataHtml = selRange.toHtml();
         
-        // internal tags are contained as divs; selRange.toString() would not remove them.
+        // for insert as html
+        // (must not include element-ids that already exist in Ext.cache!)
+        selDataHtml = selRange.toHtml();
+        selDataHtml = selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
+        
+        // for insert as text only
+        // (internal tags are contained as divs; selRange.toString() would not remove them)
         selDataText = selDataHtml;
         selInternalTags = selRange.getNodes([1], function(node) {
             return node.classList.contains('internal-tag');
