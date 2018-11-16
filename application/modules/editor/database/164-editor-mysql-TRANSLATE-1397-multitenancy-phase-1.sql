@@ -27,7 +27,7 @@
 
 -- create default customer if none exists
 INSERT INTO `LEK_customer` (`name`,`number`,`searchCharacterLimit`)
-SELECT * FROM (SELECT 'defaultcustomer','1111',100000) AS tmp
+SELECT * FROM (SELECT 'defaultcustomer','default for legacy data',100000) AS tmp
 WHERE NOT EXISTS (
     SELECT * FROM `LEK_customer` WHERE `LEK_customer`.`name` = 'defaultcustomer'
 ) LIMIT 1;
