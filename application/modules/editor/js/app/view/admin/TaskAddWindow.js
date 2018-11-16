@@ -62,6 +62,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         relaisLangTip: '#UT#Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)',
         relaisLangLabel: '#UT#Relaissprache',
         numberFieldLabel: '#UT#Anzahl Wörter',
+        customerTip:  '#UT#Kunde der Aufgage (Angabe notwendig)',
+        customerLabel:  '#UT#Kunde',
         orderdate: '#UT#Bestelldatum',
         targetDeliveryLabel: '#UT#Lieferdatum',
         fullMatchLabel: '#UT#100% Matches sind editierbar',
@@ -243,7 +245,16 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     labelWidth: 200,
                                     anchor: '100%'
                                 },
-                                items: [{
+                                items: [Ext.applyIf({
+                                    name: 'customer',
+                                    allowBlank: false,
+                                    toolTip: me.strings.customerTip,
+                                    fieldLabel: me.strings.customerLabel,
+                                    store:Ext.create('Ext.data.Store', { // TODO: as in AddTmWindow.js, but here combo is empty, why?
+                                        model:'Editor.model.admin.Customer',
+                                        autoLoad:true
+                                    })
+                                }, langCombo),{
                                     xtype: 'textfield',
                                     maxLength: 120,
                                     name: 'taskNr',

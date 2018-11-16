@@ -45,6 +45,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       relaisLang: '#UT#Relaissprache',
       targetLang: '#UT#Zielsprache',
       state: '#UT#Status',
+      customerName: '#UT#Kunden',
       pmGuid: '#UT#Projektmanager',
       users: '#UT#Benutzer',
       wordCount: '#UT#Wörter',
@@ -289,6 +290,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
               },
               text: me.text_cols.state,
               sortable: false
+          },{
+              xtype: 'gridcolumn',
+              width: 135,
+              dataIndex: 'customerName',
+              stateId: 'customerName',
+              filter: {
+                  type: 'string'
+              },
+              text: me.text_cols.customerName
           },{
               xtype: 'gridcolumn',
               width: 220,
