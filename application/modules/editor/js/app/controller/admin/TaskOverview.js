@@ -231,7 +231,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
   },
   handleInitEditor: function() {
-      this.getHeadToolBar().down('#task-admin-btn').hide();
+      this.getHeadToolBar() && this.getHeadToolBar().down('#task-admin-btn').hide();
   },
   clearTasks: function() {
       this.getAdminTasksStore().removeAll();
