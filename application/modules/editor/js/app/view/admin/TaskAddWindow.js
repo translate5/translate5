@@ -30,7 +30,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     extend: 'Ext.window.Window',
     requires:[
         'Editor.view.admin.TaskUpload',
-        'Editor.view.admin.TaskAddWindowViewModel'
+        'Editor.view.admin.TaskAddWindowViewModel',
+        'Editor.view.admin.customer.UserCustomersCombo'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -245,16 +246,13 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     labelWidth: 200,
                                     anchor: '100%'
                                 },
-                                items: [Ext.applyIf({
-                                    name: 'customer',
+                                items: [{
+                                    xtype: 'usercustomerscombo',
+                                    name: 'customerId',
                                     allowBlank: false,
                                     toolTip: me.strings.customerTip,
-                                    fieldLabel: me.strings.customerLabel,
-                                    store:Ext.create('Ext.data.Store', { // TODO: as in AddTmWindow.js, but here combo is empty, why?
-                                        model:'Editor.model.admin.Customer',
-                                        autoLoad:true
-                                    })
-                                }, langCombo),{
+                                    fieldLabel: me.strings.customerLabel
+                                },{
                                     xtype: 'textfield',
                                     maxLength: 120,
                                     name: 'taskNr',
