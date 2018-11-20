@@ -71,10 +71,19 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       entrySaved: '#UT#Eintrag gespeichert',
       entryDeleted: '#UT#Eintrag gelöscht',
       entrySaveError: '#UT#Fehler beim Speichern der Änderungen!',
-      forAll: '#UT#für alle'
+      forAll: '#UT#für alle',
+      customerTip: '#UT#Kunde der Aufgage (Angabe notwendig)',
+      customerLabel: '#UT#Kunde'
   },
   actualTask: null,
   alias: 'controller.taskPreferencesController',
+  listen: {
+      component: {
+          '#taskMainCard':{
+              render:'onTaskMainCardRender'
+          }
+      }
+  },
   
   init : function() {
       var me = this,
@@ -520,5 +529,39 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           }
       });
       me.loadAllPreferences(me.actualTask);
+  },
+  
+  /**
+   * Called when task add window (task main card) is rendered.
+   * Adds the item for assigning a customer to the new task.
+   */
+  onTaskMainCardRender: function(addTaskCard,eOpts) {
+      var me = this, 
+          taskMainCardContainer2 = addTaskCard.down('#taskMainCardContainer2'),
+          userCustomers = Ext.StoreManager.get('userCustomers');
+      
+      // add the customer field to the taskUpload window
+      if(userCustomers.getTotalCount() == 1) {
+          taskMainCardContainer2.add({
+              xtype: 'displayfield',
+              name: 'customer',
+              value: userCustomers.getAt(0).getData().name,
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel
+          });
+          taskMainCardContainer2.add({
+              xtype: 'hiddenfield',
+              name: 'customerId',
+              value: userCustomers.getAt(0).getData().id,
+          });
+      } else {
+          taskMainCardContainer2.add({
+              xtype: 'usercustomerscombo',
+              name: 'customerId',
+              allowBlank: false,
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel
+          });
+      }
   }
 });

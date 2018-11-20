@@ -63,8 +63,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         relaisLangTip: '#UT#Relaissprache (Angabe notwendig sofern Relaisdaten vorhanden)',
         relaisLangLabel: '#UT#Relaissprache',
         numberFieldLabel: '#UT#Anzahl Wörter',
-        customerTip:  '#UT#Kunde der Aufgage (Angabe notwendig)',
-        customerLabel:  '#UT#Kunde',
         orderdate: '#UT#Bestelldatum',
         targetDeliveryLabel: '#UT#Lieferdatum',
         fullMatchLabel: '#UT#100% Matches sind editierbar',
@@ -240,6 +238,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 }]
                             },{
                                 xtype: 'container',
+                                itemId: 'taskMainCardContainer2',
                                 flex: 1,
                                 layout: 'anchor',
                                 defaults: {
@@ -247,12 +246,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     anchor: '100%'
                                 },
                                 items: [{
-                                    xtype: 'usercustomerscombo',
-                                    name: 'customerId',
-                                    allowBlank: false,
-                                    toolTip: me.strings.customerTip,
-                                    fieldLabel: me.strings.customerLabel
-                                },{
                                     xtype: 'textfield',
                                     maxLength: 120,
                                     name: 'taskNr',
