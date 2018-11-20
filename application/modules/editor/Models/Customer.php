@@ -54,6 +54,7 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Customer';
     
+    CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     
     /***
      * Find customer by number
@@ -133,6 +134,14 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
      * Load by default customer.
      */
     public function loadByDefaultCustomer(){
-        $this->loadRow('name=?','defaultcustomer');
+        $this->loadRow('number=?',self::DEFAULTCUSTOMER_NUMBER);
+    }
+    
+    /***
+     * Is the customer the default customer?
+     * @return boolean
+     */
+    public function isDefaultCustomer(){
+        return ($this->getNumber() == self::DEFAULTCUSTOMER_NUMBER);
     }
 }
