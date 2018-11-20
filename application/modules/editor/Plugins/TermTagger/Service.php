@@ -371,6 +371,7 @@ class editor_Plugins_TermTagger_Service {
         $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges($text, $trackChangeTag->textWithTrackChanges);
         //check if content is valid XML, or if textual content has changed
         $oldFlagValue = libxml_use_internal_errors(true);
+        // delete tags and internal tags are masked, thats ok for the check here
         $invalidXml = ! @simplexml_load_string('<container>'.$text.'</container>');
         libxml_use_internal_errors($oldFlagValue);
         $textNotEqual = strip_tags($text) !== strip_tags($segment->$field);
