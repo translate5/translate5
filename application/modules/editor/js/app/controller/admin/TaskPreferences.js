@@ -534,6 +534,8 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   /**
    * Called when task add window (task main card) is rendered.
    * Adds the item for assigning a customer to the new task.
+   * If there is only one client defined, this client is 
+   * automatically associated and the drop-down is omitted.
    */
   onTaskMainCardRender: function(addTaskCard,eOpts) {
       var me = this, 
@@ -545,14 +547,14 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           taskMainCardContainer2.add({
               xtype: 'displayfield',
               name: 'customer',
-              value: userCustomers.getAt(0).getData().name,
+              value: userCustomers.getAt(0).getData().name, // display customer-name for the user
               toolTip: me.strings.customerTip,
               fieldLabel: me.strings.customerLabel
           });
           taskMainCardContainer2.add({
               xtype: 'hiddenfield',
               name: 'customerId',
-              value: userCustomers.getAt(0).getData().id,
+              value: userCustomers.getAt(0).getData().id, // store customer-id in LEK_task
           });
       } else {
           taskMainCardContainer2.add({

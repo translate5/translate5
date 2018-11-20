@@ -287,6 +287,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     checked: true,
                                     fieldLabel: me.strings.lockLockedLabel
                                 }]
+                                // + item for assigning customers to the task
+                                // (added dynamically by Editor.controller.admin.TaskPreferences)
                             }]
                         
                         },{
