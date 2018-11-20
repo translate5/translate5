@@ -146,12 +146,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * Load all resources associated customers of a user
      * 
      * @param array $serviceNames: add service name as filter
-     * @param string $sourceLang: add source language as filter
-     * @param string $targetLang: add target language as filter
+     * @param array $sourceLang: add source languages as filter
+     * @param array $targetLang: add target languages as filter
      * 
      * @return array|array
      */
-    public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=null,$targetLang=null){
+    public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=array(),$targetLang=array()){
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();
@@ -169,12 +169,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                 $s->where('tm.serviceName IN(?)',$serviceNames);
             }
             
-            if($sourceLang){
-                $s->where('l.sourceLang=?',$sourceLang);
+            if(!empty($sourceLang)){
+                $s->where('l.sourceLang IN(?)',$sourceLang);
             }
             
-            if($targetLang){
-                $s->where('l.targetLang=?',$targetLang);
+            if(!empty($targetLang)){
+                $s->where('l.targetLang IN(?)',$targetLang);
             }
             $s->group('tm.id');
             return $this->db->fetchAll($s)->toArray();

@@ -77,30 +77,51 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
-     * Search from term matches the current term collections with the given query string
-     *.
+     * Search from term matches the current term collections with the given query string.
+     * All fuzzy languages will be included in the search.('en' as search language will result with search using 'en','en-US','en-GB' etc)
+     * 
      * @param string $queryString
+     * @param integer $sourceLang
+     * @param integer $targetLang
+     * 
      * @return array
      */
     public function searchCollection($queryString,$sourceLang,$targetLang){
+        $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languageModel editor_Models_Languages */
+        
+        //get source and target language fuzzies
+        $sourceLangs=$languageModel->getFuzzyLanguages($sourceLang);
+        $targetLangs=$languageModel->getFuzzyLanguages($targetLang);
+        
         $sqlOld_and_very_slow_on_large_data=' SELECT * FROM LEK_terms '.
               'WHERE groupId IN ( '.
               'SELECT `t`.`groupId` FROM `LEK_terms` AS `t` '.
               'WHERE lower(term) like lower(?) COLLATE utf8_bin '.
-              'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`) '.
-              'AND language=? AND collectionId=?';
-        $sql2= 'SELECT * FROM `LEK_terms` AS `t` '.
-              'WHERE lower(term) like lower(?) COLLATE utf8_bin '.
-              'AND (t.collectionId=?) AND (t.language=?) GROUP BY `t`.`groupId`';
+              'AND (t.collectionId=?) AND (t.language IN(?)) GROUP BY `t`.`groupId`) '.
+              'AND language IN(?) AND collectionId=?';
+        
+        $s=$this->db->select()
+            ->setIntegrityCheck(false)
+            ->from('LEK_terms')
+            ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString)
+            ->where('collectionId=?',$this->getId())
+            ->where('language IN(?)',$sourceLangs)
+            ->group('groupId');
+        $rows=$this->db->fetchAll($s)->toArray();
+        
 		$groupIds = array();
-        $results = $this->db->getAdapter()->query($sql2, array($queryString,$this->getId(),$sourceLang))->fetchAll();
-		foreach($results as $res){
+		foreach($rows as $res){
 			$groupIds[] = $res['groupId'];
 		}
-        $sql3=' SELECT * FROM LEK_terms '.
-              'WHERE groupId IN ( \''.implode("','",$groupIds).'\')'.
-              'AND language=? AND collectionId=?';
-        return $this->db->getAdapter()->query($sql3, array($targetLang,$this->getId()))->fetchAll();
+		$s=$this->db->select()
+    		->setIntegrityCheck(false)
+    		->from('LEK_terms')
+    		->where('groupId IN(?)',$groupIds)
+    		->where('language IN(?)',$targetLangs)
+    		->where('collectionId=?',$this->getId());
+		
+		return $this->db->fetchAll($s)->toArray();
     }
     
     /***
