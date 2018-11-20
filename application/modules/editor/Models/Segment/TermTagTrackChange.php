@@ -51,320 +51,268 @@
  */
 class editor_Models_Segment_TermTagTrackChange {
     
+    const TAG_INS = editor_Models_Segment_TrackChangeTag::NODE_NAME_INS;
+    const TAG_TERM = 'div';
+    const START_INS = '<'.self::TAG_INS;
+    const END_INS = '</'.self::TAG_INS.'>';
+    const START_TERM = '<'.self::TAG_TERM;
+    const END_TERM = '</'.self::TAG_TERM.'>';
+    
+    protected $partlyCorrected;
+    protected $insStack = [];
     /**
-     * Example for an ins-Node at position 4:
-     * $arrTrackChangeNodes[$textId][4] = '<ins...>'
-     * ($textId: We will need to assign the found TrackChange-Nodes to the original text later.
-     * So we have to remember which text the found TrackChange-Nodes belong to!)
+     * @var editor_Models_Import_FileParser_XmlParser
      */
-    private $arrTrackChangeNodes = array();
+    protected $xml;
     
     /**
-     * For fetching/searching the TrackChanges and TermTags:
-     */
-    const REGEX_TERMTAG = '/<\/?div[^>]*>/i';           // term-Tag: only the tags without their content (all other divs have been masked already) // TODO: get regex from from editor_Models_Segment_TermTag
-    
-    /**
-     * For the process of decoding a given text:
-     */
-    private $text;
-    private $arrTrackChangeNodesInText = array();
-    private $arrTermTagsInText = array();
-    private $posInText;
-    private $trackChangeNodeStatus;
-    private $debugText;
-    
-    /**
-     * @var editor_Models_Segment_InternalTag
-     */
-    private $internalTagHelper;
-    
-    /**
-     * @var editor_Models_Segment_TermTag
-     */
-    protected $termTagHelper;
-    
-    /**
-     * enables / disables debugging (logging), can be enabled by setting runtimeOptions.debug.core.termTagTrackChange = 1 in installation.ini
-     * 00 => disabled
-     * 1 => log called handler methods (logging must be manually implemented in the handler methods by usage of $this->doDebug)
-     * 2 => log also $this
-     * @var integer
-     */
-    private $debug = 0;
-    
-    public function __construct() {
-        $this->internalTagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag'); // TODO: lazy load?
-        $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
-        $this->debug = ZfExtended_Debug::getLevel('core', 'termTagTrackChange');
-    }
-    
-    /**
-     * Store all TrackChange-Nodes and their positions; then remove them from the text.
-     * This arry must be stored even if it includes no Nodes; that there are NO nodes is exactly
-     * an information we will need later on when it comes to (not) re-inserting the (not) found nodes.
-     * @param string $text
-     * @param string $textId
+     * merge together the original content with ins and del tags with the same content coming from the term tagger without ins/del but with terms
+     * @param string $target
+     * @param string $tagged
      * @return string
      */
-    public function storeNodes($text, $textId) {
-        $this->doDebug('Store TrackChangeNodes for (textId: ' . $textId . '): ' . $text);
-        $text = $this->internalTagHelper->protect($text);
-        $this->fetchTrackChangeNodes($text, $textId);
-    }
-    
-    /**
-     * Re-insert the stored TrackChange-Nodes at the stored positions in the text (that now includes - only! - the TermTags).
-     * @param string $text
-     * @param string $textId
-     * @return string
-     */
-    public function restoreNodes($text, $textId) {
-        $this->doDebug('Restore TrackChangeNodes for (textId: ' . $textId . '): ' . $text);
+    public function mergeTermsAndTrackChanges($target, $tagged) {
+        //FIXME Schritt 1: interne tags maskieren, wie gehabt
         
-        if (!array_key_exists($textId, $this->arrTrackChangeNodes) || $this->arrTrackChangeNodes[$textId] == null) {
-            //throw new ZfExtended_Exception('Decoding TrackChanges failed because there is no information about the original version (textId: ' . $textId . '): ' . $text);
-            $this->doDebug('Decoding TrackChanges failed because there is no information about the original version (textId: ' . $textId . '): ' . $text);
-            return $text;
-        }
+//         //Beispiel 1
+//         $target = 'Das ist d<d>as</d><i>ie</i> <d>H</d><i>M</i>aus des Nikolaus';
+//         //FIXME do <d> masking with according function!
+//         $target = 'Das ist d<d/><i>ie</i> <d/><i>M</i>aus des Nikolaus';
+//         $tagged = 'Das ist <t>die Maus</t> des Nikolaus';
         
-        // At this point, we cannot check for ins- and del-Nodes in the text
-        // because the text that the TermTagger has returned does not include them anyway!
-        // (It is OUR task HERE to re-include them if there have been any.)
-        if (count($this->arrTrackChangeNodes[$textId]) == 0) {
-            // no TrackChange-Markup found; return the termtagged text as it is.
-            return $text;
-        }
+//         //Beispiel 2
+//         $target = 'Das ist d<d>as</d><i>ie</i> <d>H</d><i>M</i>aus des Nikolaus';
+//         //FIXME do <d> masking with according function!
+//         $target = 'Das ist d<d/><i>ie</i> <d/><i>M</i>aus des Nikolaus';
+//         $tagged = 'Das ist <t>die</t> <t>Maus</t> des Nikolaus';
         
-        $this->text = $text;
-        $this->text = $this->internalTagHelper->protect($this->text);
+        //unicode affin machen!
+        $target = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/', $target, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $tagged = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/', $tagged, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
         
-        $this->debugText = "\n-----------\n" . $text . "\n";
+//        error_log(print_r($target,1));
+//        error_log(print_r($tagged,1));
+//        error_log(print_r(join('', $target),1));
+//        error_log(print_r(join('', $tagged),1));
         
-        $this->arrTrackChangeNodesInText = $this->arrTrackChangeNodes[$textId]; // TrackChange-Markup: stored before cleaning the text BEFORE using the TermTagger-Server
-        $this->arrTermTagsInText = $this->fetchTermTags($this->text, $textId);  // Term-Tags: fetched now from the text AFTER using the TermTagger-Server
-        
-        // Re-insert the stored TrackChange-Nodes:
-        $this->trackChangeNodeStatus = null;
-        $this->posInText = 0;
-        $posEnd = strlen($this->text);
-        while ($this->posInText <= $posEnd) {
-            $posAtTheBeginningOfThisStep = $this->posInText;
-            $foundTermTag = array_key_exists($this->posInText, $this->arrTermTagsInText);
-            $foundTrackChangeMarkup = array_key_exists($this->posInText, $this->arrTrackChangeNodesInText);
-            switch (true) {
-                case ($foundTermTag && $foundTrackChangeMarkup && $this->trackChangeNodeStatus == 'open'):
-                    // If a TrackChange-Node ist still open and both a TrackChange-Node AND a TermTag are found,
-                    // we will close the TrackChange-Node first. The next loop then will recognize the other item from the TermTags.
-                    $this->debugText .= "\n" . $this->posInText .": foundTermTag && foundTrackChangeMarkup";
-                    $posEnd += $this->handleTrackChangeNodeInText();
-                    $this->debugText .= "\n- weiter bis: " . $posEnd . "\n\n";
-                    break;
-                case $foundTermTag:
-                    $this->debugText .= "\n" . $this->posInText .": foundTermTag";
-                    $posEnd += $this->handleTermTagInText();
-                    $this->debugText .= "\n- weiter bis: " . $posEnd . "\n\n";
-                    break;
-                case $foundTrackChangeMarkup:
-                    $this->debugText .= "\n" . $this->posInText .": foundTrackChangeMarkup";
-                    $posEnd += $this->handleTrackChangeNodeInText();
-                    $this->debugText .= "\n- weiter bis: " . $posEnd . "\n\n";
-                    break;
-            }
-            if ($this->posInText == $posAtTheBeginningOfThisStep) { // if we increase $pos after it has already been increased in the current step we will skip the current $pos
-                $this->posInText++;
+        $diff = ZfExtended_Factory::get('ZfExtended_Diff');
+        /* @var $diff ZfExtended_Diff */
+        $diffRes = $diff->process($target, $tagged);
+//        error_log(print_r($diffRes,1));
+        foreach($diffRes as $idx => $item) {
+            if(is_array($item)) {
+                $diffRes[$idx] = join('', $this->mergeTagHunks($item['d'], $item['i']));
             }
         }
+        //FIXME Weitere Schritte: INS / TERM Cleanup. Es kann passieren, dass sich <i> und <t> tag paare überlappen.
         
-        $this->debugText .= "\nERGEBNIS:\n" . $this->text;
-        $this->doDebug($this->debugText);
-        
-        $this->text = $this->internalTagHelper->unprotect($this->text);
-        
-        // For safety reasons: delete the decoded item from the stored items so it cannot be used for another text that might per accident have the same textId.
-        // (Maybe this FIRST text using it was the wrong one, but at least on the following SECOND try we will know that something DID go wrong.)
-        // If this happens, the given $textId was not unique enough.
-        unset($this->arrTrackChangeNodes[$textId]);
-        
-        return $this->text;
+        //Beispiel: <t>IchbineinTerm</t>  und man tippt nach bin los mit "einTerm Ichbin"
+        // Das ergibt dann:
+        //<t>Ichbin<i>einTerm</t> <t>Ichbin</i>einTerm</t>
+        //Weitere Beispiele für Tests: 
+        //'<t>Ichbin<i>einTerm</t> <t>Ichbin</i>einTerm</t>'
+        //'<i>Ichbin<t>einTerm</i> <i>Ichbin</t>einTerm</i>';
+        //'<i user="Alice">Ichbin<t>einTerm</i> <i user="Bob">Ichbin</t>einTerm</i>';
+        //'<i user="Alice">Ichbi</i><i user="Bob">n<t>ein</i><i user="Alice">Term</i> <i user="Bob">Ichbin</t>einTerm</i>';
+        //'<i>Soll heißen <t>Ich</i>bineinTerm</t>';
+        //'<t>Muss heißen <i>Ichbin</t> einTerm</i>';
+        //error_log("After diff: ".print_r($diffRes,1));
+        return $this->checkAndRepairXml(join('', $diffRes));
     }
     
     /**
-     * Fetch the TrackChanges in the given text and store them in an array.
-     * (textId needed for later matching these TrackChanges with their original text.)
-     * @param string $text
-     * @param string $textId
+     * merge together the content with term tags and the content with ins del tags
+     * @param array $termTags
+     * @param array $insDelTags
+     * @return array
      */
-    private function fetchTrackChangeNodes($text, $textId) {
-        $this->arrTrackChangeNodes[$textId] = array();
-        // - DEL
-        preg_match_all(editor_Models_Segment_TrackChangeTag::REGEX_DEL, $text, $tempMatchesTrackChangesDEL, PREG_OFFSET_CAPTURE);
-        foreach ($tempMatchesTrackChangesDEL[0] as $match) {
-            $this->arrTrackChangeNodes[$textId][$match[1]] = $match[0];
+    protected function mergeTagHunks(array $termTags, array $insDelTags) {
+        //since textual content can be different before and after retrieving it from the termtagger
+        // we dismiss the before text content and use the after text content.
+        // for example &39; are converted to real ' characters by the termtagger. Such characters will be in the diff to.
+        // on the termTags side we have to keep them
+        // in the $insDelTags we can just remove them
+//error_log("BEFORE :".print_r($insDelTags,1));
+        $insDelTags = array_filter($insDelTags, function($item) {
+            //it is save to check for just the first < character, since this is always a tag then, since single <> characters are always encoded  
+            return strpos($item, '<') === 0;
+        });
+//        error_log("AFTER :".print_r($insDelTags,1));
+        
+            
+        //if the one side is empty, we just use the other side
+        if(empty($insDelTags)) {
+            return $termTags;
         }
-        //- INS
-        preg_match_all(editor_Models_Segment_TrackChangeTag::REGEX_INS, $text, $tempMatchesTrackChangesINS, PREG_OFFSET_CAPTURE);
-        foreach ($tempMatchesTrackChangesINS[0] as $match) {
-            $this->arrTrackChangeNodes[$textId][$match[1]] = $match[0];
+        if(empty($termTags)) {
+            return $insDelTags;
         }
-        ksort($this->arrTrackChangeNodes[$textId]);
+        
+        $result = [];
+        $termTag = array_shift($termTags);
+        $insDelTag = array_shift($insDelTags);
+        while($termTag || $insDelTag) {
+            if(empty($insDelTag)) {
+                $result[] = $termTag;
+                $termTag = array_shift($termTags);
+                continue;
+            }
+            if(empty($termTag)) {
+                $result[] = $insDelTag;
+                $insDelTag = array_shift($insDelTags);
+                continue;
+            }
+            if($this->useTermBeforeInsDel($termTag, $insDelTag)) {
+                $result[] = $termTag;
+                $termTag = array_shift($termTags);
+            }
+            else {
+                $result[] = $insDelTag;
+                $insDelTag = array_shift($insDelTags);
+            }
+        }
+        return $result;
     }
     
     /**
-     * Are there no nodes to stored for the given textId?
-     * @param string $textId
+     * Decide if the termTag or the given insDelTag has a higher precedence
+     * @param string $termTag
+     * @param string $insDelTag
      * @return boolean
      */
-    public function hasNoTrackChangeNodes($textId) {
-        return empty($this->arrTrackChangeNodes[$textId]);
+    protected function useTermBeforeInsDel($termTag, $insDelTag) {
+        // the sort order for comparing <ins></ins><del placeholder /> with <div class="term"> </div> tags, is listed here:
+        /*
+         //$termTag's → </t><t> | </t> | <t>
+         //$insDelTag's → </i><d/><i> | <d/><i> | </i><d/> | <i> | </i> | <d/>
+         
+         Matrix:
+                  ||   </i><d/><i>         ||  <d/><i>        ||   </i><d/>        ||  <i>        ||   </i>         ||   <d/>
+         ===========================================================================================================================
+         </t><t>  ||   </i></t><d/><t><i>  ||  </t><d/><t><i> ||   </i></t><d/><t> ||  </t><t><i> ||   </i></t><t>  ||   </t><d/><t>
+         </t>     ||   </i></t><d/><i>     ||  </t><d/><i>    ||   </i></t><d/>    ||  </t><i>    ||   </i></t>     ||   </t><d/>
+         <t>      ||   </i><d/><t><i>      ||  <d/><t><i>     ||   </i><d/><t>     ||  <t><i>     ||   </i><t>      ||   <d/><t>
+         
+         This results in the following mapping to numbers to use integers for comparison
+         
+         </i> => 1
+         </t> => 2
+         <d/> => 3
+         <t> => 4
+         <i> => 5
+         */
+        
+        if($termTag === self::END_TERM) {
+            $termTag = 2;
+        }
+        elseif (strpos($termTag, self::START_TERM.' ') === 0) {
+            $termTag = 4;
+        }
+        else {
+            //all other is text coming from the TermTagger for example a converted &39; to a '
+            // so in $insDelTag was &39; and in $termTag the ', we keep just the content coming from termTagger
+            return true;
+        }
+        
+        if($insDelTag === self::END_INS) {
+            $insDelTag = 1;
+        }
+        elseif (strpos($insDelTag, self::START_INS) === 0) {
+            $insDelTag = 5;
+        }
+        else {
+            //these are the <segment:del placeholders
+            $insDelTag = 3;
+        }
+        
+        return $insDelTag > $termTag;
     }
     
     /**
-     * Fetch the TermTags in the given text and return them in an array.
+     * Checks the given XML string if it is well formed and repairs if needed by cutting the INS tags into several peaces 
      * @param string $text
-     * @return array
+     * @return string
      */
-    private function fetchTermTags($text) {
-        $allTermTagsInText = array();
-        preg_match_all(self::REGEX_TERMTAG, $text, $tempMatchesTermTags, PREG_OFFSET_CAPTURE);
-        foreach ($tempMatchesTermTags[0] as $match) {
-            $allTermTagsInText[$match[1]] = $match[0];
-        }
-        ksort($allTermTagsInText);
-        return $allTermTagsInText;
-    }
-    
-    /**
-     * If there is a termTag in the text at this position, we need to:
-     * - get all needed items related to the current $pos before positions in the text/arrays change
-     * - close the current TrackChange-Node in case we are in the midst of one
-     * - increase the following positions of the found TrackChange-Nodes by the length of the found termTag
-     * - re-open the current TrackChange-Node in case we are in the midst of one
-     * Returns the length of text that has been added.
-     * @return number
-     */
-    private function handleTermTagInText() {
-        $textLengthIncreased = 0;
-        $openingTrackChangeNode = null;
-        $closingTrackChangeNode = null;
-        $textLengthIncreased = 0;
-        $termTagInText = $this->arrTermTagsInText[$this->posInText];
-        if ($this->trackChangeNodeStatus == 'open') {
-            $openingTrackChangeNode = $this->getThresholdItemInArray($this->arrTrackChangeNodesInText, $this->posInText, 'before');
-            $closingTrackChangeNode = $this->getThresholdItemInArray($this->arrTrackChangeNodesInText, $this->posInText, 'next');
-        }
-        if ($closingTrackChangeNode != null) {
-            $length = strlen($closingTrackChangeNode);
-            $this->arrTrackChangeNodesInText = $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length, $this->posInText);
-            $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length, $this->posInText);
-            $this->debugText .= "\n" . $this->posInText .": closingTrackChangeNode";
-            $textLengthIncreased += $this->insertTextAtCurrentPos($closingTrackChangeNode);
-        }
-        $length = strlen($termTagInText);
-        $this->arrTrackChangeNodesInText = $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length, $this->posInText);
-        $this->posInText += $length;
-        $this->debugText .= "\n- vorgefunden: " . $termTagInText.  "\n- length:" . $length . "\n- weiter bei: " . $this->posInText;
-        if ($openingTrackChangeNode != null) {
-            $length = strlen($openingTrackChangeNode);
-            $this->arrTrackChangeNodesInText = $this->increaseKeysInArray($this->arrTrackChangeNodesInText, $length, $this->posInText);
-            $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length, $this->posInText);
-            $this->debugText .= "\n" . $this->posInText .": openingTrackChangeNode";
-            $textLengthIncreased += $this->insertTextAtCurrentPos($openingTrackChangeNode);
-        }
-        return $textLengthIncreased;
-    }
-    
-    /**
-     * If there is a TrackChange-Node in the text at this position, we need to:
-     * - get all needed items related to the current $pos before positions in the text/arrays change
-     * - increase the following positions of the found TermTags by the length of the found TrackChange-Node
-     * - re-enter the TrackChange-Node here
-     * - set the status of the current TrackChange-Node (open/close) (but only when opening and closing tags are handled extra, thus not for "<del>...</del>")
-     * Returns the length of text that has been added.
-     * @return number
-     */
-    private function handleTrackChangeNodeInText() {
-        $textLengthIncreased = 0;
-        $trackChangeNodeInText = $this->arrTrackChangeNodesInText[$this->posInText];
-        $length = strlen($trackChangeNodeInText);
-        $this->arrTermTagsInText = $this->increaseKeysInArray($this->arrTermTagsInText, $length, $this->posInText);
-        $textLengthIncreased += $this->insertTextAtCurrentPos($trackChangeNodeInText);
-        if (!preg_match_all(editor_Models_Segment_TrackChangeTag::REGEX_DEL, $trackChangeNodeInText)) {
-            $this->trackChangeNodeStatus = ($this->trackChangeNodeStatus == 'open') ? 'close' : 'open'; // start was null and the first step must go to 'open'
-        }
-        return $textLengthIncreased;
-    }
-    
-    /**
-     * Insert given string at the current position and forward the position by length of given $textToInsert.
-     * Returns the length of text that has been added.
-     * @param string $textToInsert
-     * @return number
-     */
-    private function insertTextAtCurrentPos($textToInsert) {
-        $length = strlen($textToInsert);
-        $this->text = substr($this->text, 0, $this->posInText) . $textToInsert . substr($this->text, $this->posInText);
-        $this->posInText += $length;
-        $this->debugText .= "\n- eingefuegt: " . $textToInsert .  "\n- length: " . $length . "\n- weiter bei: " . $this->posInText;
-        return $length;
-    }
-    
-    /**
-     * Returns the array-item of the key that is after or before/at the given threshold.
-     * @param array $arr
-     * @param number $threshold
-     * @param number $direction
-     * @return array||string
-     */
-    private static function getThresholdItemInArray ($arr, $threshold, $direction) {
-        if ($direction == 'next') {
-            end($arr);
-            while(key($arr) > $threshold) prev($arr);   // set internal pointer to position before $threshold
-            return next($arr);                          // return the item after that position.
-        }
-        if(array_key_exists($threshold, $arr)) {        // If there IS an item at the threshold's position
-            return $arr[$threshold];                    // return that one.
-        }
-        while(key($arr) < $threshold) next($arr);       // set internal pointer to position after $threshold
-        return prev($arr);                              // return the item before that position.
-    }
-    
-    /**
-     * Returns a "new version" of the given array with keys increased by the given number.
-     * Increases only those keys that are higher than the given threshold.
-     * @param array $arr
-     * @param number $number
-     * @param number $threshold
-     * @return array
-     */
-    private static function increaseKeysInArray ($arr, $number, $threshold) {
-        $arrOldValues = array_values($arr);
-        $arrOldKeys = array_keys($arr);
-        $arrNewKeys = array_map(function($oldKey) use ($number, $threshold) {
-            if ($oldKey < $threshold) {
-                return $oldKey;
-            } else {
-                return $oldKey + $number;
+    protected function checkAndRepairXml($text) {
+        do {
+            $this->partlyCorrected = null;
+            try {
+                $this->innerCheckAndRepairXml($text);
             }
-        }, $arrOldKeys);
-        return array_combine($arrNewKeys, $arrOldValues);
+            catch(editor_Models_Segment_TermTagTrackChangeStopException $e) {
+                //if there was an error, rerun the check / parse with the applied fixes
+            }
+            $text = $this->partlyCorrected;
+        }
+        while(!empty($this->partlyCorrected));
+        //error_log("Final step: ".print_r($this->xml->getChunks(0, null),1));
+        return (string) $this->xml;
     }
     
     /**
-     * simple debugging
-     * @param string $name
+     * Real repair call, called in a loop until all errors are gone
+     * We assume that del and ins are not nested (this is not allowed in the Frontend), 
+     *  that results in the fact that there is no need to handle the del tags here, 
+     *  since we are always in the start or end node of a ins pair. Inside there is no del tag. So we don't have to care about them. 
+     * 
+     * @param string $text
      */
-    private function doDebug($name) {
-        if(empty($this->debug)) {
-            return;
+    protected function innerCheckAndRepairXml($text) {
+        $this->insStack = [];
+        $xml = $this->xml = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xml editor_Models_Import_FileParser_XmlParser */
+        $xml->registerError(function($opener, $tag, $key){
+            return $this->handleXmlError($opener, $tag, $key);
+        });
+        $xml->registerElement(self::TAG_INS,
+            function($tag, $attributes, $key) {
+                $this->insStack[] = $this->xml->getChunk($key);
+            },
+            function($tag, $key, $opener) {
+                array_pop($this->insStack);
+            }
+        );
+        $xml->parse($text);
+    }
+    
+    /**
+     * Handler for XML structure Errors
+     * @param array $opener
+     * @param string $tag
+     * @param integer $key
+     * @throws editor_Models_Segment_TermTagTrackChangeStopException
+     * @throws ZfExtended_Exception
+     * @return string|boolean
+     */
+    protected function handleXmlError($opener, $tag, $key) {
+        if($opener['tag'] == self::TAG_INS && $tag == self::TAG_TERM) {
+            $insertStart = end($this->insStack);
+            if(!empty($insertStart)) {
+                $this->xml->replaceChunk($key, '</ins></'.$tag.'>'.$insertStart);
+            }
+            
+            //save the partly corrected string
+            $this->partlyCorrected = $this->xml->__toString();
+            throw new editor_Models_Segment_TermTagTrackChangeStopException;
+            
+            return self::END_INS;
         }
-        if($this->debug == 1) {
-            error_log(get_class($this).'::'.$name);
-            return;
-        }
-        if($this->debug == 2) {
-            error_log($name);
-            error_log(print_r($this, 1));
+        if($opener['tag'] == self::TAG_TERM && $tag == self::TAG_INS && strpos($this->xml->getAttribute($opener['attributes'], 'class', ''), 'term') !== false) {
+            $insertStart = end($this->insStack);
+            if(empty($insertStart)) {
+                throw new ZfExtended_Exception('Missing starting insert!');
+            }
+            $this->xml->replaceChunk($opener['openerKey'], self::END_INS.$this->xml->getChunk($opener['openerKey']).$insertStart);
+            
+            //save the partly corrected string
+            $this->partlyCorrected = $this->xml->__toString();
+            throw new editor_Models_Segment_TermTagTrackChangeStopException;
+            
+            return false; //we may not leave the current term node, from the DOM viewpoint we are still in it
         }
     }
+}
+
+class editor_Models_Segment_TermTagTrackChangeStopException extends Exception {
+    
 }
