@@ -745,4 +745,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $s->where('lower(taskName) LIKE lower(?)','%'.$searchString.'%');
         return $this->db->fetchAll($s)->toArray();
     }
+    
+    /**
+     * Assign the task to the default customer.
+     */
+    public function setDefaultCustomerId() {
+        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $customer->loadByDefaultCustomer();
+        $this->setCustomerId($customer->getId());
+    }
 }

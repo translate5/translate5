@@ -128,4 +128,11 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
         }
         return 0;
     }
+    
+    /***
+     * Load by default customer.
+     */
+    public function loadByDefaultCustomer(){
+        $this->loadRow('name=?','defaultcustomer');
+    }
 }

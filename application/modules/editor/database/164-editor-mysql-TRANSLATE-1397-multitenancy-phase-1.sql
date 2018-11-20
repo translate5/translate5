@@ -43,9 +43,9 @@ WHERE customer.name = 'defaultcustomer';
 
 -- set foreign key for task-customer-assoc
 ALTER TABLE `LEK_task`
-ADD INDEX `fk_LEK_task_1_idx` (`customerId` ASC);
-ALTER TABLE `LEK_task` 
+ADD INDEX `fk_LEK_task_1_idx` (`customerId` ASC),
 ADD CONSTRAINT `fk_LEK_task_1`
   FOREIGN KEY (`customerId`)
   REFERENCES `LEK_customer` (`id`)
-  ON CASCADE RESTRICT;
+  ON DELETE RESTRICT;
+  
