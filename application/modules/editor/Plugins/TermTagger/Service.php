@@ -295,7 +295,7 @@ class editor_Plugins_TermTagger_Service {
             throw new editor_Plugins_TermTagger_Exception_Request('TermTagger : Error on decodeServiceResult');
         }
         
-        $response = $this->decodeSegments($response);
+        $response = $this->decodeSegments($response, $data);
         
         return $response;
     }
@@ -318,12 +318,13 @@ class editor_Plugins_TermTagger_Service {
      * restores our internal tags from the delivered img tags
      * 
      * @param stdClass $data
+     * @param editor_Plugins_TermTagger_Service_ServerCommunication $requests
      * @return stdClass
      */
-    private function decodeSegments(stdClass $data) {
+    private function decodeSegments(stdClass $data, editor_Plugins_TermTagger_Service_ServerCommunication $request) {
         foreach ($data->segments as & $segment) {
-            $segment->source = $this->decodeSegment($segment, 'source');
-            $segment->target = $this->decodeSegment($segment, 'target');
+            $segment->source = $this->decodeSegment($segment, 'source', $request);
+            $segment->target = $this->decodeSegment($segment, 'target', $request);
         }
         return $data;
     }
@@ -357,7 +358,7 @@ class editor_Plugins_TermTagger_Service {
         return $this->generalTrackChangesHelper->removeTrackChanges($text);
     }
     
-    private function decodeSegment($segment, $field) {
+    private function decodeSegment($segment, $field, editor_Plugins_TermTagger_Service_ServerCommunication $request) {
         $text = $segment->$field;
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
@@ -368,6 +369,23 @@ class editor_Plugins_TermTagger_Service {
         //error_log(print_r($trackChangeTag,1));
         //error_log($text);
         $text = $this->termTagTrackChangeHelper->mergeTermsAndTrackChanges($text, $trackChangeTag->textWithTrackChanges);
+        //check if content is valid XML, or if textual content has changed
+        $oldFlagValue = libxml_use_internal_errors(true);
+        $invalidXml = ! @simplexml_load_string('<container>'.$text.'</container>');
+        libxml_use_internal_errors($oldFlagValue);
+        $textNotEqual = strip_tags($text) !== strip_tags($segment->$field);
+        if($invalidXml || $textNotEqual) {
+            $msg = 'Problem in merging terminology and track changes: '."\n\n";
+            $msg .= "Problem(s):   ".($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':'')." \n";
+            $msg .= "task guid:    ".$request->task->getTaskGuid()." \n";
+            $msg .= "task name:    ".$request->task->getTaskName()." \n";
+            $msg .= "task nr:      ".$request->task->getTaskNr()." \n";
+            $msg .= "segment id:   ".$segment->id." \n";
+            $msg .= "\nInput from browser: \n".$trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges)."\n";
+            $msg .= "\nResult termtagger: \n".$segment->$field."\n";
+            $msg .= "\nmerged result: \n".$text."\n";
+            $this->log->log('conflict in merging terminology and track changes', $msg);
+        }
         //error_log($text);
         $text = $trackChangeTag->unprotect($text);
         //error_log($text);

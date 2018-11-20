@@ -67,56 +67,25 @@ class editor_Models_Segment_TermTagTrackChange {
     
     /**
      * merge together the original content with ins and del tags with the same content coming from the term tagger without ins/del but with terms
+     * 
+     * Examples see Translate1475Test Test
+     * 
      * @param string $target
      * @param string $tagged
      * @return string
      */
     public function mergeTermsAndTrackChanges($target, $tagged) {
-        //FIXME Schritt 1: interne tags maskieren, wie gehabt
-        
-//         //Beispiel 1
-//         $target = 'Das ist d<d>as</d><i>ie</i> <d>H</d><i>M</i>aus des Nikolaus';
-//         //FIXME do <d> masking with according function!
-//         $target = 'Das ist d<d/><i>ie</i> <d/><i>M</i>aus des Nikolaus';
-//         $tagged = 'Das ist <t>die Maus</t> des Nikolaus';
-        
-//         //Beispiel 2
-//         $target = 'Das ist d<d>as</d><i>ie</i> <d>H</d><i>M</i>aus des Nikolaus';
-//         //FIXME do <d> masking with according function!
-//         $target = 'Das ist d<d/><i>ie</i> <d/><i>M</i>aus des Nikolaus';
-//         $tagged = 'Das ist <t>die</t> <t>Maus</t> des Nikolaus';
-        
-        //unicode affin machen!
         $target = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/', $target, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
         $tagged = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/', $tagged, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-        
-//        error_log(print_r($target,1));
-//        error_log(print_r($tagged,1));
-//        error_log(print_r(join('', $target),1));
-//        error_log(print_r(join('', $tagged),1));
         
         $diff = ZfExtended_Factory::get('ZfExtended_Diff');
         /* @var $diff ZfExtended_Diff */
         $diffRes = $diff->process($target, $tagged);
-//        error_log(print_r($diffRes,1));
         foreach($diffRes as $idx => $item) {
             if(is_array($item)) {
                 $diffRes[$idx] = join('', $this->mergeTagHunks($item['d'], $item['i']));
             }
         }
-        //FIXME Weitere Schritte: INS / TERM Cleanup. Es kann passieren, dass sich <i> und <t> tag paare überlappen.
-        
-        //Beispiel: <t>IchbineinTerm</t>  und man tippt nach bin los mit "einTerm Ichbin"
-        // Das ergibt dann:
-        //<t>Ichbin<i>einTerm</t> <t>Ichbin</i>einTerm</t>
-        //Weitere Beispiele für Tests: 
-        //'<t>Ichbin<i>einTerm</t> <t>Ichbin</i>einTerm</t>'
-        //'<i>Ichbin<t>einTerm</i> <i>Ichbin</t>einTerm</i>';
-        //'<i user="Alice">Ichbin<t>einTerm</i> <i user="Bob">Ichbin</t>einTerm</i>';
-        //'<i user="Alice">Ichbi</i><i user="Bob">n<t>ein</i><i user="Alice">Term</i> <i user="Bob">Ichbin</t>einTerm</i>';
-        //'<i>Soll heißen <t>Ich</i>bineinTerm</t>';
-        //'<t>Muss heißen <i>Ichbin</t> einTerm</i>';
-        //error_log("After diff: ".print_r($diffRes,1));
         return $this->checkAndRepairXml(join('', $diffRes));
     }
     
@@ -132,13 +101,10 @@ class editor_Models_Segment_TermTagTrackChange {
         // for example &39; are converted to real ' characters by the termtagger. Such characters will be in the diff to.
         // on the termTags side we have to keep them
         // in the $insDelTags we can just remove them
-//error_log("BEFORE :".print_r($insDelTags,1));
         $insDelTags = array_filter($insDelTags, function($item) {
             //it is save to check for just the first < character, since this is always a tag then, since single <> characters are always encoded  
             return strpos($item, '<') === 0;
         });
-//        error_log("AFTER :".print_r($insDelTags,1));
-        
             
         //if the one side is empty, we just use the other side
         if(empty($insDelTags)) {

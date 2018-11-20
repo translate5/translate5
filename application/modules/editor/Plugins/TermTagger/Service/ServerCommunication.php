@@ -37,6 +37,12 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     public $sourceLang = NULL;
     public $targetLang = NULL;
     public $segments = NULL;
+    
+    /**
+     * @var editor_Models_Task
+     */
+    public $task = NULL;
+    
     /*
     {
         "id": "123",
@@ -54,7 +60,8 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
      * 
      * @param editor_Models_Task $task
      */
-    public function __construct(editor_Models_Task $task = NULL) {
+    public function __construct(editor_Models_Task $task) {
+        $this->task = $task;
         $config = Zend_Registry::get('config');
         $taggerConfig = $config->runtimeOptions->termTagger;
         $this->debug = (integer)$taggerConfig->debug;
@@ -66,9 +73,6 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
         $this->minFuzzyStringLength = (integer)$taggerConfig->minFuzzyStringLength;
         
         $this->targetStringMatch = 0;
-        if (!$task) {
-            return;
-        }
         
         $this->tbxFile = $task->meta()->getTbxHash();
         
