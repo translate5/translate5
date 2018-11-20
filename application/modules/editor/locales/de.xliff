@@ -1574,11 +1574,11 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
 <source>Kunden</source>
-<target>Customers</target>
+<target>Kunden</target>
 </trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
-<target>Default customer</target>
+<target>Standardkunde</target>
 </trans-unit>
 <trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='><source>Importarchiv herunterladen</source><target>Importarchiv herunterladen</target></trans-unit>
 <trans-unit id='RGVyIEJlbnV0emVyIGthbm4gbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbiwgZXIgaXN0IFBNIGluIGVpbmVyIG9kZXIgbWVocmVyZW4gQXVmZ2FiZW4u'><source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source><target>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</target></trans-unit>

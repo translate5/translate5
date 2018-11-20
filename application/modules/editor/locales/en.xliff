@@ -2391,12 +2391,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='SWhuZW4gc2luZCBkZXJ6ZWl0IGtlaW5lIEt1bmRlbnZlcmtuw7xwZnVuZ2VuIHVuZCBkYW1pdCBhdWNoIGtlaW5lIFRlcm1Db2xsZWN0aW9ucyB6dWdlb3JkbmV0LiBEYWhlciBpc3QgYXVjaCBrZWluZSBUZXJtc3VjaGUgbcO2Z2xpY2gu'>
 	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
-	<target>There are currently no customers connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
+	<target>There are currently no clients connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
 </trans-unit>
 
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIHZlcmbDvGdiYXJlbiB0ZXJtQ29sbGVjdGlvbiBmw7xyIGRlbiBJaG5lbiB6dWdlb3JkbmV0ZW4gS3VuZGVuIGdlZnVuZGVuLg=='>
 	<source>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</source>
-	<target>No available term collections were found for the customer that is associated to you.</target>
+	<target>No available term collections were found for the clients that are associated to you.</target>
 </trans-unit>
 
 <trans-unit id='VGVybWU='>
@@ -2410,12 +2410,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
     <source>Kunden</source>
-    <target>Customers</target>
+    <target>Clients</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='>
     <source>Kundenübersicht</source>
-    <target>Customers overview</target>
+    <target>Clients overview</target>
 </trans-unit>
 
 <trans-unit id='SGluenVmw7xnZW4='>
@@ -2425,52 +2425,52 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='S3VuZGVubmFtZQ=='>
     <source>Kundenname</source>
-    <target>Customer name</target>
+    <target>Client name</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGVubnVtbWVy'>
     <source>Kundennummer</source>
-    <target>Customer number</target>
+    <target>Client number</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgYmVhcmJlaXRlbg=='>
     <source>Kunde bearbeiten</source>
-    <target>Edit customer</target>
+    <target>Edit client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgaGluenVmw7xnZW4='>
     <source>Kunde hinzufügen</source>
-    <target>Add a customer</target>
+    <target>Add a client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4u'>
     <source>Kunde wird gespeichert...</source>
-    <target>Customer is saved ...</target>
+    <target>Client is saved ...</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgZ2VzcGVpY2hlcnQh'>
     <source>Kunde gespeichert!</source>
-    <target>Customer saved!</target>
+    <target>Client saved!</target>
 </trans-unit>
 
 <trans-unit id='RGllc2VuIEt1bmRlbiBsw7ZzY2hlbj8='>
     <source>Diesen Kunden löschen?</source>
-    <target>Delete this customer ?</target>
+    <target>Delete this client?</target>
 </trans-unit>
 
     <trans-unit id='S3VuZGVuIGzDtnNjaGVu'>
     <source>Kunden löschen</source>
-    <target>Delete customer</target>
+    <target>Delete client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'>
     <source>Kunde gelöscht</source>
-    <target>Customer deleted</target>
+    <target>Client deleted</target>
 </trans-unit>
 
 <trans-unit id='RW5ka3VuZGU='>
     <source>Endkunde</source>
-    <target>End customer</target>
+    <target>Client</target>
 </trans-unit>
 <trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='>
     <source>no existing attributes</source>
@@ -2816,15 +2816,15 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
-<target>Customer already assigned to resource {0} as default for {1} to {2} - Remove assignment and assign to current resource?</target>
+<target>Client already assigned to resource {0} as default for {1} to {2} - Remove assignment and assign to current resource?</target>
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
 <source>Kunden</source>
-<target>Customers</target>
+<target>Clients</target>
 </trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
-<target>Default customer</target>
+<target>Default client</target>
 </trans-unit>
 <trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='>
     <source>Importarchiv herunterladen</source>
@@ -2901,7 +2901,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'>
     <source>Für diese Kunden nutzen</source>
-    <target>Use for selected customers</target>
+    <target>Use for selected clients</target>
 </trans-unit>
     </body>
   </file>
