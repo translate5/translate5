@@ -2673,8 +2673,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <target>Associate language resources</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
-  <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
-  <target>No language resource available for the language combination of the opened task.</target>
+  <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
+  <target>No language resource available for the language combination and client of the opened task.</target>
 </trans-unit>
 <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
   <source>Ressource: {name}</source>

@@ -1427,8 +1427,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
       <target>Sprach-Resourcen zuweisen</target>
     </trans-unit>
     <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
-      <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
-      <target>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</target>
+      <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
+      <target>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</target>
     </trans-unit>
     <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
       <source>Ressource: {name}</source>
