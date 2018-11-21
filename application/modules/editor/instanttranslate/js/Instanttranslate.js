@@ -520,6 +520,8 @@ function fillTranslation() {
                     infoText = '';
                     term = '';
                     termStatus = '';
+                    processStatusAttribute = '';
+                    processStatusAttributeValue = '';
                     if (result['metaData'] != undefined) {
                         metaData = result['metaData'];
                         if(metaData['definition'] != undefined) {
@@ -531,6 +533,12 @@ function fillTranslation() {
                         if(metaData['status'] != undefined) {
                             termStatus = metaData['status'];
                         }
+                        if(metaData['processStatusAttribute'] != undefined) {
+                        	processStatusAttribute = metaData['processStatusAttribute'];
+                        }
+                        if(metaData['processStatusAttributeValue'] != undefined) {
+                        	processStatusAttributeValue = metaData['processStatusAttributeValue'];
+                        }
                     }
                     resultData = {'engineId': result['languageResourceid'],
                                   'fuzzyMatch': fuzzyMatch,
@@ -540,8 +548,8 @@ function fillTranslation() {
                                   'term': term,
                                   'termStatus': termStatus,
                                   'translationText': result['target'],
-                    			  'processStatusAttribute':metaData['processStatusAttribute'],
-                    			  'processStatusAttributeValue':metaData['processStatusAttributeValue']
+                    			  'processStatusAttribute':processStatusAttribute,
+                    			  'processStatusAttributeValue':processStatusAttributeValue
                                   };
                     resultHtml += renderTranslationContainer(resultData);
                 }
