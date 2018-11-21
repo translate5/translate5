@@ -31,6 +31,9 @@ Ext.define('Editor.store.LanguageResources.LanguageResource', {
   model: 'Editor.model.LanguageResources.LanguageResource',
   autoLoad: true,
   remoteFilter:true,
+  sorters:[{
+	  property:'serviceName'
+  }],
   //INFO:remote sort is not needed since the pageing is removed
   pageSize: 0
   //remoteSort:true
