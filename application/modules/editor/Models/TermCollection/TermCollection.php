@@ -116,11 +116,11 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
 		}
 		$s=$this->db->select()
     		->setIntegrityCheck(false)
-    		->from('LEK_terms')
-    		->where('groupId IN(?)',$groupIds)
-    		->where('language IN(?)',$targetLangs)
-    		->where('collectionId=?',$this->getId());
-		
+    		->from(array('t'=>'LEK_terms'))
+    		->joinLeft(array('ta'=>'LEK_term_attributes'), 'ta.termId=t.id AND ta.attrType="processStatus"',array('ta.attrType AS processStatusAttribute','ta.value AS processStatusAttributeValue'))
+    		->where('t.groupId IN(?)',$groupIds)
+    		->where('t.language IN(?)',$targetLangs)
+    		->where('t.collectionId=?',$this->getId());
 		return $this->db->fetchAll($s)->toArray();
     }
     
