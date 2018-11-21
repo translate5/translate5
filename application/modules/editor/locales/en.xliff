@@ -2728,6 +2728,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
     <target>Import TMX to TM</target>
 </trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
+    <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen</source>
+    <target>Import TBX to Term-Collection</target>
+</trans-unit>
 <trans-unit id='VE1YLURhdGVp'>
     <source>TMX-Datei</source>
     <target>TMX-file</target>

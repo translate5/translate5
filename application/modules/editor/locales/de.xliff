@@ -1482,6 +1482,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
         <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
         <target>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</target>
     </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
+        <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen</source>
+        <target>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen</target>
+    </trans-unit>
     <trans-unit id='VE1YLURhdGVp'>
         <source>TMX-Datei</source>
         <target>TMX-Datei</target>
