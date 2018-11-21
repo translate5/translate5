@@ -34,6 +34,14 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmwindowviewcontroller',
 
+    listen: {
+        component: {
+            'languagecombo': {
+                change:'onLanguageComboChange'
+            }
+        }
+    },
+    
     /**
      * On add new tm window render handler
      */
