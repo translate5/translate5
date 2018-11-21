@@ -539,7 +539,9 @@ function fillTranslation() {
                                   'serviceName': serviceName,
                                   'term': term,
                                   'termStatus': termStatus,
-                                  'translationText': result['target']
+                                  'translationText': result['target'],
+                    			  'processStatusAttribute':metaData['processStatusAttribute'],
+                    			  'processStatusAttributeValue':metaData['processStatusAttributeValue']
                                   };
                     resultHtml += renderTranslationContainer(resultData);
                 }
@@ -574,9 +576,15 @@ function renderTranslationContainer(resultData) {
     if (resultData.term != '') {
         translationsContainer += '<span class="term-info" id="'+resultData.term+'" title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
     }
+    
+    if (resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
+        translationsContainer += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
+    }
+    
     if (resultData.termStatus != '') {
         translationsContainer += '<span class="term-status">'+renderTermStatusIcon(resultData.termStatus)+'</span>';
     }
+    
     translationsContainer += '</div>';
     
     if (resultData.infoText != '') {

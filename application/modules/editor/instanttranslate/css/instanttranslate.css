@@ -301,6 +301,7 @@ h4, p {
 .clearable-clear,
 .copyable-copy,
 .term-info,
+.process-status-attribute,
 .term-status {
   position: absolute;
   user-select: none;
@@ -331,11 +332,17 @@ h4, p {
   bottom: 0px;
   padding: 0px 4px;
 }
+.process-status-attribute{
+  left: 63px;
+  bottom: 0px;
+  padding: 0px 4px;
+}
 .term-status {
   left: 45px;
   bottom: 0px;
   padding: 0px 4px;
 }
+
 
 #countedCharacters {
   position: absolute;
