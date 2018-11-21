@@ -122,14 +122,13 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         //get all available tm resources
         foreach($resources as $resource) {
             /* @var $resource editor_Models_LanguageResources_Resource */
-            if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT && !in_array($resource->getService(), $mtRes)){
+            if(!in_array($resource->getService(), $mtRes)){
                 $mtRes[]=$resource->getService();
             }
         }
         
         //filter assoc resources by mt
         $engines=$this->loadByUserCustomerAssocs($mtRes);
-        
         //check if results are found
         if(empty($engines)){
             return $engines;
@@ -176,8 +175,8 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             if(!empty($targetLang)){
                 $s->where('l.targetLang IN(?)',$targetLang);
             }
-            $s->group('tm.id');
-            return $this->db->fetchAll($s)->toArray();
+            $resutl=$this->db->fetchAll($s)->toArray();
+            return $this->mergeLanguages($resutl);
             
         }
         return [];
@@ -449,5 +448,56 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         $specificData->$propertyName=$value;
         $this->setSpecificData($specificData);
         return true;
+    }
+    
+    /***
+     * Merge the group the languages by language resource. In the return array for each language resource, all available languages ids and 
+     * rfc language values will be in separate array.
+     * NOTE: the function is used to merge the languages from ungrouped results from "loadByUserCustomerAssocs" function.
+     * 
+     * @param array $languageResources
+     * @return array
+     */
+    private function mergeLanguages(array $languageResources){
+        
+        $resIndex=array();
+        foreach ($languageResources as $key=>$res) {
+            $removeMeAfter=true;
+            if(!isset($resIndex[$res['id']])){
+                //save the index of the language resource
+                $resIndex[$res['id']]=$key;
+                
+                //init the language resource languages array, and save the first language
+                $languageResources[$key]['sourceLang']=[];
+                $languageResources[$key]['sourceLangRfc5646']=[];
+                $languageResources[$key]['sourceLang'][]=$res['sourceLang'];
+                $languageResources[$key]['sourceLangRfc5646'][]=$res['sourceLangRfc5646'];
+                
+                $languageResources[$key]['targetLang']=[];
+                $languageResources[$key]['targetLangRfc5646']=[];
+                $languageResources[$key]['targetLang'][]=$res['targetLang'];
+                $languageResources[$key]['targetLangRfc5646'][]=$res['targetLangRfc5646'];
+                
+                $removeMeAfter=false;
+            }
+            
+            //check if the language allready exist for the language resource
+            if(!in_array($res['sourceLang'], $languageResources[$resIndex[$res['id']]]['sourceLang'])){
+                $languageResources[$resIndex[$res['id']]]['sourceLang'][]=$res['sourceLang'];
+                $languageResources[$resIndex[$res['id']]]['sourceLangRfc5646'][]=$res['sourceLangRfc5646'];
+            }
+            if(!in_array($res['targetLang'], $languageResources[$resIndex[$res['id']]]['targetLang'])){
+                $languageResources[$resIndex[$res['id']]]['targetLang'][]=$res['targetLang'];
+                $languageResources[$resIndex[$res['id']]]['targetLangRfc5646'][]=$res['targetLangRfc5646'];
+            }
+            
+            //remove the result from the array
+            //the only valid result is in $resIndex[$res['id']]
+            if($removeMeAfter){
+                unset($languageResources[$key]);
+            }
+        }
+        //re-index the array
+        return array_values($languageResources);
     }
 }
