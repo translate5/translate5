@@ -360,6 +360,9 @@ class editor_Plugins_TermTagger_Service {
     
     private function decodeSegment($segment, $field, editor_Plugins_TermTagger_Service_ServerCommunication $request) {
         $text = $segment->$field;
+        if(empty($text)) {
+            return $text;
+        }
         //fix TRANSLATE-713
         $text = str_replace('term-STAT_NOT_FOUND', 'term STAT_NOT_FOUND', $text);
         
