@@ -539,25 +539,25 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    */
   onTaskMainCardRender: function(addTaskCard,eOpts) {
       var me = this, 
-          taskMainCardContainer2 = addTaskCard.down('#taskMainCardContainer2'),
+          taskMainCardContainer = addTaskCard.down('#taskMainCardContainer'),
           userCustomers = Ext.StoreManager.get('userCustomers');
       
       // add the customer field to the taskUpload window
       if(userCustomers.getTotalCount() == 1) {
-          taskMainCardContainer2.add({
+          taskMainCardContainer.add({
               xtype: 'displayfield',
               name: 'customer',
               value: userCustomers.getAt(0).getData().name, // display customer-name for the user
               toolTip: me.strings.customerTip,
               fieldLabel: me.strings.customerLabel
           });
-          taskMainCardContainer2.add({
+          taskMainCardContainer.add({
               xtype: 'hiddenfield',
               name: 'customerId',
               value: userCustomers.getAt(0).getData().id, // store customer-id in LEK_task
           });
       } else {
-          taskMainCardContainer2.add({
+          taskMainCardContainer.add({
               xtype: 'usercustomerscombo',
               name: 'customerId',
               allowBlank: false,
