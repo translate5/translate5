@@ -517,15 +517,18 @@ function fillTranslation() {
                         fuzzyMatch = {'matchRate': result['matchrate'], 
                                       'sourceDiff': result['sourceDiff']}
                     }
-                    infoText = '';
+                    infoText = [];
                     term = '';
                     termStatus = '';
                     processStatusAttribute = '';
                     processStatusAttributeValue = '';
                     if (result['metaData'] != undefined) {
                         metaData = result['metaData'];
-                        if(metaData['definition'] != undefined) {
-                            infoText = metaData['definition'];
+                        if(metaData['definitions'] != undefined && metaData['definitions'].length>0) {
+                        	//add all available definitions as separate row
+                        	for(var i=0;i<metaData['definitions'].length;i++){
+                        		infoText.push(metaData['definitions'][i]);
+                        	}
                         }
                         if(metaData['term'] != undefined) {
                             term = metaData['term'];
@@ -542,7 +545,7 @@ function fillTranslation() {
                     }
                     resultData = {'engineId': result['languageResourceid'],
                                   'fuzzyMatch': fuzzyMatch,
-                                  'infoText': infoText,
+                                  'infoText': infoText.join('<br/>'),
                                   'resourceName': resourceName,
                                   'serviceName': serviceName,
                                   'term': term,
