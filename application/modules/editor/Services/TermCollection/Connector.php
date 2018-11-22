@@ -143,11 +143,22 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
         
+        $groupids=array_column($results, 'termEntryId');
+        $groupids=array_unique($groupids);
+        
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $definitions=$term->getDeffinitionsByEntryIds($groupids);
+        
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $groups=$term->sortTerms([$results]);
         foreach ($groups as $group){
             foreach ($group as $res){
+                //add all available definitions from the term termEntry
+                if(isset($definitions[$res['termEntryId']])){
+                    $res['definitions']=$definitions[$res['termEntryId']];
+                }
                 //convert back to array
                 $this->resultList->addResult($res['term'],$this->defaultMatchRate,$res);
             }

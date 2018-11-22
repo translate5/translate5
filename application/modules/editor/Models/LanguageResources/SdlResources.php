@@ -101,6 +101,14 @@ class editor_Models_LanguageResources_SdlResources {
             }
         };
         
+        $getIsoLangs=function($languages) use($lngs){
+          $ret=[];
+          foreach ($languages as $l){
+              $ret[]=isset($lngs[$l]) ? $lngs[$l] : null;
+          }
+          return $ret;
+        };
+        
         
         $sdlService=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_Service');
         /* @var $sdlService editor_Services_SDLLanguageCloud_Service */
@@ -140,9 +148,9 @@ class editor_Models_LanguageResources_SdlResources {
                 'id'=>is_array($engine) ? $engine['id'] :'mt'.$engineCounter,
                 'name' =>is_array($engine) ? $engine['name'] : $engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
                 'source' => is_array($engine) ? $engine['sourceLangRfc5646'] : $engine->fromCulture,
-                'sourceIso' => is_array($engine) ? $lngs[$engine['sourceLang']] : $engine->from->code,
+                'sourceIso' => is_array($engine) ? $getIsoLangs($engine['sourceLang']) : $engine->from->code,
                 'target' => is_array($engine) ? $engine['targetLangRfc5646']: $engine->toCulture,
-                'targetIso' => is_array($engine) ?$lngs[$engine['targetLang']]:$engine->to->code,
+                'targetIso' => is_array($engine) ? $getIsoLangs($engine['targetLang']):$engine->to->code,
                 'domainCode' => is_array($engine) ? $getDomainCode($engine['specificData']):$engine->domainCode,
                 'characterLimit' => $getCharacterLimit([$customerLimit,$engineLimit]),
                 'fileUpload'=> $fileUpload,

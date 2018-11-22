@@ -97,6 +97,13 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $db = $this->db;
         $adapter = $db->getAdapter();
         
+        $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languageModel editor_Models_Languages */
+
+        //get source and target language fuzzies
+        $sourceLangs=$languageModel->getFuzzyLanguages($task->getSourceLang());
+        $targetLangs=$languageModel->getFuzzyLanguages($task->getTargetLang());
+        
         //get all available services
         $services=ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $services editor_Services_Manager */
@@ -106,8 +113,8 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         ->setIntegrityCheck(false)
         ->from(array("languageResource" => "LEK_languageresources"), array("languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
         ->join(array("la"=>"LEK_languageresources_languages"), 'languageResource.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
-        ->where('la.sourceLang=?',$task->getSourceLang())
-        ->where('la.targetLang=?',$task->getTargetLang())
+        ->where('la.sourceLang IN(?)',$sourceLangs)
+        ->where('la.targetLang IN(?)',$targetLangs)
         ->where('languageResource.serviceType IN(?)',$allservices);
 
         //check filter is set true when editor needs a list of all used TMs/MTs
@@ -129,7 +136,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         
         $on = $adapter->quoteInto('ta.languageResourceId = languageResource.id AND ta.taskGuid = ?', $taskGuid);
         $s->joinLeft(["ta"=>"LEK_languageresources_taskassoc"], $on, $checkColumns);
-        
+        $s->group('languageResource.id');
         return $this->loadFilterdCustom($s);
     }
     /**
