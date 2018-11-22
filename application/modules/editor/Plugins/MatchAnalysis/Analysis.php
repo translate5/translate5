@@ -273,7 +273,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $isFuzzy=false;
         if(isset($matchRateResult) && is_object($matchRateResult)){
-            $isFuzzy=$matchRateResult->target == "translate5-unique-id[".$segment->getTaskGuid()."]";
+            //ignore internal fuzzy match target
+            $isFuzzy = strpos($matchRateResult->target, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false;
         }
         $matchAnalysis->setInternalFuzzy($isFuzzy  ? 1 : 0);
         $matchAnalysis->save();
