@@ -743,6 +743,38 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             }
         }
     }
+    
+    /***
+     * Get all definitions in the given entryIds. The end results will be grouped by $entryIds as a key. 
+     * @param array $entryIds
+     * @return array
+     */
+    public function getDeffinitionsByEntryIds(array $entryIds){
+        if(empty($entryIds)){
+            return array();
+        }
+        $s=$this->db->select()
+        ->where('termEntryId IN(?)',$entryIds);
+        $return=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($return)){
+            return array();
+        }
+
+        //group the definitions by termEntryId as a key
+        $result=array();
+        foreach ($return as $r) {
+            if(!isset($result[$r['termEntryId']])){
+                $result[$r['termEntryId']]=array();
+            }
+            
+            if(!in_array($r['definition'], $result[$r['termEntryId']]) && !empty($r['definition'])){
+                $result[$r['termEntryId']][]=$r['definition'];
+            }
+        }
+        
+        return $result;
+    }
 
     /**
      * returns a map CONSTNAME => value of all term status

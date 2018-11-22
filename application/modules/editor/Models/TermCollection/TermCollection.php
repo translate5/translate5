@@ -110,6 +110,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             ->group('groupId');
         $rows=$this->db->fetchAll($s)->toArray();
         
+        if(empty($rows)){
+            return array();
+        }
+        
 		$groupIds = array();
 		foreach($rows as $res){
 			$groupIds[] = $res['groupId'];
