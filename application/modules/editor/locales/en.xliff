@@ -760,18 +760,6 @@
         <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
         <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
       </trans-unit>
-      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='>
-        <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
-        <target>Please choose the TBX data to be imported for the term tagging</target>
-      </trans-unit>
-      <trans-unit id='VEJYIERhdGVpwrI='>
-        <source>TBX Datei²</source>
-        <target>TBX file²</target>
-      </trans-unit>
-      <trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'>
-        <source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source>
-        <target>² A TBX file is optional. You need a TBX-file in TBX-Core format to mark terminology in your bilingual files.</target>
-      </trans-unit>
       
       
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
