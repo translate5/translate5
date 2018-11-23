@@ -219,8 +219,6 @@ class editor_TaskController extends ZfExtended_RestController {
             if(isset($taskassocs[$row['taskGuid']])){
                 $row['taskassocs'] = $taskassocs[$row['taskGuid']];
             }
-            
-            $row['customerName'] = $this->getCustomerName($row['customerId']);
         }
         return $rows;
     }
@@ -302,17 +300,6 @@ class editor_TaskController extends ZfExtended_RestController {
             return '- not found -'; //should not be, but can occur after migration of old data!
         }
         return $userinfo['firstName'].' '.$userinfo['surName'].' ('.$userinfo['login'].')';
-    }
-    
-    /**
-     * returns the customerName
-     * @param integer $customerId
-     */
-    protected function getCustomerName($customerId) {
-        $customer = ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $customer editor_Models_Customer */
-        $customer->load($customerId);
-        return $customer->getName();
     }
 
     /**
