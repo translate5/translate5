@@ -378,20 +378,21 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
-        if(count($allUseAsDefaultCustomers) > 0) {
-            $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
-            /* @var $languages editor_Models_LanguageResources_Languages */
-            $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-            /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
-            foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
-                $languageResourceId = $defaultCustomer['languageResourceId'];
-                if ($languages->isInCollection($this->entity->getSourceLang(),'sourceLang',$languageResourceId)
-                        && $languages->isInCollection($this->entity->getTargetLang(),'targetLang',$languageResourceId) ) {
-                            $taskAssoc->init();
-                            $taskAssoc->setLanguageResourceId($languageResourceId);
-                            $taskAssoc->setTaskGuid($this->entity->getTaskGuid());
-                            $taskAssoc->save();
-                }
+        if(empty($allUseAsDefaultCustomers)) {
+            return;
+        }
+        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
+            $languageResourceId = $defaultCustomer['languageResourceId'];
+            if ($languages->isInCollection($this->entity->getSourceLang(),'sourceLang',$languageResourceId)
+                    && $languages->isInCollection($this->entity->getTargetLang(),'targetLang',$languageResourceId) ) {
+                        $taskAssoc->init();
+                        $taskAssoc->setLanguageResourceId($languageResourceId);
+                        $taskAssoc->setTaskGuid($this->entity->getTaskGuid());
+                        $taskAssoc->save();
             }
         }
     }
