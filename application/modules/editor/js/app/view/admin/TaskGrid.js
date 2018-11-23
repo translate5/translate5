@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       relaisLang: '#UT#Relaissprache',
       targetLang: '#UT#Zielsprache',
       state: '#UT#Status',
-      customerName: '#UT#Kunden',
+      customerId: '#UT#Kunden',
       pmGuid: '#UT#Projektmanager',
       users: '#UT#Benutzer',
       wordCount: '#UT#Wörter',
@@ -161,6 +161,21 @@ Ext.define('Editor.view.admin.TaskGrid', {
       }
       return '';
   },
+  /**
+   * renders the value (= names) of the customer column
+   * @param {String} val
+   * @returns {String}
+   */
+  customerRenderer: function(val, md) {
+      var customer = this.customerStore.getById(val), 
+          label;
+      if(customer){
+          label = customer.get('name');
+          md.tdAttr = 'data-qtip="' + label + ' (id: ' + val + ')"';
+          return label;
+      }
+      return '';
+  },
 
   initComponent: function() {
     var me = this,
@@ -233,6 +248,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           config = {
                   title: me.title, //see EXT6UPD-9
           languageStore: Ext.StoreMgr.get('admin.Languages'),
+          customerStore: Ext.StoreManager.get('customersStore'),
           columns: [{
               text: me.text_cols.taskActions,
               menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
@@ -293,8 +309,9 @@ Ext.define('Editor.view.admin.TaskGrid', {
           },{
               xtype: 'gridcolumn',
               width: 135,
-              dataIndex: 'customerName',
-              stateId: 'customerName',
+              renderer: me.customerRenderer,
+              dataIndex: 'customerId',
+              stateId: 'customerId',
               filter: {
                   type: 'string'
               },
