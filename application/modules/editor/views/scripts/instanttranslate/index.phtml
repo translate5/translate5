@@ -28,35 +28,39 @@
 ?>
 
 <?php
-    // Which languages are available according to the MachineTranslation-Engines?
-    // (The result might add translations from resources with more langauges, e.g. TermCollections,
-    //  but their language-combinations are not taken into account here.)
+    // Which languages are available according to the Language-Resources?
     // In order to save time we use this loop to calculate the characterLimit, too.
     $allCharacterLimits = array();
     $machineTranslationEngines = $this->machineTranslationEngines;
     $mtSourceLanguageLocales = array();
     $mtTargetLanguageLocales = array();
     
-    $rfcToIsoMap=array();
+    $rfcToIsoMap=array(); // code-review: what do we need this for?
     
     foreach ($machineTranslationEngines as $mtEngine) {
         $allCharacterLimits[] = $mtEngine['characterLimit'];
-        $mtSourceLocale = $mtEngine['source'];
-        $mtTargetLocale = $mtEngine['target'];
+        $allMtSourceLocales = $mtEngine['source'];
+        $allMtTargetLocales = $mtEngine['target'];
+        $allMtSourceIso  = $mtEngine['sourceIso'];
+        $allMtTargetIso  = $mtEngine['targetIso'];
         
-        if(!isset($rfcToIsoMap[$mtSourceLocale])){
-            $rfcToIsoMap[$mtSourceLocale]=$mtEngine['sourceIso'];
-        }
-        
-        if(!isset($rfcToIsoMap[$mtTargetLocale])){
-            $rfcToIsoMap[$mtTargetLocale]=$mtEngine['targetIso'];
-        }
-        
-        if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
-            $mtSourceLanguageLocales[] = $mtSourceLocale;
-        }
-        if (!in_array($mtTargetLocale, $mtTargetLanguageLocales)) {
-            $mtTargetLanguageLocales[] = $mtTargetLocale;
+        foreach ($allMtSourceLocales as $key => $mtSourceLocale) {
+            $mtTargetLocale = $allMtTargetLocales[$key];
+            
+            if(!isset($rfcToIsoMap[$mtSourceLocale])){
+                $rfcToIsoMap[$mtSourceLocale] = $allMtSourceIso[$key];
+            }
+            
+            if(!isset($rfcToIsoMap[$mtTargetLocale])){
+                $rfcToIsoMap[$mtTargetLocale] = $allMtTargetIso[$key];
+            }
+            
+            if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
+                $mtSourceLanguageLocales[] = $mtSourceLocale;
+            }
+            if (!in_array($mtTargetLocale, $mtTargetLanguageLocales)) {
+                $mtTargetLanguageLocales[] = $mtTargetLocale;
+            }
         }
     }
     sort($mtSourceLanguageLocales);
@@ -126,14 +130,9 @@
         <form id="sourceLanguageAndContent">
             <select id="sourceLocale" name="sourceLocale">
                 <?php
-                    $sourceLangLocalesFound = array();
-                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
-                        $sourceLangLocalesFound[] = $sourceLangLocale;
-                    }
-                    sort($sourceLangLocalesFound);
                     $optionValues=[];
                     $optionValues[]='<option value="-">-</option>';
-                    foreach ($sourceLangLocalesFound as $sourceLangLocale) {
+                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
                         $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
@@ -155,14 +154,9 @@
         <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
                 <?php
-                    $targetLangLocalesFound = array();
-                    foreach ($mtTargetLanguageLocales as $targetLangLocale) {
-                        $targetLangLocalesFound[] = $targetLangLocale;
-                    }
-                    sort($targetLangLocalesFound);
                     $optionValues=[];
                     $optionValues[]='<option value="-">-</option>';
-                    foreach ($targetLangLocalesFound as $targetLangLocale) {
+                    foreach ($mtTargetLanguageLocales as $targetLangLocale) {
                         $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
