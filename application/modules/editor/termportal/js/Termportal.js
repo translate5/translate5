@@ -37,7 +37,8 @@ var termAttributeContainer=[],
     KEY_TERM="term",
     KEY_TERM_ATTRIBUTES="termAttributes",
     KEY_TERM_ENTRY_ATTRIBUTES="termEntryAttributes",
-    termGroupsCache=[];//cache the groups results
+    termGroupsCache=[],//cache the groups results
+    instantTranslateWindow;
 
 /***
  * If the parameter 'term' is given in the URL, we start a search directly.
@@ -621,6 +622,10 @@ $('#search').keyup(function (e) {
     $('#termTable').empty();
 });
 
+$('#instantTranslate').on('touchstart click',function(){
+	openInstantTranslate();
+});
+
 function startAutocomplete(){
     console.log("startAutocomplete...");
     $('#finalResultContent').hide();
@@ -633,4 +638,18 @@ function startAutocomplete(){
 function showFinalResultContent() {
     $('#finalResultContent').show();
     setSizesInFinalResultContent();
+}
+
+function openInstantTranslate(){
+	
+	if(!instantTranslateWindow && window.opener){
+		instantTranslateWindow=window.opener;
+	}
+	
+	if(instantTranslateWindow && !instantTranslateWindow.closed){
+		instantTranslateWindow.location=Editor.data.restpath+"instanttranslate";
+		instantTranslateWindow.focus();
+		return;
+	}
+	instantTranslateWindow=window.open(Editor.data.restpath+"instanttranslate", '_blank');
 }

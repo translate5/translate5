@@ -35,7 +35,8 @@ var editIdleTimer = null,
     latestTextToTranslate = '',
     instantTranslationIsActive = true,
     chosenSourceIsText = true,
-    fileTypesAllowedAndAvailable = [];
+    fileTypesAllowedAndAvailable = [],
+    termPortalWindow=null;
 
 /***
  * Stores an array with the allowed file-types according to the available engines.
@@ -811,8 +812,28 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 
 /* --------------- open TermPortal ------------------------------------------ */
 $('#translations').on('touchstart click','.term-info',function(){
-    window.open(Editor.data.restpath+"termportal?term="+$(this).attr('id')+"&lang="+$("#targetLocale").val(), '_blank');
+    //window.open(Editor.data.restpath+"termportal?term="+$(this).attr('id')+"&lang="+$("#targetLocale").val(), '_blank');
+	openTermPortal($(this).attr('id'),$("#targetLocale").val());
 });
+
+$('#termPortal').on('touchstart click',function(){
+	openTermPortal();
+});
+
+function openTermPortal(termString,targetLang){
+	var arguments=(termString && termString!="") ? "?term="+termString+"&lang="+targetLang : "";
+	
+	if(!termPortalWindow && window.opener){
+		termPortalWindow=window.opener;
+	}
+	
+	if(termPortalWindow && !termPortalWindow.closed){
+		termPortalWindow.location=Editor.data.restpath+"termportal"+arguments;
+		termPortalWindow.focus();
+		return;
+	}
+	termPortalWindow=window.open(Editor.data.restpath+"termportal"+arguments, '_blank');
+}
 
 /* --------------- show/hide: helpers --------------------------------------- */
 function showLanguageSelectsOnly() {
@@ -891,4 +912,3 @@ function startLoadingState() {
 function stopLoadingState() {
     $('.loadingSpinnerLayer').hide();
 }
-

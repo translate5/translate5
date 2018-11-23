@@ -128,9 +128,14 @@ h4, p {
     margin-right: 7px;
 }
 #locale-button {width: 9em;}
+#termPortal{
+	flex: 0 0 80px;
+    order: 3;
+    text-align: right;
+}
 #logout {
     flex: 0 0 80px;
-    order: 3;
+    order: 4;
     text-align: right;
 }
 

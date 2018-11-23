@@ -58,9 +58,14 @@ END LICENSE AND COPYRIGHT
     margin-right: 7px;
 }
 #locale-button {width: 9em;}
+#instantTranslate{
+	flex: 0 0 80px;
+    order: 3;
+    text-align: right;
+}
 #logout {
     flex: 0 0 80px;
-    order: 3;
+    order: 4;
     text-align: right;
 }
 
