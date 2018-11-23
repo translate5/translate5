@@ -281,17 +281,26 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     var localesAvailable = [],
         engineId,
         mtEngineToCheck,
+        mtEngineToCheckAllSources,
+        mtEngineToCheckAllTargets,
         mtEngineLocaleSet,
-        mtEngineLocaleToAdd;
+        mtEngineAllLocalesToAdd;
     for (engineId in machineTranslationEngines) {
         if (machineTranslationEngines.hasOwnProperty(engineId)) {
             mtEngineToCheck = machineTranslationEngines[engineId];
-            mtEngineLocaleSet = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheck.source : mtEngineToCheck.target;
-            if (mtEngineLocaleSet === selectedLocale) {
-                mtEngineLocaleToAdd = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheck.target : mtEngineToCheck.source;
-                if ($.inArray(mtEngineLocaleToAdd, localesAvailable) === -1) {
-                    localesAvailable.push(mtEngineLocaleToAdd); 
-                }
+            mtEngineToCheckAllSources = mtEngineToCheck.source;
+            mtEngineToCheckAllTargets = mtEngineToCheck.target;
+            mtEngineLocaleSet = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheckAllSources : mtEngineToCheckAllTargets;
+            if ($.inArray(selectedLocale, mtEngineLocaleSet) !== -1) {
+                mtEngineAllLocalesToAdd = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheckAllTargets : mtEngineToCheckAllSources;
+                $.each(mtEngineAllLocalesToAdd, function(index, mtEngineLocaleToAdd) {
+                    // TermCollections can translate in all combinations of their source- and target-languages,
+                    // but not from the source to the SAME target-language.
+                    if (mtEngineLocaleToAdd != selectedLocale
+                        && $.inArray(mtEngineLocaleToAdd, localesAvailable) === -1) {
+                            localesAvailable.push(mtEngineLocaleToAdd); 
+                    }
+                });
             }
         }
     }
