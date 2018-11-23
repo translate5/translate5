@@ -357,11 +357,42 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->processUploadedFile();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
+            
+            // Language resources that are assigned as default language resource for a client,
+            // are associated automatically with tasks for this client.
+            $this->addDefaultLanguageResources();
+            
             if($this->data['autoStartImport']) {
                 $this->startImportWorkers();
             }
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
+        }
+    }
+    
+    /**
+     * Assign language resources by default that are set as useAsDefault for the task's client
+     * (but only if the language combination matches).
+     */
+    protected function addDefaultLanguageResources() {
+        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
+        if(count($allUseAsDefaultCustomers) > 0) {
+            $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+            /* @var $languages editor_Models_LanguageResources_Languages */
+            $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+            /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+            foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
+                $languageResourceId = $defaultCustomer['languageResourceId'];
+                if ($languages->isInCollection($this->entity->getSourceLang(),'sourceLang',$languageResourceId)
+                        && $languages->isInCollection($this->entity->getTargetLang(),'targetLang',$languageResourceId) ) {
+                            $taskAssoc->init();
+                            $taskAssoc->setLanguageResourceId($languageResourceId);
+                            $taskAssoc->setTaskGuid($this->entity->getTaskGuid());
+                            $taskAssoc->save();
+                }
+            }
         }
     }
     
