@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 var editIdleTimer = null,
     DEFAULT_FILE_EXT='txt',
     uploadedFiles,//Variable to store uploaded files
-    selectedEngineId = undefined,
+    selectedLanguageResourceId = undefined,
     translateTextResponse = '',
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
@@ -38,43 +38,43 @@ var editIdleTimer = null,
     fileTypesAllowedAndAvailable = [];
 
 /***
- * Store allowed file-types for all available engines.
+ * Store allowed file-types for all available languageResources.
  */
 function setFileTypesAllowedAndAvailable() {
-    for (engineId in machineTranslationEngines) {
-        if(machineTranslationEngines.hasOwnProperty(engineId)){
-            addFileTypesAllowedAndAvailable(machineTranslationEngines[engineId]);
+    for (languageResourceId in allLanguageResources) {
+        if(allLanguageResources.hasOwnProperty(languageResourceId)){
+            addFileTypesAllowedAndAvailable(allLanguageResources[languageResourceId]);
         }
     }
 }
 /***
  * Adds the allowed file-types for the given languageResource.
- * - If two engines for the same language-combination are available and allow fileUploads,
+ * - If two languageResources for the same language-combination are available and allow fileUploads,
  *   the one with a domainCode is prioritized.
- * - Other cases are not defined so far (e.g. what if we have THREE engines for the same 
+ * - Other cases are not defined so far (e.g. what if we have THREE languageResources for the same 
  *   language-combination and TWO of them have a domainCode / what if they belong to different 
  *   services / ...).
  */
-function addFileTypesAllowedAndAvailable(mtEngine) {
+function addFileTypesAllowedAndAvailable(languageResource) {
     var extensionsFileTranslation,
         serviceFileExtensions,
         languageCombination,
         filesTypesForLanguageCombination;
-    if(mtEngine.fileUpload == false){
+    if(languageResource.fileUpload == false){
         return;
     }
     extensionsFileTranslation = Editor.data.languageresource.fileExtension;
-    if(!extensionsFileTranslation.hasOwnProperty(mtEngine.serviceName)){
+    if(!extensionsFileTranslation.hasOwnProperty(languageResource.serviceName)){
         return;
     }
-    serviceFileExtensions = extensionsFileTranslation[mtEngine.serviceName];
-    $.each(getLanguageCombinations(mtEngine), function(index, languageCombination) {
+    serviceFileExtensions = extensionsFileTranslation[languageResource.serviceName];
+    $.each(getLanguageCombinations(languageResource), function(index, languageCombination) {
         filesTypesForLanguageCombination = [];
         // Do we already have file-types stored for this language-combination? Then check the domainCode and prioritize accordingly.
         if(fileTypesAllowedAndAvailable.hasOwnProperty(languageCombination)) {
             var domainCodeStored = fileTypesAllowedAndAvailable[languageCombination].domainCode,
-                isEmptyEngineDomainCode = (mtEngine.domainCode == '' || mtEngine.domainCode == null) ? true : false;
-            if (domainCodeStored != '' && isEmptyEngineDomainCode) {
+                isEmptyDomainCode = (languageResource.domainCode == '' || languageResource.domainCode == null) ? true : false;
+            if (domainCodeStored != '' && isEmptyDomainCode) {
                 return;
             } 
         }
@@ -85,9 +85,9 @@ function addFileTypesAllowedAndAvailable(mtEngine) {
             }
           });
         if(filesTypesForLanguageCombination.length > 0) {
-            var dataForLanguageCombination = {'domainCode': mtEngine.domainCode,
-                                              'sourceLocale': mtEngine.source,
-                                              'targetLocale': mtEngine.target,
+            var dataForLanguageCombination = {'domainCode': languageResource.domainCode,
+                                              'sourceLocale': languageResource.source,
+                                              'targetLocale': languageResource.target,
                                               'fileTypes': filesTypesForLanguageCombination};
             fileTypesAllowedAndAvailable[languageCombination] = dataForLanguageCombination;
         }
@@ -187,16 +187,16 @@ function setTextForSource() {
 /*  -------------------------------------------------------------------------
  * ORDER OF DISPLAY FOR THE USER:
  * (1) languages are selected from the locales-lists (renderLocalesAsAvailable)
- * (2) every change in the language-selection starts a check if/how many mtEngines 
- *     are available (renderMtEnginesAsAvailable)
- * (3) As soon as there is exactly ONE mtEngine available:
+ * (2) every change in the language-selection starts a check if/how many languageResources 
+ *     are available
+ * (3) As soon as there is exactly ONE languageResource available:
  *     - source- and target-language are set
  *     - (if text is already entered:) translation starts
  *  ------------------------------------------------------------------------- */
 
 /* --------------- locales-list (source, target) ---------------------------- */
 /**
- * Include languages for source/target only if there is an Mt-Engine available 
+ * Include languages for source/target only if there is a languageResource available 
  * for the resulting source-target-combination.
  * - accordingToSourceLocale: sourceLocale is set, targetLocales are rendered
  * - accordingToTargetLocale: targetLocale is set, sourceLocales are rendered
@@ -293,26 +293,26 @@ function renderLocalesAsAvailable(accordingTo) {
 }
 function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     var localesAvailable = [],
-        engineId,
-        mtEngineToCheck,
-        mtEngineToCheckAllSources,
-        mtEngineToCheckAllTargets,
-        mtEngineLocaleSet,
-        mtEngineAllLocalesToAdd;
-    for (engineId in machineTranslationEngines) {
-        if (machineTranslationEngines.hasOwnProperty(engineId)) {
-            mtEngineToCheck = machineTranslationEngines[engineId];
-            mtEngineToCheckAllSources = mtEngineToCheck.source;
-            mtEngineToCheckAllTargets = mtEngineToCheck.target;
-            mtEngineLocaleSet = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheckAllSources : mtEngineToCheckAllTargets;
-            if (isAvailableLocale(selectedLocale, mtEngineLocaleSet)) {
-                mtEngineAllLocalesToAdd = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheckAllTargets : mtEngineToCheckAllSources;
-                $.each(mtEngineAllLocalesToAdd, function(index, mtEngineLocaleToAdd) {
+        languageResourceId,
+        languageResourceToCheck,
+        languageResourceToCheckAllSources,
+        languageResourceToCheckAllTargets,
+        languageResourceLocaleSet,
+        languageResourceAllLocalesToAdd;
+    for (languageResourceId in allLanguageResources) {
+        if (allLanguageResources.hasOwnProperty(languageResourceId)) {
+            languageResourceToCheck = allLanguageResources[languageResourceId];
+            languageResourceToCheckAllSources = languageResourceToCheck.source;
+            languageResourceToCheckAllTargets = languageResourceToCheck.target;
+            languageResourceLocaleSet = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllSources : languageResourceToCheckAllTargets;
+            if (isAvailableLocale(selectedLocale, languageResourceLocaleSet)) {
+                languageResourceAllLocalesToAdd = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllTargets : languageResourceToCheckAllSources;
+                $.each(languageResourceAllLocalesToAdd, function(index, languageResourceLocaleToAdd) {
                     // TermCollections can translate in all combinations of their source- and target-languages,
                     // but not from the source to the SAME target-language.
-                    if (mtEngineLocaleToAdd != selectedLocale
-                        && $.inArray(mtEngineLocaleToAdd, localesAvailable) === -1) {
-                            localesAvailable.push(mtEngineLocaleToAdd); 
+                    if (languageResourceLocaleToAdd != selectedLocale
+                        && $.inArray(languageResourceLocaleToAdd, localesAvailable) === -1) {
+                            localesAvailable.push(languageResourceLocaleToAdd); 
                     }
                 });
             }
@@ -492,7 +492,7 @@ function translateText(textToTranslate,translationInProgressID){
         statusCode: {
             500: function() {
                 hideTranslations();
-                showMtEngineSelectorError('serverErrorMsg500');
+                showLanguageResourceSelectorError('serverErrorMsg500');
             }
         },
         url: Editor.data.restpath+"instanttranslateapi/translate",
@@ -566,7 +566,7 @@ function fillTranslation() {
                         	processStatusAttributeValue = metaData['processStatusAttributeValue'];
                         }
                     }
-                    resultData = {'engineId': result['languageResourceid'],
+                    resultData = {'languageResourceId': result['languageResourceid'],
                                   'fuzzyMatch': fuzzyMatch,
                                   'infoText': infoText.join('<br/>'),
                                   'resourceName': resourceName,
@@ -605,7 +605,7 @@ function renderTranslationContainer(resultData) {
     }
     
     translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+resultData.engineId+'">'+resultData.translationText+'</div>';
+    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     if (resultData.term != '') {
         translationsContainer += '<span class="term-info" id="'+resultData.term+'" title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
@@ -625,7 +625,7 @@ function renderTranslationContainer(resultData) {
         translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
     }
     
-    translationsContainer += '<div id="translationError'+resultData.engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
+    translationsContainer += '<div id="translationError'+resultData.languageResourceId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
     return translationsContainer;
 }
 
@@ -707,7 +707,7 @@ function getDownloadUrl(fileId){
         statusCode: {
             500: function() {
                 hideTranslations();
-                showMtEngineSelectorError('serverErrorMsg500');
+                showLanguageResourceSelectorError('serverErrorMsg500');
                 }
         },
         url: Editor.data.restpath+"instanttranslateapi/url",
@@ -881,8 +881,8 @@ function showInstantTranslationOffOn() {
     }
 }
 /* --------------- show/hide: errors --------------------------------------- */
-function showMtEngineSelectorError(errorMode) {
-    $('#mtEngineSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
+function showLanguageResourceSelectorError(errorMode) {
+    $('#languageResourceSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
     $('#translationSubmit').hide();
 }
 function showTargetError(errorText) {
