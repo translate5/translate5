@@ -29,35 +29,20 @@
 
 <?php
     // Which languages are available according to the Language-Resources?
+    // (We only the need the single lists here, not in which combination they work.)
     // In order to save time we use this loop to calculate the characterLimit, too.
     $allCharacterLimits = array();
-    $machineTranslationEngines = $this->machineTranslationEngines;
     $mtSourceLanguageLocales = array();
     $mtTargetLanguageLocales = array();
     
-    $rfcToIsoMap=array(); // code-review: what do we need this for?
-    
-    foreach ($machineTranslationEngines as $mtEngine) {
+    foreach ($this->machineTranslationEngines as $mtEngine) {
         $allCharacterLimits[] = $mtEngine['characterLimit'];
-        $allMtSourceLocales = $mtEngine['source'];
-        $allMtTargetLocales = $mtEngine['target'];
-        $allMtSourceIso  = $mtEngine['sourceIso'];
-        $allMtTargetIso  = $mtEngine['targetIso'];
-        
-        foreach ($allMtSourceLocales as $key => $mtSourceLocale) {
-            $mtTargetLocale = $allMtTargetLocales[$key];
-            
-            if(!isset($rfcToIsoMap[$mtSourceLocale])){
-                $rfcToIsoMap[$mtSourceLocale] = $allMtSourceIso[$key];
-            }
-            
-            if(!isset($rfcToIsoMap[$mtTargetLocale])){
-                $rfcToIsoMap[$mtTargetLocale] = $allMtTargetIso[$key];
-            }
-            
+        foreach ($mtEngine['source'] as $mtSourceLocale) {
             if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
                 $mtSourceLanguageLocales[] = $mtSourceLocale;
             }
+        }
+        foreach ($mtEngine['target']as $key => $mtTargetLocale) {
             if (!in_array($mtTargetLocale, $mtTargetLanguageLocales)) {
                 $mtTargetLanguageLocales[] = $mtTargetLocale;
             }
