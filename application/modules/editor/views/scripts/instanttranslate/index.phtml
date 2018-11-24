@@ -28,30 +28,30 @@
 ?>
 
 <?php
-    // Which languages are available according to the Language-Resources?
+    // Which languages are available according to the LanguageResources?
     // (We only the need the single lists here, not in which combination they work.)
     // In order to save time we use this loop to calculate the characterLimit, too.
     $allCharacterLimits = array();
-    $mtSourceLanguageLocales = array();
-    $mtTargetLanguageLocales = array();
+    $allSourceLanguageLocales = array();
+    $allTargetLanguageLocales = array();
     
-    foreach ($this->machineTranslationEngines as $mtEngine) {
-        $allCharacterLimits[] = $mtEngine['characterLimit'];
-        foreach ($mtEngine['source'] as $mtSourceLocale) {
-            if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
-                $mtSourceLanguageLocales[] = $mtSourceLocale;
+    foreach ($this->machineTranslationEngines as $languageResource) {
+        $allCharacterLimits[] = $languageResource['characterLimit'];
+        foreach ($languageResource['source'] as $mtSourceLocale) {
+            if (!in_array($mtSourceLocale, $allSourceLanguageLocales)) {
+                $allSourceLanguageLocales[] = $mtSourceLocale;
             }
         }
-        foreach ($mtEngine['target']as $key => $mtTargetLocale) {
-            if (!in_array($mtTargetLocale, $mtTargetLanguageLocales)) {
-                $mtTargetLanguageLocales[] = $mtTargetLocale;
+        foreach ($languageResource['target']as $key => $mtTargetLocale) {
+            if (!in_array($mtTargetLocale, $allTargetLanguageLocales)) {
+                $allTargetLanguageLocales[] = $mtTargetLocale;
             }
         }
     }
-    sort($mtSourceLanguageLocales);
-    sort($mtTargetLanguageLocales);
+    sort($allSourceLanguageLocales);
+    sort($allTargetLanguageLocales);
     
-    // the lowest number of characters that any of the mtEngines can handle 
+    // the lowest number of characters that any of the LanguageResources can handle 
     // is our limit for what the user is allowed to enter:
     if(empty($allCharacterLimits)) {
         $characterLimit = 3;
@@ -117,7 +117,7 @@
                 <?php
                     $optionValues=[];
                     $optionValues[]='<option value="-">-</option>';
-                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
+                    foreach ($allSourceLanguageLocales as $sourceLangLocale) {
                         $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
@@ -141,7 +141,7 @@
                 <?php
                     $optionValues=[];
                     $optionValues[]='<option value="-">-</option>';
-                    foreach ($mtTargetLanguageLocales as $targetLangLocale) {
+                    foreach ($allTargetLanguageLocales as $targetLangLocale) {
                         $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
@@ -161,12 +161,12 @@
 </div>
 
 <script type="text/javascript">
-    var mtSourceLanguageLocales = '<?php echo json_encode($mtSourceLanguageLocales);?>';
+    var mtSourceLanguageLocales = '<?php echo json_encode($allSourceLanguageLocales);?>';
     mtSourceLanguageLocales = JSON.parse(mtSourceLanguageLocales);
-    var mtTargetLanguageLocales = '<?php echo json_encode($mtTargetLanguageLocales);?>';
+    var mtTargetLanguageLocales = '<?php echo json_encode($allTargetLanguageLocales);?>';
     mtTargetLanguageLocales = JSON.parse(mtTargetLanguageLocales);
-    var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
-    machineTranslationEngines = JSON.parse(machineTranslationEngines);
+    var allLanguageResources = '<?php echo json_encode($this->machineTranslationEngines);?>';
+    allLanguageResources = JSON.parse(allLanguageResources);
     var characterLimit = '<?php echo $characterLimit;?>';
 </script>
 
