@@ -1089,7 +1089,7 @@ Ext.define('Editor.controller.Editor', {
         editor = plug.editor.mainEditor;
         editor.insertWhitespaceInEditor(whitespaceType, tagNr);
         if (e.delegatedTarget.nodeName.toLowerCase() == 'a') {
-            e.delegatedTarget.blur();
+            editor.focus();
         }
         e.stopEvent();
     },
