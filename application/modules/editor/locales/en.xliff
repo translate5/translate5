@@ -890,6 +890,10 @@
         <source>für alle</source>
         <target>for all</target>
       </trans-unit>
+      <trans-unit id='S3VuZGUgZGVyIEF1ZmdhYmUgKEFuZ2FiZSBub3R3ZW5kaWcp'>
+        <source>Kunde der Aufgabe (Angabe notwendig)</source>
+        <target>Task's client (mandatory)</target>
+      </trans-unit>
       <trans-unit id='SWhyZSBEYXRlbiBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbiwgYmVpbSBTcGVpY2hlcm4ga2FtIGVzIHp1IGVpbmVtIEtvbmZsaWt0IQ=='>
         <source>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</source>
         <target>Your data could not be saved, on saving there was a conflict on server side!</target>
