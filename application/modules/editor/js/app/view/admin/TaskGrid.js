@@ -65,6 +65,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       noRelaisLang: '#UT#- Ohne Relaissprache -',
       ended: '#UT#beendet',
       noUsers: '#UT#Keine Benutzer zugeordnet!',
+      notFound: '#UT#nicht gefunden',
       locked: '#UT#in Arbeit',
       lockedBy: '#UT#Bearbeitet und Gesperrt durch {0}',
       lockedSystem: '#UT#Durch das System gesperrt mit dem Status \'{0}\'',
@@ -167,14 +168,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
    * @returns {String}
    */
   customerRenderer: function(val, md) {
-      var customer = this.customerStore.getById(val), 
+      var me = this,
+          customer = me.customerStore.getById(val), 
           label;
       if(customer){
           label = customer.get('name');
           md.tdAttr = 'data-qtip="' + label + ' (id: ' + val + ')"';
           return label;
       }
-      return '';
+      return me.strings.notFound;
   },
 
   initComponent: function() {
