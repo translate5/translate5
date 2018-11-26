@@ -237,8 +237,8 @@ function renderLocalesAsAvailable(accordingTo) {
         }
     } else if (accordingTo === 'reset' || selectedText === Editor.data.languageresource.translatedStrings['clearBothLists']) {
         // This means a "reset" of one or both the lists:
-        sourceLocalesAvailable = mtSourceLanguageLocales;
-        targetLocalesAvailable = mtTargetLanguageLocales;
+        sourceLocalesAvailable = allSourceLanguageLocales;
+        targetLocalesAvailable = allTargetLanguageLocales;
         source = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
         target = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
     } else {
@@ -585,6 +585,9 @@ function fillTranslation() {
             translationHtml += resultHtml;
         }
     });
+    if (translationHtml == '') {
+        showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
+    }
     $('#translations').html(translationHtml);
     showTranslations();
 }
@@ -894,6 +897,8 @@ function showSourceError(errorText) {
 function clearAllErrorMessages() {
     $('.instant-translation-error').hide();
     $("#sourceIsText").removeClass('source-text-error');
+    $('#sourceError').hide();
+    $("#targetError").hide();
 }
 /* --------------- show/hide: loading spinner ------------------------------- */
 // 'sign' = show indicator in addition to content (currently used for text-translations)

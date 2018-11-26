@@ -53,6 +53,7 @@ h4, p {
 
 .instant-translation-error {
     display: none;
+    padding: 3px;
 }
 
 .overflow {
@@ -181,13 +182,15 @@ h4, p {
 }
 
 /* --------------- source --------------- */
-    
+
+#sourceLanguageAndContent {
+    padding-right: 10px;
+}
 #sourceContent {
     z-index: 100;
 }
 #source textarea {
     width: 99%;
-    margin-right: 10px;
     height: 105px;
     font-family: verdana,helvetica,sans-serif;
     font-size: 17px;
@@ -199,7 +202,6 @@ h4, p {
 }
 #sourceFile {
     width: 94%;
-    margin-right: 10px;
 }
 #sourceContent,
 .show-if-source-is-file,
