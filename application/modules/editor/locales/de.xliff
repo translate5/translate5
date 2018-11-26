@@ -598,6 +598,7 @@
 <trans-unit id='w4RuZGVydW5nIGRlcyBXb3JrZmxvd3MgZGVyIEF1ZmdhYmUgZ2VzcGVpY2hlcnQh'><source>Änderung des Workflows der Aufgabe gespeichert!</source><target>Änderung des Workflows der Aufgabe gespeichert!</target></trans-unit>
 <trans-unit id='ZsO8ciBhbGxl'><source>für alle</source><target>für alle</target></trans-unit>
 <trans-unit id='S3VuZGUgZGVyIEF1ZmdhYmUgKEFuZ2FiZSBub3R3ZW5kaWcp'><source>Kunde der Aufgabe (Angabe notwendig)</source><target>Kunde der Aufgabe (Angabe notwendig)</target></trans-unit>
+<trans-unit id='bmljaHQgZ2VmdW5kZW4='><source>nicht gefunden</source><target>nicht gefunden</target></trans-unit>
 <trans-unit id='SWhyZSBEYXRlbiBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbiwgYmVpbSBTcGVpY2hlcm4ga2FtIGVzIHp1IGVpbmVtIEtvbmZsaWt0IQ=='><source>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</source><target>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</target></trans-unit>
 <trans-unit id='RWludHJhZyBnZXNwZWljaGVydCE='><source>Eintrag gespeichert!</source><target>Eintrag gespeichert!</target></trans-unit>
 <trans-unit id='RWludHJhZyBnZWzDtnNjaHQh'><source>Eintrag gelöscht!</source><target>Eintrag gelöscht!</target></trans-unit>
