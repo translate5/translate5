@@ -160,7 +160,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           md.tdAttr = 'data-qtip="' + label + '"';
           return label;
       }
-      return '';
+      return me.strings.notFound;
   },
   /**
    * renders the value (= names) of the customer column
