@@ -37,14 +37,14 @@
     
     foreach ($this->machineTranslationEngines as $languageResource) {
         $allCharacterLimits[] = $languageResource['characterLimit'];
-        foreach ($languageResource['source'] as $mtSourceLocale) {
-            if (!in_array($mtSourceLocale, $allSourceLanguageLocales)) {
-                $allSourceLanguageLocales[] = $mtSourceLocale;
+        foreach ($languageResource['source'] as $sourceLocale) {
+            if (!in_array($sourceLocale, $allSourceLanguageLocales)) {
+                $allSourceLanguageLocales[] = $sourceLocale;
             }
         }
-        foreach ($languageResource['target']as $key => $mtTargetLocale) {
-            if (!in_array($mtTargetLocale, $allTargetLanguageLocales)) {
-                $allTargetLanguageLocales[] = $mtTargetLocale;
+        foreach ($languageResource['target']as $key => $targetLocale) {
+            if (!in_array($targetLocale, $allTargetLanguageLocales)) {
+                $allTargetLanguageLocales[] = $targetLocale;
             }
         }
     }
@@ -79,6 +79,7 @@
         "copy"                      => $translate->_("Kopieren"),
         "enterText"                 => $translate->_("Geben Sie Text ein"),
         "serverErrorMsg500"         => $translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
+        "noResultsFound"            => $translate->_("Es wurden keine Ergebnisse gefunden."),
         "translate"                 => $translate->_("Übersetzen"),
         "orTranslateFile"           => $translate->_("oder lassen Sie ein Dokument übersetzen"),
         "orTranslateText"           => $translate->_("oder lassen Sie Text übersetzen, den Sie eingeben."),
@@ -161,10 +162,10 @@
 </div>
 
 <script type="text/javascript">
-    var mtSourceLanguageLocales = '<?php echo json_encode($allSourceLanguageLocales);?>';
-    mtSourceLanguageLocales = JSON.parse(mtSourceLanguageLocales);
-    var mtTargetLanguageLocales = '<?php echo json_encode($allTargetLanguageLocales);?>';
-    mtTargetLanguageLocales = JSON.parse(mtTargetLanguageLocales);
+    var allSourceLanguageLocales = '<?php echo json_encode($allSourceLanguageLocales);?>';
+    allSourceLanguageLocales = JSON.parse(allSourceLanguageLocales);
+    var allTargetLanguageLocales = '<?php echo json_encode($allTargetLanguageLocales);?>';
+    allTargetLanguageLocales = JSON.parse(allTargetLanguageLocales);
     var allLanguageResources = '<?php echo json_encode($this->machineTranslationEngines);?>';
     allLanguageResources = JSON.parse(allLanguageResources);
     var characterLimit = '<?php echo $characterLimit;?>';
