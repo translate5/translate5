@@ -72,7 +72,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       entryDeleted: '#UT#Eintrag gelöscht',
       entrySaveError: '#UT#Fehler beim Speichern der Änderungen!',
       forAll: '#UT#für alle',
-      customerTip: '#UT#Kunde der Aufgage (Angabe notwendig)',
+      customerTip: '#UT#Kunde der Aufgabe (Angabe notwendig)',
       customerLabel: '#UT#Kunde'
   },
   actualTask: null,
