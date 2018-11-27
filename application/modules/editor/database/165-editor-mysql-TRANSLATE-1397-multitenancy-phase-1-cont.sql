@@ -24,28 +24,16 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
-
--- create default customer if none exists
-INSERT INTO `LEK_customer` (`name`,`number`,`searchCharacterLimit`)
-SELECT * FROM (SELECT 'defaultcustomer','default for legacy data',100000) AS tmp
-WHERE NOT EXISTS (
-    SELECT * FROM `LEK_customer` WHERE `LEK_customer`.`name` = 'defaultcustomer'
-) LIMIT 1;
-
--- add column for task-customer-assoc (each task can be assigned to one customer only => INT(11) as for customer-id)
-ALTER TABLE `LEK_task`
-ADD COLUMN `customerId` INT(11) NULL COMMENT 'Client (= id from table LEK_customer)';
-
--- set defaultcustomer as default customer for every task (this is the initial step, so we can set it for all)
-UPDATE `LEK_task` AS task, `LEK_customer` AS customer 
-SET task.customerId = customer.id
-WHERE customer.name = 'defaultcustomer';
-
--- set foreign key for task-customer-assoc
-ALTER TABLE `LEK_task`
-ADD INDEX `fk_LEK_task_1_idx` (`customerId` ASC),
-ADD CONSTRAINT `fk_LEK_task_1`
-  FOREIGN KEY (`customerId`)
-  REFERENCES `LEK_customer` (`id`)
-  ON DELETE RESTRICT;
+  
+-- assign all language resources which are not belonging to any customer to the default customer
+-- step 1: get customerId
+SELECT @cust_id := id
+FROM LEK_customer
+WHERE name = 'defaultcustomer';
+-- step 2: insert language resources that are not assigned so far
+INSERT INTO LEK_languageresources_customerassoc (languageResourceId, customerId, useAsDefault)
+SELECT res.id, @cust_id, 0
+FROM LEK_languageresources res
+LEFT JOIN LEK_languageresources_customerassoc assoc ON res.id = assoc.languageResourceId
+WHERE assoc.id IS NULL;
 
