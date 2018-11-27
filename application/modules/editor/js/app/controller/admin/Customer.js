@@ -59,6 +59,9 @@ Ext.define('Editor.controller.admin.Customer', {
             '#btnCustomerOverviewWindow': {
                 click: 'onCustomerOverviewClick'
             },
+            '#customerSwitch': {
+                change: 'onCustomerSwitch'
+            },
             'customerPanel':{
                 show: 'onCustomerPanelShow'
             },
@@ -113,6 +116,15 @@ Ext.define('Editor.controller.admin.Customer', {
             itemId: 'btnCustomerOverviewWindow',
             text:this.strings.customer
         });
+        
+        // add the drop-down "Switch client"
+       var pos = toolbar.items.length - 1;
+        toolbar.insert(pos, {
+            xtype: 'usercustomerscombo',
+            allowBlank: true,
+            itemId: 'customerSwitch',
+            fieldLabel: ''
+        });
     },
 
     /***
@@ -124,6 +136,15 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         //set the component to visible on each centar panel element hide
         this.setCustomerOverviewButtonHidden(false);
+    },
+
+    /**
+     * "Switch client" drop-down change handler
+     */
+    onCustomerSwitch:function(combo, customerId){
+        var tasks = Ext.StoreMgr.get('admin.Tasks');
+        tasks.clearFilter();
+        tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
     },
 
     /**
