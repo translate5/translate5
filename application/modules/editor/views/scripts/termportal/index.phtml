@@ -44,8 +44,18 @@
     }
     echo '</select>';
     echo '</form>';
+    
+    $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+    /* @var $userModel ZfExtended_Models_User */
+    $isUserAllowed=$userModel->isAllowed("editor_instanttranslate","all");
+    
+    //check if the user is allowed to acces the term portal
+    if($isUserAllowed){
+        echo '<div id="instantTranslate"><a class="ui-button ui-widget ui-corner-all">'.$translate->_("Sofortübersetzung").'</a></div>';
+    }else{
+        echo '<div id="instantTranslate"></div>';
+    }
 ?>
-	<div id="instantTranslate"><a class="ui-button ui-widget ui-corner-all"><?php echo $translate->_("Sofortübersetzung"); ?></a></div>
     <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
 </div>
         
