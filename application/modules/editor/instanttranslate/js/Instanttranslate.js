@@ -834,7 +834,14 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 
 /* --------------- open TermPortal ------------------------------------------ */
 $('#translations').on('touchstart click','.term-info',function(){
-    window.open(Editor.data.restpath+"termportal?term="+$(this).attr('id')+"&lang="+$("#targetLocale").val(), '_blank');
+    var url=Editor.data.restpath+"termportal",
+        params="term="+$(this).attr('id')+"&lang="+$("#targetLocale").val();
+    
+    window.parent.loadIframe('termportal',url,params);
+});
+
+$('#termPortal').on('touchstart click',function(){
+    window.parent.loadIframe('termportal',Editor.data.restpath+'termportal');
 });
 
 /* --------------- show/hide: helpers --------------------------------------- */

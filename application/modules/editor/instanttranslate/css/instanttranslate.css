@@ -121,18 +121,17 @@ h4, p {
     background-size: auto auto;
     background-size: 150px;
 }
-#languageSelector {
-    flex: 1 0 auto;
+#termPortal{
     order: 2;
+    flex: 1 0 auto;
     text-align: right;
     margin-right: 7px;
 }
-#locale-button {width: 9em;}
-#termPortal{
-	flex: 0 0 80px;
+#languageSelector {
     order: 3;
     text-align: right;
 }
+#locale-button {width: 9em;}
 #logout {
     flex: 0 0 80px;
     order: 4;
