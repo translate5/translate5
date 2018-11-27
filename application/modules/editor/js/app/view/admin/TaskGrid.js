@@ -153,12 +153,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
    * @returns {String}
    */
   langRenderer: function(val, md) {
-      var lang = this.languageStore.getById(val), 
+      var me = this,
+          lang = me.languageStore.getById(val), 
           label;
       if(lang){
           label = lang.get('label');
           md.tdAttr = 'data-qtip="' + label + '"';
           return label;
+      }
+      if (!val || val == "0") {
+          return '';
       }
       return me.strings.notFound;
   },
