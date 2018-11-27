@@ -2507,7 +2507,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='VmVyYW50d29ydGxpY2g='>     
 <source>Verantwortlich</source>     
-<target>Responsible</target> 
+<target>Responsibility</target> 
 </trans-unit>  
 
 <trans-unit id='RGF0dW0='>     
@@ -2517,7 +2517,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='TGV0enRlIMOEbmRlcnVuZw=='>     
 <source>Letzte Änderung</source>     
-<target>Last modification</target> 
+<target>Modification</target> 
 </trans-unit>  
 
 <trans-unit id='VGVybSBUeXA='>     
@@ -2532,7 +2532,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='QWJrw7xyenVuZyBmw7xy'>     
 <source>Abkürzung für</source>     
-<target>Abbreviation of</target> 
+<target>Abbreviated form for</target> 
 </trans-unit>  
 
 <trans-unit id='QXVzc3ByYWNoZQ=='>     
@@ -2542,7 +2542,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
  <trans-unit id='RWluc3R1ZnVuZw=='>     
  <source>Einstufung</source>     
- <target>Normative Authorization</target> 
+ <target>Normative authorization</target> 
  </trans-unit>
 <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='>
   <source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source>
@@ -2907,6 +2907,77 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Für diese Kunden nutzen</source>
     <target>Use for selected clients</target>
 </trans-unit>
+
+<trans-unit id='RmFjaGdlYmlldA=='>
+    <source>Fachgebiet</source>
+    <target>Subject field</target>
+</trans-unit>
+
+<trans-unit id='VmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Verwandtes Konzept</source>
+    <target>Related concept</target>
+</trans-unit>
+
+<trans-unit id='RXJ3ZWl0ZXJ0ZXMgdmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Erweitertes verwandtes Konzept</source>
+    <target>Related broader concept</target>
+</trans-unit>
+
+<trans-unit id='UHJvZHVrdC1VbnRlcm1lbmdl'>
+    <source>Produkt-Untermenge</source>
+    <target>Product subset</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlbmlkZW50aWZpa2F0b3I='>
+    <source>Quellenidentifikator</source>
+    <target>Source identifier</target>
+</trans-unit>
+
+<trans-unit id='V29ydGFydA=='>
+    <source>Wortart</source>
+    <target>Part of speech</target>
+</trans-unit>
+
+<trans-unit id='S29udGV4dA=='>
+    <source>Kontext</source>
+    <target>Context</target>
+</trans-unit>
+
+<trans-unit id='VGVpbGJlcmVpY2ggZGVyIEdlc2Now6RmdHNlaW5oZWl0'>
+    <source>Teilbereich der Geschäftseinheit</source>
+    <target>Business unit subset</target>
+</trans-unit>
+
+<trans-unit id='UHJvamVrdHVudGVybWVuZ2U='>
+    <source>Projektuntermenge</source>
+    <target>Project subset</target>
+</trans-unit>
+
+<trans-unit id='R3JhbW1hdGlrYWxpc2NoZXMgR2VzY2hsZWNodA=='>
+    <source>Grammatikalisches Geschlecht</source>
+    <target>Grammatical gender</target>
+</trans-unit>
+
+<trans-unit id='QW5tZXJrdW5n'>
+    <source>Anmerkung</source>
+    <target>Note</target>
+</trans-unit>
+
+<trans-unit id='QWRtaW5pc3RyYXRpdmVyIFN0YXR1cw=='>
+    <source>Administrativer Status</source>
+    <target>Administrative status</target>
+</trans-unit>
+
+<trans-unit id='w5xiZXJ0cmFndW5nc2tvbW1lbnRhcg=='>
+    <source>Übertragungskommentar</source>
+    <target>Transfer comment</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='>
+    <source>Quelle des Eintrags</source>
+    <target>Entry source</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
