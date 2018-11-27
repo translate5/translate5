@@ -1280,6 +1280,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='><source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source><target>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='><source>Kundenübersicht</source><target>Kundenübersicht</target></trans-unit>
+<trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='><source>Hinzufügen</source><target>Hinzufügen</target></trans-unit>
 <trans-unit id='S3VuZGVubmFtZQ=='><source>Kundenname</source><target>Kundenname</target></trans-unit>
 <trans-unit id='S3VuZGVubnVtbWVy'><source>Kundennummer</source><target>Kundennummer</target></trans-unit>

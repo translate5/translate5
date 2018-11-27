@@ -2414,6 +2414,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Clients overview</target>
 </trans-unit>
 
+<trans-unit id="QWxsZSBLdW5kZW4=">
+    <source>Alle Kunden</source>
+    <target>All clients</target>
+</trans-unit>
+
+
 <trans-unit id='SGluenVmw7xnZW4='>
     <source>Hinzufügen</source>
     <target>Add</target>
