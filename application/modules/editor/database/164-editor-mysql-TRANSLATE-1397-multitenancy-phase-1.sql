@@ -36,7 +36,7 @@ WHERE NOT EXISTS (
 ALTER TABLE `LEK_task`
 ADD COLUMN `customerId` INT(11) NULL COMMENT 'Client (= id from table LEK_customer)';
 
--- set defaultcustomer as default customer for every task
+-- set defaultcustomer as default customer for every task (this is the initial step, so we can set it for all)
 UPDATE `LEK_task` AS task, `LEK_customer` AS customer 
 SET task.customerId = customer.id
 WHERE customer.name = 'defaultcustomer';
@@ -49,3 +49,15 @@ ADD CONSTRAINT `fk_LEK_task_1`
   REFERENCES `LEK_customer` (`id`)
   ON DELETE RESTRICT;
   
+-- assign all language resources which are not belonging to any customer to the default customer
+-- step 1: get customerId
+SELECT @cust_id := id
+FROM LEK_customer
+WHERE name = 'defaultcustomer';
+-- step 2: insert language resources that are not assigned so far
+INSERT INTO LEK_languageresources_customerassoc (languageResourceId, customerId, useAsDefault)
+SELECT res.id, @cust_id, 0
+FROM LEK_languageresources res
+LEFT JOIN LEK_languageresources_customerassoc assoc ON res.id = assoc.languageResourceId
+WHERE assoc.id IS NULL;
+
