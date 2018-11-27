@@ -60,7 +60,8 @@ Ext.define('Editor.controller.admin.Customer', {
                 click: 'onCustomerOverviewClick'
             },
             '#customerSwitch': {
-                change: 'onCustomerSwitch'
+                afterrender: 'onCustomerSwitchAfterRender',
+                change: 'onCustomerSwitchChange'
             },
             'customerPanel':{
                 show: 'onCustomerPanelShow'
@@ -88,7 +89,8 @@ Ext.define('Editor.controller.admin.Customer', {
     },
 
     strings:{
-        customer:'#UT#Kunden'
+        customer:'#UT#Kunden',
+        allCustomers:'#UT#Alle Kunden'
     },
     
     /***
@@ -139,11 +141,28 @@ Ext.define('Editor.controller.admin.Customer', {
     },
 
     /**
+     * "Switch client" drop-down after render handler
+     */
+    onCustomerSwitchAfterRender:function(combo){
+        var allCustomers = this.strings.allCustomers;
+        combo.getStore().on("load", function(store, items){
+            store.insert(0, [{
+                name: allCustomers,
+                id: 0
+            }]);
+            combo.setValue(0);
+        });
+    },
+
+    /**
      * "Switch client" drop-down change handler
      */
-    onCustomerSwitch:function(combo, customerId){
+    onCustomerSwitchChange:function(combo, customerId){
         var tasks = Ext.StoreMgr.get('admin.Tasks');
         tasks.clearFilter();
+        if(customerId == 0) {
+            return;
+        }
         tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
     },
 
