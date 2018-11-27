@@ -191,10 +191,7 @@ Ext.define('Editor.controller.admin.Customer', {
             cls: 'customers',
             text:this.strings.customer,
             filter: {
-                type: 'list',
-                store:Ext.StoreManager.get('customersStore'),
-                idField:'id',
-                labelField:'name'
+                type: 'string'
             },
             renderer: function(v, meta, rec){
                 var names = [];
