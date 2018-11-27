@@ -157,7 +157,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                             return record.get('status') == 'novalidlicense' ? true : false;
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-	                    	if(r.get('resourceType')==Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
+                            var service=Editor.util.LanguageResources.getService(r.get('serviceName'));
+	                    	if(service.id==r.get('serviceName')){
 	                    		return me.strings.importCollection;
 	                    	}
 	                    	return me.strings.import;
