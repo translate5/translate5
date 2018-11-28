@@ -98,7 +98,10 @@ Ext.define('Editor.controller.Termportal', {
      */
     onTermPortalButtonClick:function(){
         if(this.isTermportalAllowed()){
-            window.open(Editor.data.restpath+"termportal", '_blank');
+            var apiUrl=Editor.data.restpath+'termportal',
+                appName='termportal',
+                url=Editor.data.restpath+'apps?name='+appName+'&apiUrl='+apiUrl;
+            window.open(url, '_blank');
         }  
     },
     
