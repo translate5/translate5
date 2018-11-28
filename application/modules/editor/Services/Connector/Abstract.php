@@ -98,14 +98,14 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /**
-     * Link this Connector Instance to the given LanguageResource and its resource
+     * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param integer $sourceLang language id, optional 
-     * @param integer $targetLang language id, optional 
+     * @param integer $sourceLang language id 
+     * @param integer $targetLang language id 
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        $this->sourceLang=$sourceLang;
-        $this->targetLang=$targetLang;
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
+        $this->sourceLang = $sourceLang;
+        $this->targetLang = $targetLang;
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
         $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();

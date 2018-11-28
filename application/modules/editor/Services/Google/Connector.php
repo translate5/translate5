@@ -35,19 +35,13 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     protected $api;
 
-    /***
-     * api class
-     * @var string
-     */
-    protected $apiClass='editor_Services_Google_HttpApi';
-    
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::connectTo()
+     * @see editor_Services_Connector_Abstract::__construct()
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
-        $this->api = ZfExtended_Factory::get($this->apiClass, [$languageResource]);
+    public function __construct() {
+        parent::__construct();
+        $this->api = ZfExtended_Factory::get('editor_Services_Google_HttpApi');
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->google->matchrate;

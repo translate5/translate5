@@ -33,11 +33,6 @@ use Google\Cloud\Core\Exception\BadRequestException;
 
 class editor_Services_Google_HttpApi {
     /**
-     * @var editor_Models_LanguageResources_LanguageResource
-     */
-    protected $languageResource;
-    
-    /**
      * @var stdClass
      */
     protected $result;
@@ -63,8 +58,7 @@ class editor_Services_Google_HttpApi {
      */
     protected $projectId;
     
-    public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource) {
-        $this->languageResource = $languageResource;
+    public function __construct() {
         $this->initApi();
     }
     
