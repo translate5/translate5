@@ -51,8 +51,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
-        import: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
-        importCollection:'#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
@@ -150,18 +148,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                             return record.get('status') == 'novalidlicense' ? true : false;
                         }
                     },{
-                        //tooltip: me.strings.import,
                         action: 'import',
                         iconCls: 'ico-tm-import',
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return record.get('status') == 'novalidlicense' ? true : false;
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-                            var service=Editor.util.LanguageResources.getService(r.get('serviceName'));
-	                    	if(service.id==r.get('serviceName')){
-	                    		return me.strings.importCollection;
-	                    	}
-	                    	return me.strings.import;
+                            return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip();
 	                    }
                     },{
                         tooltip: me.strings.download,

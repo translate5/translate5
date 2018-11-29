@@ -40,6 +40,9 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     requires: ['Editor.view.LanguageResources.services.Default'],
     extends: 'Editor.view.LanguageResources.services.Default',
     id: 'TermCollection',
+
+    addTooltip: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
+
     /**
      * returns the row css class for the associated service in the tm overview panel
      * @param {Editor.model.LanguageResources.LanguageResource} rec
@@ -50,5 +53,12 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
         result.push('language-ressource-import');
         result.push('languageResource-status-'+record.get('status'));
         return result;
+    },
+
+    /***
+     * Term collection tooltip for add/import term collection button. This is rendered in the language resources grid.
+     */
+    getAddTooltip:function(){
+        return this.addTooltip;
     }
 });

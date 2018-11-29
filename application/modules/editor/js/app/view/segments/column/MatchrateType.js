@@ -170,6 +170,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             firstType, useAsLabel,
             prefix = value.shift(), //import, edited, pretranslated
             isImport = (prefix == 'import'),
+            resourceName='',
             translate = function(value) {
                 return me.strings.type[value] || value;
             },
@@ -212,12 +213,13 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         if(firstType == 'unknown' || prefix == 'pretranslated') {
             useAsLabel = value.shift(); //when unknown remove it to prevent a not found image, the real value is in the next field
         }
-        
+
         //translating and formatting known types 
         label = Ext.String.format(me.strings[prefix], translate(useAsLabel));
-        if(value.length > 0) {
-            label = label + ' (' + value.join(';') + ')';
+        if(value.length>0){
+            label = label + ' (' +value.join(';')+ ')';
         }
+
         //using tooltip 
         qtip(meta, label, me.strings[prefix+'Desc'][firstType]);
         value.unshift(firstType);
@@ -226,14 +228,11 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             var path;
             if(Editor.data.segments.matchratetypes && Editor.data.segments.matchratetypes[val]) {
                 path = Editor.data.segments.matchratetypes[val];
+                value[idx] = {
+                    type: val,
+                    path: path
+                };
             }
-            else {
-                path = Editor.data.moduleFolder+'images/matchratetypes/'+val+'.png';
-            }
-            value[idx] = {
-                type: val,
-                path: path
-            };
         });
         return me.imgTpl.apply({types: value, edited: !isImport});
     }

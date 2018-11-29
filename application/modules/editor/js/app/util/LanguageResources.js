@@ -33,7 +33,8 @@ Ext.define('Editor.util.LanguageResources', {
 	strings: {
 		exactMatch:'#UT#101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.',
         repetitionMatch:'#UT#Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.',
-		contextMatch:'#UT#103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.'
+		contextMatch:'#UT#103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.',
+		termcollectionMatch:'#UT#104% ist ein 100% Treffer, der aus einer Termcollection kommt.'
     },
     
     statics: {
@@ -77,20 +78,19 @@ Ext.define('Editor.util.LanguageResources', {
     },
     
     /***
-     *  Get the match rate (only for 103,102,101 matches) tooltip depending of the match rate percent
+     *  Get the match rate (only for 104,103,102,101 matches) tooltip depending of the match rate percent
      */
     getMatchrateTooltip:function(matchrate){
     	matchrate=parseInt(matchrate);
     	switch(matchrate) {
     		case 101:
 		    	return this.strings.exactMatch;
-		        break;
 		    case 102:
 		    	return this.strings.repetitionMatch;
-		        break;
 		    case 103:
 		    	return this.strings.contextMatch;
-		        break;
+			case 104:
+		    	return this.strings.termcollectionMatch;
 		    default:
 		    	return "";
 		}
