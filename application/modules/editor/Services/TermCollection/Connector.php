@@ -105,10 +105,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $this->resultList->setDefaultSource($queryString);
         
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
-        $queryString = $internalTag->toXliffPaired($queryString, true);
+        //query sdlcloud without tags
+        $queryString = $segment->stripTags($queryString);
         
         return $this->queryCollectionResults($queryString);
     }

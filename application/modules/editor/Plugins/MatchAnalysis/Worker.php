@@ -55,6 +55,25 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     protected function doWork() {
         $params = $this->workerModel->getParameters();
+
+        $oldState=null;
+        $newState=null;
+        
+        //can the task be locked
+        if(!$this->task->lock(NOW_ISO, true)) {
+            
+            //if the task is not in state import, the task is in use(can not be locked)
+            if($this->task->getState()!=editor_Models_Task::STATE_IMPORT){
+                error_log('Match analysis and pretranslation canot be run. The following task is in use: '.$this->task->getTaskName().' ('.$this->task->getTaskGuid().')');
+                return;
+            }
+        }else{
+            //lock the task while match analysis are running
+            $oldState = $this->task->getState();
+            $newState='matchanalysis';
+            $this->task->setState('matchanalysis');
+            $this->task->save();
+        }
         
         $pretranslate=false;
         if(isset($params['pretranslate'])){
@@ -66,13 +85,9 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $internalFuzzy=$params['internalFuzzy'];
         }
         
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->taskGuid);
-        
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
-        $analysisAssoc->setTaskGuid($task->getTaskGuid());
+        $analysisAssoc->setTaskGuid($this->task->getTaskGuid());
         
         //set flag for internal fuzzy usage
         if(isset($params['internalFuzzy'])){
@@ -85,7 +100,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         $analysisId=$analysisAssoc->save();
         
-        $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
+        $analysis=new editor_Plugins_MatchAnalysis_Analysis($this->task,$analysisId);
         /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
         $analysis->setPretranslate($pretranslate);
         $analysis->setInternalFuzzy($internalFuzzy);
@@ -106,6 +121,14 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         if(isset($params['pretranslateTmAndTerm'])){
             $analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         }
-        return $analysis->calculateMatchrate();
+        $return=$analysis->calculateMatchrate();
+        
+        //unlock the state
+        if(!empty($newState)){
+            $this->task->setState($oldState);
+            $this->task->save();
+            $this->task->unlock();
+        }
+        return $return;
     }
 }

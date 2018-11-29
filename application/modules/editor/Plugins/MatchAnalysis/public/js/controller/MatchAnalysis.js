@@ -71,6 +71,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         preTranslation:'#UT#Analyse &amp; Vorübersetzungen starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
+        finishAnalysisMsg:'#UT#Die Match-Analyse und die Vorübersetzung sind abgeschlossen.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
         pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
         pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist',
@@ -301,9 +302,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Load match resources task assoc store
      */
     loadTaskAssoc:function(task){
-        var me=this,
-	        taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
-	    
+        var taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
 	    //load the task assoc store
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);
     },
@@ -338,12 +337,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startAnalysis:function(taskId,operation){
     	//'editor/:entity/:id/operation/:operation',
-        var me=this;
-        			
-        me.reloadTaskRecord(taskId);
+        var me=this,
+            assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
         
-    	Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
-    	Ext.Ajax.request({
+        Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
+        assocPanel.getEl().mask('Loading...')
+        
+        Ext.Ajax.request({
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
             params: {
@@ -355,24 +355,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             scope: this,
             timeout:600000,
             success: function(response){
-            	me.reloadTaskRecord(taskId);
+                me.checkTaskState(taskId);
             }, 
             failure: function(response){
+                assocPanel.getEl().unmask()
             	Editor.app.getController('ServerException').handleException(response);
-            	me.reloadTaskRecord(taskId);
             }
         })
-    },
-    
-    /***
-     * Reload task record
-     */
-    reloadTaskRecord:function(taskId){
-    	var me=this,
-    		taskOverview = me.application.getController('admin.TaskOverview'),
-    		taskStore=taskOverview.getAdminTasksStore();
-		//TODO reload only one row
-    	taskStore.reload();
     },
 
     /***
@@ -406,5 +395,49 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		return;
     	}
     	return cmp[0];
+    },
+
+    /***
+     * Check the task state on each 10 secounds.
+     * It is used to check if the matchanalysis are finished.
+     */
+    checkTaskState:function(taskId){
+        var me=this,
+            runTask={
+                run:function(){
+                    //get the task from the task store
+                    var task=Ext.StoreManager.get('admin.Tasks').getById(taskId);
+
+                    //load the task on each 10 sec, so the task status is checked
+                    task.load({
+                        success:function(record){
+                            var assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
+
+                            //the task state is different as matchanalysis
+                            if(record.get('state')!='matchanalysis'){
+
+                                //stop the task loop
+                                Ext.TaskManager.stop(runTask);
+                                //remove the mask from the task assoc panel if exist
+                                if(assocPanel){
+                                    assocPanel.getEl().unmask();
+                                }
+                                Editor.MessageBox.addSuccess(me.strings.finishAnalysisMsg);
+                            }
+                        },
+                        failure: function(response){
+                            var assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
+                            Ext.TaskManager.stop(runTask);
+                            if(assocPanel){
+                                assocPanel.getEl().unmask();
+                            }
+                        }
+                    });
+                },
+                scope: this,
+                interval: 10000
+            };
+        //start the task
+        Ext.TaskManager.start(runTask);
     }
 });

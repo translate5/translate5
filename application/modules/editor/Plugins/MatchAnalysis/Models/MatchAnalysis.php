@@ -120,8 +120,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      */
     protected function groupByMatchrate(array $results,array $analysisAssoc){
 
-        //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
-        $groupBorder=['102'=>'103','101'=>'102','100'=>'101','99'=>'100','89'=>'99','79'=>'89','69'=>'79','59'=>'69','50'=>'59','noMatch'=>'noMatch'];
+        //104%, 103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
+        $groupBorder=['103'=>'104','102'=>'103','101'=>'102','100'=>'101','99'=>'100','89'=>'99','79'=>'89','69'=>'79','59'=>'69','50'=>'59','noMatch'=>'noMatch'];
         
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         

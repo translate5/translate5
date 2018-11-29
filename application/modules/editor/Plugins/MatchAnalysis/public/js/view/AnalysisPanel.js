@@ -111,6 +111,18 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     },{
                         xtype: 'gridcolumn',
                         flex: 2,
+                        dataIndex: '104',
+                        cellWrap: true,
+                        text: "104%",
+                        tooltip:Editor.util.LanguageResources.getMatchrateTooltip(104),
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                            return me.calculateRowSum(104,analysisStore);
+                        },
+                        renderer:columnRenderer,
+                    },{
+                        xtype: 'gridcolumn',
+                        flex: 2,
                         dataIndex: '103',
                         cellWrap: true,
                         text: "103%",

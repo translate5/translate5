@@ -1409,9 +1409,9 @@
     <source>{0} (importiert)</source>
     <target>{0} (imported)</target>
 </trans-unit>
-<trans-unit id='ezB9ICh0cmFuc2xhdGU1KQ=='>
-    <source>{0} (translate5)</source>
-    <target>{0} (translate5)</target>
+<trans-unit id='ezB9'>
+  <source>{0}</source>
+  <target>{0}</target>
 </trans-unit>
 <trans-unit id='ezB9ICh2b3LDvGJlcnNldHp0KQ=='>
     <source>{0} (vorübersetzt)</source>
@@ -2498,6 +2498,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='MTAzJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdCAod2llIGVpbiAxMDElIFRyZWZmZXIpLiBadXPDpHR6bGljaCB6dW0gMTAxJSBUcmVmZmVyIGlzdCBkaWUgU2VnbWVudC1JRCBub2NoIGlkZW50aXNjaCBvZGVyIGdsZWljaCBtaXQgZGVyIFNlZ21lbnQtSUQgaW4gZGVyIGFrdHVlbGxlbiBEYXRlaS4='>
 <source>103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.</source>
 <target>103% is a 100% match that originally came from a file with the same name (like a 101% match). In addition to the 101% match, the segment ID is still the same or equal to the segment ID in the current file.</target>
+</trans-unit>
+
+<trans-unit id='MTA0JSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIGF1cyBlaW5lciBUZXJtY29sbGVjdGlvbiBrb21tdC4='>
+<source>104% ist ein 100% Treffer, der aus einer Termcollection kommt.</source>
+<target>104% is a 100% match coming from a term collection.</target>
 </trans-unit>
 
 <trans-unit id='RXJzdGVsbHVuZw=='>     

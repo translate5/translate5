@@ -85,6 +85,9 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             return $this->resultList;
         }
         $this->resultList->setDefaultSource($queryString);
+        
+        //query google without tags
+        $queryString = $segment->stripTags($queryString);
         return $this->queryGoogleApi($queryString);
     }
     

@@ -112,6 +112,12 @@
 		    <source>Analyse</source>
 		    <target>Analyse</target>
 		</trans-unit>
+
+		<trans-unit id='RGllIE1hdGNoLUFuYWx5c2UgdW5kIGRpZSBWb3LDvGJlcnNldHp1bmcgc2luZCBhYmdlc2NobG9zc2VuLg=='>
+		    <source>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</source>
+		    <target>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</target>
+		</trans-unit>
+		
     </body>
   </file>
 </xliff>

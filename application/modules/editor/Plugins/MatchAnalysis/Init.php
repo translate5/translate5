@@ -118,7 +118,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $worker = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Worker');
         /* @var $worker editor_Plugins_MatchAnalysis_Worker */
         
-        
         $user = new Zend_Session_Namespace('user');
         $eventParams['userGuid']=$user->data->userGuid;
         $eventParams['userName']=$user->data->userName;
@@ -143,73 +142,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $worker->queue($parentWorkerId);
     }
     
-    /***
-     * Run match analysis and pretranslation
-     * 
-     * @param editor_Models_Task $task
-     * @param boolean $pretranslate
-     * @param array $eventParams
-     */
-    protected function runAnalysis(editor_Models_Task $task,$pretranslate=false,$eventParams=array()){
-        
-        if(!$this->checkLanguageResources($task->getTaskGuid())){
-            error_log("The associated language resource can not be used for analysis.");
-            return;
-        }
-        
-        if(!$task->lock(NOW_ISO, true)) {
-            error_log('Match analysis and pretranslation canot be run. The following task is in use: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
-            continue;
-        }
-        
-        //lock the task while match analysis are running
-        $oldState = $task->getState();
-        $task->setState('matchanalysis');
-        $task->save();
-        
-        //create new analysis
-        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
-        $analysisAssoc->setTaskGuid($task->getTaskGuid());
-        
-        //set flag for internal fuzzy usage
-        $analysisAssoc->setInternalFuzzy($eventParams['internalFuzzy']);
-        
-        //set pretranslation matchrate used for the anlysis
-        $analysisAssoc->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
-        
-        $analysisId=$analysisAssoc->save();
-        
-        try {
-            $analysis=new editor_Plugins_MatchAnalysis_Analysis($task,$analysisId);
-            /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
-            $analysis->setPretranslate($pretranslate);
-            $user = new Zend_Session_Namespace('user');
-            
-            $analysis->setInternalFuzzy($eventParams['internalFuzzy']);
-            $analysis->setPretranslateMatchrate($eventParams['pretranslateMatchrate']);
-            $analysis->setPretranslateMt($eventParams['pretranslateMt']);
-            $analysis->setPretranslateTmAndTerm($eventParams['pretranslateTmAndTerm']);
-            
-            $analysis->setUserGuid($user->data->userGuid);
-            $analysis->setUserName($user->data->userName);
-            $analysis->calculateMatchrate();
-        } catch (ZfExtended_Exception $e) {
-            //error_log("Error happend on match analysis and pretranslation (taskGuid=".$task->getTaskGuid()."). Error was: ".$e->getMessage());
-            error_log($e->getMessage());
-            //inlock the task
-            $task->setState($oldState);
-            $task->save();
-            $task->unlock();
-            throw $e;
-        }
-        
-        //inlock the task
-        $task->setState($oldState);
-        $task->save();
-        $task->unlock();
-    }
-    
     public function handleOnAnalysisOperation(Zend_EventManager_Event $event){
         //if the task is in import state -> queue the worker, do not pretranslate
         //if the task is allready imported -> run the analysis directly, do not pretranslate
@@ -229,7 +161,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @param boolean $pretranlsate
      */
-    private function handleOperation(Zend_EventManager_Event $event,$pretranlsate=false){
+    protected function handleOperation(Zend_EventManager_Event $event,$pretranlsate=false){
         $task = $event->getParam('entity');
         $params = $event->getParam('params');
         
@@ -238,13 +170,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         settype($params['pretranslateTmAndTerm'], 'boolean');
         settype($params['pretranslateMt'], 'boolean');
         
-        /* @var $task editor_Models_Task */
-        //if the task is in import state -> queue the worker
-        if($task->getState()==editor_Models_Task::STATE_IMPORT){
-            $this->queueAnalysis($task->getTaskGuid(),$pretranlsate,$params);
-            return;
-        }
-        $this->runAnalysis($task,$pretranlsate,$params);
+        $this->queueAnalysis($task->getTaskGuid(),$pretranlsate,$params);
     }
 
     /***
@@ -255,7 +181,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * 
      * @return boolean
      */
-    private function checkLanguageResources($taskGuid){
+    protected function checkLanguageResources($taskGuid){
         $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
         

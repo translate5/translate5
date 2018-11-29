@@ -370,8 +370,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             return;
         }
         
+        //just to display the TM name too, we add it here to the type
+        $type = $languageresource->getServiceName().' - '.$languageresource->getName();
+        
         //set the type
-        $matchrateType->initEdited($languageresource->getResource()->getType());
+        $matchrateType->initEdited($languageresource->getResource()->getType(),$type);
         
         //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
         //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);

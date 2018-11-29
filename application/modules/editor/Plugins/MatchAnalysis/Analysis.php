@@ -101,12 +101,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $repetitionByHash=array();
 
+        $taskTotalWords=0;
         //init the word count calculator
         $this->initWordCount();
         foreach($segments as $segment) {
             /* @var $segment editor_Models_Segment */
 
             $this->wordCount->setSegment($segment);
+            
+            //collect the total words in the task
+            $taskTotalWords+=$this->wordCount->getSourceCount();
             
             //calculate and set segment hash
             $segmentHash = $segment->getSourceMd5();
@@ -155,6 +159,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
+        
+        //update the task total words
+        $this->task->setWordCount($taskTotalWords);
+        $this->task->save();
+        
         return true;
     }
     

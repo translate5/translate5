@@ -129,6 +129,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return;
         }
         
+        //if the result language resource is termcollection, set the target result first character to uppercase
+        if($this->isTermCollection($languageResourceid)){
+            $targetResult=ZfExtended_Utils::mb_ucfirst($targetResult);
+        }
+        
         $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $internalTag editor_Models_Segment_InternalTag */
         
@@ -283,6 +288,22 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return $result;
         }
         return null;
+    }
+    
+    /***
+     * Check if the given language resource id is a valid termcollection resource
+     * @param integer $languageResourceId
+     * @return boolean
+     */
+    protected function isTermCollection($languageResourceId){
+        if(!isset($this->resources[$languageResourceId])){
+            return false;
+        }
+        $lr=$this->resources[$languageResourceId];
+        /* @var $lr editor_Models_LanguageResources_LanguageResource */
+        $tcs=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $tcs editor_Services_TermCollection_Service */
+        return $lr->getServiceName()==$tcs->getName();
     }
     
     public function setUserGuid($userGuid) {

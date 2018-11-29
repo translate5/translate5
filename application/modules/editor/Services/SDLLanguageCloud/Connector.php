@@ -78,7 +78,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         
         $this->resultList->setDefaultSource($queryString);
         
-        //query moses without tags
+        //query sdlcloud without tags
         $queryString = $segment->stripTags($queryString);
         return $this->querySdlApi($queryString);
     }

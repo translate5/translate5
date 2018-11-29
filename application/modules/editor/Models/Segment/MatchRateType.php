@@ -127,6 +127,13 @@ class editor_Models_Segment_MatchRateType {
      */
     const PREFIX_PRETRANSLATED = 'pretranslated';
     
+    
+    /***
+     * All match rate types which are requiring an icon
+     * @var array
+     */
+    const TYPES_WITH_ICONS=array(self::TYPE_TM,self::TYPE_MT,self::TYPE_TERM_COLLECTION);
+    
     /**
      * internal map for import conversion 
      * @var array
@@ -150,6 +157,7 @@ class editor_Models_Segment_MatchRateType {
      * @var ZfExtended_Log
      */
     static protected $log;
+    
     
     public function __construct() {
         self::initValidTypes();
@@ -247,12 +255,6 @@ class editor_Models_Segment_MatchRateType {
         //fallback when no type was given
         if(empty($types)) {
             $types = [self::TYPE_INTERACTIVE];
-        }
-        foreach($types as $type) {
-            if(!$this->isValidType($type)) {
-                array_unshift($types, self::TYPE_UNKNOWN);
-                break;
-            }
         }
         array_unshift($types, self::PREFIX_EDITED);
         $this->data = $types;
