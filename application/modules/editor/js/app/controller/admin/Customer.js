@@ -93,6 +93,8 @@ Ext.define('Editor.controller.admin.Customer', {
         allCustomers:'#UT#Alle Kunden'
     },
     
+    hasStoreUsersCustomers: false,
+    
     /***
      * hide the customers button when editor is opened
      */
@@ -158,12 +160,23 @@ Ext.define('Editor.controller.admin.Customer', {
      * "Switch client" drop-down change handler
      */
     onCustomerSwitchChange:function(combo, customerId){
-        var tasks = Ext.StoreMgr.get('admin.Tasks');
+        // Multitenancy: filter all affected grids
+        var customerName,
+            customersStore,
+            tasks = Ext.StoreMgr.get('admin.Tasks'),
+            users = Ext.StoreMgr.get('admin.Users');
+            languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
         tasks.clearFilter();
+        users.clearFilter();
+        languageResources.clearFilter();
         if(customerId == 0) {
             return;
         }
+        customersStore = Ext.StoreManager.get('customersStore');
+        customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
         tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
+        users.filter([{property: 'customers', operator:'like', value: customerName}]);
+        languageResources.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
     },
 
     /**
@@ -287,7 +300,11 @@ Ext.define('Editor.controller.admin.Customer', {
      * Users store load handler
      */
     onUserStoreLoad:function(){
-        //after the users store is loaded, load the usersCustomers store
-        Ext.StoreManager.get('userCustomers').loadCustom();
+        var me = this;
+        if (!me.hasStoreUsersCustomers) { // avoid ongoing reloads eg. after multitenancy-filtering via "Switch Client"
+            //after the users store is loaded, load the usersCustomers store
+            Ext.StoreManager.get('userCustomers').loadCustom();
+            me.hasStoreUsersCustomers = true;
+        }
     }
 });
