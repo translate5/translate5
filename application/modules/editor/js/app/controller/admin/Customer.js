@@ -60,7 +60,6 @@ Ext.define('Editor.controller.admin.Customer', {
                 click: 'onCustomerOverviewClick'
             },
             '#customerSwitch': {
-                afterrender: 'onCustomerSwitchAfterRender',
                 change: 'onCustomerSwitchChange'
             },
             'customerPanel':{
@@ -122,12 +121,23 @@ Ext.define('Editor.controller.admin.Customer', {
         });
         
         // add the drop-down "Switch client"
-       var pos = toolbar.items.length - 1;
+       var pos = toolbar.items.length - 1,
+           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {id:'userCustomersSwitch'}),
+           allCustomers = this.strings.allCustomers;
         toolbar.insert(pos, {
             xtype: 'usercustomerscombo',
             allowBlank: true,
             itemId: 'customerSwitch',
-            fieldLabel: ''
+            fieldLabel: '',
+            store: storeForSwitch
+        });
+        Ext.ComponentQuery.query('#segmentgrid')[0]
+        storeForSwitch.on("load", function(store, items){
+            store.insert(0, [{
+                name: allCustomers,
+                id: 0
+            }]);
+            Ext.ComponentQuery.query('#customerSwitch')[0].setValue(0);
         });
     },
 
@@ -140,20 +150,6 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         //set the component to visible on each centar panel element hide
         this.setCustomerOverviewButtonHidden(false);
-    },
-
-    /**
-     * "Switch client" drop-down after render handler
-     */
-    onCustomerSwitchAfterRender:function(combo){
-        var allCustomers = this.strings.allCustomers;
-        combo.getStore().on("load", function(store, items){
-            store.insert(0, [{
-                name: allCustomers,
-                id: 0
-            }]);
-            combo.setValue(0);
-        });
     },
 
     /**
