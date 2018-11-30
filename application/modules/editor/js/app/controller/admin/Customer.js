@@ -49,6 +49,9 @@ Ext.define('Editor.controller.admin.Customer', {
     },{
         ref: 'headToolBar',
         selector: 'headPanel toolbar#top-menu'
+    },{
+        ref: 'customerSwitch',
+        selector: '#customerSwitch'
     }],
 
     listen: {
@@ -59,9 +62,6 @@ Ext.define('Editor.controller.admin.Customer', {
             '#btnCustomerOverviewWindow': {
                 click: 'onCustomerOverviewClick'
             },
-            '#customerSwitch': {
-                change: 'onCustomerSwitchChange'
-            },
             'customerPanel':{
                 show: 'onCustomerPanelShow'
             },
@@ -69,11 +69,22 @@ Ext.define('Editor.controller.admin.Customer', {
                 hide:'onCentarPanelComponentAfterLayout'
             },
             '#adminUserAddWindow':{
-                afterrender:'onAdminUserAddWindowAfterRender'
+                afterrender:'onAdminUserAddWindowAfterRender',
+                afterlayout: 'setFilteredCustomerForUserAdd', // Multitenancy
             },
             '#adminUserGrid': {
                 beforerender:'onAdminUserGridBeforeRender'
-            }
+            },
+            '#taskMainCard':{
+                afterrender:'setFilteredCustomerForTaskAdd' // Multitenancy
+            },
+            '#addTmWindow':{
+                afterrender: 'setFilteredCustomerForLanguageResourceAdd', // Multitenancy
+            },
+            '#customerSwitch': {
+                change: 'onCustomerSwitchChange' // Multitenancy
+            },
+
         },
         controller:{
             '#Editor.$application': {
@@ -120,25 +131,8 @@ Ext.define('Editor.controller.admin.Customer', {
             text:this.strings.customer
         });
         
-        // add the drop-down "Switch client"
-       var pos = toolbar.items.length - 1,
-           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {id:'userCustomersSwitch'}),
-           allCustomers = this.strings.allCustomers;
-        toolbar.insert(pos, {
-            xtype: 'usercustomerscombo',
-            allowBlank: true,
-            itemId: 'customerSwitch',
-            fieldLabel: '',
-            store: storeForSwitch
-        });
-        Ext.ComponentQuery.query('#segmentgrid')[0]
-        storeForSwitch.on("load", function(store, items){
-            store.insert(0, [{
-                name: allCustomers,
-                id: 0
-            }]);
-            Ext.ComponentQuery.query('#customerSwitch')[0].setValue(0);
-        });
+        // multitenancy: add the drop-down "Switch client"
+        this.addCustomerSwitch(toolbar);
     },
 
     /***
@@ -150,29 +144,6 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         //set the component to visible on each centar panel element hide
         this.setCustomerOverviewButtonHidden(false);
-    },
-
-    /**
-     * "Switch client" drop-down change handler
-     */
-    onCustomerSwitchChange:function(combo, customerId){
-        // Multitenancy: filter all affected grids
-        var customerName,
-            customersStore,
-            tasks = Ext.StoreMgr.get('admin.Tasks'),
-            users = Ext.StoreMgr.get('admin.Users');
-            languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
-        tasks.clearFilter();
-        users.clearFilter();
-        languageResources.clearFilter();
-        if(customerId == 0) {
-            return;
-        }
-        customersStore = Ext.StoreManager.get('customersStore');
-        customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
-        tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
-        users.filter([{property: 'customers', operator:'like', value: customerName}]);
-        languageResources.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
     },
 
     /**
@@ -302,5 +273,123 @@ Ext.define('Editor.controller.admin.Customer', {
             Ext.StoreManager.get('userCustomers').loadCustom();
             me.hasStoreUsersCustomers = true;
         }
+    },
+
+    // --------------------------- Multitenancy ----------------------------
+    
+    /**
+     * [Multitenancy:] Add the drop-down "Switch client"
+     */
+    addCustomerSwitch: function(toolbar) {
+       var me = this,
+           pos = toolbar.items.length - 1,
+           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {id:'userCustomersSwitch'}),
+           allCustomers = this.strings.allCustomers;
+        toolbar.insert(pos, {
+            xtype: 'usercustomerscombo',
+            allowBlank: true,
+            itemId: 'customerSwitch',
+            fieldLabel: '',
+            store: storeForSwitch
+        });
+        storeForSwitch.on("load", function(store, items){
+            store.insert(0, [{
+                name: allCustomers,
+                id: 0
+            }]);
+            me.setCustomerSwitchValue(0);
+        });
+    },
+
+    /**
+     * [Multitenancy:] "Switch client" drop-down change handler (filter all affected grids)
+     */
+    onCustomerSwitchChange: function(combo, customerId) {
+        var customerName,
+            customersStore,
+            tasks = Ext.StoreMgr.get('admin.Tasks'),
+            users = Ext.StoreMgr.get('admin.Users');
+            languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
+        tasks.clearFilter();
+        users.clearFilter();
+        languageResources.clearFilter();
+        if(customerId == 0) {
+            return;
+        }
+        customersStore = Ext.StoreManager.get('customersStore');
+        customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
+        tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
+        users.filter([{property: 'customers', operator:'like', value: customerName}]);
+        languageResources.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
+    },
+
+    /**
+     * [Multitenancy:] Add task: preselect filtered customer
+     */
+    setFilteredCustomerForTaskAdd: function(taskMainCard) {
+        var customerId = this.getCustomerSwitchValue(),
+            customerIdField,
+            customerNameField,
+            customersStore,
+            customerName;
+        if (customerId == '0') {
+            return;
+        }
+        // id
+        customerIdField = taskMainCard.down('#customerId');
+        customerIdField.setValue(customerId);
+        // name
+        customerNameField = taskMainCard.down('#customerNameField');
+        if (customerNameField) {
+            customersStore = Ext.StoreManager.get('customersStore');
+            customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
+            customerNameField.setValue(customerName);
+        }
+    },
+
+    /**
+     * [Multitenancy:] Add language resource: preselect filtered customer
+     */
+    setFilteredCustomerForLanguageResourceAdd: function(addTmWindow) {
+        var customerId = this.getCustomerSwitchValue(),
+            resourcesCustomersField;
+        if (customerId == '0') {
+            return;
+        }
+        resourcesCustomersField = addTmWindow.down('#resourcesCustomers');
+        resourcesCustomersField.setValue(customerId);
+    },
+    
+
+    /**
+     * [Multitenancy:] Add user: preselect filtered customer
+     */
+    setFilteredCustomerForUserAdd: function(adminUserAddWindow){
+        var customerId = this.getCustomerSwitchValue(),
+            customersField;
+        if (customerId == '0') {
+            return;
+        }
+        customersField = adminUserAddWindow.down('#customers');
+        customersField.setValue(customerId);
+        // TODO: The value is set, but the visible content of the field does not show it.
+        //   console.log(customersField.getValue());
+        // Using the console to set the value works DOES immediately show it:
+        //   Ext.ComponentQuery.query('#customers')[0].setValue(1)
+        // Hence, maybe we are still too early here?
+    },
+    
+    /**
+     * 
+     */
+    setCustomerSwitchValue: function(val) {
+        this.getCustomerSwitch().setValue(val);
+    },
+    
+    /**
+     * 
+     */
+    getCustomerSwitchValue: function() {
+        return this.getCustomerSwitch().getValue();
     }
 });

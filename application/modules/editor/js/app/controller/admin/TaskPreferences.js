@@ -537,9 +537,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * If there is only one client defined, this client is 
    * automatically associated and the drop-down is omitted.
    */
-  onTaskMainCardRender: function(addTaskCard,eOpts) {
+  onTaskMainCardRender: function(taskMainCard,eOpts) {
       var me = this, 
-          taskMainCardContainer = addTaskCard.down('#taskMainCardContainer'),
+          taskMainCardContainer = taskMainCard.down('#taskMainCardContainer'),
           userCustomers = Ext.StoreManager.get('userCustomers');
       
       // add the customer field to the taskUpload window
@@ -547,6 +547,7 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           taskMainCardContainer.add({
               xtype: 'displayfield',
               name: 'customer',
+              itemId: 'customer',
               value: userCustomers.getAt(0).getData().name, // display customer-name for the user
               toolTip: me.strings.customerTip,
               fieldLabel: me.strings.customerLabel
@@ -554,12 +555,14 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           taskMainCardContainer.add({
               xtype: 'hiddenfield',
               name: 'customerId',
+              itemId: 'customerId',
               value: userCustomers.getAt(0).getData().id, // store customer-id in LEK_task
           });
       } else {
           taskMainCardContainer.add({
               xtype: 'usercustomerscombo',
               name: 'customerId',
+              itemId: 'customerId',
               allowBlank: false,
               toolTip: me.strings.customerTip,
               fieldLabel: me.strings.customerLabel
