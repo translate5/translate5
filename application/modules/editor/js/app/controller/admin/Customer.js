@@ -283,7 +283,7 @@ Ext.define('Editor.controller.admin.Customer', {
     addCustomerSwitch: function(toolbar) {
        var me = this,
            pos = toolbar.items.length - 1,
-           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {id:'userCustomersSwitch'}),
+           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {storeId:'userCustomersSwitch'}),
            allCustomers = this.strings.allCustomers;
         toolbar.insert(pos, {
             xtype: 'usercustomerscombo',
