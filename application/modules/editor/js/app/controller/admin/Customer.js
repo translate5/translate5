@@ -112,10 +112,6 @@ Ext.define('Editor.controller.admin.Customer', {
     
     hasStoreUsersCustomers: false,
     
-    // Multitenancy: filtering via the CustomerSwitchChange also fires the 
-    // filterchange-event, but must not be handled by onGridFilterChange.
-    isFilterFromGrid: true,
-    
     /***
      * hide the customers button when editor is opened
      */
@@ -324,7 +320,6 @@ Ext.define('Editor.controller.admin.Customer', {
             tasks = Ext.StoreMgr.get('admin.Tasks'),
             users = Ext.StoreMgr.get('admin.Users'),
             languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
-        me.isFilterFromGrid = false;
         tasks.clearFilter();
         users.clearFilter();
         languageResources.clearFilter();
@@ -336,7 +331,6 @@ Ext.define('Editor.controller.admin.Customer', {
         tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
         users.filter([{property: 'customers', operator:'like', value: customerName}]);
         languageResources.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
-        me.isFilterFromGrid = true;
     },
     
     /**
@@ -346,13 +340,17 @@ Ext.define('Editor.controller.admin.Customer', {
     onGridFilterChange: function (store, filters) {
         var me = this,
             customerColumnNames = ['customerId','customers','resourcesCustomers'];
-        if (me.isFilterFromGrid) {
-            filters.forEach(function(filter){
-                if (Ext.Array.indexOf(customerColumnNames,filter.getProperty()) != -1) {
-                    me.deselectCustomerSwitchValue();
-                }
-            });
-        }
+        filters.forEach(function(filter){
+            // Why 'x-gridfilter'? 
+            // - Because filtering via the CustomerSwitchChange also fires the
+            //   filterchange-event, but must not be handled here.
+            // - This also prevents the very first reset of the filters when a grid 
+            //   is opened for the first time.
+            if (Ext.String.startsWith(filter.getId(), 'x-gridfilter') 
+                    && Ext.Array.indexOf(customerColumnNames,filter.getProperty()) != -1) {
+                me.setCustomerSwitchValue(0);
+            }
+        });
     },
 
     /**
@@ -404,7 +402,11 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         customersField = adminUserAddWindow.down('#customers');
         customersField.setValue(customerId);
-        customersField.getView().refresh();
+        // TODO: The value is set, but the visible content of the field does not show it.
+        //   console.log(customersField.getValue());
+        // Using the console to set the value works DOES immediately show it:
+        //   Ext.ComponentQuery.query('#customers')[0].setValue(1)
+        // Hence, maybe we are still too early here?
     },
 
     /**
