@@ -402,11 +402,7 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         customersField = adminUserAddWindow.down('#customers');
         customersField.setValue(customerId);
-        // TODO: The value is set, but the visible content of the field does not show it.
-        //   console.log(customersField.getValue());
-        // Using the console to set the value works DOES immediately show it:
-        //   Ext.ComponentQuery.query('#customers')[0].setValue(1)
-        // Hence, maybe we are still too early here?
+        customersField.getView().refresh();
     },
 
     /**
