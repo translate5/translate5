@@ -100,13 +100,13 @@ class editor_TaskController extends ZfExtended_RestController {
     
     public function init() {
         $this->_filterTypeMap = [
-            'customerName' => [
+            'customerId' => [
                 //'string' => new ZfExtended_Models_Filter_JoinHard('editor_Models_Db_Customer', 'name', 'id', 'customerId')
                 'string' => new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId')
             ]
         ];
         //set same join for sorting!
-        $this->_sortColMap['customerName'] = $this->_filterTypeMap['customerName']['string'];
+        $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
         
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
