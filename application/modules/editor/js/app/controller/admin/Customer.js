@@ -294,9 +294,11 @@ Ext.define('Editor.controller.admin.Customer', {
     addCustomerSwitch: function(toolbar) {
        var me = this,
            pos = toolbar.items.length - 1,
-           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {id:'userCustomersSwitch'}),
+           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {storeId:'userCustomersSwitch',autoLoad:true}),
            allCustomers = this.strings.allCustomers;
-        toolbar.insert(pos, {
+       // storeForSwitch refers to Editor.model.admin.Customer and does not wait for loadCustom() as the userCustomers does
+       // hence it loads ALL customers, not only those assigned to the login-user. That's ok for now.
+       toolbar.insert(pos, {
             xtype: 'usercustomerscombo',
             allowBlank: true,
             itemId: 'customerSwitch',
