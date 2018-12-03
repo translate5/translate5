@@ -70,19 +70,26 @@ Ext.define('Editor.controller.admin.Customer', {
             },
             '#adminUserAddWindow':{
                 afterrender:'onAdminUserAddWindowAfterRender',
-                afterlayout: 'setFilteredCustomerForUserAdd', // Multitenancy
+                afterlayout: 'setFilteredCustomerForUserAdd',               // Multitenancy
             },
             '#adminUserGrid': {
-                beforerender:'onAdminUserGridBeforeRender'
-            },
-            '#taskMainCard':{
-                afterrender:'setFilteredCustomerForTaskAdd' // Multitenancy
+                beforerender:'onAdminUserGridBeforeRender',
+                filterchange: 'onGridFilterChange'                          // Multitenancy
             },
             '#addTmWindow':{
-                afterrender: 'setFilteredCustomerForLanguageResourceAdd', // Multitenancy
+                afterrender: 'setFilteredCustomerForLanguageResourceAdd',   // Multitenancy
+            },
+            '#adminTaskGrid': {
+                filterchange: 'onGridFilterChange'                          // Multitenancy
             },
             '#customerSwitch': {
-                change: 'onCustomerSwitchChange' // Multitenancy
+                change: 'onCustomerSwitchChange'                            // Multitenancy
+            },
+            '#taskMainCard':{
+                afterrender:'setFilteredCustomerForTaskAdd'                 // Multitenancy
+            },
+            '#tmOverviewPanel':{
+                filterchange: 'onGridFilterChange'                          // Multitenancy
             },
 
         },
@@ -104,6 +111,10 @@ Ext.define('Editor.controller.admin.Customer', {
     },
     
     hasStoreUsersCustomers: false,
+    
+    // Multitenancy: filtering via the CustomerSwitchChange also fires the 
+    // filterchange-event, but must not be handled by onGridFilterChange.
+    isFilterFromGrid: true,
     
     /***
      * hide the customers button when editor is opened
@@ -305,11 +316,13 @@ Ext.define('Editor.controller.admin.Customer', {
      * [Multitenancy:] "Switch client" drop-down change handler (filter all affected grids)
      */
     onCustomerSwitchChange: function(combo, customerId) {
-        var customerName,
+        var me = this,
+            customerName,
             customersStore,
             tasks = Ext.StoreMgr.get('admin.Tasks'),
-            users = Ext.StoreMgr.get('admin.Users');
+            users = Ext.StoreMgr.get('admin.Users'),
             languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
+        me.isFilterFromGrid = false;
         tasks.clearFilter();
         users.clearFilter();
         languageResources.clearFilter();
@@ -321,6 +334,23 @@ Ext.define('Editor.controller.admin.Customer', {
         tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
         users.filter([{property: 'customers', operator:'like', value: customerName}]);
         languageResources.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
+        me.isFilterFromGrid = true;
+    },
+    
+    /**
+     * [Multitenancy:] If the setting of one of the grid-filters is changed manually,
+     * deselect the client that is currently selected in the "Switch client" drop-down.
+     */
+    onGridFilterChange: function (store, filters) {
+        var me = this,
+            customerColumnNames = ['customerId','customers','resourcesCustomers'];
+        if (me.isFilterFromGrid) {
+            filters.forEach(function(filter){
+                if (Ext.Array.indexOf(customerColumnNames,filter.getProperty()) != -1) {
+                    me.deselectCustomerSwitchValue();
+                }
+            });
+        }
     },
 
     /**
@@ -377,6 +407,19 @@ Ext.define('Editor.controller.admin.Customer', {
         // Using the console to set the value works DOES immediately show it:
         //   Ext.ComponentQuery.query('#customers')[0].setValue(1)
         // Hence, maybe we are still too early here?
+    },
+
+    /**
+     * [Multitenancy:] Deselect the client that is currently selected in the "Switch client" drop-down.
+     */
+    deselectCustomerSwitchValue: function() {
+        var tasks = Ext.StoreMgr.get('admin.Tasks'),
+            users = Ext.StoreMgr.get('admin.Users'),
+            languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
+        tasks.clearFilter();
+        users.clearFilter();
+        languageResources.clearFilter();
+        this.setCustomerSwitchValue(0);
     },
     
     /**
