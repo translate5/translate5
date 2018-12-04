@@ -288,10 +288,17 @@ Ext.define('Editor.controller.admin.Customer', {
      * [Multitenancy:] Add the drop-down "Switch client"
      */
     addCustomerSwitch: function(toolbar) {
-       var me = this,
-           pos = toolbar.items.length - 1,
-           storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {storeId:'userCustomersSwitch',autoLoad:true}),
-           allCustomers = this.strings.allCustomers;
+        var me = this,
+            auth = Editor.app.authenticatedUser,
+            pos,
+            storeForSwitch,
+            allCustomers;
+        if (!auth.isAllowed('editorCustomerSwitch')) {
+            return;
+        }
+        pos = toolbar.items.length - 1;
+        storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {storeId:'userCustomersSwitch',autoLoad:true});
+        allCustomers = this.strings.allCustomers;
        // storeForSwitch refers to Editor.model.admin.Customer and does not wait for loadCustom() as the userCustomers does
        // hence it loads ALL customers, not only those assigned to the login-user. That's ok for now.
        toolbar.insert(pos, {
@@ -426,6 +433,9 @@ Ext.define('Editor.controller.admin.Customer', {
      * 
      */
     setCustomerSwitchValue: function(val) {
+        if (!this.getCustomerSwitch()) {
+            return;
+        }
         this.getCustomerSwitch().setValue(val);
     },
     
@@ -433,6 +443,9 @@ Ext.define('Editor.controller.admin.Customer', {
      * 
      */
     getCustomerSwitchValue: function() {
+        if (!this.getCustomerSwitch()) {
+            return '0';
+        }
         return this.getCustomerSwitch().getValue();
     }
 });
