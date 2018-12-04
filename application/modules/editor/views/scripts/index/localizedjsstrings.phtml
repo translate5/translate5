@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* @var $translate ZfExtended_Zendoverwrites_Translate */
+/* @var $this Zend_View */
 
 $this->translate->setJsonEncode(true);
 //Datei muss als Javascript ausgespielt werden.
@@ -1112,8 +1112,6 @@ Ext.define('Editor.controller.Localizer', {
             add: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
             name: '<?php echo $this->translate->_('Name');?>',
-            source: '<?php echo $this->translate->_('Quellsprache');?>',
-            target: '<?php echo $this->translate->_('Zielsprache');?>',
             file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
             importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
@@ -1165,6 +1163,7 @@ Ext.define('Editor.controller.Localizer', {
             color: '<?php echo $this->translate->_('Farbe');?>',
             add: '<?php echo $this->translate->_('Hinzufügen');?>',
             import: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+            importCollection: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
             noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
@@ -1237,6 +1236,15 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.MaintenancePanel", {
         override: "Editor.view.MaintenancePanel",
         maintenanceMessage: '<?php echo $this->translate->_('<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>');?>' 
+    });
+    
+    Ext.define("Editor.locale.view.LanguageCombo", {
+        override: "Editor.view.LanguageCombo",
+        strings: {
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            neutral: '<?php echo $this->translate->_('Sprache');?>'
+        }
     });
 
     this.initPluginTranslations();

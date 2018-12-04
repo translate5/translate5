@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file source-language="en-EN" target-language="de-DE" original="x" datatype="x-translate5-translation" category="x">
+    <header>
+      <tool tool-id="Translate5" tool-name="Translate5" tool-version="2.9.3" tool-company="MittagQI" />
+    </header>
+    <body>
+      <!--   <t>Ichbin<i>einTerm</t> <t>Ichbin</i>einTerm</t>     -->
+      <trans-unit id="1">
+        <source><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>Iamaterm</source>
+        <target><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>IchbineinTerm</target>
+      </trans-unit>
+      
+      <!--    <i>Ichbin <t>keinTerm</i> <i>Ichbin</t> keinTerm</i>x    -->
+      <trans-unit id="2">
+        <source><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>Iam noterm Iam notermx</source>
+        <target><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph> x</target>
+      </trans-unit>
+      
+      <!--    <i user="Alice">Ichbin <t>keinTerm</i> <i user="Bob">Ichbin</t> keinTerm</i>    -->
+      <trans-unit id="3">
+        <source><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>Iam noterm Iam notermx</source>
+        <target><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph> x</target>
+      </trans-unit>
+      
+      <!--    <i user="Alice">Ichbi</i><i user="Bob">n <t>kein</i><i user="Alice">Term</i> <i user="Bob">Ichbin</t> keinTerm</i>    -->
+      <trans-unit id="4">
+        <source><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>Iam noterm Iam notermx</source>
+        <target><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph> x</target>
+      </trans-unit>
+      
+      <!--    <i>Soll heißen <t>Ich</i>bineinTerm</t>    -->
+      <trans-unit id="5">
+        <source><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>Should be Iamaterm</source>
+        <target><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>bineinTerm</target>
+      </trans-unit>
+
+      <!--    <i><t>Muss heißen <i>Ich</t>binkeinTerm</i>    -->
+      <trans-unit id="6">
+        <source><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>Must be Iam noterm</source>
+        <target><ph id="1">&lt;sym&gt;&lt;/sym&gt;</ph>Muss heißen x</target>
+      </trans-unit>
+      
+    </body>
+  </file>
+</xliff>  

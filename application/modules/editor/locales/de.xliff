@@ -1482,6 +1482,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
         <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
         <target>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</target>
     </trans-unit>
+    <trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
+        <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen</source>
+        <target>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen</target>
+    </trans-unit>
     <trans-unit id='VE1YLURhdGVp'>
         <source>TMX-Datei</source>
         <target>TMX-Datei</target>
@@ -1633,6 +1637,119 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <source>Für diese Kunden nutzen</source>
     <target>Für diese Kunden nutzen</target>
 </trans-unit>
+
+-------------------------------------------------------------------------------------
+
+<trans-unit id='VmVyYW50d29ydGxpY2g='>     
+    <source>Verantwortlich</source>     
+    <target>Verantwortlich</target> 
+</trans-unit> 
+
+<trans-unit id='RGF0dW0='>     
+    <source>Datum</source>     
+    <target>Datum</target> 
+</trans-unit>
+
+<trans-unit id='TGV0enRlIMOEbmRlcnVuZw=='>     
+    <source>Letzte Änderung</source>     
+    <target>Letzte Änderung</target> 
+</trans-unit>  
+
+<trans-unit id='VGVybSBUeXA='>     
+    <source>Term Typ</source>     
+    <target>Term Typ</target> 
+</trans-unit>  
+
+<trans-unit id='RGVmaW5pdGlvbg=='>     
+<source>Definition</source>     
+<target>Definition</target> 
+</trans-unit> 
+
+<trans-unit id='QXVzc3ByYWNoZQ=='>     
+<source>Aussprache</source>     
+<target>Aussprache</target>
+ </trans-unit>  
+
+ <trans-unit id='RWluc3R1ZnVuZw=='>     
+ <source>Einstufung</source>     
+ <target>Einstufung</target> 
+ </trans-unit>
+
+<trans-unit id='QWJrw7xyenVuZyBmw7xy'>     
+<source>Abkürzung für</source>     
+<target>Abkürzung für</target> 
+</trans-unit>  
+
+<trans-unit id='RmFjaGdlYmlldA=='>
+    <source>Fachgebiet</source>
+    <target>Fachgebiet</target>
+</trans-unit>
+
+<trans-unit id='VmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Verwandtes Konzept</source>
+    <target>Verwandtes Konzept</target>
+</trans-unit>
+
+<trans-unit id='RXJ3ZWl0ZXJ0ZXMgdmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Erweitertes verwandtes Konzept</source>
+    <target>Erweitertes verwandtes Konzept</target>
+</trans-unit>
+
+<trans-unit id='UHJvZHVrdC1VbnRlcm1lbmdl'>
+    <source>Produkt-Untermenge</source>
+    <target>Produkt-Untermenge</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlbmlkZW50aWZpa2F0b3I='>
+    <source>Quellenidentifikator</source>
+    <target>Quellenidentifikator</target>
+</trans-unit>
+
+<trans-unit id='V29ydGFydA=='>
+    <source>Wortart</source>
+    <target>Wortart</target>
+</trans-unit>
+
+<trans-unit id='S29udGV4dA=='>
+    <source>Kontext</source>
+    <target>Kontext</target>
+</trans-unit>
+
+<trans-unit id='VGVpbGJlcmVpY2ggZGVyIEdlc2Now6RmdHNlaW5oZWl0'>
+    <source>Teilbereich der Geschäftseinheit</source>
+    <target>Teilbereich der Geschäftseinheit</target>
+</trans-unit>
+
+<trans-unit id='UHJvamVrdHVudGVybWVuZ2U='>
+    <source>Projektuntermenge</source>
+    <target>Projektuntermenge</target>
+</trans-unit>
+
+<trans-unit id='R3JhbW1hdGlrYWxpc2NoZXMgR2VzY2hsZWNodA=='>
+    <source>Grammatikalisches Geschlecht</source>
+    <target>Grammatikalisches Geschlecht</target>
+</trans-unit>
+
+<trans-unit id='QW5tZXJrdW5n'>
+    <source>Anmerkung</source>
+    <target>Anmerkung</target>
+</trans-unit>
+
+<trans-unit id='QWRtaW5pc3RyYXRpdmVyIFN0YXR1cw=='>
+    <source>Administrativer Status</source>
+    <target>Administrativer Status</target>
+</trans-unit>
+
+<trans-unit id='w5xiZXJ0cmFndW5nc2tvbW1lbnRhcg=='>
+    <source>Übertragungskommentar</source>
+    <target>Übertragungskommentar</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='>
+    <source>Quelle des Eintrags</source>
+    <target>Quelle des Eintrags</target>
+</trans-unit>
+
   </body>
  </file>
 </xliff>
