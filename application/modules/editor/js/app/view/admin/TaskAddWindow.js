@@ -31,7 +31,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     requires:[
         'Editor.view.admin.TaskUpload',
         'Editor.view.admin.TaskAddWindowViewModel',
-        'Editor.view.admin.customer.UserCustomersCombo'
+        'Editor.view.admin.customer.UserCustomersCombo',
+        'Editor.view.LanguageCombo'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -186,30 +187,26 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: false,
                                     toolTip: me.strings.taskNameTip,
                                     fieldLabel: me.strings.taskNameLabel
-                                },Ext.applyIf({
+                                },{
+                                    xtype: 'languagecombo',
                                     name: 'sourceLang',
-                                    allowBlank: false,
                                     toolTip: me.strings.sourceLangTip,
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
                                     fieldLabel: me.strings.sourceLangLabel
-                                }, langCombo),Ext.applyIf({
+                                },{
+                                    xtype: 'languagecombo',
                                     name: 'targetLang',
-                                    allowBlank: false,
                                     toolTip: me.strings.targetLangTip,
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
                                     fieldLabel: me.strings.targetLangLabel
-                                }, langCombo),Ext.applyIf({
+                                },{
+                                    xtype: 'languagecombo',
                                     name: 'relaisLang',
                                     getSubmitValue: function() {
-                                    return this.getValue();
+                                        return this.getValue();
                                     },
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
+                                    allowBlank: true,
                                     toolTip: me.strings.relaisLangTip,
                                     fieldLabel: me.strings.relaisLangLabel
-                                }, langCombo),{
+                                },{
                                     xtype: 'filefield',
                                     name: 'importUpload',
                                     regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),

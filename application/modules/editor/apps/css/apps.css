@@ -25,16 +25,14 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-Ext.define('Editor.store.LanguageResources.LanguageResource', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.LanguageResource',
-  autoLoad: true,
-  remoteFilter:true,
-  sorters:[{
-	  property:'serviceName'
-  }],
-  //INFO:remote sort is not needed since the pageing is removed
-  pageSize: 0
-  //remoteSort:true
-});
+#appContainer{
+	margin: 0;
+    overflow: hidden;
+}
+.iframeApp{
+    position:absolute;
+    left: 0px;
+    width: 100%;
+    top: 0px;
+    height: 100%;
+}

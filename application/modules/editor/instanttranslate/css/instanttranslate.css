@@ -53,6 +53,7 @@ h4, p {
 
 .instant-translation-error {
     display: none;
+    padding: 3px;
 }
 
 .overflow {
@@ -121,16 +122,20 @@ h4, p {
     background-size: auto auto;
     background-size: 150px;
 }
-#languageSelector {
-    flex: 1 0 auto;
+#termPortal{
     order: 2;
+    flex: 1 0 auto;
     text-align: right;
     margin-right: 7px;
+}
+#languageSelector {
+    order: 3;
+    text-align: right;
 }
 #locale-button {width: 9em;}
 #logout {
     flex: 0 0 80px;
-    order: 3;
+    order: 4;
     text-align: right;
 }
 
@@ -181,13 +186,15 @@ h4, p {
 }
 
 /* --------------- source --------------- */
-    
+
+#sourceLanguageAndContent {
+    padding-right: 10px;
+}
 #sourceContent {
     z-index: 100;
 }
 #source textarea {
     width: 99%;
-    margin-right: 10px;
     height: 105px;
     font-family: verdana,helvetica,sans-serif;
     font-size: 17px;
@@ -199,7 +206,6 @@ h4, p {
 }
 #sourceFile {
     width: 94%;
-    margin-right: 10px;
 }
 #sourceContent,
 .show-if-source-is-file,
@@ -301,6 +307,7 @@ h4, p {
 .clearable-clear,
 .copyable-copy,
 .term-info,
+.process-status-attribute,
 .term-status {
   position: absolute;
   user-select: none;
@@ -331,11 +338,17 @@ h4, p {
   bottom: 0px;
   padding: 0px 4px;
 }
+.process-status-attribute{
+  left: 63px;
+  bottom: 0px;
+  padding: 0px 4px;
+}
 .term-status {
   left: 45px;
   bottom: 0px;
   padding: 0px 4px;
 }
+
 
 #countedCharacters {
   position: absolute;

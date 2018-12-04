@@ -621,6 +621,10 @@ $('#search').keyup(function (e) {
     $('#termTable').empty();
 });
 
+$('#instantTranslate').on('touchstart click',function(){
+    window.parent.loadIframe('instanttranslate',REST_PATH+'instanttranslate');
+});
+
 function startAutocomplete(){
     console.log("startAutocomplete...");
     $('#finalResultContent').hide();
