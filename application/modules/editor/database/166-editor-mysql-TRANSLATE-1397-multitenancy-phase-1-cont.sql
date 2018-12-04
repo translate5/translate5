@@ -27,7 +27,11 @@
   
 -- assign all users which are not belonging to any customer to the default customer
 UPDATE `Zf_users` AS user, `LEK_customer` AS customer 
-SET user.customers = customer.id
+SET user.customers = CONCAT(',', customer.id, ',')
 WHERE customer.name = 'defaultcustomer'
-AND user.customers IS NULL
+AND user.customers IS NULL;
 
+-- customer-switch should only be visible for users with a specific right
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'admin', 'frontend', 'editorCustomerSwitch'),
+('editor', 'pm', 'frontend', 'editorCustomerSwitch');
