@@ -52,10 +52,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     public function init() {
         //add filter type for languages
-        $this->_filterTypeMap = array(
-            array('sourceLang' => array('string' => 'list')),
-            array('targetLang' => array('string' => 'list')),
-        );
+        $this->_filterTypeMap = [
+            'sourceLang' => ['string' => 'list'],
+            'targetLang' => ['string' => 'list'],
+        ];
         parent::init();
     }
     
