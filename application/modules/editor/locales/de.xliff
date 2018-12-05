@@ -568,9 +568,6 @@
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIFhMSUZGOyBBbmdhYmUgbm90d2VuZGlnKQ=='><source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</source><target>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</target></trans-unit>
 <trans-unit id='SW1wb3J0IERhdGVpwrk='><source>Import Datei¹</source><target>Import Datei¹</target></trans-unit>
 <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWLCBYTElGRiBvZGVyIFNETFhMSUZGIERhdGVpIQ=='><source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source><target>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</target></trans-unit>
-<trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='><source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source><target>Wählen Sie die zu importierenden TBX Daten für das TermTagging</target></trans-unit>
-<trans-unit id='VEJYIERhdGVpwrI='><source>TBX Datei²</source><target>TBX Datei²</target></trans-unit>
-<trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'><source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source><target>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</target></trans-unit>
 <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='><source>Bitte verwenden Sie eine TBX Datei!</source><target>Bitte verwenden Sie eine TBX Datei!</target></trans-unit>
 <trans-unit id='wrIgc2VwYXJhdGUgVEJYIG51ciBiZWltIEltcG9ydCBlaW5lciBTRExYTElGRiBEYXRlaSBtw7ZnbGljaC4='><source>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</source><target>² separate TBX nur beim Import einer SDLXLIFF Datei möglich.</target></trans-unit>
 <trans-unit id='U3RhbmRhcmQgQWJsYXVmcGxhbg=='><source>Standard Ablaufplan</source><target>Standard Ablaufplan</target></trans-unit>
@@ -600,6 +597,8 @@
 <trans-unit id='V8OkaGxlbiBTaWUgZWluZW4gRWludHJhZyBpbiBkZXIgVGFiZWxsZSBhdXMgdW0gZGllc2VuIHp1IGJlYXJiZWl0ZW4h'><source>Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!</source><target>Wählen Sie einen Eintrag in der Tabelle aus um diesen zu bearbeiten!</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIGRlcyBXb3JrZmxvd3MgZGVyIEF1ZmdhYmUgZ2VzcGVpY2hlcnQh'><source>Änderung des Workflows der Aufgabe gespeichert!</source><target>Änderung des Workflows der Aufgabe gespeichert!</target></trans-unit>
 <trans-unit id='ZsO8ciBhbGxl'><source>für alle</source><target>für alle</target></trans-unit>
+<trans-unit id='S3VuZGUgZGVyIEF1ZmdhYmUgKEFuZ2FiZSBub3R3ZW5kaWcp'><source>Kunde der Aufgabe (Angabe notwendig)</source><target>Kunde der Aufgabe (Angabe notwendig)</target></trans-unit>
+<trans-unit id='bmljaHQgZ2VmdW5kZW4='><source>nicht gefunden</source><target>nicht gefunden</target></trans-unit>
 <trans-unit id='SWhyZSBEYXRlbiBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbiwgYmVpbSBTcGVpY2hlcm4ga2FtIGVzIHp1IGVpbmVtIEtvbmZsaWt0IQ=='><source>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</source><target>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</target></trans-unit>
 <trans-unit id='RWludHJhZyBnZXNwZWljaGVydCE='><source>Eintrag gespeichert!</source><target>Eintrag gespeichert!</target></trans-unit>
 <trans-unit id='RWludHJhZyBnZWzDtnNjaHQh'><source>Eintrag gelöscht!</source><target>Eintrag gelöscht!</target></trans-unit>
@@ -1281,6 +1280,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='><source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source><target>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='><source>Kundenübersicht</source><target>Kundenübersicht</target></trans-unit>
+<trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='><source>Hinzufügen</source><target>Hinzufügen</target></trans-unit>
 <trans-unit id='S3VuZGVubmFtZQ=='><source>Kundenname</source><target>Kundenname</target></trans-unit>
 <trans-unit id='S3VuZGVubnVtbWVy'><source>Kundennummer</source><target>Kundennummer</target></trans-unit>
@@ -1427,8 +1427,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
       <target>Sprach-Resourcen zuweisen</target>
     </trans-unit>
     <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
-      <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
-      <target>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</target>
+      <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
+      <target>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</target>
     </trans-unit>
     <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
       <source>Ressource: {name}</source>

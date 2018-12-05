@@ -760,18 +760,6 @@
         <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
         <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
       </trans-unit>
-      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='>
-        <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
-        <target>Please choose the TBX data to be imported for the term tagging</target>
-      </trans-unit>
-      <trans-unit id='VEJYIERhdGVpwrI='>
-        <source>TBX Datei²</source>
-        <target>TBX file²</target>
-      </trans-unit>
-      <trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'>
-        <source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source>
-        <target>² A TBX file is optional. You need a TBX-file in TBX-Core format to mark terminology in your bilingual files.</target>
-      </trans-unit>
       
       
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
@@ -901,6 +889,14 @@
       <trans-unit id='ZsO8ciBhbGxl'>
         <source>für alle</source>
         <target>for all</target>
+      </trans-unit>
+      <trans-unit id='S3VuZGUgZGVyIEF1ZmdhYmUgKEFuZ2FiZSBub3R3ZW5kaWcp'>
+        <source>Kunde der Aufgabe (Angabe notwendig)</source>
+        <target>Task's client (mandatory)</target>
+      </trans-unit>
+      <trans-unit id='bmljaHQgZ2VmdW5kZW4='>
+        <source>nicht gefunden</source>
+        <target>not found</target>
       </trans-unit>
       <trans-unit id='SWhyZSBEYXRlbiBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbiwgYmVpbSBTcGVpY2hlcm4ga2FtIGVzIHp1IGVpbmVtIEtvbmZsaWt0IQ=='>
         <source>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</source>
@@ -2418,6 +2414,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Clients overview</target>
 </trans-unit>
 
+<trans-unit id="QWxsZSBLdW5kZW4=">
+    <source>Alle Kunden</source>
+    <target>All clients</target>
+</trans-unit>
+
+
 <trans-unit id='SGluenVmw7xnZW4='>
     <source>Hinzufügen</source>
     <target>Add</target>
@@ -2673,8 +2675,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <target>Associate language resources</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
-  <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
-  <target>No language resource available for the language combination of the opened task.</target>
+  <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
+  <target>No language resource available for the language combination and client of the opened task.</target>
 </trans-unit>
 <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
   <source>Ressource: {name}</source>

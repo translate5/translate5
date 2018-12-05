@@ -54,9 +54,9 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * Feld.
      * @var array array($field => array(origType => newType),...)
      */
-    protected $_filterTypeMap = array(
-                    array('qmId'=>array('list'=>'listAsString'))
-    );
+    protected $_filterTypeMap = [
+        'qmId' => ['list' => 'listAsString']
+    ];
     
     
     public function preDispatch() {
