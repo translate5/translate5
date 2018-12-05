@@ -94,8 +94,8 @@ END LICENSE AND COPYRIGHT
  * @method void setEmptyTargets() setEmptyTargets(boolean $emptyTargets)
  * @method string getImportAppVersion() getImportAppVersion()
  * @method void setImportAppVersion() setImportAppVersion(string $version)
- * @method string getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(string $version)
+ * @method integer getCustomerId() getCustomerId()
+ * @method void setCustomerId() setCustomerId(integer $customerId)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
