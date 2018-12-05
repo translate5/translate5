@@ -180,6 +180,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     fieldLabel:me.strings.customers,
                     itemId:'resourcesCustomers',
                     dataIndex:'resourcesCustomers',
+                    allowBlank: false,
                     store:Ext.create('Ext.data.Store', {
                         model:'Editor.model.admin.Customer',
                         autoLoad:true
