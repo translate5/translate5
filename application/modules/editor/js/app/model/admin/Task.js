@@ -59,6 +59,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'lockingUser', type: 'string', persist: false},
     {name: 'lockingUsername', type: 'string', persist: false},
     {name: 'state', type: 'string'},
+    {name: 'customer', type: 'string'},
     {name: 'workflow', type: 'string'},
     {name: 'pmGuid', type: 'string'},
     {name: 'pmName', type: 'string'},
