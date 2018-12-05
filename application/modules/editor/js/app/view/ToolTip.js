@@ -109,7 +109,7 @@ Ext.define('Editor.view.ToolTip', {
         // add tooltip for trackChanges?
         if(fly.hasCls('trackchanges')) {
             result += me.getTrackChangesData(node);
-        } else if (/(^|[\s])trackchanges([\s]|$)/.test(node.parentNode.className)) {
+        } else if (node.parentNode && /(^|[\s])trackchanges([\s]|$)/.test(node.parentNode.className)) {
             result += me.getTrackChangesData(node.parentNode);
         }
         
