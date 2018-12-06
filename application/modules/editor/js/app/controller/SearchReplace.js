@@ -787,7 +787,7 @@ Ext.define('Editor.controller.SearchReplace', {
             params:params,
             method:'GET',
             success: function(response){
-                var responseData = JSON.parse(response.responseText);
+                var responseData = Ext.JSON.decode(response.responseText);
                 if(!responseData){
                     return;
                 }
@@ -902,7 +902,7 @@ Ext.define('Editor.controller.SearchReplace', {
             success: function(response){
                 //stop the loading
                 me.showReplaceAllLoading(false);
-                var responseData = JSON.parse(response.responseText);
+                var responseData = Ext.JSON.decode(response.responseText);
                 if(!responseData){
                     return;
                 }
@@ -1383,7 +1383,7 @@ Ext.define('Editor.controller.SearchReplace', {
             params: params,
             scope: me,
             success: function(response){
-                var responseData = JSON.parse(response.responseText);
+                var responseData = Ext.JSON.decode(response.responseText);
                 if(!responseData){
                     return;
                 }
