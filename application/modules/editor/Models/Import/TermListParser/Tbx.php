@@ -271,7 +271,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     }
 
     /**
-     * Imports only the first TBX file found!
+     * Imports the tbx files into the term collection
      * (non-PHPdoc)
      * @see editor_Models_Import_IMetaDataImporter::import()
      */
@@ -286,6 +286,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
 
         //create term collection for the task and customer
         $termCollectionId=$this->createTermCollection($this->customerIds);
+        
         //add termcollection to task assoc
         $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $model editor_Models_TermCollection_TermCollection */
@@ -306,15 +307,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
             //languages welche aus dem TBX importiert werden sollen
             $this->languages[$meta->getSourceLang()->getId()] = $this->normalizeLanguage($meta->getSourceLang()->getRfc5646());
             $this->languages[$meta->getTargetLang()->getId()] = $this->normalizeLanguage($meta->getTargetLang()->getRfc5646());
-            
+           
             //start with file parse
             $this->parseTbxFile([$file->getPathname()],$termCollectionId);
-            
-            //check if import languages are can be found in the tbx file
-            if($this->validateTbxLanguages()){
-                $this->assertTbxExists($this->task, new SplFileInfo(self::getTbxPath($this->task)));
-            }
-            
+
+            //check if the languages in the task are valid for the term collection
+            $this->validateTbxLanguages();
         }
         
         if(!empty($this->unknownStates)) {
@@ -377,6 +375,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         /* @var $export editor_Models_Export_Terminology_Tbx */
         
         $tbxData = $term->export($task, $export);
+        
+        if(empty($tbxData)){
+            return $tbxData;
+        }
         
         $meta = $task->meta();
         //ensure existence of the tbxHash field

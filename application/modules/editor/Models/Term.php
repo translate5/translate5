@@ -464,14 +464,25 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Export_Tbx $exporteur
      */
     public function export(editor_Models_Task $task, editor_Models_Export_Terminology_Tbx $exporteur) {
-        $langs = array($task->getSourceLang(), $task->getTargetLang());
-        if($task->getRelaisLang() > 0) {
-            $langs[] = $task->getRelaisLang();
-        }
+        $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languageModel editor_Models_Languages */
         
         $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collectionIds=$assoc->getCollectionsForTask($task->getTaskGuid());
+        
+        if(empty($collectionIds)){
+            return null;
+        }
+        
+        //get source and target language fuzzies
+        $langs=[];
+        $langs=array_merge($langs,$languageModel->getFuzzyLanguages($task->getSourceLang()));
+        $langs=array_merge($langs,$languageModel->getFuzzyLanguages($task->getTargetLang()));
+        if($task->getRelaisLang() > 0) {
+            $langs=array_merge($langs,$languageModel->getFuzzyLanguages($task->getRelaisLang()));
+        }
+        $langs=array_unique($langs);
         
         $data=$this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
         if(!$data) {

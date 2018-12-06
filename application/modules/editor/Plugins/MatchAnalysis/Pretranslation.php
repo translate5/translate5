@@ -124,8 +124,24 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $targetResult=$result->target;
         
+        $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+        /* @var $matchrateType editor_Models_Segment_MatchRateType */
+        
+        //set the type
+        $languageResource = $this->resources[$languageResourceid];
+        /* @var $langRes editor_Models_LanguageResources_LanguageResource */
+        
+        //just to display the TM name too, we add it here to the type
+        $type = $languageResource->getServiceName().' - '.$languageResource->getName();
+        
         //ignore internal fuzzy match target
         if (strpos($targetResult, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false){
+            //set the internal fuzzy available matchrate type
+            $matchrateType->initPretranslated(editor_Models_Segment_MatchRateType::TYPE_INTERNAL_FUZZY_AVAILABLE,$type);
+            $segment->setMatchRateType((string) $matchrateType);
+            
+            //save the segment and history
+            $this->saveSegmentAndHistory($segment,$history);
             return;
         }
         
@@ -155,16 +171,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segment->setUserGuid($this->userGuid);//to the authenticated userGuid
         $segment->setUserName($this->userName);//to the authenticated userName
         
-        $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        /* @var $matchrateType editor_Models_Segment_MatchRateType */
-        
-        //set the type
-        $langRes = $this->resources[$languageResourceid];
-        /* @var $langRes editor_Models_LanguageResources_LanguageResource */
-        
-        //just to display the TM name too, we add it here to the type 
-        $type = $langRes->getServiceName().' - '.$langRes->getName();
-        $matchrateType->initPretranslated($langRes->getResourceType(), $type);
+        $matchrateType->initPretranslated($languageResource->getResourceType(), $type);
         
         $segment->setMatchRateType((string) $matchrateType);
         
@@ -226,18 +233,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if($result->matchrate >= 100 && !$this->task->getEdit100PercentMatch()){
             $segment->setEditable(false);
         }
-        
-        $duration=new stdClass();
-        $duration->$segmentField=0;
-        $segment->setTimeTrackData($duration);
-        
-        $duration=new stdClass();
-        $duration->$segmentFieldEdit=0;
-        $segment->setTimeTrackData($duration);
-        
-        $history->save();
-        $segment->setTimestamp(null);
-        $segment->save();
+
+        //save the segment and history
+        $this->saveSegmentAndHistory($segment,$history);
     }
     
     
@@ -245,7 +243,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      * Init the task user assocition if exist. If not a default record will be initialized
      * @return editor_Models_TaskUserAssoc
      */
-    public function initUsertTaskAssoc(){
+    protected function initUsertTaskAssoc(){
         if($this->userTaskAssoc){
             return $this->userTaskAssoc;
         }
@@ -304,6 +302,27 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $tcs=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $tcs editor_Services_TermCollection_Service */
         return $lr->getServiceName()==$tcs->getName();
+    }
+    
+    /***
+     * Save the segment(set the duration and the timestamp) and the segmenthistory 
+     * @param editor_Models_Segment $segment
+     * @param editor_Models_SegmentHistory $history
+     */
+    protected function saveSegmentAndHistory(editor_Models_Segment $segment,editor_Models_SegmentHistory $history){
+        $segmentField=$this->sfm->getFirstTargetName();
+        $segmentFieldEdit=$segmentField.'Edit';
+        $duration=new stdClass();
+        $duration->$segmentField=0;
+        $segment->setTimeTrackData($duration);
+        
+        $duration=new stdClass();
+        $duration->$segmentFieldEdit=0;
+        $segment->setTimeTrackData($duration);
+        
+        $history->save();
+        $segment->setTimestamp(null);
+        $segment->save();
     }
     
     public function setUserGuid($userGuid) {

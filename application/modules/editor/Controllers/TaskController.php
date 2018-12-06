@@ -840,9 +840,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
         $this->entityLoad();
         //if task is erroneous then it is also deleteable, regardless of its locking state
-        if(!$this->entity->isErroneous() && !$forced){
+        if(!$this->entity->isImporting() && !$this->entity->isErroneous() && !$forced){
             $this->entity->checkStateAllowsActions();
         }
+        //we enable task deletion for importing task
+        $forced=$forced || $this->entity->isImporting();
+        
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
         /* @var $remover editor_Models_Task_Remover */

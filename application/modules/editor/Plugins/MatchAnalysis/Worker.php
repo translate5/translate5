@@ -41,7 +41,12 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      */
     public function work() {
         try {
+            $params = $this->workerModel->getParameters();
             $ret=$this->doWork();
+            //run the term tagger when the termtagger flag is set, it is pretranslation and no terminologie active
+            if($params['termtaggerSegment'] && $params['pretranslate'] && !$this->task->getTerminologie()){
+                $this->queueTermtagger($this->taskGuid,$this->workerModel->getId());
+            }
         } catch (Exception $e) {
             error_log("Error happend on match analysis and pretranslation (taskGuid=".$this->task->getTaskGuid()."). Error was: ".$e->getMessage());
             return false;
@@ -130,5 +135,29 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->unlock();
         }
         return $return;
+    }
+    
+    /***
+     * Queue the termtagger worker
+     * @param string $taskGuid
+     * @param string $workerId
+     * @return boolean
+     */
+    protected function queueTermtagger($taskGuid,$workerId){
+        $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTaggerImport');
+        /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
+        
+        // Create segments_meta-field 'termtagState' if not exists
+        $meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $meta editor_Models_Segment_Meta */
+        $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
+        
+        // init worker and queue it
+        if (!$worker->init($taskGuid, array('resourcePool' => 'import'))) {
+            $this->log->logError('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return false;
+        }
+        $worker->queue($workerId);
+        return true;
     }
 }

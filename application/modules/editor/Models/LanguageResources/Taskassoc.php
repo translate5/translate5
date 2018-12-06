@@ -139,6 +139,26 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $s->group('languageResource.id');
         return $this->loadFilterdCustom($s);
     }
+    
+    /***
+     * Load the associated language resources to a task by serviceName
+     * @param string $taskGuid
+     * @param string $serviceName
+     * @param array $ignoreAssocs: ignore languageresources task assocs 
+     */
+    public function loadAssocByServiceName($taskGuid,$serviceName,$ignoreAssocs=array()){
+        $s = $this->db->select()
+        ->from(array("assocs" => "LEK_languageresources_taskassoc"), array("assocs.*"))
+        ->setIntegrityCheck(false)
+        ->join(array("lr" => "LEK_languageresources"),"assocs.languageResourceId = lr.id","")
+        ->where('assocs.taskGuid=?', $taskGuid)
+        ->where('lr.serviceName=?', $serviceName);
+        if(!empty($ignoreAssocs)){
+            $s->where('assocs.id NOT IN(?)', $ignoreAssocs);
+        }
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
     /**
      * Returns join between taskassoc table and task table for languageResource's id list
      * @param array $languageResourceids

@@ -78,7 +78,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateTmAndTerm:'#UT#Vorübersetzen (TM &amp; Terme)',
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
         pretranslateMt:'#UT#Vorübersetzen (MT)',
-        pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt'
+        pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
+        termtaggerSegment:'#UT#Terminologie prüfen und markieren'
     },
     
     listen:{
@@ -96,7 +97,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             	startMatchAnalysis:'onStartMatchAnalysis'
             },
             'taskActionColumn': {
-                added: 'addTaskOverviewActionIcon'
+                itemsinitialized: 'onTaskActionColumnItemsInitialized'
             }
         },
         controller:{
@@ -116,14 +117,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
     
     /**
-     * Add the pie icon to the task overview action column
-     * @var {Editor.view.admin.TaskActionColumn} column
+     * Task action column items initialized event handler.
      */
-    addTaskOverviewActionIcon: function(column) {
-        column.items.push({
+    onTaskActionColumnItemsInitialized: function(items) {
+        items.push({
             tooltip:this.strings.taskGridIconTooltip,
             iconCls: 'ico-task-analysis',
-            isAllowedFor: 'editorAnalysisTask'      
+            isAllowedFor: 'editorAnalysisTask'   ,
+            sortIndex:8,   
         });
     },
     /**
@@ -265,6 +266,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     'data-qtip': me.strings.pretranslateMtTooltip
                 },
                 itemId:'pretranslateMt',
+            },{
+                xtype:'checkbox',
+                bind:{
+                    disabled:'{!hasTermcollection}'
+                },
+                value: 1,
+                boxLabel:me.strings.termtaggerSegment,
+                autoEl: {
+                    tag: 'div',
+                    'data-qtip': me.strings.termtaggerSegment
+                },
+                itemId:'termtaggerSegment',
             }]
         }]);
     },
@@ -347,10 +360,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
             params: {
-            	internalFuzzy: me.getComponentByItemId('cbInternalFuzzy').getValue() ? 1 : 0,
+            	internalFuzzy: me.isChecboxChecked('cbInternalFuzzy'),
                 pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
-                pretranslateTmAndTerm: me.getComponentByItemId('pretranslateTmAndTerm').getValue() ? 1 : 0,
-                pretranslateMt: me.getComponentByItemId('pretranslateMt').getValue() ? 1 : 0
+                pretranslateTmAndTerm: me.isChecboxChecked('pretranslateTmAndTerm'),
+                pretranslateMt: me.isChecboxChecked('pretranslateMt'),
+                termtaggerSegment: me.isChecboxChecked('termtaggerSegment'),
             },
             scope: this,
             timeout:600000,
@@ -395,6 +409,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     		return;
     	}
     	return cmp[0];
+    },
+
+    /***
+     * Check if the checbox component is checked
+     */
+    isChecboxChecked:function(itemId){
+        var component=this.getComponentByItemId(itemId);
+        if(!component || component.isDisabled()){
+            return 0;
+        }
+        return component.checked ? 1 : 0;
     },
 
     /***

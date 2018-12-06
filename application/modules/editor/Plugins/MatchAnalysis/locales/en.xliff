@@ -7,7 +7,7 @@
     
     	<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='>
 		    <source>Match-Analyse</source>
-		    <target>Match-Analysis</target>
+		    <target>Match analysis</target>
 		</trans-unit>
 		
 		<trans-unit id='QmVlbmRlbg=='>
@@ -118,6 +118,11 @@
 		<trans-unit id='RGllIE1hdGNoLUFuYWx5c2UgdW5kIGRpZSBWb3LDvGJlcnNldHp1bmcgc2luZCBhYmdlc2NobG9zc2VuLg=='>
 		    <source>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</source>
 		    <target>Match analysis and pretranslation are finished.</target>
+		</trans-unit>
+
+		<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='>
+		    <source>Terminologie prüfen und markieren</source>
+		    <target>Check and mark terminology</target>
 		</trans-unit>
 
     </body>

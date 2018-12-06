@@ -189,7 +189,8 @@ Ext.define('Editor.controller.Localizer', {
                 "source": '<?php echo $this->translate->_('Quelle übernommen');?>',
                 "auto-propagated": '<?php echo $this->translate->_('Wiederholung');?>',
                 "auto-aligned": '<?php echo $this->translate->_('Alignment');?>',
-                "document-match": '<?php echo $this->translate->_('Dokumenten-Match');?>'
+                "document-match": '<?php echo $this->translate->_('Dokumenten-Match');?>',
+                "internal-fuzzy-available": '<?php echo $this->translate->_('Interner Fuzzy');?>'
             },
             importDesc: {
                 "tm": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus einem TM übernommen');?>',
@@ -209,7 +210,8 @@ Ext.define('Editor.controller.Localizer', {
             pretranslatedDesc: {
                 "tm": '<?php echo $this->translate->_('Bei der Vorübersetzung aus TM übernommen');?>',
                 "mt": '<?php echo $this->translate->_('Bei der Vorübersetzung aus MT übernommen');?>',
-                "termcollection": '<?php echo $this->translate->_('Bei der Vorübersetzung aus Term-Collection übernommen');?>'
+                "termcollection": '<?php echo $this->translate->_('Bei der Vorübersetzung aus Term-Collection übernommen');?>',
+                "internal-fuzzy-available": '<?php echo $this->translate->_('Interner Fuzzy verfügbar');?>'
             }
         }
     });
@@ -437,7 +439,12 @@ Ext.define('Editor.controller.Localizer', {
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
             openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
             loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
-            loading: '<?php echo $this->translate->_('Laden');?>'
+            loading: '<?php echo $this->translate->_('Laden');?>',
+            importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
+            deleteTaskDialogMessage:'<?php echo $this->translate->_('Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?');?>',
+            deleteTaskDialogTitle:'<?php echo $this->translate->_('Aufgabe löschen');?>',
+            taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
+            taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -520,7 +527,6 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
-        importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
         strings: {
             importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
@@ -1178,7 +1184,8 @@ Ext.define('Editor.controller.Localizer', {
             taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             customers: '<?php echo $this->translate->_('Kunden');?>',
         	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
-        	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>'
+        	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
         }
     });
 

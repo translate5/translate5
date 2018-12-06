@@ -550,6 +550,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * returns if tasks is importing
+     * @return boolean
+     */
+    public function isImporting() {
+        return $this->getState() == self::STATE_IMPORT;
+    }
+    
+    
+    /**
      * checks if the given taskGuid is locked. If optional userGuid is given, 
      * checks if is locked by given userGuid. 
      * @param string $taskGuid
@@ -742,5 +751,21 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         $s->where('lower(taskName) LIKE lower(?)','%'.$searchString.'%');
         return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
+     * Update the terminologie flag based on if there is a term collection assigned as language resource to the task.
+     * @param string $taskGuid
+     * @param array $ignoreAssocs: the provided languageresources taskassoc ids will be ignored
+     */
+    public function updateIsTerminologieFlag($taskGuid,$ignoreAssocs=array()){
+        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
+        $result=$assoc->loadAssocByServiceName($taskGuid, $service->getName(),$ignoreAssocs);
+        $this->loadByTaskGuid($taskGuid);
+        $this->setTerminologie(!empty($result));
+        $this->save();
     }
 }

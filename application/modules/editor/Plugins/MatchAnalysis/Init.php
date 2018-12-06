@@ -101,6 +101,18 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
+    public function handleOnAnalysisOperation(Zend_EventManager_Event $event){
+        //if the task is in import state -> queue the worker, do not pretranslate
+        //if the task is allready imported -> run the analysis directly, do not pretranslate
+        $this->handleOperation($event);
+    }
+    
+    public function handleOnPretranslationOperation(Zend_EventManager_Event $event){
+        //if the task is in import state -> queue the worker, set pretranslate to true in the worker and from the worker in the analysis
+        //if the task is allready imported -> run the analysis directly, set pretranslate to true
+        $this->handleOperation($event,true);
+    }
+    
     /***
      * Queue the match analysis worker
      * 
@@ -109,7 +121,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @param array $eventParams
      * @return void|boolean
      */
-    public function queueAnalysis($taskGuid, $pretranlsate = false, $eventParams = []) {
+    protected function queueAnalysis($taskGuid, $pretranlsate = false, $eventParams = []) {
         if(!$this->checkLanguageResources($taskGuid)){
             error_log("The associated language resource can not be used for analysis.");
             return;
@@ -139,20 +151,8 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         if(!empty($result)){
             $parentWorkerId=$result[0]['id'];
         }
+        
         $worker->queue($parentWorkerId);
-    }
-    
-    public function handleOnAnalysisOperation(Zend_EventManager_Event $event){
-        //if the task is in import state -> queue the worker, do not pretranslate
-        //if the task is allready imported -> run the analysis directly, do not pretranslate
-        $this->handleOperation($event);
-    }
-    
-    
-    public function handleOnPretranslationOperation(Zend_EventManager_Event $event){
-        //if the task is in import state -> queue the worker, set pretranslate to true in the worker and from the worker in the analysis
-        //if the task is allready imported -> run the analysis directly, set pretranslate to true
-        $this->handleOperation($event,true);
     }
     
     /***
@@ -169,7 +169,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         settype($params['pretranslateMatchrate'], 'integer');
         settype($params['pretranslateTmAndTerm'], 'boolean');
         settype($params['pretranslateMt'], 'boolean');
-        
+        settype($params['termtaggerSegment'], 'boolean');
         $this->queueAnalysis($task->getTaskGuid(),$pretranlsate,$params);
     }
 

@@ -117,6 +117,11 @@
 		    <source>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</source>
 		    <target>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</target>
 		</trans-unit>
+
+		<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='>
+		    <source>Terminologie prüfen und markieren</source>
+		    <target>Terminologie prüfen und markieren</target>
+		</trans-unit>
 		
     </body>
   </file>

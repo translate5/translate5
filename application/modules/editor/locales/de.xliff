@@ -1642,8 +1642,6 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <target>Für diese Kunden nutzen</target>
 </trans-unit>
 
--------------------------------------------------------------------------------------
-
 <trans-unit id='VmVyYW50d29ydGxpY2g='>     
     <source>Verantwortlich</source>     
     <target>Verantwortlich</target> 
@@ -1752,6 +1750,26 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='>
     <source>Quelle des Eintrags</source>
     <target>Quelle des Eintrags</target>
+</trans-unit>
+
+<trans-unit id='U29sbHRlIGRlciBUYXNrIGdlbMO2c2NodCBvZGVyIG1pdCBkZW4gYWt0dWVsbGVuIEVpbnN0ZWxsdW5nZW4gaW1wb3J0aWVydCB3ZXJkZW4/'>
+    <source>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</source>
+    <target>Should the task be deleted or imported with the current settings?</target>
+</trans-unit>
+
+<trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='>
+    <source>Aufgabe löschen</source>
+    <target>Delete task</target>
+</trans-unit>
+
+<trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
+    <source>Ressource: {name}</source>
+    <target>Ressource: {name}</target>
+</trans-unit>
+
+<trans-unit id='QXVmZ2FiZSBpbXBvcnRpZXJlbg=='>
+    <source>Aufgabe importieren</source>
+    <target>Aufgabe importieren</target>
 </trans-unit>
 
   </body>
