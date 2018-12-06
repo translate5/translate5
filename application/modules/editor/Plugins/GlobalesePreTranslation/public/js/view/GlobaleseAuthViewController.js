@@ -115,7 +115,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             method: 'GET',
             params: params,
             success: function(response){
-                var responsData = JSON.parse(response.responseText);
+                var responsData = Ext.JSON.decode(response.responseText);
                 if(!responsData){
                     Editor.MessageBox.addInfo(me.strings.noEnginesFoundMsg, 1.4);
                 }
@@ -168,7 +168,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             method: 'GET',
             params: params,
             success: function(response){
-                var responseObject = JSON.parse(response.responseText);
+                var responseObject = Ext.JSON.decode(response.responseText);
                 if(responseObject && responseObject.rows){
                     var groups = Ext.create('Ext.data.Store', {
                         fields: [
