@@ -37,12 +37,8 @@ class editor_Models_LanguageResources_SdlResources {
      * @return array
      */
     public function getAllEngines(){
-        $dummy=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $dummy editor_Models_LanguageResources_LanguageResource */
-        
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummy]);
+        $api = ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi');
         /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
-        
         
         $result=null;
         //load all available engines

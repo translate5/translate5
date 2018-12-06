@@ -473,6 +473,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             ended: '<?php echo $this->translate->_('beendet');?>',
             noUsers: '<?php echo $this->translate->_('Keine Benutzer zugeordnet!');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
             lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
             lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
@@ -491,6 +492,7 @@ Ext.define('Editor.controller.Localizer', {
             relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
             state: '<?php echo $this->translate->_('Status');?>',
+            customerName: '<?php echo $this->translate->_('Kunde');?>',
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
             users: '<?php echo $this->translate->_('Benutzer');?>',
             wordCount: '<?php echo $this->translate->_('Wörter');?>',
@@ -513,6 +515,7 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
         strings:{
             taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            customerName: '<?php echo $this->translate->_('Kunde');?>',
             deliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
             realDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (ist)');?>',
             orderDate: '<?php echo $this->translate->_('Bestelldatum');?>',
@@ -548,7 +551,6 @@ Ext.define('Editor.controller.Localizer', {
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
             bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
-            bottomInfo2: '<?php echo $this->translate->_('² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.');?>',
             feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
             feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
             addBtn: '<?php echo $this->translate->_('Aufgabe Importieren');?>',
@@ -947,7 +949,9 @@ Ext.define('Editor.controller.Localizer', {
       entrySaved: '<?php echo $this->translate->_('Eintrag gespeichert');?>',
       entryDeleted: '<?php echo $this->translate->_('Eintrag gelöscht');?>',
       entrySaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
-      forAll: '<?php echo $this->translate->_('für alle');?>'
+      forAll: '<?php echo $this->translate->_('für alle');?>',
+      customerTip: '<?php echo $this->translate->_('Kunde der Aufgabe (Angabe notwendig)');?>',
+      customerLabel: '<?php echo $this->translate->_('Kunde');?>'
     };
 <?php 
     }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
@@ -958,6 +962,7 @@ Ext.define('Editor.controller.Localizer', {
 		override: "Editor.controller.admin.Customer",
         strings: {
             customer:'<?php echo $this->translate->_("Kunden");?>',
+            allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>',
         }
     });
 
@@ -1077,7 +1082,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
-            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.');?>',
+            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
             name: '<?php echo $this->translate->_('Name');?>',

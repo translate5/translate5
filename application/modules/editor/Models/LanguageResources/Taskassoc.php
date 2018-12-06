@@ -109,6 +109,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         /* @var $services editor_Services_Manager */
         $allservices=$services->getAll();
         
+        $this->filter->addTableForField('taskGuid', 'ta');
         $s = $db->select()
         ->setIntegrityCheck(false)
         ->from(array("languageResource" => "LEK_languageresources"), array("languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
@@ -136,6 +137,11 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         
         $on = $adapter->quoteInto('ta.languageResourceId = languageResource.id AND ta.taskGuid = ?', $taskGuid);
         $s->joinLeft(["ta"=>"LEK_languageresources_taskassoc"], $on, $checkColumns);
+        
+        // Only match resources can be associated to a task, that are associated to the same client as the task is.
+        $s->join(array("cu"=>"LEK_languageresources_customerassoc"), 'languageResource.id=cu.languageResourceId',array('cu.customerId AS customerId'))
+        ->where('cu.customerId=?',$task->getCustomerId());
+
         $s->group('languageResource.id');
         return $this->loadFilterdCustom($s);
     }

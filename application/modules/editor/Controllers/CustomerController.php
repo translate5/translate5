@@ -81,6 +81,30 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
     }
     
+    public function deleteAction() {
+        try {
+            parent::deleteAction();
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+            if(stripos($m, 'Integrity constraint violation') !== false) {
+                throw new ZfExtended_Models_Entity_NotAcceptableException('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
+            }
+            throw $e;
+        }
+    }
+    
+    /**
+     * Protect the default customer from being edited or deleted.
+     */
+    protected function entityLoad() {
+        $this->entity->load($this->_getParam('id'));
+        if(($this->_request->isPut() || $this->_request->isDelete())
+                && $this->entity->isDefaultCustomer()) {
+                    throw new ZfExtended_Models_Entity_NotAcceptableException('The default client must not be edited or deleted.', 0);
+                }
+    }
+    
     /**
      * Internal handler for duplicated entity message
      * @param Zend_Db_Statement_Exception $e

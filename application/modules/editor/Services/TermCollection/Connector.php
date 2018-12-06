@@ -30,15 +30,12 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Services_TermCollection_Connector extends editor_Services_Connector_FilebasedAbstract {
 
-    /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::connectTo()
-     */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
+    public function __construct() {
+        parent::__construct();
         //the translations from the term collections are with high priority, that is why 104 (this is the highest matchrate in translate5)
         $this->defaultMatchRate = self::TERMCOLLECTION_MATCH_VALUE;
     }
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
