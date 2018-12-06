@@ -71,10 +71,19 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       entrySaved: '#UT#Eintrag gespeichert',
       entryDeleted: '#UT#Eintrag gelöscht',
       entrySaveError: '#UT#Fehler beim Speichern der Änderungen!',
-      forAll: '#UT#für alle'
+      forAll: '#UT#für alle',
+      customerTip: '#UT#Kunde der Aufgabe (Angabe notwendig)',
+      customerLabel: '#UT#Kunde'
   },
   actualTask: null,
   alias: 'controller.taskPreferencesController',
+  listen: {
+      component: {
+          '#taskMainCard':{
+              render:'onTaskMainCardRender'
+          }
+      }
+  },
   
   init : function() {
       var me = this,
@@ -520,5 +529,44 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           }
       });
       me.loadAllPreferences(me.actualTask);
+  },
+  
+  /**
+   * Called when task add window (task main card) is rendered.
+   * Adds the item for assigning a customer to the new task.
+   * If there is only one client defined, this client is 
+   * automatically associated and the drop-down is omitted.
+   */
+  onTaskMainCardRender: function(taskMainCard,eOpts) {
+      var me = this, 
+          taskMainCardContainer = taskMainCard.down('#taskMainCardContainer'),
+          userCustomers = Ext.StoreManager.get('userCustomers');
+      
+      // add the customer field to the taskUpload window
+      if(userCustomers.getTotalCount() == 1) {
+          taskMainCardContainer.add({
+              xtype: 'displayfield',
+              name: 'customer',
+              itemId: 'customer',
+              value: userCustomers.getAt(0).getData().name, // display customer-name for the user
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel
+          });
+          taskMainCardContainer.add({
+              xtype: 'hiddenfield',
+              name: 'customerId',
+              itemId: 'customerId',
+              value: userCustomers.getAt(0).getData().id, // store customer-id in LEK_task
+          });
+      } else {
+          taskMainCardContainer.add({
+              xtype: 'usercustomerscombo',
+              name: 'customerId',
+              itemId: 'customerId',
+              allowBlank: false,
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel
+          });
+      }
   }
 });

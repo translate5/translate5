@@ -31,6 +31,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     requires:[
         'Editor.view.admin.TaskUpload',
         'Editor.view.admin.TaskAddWindowViewModel',
+        'Editor.view.admin.customer.UserCustomersCombo',
         'Editor.view.LanguageCombo'
     ],
     mixins:[
@@ -47,7 +48,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
         importUploadType: '#UT#Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!',
-        importTbxTipDis: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
         importNews: '#UT#Sie können direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
         
         taskNrLabel: '#UT#Auftragsnummer',
@@ -66,7 +66,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         lockLockedLabel: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
         bottomInfo: '#UT# ¹ Diese Angaben / Daten werden für den Import zwingend benötigt.',
-        bottomInfo2: '#UT# ² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminology auszuzeichnen.',
         feedbackText: "#UT# Fehler beim Import!",
         feedbackTip: '#UT#Fehler beim Import: Bitte wenden Sie sich an den Support!',
         addBtn: '#UT#Aufgabe Importieren',
@@ -221,6 +220,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     padding: '0 0 10 0',
                                     html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
                                 }]
+                                // + item for assigning customers to the task
+                                // (added dynamically by Editor.controller.admin.TaskPreferences)
                             },{
                                 xtype: 'container',
                                 flex: 1,
@@ -276,7 +277,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         },{
                             xtype: 'container',
                             padding: '10',
-                            html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,
+                            html: me.strings.bottomInfo,
                             dock : 'bottom'
                         }],
                         triggerNextCard:function(activeItem){

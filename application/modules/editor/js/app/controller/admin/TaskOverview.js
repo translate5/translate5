@@ -293,12 +293,21 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var name = this.getTaskAddForm().down('textfield[name=taskName]'),
           srcLang = this.getTaskAddForm().down('combo[name=sourceLang]'),
           targetLang = this.getTaskAddForm().down('combo[name=targetLang]'),
-          langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
+          langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
       if(name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/,''));
       }
       //simple algorithmus to get the language from the filename
       if(langs && langs.length == 3) {
+          //try to convert deDE language to de-DE for searching in the store
+          var regex = /^([a-z]+)([A-Z]+)$/;
+          if(regex.test(langs[1])) {
+              langs[1] = langs[1].match(/^([a-z]+)([A-Z]+)$/).splice(1).join('-');
+          }
+          if(regex.test(langs[2])) {
+              langs[2] = langs[2].match(/^([a-z]+)([A-Z]+)$/).splice(1).join('-');
+          }
+          
           var srcStore = srcLang.store,
               targetStore = targetLang.store,
               srcIdx = srcStore.find('label', '('+langs[1]+')', 0, true, true),

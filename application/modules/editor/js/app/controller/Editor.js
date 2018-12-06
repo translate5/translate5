@@ -1189,7 +1189,7 @@ Ext.define('Editor.controller.Editor', {
             but = navi.down('#watchSegmentBtn'),
             success = function(rec, op) {
                 var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
-                    autoStateCell = Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
+                    autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
                 //isWatched
                 record.set('isWatched', !isWatched);
                 record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
@@ -1202,7 +1202,7 @@ Ext.define('Editor.controller.Editor', {
                     me.fireEvent('watchlistRemoved', record, me, rec);
                 }
                 //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
-                displayfield.setValue(autoStateCell.getHtml());
+                autoStateCell && displayfield.setValue(autoStateCell.getHtml());
             },
             failure = function(rec, op) {
                 but.setTooltip(isWatched ? stopText : startText);
