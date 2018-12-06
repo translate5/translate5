@@ -725,13 +725,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         
         foreach($data as $key=>$value) {
             $alreadyProcessed = array();
+            //the term collection contains terms with only one language
+            $isSingleCombination=count($value)==1;
             foreach ($value as $x) {
                 foreach ($value as $y) {
                     //keep track of what is already processed
                     $combination = array($x['language'], $y['language']);
                     
-                    //it is not the same number and thay are not already processed
-                    if ($x['language'] === $y['language'] || in_array($combination, $alreadyProcessed)) {
+                    //it is not the same number or single language combination and thay are not already processed
+                    if (($x['language'] === $y['language'] && !$isSingleCombination) || in_array($combination, $alreadyProcessed)) {
                         continue;
                     }
                     //Add it to the list of what you've already processed

@@ -88,6 +88,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             items:[{
                     xtype:'grid',
                     itemId:'matchAnalysisGrid',
+                    cls: 'matchAnalysisGrid',
                     emptyText:me.strings.noAnalysis,
                     store : analysisStore,
                     features: [{
@@ -110,6 +111,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         sortable : true
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '104',
                         cellWrap: true,
@@ -122,6 +124,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         renderer:columnRenderer,
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '103',
                         cellWrap: true,
@@ -134,6 +137,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         renderer:columnRenderer,
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '102',
                         cellWrap: true,
@@ -146,6 +150,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '101',
                         cellWrap: true,

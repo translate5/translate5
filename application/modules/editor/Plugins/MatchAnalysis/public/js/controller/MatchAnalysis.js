@@ -438,9 +438,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                         success:function(record){
                             var assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
 
-                            //the task state is different as matchanalysis
-                            if(record.get('state')!='matchanalysis'){
-
+                            //the task state is different as matchanalysis and import
+                            if(record.get('state')!='matchanalysis' && record.get('state')!='import'){
                                 //stop the task loop
                                 Ext.TaskManager.stop(runTask);
                                 //remove the mask from the task assoc panel if exist
