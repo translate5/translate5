@@ -68,7 +68,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         },
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Standardmässig aktiv für',
-        taskassocgridcell:'#UT#Zugewiesene Aufgaben'
+        taskassocgridcell:'#UT#Zugewiesene Aufgaben',
+        groupHeader: '#UT#Ressource: {name}'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -97,6 +98,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                     }
                 },
+                features: [{ftype:'grouping'}],
                 columns: [{
                     xtype: 'gridcolumn',
                     width: 170,

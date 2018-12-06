@@ -54,72 +54,99 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
    * Items and Icon Class: the action dispatching is done by the iconCls, therefore the iconCls has to start with ico-task
    * The Action itself is the afterwards part, so the following class "ico-task-foo-bar" is transformed to handleTaskFooBar in the controller
    * We cant use the isAllowedFor right, because in the click handler we have only access to the DOM Element (and therefore the icon cls) 
-   * @param cfg
+   * @param instanceConfig
    */
-  constructor: function(cfg) {
-      var me = this,
-          itemFilter = function(item){
-              //this filters only by systemrights. taskrights must be implemented by css
-              return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
-          },
-          items = Ext.Array.filter([{
-              // - öffnen
-              tooltip: me.messages.actionOpen,
-              isAllowedFor: 'editorOpenTask',
-              iconCls: 'ico-task-open'
-          },{
-              // - read only öffnen
-              tooltip: me.messages.actionEdit,
-              isAllowedFor: 'editorEditTask',
-              iconCls: 'ico-task-edit'
-          },{
-              // - abschließen (Recht editorFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf finish)
-              tooltip: me.messages.actionFinish,
-              isAllowedFor: 'editorFinishTask',
-              iconCls: 'ico-task-finish'
-          },{
-              // - wieder öffnen (Recht editorUnFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf open, aktuell nicht gefordert)
-              tooltip: me.messages.actionUnFinish,
-              isAllowedFor: 'editorUnfinishTask',
-              iconCls: 'ico-task-unfinish'
-          },{
-              // - beenden (Recht editorEndTask benötigt, setzt den Task auf Status ""end"")
-              tooltip: me.messages.actionEnd,
-              isAllowedFor: 'editorEndTask',
-              iconCls: 'ico-task-end'
-          },{
-              // - wieder öffnen (Recht editorReOpenTask benötigt, setzt den Task auf Status ""open"")
-              tooltip: me.messages.actionReOpen,
-              isAllowedFor: 'editorReopenTask',
-              iconCls: 'ico-task-reopen'
-          },{
-              tooltip: me.messages.taskPrefs,
-              isAllowedFor: 'editorPreferencesTask',
-              iconCls: 'ico-task-preferences'
-          },{
-              // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten. 
-              // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen. 
-              tooltip: me.messages.exp,
-              isAllowedFor: 'editorShowexportmenuTask',
-              iconCls: 'ico-task-showexportmenu'
-          },{
-              tooltip: me.messages.actionClone,
-              isAllowedFor: 'editorCloneTask',
-              iconCls: 'ico-task-clone'
-          },{
-              tooltip: me.messages.actionDelete,
-              isAllowedFor: 'editorDeleteTask',
-              iconCls: 'ico-task-delete'
-          }],itemFilter),
-          width = items.length * 18;
-          
-      cfg = cfg || {};
-      
-      //dynamic column width with configured minWith
-      cfg.width = Math.max(width, me.width);
-      
-      me.callParent([Ext.apply({
-          items: items
-      }, cfg)]);
-  }
+  constructor: function(instanceConfig) {
+    var me = this,
+    config = {
+        itemFilter:function(item){
+            //this filters only by systemrights. taskrights must be implemented by css
+            return Editor.app.authenticatedUser.isAllowed(item.isAllowedFor);
+        },
+        items:[{
+                // - öffnen
+                tooltip: me.messages.actionOpen,
+                isAllowedFor: 'editorOpenTask',
+                iconCls: 'ico-task-open',
+                sortIndex:1,//define the sort index (this is no extjs property, it is internaly used for sorting)
+            },{
+                // - read only öffnen
+                tooltip: me.messages.actionEdit,
+                isAllowedFor: 'editorEditTask',
+                iconCls: 'ico-task-edit',
+                sortIndex:2,
+            },{
+                // - abschließen (Recht editorFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf finish)
+                tooltip: me.messages.actionFinish,
+                isAllowedFor: 'editorFinishTask',
+                iconCls: 'ico-task-finish',
+                sortIndex:3,
+            },{
+                // - wieder öffnen (Recht editorUnFinishTask benötigt, setzt den TaskUser Status des aktuellen Users auf open, aktuell nicht gefordert)
+                tooltip: me.messages.actionUnFinish,
+                isAllowedFor: 'editorUnfinishTask',
+                iconCls: 'ico-task-unfinish',
+                sortIndex:4,
+            },{
+                // - beenden (Recht editorEndTask benötigt, setzt den Task auf Status ""end"")
+                tooltip: me.messages.actionEnd,
+                isAllowedFor: 'editorEndTask',
+                iconCls: 'ico-task-end',
+                sortIndex:5,
+            },{
+                // - wieder öffnen (Recht editorReOpenTask benötigt, setzt den Task auf Status ""open"")
+                tooltip: me.messages.actionReOpen,
+                isAllowedFor: 'editorReopenTask',
+                iconCls: 'ico-task-reopen',
+                sortIndex:6,
+            },{
+                tooltip: me.messages.taskPrefs,
+                isAllowedFor: 'editorPreferencesTask',
+                iconCls: 'ico-task-preferences',
+                sortIndex:7,
+            },{
+                tooltip: me.messages.actionClone,
+                isAllowedFor: 'editorCloneTask',
+                iconCls: 'ico-task-clone',
+                sortIndex:9,
+            },{
+                // - Export Icon, bei Klick darauf öffnet sich ein Menü mit den verschiedenen Export Möglichkeiten. 
+                // Die einzelnen Menüpunkte ebenfalls per isAllowed abfragen. 
+                tooltip: me.messages.exp,
+                isAllowedFor: 'editorShowexportmenuTask',
+                iconCls: 'ico-task-showexportmenu',
+                sortIndex:10,
+            },{
+                tooltip: me.messages.actionDelete,
+                isAllowedFor: 'editorDeleteTask',
+                iconCls: 'ico-task-delete',
+                sortIndex:11,
+            }]
+    };
+
+    //workaroud for fireevent (the component is not created yet so fake the event)
+    me.hasListeners={};
+    me.hasListeners['itemsinitialized']=true;
+    
+    //fire the event, so another action columns can be added from outside
+    me.fireEvent('itemsinitialized',config.items);
+    
+    config.items=Ext.Array.sort(config.items,function(a,b){
+        return a.sortIndex - b.sortIndex;
+    });
+
+    config.items= Ext.Array.filter(config.items,config.itemFilter);
+    config.width = config.items.length * 18;
+
+    //dynamic column width with configured minWith
+    config.width = Math.max(config.width, me.width);
+
+    if (instanceConfig) {
+        me.self.getConfigurator().merge(me, config, instanceConfig);
+    }
+    
+    me.callParent([Ext.apply({
+        items: config.items
+    }, config)]);
+  },
 });

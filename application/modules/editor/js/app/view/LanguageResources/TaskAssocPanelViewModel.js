@@ -49,6 +49,9 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanelViewModel', {
         hasMt:function(get){
             return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.MT);
         },
+        hasTermcollection:function(get){
+            return this.checkResourceType(get('items'),Editor.util.LanguageResources.resourceType.TERM_COLLECTION);
+        }
     },
 
     checkResourceType:function(items,resourceType){

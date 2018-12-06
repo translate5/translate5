@@ -223,17 +223,18 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         //using tooltip 
         qtip(meta, label, me.strings[prefix+'Desc'][firstType]);
         value.unshift(firstType);
+        var newValue=[];
         //and image
         Ext.Array.each(value, function(val, idx){
             var path;
             if(Editor.data.segments.matchratetypes && Editor.data.segments.matchratetypes[val]) {
                 path = Editor.data.segments.matchratetypes[val];
-                value[idx] = {
+                newValue[idx] = {
                     type: val,
                     path: path
                 };
             }
         });
-        return me.imgTpl.apply({types: value, edited: !isImport});
+        return me.imgTpl.apply({types: newValue, edited: !isImport});
     }
 });

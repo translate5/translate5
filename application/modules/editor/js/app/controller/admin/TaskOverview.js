@@ -92,7 +92,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht",
       loadingWindowMessage:"#UT#Dateien werden hochgeladen",
-      loading:'#UT#Laden'
+      loading:'#UT#Laden',
+      importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
+      deleteTaskDialogMessage:'#UT#Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?',
+      deleteTaskDialogTitle:'#UT#Aufgabe löschen',
+      taskImportButtonText:'#UT#Aufgabe importieren',
+      taskDeleteButtonText:'#UT#Aufgabe löschen'
   },
   init : function() {
       var me = this;
@@ -266,11 +271,17 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               }
           };
       tasks.each(function(task){
-          if(!task.isImporting()){
+          if(!task.isImporting() || task.dropped){
               return;
           }
           task.load({
-              success: taskReloaded
+              success: taskReloaded,
+              failure: function(records, op){
+                  //handle 404, so the user does not receive error messages
+                if(op.getError().status != '404') {
+                    Editor.app.getController('ServerException').handleException(op.error.response);
+                }
+            }
           });
           foundImporting++;
       });
@@ -698,12 +709,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var me = this,
 	      win = me.getTaskAddWindow(),
 	      winLayout=win.getLayout(),
-	      nextStep=winLayout.getNext(),
-	      activeItem=winLayout.getActiveItem();
+          activeItem=winLayout.getActiveItem(),
+          task=activeItem.task;
       
       //if the task exist start it if the import is not started yet
       if(activeItem.task && !me.isImportStarted){
-    	  me.startImport(activeItem.task);
+          Ext.Msg.show({
+            title:me.strings.deleteTaskDialogTitle,
+            message: me.strings.deleteTaskDialogMessage,
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            closable:false,
+            buttonText: {
+                yes: me.strings.taskDeleteButtonText,
+                no: me.strings.taskImportButtonText
+            },
+            fn: function(btn) {
+                //yes -> the task will be deleted
+                //no  -> the task will be imported
+                if (btn === 'yes') {
+                	me.handleTaskDelete(task);
+                } else if (btn === 'no') {
+                    me.startImport(task);
+                }
+            }
+          });
       }
   },
 
@@ -757,6 +787,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               win.setLoading(false);
               me.getAdminTasksStore().load();
               
+              //set the store reference to the model(it is missing), it is used later when the task is deleted
+              task.store=me.getAdminTasksStore();
+              
               me.setCardsTask(task);
               
               //call the callback if exist
@@ -781,8 +814,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  var me=this,
 	  	  url=Editor.data.restpath+"task/"+task.get('id')+"/import",
 	  	  win = me.getTaskAddWindow();
-	  
-	  win.setLoading(me.strings.loading);
+      
+      //if the window exist, add loading mask
+	  win && win.setLoading(me.strings.loading);
 	  
 	  //set the import started flag
 	  me.isImportStarted=true;
@@ -791,13 +825,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 		 url:url,
 		 method:'GET',
          success: function(response){
-        	 win.setLoading(false);
-             Editor.MessageBox.addSuccess(win.importTaskMessage,2);
+        	 win && win.setLoading(false);
+             Editor.MessageBox.addSuccess(me.strings.importTaskMessage,2);
              me.handleTaskCancel();
              me.isImportStarted=false;
          },
          failure: function(response){
-        	 win.setLoading(false);
+        	 win && win.setLoading(false);
              Editor.app.getController('ServerException').handleException(response);
              me.isImportStarted=false;
          }
