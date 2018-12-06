@@ -115,7 +115,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             }
         }
     },
-    
+
     /**
      * Task action column items initialized event handler.
      */
@@ -423,45 +423,19 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
 
     /***
-     * Check the task state on each 10 secounds.
-     * It is used to check if the matchanalysis are finished.
+     * Add tast state check conditional function, so the task reload condition depends also from the matchanalysis state
      */
     checkTaskState:function(taskId){
-        var me=this,
-            runTask={
-                run:function(){
-                    //get the task from the task store
-                    var task=Ext.StoreManager.get('admin.Tasks').getById(taskId);
-
-                    //load the task on each 10 sec, so the task status is checked
-                    task.load({
-                        success:function(record){
-                            var assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
-
-                            //the task state is different as matchanalysis and import
-                            if(record.get('state')!='matchanalysis' && record.get('state')!='import'){
-                                //stop the task loop
-                                Ext.TaskManager.stop(runTask);
-                                //remove the mask from the task assoc panel if exist
-                                if(assocPanel){
-                                    assocPanel.getEl().unmask();
-                                }
-                                Editor.MessageBox.addSuccess(me.strings.finishAnalysisMsg);
-                            }
-                        },
-                        failure: function(response){
-                            var assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
-                            Ext.TaskManager.stop(runTask);
-                            if(assocPanel){
-                                assocPanel.getEl().unmask();
-                            }
-                        }
-                    });
-                },
-                scope: this,
-                interval: 10000
-            };
-        //start the task
-        Ext.TaskManager.start(runTask);
+        //the task needs to be updated, so the last state is fetched from the db
+        Ext.StoreManager.get('admin.Tasks').getById(taskId).load({
+            success:function(){
+                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
+                //add match analysis state checker function to the task state checker loop
+                controller.addTaskStateCheckPull(function(rec){
+                    return rec.get('state')=='matchanalysis';
+                });
+                controller.startCheckImportStates();
+            }
+        });
     }
 });
