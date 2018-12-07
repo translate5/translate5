@@ -98,8 +98,10 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
         if (count($i) > 0) {
             
             $addition = implode('', $i);
-            if($addition === '')return;
-            return '<ins>' . $addition . '</ins>';
+            if($addition === ''){
+                return;
+            }
+            return $this->surroundWithIns($addition);
         }
         return '';
     }
@@ -114,8 +116,10 @@ class editor_Models_Export_DiffTagger_Csv extends editor_Models_Export_DiffTagge
         if (count($d) > 0) {
             
             $deletion = implode('', $d);
-            if($deletion === '')return;
-            return '<del>' . $deletion . '</del>';
+            if($deletion === ''){
+                return;
+            }
+            return $this->surroundWithDel($deletion);
         }
         return '';
     }

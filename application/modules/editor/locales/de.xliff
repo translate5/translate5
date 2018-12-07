@@ -1772,6 +1772,11 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <target>Aufgabe importieren</target>
 </trans-unit>
 
+<trans-unit id='VW50ZXJzY2hpZWQgenUgUXVlbGxzZWdtZW50'>
+    <source>Unterschied zu Quellsegment</source>
+    <target>Unterschied zu Quellsegment</target>
+</trans-unit>
+
   </body>
  </file>
 </xliff>
