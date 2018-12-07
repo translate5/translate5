@@ -188,7 +188,8 @@ Ext.define('Editor.controller.admin.Customer', {
             loginFieldset=adminWindow.down('#loginDetailsFieldset');
         
         loginFieldset.add({
-            xtype:'customers'
+            xtype:'customers',
+            allowBlank: false
         });
     },
 
