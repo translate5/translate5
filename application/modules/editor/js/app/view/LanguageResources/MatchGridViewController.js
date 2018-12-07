@@ -44,7 +44,8 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         noresults: '#UT#Es wurden keine Ergebnisse gefunden.',
         serverErrorMsgDefault: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
         serverErrorMsg500: '#UT#Die Anfrage führte zu einem Fehler im angefragten Dienst.',
-        serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.'
+        serverErrorMsg408: '#UT#Die Anfrage an die Sprachressource dauerte zu lange.',
+        delInsTagTooltip:'#UT#Unterschied zu Quellsegment'
     },
     refs:[{
         ref: 'matchgrid',
@@ -77,6 +78,8 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
     firstEditableRow: -1,
     NUMBER_OF_CHACHED_SEGMENTS:10,
     ergonomicMode: false,
+    //tooltip for source and del tags in grid source column
+    sourceFieldDelInsTooltip:null,
     /**
      * if segment store was already loaded before, we have to set the firstEditableRow in here too
      */
@@ -95,6 +98,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
         //me.loadCachedDataIntoGrid(context.record.id,-1);
         me.cacheSegmentIndex = new Array();
         me.cacheSegmentIndex.push(context.rowIdx);
+        me.registerDelInsTagTooltip();
     },
     endEditing: function() {
         var me = this;
@@ -322,5 +326,27 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
             me.loadCachedDataIntoGrid(segmentId,languageResourceid);
             segment.removeAtKey(languageResourceid);
         }
+    },
+
+    /***
+     * Init the del/ins tag source column tooltip.
+     */
+    registerDelInsTagTooltip:function(){
+        var me=this;
+        //if it is registered, do nothing
+        if(me.sourceFieldDelInsTooltip){
+            return;
+        }
+
+        me.sourceFieldDelInsTooltip = Ext.create('Ext.tip.ToolTip', {
+            // The overall target element.
+            target: me.getView().getEl(),
+            // tag selector class
+            delegate: '.tmMatchGridResultTooltip',
+            // Moving within the row should not hide the tip.
+            trackMouse: true,
+            renderTo: Ext.getBody(),
+            html:me.strings.delInsTagTooltip
+        });
     }
 });

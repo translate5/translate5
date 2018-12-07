@@ -741,3 +741,7 @@ a.x-btn span.task-confirmation {
 .x-colorpicker-field input {
     background-color: inherit;
 }
+
+.tmMatchGridResultTooltip{
+	background-color: #f9e788;
+} 
