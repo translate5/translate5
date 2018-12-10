@@ -145,6 +145,10 @@ class editor_Services_ServiceResult {
         return $this->results;
     }
     
+    public function setResults($results){
+        $this->results=$results;
+    }
+    
     public function resetResult(){
         $this->results=[];
     }

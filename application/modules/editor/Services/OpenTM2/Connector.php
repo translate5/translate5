@@ -261,7 +261,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 
                 $this->resultList->setSource($source);
             }
-            return $this->resultList; 
+            return $this->getResultListGrouped();
         }
         $this->throwBadGateway();
     }
@@ -608,5 +608,95 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
         $connector->isInternalFuzzy = true;
         return $connector;
+    }
+    
+    /***
+     * Get the result list where the >=100 matches with the same target are grouped as 1 match.
+     * @return editor_Services_ServiceResult|number
+     */
+    public function getResultListGrouped() {
+        //error_log(print_r($this->resultList->getResult(),1));
+        $allResults=$this->resultList->getResult();
+        if(empty($allResults)){
+            return $this->resultList;
+        }
+        
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $differentTargetCollect = $config->runtimeOptions->LanguageResources->opentm2->differentTargetCollect;
+        
+        $other=array();
+        $document=array();
+        $target=null;
+        //filter and collect the results
+        //all 100>= matches with same target will be collected
+        // * if the $differentTargetCollect is set, the >=100 matches with different target will be collected
+        //all <100 mathes will be collected
+        //all documentName and documentShortName will be collected from matches >=100
+        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,$differentTargetCollect) {
+            //collect lower then 100 matches to separate array
+            if($var->matchrate<100){
+                $other[]=$var;
+                return false;
+            }
+            //set the compare target
+            if(!isset($target)){
+                $target=$var->target;
+            }
+            
+            $documentName=null;
+            $documentShortName=null;
+            //collect documentName and documentShortName
+            foreach ($var->metaData as $md) {
+                if($md->name=='documentName'){
+                    $documentName=$md->value;
+                }
+                if($md->name=='documentShortName'){
+                    $documentShortName=$md->value;
+                }
+            }
+            $document[]=array(
+                'documentName'=>$documentName,
+                'documentShortName'=>$documentShortName
+            );
+            
+            //the target is not the same as the compare target
+            //if the flag is set, collect/show the >=100 matches with different target 
+            if($var->target!=$target && $differentTargetCollect){
+                $other[]=$var;
+                return false;
+            }
+            return true;
+        });
+        
+        //sort by highes matchrate from the >=100 match results
+        function matchRateSort($item1,$item2){
+            if ($item1->matchrate == $item2->matchrate) return 0;
+            return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
+        }
+        usort($filterArray,'matchRateSort');
+        
+        if(!empty($filterArray)){
+            
+            //get the highest >=100 match, and apply the documentName and documentShrotName from all >=100 matches
+            $filterArray=$filterArray[0];
+            foreach ($filterArray->metaData as $md) {
+                if($md->name=='documentName'){
+                    $md->value=implode(';',array_column($document, 'documentName'));
+                }
+                if($md->name=='documentShortName'){
+                    $md->value=implode(';',array_column($document, 'documentShortName'));
+                }
+            }
+        }
+        if(!is_array($filterArray)){
+            $filterArray=[$filterArray];
+        }
+        
+        //merge all available results
+        $result=array_merge($filterArray,$other);
+        $this->resultList->resetResult();
+        $this->resultList->setResults($result);
+        return $this->resultList;
     }
 }
