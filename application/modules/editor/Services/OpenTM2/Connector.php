@@ -300,7 +300,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $sub = 'OpenTM2 result contains <it> or <ph> tags! Segment not shown as match result!';
             $msg = 'The <ph> or <it> tag could not be reconverted to a usable tag, so that match result was ignored! '."\n\n";
             $msg .= 'OpenTM2 Result: '.print_r($result,1)."\n";
-            $msg .= 'Segment: '.print_r($seg->getDataObject(),1)."\n";
+            
+            //when using dummy segment in instant translate the segment does not exist (it is only model init)
+            if($seg->getId()!=null){
+                $msg .= 'Segment: '.print_r($seg->getDataObject(),1)."\n";
+            }
             $msg .= 'LanguageResource: '.print_r($this->languageResource->getDataObject(),1)."\n";
             $log->log($sub,$msg);
             return false;
