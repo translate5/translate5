@@ -345,6 +345,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         if(empty($this->data['customerId'])){
             $this->entity->setDefaultCustomerId();
+            $this->data['customerId'] = $this->entity->getCustomerId();
         }
         
         //init workflow id for the task
