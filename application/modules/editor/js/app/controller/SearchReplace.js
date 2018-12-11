@@ -1534,6 +1534,9 @@ Ext.define('Editor.controller.SearchReplace', {
      * Get segment row index from the segment store
      */
     getSegmentRowNumber:function(record){
+        if(!record || record === undefined){
+            return -1;
+        }
         var grid=this.getSegmentGrid(),
             store=grid.store,
             newRecord=store.findRecord('id',record.id),
