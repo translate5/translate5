@@ -57,8 +57,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         parent::connectTo($languageResource, $sourceLang, $targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$languageResource]);
-        $this->diffTagger->insertTagAttributes['class']='tmMatchGridResultTooltip';
-        $this->diffTagger->deleteTagAttributes['class']='tmMatchGridResultTooltip';
     }
     
     /**
@@ -249,15 +247,10 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
                 
                 $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
-                
 
                 $source = $internalTag->reapply2dMap($found->source, $map);
 
-                //marc the differences between the result sorce and the query segment
-                $source=$this->markDiff($source,$queryString);
-
                 $source = $this->replaceAdditionalTags($source, $mapCount);
-                
                 
                 $this->resultList->setSource($source);
             }

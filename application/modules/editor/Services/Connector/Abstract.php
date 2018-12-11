@@ -82,18 +82,11 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $isInternalFuzzy = false;
     
-    /***
-     * 
-     * @var editor_Models_Export_DiffTagger_Csv
-     */
-    protected $diffTagger;
-    
     /**
      * initialises the internal result list
      */
     public function __construct() {
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
-        $this->diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
     }
     
     /**
@@ -173,18 +166,6 @@ abstract class editor_Services_Connector_Abstract {
         $isSourceEdit = ($sourceMeta !== false && $sourceMeta->editable == 1);
         return $isSourceEdit ? $segment->getFieldEdited($source) : $segment->getFieldOriginal($source);
     }
-    
-    /***
-     * Mark differences between $resultSource (the result from the resource) and the $queryString(the requested search string)
-     * The difference is marked in $resultSource as return value
-     * @param string $resultSource
-     * @param string $queryString
-     * @return string
-     */
-    public function markDiff($resultSource,$queryString){
-        return $this->diffTagger->diffSegment($queryString, $resultSource, null,null);
-    }
-    
     
     /**
      * makes a tm / mt / file concordance search

@@ -705,6 +705,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
 
         $result = $connector->query($segment);
         
+        if($this->entity->getResourceType() ==editor_Models_Segment_MatchRateType::TYPE_TM){
+            $result=$this->markDiff($segment, $result,$connector);
+        }
+        
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->languageResourceId = $this->entity->getId();
         $this->view->rows = $result->getResult();
@@ -760,5 +764,31 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($session->taskGuid);
         return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang());
+    }
+    
+    /***
+    * Mark differences between $resultSource (the result from the resource) and the $queryString(the requested search string)
+    * The difference is marked in $resultSource as return value
+    * @param editor_Models_Segment $segment
+    * @param editor_Services_ServiceResult $result
+    * @param editor_Services_Connector_Abstract $connector
+    * @return editor_Services_ServiceResult
+    */
+    protected function markDiff($segment,$result,$connector){
+        $queryString = $connector->getQueryString($segment);
+        
+        
+        $diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
+        /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
+
+        //add del/ins tags css class
+        $diffTagger->insertTagAttributes['class']='tmMatchGridResultTooltip';
+        $diffTagger->deleteTagAttributes['class']='tmMatchGridResultTooltip';
+        $results=$result->getResult();
+        foreach ($results as &$res) {
+            $res->source=$diffTagger->diffSegment($queryString, $res->source, null,null);
+        }
+        
+        return $result;
     }
 }
