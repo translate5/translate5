@@ -627,7 +627,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $differentTargetCollect = $config->runtimeOptions->LanguageResources->opentm2->differentTargetCollect;
+        $showDifferendTarget = $config->runtimeOptions->LanguageResources->opentm2->showDifferendTarget;
         
         $other=array();
         $document=array();
@@ -637,7 +637,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // * if the $differentTargetCollect is set, the >=100 matches with different target will be collected
         //all <100 mathes will be collected
         //all documentName and documentShortName will be collected from matches >=100
-        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,$differentTargetCollect) {
+        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,$showDifferendTarget) {
             //collect lower then 100 matches to separate array
             if($var->matchrate<100){
                 $other[]=$var;
@@ -664,9 +664,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 'documentShortName'=>$documentShortName
             );
             
-            //the target is not the same as the compare target
-            //if the flag is set, collect/show the >=100 matches with different target 
-            if($var->target!=$target && $differentTargetCollect){
+            //is with same target, collect >=100 match for later sorting
+            if($var->target==$target){
+                return true;
+            }
+            
+            //if show different target, collect the result in separate array, and return false so it is not sorted in main group
+            if($showDifferendTarget){
                 $other[]=$var;
                 return false;
             }
@@ -680,7 +684,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
         usort($filterArray,'matchRateSort');
         
-        if(!empty($filterArray)){
+        //merge the document name and document short name in the highest match if grouping is enabled(show different target is false)
+        if(!empty($filterArray) && !$showDifferendTarget){
             
             //get the highest >=100 match, and apply the documentName and documentShrotName from all >=100 matches
             $filterArray=$filterArray[0];
