@@ -185,7 +185,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $text = htmlentities($originalContent);
         }
         $tagNr = $this->getShortTagNumber($rid);
-        $p = $this->getTagParams($originalContent, $tagNr, $tag, $text);
+        $p = $this->getTagParams($originalContent, $tagNr, $rid, $text);
         return $this->{$type}->getHtmlTag($p);
     }
     
