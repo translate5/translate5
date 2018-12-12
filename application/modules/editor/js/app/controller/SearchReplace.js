@@ -794,6 +794,10 @@ Ext.define('Editor.controller.SearchReplace', {
                 var foundSegments = responseData.rows,
                     message=responseData.message,
                     tabPanelviewModel=tabPanel.getViewModel();
+                
+                if(!tabPanelviewModel){
+                    return;
+                }
 
                 tabPanelviewModel.set('hasMqm',responseData.hasMqm ? true : false);
                 
@@ -1107,11 +1111,16 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     findMatchesGrid:function(cell){
         var me=this,
-            tabPanel=me.getTabPanel(),
-            activeTab=tabPanel.getActiveTab(),
+            tabPanel=me.getTabPanel();
+
+        //the tab panel does not exist (the window can be closed)
+        if(!tabPanel){
+            return;
+        }
+
+        var activeTab=tabPanel.getActiveTab(),
             searchField=activeTab.down('#searchField'),
             searchTerm=searchField.getRawValue(),
-            replaceField=activeTab.down('#replaceField'),
             searchType=activeTab.down('radiofield').getGroupValue(),
             matchCase=activeTab.down('#matchCase').checked;
         
@@ -1557,8 +1566,12 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     isContentEditableField:function(){
         var me=this,
-            tabPanel=me.getTabPanel(),
-            activeTab=tabPanel.getActiveTab(),
+            tabPanel=me.getTabPanel();
+        
+        if(!tabPanel){
+            return false;
+        }
+        var activeTab=tabPanel.getActiveTab(),
         searchInField=activeTab.down('#searchInField'),
         searchInFieldSelectedVal=searchInField.getValue();
         return Ext.Array.contains(this.replaceFields,searchInFieldSelectedVal);
