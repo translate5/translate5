@@ -110,7 +110,9 @@ Ext.define('Editor.controller.admin.Customer', {
         allCustomers:'#UT#Alle Kunden'
     },
     
+    // Multitenancy
     hasStoreUsersCustomers: false,
+    isTasksFilteredByCustomer: false,
     
     /***
      * hide the customers button when editor is opened
@@ -297,6 +299,11 @@ Ext.define('Editor.controller.admin.Customer', {
         if (!auth.isAllowed('editorCustomerSwitch')) {
             return;
         }
+        
+        // Task Grid: Check if it's filtered by customers.
+        // (= only for tasks; users and language resources are edited in extra window and won't load the grid after closing)
+        me.isTasksFilteredByCustomer = me.isTaskStoreFilteredWithCustomer();
+        
         pos = toolbar.items.length - 1;
         storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {storeId:'userCustomersSwitch',autoLoad:true});
         allCustomers = this.strings.allCustomers;
@@ -319,6 +326,21 @@ Ext.define('Editor.controller.admin.Customer', {
     },
 
     /**
+     * Has the task grid filters set that include the customers-filter?
+     * @returns boolean
+     */
+    isTaskStoreFilteredWithCustomer: function() {
+        var isFilteredWithCustomer = false;
+        Ext.StoreMgr.get('admin.Tasks').getFilters().items.forEach(function(filter){
+            if (filter.getProperty() == 'customerId') {
+                isFilteredWithCustomer = true;
+                return false; // stop iterating
+            }
+        });
+        return isFilteredWithCustomer; 
+    },
+
+    /**
      * [Multitenancy:] "Switch client" drop-down change handler (filter all affected grids)
      */
     onCustomerSwitchChange: function(combo, customerId) {
@@ -328,7 +350,15 @@ Ext.define('Editor.controller.admin.Customer', {
             tasks = Ext.StoreMgr.get('admin.Tasks'),
             users = Ext.StoreMgr.get('admin.Users'),
             languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
-        tasks.clearFilter();
+        // AFTER editing tasks, the task-grid loads the header anew which causes "a change" the CustomerSwitch
+        // (= because it gets a default value set after loading). When the task-grid has been filtered BEFORE
+        // editing the task, this filters should be kept.
+        if (!me.isTasksFilteredByCustomer) {
+            // tasks are not filtered by customer; keep current state of (not) filtering
+        } else {
+            // tasks ARE filtered including the customer; we MUST reset the customer-Filter.
+            tasks.clearFilter(); // TODO: If the grid had been manually filtered before, the column-headers still look as if they were still in place.
+        }
         users.clearFilter();
         languageResources.clearFilter();
         if(customerId == 0) {
@@ -340,7 +370,7 @@ Ext.define('Editor.controller.admin.Customer', {
         users.filter([{property: 'customers', operator:'like', value: customerName}]);
         languageResources.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
     },
-    
+
     /**
      * [Multitenancy:] If the setting of one of the grid-filters is changed manually,
      * deselect the client that is currently selected in the "Switch client" drop-down.

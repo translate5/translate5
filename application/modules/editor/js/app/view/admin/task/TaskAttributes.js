@@ -178,7 +178,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 store: Ext.create('Ext.data.Store',{
                     autoLoad: true,
                     model: 'Editor.model.admin.User',
-                    storeId: 'pmUsers',
+                    pageSize: 0,
                     proxy : {
                         type : 'rest',
                         url: Editor.data.restpath+'user/pm',
