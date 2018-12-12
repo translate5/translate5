@@ -50,12 +50,20 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $uploadErrors = array();
     
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
     public function init() {
         //add filter type for languages
         $this->_filterTypeMap = [
             'sourceLang' => ['string' => 'list'],
             'targetLang' => ['string' => 'list'],
         ];
+        
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        
         parent::init();
     }
     
@@ -776,19 +784,61 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     */
     protected function markDiff($segment,$result,$connector){
         $queryString = $connector->getQueryString($segment);
-        
+        $queryStringTags = [];
+        $queryString = $this->protectTags($queryString, $queryStringTags);
         
         $diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
         /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
-
+        
         //add del/ins tags css class
         $diffTagger->insertTagAttributes['class']='tmMatchGridResultTooltip';
         $diffTagger->deleteTagAttributes['class']='tmMatchGridResultTooltip';
+        
         $results=$result->getResult();
         foreach ($results as &$res) {
-            $res->source=$diffTagger->diffSegment($queryString, $res->source, null,null);
+            $tags = []; 
+            //replace the internal tags before diff
+            $res->source = $this->protectTags($res->source, $tags);
+            $res->source = $diffTagger->diffSegment($queryString, $res->source, null,null);
+            $res->source = $this->unprotectTags($res->source, array_merge($tags, $queryStringTags));
         }
-        
         return $result;
+    }
+    
+    /**
+     * protected the internal tags for diffing
+     * @param string $segment
+     * @param array $tags
+     */
+    protected function protectTags($segment, array &$tags) { 
+        $tag = $this->internalTag;
+        return $tag->replace($segment, function($match) use (&$tags, $tag) {
+            $submatch = null;
+            if(preg_match($tag::REGEX_STARTTAG, $match[0], $submatch)) {
+                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $submatch[1].'-start');
+            }
+            elseif(preg_match($tag::REGEX_ENDTAG, $match[0], $submatch)) {
+                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $submatch[1].'-end');
+            }
+            elseif(preg_match($tag::REGEX_SINGLETAG, $match[0], $submatch)) {
+                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $submatch[1].'-single');
+            }
+            else {
+                $placeholder = 'notfound';
+            }
+            
+            $tags[$placeholder] = $match[0];
+            return $placeholder;
+        });
+    }
+    
+    /**
+     * unprotects / restores the content tags
+     * @param string $segment
+     * @param array $segment
+     * @return string
+     */
+    protected function unprotectTags($segment, array $tags) {
+        return str_replace(array_keys($tags), array_values($tags), $segment);
     }
 }
