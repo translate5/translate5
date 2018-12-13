@@ -122,6 +122,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
+        $this->initHelper();
         $this->meta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
         $this->meta->addMeta('transitLockedForRefMat', editor_Models_Segment_Meta::META_TYPE_BOOLEAN, 0, 'defines, if segment is marked in transitFile as locked for translation memory use');
         $transitLangInfo = Zend_Registry::get('transitLangInfo');

@@ -72,6 +72,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->task=$task;
         $this->analysisId=$analysisId;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
+        $this->initHelper();
     }
     
     /***
