@@ -745,3 +745,5 @@ a.x-btn span.task-confirmation {
 .tmMatchGridResultTooltip{
 	background-color: #f9e788;
 } 
+
+.customerPanelGrid .ico-customer-mt-export {background-image: url("../images/database_go.png");display:inline-block;}

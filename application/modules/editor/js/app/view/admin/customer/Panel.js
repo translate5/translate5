@@ -65,7 +65,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerSavedMsg:'#UT#Kunde gespeichert!',
         customerDeleteMsg:'#UT#Diesen Kunden löschen?',
         customerDeleteTitle:'#UT#Kunden löschen',
-        customerDeletedMsg:'#UT#Kunde gelöscht'
+        customerDeletedMsg:'#UT#Kunde gelöscht',
+        export:'#UT#Exportieren'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -82,6 +83,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                 items: [
                     {
                         xtype: 'gridpanel',
+                        cls: 'customerPanelGrid',
                         flex: 0.7,
                         region: 'center',
                         split: true,
@@ -108,6 +110,16 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 filter: {
                                     type: 'string'
                                 }
+                            },
+                            {
+                                xtype: 'actioncolumn',
+                                text:  me.strings.export,
+                                menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
+                                sortable: false,
+                                items:[{
+                                    iconCls: 'ico-customer-mt-export',
+                                    handler:me.onTmExportClick
+                                }]
                             }
                         ],
                         listeners: {
@@ -272,6 +284,17 @@ Ext.define('Editor.view.admin.customer.Panel', {
     onViewBeforeRefresh: function(dataview, eOpts) {
         //workaround / fix for TMUE-11
         dataview.getSelectionModel().deselectAll();
+    },
+
+    /***
+     * On export action column click handler
+     */
+    onTmExportClick:function(view, cell, row, col, ev, evObj) {
+        var row = view.getStore().getAt(row);
+        if(!row){
+            return;
+        }
+        //TODO: implement me
     }
 
 });
