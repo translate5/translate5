@@ -71,6 +71,12 @@ trait editor_Models_Import_FileParser_TagTrait {
         '#<(space) ts="[^"]*"( length="([0-9]+)")?/>#',
     ];
     
+    protected function initHelper(){
+        if(empty($this->whitespaceHelper)) {
+            $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        }
+    }
+    
     /**
      * to be called in the constructors
      */
@@ -79,7 +85,7 @@ trait editor_Models_Import_FileParser_TagTrait {
         $this->_rightTag = ZfExtended_Factory::get('editor_ImageTag_Right');
         $this->_singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
     }
-
+    
     /**
      * replaces whitespace placeholder tags with internal tags
      * @param string $segment
@@ -194,9 +200,6 @@ trait editor_Models_Import_FileParser_TagTrait {
      * @return string $segment
      */
     protected function parseSegmentProtectWhitespace($segment, callable $textNodeCallback = null) {
-        if(empty($this->whitespaceHelper)) {
-            $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
-        }
         $split = preg_split('#(<[^\s][^>]+>)#', $segment, null, PREG_SPLIT_DELIM_CAPTURE);
         
         $i = 0;

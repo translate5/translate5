@@ -78,6 +78,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     {
         parent::__construct($request, $response);
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        $this->initHelper();
     }
     
     public function preDispatch() {

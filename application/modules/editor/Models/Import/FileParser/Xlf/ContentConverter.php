@@ -99,6 +99,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->task = $task;
         $this->filename = $filename;
         $this->initImageTags();
+        $this->initHelper();
         
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
         

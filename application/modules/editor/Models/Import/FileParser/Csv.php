@@ -128,6 +128,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
+        $this->initHelper();
         
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
