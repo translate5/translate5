@@ -102,7 +102,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         return $this->replace($segment, function($match) use ($whitespaceOnly) {
             $id = $match[3];
             
-            if($whitespaceOnly && !in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGSWH)) {
+            if($whitespaceOnly && !in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
                 return $match[0];
             }
             
