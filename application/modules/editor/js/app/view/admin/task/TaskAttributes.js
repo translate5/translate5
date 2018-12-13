@@ -127,8 +127,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         items.push({
             xtype: 'displayfield',
             fieldLabel: me.strings.customerName,
+            renderer: me.customerRenderer,
             bind:{
-                value:'{currentTask.customerName}'
+                value:'{currentTask.customerId}'
             }
         });
         
@@ -277,4 +278,11 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
 
         return items;
     },
+    customerRenderer : function(val) {
+        if (val == undefined) {
+            return val;
+        }
+        var customersStore = Ext.StoreManager.get('customersStore');
+        return customersStore.findRecord('id',val,0,false,false,true).get('name');
+    }
   });

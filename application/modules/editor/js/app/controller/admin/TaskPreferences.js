@@ -534,39 +534,21 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
   /**
    * Called when task add window (task main card) is rendered.
    * Adds the item for assigning a customer to the new task.
-   * If there is only one client defined, this client is 
-   * automatically associated and the drop-down is omitted.
+   * If there is only one customer filtered (eg by the CustomerSwitch),
+   * this customer is preselected.
    */
   onTaskMainCardRender: function(taskMainCard,eOpts) {
       var me = this, 
-          taskMainCardContainer = taskMainCard.down('#taskMainCardContainer'),
-          userCustomers = Ext.StoreManager.get('userCustomers');
+          taskMainCardContainer = taskMainCard.down('#taskMainCardContainer');
       
       // add the customer field to the taskUpload window
-      if(userCustomers.getTotalCount() == 1) {
-          taskMainCardContainer.add({
-              xtype: 'displayfield',
-              name: 'customer',
-              itemId: 'customer',
-              value: userCustomers.getAt(0).getData().name, // display customer-name for the user
-              toolTip: me.strings.customerTip,
-              fieldLabel: me.strings.customerLabel
-          });
-          taskMainCardContainer.add({
-              xtype: 'hiddenfield',
-              name: 'customerId',
-              itemId: 'customerId',
-              value: userCustomers.getAt(0).getData().id, // store customer-id in LEK_task
-          });
-      } else {
-          taskMainCardContainer.add({
-              xtype: 'usercustomerscombo',
-              name: 'customerId',
-              itemId: 'customerId',
-              allowBlank: false,
-              toolTip: me.strings.customerTip,
-              fieldLabel: me.strings.customerLabel
-          });
-      }
+      taskMainCardContainer.add({
+          xtype: 'customers',
+          name: 'customerId',
+          itemId: 'customerId',
+          allowBlank: false,
+          toolTip: me.strings.customerTip,
+          fieldLabel: me.strings.customerLabel + '¹'
+      });
   }
 });
