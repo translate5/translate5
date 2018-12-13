@@ -103,7 +103,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         controller:{
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
-        		taskUnhandledAction: 'onTaskActionColumnNoHandler'
+                taskUnhandledAction: 'onTaskActionColumnNoHandler',
+                taskStateCheckPullCleaned:'onTaskStateCheckPullCleaned'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -437,5 +438,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 controller.startCheckImportStates();
             }
         });
+    },
+
+    /***
+     * Tash state check cleand event handler. This event is fired from Task overview controller.
+     */
+    onTaskStateCheckPullCleaned:function(){
+        var assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
+        assocPanel && assocPanel.getEl().unmask();
     }
 });

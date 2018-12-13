@@ -104,8 +104,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                         AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 1 AND t2.analysisId = ?
                 WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 1
             ) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
-        //$resultArray=$this->db->getAdapter()->query($sqlV2,[$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
-        $resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();
+        $resultArray=$this->db->getAdapter()->query($sqlV2,[$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
+        //$resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();
         if(empty($resultArray)){
             return array();
         }
