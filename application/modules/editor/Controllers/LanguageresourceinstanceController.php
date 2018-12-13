@@ -391,7 +391,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         
         $connector = $serviceManager->getConnector($this->entity);
-        /* @var $connector editor_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector */
         
         //just reuse importvalidtypes here, nothing other implemented yet 
         $validExportTypes = $connector->getValidFiletypes();
@@ -573,7 +573,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function handleInitialFileUpload(editor_Services_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
-        /* @var $connector editor_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector */
         $importInfo = $this->handleFileUpload($connector);
         
         //currently the initial upload is optional
@@ -598,7 +598,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function handleAdditionalFileUpload(editor_Services_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
-        /* @var $connector editor_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector */
         $importInfo = $this->handleFileUpload($connector);
         
         if(empty($importInfo)){
@@ -615,7 +615,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * handles the fileupload
      * @return array|boolean meta data about the upload or false when there was no file 
      */
-    protected function handleFileUpload(editor_Services_Connector_FilebasedAbstract $connector) {
+    protected function handleFileUpload(editor_Services_Connector $connector) {
         $upload = new Zend_File_Transfer_Adapter_Http();
         
         //check if connector / resource can deal with the uploaded file type
@@ -646,7 +646,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
         }
         
-        /* @var $connector editor_Services_Connector_Abstract */
         if(empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
             $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';
         }
@@ -681,9 +680,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $manager editor_Services_Manager */
         $connector = $manager->getConnector($this->entity);
         $deleteInResource = !$this->getParam('deleteLocally', false);
-        if($deleteInResource && $connector instanceof editor_Services_Connector_FilebasedAbstract) {
-            $connector->delete();
-        }
+        $deleteInResource && $connector->delete();
         
         $userSession = new Zend_Session_Namespace('user');
         
@@ -762,7 +759,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     /**
      * returns the connector to be used
-     * @return editor_Services_Connector_Abstract
+     * @return editor_Services_Connector
      */
     protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -779,10 +776,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     * The difference is marked in $resultSource as return value
     * @param editor_Models_Segment $segment
     * @param editor_Services_ServiceResult $result
-    * @param editor_Services_Connector_Abstract $connector
+    * @param editor_Services_Connector $connector
     * @return editor_Services_ServiceResult
     */
-    protected function markDiff($segment,$result,$connector){
+    protected function markDiff(editor_Models_Segment $segment,editor_Services_ServiceResult $result,editor_Services_Connector $connector){
         $queryString = $connector->getQueryString($segment);
         $queryStringTags = [];
         $queryString = $this->protectTags($queryString, $queryStringTags);

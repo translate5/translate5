@@ -32,7 +32,6 @@ class editor_Services_Google_Resource extends editor_Models_LanguageResources_Re
         $this->id = $id;
         $this->name = $name;
         $this->filebased = false; //forced to be no filebased
-        $this->searchable = false; //forced to be non searchable
         $this->writable = false; //forced to be non writeable
         $this->analysable=true;//is used by match analysis
         $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
