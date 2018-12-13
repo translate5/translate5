@@ -612,7 +612,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @return editor_Services_ServiceResult|number
      */
     public function getResultListGrouped() {
-        //error_log(print_r($this->resultList->getResult(),1));
         $allResults=$this->resultList->getResult();
         if(empty($allResults)){
             return $this->resultList;
@@ -620,17 +619,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $showDifferendTarget = $config->runtimeOptions->LanguageResources->opentm2->showDifferendTarget;
+        $showMultiple100PercentMatches = $config->runtimeOptions->LanguageResources->opentm2->showMultiple100PercentMatches;
         
         $other=array();
+        $differentTargetResult=array();
         $document=array();
         $target=null;
+        $resultlist=$this->resultList;
         //filter and collect the results
         //all 100>= matches with same target will be collected
-        // * if the $differentTargetCollect is set, the >=100 matches with different target will be collected
         //all <100 mathes will be collected
         //all documentName and documentShortName will be collected from matches >=100
-        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,$showDifferendTarget) {
+        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,&$differentTargetResult,$resultlist) {
             //collect lower then 100 matches to separate array
             if($var->matchrate<100){
                 $other[]=$var;
@@ -641,33 +641,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $target=$var->target;
             }
             
-            $documentName=null;
-            $documentShortName=null;
-            //collect documentName and documentShortName
-            foreach ($var->metaData as $md) {
-                if($md->name=='documentName'){
-                    $documentName=$md->value;
-                }
-                if($md->name=='documentShortName'){
-                    $documentShortName=$md->value;
-                }
-            }
-            $document[]=array(
-                'documentName'=>$documentName,
-                'documentShortName'=>$documentShortName
-            );
-            
             //is with same target, collect >=100 match for later sorting
             if($var->target==$target){
+                $document[]=array(
+                    'documentName'=>$resultlist->getMetaValue($var->metaData, 'documentName'),
+                    'documentShortName'=>$resultlist->getMetaValue($var->metaData, 'documentShortName'),
+                );
                 return true;
             }
-            
-            //if show different target, collect the result in separate array, and return false so it is not sorted in main group
-            if($showDifferendTarget){
-                $other[]=$var;
-                return false;
-            }
-            return true;
+            //collect different target result 
+            $differentTargetResult[]=$var;
+            return false;
         });
         
         //sort by highes matchrate from the >=100 match results
@@ -679,7 +663,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         });
         
         //merge the document name and document short name in the highest match if grouping is enabled(show different target is false)
-        if(!empty($filterArray) && !$showDifferendTarget){
+        if(!empty($filterArray)){
             
             //get the highest >=100 match, and apply the documentName and documentShrotName from all >=100 matches
             $filterArray=$filterArray[0];
@@ -692,12 +676,34 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 }
             }
         }
+
+        //if it is single result, init it as array
         if(!is_array($filterArray)){
             $filterArray=[$filterArray];
         }
         
+        //if different target result exist and if showMultiple100PercentMatches config is set to false
+        if(!empty($differentTargetResult) && !$showMultiple100PercentMatches){
+            //sor the different target result by matchrate, if the matchrates are the same sort by timestamp
+            usort($differentTargetResult,function($item1,$item2)  use($resultlist){
+                if ($item1->matchrate == $item2->matchrate){
+                    return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
+                }
+                return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
+            });
+            
+            //since showMultiple100PercentMatches is false, we show only one result 
+            $differentTargetResult=$differentTargetResult[0];
+        }
+        
+        if(!is_array($differentTargetResult)){
+            $differentTargetResult=[$differentTargetResult];
+        }
+        
         //merge all available results
-        $result=array_merge($filterArray,$other);
+        $result=array_merge($filterArray,$differentTargetResult);
+        $result=array_merge($result,$other);
+        
         $this->resultList->resetResult();
         $this->resultList->setResults($result);
         return $this->resultList;
