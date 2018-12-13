@@ -110,8 +110,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 filter: {
                                     type: 'string'
                                 }
-                            },
-                            {
+                            }
+                            /*{
                                 xtype: 'actioncolumn',
                                 text:  me.strings.export,
                                 menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
@@ -121,6 +121,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     handler:me.onTmExportClick
                                 }]
                             }
+                            */
                         ],
                         listeners: {
                             itemdblclick: {
