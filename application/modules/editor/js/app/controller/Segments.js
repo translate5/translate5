@@ -580,7 +580,7 @@ Ext.define('Editor.controller.Segments', {
    * 
    * fires event "saveComplete". Returning false in the event prevents calling next step.
    */
-  saveChainSaveCallback: function(records, operation, success) {
+  saveChainSaveCallback: function(record, operation, success) {
       var me = this,
           errorHandler;
       me.saveIsRunning = false;
@@ -590,7 +590,7 @@ Ext.define('Editor.controller.Segments', {
           me.saveChainEnd();
           return;
       }
-      me.updateSiblingsMetaCache(records);
+      me.updateSiblingsMetaCache(record);
       
       //show other messages on the segment:
       Editor.MessageBox.addByOperation(operation);
@@ -600,7 +600,7 @@ Ext.define('Editor.controller.Segments', {
       //the 'saveComplete' event is subscribed in 'ChangeAlike' controller, and it is disabled if the manual processing is disabled
       //we are not able to use the event listener priority because of the extjs bug : https://www.sencha.com/forum/showthread.php?305085-Observable-listener-priority-does-not-work
       //this bug also exist in extjs 6.2.0
-      me.fireEvent('beforeSaveCall',records);
+      me.fireEvent('beforeSaveCall', record);
       
       //invoking change alike handling:
       if(me.fireEvent('saveComplete')){
