@@ -69,8 +69,7 @@ Ext.define('Editor.controller.admin.Customer', {
                 hide:'onCentarPanelComponentAfterLayout'
             },
             '#adminUserAddWindow':{
-                afterrender:'onAdminUserAddWindowAfterRender',
-                afterlayout: 'setFilteredCustomerForUserAdd',               // Multitenancy
+                afterrender:'onAdminUserAddWindowAfterRender'
             },
             '#adminUserGrid': {
                 beforerender:'onAdminUserGridBeforeRender',
@@ -190,8 +189,7 @@ Ext.define('Editor.controller.admin.Customer', {
             loginFieldset=adminWindow.down('#loginDetailsFieldset');
         
         loginFieldset.add({
-            xtype:'customers',
-            allowBlank: false
+            xtype:'customers'
         });
     },
 
@@ -386,7 +384,10 @@ Ext.define('Editor.controller.admin.Customer', {
             //   is opened for the first time.
             if (Ext.String.startsWith(filter.getId(), 'x-gridfilter') 
                     && Ext.Array.indexOf(customerColumnNames,filter.getProperty()) != -1) {
-                me.setCustomerSwitchValue(0);
+                customersStore = Ext.StoreManager.get('customersStore');
+                customerId = customersStore.findRecord('name',filter.getValue(),0,true,false,false).get('id');
+                me.setCustomerSwitchValue(customerId);
+                return false; // stop iterating
             }
         });
     },
@@ -426,25 +427,6 @@ Ext.define('Editor.controller.admin.Customer', {
         }
         resourcesCustomersField = addTmWindow.down('#resourcesCustomers');
         resourcesCustomersField.setValue(customerId);
-    },
-    
-
-    /**
-     * [Multitenancy:] Add user: preselect filtered customer
-     */
-    setFilteredCustomerForUserAdd: function(adminUserAddWindow){
-        var customerId = this.getCustomerSwitchValue(),
-            customersField;
-        if (customerId == '0') {
-            return;
-        }
-        customersField = adminUserAddWindow.down('#customers');
-        customersField.setValue(customerId);
-        // TODO: The value is set, but the visible content of the field does not show it.
-        //   console.log(customersField.getValue());
-        // Using the console to set the value works DOES immediately show it:
-        //   Ext.ComponentQuery.query('#customers')[0].setValue(1)
-        // Hence, maybe we are still too early here?
     },
 
     /**
