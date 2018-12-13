@@ -55,7 +55,6 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     const PLACEHOLDER_TEMPLATE='<translate5:escaped id="%s" />';
     
-    
     public function __construct(){
         $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
         $this->placeholderTemplate=self::PLACEHOLDER_TEMPLATE;
@@ -94,10 +93,19 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     
     /**
      * restores the original escaped tag
+     * @param string $segment
+     * @param boolean $whitespaceOnly optional, if true restore whitespace tags only 
+     * @return mixed
      */
-    public function restore(string $segment) {
-        return $this->replace($segment, function($match){
+    public function restore(string $segment, $whitespaceOnly = false) {
+        //TODO extend $whitespaceOnly filter so that we can filter for one ore more of the CSS classes (nbsp, newline, tab, space) 
+        return $this->replace($segment, function($match) use ($whitespaceOnly) {
             $id = $match[3];
+            
+            if($whitespaceOnly && !in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGSWH)) {
+                return $match[0];
+            }
+            
             $data = $match[2];
             //restore packed data
             $result = pack('H*', $data);

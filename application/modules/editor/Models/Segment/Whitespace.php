@@ -30,6 +30,8 @@ END LICENSE AND COPYRIGHT
  * Helper Class which encapsulates segment whitespace handling
  */
 class editor_Models_Segment_Whitespace {
+    const WHITESPACE_TAGS = ['hardReturn', 'softReturn', 'macReturn', 'space', 'tab', 'char'];
+    
     /**
      * Return search and replace map
      * @var array
