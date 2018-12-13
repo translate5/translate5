@@ -905,6 +905,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var me=this;
       me.taskStateCheckPull=[];
       me.addTaskStateCheckPull(me.isImportingCheck);
+      me.fireEvent('taskStateCheckPullCleaned',[]);
   }
   
 });
