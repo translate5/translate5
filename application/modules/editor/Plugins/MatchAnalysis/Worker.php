@@ -132,8 +132,8 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         if(!empty($newState)){
             $this->task->setState($oldState);
             $this->task->save();
-            $this->task->unlock();
         }
+        $this->task->unlock();
         return $return;
     }
     
