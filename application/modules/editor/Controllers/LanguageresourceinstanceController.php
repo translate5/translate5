@@ -812,13 +812,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         return $tag->replace($segment, function($match) use (&$tags, $tag) {
             $submatch = null;
             if(preg_match($tag::REGEX_STARTTAG, $match[0], $submatch)) {
-                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $submatch[1].'-start');
+                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'start-'.$submatch[1]);
             }
             elseif(preg_match($tag::REGEX_ENDTAG, $match[0], $submatch)) {
-                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $submatch[1].'-end');
+                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'end-'.$submatch[1]);
             }
             elseif(preg_match($tag::REGEX_SINGLETAG, $match[0], $submatch)) {
-                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $submatch[1].'-single');
+                $id = $match[3];
+                if(in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+                    //for diffing the content of the whitespace tags is important not the number on it! 
+                    $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $id.'-'.$tag->getLength($match[0]));
+                }
+                else {
+                    $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'single-'.$submatch[1]);
+                }
+                
             }
             else {
                 $placeholder = 'notfound';
