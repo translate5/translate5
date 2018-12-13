@@ -181,7 +181,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //query the segment for each assigned tm
         foreach ($this->connectors as $languageResourceid => $connector){
-            /* @var $connector editor_Services_Connector_Abstract */
+            /* @var $connector editor_Services_Connector */
             
             $matches=[];
             $connector->resetResultList();

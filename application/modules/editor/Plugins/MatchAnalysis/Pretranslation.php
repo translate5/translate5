@@ -276,7 +276,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         }
         //INFO: use the first connector, since no mt engine priority exist
         $connector = $this->mtConnectors[0];
-        /* @var $connector editor_Services_Connector_Abstract */
+        /* @var $connector editor_Services_Connector */
         $connector->resetResultList();
         $matches = $connector->query($segment);
         $matchResults=$matches->getResult();

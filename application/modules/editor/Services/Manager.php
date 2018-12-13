@@ -60,7 +60,7 @@ class editor_Services_Manager {
 
     /**
      * Creates all configured connector resources
-     * @return [editor_Services_Connector_Abstract]
+     * @return [editor_Services_Connector]
      */
     public function getAllResources() {
         $serviceResources = array();
@@ -99,13 +99,13 @@ class editor_Services_Manager {
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      * @param integer $sourceLang
      * @param integer $targetLang
-     * @return editor_Services_Connector_Abstract
+     * @return editor_Services_Connector
      */
     public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
         $serviceType = $languageResource->getServiceType();
         $this->checkService($serviceType);
-        $connector = ZfExtended_Factory::get($serviceType.self::CLS_CONNECTOR);
-        /* @var $connector editor_Services_Connector_Abstract */
+        $connector = ZfExtended_Factory::get('editor_Services_Connector');
+        /* @var $connector editor_Services_Connector */
         $connector->connectTo($languageResource,$sourceLang,$targetLang);
         return $connector;
     }
@@ -142,13 +142,13 @@ class editor_Services_Manager {
     }
     
     public function openForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector_Abstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector $connector){
             $connector->open();
         });
     }
     
     public function closeForTask(editor_Models_Task $task) {
-        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector_Abstract $connector){
+        $this->visitAllAssociatedTms($task->getTaskGuid(), function(editor_Services_Connector $connector){
             $connector->close();
         });
     }
@@ -157,7 +157,7 @@ class editor_Services_Manager {
         if(empty($segment->getTargetEdit())){
             return;
         }
-        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Services_Connector_Abstract $connector, $languageResource, $assoc) use ($segment) {
+        $this->visitAllAssociatedTms($segment->getTaskGuid(), function(editor_Services_Connector $connector, $languageResource, $assoc) use ($segment) {
             if(!empty($assoc['segmentsUpdateable'])) {
                 $connector->update($segment);
             }
@@ -174,7 +174,7 @@ class editor_Services_Manager {
             $languageResource->init($one);
             try {
                 $connector = $this->getConnector($languageResource);
-                /* @var $connector editor_Services_Connector_Abstract */
+                /* @var $connector editor_Services_Connector */
                 $todo($connector, $languageResource, $one);
             }
             catch(ZfExtended_BadGateway $e) {

@@ -26,12 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_SDLLanguageCloud_Resource extends editor_Models_LanguageResources_Resource {
-    public function __construct(string $id, string $name, string $url) {
-        parent::__construct($id, $name, $url);
-        $this->filebased = false; //forced to be no filebased
-        $this->writable = false; //forced to be non writeable
-        $this->analysable=true;//is used by match analysis
-        $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
-    }
+/**
+ */
+class editor_Models_Db_LanguageResources_MtUsageLogger extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_languageresources_mt_usage_log';
+    public $_primary = 'id';
 }

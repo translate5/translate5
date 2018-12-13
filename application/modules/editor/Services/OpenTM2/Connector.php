@@ -601,7 +601,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $fuzzyLanguageResource->setId(null);
         
         $connector = ZfExtended_Factory::get(get_class($this));
-        /* @var $connector editor_Services_Connector_Abstract */
+        /* @var $connector editor_Services_Connector */
         $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
         $connector->isInternalFuzzy = true;
         return $connector;
@@ -671,11 +671,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         });
         
         //sort by highes matchrate from the >=100 match results
-        function matchRateSort($item1,$item2){
-            if ($item1->matchrate == $item2->matchrate) return 0;
+        usort($filterArray,function($item1,$item2){
+            if ($item1->matchrate == $item2->matchrate){
+                return 0;
+            }
             return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
-        }
-        usort($filterArray,'matchRateSort');
+        });
         
         //merge the document name and document short name in the highest match if grouping is enabled(show different target is false)
         if(!empty($filterArray) && !$showDifferendTarget){
