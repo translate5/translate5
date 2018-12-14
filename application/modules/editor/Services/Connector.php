@@ -88,9 +88,9 @@ class editor_Services_Connector {
     public function query(editor_Models_Segment $segment) {
         $serviceResult=$this->adapter->query($segment);
         //ignore the log if no results
-        if(!empty($serviceResult->getResult())){
-            $this->logMtUsage($segment,self::REQUEST_SOURCE_EDITOR);
-        }
+        //if(!empty($serviceResult->getResult())){
+        //    $this->logMtUsage($segment,self::REQUEST_SOURCE_EDITOR);
+        //}
         return $serviceResult;
     }
     
@@ -104,9 +104,9 @@ class editor_Services_Connector {
     public function search(string $searchString, $field = 'source', $offset = null) {
         $serviceResult=$this->adapter->search($searchString,$field,$offset);
         //ignore the log if no results
-        if(!empty($serviceResult->getResult())){
-            $this->logMtUsage($searchString,self::REQUEST_SOURCE_EDITOR);
-        }
+        //if(!empty($serviceResult->getResult())){
+        //    $this->logMtUsage($searchString,self::REQUEST_SOURCE_EDITOR);
+        //}
         return $serviceResult;
     }
 
@@ -118,9 +118,9 @@ class editor_Services_Connector {
     public function translate(string $searchString){
         $serviceResult=$this->adapter->translate($searchString);
         //ignore the log if no results
-        if(!empty($serviceResult->getResult())){
-            $this->logMtUsage($searchString,self::REQUEST_SOURCE_INSTANT_TRANSLATE);
-        }
+        //if(!empty($serviceResult->getResult())){
+        //    $this->logMtUsage($searchString,self::REQUEST_SOURCE_INSTANT_TRANSLATE);
+        //}
         return $serviceResult;
     }
     
@@ -145,87 +145,87 @@ class editor_Services_Connector {
         }
     }
     
-    /***
-     * Log MT language resources ussage
-     * @param mixed $queryString
-     * @param string $requestSource
-     */
-    protected function logMtUsage($querySource,$requestSource){
-        //use the logger only for MT resoruces
-        if($this->languageResource->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
-            return;
-        }
-        $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
-        /* @var $mtlogger editor_Models_LanguageResources_MtUsageLogger */
-        $mtlogger->setLanguageResourceId($this->languageResource->getId());
-        $mtlogger->setSourceLang($this->sourceLang);
-        $mtlogger->setTargetLang($this->targetLang);
-        $mtlogger->setQueryString($this->getQueryString($querySource));
-        $mtlogger->setRequestSource($requestSource);
-        $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($querySource));
+//     /***
+//      * Log MT language resources ussage
+//      * @param mixed $queryString
+//      * @param string $requestSource
+//      */
+//     protected function logMtUsage($querySource,$requestSource){
+//         //use the logger only for MT resoruces
+//         if($this->languageResource->getResourceType()!=editor_Models_Segment_MatchRateType::TYPE_MT){
+//             return;
+//         }
+//         $mtlogger=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
+//         /* @var $mtlogger editor_Models_LanguageResources_MtUsageLogger */
+//         $mtlogger->setLanguageResourceId($this->languageResource->getId());
+//         $mtlogger->setSourceLang($this->sourceLang);
+//         $mtlogger->setTargetLang($this->targetLang);
+//         $mtlogger->setQueryString($this->getQueryString($querySource));
+//         $mtlogger->setRequestSource($requestSource);
+//         $mtlogger->setTranslatedCharacterCount($this->getCharacterCount($querySource));
         
-        //the request is triggered via editor, save the task customers as customers
-        if($requestSource==self::REQUEST_SOURCE_EDITOR){
-            $task=ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($querySource->getTaskGuid());
-            $mtlogger->setCustomers($task->getCustomerId());
+//         //the request is triggered via editor, save the task customers as customers
+//         if($requestSource==self::REQUEST_SOURCE_EDITOR){
+//             $task=ZfExtended_Factory::get('editor_Models_Task');
+//             /* @var $task editor_Models_Task */
+//             $task->loadByTaskGuid($querySource->getTaskGuid());
+//             $mtlogger->setCustomers($task->getCustomerId());
             
-        }
+//         }
         
-        //the request is triggered via instanttranslate, save the languageresource customers of user customers
-        if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
-            $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
-        }
+//         //the request is triggered via instanttranslate, save the languageresource customers of user customers
+//         if($requestSource==self::REQUEST_SOURCE_INSTANT_TRANSLATE){
+//             $mtlogger->setCustomers($this->getInstantTranslateRequestSourceCustomers());
+//         }
         
-        $mtlogger->save();
-    }
+//         $mtlogger->save();
+//     }
     
-    /***
-     * Count characters in the requested language resources query string/segment
-     * @param mixed $query
-     * @return integer
-     */
-    protected function getCharacterCount($query){
-        return mb_strlen($this->getQueryString($query));
-    }
+//     /***
+//      * Count characters in the requested language resources query string/segment
+//      * @param mixed $query
+//      * @return integer
+//      */
+//     protected function getCharacterCount($query){
+//         return mb_strlen($this->getQueryString($query));
+//     }
     
-    /***
-     * Get the query string and removes the tags from it
-     */
-    protected function getQueryString($query){
-        if($query instanceof editor_Models_Segment){
-            $queryString=$this->adapter->getQueryString($query);
-            //remove all tags, since the mt engines are ignoring the tags
-            $queryString=$query->stripTags($queryString);
-            $query=$queryString;
-        }
-        return $query;
-    }
+//     /***
+//      * Get the query string and removes the tags from it
+//      */
+//     protected function getQueryString($query){
+//         if($query instanceof editor_Models_Segment){
+//             $queryString=$this->adapter->getQueryString($query);
+//             //remove all tags, since the mt engines are ignoring the tags
+//             $queryString=$query->stripTags($queryString);
+//             $query=$queryString;
+//         }
+//         return $query;
+//     }
     
-    /***
-     * Get customers when instant translate is used as request source.
-     * The return value will be the intersection of the customers of the language resource and the customers of the current user
-     * @return NULL|array
-     */
-    protected function getInstantTranslateRequestSourceCustomers(){
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $userCustomers=$userModel->getUserCustomersFromSession();
+//     /***
+//      * Get customers when instant translate is used as request source.
+//      * The return value will be the intersection of the customers of the language resource and the customers of the current user
+//      * @return NULL|array
+//      */
+//     protected function getInstantTranslateRequestSourceCustomers(){
+//         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+//         /* @var $userModel ZfExtended_Models_User */
+//         $userCustomers=$userModel->getUserCustomersFromSession();
         
-        if(empty($userCustomers)){
-            return null;
-        }
+//         if(empty($userCustomers)){
+//             return null;
+//         }
         
-        $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
-        /* @var $la editor_Models_LanguageResources_CustomerAssoc */
-        $resourceCustomers=$la->loadByLanguageResourceId($this->languageResource->getId());
-        $resourceCustomers=array_column($resourceCustomers,'customerId');
-        $return=array_intersect($userCustomers,$resourceCustomers);
-        if(empty($return)){
-            return null;
-        }
-        //return with leading and trailing comma so the customers are searchable
-        return ','.implode(',', $return).',';
-    }
+//         $la=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+//         /* @var $la editor_Models_LanguageResources_CustomerAssoc */
+//         $resourceCustomers=$la->loadByLanguageResourceId($this->languageResource->getId());
+//         $resourceCustomers=array_column($resourceCustomers,'customerId');
+//         $return=array_intersect($userCustomers,$resourceCustomers);
+//         if(empty($return)){
+//             return null;
+//         }
+//         //return with leading and trailing comma so the customers are searchable
+//         return ','.implode(',', $return).',';
+//     }
 }
