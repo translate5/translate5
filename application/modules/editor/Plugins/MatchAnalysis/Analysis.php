@@ -149,11 +149,19 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             }
             $useMt = empty($bestMatchRateResult) || $bestMatchRateResult->matchrate < $this->pretranslateMatchrate;
             if($this->usePretranslateMT && $useMt) {
+                
                 $bestMatchRateResult = $this->getMtResult($segment);
-                // since nothing other was found, we have to store the result for the repetitions too
-                $repetitionByHash[$segmentHash] = $bestMatchRateResult;
+
+                //check if the mt matchrate is lower than the pretranslateMatchrate
+                if($bestMatchRateResult->matchrate < $this->pretranslateMatchrate){
+                    $bestMatchRateResult=null;
+                }else{
+                    // since nothing other was found, we have to store the result for the repetitions too
+                    $repetitionByHash[$segmentHash] = $bestMatchRateResult;
+                }
             }
-            if(!empty($bestMatchRateResult)) {
+            //if best matchrate results are found, and the matchrate is higher or equal then the pretranslateMatchrate
+            if(!empty($bestMatchRateResult) && $bestMatchRateResult->matchrate >= $this->pretranslateMatchrate) {
                 $this->updateSegment($segment, $bestMatchRateResult);
             }
         }
@@ -272,7 +280,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //error_log('segmentNrInTask='.$segment->getSegmentNrInTask().' wordCount:'.$this->wordCount->getSourceCount().' totalCount:');
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-        
         $matchAnalysis->setSegmentId($segment->getId());
         $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
         $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
