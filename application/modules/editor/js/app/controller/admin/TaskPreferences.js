@@ -539,16 +539,27 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * this customer is preselected.
    */
   onTaskMainCardRender: function(taskMainCard,eOpts) {
-      var me = this, 
+      var me = this,
+          auth = Editor.app.authenticatedUser,
           taskMainCardContainer = taskMainCard.down('#taskMainCardContainer');
       
       // add the customer field to the taskUpload window
-      taskMainCardContainer.add({
-          xtype: 'customersCombo',
-          name: 'customerId',
-          itemId: 'customerId',
-          toolTip: me.strings.customerTip,
-          fieldLabel: me.strings.customerLabel + '¹'
-      });
+      if (auth.isAllowed('editorCustomerSwitch')) {
+          taskMainCardContainer.add({
+              xtype: 'customersCombo', // user is allowed to see the CustomerSwitch => show all customers
+              name: 'customerId',
+              itemId: 'customerId',
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel + '¹'
+          });
+      } else {
+          taskMainCardContainer.add({
+              xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
+              name: 'customerId',
+              itemId: 'customerId',
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel + '¹'
+          });
+      }
   }
 });
