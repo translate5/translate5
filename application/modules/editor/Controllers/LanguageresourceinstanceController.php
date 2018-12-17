@@ -779,6 +779,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function markDiff(editor_Models_Segment $segment,editor_Services_ServiceResult $result,editor_Services_Connector $connector){
         $queryString = $connector->getQueryString($segment);
         $queryStringTags = [];
+        
+        //remove the terms and track changes from the query string. When making diff they are not required
+        $queryString=$segment->stripTermTagsAndTrackChanges($queryString);
+        
         $queryString = $this->protectTags($queryString, $queryStringTags);
         
         $diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
@@ -790,6 +794,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $results=$result->getResult();
         foreach ($results as &$res) {
+            //remove the terms and the track changes tags from the result source.
+            $res->source=$segment->stripTermTagsAndTrackChanges($res->source);
+            
             $tags = []; 
             //replace the internal tags before diff
             $res->source = $this->protectTags($res->source, $tags);
