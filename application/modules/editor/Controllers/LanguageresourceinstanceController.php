@@ -129,7 +129,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $id = $languageresource['id'];
             //add customer assocs
             $languageresource['resourcesCustomers'] = $this->getCustassoc($custAssoc, 'customerId', $id);
-            $languageresource['useAsDefault'] = $this->getCustassoc($custAssoc, 'useAsDefault', $id);
+            $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
         }
@@ -162,6 +162,27 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         //remove 0 and null values
         return array_filter(array_column($data[$id], $index));
+    }
+    
+    /***
+     * Retrives the useAsDefault customers for the given language resource
+     * @param array $data
+     * @param string $index the datafield to get
+     * @param integer $id the language resource id 
+     * @return array
+     */
+    protected function getCustassocDefault(array $data, $index, $id){
+        if(empty($data[$id])){
+            return [];
+        }
+        //get the useAsDefault array indexes
+        $default=$this->getCustassoc($data, $index, $id);
+        $customerIds=[];
+        //get the customer ids for those array indexes
+        foreach ($default as $key=>$value){
+            $customerIds[]=$data[$id][$key]['customerId'];
+        }
+        return $customerIds;
     }
     
     /**
