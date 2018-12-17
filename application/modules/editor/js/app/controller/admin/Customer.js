@@ -346,7 +346,6 @@ Ext.define('Editor.controller.admin.Customer', {
             customerId = this.getCustomerSwitchValue(),
             customerIdField,
             customerNameField,
-            customersStore,
             customerName;
         if (customerId == me.customerSwitchAllClientsValue) {
             return;
@@ -357,8 +356,7 @@ Ext.define('Editor.controller.admin.Customer', {
         // name
         customerNameField = taskMainCard.down('#customerNameField');
         if (customerNameField) {
-            customersStore = Ext.StoreManager.get('customersStore');
-            customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
+            customerName = me.getCustomerName(customerId);
             customerNameField.setValue(customerName);
         }
     },
@@ -395,8 +393,6 @@ Ext.define('Editor.controller.admin.Customer', {
         console.dir(filters);
         var me = this,
             storeId = store.getStoreId(),
-            customersStore,
-            customerInStore,
             customerId = me.customerSwitchAllClientsValue,
             isXGridFilter = false;
         console.log("COMING FROM onGridFilterChange");
@@ -406,11 +402,7 @@ Ext.define('Editor.controller.admin.Customer', {
             }
             if (Ext.String.startsWith(filter.getId(), 'x-gridfilter') && Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) != -1  && filter.getValue() != undefined) {
                 console.log(storeId + ": filter.getValue():" + filter.getValue());
-                customersStore = Ext.StoreManager.get('customersStore');
-                customerInStore = customersStore.findRecord('name',filter.getValue(),0,true,false,false);
-                if(customerInStore) {
-                    customerId = customerInStore.get('id');
-                }
+                customerId = me.getCustomerId(filter.getValue());
                 console.log('stop iteration');
                 return false; // stop iteration
             }
@@ -470,8 +462,6 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     setCustomerFilteringForStores: function(customerId) {
         var me = this,
-            customerName,
-            customersStore,
             tasks = Ext.StoreMgr.get('admin.Tasks'),
             users = Ext.StoreMgr.get('admin.Users'),
             languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
@@ -487,8 +477,6 @@ Ext.define('Editor.controller.admin.Customer', {
     filterStore: function(store, customerId){
         var me = this,
             storeId = store.getStoreId(),
-            customersStore,
-            customerName,
             storeCustomerFilters = {};
         // filter is already set for this store
         if (Ext.Array.indexOf(me.customerSwitchStoresAlreadyFiltered,storeId) != -1) {
@@ -517,8 +505,7 @@ Ext.define('Editor.controller.admin.Customer', {
         // set customer-filter (either by name or by id, depends on the store)
         me.handleFiltering = false;
         console.log(storeId + ': set Filter');
-        customersStore = Ext.StoreManager.get('customersStore');
-        customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
+        customerName = me.getCustomerName(customerId);
         switch(storeId) {
             case 'admin.Tasks':
                 store.filter([{property: 'customerId', operator:'eq', value: customerId}]);
@@ -569,4 +556,18 @@ Ext.define('Editor.controller.admin.Customer', {
         });
         return allOtherFilters; 
     },
+    
+    /**
+     * Helpers.
+     */
+    getCustomerName: function (id) {
+        var customersStore = Ext.StoreManager.get('customersStore'),
+            customer = customersStore.getById(id);
+        return customer ? customer.get('name') : '';
+    },
+    getCustomerId: function (name) {
+        var customersStore = Ext.StoreManager.get('customersStore'),
+            customer = customersStore.findRecord('name',name,0,true,false,false);
+        return customer ? customer.get('id') : '';
+    }
 });
