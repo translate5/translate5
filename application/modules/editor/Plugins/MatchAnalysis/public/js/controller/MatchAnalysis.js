@@ -79,7 +79,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
         pretranslateMt:'#UT#Vorübersetzen (MT)',
         pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
-        termtaggerSegment:'#UT#Terminologie prüfen und markieren'
+        termtaggerSegment:'#UT#Terminologie prüfen und markieren',
+        analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
     listen:{
@@ -355,7 +356,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
         
         Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
-        assocPanel.getEl().mask('Loading...')
+        assocPanel.getEl().mask(me.strings.analysisLoadingMsg)
         
         Ext.Ajax.request({
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
@@ -366,6 +367,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 pretranslateTmAndTerm: me.isChecboxChecked('pretranslateTmAndTerm'),
                 pretranslateMt: me.isChecboxChecked('pretranslateMt'),
                 termtaggerSegment: me.isChecboxChecked('termtaggerSegment'),
+                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
             },
             scope: this,
             timeout:600000,

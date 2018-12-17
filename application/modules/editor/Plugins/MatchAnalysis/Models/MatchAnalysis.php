@@ -104,8 +104,16 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                         AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 1 AND t2.analysisId = ?
                 WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 1
             ) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
+        $sqlV3='SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount  FROM (
+                SELECT t1.*
+                	FROM LEK_match_analysis AS t1
+                	LEFT OUTER JOIN LEK_match_analysis AS t2
+                	ON t1.segmentId = t2.segmentId 
+                			AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId =?
+                	WHERE t2.segmentId IS NULL AND t1.analysisId = ?) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
         //$resultArray=$this->db->getAdapter()->query($sqlV2,[$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
-        $resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();
+        //$resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();
+        $resultArray=$this->db->getAdapter()->query($sqlV3,[$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
         if(empty($resultArray)){
             return array();
         }
@@ -125,39 +133,26 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
         
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
-        $groupedResults=[];
+        //init the language reources group array
+        $groupedResults=$this->initResultArray($analysisAssoc['taskGuid'],$analysisAssoc['internalFuzzy']=='1');
         foreach ($results as $res){
             
             //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
             //because for the internal fuzzy additional row is displayed
             $rowKey=$res['languageResourceid'].($res['internalFuzzy']=='1' ? 'fuzzy' : '');
             
-            //for each languageResource separate array
-            if(!isset($groupedResults[$rowKey])){
-                $groupedResults[$rowKey]=[];
-                $groupedResults[$rowKey]['resourceName']="";
-                $groupedResults[$rowKey]['resourceColor']="";
-                //set languageResource color and name
-                if($res['languageResourceid']>0){
-                    $languageResourceModel=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-                    /* $languageResourceModel editor_Models_LanguageResources_LanguageResource */
-                    try {
-                        $languageResourceModel->load($res['languageResourceid']);
-                        //if the resource is internal fuzzy, change the name
-                        $groupedResults[$rowKey]['resourceName']=$languageResourceModel->getName().($res['internalFuzzy']=='1' ? ' - internal Fuzzies':'');
-                        $groupedResults[$rowKey]['resourceColor']=$languageResourceModel->getColor();
-                    } catch (Exception $e) {
-                        $groupedResults[$rowKey]['resourceName']="This resource is removed";
-                        $groupedResults[$rowKey]['resourceColor']="";
-                    }
-                }
-            }
-            
             //results found in group
             $resultFound=false;
             
             //check on which border group this result belongs to
             foreach ($groupBorder as $border=>$value){
+                
+                //check if the language resource is not initialized by group initializer
+                if(!isset($groupedResults[$rowKey]) && $res['languageResourceid']>0){
+                    //the resource is removed for the assoc, but the analysis stays
+                    $groupedResults[$rowKey]['resourceName']=$translate->_("Diese Ressource wird entfernt");
+                    $groupedResults[$rowKey]['resourceColor']="";
+                }
                 
                 //set the group key in the array
                 if(!isset($groupedResults[$rowKey][$value])){
@@ -183,8 +178,53 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $groupedResults[$rowKey]['created']=$analysisAssoc['created'];
             $groupedResults[$rowKey]['internalFuzzy']=filter_var($analysisAssoc['internalFuzzy'], FILTER_VALIDATE_BOOLEAN) ? $translate->_("Ja"): $translate->_("Nein");
         }
-        
         return array_values($groupedResults);
+    }
+    
+    /***
+     * Init match analysis result array. Fore each assoc language resource one row will be created.
+     * @param string $taskGuid
+     * @param boolean $internalFuzzy
+     * @return array|number
+     */
+    protected function initResultArray($taskGuid,$internalFuzzy){
+        $taskAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $result=$taskAssoc->loadByTaskGuids([$taskGuid]);
+        
+        //create empty group for given key,name and color
+        $initRow=function($key,$name,$color){
+            $row=[];
+            $row[$key]=[];
+            $row[$key]['resourceName']="";
+            $row[$key]['resourceColor']="";
+            //set languageResource color and name
+            //if the resource is internal fuzzy, change the name
+            $row[$key]['resourceName']=$name;
+            $row[$key]['resourceColor']=$color;
+            return $row;
+        };
+        
+        $openTm2=ZfExtended_Factory::get('editor_Services_OpenTM2_Service');
+        /* @var $openTm2 editor_Services_OpenTM2_Service */
+        $serviceName=$openTm2->getName();
+        $initGroups=[];
+        foreach ($result as $res){
+            $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $lr editor_Models_LanguageResources_LanguageResource */
+            $lr->load($res['languageResourceId']);
+            
+            //init the group
+            $initGroups=$initGroups+$initRow($lr->getId(),$lr->getName(),$lr->getColor());
+            
+            //if internal fuzzy is activated, and the curent language resource is opentm2, add additional row for the internal fuzzy
+            if($internalFuzzy && $lr->getServiceName()==$serviceName){
+                //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+                //for each internal fuzzy, additional row is displayed
+                $initGroups=$initGroups+$initRow(($lr->getId().'fuzzy'),($lr->getName().' - internal Fuzzies'),$lr->getColor());
+            }
+        }
+        return $initGroups;
     }
     
     /***

@@ -125,6 +125,10 @@
 		    <target>Check and mark terminology</target>
 		</trans-unit>
 
+		<trans-unit id='QW5hbHlzZSBsw6R1ZnQ='>
+		    <source>Analyse läuft</source>
+		    <target>Analysis in progress</target>
+		</trans-unit>
     </body>
   </file>
 </xliff>

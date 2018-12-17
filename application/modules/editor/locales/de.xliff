@@ -1777,6 +1777,11 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <target>Unterschied zu Quellsegment</target>
 </trans-unit>
 
+<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
+    <source>Diese Ressource wird entfernt</source>
+    <target>This resource is removed</target>
+</trans-unit>
+
   </body>
  </file>
 </xliff>

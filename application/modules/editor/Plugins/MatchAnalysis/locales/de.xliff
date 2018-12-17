@@ -122,6 +122,11 @@
 		    <source>Terminologie prüfen und markieren</source>
 		    <target>Terminologie prüfen und markieren</target>
 		</trans-unit>
+
+		<trans-unit id='QW5hbHlzZSBsw6R1ZnQ='>
+		    <source>Analyse läuft</source>
+		    <target>Analyse läuft</target>
+		</trans-unit>
 		
     </body>
   </file>
