@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.Customer', {
     extend : 'Ext.app.Controller',
+    requires: ['Editor.view.admin.customer.CustomerFilter'],
 
     views: [
         'Editor.view.admin.customer.Panel',
@@ -225,7 +226,7 @@ Ext.define('Editor.controller.admin.Customer', {
             cls: 'customers',
             text:this.strings.customer,
             filter: {
-                type: 'string',
+                type: 'customer', // [Multitenancy]
             },
             renderer: function(v, meta, rec){
                 var names = [];
