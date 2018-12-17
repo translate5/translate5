@@ -282,7 +282,8 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         if (val == undefined) {
             return val;
         }
-        var customersStore = Ext.StoreManager.get('customersStore');
-        return customersStore.findRecord('id',val,0,false,false,true).get('name');
+        var customersStore = Ext.StoreManager.get('customersStore'),
+            customer = customersStore.getById(val);
+        return customer ? customer.get('name') : '';
     }
   });

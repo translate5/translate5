@@ -32,6 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.Customer', {
     extend : 'Ext.app.Controller',
+    requires: ['Editor.view.admin.customer.CustomerFilter'],
 
     views: [
         'Editor.view.admin.customer.Panel',
@@ -110,8 +111,14 @@ Ext.define('Editor.controller.admin.Customer', {
     },
     
     // Multitenancy
-    hasStoreUsersCustomers: false,
-    isTasksFilteredByCustomer: false,
+    isUserCustomersStoreLoaded: false,
+    // Multitenancy: Customer Switch
+    customerSwitchId: 'customerSwitch', // CustomerSwitch-dropdown: component-Id
+    customerSwitchAllClientsValue: 0,   // CustomerSwitch-dropdown: value for "All clients"
+    // Multitenancy: filtering
+    customerColumnNames: ['customerId','customers','resourcesCustomers'], // the columns that refer to the customer in the (stores of the affected) grids
+    customerSwitchStoresAlreadyFiltered: [],
+    handleFiltering: true,
     
     /***
      * hide the customers button when editor is opened
@@ -219,7 +226,7 @@ Ext.define('Editor.controller.admin.Customer', {
             cls: 'customers',
             text:this.strings.customer,
             filter: {
-                type: 'string'
+                type: 'customer', // [Multitenancy]
             },
             renderer: function(v, meta, rec){
                 var names = [];
@@ -276,10 +283,10 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     onUserStoreLoad:function(){
         var me = this;
-        if (!me.hasStoreUsersCustomers) { // avoid ongoing reloads eg. after multitenancy-filtering via "Switch Client"
+        if (!me.isUserCustomersStoreLoaded) { // avoid ongoing reloads eg. after multitenancy-filtering via "Switch Client"
             //after the users store is loaded, load the usersCustomers store
             Ext.StoreManager.get('userCustomers').loadCustom();
-            me.hasStoreUsersCustomers = true;
+            me.isUserCustomersStoreLoaded = true;
         }
     },
 
@@ -297,11 +304,6 @@ Ext.define('Editor.controller.admin.Customer', {
         if (!auth.isAllowed('editorCustomerSwitch')) {
             return;
         }
-        
-        // Task Grid: Check if it's filtered by customers.
-        // (= only for tasks; users and language resources are edited in extra window and won't load the grid after closing)
-        me.isTasksFilteredByCustomer = me.isTaskStoreFilteredWithCustomer();
-        
         pos = toolbar.items.length - 1;
         storeForSwitch = Ext.create(Editor.store.admin.UserCustomers, {storeId:'userCustomersSwitch',autoLoad:true});
         allCustomers = this.strings.allCustomers;
@@ -310,98 +312,42 @@ Ext.define('Editor.controller.admin.Customer', {
        toolbar.insert(pos, {
             xtype: 'usercustomerscombo',
             allowBlank: true,
-            itemId: 'customerSwitch',
+            itemId: me.customerSwitchId,
             fieldLabel: '',
             store: storeForSwitch
         });
+       // add the "All clients"-option
         storeForSwitch.on("load", function(store, items){
             store.insert(0, [{
                 name: allCustomers,
-                id: 0
+                id: me.customerSwitchAllClientsValue
             }]);
-            me.setCustomerSwitchValue(0);
+            me.setCustomerSwitchValue(me.customerSwitchAllClientsValue);
         });
     },
 
     /**
-     * Has the task grid filters set that include the customers-filter?
-     * @returns boolean
+     * [Multitenancy:] If the CustomerSwitch does not exist, we pretend that
+     * it is set to "All clients".
      */
-    isTaskStoreFilteredWithCustomer: function() {
-        var isFilteredWithCustomer = false;
-        Ext.StoreMgr.get('admin.Tasks').getFilters().items.forEach(function(filter){
-            if (filter.getProperty() == 'customerId') {
-                isFilteredWithCustomer = true;
-                return false; // stop iterating
-            }
-        });
-        return isFilteredWithCustomer; 
-    },
-
-    /**
-     * [Multitenancy:] "Switch client" drop-down change handler (filter all affected grids)
-     */
-    onCustomerSwitchChange: function(combo, customerId) {
-        var me = this,
-            customerName,
-            customersStore,
-            tasks = Ext.StoreMgr.get('admin.Tasks'),
-            users = Ext.StoreMgr.get('admin.Users'),
-            languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
-        // AFTER editing tasks, the task-grid loads the header anew which causes "a change" the CustomerSwitch
-        // (= because it gets a default value set after loading). When the task-grid has been filtered BEFORE
-        // editing the task, this filters should be kept.
-        if (!me.isTasksFilteredByCustomer) {
-            // tasks are not filtered by customer; keep current state of (not) filtering
-        } else {
-            // tasks ARE filtered including the customer; we MUST reset the customer-Filter.
-            tasks.clearFilter(); // TODO: If the grid had been manually filtered before, the column-headers still look as if they were still in place.
+    getCustomerSwitchValue: function() {
+        var me = this;
+        if (!me.getCustomerSwitch()) {
+            return me.customerSwitchAllClientsValue;
         }
-        users.clearFilter();
-        languageResources.clearFilter();
-        if(customerId == 0) {
-            return;
-        }
-        customersStore = Ext.StoreManager.get('customersStore');
-        customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
-        tasks.filter([{property: 'customerId', operator:'eq', value: customerId}]);
-        users.filter([{property: 'customers', operator:'like', value: customerName}]);
-        languageResources.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
-    },
-
-    /**
-     * [Multitenancy:] If the setting of one of the grid-filters is changed manually,
-     * deselect the client that is currently selected in the "Switch client" drop-down.
-     */
-    onGridFilterChange: function (store, filters) {
-        var me = this,
-            customerColumnNames = ['customerId','customers','resourcesCustomers'];
-        filters.forEach(function(filter){
-            // Why 'x-gridfilter'? 
-            // - Because filtering via the CustomerSwitchChange also fires the
-            //   filterchange-event, but must not be handled here.
-            // - This also prevents the very first reset of the filters when a grid 
-            //   is opened for the first time.
-            if (Ext.String.startsWith(filter.getId(), 'x-gridfilter') 
-                    && Ext.Array.indexOf(customerColumnNames,filter.getProperty()) != -1) {
-                customersStore = Ext.StoreManager.get('customersStore');
-                customerId = customersStore.findRecord('name',filter.getValue(),0,true,false,false).get('id');
-                me.setCustomerSwitchValue(customerId);
-                return false; // stop iterating
-            }
-        });
+        return me.getCustomerSwitch().getValue();
     },
 
     /**
      * [Multitenancy:] Add task: preselect filtered customer
      */
     setFilteredCustomerForTaskAdd: function(taskMainCard) {
-        var customerId = this.getCustomerSwitchValue(),
+        var me = this,
+            customerId = this.getCustomerSwitchValue(),
             customerIdField,
             customerNameField,
-            customersStore,
             customerName;
-        if (customerId == '0') {
+        if (customerId == me.customerSwitchAllClientsValue) {
             return;
         }
         // id
@@ -410,8 +356,7 @@ Ext.define('Editor.controller.admin.Customer', {
         // name
         customerNameField = taskMainCard.down('#customerNameField');
         if (customerNameField) {
-            customersStore = Ext.StoreManager.get('customersStore');
-            customerName = customersStore.findRecord('id',customerId,0,false,false,true).get('name');
+            customerName = me.getCustomerName(customerId);
             customerNameField.setValue(customerName);
         }
     },
@@ -420,45 +365,209 @@ Ext.define('Editor.controller.admin.Customer', {
      * [Multitenancy:] Add language resource: preselect filtered customer
      */
     setFilteredCustomerForLanguageResourceAdd: function(addTmWindow) {
-        var customerId = this.getCustomerSwitchValue(),
+        var me = this,
+            customerId = this.getCustomerSwitchValue(),
             resourcesCustomersField;
-        if (customerId == '0') {
+        if (customerId == me.customerSwitchAllClientsValue) {
             return;
         }
         resourcesCustomersField = addTmWindow.down('#resourcesCustomers');
         resourcesCustomersField.setValue(customerId);
     },
+    
+    /**
+     * [Multitenancy:] Add user: does not get a preselected customer 
+     * (for users the customer is not mandatory)
+     */
+
+    // ---------------------- Multitenancy: filtering ----------------------
+    
+    // Concept: All filtering is done via the CustomerSwitch. Filtering via the grids changes
+    // the CustomerSwitch-value which then invokes the filtering of the grids (= stores). The 
+    // filter-changes that this causes in the stores must not start another filterchange-process.
 
     /**
-     * [Multitenancy:] Deselect the client that is currently selected in the "Switch client" drop-down.
+     * [Multitenancy:] Grid filterchange handler.
      */
-    deselectCustomerSwitchValue: function() {
-        var tasks = Ext.StoreMgr.get('admin.Tasks'),
-            users = Ext.StoreMgr.get('admin.Users'),
-            languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
-        tasks.clearFilter();
-        users.clearFilter();
-        languageResources.clearFilter();
-        this.setCustomerSwitchValue(0);
-    },
-    
-    /**
-     * 
-     */
-    setCustomerSwitchValue: function(val) {
-        if (!this.getCustomerSwitch()) {
+    onGridFilterChange: function (store, filters, eOpts) {
+        console.dir(filters);
+        var me = this,
+            storeId = store.getStoreId(),
+            customerId = me.customerSwitchAllClientsValue,
+            isXGridFilter = false;
+        console.log("COMING FROM onGridFilterChange");
+        filters.forEach(function(filter){
+            if (Ext.String.startsWith(filter.getId(), 'x-gridfilter')) {
+                isXGridFilter = true;
+            }
+            if (Ext.String.startsWith(filter.getId(), 'x-gridfilter') && Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) != -1  && filter.getValue() != undefined) {
+                console.log(storeId + ": filter.getValue():" + filter.getValue());
+                customerId = me.getCustomerId(filter.getValue());
+                console.log('stop iteration');
+                return false; // stop iteration
+            }
+        });
+        // Why check on 'x-gridfilter'? 
+        // - Because filtering via the CustomerSwitchChange also fires the
+        //   filterchange-event, but must not be handled here.
+        // - This also prevents the very first reset of the filters when a grid 
+        //   is opened for the first time (= fires the filterchange-event, too).
+        if (!isXGridFilter) {
+            console.log(storeId + ': no x-gridfilter = not our job.');
             return;
         }
-        this.getCustomerSwitch().setValue(val);
+        if (!me.handleFiltering) {
+            console.log("no handleFiltering => RETURN");
+            return;
+        }
+        console.log(storeId + ': START setCustomerSwitchValue with ' + customerId);
+        me.setCustomerSwitchValue(customerId); // = this will set the CustomerSwitch
+    },
+
+    /**
+     * [Multitenancy:] Check if CustomerSwitch exists before setting the value.
+     */
+    setCustomerSwitchValue: function(val) {
+        var me = this;
+        if (!me.getCustomerSwitch()) {
+            return; // no CustomerSwitch, no Multitanancy-filtering!
+        }
+        me.getCustomerSwitch().setValue(val); // = fires the event for the onCustomerSwitchChange
+    },
+
+    /**
+     * [Multitenancy:] "Switch client" drop-down change handler.
+     */
+    onCustomerSwitchChange: function(combo, customerId) {
+        var me = this;
+        console.log("STARTED BY onCustomerSwitchChange");
+        console.log("customerSwitch value: " + me. getCustomerSwitchValue());
+        me.clearStoresAlreadyFiltered();
+        me.customerSwitchStoresAlreadyFiltered.push(me.customerSwitchId);
+        me.setCustomerFilteringForStores(customerId,me.customerSwitchId);
+    },
+
+    /**
+     * [Multitenancy:] Check if all stores and the CustomerSwitch are filtered for the current filter-change-event.
+     * If we don't check this (and don't stop then), every filtering causes a new filterchange-event that we would handle.
+     */
+    clearStoresAlreadyFiltered: function() {
+        var me = this;
+        console.log('****** clearStoresAlreadyFiltered *******');
+        me.customerSwitchStoresAlreadyFiltered = [];
+    },
+
+    /**
+     * [Multitenancy:] Filter stores by customers according to the user's selection.
+     */
+    setCustomerFilteringForStores: function(customerId) {
+        var me = this,
+            tasks = Ext.StoreMgr.get('admin.Tasks'),
+            users = Ext.StoreMgr.get('admin.Users'),
+            languageResources = Ext.StoreManager.get('Editor.store.LanguageResources.LanguageResource');
+        console.log('setCustomerFilteringForStores: ' + customerId);
+        me.filterStore(tasks, customerId);
+        me.filterStore(users, customerId);
+        me.filterStore(languageResources, customerId);
+    },
+
+    /**
+     * [Multitenancy:] Apply the filtering for the given store.
+     */
+    filterStore: function(store, customerId){
+        var me = this,
+            storeId = store.getStoreId(),
+            storeCustomerFilters = {};
+        // filter is already set for this store
+        if (Ext.Array.indexOf(me.customerSwitchStoresAlreadyFiltered,storeId) != -1) {
+            console.log(storeId + ': already filtered');
+            return;
+        }
+        // now the filtering of the store will be handled => list it as such!
+        me.customerSwitchStoresAlreadyFiltered.push(storeId);
+        // clear filters (but don't remove other filters than the customer's filter!)
+        if(customerId == me.customerSwitchAllClientsValue) {
+            if (!me.isStoreFilteredByCustomerFilter(store)) {
+                console.log(storeId + ': clear filter not necessary; was not filtered on customers.');
+                return;
+            }
+            me.handleFiltering = false;
+            console.log(storeId + ': clear filter');
+                storeCustomerFilters = me.getStoreFiltersExceptCustomerFilter(store);
+                store.clearFilter();
+                storeCustomerFilters.forEach(function(filter){
+                    console.log(storeId + ': reapply filter for ' + filter.property);
+                    store.filter([{property: filter.property, operator:filter.operator, value: filter.value}]);
+                });
+                me.handleFiltering = true;
+            return;
+        } 
+        // set customer-filter (either by name or by id, depends on the store)
+        me.handleFiltering = false;
+        console.log(storeId + ': set Filter');
+        customerName = me.getCustomerName(customerId);
+        switch(storeId) {
+            case 'admin.Tasks':
+                store.filter([{property: 'customerId', operator:'eq', value: customerId}]);
+                console.log(storeId + ': set Filter done');
+                break;
+            case 'admin.Users':
+                store.filter([{property: 'customers', operator:'like', value: customerName}]);
+                console.log(storeId + ': set Filter done');
+                break;
+            case 'Editor.store.LanguageResources.LanguageResource':
+                store.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
+                console.log(storeId + ': set Filter done');
+                break;
+            }
+        me.handleFiltering = true;
+    },
+    
+
+    /**
+     * [Multitenancy:] Is the store filtered by customers?
+     * @returns booelan
+     */
+    isStoreFilteredByCustomerFilter: function(store) {
+        var me = this,
+            isFilteredByCustomers = false;
+        store.getFilters().items.forEach(function(filter){
+            if (Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) != -1) {
+                isFilteredByCustomers = true;
+                return false; // stop iteration
+            }
+        });
+        return isFilteredByCustomers;
+    },
+
+    /**
+     * [Multitenancy:] Returns all the filters for a store other than the customer filter.
+     * @returns array
+     */
+    getStoreFiltersExceptCustomerFilter: function(store) {
+        var me = this,
+            otherFilter,
+            allOtherFilters = [];
+        store.getFilters().items.forEach(function(filter){
+            if (Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) == -1) {
+                otherFilter = {property: filter.getProperty(), operator:filter.getOperator(), value: filter.getValue()};
+                allOtherFilters.push(otherFilter);
+            }
+        });
+        return allOtherFilters; 
     },
     
     /**
-     * 
+     * Helpers.
      */
-    getCustomerSwitchValue: function() {
-        if (!this.getCustomerSwitch()) {
-            return '0';
-        }
-        return this.getCustomerSwitch().getValue();
+    getCustomerName: function (id) {
+        var customersStore = Ext.StoreManager.get('customersStore'),
+            customer = customersStore.getById(id);
+        return customer ? customer.get('name') : '';
+    },
+    getCustomerId: function (name) {
+        var customersStore = Ext.StoreManager.get('customersStore'),
+            customer = customersStore.findRecord('name',name,0,true,false,false);
+        return customer ? customer.get('id') : '';
     }
 });

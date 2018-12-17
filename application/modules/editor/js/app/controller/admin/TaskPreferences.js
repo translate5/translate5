@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.TaskPreferences', {
   extend : 'Ext.app.Controller',
+  requires: ['Editor.view.admin.customer.Combo'],
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   //constant to be used as value in the frontend for null values in userGuid and workflowStep:
   FOR_ALL: '_forall',
@@ -538,17 +539,27 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
    * this customer is preselected.
    */
   onTaskMainCardRender: function(taskMainCard,eOpts) {
-      var me = this, 
+      var me = this,
+          auth = Editor.app.authenticatedUser,
           taskMainCardContainer = taskMainCard.down('#taskMainCardContainer');
       
       // add the customer field to the taskUpload window
-      taskMainCardContainer.add({
-          xtype: 'customers',
-          name: 'customerId',
-          itemId: 'customerId',
-          allowBlank: false,
-          toolTip: me.strings.customerTip,
-          fieldLabel: me.strings.customerLabel + '¹'
-      });
+      if (auth.isAllowed('editorCustomerSwitch')) {
+          taskMainCardContainer.add({
+              xtype: 'customersCombo', // user is allowed to see the CustomerSwitch => show all customers
+              name: 'customerId',
+              itemId: 'customerId',
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel + '¹'
+          });
+      } else {
+          taskMainCardContainer.add({
+              xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
+              name: 'customerId',
+              itemId: 'customerId',
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel + '¹'
+          });
+      }
   }
 });

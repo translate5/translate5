@@ -28,7 +28,7 @@ END LICENSE AND COPYRIGHT
 
 Ext.define('Editor.view.admin.TaskGrid', {
   extend: 'Ext.grid.Panel',
-  requires: ['Editor.view.admin.TaskActionColumn','Editor.view.CheckColumn'],
+  requires: ['Editor.view.admin.TaskActionColumn','Editor.view.CheckColumn','Editor.view.admin.customer.CustomerFilter'],
   alias: 'widget.adminTaskGrid',
   itemId: 'adminTaskGrid',
   cls: 'adminTaskGrid',
@@ -319,7 +319,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               dataIndex: 'customerId',
               stateId: 'customerId',
               filter: {
-                  type: 'string'
+                  type: 'customer' // [Multitenancy]
               },
               text: me.text_cols.customerName
           },{

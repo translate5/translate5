@@ -38,6 +38,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
+    requires: ['Editor.view.admin.customer.CustomerFilter'],
     alias: 'widget.tmOverviewPanel',
     itemId: 'tmOverviewPanel',
     title:'#UT#Sprach-Resourcen',
@@ -191,7 +192,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     width: 100,
                     dataIndex:'resourcesCustomers',
                     filter: {
-                        type: 'string'
+                        type: 'customer' // [Multitenancy]
                     },
                     text:me.strings.customers,
                     renderer:me.resourceCustomersRenderer
