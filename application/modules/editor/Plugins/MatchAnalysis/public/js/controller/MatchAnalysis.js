@@ -352,12 +352,9 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startAnalysis:function(taskId,operation){
     	//'editor/:entity/:id/operation/:operation',
-        var me=this,
-            assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
+        var me=this;
         
-        Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
-        assocPanel.getEl().mask(me.strings.analysisLoadingMsg)
-        
+        me.addLoadingMask();
         Ext.Ajax.request({
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
@@ -375,7 +372,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 me.checkTaskState(taskId);
             }, 
             failure: function(response){
-                assocPanel.getEl().unmask()
+                me.removeLoadingMask();
             	Editor.app.getController('ServerException').handleException(response);
             }
         })
@@ -409,7 +406,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     getComponentByItemId:function(itemId){
     	var cmp=Ext.ComponentQuery.query('#'+itemId);
     	if(cmp.length<1){
-    		return;
+    		return null;
     	}
     	return cmp[0];
     },
@@ -446,7 +443,48 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Tash state check cleand event handler. This event is fired from Task overview controller.
      */
     onTaskStateCheckPullCleaned:function(){
-        var assocPanel=Ext.ComponentQuery.query('#languageResourceTaskAssocPanel')[0];
-        assocPanel && assocPanel.getEl().unmask();
+        this.removeLoadingMask(true);
+    },
+
+    /***
+     * Add loadin mask in match analysis panel and in the task assoc panel
+     */
+    addLoadingMask:function(){
+        var me=this,
+            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
+            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
+        
+        if(assocPanel){
+            assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        }
+
+        if(matchAnalysisPanel){
+            matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        }
+    },
+
+    /***
+     * Remove loading mask from task assoc panel and match analysis panel.
+     * If the reloadStore is set, the analysis panel will be reloaded
+     */
+    removeLoadingMask:function(reloadStore){
+        var me=this,
+            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel'),
+            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel'),
+            matchAnalysisGrid=me.getComponentByItemId('matchAnalysisGrid');
+        
+        if(!assocPanel){
+            return;
+        }
+        assocPanel.unmask();;
+
+        if(!matchAnalysisPanel){
+            return;
+        }
+        if(reloadStore){
+            matchAnalysisGrid.getStore().reload();
+        }
+        matchAnalysisPanel.getEl().unmask(me.strings.analysisLoadingMsg);
     }
+
 });

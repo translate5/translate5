@@ -224,6 +224,8 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
                 $initGroups=$initGroups+$initRow(($lr->getId().'fuzzy'),($lr->getName().' - internal Fuzzies'),$lr->getColor());
             }
         }
+        //init the repetition
+        $initGroups=$initGroups+$initRow(0,"","");
         return $initGroups;
     }
     
