@@ -142,6 +142,11 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(200, $this->api()->getLastResponse()->getStatus(), 'Server did not respond HTTP 200');
         unset($sessionData->user->id);
         unset($sessionData->user->loginTimeStamp);
+        
+        //since default customer id changes on testsystems we have to test it via regex and remove it for next test
+        $this->assertRegExp('/^,[0-9]+,$/', $sessionData->user->customers);
+        $sessionData->user->customers = null;
+        
         $expected = '{"state":"authenticated","user":{"userGuid":"{00000000-0000-0000-C100-CCDDEE000001}","firstName":"manager","surName":"test","gender":"m","login":"testmanager","email":"support@translate5.net","roles":["pm","editor","admin","basic","noRights"],"passwd":"********","editable":0,"locale":"en","sourceLanguage":null,"targetLanguage":null,"parentIds":null,"customers":null,"userName":"manager test"}}';
         $this->assertEquals(json_decode($expected), $sessionData, 'User was not properly authenticated via ');
         
