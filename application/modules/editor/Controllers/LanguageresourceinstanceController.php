@@ -57,13 +57,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     public function init() {
         //add filter type for languages
+        $finalTableForAssoc = new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId');
         $this->_filterTypeMap = [
             'sourceLang' => ['string' => 'list'],
             'targetLang' => ['string' => 'list'],
+            'resourcesCustomers' => [
+                'string' => new ZfExtended_Models_Filter_JoinAssoc('LEK_languageresources_customerassoc', $finalTableForAssoc, 'languageResourceId', 'id')
+            ]
         ];
         
+        //set same join for sorting!
+        $this->_sortColMap['resourcesCustomers'] = $this->_filterTypeMap['resourcesCustomers']['string'];
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        
         parent::init();
     }
     
@@ -220,14 +225,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function handleFilterCustom(){
         $sourceFilter=null;
         $targetFilter=null;
-        $resourcesCustomers=null;
         $useAsDefault=null;
         $taskList=null;
         
         $this->entity->getFilter()->hasFilter('sourceLang',$sourceFilter);
         $this->entity->getFilter()->hasFilter('targetLang',$targetFilter);
         
-        $this->entity->getFilter()->hasFilter('resourcesCustomers',$resourcesCustomers);
         $this->entity->getFilter()->hasFilter('useAsDefault',$useAsDefault);
         $this->entity->getFilter()->hasFilter('taskList',$taskList);
         
@@ -301,12 +304,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(isset($targetFilter)){
             $resultList=$searchEntity($targetFilter->value,'editor_Models_Languages');
             $handleFilter($targetFilter,$resultList,'editor_Models_LanguageResources_Languages','loadByTargetLangIds','languageResourceId');
-        }
-        
-        //check if filtering for resourceCustomers should be done
-        if(isset($resourcesCustomers) && is_string($resourcesCustomers->value)){
-            $resultList=$searchEntity($resourcesCustomers->value,'editor_Models_Customer');
-            $handleFilter($resourcesCustomers,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIds','languageResourceId');
         }
         
         //check if filtering for useAsDefault should be done
