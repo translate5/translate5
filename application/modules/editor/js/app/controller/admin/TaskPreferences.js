@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.TaskPreferences', {
   extend : 'Ext.app.Controller',
+  requires: ['Editor.view.admin.customer.Combo'],
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   //constant to be used as value in the frontend for null values in userGuid and workflowStep:
   FOR_ALL: '_forall',
@@ -543,10 +544,9 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       
       // add the customer field to the taskUpload window
       taskMainCardContainer.add({
-          xtype: 'customers',
+          xtype: 'customersCombo',
           name: 'customerId',
           itemId: 'customerId',
-          allowBlank: false,
           toolTip: me.strings.customerTip,
           fieldLabel: me.strings.customerLabel + '¹'
       });
