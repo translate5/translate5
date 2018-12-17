@@ -145,7 +145,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     itemId:'useAsDefault',
                     fieldLabel:me.strings.useAsDefault,
                     store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer',
+                        model:'Editor.model.admin.Customer'
                     }),
                     displayField: 'name', 
                     valueField: 'id', 
