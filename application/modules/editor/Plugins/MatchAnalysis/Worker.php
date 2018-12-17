@@ -27,6 +27,12 @@ END LICENSE AND COPYRIGHT
 */
 
 class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Abstract {
+    
+    /***
+     * Task old state before the match analysis were started
+     * @var string
+     */
+    private $taskOldState=null;
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -43,11 +49,16 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         try {
             $params = $this->workerModel->getParameters();
             $ret=$this->doWork();
-            //run the term tagger when the termtagger flag is set, it is pretranslation and no terminologie active
-            if($params['termtaggerSegment'] && $params['pretranslate'] && !$this->task->getTerminologie()){
-                $this->queueTermtagger($this->taskGuid,$this->workerModel->getId());
+            
+            //run the term tagger when the termtagger flag is set, it is pretranslation and no terminologie worker is queued
+            if($params['termtaggerSegment'] && $params['pretranslate'] && !$params['isTaskImport']){
+                $this->queueTermtagger($this->taskGuid,$this->workerModel->getParentId());
             }
         } catch (Exception $e) {
+            //when error happens, revoke the task old state, and unlock the task
+            $this->task->setState($this->taskOldState);
+            $this->task->save();
+            $this->task->unlock();
             error_log("Error happend on match analysis and pretranslation (taskGuid=".$this->task->getTaskGuid()."). Error was: ".$e->getMessage());
             return false;
         }
@@ -61,7 +72,6 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
     protected function doWork() {
         $params = $this->workerModel->getParameters();
 
-        $oldState=null;
         $newState=null;
         
         //can the task be locked
@@ -74,7 +84,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             }
         }else{
             //lock the task while match analysis are running
-            $oldState = $this->task->getState();
+            $this->taskOldState = $this->task->getState();
             $newState='matchanalysis';
             $this->task->setState('matchanalysis');
             $this->task->save();
@@ -130,7 +140,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         //unlock the state
         if(!empty($newState)){
-            $this->task->setState($oldState);
+            $this->task->setState($this->taskOldState);
             $this->task->save();
         }
         $this->task->unlock();

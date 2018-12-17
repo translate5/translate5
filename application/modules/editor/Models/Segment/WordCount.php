@@ -79,16 +79,8 @@ class editor_Models_Segment_WordCount {
      */
     protected $rfcLanguage;
     
-    /***
-     * 
-     * @var editor_Models_Segment_InternalTag
-     */
-    protected $internalTagHepler;
-    
-    
     public function __construct($rfcLanguage=""){
         $this->rfcLanguage=$rfcLanguage;
-        $this->internalTagHepler=ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
     
     /**
@@ -146,8 +138,7 @@ class editor_Models_Segment_WordCount {
      * @return number|mixed
      */
     public function getSourceCount(){
-        
-        $text=$this->internalTagHepler->replace($this->segment->getFieldOriginal('source'),"");
+        $text=$this->segment->stripTags($this->segment->getFieldOriginal('source'));
         $text=$this->removePunctuation($text);
         
         

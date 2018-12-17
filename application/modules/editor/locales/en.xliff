@@ -3010,6 +3010,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Diff to source</target>
 </trans-unit>
 
+<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
+    <source>Diese Ressource wird entfernt</source>
+    <target>This resource is removed</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
