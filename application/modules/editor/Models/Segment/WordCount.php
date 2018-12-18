@@ -37,7 +37,6 @@ class editor_Models_Segment_WordCount {
      */
     protected $segment;
     
-    
     /***
      * List of non-word characters (empty spaces)
      * This list is the practical implementation of the https://www.xtm.cloud/manuals/gmx-v/GMX-V-2.0.html#Words standard.
