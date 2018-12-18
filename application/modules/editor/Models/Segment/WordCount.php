@@ -145,13 +145,70 @@ class editor_Models_Segment_WordCount {
      * @return number
      */
     protected function getWordsCount($text){
+		//replace 'hyphen' and 'apostrophe' characters with on one side bordering the segment and on the other whitespace with whitespace
+		$search = array(
+			'/^\s*‐\s+/s',
+			'/\s+‐\s*$/s',
+			
+			'/^\s*\'\s+/s',
+			'/\s+\'\s*$/s',
+			
+			'/^\s*-\s+/s',
+			'/\s+-\s*$/s',
+			
+			'/^\s*‐\s+/s',
+			'/\s+‐\s*$/s',
+			
+			'/^\s*֊\s+/s',
+			'/\s+֊\s*$/s',
+			
+			'/^\s*゠\s+/s',
+			'/\s+゠\s*$/s',
+		
+		//replace 'hyphen' and 'apostrophe' characters with surounding whitespace with whitespace	
+			'/\s+‐\s+/s',
+			'/\s+\'\s+/s',
+			'/\s+-\s+/s',
+			'/\s+‐\s+/s',
+			'/\s+֊\s+/s',
+			'/\s+゠\s+/s',
+			
+		//remove decimal and thousands chars from numbers
+			'/(\d+)\.(\d+)/s',
+			'/(\d+),(\d+)/s'
+			);
+			$replace = array(
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			"\\1\\2",
+			"\\1\\2"
+			);
+        $text = preg_replace($search,$replace,$text);
+        
         //replace 'hyphen' and 'apostrophe' characters with underscore
-        $text = str_replace("‐","_",$text);
-        $text = str_replace("'", '_', $text);
-        $text = str_replace("-", '_', $text);
-        $text = str_replace("‐", '_', $text);
-        $text = str_replace("֊", '_', $text);
-        $text = str_replace("゠", '_', $text);
+        $search = array("‐","'","-","‐","֊","゠" );
+        $text = str_replace($search,"_",$text);
+        
+        //replace html entities with each real chars
+        $text = html_entity_decode($text,ENT_HTML5);
+        
+        
         $re = '/\w+/mu';
         $matches=null;
         preg_match_all($re, $text, $matches, PREG_SET_ORDER, 0);
