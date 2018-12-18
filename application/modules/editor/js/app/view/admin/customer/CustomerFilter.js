@@ -31,6 +31,7 @@ Ext.define('Editor.view.admin.customer.CustomerFilter', {
     alias: 'grid.filter.customer',
     onFilterRemove: function() {
         this.resetCustomerSwitch();
+        this.setActive(false);
         this.callParent(arguments);
     },
     /**

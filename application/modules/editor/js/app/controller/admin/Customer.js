@@ -118,7 +118,6 @@ Ext.define('Editor.controller.admin.Customer', {
     // Multitenancy: filtering
     customerColumnNames: ['customerId','customers','resourcesCustomers'], // the columns that refer to the customer in the (stores of the affected) grids
     customerSwitchStoresAlreadyFiltered: [],
-    handleFiltering: true,
     
     /***
      * hide the customers button when editor is opened
@@ -416,10 +415,6 @@ Ext.define('Editor.controller.admin.Customer', {
             console.log(storeId + ': no x-gridfilter = not our job.');
             return;
         }
-        if (!me.handleFiltering) {
-            console.log("no handleFiltering => RETURN");
-            return;
-        }
         console.log(storeId + ': START setCustomerSwitchValue with ' + customerId);
         me.setCustomerSwitchValue(customerId); // = this will set the CustomerSwitch
     },
@@ -476,8 +471,7 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     filterStore: function(store, customerId){
         var me = this,
-            storeId = store.getStoreId(),
-            storeCustomerFilters = {};
+            storeId = store.getStoreId();
         // filter is already set for this store
         if (Ext.Array.indexOf(me.customerSwitchStoresAlreadyFiltered,storeId) != -1) {
             console.log(storeId + ': already filtered');
@@ -487,64 +481,90 @@ Ext.define('Editor.controller.admin.Customer', {
         me.customerSwitchStoresAlreadyFiltered.push(storeId);
         // clear filters (but don't remove other filters than the customer's filter!)
         if(customerId == me.customerSwitchAllClientsValue) {
-            if (!me.isStoreFilteredByCustomerFilter(store)) {
-                console.log(storeId + ': clear filter not necessary; was not filtered on customers.');
-                return;
-            }
-            me.handleFiltering = false;
-            console.log(storeId + ': clear filter');
-                storeCustomerFilters = me.getStoreFiltersExceptCustomerFilter(store);
-                store.clearFilter();
-                storeCustomerFilters.forEach(function(filter){
-                    console.log(storeId + ': reapply filter for ' + filter.property);
-                    store.filter([{property: filter.property, operator:filter.operator, value: filter.value}]);
-                });
-                me.handleFiltering = true;
+            me.clearCustomerFilter(store);
             return;
         } 
-        // set customer-filter (either by name or by id, depends on the store)
-        me.handleFiltering = false;
-        console.log(storeId + ': set Filter');
-        customerName = me.getCustomerName(customerId);
-        switch(storeId) {
-            case 'admin.Tasks':
-                store.filter([{property: 'customerId', operator:'eq', value: customerId}]);
-                console.log(storeId + ': set Filter done');
-                break;
-            case 'admin.Users':
-                store.filter([{property: 'customers', operator:'like', value: customerName}]);
-                console.log(storeId + ': set Filter done');
-                break;
-            case 'Editor.store.LanguageResources.LanguageResource':
-                store.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
-                console.log(storeId + ': set Filter done');
-                break;
-            }
-        me.handleFiltering = true;
+        // set customer-filter
+        me.setCustomerFilter(store, customerId);
     },
     
-
     /**
-     * [Multitenancy:] Is the store filtered by customers?
-     * @returns booelan
+     * [Multitenancy:] Clear the customer-filter in the given store (keep all others!).
      */
-    isStoreFilteredByCustomerFilter: function(store) {
+    clearCustomerFilter: function(store) {
         var me = this,
-            isFilteredByCustomers = false;
+            customerFilter = me.getCustomerFilterInStore(store);
+        if(customerFilter !== false) {
+            console.log(store.getStoreId() + ': filter removed (' + customerFilter.getId() + ')');
+            //store.removeFilter(customerFilter.getId()); // DID NOT WORK (grid did not reload even after reloading the store 
+            //customerFilter.setValue('');                // DID NOT WORK (does not show users that are not assigned to a customer)
+            console.log(store.getStoreId() + ': clear filter');
+            storeCustomerFilters = me.getAllFilterInStoreExceptCustomerFilter(store);
+            store.clearFilter(); // + reloads the store
+            storeCustomerFilters.forEach(function(filter){
+                console.log(store.getStoreId() + ': reapply filter for ' + filter.property);
+                store.filter([{property: filter.property, operator:filter.operator, value: filter.value}]);
+            });
+        }
+    },
+    
+    /**
+     * [Multitenancy:] Set the customer-filter in the given store.
+     */
+    setCustomerFilter: function(store, customerId) {
+        var me = this,
+            storeId = store.getStoreId(),
+            customerFilter = me.getCustomerFilterInStore(store),
+            customerName = me.getCustomerName(customerId);
+        store.remoteFilter = false;
+        if(customerFilter !== false) {
+            // If there is a customer-filter already, we change the Value.
+            customerFilter.setValue(customerName);
+            console.log(storeId + ': set Value For (existing) Filter done: ' + customerName);
+            store.reload();
+        } else {
+            // If no customer-filter exists, we create one.
+            switch(storeId) {
+                case 'admin.Tasks':
+                    store.filter([{property: 'customerId', operator:'like', value: customerName}]);
+                    store.reload();
+                    break;
+                case 'admin.Users':
+                    store.filter([{property: 'customers', operator:'like', value: customerName}]);
+                    store.reload();
+                    break;
+                case 'Editor.store.LanguageResources.LanguageResource':
+                    store.filter([{property: 'resourcesCustomers', operator:'like', value: customerName}]);
+                    store.reload();
+                    break;
+            }
+            console.log(storeId + ': set (new) Filter done: ' + customerName);
+        }
+        store.remoteFilter = true;
+    },
+    
+    /**
+     * Return the customer-filter in the given store (or false if there is none).
+     * @param {object} store
+     * @returns false|{object} filter
+     */
+    getCustomerFilterInStore (store) {
+        var me = this,
+            customerFilter = false;
         store.getFilters().items.forEach(function(filter){
             if (Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) != -1) {
-                isFilteredByCustomers = true;
+                customerFilter = filter;
                 return false; // stop iteration
             }
         });
-        return isFilteredByCustomers;
+        return customerFilter;
     },
 
     /**
      * [Multitenancy:] Returns all the filters for a store other than the customer filter.
      * @returns array
      */
-    getStoreFiltersExceptCustomerFilter: function(store) {
+    getAllFilterInStoreExceptCustomerFilter: function(store) {
         var me = this,
             otherFilter,
             allOtherFilters = [];
