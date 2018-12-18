@@ -456,17 +456,15 @@ Ext.define('Editor.controller.admin.Customer', {
      * [Multitenancy:] Internal settings before the stores are being filtered.
      */
     beforeStoreFiltering: function() {
-        var me = this;
         console.log('****** clearStoresAlreadyFiltered *******');
-        me.customerSwitchStoresAlreadyFiltered = [];
+        this.customerSwitchStoresAlreadyFiltered = [];
     },
 
     /**
      * [Multitenancy:] Internal "resets" after the stores have been filtered.
      */
     afterStoreFiltering: function() {
-        var me = this;
-        me.isFromGridFilter = false;
+        this.isFromGridFilter = false;
         console.log('****** reset *******');
     },
 
