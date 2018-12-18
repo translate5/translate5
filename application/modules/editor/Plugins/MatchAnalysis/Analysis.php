@@ -152,16 +152,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 
                 $bestMatchRateResult = $this->getMtResult($segment);
 
-                //if matches found and the matchrate is higher or equal to ptretranslateMatchrate
-                if(!empty($bestMatchRateResult) && ($bestMatchRateResult->matchrate >= $this->pretranslateMatchrate)){
+                if(!empty($bestMatchRateResult)){
                     //store the result for the repetitions too
                     $repetitionByHash[$segmentHash] = $bestMatchRateResult;
                 }else{
                     $bestMatchRateResult=null;
                 }
             }
-            //if best matchrate results are found, and the matchrate is higher or equal then the pretranslateMatchrate
-            if(!empty($bestMatchRateResult) && $bestMatchRateResult->matchrate >= $this->pretranslateMatchrate) {
+            
+            //if best matchrate results are found
+            if(!empty($bestMatchRateResult)) {
                 $this->updateSegment($segment, $bestMatchRateResult);
             }
         }
