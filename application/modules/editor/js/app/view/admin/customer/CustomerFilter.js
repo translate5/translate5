@@ -29,17 +29,20 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.customer.CustomerFilter', {
     extend: 'Ext.grid.filters.filter.String',
     alias: 'grid.filter.customer',
+    // [Multitenancy:] 
     onFilterRemove: function() {
         this.resetCustomerSwitch();
-        this.setActive(false);
+        this.callParent(arguments);
+    },
+    // [Multitenancy:] 
+    onValueChange: function() {
+        this.resetCustomerSwitch();
         this.callParent(arguments);
     },
     /**
      * [Multitenancy:] Set customerSwitch to "All clients".
      */
     resetCustomerSwitch: function() {
-        if(Ext.ComponentQuery.query('#customerSwitch')[0]){
-             Ext.ComponentQuery.query('#customerSwitch')[0].setValue('0');
-        }
+        Ext.fireEvent('resetCustomerSwitch');
     }
 });
