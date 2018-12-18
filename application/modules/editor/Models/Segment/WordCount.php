@@ -78,8 +78,33 @@ class editor_Models_Segment_WordCount {
      */
     protected $rfcLanguage;
     
+       /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
+    /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /***
+     * The segment query string
+     * @var string
+     */
+    protected $queryString;
+    
+    /***
+     * Dummy connector used to get the qeury string
+     * @var editor_Services_OpenTM2_Connector
+     */
+    protected $connector;
+
     public function __construct($rfcLanguage=""){
         $this->rfcLanguage=$rfcLanguage;
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $this->connector= ZfExtended_Factory::get('editor_Services_OpenTM2_Connector');
     }
     
     /**
@@ -127,7 +152,6 @@ class editor_Models_Segment_WordCount {
         $text = str_replace("‐", '_', $text);
         $text = str_replace("֊", '_', $text);
         $text = str_replace("゠", '_', $text);
-        
         $re = '/\w+/mu';
         $matches=null;
         preg_match_all($re, $text, $matches, PREG_SET_ORDER, 0);
@@ -139,6 +163,7 @@ class editor_Models_Segment_WordCount {
     
     public function setSegment(editor_Models_Segment $segment){
         $this->segment = $segment;
+        $this->queryString=$this->connector->getQueryString($this->segment);
     }
     
     /***
@@ -149,7 +174,10 @@ class editor_Models_Segment_WordCount {
      * @return number|mixed
      */
     public function getSourceCount(){
-        $text=$this->segment->stripTags($this->segment->getFieldOriginal('source'));
+        //replace white space tags with real white space, before clean all teh tags
+        $text = $this->internalTag->restore($this->queryString, true);
+        $text = $this->whitespaceHelper->unprotectWhitespace($text);
+        $text=$this->segment->stripTags($text);
         //average words in East Asian languages by language
         //Chinese (all forms): 2.8
         //Japanese: 3.0
