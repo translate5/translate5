@@ -120,6 +120,14 @@ class editor_Models_Segment_WordCount {
      * @return number
      */
     protected function getWordsCount($text){
+        //replace 'hyphen' and 'apostrophe' characters with underscore
+        $text = str_replace("‐","_",$text);
+        $text = str_replace("'", '_', $text);
+        $text = str_replace("-", '_', $text);
+        $text = str_replace("‐", '_', $text);
+        $text = str_replace("֊", '_', $text);
+        $text = str_replace("゠", '_', $text);
+        
         $re = '/\w+/mu';
         $matches=null;
         preg_match_all($re, $text, $matches, PREG_SET_ORDER, 0);
