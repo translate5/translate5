@@ -115,14 +115,18 @@ class editor_Models_Segment_WordCount {
     }
     
     /***
-     * Remove punctuation from text
-     * 
-     * @param unknown $text
-     * @return mixed
+     * Return number of words in text
+     * @param string $text
+     * @return number
      */
-    protected function removePunctuation($text){
-        $re = '/[\x{2000}-\x{206F}\x{2E00}-\x{2E7F}\\\\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`§{|}~]/u';
-        return preg_replace($re, " ", $text);
+    protected function getWordsCount($text){
+        $re = '/\w+/mu';
+        $matches=null;
+        preg_match_all($re, $text, $matches, PREG_SET_ORDER, 0);
+        if(!empty($matches)){
+            return count($matches);
+        }
+        return 0;
     }
     
     public function setSegment(editor_Models_Segment $segment){
@@ -138,9 +142,6 @@ class editor_Models_Segment_WordCount {
      */
     public function getSourceCount(){
         $text=$this->segment->stripTags($this->segment->getFieldOriginal('source'));
-        $text=$this->removePunctuation($text);
-        
-        
         //average words in East Asian languages by language
         //Chinese (all forms): 2.8
         //Japanese: 3.0
@@ -152,30 +153,14 @@ class editor_Models_Segment_WordCount {
             case 'zh-mo':
             case 'zh-sg':
                 return $this->getGraphemeCount($text, 2.8);
-                break;
             case 'th-th':
                 return $this->getGraphemeCount($text, 6.0);
             case 'ja-jp':
                 return $this->getGraphemeCount($text, 3.0);
-                break;
             case 'ko-kr':
                 return $this->getGraphemeCount($text, 3.3);
-                break;
             default:
-                $retText=$this->toCodePoint($text,'UTF-8');
-                $finalString="";
-                foreach ($retText as $ret){
-                    if(in_array($ret, $this->whiteSpaceChars)){
-                        $ret='00000020';
-                    }
-                    $ret=hexdec($ret);//to decimal
-                    
-                    $ret=chr($ret);//get char
-                    
-                    $finalString.=$ret;
-                }
-                return $count = str_word_count($finalString, 0);
-                break;
+                return $this->getWordsCount($text);
         }
         return 0;
     }
