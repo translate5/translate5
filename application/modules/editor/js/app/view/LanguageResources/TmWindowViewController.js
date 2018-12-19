@@ -167,6 +167,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      */
     mergeCustomersToDefault:function(){
         var me=this,
+            record=me.getView().down('form').getRecord(),
             resourcesCustomers=me.getView().down('#resourcesCustomers'),
             asDefaultField=me.getView().down('#useAsDefault'),
             defaultStore=asDefaultField.getStore(),
@@ -175,6 +176,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             records=[],
             selectedValues=[];
         
+        if(!asDefaultSelection || asDefaultSelection.length<1 && record){
+            asDefaultSelection=record.get('useAsDefault');
+        }
         //INFO: bevause of extjs bug, unable to use the selected records from the customers as model data to the defaultCustomers store
         //https://www.sencha.com/forum/showthread.php?304305-Uncaught-TypeError-Cannot-read-property-internalId-of-undefined
         //collect all selected customers to additional array

@@ -45,7 +45,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
       relaisLang: '#UT#Relaissprache',
       targetLang: '#UT#Zielsprache',
       state: '#UT#Status',
-      customerId: '#UT#Kunden',
+      customerId: '#UT#Endkunde',
       pmGuid: '#UT#Projektmanager',
       users: '#UT#Benutzer',
       wordCount: '#UT#Wörter',
@@ -321,7 +321,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
               filter: {
                   type: 'customer' // [Multitenancy]
               },
-              text: me.text_cols.customerName
+              text: me.text_cols.customerId
           },{
               xtype: 'gridcolumn',
               width: 220,

@@ -99,7 +99,11 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                     }
                 },
-                features: [{ftype:'grouping'}],
+                features: [{
+                    ftype:'grouping',
+                    hideGroupedHeader: true,
+                    enableGroupingMenu: false
+                }],
                 columns: [{
                     xtype: 'gridcolumn',
                     width: 170,
