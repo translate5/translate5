@@ -100,11 +100,19 @@ class editor_Models_Segment_WordCount {
      */
     protected $connector;
 
+    /***
+     * Regex used for word break
+     * @var string
+     */
+    protected $regexWordBreak;
+    
     public function __construct($rfcLanguage=""){
         $this->rfcLanguage=$rfcLanguage;
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         $this->connector= ZfExtended_Factory::get('editor_Services_OpenTM2_Connector');
+        $config = Zend_Registry::get('config');
+        $this->regexWordBreak = $config->runtimeOptions->editor->export->wordBreakUpRegex;
     }
     
     /**
@@ -208,14 +216,8 @@ class editor_Models_Segment_WordCount {
         //replace html entities with each real chars
         $text = html_entity_decode($text,ENT_HTML5);
         
-        
-        $re = '/\w+/mu';
-        $matches=null;
-        preg_match_all($re, $text, $matches, PREG_SET_ORDER, 0);
-        if(!empty($matches)){
-            return count($matches);
-        }
-        return 0;
+        $words = preg_split($this->regexWordBreak, $text, NULL, PREG_SPLIT_NO_EMPTY);
+        return count($words);
     }
     
     public function setSegment(editor_Models_Segment $segment){

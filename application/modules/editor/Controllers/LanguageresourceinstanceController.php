@@ -814,6 +814,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $termTag editor_Models_Segment_TermTag */
         $queryString =$termTag->remove($queryString);
         
+        //convert the html special chars
+        $decodeHtmlSpecial=function($string){
+            return htmlspecialchars_decode($string);;
+        };
+        
+        $queryString=$decodeHtmlSpecial($queryString);
+        
         $diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
         /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
         
@@ -826,6 +833,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $tags = []; 
             //replace the internal tags before diff
             $res->source = $this->protectTags($res->source, $tags);
+            
+            $res->source =$decodeHtmlSpecial($res->source);
+            
             $res->source = $diffTagger->diffSegment($queryString, $res->source, null,null);
             $res->source = $this->unprotectTags($res->source, array_merge($tags, $queryStringTags));
         }
