@@ -37,7 +37,6 @@ class editor_Models_Segment_WordCount {
      */
     protected $segment;
     
-    
     /***
      * List of non-word characters (empty spaces)
      * This list is the practical implementation of the https://www.xtm.cloud/manuals/gmx-v/GMX-V-2.0.html#Words standard.
@@ -79,8 +78,33 @@ class editor_Models_Segment_WordCount {
      */
     protected $rfcLanguage;
     
+       /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
+    /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /***
+     * The segment query string
+     * @var string
+     */
+    protected $queryString;
+    
+    /***
+     * Dummy connector used to get the qeury string
+     * @var editor_Services_OpenTM2_Connector
+     */
+    protected $connector;
+
     public function __construct($rfcLanguage=""){
         $this->rfcLanguage=$rfcLanguage;
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $this->connector= ZfExtended_Factory::get('editor_Services_OpenTM2_Connector');
     }
     
     /**
@@ -116,18 +140,87 @@ class editor_Models_Segment_WordCount {
     }
     
     /***
-     * Remove punctuation from text
-     * 
-     * @param unknown $text
-     * @return mixed
+     * Return number of words in text
+     * @param string $text
+     * @return number
      */
-    protected function removePunctuation($text){
-        $re = '/[\x{2000}-\x{206F}\x{2E00}-\x{2E7F}\\\\\'!"#$%&()*+,\-.\/:;<=>?@\[\]^_`§{|}~]/u';
-        return preg_replace($re, " ", $text);
+    protected function getWordsCount($text){
+		//replace 'hyphen' and 'apostrophe' characters with on one side bordering the segment and on the other whitespace with whitespace
+		$search = array(
+			'/^\s*‐\s+/s',
+			'/\s+‐\s*$/s',
+			
+			'/^\s*\'\s+/s',
+			'/\s+\'\s*$/s',
+			
+			'/^\s*-\s+/s',
+			'/\s+-\s*$/s',
+			
+			'/^\s*‐\s+/s',
+			'/\s+‐\s*$/s',
+			
+			'/^\s*֊\s+/s',
+			'/\s+֊\s*$/s',
+			
+			'/^\s*゠\s+/s',
+			'/\s+゠\s*$/s',
+		
+		//replace 'hyphen' and 'apostrophe' characters with surounding whitespace with whitespace	
+			'/\s+‐\s+/s',
+			'/\s+\'\s+/s',
+			'/\s+-\s+/s',
+			'/\s+‐\s+/s',
+			'/\s+֊\s+/s',
+			'/\s+゠\s+/s',
+			
+		//remove decimal and thousands chars from numbers
+			'/(\d+)\.(\d+)/s',
+			'/(\d+),(\d+)/s'
+			);
+			$replace = array(
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			" ",
+			"\\1\\2",
+			"\\1\\2"
+			);
+        $text = preg_replace($search,$replace,$text);
+        
+        //replace 'hyphen' and 'apostrophe' characters with underscore
+        $search = array("‐","'","-","‐","֊","゠" );
+        $text = str_replace($search,"_",$text);
+        
+        //replace html entities with each real chars
+        $text = html_entity_decode($text,ENT_HTML5);
+        
+        
+        $re = '/\w+/mu';
+        $matches=null;
+        preg_match_all($re, $text, $matches, PREG_SET_ORDER, 0);
+        if(!empty($matches)){
+            return count($matches);
+        }
+        return 0;
     }
     
     public function setSegment(editor_Models_Segment $segment){
         $this->segment = $segment;
+        $this->queryString=$this->connector->getQueryString($this->segment);
     }
     
     /***
@@ -138,10 +231,10 @@ class editor_Models_Segment_WordCount {
      * @return number|mixed
      */
     public function getSourceCount(){
-        $text=$this->segment->stripTags($this->segment->getFieldOriginal('source'));
-        $text=$this->removePunctuation($text);
-        
-        
+        //replace white space tags with real white space, before clean all teh tags
+        $text = $this->internalTag->restore($this->queryString, true);
+        $text = $this->whitespaceHelper->unprotectWhitespace($text);
+        $text=$this->segment->stripTags($text);
         //average words in East Asian languages by language
         //Chinese (all forms): 2.8
         //Japanese: 3.0
@@ -153,30 +246,14 @@ class editor_Models_Segment_WordCount {
             case 'zh-mo':
             case 'zh-sg':
                 return $this->getGraphemeCount($text, 2.8);
-                break;
             case 'th-th':
                 return $this->getGraphemeCount($text, 6.0);
             case 'ja-jp':
                 return $this->getGraphemeCount($text, 3.0);
-                break;
             case 'ko-kr':
                 return $this->getGraphemeCount($text, 3.3);
-                break;
             default:
-                $retText=$this->toCodePoint($text,'UTF-8');
-                $finalString="";
-                foreach ($retText as $ret){
-                    if(in_array($ret, $this->whiteSpaceChars)){
-                        $ret='00000020';
-                    }
-                    $ret=hexdec($ret);//to decimal
-                    
-                    $ret=chr($ret);//get char
-                    
-                    $finalString.=$ret;
-                }
-                return $count = str_word_count($finalString, 0);
-                break;
+                return $this->getWordsCount($text);
         }
         return 0;
     }

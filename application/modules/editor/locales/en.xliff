@@ -2829,10 +2829,6 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
 <target>Client already assigned to resource {0} as default for {1} to {2} - Remove assignment and assign to current resource?</target>
 </trans-unit>
-<trans-unit id='S3VuZGVu'>
-<source>Kunden</source>
-<target>Clients</target>
-</trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
 <target>Default client</target>

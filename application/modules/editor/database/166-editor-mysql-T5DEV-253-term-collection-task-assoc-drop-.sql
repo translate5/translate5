@@ -25,4 +25,15 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+/* remove the invalid taskGuid and language resoruces form the table */
+DELETE FROM LEK_term_collection_taskassoc WHERE taskGuid NOT IN (select taskGuid from LEK_task);
+DELETE FROM LEK_term_collection_taskassoc WHERE collectionId NOT IN (select id from LEK_languageresourcess);
+
+/* migrate from LEK_term_collection_taskassoc to LEK_languageresources_taskassoc */
+INSERT INTO `LEK_languageresources_taskassoc` (`languageResourceId`,`taskGuid`,`segmentsUpdateable`)
+SELECT  `tcta`.`collectionId`,`tcta`.`taskGuid`,0
+FROM `LEK_term_collection_taskassoc` `tcta`
+LEFT JOIN `LEK_languageresources_taskassoc` `rs` on `rs`.`taskGuid`=`tcta`.`taskGuid` AND `rs`.`languageResourceId`=`tcta`.`collectionId`
+WHERE `rs`.`taskGuid` IS NULL;
+
 DROP TABLE `LEK_term_collection_taskassoc`;

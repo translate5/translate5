@@ -161,6 +161,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collections=$assoc->getCollectionsForTask($task->getTaskGuid());
+        if(empty($collections)) {
+            return array();
+        }
         $result = $this->getSortedTermGroups($collections, $termIds, $task->getSourceLang());
         
         if(empty($result)) {

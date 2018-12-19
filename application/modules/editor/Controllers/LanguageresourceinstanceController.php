@@ -129,7 +129,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $id = $languageresource['id'];
             //add customer assocs
             $languageresource['resourcesCustomers'] = $this->getCustassoc($custAssoc, 'customerId', $id);
-            $languageresource['useAsDefault'] = $this->getCustassoc($custAssoc, 'useAsDefault', $id);
+            $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
         }
@@ -162,6 +162,27 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         //remove 0 and null values
         return array_filter(array_column($data[$id], $index));
+    }
+    
+    /***
+     * Retrives the useAsDefault customers for the given language resource
+     * @param array $data
+     * @param string $index the datafield to get
+     * @param integer $id the language resource id 
+     * @return array
+     */
+    protected function getCustassocDefault(array $data, $index, $id){
+        if(empty($data[$id])){
+            return [];
+        }
+        //get the useAsDefault array indexes
+        $default=$this->getCustassoc($data, $index, $id);
+        $customerIds=[];
+        //get the customer ids for those array indexes
+        foreach ($default as $key=>$value){
+            $customerIds[]=$data[$id][$key]['customerId'];
+        }
+        return $customerIds;
     }
     
     /**
@@ -779,6 +800,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function markDiff(editor_Models_Segment $segment,editor_Services_ServiceResult $result,editor_Services_Connector $connector){
         $queryString = $connector->getQueryString($segment);
         $queryStringTags = [];
+        
+        //remove the terms and track changes from the query string. When making diff they are not required
+        $queryString=$segment->stripTermTagsAndTrackChanges($queryString);
+        
         $queryString = $this->protectTags($queryString, $queryStringTags);
         
         $diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
@@ -790,6 +815,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $results=$result->getResult();
         foreach ($results as &$res) {
+            //remove the terms and the track changes tags from the result source.
+            $res->source=$segment->stripTermTagsAndTrackChanges($res->source);
+            
             $tags = []; 
             //replace the internal tags before diff
             $res->source = $this->protectTags($res->source, $tags);
