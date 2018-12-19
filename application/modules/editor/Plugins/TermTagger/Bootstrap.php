@@ -68,8 +68,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
         
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPostTermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDeleteTermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPost#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDelete#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
     }
     
     /**
@@ -90,7 +90,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
         $entity=$event->getParam('entity');
         /* @var $entity editor_Models_LanguageResources_Taskassoc */
-        $this->exportFromCollection($entity->getTaskGuid());
+        $this->removeTerminologieFile($entity->getTaskGuid());
         
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -100,11 +100,10 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     }
     
     /***
-     * Export tbx file from the associated termcollections to the task.
-     * This file is used by the term tagger
+     * Remove the terminologie file from the disk.
      * @param string $taskGuid
      */
-    private function exportFromCollection($taskGuid){
+    private function removeTerminologieFile($taskGuid){
         $task=ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);

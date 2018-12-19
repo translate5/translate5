@@ -801,10 +801,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $queryString = $connector->getQueryString($segment);
         $queryStringTags = [];
         
-        //remove the terms and track changes from the query string. When making diff they are not required
-        $queryString=$segment->stripTermTagsAndTrackChanges($queryString);
-        
+        //remove track changes tag from the query string
+        $trackChangeTag=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChangeTag editor_Models_Segment_TrackChangeTag */
+        $queryString=$trackChangeTag->removeTrackChanges($queryString);
+
+        //protect the tags
         $queryString = $this->protectTags($queryString, $queryStringTags);
+        
+        //remove term tags from the query string
+        $termTag=ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+        /* @var $termTag editor_Models_Segment_TermTag */
+        $queryString =$termTag->remove($queryString);
         
         $diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
         /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
@@ -815,9 +823,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $results=$result->getResult();
         foreach ($results as &$res) {
-            //remove the terms and the track changes tags from the result source.
-            $res->source=$segment->stripTermTagsAndTrackChanges($res->source);
-            
             $tags = []; 
             //replace the internal tags before diff
             $res->source = $this->protectTags($res->source, $tags);

@@ -123,8 +123,9 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
     
     /***
      * Fire after post/delete special event with language resources service name in it.
-     * ex: afterPostOpenTM2
-     *     afterDeleteTermCollection
+     * The event and the service name will be separated with #
+     * ex: afterPost#OpenTM2
+     *     afterDelete#TermCollection
      *     
      * @param string $action
      * @param editor_Models_LanguageResources_Taskassoc
@@ -135,8 +136,9 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         $lr->load($entity->getLanguageResourceId());
         
         //fire event with name of the saved language resource service name
-        //ex: afterPostOpenTM2
-        $eventName="after".ucfirst($action).$lr->getServiceName();
+        //separate with # so it is more clear that is is not regular after/before action event
+        //ex: afterPost#OpenTM2
+        $eventName="after".ucfirst($action).'#'.$lr->getServiceName();
         $this->events->trigger($eventName, $this, array(
             'entity' => $entity,
         ));
