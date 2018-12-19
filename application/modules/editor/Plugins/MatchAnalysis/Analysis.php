@@ -148,7 +148,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $bestMatchRateResult = null;
             }
             $useMt = empty($bestMatchRateResult) || $bestMatchRateResult->matchrate < $this->pretranslateMatchrate;
-            if($this->usePretranslateMT && $useMt) {
+            $mtUsed=$this->usePretranslateMT && $useMt;
+            if($mtUsed) {
                 
                 $bestMatchRateResult = $this->getMtResult($segment);
 
@@ -158,6 +159,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 }else{
                     $bestMatchRateResult=null;
                 }
+            }
+            //if no mt is used but the matchrate is lower than the pretranslateMatchrate (match lower than pretranslateMatchrate comming from the TM)
+            if(!$mtUsed && !empty($bestMatchRateResult) && $bestMatchRateResult->matchrate < $this->pretranslateMatchrate){
+                $bestMatchRateResult=null;
             }
             
             //if best matchrate results are found
