@@ -35,9 +35,9 @@
 		    <target>Export</target>
 		</trans-unit>
 		
-		<trans-unit id='S2VpbmUgQW5hbHlzZSBmw7xyIGRpZSBha3R1ZWxsZSBBdWZnYWJl'>
-		    <source>Keine Analyse für die aktuelle Aufgabe</source>
-		    <target>No analysis for the current task</target>
+		<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaC1SZXNvdXJjZW4genV3ZWlzZW7igJw='>
+		    <source>Start der Analyse im Tab “Sprach-Resourcen zuweisen“</source>
+		    <target>Start analysis in the tab “Associate language resources“</target>
 		</trans-unit>
 
 		<trans-unit id='V2llZGVyaG9sdW5nZW46'>

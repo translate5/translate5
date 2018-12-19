@@ -51,7 +51,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       matchCount:'#UT#Gesamtzahl der Wörter',
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
-	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
+	  noAnalysis:'#UT#Start der Analyse im Tab “Sprach-Resourcen zuweisen“',
 	  languageResources:'#UT#Sprach-Resourcen',
 	  analysisDate:'#UT#Datum',
 	  languageResourceName: '#UT#Name',

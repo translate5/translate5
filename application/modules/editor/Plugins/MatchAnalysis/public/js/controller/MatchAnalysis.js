@@ -160,7 +160,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
            task:prefWindow.actualTask
         });
     },
-    
+
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
     		win=panel.up('window'),
