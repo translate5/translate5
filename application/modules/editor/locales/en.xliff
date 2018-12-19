@@ -3011,6 +3011,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>This resource is removed</target>
 </trans-unit>
 
+<trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='>
+    <source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source>
+    <target>Only replace repetition automatically / propose replacement of repetition, if target is empty</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
