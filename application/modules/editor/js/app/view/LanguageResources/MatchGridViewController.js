@@ -300,9 +300,17 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
                 strState = me.SERVER_STATUS.SERVER_STATUS_CLIENTTIMEOUT;
                 break;
             case 500:
+            case 502:
                 json = Ext.JSON.decode(response.responseText);
+                respStatusMsg = me.strings.serverErrorMsg500;
                 if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
                     targetMsg = json.errors[0]._errorMessage;
+                }
+                else if(json.errors && json.errors[0] && json.errors[0].msg) {
+                    respStatusMsg = json.errors[0].msg;
+                    if(json.errors[0].data) {
+                        targetMsg = Editor.MessageBox.dataTable(json.errors[0].data);
+                    }
                 }
                 else if(json.errors && json.errors.message) {
                     targetMsg = json.errors.message;
@@ -310,7 +318,7 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
                 else {
                     targetMsg = response.responseText;
                 }
-                respStatusMsg = me.strings.serverErrorMsg500;
+                //;
                 break;
         }
         
