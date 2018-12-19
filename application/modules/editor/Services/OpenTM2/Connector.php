@@ -630,7 +630,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //all 100>= matches with same target will be collected
         //all <100 mathes will be collected
         //all documentName and documentShortName will be collected from matches >=100
-        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,&$differentTargetResult,$resultlist) {
+        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,&$differentTargetResult,$resultlist,$showMultiple100PercentMatches) {
             //collect lower then 100 matches to separate array
             if($var->matchrate<100){
                 $other[]=$var;
@@ -641,8 +641,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 $target=$var->target;
             }
             
-            //is with same target, collect >=100 match for later sorting
-            if($var->target==$target){
+            //is with same target or show multiple id disabled collect >=100 match for later sorting
+            if($var->target==$target || !$showMultiple100PercentMatches){
                 $document[]=array(
                     'documentName'=>$resultlist->getMetaValue($var->metaData, 'documentName'),
                     'documentShortName'=>$resultlist->getMetaValue($var->metaData, 'documentShortName'),
@@ -654,17 +654,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return false;
         });
         
-        //sort by highes matchrate from the >=100 match results
-        usort($filterArray,function($item1,$item2){
+        //sort by highes matchrate from the >=100 match results, when same matchrate sort by timestamp
+        usort($filterArray,function($item1,$item2) use($resultlist){
             if ($item1->matchrate == $item2->matchrate){
-                return 0;
+                return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
             }
             return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
         });
         
-        //merge the document name and document short name in the highest match if grouping is enabled(show different target is false)
         if(!empty($filterArray)){
-            
             //get the highest >=100 match, and apply the documentName and documentShrotName from all >=100 matches
             $filterArray=$filterArray[0];
             foreach ($filterArray->metaData as $md) {
@@ -680,24 +678,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         //if it is single result, init it as array
         if(!is_array($filterArray)){
             $filterArray=[$filterArray];
-        }
-        
-        //if different target result exist and if showMultiple100PercentMatches config is set to false
-        if(!empty($differentTargetResult) && !$showMultiple100PercentMatches){
-            //sor the different target result by matchrate, if the matchrates are the same sort by timestamp
-            usort($differentTargetResult,function($item1,$item2)  use($resultlist){
-                if ($item1->matchrate == $item2->matchrate){
-                    return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
-                }
-                return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
-            });
-            
-            //since showMultiple100PercentMatches is false, we show only one result 
-            $differentTargetResult=$differentTargetResult[0];
-        }
-        
-        if(!is_array($differentTargetResult)){
-            $differentTargetResult=[$differentTargetResult];
         }
         
         //merge all available results
