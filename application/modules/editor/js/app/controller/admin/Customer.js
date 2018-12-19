@@ -121,8 +121,6 @@ Ext.define('Editor.controller.admin.Customer', {
     customerSwitchAllClientsValue: 0,   // CustomerSwitch-dropdown: value for "All clients"
     // Multitenancy: filtering
     handleFiltering: true,
-    customerColumnNames: ['customerId','customers','resourcesCustomers'], // the columns that refer to the customer in the (stores of the affected) grids
-    customerSwitchStoresAlreadyFiltered: [],
     
     /***
      * hide the customers button when editor is opened
@@ -334,6 +332,9 @@ Ext.define('Editor.controller.admin.Customer', {
      * [Multitenancy:] Reset customerSwitch to "All clients".
      */
     resetCustomerSwitch: function() {
+        if (!this.handleFiltering) {
+            return;
+        }
         console.log('---- resetCustomerSwitch ----');
         if(Ext.ComponentQuery.query('#customerSwitch')[0]){
              Ext.ComponentQuery.query('#customerSwitch')[0].setValue('0');
@@ -426,6 +427,7 @@ Ext.define('Editor.controller.admin.Customer', {
                 if (val == '' && gridId != grid.getId()) {
                     gridToCheck = Ext.ComponentQuery.query(gridId)[0];
                     val = me.getCustomerFilterValInGrid(gridToCheck);
+                    console.log('- ' + gridId + ' val : ' + val);
                 }
             });
         }
@@ -441,6 +443,7 @@ Ext.define('Editor.controller.admin.Customer', {
     onGridFilterChange: function (store, filters, eOpts) {
         var me = this,
             storeId = store.getStoreId(),
+            customerColumnName = me.getCustomerColumnNameInStore(store),
             isXGridFilter = false,
             val = '';
         if (!me.handleFiltering) {
@@ -449,10 +452,11 @@ Ext.define('Editor.controller.admin.Customer', {
         filters.forEach(function(filter){
             if (Ext.String.startsWith(filter.getId(), 'x-gridfilter')) {
                 isXGridFilter = true;
-            }
-            if (Ext.String.startsWith(filter.getId(), 'x-gridfilter') && Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) != -1  && filter.getValue() != undefined) {
-                val = filter.getValue();
-                return false; // stop iteration
+                if (filter.getProperty() == customerColumnName  
+                        && filter.getValue() != undefined) {
+                    val = filter.getValue();
+                    return false; // stop iteration
+                }
             }
         });
         // Why check on 'x-gridfilter'? 
@@ -515,7 +519,6 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     beforeStoreFiltering: function() {
         console.log('****** beforeStoreFiltering *******');
-        this.customerSwitchStoresAlreadyFiltered = [];
         this.handleFiltering = false;
     },
 
@@ -538,10 +541,10 @@ Ext.define('Editor.controller.admin.Customer', {
             return false;
         }
         var me = this,
+            customerColumnName = me.getCustomerColumnNameInStore(store),
             customerFilter = false;
-        var test = grid.filters; debugger;
         grid.filters.items.forEach(function(filter){
-            if (Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) != -1) {
+            if (filter.getProperty() == customerColumnName) {
                 customerFilter = filter;
                 return false; // stop iteration
             }
@@ -559,20 +562,27 @@ Ext.define('Editor.controller.admin.Customer', {
             return;
         }
         var me = this,
-            store = grid.filters.store,
+            gridFilters = grid.filters,
+            store = gridFilters.store,
             storeId = store.getStoreId(),
             sorters = store.sorters,
             customerColumnName = me.getCustomerColumnNameInStore(store),
             customerColumn,
             isActive = (val != '');
+        grid.selModel.deselectAll();
         if(sorters.length > 0){
             sorters.clear();
         }
+        me.clearCustomerFilter(store,val); // otherwise we'll have the customer-filter twice
         customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName);
-        customerColumn.filter.setValue(val);
-        console.log(grid.getId() + ' customerColumn.filter.setValue: ' + val);
         customerColumn.filter.setActive(isActive);
-        console.log(grid.getId() + ' customerColumn.filter.setActive: ' + isActive);
+        console.log('GRID ' + grid.getId() + ' customerColumn.filter.setActive: ' + isActive + ' (val: ' + val + ')');
+        customerColumn.filter.setValue(val);
+        console.log('GRID ' + grid.getId() + ' customerColumn.filter.setValue: ' + val);
+        if (val == '') {
+            console.log('GRID ' + grid.getId() + ' gridFilters.clearFilters');
+            gridFilters.clearFilters(); // TODO: only for customer-filter...
+        }
     },
     
     /**
@@ -581,13 +591,6 @@ Ext.define('Editor.controller.admin.Customer', {
     setStoreFilter: function(store,val){
         var me = this,
             storeId = store.getStoreId();
-        // filter is already set for this store
-        if (Ext.Array.indexOf(me.customerSwitchStoresAlreadyFiltered,storeId) != -1) {
-            console.log(storeId + ': already filtered');
-            return;
-        }
-        // now the filtering of the store will be handled => list it as such!
-        me.customerSwitchStoresAlreadyFiltered.push(storeId);
         // clear filters (but don't remove other filters than the customer's filter!)
         if(val == '') {
             me.clearCustomerFilter(store,val);
@@ -605,16 +608,18 @@ Ext.define('Editor.controller.admin.Customer', {
             customerFilter = me.getCustomerFilterInStore(store),
             otherFilters;
         if(customerFilter !== false) {
-            //store.removeFilter(customerFilter.getId()); // DID NOT WORK (grid did not reload even after reloading the store 
-            //customerFilter.setValue('');                // DID NOT WORK (does not show users that are not assigned to a customer)
             otherFilters = me.getAllFilterInStoreExceptCustomerFilter(store);
-            console.log(store.getStoreId() + ': filter found (' + customerFilter.getId() + ') => clear filter');
+            console.log('STORE ' + store.getStoreId() + ': customerFilter found (' + customerFilter.getProperty() + ') => removeFilter customerFilter');
+            store.removeFilter(customerFilter.getProperty());
+            console.log('STORE ' + store.getStoreId() + ': clear (all) filter');
             store.clearFilter();
             otherFilters.forEach(function(filter){
-                console.log(store.getStoreId() + ': reapply filter for ' + filter.property);
+                console.log('STORE ' + store.getStoreId() + ': reapply filter for ' + filter.property);
                 store.filter([{property: filter.property, operator:filter.operator, value: filter.value}]);
             });
             store.reload();
+        } else {
+            console.log('STORE ' + store.getStoreId() + ': no customer filter set');
         }
     },
     
@@ -624,25 +629,17 @@ Ext.define('Editor.controller.admin.Customer', {
     setCustomerFilter: function(store,val) {
         var me = this,
             storeId = store.getStoreId(),
-            customerFilter = me.getCustomerFilterInStore(store);
+            customerFilter = me.getCustomerFilterInStore(store),
+            customerColumnName;
         if(customerFilter !== false) {
             // If there is a customer-filter already, we change the Value.
             customerFilter.setValue(val);
-            console.log(storeId + ': set Value For (existing) Filter done: ' + val);
+            console.log('STORE ' + storeId + ': set Value For (existing) Filter done: ' + val);
         } else {
             // If no customer-filter exists, we create one.
-            switch(storeId) {
-                case 'admin.Tasks':
-                    store.filter([{property: 'customerId', operator:'like', value: val}]);
-                    break;
-                case 'admin.Users':
-                    store.filter([{property: 'customers', operator:'like', value: val}]);
-                    break;
-                case 'Editor.store.LanguageResources.LanguageResource':
-                    store.filter([{property: 'resourcesCustomers', operator:'like', val}]);
-                    break;
-            }
-            console.log(storeId + ': set (new) Filter done: ' + val);
+            customerColumnName = me.getCustomerColumnNameInStore(store);
+            store.filter([{property: customerColumnName, operator:'like', value: val}]);
+            console.log('STORE ' + storeId + ': set (new) Filter done: ' + val);
         }
         store.reload();
     },
@@ -654,9 +651,10 @@ Ext.define('Editor.controller.admin.Customer', {
      */
     getCustomerFilterInStore (store) {
         var me = this,
-            customerFilter = false;
+            customerFilter = false,
+            customerColumnName = me.getCustomerColumnNameInStore(store);
         store.getFilters().items.forEach(function(filter){
-            if (Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) != -1) {
+            if (filter.getProperty() == customerColumnName) {
                 customerFilter = filter;
                 return false; // stop iteration
             }
@@ -671,9 +669,10 @@ Ext.define('Editor.controller.admin.Customer', {
     getAllFilterInStoreExceptCustomerFilter: function(store) {
         var me = this,
             otherFilter,
-            allOtherFilters = [];
+            allOtherFilters = [],
+            customerColumnName = me.getCustomerColumnNameInStore(store);
         store.getFilters().items.forEach(function(filter){
-            if (Ext.Array.indexOf(me.customerColumnNames,filter.getProperty()) == -1) {
+            if (filter.getProperty() != customerColumnName) {
                 otherFilter = {property: filter.getProperty(), operator:filter.getOperator(), value: filter.getValue()};
                 allOtherFilters.push(otherFilter);
             }
@@ -712,8 +711,10 @@ Ext.define('Editor.controller.admin.Customer', {
             store = grid.filters.store,
             customerColumnName = me.getCustomerColumnNameInStore(store),
             customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName),
-            val;
-        val = (customerColumn.filter && customerColumn.filter.value) ? customerColumn.filter.value : '';
+            val = '';
+        if (customerColumn.filter && customerColumn.filter.filter && customerColumn.filter.filter.getValue() != undefined) {
+            val = customerColumn.filter.filter.getValue();
+        }
         return val;
     },
 });
