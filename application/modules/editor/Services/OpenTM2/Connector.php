@@ -516,6 +516,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return self::STATUS_UNKNOWN;
         }
         
+        //Warning: this evaluates to "available" in the GUI, see the following explanation:
         //a 404 response from the status call means: 
         // - OpenTM2 is online
         // - the requested TM is currently not loaded, so there is no info about the existence
