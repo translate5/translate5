@@ -74,6 +74,7 @@ Ext.define('Editor.controller.admin.Customer', {
             },
             '#adminUserGrid': {
                 beforerender:'onAdminUserGridBeforeRender',
+                afterrender: 'onGridAfterRender',                           // Multitenancy
                 filterchange: 'onGridFilterChange'                          // Multitenancy
             },
             '#addTmWindow':{
@@ -89,7 +90,8 @@ Ext.define('Editor.controller.admin.Customer', {
                 afterrender:'setFilteredCustomerForTaskAdd'                 // Multitenancy
             },
             '#tmOverviewPanel':{
-                filterchange: 'onGridFilterChange'                          // Multitenancy
+                filterchange: 'onGridFilterChange',                         // Multitenancy
+                afterrender: 'onGridAfterRender',                           // Multitenancy
             }
         },
         global: {
@@ -407,6 +409,20 @@ Ext.define('Editor.controller.admin.Customer', {
     // ---------------------- Multitenancy: filtering ----------------------
     
     /**
+     * [Multitenancy:] On grid after render handler: Filter the grid according to
+     * CustomerSwitch.
+     */
+    onGridAfterRender: function (grid) {
+        console.log(grid.getId() + ': onGridAfterRender');
+        var me = this,
+            val = me.getCustomerName(me.getCustomerSwitchValue());
+        if (val == me.customerSwitchAllClientsValue) {
+            return;
+        }
+        me.setGridFilter(grid,val);
+    },
+    
+    /**
      * [Multitenancy:] Grid filterchange handler.
      */
     onGridFilterChange: function (store, filters, eOpts) {
@@ -568,7 +584,6 @@ Ext.define('Editor.controller.admin.Customer', {
             //customerFilter.setValue('');                // DID NOT WORK (does not show users that are not assigned to a customer)
             otherFilters = me.getAllFilterInStoreExceptCustomerFilter(store);
             console.log(store.getStoreId() + ': filter found (' + customerFilter.getId() + ') => clear filter');
-            store.removeAll();
             store.clearFilter();
             otherFilters.forEach(function(filter){
                 console.log(store.getStoreId() + ': reapply filter for ' + filter.property);
