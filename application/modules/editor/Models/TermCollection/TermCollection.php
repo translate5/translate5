@@ -60,9 +60,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $nsp=$service->getServiceNamespace();
-        $this->setResourceId($nsp);
-        $this->setServiceType($nsp);
+
+        //since for termcollections there are no service resources we don't have to deal with them.
+        // normally the service resource provides the serviceType, here we use the Namespace as "shortcut"
+        $serviceType = $service->getServiceNamespace(); 
+        $this->setResourceId($serviceType);
+        $this->setServiceType($serviceType);
         $this->setServiceName($service->getName());
         $this->setColor($service::DEFAULT_COLOR);
         $this->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
