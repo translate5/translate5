@@ -157,9 +157,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     public function update(editor_Models_Segment $segment) {
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
         
@@ -171,12 +168,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         /* @var $trackChange editor_Models_Segment_TrackChangeTag */
         
         $source= $trackChange->removeTrackChanges($this->getQueryString($segment));
-        
-        $source = $internalTag->toXliffPaired($source);
+        //restore the whitespaces to real characters
+        $source = $this->internalTag->restore($source, true);
+        $source = $this->whitespaceHelper->unprotectWhitespace($source);
+        $source = $this->internalTag->toXliffPaired($source);
         
         $target= $trackChange->removeTrackChanges($segment->getTargetEdit());
-        
-        $target = $internalTag->toXliffPaired($target);
+        //restore the whitespaces to real characters
+        $target = $this->internalTag->restore($target, true);
+        $target = $this->whitespaceHelper->unprotectWhitespace($target);
+        $target = $this->internalTag->toXliffPaired($target);
         
         if($this->api->update($source, $target, $segment, $file->getFileName())) {
             $messages->addNotice('Segment im TM aktualisiert!');
@@ -225,12 +226,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we have to set the default source here to fill the be added internal tags 
         $this->resultList->setDefaultSource($queryString);
         
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
+        $queryString = $this->restoreWhitespaceForQuery($queryString);
         
-        //$map is returned by reference
-        $queryString = $internalTag->toXliffPaired($queryString, true, $map);
+        //$map is set by reference
+        $map = [];
+        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
         $mapCount = count($map);
+        
+        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
+        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
+        
+        $this->shortTagIdent = $mapCount + 1;
+        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
+            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, false);
+            $textNode = $this->whitespaceTagReplacer($textNode);
+            $xmlParser->replaceChunk($key, $textNode);
+        });
         
         if($this->api->lookup($segment,$queryString, $fileName)){
             $result = $this->api->getResult();
@@ -241,17 +253,18 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 if(!$this->validateInternalTags($found, $segment)) {
                     continue;
                 }
-                $target = $internalTag->reapply2dMap($found->target, $map);
+                //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied, 
+                // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
+                $target = $xmlParser->parse($found->target);
+                $target = $this->internalTag->reapply2dMap($target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
-                
                 $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
-                
                 $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
 
-                $source = $internalTag->reapply2dMap($found->source, $map);
-
+                //about whitespace see target
+                $source = $xmlParser->parse($found->source);
+                $source = $this->internalTag->reapply2dMap($source, $map);
                 $source = $this->replaceAdditionalTags($source, $mapCount);
-                
                 $this->resultList->setSource($source);
             }
             return $this->getResultListGrouped();
@@ -385,11 +398,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $this->resultList->setDefaultSource($searchString);
         
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
         //$map is returned by reference
-        $searchString = $internalTag->toXliffPaired($searchString, true, $map);
+        $searchString = $this->internalTag->toXliffPaired($searchString, true, $map);
         $mapCount = count($map);
         
         //create dummy segment so we can use the lookup
@@ -406,14 +416,14 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 if(!$this->validateInternalTags($found, $dummySegment)) {
                     continue;
                 }
-                $target = $internalTag->reapply2dMap($found->target, $map);
+                $target = $this->internalTag->reapply2dMap($found->target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
                 
                 $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$dummySegment,'InstantTranslate');
                 
                 $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
                 
-                $source = $internalTag->reapply2dMap($found->source, $map);
+                $source = $this->internalTag->reapply2dMap($found->source, $map);
                 $source = $this->replaceAdditionalTags($source, $mapCount);
                 $this->resultList->setSource($source);
             }

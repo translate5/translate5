@@ -49,12 +49,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($queryString);
-        
-        //query moses without tags
-        $queryString = $segment->stripTags($queryString);
-        return $this->queryMosesApi($queryString);
+        return $this->queryMosesApi($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -101,9 +96,13 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
     /***
      * Query the Moses resource with the given search string
      * @param string $searchString
+     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
-    protected function queryMosesApi($searchString){
+    protected function queryMosesApi($searchString, $reimportWhitespace = false){
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
         $res = $this->languageResource->getResource();
         /* @var $res editor_Services_Moses_Resource */
         
@@ -121,6 +120,9 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         
         if(!empty($res['text'])){
             $res['text'] = str_replace(array('\[','\]'), array('[',']'), $res['text']);
+            if($reimportWhitespace) {
+                $res['text'] = $this->importWhitespaceFromTagLessQuery($res['text']);
+            }
             $this->resultList->addResult($res['text'], $this->calculateMatchrate());
             return $this->resultList;
         }

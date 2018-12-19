@@ -37,6 +37,9 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Services_Connector_Abstract {
     
+    //FIXME this is just a temporary solution until TagTrait is refactored into smaller reusable classes, see TRANSLATE-1509 
+    use editor_Models_Import_FileParser_TagTrait;
+    
     const STATUS_NOTCHECKED = 'notchecked';
     const STATUS_ERROR = 'error';
     const STATUS_AVAILABLE = 'available';
@@ -83,10 +86,37 @@ abstract class editor_Services_Connector_Abstract {
     protected $isInternalFuzzy = false;
     
     /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
+    /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /**
+     * @var editor_Models_Segment_TrackChangeTag
+     */
+    protected $trackChange;
+    
+    /**
+     * Internal flag which stores the info if tags where stripped by the query call or not
+     * @var string
+     */
+    protected $tagsWereStripped = true;
+    
+    /**
      * initialises the internal result list
      */
     public function __construct() {
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        
+        $this->initHelper();
+            //$this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $this->initImageTags();
     }
     
     /**
@@ -165,6 +195,56 @@ abstract class editor_Services_Connector_Abstract {
         $sourceMeta = $sfm->getByName($source);
         $isSourceEdit = ($sourceMeta !== false && $sourceMeta->editable == 1);
         return $isSourceEdit ? $segment->getFieldEdited($source) : $segment->getFieldOriginal($source);
+    }
+    
+    /**
+     * prepares and gets the query string in a default manner:
+     * - restore whitespace
+     * - remove all translate5 tags 
+     * the single steps from that function can be reused if needed the query string in a different way 
+     * @param editor_Models_Segment $segment
+     * @return string 
+     */
+    protected function prepareDefaultQueryString(editor_Models_Segment $segment) {
+        //1. organizational preparation
+        $qs = $this->getQueryString($segment);
+        $this->resultList->setDefaultSource($qs);
+        if(empty($qs)) {
+            return $qs;
+        }
+        
+        //2. whitespace preparation
+        $qs = $this->restoreWhitespaceForQuery($qs);
+        
+        //3. strip tags
+        $qsStripped = $segment->stripTags($qs);
+        
+        //4. set flag if tags were removed or not (= if the segment was containing flags)
+        $this->tagsWereStripped = $qsStripped != $qs;
+        return $qsStripped;
+    }
+    
+    /**
+     * restores whitespace in segment content and removes track changes before
+     * @param string $queryString
+     * @return string
+     */
+    protected function restoreWhitespaceForQuery($queryString) {
+        $qs = $this->trackChange->removeTrackChanges($queryString);
+        //restore the whitespaces to real characters
+        $qs = $this->internalTag->restore($qs, true);
+        return $this->whitespaceHelper->unprotectWhitespace($qs);
+    }
+    
+    /**
+     * converts whitespace coming from the connected resource to translate5 usable whitespace tags
+     * Warning: text may not contain other tags - they will be destroyed! For more complex solution see OpenTM2
+     * 
+     * @param string $textNode
+     */
+    protected function importWhitespaceFromTagLessQuery($textNode) {
+        $textNode = $this->whitespaceHelper->protectWhitespace($textNode, false);
+        return $this->whitespaceTagReplacer($textNode);
     }
     
     /**

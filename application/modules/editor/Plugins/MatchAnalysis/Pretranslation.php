@@ -153,15 +153,6 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $internalTag editor_Models_Segment_InternalTag */
         
-        //since our internal tags are a div span construct with plain content in between, we have to replace them first
-        $targetResult = $internalTag->protect($targetResult);
-        
-        //this method splits the content at tag boundaries, and sanitizes the textNodes only
-        $targetResult = $this->parseSegmentProtectWhitespace($targetResult);
-        
-        //revoke the internaltag replacement
-        $targetResult = $internalTag->unprotect($targetResult);
-        
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
         $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here
         
