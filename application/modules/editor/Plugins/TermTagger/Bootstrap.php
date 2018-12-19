@@ -68,8 +68,8 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
         
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPostAction', array($this, 'handleAfterPostLanguageResourcesTaskAssoc'));
-        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'beforeDeleteAction', array($this, 'handleBeforeDeleteLanguageResourcesTaskAssoc'));
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPostTermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDeleteTermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
     }
     
     /**
@@ -87,7 +87,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
      * After post action handler in language resources task assoc
      * @param Zend_EventManager_Event $event
      */
-    public function handleAfterPostLanguageResourcesTaskAssoc(Zend_EventManager_Event $event){
+    public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
         $entity=$event->getParam('entity');
         /* @var $entity editor_Models_LanguageResources_Taskassoc */
         $this->exportFromCollection($entity->getTaskGuid());
@@ -97,24 +97,6 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         //update the terminologie flag, based on if there is a termcollection
         //as language resource associated to the task
         $task->updateIsTerminologieFlag($entity->getTaskGuid());
-    }
-    
-    /***
-     * Before delete action handler in language resources task assoc
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleBeforeDeleteLanguageResourcesTaskAssoc(Zend_EventManager_Event $event){
-        $params=$event->getParam('params');
-        $assoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
-        /* @var $assoc editor_Models_LanguageResources_Taskassoc */
-        $assoc->load($params['id']);
-        $this->exportFromCollection($assoc->getTaskGuid());
-        
-        $task=ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        //update the terminologie flag, based on if there is a termcollection
-        //as language resource associated to the task
-        $task->updateIsTerminologieFlag($assoc->getTaskGuid(),[$assoc->getId()]);
     }
     
     /***

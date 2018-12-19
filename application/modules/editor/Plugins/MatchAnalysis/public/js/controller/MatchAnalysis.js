@@ -454,11 +454,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
             matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
         
-        if(assocPanel){
+        if(assocPanel && assocPanel.getEl()){
             assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
         }
 
-        if(matchAnalysisPanel){
+        if(matchAnalysisPanel && matchAnalysisPanel.getEl()){
             matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
         }
     },
