@@ -394,11 +394,9 @@ Ext.define('Editor.controller.TmOverview', {
         win.loadRecord(rec);
         win.show();
     },
-    handleTmGridActionColumnClick:function(view, cell, row, col, ev, evObj) {
+    handleTmGridActionColumnClick:function(view, cell, row, col, ev, record) {
         var me = this,
             grid=view.up('tmOverviewPanel'),
-            store = view.getStore(),
-            record = store.getAt(row),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
         
         //call the selection row handler
