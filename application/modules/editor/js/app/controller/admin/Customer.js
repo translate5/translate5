@@ -423,7 +423,7 @@ Ext.define('Editor.controller.admin.Customer', {
         // of the other grids (= they shall run synchronously).
         if (val == '') {
             allGridsToCheck = ['#adminTaskGrid','#adminUserGrid','#tmOverviewPanel'];
-            allGridsToCheck.forEach(function(gridId){
+            Ext.Array.each(allGridsToCheck, function(gridId){
                 if (val == '' && gridId != grid.getId()) {
                     gridToCheck = Ext.ComponentQuery.query(gridId)[0];
                     val = me.getCustomerFilterValInGrid(gridToCheck);
@@ -444,21 +444,30 @@ Ext.define('Editor.controller.admin.Customer', {
         var me = this,
             storeId = store.getStoreId(),
             customerColumnName = me.getCustomerColumnNameInStore(store),
+            isCustomerFilter = false,
             isXGridFilter = false,
             val = '';
         if (!me.handleFiltering) {
             return;
         }
-        filters.forEach(function(filter){
+        if (filters.length == 0) {
+            return;
+        }
+        Ext.Array.each(filters, function(filter){
             if (Ext.String.startsWith(filter.getId(), 'x-gridfilter')) {
                 isXGridFilter = true;
-                if (filter.getProperty() == customerColumnName  
+                if (filter.getProperty() == customerColumnName
                         && filter.getValue() != undefined) {
+                    isCustomerFilter = true;
                     val = filter.getValue();
                     return false; // stop iteration
                 }
             }
         });
+        if (!isCustomerFilter) {
+            console.log(storeId + ': no isCustomerFilter = not our job.');
+            return;
+        }
         // Why check on 'x-gridfilter'? 
         // - Because filtering via the CustomerSwitchChange also fires the
         //   filterchange-event, but must not be handled here.
@@ -543,7 +552,7 @@ Ext.define('Editor.controller.admin.Customer', {
         var me = this,
             customerColumnName = me.getCustomerColumnNameInStore(store),
             customerFilter = false;
-        grid.filters.items.forEach(function(filter){
+        Ext.Array.each(grid.filters.items,function(filter){
             if (filter.getProperty() == customerColumnName) {
                 customerFilter = filter;
                 return false; // stop iteration
@@ -613,7 +622,7 @@ Ext.define('Editor.controller.admin.Customer', {
             store.removeFilter(customerFilter.getProperty());
             console.log('STORE ' + store.getStoreId() + ': clear (all) filter');
             store.clearFilter();
-            otherFilters.forEach(function(filter){
+            Ext.Array.each(otherFilters,function(filter){
                 console.log('STORE ' + store.getStoreId() + ': reapply filter for ' + filter.property);
                 store.filter([{property: filter.property, operator:filter.operator, value: filter.value}]);
             });
@@ -653,7 +662,7 @@ Ext.define('Editor.controller.admin.Customer', {
         var me = this,
             customerFilter = false,
             customerColumnName = me.getCustomerColumnNameInStore(store);
-        store.getFilters().items.forEach(function(filter){
+        Ext.Array.each(store.getFilters().items,function(filter){
             if (filter.getProperty() == customerColumnName) {
                 customerFilter = filter;
                 return false; // stop iteration
@@ -671,7 +680,7 @@ Ext.define('Editor.controller.admin.Customer', {
             otherFilter,
             allOtherFilters = [],
             customerColumnName = me.getCustomerColumnNameInStore(store);
-        store.getFilters().items.forEach(function(filter){
+        Ext.Array.each(store.getFilters().items,function(filter){
             if (filter.getProperty() != customerColumnName) {
                 otherFilter = {property: filter.getProperty(), operator:filter.getOperator(), value: filter.getValue()};
                 allOtherFilters.push(otherFilter);
