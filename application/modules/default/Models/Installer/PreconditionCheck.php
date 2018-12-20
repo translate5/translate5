@@ -109,6 +109,7 @@ class Models_Installer_PreconditionCheck {
             'fileinfo',
             'gd',
             'iconv',
+            'intl',
             'mbstring',
             'pdo_mysql',
             'zip',
