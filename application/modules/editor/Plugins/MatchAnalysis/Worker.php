@@ -38,7 +38,11 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        return true;
+        $neededEntries = ['internalFuzzy', 'pretranslateMatchrate', 'pretranslateTmAndTerm', 'pretranslateMt', 'termtaggerSegment', 'isTaskImport', 'pretranslate'];
+        $foundEntries = array_keys($parameters);
+        $keyDiff = array_diff($neededEntries, $foundEntries);
+        //if there is not keyDiff all needed were found
+        return empty($keyDiff);
     } 
     
     /**
@@ -59,7 +63,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->setState($this->taskOldState);
             $this->task->save();
             $this->task->unlock();
-            error_log("Error happend on match analysis and pretranslation (taskGuid=".$this->task->getTaskGuid()."). Error was: ".$e->getMessage());
+            error_log("Error happend on match analysis and pretranslation (taskGuid=".$this->task->getTaskGuid()."). Error was: ".$e);
             return false;
         }
         return $ret;
@@ -90,52 +94,27 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
             $this->task->save();
         }
         
-        $pretranslate=false;
-        if(isset($params['pretranslate'])){
-            $pretranslate=$params['pretranslate'];
-        }
-        
-        $internalFuzzy=false;
-        if(isset($params['internalFuzzy'])){
-            $internalFuzzy=$params['internalFuzzy'];
-        }
-        
         $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
         /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
         $analysisAssoc->setTaskGuid($this->task->getTaskGuid());
         
         //set flag for internal fuzzy usage
-        if(isset($params['internalFuzzy'])){
-            $analysisAssoc->setInternalFuzzy(filter_var($params['internalFuzzy'], FILTER_VALIDATE_BOOLEAN));
-        }
+        $analysisAssoc->setInternalFuzzy($params['internalFuzzy']);
         //set pretranslation matchrate used for the anlysis
-        if(isset($params['pretranslateMatchrate'])){
-            $analysisAssoc->setPretranslateMatchrate($params['pretranslateMatchrate']);
-        }
+        $analysisAssoc->setPretranslateMatchrate($params['pretranslateMatchrate']);
         
         $analysisId=$analysisAssoc->save();
         
-        $analysis=new editor_Plugins_MatchAnalysis_Analysis($this->task,$analysisId);
+        $analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId]);
         /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
-        $analysis->setPretranslate($pretranslate);
-        $analysis->setInternalFuzzy($internalFuzzy);
-        if(isset($params['userGuid'])){
-            $analysis->setUserGuid($params['userGuid']);
-        }
-        if(isset($params['userName'])){
-            $analysis->setUserName($params['userName']);
-        }
-        if(isset($params['pretranslateMatchrate'])){
-            $analysis->setPretranslateMatchrate($params['pretranslateMatchrate']);
-        }
         
-        if(isset($params['pretranslateMt'])){
-            $analysis->setPretranslateMt($params['pretranslateMt']);
-        }
-        
-        if(isset($params['pretranslateTmAndTerm'])){
-            $analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
-        }
+        $analysis->setPretranslate($params['pretranslate']);
+        $analysis->setInternalFuzzy($params['internalFuzzy']);
+        $analysis->setUserGuid($params['userGuid']);
+        $analysis->setUserName($params['userName']);
+        $analysis->setPretranslateMatchrate($params['pretranslateMatchrate']);
+        $analysis->setPretranslateMt($params['pretranslateMt']);
+        $analysis->setPretranslateTmAndTerm($params['pretranslateTmAndTerm']);
         $return=$analysis->calculateMatchrate();
         
         //unlock the state
@@ -147,7 +126,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         return $return;
     }
     
-    /***
+    /**
      * Queue the termtagger worker
      * @param string $taskGuid
      * @param string $workerId
