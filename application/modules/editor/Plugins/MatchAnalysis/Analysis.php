@@ -119,7 +119,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //check if the segment source hash exist in the repetition array
             //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 languageResource
             //segment does not exist in repetition array -> query the tm save the best match rate per tm
-            $isRepetition = isset($repetitionsDb[$segment->getId()]) && isset($repetitionByHash[$segmentHash]);
+            $isRepetition = isset($repetitionsDb[$segment->getId()]) && array_key_exists($segmentHash,$repetitionByHash);
             if($isRepetition){
                 $repetitionRate = editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE;
                 //get the best match rate for the repetition segment, 
@@ -282,6 +282,9 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param integer $languageResourceid
      */
     public function saveAnalysis($segment,$matchRateResult,$languageResourceid){
+        if($segment->getSegmentNrInTask()==154){
+            error_log("ace");
+        }
         //error_log('segmentNrInTask='.$segment->getSegmentNrInTask().' wordCount:'.$this->wordCount->getSourceCount().' totalCount:');
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
