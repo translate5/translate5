@@ -3,6 +3,51 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+
+
+## [3.0.0] - 2018-12-20
+### PHP Installation
+For PHP installation the package intl must be activated!
+ 
+###Added
+TRANSLATE-1490: Highlight fuzzy range in source of match in translate5 editor
+TRANSLATE-1430: Enable copy and paste of internal tags from source to target
+TRANSLATE-1397: Multitenancy phase 1
+TRANSLATE-1206: Add Whitespace chars to segment
+
+###Changed
+TRANSLATE-1483: PHP Backend: Implement an easy way to join tables for filtering via API
+TRANSLATE-1460: Deactivate export menu in taskoverview for editor users
+
+###Bugfixes
+TRANSLATE-1500: PM dropdown field in task properties shows max 25 users
+TRANSLATE-1497: Convert JSON.parse calls to Ext.JSON.decode calls for better debugging
+TRANSLATE-1491: Combine multiple OpenTM2 100% matches to one match
+TRANSLATE-1488: JS Error "Cannot read property 'row' of null" on using bookmark functionality
+TRANSLATE-1487: User can not change his own password
+TRANSLATE-1477: Error on removing a user from a task which finished then the task
+TRANSLATE-1476: TrackChanges: JS Error when replacing a character in certain cases
+TRANSLATE-1475: Merging of term tagger result and track changes content leads to several errors
+TRANSLATE-1474: Clicking in Treepanel while segments are loading is creating an error
+TRANSLATE-1472: Task delete throws DB foreign key constraint error
+TRANSLATE-1470: Do not automatically add anymore missing tags on overtaking results from language resources
+TRANSLATE-146: Internal translation mechanism creates corrupt XLIFF
+TRANSLATE-1465: InstantTranslate: increased input-field must not be covered by other elements
+TRANSLATE-1463: Trigger workflow action not in all remove user cases
+TRANSLATE-1449: Spellcheck needs to handle whitespace tags as space / word boundary
+TRANSLATE-1440: Short tag view does not accurately reflect tag order and relationship between tags
+TRANSLATE-1505: Several smaller issues
+TRANSLATE-1429: TrackChanges: Unable to get property 'className' of undefined or null reference
+TRANSLATE-1398: TrackChanges: Backspace and DEL are removing whole content instead only single characters
+TRANSLATE-1333: Search and Replace: JS Error: Die Eigenschaft "getActiveTab" eines undefinierten oder Nullverweises kann nicht abgerufen werden
+TRANSLATE-1332: Search and Replace - JS error: record is undefined
+TRANSLATE-1300: TrackChanges: Position of the caret after deleting from CTRL+A
+TRANSLATE-1020: Tasknames with HTML entities are producing errors in segmentstatistics plugin
+T5DEV-251: Several issues in InstantTranslate
+T5DEV-253: Several issues in match analysis and pre-translation
+TRANSLATE-1499: Task Name filtering does not work anymore after leaving a task
+
+
 ## [2.9.2] - 2018-10-30
 ###Bugfixes
 Fixing Problems in IE11
