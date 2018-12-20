@@ -27,7 +27,7 @@
 
 /* remove the invalid taskGuid and language resoruces form the table */
 DELETE FROM LEK_term_collection_taskassoc WHERE taskGuid NOT IN (select taskGuid from LEK_task);
-DELETE FROM LEK_term_collection_taskassoc WHERE collectionId NOT IN (select id from LEK_languageresourcess);
+DELETE FROM LEK_term_collection_taskassoc WHERE collectionId NOT IN (select id from LEK_languageresources);
 
 /* migrate from LEK_term_collection_taskassoc to LEK_languageresources_taskassoc */
 INSERT INTO `LEK_languageresources_taskassoc` (`languageResourceId`,`taskGuid`,`segmentsUpdateable`)
