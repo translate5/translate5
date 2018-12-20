@@ -247,11 +247,16 @@ class editor_Models_Segment_WordCount {
             case 'zh-hk':
             case 'zh-mo':
             case 'zh-sg':
+            case 'zh-cn':
+            case 'zh-tw':
                 return $this->getGraphemeCount($text, 2.8);
+            case 'th':
             case 'th-th':
                 return $this->getGraphemeCount($text, 6.0);
+            case 'ja':
             case 'ja-jp':
                 return $this->getGraphemeCount($text, 3.0);
+            case 'ko':
             case 'ko-kr':
                 return $this->getGraphemeCount($text, 3.3);
             default:
