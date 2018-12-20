@@ -216,6 +216,9 @@ class editor_Models_Segment_WordCount {
         //replace html entities with each real chars
         $text = html_entity_decode($text,ENT_HTML5);
         
+        //replace forward slash with empty space (ex:DQF/MQM -> DQF MQM -> 2 words)
+        $text = str_replace("/"," ",$text);
+        
         $words = preg_split($this->regexWordBreak, $text, NULL, PREG_SPLIT_NO_EMPTY);
         return count($words);
     }
