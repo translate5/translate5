@@ -110,7 +110,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
     public function handleOnPretranslationOperation(Zend_EventManager_Event $event){
         //if the task is in import state -> queue the worker, set pretranslate to true in the worker and from the worker in the analysis
         //if the task is allready imported -> run the analysis directly, set pretranslate to true
-        $this->handleOperation($event,true);
+        $this->handleOperation($event, true);
     }
     
     /***
@@ -121,7 +121,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @param array $eventParams
      * @return void|boolean
      */
-    protected function queueAnalysis($taskGuid, $pretranlsate = false, $eventParams = []) {
+    protected function queueAnalysis($taskGuid, $eventParams = []) {
         if(!$this->checkLanguageResources($taskGuid)){
             error_log("The associated language resource can not be used for analysis.");
             return;
@@ -133,11 +133,6 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         $user = new Zend_Session_Namespace('user');
         $eventParams['userGuid']=$user->data->userGuid;
         $eventParams['userName']=$user->data->userName;
-        
-        //pretranslate flag
-        if($pretranlsate){
-            $eventParams['pretranslate'] = $pretranlsate;
-        }
         
         // init worker and queue it
         if (!$worker->init($taskGuid, $eventParams)) {
@@ -161,7 +156,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      * @param boolean $pretranlsate
      */
-    protected function handleOperation(Zend_EventManager_Event $event,$pretranlsate=false){
+    protected function handleOperation(Zend_EventManager_Event $event, $pretranslate = false){
         $task = $event->getParam('entity');
         $params = $event->getParam('params');
         
@@ -172,7 +167,9 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
         settype($params['termtaggerSegment'], 'boolean');
         settype($params['isTaskImport'], 'boolean');
         
-        $this->queueAnalysis($task->getTaskGuid(),$pretranlsate,$params);
+        $params['pretranslate'] = $pretranslate;
+        
+        $this->queueAnalysis($task->getTaskGuid(),$params);
     }
 
     /***
