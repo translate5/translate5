@@ -216,12 +216,11 @@ abstract class editor_Services_Connector_Abstract {
         //2. whitespace preparation
         $qs = $this->restoreWhitespaceForQuery($qs);
         
-        //3. strip tags
-        $qsStripped = $segment->stripTags($qs);
+        //3. set flag if tags were removed or not (= if the segment was containing flags)
+        $this->tagsWereStripped = $this->internalTag->count($qs) > 0;
         
-        //4. set flag if tags were removed or not (= if the segment was containing flags)
-        $this->tagsWereStripped = $qsStripped != $qs;
-        return $qsStripped;
+        //4. strip tags
+        return $segment->stripTags($qs);
     }
     
     /**
