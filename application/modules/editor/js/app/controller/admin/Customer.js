@@ -536,7 +536,7 @@ Ext.define('Editor.controller.admin.Customer', {
      * @param {object} store
      * @returns false|{object} filter
      */
-    getCustomerFilterInGrid (grid) {
+    getCustomerFilterInGrid: function(grid) {
         if(!grid) {
             return false;
         }
@@ -649,7 +649,7 @@ Ext.define('Editor.controller.admin.Customer', {
      * @param {object} store
      * @returns false|{object} filter
      */
-    getCustomerFilterInStore (store) {
+    getCustomerFilterInStore: function(store) {
         var me = this,
             customerFilter = false,
             customerColumnName = me.getCustomerColumnNameInStore(store);
