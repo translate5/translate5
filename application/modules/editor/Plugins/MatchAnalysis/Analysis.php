@@ -333,9 +333,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param integer $languageResourceid
      */
     public function saveAnalysis($segment,$matchRateResult,$languageResourceid){
-        if($segment->getSegmentNrInTask()==154){
-            error_log("ace");
-        }
         //error_log('segmentNrInTask='.$segment->getSegmentNrInTask().' wordCount:'.$this->wordCount->getSourceCount().' totalCount:');
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */

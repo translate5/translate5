@@ -252,7 +252,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     dockedItems: [{
                         xtype: 'toolbar',
                         dock: 'bottom',
-                        items: [{ 
+                        layout: {
+                            type: 'vbox',
+                            align: 'left'
+                        },
+                        items: [{
+                            xtype: 'container',
+                            padding: '10',
+                            html:"¹ "+me.strings.noAnalysis,
+                            dock : 'bottom'
+                        },{ 
                             xtype: 'button',
                             iconCls:'icon-excel-export',
                             itemId:'exportExcel',
