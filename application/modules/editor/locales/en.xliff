@@ -3016,6 +3016,51 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Only replace repetition automatically / propose replacement of repetition, if target is empty</target>
 </trans-unit>
 
+<trans-unit id='VHJlZmZlcmFuYWx5c2U='>
+    <source>Trefferanalyse</source>
+    <target>Match-Analysis</target>
+</trans-unit>
+
+<trans-unit id='VGVybUNvbGxlY3Rpb24gVHJlZmZlciAoMTA0JSk='>
+    <source>TermCollection Treffer (104%)</source>
+    <target>TermCollection Match (104%)</target>
+</trans-unit>
+
+<trans-unit id='S29udGV4dCBUcmVmZmVyICgxMDMlKQ=='>
+    <source>Kontext Treffer (103%)</source>
+    <target>Kontext Match (103%)</target>
+</trans-unit>
+
+<trans-unit id='V2llZGVyaG9sdW5nICgxMDIlKQ=='>
+    <source>Wiederholung (102%)</source>
+    <target>Repetition (102%)</target>
+</trans-unit>
+
+<trans-unit id='RXhhY3QtZXhhY3QgVHJlZmZlciAoMTAxJSk='>
+    <source>Exact-exact Treffer (101%)</source>
+    <target>Exact-exact Match (101%)</target>
+</trans-unit>
+
+<trans-unit id='U3VtbWUgV8O2cnRlcg=='>
+    <source>Summe Wörter</source>
+    <target>Sum words</target>
+</trans-unit>
+
+<trans-unit id='VHJlZmZlciBSYXRl'>
+    <source>Treffer Rate</source>
+    <target>Match Rate</target>
+</trans-unit>
+
+<trans-unit id='SW50ZXJuZXIgRnV6enkgYWt0aXY='>
+    <source>Interner Fuzzy aktiv</source>
+    <target>Internal fuzzy active</target>
+</trans-unit>
+
+<trans-unit id='RXJzdGVsbHVuZ3NkYXR1bQ=='>
+    <source>Erstellungsdatum</source>
+    <target>Creation date</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
