@@ -80,8 +80,13 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                     $value=$translate->_("Repetitions");
                 }
                 
+                //change the key to $key+Group, since the excel export does not accepts numerical keys
                 if(is_numeric($key)){
                     $newKey=$key.'Group';
+                }
+                
+                //update the totals when collectable group is found
+                if(is_numeric($key) || $key=="noMatch"){
                     $wordCountTotal+=$value;
                 }
                 $newRows[$newKey]=$value;
@@ -123,6 +128,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
 
         $rowsCount=count($rows);
         $rowIndex=$rowsCount+2;
+        
         
         $sheet=$excel->getPhpExcel()->getActiveSheet();
         
