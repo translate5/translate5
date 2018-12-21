@@ -27,9 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 class Editor_SegmentController extends editor_Controllers_EditorrestController {
-    use editor_Models_Import_FileParser_TagTrait {
-        protectWhitespace as protected traitProtectWhitespace;
-    }
+    use editor_Models_Import_FileParser_TagTrait;
 
     protected $entityClass = 'editor_Models_Segment';
 
@@ -50,9 +48,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Feld.
      * @var array array($field => array(origType => newType),...)
      */
-    protected $_filterTypeMap = array(
-        array('qmId' => array('list' => 'listAsString'))
-    );
+    protected $_filterTypeMap = [
+        'qmId' => ['list' => 'listAsString']
+    ];
     
     /**
      * @var ZfExtended_EventManager
@@ -80,6 +78,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     {
         parent::__construct($request, $response);
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
+        $this->initHelper();
     }
     
     public function preDispatch() {
@@ -370,8 +369,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             return;
         }
         
+        //just to display the TM name too, we add it here to the type
+        $type = $languageresource->getServiceName().' - '.$languageresource->getName();
+        
         //set the type
-        $matchrateType->initEdited($languageresource->getResource()->getType());
+        $matchrateType->initEdited($languageresource->getResource()->getType(),$type);
         
         //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
         //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);
@@ -618,31 +620,21 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             //since our internal tags are a div span construct with plain content in between, we have to replace them first
             $data = $internalTag->protect($data);
 
-            //this method splits the content at tag boundaries, and sanitizes the textNodes only
-            $data = $this->parseSegmentProtectWhitespace($data);
+            //the following call splits the content at tag boundaries, and sanitizes the textNodes only
+            // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
+            // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
+            $data = $this->parseSegmentProtectWhitespace($data, 'strip_tags');
 
             //revoke the internaltag replacement
             $data = $internalTag->unprotect($data);
             
             //if nothing was changed, everything was OK already
-            if($this->entityCleanup($data) === $this->entityCleanup($this->data->{$key})) {
+            if($this->whitespaceHelper->entityCleanup($data) === $this->whitespaceHelper->entityCleanup($this->data->{$key})) {
                 return;
             }
             $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
             $this->data->{$key} = $data;
         }
-    }
-    
-    /**
-     * This method removes the protected characters instead creating internal tags
-     * The user is not allowed to add new internal tags by adding special characters
-     * @param string $textNode
-     * @param string $xmlBased
-     * @return string
-     */
-    protected function protectWhitespace($textNode, $xmlBased = true) {
-        $protected = $this->traitProtectWhitespace($textNode, $xmlBased);
-        return strip_tags($protected);
     }
     
     /**

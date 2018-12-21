@@ -97,8 +97,17 @@ class editor_TaskController extends ZfExtended_RestController {
      * @var Zend_Config
      */
     protected $config;
-
+    
     public function init() {
+        $this->_filterTypeMap = [
+            'customerId' => [
+                //'string' => new ZfExtended_Models_Filter_JoinHard('editor_Models_Db_Customer', 'name', 'id', 'customerId')
+                'string' => new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId')
+            ]
+        ];
+        //set same join for sorting!
+        $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
+        
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $this->user = new Zend_Session_Namespace('user');
@@ -334,6 +343,11 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
+        if(empty($this->data['customerId'])){
+            $this->entity->setDefaultCustomerId();
+            $this->data['customerId'] = $this->entity->getCustomerId();
+        }
+        
         //init workflow id for the task
         $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
         $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
@@ -344,11 +358,43 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->processUploadedFile();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
+            
+            // Language resources that are assigned as default language resource for a client,
+            // are associated automatically with tasks for this client.
+            $this->addDefaultLanguageResources();
+            
             if($this->data['autoStartImport']) {
                 $this->startImportWorkers();
             }
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
+        }
+    }
+    
+    /**
+     * Assign language resources by default that are set as useAsDefault for the task's client
+     * (but only if the language combination matches).
+     */
+    protected function addDefaultLanguageResources() {
+        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
+        if(empty($allUseAsDefaultCustomers)) {
+            return;
+        }
+        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
+            $languageResourceId = $defaultCustomer['languageResourceId'];
+            if ($languages->isInCollection($this->entity->getSourceLang(),'sourceLang',$languageResourceId)
+                    && $languages->isInCollection($this->entity->getTargetLang(),'targetLang',$languageResourceId) ) {
+                        $taskAssoc->init();
+                        $taskAssoc->setLanguageResourceId($languageResourceId);
+                        $taskAssoc->setTaskGuid($this->entity->getTaskGuid());
+                        $taskAssoc->save();
+            }
         }
     }
     
@@ -840,9 +886,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
         $this->entityLoad();
         //if task is erroneous then it is also deleteable, regardless of its locking state
-        if(!$this->entity->isErroneous() && !$forced){
+        if(!$this->entity->isImporting() && !$this->entity->isErroneous() && !$forced){
             $this->entity->checkStateAllowsActions();
         }
+        //we enable task deletion for importing task
+        $forced=$forced || $this->entity->isImporting();
+        
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
         /* @var $remover editor_Models_Task_Remover */

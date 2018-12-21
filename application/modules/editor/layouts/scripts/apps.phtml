@@ -26,15 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TaskAssoc extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection task assoc
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('taskGuid', 'guid');
-  }
-}
+
+$config = Zend_Registry::get('config');
+/* @var $config Zend_Config */
+
+echo $this->doctype();
+$this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/apps/css/apps.css');
+$jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-1.12.1';
+$this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css');
+?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <?php echo $this->layout()->title ?>
+        <?php echo $this->headMeta() ?>
+        <?php echo $this->headLink() ?>
+        <?php echo $this->headStyle() ?>
+        <link rel="shortcut icon" href="<?php echo APPLICATION_RUNDIR . $config->runtimeOptions->server->pathToIMAGES; ?>/favicon.ico" type="image/x-icon"/>
+<?php echo $this->headScript() ?>
+        <script src="<?php echo $jqueryPath; ?>/external/jquery/jquery.js"></script>
+        <script src="<?php echo $jqueryPath; ?>/jquery-ui.min.js"></script>
+    </head>
+    <body>
+        <?php 
+            echo $this->layout()->content; 
+        ?>
+    </body>
+</html>

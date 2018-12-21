@@ -39,6 +39,30 @@ END LICENSE AND COPYRIGHT
 
 abstract class editor_Models_Export_DiffTagger {
     
+    /***
+     * Insert tag string 
+     * @var string
+     */
+    const INSERT_TAG="ins";
+    
+    /***
+     * Delete tag string
+     * @var string
+     */
+    const DELETE_TAG="del";
+    
+    /***
+     * Delete tag attributes. Defined as key value, where the key is the attribute name, and the value is the attribute value
+     * @var array
+     */
+    public  $deleteTagAttributes=array();
+    
+    /***
+     * Insert tag attributes. Defined as key value, where the key is the attribute name, and the value is the attribute value
+     * @var array
+     */
+    public  $insertTagAttributes=array();
+    
     /**
      * @var array Regexes which define the opening and closing add changemarks
      */
@@ -163,5 +187,53 @@ abstract class editor_Models_Export_DiffTagger {
             $segment = str_replace('~'.$i.'~', $mqm[$i], $segment);
         }
         return str_replace('______tilde_translate5_____','~', $segment);
+    }
+    
+    /***
+     * Surround the text content with given tag.
+     * @param string $tag
+     * @param string $content
+     * @return string
+     */
+    protected function surroundWith($tag,$content){
+        //check which attribute array should be used
+        $attributes=null;
+        if($tag==self::INSERT_TAG){
+            $attributes=$this->insertTagAttributes;
+        }else{
+            $attributes=$this->deleteTagAttributes;
+        }
+        
+        //build the opening tag and add the attributes
+        $tagcontent=[];
+        $tagcontent[]='<'.$tag;
+        foreach ($attributes as $att=>$value) {
+            $tagcontent[]=' '.$att.'="'.$value.'" ';
+        }
+        $tagcontent[]='>';
+        //apply the content
+        $tagcontent[]=$content;
+        $tagcontent[]='</'.$tag.'>';
+        
+        //merge the content as string
+        return implode('', $tagcontent);
+    }
+    
+    /***
+     * Surround the content as ins tag
+     * @param string $content
+     * @return string
+     */
+    protected function surroundWithIns($content){
+        return $this->surroundWith(self::INSERT_TAG, $content);
+    }
+    
+    /***
+     * Surround the content as del tag
+     * @param string $content
+     * @return string
+     */
+    protected function surroundWithDel($content){
+        return $this->surroundWith(self::DELETE_TAG, $content);
     }
 }

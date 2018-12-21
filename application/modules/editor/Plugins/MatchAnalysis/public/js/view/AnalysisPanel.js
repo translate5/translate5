@@ -51,7 +51,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       matchCount:'#UT#Gesamtzahl der Wörter',
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
-	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
+	  noAnalysis:'#UT#Start der Analyse im Tab “Sprach-Resourcen zuweisen“',
 	  languageResources:'#UT#Sprach-Resourcen',
 	  analysisDate:'#UT#Datum',
 	  languageResourceName: '#UT#Name',
@@ -88,6 +88,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             items:[{
                     xtype:'grid',
                     itemId:'matchAnalysisGrid',
+                    cls: 'matchAnalysisGrid',
                     emptyText:me.strings.noAnalysis,
                     store : analysisStore,
                     features: [{
@@ -110,6 +111,20 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         sortable : true
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
+                        flex: 2,
+                        dataIndex: '104',
+                        cellWrap: true,
+                        text: "104%",
+                        tooltip:Editor.util.LanguageResources.getMatchrateTooltip(104),
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                            return me.calculateRowSum(104,analysisStore);
+                        },
+                        renderer:columnRenderer,
+                    },{
+                        xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '103',
                         cellWrap: true,
@@ -122,6 +137,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         renderer:columnRenderer,
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '102',
                         cellWrap: true,
@@ -134,6 +150,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '101',
                         cellWrap: true,
@@ -235,7 +252,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     dockedItems: [{
                         xtype: 'toolbar',
                         dock: 'bottom',
-                        items: [{ 
+                        layout: {
+                            type: 'vbox',
+                            align: 'left'
+                        },
+                        items: [{
+                            xtype: 'container',
+                            padding: '10',
+                            html:"¹ "+me.strings.noAnalysis,
+                            dock : 'bottom'
+                        },{ 
                             xtype: 'button',
                             iconCls:'icon-excel-export',
                             itemId:'exportExcel',

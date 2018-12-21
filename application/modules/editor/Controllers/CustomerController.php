@@ -81,6 +81,72 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
     }
     
+    public function deleteAction() {
+        try {
+            parent::deleteAction();
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+            if(stripos($m, 'Integrity constraint violation') !== false) {
+                throw new ZfExtended_Models_Entity_NotAcceptableException('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
+            }
+            throw $e;
+        }
+    }
+    
+    public function exportAction(){
+        $exportModel=ZfExtended_Factory::get('editor_Models_LanguageResources_MtUsageLogger');
+        /* @var $exportModel editor_Models_LanguageResources_MtUsageLogger */
+        $rows=$exportModel->loadByCustomer($this->getParam('customerId'));
+        
+        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        
+        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+        
+        // set property for export-filename
+        $excel->setProperty('filename', 'Mt engine ussage export data');
+        
+        //TODO: find the language text and display it
+        $excel->setCallback('sourceLang',function($sourceLang) use ($languages){
+        });
+        $excel->setCallback('targetLang',function($targetLang) use ($languages){
+        });
+        
+        $excel->setLabel('serviceName', $translate->_("Resource"));
+        $excel->setLabel('languageResourceName', $translate->_("Name"));
+        $excel->setLabel('timestamp', $translate->_("Erstellungsdatum"));
+        //TODO: devide the character count with customer number
+        $excel->setLabel('translatedCharacterCount', 'Übersetzte Zeichen');
+        
+        //set the cell autosize
+        $excel->simpleArrayToExcel($rows,function($phpExcel){
+            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
+                
+                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
+                
+                $sheet = $phpExcel->getActiveSheet();
+                $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(true);
+                /** @var PHPExcel_Cell $cell */
+                foreach ($cellIterator as $cell) {
+                    $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Protect the default customer from being edited or deleted.
+     */
+    protected function entityLoad() {
+        $this->entity->load($this->_getParam('id'));
+        if(($this->_request->isPut() || $this->_request->isDelete())
+                && $this->entity->isDefaultCustomer()) {
+                    throw new ZfExtended_Models_Entity_NotAcceptableException('The default client must not be edited or deleted.', 0);
+                }
+    }
+    
     /**
      * Internal handler for duplicated entity message
      * @param Zend_Db_Statement_Exception $e

@@ -35,9 +35,9 @@
 		    <target>Export</target>
 		</trans-unit>
 		
-		<trans-unit id='S2VpbmUgQW5hbHlzZSBmw7xyIGRpZSBha3R1ZWxsZSBBdWZnYWJl'>
-		    <source>Keine Analyse für die aktuelle Aufgabe</source>
-		    <target>Keine Analyse für die aktuelle Aufgabe</target>
+		<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaC1SZXNvdXJjZW4genV3ZWlzZW7igJw='>
+		    <source>Start der Analyse im Tab “Sprach-Resourcen zuweisen“</source>
+		    <target>Start der Analyse im Tab “Sprach-Resourcen zuweisen“</target>
 		</trans-unit>
 
 		<trans-unit id='V2llZGVyaG9sdW5nZW46'>
@@ -112,6 +112,22 @@
 		    <source>Analyse</source>
 		    <target>Analyse</target>
 		</trans-unit>
+
+		<trans-unit id='RGllIE1hdGNoLUFuYWx5c2UgdW5kIGRpZSBWb3LDvGJlcnNldHp1bmcgc2luZCBhYmdlc2NobG9zc2VuLg=='>
+		    <source>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</source>
+		    <target>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</target>
+		</trans-unit>
+
+		<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='>
+		    <source>Terminologie prüfen und markieren</source>
+		    <target>Terminologie prüfen und markieren</target>
+		</trans-unit>
+
+		<trans-unit id='QW5hbHlzZSBsw6R1ZnQ='>
+		    <source>Analyse läuft</source>
+		    <target>Analyse läuft</target>
+		</trans-unit>
+		
     </body>
   </file>
 </xliff>

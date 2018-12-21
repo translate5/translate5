@@ -31,14 +31,17 @@ END LICENSE AND COPYRIGHT
 class editor_Services_TermCollection_Connector extends editor_Services_Connector_FilebasedAbstract {
 
     /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::connectTo()
+     * If the query for the term had tags, the match rate must be less then 100% so that the user has to fix the tags
+     * @var integer
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
+    const TERMCOLLECTION_TAG_MATCH_VALUE = 99;
+    
+    public function __construct() {
+        parent::__construct();
         //the translations from the term collections are with high priority, that is why 104 (this is the highest matchrate in translate5)
         $this->defaultMatchRate = self::TERMCOLLECTION_MATCH_VALUE;
     }
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
@@ -96,21 +99,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        
-        //return empty result when no query string exisit
-        if(empty($queryString)) {
-            return $this->resultList;
-        }
-        
-        $this->resultList->setDefaultSource($queryString);
-        
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
-        $queryString = $internalTag->toXliffPaired($queryString, true);
-        
-        return $this->queryCollectionResults($queryString);
+        return $this->queryCollectionResults($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -118,6 +107,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
+        $this->resultList->setDefaultSource($searchString);
         return $this->queryCollectionResults($searchString);
     }
     
@@ -134,9 +124,13 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     /***
      * Search the terms in the term collection with the given query string
      * @param string $queryString
+     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
-    protected function queryCollectionResults($queryString){
+    protected function queryCollectionResults($queryString, $reimportWhitespace = false){
+        if(empty($queryString)) {
+            return $this->resultList;
+        }
         $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $entity editor_Models_TermCollection_TermCollection */
         $entity->load($this->languageResource->getId());
@@ -160,7 +154,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                     $res['definitions']=$definitions[$res['termEntryId']];
                 }
                 //convert back to array
-                $this->resultList->addResult($res['term'],$this->defaultMatchRate,$res);
+                $matchRate = $this->tagsWereStripped ? self::TERMCOLLECTION_TAG_MATCH_VALUE : $this->defaultMatchRate;
+                if($reimportWhitespace) {
+                    $res['term'] = $this->importWhitespaceFromTagLessQuery($res['term']);
+                }
+                $this->resultList->addResult($res['term'], $matchRate,$res);
             }
         }
         

@@ -145,6 +145,10 @@ class editor_Services_ServiceResult {
         return $this->results;
     }
     
+    public function setResults($results){
+        $this->results=$results;
+    }
+    
     public function resetResult(){
         $this->results=[];
     }
@@ -154,5 +158,23 @@ class editor_Services_ServiceResult {
      */
     public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource){
         $this->languageResource = $languageResource;
+    }
+    
+    /***
+     * Get meta value by meta name from meta data object
+     * @param array $metaData
+     * @param string $fieldName
+     * @return NULL|string
+     */
+    public function getMetaValue($metaData,$fieldName){
+        if(empty($metaData)){
+            return null;
+        }
+        foreach ($metaData as $data) {
+            if($data->name==$fieldName){
+                return $data->value;
+            }
+        }
+        return null;
     }
 }

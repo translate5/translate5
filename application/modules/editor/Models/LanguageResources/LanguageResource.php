@@ -233,38 +233,13 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /**
-     * Get language resource by given resourceId
-     * @param string $resourceId
-     * @return Ambigous <Zend_Db_Table_Row_Abstract, NULL>
-     */
-    public function loadByResourceId($resourceId) {
-        return $this->loadRow('resourceId = ?', $resourceId);
-    }
-    
-    /**
-     * loads the ids, names and additional information of all TMs for the given serviceName
-     * @param string $serviceName
+     * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
+     * @param string $serviceResourceId
      * @return array
      */
-    public function loadByServiceName(string $serviceName) {
-        $db = $this->db;
-        $s = $db->select()
-            ->from($db->info($db::NAME), ['id','name','specificData'])
-            ->where('LEK_languageresources.serviceName LIKE ?', $serviceName);
+    public function loadByResourceId(string $serviceResourceId) {
+        $s = $this->db->select()->where('resourceId = ?', $serviceResourceId);
         return $this->db->fetchAll($s)->toArray(); 
-    }
-    
-    /**
-     * loads the ids and names of all TMs for the given name
-     * @param string $name
-     * @return array
-     */
-    public function loadByName(string $name) {
-        $db = $this->db;
-        $s = $db->select()
-        ->from($db->info($db::NAME), ['id','name'])
-        ->where('LEK_languageresources.name LIKE ?', $name);
-        return $this->db->fetchAll($s)->toArray();
     }
     
     /**

@@ -36,14 +36,9 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      */
     protected $api;
     
-    /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::connectTo()
-     */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
-        $class = 'editor_Services_SDLLanguageCloud_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+    public function __construct() {
+        parent::__construct();        
+        $this->api = ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi');
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate;
@@ -70,17 +65,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        //return empty result when no query string exisit
-        if(empty($queryString)) {
-            return $this->resultList;
-        }
-        
-        $this->resultList->setDefaultSource($queryString);
-        
-        //query moses without tags
-        $queryString = $segment->stripTags($queryString);
-        return $this->querySdlApi($queryString);
+        return $this->querySdlApi($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -88,7 +73,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        return $this->querySdlApi($searchString);
+        throw new BadMethodCallException("The SDL Language Cloud Connector does not support search requests");
     }
     
     /***
@@ -105,14 +90,13 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     /***
      * Query the sdl cloud api and get the available results as editor_Services_ServiceResult
      * @param string $searchString
+     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
-    protected function querySdlApi($searchString){
+    protected function querySdlApi($searchString, $reimportWhitespace = false){
         if(empty($searchString)) {
             return $this->resultList;
         }
-        
-        $this->resultList->setDefaultSource($searchString);
         
         //load all languages (sdl api use iso6393 langage shortcuts)
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
@@ -129,7 +113,11 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         if($this->api->search($params)){
             $result=$this->api->getResult();
         }
-        $this->resultList->addResult(isset($result->translation) ? $result->translation : "",$this->defaultMatchRate);
+        $translation = isset($result->translation) ? $result->translation : "";
+        if($reimportWhitespace) {
+            $translation = $this->importWhitespaceFromTagLessQuery($translation);
+        }
+        $this->resultList->addResult($translation,$this->defaultMatchRate);
         return $this->resultList;
     }
     

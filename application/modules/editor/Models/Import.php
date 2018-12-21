@@ -181,6 +181,13 @@ class editor_Models_Import {
         //Task based Source Editing can only be enabled if its allowed in the whole editor instance 
         $enableSourceEditing = (bool) $config->runtimeOptions->import->enableSourceEditing;
         $task->setEnableSourceEditing((int) (! empty($params->enableSourceEditing) && $enableSourceEditing));
+        
+        if(empty($params->customerId)){
+            $task->setDefaultCustomerId();
+        } else {
+            $task->setCustomerId($params->customerId);
+        }
+        
         $task->validate();
         $this->setTask($task);
         return $task;

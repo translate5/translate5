@@ -99,6 +99,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->task = $task;
         $this->filename = $filename;
         $this->initImageTags();
+        $this->initHelper();
         
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
         
@@ -185,7 +186,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $text = htmlentities($originalContent);
         }
         $tagNr = $this->getShortTagNumber($rid);
-        $p = $this->getTagParams($originalContent, $tagNr, $tag, $text);
+        $p = $this->getTagParams($originalContent, $tagNr, $rid, $text);
         return $this->{$type}->getHtmlTag($p);
     }
     
@@ -324,7 +325,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 
         // we have to protect them here 
-        $text = $this->protectWhitespace($text);
+        $text = $this->whitespaceHelper->protectWhitespace($text);
         $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;
     }

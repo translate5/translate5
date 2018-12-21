@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation{
+    const MAX_ERROR_PER_CONNECTOR = 2;
     
     /***
      * Analysis id 
@@ -67,11 +68,14 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      */
     protected $wordCount;
     
+    protected $connectorErrorCount = [];
+    
     
     public function __construct(editor_Models_Task $task,$analysisId){
         $this->task=$task;
         $this->analysisId=$analysisId;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
+        $this->initHelper();
     }
     
     /***
@@ -101,6 +105,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $repetitionByHash=array();
 
+        $taskTotalWords=0;
         //init the word count calculator
         $this->initWordCount();
         foreach($segments as $segment) {
@@ -108,13 +113,16 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             $this->wordCount->setSegment($segment);
             
+            //collect the total words in the task
+            $taskTotalWords+=$this->wordCount->getSourceCount();
+            
             //calculate and set segment hash
             $segmentHash = $segment->getSourceMd5();
             
             //check if the segment source hash exist in the repetition array
             //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 languageResource
             //segment does not exist in repetition array -> query the tm save the best match rate per tm
-            $isRepetition = isset($repetitionsDb[$segment->getId()]) && isset($repetitionByHash[$segmentHash]);
+            $isRepetition = isset($repetitionsDb[$segment->getId()]) && array_key_exists($segmentHash,$repetitionByHash);
             if($isRepetition){
                 $repetitionRate = editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE;
                 //get the best match rate for the repetition segment, 
@@ -143,11 +151,24 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $bestMatchRateResult = null;
             }
             $useMt = empty($bestMatchRateResult) || $bestMatchRateResult->matchrate < $this->pretranslateMatchrate;
-            if($this->usePretranslateMT && $useMt) {
+            $mtUsed=$this->usePretranslateMT && $useMt;
+            if($mtUsed) {
+                
                 $bestMatchRateResult = $this->getMtResult($segment);
-                // since nothing other was found, we have to store the result for the repetitions too
-                $repetitionByHash[$segmentHash] = $bestMatchRateResult;
+
+                if(!empty($bestMatchRateResult)){
+                    //store the result for the repetitions too
+                    $repetitionByHash[$segmentHash] = $bestMatchRateResult;
+                }else{
+                    $bestMatchRateResult=null;
+                }
             }
+            //if no mt is used but the matchrate is lower than the pretranslateMatchrate (match lower than pretranslateMatchrate comming from the TM)
+            if(!$mtUsed && !empty($bestMatchRateResult) && $bestMatchRateResult->matchrate < $this->pretranslateMatchrate){
+                $bestMatchRateResult=null;
+            }
+            
+            //if best matchrate results are found
             if(!empty($bestMatchRateResult)) {
                 $this->updateSegment($segment, $bestMatchRateResult);
             }
@@ -155,6 +176,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //remove fuzzy languageResource from opentm2
         $this->removeFuzzyResources();
+        
+        //update the task total words
+        $this->task->setWordCount($taskTotalWords);
+        $this->task->save();
+        
         return true;
     }
     
@@ -172,45 +198,25 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         
         //query the segment for each assigned tm
         foreach ($this->connectors as $languageResourceid => $connector){
-            /* @var $connector editor_Services_Connector_Abstract */
+            /* @var $connector editor_Services_Connector */
             
-            $matches=[];
-            $connector->resetResultList();
-            $isMtResource=false;
-            
-            //if the current resource type is not MT, query the tm or termcollection
-            if($this->resources[$languageResourceid]->getResourceType() != editor_Models_Segment_MatchRateType::TYPE_MT){
-                $matches=$connector->query($segment);
-                
-                //update the segment with custom target in fuzzy tm
-                if($this->internalFuzzy && $connector->isInternalFuzzy()){
-                    $origTarget = $segment->getTargetEdit();
-                    $segment->setTargetEdit("translate5-unique-id[".$segment->getTaskGuid()."]");
-                    $connector->update($segment);
-                    $segment->setTargetEdit($origTarget);
-                }
-                
-                $matchResults=$matches->getResult();
-            }else{
-                //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate
-                //the mt resource only will be searched when pretranslating
-                $isMtResource=true;
-                
-                //get the query string from the segment
-                $queryString = $connector->getQueryString($segment);
-                
-                $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-                /* @var $internalTag editor_Models_Segment_InternalTag */
-                $queryString = $internalTag->toXliffPaired($queryString, true);
-                $matches=ZfExtended_Factory::get('editor_Services_ServiceResult',[
-                    $queryString
-                ]);
-                /* @var $dummyResult editor_Services_ServiceResult */
-                $matches->setLanguageResource($connector->getLanguageResource());
-                $matches->addResult('',$connector->getDefaultMatchRate());
-                
-                $matchResults=$matches->getResult();
+            if($this->isDisabledDueErrors($connector, $languageResourceid)) {
+                continue;
             }
+            
+            $connector->resetResultList();
+            $isMtResource = $this->resources[$languageResourceid]->getResourceType() == editor_Models_Segment_MatchRateType::TYPE_MT;
+            
+            try {
+                $matches = $this->getMatches($connector, $segment, $isMtResource);
+            }
+            catch(Exception $e) {
+                $this->handleConnectionError($e, $languageResourceid);
+                // in case of an error we produce an empty result container for that query and log the error so that the analysis can proceed
+                $matches = ZfExtended_Factory::get('editor_Services_ServiceResult');
+            }
+
+            $matchResults = $matches->getResult();
             
             $matchRateInternal=new stdClass();
             $matchRateInternal->matchrate=null;
@@ -251,6 +257,74 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         return $bestMatchRateResult;
     }
     
+    /**
+     * Checks how many errors the connector has produced. If too much, disable it.
+     * @param editor_Services_Connector $connector
+     * @param integer $id
+     * @return boolean
+     */
+    protected function isDisabledDueErrors(editor_Services_Connector_Abstract $connector, $id) {
+        if(!isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
+            return false;
+        }
+        $langRes = $connector->getLanguageResource();
+        $msg = __CLASS__.'::getBestMatchrate: ';
+        $msg .= 'Disabled the following Language Resource for analysing and pretranslation due too much errors. ';
+        $msg .= 'Errors see above in log. Task: '.$this->task->getTaskName().' - '.$this->task->getTaskNr().' ('.$this->task->getTaskGuid().')';
+        $msg .= 'Language Resource: '.$langRes->getName().' ('.$langRes->getServiceName().'; ID: '.$id.')';
+        error_log($msg);
+        unset($this->connectors[$id]);
+        return true;
+    }
+    
+    /**
+     * Log and count the connection error
+     * @param Exception $e
+     * @param integer $id
+     */
+    protected function handleConnectionError(Exception $e, $id) {
+        settype($this->connectorErrorCount[$id], 'integer');
+        $this->connectorErrorCount[$id]++;
+    }
+    
+    /**
+     * @param editor_Services_Connector $connector
+     * @param boolean $isMtResource
+     * @return editor_Services_ServiceResult
+     */
+    protected function getMatches(editor_Services_Connector_Abstract $connector, editor_Models_Segment $segment, $isMtResource) {
+        if($isMtResource){
+            //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate
+            //the mt resource only will be searched when pretranslating
+            
+            //get the query string from the segment
+            $queryString = $connector->getQueryString($segment);
+            
+            $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+            /* @var $internalTag editor_Models_Segment_InternalTag */
+            $queryString = $internalTag->toXliffPaired($queryString, true);
+            $matches=ZfExtended_Factory::get('editor_Services_ServiceResult',[
+                $queryString
+            ]);
+            /* @var $dummyResult editor_Services_ServiceResult */
+            $matches->setLanguageResource($connector->getLanguageResource());
+            $matches->addResult('',$connector->getDefaultMatchRate());
+            return $matches;
+        }
+        
+        // if the current resource type is MT, query the tm or termcollection
+        $matches = $connector->query($segment);
+        
+        //update the segment with custom target in fuzzy tm
+        if($this->internalFuzzy && $connector->isInternalFuzzy()){
+            $origTarget = $segment->getTargetEdit();
+            $segment->setTargetEdit("translate5-unique-id[".$segment->getTaskGuid()."]");
+            $connector->update($segment);
+            $segment->setTargetEdit($origTarget);
+        }
+        return $matches;
+    }
+    
     /***
      * Save match analysis to the database
      * 
@@ -262,7 +336,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         //error_log('segmentNrInTask='.$segment->getSegmentNrInTask().' wordCount:'.$this->wordCount->getSourceCount().' totalCount:');
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
-        
         $matchAnalysis->setSegmentId($segment->getId());
         $matchAnalysis->setSegmentNrInTask($segment->getSegmentNrInTask());
         $matchAnalysis->setTaskGuid($this->task->getTaskGuid());
@@ -273,7 +346,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
         $isFuzzy=false;
         if(isset($matchRateResult) && is_object($matchRateResult)){
-            $isFuzzy=$matchRateResult->target == "translate5-unique-id[".$segment->getTaskGuid()."]";
+            //ignore internal fuzzy match target
+            $isFuzzy = strpos($matchRateResult->target, 'translate5-unique-id['.$segment->getTaskGuid().']') !== false;
         }
         $matchAnalysis->setInternalFuzzy($isFuzzy  ? 1 : 0);
         $matchAnalysis->save();
@@ -285,7 +359,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * 
      * @return array
      */
-    public function initConnectors(){
+    protected function initConnectors(){
         
         $languageResources=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
@@ -317,7 +391,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
             } catch (ZfExtended_Exception $e) {
-                error_log("Unable to use connector from Language Resource: resourceName:".$languageresource->getName().', resourceId:'.$languageresource->getId().'. Error was:'.$e->getMessage());
+                error_log("Unable to use connector from Language Resource: resourceName: ".$languageresource->getName().', resourceId: '.$languageresource->getId().'. Error was: '.$e);
                 continue;
             }
             
@@ -341,7 +415,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /***
      * Init word counter 
      */
-    public function initWordCount(){
+    protected function initWordCount(){
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $langModel editor_Models_Languages */
         

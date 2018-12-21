@@ -96,6 +96,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         self::$testTask->setLockLocked(1);
         self::$testTask->setTerminologie(1);
         self::$testTask->createTaskGuidIfNeeded();
+        self::$testTask->setDefaultCustomerId();
     }    
     
     /**

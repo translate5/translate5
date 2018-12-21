@@ -285,8 +285,12 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
         $tbxParser = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $tbxParser editor_Models_Import_TermListParser_Tbx */
         $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
-        $tbxHash = $this->task->meta()->getTbxHash();
         
+        if(empty($tbxData)){
+            throw new editor_Plugins_TermTagger_Exception_Open("Unable to create the tbx data on the disk. taskGuid:".$this->task->getTaskGuid());
+        }
+        
+        $tbxHash = $this->task->meta()->getTbxHash();
         $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $service editor_Plugins_TermTagger_Service */
         

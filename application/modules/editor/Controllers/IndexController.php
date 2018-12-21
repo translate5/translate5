@@ -215,7 +215,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $tagPath = APPLICATION_RUNDIR.'/'.$rop->dir->tagImagesBasePath.'/';
       $this->view->Php2JsVars()->set('segments.shortTagPath', $tagPath);
       $this->view->Php2JsVars()->set('segments.fullTagPath', $tagPath);
-      $this->view->Php2JsVars()->set('segments.matchratetypes', []); //needed to give plugins the abilty to add own icons as matchrate types
+
+      //matchrate type to icon map
+      $typesWihtIcons=array();
+      foreach(editor_Models_Segment_MatchRateType::TYPES_WITH_ICONS as $type){
+          $typesWihtIcons[$type]=$this->view->publicModulePath.'/images/matchratetypes/'.$type.'.png';
+      }
+      
+      $this->view->Php2JsVars()->set('segments.matchratetypes', $typesWihtIcons); //needed to give plugins the abilty to add own icons as matchrate types
       
       if($rop->editor->enableQmSubSegments) {
           $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);

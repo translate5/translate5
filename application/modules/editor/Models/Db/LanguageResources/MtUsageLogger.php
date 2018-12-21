@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_TermCollection_TaskAssoc extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_term_collection_taskassoc';
+/**
+ */
+class editor_Models_Db_LanguageResources_MtUsageLogger extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_languageresources_mt_usage_log';
     public $_primary = 'id';
 }

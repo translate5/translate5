@@ -60,9 +60,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
         /* @var $service editor_Services_TermCollection_Service */
-        $nsp=$service->getServiceNamespace();
-        $this->setResourceId($nsp);
-        $this->setServiceType($nsp);
+
+        //since for termcollections there are no service resources we don't have to deal with them.
+        // normally the service resource provides the serviceType, here we use the Namespace as "shortcut"
+        $serviceType = $service->getServiceNamespace(); 
+        $this->setResourceId($serviceType);
+        $this->setServiceType($serviceType);
         $this->setServiceName($service->getName());
         $this->setColor($service::DEFAULT_COLOR);
         $this->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
@@ -131,17 +134,22 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     /***
      * Get all collection associated with the task
      * 
-     * @param guid $taskGuid
+     * @param string $taskGuid
      * @return array
      */
     public function getCollectionsForTask($taskGuid){
+        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        
         $s=$this->db->select()
             ->setIntegrityCheck(false)
-            ->from('LEK_term_collection_taskassoc')
-            ->where('taskGuid=?',$taskGuid);
+            ->from(array('lr'=>'LEK_languageresources'))
+            ->join(array('ta'=>'LEK_languageresources_taskassoc'), 'ta.languageResourceId=lr.id',array('ta.taskGuid'))
+            ->where('ta.taskGuid=?',$taskGuid)
+            ->where('lr.serviceName=?',$service->getName());
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
-            $ids = array_column($rows, 'collectionId');
+            $ids = array_column($rows, 'id');
             return $ids;
         }
         return [];
@@ -196,9 +204,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param string $taskGuid
      */
     public function addTermCollectionTaskAssoc($collectionId,$taskGuid){
-        $sql='INSERT INTO LEK_term_collection_taskassoc (collectionId,taskGuid) '.
-              'VALUES(?,?);';
-        $this->db->getAdapter()->query($sql,[$collectionId,$taskGuid]);
+        $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $model editor_Models_LanguageResources_Taskassoc */
+        $model->setLanguageResourceId($collectionId);
+        $model->setTaskGuid($taskGuid);
+        $model->setSegmentsUpdateable(false);
+        $model->save();
     }
     
     /***
@@ -246,8 +257,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from('LEK_languageresources',array('LEK_languageresources.*'))
-        ->join('LEK_term_collection_taskassoc', 'LEK_term_collection_taskassoc.collectionId = LEK_languageresources.id',array('LEK_term_collection_taskassoc.collectionId','LEK_term_collection_taskassoc.taskGuid'))
-        ->where('LEK_term_collection_taskassoc.taskGuid=?',$taskGuid)
+        ->join('LEK_languageresources_taskassoc', 'LEK_languageresources_taskassoc.languageResourceId = LEK_languageresources.id',array('LEK_languageresources_taskassoc.languageResourceId as collectionId','LEK_languageresources_taskassoc.taskGuid'))
+        ->where('LEK_languageresources_taskassoc.taskGuid=?',$taskGuid)
         ->where('LEK_languageresources.autoCreatedOnImport=?',1);
         $rows=$this->db->fetchAll($s)->toArray();
         
@@ -259,10 +270,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         //remove the collection
         $this->load($collectionId);
         $this->delete();
-        
-        //remove the task from the assoc table
-        $taskassoc = ZfExtended_Factory::get('editor_Models_Db_TermCollection_TaskAssoc');
-        $taskassoc->delete(array('taskGuid = ?' => $taskGuid));
         
         //remove the termcollection from the disk
         $this->removeCollectionDir($collectionId);

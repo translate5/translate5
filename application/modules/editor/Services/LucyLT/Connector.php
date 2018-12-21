@@ -47,6 +47,8 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::query()
+     * 
+     * FIXME currently no unified whitespace handling is used (see other connectors), should be refactored on demand
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);

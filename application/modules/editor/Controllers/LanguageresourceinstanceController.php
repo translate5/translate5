@@ -50,12 +50,25 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected $uploadErrors = array();
     
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
     public function init() {
         //add filter type for languages
-        $this->_filterTypeMap = array(
-            array('sourceLang' => array('string' => 'list')),
-            array('targetLang' => array('string' => 'list')),
-        );
+        $finalTableForAssoc = new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId');
+        $this->_filterTypeMap = [
+            'sourceLang' => ['string' => 'list'],
+            'targetLang' => ['string' => 'list'],
+            'resourcesCustomers' => [
+                'string' => new ZfExtended_Models_Filter_JoinAssoc('LEK_languageresources_customerassoc', $finalTableForAssoc, 'languageResourceId', 'id')
+            ]
+        ];
+        
+        //set same join for sorting!
+        $this->_sortColMap['resourcesCustomers'] = $this->_filterTypeMap['resourcesCustomers']['string'];
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         parent::init();
     }
     
@@ -116,7 +129,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $id = $languageresource['id'];
             //add customer assocs
             $languageresource['resourcesCustomers'] = $this->getCustassoc($custAssoc, 'customerId', $id);
-            $languageresource['useAsDefault'] = $this->getCustassoc($custAssoc, 'useAsDefault', $id);
+            $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
         }
@@ -149,6 +162,27 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         //remove 0 and null values
         return array_filter(array_column($data[$id], $index));
+    }
+    
+    /***
+     * Retrives the useAsDefault customers for the given language resource
+     * @param array $data
+     * @param string $index the datafield to get
+     * @param integer $id the language resource id 
+     * @return array
+     */
+    protected function getCustassocDefault(array $data, $index, $id){
+        if(empty($data[$id])){
+            return [];
+        }
+        //get the useAsDefault array indexes
+        $default=$this->getCustassoc($data, $index, $id);
+        $customerIds=[];
+        //get the customer ids for those array indexes
+        foreach ($default as $key=>$value){
+            $customerIds[]=$data[$id][$key]['customerId'];
+        }
+        return $customerIds;
     }
     
     /**
@@ -212,14 +246,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     protected function handleFilterCustom(){
         $sourceFilter=null;
         $targetFilter=null;
-        $resourcesCustomers=null;
         $useAsDefault=null;
         $taskList=null;
         
         $this->entity->getFilter()->hasFilter('sourceLang',$sourceFilter);
         $this->entity->getFilter()->hasFilter('targetLang',$targetFilter);
         
-        $this->entity->getFilter()->hasFilter('resourcesCustomers',$resourcesCustomers);
         $this->entity->getFilter()->hasFilter('useAsDefault',$useAsDefault);
         $this->entity->getFilter()->hasFilter('taskList',$taskList);
         
@@ -293,12 +325,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         if(isset($targetFilter)){
             $resultList=$searchEntity($targetFilter->value,'editor_Models_Languages');
             $handleFilter($targetFilter,$resultList,'editor_Models_LanguageResources_Languages','loadByTargetLangIds','languageResourceId');
-        }
-        
-        //check if filtering for resourceCustomers should be done
-        if(isset($resourcesCustomers) && is_string($resourcesCustomers->value)){
-            $resultList=$searchEntity($resourcesCustomers->value,'editor_Models_Customer');
-            $handleFilter($resourcesCustomers,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIds','languageResourceId');
         }
         
         //check if filtering for useAsDefault should be done
@@ -383,7 +409,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         
         $connector = $serviceManager->getConnector($this->entity);
-        /* @var $connector editor_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector */
         
         //just reuse importvalidtypes here, nothing other implemented yet 
         $validExportTypes = $connector->getValidFiletypes();
@@ -565,7 +591,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function handleInitialFileUpload(editor_Services_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
-        /* @var $connector editor_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector */
         $importInfo = $this->handleFileUpload($connector);
         
         //currently the initial upload is optional
@@ -590,7 +616,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      */
     protected function handleAdditionalFileUpload(editor_Services_Manager $manager) {
         $connector = $manager->getConnector($this->entity);
-        /* @var $connector editor_Services_Connector_FilebasedAbstract */
+        /* @var $connector editor_Services_Connector */
         $importInfo = $this->handleFileUpload($connector);
         
         if(empty($importInfo)){
@@ -607,7 +633,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * handles the fileupload
      * @return array|boolean meta data about the upload or false when there was no file 
      */
-    protected function handleFileUpload(editor_Services_Connector_FilebasedAbstract $connector) {
+    protected function handleFileUpload(editor_Services_Connector $connector) {
         $upload = new Zend_File_Transfer_Adapter_Http();
         
         //check if connector / resource can deal with the uploaded file type
@@ -638,7 +664,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $this->uploadErrors[] = 'Die ausgewählte Ressource kann Dateien diesen Typs nicht verarbeiten!';
         }
         
-        /* @var $connector editor_Services_Connector_Abstract */
         if(empty($importInfo[self::FILE_UPLOAD_NAME]['size'])) {
             $this->uploadErrors[] = 'Die ausgewählte Datei war leer!';
         }
@@ -673,9 +698,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $manager editor_Services_Manager */
         $connector = $manager->getConnector($this->entity);
         $deleteInResource = !$this->getParam('deleteLocally', false);
-        if($deleteInResource && $connector instanceof editor_Services_Connector_FilebasedAbstract) {
-            $connector->delete();
-        }
+        $deleteInResource && $connector->delete();
         
         $userSession = new Zend_Session_Namespace('user');
         
@@ -704,6 +727,10 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $connector = $this->getConnector();
 
         $result = $connector->query($segment);
+        
+        if($this->entity->getResourceType() ==editor_Models_Segment_MatchRateType::TYPE_TM){
+            $result=$this->markDiff($segment, $result,$connector);
+        }
         
         $this->view->segmentId = $segment->getId(); //return the segmentId back, just for reference
         $this->view->languageResourceId = $this->entity->getId();
@@ -750,7 +777,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     /**
      * returns the connector to be used
-     * @return editor_Services_Connector_Abstract
+     * @return editor_Services_Connector
      */
     protected function getConnector() {
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
@@ -760,5 +787,103 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($session->taskGuid);
         return $manager->getConnector($this->entity,$task->getSourceLang(),$task->getTargetLang());
+    }
+    
+    /***
+    * Mark differences between $resultSource (the result from the resource) and the $queryString(the requested search string)
+    * The difference is marked in $resultSource as return value
+    * @param editor_Models_Segment $segment
+    * @param editor_Services_ServiceResult $result
+    * @param editor_Services_Connector $connector
+    * @return editor_Services_ServiceResult
+    */
+    protected function markDiff(editor_Models_Segment $segment,editor_Services_ServiceResult $result,editor_Services_Connector $connector){
+        $queryString = $connector->getQueryString($segment);
+        $queryStringTags = [];
+        
+        //remove track changes tag from the query string
+        $trackChangeTag=ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChangeTag editor_Models_Segment_TrackChangeTag */
+        $queryString=$trackChangeTag->removeTrackChanges($queryString);
+
+        //protect the tags
+        $queryString = $this->protectTags($queryString, $queryStringTags);
+        
+        //remove term tags from the query string
+        $termTag=ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+        /* @var $termTag editor_Models_Segment_TermTag */
+        $queryString =$termTag->remove($queryString);
+        
+        //convert the html special chars
+        $decodeHtmlSpecial=function($string){
+            return htmlspecialchars_decode($string);;
+        };
+        
+        $queryString=$decodeHtmlSpecial($queryString);
+        
+        $diffTagger=ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
+        /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
+        
+        //add del/ins tags css class
+        $diffTagger->insertTagAttributes['class']='tmMatchGridResultTooltip';
+        $diffTagger->deleteTagAttributes['class']='tmMatchGridResultTooltip';
+        
+        $results=$result->getResult();
+        foreach ($results as &$res) {
+            $tags = []; 
+            //replace the internal tags before diff
+            $res->source = $this->protectTags($res->source, $tags);
+            
+            $res->source =$decodeHtmlSpecial($res->source);
+            
+            $res->source = $diffTagger->diffSegment($queryString, $res->source, null,null);
+            $res->source = $this->unprotectTags($res->source, array_merge($tags, $queryStringTags));
+        }
+        return $result;
+    }
+    
+    /**
+     * protected the internal tags for diffing
+     * @param string $segment
+     * @param array $tags
+     */
+    protected function protectTags($segment, array &$tags) { 
+        $tag = $this->internalTag;
+        return $tag->replace($segment, function($match) use (&$tags, $tag) {
+            $submatch = null;
+            if(preg_match($tag::REGEX_STARTTAG, $match[0], $submatch)) {
+                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'start-'.$submatch[1]);
+            }
+            elseif(preg_match($tag::REGEX_ENDTAG, $match[0], $submatch)) {
+                $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'end-'.$submatch[1]);
+            }
+            elseif(preg_match($tag::REGEX_SINGLETAG, $match[0], $submatch)) {
+                $id = $match[3];
+                if(in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+                    //for diffing the content of the whitespace tags is important not the number on it! 
+                    $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, $id.'-'.$tag->getLength($match[0]));
+                }
+                else {
+                    $placeholder = sprintf($tag::PLACEHOLDER_TEMPLATE, 'single-'.$submatch[1]);
+                }
+                
+            }
+            else {
+                $placeholder = 'notfound';
+            }
+            
+            $tags[$placeholder] = $match[0];
+            return $placeholder;
+        });
+    }
+    
+    /**
+     * unprotects / restores the content tags
+     * @param string $segment
+     * @param array $segment
+     * @return string
+     */
+    protected function unprotectTags($segment, array $tags) {
+        return str_replace(array_keys($tags), array_values($tags), $segment);
     }
 }

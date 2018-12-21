@@ -760,18 +760,6 @@
         <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
         <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
       </trans-unit>
-      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='>
-        <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
-        <target>Please choose the TBX data to be imported for the term tagging</target>
-      </trans-unit>
-      <trans-unit id='VEJYIERhdGVpwrI='>
-        <source>TBX Datei²</source>
-        <target>TBX file²</target>
-      </trans-unit>
-      <trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'>
-        <source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source>
-        <target>² A TBX file is optional. You need a TBX-file in TBX-Core format to mark terminology in your bilingual files.</target>
-      </trans-unit>
       
       
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
@@ -901,6 +889,14 @@
       <trans-unit id='ZsO8ciBhbGxl'>
         <source>für alle</source>
         <target>for all</target>
+      </trans-unit>
+      <trans-unit id='S3VuZGUgZGVyIEF1ZmdhYmUgKEFuZ2FiZSBub3R3ZW5kaWcp'>
+        <source>Kunde der Aufgabe (Angabe notwendig)</source>
+        <target>Task's client (mandatory)</target>
+      </trans-unit>
+      <trans-unit id='bmljaHQgZ2VmdW5kZW4='>
+        <source>nicht gefunden</source>
+        <target>not found</target>
       </trans-unit>
       <trans-unit id='SWhyZSBEYXRlbiBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbiwgYmVpbSBTcGVpY2hlcm4ga2FtIGVzIHp1IGVpbmVtIEtvbmZsaWt0IQ=='>
         <source>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</source>
@@ -1409,9 +1405,9 @@
     <source>{0} (importiert)</source>
     <target>{0} (imported)</target>
 </trans-unit>
-<trans-unit id='ezB9ICh0cmFuc2xhdGU1KQ=='>
-    <source>{0} (translate5)</source>
-    <target>{0} (translate5)</target>
+<trans-unit id='ezB9'>
+  <source>{0}</source>
+  <target>{0}</target>
 </trans-unit>
 <trans-unit id='ezB9ICh2b3LDvGJlcnNldHp0KQ=='>
     <source>{0} (vorübersetzt)</source>
@@ -2418,6 +2414,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Clients overview</target>
 </trans-unit>
 
+<trans-unit id="QWxsZSBLdW5kZW4=">
+    <source>Alle Kunden</source>
+    <target>All clients</target>
+</trans-unit>
+
+
 <trans-unit id='SGluenVmw7xnZW4='>
     <source>Hinzufügen</source>
     <target>Add</target>
@@ -2500,6 +2502,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <target>103% is a 100% match that originally came from a file with the same name (like a 101% match). In addition to the 101% match, the segment ID is still the same or equal to the segment ID in the current file.</target>
 </trans-unit>
 
+<trans-unit id='MTA0JSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIGF1cyBlaW5lciBUZXJtY29sbGVjdGlvbiBrb21tdC4='>
+<source>104% ist ein 100% Treffer, der aus einer Termcollection kommt.</source>
+<target>104% is a 100% match coming from a term collection.</target>
+</trans-unit>
+
 <trans-unit id='RXJzdGVsbHVuZw=='>     
 <source>Erstellung</source>     
 <target>Creation</target> 
@@ -2507,7 +2514,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='VmVyYW50d29ydGxpY2g='>     
 <source>Verantwortlich</source>     
-<target>Responsible</target> 
+<target>Responsibility</target> 
 </trans-unit>  
 
 <trans-unit id='RGF0dW0='>     
@@ -2517,7 +2524,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='TGV0enRlIMOEbmRlcnVuZw=='>     
 <source>Letzte Änderung</source>     
-<target>Last modification</target> 
+<target>Modification</target> 
 </trans-unit>  
 
 <trans-unit id='VGVybSBUeXA='>     
@@ -2532,7 +2539,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='QWJrw7xyenVuZyBmw7xy'>     
 <source>Abkürzung für</source>     
-<target>Abbreviation of</target> 
+<target>Abbreviated form for</target> 
 </trans-unit>  
 
 <trans-unit id='QXVzc3ByYWNoZQ=='>     
@@ -2542,7 +2549,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
  <trans-unit id='RWluc3R1ZnVuZw=='>     
  <source>Einstufung</source>     
- <target>Normative Authorization</target> 
+ <target>Normative authorization</target> 
  </trans-unit>
 <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='>
   <source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source>
@@ -2673,8 +2680,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <target>Associate language resources</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
-  <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
-  <target>No language resource available for the language combination of the opened task.</target>
+  <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
+  <target>No language resource available for the language combination and client of the opened task.</target>
 </trans-unit>
 <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
   <source>Ressource: {name}</source>
@@ -2822,10 +2829,6 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
 <target>Client already assigned to resource {0} as default for {1} to {2} - Remove assignment and assign to current resource?</target>
 </trans-unit>
-<trans-unit id='S3VuZGVu'>
-<source>Kunden</source>
-<target>Clients</target>
-</trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
 <target>Default client</target>
@@ -2907,6 +2910,112 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Für diese Kunden nutzen</source>
     <target>Use for selected clients</target>
 </trans-unit>
+
+<trans-unit id='RmFjaGdlYmlldA=='>
+    <source>Fachgebiet</source>
+    <target>Subject field</target>
+</trans-unit>
+
+<trans-unit id='VmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Verwandtes Konzept</source>
+    <target>Related concept</target>
+</trans-unit>
+
+<trans-unit id='RXJ3ZWl0ZXJ0ZXMgdmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Erweitertes verwandtes Konzept</source>
+    <target>Related broader concept</target>
+</trans-unit>
+
+<trans-unit id='UHJvZHVrdC1VbnRlcm1lbmdl'>
+    <source>Produkt-Untermenge</source>
+    <target>Product subset</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlbmlkZW50aWZpa2F0b3I='>
+    <source>Quellenidentifikator</source>
+    <target>Source identifier</target>
+</trans-unit>
+
+<trans-unit id='V29ydGFydA=='>
+    <source>Wortart</source>
+    <target>Part of speech</target>
+</trans-unit>
+
+<trans-unit id='S29udGV4dA=='>
+    <source>Kontext</source>
+    <target>Context</target>
+</trans-unit>
+
+<trans-unit id='VGVpbGJlcmVpY2ggZGVyIEdlc2Now6RmdHNlaW5oZWl0'>
+    <source>Teilbereich der Geschäftseinheit</source>
+    <target>Business unit subset</target>
+</trans-unit>
+
+<trans-unit id='UHJvamVrdHVudGVybWVuZ2U='>
+    <source>Projektuntermenge</source>
+    <target>Project subset</target>
+</trans-unit>
+
+<trans-unit id='R3JhbW1hdGlrYWxpc2NoZXMgR2VzY2hsZWNodA=='>
+    <source>Grammatikalisches Geschlecht</source>
+    <target>Grammatical gender</target>
+</trans-unit>
+
+<trans-unit id='QW5tZXJrdW5n'>
+    <source>Anmerkung</source>
+    <target>Note</target>
+</trans-unit>
+
+<trans-unit id='QWRtaW5pc3RyYXRpdmVyIFN0YXR1cw=='>
+    <source>Administrativer Status</source>
+    <target>Administrative status</target>
+</trans-unit>
+
+<trans-unit id='w5xiZXJ0cmFndW5nc2tvbW1lbnRhcg=='>
+    <source>Übertragungskommentar</source>
+    <target>Transfer comment</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='>
+    <source>Quelle des Eintrags</source>
+    <target>Entry source</target>
+</trans-unit>
+
+<trans-unit id='U29sbHRlIGRlciBUYXNrIGdlbMO2c2NodCBvZGVyIG1pdCBkZW4gYWt0dWVsbGVuIEVpbnN0ZWxsdW5nZW4gaW1wb3J0aWVydCB3ZXJkZW4/'>
+    <source>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</source>
+    <target>Should the task be deleted or imported with the current settings?</target>
+</trans-unit>
+
+<trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='>
+    <source>Aufgabe löschen</source>
+    <target>Delete task</target>
+</trans-unit>
+
+<trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
+    <source>Ressource: {name}</source>
+    <target>Ressource: {name}</target>
+</trans-unit>
+
+<trans-unit id='QXVmZ2FiZSBpbXBvcnRpZXJlbg=='>
+    <source>Aufgabe importieren</source>
+    <target>Import task</target>
+</trans-unit>
+
+<trans-unit id='VW50ZXJzY2hpZWQgenUgUXVlbGxzZWdtZW50'>
+    <source>Unterschied zu Quellsegment</source>
+    <target>Diff to source</target>
+</trans-unit>
+
+<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
+    <source>Diese Ressource wird entfernt</source>
+    <target>This resource is removed</target>
+</trans-unit>
+
+<trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='>
+    <source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source>
+    <target>Only replace repetition automatically / propose replacement of repetition, if target is empty</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>

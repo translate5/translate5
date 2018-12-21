@@ -71,13 +71,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         preTranslation:'#UT#Analyse &amp; Vorübersetzungen starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
+        finishAnalysisMsg:'#UT#Die Match-Analyse und die Vorübersetzung sind abgeschlossen.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
         pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
         pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist',
         pretranslateTmAndTerm:'#UT#Vorübersetzen (TM &amp; Terme)',
         pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
         pretranslateMt:'#UT#Vorübersetzen (MT)',
-        pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt'
+        pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
+        termtaggerSegment:'#UT#Terminologie prüfen und markieren',
+        analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
     listen:{
@@ -95,13 +98,14 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             	startMatchAnalysis:'onStartMatchAnalysis'
             },
             'taskActionColumn': {
-                added: 'addTaskOverviewActionIcon'
+                itemsinitialized: 'onTaskActionColumnItemsInitialized'
             }
         },
         controller:{
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
-        		taskUnhandledAction: 'onTaskActionColumnNoHandler'
+                taskUnhandledAction: 'onTaskActionColumnNoHandler',
+                taskStateCheckPullCleaned:'onTaskStateCheckPullCleaned'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -113,16 +117,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             }
         }
     },
-    
+
     /**
-     * Add the pie icon to the task overview action column
-     * @var {Editor.view.admin.TaskActionColumn} column
+     * Task action column items initialized event handler.
      */
-    addTaskOverviewActionIcon: function(column) {
-        column.items.push({
+    onTaskActionColumnItemsInitialized: function(items) {
+        items.push({
             tooltip:this.strings.taskGridIconTooltip,
             iconCls: 'ico-task-analysis',
-            isAllowedFor: 'editorAnalysisTask'      
+            isAllowedFor: 'editorAnalysisTask'   ,
+            sortIndex:8,   
         });
     },
     /**
@@ -156,7 +160,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
            task:prefWindow.actualTask
         });
     },
-    
+
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
     		win=panel.up('window'),
@@ -264,6 +268,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                     'data-qtip': me.strings.pretranslateMtTooltip
                 },
                 itemId:'pretranslateMt',
+            },{
+                xtype:'checkbox',
+                bind:{
+                    disabled:'{!hasTermcollection}'
+                },
+                value: 1,
+                boxLabel:me.strings.termtaggerSegment,
+                autoEl: {
+                    tag: 'div',
+                    'data-qtip': me.strings.termtaggerSegment
+                },
+                itemId:'termtaggerSegment',
             }]
         }]);
     },
@@ -301,9 +317,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Load match resources task assoc store
      */
     loadTaskAssoc:function(task){
-        var me=this,
-	        taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
-	    
+        var taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
 	    //load the task assoc store
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);
     },
@@ -339,40 +353,29 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     startAnalysis:function(taskId,operation){
     	//'editor/:entity/:id/operation/:operation',
         var me=this;
-        			
-        me.reloadTaskRecord(taskId);
         
-    	Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
-    	Ext.Ajax.request({
+        me.addLoadingMask();
+        Ext.Ajax.request({
             url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
             method: "PUT",
             params: {
-            	internalFuzzy: me.getComponentByItemId('cbInternalFuzzy').getValue() ? 1 : 0,
+            	internalFuzzy: me.isChecboxChecked('cbInternalFuzzy'),
                 pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
-                pretranslateTmAndTerm: me.getComponentByItemId('pretranslateTmAndTerm').getValue() ? 1 : 0,
-                pretranslateMt: me.getComponentByItemId('pretranslateMt').getValue() ? 1 : 0
+                pretranslateTmAndTerm: me.isChecboxChecked('pretranslateTmAndTerm'),
+                pretranslateMt: me.isChecboxChecked('pretranslateMt'),
+                termtaggerSegment: me.isChecboxChecked('termtaggerSegment'),
+                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
             },
             scope: this,
             timeout:600000,
             success: function(response){
-            	me.reloadTaskRecord(taskId);
+                me.checkTaskState(taskId);
             }, 
             failure: function(response){
+                me.removeLoadingMask();
             	Editor.app.getController('ServerException').handleException(response);
-            	me.reloadTaskRecord(taskId);
             }
         })
-    },
-    
-    /***
-     * Reload task record
-     */
-    reloadTaskRecord:function(taskId){
-    	var me=this,
-    		taskOverview = me.application.getController('admin.TaskOverview'),
-    		taskStore=taskOverview.getAdminTasksStore();
-		//TODO reload only one row
-    	taskStore.reload();
     },
 
     /***
@@ -403,8 +406,85 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     getComponentByItemId:function(itemId){
     	var cmp=Ext.ComponentQuery.query('#'+itemId);
     	if(cmp.length<1){
-    		return;
+    		return null;
     	}
     	return cmp[0];
+    },
+
+    /***
+     * Check if the checbox component is checked
+     */
+    isChecboxChecked:function(itemId){
+        var component=this.getComponentByItemId(itemId);
+        if(!component || component.isDisabled()){
+            return 0;
+        }
+        return component.checked ? 1 : 0;
+    },
+
+    /***
+     * Add tast state check conditional function, so the task reload condition depends also from the matchanalysis state
+     */
+    checkTaskState:function(taskId){
+        //the task needs to be updated, so the last state is fetched from the db
+        Ext.StoreManager.get('admin.Tasks').getById(taskId).load({
+            success:function(){
+                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
+                //add match analysis state checker function to the task state checker loop
+                controller.addTaskStateCheckPull(function(rec){
+                    return rec.get('state')=='matchanalysis';
+                });
+                controller.startCheckImportStates();
+            }
+        });
+    },
+
+    /***
+     * Tash state check cleand event handler. This event is fired from Task overview controller.
+     */
+    onTaskStateCheckPullCleaned:function(){
+        this.removeLoadingMask(true);
+    },
+
+    /***
+     * Add loadin mask in match analysis panel and in the task assoc panel
+     */
+    addLoadingMask:function(){
+        var me=this,
+            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
+            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
+        
+        if(assocPanel && assocPanel.getEl()){
+            assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        }
+
+        if(matchAnalysisPanel && matchAnalysisPanel.getEl()){
+            matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        }
+    },
+
+    /***
+     * Remove loading mask from task assoc panel and match analysis panel.
+     * If the reloadStore is set, the analysis panel will be reloaded
+     */
+    removeLoadingMask:function(reloadStore){
+        var me=this,
+            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel'),
+            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel'),
+            matchAnalysisGrid=me.getComponentByItemId('matchAnalysisGrid');
+        
+        if(!assocPanel){
+            return;
+        }
+        assocPanel.unmask();;
+
+        if(!matchAnalysisPanel){
+            return;
+        }
+        if(reloadStore){
+            matchAnalysisGrid.getStore().reload();
+        }
+        matchAnalysisPanel.getEl().unmask(me.strings.analysisLoadingMsg);
     }
+
 });

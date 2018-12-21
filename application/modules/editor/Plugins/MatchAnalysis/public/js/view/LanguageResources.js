@@ -91,7 +91,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     },
     
     disableCancelButton:function(){
-        return true;
+        return false;
     }
     
 });

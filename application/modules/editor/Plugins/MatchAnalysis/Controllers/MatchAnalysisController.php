@@ -105,6 +105,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
         //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
         $excel->setLabel('resourceName', $translate->_("Name"));
+        $excel->setLabel('104Group', $translate->_("Term-Collection match (104%)"));
         $excel->setLabel('103Group', $translate->_("Context match (103%)"));
         $excel->setLabel('102Group', $translate->_("Wiederholung (102%)"));
         $excel->setLabel('101Group', $translate->_("Exact-exact match (101%)"));
@@ -137,6 +138,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $sheet->setCellValue("J".$rowIndex, "=SUM(J2:J".($rowIndex-1).")");
         $sheet->setCellValue("K".$rowIndex, "=SUM(K2:K".($rowIndex-1).")");
         $sheet->setCellValue("L".$rowIndex, "=SUM(L2:L".($rowIndex-1).")");
+        $sheet->setCellValue("M".$rowIndex, "=SUM(M2:M".($rowIndex-1).")");
         
         //set the cell autosize
         $excel->simpleArrayToExcel($rows,function($phpExcel){
