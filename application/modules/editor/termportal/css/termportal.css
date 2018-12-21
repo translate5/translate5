@@ -67,6 +67,12 @@ END LICENSE AND COPYRIGHT
     order: 4;
     text-align: right;
 }
+#logout a {
+    color: #fff;
+}
+#logout a:hover {
+    color: #000;
+}
 
 @media (max-width: 500px) {
     #logo {
