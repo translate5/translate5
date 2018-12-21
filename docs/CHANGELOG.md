@@ -3,7 +3,11 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-
+## [3.0.1] - 2018-12-21
+###Bugfixes
+TRANSLATE-1412: TermPortal logout URL is wrong
+TRANSLATE-1504: TermTagging does not work with certain terms
+Fixing several smaller problems
 
 ## [3.0.0] - 2018-12-20
 ### PHP Installation
