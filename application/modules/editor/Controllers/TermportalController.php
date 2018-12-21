@@ -141,6 +141,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             'preferred' => $this->translate->_('Vorzugsbenennung'),
             'unknown' => $this->translate->_('Unbekannter Term Status'),
         ]);
+        $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$config->runtimeOptions->loginUrl);
         
         //translated strings for some of the result tables
         $translatedStrings=array(

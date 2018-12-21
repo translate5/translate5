@@ -67,7 +67,7 @@ class editor_Services_SDLLanguageCloud_HttpApi {
     public function __construct() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->server;
+        $urls = $config->runtimeOptions->LanguageResources->sdllanguagecloud->server;
         $urls=$urls->toArray();
         if(empty($urls) || empty($urls[0])){
             $exc= new Zend_Exception("Api url is not defined in the zf configuration");
@@ -75,7 +75,7 @@ class editor_Services_SDLLanguageCloud_HttpApi {
         }
         
         $this->apiUrl=$urls[0];
-        $apiKey = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->apiKey;
+        $apiKey = $config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey;
         
         if(empty($apiKey)){
             $exc= new Zend_Exception("Api key is not defined in the zf configuration");

@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.LanguageResources.sdllnaguagecloud.server', '1', 'editor', 'editor', '', '', '', 'list', 'List of available SdlLanguageCloud server');
+UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.LanguageResources.sdllanguagecloud.server' WHERE `name` = 'runtimeOptions.LanguageResources.sdllnaguagecloud.server';
+UPDATE `Zf_configuration` SET `name` = 'runtimeOptions.LanguageResources.sdllanguagecloud.apiKey' WHERE `name` = 'runtimeOptions.LanguageResources.sdllnaguagecloud.apiKey';
 
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.LanguageResources.sdllnaguagecloud.apiKey', '1', 'editor', 'editor', '', '', '', 'string', 'Api key used for authentication to sdl language cloud api');
+UPDATE `Zf_configuration` SET `value` = '' WHERE `name` = 'runtimeOptions.LanguageResources.sdllanguagecloud.apiKey' and `value` like '8wFVYOBiA1Y%';
 
