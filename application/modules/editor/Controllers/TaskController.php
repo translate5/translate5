@@ -324,7 +324,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerIds = array_map(function($item){
             return $item['customerId'];
         },$rows);
-        
+
+        if(empty($customerIds)){
+            return [];
+        }
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds($customerIds);
