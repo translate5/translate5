@@ -321,13 +321,18 @@ class editor_TaskController extends ZfExtended_RestController {
      * @return array
      */
     protected function getCustomersForRendering(array $rows) {
+        if(empty($rows)){
+           return [];
+        }
+        
         $customerIds = array_map(function($item){
             return $item['customerId'];
         },$rows);
 
         if(empty($customerIds)){
-            return [];
+            throw new ZfExtended_BadMethodCallException("No customers are found in the task list. The list of was: ".error_log(print_r($rows,1)));
         }
+        
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds($customerIds);
