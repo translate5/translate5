@@ -121,7 +121,8 @@
     $languageSelector[]='</form>';
     echo implode(' ', $languageSelector);
 ?>
-    <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
+    <div id="logout"><a href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
+    
 </div>
 
 <div id="containerTranslation" class="container">
@@ -186,6 +187,15 @@
 
 <script type="text/javascript">
 $( function() {
+    $('#logout a').mouseover(function(){
+        $(this).removeClass("ui-state-active");
+    });
+    $('#logout a').mouseout(function(){
+            $(this).addClass("ui-state-active");
+        });
+    $('#logout').on("click",function(){
+        window.location = Editor.data.loginUrl;
+    });
     $('#locale').selectmenu({
         change: function() {
             var action = $(this).val();
