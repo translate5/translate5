@@ -171,16 +171,13 @@ Ext.define('Editor.view.admin.TaskGrid', {
    * @param {String} val
    * @returns {String}
    */
-  customerRenderer: function(val, md) {
-      var me = this,
-          customer = me.customerStore.getById(val), 
-          label;
+  customerRenderer: function(val, md, record) {
+      var customer = record.get('customerName');
       if(customer){
-          label = customer.get('name');
-          md.tdAttr = 'data-qtip="' + label + ' (id: ' + val + ')"';
-          return label;
+          md.tdAttr = 'data-qtip="' + customer + ' (id: ' + val + ')"';
+          return customer;
       }
-      return me.strings.notFound;
+      return this.strings.notFound;
   },
 
   initComponent: function() {
