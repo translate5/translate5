@@ -143,11 +143,11 @@ class editor_Plugins_TermTagger_RecalcTransFound {
     /**
      * insert the css-class transFound or transNotFound into css-class of the term-div tag with the corresponding mid
      * @param string $seg
-     * @param string $mid
+     * @param $mid
      * @param $groupId
      * @return string
      */
-    protected function insertTransFoundInSegmentClass(string $seg,string $mid, $groupId) {
+    protected function insertTransFoundInSegmentClass(string $seg,$mid, $groupId) {
         settype($this->groupCounter[$groupId], 'integer');
         $transFound =& $this->groupCounter[$groupId];
         $presentInTbxTarget = empty($this->notPresentInTbxTarget[$groupId]);

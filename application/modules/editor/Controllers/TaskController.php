@@ -211,6 +211,8 @@ class editor_TaskController extends ZfExtended_RestController {
             array_push($taskassocs[$res['taskGuid']], $res);
         }
         
+        $customerData = $this->getCustomersForRendering($rows);
+        
         foreach ($rows as &$row) {
             $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
@@ -220,6 +222,8 @@ class editor_TaskController extends ZfExtended_RestController {
                 $row['qmSubEnabled'] = true;
             }
             unset($row['qmSubsegmentFlags']);
+            
+            $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             
             $this->addUserInfos($row, $row['taskGuid'], $userAssocInfos, $allAssocInfos);
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
@@ -311,6 +315,30 @@ class editor_TaskController extends ZfExtended_RestController {
         return $userinfo['firstName'].' '.$userinfo['surName'].' ('.$userinfo['login'].')';
     }
 
+    /**
+     * Returns a mapping of customerIds and Names to the given rows of tasks
+     * @param array $rows
+     * @return array
+     */
+    protected function getCustomersForRendering(array $rows) {
+        if(empty($rows)){
+           return [];
+        }
+        
+        $customerIds = array_map(function($item){
+            return $item['customerId'];
+        },$rows);
+
+        if(empty($customerIds)){
+            throw new ZfExtended_BadMethodCallException("No customers are found in the task list. The list of was: ".error_log(print_r($rows,1)));
+        }
+        
+        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $customerData = $customer->loadByIds($customerIds);
+        return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
+    }
+    
     /**
      * creates a task and starts import of the uploaded task files 
      * (non-PHPdoc)

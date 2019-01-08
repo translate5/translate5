@@ -56,6 +56,17 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     
+    /**
+     * Loads customers by a given list of ids
+     * @param array $ids
+     * @return array
+     */
+    public function loadByIds(array $ids){
+        $s=$this->db->select()
+        ->where('id IN (?)',$ids);
+        return $this->loadFilterdCustom($s);
+    }
+    
     /***
      * Find customer by number
      * 

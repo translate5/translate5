@@ -61,6 +61,12 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
     
+    /***
+     * Match analysis groups and calculation borders
+     * 
+     * 104%, 103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
+     */ 
+    protected $groupBorder=['103'=>'104','102'=>'103','101'=>'102','100'=>'101','99'=>'100','89'=>'99','79'=>'89','69'=>'79','59'=>'69','50'=>'59','noMatch'=>'noMatch'];
     
     /***
      * Load the result by best match rate. The results will be grouped in the followed groups:
@@ -128,9 +134,6 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      */
     protected function groupByMatchrate(array $results,array $analysisAssoc){
 
-        //104%, 103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
-        $groupBorder=['103'=>'104','102'=>'103','101'=>'102','100'=>'101','99'=>'100','89'=>'99','79'=>'89','69'=>'79','59'=>'69','50'=>'59','noMatch'=>'noMatch'];
-        
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         //init the language reources group array
@@ -145,7 +148,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             $resultFound=false;
             
             //check on which border group this result belongs to
-            foreach ($groupBorder as $border=>$value){
+            foreach ($this->groupBorder as $border=>$value){
                 
                 //check if the language resource is not initialized by group initializer
                 if(!isset($groupedResults[$rowKey]) && $res['languageResourceid']>0){
@@ -202,6 +205,13 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
             //if the resource is internal fuzzy, change the name
             $row[$key]['resourceName']=$name;
             $row[$key]['resourceColor']=$color;
+            
+            //init the result borders
+            foreach ($this->groupBorder as $border=>$value){
+                if(!isset($row[$key][$value])){
+                    $row[$key][$value]=0;
+                }
+            }
             return $row;
         };
         

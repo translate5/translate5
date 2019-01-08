@@ -1778,6 +1778,51 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <target>This resource is removed</target>
 </trans-unit>
 
+<trans-unit id='VHJlZmZlcmFuYWx5c2U='>
+    <source>Trefferanalyse</source>
+    <target>Trefferanalyse</target>
+</trans-unit>
+
+<trans-unit id='VGVybUNvbGxlY3Rpb24gVHJlZmZlciAoMTA0JSk='>
+    <source>TermCollection Treffer (104%)</source>
+    <target>TermCollection Treffer (104%)</target>
+</trans-unit>
+
+<trans-unit id='S29udGV4dCBUcmVmZmVyICgxMDMlKQ=='>
+    <source>Kontext Treffer (103%)</source>
+    <target>Kontext Treffer (103%)</target>
+</trans-unit>
+
+<trans-unit id='V2llZGVyaG9sdW5nICgxMDIlKQ=='>
+    <source>Wiederholung (102%)</source>
+    <target>Wiederholung (102%)</target>
+</trans-unit>
+
+<trans-unit id='RXhhY3QtZXhhY3QgVHJlZmZlciAoMTAxJSk='>
+    <source>Exact-exact Treffer (101%)</source>
+    <target>Exact-exact Treffer (101%)</target>
+</trans-unit>
+
+<trans-unit id='U3VtbWUgV8O2cnRlcg=='>
+    <source>Summe Wörter</source>
+    <target>Summe Wörter</target>
+</trans-unit>
+
+<trans-unit id='VHJlZmZlciBSYXRl'>
+    <source>Treffer Rate</source>
+    <target>Treffer Rate</target>
+</trans-unit>
+
+<trans-unit id='SW50ZXJuZXIgRnV6enkgYWt0aXY='>
+    <source>Interner Fuzzy aktiv</source>
+    <target>Interner Fuzzy aktiv</target>
+</trans-unit>
+
+<trans-unit id='RXJzdGVsbHVuZ3NkYXR1bQ=='>
+    <source>Erstellungsdatum</source>
+    <target>Erstellungsdatum</target>
+</trans-unit>
+
   </body>
  </file>
 </xliff>
