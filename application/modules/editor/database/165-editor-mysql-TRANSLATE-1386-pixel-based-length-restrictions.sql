@@ -25,6 +25,22 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+CREATE TABLE `LEK_pixel_mapping` (
+  `mappingId` VARCHAR (127) NOT NULL COMMENT 'Unique md5-Key from customerId, font, fontsize, unicodeChar',
+  `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
+  `font` VARCHAR (255) NOT NULL,
+  `fontsize` int (3) NOT NULL,
+  `unicodeChar` VARCHAR (4) NOT NULL COMMENT '(numeric)',
+  `pixelWidth` int (4) NOT NULL,
+  PRIMARY KEY (`mappingId`),
+  UNIQUE KEY `mappingId` (`mappingId`),
+  CONSTRAINT `fk_LEK_pixel_mapping_1`
+    FOREIGN KEY (`customerId`)
+    REFERENCES `LEK_customer` (`id`) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 ALTER TABLE `LEK_segments_meta`
 ADD `sizeUnit` VARCHAR(8) NULL AFTER `maxWidth`,
 ADD `font` VARCHAR(256) NULL AFTER `sizeUnit`,
