@@ -49,6 +49,20 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public $fileNameCache=array();
     
     
+    /***
+     * Unupported unicode characters by opentm2 and there replace mapping
+     * @var array
+     */
+    protected $replaceMap=array(
+        '&#x1E;'=>'___tag___INFORMATION SEPARATOR TWO___tag___',
+        '&#x8;'=>'___tag___backspace___tag___',
+    );
+    
+    /**
+     * @var editor_Models_Import_FileParser_XmlParser
+     */
+    protected $xmlparser;
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
@@ -57,6 +71,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         parent::connectTo($languageResource, $sourceLang, $targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+        $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $parser editor_Models_Import_FileParser_XmlParser */
     }
     
     /**
@@ -111,8 +127,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return false;
         }
         
+        //replace the unsupported unicodes
+        $data=file_get_contents($fileinfo['tmp_name']);
+        $data=$this->replaceUnicodes($data);
+        
         //initial upload is a TM file
-        if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
+        if($this->api->createMemory($name, $sourceLang, $data)){
             $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
             return true;
         }
@@ -127,7 +147,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
-        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
+        $data=file_get_contents($fileinfo['tmp_name']);
+        $data=$this->replaceUnicodes($data);
+        if($this->api->importMemory($data)) {
             return true;
         }
         $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." LanguageResource: \n");
@@ -301,22 +323,37 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     protected function validateInternalTags($result, editor_Models_Segment $seg) {
         //just concat source and target to check both:
         if(preg_match('#<(it|ph)[^>]*>#', $result->source.$result->target)) {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $sub = 'OpenTM2 result contains <it> or <ph> tags! Segment not shown as match result!';
-            $msg = 'The <ph> or <it> tag could not be reconverted to a usable tag, so that match result was ignored! '."\n\n";
-            $msg .= 'OpenTM2 Result: '.print_r($result,1)."\n";
-            
-            //when using dummy segment in instant translate the segment does not exist (it is only model init)
-            if($seg->getId()!=null){
-                $msg .= 'Segment: '.print_r($seg->getDataObject(),1)."\n";
-            }
-            $msg .= 'LanguageResource: '.print_r($this->languageResource->getDataObject(),1)."\n";
-            $log->log($sub,$msg);
-            return false;
+            $result->source=$this->replaceItAndPhTags($result->source);
+            $result->target=$this->replaceItAndPhTags($result->target);
         }
         return true;
     }
+    
+    /***
+     * Replace it and ph tags with empty content
+     * @param string $content
+     * @param string $replace: the replace content of the chunk
+     * @return string
+     */
+    protected function replaceItAndPhTags($content,$replace=''){
+        //surround the content with tmp tags(used later as selectors)
+        $content='<opentm2result>'.$content.'</opentm2result>';
+        
+        
+        $this->xmlparser->registerElement('opentm2result > it,opentm2result > ph',null, function($tag, $key, $opener) use($replace){
+            $this->xmlparser->replaceChunk($opener['openerKey'],$replace,$opener['isSingle'] ? 1 : $key-$opener['openerKey']);
+        });
+        //parse the content
+        $content=$this->xmlparser->parse($content);
+        
+        //remove the helper tags
+        $content=strtr($content,array(
+            '<opentm2result>'=>'',
+            '</opentm2result>'=>''
+        ));
+        return $content;
+    }
+    
     
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
@@ -698,5 +735,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->resultList->resetResult();
         $this->resultList->setResults($result);
         return $this->resultList;
+    }
+    
+    /***
+     * Replace unsupported unicodes in the given text with there defined replacement
+     * @param string $data: tbx file content
+     * @return string
+     */
+    protected function replaceUnicodes($data){
+        return strtr($data,$this->replaceMap);
+        
     }
 }
