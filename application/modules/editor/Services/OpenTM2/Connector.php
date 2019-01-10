@@ -50,7 +50,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     
     
     /***
-     * Unupported unicode characters by opentm2 and there replace mapping
+     * Unsupported unicode characters by opentm2 and their replace mapping
      * @var array
      */
     protected $replaceMap=array(
