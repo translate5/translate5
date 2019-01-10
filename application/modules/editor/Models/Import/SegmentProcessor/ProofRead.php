@@ -112,6 +112,15 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
         if(!empty($attributes->minWidth) && !is_null($attributes->minWidth)) {
             $meta->setMinWidth($attributes->minWidth);
         }
+        if(!empty($attributes->sizeUnit) && !is_null($attributes->sizeUnit)) {
+            $meta->setSizeUnit($attributes->sizeUnit);
+        }
+        if(!empty($attributes->font) && !is_null($attributes->font)) {
+            $meta->setFont($attributes->font);
+        }
+        if(!empty($attributes->fontSize) && !is_null($attributes->fontSize)) {
+            $meta->setFontSize($attributes->fontSize);
+        }
         if(!empty($attributes->additionalMrkLength)) {
             $meta->setAdditionalMrkLength($attributes->additionalMrkLength);
         }

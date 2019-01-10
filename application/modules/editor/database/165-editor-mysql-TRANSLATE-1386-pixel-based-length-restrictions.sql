@@ -42,6 +42,6 @@ CREATE TABLE `LEK_pixel_mapping` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `LEK_segments_meta`
-ADD `sizeUnit` VARCHAR(8) NULL AFTER `maxWidth`,
-ADD `font` VARCHAR(256) NULL AFTER `sizeUnit`,
+ADD `sizeUnit` VARCHAR(6) NULL AFTER `maxWidth` COMMENT 'char or pixel',
+ADD `font` VARCHAR(255) NULL AFTER `sizeUnit` COMMENT 'font-family',
 ADD `fontSize` INT(3) NULL AFTER `font`;

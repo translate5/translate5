@@ -93,16 +93,36 @@ class editor_Models_Import_FileParser_SegmentAttributes {
     public $targetState; 
     
     /**
-     * Min Width of a segment, currently only characters (size-unit="char") supported
+     * Min Width of a segment (characters or pixel)
      * @var integer
      */
     public $minWidth = null;
     
     /**
-     * Max Width of a segment, currently only characters (size-unit="char") supported
+     * Max Width of a segment (characters or pixel)
      * @var integer
      */
     public $maxWidth = null;
+    
+    /**
+     * Size-unit of a segment (size-unit="char" or "pixel"; default if nothing is set: "pixel")
+     * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#size-unit
+     * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#maxwidth
+     * @var string
+     */
+    public $sizeUnit = null;
+    
+    /**
+     * Font-family for pixel-based length of a segment
+     * @var string
+     */
+    public $font = null;
+    
+    /**
+     * Font-size for pixel-based length of a segment
+     * @var integer
+     */
+    public $fontSize = null;
     
     /**
      * Additional string length in transunit before first mrk tag, to be added to the length calculation of the segment once

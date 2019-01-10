@@ -684,13 +684,34 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // also in each XLIFF there can be multiple file containers, which must be reflected in the transunitId too. 
         //  Easiest way: each transunit of the xlf file gets a counter   
         $segmentAttributes->transunitId = $this->_fileId.'_'.$this->transUnitCnt.'_'.$transunitId;
-        $sizeUnit = $this->xmlparser->getAttribute($attributes, 'size-unit');
-        if($sizeUnit == 'char') {
-            $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
-            $segmentAttributes->maxWidth = $this->xmlparser->getAttribute($attributes, 'maxwidth', null);
-        }
+        
+        $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
+        $segmentAttributes->maxWidth = $this->xmlparser->getAttribute($attributes, 'maxwidth', null);
+        
+        $segmentAttributes->sizeUnit = $this->getPixelMappingAttribute($attributes, 'sizeUnit');
+        $segmentAttributes->font     = $this->getPixelMappingAttribute($attributes, 'font');
+        $segmentAttributes->fontSize = $this->getPixelMappingAttribute($attributes, 'fontSize');
         
         return $segmentAttributes;
+    }
+    
+    /**
+     * PixelMapping-Attributes (sizeUnit, font, fontSize): If there is nothing set in the xlf-transUnit,
+     * then we check if something is set for the task in general.
+     * @param array $attributes transUnit attributes
+     * @param string $attrName
+     * @return string|null $attrValue
+     */
+    protected function getPixelMappingAttribute ($attributes, $attrName) {
+        $attrValue = $this->xmlparser->getAttribute($attributes, $attrName, null);
+        if (is_null($attrValue)) {
+            $taskConfig = Zend_Registry::get('taskTemplate');
+            if (isset($taskConfig->pixelmapping->$attrName)) {
+                // TODO: Gilt ein leerer Eintrag als gültiger Wert?
+                $attrValue = $taskConfig->pixelmapping->$attrName;
+            }
+        }
+        return $attrValue;
     }
     
     protected function calculateMatchRate(editor_Models_Import_FileParser_SegmentAttributes $attributes) {
