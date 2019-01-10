@@ -284,7 +284,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         
         $this->task = $task;
 
+        //the termcollection customer is the one in the task
+        if(empty($this->customerIds)){
+            $this->customerIds=[$this->task->getCustomerId()];
+        }
+        
         //create term collection for the task and customer
+        //the term collection will be created with autoCreateOnImport flag
         $termCollectionId=$this->createTermCollection($this->customerIds);
         
         //add termcollection to task assoc
@@ -295,7 +301,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
         $this->termCollectionId=$termCollectionId;
         
         //all tbx files in the same term collection
-        /* @var $importer editor_Models_Import_TermListParser_Tbx */
         foreach($tbxfiles as $file) {
             
             if(! $file->isReadable()){
