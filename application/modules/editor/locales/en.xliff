@@ -3061,6 +3061,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Creation date</target>
 </trans-unit>
 
+<trans-unit id='QXV0b8O8YmVyc2V0enQ='>
+  <source>Autoübersetzt</source>
+  <target>Auto-translated</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
