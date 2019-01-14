@@ -37,7 +37,15 @@ class editor_Services_SDLLanguageCloud_Service extends editor_Services_ServiceAb
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         $urls = $config->runtimeOptions->LanguageResources->sdllanguagecloud->server;
-        $this->addResourceForeachUrl('SDLLanguageCloud', $urls->toArray());
+        $urls=$urls->toArray();
+        if(empty($urls) || empty($urls[0])){
+            return;
+        }
+        $apiKey = $config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey;
+        if(empty($apiKey)){
+            return;
+        }
+        $this->addResourceForeachUrl('SDLLanguageCloud', $urls);
     }
     
     /**
