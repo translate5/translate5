@@ -50,6 +50,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       'Editor.view.segments.HtmlEditorLayout',
       'Editor.view.segments.StatusStrip'
   ],
+  mixins: ['Editor.util.SegmentEditorSnapshots'
+  ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
   
@@ -300,7 +302,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
-        range.setEndAfter(lastNode); 
+        range.setEndAfter(lastNode);
+        this.saveSnapshot(); // Keep a snapshot from the new content
         this.fireEvent('afterInsertMarkup', rangeForNode);
       }
   },
