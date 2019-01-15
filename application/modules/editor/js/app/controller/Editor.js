@@ -485,8 +485,12 @@ Ext.define('Editor.controller.Editor', {
      * Cleanup stuff in the editor view port
      */
     onCloseEditorViewport: function() {
-        this.clearKeyMaps();
-        this.taskConfirmation && this.taskConfirmation.destroy();
+        var me = this;
+        me.clearKeyMaps();
+        // removing the following handler has no effect, but it should be removed here!
+        //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
+        me.tooltip && me.tooltip.destroy();
+        me.taskConfirmation && me.taskConfirmation.destroy();
     },
     clearKeyMaps: function() {
         var me = this;
@@ -1014,6 +1018,10 @@ Ext.define('Editor.controller.Editor', {
         }
     },
     copySelectionWithInternalTags: function(event) {
+        if(!this.editorKeyMap) {
+            //if we are not in a task, we may not invoke. Easiest way: check for editorKeyMap 
+            return;
+        }
         // CTRL+C gets the selected text (including internal tags)
         var me = this,
             plug = me.getEditPlugin(),
