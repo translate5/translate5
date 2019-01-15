@@ -267,12 +267,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             return true;
         }
         
-        //check the okapi config
-        foreach ($attachOriginalFileAsReference as $fileconverter) {
-            $obj=get_object_vars($fileconverter);
-            if(isset($obj['okapi']) && !boolval($obj['okapi'])){
-                return false;
-            }
+        if(isset($attachOriginalFileAsReference['okapi']) && !boolval($attachOriginalFileAsReference['okapi'])){
+            return false;
         }
         
         return true;
