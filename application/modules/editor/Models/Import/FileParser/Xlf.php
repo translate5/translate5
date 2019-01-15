@@ -688,7 +688,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
         $segmentAttributes->maxWidth = $this->xmlparser->getAttribute($attributes, 'maxwidth', null);
         
-        $segmentAttributes->sizeUnit = $this->getPixelMappingAttribute($attributes, 'sizeUnit');
+        $segmentAttributes->sizeUnit = $this->getPixelMappingAttribute($attributes, 'size-unit');
         $segmentAttributes->font     = $this->getPixelMappingAttribute($attributes, 'font');
         $segmentAttributes->fontSize = $this->getPixelMappingAttribute($attributes, 'fontSize');
         
