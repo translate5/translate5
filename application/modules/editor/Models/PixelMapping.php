@@ -57,7 +57,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * (order of columns must not be changed; see Confluence!).
      * @param array $values
      */
-    public function importPixelMappingRow($values) {
+    public function insertPixelMappingRow($values) {
         $customerId = $values[1];
         $font = $values[2];
         $fontsize = $values[3];

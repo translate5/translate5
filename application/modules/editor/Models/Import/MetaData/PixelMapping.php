@@ -35,24 +35,36 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 /**
  * Encapsulates the import of the pixel-mapping
  */
-class editor_Models_Import_PixelMapping {
+class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import_MetaData_IMetaDataImporter {
     /**
      * @var string
      */
     const PIXEL_MAPPING_XLSX = 'pixel-mapping.xlsx';
     
     /**
+     * @var string
+     */
+    protected $importPath;
+    
+    /**
      * @var Spreadsheet
      */
     protected $spreadsheet = null;
     
+    /**
+     * (non-PHPdoc)
+     * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
+     */
+    public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta) {
+        $this->importPath = $meta->getImportPath();
+        $this->importFromSpreadsheet();
+    }
+    
      /**
      * import pixel-mapping.xls file
      * if exist update table LEK_pixel_mapping
-     * @param editor_Models_Import_Configuration $importConfig
      */
-    public function import(editor_Models_Import_Configuration $importConfig) {
-        $this->importConfig = $importConfig;
+    public function importFromSpreadsheet() {
         $this->loadSpreadsheet();
         $this->updateDb();
     }
@@ -61,7 +73,7 @@ class editor_Models_Import_PixelMapping {
      * load pixel-mapping-file as spreadsheet
      */
     protected function loadSpreadsheet() {
-        $pixelMappingFilename = $this->importConfig->importFolder.'/'.self::PIXEL_MAPPING_XLSX;
+        $pixelMappingFilename = $this->importPath.DIRECTORY_SEPARATOR.self::PIXEL_MAPPING_XLSX;
         if (file_exists($pixelMappingFilename)) {
             $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader("Xlsx");
             $reader->setReadDataOnly(true);
@@ -90,7 +102,7 @@ class editor_Models_Import_PixelMapping {
             for ($col = 1; $col <= $highestColumnIndex; ++$col) {
                 $values[$col] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
             }
-            $pixelMappingModel->importPixelMappingRow($values);
+            $pixelMappingModel->insertPixelMappingRow($values);
         }
     }
 }

@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Defines the default interface for MetaData Importers
  */
-interface editor_Models_Import_IMetaDataImporter {
+interface editor_Models_Import_MetaData_IMetaDataImporter {
     /**
      * calls the internal import mechanisim
      * @param editor_Models_Task $task

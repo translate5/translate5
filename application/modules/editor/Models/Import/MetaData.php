@@ -109,13 +109,14 @@ class editor_Models_Import_MetaData {
                 'task' => $task, 'metaImporter' => $this
         ));
         
-        //Meta Data import from Core Features, currently XML for MQM: 
-        $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_QmSubsegments'));
-        
-        // TODO: so auch den PixelMapping-Importer dazunehmen
+        //Meta Data import from Core Features, currently:
+        // - XML for MQM: 
+        $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_MetaData_QmSubsegments'));
+        // - PixelMapping:
+        $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_MetaData_PixelMapping'));
         
         foreach($this->importers as $importer) {
-            /* @var $import editor_Models_Import_IMetaDataImporter */
+            /* @var $import editor_Models_Import_MetaData_IMetaDataImporter */
             $importer->import($task, $this);
         }
     }
@@ -154,9 +155,9 @@ class editor_Models_Import_MetaData {
 
     /**
      * adds a given importer to the internal importer list for further standardized processing
-     * @param editor_Models_Import_IMetaDataImporter $importer
+     * @param editor_Models_Import_MetaData_IMetaDataImporter $importer
      */
-    public function addImporter(editor_Models_Import_IMetaDataImporter $importer) {
+    public function addImporter(editor_Models_Import_MetaData_IMetaDataImporter $importer) {
         $this->importers[] = $importer;
     }
 }

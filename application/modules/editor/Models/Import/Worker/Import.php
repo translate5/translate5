@@ -91,7 +91,6 @@ class editor_Models_Import_Worker_Import {
     public function import(editor_Models_Task $task, editor_Models_Import_Configuration $importConfig) {
         $this->task = $task;
         $this->importConfig = $importConfig;
-        $this->importPixelMappingXlsx();
         $this->importTaskTemplateXml();
         
         $importConfig->isValid($task->getTaskGuid());
@@ -180,15 +179,6 @@ class editor_Models_Import_Worker_Import {
         $mqmProc->handleErrors();
         
         $this->task->setReferenceFiles($this->filelist->hasReferenceFiles());
-    }
-    
-    /**
-     * import pixel-mapping
-     */
-    protected function importPixelMappingXlsx() {
-        $pixelMapping = ZfExtended_Factory::get('editor_Models_Import_PixelMapping');
-        /* @var $pixelMapping editor_Models_Import_PixelMapping */
-        $pixelMapping->import($this->importConfig);
     }
     
     /**
