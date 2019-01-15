@@ -31,5 +31,5 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Db_PixelMapping extends Zend_Db_Table_Abstract {
     protected $_name    = 'LEK_pixel_mapping';
-    public $_primary = 'mappingId';
+    public $_primary = 'id';
 }

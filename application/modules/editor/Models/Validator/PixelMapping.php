@@ -40,8 +40,8 @@ class editor_Models_Validator_PixelMapping extends ZfExtended_Models_Validator_A
     * Validators for PixelMapping entity
     */
     protected function defineValidators() {
-        // `mappingId` VARCHAR (127) NOT NULL COMMENT 'Unique md5-Key from customerId, font, fontsize, unicodeChar',
-        $this->addValidator('mappingId', 'stringLength', array('min' => 0, 'max' => 127));
+        // `id` int(11) AUTO_INCREMENT,
+        $this->addValidator('id', 'int');
         // `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
         $this->addValidator('customerId', 'int');
         // `font` VARCHAR (255) NOT NULL,

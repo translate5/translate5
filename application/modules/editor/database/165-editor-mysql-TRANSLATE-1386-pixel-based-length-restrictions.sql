@@ -26,14 +26,14 @@
 -- */
 
 CREATE TABLE `LEK_pixel_mapping` (
-  `mappingId` VARCHAR (127) NOT NULL COMMENT 'Unique md5-Key from customerId, font, fontsize, unicodeChar',
+  `id` int(11) AUTO_INCREMENT,
   `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
   `font` VARCHAR (255) NOT NULL,
   `fontsize` int (3) NOT NULL,
   `unicodeChar` VARCHAR (4) NOT NULL COMMENT '(numeric)',
   `pixelWidth` int (4) NOT NULL,
-  PRIMARY KEY (`mappingId`),
-  UNIQUE KEY `mappingId` (`mappingId`),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`customerId`,`font`,`fontsize`,`unicodeChar`),
   CONSTRAINT `fk_LEK_pixel_mapping_1`
     FOREIGN KEY (`customerId`)
     REFERENCES `LEK_customer` (`id`) 
@@ -42,6 +42,8 @@ CREATE TABLE `LEK_pixel_mapping` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `LEK_segments_meta`
-ADD `sizeUnit` VARCHAR(6) NULL AFTER `maxWidth` COMMENT 'char or pixel',
-ADD `font` VARCHAR(255) NULL AFTER `sizeUnit` COMMENT 'font-family',
-ADD `fontSize` INT(3) NULL AFTER `font`;
+ADD `sizeUnit` VARCHAR(6) NOT NULL DEFAULT '' COMMENT 'char or pixel' AFTER `maxWidth`,
+ADD `font` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'font-family' AFTER `sizeUnit`,
+ADD `fontSize` INT(3) NOT NULL DEFAULT 0 AFTER `font`;
+
+-- TODO: migrations-skript, damit für alle und immer meta-Daten vorliegen

@@ -63,11 +63,9 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         $fontsize = $values[3];
         $unicodeChar = $values[4];
         $pixelWidth = $values[5];
-        $mappingId = md5($customerId . $font . $fontsize . $unicodeChar); // create unique key for each item
-        $sql= 'INSERT INTO LEK_pixel_mapping (`mappingId`,`customerId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
-                                VALUES (\''.$mappingId.'\', '.$customerId.', \''.$font.'\', '.$fontsize.', \''.$unicodeChar.'\', '.$pixelWidth.')
+        $sql= 'INSERT INTO LEK_pixel_mapping (`customerId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
+                                VALUES ('.$customerId.', \''. $font .'\', '.$fontsize.', \''.$unicodeChar.'\', '.$pixelWidth.')
                                 ON DUPLICATE KEY UPDATE
-                                    `mappingId` = \''. $mappingId .'\',
                                     `customerId` = '. $customerId .',
                                     `font` = \''. $font .'\',
                                     `fontsize` = '. $fontsize .',
@@ -80,5 +78,14 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         catch(Zend_Db_Statement_Exception $e) {
             throw new ZfExtended_Exception('Pixel-Mapping: Import failed.');
         }
+    }
+    
+    /**
+     * Returns the pixelWidth-data according to customer, font(-family) and fontSize.
+     * [unicodeChar] => length
+     * @return array
+     */
+    public function getPixelWidthData($customerId, $font, $fontSize) {
+        // AT WORK
     }
 }
