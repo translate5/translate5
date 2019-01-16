@@ -140,9 +140,9 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           $taskGuid = $this->segment->getTaskGuid();
           $font = $meta['font'];
           $fontSize = intval($meta['fontSize']);
-          $isPixelMapping = true;
+          $isPixelBased = true;
       } else {
-          $isPixelMapping= false;
+          $isPixelBased = false;
       }
       
       $length = 0;
@@ -153,7 +153,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           }
           if($id == $this->segment->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
-              if($isPixelMapping) {
+              if($isPixelBased) {
                   $length += $pixelMapping->pixelLength($value, $taskGuid, $font, $fontSize);
               } else {
                   $length += (int)$this->segment->textLength($value);
@@ -165,7 +165,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           }
       }
       
-      $messageSizeUnit = ($isPixelMapping) ? 'px' : '';
+      $messageSizeUnit = ($isPixelBased) ? 'px' : '';
       if(array_key_exists('minWidth', $meta) && $length < $meta['minWidth']) {
           $this->addMessage($field, 'segmentToShort', 'Transunit length is '.$length.$messageSizeUnit.' minWidth is '.$meta['minWidth'].$messageSizeUnit);
           return false;
