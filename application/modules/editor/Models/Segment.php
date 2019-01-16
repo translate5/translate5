@@ -472,6 +472,12 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_XHTML);
     }
     
+    public function prepareForPixelBasedLengthCount($text) {
+        $text = $this->trackChangesTagHelper->removeTrackChanges($text);
+        $text = $this->restoreWhiteSpace($text);
+        return $text;
+    }
+    
     /**
      * Restore whitespace to original real characters.
      * @param string $segmentContent
@@ -484,25 +490,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $segmentContent = html_entity_decode(strip_tags($segmentContent), ENT_QUOTES | ENT_XHTML);
         return $segmentContent;
     }
-    
-    /**
-     * Returns an array with the single characters of the given segment's content
-     * (including the original whitespace).
-     * @param string $string
-     * @return string
-     */
-    public function segmentContentAsCharacters (string $segmentContent) {
-        $string = $this->restoreWhiteSpace($segmentContent);
-        // Break-up a multibyte string into its individual characters.
-        // http://php.net/manual/en/function.mb-split.php#80046
-        $strlen = mb_strlen($string);
-        while ($strlen) {
-            $array[] = mb_substr($string,0,1,"UTF-8");
-            $string = mb_substr($string,1,$strlen,"UTF-8");
-            $strlen = mb_strlen($string);
-        }
-        return $array;
-    } 
     
     /**
      * strips all tags including tag description

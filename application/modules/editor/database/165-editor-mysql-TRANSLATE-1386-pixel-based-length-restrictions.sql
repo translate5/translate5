@@ -31,7 +31,7 @@ CREATE TABLE `LEK_pixel_mapping` (
   `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
   `font` VARCHAR (255) NOT NULL,
   `fontsize` int (3) NOT NULL,
-  `unicodeChar` VARCHAR (4) NOT NULL COMMENT '(numeric)',
+  `unicodeChar` VARCHAR (7) NOT NULL COMMENT '(numeric)',
   `pixelWidth` int (4) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY (`customerId`,`font`,`fontsize`,`unicodeChar`),
