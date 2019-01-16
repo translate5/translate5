@@ -35,8 +35,8 @@
  */
 
 /**
- * @method string getMappingId() getMappingId()
- * @method void setMappingId() setMappingId(string $mappingId)
+ * @method string getId() getId()
+ * @method void setId() setId(integer $id)
  * @method integer getCustomerId() getCustomerId()
  * @method void setCustomerId() setCustomerId(integer $customerId)
  * @method string getFont() getFont()
@@ -51,6 +51,32 @@
 class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_PixelMapping';
     protected $validatorInstanceClass   = 'editor_Models_Validator_PixelMapping';
+    
+    /**
+     * In xlf, the default size-unit of a trans-unit is 'pixel' if size-unit is not set.
+     * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#size-unit
+     * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#maxwidth
+     * @var string
+     */
+    const SIZE_UNIT_XLF_DEFAULT = 'pixel';
+    
+    /**
+     * Size-unit used for pixel-mapping.
+     * @var string
+     */
+    const SIZE_UNIT_FOR_PIXELMAPPING = 'pixel';
+    
+    /**
+     * Default pixel-width in general from ZfConfig
+     * @var integer
+     */
+    protected $defaultPixelWidthGeneral;
+    
+    /**
+     * Default pixel-widths for font_sizes from ZfConfig
+     * @var array
+     */
+    protected $defaultPixelWidths;
     
     /**
      * insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx
@@ -81,11 +107,143 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Returns the pixelWidth-data according to customer, font(-family) and fontSize.
+     * Return the default pixel-width as set in the Zf-config.
+     * @param int $fontSize
+     */
+    protected function getDefaultPixelWidth($fontSize) {
+        if (!isset($this->defaultPixelWidthGeneral) || !isset($this->defaultPixelWidths)) {
+            $config = Zend_Registry::get('config');
+            $this->defaultPixelWidthGeneral = $config->runtimeOptions->pixelMapping->defaultPixelWidthGeneral;
+            $this->defaultPixelWidths = $config->runtimeOptions->pixelMapping->defaultPixelWidths->toArray();
+        }
+        if (array_key_exists($fontSize, $this->defaultPixelWidths)) {
+            return $this->defaultPixelWidths[$fontSize];
+        }
+        if (!empty($this->defaultPixelWidthGeneral)) {
+            return $this->defaultPixelWidthGeneral;
+            
+        }
+        throw new ZfExtended_NotFoundException('pixelMapping cannot continue due to missing default-values for pixel-width.');
+    }
+    
+    /**
+     * Returns the pixelMapping-data from the database by customer, font-family and fontSize.
      * [unicodeChar] => length
+     * @param int $customerId
+     * @param string $fontFamily
+     * @param int $fontSize
      * @return array
      */
-    public function getPixelWidthData($customerId, $font, $fontSize) {
-        // AT WORK
+    protected function getPixelMappingByFont(int $customerId, string $fontFamily, int $fontSize) {
+        $pixelMappingForFont = array();
+        $sql = $this->db->select()
+        ->from($this->db, array('unicodeChar','pixelWidth'))
+        ->where('customerId = ?', $customerId)
+        ->where('font LIKE ?', $fontFamily)
+        ->where('fontSize = ?', $fontSize);
+        $allPixelMappingRows = $this->db->fetchAll($sql);
+        foreach ($allPixelMappingRows->toArray() as $row) {
+            $pixelMappingForFont[$row['unicodeChar']] = $row['pixelWidth'];
+        }
+        return $pixelMappingForFont;
+    }
+    
+    /**
+     * Return all pixelMapping-data as set for the customer for all fonts used in a task.
+     * @param int $customerId
+     * @param array $allFontsInTask
+     * @return array
+     */
+    public function getPixelMappingForTask(int $customerId, array $allFontsInTask) {
+        $pixelMapping = array();
+        foreach ($allFontsInTask as $font) {
+            $fontFamily = $font['font'];
+            $fontSize = $font['fontSize'];
+            $pixelMapping[$fontFamily][$fontSize] = $this->getPixelMappingByFont($customerId, $fontFamily, intval($fontSize));
+        }
+        return $pixelMapping;
+        /*
+         Array
+         (
+         [Arial] => Array
+         (
+         [12] => Array
+         (
+         [6CA] => 10
+         [6CD] => 9
+         )
+         
+         )
+         
+         )
+         
+         
+         */
+    }
+    
+    /**
+     * Return the pixelMapping for a specific segment as already loaded for the task
+     * (= the item from the array with all fonts for the task that matches the segment's
+     * font-family and font-size; don't start db-selects again!).
+     * @param string $taskGuid
+     * @param string $fontFamily
+     * @param int $fontSize
+     * @return array
+     */
+    protected function getPixelMappingForSegment(string $taskGuid, string $fontFamily, int $fontSize) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $taskData = $task->getDataObject();
+        $pixelMapping = $taskData->pixelMapping;
+        return isset($pixelMapping[$fontFamily][$fontSize]) ? $pixelMapping[$fontFamily][$fontSize] : [];
+        /*
+         Array
+         (
+         [6CA] => 10
+         [6CD] => 9
+         )
+         */
+    }
+    
+    /**
+     * What's the length of a segment's content according to the pixelMapping?
+     * @param string $segmentContent
+     * @param string $taskGuid
+     * @param string $fontFamily
+     * @param int $fontSize
+     * @return integer
+     */
+    public function pixelLength(string $segmentContent, string $taskGuid, string $fontFamily, int $fontSize) {
+        
+        $pixelLength = 0;
+        $pixelMapping = $this->getPixelMappingForSegment($taskGuid, $fontFamily, $fontSize);
+        $charsNotSet = array();
+        
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $allCharsInSegment = $segment->segmentContentAsCharacters($segmentContent);
+        
+        foreach ($allCharsInSegment as $char) {
+            if (array_key_exists($char, $pixelMapping)) {
+                $charWidth = $pixelMapping[$char];
+            } else {
+                $charWidth = $this->getDefaultPixelWidth($fontSize);
+                if (!in_array($char, $charsNotSet)) {
+                    $charsNotSet[] = $char;
+                }
+            }
+            error_log($char .': '.$charWidth);
+            $pixelLength += $charWidth;
+        }
+        
+        if (!empty($charsNotSet)) {
+            sort($charsNotSet);
+            $log = ZfExtended_Factory::get('ZfExtended_Log');
+            /* @var $log ZfExtended_Log */
+            $log->logError('No pixel-width set for: ' . implode(",",$charsNotSet) . ' ('.$fontFamily . ', font-size '. $fontSize .')');
+        }
+        
+        return $pixelLength;
     }
 }

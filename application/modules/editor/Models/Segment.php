@@ -140,6 +140,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $trackChangesTagHelper;
     
     /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -147,6 +152,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         parent::__construct();
     }
     
@@ -465,6 +471,38 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         });
         return html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_XHTML);
     }
+    
+    /**
+     * Restore whitespace to original real characters.
+     * @param string $segmentContent
+     * @return string $segmentContent
+     */
+    protected function restoreWhiteSpace ($segmentContent) {
+        $segmentContent = $this->tagHelper->restore($segmentContent, true);
+        $segmentContent = $this->whitespaceHelper->unprotectWhitespace($segmentContent);
+        $segmentContent = $this->tagHelper->protect($segmentContent);
+        $segmentContent = html_entity_decode(strip_tags($segmentContent), ENT_QUOTES | ENT_XHTML);
+        return $segmentContent;
+    }
+    
+    /**
+     * Returns an array with the single characters of the given segment's content
+     * (including the original whitespace).
+     * @param string $string
+     * @return string
+     */
+    public function segmentContentAsCharacters (string $segmentContent) {
+        $string = $this->restoreWhiteSpace($segmentContent);
+        // Break-up a multibyte string into its individual characters.
+        // http://php.net/manual/en/function.mb-split.php#80046
+        $strlen = mb_strlen($string);
+        while ($strlen) {
+            $array[] = mb_substr($string,0,1,"UTF-8");
+            $string = mb_substr($string,1,$strlen,"UTF-8");
+            $strlen = mb_strlen($string);
+        }
+        return $array;
+    } 
     
     /**
      * strips all tags including tag description

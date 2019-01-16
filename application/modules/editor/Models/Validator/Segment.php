@@ -132,6 +132,19 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
       if(empty($meta['siblingData'])) {
           return true;
       }
+      
+      $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
+      /* @var $pixelMapping editor_Models_PixelMapping */
+      $sizeUnit = (array_key_exists('sizeUnit', $meta) && !empty($meta['sizeUnit'])) ? $meta['sizeUnit'] : $pixelMapping::SIZE_UNIT_XLF_DEFAULT;
+      if($sizeUnit == $pixelMapping::SIZE_UNIT_FOR_PIXELMAPPING) {
+          $taskGuid = $this->segment->getTaskGuid();
+          $font = $meta['font'];
+          $fontSize = intval($meta['fontSize']);
+          $isPixelMapping = true;
+      } else {
+          $isPixelMapping= false;
+      }
+      
       $length = 0;
       foreach($meta['siblingData'] as $id => $data) {
           //if we don't have any information about the givens field length, we assume all OK
@@ -140,7 +153,11 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           }
           if($id == $this->segment->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
-              $length += (int)$this->segment->textLength($value);
+              if($isPixelMapping) {
+                  $length += $pixelMapping->pixelLength($value, $taskGuid, $font, $fontSize);
+              } else {
+                  $length += (int)$this->segment->textLength($value);
+              }
           }
           else {
               //add the text length of desired field 
@@ -148,12 +165,13 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           }
       }
       
+      $messageSizeUnit = ($isPixelMapping) ? 'px' : '';
       if(array_key_exists('minWidth', $meta) && $length < $meta['minWidth']) {
-          $this->addMessage($field, 'segmentToShort', 'Transunit length is '.$length.' minWidth is '.$meta['minWidth']);
+          $this->addMessage($field, 'segmentToShort', 'Transunit length is '.$length.$messageSizeUnit.' minWidth is '.$meta['minWidth'].$messageSizeUnit);
           return false;
       }
       if(array_key_exists('maxWidth', $meta)&& !empty($meta['maxWidth']) && $length > $meta['maxWidth']) {
-          $this->addMessage($field, 'segmentToLong', 'Transunit length is '.$length.' maxWidth is '.$meta['maxWidth']);
+          $this->addMessage($field, 'segmentToLong', 'Transunit length is '.$length.$messageSizeUnit.' maxWidth is '.$meta['maxWidth'].$messageSizeUnit);
           return false;
       }
       return true;

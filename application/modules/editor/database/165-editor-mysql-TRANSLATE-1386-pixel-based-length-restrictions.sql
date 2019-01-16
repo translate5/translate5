@@ -25,6 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+-- new table for import of pixel-mapping.xls
 CREATE TABLE `LEK_pixel_mapping` (
   `id` int(11) AUTO_INCREMENT,
   `customerId` int (11) NOT NULL COMMENT 'Foreign Key to LEK_customer',
@@ -41,9 +42,18 @@ CREATE TABLE `LEK_pixel_mapping` (
     ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- additions for segment's meta
 ALTER TABLE `LEK_segments_meta`
 ADD `sizeUnit` VARCHAR(6) NOT NULL DEFAULT '' COMMENT 'char or pixel' AFTER `maxWidth`,
 ADD `font` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'font-family' AFTER `sizeUnit`,
 ADD `fontSize` INT(3) NOT NULL DEFAULT 0 AFTER `font`;
 
--- TODO: migrations-skript, damit für alle und immer meta-Daten vorliegen
+-- (TODO: migration-script)
+-- Segments might have been imported without saving their meta-data-information, hence
+-- we need to make sure that from now on their (empty) meta-data-information exists.
+
+-- default values for pixel-widths for font-size
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
+('runtimeOptions.pixelMapping.defaultPixelWidthGeneral', '1', 'editor', 'system', '', '', '', 'integer', 'Default pixel-width if nothing else is set, example: 4'),
+('runtimeOptions.pixelMapping.defaultPixelWidths', '1', 'editor', 'system', '', '', '', 'map', 'Default pixel-widths for font-sizes, example: {"12":"3", "13":"4", "14":"5"}');
+
