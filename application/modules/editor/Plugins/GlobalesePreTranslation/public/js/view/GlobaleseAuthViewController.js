@@ -45,6 +45,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
         noGroupsFoundMsg:'#UT#Keine Globalese Benutzergruppe verfügbar (für Ihren Globalese Benutzer und Ihre Sprachkombination). Bitte ändern Sie den Benutzer oder überspringen Sie die Vorübersetzung.',
         authErrorMsg:'#UT#Benutzer oder Passwort sind nicht valide.',
         loadingWindowMessage:"#UT#Laden",
+        noEnginesForLanguageComboMsg:'#UT#Für die aktuelle Sprachkombination existiert keine Engine in Globalese. Bitte überspringen Sie den Globalese Schritt für diesen Import.'
         
     },
     
@@ -100,6 +101,7 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
             apiusername=view.down('#apiUsername').getValue(),
             apipassword=view.down('#apiPassword').getValue(),
             globaleseEngine=window.down('#globaleseEngine'),
+            globaleseGroup=window.down('#globaleseGroup'),
             url = Editor.data.restpath+'plugins_globalesepretranslation_globalese/engines',
             params = {},
             paramsData = Ext.JSON.encode({
@@ -119,18 +121,26 @@ Ext.define('Editor.plugins.GlobalesePreTranslation.view.GlobaleseAuthViewControl
                 if(!responsData){
                     Editor.MessageBox.addInfo(me.strings.noEnginesFoundMsg, 1.4);
                 }
-                var engines = Ext.create('Ext.data.Store', {
-                    fields: [
-                        {name: 'id', type: 'int'},
-                        {name: 'name',  type: 'string'},
-                        {name: 'group',  type: 'int'},
-                        {name: 'source',  type: 'string'},
-                        {name: 'target',  type: 'string'},
-                        {name: 'status',  type: 'string'},
-                    ],
-                    data : responsData.rows
-                });
-                globaleseEngine.setStore(engines);
+                if(responsData.rows && responsData.rows.length<1){
+                	Editor.MessageBox.addInfo(me.strings.noEnginesForLanguageComboMsg, 1.4);
+                	globaleseEngine.setDisabled(true);
+                	globaleseGroup.setDisabled(true);
+                }else{
+                	//engines exist, set the store from the loaded data
+                	var engines = Ext.create('Ext.data.Store', {
+                		fields: [
+                			{name: 'id', type: 'int'},
+                			{name: 'name',  type: 'string'},
+                			{name: 'group',  type: 'int'},
+                			{name: 'source',  type: 'string'},
+                			{name: 'target',  type: 'string'},
+                			{name: 'status',  type: 'string'},
+                			],
+                			data : responsData.rows
+                	});
+                	globaleseEngine.setStore(engines);
+                }
+                
                 view.fireEvent('wizardCardFinished');
                 window.setLoading(false);
                 return;
