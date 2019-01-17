@@ -115,12 +115,6 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     const GLOBALESE_FILESTATUS_ERROR= 'error';
 
     /***
-    * Globalese engine statuses used by globalese api to determine if the engine is available for usage
-    */
-    const GLOBALESE_ENGINSTATUS_TRAINED= 'trained';
-    const GLOBALESE_ENGINSTATUS_ON= 'on';
-    
-    /***
      * Request timeout for the api
      * 
      * @var integer
@@ -420,16 +414,16 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         $http->setHeaders('Content-Type: application/json');
         $http->setHeaders('Accept: application/json');
         $response = $http->request('GET');
-        
+
         $result = $this->processResponse($response);
 
         $retVal = [];
-        if(empty($result)){
+        if(empty($result) || is_string($result)){
             return $retVal;
         }
-        //return only the engines with status ok or on
+        //return only the engines where the ready property is true 
         foreach ($result as $engine){
-            if($engine->status == self::GLOBALESE_ENGINSTATUS_TRAINED || $engine->status ==self::GLOBALESE_ENGINSTATUS_ON){
+            if(isset($engine->ready) && boolval($engine->ready)){
                 $retVal[] = $engine;
             }
         }
