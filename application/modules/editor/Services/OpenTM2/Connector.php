@@ -640,13 +640,15 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
         }
         $data = $this->getTm($validExportTypes[$mime]);
-        $fuzzyName = $this->languageResource->getSpecificData('fileName').'-Fuzzy-Analysis';
+        
+        $fuzzyName = $this->languageResource->getSpecificData('fileName').$suffix;
         $this->api->createMemory($fuzzyName, $this->languageResource->getSourceLangRfc5646(), $data);
         
         $fuzzyLanguageResource = clone $this->languageResource;
         /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
         
-        $fuzzyLanguageResource->setName($this->languageResource->getName().'-Fuzzy-Analysis');
+        //visualized name:
+        $fuzzyLanguageResource->setName($this->languageResource->getName().$suffix);
         $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyName);
         $fuzzyLanguageResource->setId(null);
         
