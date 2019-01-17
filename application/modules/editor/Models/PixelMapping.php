@@ -160,24 +160,23 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             $fontFamily = $font['font'];
             $fontSize = $font['fontSize'];
             $pixelMapping[$fontFamily][$fontSize] = $this->getPixelMappingByFont($customerId, $fontFamily, intval($fontSize));
+            $pixelMapping[$fontFamily][$fontSize]['default'] = $this->getDefaultPixelWidth( intval($fontSize));
         }
         return $pixelMapping;
         /*
          Array
-         (
-         [Arial] => Array
-         (
-         [12] => Array
-         (
-         [6CA] => 10
-         [6CD] => 9
-         )
-         
-         )
-         
-         )
-         
-         
+            (
+                [Verdana] => Array
+                    (
+                        [13] => Array
+                            (
+                                [1593] => 12
+                                [default] => 4
+                            )
+            
+                    )
+            
+            )
          */
     }
     
@@ -197,13 +196,6 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         $taskData = $task->getDataObject();
         $pixelMapping = $taskData->pixelMapping;
         return isset($pixelMapping[$fontFamily][$fontSize]) ? $pixelMapping[$fontFamily][$fontSize] : [];
-        /*
-         Array
-         (
-         [6CA] => 10
-         [6CD] => 9
-         )
-         */
     }
     
     /**
@@ -226,18 +218,18 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         $segmentContent = $segment->prepareForPixelBasedLengthCount($segmentContent);
         
         $allCharsInSegment = $this->segmentContentAsCharacters($segmentContent);
-        foreach ($allCharsInSegment as $char) {
+        foreach ($allCharsInSegment as $key => $char) {
             $unicodeCharNumeric = $this->getNumericValueOfUnicodeChar($char);
             if (array_key_exists($unicodeCharNumeric, $pixelMapping)) {
                 $charWidth = $pixelMapping[$unicodeCharNumeric];
             } else {
-                $charWidth = $this->getDefaultPixelWidth($fontSize);
+                $charWidth = $pixelMapping['default'];
                 if (!in_array($char, $charsNotSet)) {
                     $charsNotSet[] = $char;
                     $charsNotSetMsg .= '- ' . $unicodeCharNumeric . ' (' . $char. ')'."\n";
                 }
             }
-            error_log($char . ' ('. $unicodeCharNumeric . '): '.$charWidth);
+            error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => pixelLength: ' . $pixelLength);
             $pixelLength += $charWidth;
         }
         
@@ -288,7 +280,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             return mb_ord($char, "utf8");
         }
         // PHP 5 etc.
-        return unpack('V', iconv('UTF-8', 'UCS-4LE', $char))[1];
+        return unpack('V', iconv('UTF-8', 'UCS-4LE', $char))[1]; // https://stackoverflow.com/a/27444149
     }
     
     /*
