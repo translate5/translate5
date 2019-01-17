@@ -752,6 +752,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $this->meta()->setSiblingData($this);
             $this->meta()->save();
             $matView = $this->segmentFieldManager->getView();
+            /* @var $matView editor_Models_Segment_MaterializedView */
             if($matView->exists()) {
                 $matView->updateSegment($this);
                 $matView->updateSiblingMetaCache($this);
