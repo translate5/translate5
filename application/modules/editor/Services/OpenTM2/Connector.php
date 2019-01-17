@@ -626,10 +626,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /***
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
      * The fuzzy languageResource name format is: oldname+Fuzzy-Analysis
+     * @param integer $analysisId
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */
-    public function initForFuzzyAnalysis() {
+    public function initForFuzzyAnalysis($analysisId) {
+        $suffix = '-fuzzy-'.$analysisId;
         $mime="TM";
         $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidFiletypes();
