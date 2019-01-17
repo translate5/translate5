@@ -431,7 +431,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         if(!task) {
             return;
         }
-        task.getById(taskId).load({
+        task.load({
             success:function(){
                 var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
                 //add match analysis state checker function to the task state checker loop
