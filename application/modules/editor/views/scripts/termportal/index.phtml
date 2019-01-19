@@ -58,7 +58,7 @@
 ?>
     <div id="logout"><a href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
 </div>
-        
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <?php 
 if(isset($this->error)){
     echo '<div class="container ui-state-error ui-corner-all">';
@@ -129,7 +129,6 @@ attributeLabels = JSON.parse(attributeLabels);
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
 var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
-var REST_PATH='<?php echo $this->restPath; ?>';
 var SESSION_LOCALE='<?php echo $session->locale; ?>';
 var noExistingAttributes='<?php echo $this->translations["noExistingAttributes"];?>';
 
@@ -183,7 +182,6 @@ $( function() {
 } );
 
 </script>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <script type="text/javascript">
     checkDirectSearch();
 </script>
