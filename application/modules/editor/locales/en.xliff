@@ -3065,6 +3065,22 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Autoübersetzt</source>
   <target>Auto-translated</target>
 </trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS1hcHBz'>
+    <source>translate5-apps</source>
+    <target>translate5-apps</target>
+</trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'>
+    <source>translate5-instanttranslate</source>
+    <target>Instant-Translate</target>
+</trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'>
+    <source>translate5-termportal</source>
+    <target>Terminologieportal</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>
