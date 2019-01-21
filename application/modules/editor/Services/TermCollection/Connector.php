@@ -137,6 +137,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
         
+        //load all available languages, so we can set the term rfc value to the frontend
+        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $lngs=$langModel->loadAllKeyValueCustom('id','rfc5646');
+        
         $groupids=array_column($results, 'termEntryId');
         $groupids=array_unique($groupids);
         
@@ -157,6 +162,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                 $matchRate = $this->tagsWereStripped ? self::TERMCOLLECTION_TAG_MATCH_VALUE : $this->defaultMatchRate;
                 if($reimportWhitespace) {
                     $res['term'] = $this->importWhitespaceFromTagLessQuery($res['term']);
+                }
+                if(isset($res['language'])){
+                    $res['languageRfc']=isset($lngs[$res['language']]) ? $lngs[$res['language']] : null;
                 }
                 $this->resultList->addResult($res['term'], $matchRate,$res);
             }
