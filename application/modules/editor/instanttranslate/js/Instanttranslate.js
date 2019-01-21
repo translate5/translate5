@@ -529,7 +529,8 @@ function fillTranslation() {
         term,
         termStatus,
         metaData,
-        resultData;
+        resultData,
+        languageRfc;
     $.each(translateTextResponse, function(serviceName, resource){
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
@@ -542,6 +543,7 @@ function fillTranslation() {
                     }
                     infoText = [];
                     term = '';
+                    languageRfc=null;
                     termStatus = '';
                     processStatusAttribute = '';
                     processStatusAttributeValue = '';
@@ -555,6 +557,9 @@ function fillTranslation() {
                         }
                         if(metaData['term'] != undefined) {
                             term = metaData['term'];
+                        }
+                        if(metaData['languageRfc'] != undefined) {
+                        	languageRfc = metaData['languageRfc'];
                         }
                         if(metaData['status'] != undefined) {
                             termStatus = metaData['status'];
@@ -575,7 +580,8 @@ function fillTranslation() {
                                   'termStatus': termStatus,
                                   'translationText': result['target'],
                     			  'processStatusAttribute':processStatusAttribute,
-                    			  'processStatusAttributeValue':processStatusAttributeValue
+                    			  'processStatusAttributeValue':processStatusAttributeValue,
+                    			  'languageRfc':languageRfc
                                   };
                     resultHtml += renderTranslationContainer(resultData);
                 }
@@ -611,7 +617,9 @@ function renderTranslationContainer(resultData) {
     translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     if (resultData.term != '') {
-        translationsContainer += '<span class="term-info" id="'+resultData.term+'" title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
+    	//check if for the current term the rfc language value is set, if yes set data property so the language is used in the term portal
+    	var languageRfc=resultData.languageRfc ? ('data-languageRfc="'+resultData.languageRfc+'"') : '';
+        translationsContainer += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
     }
     
     if (resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
@@ -838,7 +846,8 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 /* --------------- open TermPortal ------------------------------------------ */
 $('#translations').on('touchstart click','.term-info',function(){
     var url=Editor.data.restpath+"termportal",
-        params="term="+$(this).attr('id')+"&lang="+$("#targetLocale").val();
+    	termLanguage=$(this).attr("data-languageRfc"),
+        params="term="+$(this).attr('id')+"&lang="+termLanguage;
     
     window.parent.loadIframe('termportal',url,params);
 });
