@@ -31,9 +31,11 @@ var activeIframe=[];
  * Load translate5 app as iframe.
  */
 function loadIframe(appName,url,params){
-    var iframeId=appName+'Iframe';
-    url = url+(params ? ("?"+params) : "");
+    var iframeId=appName+'Iframe',
+    	url = url+(params ? ("?"+params) : ""),
+    	title=Editor.data.apps[appName].title;
 
+    document.title=title;
     //hide all other apps, and show only the requested one
     $.each(activeIframe, function( index, value ) {
         var frameId="#"+value;

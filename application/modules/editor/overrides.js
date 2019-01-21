@@ -992,3 +992,18 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
         return Math.min(rows.endIndex, me.getFirstVisibleRowIndex() + Math.ceil(clientHeight / me.rowHeight));
     }
 });
+
+
+/**
+ * Fixing the: TRANSLATE-1544 Cannot read property 'isCollapsedPlaceholder' of undefined
+ * this fix is also related to TRANSLATE-1422
+ */
+Ext.override(Ext.grid.feature.GroupStore, {
+    indexOf: function(record) {
+        var ret = -1;
+        if (record && !record.isCollapsedPlaceholder) {
+            ret = this.data.indexOf(record);
+        }
+        return ret;
+    }
+});

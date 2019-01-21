@@ -132,7 +132,7 @@ function findTermsAndAttributes(termGroupid){
     }
     
     $.ajax({
-        url: REST_PATH+"termcollection/searchattribute",
+        url: Editor.data.termportal.restPath+"termcollection/searchattribute",
         dataType: "json",
         data: {
             'groupId':termGroupid
@@ -162,7 +162,7 @@ function searchTerm(searchString,successCallback){
     console.log("searchTerm() for language: " + lng);
     searchTermsResponse=[];  
     $.ajax({
-        url: REST_PATH+"termcollection/search",
+        url: Editor.data.termportal.restPath+"termcollection/search",
         dataType: "json",
         data: {
             'term':searchString,
@@ -622,7 +622,7 @@ $('#search').keyup(function (e) {
 });
 
 $('#instantTranslate').on('touchstart click',function(){
-    window.parent.loadIframe('instanttranslate',REST_PATH+'instanttranslate');
+    window.parent.loadIframe('instanttranslate',Editor.data.termportal.restPath+'instanttranslate');
 });
 
 function startAutocomplete(){
