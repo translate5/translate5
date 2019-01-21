@@ -54,12 +54,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     const CONFIG_COLUMN_MID = 'mid';
     
     /**
-     * @var type array order of the columns - which column is mid, source and target
+     * @var array order of the columns - which column is mid, source and target
      */
     protected $colOrder = array();
     
     /**
-     * @var type string line break chars of the csv file
+     * @var string line break chars of the csv file
      */
     protected $break;
     
