@@ -51,7 +51,7 @@ END LICENSE AND COPYRIGHT
     background-size: auto auto;
     background-size: 150px;
 }
-#instantTranslate{
+#instantTranslateButtonContainer{
     order: 2;
     flex: 1 0 auto;
     text-align: right;

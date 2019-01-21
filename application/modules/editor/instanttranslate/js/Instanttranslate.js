@@ -843,7 +843,7 @@ $('#translations').on('touchstart click','.term-info',function(){
     window.parent.loadIframe('termportal',url,params);
 });
 
-$('#termPortal').on('touchstart click',function(){
+$('#termPortalButton').on('touchstart click',function(){
     window.parent.loadIframe('termportal',Editor.data.restpath+'termportal');
 });
 

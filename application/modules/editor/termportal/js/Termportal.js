@@ -621,7 +621,7 @@ $('#search').keyup(function (e) {
     $('#termTable').empty();
 });
 
-$('#instantTranslate').on('touchstart click',function(){
+$('#instantTranslateButton').on('touchstart click',function(){
     window.parent.loadIframe('instanttranslate',Editor.data.termportal.restPath+'instanttranslate');
 });
 

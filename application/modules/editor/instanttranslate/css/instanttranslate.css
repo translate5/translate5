@@ -122,7 +122,7 @@ h4, p {
     background-size: auto auto;
     background-size: 150px;
 }
-#termPortal{
+#termPortalButtonContainer{
     order: 2;
     flex: 1 0 auto;
     text-align: right;
