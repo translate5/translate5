@@ -404,7 +404,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
 
             //if internal fuzzy is active and the connector supports the internal fuzzy calculation, get the fuzzy connector
             if($this->internalFuzzy){
-                $this->connectors[$assoc['id']]=$connector->initForFuzzyAnalysis();
+                $this->connectors[$assoc['id']]=$connector->initForFuzzyAnalysis($this->analysisId);
             }else{
                 $this->connectors[$assoc['id']]=$connector;
             }

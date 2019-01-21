@@ -287,9 +287,10 @@ abstract class editor_Services_Connector_Abstract {
     
     /***
      * Initialize fuzzy connectors. Returns the current instance if not supported.
+     * @param integer $analysisId
      * @return editor_Services_Connector_Abstract
      */
-    public function initForFuzzyAnalysis() {
+    public function initForFuzzyAnalysis($analysisId) {
         return $this;
     }
     

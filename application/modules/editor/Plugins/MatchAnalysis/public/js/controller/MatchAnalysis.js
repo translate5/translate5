@@ -427,7 +427,11 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     checkTaskState:function(taskId){
         //the task needs to be updated, so the last state is fetched from the db
-        Ext.StoreManager.get('admin.Tasks').getById(taskId).load({
+        var task = Ext.StoreManager.get('admin.Tasks').getById(taskId);
+        if(!task) {
+            return;
+        }
+        task.load({
             success:function(){
                 var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
                 //add match analysis state checker function to the task state checker loop
