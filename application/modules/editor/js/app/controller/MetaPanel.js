@@ -144,10 +144,10 @@ Ext.define('Editor.controller.MetaPanel', {
     
     me.record = record;
     me.getMetaTermPanel().getLoader().load({
-      params: {id: segmentId},
-      callback: function() {
-        me.getSegmentMeta().updateLayout();
-      }
+        params: {id: segmentId},
+        callback: function() {
+            me.getSegmentMeta() && me.getSegmentMeta().updateLayout();
+        }
     });
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
