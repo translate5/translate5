@@ -63,7 +63,7 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByIds(array $ids){
         $s=$this->db->select()
-        ->where('id IN (?)',$ids);
+        ->where('id IN (?)', array_unique($ids));
         return $this->loadFilterdCustom($s);
     }
     
