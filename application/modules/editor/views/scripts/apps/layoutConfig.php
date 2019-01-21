@@ -1,2 +1,3 @@
 <?php 
-$this->layout()->title = $this->headTitle();//get the default title 
+$translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+$this->headTitle($translate->_('translate5-termportal'));

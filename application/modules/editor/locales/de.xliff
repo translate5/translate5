@@ -1823,6 +1823,21 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <target>Erstellungsdatum</target>
 </trans-unit>
 
+<trans-unit id='dHJhbnNsYXRlNS1hcHBz'>
+    <source>translate5-apps</source>
+    <target>translate5-apps</target>
+</trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'>
+    <source>translate5-instanttranslate</source>
+    <target>Sofortübersetzung</target>
+</trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'>
+    <source>translate5-termportal</source>
+    <target>Terminologieportal</target>
+</trans-unit>
+
   </body>
  </file>
 </xliff>

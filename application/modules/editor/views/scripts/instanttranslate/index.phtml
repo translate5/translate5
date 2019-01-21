@@ -38,12 +38,16 @@
     foreach ($this->machineTranslationEngines as $languageResource) {
         $allCharacterLimits[] = $languageResource['characterLimit'];
         foreach ($languageResource['source'] as $sourceLocale) {
-            if (!in_array($sourceLocale, $allSourceLanguageLocales)) {
+            //are the sublanguages used as dropdown selections
+            $useLanguage=strpos($sourceLocale, '-') === false || $this->showSublanguages;
+            if (!in_array($sourceLocale, $allSourceLanguageLocales) && $useLanguage) {
                 $allSourceLanguageLocales[] = $sourceLocale;
             }
         }
         foreach ($languageResource['target']as $key => $targetLocale) {
-            if (!in_array($targetLocale, $allTargetLanguageLocales)) {
+            //are the sublanguages used as dropdown selections
+            $useLanguage=strpos($targetLocale, '-') === false || $this->showSublanguages;
+            if (!in_array($targetLocale, $allTargetLanguageLocales) && $useLanguage) {
                 $allTargetLanguageLocales[] = $targetLocale;
             }
         }

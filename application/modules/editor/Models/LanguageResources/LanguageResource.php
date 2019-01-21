@@ -104,7 +104,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         }
         $allservices=array_unique($allservices);
         $s=$this->db->select()
-        ->where('serviceType IN(?)',$allservices);
+        ->where('LEK_languageresources.serviceType IN(?)',$allservices);
         return $this->loadFilterdCustom($s);
     }
     
