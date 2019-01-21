@@ -78,9 +78,9 @@
     
     //check if the user is allowed to acces the term portal
     if($isUserAllowed){
-        echo '<div id="termPortal"><a class="ui-button ui-widget ui-corner-all">'.$translate->_("Terminologieportal").'</a></div>';
+        echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("Terminologieportal").'</a></div>';
     }else{
-        echo '<div id="termPortal"></div>';
+        echo '<div id="termPortalButtonContainer"></div>';
     }
     
     // see View_Helper_LanguageSelector

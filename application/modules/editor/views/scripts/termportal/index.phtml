@@ -51,9 +51,9 @@
     
     //check if the user is allowed to acces the term portal
     if($isUserAllowed){
-        echo '<div id="instantTranslate"><a class="ui-button ui-widget ui-corner-all">'.$translate->_("Sofortübersetzung").'</a></div>';
+        echo '<div id="instantTranslateButtonContainer"><a id="instantTranslateButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("Sofortübersetzung").'</a></div>';
     }else{
-        echo '<div id="instantTranslate"></div>';
+        echo '<div id="instantTranslateButtonContainer"></div>';
     }
 ?>
     <div id="logout"><a href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
