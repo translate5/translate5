@@ -3,6 +3,37 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+
+## [3.0.2] - 2019-01-21
+###Added
+TRANSLATE-1523: Configurable: Should source files be auto-attached as reference files?
+
+###Changed
+TRANSLATE-1543: InstantTranslate: show main languages in InstantTranslate language selection
+TRANSLATE-1533: Switch API value, that is checked to know, if Globalese engine is available
+
+###Bugfixes
+TRANSLATE-1540: Filtering language resources by customer replaces resource name with customer name
+TRANSLATE-1541: For title tag of TermPortal and InstantTranslate translation mechanism is not used
+TRANSLATE-1537: GroupShare sync throws an exception if a language can no be found locally
+TRANSLATE-1535: GroupShare license cache ID may not contain special characters
+TRANSLATE-1534: internal target marker persists as translation on pretranslation with fuzzy match analysis
+TRANSLATE-1532: Globalese integration: error 500 thrown, if no engines are available
+TRANSLATE-1518: Multitenancy language resources to customer association fix (customer assoc migration fix)
+TRANSLATE-1522: Autostaus "Autoübersetzt" is untranslated in EN
+VISUAL-57: VisualReview: Prevent translate5 to scroll layout, if segment has been opened by click in the layout
+TRANSLATE-1519: Termcollection is not assigned with default customer with zip import
+TRANSLATE-1521: OpenTM2 Matches with <it> or <ph> tags are not shown
+TRANSLATE-1501: TrackChanges: Select a word with double click then type new text produces JS error and wrong track changes
+TRANSLATE-1544: JS error on using grid filters
+TRANSLATE-1527: JS error on copy text content in task overview area
+TRANSLATE-1524: JS Error when leaving task faster as server responds terms of segment
+TRANSLATE-1503: CTRL+Z does not undo CTRL+.
+TRANSLATE-1412: TermPortal logout URL is wrong - same for InstantTranslate
+TRANSLATE-1517: Add user: no defaultcustomer if no customer is selected
+TRANSLATE-1538: click in white head area of TermPortal or InstantTranslate leads to action
+TRANSLATE-1539: click on info icon of term does not transfer sublanguage, when opening term in TermPortal
+
 ## [3.0.1] - 2018-12-21
 ###Bugfixes
 TRANSLATE-1412: TermPortal logout URL is wrong
