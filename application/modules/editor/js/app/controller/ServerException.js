@@ -127,7 +127,12 @@ Ext.define('Editor.controller.ServerException', {
                 if(response.aborted) {
                     return;
                 }
-                Ext.Msg.alert(str.title, appendServerMsg(str.timeout));
+                statusText = appendServerMsg(str.timeout);
+                if(response && response.request) {
+                    statusText += '<p style="font-size: 10px;color: #808080;font-style: italic;user-select: text;">';
+                    statusText += 'URL: '+response.request.url+' '+Ext.Date.format(new Date(), 'Y-m-d H:i:sO')+'</p>';
+                }
+                Ext.Msg.alert(str.title, statusText);
                 return;
             //@todo remove this specific 405 handler with TRANSLATE-94
             case 405: //Method Not Allowed: the used HTTP Method is not allowed
