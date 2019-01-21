@@ -278,6 +278,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $idFilter=new stdClass();
             $idFilter->type='list';
             $idFilter->field='id';
+            $idFilter->table='LEK_languageresources';
             $idFilter->comparison='in';
             
             //if no ids are found, set the filter so no results are returned
@@ -328,13 +329,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         
         //check if filtering for useAsDefault should be done
-        if(isset($useAsDefault) && is_string($useAsDefault->value)){
+        if(isset($useAsDefault) && isset($useAsDefault->value) && is_string($useAsDefault->value)){
             $resultList=$searchEntity($useAsDefault->value,'editor_Models_Customer');
             $handleFilter($useAsDefault,$resultList,'editor_Models_LanguageResources_CustomerAssoc','loadByCustomerIdsDefault','languageResourceId');
         }
         
         //check if filtering for taskList should be done
-        if(isset($taskList) && is_string($taskList->value)){
+        if(isset($taskList) && isset($taskList->value) && is_string($taskList->value)){
             $resultList=$searchEntity($taskList->value,'editor_Models_Task','taskGuid');
             $handleFilter($taskList,$resultList,'editor_Models_LanguageResources_Taskassoc','loadByTaskGuids','languageResourceId');
         }
