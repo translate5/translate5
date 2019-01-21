@@ -58,7 +58,6 @@
 ?>
     <div id="logout"><a href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
 </div>
-<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <?php 
 if(isset($this->error)){
     echo '<div class="container ui-state-error ui-corner-all">';
@@ -182,6 +181,7 @@ $( function() {
 } );
 
 </script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <script type="text/javascript">
     checkDirectSearch();
 </script>
