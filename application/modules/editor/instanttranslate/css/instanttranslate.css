@@ -134,15 +134,15 @@ h4, p {
     margin-right: 7px;
 }
 #locale-button {width: 9em;}
-#logout {
+#logoutContainer {
     flex: 0 0 80px;
     order: 4;
     text-align: right;
 }
-#logout a {
+#logoutContainer a {
     color: #fff;
 }
-#logout a:hover {
+#logoutContainer a:hover {
     color: #000;
 }
 
@@ -154,7 +154,7 @@ h4, p {
     }
     #logo { order: 1; }
     #languageSelector { order: 2; text-align: left; margin-top: 5px;}
-    #logout { order: 3; margin-top: 5px;}
+    #logoutContainer { order: 3; margin-top: 5px;}
 }
 
 /* --------------- spinner --------------- */
