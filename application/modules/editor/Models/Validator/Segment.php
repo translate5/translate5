@@ -150,7 +150,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           }
           if($id == $this->segment->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
-              $length += (int)$this->segment->textLength($value, $meta);
+              $length += (int)$this->segment->textLength($value, $this->segment->meta());
           }
           else {
               //add the text length of desired field 

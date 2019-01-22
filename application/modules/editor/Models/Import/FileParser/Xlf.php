@@ -170,6 +170,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $trackTagOutsideMrk = false;
     
     /**
+     * @var editor_Models_PixelMapping
+     */
+    protected $pixelMapping;
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -187,6 +192,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->segmentBareInstance = ZfExtended_Factory::get('editor_Models_Segment');
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
+        $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
     }
     
     
@@ -388,6 +394,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // only of preserveWhitespace is true
         if($preserveWhitespace && !empty($otherContent[0])) {
             $attributes->additionalUnitLength = $this->segmentBareInstance->textLength($text($otherContent[0]));
+            // TODO: über $attributes auch die sizeUnit holen und analog auf pixelLength gehen statt textLength
         }
         //the other lengths are stored per affected segment, so if there is none, do nothing
         if(empty($otherContent[$attributes->mrkMid])) {
@@ -410,6 +417,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         $attributes->additionalMrkLength = $this->segmentBareInstance->textLength($content);
+        // TODO: über $attributes auch die sizeUnit holen und analog auf pixelLength gehen statt textLength
     }
     
     /**
@@ -691,6 +699,19 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $segmentAttributes->sizeUnit = $this->getPixelMappingAttribute($attributes, 'size-unit');
         $segmentAttributes->font     = $this->getPixelMappingAttribute($attributes, 'font');
         $segmentAttributes->fontSize = $this->getPixelMappingAttribute($attributes, 'fontSize');
+        
+        // When pixelMapping is to be used, the config's defaultPixelWidth for this fontSize must exist.
+        // (We cannot assume that every character will have a pixelWidth set in the pixelMapping-table,
+        // and if there is no pixelWidth set, the calculation of the pixelLength will be not reliable at all.)
+        if ($segmentAttributes->sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
+            try {
+                $this->pixelMapping->getDefaultPixelWidth($segmentAttributes->fontSize);
+            }
+            catch(Zend_Db_Statement_Exception $e) {
+                $msg = 'Import failed for task ' . $this->task->getTaskGuid() . ': ' . $e->getMessage();
+                throw new ZfExtended_Exception($msg);
+            }
+        }
         
         return $segmentAttributes;
     }

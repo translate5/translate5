@@ -93,8 +93,7 @@ class editor_Models_Segment_PixelLength {
         $this->customerId = $task->getCustomerId();
         $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
         /* @var $pixelMapping editor_Models_PixelMapping */
-        $this->pixelMappingForTask = $pixelMapping->getPixelMappingForTask($taskGuid);
-        parent::__construct();
+        $this->pixelMappingForTask = $pixelMapping->getPixelMappingForTask(intval($task->getCustomerId()), $task->getAllFontsInTask());
     }
     
     /**
@@ -113,21 +112,21 @@ class editor_Models_Segment_PixelLength {
      * @param int $fontSize
      * @return array
      */
-    protected function getPixelMappingForSegment(string $fontFamily, int $fontSize) {
+    public function getPixelMappingForSegment(string $fontFamily, int $fontSize) {
         $pixelMappingForTask = $this->pixelMappingForTask;
+        $fontFamily = strtolower($fontFamily);
         return isset($pixelMappingForTask[$fontFamily][$fontSize]) ? $pixelMappingForTask[$fontFamily][$fontSize] : [];
     }
     
     /**
      * What's the length of a segment's content according to the pixelMapping?
      * @param string $segmentContent
-     * @param array $segmentMeta
+     * @param string $fontFamily
+     * @param int $fontSize
      * @return integer
      */
-    public function textLengthByPixel ($segmentContent, $segmentMeta) {
+    public function textLengthByPixel ($segmentContent, $fontFamily, $fontSize) {
         $pixelLength = 0;
-        $fontFamily = $segmentMeta['fontFamily'];
-        $fontSize = $segmentMeta['fontSize'];
         $pixelMappingForSegment = $this->getPixelMappingForSegment($fontFamily, $fontSize);
         $charsNotSet = array();
         $charsNotSetMsg = '';
@@ -142,7 +141,9 @@ class editor_Models_Segment_PixelLength {
             if (array_key_exists($unicodeCharNumeric, $pixelMappingForSegment)) {
                 $charWidth = $pixelMappingForSegment[$unicodeCharNumeric];
             } else {
-                $charWidth = $pixelMappingForSegment['default'];
+                if (array_key_exists('default', $pixelMappingForSegment)) {
+                    $charWidth = $pixelMappingForSegment['default'];
+                }
                 if (!in_array($char, $charsNotSet)) {
                     $charsNotSet[] = $char;
                     $charsNotSetMsg .= '- ' . $unicodeCharNumeric . ' (' . $char. ')'."\n";
@@ -173,6 +174,7 @@ class editor_Models_Segment_PixelLength {
      * @return string
      */
     protected function segmentContentAsCharacters (string $string) {
+        $array = [];
         // Break-up a multibyte string into its individual characters.
         // http://php.net/manual/en/function.mb-split.php#80046
         $strlen = mb_strlen($string);

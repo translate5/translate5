@@ -59,7 +59,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      */
     public function insertPixelMappingRow($values) {
         $customerId = $values[1];
-        $font = $values[2];
+        $font = strtolower($values[2]);
         $fontsize = $values[3];
         $unicodeChar = $values[4];
         $pixelWidth = $values[5];
@@ -84,7 +84,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * Return the default pixel-width as set in the Zf-config.
      * @param int $fontSize
      */
-    protected function getDefaultPixelWidth($fontSize) {
+    public function getDefaultPixelWidth($fontSize) {
         if (!isset($this->defaultPixelWidths)) {
             $config = Zend_Registry::get('config');
             $this->defaultPixelWidths = $config->runtimeOptions->pixelMapping->defaultPixelWidths->toArray();
@@ -92,7 +92,9 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         if (array_key_exists($fontSize, $this->defaultPixelWidths)) {
             return $this->defaultPixelWidths[$fontSize];
         }
-        throw new ZfExtended_NotFoundException('pixelMapping cannot continue due to missing default-values for pixel-width.');
+        $msg = 'pixelMapping cannot be implemented due to missing default-values for pixel-width for font-size ' . $fontSize . '.';
+        $msg .= ' Add the missing value in your defaultPixelWidths-settings in the config.';
+        throw new ZfExtended_Exception($msg);
     }
     
     /**
@@ -124,18 +126,18 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function getPixelMappingForTask(int $customerId, array $allFontsInTask) {
-        $pixelMapping = array();
+        $pixelMappingForTask = array();
         foreach ($allFontsInTask as $font) {
-            $fontFamily = $font['font'];
-            $fontSize = $font['fontSize'];
-            $pixelMapping[$fontFamily][$fontSize] = $this->getPixelMappingByFont($customerId, $fontFamily, intval($fontSize));
-            $pixelMapping[$fontFamily][$fontSize]['default'] = $this->getDefaultPixelWidth( intval($fontSize));
+            $fontFamily = strtolower($font['font']);
+            $fontSize = intval($font['fontSize']);
+            $pixelMappingForTask[$fontFamily][$fontSize] = $this->getPixelMappingByFont($customerId, $fontFamily, $fontSize);
+            $pixelMappingForTask[$fontFamily][$fontSize]['default'] = $this->getDefaultPixelWidth($fontSize);
         }
-        return $pixelMapping;
+        return $pixelMappingForTask;
         /*
          Array
             (
-                [Verdana] => Array
+                [verdana] => Array
                     (
                         [13] => Array
                             (

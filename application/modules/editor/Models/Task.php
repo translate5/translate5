@@ -129,24 +129,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected $taskDataPath;
 
     /**
-     * merges additional task data into the result set
-     * (non-PHPdoc)
-     * @see ZfExtended_Models_Entity_Abstract::getDataObject()
-     */
-    public function getDataObject() {
-        $res = parent::getDataObject();
-        
-        // Add pixelMapping-data for the fonts used in the task.
-        // We do this here to have it immediately available e.g. when opening segments.
-        $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
-        /* @var $pixelMapping editor_Models_PixelMapping */
-        $allFontsInTask = $this->getAllFontsInTask();
-        $res->pixelMapping = $pixelMapping->getPixelMappingForTask(intval($res->customerId), $allFontsInTask);
-        
-        return $res;
-    }
-    
-    /**
      * loads the task to the given guid
      * @param guid $taskGuid
      */
@@ -803,7 +785,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * Return all combinations of font-family and font-size that are used in the task.
      * @return array
      */
-    protected function getAllFontsInTask() {
+    public function getAllFontsInTask() {
         // TODO: Get these infos from the config-data of the taskTemplate (unfortunately not implemented yet).
         // Workaround (!!!!): check the task's segments.
         $segMeta = ZfExtended_Factory::get('editor_Models_Segment_Meta');

@@ -442,22 +442,18 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Get length of a segment's text according to the segment's sizeUnit. 
-     * If $segmentMeta is given and the sizeUnit is set to 'pixel' in $segmentMeta, we use 
-     * pixelMapping, otherwise we count by characters (this is for historical reasons of 
-     * this code; other than the XLF-specifications which are not relevant here!).
+     * If the sizeUnit is set to 'pixel', we use pixelMapping, otherwise 
+     * we count by characters (this is for historical reasons of this code; 
+     * other than the XLF-specifications which are not relevant here!).
      * @param string $segmentContent
-     * @param array $segmentMeta
+     * @param editor_Models_Segment_Meta $segmentMeta
      * @return integer
      */
-    public function textLength($segmentContent, $segmentMeta = null) {
-        $isPixelBased = false;
-        $taskGuid = (!is_null($segmentMeta) && array_key_exists('taskGuid', $segmentMeta)) ? $segmentMeta['taskGuid'] : null;
-        if (!is_null($taskGuid)) {
-            $pixelLength = $this->getPixelLength($taskGuid);
-            $isPixelBased = (array_key_exists('sizeUnit', $segmentMeta) && $segmentMeta['sizeUnit'] == $pixelLength::SIZE_UNIT_XLF_DEFAULT);
-        }
+    public function textLength($segmentContent, editor_Models_Segment_Meta $segmentMeta) {
+        $pixelLength = $this->getPixelLength($segmentMeta->getTaskGuid()); // make sure that the pixelLength we use is that for the segment's task!
+        $isPixelBased = ($segmentMeta->getSizeUnit() == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
-            return $pixelLength->textLengthByPixel($segmentContent, $segmentMeta);
+            return $pixelLength->textLengthByPixel($segmentContent, $segmentMeta->getFont(), intval($segmentMeta->getFontSize()));
         }
         return $this->textLengthByChar($segmentContent);
     }
