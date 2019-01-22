@@ -94,7 +94,7 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
      * @param string $taskGuid
      * @return array
      */
-    public function getFontDataForTask($taskGuid) {
+    public function getAllFontsInTask($taskGuid) {
         $sql = $this->db->select()
                 ->from($this->db, array('font','fontSize'))
                 ->distinct()

@@ -53,32 +53,6 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass   = 'editor_Models_Validator_PixelMapping';
     
     /**
-     * In xlf, the default size-unit of a trans-unit is 'pixel' if size-unit is not set.
-     * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#size-unit
-     * - http://docs.oasis-open.org/xliff/v1.2/os/xliff-core.html#maxwidth
-     * @var string
-     */
-    const SIZE_UNIT_XLF_DEFAULT = 'pixel';
-    
-    /**
-     * Size-unit used for pixel-mapping.
-     * @var string
-     */
-    const SIZE_UNIT_FOR_PIXELMAPPING = 'pixel';
-    
-    /**
-     * Default pixel-width in general from ZfConfig
-     * @var integer
-     */
-    protected $defaultPixelWidthGeneral;
-    
-    /**
-     * Default pixel-widths for font_sizes from ZfConfig
-     * @var array
-     */
-    protected $defaultPixelWidths;
-    
-    /**
      * insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx
      * (order of columns must not be changed; see Confluence!).
      * @param array $values
@@ -111,17 +85,12 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @param int $fontSize
      */
     protected function getDefaultPixelWidth($fontSize) {
-        if (!isset($this->defaultPixelWidthGeneral) || !isset($this->defaultPixelWidths)) {
+        if (!isset($this->defaultPixelWidths)) {
             $config = Zend_Registry::get('config');
-            $this->defaultPixelWidthGeneral = $config->runtimeOptions->pixelMapping->defaultPixelWidthGeneral;
             $this->defaultPixelWidths = $config->runtimeOptions->pixelMapping->defaultPixelWidths->toArray();
         }
         if (array_key_exists($fontSize, $this->defaultPixelWidths)) {
             return $this->defaultPixelWidths[$fontSize];
-        }
-        if (!empty($this->defaultPixelWidthGeneral)) {
-            return $this->defaultPixelWidthGeneral;
-            
         }
         throw new ZfExtended_NotFoundException('pixelMapping cannot continue due to missing default-values for pixel-width.');
     }
@@ -179,140 +148,4 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             )
          */
     }
-    
-    /**
-     * Return the pixelMapping for a specific segment as already loaded for the task
-     * (= the item from the array with all fonts for the task that matches the segment's
-     * font-family and font-size; don't start db-selects again!).
-     * @param string $taskGuid
-     * @param string $fontFamily
-     * @param int $fontSize
-     * @return array
-     */
-    protected function getPixelMappingForSegment(string $taskGuid, string $fontFamily, int $fontSize) {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        $taskData = $task->getDataObject();
-        $pixelMapping = $taskData->pixelMapping;
-        return isset($pixelMapping[$fontFamily][$fontSize]) ? $pixelMapping[$fontFamily][$fontSize] : [];
-    }
-    
-    /**
-     * What's the length of a segment's content according to the pixelMapping?
-     * @param string $segmentContent
-     * @param string $taskGuid
-     * @param string $fontFamily
-     * @param int $fontSize
-     * @return integer
-     */
-    public function pixelLength(string $segmentContent, string $taskGuid, string $fontFamily, int $fontSize) {
-        
-        $pixelLength = 0;
-        $pixelMapping = $this->getPixelMappingForSegment($taskGuid, $fontFamily, $fontSize);
-        $charsNotSet = array();
-        $charsNotSetMsg = '';
-        
-        $segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segment editor_Models_Segment */
-        $segmentContent = $segment->prepareForPixelBasedLengthCount($segmentContent);
-        
-        $allCharsInSegment = $this->segmentContentAsCharacters($segmentContent);
-        foreach ($allCharsInSegment as $key => $char) {
-            $unicodeCharNumeric = $this->getNumericValueOfUnicodeChar($char);
-            if (array_key_exists($unicodeCharNumeric, $pixelMapping)) {
-                $charWidth = $pixelMapping[$unicodeCharNumeric];
-            } else {
-                $charWidth = $pixelMapping['default'];
-                if (!in_array($char, $charsNotSet)) {
-                    $charsNotSet[] = $char;
-                    $charsNotSetMsg .= '- ' . $unicodeCharNumeric . ' (' . $char. ')'."\n";
-                }
-            }
-            error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => pixelLength: ' . $pixelLength);
-            $pixelLength += $charWidth;
-        }
-        
-        if (!empty($charsNotSet)) {
-            sort($charsNotSet);
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($taskGuid);
-            $customerId = $task->getCustomerId();
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $logMsg = 'No pixel-width set for ('.$fontFamily . ', font-size '. $fontSize .', customerId ' . $customerId.'):' . "\n" . $charsNotSetMsg;
-            $log->logError($logMsg);
-        }
-        
-        return $pixelLength;
-    }
-    
-    // ---------------------------------------------------------------------------------------
-    // Unicode-Helpers
-    // ---------------------------------------------------------------------------------------
-    
-    /**
-     * Returns an array with the single (unicode-)characters of the given string.
-     * @param string $string
-     * @return string
-     */
-    protected function segmentContentAsCharacters (string $string) {
-        // Break-up a multibyte string into its individual characters.
-        // http://php.net/manual/en/function.mb-split.php#80046
-        $strlen = mb_strlen($string);
-        while ($strlen) {
-            $array[] = mb_substr($string,0,1,"UTF-8");
-            $string = mb_substr($string,1,$strlen,"UTF-8");
-            $strlen = mb_strlen($string);
-        }
-        return $array;
-    }
-    
-    /**
-     * Returns the numeric value of the given unicode-character.
-     * @param string $char
-     * @return mixed
-     */
-    protected function getNumericValueOfUnicodeChar($char) {
-        // PHP >= 7.2.0
-        if (version_compare(PHP_VERSION, '7.2.0') >= 0) {
-            return mb_ord($char, "utf8");
-        }
-        // PHP 5 etc.
-        return unpack('V', iconv('UTF-8', 'UCS-4LE', $char))[1]; // https://stackoverflow.com/a/27444149
-    }
-    
-    /*
-     * ---------------------------------------------------------------------
-     * |     UNICODE-TABLE     |                RESULTS             | $char 
-     * ---------------------------------------------------------------------
-     * | DECIMAL   HEXADECIMAL |  [1]      [2]       [3]      [4]   |       
-     * | NUMERIC   CODE POINT  |                                    |
-     * ---------------------------------------------------------------------
-     * |    &#80;      U+0050  |   80  |   &#80;  |    80  |        |  P
-     * |  &#1593;      U+0639  | 1593  | &#1593;  |  1593  |        |  ع
-     * | &#12103;      U+2F47  | 12103 | &#12103; | 12103  |  12103 |  ⽇
-     * ---------------------------------------------------------------------
-     * 
-     * UNICODE-TABLE
-     * - https://www.utf8-zeichentabelle.de/unicode-utf8-table.pl
-     *   (see also: http://unicode.scarfboy.com/?s=U%2B0639)
-     * 
-     * RESULTS:
-     * [1] https://stackoverflow.com/a/9361531:
-     *     getUniord($char)
-     * [2] http://php.net/manual/de/function.mb-encode-numericentity.php#88586:
-     *     mb_encode_numericentity ($char, array (0x0, 0xffff, 0, 0xffff), 'UTF-8')
-     * [3] https://stackoverflow.com/a/27444149
-     *     unpack('V', iconv('UTF-8', 'UCS-4LE', $char))[1]
-     * [4] https://stackoverflow.com/a/49097906
-     *     mb_ord("⽇", "utf8"); // 12103
-     * 
-     * MORE INFOS:
-     * "The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)":
-     * https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
-     * 
-     *
-     */
 }

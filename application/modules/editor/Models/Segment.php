@@ -145,6 +145,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $whitespaceHelper;
     
     /**
+     * @var editor_Models_Segment_PixelLength
+     */
+    protected $pixelLength;
+    
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -156,6 +161,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         parent::__construct();
     }
     
+    /**
+     * "lazy load" for editor_Models_Segment_PixelLength (must fit to the segment's task!).
+     */
+    protected function getPixelLength(string $taskGuid) {
+        if (!isset($this->pixelLength) || $this->pixelLength->getTaskGuid() != $taskGuid) {
+            $this->pixelLength = ZfExtended_Factory::get('editor_Models_Segment_PixelLength',[$taskGuid]);
+        }
+        return $this->pixelLength;
+    }
     
     /***
      * Search the materialized view for given search field,search string and match case.
@@ -427,15 +441,37 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * Get length of a segment's text according to the segment's sizeUnit. 
+     * If $segmentMeta is given and the sizeUnit is set to 'pixel' in $segmentMeta, we use 
+     * pixelMapping, otherwise we count by characters (this is for historical reasons of 
+     * this code; other than the XLF-specifications which are not relevant here!).
+     * @param string $segmentContent
+     * @param array $segmentMeta
+     * @return integer
+     */
+    public function textLength($segmentContent, $segmentMeta = null) {
+        $isPixelBased = false;
+        $taskGuid = (!is_null($segmentMeta) && array_key_exists('taskGuid', $segmentMeta)) ? $segmentMeta['taskGuid'] : null;
+        if (!is_null($taskGuid)) {
+            $pixelLength = $this->getPixelLength($taskGuid);
+            $isPixelBased = (array_key_exists('sizeUnit', $segmentMeta) && $segmentMeta['sizeUnit'] == $pixelLength::SIZE_UNIT_XLF_DEFAULT);
+        }
+        if ($isPixelBased) {
+            return $pixelLength->textLengthByPixel($segmentContent, $segmentMeta);
+        }
+        return $this->textLengthByChar($segmentContent);
+    }
+    
+    /**
      * dedicated method to count chars of given segment content
-     * does a htmlentitydecode, so that 5 char "&amp;" is converted to one char "&" for counting 
+     * does a htmlentitydecode, so that 5 char "&amp;" is converted to one char "&" for counting
      * Further:
      * - content in &gt;del&lt; tags is ignored
      * - all other tags are ignored, if the tag has a length attribute, this length is added
      * @param string $segmentContent
      * @return integer
      */
-    public function textLength($segmentContent) {
+    protected function textLengthByChar($segmentContent) {
         return mb_strlen($this->prepareForCount($segmentContent, true));
     }
     
@@ -472,6 +508,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         return html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_XHTML);
     }
     
+    /**
+     * Remove TrackChange-tags and restore whitespace.
+     * @param string $text
+     * @return string
+     */
     public function prepareForPixelBasedLengthCount($text) {
         $text = $this->trackChangesTagHelper->removeTrackChanges($text);
         $text = $this->restoreWhiteSpace($text);
