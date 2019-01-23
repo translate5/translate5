@@ -140,6 +140,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $trackChangesTagHelper;
     
     /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -147,6 +152,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         parent::__construct();
     }
     
@@ -464,6 +470,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
         });
         return html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_XHTML);
+    }
+    
+    public function prepareForPixelBasedLengthCount($text) {
+        $text = $this->trackChangesTagHelper->removeTrackChanges($text);
+        $text = $this->restoreWhiteSpace($text);
+        return $text;
+    }
+    
+    /**
+     * Restore whitespace to original real characters.
+     * @param string $segmentContent
+     * @return string $segmentContent
+     */
+    protected function restoreWhiteSpace ($segmentContent) {
+        $segmentContent = $this->tagHelper->restore($segmentContent, true);
+        $segmentContent = $this->whitespaceHelper->unprotectWhitespace($segmentContent);
+        $segmentContent = $this->tagHelper->protect($segmentContent);
+        $segmentContent = html_entity_decode(strip_tags($segmentContent), ENT_QUOTES | ENT_XHTML);
+        return $segmentContent;
     }
     
     /**

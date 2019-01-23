@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
  * Collect the terms and the terms attributes from the tbx file and save them to the database
  *
  */
-class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IMetaDataImporter {
+class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_MetaData_IMetaDataImporter {
     const TBX_ARCHIV_NAME = 'terminology.tbx';
     
     /**
@@ -273,7 +273,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_IM
     /**
      * Imports the tbx files into the term collection
      * (non-PHPdoc)
-     * @see editor_Models_Import_IMetaDataImporter::import()
+     * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
      */
     public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta){
         $tbxFilterRegex = '/\.tbx$/i';

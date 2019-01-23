@@ -260,6 +260,7 @@ class editor_Models_Segment_MaterializedView {
         $segmentId = (int)$segmentId;
         $selectSql = '';
         $selectSql .= ' CONCAT(\'{"minWidth":\', ifnull(m.minWidth, \'null\'), \',"maxWidth":\', ifnull(m.maxWidth, \'null\'), ';
+        $selectSql .= '\',"sizeUnit":"\', m.sizeUnit, \'","font":"\', m.font, \'","fontSize":\', m.fontSize, ';
         $selectSql .= '\',"additionalUnitLength":\', m.additionalUnitLength, \',"additionalMrkLength":\', m.additionalMrkLength, ';
         $selectSql .= '\',"siblingData":{\', ifnull(siblings.siblingData,\'\'), \'}}\') metaCache';
         $selectSql .= ' FROM LEK_segment_data d, LEK_segments s';

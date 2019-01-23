@@ -26,20 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
-
 /**
- * Defines the default interface for MetaData Importers
+ * DB Model for pixel mapping
  */
-interface editor_Models_Import_IMetaDataImporter {
-    /**
-     * calls the internal import mechanisim
-     * @param editor_Models_Task $task
-     * @param editor_Models_Import_MetaData $meta
-     */
-    public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta);
+class editor_Models_Db_PixelMapping extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_pixel_mapping';
+    public $_primary = 'id';
 }
