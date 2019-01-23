@@ -1103,6 +1103,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           additionalLength += meta.additionalMrkLength;
       }
       
+      //return 30; // for testing
       return additionalLength + textLength;
   },
   
