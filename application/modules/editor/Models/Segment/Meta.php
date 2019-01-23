@@ -81,7 +81,7 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
             //the additional mrk length is added here to each field, 
             // so that it is available in the frontend out of the cached siblings without providing an additional data field
             // (the additional unit length is added once to the calculation in the frontend!
-            $data->length[$field] = (int)$segment->textLength($value) + (int)$this->getAdditionalMrkLength();
+            $data->length[$field] = (int)$segment->textLengthByMeta($value, $this) + (int)$this->getAdditionalMrkLength();
         }
         $this->__call(__FUNCTION__, [json_encode($data)]);
     }
@@ -94,7 +94,7 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
      * @param string $taskGuid
      * @return array
      */
-    public function getFontDataForTask($taskGuid) {
+    public function getAllFontsInTask($taskGuid) {
         $sql = $this->db->select()
                 ->from($this->db, array('font','fontSize'))
                 ->distinct()

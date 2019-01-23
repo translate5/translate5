@@ -133,13 +133,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           return true;
       }
       
-      $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
-      /* @var $pixelMapping editor_Models_PixelMapping */
-      $sizeUnit = (array_key_exists('sizeUnit', $meta) && !empty($meta['sizeUnit'])) ? $meta['sizeUnit'] : $pixelMapping::SIZE_UNIT_XLF_DEFAULT;
-      if($sizeUnit == $pixelMapping::SIZE_UNIT_FOR_PIXELMAPPING) {
-          $taskGuid = $this->segment->getTaskGuid();
-          $font = $meta['font'];
-          $fontSize = intval($meta['fontSize']);
+      $sizeUnit = (array_key_exists('sizeUnit', $meta) && !empty($meta['sizeUnit'])) ? $meta['sizeUnit'] : editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT;
+      if($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
           $isPixelBased = true;
       } else {
           $isPixelBased = false;
@@ -153,11 +148,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           }
           if($id == $this->segment->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
-              if($isPixelBased) {
-                  $length += $pixelMapping->pixelLength($value, $taskGuid, $font, $fontSize);
-              } else {
-                  $length += (int)$this->segment->textLength($value);
-              }
+              $length += (int)$this->segment->textLengthByMeta($value, $this->segment->meta());
           }
           else {
               //add the text length of desired field 

@@ -48,12 +48,15 @@ ADD `sizeUnit` VARCHAR(6) NOT NULL DEFAULT '' COMMENT 'char or pixel' AFTER `max
 ADD `font` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'font-family' AFTER `sizeUnit`,
 ADD `fontSize` INT(3) NOT NULL DEFAULT 0 AFTER `font`;
 
--- (TODO: migration-script)
--- Segments might have been imported without saving their meta-data-information, hence
--- we need to make sure that from now on their (empty) meta-data-information exists.
+-- Migration-script: Segments might have been imported without saving their meta-data-information,
+-- hence we need to make sure that from now on their (empty) meta-data-information exists.
+INSERT INTO `LEK_segments_meta` (`taskGuid`, `segmentId`, `termtagState`, `transitLockedForRefMat`, `noMissingTargetTermOnImport`) 
+SELECT `LEK_segments`.`taskGuid`, `LEK_segments`.`id` `segmentId`, 'untagged' `termtagState`, 0 `transitLockedForRefMat`, 0 `noMissingTargetTermOnImport`
+FROM `LEK_segments`
+LEFT OUTER JOIN `LEK_segments_meta` ON `LEK_segments_meta`.`segmentId` = `LEK_segments`.`id`
+WHERE `LEK_segments_meta`.`segmentId` IS NULL;
 
 -- default values for pixel-widths for font-size
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES 
-('runtimeOptions.pixelMapping.defaultPixelWidthGeneral', '1', 'editor', 'system', '', '', '', 'integer', 'Default pixel-width if nothing else is set, example: 4'),
 ('runtimeOptions.pixelMapping.defaultPixelWidths', '1', 'editor', 'system', '', '', '', 'map', 'Default pixel-widths for font-sizes, example: {"12":"3", "13":"4", "14":"5"}');
 
