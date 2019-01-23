@@ -1053,12 +1053,12 @@ abstract class editor_Workflow_Abstract {
         if($wasNotFinished && $stat['roleAllFinished']) {
             //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
             $tua->setState(self::STATE_FINISH);
-            $this->handleAllFinishOfARole();
+            $this->handleAllFinishOfARole($stat);
         }
         if($wasNotFinished && $stat['allFinished']) {
             //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
             $tua->setState(self::STATE_FINISH);
-            $this->handleAllFinish();
+            $this->handleAllFinish($stat);
         }
         $tua->setState($originalState);
         $this->handleUserAssociationDeleted();
@@ -1152,18 +1152,18 @@ abstract class editor_Workflow_Abstract {
         $stat = $this->calculateFinish();
         
         if($stat['roleFirstFinished']) {
-            $this->handleFirstFinishOfARole();
+            $this->handleFirstFinishOfARole($stat);
         }
         if($stat['firstFinished']) {
-            $this->handleFirstFinish();
+            $this->handleFirstFinish($stat);
         }
         if($stat['roleAllFinished']) {
-            $this->handleAllFinishOfARole(); 
+            $this->handleAllFinishOfARole($stat); 
         }
         if($stat['allFinished']) {
-            $this->handleAllFinish(); 
+            $this->handleAllFinish($stat); 
         }
-        $this->handleFinish();
+        $this->handleFinish($stat);
     }
     
     /**
@@ -1229,33 +1229,38 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * will be called after a user has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      * @abstract
      */
-    abstract protected function handleFinish();
+    abstract protected function handleFinish(array $finishStat);
     
     /**
      * will be called after first user of a role has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      * @abstract
      */
-    abstract protected function handleFirstFinishOfARole();
+    abstract protected function handleFirstFinishOfARole(array $finishStat);
     
     /**
      * will be called after all users of a role has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      * @abstract
      */
-    abstract protected function handleAllFinishOfARole();
+    abstract protected function handleAllFinishOfARole(array $finishStat);
     
     /**
      * will be called after a user has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      * @abstract
      */
-    abstract protected function handleFirstFinish();
+    abstract protected function handleFirstFinish(array $finishStat);
     
     /**
      * will be called after all associated users of a task has finished a task
+     * @param array $finishStat contains the info which of all different finishes are applicable
      * @abstract
      */
-    abstract protected function handleAllFinish();
+    abstract protected function handleAllFinish(array $finishStat);
     
     /**
      * will be called after a task has been ended
