@@ -105,7 +105,7 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
      * @param int $fontSize
      * @return array
      */
-    protected function getPixelMappingByFont(int $customerId, string $fontFamily, int $fontSize) {
+    public function getPixelMappingByFont(int $customerId, string $fontFamily, int $fontSize) {
         $pixelMappingForFont = array();
         $sql = $this->db->select()
         ->from($this->db, array('unicodeChar','pixelWidth'))

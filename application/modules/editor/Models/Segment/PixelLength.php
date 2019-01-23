@@ -77,6 +77,11 @@ class editor_Models_Segment_PixelLength {
     protected $customerId;
     
     /**
+     * @var editor_Models_PixelMapping
+     */
+    protected $pixelMapping;
+    
+    /**
      * PixelMapping for current task
      * @var array
      */
@@ -90,10 +95,10 @@ class editor_Models_Segment_PixelLength {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        $this->customerId = $task->getCustomerId();
-        $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
+        $this->customerId = intval($task->getCustomerId());
+        $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
         /* @var $pixelMapping editor_Models_PixelMapping */
-        $this->pixelMappingForTask = $pixelMapping->getPixelMappingForTask(intval($task->getCustomerId()), $task->getAllFontsInTask());
+        $this->pixelMappingForTask = $this->pixelMapping->getPixelMappingForTask(intval($task->getCustomerId()), $task->getAllFontsInTask());
     }
     
     /**
@@ -101,7 +106,7 @@ class editor_Models_Segment_PixelLength {
      * @return string
      */
     public function getTaskGuid() {
-        return $this->taskGuid();
+        return $this->taskGuid;
     }
     
     /**
@@ -115,7 +120,44 @@ class editor_Models_Segment_PixelLength {
     public function getPixelMappingForSegment(string $fontFamily, int $fontSize) {
         $pixelMappingForTask = $this->pixelMappingForTask;
         $fontFamily = strtolower($fontFamily);
+        if (!isset($pixelMappingForTask[$fontFamily][$fontSize])) {
+            // eg on import, the task's font as set in the segment's are unknown (= the segments don't exist yet).
+            // In this case we check the pixelMapping for the missing combination of font-family and font-size and add it (if found).
+            $this->addPixelMappingForFont($fontFamily, $fontSize);
+            $pixelMappingForTask = $this->pixelMappingForTask;
+        }
         return isset($pixelMappingForTask[$fontFamily][$fontSize]) ? $pixelMappingForTask[$fontFamily][$fontSize] : [];
+    }
+    
+    /**
+     * Add the pixelMapping for a specific font to the pixelMappingForTask.
+     * @param string $fontFamily
+     * @param int $fontSize
+     */
+    protected function addPixelMappingForFont(string $fontFamily, int $fontSize) {
+        $fontFamily = strtolower($fontFamily);
+        // If there is anything set in the database, add it:
+        $pixelMappingForFont = $this->pixelMapping->getPixelMappingByFont($this->customerId, $fontFamily, $fontSize);
+        if (!empty($pixelMappingForFont)) {
+            $this->pixelMappingForTask[$fontFamily][$fontSize] = $pixelMappingForFont;
+        }
+        // If a default value is set (and not already set for this font-size), add it, too:
+        if (!array_key_exists('default', $this->pixelMappingForTask[$fontFamily][$fontSize])) {
+            $defaultPixelWidthForFont = $this->pixelMapping->getDefaultPixelWidth($fontSize);
+            if (!empty($defaultPixelWidthForFont)) {
+                $this->pixelMappingForTask[$fontFamily][$fontSize]['default'] = $defaultPixelWidthForFont;
+            }
+        }
+        /*
+         [verdana] => Array
+                    (
+                        [13] => Array
+                            (
+                                [1593] => 12
+                                [default] => 4
+                             )
+                     )
+         */
     }
     
     /**
@@ -127,6 +169,7 @@ class editor_Models_Segment_PixelLength {
      */
     public function textLengthByPixel ($segmentContent, $fontFamily, $fontSize) {
         $pixelLength = 0;
+        $fontFamily = strtolower($fontFamily);
         $pixelMappingForSegment = $this->getPixelMappingForSegment($fontFamily, $fontSize);
         $charsNotSet = array();
         $charsNotSetMsg = '';
@@ -137,6 +180,7 @@ class editor_Models_Segment_PixelLength {
         // get length for string by adding each character's length
         $allCharsInSegment = $this->segmentContentAsCharacters($segmentContent);
         foreach ($allCharsInSegment as $key => $char) {
+            $charWidth = null;
             $unicodeCharNumeric = $this->getNumericValueOfUnicodeChar($char);
             if (array_key_exists($unicodeCharNumeric, $pixelMappingForSegment)) {
                 $charWidth = $pixelMappingForSegment[$unicodeCharNumeric];
@@ -150,6 +194,13 @@ class editor_Models_Segment_PixelLength {
                 }
             }
             error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => pixelLength: ' . $pixelLength);
+            
+            if (is_null($charWidth)) {
+                $msg = 'textlength by pixel failed; most probably data about the pixelWidth is missing';
+                $msg .= ' ('. $fontFamily. ', font-size ' . $fontSize . ')';
+                throw new ZfExtended_Exception($msg);
+            }
+            
             $pixelLength += $charWidth;
         }
         

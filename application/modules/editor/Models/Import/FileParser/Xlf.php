@@ -393,8 +393,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //by definition the first otherContent belongs to the whole transunit - this value is stored in each segment
         // only of preserveWhitespace is true
         if($preserveWhitespace && !empty($otherContent[0])) {
-            $attributes->additionalUnitLength = $this->segmentBareInstance->textLength($text($otherContent[0]));
-            // TODO: über $attributes auch die sizeUnit holen und analog auf pixelLength gehen statt textLength
+            $attributes->additionalUnitLength = $this->segmentBareInstance->textLengthByImportattributes($text($otherContent[0]), $attributes, $this->task->getTaskGuid());
         }
         //the other lengths are stored per affected segment, so if there is none, do nothing
         if(empty($otherContent[$attributes->mrkMid])) {
@@ -416,8 +415,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $content = '';
             }
         }
-        $attributes->additionalMrkLength = $this->segmentBareInstance->textLength($content);
-        // TODO: über $attributes auch die sizeUnit holen und analog auf pixelLength gehen statt textLength
+        $attributes->additionalMrkLength = $this->segmentBareInstance->textLengthByImportattributes($content, $attributes, $this->task->getTaskGuid());
     }
     
     /**
@@ -693,12 +691,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //  Easiest way: each transunit of the xlf file gets a counter   
         $segmentAttributes->transunitId = $this->_fileId.'_'.$this->transUnitCnt.'_'.$transunitId;
         
-        $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
-        $segmentAttributes->maxWidth = $this->xmlparser->getAttribute($attributes, 'maxwidth', null);
-        
-        $segmentAttributes->sizeUnit = $this->getPixelMappingAttribute($attributes, 'size-unit');
-        $segmentAttributes->font     = $this->getPixelMappingAttribute($attributes, 'font');
-        $segmentAttributes->fontSize = $this->getPixelMappingAttribute($attributes, 'fontSize');
+        // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task-template); optional
+        $segmentAttributes->minWidth = $this->getLengthRestrictionAttribute($attributes, 'minWidth');
+        $segmentAttributes->maxWidth = $this->getLengthRestrictionAttribute($attributes, 'maxWidth');
+        $segmentAttributes->sizeUnit = $this->getLengthRestrictionAttribute($attributes, 'size-unit');
+        $segmentAttributes->font     = $this->getLengthRestrictionAttribute($attributes, 'font');
+        $segmentAttributes->fontSize = $this->getLengthRestrictionAttribute($attributes, 'fontSize');
         
         // When pixelMapping is to be used, the config's defaultPixelWidth for this fontSize must exist.
         // (We cannot assume that every character will have a pixelWidth set in the pixelMapping-table,
@@ -708,7 +706,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->pixelMapping->getDefaultPixelWidth($segmentAttributes->fontSize);
             }
             catch(Zend_Db_Statement_Exception $e) {
-                $msg = 'Import failed for task ' . $this->task->getTaskGuid() . ': ' . $e->getMessage();
+                $msg = 'Import failed for task ' . $this->task->getTaskGuid() . ' at trans-unit id ' . $transunitId . ': ' . $e->getMessage();
                 throw new ZfExtended_Exception($msg);
             }
         }
@@ -717,18 +715,24 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * PixelMapping-Attributes (sizeUnit, font, fontSize): If there is nothing set in the xlf-transUnit,
-     * then we check if something is set for the task in general.
+     * Length-Restriction-Attributes (sizeUnit, font, fontSize, minWidth, maxWidth): 
+     * If there is nothing set in the xlf's trans-unit,
+     * then we check if something is set for the task in general (task-template).
      * @param array $attributes transUnit attributes
      * @param string $attrName
      * @return string|null $attrValue
      */
-    protected function getPixelMappingAttribute ($attributes, $attrName) {
+    protected function getLengthRestrictionAttribute ($attributes, $attrName) {
+        // xliff's trans-unit:
         $attrValue = $this->xmlparser->getAttribute($attributes, $attrName, null);
         if (is_null($attrValue)) {
+            // fallback: check task-template
             $taskConfig = Zend_Registry::get('taskTemplate');
-            if (isset($taskConfig->pixelmapping->$attrName)) {
-                // TODO: Gilt ein leerer Eintrag als gültiger Wert?
+            if (isset($taskConfig->pixelmapping->$attrName) 
+                    && trim($taskConfig->pixelmapping->$attrName) != "") {
+                    // eg. <minWidth>0</minWidth> would be taken (=> don't check for empty() here!)
+                    // eg. <minWidth></minWidth>  would NOT be taken
+                    // eg. <minWidth> </minWidth> would NOT be taken
                 $attrValue = $taskConfig->pixelmapping->$attrName;
             }
         }
