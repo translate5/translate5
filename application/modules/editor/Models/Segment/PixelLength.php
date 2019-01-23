@@ -193,7 +193,6 @@ class editor_Models_Segment_PixelLength {
                     $charsNotSetMsg .= '- ' . $unicodeCharNumeric . ' (' . $char. ')'."\n";
                 }
             }
-            error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => pixelLength: ' . $pixelLength);
             
             if (is_null($charWidth)) {
                 $msg = 'textlength by pixel failed; most probably data about the pixelWidth is missing';
@@ -202,6 +201,7 @@ class editor_Models_Segment_PixelLength {
             }
             
             $pixelLength += $charWidth;
+            error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => length now: ' . $pixelLength);
         }
         
         if (!empty($charsNotSet)) {
