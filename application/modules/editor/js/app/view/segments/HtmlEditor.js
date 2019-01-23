@@ -1050,7 +1050,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           div = document.createElement("div"),
           additionalLength = 0,
           meta = me.currentSegment.get('metaCache'),
-          field = me.dataIndex;
+          field = me.dataIndex,
+          textLength;
       
       //function can be called with given text - or not. Then it uses the current value.
       if(!Ext.isDefined(text) || text === null){
@@ -1072,26 +1073,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           }
       });
       
-      // ----------- pixel-based -------------
-      
-      var pixelMapping = Editor.view.segments.PixelMapping;
-      if (meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) {
-          pixelLength = pixelMapping.getPixelLength(div.innerText, meta);
-          div = null;
-          return pixelLength;
-      }
-      
-      // ----------- character-based -------------
-      
       //add the length of the text itself 
-      text = div.textContent || div.innerText || "";
-      //remove characters with 0 length:
-      text = text.replace(/\u200B/g, '');
+      textLength = me.getLength(text, meta, div);
       
       div = null;
       
       //only the segment length + the tag lengths:
-      me.lastSegmentLength = additionalLength + text.length;
+      me.lastSegmentLength = additionalLength + textLength;
 
       //add the length of the sibling segments (min max length is given for the whole transunit, not each mrk tag
       if(meta && meta.siblingData) {
@@ -1115,8 +1103,26 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           additionalLength += meta.additionalMrkLength;
       }
       
-      return additionalLength + text.length;
+      return additionalLength + textLength;
   },
+  
+  /**
+   * Return the text's length either based on pixelMapping or as the number of code units in the text.
+   * @return {Integer}
+   */
+  getLength: function (text, meta, div) {
+      var pixelMapping = Editor.view.segments.PixelMapping;
+      // ----------- pixel-based -------------
+      if (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) {
+          return pixelMapping.getPixelLength(div.innerText, meta);
+      } 
+      // ----------- char-based -------------
+      text = div.textContent || div.innerText || "";
+      //remove characters with 0 length:
+      text = text.replace(/\u200B/g, '');
+      return text.length;
+  },
+  
   /**
    * returns the last calculated segment length (with tag lengths, without sibling lengths)
    * @return {Integer}

@@ -61,17 +61,10 @@ Ext.define('Editor.view.segments.PixelMapping', {
                } else {
                    charWidth = pixelMapping['default'];
                }
-               console.log('['+key+'] ' + char + ' ('+ unicodeCharNumeric + '): ' + charWidth + ' => pixelLength: ' + pixelLength);
                key++;
                pixelLength += parseInt(charWidth);
+               console.log('['+key+'] ' + char + ' ('+ unicodeCharNumeric + '): ' + charWidth + ' => pixelLength: ' + pixelLength);
            });
-
-           // TODO:
-           // - in PHP: 
-           // [116]ع (1593): 12) => pixelLength: 512
-           // - in Javascript:
-           // [116] ع (1593): 12 => pixelLength: 512
-           // [117]   (32): 4 => pixelLength: 524
 
            return pixelLength;
         },
@@ -86,7 +79,7 @@ Ext.define('Editor.view.segments.PixelMapping', {
         getPixelMappingForSegment: function(segmentMeta) {
             var me = this,
                 pixelMapping = Editor.data.task.get('pixelMapping'),
-                fontFamily = segmentMeta.font,
+                fontFamily = segmentMeta.font.toLowerCase(),
                 fontSize = segmentMeta.fontSize,
                 pixelMappingForFontfamily = pixelMapping[fontFamily];
             return pixelMappingForFontfamily[fontSize];
