@@ -164,26 +164,27 @@ Ext.define('Editor.view.segments.MinMaxLength', {
     /**
      * Update the minmax status strip label
      */
-    updateLabel: function(record, charactersCount){
+    updateLabel: function(record, segmentLength){
         var me=this,
             meta=record.get('metaCache'),
+            messageSizeUnit = (meta.sizeUnit === Editor.view.segments.PixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) ? 'px' : '',
             msgs = me.up('segmentsHtmleditor').strings,
             labelData = {
-                length: charactersCount,
-                minWidth: meta && meta.minWidth ? meta.minWidth : 0,
-                maxWidth: meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER,
+                length: segmentLength + messageSizeUnit,
+                minWidth: meta && meta.minWidth ? meta.minWidth : 0, // don't add messageSizeUnit here, will be used for calculating...
+                maxWidth: meta && meta.maxWidth ? meta.maxWidth : Number.MAX_SAFE_INTEGER, // don't add messageSizeUnit here, will be used for calculating...
                 siblings: null
             },
             tplData = {
                 cls: 'invalid-length'
             };
 
-        if(labelData.minWidth <= charactersCount && charactersCount <= labelData.maxWidth) {
+        if(labelData.minWidth <= segmentLength && segmentLength <= labelData.maxWidth) {
             tplData.cls = 'valid-length';
         }
         else {
-            tplData.tip = charactersCount > labelData.maxWidth ? msgs.segmentToLong : msgs.segmentToShort;
-            tplData.tip = Ext.String.format(tplData.tip, charactersCount > labelData.maxWidth ? labelData.maxWidth : labelData.minWidth);
+            tplData.tip = segmentLength > labelData.maxWidth ? msgs.segmentToLong : msgs.segmentToShort;
+            tplData.tip = Ext.String.format(tplData.tip, segmentLength > labelData.maxWidth ? labelData.maxWidth : labelData.minWidth);
         }
         
         if(meta && meta.siblingData) {

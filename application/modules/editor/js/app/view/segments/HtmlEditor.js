@@ -48,6 +48,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   idPrefix: 'tag-image-',
   requires: [
       'Editor.view.segments.HtmlEditorLayout',
+      'Editor.view.segments.PixelMapping',
       'Editor.view.segments.StatusStrip'
   ],
   mixins: ['Editor.util.SegmentEditorSnapshots'
@@ -1073,6 +1074,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               additionalLength += l;
           }
       });
+      
+      // ----------- pixel-based -------------
+      
+      var pixelMapping = Editor.view.segments.PixelMapping;
+      if (meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) {
+          pixelLength = pixelMapping.getPixelLength(div.innerText, meta);
+          div = null;
+          return pixelLength;
+      }
+      
+      // ----------- character-based -------------
       
       //add the length of the text itself 
       text = div.textContent || div.innerText || "";
