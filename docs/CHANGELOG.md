@@ -3,6 +3,10 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.0.3] - 2019-01-24
+###Added
+TRANSLATE-1547: Workflow: send mail to PM if one user finishes a task
+TRANSLATE-1386: Pixel-based length restrictions for display text translation
 
 ## [3.0.2] - 2019-01-21
 ###Added
