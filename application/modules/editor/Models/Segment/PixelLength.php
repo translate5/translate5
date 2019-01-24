@@ -201,16 +201,20 @@ class editor_Models_Segment_PixelLength {
             }
             
             $pixelLength += $charWidth;
-            error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => length now: ' . $pixelLength);
+            //error_log('[' . $key . '] ' . $char . ' ('. $unicodeCharNumeric . '): '.$charWidth. ') => length now: ' . $pixelLength);
         }
         
         if (!empty($charsNotSet)) {
             sort($charsNotSet);
+            $customer = ZfExtended_Factory::get('editor_Models_Customer');
+            /* @var $customer editor_Models_Customer */
+            $customer->load($this->customerId);
+            
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $logMsg = 'No pixel-width set for ('.$fontFamily . ', font-size '. $fontSize .', customerId ' . $this->customerId.')' . "\n";
+            $logMsg = 'No pixel-width set for ('.$fontFamily . ', font-size: '. $fontSize .', Customer: ' . $customer.')' . "\n";
             $logMsg .= 'Default width '.$pixelMappingForSegment['default'].'px for character used. Affected characters: '."\n".$charsNotSetMsg;
-            $log->logError($logMsg);
+            $log->log('Segment length calculation: missing pixel width', $logMsg);
         }
         
         return $pixelLength;

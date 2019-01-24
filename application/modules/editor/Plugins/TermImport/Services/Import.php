@@ -356,15 +356,10 @@ class editor_Plugins_TermImport_Services_Import {
             
         $customerNumber=$this->configMap[self::COLLECTION_MAPPING_GROUP][$collectionName];
         
-        $cm=ZfExtended_Factory::get('editor_Models_Customer');
-        /* @var $cm editor_Models_Customer */
-        $customer=$cm->findCustomerByNumber($customerNumber);
-        
-        if(!$customer){
-            return "Customer with number:".$customerNumber.' does not exist.';
-        }
-        
-        $customerId=$customer['id'];
+        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $customer->loadByNumber($customerNumber);
+        $customerId = $customer->getId();
         
         $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $model editor_Models_TermCollection_TermCollection */

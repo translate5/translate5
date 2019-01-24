@@ -145,12 +145,19 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           if($id == $this->segment->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
               $length += (int)$this->segment->textLengthByMeta($value, $this->segment->meta());
+              //normally, the length of one segment contains also the additionalMrkLength, 
+              //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
           }
           else {
               //add the text length of desired field 
               $length += (int)$data['length'][$field];
           }
       }
+      
+      settype($meta['additionalUnitLength'], 'integer');
+      $length += $meta['additionalUnitLength'];
+      settype($meta['additionalMrkLength'], 'integer');
+      $length += $meta['additionalMrkLength'];
       
       $messageSizeUnit = ($isPixelBased) ? 'px' : '';
       if(array_key_exists('minWidth', $meta) && $length < $meta['minWidth']) {
