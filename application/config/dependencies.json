@@ -167,6 +167,45 @@
                     "relpath": "docs\/third-party-licenses\/skel-license.txt"
                 }
             ]
+        },
+        {
+            "name": "phpppreadsheet",
+            "label": "PhpSpreadsheet",
+            "version": "1.6",
+            "url": "RELEASE:PhpSpreadsheet-and-dependencies.zip",
+            "target": "library\/PhpSpreadsheet\/",
+            "licenses": [
+                {
+                    "uses": "Composer",
+                    "license": "Expat",
+                    "relpath": "docs\/third-party-licenses\/Composer-license.txt"
+                },
+                {
+                    "uses": "Composer File Util\/TlsHelper.php",
+                    "license": "Expat and BSD-2-Clause",
+                    "relpath": "docs\/third-party-licenses\/Composer-license.txt"
+                },
+                {
+                    "uses": "PHPComplex",
+                    "license": "MIT",
+                    "relpath": "docs\/third-party-licenses\/MarkBaker-PHPComplex-license.md"
+                },
+                {
+                    "uses": "PHPMatrix",
+                    "license": "MIT",
+                    "relpath": "docs\/third-party-licenses\/MarkBaker-PHPMatrix-license.md"
+                },
+                {
+                    "uses": "PhpSpreadsheet",
+                    "license": "LGPL",
+                    "relpath": "docs\/third-party-licenses\/PhpSpreadsheet-license.txt"
+                },
+                {
+                    "uses": "PHP FIG Simple Cache PSR",
+                    "license": "MIT",
+                    "relpath": "docs\/third-party-licenses\/Simple-Cache-license.md"
+                }
+            ]
         }
     ]
 }
