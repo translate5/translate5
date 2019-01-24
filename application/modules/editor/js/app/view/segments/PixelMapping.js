@@ -50,9 +50,9 @@ Ext.define('Editor.view.segments.PixelMapping', {
                 allCharsInText = me.stringToArray(text),
                 pixelMapping = me.getPixelMappingForSegment(segmentMeta),
                 charWidth;
-           console.dir(pixelMapping);
-           console.log(text);
-           console.dir(allCharsInText);
+           //console.dir(pixelMapping);
+           //console.log(text);
+           //console.dir(allCharsInText);
            var key = 0;
            Ext.each(allCharsInText, function(char){
                unicodeCharNumeric = char.codePointAt(0);
@@ -63,7 +63,7 @@ Ext.define('Editor.view.segments.PixelMapping', {
                }
                key++;
                pixelLength += parseInt(charWidth);
-               console.log('['+key+'] ' + char + ' ('+ unicodeCharNumeric + '): ' + charWidth + ' => pixelLength: ' + pixelLength);
+               //console.log('['+key+'] ' + char + ' ('+ unicodeCharNumeric + '): ' + charWidth + ' => pixelLength: ' + pixelLength);
            });
 
            return pixelLength;

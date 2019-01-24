@@ -1116,14 +1116,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getLength: function (text, meta, div) {
       var pixelMapping = Editor.view.segments.PixelMapping;
-      // ----------- pixel-based -------------
-      if (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) {
-          return pixelMapping.getPixelLength(div.innerText, meta);
-      } 
-      // ----------- char-based -------------
       text = div.textContent || div.innerText || "";
       //remove characters with 0 length:
       text = text.replace(/\u200B/g, '');
+      // ----------- pixel-based -------------
+      if (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) {
+          return pixelMapping.getPixelLength(text, meta);
+      } 
+      // ----------- char-based -------------
       return text.length;
   },
   
