@@ -133,12 +133,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           return true;
       }
       
-      $sizeUnit = (array_key_exists('sizeUnit', $meta) && !empty($meta['sizeUnit'])) ? $meta['sizeUnit'] : editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT;
-      if($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
-          $isPixelBased = true;
-      } else {
-          $isPixelBased = false;
-      }
+      $sizeUnit = empty($meta['sizeUnit']) ? editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT : $meta['sizeUnit'];
+      $isPixelBased = ($sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING);
       
       $length = 0;
       foreach($meta['siblingData'] as $id => $data) {

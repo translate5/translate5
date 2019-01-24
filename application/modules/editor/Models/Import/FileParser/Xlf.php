@@ -698,18 +698,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $segmentAttributes->font     = $this->getLengthRestrictionAttribute($attributes, 'font');
         $segmentAttributes->fontSize = $this->getLengthRestrictionAttribute($attributes, 'fontSize');
         
-        // When pixelMapping is to be used, the config's defaultPixelWidth for this fontSize must exist.
-        // (We cannot assume that every character will have a pixelWidth set in the pixelMapping-table,
-        // and if there is no pixelWidth set, the calculation of the pixelLength will be not reliable at all.)
-        if ($segmentAttributes->sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
-            try {
-                $this->pixelMapping->getDefaultPixelWidth($segmentAttributes->fontSize);
-            }
-            catch(Zend_Db_Statement_Exception $e) {
-                $msg = 'Import failed for task ' . $this->task->getTaskGuid() . ' at trans-unit id ' . $transunitId . ': ' . $e->getMessage();
-                throw new ZfExtended_Exception($msg);
-            }
-        }
+        $this->ensurePixelWidthDefault($segmentAttributes);
         
         return $segmentAttributes;
     }
@@ -737,6 +726,27 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
         }
         return $attrValue;
+    }
+    
+    /**
+     * 
+     * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
+     * @throws ZfExtended_Exception
+     */
+    protected function ensurePixelWidthDefault(editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
+        // When pixelMapping is to be used, the config's defaultPixelWidth for this fontSize must exist.
+        // (We cannot assume that every character will have a pixelWidth set in the pixelMapping-table,
+        // and if there is no pixelWidth set, the calculation of the pixelLength will be not reliable at all.)
+        if ($segmentAttributes->sizeUnit != editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
+            return;
+        }
+        try {
+            $this->pixelMapping->getDefaultPixelWidth($segmentAttributes->fontSize);
+        }
+        catch(ZfExtended_Exception $e) {
+            $msg = 'Import failed for task ' . $this->task->getTaskGuid() . ' at trans-unit id ' . $transunitId . ': ' . $e->getMessage();
+            throw new ZfExtended_Exception($msg, 0, $e);
+        }
     }
     
     protected function calculateMatchRate(editor_Models_Import_FileParser_SegmentAttributes $attributes) {

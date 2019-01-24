@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 
-require APPLICATION_PATH.'/../library/composer/vendor/autoload.php';
+require APPLICATION_PATH.'/../library/PhpSpreadsheet/vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;

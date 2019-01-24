@@ -487,7 +487,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @param string $segmentContent
      * @return integer
      */
-    protected function textLengthByChar($segmentContent) {
+    public function textLengthByChar($segmentContent) {
         return mb_strlen($this->prepareForCount($segmentContent, true));
     }
     
