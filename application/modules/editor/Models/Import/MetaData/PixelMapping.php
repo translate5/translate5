@@ -52,10 +52,22 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
     protected $spreadsheet = null;
     
     /**
+     * @var editor_Models_Task
+     */
+    protected $task = null;
+    
+    /**
+     * Container for ignored lines from Excel file
+     * @var array
+     */
+    protected $ignoredLines = [];
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
      */
     public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta) {
+        $this->task = $task;
         $this->importPath = $meta->getImportPath();
         $this->importFromSpreadsheet();
     }
@@ -67,6 +79,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
     public function importFromSpreadsheet() {
         $this->loadSpreadsheet();
         $this->updateDb();
+        $this->logIgnoredLines();
     }
     
     /**
@@ -99,10 +112,30 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
         /* @var $pixelMappingModel editor_Models_PixelMapping */
         for ($row = 2; $row <= $highestRow; ++$row) { // first row: headlines only
             $values = [];
+            $oneColWasEmpty = false;
             for ($col = 1; $col <= $highestColumnIndex; ++$col) {
-                $values[$col] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                $values[] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                $oneColWasEmpty = $oneColWasEmpty || (strlen(end($values)) == 0);
+            }
+            if($oneColWasEmpty) {
+                array_unshift($values, $row);
+                $this->ignoredLines[] = join(', ', $values);
+                continue;
             }
             $pixelMappingModel->insertPixelMappingRow($values);
         }
+    }
+    
+    /**
+     * Log non importable lines from Excel file
+     */
+    protected function logIgnoredLines() {
+        if(empty($this->ignoredLines)) {
+            return;
+        }
+        $msg = 'Task Meta Data Import PixelMapping: ignored one ore more lines of the excel due one or more empty columns'."\n";
+        $msg .= 'Task: '.$this->task->getTaskName().' ('.$this->task->getTaskNr()."\n";
+        $msg .= 'PixelMapping Excel Line(s): '."\n".join("\n", $this->ignoredLines);
+        error_log($msg);
     }
 }

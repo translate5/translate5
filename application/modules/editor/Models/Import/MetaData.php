@@ -115,9 +115,15 @@ class editor_Models_Import_MetaData {
         // - PixelMapping:
         $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_MetaData_PixelMapping'));
         
-        foreach($this->importers as $importer) {
-            /* @var $import editor_Models_Import_MetaData_IMetaDataImporter */
-            $importer->import($task, $this);
+        try {
+            foreach($this->importers as $importer) {
+                /* @var $import editor_Models_Import_MetaData_IMetaDataImporter */
+                $importer->import($task, $this);
+            }
+        }
+        catch(Exception $e) {
+            //FIXME should be some specific Exception
+            throw new ZfExtended_Exception('Task import of meta data failed. Task: '.$task->getTaskName().' ('.$task->getTaskNr().')', 0, $e);
         }
     }
 

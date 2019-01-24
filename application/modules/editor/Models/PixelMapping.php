@@ -53,31 +53,72 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass   = 'editor_Models_Validator_PixelMapping';
     
     /**
+     * Just an customer instance to load the missing customer IDs
+     * @var editor_Models_Customer
+     */
+    protected $bareCustomerInstance = null;
+    
+    /**
+     * Cache for 
+     * @var array
+     */
+    protected $cachedCustomers = [];
+    
+    public function __construct() {
+        parent::__construct();
+        $this->bareCustomerInstance = ZfExtended_Factory::get('editor_Models_Customer');
+    }
+    
+    /**
      * insert or update PixelMapping for Unicode-Character as given in pixel-mapping.xlsx
      * (order of columns must not be changed; see Confluence!).
      * @param array $values
      */
     public function insertPixelMappingRow($values) {
-        $customerId = $values[1];
-        $font = strtolower($values[2]);
-        $fontsize = $values[3];
-        $unicodeChar = $values[4];
-        $pixelWidth = $values[5];
+        $values = array_slice($values, 0, 5);
+        $dataToBind = array_combine(['customerId', 'font', 'fontsize', 'unicodeChar', 'pixelWidth'], $values);
+        $dataToBind['font'] = strtolower($dataToBind['font']);
+        
         $sql= 'INSERT INTO LEK_pixel_mapping (`customerId`,`font`,`fontsize`,`unicodeChar`,`pixelWidth`)
-                                VALUES ('.$customerId.', \''. $font .'\', '.$fontsize.', \''.$unicodeChar.'\', '.$pixelWidth.')
+                                VALUES (:customerId, :font, :fontsize, :unicodeChar, :pixelWidth)
                                 ON DUPLICATE KEY UPDATE
-                                    `customerId` = '. $customerId .',
-                                    `font` = \''. $font .'\',
-                                    `fontsize` = '. $fontsize .',
-                                    `unicodeChar` = \''. $unicodeChar .'\',
-                                    `pixelWidth` = '. $pixelWidth .';
-                                ';
+                                    `customerId` = :customerId,
+                                    `font` = :font,
+                                    `fontsize` = :fontsize,
+                                    `unicodeChar` = :unicodeChar,
+                                    `pixelWidth` = :pixelWidth';
+        
         try {
-            $this->db->getAdapter()->query($sql);
+            //customerId is filled with the customer number first:
+            $dataToBind['customerId'] = $this->getCustomerId($dataToBind['customerId']);
+            
+            $this->db->getAdapter()->query($sql, $dataToBind);
+            return;
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //no customer to the number found, proceed with the below Exception
         }
         catch(Zend_Db_Statement_Exception $e) {
-            throw new ZfExtended_Exception('Pixel-Mapping: Import failed.');
+            if(strpos($e->getMessage(), 'Integrity constraint violation: 1452 Cannot add or update a child row') === false) {
+                throw $e;
+            }
+            if(strpos($e->getMessage(), 'FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`)') === false) {
+                throw $e;
+            }
         }
+        throw new ZfExtended_Exception('Pixel-Mapping: Import failed due not found client specified by client number in excel - client nr: '. $dataToBind['customerId']);
+    }
+    
+    /**
+     * Gets the customer id to a customer number (in a cached way)
+     * @param string $customerNumber
+     */
+    protected function getCustomerId($customerNumber) {
+        if(empty($this->cachedCustomers[$customerNumber])) {
+            $this->bareCustomerInstance->loadByNumber($customerNumber);
+            $this->cachedCustomers[$customerNumber] = $this->bareCustomerInstance->getId();
+        }
+        return $this->cachedCustomers[$customerNumber];
     }
     
     /**

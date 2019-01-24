@@ -208,7 +208,8 @@ class editor_Models_Segment_PixelLength {
             sort($charsNotSet);
             $log = ZfExtended_Factory::get('ZfExtended_Log');
             /* @var $log ZfExtended_Log */
-            $logMsg = 'No pixel-width set for ('.$fontFamily . ', font-size '. $fontSize .', customerId ' . $this->customerId.'):' . "\n" . $charsNotSetMsg;
+            $logMsg = 'No pixel-width set for ('.$fontFamily . ', font-size '. $fontSize .', customerId ' . $this->customerId.')' . "\n";
+            $logMsg .= 'Default width '.$pixelMappingForSegment['default'].'px for character used. Affected characters: '."\n".$charsNotSetMsg;
             $log->logError($logMsg);
         }
         

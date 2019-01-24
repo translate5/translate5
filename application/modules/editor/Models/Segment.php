@@ -450,10 +450,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return integer
      */
     public function textLengthByMeta($segmentContent, editor_Models_Segment_Meta $segmentMeta) {
-        $pixelLength = $this->getPixelLength($segmentMeta->getTaskGuid()); // make sure that the pixelLength we use is that for the segment's task!
         $isPixelBased = ($segmentMeta->getSizeUnit() == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
-            return $pixelLength->textLengthByPixel($segmentContent, $segmentMeta->getFont(), intval($segmentMeta->getFontSize()));
+            return $this->textLengthByPixel($segmentContent, $segmentMeta->getTaskGuid(), $segmentMeta->getFont(), $segmentMeta->getFontSize());
         }
         return $this->textLengthByChar($segmentContent);
     }
@@ -468,14 +467,25 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      */
     public function textLengthByImportattributes($content, editor_Models_Import_FileParser_SegmentAttributes $attributes, $taskGuid) {
         error_log('textLengthByImportattributes for task ' . $taskGuid);
-        $pixelLength = $this->getPixelLength($taskGuid); // make sure that the pixelLength we use is that for the segment's task!
         $isPixelBased = ($attributes->sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
-            return $pixelLength->textLengthByPixel($content, $attributes->font, intval($attributes->fontSize));
+            return $this->textLengthByPixel($content, $taskGuid, $attributes->font, $attributes->fontSize);
         }
         return $this->textLengthByChar($content);
     }
     
+    /**
+     * Get pixel length of a segment's text according to the given assumed font and fontsize
+     * @param string $segmentContent
+     * @param string $taskGuid
+     * @param string $font
+     * @param string $fontSize
+     * @return integer
+     */
+    public function textLengthByPixel($segmentContent, $taskGuid, $font, $fontSize) {
+        $pixelLength = $this->getPixelLength($taskGuid); // make sure that the pixelLength we use is that for the segment's task!
+        return $pixelLength->textLengthByPixel($segmentContent, $font, intval($fontSize));
+    }
     
     
     /**
