@@ -466,7 +466,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return integer
      */
     public function textLengthByImportattributes($content, editor_Models_Import_FileParser_SegmentAttributes $attributes, $taskGuid) {
-        error_log('textLengthByImportattributes for task ' . $taskGuid);
         $isPixelBased = ($attributes->sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
         if ($isPixelBased) {
             return $this->textLengthByPixel($content, $taskGuid, $attributes->font, $attributes->fontSize);
