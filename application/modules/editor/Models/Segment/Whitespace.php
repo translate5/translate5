@@ -70,6 +70,7 @@ class editor_Models_Segment_Whitespace {
         '/\x{202F}/u', //Hex UTF-8 bytes or codepoint of small protected space
         '/\x{205F}/u', //Hex UTF-8 bytes or codepoint of middle mathematical space
         '/\x{3000}/u', //Hex UTF-8 bytes or codepoint of ideographic space
+        '/\x{200B}/u', //Hex UTF-8 bytes or codepoint of zero width space
         '/[\x{2000}-\x{200A}]/u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
     ]; //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
     
