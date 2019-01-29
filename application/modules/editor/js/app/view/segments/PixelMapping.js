@@ -50,6 +50,7 @@ Ext.define('Editor.view.segments.PixelMapping', {
                 allCharsInText = me.stringToArray(text),
                 pixelMapping = me.getPixelMappingForSegment(segmentMeta),
                 charWidth;
+            
            //console.dir(pixelMapping);
            //console.log(text);
            //console.dir(allCharsInText);
@@ -70,6 +71,44 @@ Ext.define('Editor.view.segments.PixelMapping', {
         },
         
         /**
+         * What's the length of the given internal tag according to the pixelMapping?
+         * @param {String} tagHtml
+         * @param {Object} segmentMeta (from currentSegment.get('metaCache'))
+         * @return {Integer}
+         */
+        getPixelLengthFromTag: function (tagNode, segmentMeta) {
+            if(!Editor.data.task.get('pixelMapping') || segmentMeta.sizeUnit != this.SIZE_UNIT_FOR_PIXELMAPPING) {
+                return 0;
+            }
+            
+            var me = this, 
+                matches = tagNode.className.match(/^([a-z]*)\s+([gxA-Fa-f0-9]*)/), 
+                plainTag, tag, 
+                returns = {
+                    "hardReturn": "\r\n",
+                    "softReturn": "\n",
+                    "macReturn": "\r"
+                };
+            if(! matches) {
+                return 0;
+            }
+            //convert storaged data back to plain tag
+            tag = me.hexStreamToString(matches[2]);
+            plainTag = tag.replace(/[^a-zA-Z]*$/, '');
+            //if it is a return, use the hardcoded replacements
+            if(returns[plainTag]){
+                return me.getPixelLength(returns[plainTag], segmentMeta);
+            }
+            //get the real payload from the tag
+            if(!(tag = tag.match(/ ts="([^"]+)"/))) {
+                return 0;
+            }
+            
+            //count the length of the real payload
+            return me.getPixelLength(me.hexStreamToString(tag[1]), segmentMeta);
+        },
+        
+        /**
          * Return the pixelMapping for a specific segment as already loaded for the task
          * (= the item from the array with all fonts for the task that matches the segment's
          * font-family and font-size).
@@ -83,6 +122,17 @@ Ext.define('Editor.view.segments.PixelMapping', {
                 fontSize = segmentMeta.fontSize,
                 pixelMappingForFontfamily = pixelMapping[fontFamily];
             return pixelMappingForFontfamily[fontSize];
+        },
+        
+        // ---------------------------------------------------------------------------------------
+        // tag content - Helpers
+        // ---------------------------------------------------------------------------------------
+
+        /**
+         * implementation of PHPs pack('H*', data) function to get the tags real content
+         */
+        hexStreamToString: function(data) {
+            return decodeURIComponent(data.replace(/(..)/g,'%$1'));
         },
         
         // ---------------------------------------------------------------------------------------

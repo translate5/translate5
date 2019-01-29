@@ -106,7 +106,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
-      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" />'
+      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" />'
     ]);
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
@@ -350,15 +350,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.destroy(me.measure);
     return me.result;
   },
-  getIntitalData: function() {
+  getInitialData: function() {
       return {
-              fullPath: Editor.data.segments.fullTagPath,
-              shortPath: Editor.data.segments.shortTagPath
-          };
+          fullPath: Editor.data.segments.fullTagPath,
+          shortPath: Editor.data.segments.shortTagPath
+      };
   },
   replaceTagToImage: function(rootnode, plainContent) {
     var me = this,
-        data = me.getIntitalData();
+        data = me.getInitialData();
     
     Ext.each(rootnode.childNodes, function(item){
       var termFoundCls;
@@ -404,7 +404,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName != 'DIV'){
         return;
       }
-      data = me.getData(item,data); 
+      data = me.getData(item, data); 
       
       if(me.viewModesController.isFullTag() || data.whitespaceTag) {
         data.path = me.getSvg(data.text, data.fullWidth);
@@ -441,7 +441,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   /**
    * daten aus den tags holen
    */
-  getData: function (item,data) {
+  getData: function (item, data) {
       var me = this,
           divItem, spanFull, spanShort, split,
           sp, fp, //[short|full]Path shortcuts;
@@ -453,6 +453,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.id = spanFull.getAttribute('data-originalid');
       data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
       data.length = spanFull.getAttribute('data-length');
+      
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!
       if(!data.id) {
@@ -467,6 +468,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       //Fallunterscheidung Tag Typ
       data = me.renderTagTypeInData(item.className, data);
 
+      //if it is a whitespace tag we have to precalculate the pixel width of the tag (if possible)
+      if(data.whitespaceTag) {
+          data.pixellength = Editor.view.segments.PixelMapping.getPixelLengthFromTag(item, me.currentSegment.get('metaCache'));
+      }
+      else {
+          data.pixellength = 0;
+      }
+      
       //zusammengesetzte img Pfade:
       this.measure.setHtml(data.text);
       data.fullWidth = this.measure.getSize().width;
@@ -546,7 +555,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
           return;
       }
-      data = me.getIntitalData();
+      data = me.getInitialData();
       data.nr = tagNr;
       switch(whitespaceType){
           case 'nbsp':
@@ -564,7 +573,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
               data.text = '↵';
               break;
           case 'tab':
-              classNameForTagType = 'single 7461622074733d2230393039303922206c656e6774683d2233222f tab';
+              classNameForTagType = 'single 7461622074733d22303922206c656e6774683d2231222f tab';
               data.title = '&lt;'+data.nr+'/&gt;: 1 tab character';
               data.id = 'tab';
               data.length = '1';
@@ -1067,14 +1076,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
       
       div.innerHTML = text;
-      //add the length stored in each img tag 
-      Ext.fly(div).select('img').each(function(item){
-          var l = parseInt(item.getAttribute('data-length') || "0");
-          //data-length is -1 if no length provided
-          if(l > 0) {
-              additionalLength += l;
-          }
-      });
       
       //add the length of the text itself 
       textLength = me.getLength(text, meta, div);
@@ -1115,16 +1116,34 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @return {Integer}
    */
   getLength: function (text, meta, div) {
-      var pixelMapping = Editor.view.segments.PixelMapping;
+      var me = this, 
+          pixelMapping = Editor.view.segments.PixelMapping,
+          isPixel = (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING),
+          length;
       text = div.textContent || div.innerText || "";
       //remove characters with 0 length:
       text = text.replace(/\u200B/g, '');
-      // ----------- pixel-based -------------
-      if (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING) {
-          return pixelMapping.getPixelLength(text, meta);
+      if (isPixel) {
+          // ----------- pixel-based -------------
+          length = pixelMapping.getPixelLength(text, meta);
       } 
-      // ----------- char-based -------------
-      return text.length;
+      else {
+          // ----------- char-based -------------
+          length = text.length;
+      }
+      
+      //add the length stored in each img tag 
+      Ext.fly(div).select('img').each(function(item){
+          //for performance reasons the pixellength is precalculated on converting the div span to img tags 
+          var attr = (isPixel ? 'data-pixellength' : 'data-length'),
+              l = parseInt(item.getAttribute(attr) || "0");
+          //data-length is -1 if no length provided
+          if(l > 0) {
+              length += l;
+          }
+      });
+      
+      return length;
   },
   
   /**
