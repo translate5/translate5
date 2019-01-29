@@ -164,7 +164,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if(empty($collections)) {
             return array();
         }
-        $result = $this->getSortedTermGroups($collections, $termIds, $task->getSourceLang());
+        $result = $this->getSortedTermGroups($collections, $termIds,$task->getSourceLang(),$task->getTargetLang());
         
         if(empty($result)) {
             return array();
@@ -300,10 +300,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $collectionIds term collections associated to the task
      * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
      * @param $sourceLang
+     * @param $sourceLang
      * 
      * @return array
      */
-    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang) {
+    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang,$targetLang) {
         $sourceIds = array();
         $targetIds = array();
         $transFoundSearch = array();
@@ -326,7 +327,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
                 ->where('t1.collectionId IN(?)', $collectionIds)
                 ->where('t2.collectionId IN(?)', $collectionIds)
-                ->where('t1.mid IN('.$serialIds.')');
+                ->where('t1.mid IN('.$serialIds.')')
+                ->where('t1.language IN (?)',array($sourceLang,$targetLang))
+                ->where('t2.language IN (?)',array($sourceLang,$targetLang));
        
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
