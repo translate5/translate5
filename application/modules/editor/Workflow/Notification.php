@@ -226,6 +226,52 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * Workflow specific PM Notification after one users of a role have finished a task
+     * @param string $triggeringRole
+     * @param boolean $isCron
+     */
+    public function notifyOneFinishOfARole() {
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+        $task = $this->config->task;
+        $workflow = $this->config->workflow;
+        $isCron = $workflow->isCalledByCron();
+        if($isCron) {
+            //currently we do not trigger the notifyOne on cron actions (since currently there are all users set to finish)
+            return;
+        }
+        $triggeringRole = $this->config->newTua->getRole();
+        $this->tua = clone $this->config->newTua; //we just reuse the already used entity
+        $currentStep = $workflow->getStepOfRole($triggeringRole);
+        if($currentStep === false){
+            error_log("No workflow step to Role ".$triggeringRole." found! This is actually a workflow config error!");
+        }
+        
+        $currentUsers = $this->tua->getUsersOfRoleOfTask($triggeringRole, $task->getTaskGuid(), ['state']);
+        $params = array(
+            'triggeringRole' => $triggeringRole,
+            'currentUsers' => $currentUsers,
+            'task' => $task,
+            'workflow' => $workflow
+        );
+        
+        //set the triggering user
+        $params['currentUser'] = [];
+        foreach($currentUsers as $user) {
+            if($user['userGuid'] == $this->tua->getUserGuid()) {
+                $params['currentUser'] = $user;
+            }
+        }
+        
+        //send to the PM
+        $pms = $this->getTaskPmUsers();
+        foreach($pms as $pm) {
+            $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params); //@todo PM currently not defined as WORKFLOW_ROLE, so hardcoded here
+            $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
+            $this->notify($pm);
+        }
+    }
+    
+    /**
      * Sends a notification to users which are attached newly to a task with status open
      * The User to be notified is gathered from the current active TaskUserAssociation
      */

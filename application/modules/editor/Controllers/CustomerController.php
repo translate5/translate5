@@ -87,8 +87,8 @@ class Editor_CustomerController extends ZfExtended_RestController {
         }
         catch(Zend_Db_Statement_Exception $e) {
             $m = $e->getMessage();
-            if(stripos($m, 'Integrity constraint violation') !== false) {
-                throw new ZfExtended_Models_Entity_NotAcceptableException('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
+            if(stripos($m, 'Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails') !== false) {
+                 throw new ZfExtended_Models_Entity_Conflict('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
             }
             throw $e;
         }
@@ -141,10 +141,10 @@ class Editor_CustomerController extends ZfExtended_RestController {
      */
     protected function entityLoad() {
         $this->entity->load($this->_getParam('id'));
-        if(($this->_request->isPut() || $this->_request->isDelete())
-                && $this->entity->isDefaultCustomer()) {
-                    throw new ZfExtended_Models_Entity_NotAcceptableException('The default client must not be edited or deleted.', 0);
-                }
+        $isModification = $this->_request->isPut() || $this->_request->isDelete();
+        if($isModification && $this->entity->isDefaultCustomer()) {
+            throw new ZfExtended_Models_Entity_NoAccessException('The default client must not be edited or deleted.');
+        }
     }
     
     /**

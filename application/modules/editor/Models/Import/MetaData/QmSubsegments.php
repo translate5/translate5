@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Bundles all import-Methods around the qm subsegment flags
  */
- class editor_Models_Import_QmSubsegments implements editor_Models_Import_IMetaDataImporter {
+ class editor_Models_Import_MetaData_QmSubsegments implements editor_Models_Import_MetaData_IMetaDataImporter {
     /**
      * Flag containing info if qm subsegment import uses a task specific xml file
      * @var boolean
@@ -44,7 +44,7 @@ END LICENSE AND COPYRIGHT
     
     /**
      * (non-PHPdoc)
-     * @see editor_Models_Import_IMetaDataImporter::import()
+     * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
      */
     public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta) {
         $this->importFromXml($task, $meta->getImportPath());

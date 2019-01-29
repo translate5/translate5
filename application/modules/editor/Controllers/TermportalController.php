@@ -33,6 +33,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         Zend_Layout::getMvcInstance()->setLayout('termportal');
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
         $this->view->render('termportal/layoutConfig.php');
+        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
         
         $this->view->Php2JsVars()->set('termportal.restPath', APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
         

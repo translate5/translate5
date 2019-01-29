@@ -66,9 +66,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleAllFinishOfARole()
      */
-    protected function handleAllFinishOfARole() {
+    protected function handleAllFinishOfARole(array $finishStat) {
         $this->doDebug(__FUNCTION__);
-        $userGuid = $this->authenticatedUser->userGuid;
         $newTua = $this->newTaskUserAssoc;
         $taskGuid = $newTua->getTaskGuid();
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -95,15 +94,22 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleFinish()
      */
-    protected function handleFinish() {
+    protected function handleFinish(array $finishStat) {
         $this->doDebug(__FUNCTION__);
+        $newTua = $this->newTaskUserAssoc;
+        $taskGuid = $newTua->getTaskGuid();
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $oldStep = $task->getWorkflowStepName();
+        $this->callActions(__FUNCTION__, $oldStep, $newTua->getRole(), $newTua->getState());
     }
     
     /**
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleAllFinish()
      */
-    protected function handleAllFinish() {
+    protected function handleAllFinish(array $finishStat) {
         $this->doDebug(__FUNCTION__);
     }
 
@@ -120,7 +126,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleFirstFinishOfARole()
      */
-    protected function handleFirstFinishOfARole(){
+    protected function handleFirstFinishOfARole(array $finishStat){
         $this->doDebug(__FUNCTION__);
     }
     
@@ -128,7 +134,7 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * (non-PHPdoc)
      * @see editor_Workflow_Abstract::handleFirstFinish()
      */
-    protected function handleFirstFinish(){
+    protected function handleFirstFinish(array $finishStat){
         $this->doDebug(__FUNCTION__);
     }
     

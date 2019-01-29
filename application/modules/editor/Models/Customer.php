@@ -68,18 +68,21 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Find customer by number
-     * 
-     * @param mixed $number
+     * Load customer by number
+     * @param string $number
      */
-    public function findCustomerByNumber($number){
-        $s = $this->db->select()
-        ->where('number = ?', $number);
-        $res=$this->db->fetchRow($s);
-        if(empty($res)) {
-            return $res;
+    public function loadByNumber($number){
+        try {
+            $s = $this->db->select()->where('`number` = ?', $number);
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            $this->notFound('NotFound after other Error', $e);
         }
-        return $res->toArray();
+        if (!$row) {
+            $this->notFound(__CLASS__ . '#number', $number);
+        }
+        //load implies loading one Row, so use only the first row
+        $this->row = $row;
     }
     
     /***
@@ -154,5 +157,9 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
      */
     public function isDefaultCustomer(){
         return ($this->getNumber() == self::DEFAULTCUSTOMER_NUMBER);
+    }
+    
+    public function __toString() {
+        return $this->getName().' ('.$this->getNumber().'; id: '.$this->getId().')';
     }
 }

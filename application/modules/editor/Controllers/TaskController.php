@@ -611,6 +611,22 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             unset($this->view->rows->qmSubsegmentFlags);
         }
+        
+        // Add pixelMapping-data for the fonts used in the task.
+        // We do this here to have it immediately available e.g. when opening segments.
+        $this->addPixelMapping();
+    }
+    
+    protected function addPixelMapping() {
+        $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
+        /* @var $pixelMapping editor_Models_PixelMapping */
+        try {
+            $pixelMappingForTask = $pixelMapping->getPixelMappingForTask(intval($this->entity->getCustomerId()), $this->entity->getAllFontsInTask());
+        }
+        catch(ZfExtended_Exception $e) {
+            $pixelMappingForTask = [];
+        }
+        $this->view->rows->pixelMapping = $pixelMappingForTask;
     }
     
     /**
@@ -908,6 +924,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $resultlist =$languageResourcemodel->loadByAssociatedTaskGuidList(array($taskguid));
         $this->view->rows->taskassocs = $resultlist;
         
+        // Add pixelMapping-data for the fonts used in the task.
+        // We do this here to have it immediately available e.g. when opening segments.
+        $this->addPixelMapping();
     }
     
     public function deleteAction() {

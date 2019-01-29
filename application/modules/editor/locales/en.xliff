@@ -1652,6 +1652,40 @@
     <target>Translate5 - task finished</target>
 </trans-unit>
 
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgdGVpbHdlaXNlIGFiZ2VzY2hsb3NzZW4='>
+    <source>Translate5 - Aufgabe teilweise abgeschlossen</source>
+    <target>Translate5 - task partly finished</target>
+</trans-unit>
+
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggZWluZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+IGFiZ2VzY2hsb3NzZW46PGJyIC8+'>
+    <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle <i>{currentRole}</i> abgeschlossen:<br /></source>
+    <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished by one user of the role <i>{currentRole}</i> in the task-portal {portalLink}:<br /></target>
+</trans-unit>
+
+<trans-unit id='QWxsZSBCZW51dHplciBkZXIgYWt0dWVsbGVuIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+Ogp7Y3VycmVudFVzZXJzfTxici8+Cg=='>
+    <source>Alle Benutzer der aktuellen Rolle <i>{currentRole}</i>:
+{currentUsers}<br/>
+</source>
+<target>All users of the current role <i>{currentRole}</i>:
+{currentUsers}<br/>
+</target>
+</trans-unit>
+
+<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke2N1cnJlbnRVc2VyfTxiciAvPgo8YnIgLz4Ke3VzZXJzQ3VycmVudFJvbGV9PGJyIC8+Cntmb290ZXJ9'>
+    <source>{header}
+{action}<br />
+{currentUser}<br />
+<br />
+{usersCurrentRole}<br />
+{footer}</source>
+<target>{header}
+{action}<br />
+{currentUser}<br />
+<br />
+{usersCurrentRole}<br />
+{footer}</target>
+</trans-unit>
+
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
     <source>Translate5 - Aufgabe automatisch abgeschlossen</source>
     <target>Translate5 - task finished automatically</target>

@@ -780,4 +780,35 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $customer->loadByDefaultCustomer();
         $this->setCustomerId($customer->getId());
     }
+    
+    /**
+     * Return all combinations of font-family and font-size that are used in the task.
+     * @return array
+     */
+    public function getAllFontsInTask() {
+        // TODO: Get these infos from the config-data of the taskTemplate (unfortunately not implemented yet).
+        // Workaround (!!!!): check the task's segments.
+        $segMeta = ZfExtended_Factory::get('editor_Models_Segment_Meta');
+        /* @var $segMeta editor_Models_Segment_Meta  */
+        return $segMeta->getAllFontsInTask($this->getTaskGuid());
+        /*
+         [0] => Array
+             (
+                 [font] => Arial
+                 [fontSize] => 12
+             )
+         
+         [1] => Array
+             (
+                 [font] => Arial
+                 [fontSize] => 14
+         )
+         
+         [2] => Array
+             (
+                 [font] => Verdana
+                 [fontSize] => 14
+         )
+         */
+    }
 }

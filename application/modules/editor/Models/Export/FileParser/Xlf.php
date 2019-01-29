@@ -140,7 +140,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             $this->segmentIdsPerUnit = [];
             
             $sizeUnit = $xmlparser->getAttribute($originalAttributes, 'size-unit');
-            if($sizeUnit == 'char') {
+            if($sizeUnit == 'char' || $sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT) {
                 $minWidth = $xmlparser->getAttribute($originalAttributes, 'minwidth', 0);
                 $maxWidth = $xmlparser->getAttribute($originalAttributes, 'maxwidth', PHP_INT_MAX);
                 if($this->transUnitLength < $minWidth) {

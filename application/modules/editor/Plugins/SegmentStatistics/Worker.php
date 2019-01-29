@@ -212,7 +212,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Import_Worke
         $stat->setFieldType($field->type);
         $stat->setType($this->type);
         $stat->setFileId($segment->getFileId());
-        $stat->setCharCount($segment->textLength($segmentContent));
+        $stat->setCharCount($segment->textLengthByChar($segmentContent));
         $stat->setWordCount($segment->wordCount($segmentContent));
         $stat->setTermNotFound(array_sum($termCount['notFound']));
         $stat->setTermFound(array_sum($termCount['found']));
