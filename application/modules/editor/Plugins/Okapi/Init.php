@@ -171,12 +171,26 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @param Zend_EventManager_Event $event
      */
     public function handleAfterImport(Zend_EventManager_Event $event) {
+        $task = $event->getParam('task');
+        /* @var $task editor_Models_Task */
         $config = $event->getParam('importConfig');
         /* @var $config editor_Models_Import_Configuration */
-        $directoryProvider = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Directory', [$config->importFolder]);
-        /* @var $directoryProvider editor_Models_Import_DataProvider_Directory */
-        $directoryProvider->setTask($event->getParam('task'));
-        $directoryProvider->archiveImportedData('OkapiArchive.zip');
+        
+        try {
+            $worker = ZfExtended_Factory::get('ZfExtended_Models_Worker');
+            /* @var $worker ZfExtended_Models_Worker */
+            $worker->loadFirstOf('editor_Plugins_Okapi_Worker', $task->getTaskGuid());
+            
+            //proceed with the archive only, if a okapi worker was found for the current task
+            $directoryProvider = ZfExtended_Factory::get('editor_Models_Import_DataProvider_Directory', [$config->importFolder]);
+            /* @var $directoryProvider editor_Models_Import_DataProvider_Directory */
+            $directoryProvider->setTask($task);
+            $directoryProvider->archiveImportedData('OkapiArchive.zip');
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //no okapi worker -> do nothing 
+        }
+        
     }
     
     /**
