@@ -517,6 +517,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['lockingUser']);
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();
+        editor_Models_LogRequest::create($this->entity->getTaskGuid());
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
         ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
@@ -548,6 +549,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->checkStateAllowsActions();
         
         $taskguid = $this->entity->getTaskGuid();
+        editor_Models_LogRequest::create($taskguid);
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
@@ -1112,6 +1114,7 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new BadMethodCallException('Only HTTP method POST allowed!');
         }
         $this->entityLoad();
+        editor_Models_LogRequest::create($this->entity->getTaskGuid());
         $this->initWorkflow($this->entity->getWorkflow());
         $this->view->trigger = $this->getParam('trigger');
         $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));

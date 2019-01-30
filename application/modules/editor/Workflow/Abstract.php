@@ -647,7 +647,24 @@ abstract class editor_Workflow_Abstract {
             return;
         }
         if($this->debug == 1) {
-            error_log(get_class($this).'::'.$name);
+            //error_log(get_class($this).'::'.$name);
+            if(empty($this->newTask)) {
+                return;
+            }
+            $taskGuid = $this->newTask->getTaskGuid();
+            //without that data no loggin is possible
+            if(empty($taskGuid) || empty($this->authenticatedUserModel)) {
+                return;
+            }
+            if(!empty($this->newTaskUserAssoc)) {
+                $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+                /* @var $user ZfExtended_Models_User */
+                $user->loadByGuid($this->newTaskUserAssoc->getUserGuid());
+                editor_Models_LogTask::createWorkflow($taskGuid, $name, $this->authenticatedUserModel, $user);
+            }
+            else {
+                editor_Models_LogTask::createWorkflow($taskGuid, $name, $this->authenticatedUserModel);
+            }
             return;
         }
         if($this->debug == 2) {
@@ -763,7 +780,6 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_TaskUserAssoc $newTua
      */
     public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
-        $this->doDebug(__FUNCTION__);
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
@@ -776,6 +792,7 @@ abstract class editor_Workflow_Abstract {
         else {
             $task = $this->newTask;
         }
+        $this->doDebug(__FUNCTION__);
         //ensure that segment MV is createad
         $task->createMaterializedView();
         $this->recalculateWorkflowStep($newTua);

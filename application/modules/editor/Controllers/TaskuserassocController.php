@@ -116,6 +116,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     public function putAction() {
         $this->entityLoad();
+        editor_Models_LogRequest::create($this->entity->getTaskGuid());
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->entity->getTaskGuid());
         /* @var $workflow editor_Workflow_Abstract */
         $oldEntity = clone $this->entity;
@@ -141,7 +142,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
-            editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $this->entity->getUserGuid());
+            $userSession = new Zend_Session_Namespace('user');
+            editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $userSession->data->userGuid, $this->entity->getUserGuid());
         }
         $this->applyEditableAndDeletable();
     }
@@ -152,13 +154,16 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     public function postAction() {
         parent::postAction();
+        editor_Models_LogRequest::create($this->entity->getTaskGuid());
         $this->addUserInfoToResult();
-        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $this->entity->getUserGuid());
+        $userSession = new Zend_Session_Namespace('user');
+        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $userSession->data->userGuid, $this->entity->getUserGuid());
         $this->applyEditableAndDeletable();
     }
     
     public function deleteAction(){
         $this->entityLoad();
+        editor_Models_LogRequest::create($this->entity->getTaskGuid());
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->entity->getTaskGuid());
         /* @var $workflow editor_Workflow_Abstract */
         $this->checkAuthenticatedIsParentOfEntity();
@@ -167,7 +172,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entity->setId(0);
         //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing 
         $entity->delete();
-        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), "DELETED", $this->entity->getUserGuid());
+        $userSession = new Zend_Session_Namespace('user');
+        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), "DELETED", $userSession->data->userGuid, $this->entity->getUserGuid());
     }
     
     /**
