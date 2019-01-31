@@ -987,6 +987,7 @@ abstract class editor_Workflow_Abstract {
         }
         //set the first found valid step to the current workflow step
         $step = reset($matchingSteps);
+        $this->doDebug(__FUNCTION__.' recalculate to step: '.$step);
         $task->updateWorkflowStep($step, false);
         $log = ZfExtended_Factory::get('editor_Workflow_Log');
         /* @var $log editor_Workflow_Log */
