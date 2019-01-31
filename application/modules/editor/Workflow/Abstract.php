@@ -1117,7 +1117,7 @@ abstract class editor_Workflow_Abstract {
         //if the deleted tua was not finished, we have to recheck the allFinished events after deleting it!
         $wasNotFinished = ($originalState !== self::STATE_FINISH);
         $stat = $this->calculateFinish();
-        $this->doDebug(__FUNCTION__. ' OriginalState: '.$originalState.'; Finish Stat: '.$stat);
+        $this->doDebug(__FUNCTION__. ' OriginalState: '.$originalState.'; Finish Stat: '.print_r($stat,1));
         if($wasNotFinished && $stat['roleAllFinished']) {
             //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
             $tua->setState(self::STATE_FINISH);
