@@ -1107,7 +1107,6 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_TaskUserAssoc $tua
      */
     public function doUserAssociationDelete(editor_Models_TaskUserAssoc $tua) {
-        $this->doDebug(__FUNCTION__);
         $this->newTaskUserAssoc = $tua; //"new" is basicly wrong, but with that entity all calculation is done
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -1118,6 +1117,7 @@ abstract class editor_Workflow_Abstract {
         //if the deleted tua was not finished, we have to recheck the allFinished events after deleting it!
         $wasNotFinished = ($originalState !== self::STATE_FINISH);
         $stat = $this->calculateFinish();
+        $this->doDebug(__FUNCTION__. ' OriginalState: '.$originalState.'; Finish Stat: '.$stat);
         if($wasNotFinished && $stat['roleAllFinished']) {
             //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
             $tua->setState(self::STATE_FINISH);
