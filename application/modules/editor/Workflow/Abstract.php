@@ -1241,9 +1241,12 @@ abstract class editor_Workflow_Abstract {
     protected function calculateFinish() {
         $userTaskAssoc = $this->newTaskUserAssoc;
         $stat = $userTaskAssoc->getUsageStat();
-        //we have to initialize the following two values with true for proper working but with false if there is no tua at all
-        $allFinished = !empty($stat); 
-        $roleAllFinished = !empty($stat);
+        //we have to initialize $allFinished with true for proper working but with false if there is no tua at all
+        $allFinished = !empty($stat);
+        
+        //we have to initialize $roleAllFinished with true for proper working but with false if there is no tua with the current tuas role
+        $usedRoles = array_column($stat, 'role');
+        $roleAllFinished = in_array($userTaskAssoc->getRole(), $usedRoles);
         $roleFirstFinished = false;
         $sum = 0;
         foreach($stat as $entry) {
