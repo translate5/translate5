@@ -776,7 +776,6 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_Task $newTask task as going into DB (means not saved yet!)
      */
     public function doWithTask(editor_Models_Task $oldTask, editor_Models_Task $newTask) {
-        $this->nextStepWasSet = [];
         $this->oldTask = $oldTask;
         $this->newTask = $newTask;
         $newState = $newTask->getState();
@@ -815,7 +814,6 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_TaskUserAssoc $newTua
      */
     public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
-        $this->nextStepWasSet = [];
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
@@ -946,14 +944,16 @@ abstract class editor_Workflow_Abstract {
             $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
         };
         
+        $taskGuid = $tua->getTaskGuid();
+        
         //if the step was recalculated due setNextStep in internal workflow calculations, 
         // we may not recalculate it here again!
-        if(!empty($this->nextStepWasSet)) {
-            $sendNotice($this->nextStepWasSet['newStep']);
+        if(!empty($this->nextStepWasSet[$taskGuid])) {
+            $sendNotice($this->nextStepWasSet[$taskGuid]['newStep']);
             return;
         }
         
-        $tuas = $tua->loadByTaskGuidList([$tua->getTaskGuid()]);
+        $tuas = $tua->loadByTaskGuidList([$taskGuid]);
         
         $areTuasSubset = function($toCompare) use ($tuas){
             foreach($tuas as $tua) {
@@ -969,7 +969,7 @@ abstract class editor_Workflow_Abstract {
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($tua->getTaskGuid());
+        $task->loadByTaskGuid($taskGuid);
         
         $matchingSteps = [];
         foreach($this->validStates as $step => $roleStates) {
@@ -1049,7 +1049,9 @@ abstract class editor_Workflow_Abstract {
      * @param string $stepName
      */
     protected function setNextStep(editor_Models_Task $task, $stepName) {
-        $this->nextStepWasSet = [
+        //store the nextStepWasSet per taskGuid, 
+        // so this mechanism works also when looping over different tasks with the same workflow instance
+        $this->nextStepWasSet[$task->getTaskGuid()] = [
             'oldStep' => $task->getWorkflowStepName(),
             'newStep' => $stepName,
         ];
