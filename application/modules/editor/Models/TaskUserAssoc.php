@@ -67,8 +67,8 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return [array] list with user arrays
      */
     public function getUsersOfRoleOfTask($role,$taskGuid, $assocFields = []){
-        if (is_null($role)) {
-            return array();
+        if (empty($role)) {
+            return [];
         }
         /* @var $tua editor_Models_TaskUserAssoc */
         $this->setRole($role);
@@ -117,8 +117,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByTaskGuidList(array $list) {
         try {
-            if(count($list)===0)
-                return array();
+            if(empty($list)) {
+                return [];
+            }
             $s = $this->db->select()->where('taskGuid in (?)', $list);
             return $this->db->fetchAll($s)->toArray();
         } catch (Exception $e) {

@@ -67,7 +67,6 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleAllFinishOfARole()
      */
     protected function handleAllFinishOfARole(array $finishStat) {
-        $this->doDebug(__FUNCTION__);
         $newTua = $this->newTaskUserAssoc;
         $taskGuid = $newTua->getTaskGuid();
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -77,10 +76,12 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
         
         //this remains as default behaviour
         $nextStep = $this->getNextStep($this->getStepOfRole($newTua->getRole()));
+        $this->doDebug(__FUNCTION__." Next Step: ".$nextStep.' to role '.$newTua->getRole().' with step '.$this->getStepOfRole($newTua->getRole())."; Old Step in Task: ".$oldStep);
         if($nextStep) {
             //Next step triggert ebenfalls eine callAction → aber irgendwie so, dass der neue Wert verwendet wird! Henne Ei!
             $this->setNextStep($task, $nextStep);
             $nextRole = $this->getRoleOfStep($nextStep);
+            $this->doDebug(__FUNCTION__." Next Role: ".$nextRole);
             if($nextRole) {
                 $newTua->setStateForRoleAndTask(self::STATE_OPEN, $nextRole);
             }
