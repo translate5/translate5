@@ -658,7 +658,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
         ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'))
         ->where('groupId=?',$groupId)
-        ->where('LEK_term_attributes.collectionId IN(?)',$collectionIds)
+        ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('label');
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
