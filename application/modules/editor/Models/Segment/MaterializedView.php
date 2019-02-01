@@ -285,6 +285,11 @@ class editor_Models_Segment_MaterializedView {
     }
     
     protected function metaCacheInnerSql($segmentId = null) {
+        // when ever this SQL is used, we have to increase group_concat_max_len
+        // otherwise long segments with many mrks could produce invalid JSON
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $db->query('SET SESSION group_concat_max_len = 100000;');
+        
         //integer cast is also save, no need for binding
         $segmentId = (int)$segmentId;
         $sql  = '(SELECT m1.transunitId, GROUP_CONCAT(CONCAT(\'"\',m1.segmentId,\'": \',m1.siblingData) SEPARATOR ",") siblingData ';

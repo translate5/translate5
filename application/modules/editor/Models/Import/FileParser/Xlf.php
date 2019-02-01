@@ -175,6 +175,12 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $pixelMapping;
     
     /**
+     * Container for the lengthRestriction default values
+     * @var array
+     */
+    protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'font' => null, 'fontSize' => null];
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -193,6 +199,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->segmentBareInstance = ZfExtended_Factory::get('editor_Models_Segment');
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
         $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
+        $this->initLengthRestrictionAttributes();
     }
     
     
@@ -692,11 +699,16 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $segmentAttributes->transunitId = $this->_fileId.'_'.$this->transUnitCnt.'_'.$transunitId;
         
         // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task-template); optional
-        $segmentAttributes->minWidth = $this->getLengthRestrictionAttribute($attributes, 'minWidth');
-        $segmentAttributes->maxWidth = $this->getLengthRestrictionAttribute($attributes, 'maxWidth');
-        $segmentAttributes->sizeUnit = $this->getLengthRestrictionAttribute($attributes, 'size-unit');
-        $segmentAttributes->font     = $this->getLengthRestrictionAttribute($attributes, 'font');
-        $segmentAttributes->fontSize = $this->getLengthRestrictionAttribute($attributes, 'fontSize');
+        $unit = $this->xmlparser->getAttribute($attributes, 'size-unit', $this->lengthRestrictionDefaults['size-unit']);
+        if($unit == 'char' || $unit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
+            $segmentAttributes->sizeUnit = $unit;
+            foreach ($this->lengthRestrictionDefaults as $key => $value) {
+                if($key == 'size-unit') {
+                    continue;
+                }
+                $segmentAttributes->$key = $this->xmlparser->getAttribute($attributes, $key, $value);
+            }
+        }
         
         $this->ensurePixelWidthDefault($segmentAttributes);
         
@@ -704,28 +716,21 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * Length-Restriction-Attributes (sizeUnit, font, fontSize, minWidth, maxWidth): 
-     * If there is nothing set in the xlf's trans-unit,
-     * then we check if something is set for the task in general (task-template).
-     * @param array $attributes transUnit attributes
-     * @param string $attrName
-     * @return string|null $attrValue
+     * init default values for length-Restriction-Attributes (sizeUnit, font, fontSize, minWidth, maxWidth): 
      */
-    protected function getLengthRestrictionAttribute ($attributes, $attrName) {
-        // xliff's trans-unit:
-        $attrValue = $this->xmlparser->getAttribute($attributes, $attrName, null);
-        if (is_null($attrValue)) {
-            // fallback: check task-template
-            $taskConfig = Zend_Registry::get('taskTemplate');
-            if (isset($taskConfig->pixelmapping->$attrName) 
-                    && trim($taskConfig->pixelmapping->$attrName) != "") {
-                    // eg. <minWidth>0</minWidth> would be taken (=> don't check for empty() here!)
-                    // eg. <minWidth></minWidth>  would NOT be taken
-                    // eg. <minWidth> </minWidth> would NOT be taken
-                $attrValue = $taskConfig->pixelmapping->$attrName;
+    protected function initLengthRestrictionAttributes () {
+        $keys = array_keys($this->lengthRestrictionDefaults);
+        $taskConfig = Zend_Registry::get('taskTemplate');
+        foreach($keys as $key) {
+            if(empty($taskConfig->pixelmapping->$key)) {
+                continue;
             }
+            $conf = trim($taskConfig->pixelmapping->$key);
+            if(empty($conf)) {
+                continue;
+            }
+            $this->lengthRestrictionDefaults[$key] = $conf;
         }
-        return $attrValue;
     }
     
     /**

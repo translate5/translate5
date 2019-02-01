@@ -21,7 +21,7 @@
 <target/>
 </trans-unit>
 
-<trans-unit id="4" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="69" size-unit="char">
+<trans-unit id="4" translate5:autostateId="3" translate5:autostateText="blocked" minwidth="20" maxwidth="72" size-unit="char">
 <source> Satz 1.  Satz 2.   Länge Soll = 39    </source>
 <seg-source> <mrk mtype="seg" mid="1">Satz 1.</mrk>  <mrk mtype="seg" mid="2">Satz 2.</mrk>   <mrk mtype="seg" mid="3">Länge Soll = 39</mrk>    </seg-source>
 </trans-unit>

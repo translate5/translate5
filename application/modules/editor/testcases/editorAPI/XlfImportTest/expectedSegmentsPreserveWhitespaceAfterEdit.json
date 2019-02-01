@@ -23,7 +23,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_48\":{\"nr\":\"48\",\"length\":{\"targetEdit\":76}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_48\":{\"nr\":\"48\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false,
         "isFirstofFile": true
     },
@@ -51,7 +51,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_49\":{\"nr\":\"49\",\"length\":{\"targetEdit\":16}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_49\":{\"nr\":\"49\",\"length\":{\"targetEdit\":16}}}}",
         "isWatched": false
     },
     {
@@ -78,7 +78,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_50\":{\"nr\":\"50\",\"length\":{\"targetEdit\":76}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_50\":{\"nr\":\"50\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false
     },
     {
@@ -105,7 +105,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_51\":{\"nr\":\"51\",\"length\":{\"targetEdit\":16}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_51\":{\"nr\":\"51\",\"length\":{\"targetEdit\":16}}}}",
         "isWatched": false
     },
     {
@@ -132,7 +132,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_52\":{\"nr\":\"52\",\"length\":{\"targetEdit\":56}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_52\":{\"nr\":\"52\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -159,7 +159,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_53\":{\"nr\":\"53\",\"length\":{\"targetEdit\":13}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_53\":{\"nr\":\"53\",\"length\":{\"targetEdit\":13}}}}",
         "isWatched": false
     },
     {
@@ -186,7 +186,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_54\":{\"nr\":\"54\",\"length\":{\"targetEdit\":56}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_54\":{\"nr\":\"54\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -213,7 +213,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_55\":{\"nr\":\"55\",\"length\":{\"targetEdit\":13}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_55\":{\"nr\":\"55\",\"length\":{\"targetEdit\":13}}}}",
         "isWatched": false
     },
     {
@@ -240,7 +240,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_56\":{\"nr\":\"56\",\"length\":{\"targetEdit\":76}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_56\":{\"nr\":\"56\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false
     },
     {
@@ -267,7 +267,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_57\":{\"nr\":\"57\",\"length\":{\"targetEdit\":16}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_57\":{\"nr\":\"57\",\"length\":{\"targetEdit\":16}}}}",
         "isWatched": false
     },
     {
@@ -294,7 +294,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_58\":{\"nr\":\"58\",\"length\":{\"targetEdit\":56}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_58\":{\"nr\":\"58\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -321,7 +321,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_59\":{\"nr\":\"59\",\"length\":{\"targetEdit\":13}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_59\":{\"nr\":\"59\",\"length\":{\"targetEdit\":13}}}}",
         "isWatched": false
     },
     {
@@ -348,7 +348,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_60\":{\"nr\":\"60\",\"length\":{\"targetEdit\":56}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_60\":{\"nr\":\"60\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -375,7 +375,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_61\":{\"nr\":\"61\",\"length\":{\"targetEdit\":13}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_61\":{\"nr\":\"61\",\"length\":{\"targetEdit\":13}}}}",
         "isWatched": false
     },
     {
@@ -402,7 +402,7 @@
         "targetToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;4\/&gt;: 3 whitespace characters\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div><div class=\"single 7461622074733d22303922206c656e6774683d2231222f tab internal-tag ownttip\"><span title=\"&lt;3\/&gt;: 1 tab character\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"tab\" data-length=\"1\" class=\"full\">\u2192<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323022206c656e6774683d2235222f space internal-tag ownttip\"><span title=\"&lt;5\/&gt;: 5 whitespace characters\" class=\"short\">&lt;5\/&gt;<\/span><span data-originalid=\"space\" data-length=\"5\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>shouldz bez <div class=\"single 736f667452657475726e2f newline internal-tag ownttip\"><span title=\"&lt;2\/&gt;: Newline\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"softReturn\" data-length=\"1\" class=\"full\">\u21b5<\/span><\/div> <div class=\"single 73706163652074733d223230323032303230323032303230323032303230323022206c656e6774683d223131222f space internal-tag ownttip\"><span title=\"&lt;6\/&gt;: 11 whitespace characters\" class=\"short\">&lt;6\/&gt;<\/span><span data-originalid=\"space\" data-length=\"11\" class=\"full\">\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7<\/span><\/div>preservedz.",
         "targetEditToSort": "Testz preservez Whitespacez -  shouldz bez  preservedz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_62\":{\"nr\":\"62\",\"length\":{\"targetEdit\":76}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_62\":{\"nr\":\"62\",\"length\":{\"targetEdit\":76}}}}",
         "isWatched": false
     },
     {
@@ -429,7 +429,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz <div class=\"single 73706163652074733d2232303230323022206c656e6774683d2233222f space internal-tag ownttip\"><span title=\"&lt;1\/&gt;: 3 whitespace characters\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"space\" data-length=\"3\" class=\"full\">\u00b7\u00b7\u00b7<\/span><\/div>Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_63\":{\"nr\":\"63\",\"length\":{\"targetEdit\":16}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_63\":{\"nr\":\"63\",\"length\":{\"targetEdit\":16}}}}",
         "isWatched": false
     },
     {
@@ -456,7 +456,7 @@
         "targetToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
         "targetEdit": "Testz preservez <div class=\"single 70682069643d22746573742d737562223e266c743b696d6720616c743d2671756f743b3c7375623e4d756c74697a2020202053706163657a3c2f7375623e2671756f743b2f2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"8773b0700473f53a8f86699f2e700e48\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;test-sub&quot;&gt;&amp;lt;img alt=&amp;quot;&lt;sub&gt;Multiz    Spacez&lt;\/sub&gt;&amp;quot;\/&amp;gt;&lt;\/ph&gt;<\/span><\/div>Whitespacez - shouldz bez likez configz.",
         "targetEditToSort": "Testz preservez Whitespacez - shouldz bez likez configz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_64\":{\"nr\":\"64\",\"length\":{\"targetEdit\":56}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_64\":{\"nr\":\"64\",\"length\":{\"targetEdit\":56}}}}",
         "isWatched": false
     },
     {
@@ -483,7 +483,7 @@
         "targetToSort": "Multiz Spacez",
         "targetEdit": "Multiz Spacez",
         "targetEditToSort": "Multiz Spacez",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_65\":{\"nr\":\"65\",\"length\":{\"targetEdit\":13}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_65\":{\"nr\":\"65\",\"length\":{\"targetEdit\":13}}}}",
         "isWatched": false
     },
     {
@@ -510,7 +510,7 @@
         "targetToSort": "Testz preservez whitespacez.",
         "targetEdit": "Testz preservez whitespacez.",
         "targetEditToSort": "Testz preservez whitespacez.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":29}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":22}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":26}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":29}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":22}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":26}}}}",
         "isWatched": false
     },
     {
@@ -537,7 +537,7 @@
         "targetToSort": "Betweenz mrkz tagsz.",
         "targetEdit": "Betweenz mrkz tagsz.",
         "targetEditToSort": "Betweenz mrkz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":29}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":22}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":26}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":29}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":22}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":26}}}}",
         "isWatched": false
     },
     {
@@ -564,7 +564,7 @@
         "targetToSort": "Andz surroundingz tagsz.",
         "targetEdit": "Andz surroundingz tagsz.",
         "targetEditToSort": "Andz surroundingz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":29}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":22}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":26}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_66\":{\"nr\":\"66\",\"length\":{\"targetEdit\":29}},\"fakeSegId_67\":{\"nr\":\"67\",\"length\":{\"targetEdit\":22}},\"fakeSegId_68\":{\"nr\":\"68\",\"length\":{\"targetEdit\":26}}}}",
         "isWatched": false
     },
     {
@@ -591,7 +591,7 @@
         "targetToSort": "Testz notz toz preservez whitespacez.",
         "targetEdit": "Testz notz toz preservez whitespacez.",
         "targetEditToSort": "Testz notz toz preservez whitespacez.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":38}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":21}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":38}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":21}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -618,7 +618,7 @@
         "targetToSort": "Betweenz mrkz tagsz.",
         "targetEdit": "Betweenz mrkz tagsz.",
         "targetEditToSort": "Betweenz mrkz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":38}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":21}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":38}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":21}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -645,7 +645,7 @@
         "targetToSort": "Andz surroundingz tagsz.",
         "targetEdit": "Andz surroundingz tagsz.",
         "targetEditToSort": "Andz surroundingz tagsz.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":38}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":21}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_69\":{\"nr\":\"69\",\"length\":{\"targetEdit\":38}},\"fakeSegId_70\":{\"nr\":\"70\",\"length\":{\"targetEdit\":21}},\"fakeSegId_71\":{\"nr\":\"71\",\"length\":{\"targetEdit\":24}}}}",
         "isWatched": false
     },
     {
@@ -672,7 +672,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -699,7 +699,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -726,7 +726,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -753,7 +753,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_72\":{\"nr\":\"72\",\"length\":{\"targetEdit\":1}},\"fakeSegId_73\":{\"nr\":\"73\",\"length\":{\"targetEdit\":2}},\"fakeSegId_74\":{\"nr\":\"74\",\"length\":{\"targetEdit\":1}},\"fakeSegId_75\":{\"nr\":\"75\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -780,7 +780,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -807,7 +807,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -834,7 +834,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -861,7 +861,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_76\":{\"nr\":\"76\",\"length\":{\"targetEdit\":1}},\"fakeSegId_77\":{\"nr\":\"77\",\"length\":{\"targetEdit\":2}},\"fakeSegId_78\":{\"nr\":\"78\",\"length\":{\"targetEdit\":1}},\"fakeSegId_79\":{\"nr\":\"79\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -888,7 +888,7 @@
         "targetToSort": "zacross ztags zoutside zfrom zmrk ztest",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
         "targetEditToSort": "zacross ztags zoutside zfrom zmrk ztest",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_80\":{\"nr\":\"80\",\"length\":{\"targetEdit\":40}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_80\":{\"nr\":\"80\",\"length\":{\"targetEdit\":40}}}}",
         "isWatched": false
     },
     {
@@ -915,7 +915,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test - edited",
         "targetEditToSort": "across tags outside from mrk test - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":43}},\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":43}},\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -942,7 +942,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 782069643d2233222f internal-tag ownttip\"><span title=\"&lt;x id=&quot;3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ed4445e111f59a2af0c6650c4e4cfa8b\" data-length=\"-1\" class=\"full\">&lt;x id=&quot;3&quot;\/&gt;<\/span><\/div><div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2232223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"6f4ea10b29a9a38460e94ea227a54aa0\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div> - edited",
         "targetEditToSort": " - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":43}},\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":43}},\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -969,7 +969,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test - edited",
         "targetEditToSort": "across tags outside from mrk test - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":43}},\"fakeSegId_84\":{\"nr\":\"84\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":43}},\"fakeSegId_84\":{\"nr\":\"84\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -996,7 +996,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 782069643d2233222f internal-tag ownttip\"><span title=\"&lt;x id=&quot;3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ed4445e111f59a2af0c6650c4e4cfa8b\" data-length=\"-1\" class=\"full\">&lt;x id=&quot;3&quot;\/&gt;<\/span><\/div><div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2232223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"6f4ea10b29a9a38460e94ea227a54aa0\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div> - edited",
         "targetEditToSort": " - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":43}},\"fakeSegId_84\":{\"nr\":\"84\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":43}},\"fakeSegId_84\":{\"nr\":\"84\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -1023,7 +1023,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test - edited",
         "targetEditToSort": "across tags outside from mrk test - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":44}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":44}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -1050,34 +1050,34 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 782069643d2233222f internal-tag ownttip\"><span title=\"&lt;x id=&quot;3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ed4445e111f59a2af0c6650c4e4cfa8b\" data-length=\"-1\" class=\"full\">&lt;x id=&quot;3&quot;\/&gt;<\/span><\/div><div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2232223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"6f4ea10b29a9a38460e94ea227a54aa0\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div> - edited",
         "targetEditToSort": " - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":44}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":44}},\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
         "segmentNrInTask": "87",
         "mid": "32344333_41",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
-        "userName": "lector test",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
         "editable": "1",
         "pretrans": "0",
         "matchRate": "10",
         "matchRateType": "import;tm",
         "qmId": null,
         "stateId": "0",
-        "autoStateId": "1",
+        "autoStateId": "4",
         "fileOrder": "1",
         "comments": null,
-        "workflowStepNr": "1",
-        "workflowStep": "lectoring",
+        "workflowStepNr": "0",
+        "workflowStep": null,
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
         "sourceMd5": "1b836e6ad809f2764aed25bc5193d6c0",
         "sourceToSort": "across tags outside from mrk test",
         "target": "",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
-        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test - edited",
-        "targetEditToSort": "across tags outside from mrk test - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":11,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_87\":{\"nr\":\"87\",\"length\":{\"targetEdit\":53}},\"fakeSegId_88\":{\"nr\":\"88\",\"length\":{\"targetEdit\":30}}}}",
+        "targetEdit": "",
+        "targetEditToSort": "",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":11,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_87\":{\"nr\":\"87\",\"length\":{\"targetEdit\":11}},\"fakeSegId_88\":{\"nr\":\"88\",\"length\":{\"targetEdit\":30}}}}",
         "isWatched": false
     },
     {
@@ -1104,34 +1104,34 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 782069643d2233222f internal-tag ownttip\"><span title=\"&lt;x id=&quot;3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ed4445e111f59a2af0c6650c4e4cfa8b\" data-length=\"-1\" class=\"full\">&lt;x id=&quot;3&quot;\/&gt;<\/span><\/div><div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2232223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"6f4ea10b29a9a38460e94ea227a54aa0\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div> - edited",
         "targetEditToSort": " - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":11,\"additionalMrkLength\":20,\"siblingData\":{\"fakeSegId_87\":{\"nr\":\"87\",\"length\":{\"targetEdit\":53}},\"fakeSegId_88\":{\"nr\":\"88\",\"length\":{\"targetEdit\":30}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":11,\"additionalMrkLength\":20,\"siblingData\":{\"fakeSegId_87\":{\"nr\":\"87\",\"length\":{\"targetEdit\":11}},\"fakeSegId_88\":{\"nr\":\"88\",\"length\":{\"targetEdit\":30}}}}",
         "isWatched": false
     },
     {
         "segmentNrInTask": "89",
         "mid": "32344334_43",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
-        "userName": "lector test",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
         "editable": "1",
         "pretrans": "0",
         "matchRate": "10",
         "matchRateType": "import;tm",
         "qmId": null,
         "stateId": "0",
-        "autoStateId": "1",
+        "autoStateId": "4",
         "fileOrder": "1",
         "comments": null,
-        "workflowStepNr": "1",
-        "workflowStep": "lectoring",
+        "workflowStepNr": "0",
+        "workflowStep": null,
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
         "sourceMd5": "1b836e6ad809f2764aed25bc5193d6c0",
         "sourceToSort": "across tags outside from mrk test",
         "target": "",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
-        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test - edited",
-        "targetEditToSort": "across tags outside from mrk test - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":22,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_89\":{\"nr\":\"89\",\"length\":{\"targetEdit\":53}},\"fakeSegId_90\":{\"nr\":\"90\",\"length\":{\"targetEdit\":19}}}}",
+        "targetEdit": "",
+        "targetEditToSort": "",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":22,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_89\":{\"nr\":\"89\",\"length\":{\"targetEdit\":11}},\"fakeSegId_90\":{\"nr\":\"90\",\"length\":{\"targetEdit\":19}}}}",
         "isWatched": false
     },
     {
@@ -1158,34 +1158,34 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 782069643d2233222f internal-tag ownttip\"><span title=\"&lt;x id=&quot;3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ed4445e111f59a2af0c6650c4e4cfa8b\" data-length=\"-1\" class=\"full\">&lt;x id=&quot;3&quot;\/&gt;<\/span><\/div><div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2232223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"6f4ea10b29a9a38460e94ea227a54aa0\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div> - edited",
         "targetEditToSort": " - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":22,\"additionalMrkLength\":9,\"siblingData\":{\"fakeSegId_89\":{\"nr\":\"89\",\"length\":{\"targetEdit\":53}},\"fakeSegId_90\":{\"nr\":\"90\",\"length\":{\"targetEdit\":19}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":22,\"additionalMrkLength\":9,\"siblingData\":{\"fakeSegId_89\":{\"nr\":\"89\",\"length\":{\"targetEdit\":11}},\"fakeSegId_90\":{\"nr\":\"90\",\"length\":{\"targetEdit\":19}}}}",
         "isWatched": false
     },
     {
         "segmentNrInTask": "91",
         "mid": "32344335_45",
-        "userGuid": "{00000000-0000-0000-C100-CCDDEE000002}",
-        "userName": "lector test",
+        "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
+        "userName": "manager test",
         "editable": "1",
         "pretrans": "0",
         "matchRate": "10",
         "matchRateType": "import;tm",
         "qmId": null,
         "stateId": "0",
-        "autoStateId": "1",
+        "autoStateId": "4",
         "fileOrder": "1",
         "comments": null,
-        "workflowStepNr": "1",
-        "workflowStep": "lectoring",
+        "workflowStepNr": "0",
+        "workflowStep": null,
         "source": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test",
         "sourceMd5": "1b836e6ad809f2764aed25bc5193d6c0",
         "sourceToSort": "across tags outside from mrk test",
         "target": "",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
-        "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>across tags outside from mrk test - edited",
-        "targetEditToSort": "across tags outside from mrk test - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":11,\"additionalMrkLength\":22,\"siblingData\":{\"fakeSegId_91\":{\"nr\":\"91\",\"length\":{\"targetEdit\":64}},\"fakeSegId_92\":{\"nr\":\"92\",\"length\":{\"targetEdit\":19}}}}",
+        "targetEdit": "",
+        "targetEditToSort": "",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":11,\"additionalMrkLength\":22,\"siblingData\":{\"fakeSegId_91\":{\"nr\":\"91\",\"length\":{\"targetEdit\":22}},\"fakeSegId_92\":{\"nr\":\"92\",\"length\":{\"targetEdit\":19}}}}",
         "isWatched": false
     },
     {
@@ -1212,7 +1212,7 @@
         "targetToSort": "",
         "targetEdit": "<div class=\"single 782069643d2233222f internal-tag ownttip\"><span title=\"&lt;x id=&quot;3&quot;\/&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ed4445e111f59a2af0c6650c4e4cfa8b\" data-length=\"-1\" class=\"full\">&lt;x id=&quot;3&quot;\/&gt;<\/span><\/div><div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 70682069643d2233222061783a656c656d656e742d69643d2232223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;3\/&gt;<\/span><span data-originalid=\"6f4ea10b29a9a38460e94ea227a54aa0\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;3&quot; ax:element-id=&quot;2&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div><div class=\"single 636861722074733d226332613022206c656e6774683d2231222f nbsp internal-tag ownttip\"><span title=\"&lt;4\/&gt;: Non breaking space\" class=\"short\">&lt;4\/&gt;<\/span><span data-originalid=\"char\" data-length=\"1\" class=\"full\">\u23b5<\/span><\/div> - edited",
         "targetEditToSort": " - edited",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"additionalUnitLength\":11,\"additionalMrkLength\":9,\"siblingData\":{\"fakeSegId_91\":{\"nr\":\"91\",\"length\":{\"targetEdit\":64}},\"fakeSegId_92\":{\"nr\":\"92\",\"length\":{\"targetEdit\":19}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":11,\"additionalMrkLength\":9,\"siblingData\":{\"fakeSegId_91\":{\"nr\":\"91\",\"length\":{\"targetEdit\":22}},\"fakeSegId_92\":{\"nr\":\"92\",\"length\":{\"targetEdit\":19}}}}",
         "isWatched": false
     },
     {
@@ -1239,7 +1239,7 @@
         "targetToSort": "Testword",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>Testword<div class=\"single 70682069643d2232222061783a656c656d656e742d69643d2231223e266c743b2f705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;2\/&gt;<\/span><span data-originalid=\"3d66ffe6daeb9dbf775c6166877e9d4b\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;2&quot; ax:element-id=&quot;1&quot;&gt;&amp;lt;\/p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>",
         "targetEditToSort": "Testword",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":75,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_93\":{\"nr\":\"93\",\"length\":{\"targetEdit\":8}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":75,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_93\":{\"nr\":\"93\",\"length\":{\"targetEdit\":8}}}}",
         "isWatched": false,
         "isFirstofFile": true
     },
@@ -1267,7 +1267,7 @@
         "targetToSort": "testtext one",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>testtext one",
         "targetEditToSort": "testtext one",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_94\":{\"nr\":\"94\",\"length\":{\"targetEdit\":13}},\"fakeSegId_95\":{\"nr\":\"95\",\"length\":{\"targetEdit\":14}},\"fakeSegId_96\":{\"nr\":\"96\",\"length\":{\"targetEdit\":14}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_94\":{\"nr\":\"94\",\"length\":{\"targetEdit\":13}},\"fakeSegId_95\":{\"nr\":\"95\",\"length\":{\"targetEdit\":14}},\"fakeSegId_96\":{\"nr\":\"96\",\"length\":{\"targetEdit\":14}}}}",
         "isWatched": false
     },
     {
@@ -1294,7 +1294,7 @@
         "targetToSort": "text text two",
         "targetEdit": "text text two",
         "targetEditToSort": "text text two",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_94\":{\"nr\":\"94\",\"length\":{\"targetEdit\":13}},\"fakeSegId_95\":{\"nr\":\"95\",\"length\":{\"targetEdit\":14}},\"fakeSegId_96\":{\"nr\":\"96\",\"length\":{\"targetEdit\":14}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_94\":{\"nr\":\"94\",\"length\":{\"targetEdit\":13}},\"fakeSegId_95\":{\"nr\":\"95\",\"length\":{\"targetEdit\":14}},\"fakeSegId_96\":{\"nr\":\"96\",\"length\":{\"targetEdit\":14}}}}",
         "isWatched": false
     },
     {
@@ -1321,7 +1321,7 @@
         "targetToSort": "texttext three",
         "targetEdit": "texttext three",
         "targetEditToSort": "texttext three",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_94\":{\"nr\":\"94\",\"length\":{\"targetEdit\":13}},\"fakeSegId_95\":{\"nr\":\"95\",\"length\":{\"targetEdit\":14}},\"fakeSegId_96\":{\"nr\":\"96\",\"length\":{\"targetEdit\":14}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":450,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_94\":{\"nr\":\"94\",\"length\":{\"targetEdit\":13}},\"fakeSegId_95\":{\"nr\":\"95\",\"length\":{\"targetEdit\":14}},\"fakeSegId_96\":{\"nr\":\"96\",\"length\":{\"targetEdit\":14}}}}",
         "isWatched": false
     },
     {
@@ -1348,7 +1348,7 @@
         "targetToSort": "without match",
         "targetEdit": "without match",
         "targetEditToSort": "without match",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_97\":{\"nr\":\"97\",\"length\":{\"targetEdit\":13}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_97\":{\"nr\":\"97\",\"length\":{\"targetEdit\":13}}}}",
         "isWatched": false
     },
     {
@@ -1375,7 +1375,7 @@
         "targetToSort": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source",
         "targetEdit": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source",
         "targetEditToSort": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_98\":{\"nr\":\"98\",\"length\":{\"targetEdit\":88}},\"fakeSegId_99\":{\"nr\":\"99\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_98\":{\"nr\":\"98\",\"length\":{\"targetEdit\":88}},\"fakeSegId_99\":{\"nr\":\"99\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false,
         "isFirstofFile": true
     },
@@ -1403,7 +1403,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_98\":{\"nr\":\"98\",\"length\":{\"targetEdit\":88}},\"fakeSegId_99\":{\"nr\":\"99\",\"length\":{\"targetEdit\":0}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_98\":{\"nr\":\"98\",\"length\":{\"targetEdit\":88}},\"fakeSegId_99\":{\"nr\":\"99\",\"length\":{\"targetEdit\":0}}}}",
         "isWatched": false
     },
     {
@@ -1430,7 +1430,7 @@
         "targetToSort": "2 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEdit": "2 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEditToSort": "2 - Teste eine vorhandene \u00dcbersetzung. ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_100\":{\"nr\":\"100\",\"length\":{\"targetEdit\":39}},\"fakeSegId_101\":{\"nr\":\"101\",\"length\":{\"targetEdit\":21}},\"fakeSegId_102\":{\"nr\":\"102\",\"length\":{\"targetEdit\":34}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_100\":{\"nr\":\"100\",\"length\":{\"targetEdit\":39}},\"fakeSegId_101\":{\"nr\":\"101\",\"length\":{\"targetEdit\":21}},\"fakeSegId_102\":{\"nr\":\"102\",\"length\":{\"targetEdit\":34}}}}",
         "isWatched": false
     },
     {
@@ -1457,7 +1457,7 @@
         "targetToSort": "2 - Mit MRK Tags und ",
         "targetEdit": "2 - Mit MRK Tags und ",
         "targetEditToSort": "2 - Mit MRK Tags und ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_100\":{\"nr\":\"100\",\"length\":{\"targetEdit\":39}},\"fakeSegId_101\":{\"nr\":\"101\",\"length\":{\"targetEdit\":21}},\"fakeSegId_102\":{\"nr\":\"102\",\"length\":{\"targetEdit\":34}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_100\":{\"nr\":\"100\",\"length\":{\"targetEdit\":39}},\"fakeSegId_101\":{\"nr\":\"101\",\"length\":{\"targetEdit\":21}},\"fakeSegId_102\":{\"nr\":\"102\",\"length\":{\"targetEdit\":34}}}}",
         "isWatched": false
     },
     {
@@ -1484,7 +1484,7 @@
         "targetToSort": "2 - zus\u00e4tzlichen Target Segmenten.",
         "targetEdit": "2 - zus\u00e4tzlichen Target Segmenten.",
         "targetEditToSort": "2 - zus\u00e4tzlichen Target Segmenten.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_100\":{\"nr\":\"100\",\"length\":{\"targetEdit\":39}},\"fakeSegId_101\":{\"nr\":\"101\",\"length\":{\"targetEdit\":21}},\"fakeSegId_102\":{\"nr\":\"102\",\"length\":{\"targetEdit\":34}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_100\":{\"nr\":\"100\",\"length\":{\"targetEdit\":39}},\"fakeSegId_101\":{\"nr\":\"101\",\"length\":{\"targetEdit\":21}},\"fakeSegId_102\":{\"nr\":\"102\",\"length\":{\"targetEdit\":34}}}}",
         "isWatched": false
     },
     {
@@ -1511,7 +1511,7 @@
         "targetToSort": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source.",
         "targetEdit": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source.",
         "targetEditToSort": "1 - Teste eine vorhandene \u00dcbersetzung. Mit MRK Tags und zus\u00e4tzlichen Segmenten im Source.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_103\":{\"nr\":\"103\",\"length\":{\"targetEdit\":90}},\"fakeSegId_104\":{\"nr\":\"104\",\"length\":{\"targetEdit\":0}},\"fakeSegId_105\":{\"nr\":\"105\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_103\":{\"nr\":\"103\",\"length\":{\"targetEdit\":90}},\"fakeSegId_104\":{\"nr\":\"104\",\"length\":{\"targetEdit\":0}},\"fakeSegId_105\":{\"nr\":\"105\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -1538,7 +1538,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_103\":{\"nr\":\"103\",\"length\":{\"targetEdit\":90}},\"fakeSegId_104\":{\"nr\":\"104\",\"length\":{\"targetEdit\":0}},\"fakeSegId_105\":{\"nr\":\"105\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_103\":{\"nr\":\"103\",\"length\":{\"targetEdit\":90}},\"fakeSegId_104\":{\"nr\":\"104\",\"length\":{\"targetEdit\":0}},\"fakeSegId_105\":{\"nr\":\"105\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -1565,7 +1565,7 @@
         "targetToSort": "Mittendrin",
         "targetEdit": "Mittendrin",
         "targetEditToSort": "Mittendrin",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_103\":{\"nr\":\"103\",\"length\":{\"targetEdit\":90}},\"fakeSegId_104\":{\"nr\":\"104\",\"length\":{\"targetEdit\":0}},\"fakeSegId_105\":{\"nr\":\"105\",\"length\":{\"targetEdit\":10}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_103\":{\"nr\":\"103\",\"length\":{\"targetEdit\":90}},\"fakeSegId_104\":{\"nr\":\"104\",\"length\":{\"targetEdit\":0}},\"fakeSegId_105\":{\"nr\":\"105\",\"length\":{\"targetEdit\":10}}}}",
         "isWatched": false
     },
     {
@@ -1592,7 +1592,7 @@
         "targetToSort": "2 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEdit": "2 - Teste eine vorhandene \u00dcbersetzung. ",
         "targetEditToSort": "2 - Teste eine vorhandene \u00dcbersetzung. ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_106\":{\"nr\":\"106\",\"length\":{\"targetEdit\":39}},\"fakeSegId_107\":{\"nr\":\"107\",\"length\":{\"targetEdit\":21}},\"fakeSegId_108\":{\"nr\":\"108\",\"length\":{\"targetEdit\":46}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_106\":{\"nr\":\"106\",\"length\":{\"targetEdit\":39}},\"fakeSegId_107\":{\"nr\":\"107\",\"length\":{\"targetEdit\":21}},\"fakeSegId_108\":{\"nr\":\"108\",\"length\":{\"targetEdit\":46}}}}",
         "isWatched": false
     },
     {
@@ -1619,7 +1619,7 @@
         "targetToSort": "2 - Mit MRK Tags und ",
         "targetEdit": "2 - Mit MRK Tags und ",
         "targetEditToSort": "2 - Mit MRK Tags und ",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_106\":{\"nr\":\"106\",\"length\":{\"targetEdit\":39}},\"fakeSegId_107\":{\"nr\":\"107\",\"length\":{\"targetEdit\":21}},\"fakeSegId_108\":{\"nr\":\"108\",\"length\":{\"targetEdit\":46}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_106\":{\"nr\":\"106\",\"length\":{\"targetEdit\":39}},\"fakeSegId_107\":{\"nr\":\"107\",\"length\":{\"targetEdit\":21}},\"fakeSegId_108\":{\"nr\":\"108\",\"length\":{\"targetEdit\":46}}}}",
         "isWatched": false
     },
     {
@@ -1646,7 +1646,7 @@
         "targetToSort": "2 - zus\u00e4tzlichen Target Segmenten. Mittendrin.",
         "targetEdit": "2 - zus\u00e4tzlichen Target Segmenten. Mittendrin.",
         "targetEditToSort": "2 - zus\u00e4tzlichen Target Segmenten. Mittendrin.",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_106\":{\"nr\":\"106\",\"length\":{\"targetEdit\":39}},\"fakeSegId_107\":{\"nr\":\"107\",\"length\":{\"targetEdit\":21}},\"fakeSegId_108\":{\"nr\":\"108\",\"length\":{\"targetEdit\":46}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_106\":{\"nr\":\"106\",\"length\":{\"targetEdit\":39}},\"fakeSegId_107\":{\"nr\":\"107\",\"length\":{\"targetEdit\":21}},\"fakeSegId_108\":{\"nr\":\"108\",\"length\":{\"targetEdit\":46}}}}",
         "isWatched": false
     },
     {
@@ -1673,7 +1673,7 @@
         "targetToSort": "Empty Source mit target 3",
         "targetEdit": "Empty Source mit target 3",
         "targetEditToSort": "Empty Source mit target 3",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_109\":{\"nr\":\"109\",\"length\":{\"targetEdit\":26}},\"fakeSegId_110\":{\"nr\":\"110\",\"length\":{\"targetEdit\":5}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_109\":{\"nr\":\"109\",\"length\":{\"targetEdit\":26}},\"fakeSegId_110\":{\"nr\":\"110\",\"length\":{\"targetEdit\":5}}}}",
         "isWatched": false
     },
     {
@@ -1700,7 +1700,7 @@
         "targetToSort": "foo 1",
         "targetEdit": "foo 1",
         "targetEditToSort": "foo 1",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_109\":{\"nr\":\"109\",\"length\":{\"targetEdit\":26}},\"fakeSegId_110\":{\"nr\":\"110\",\"length\":{\"targetEdit\":5}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_109\":{\"nr\":\"109\",\"length\":{\"targetEdit\":26}},\"fakeSegId_110\":{\"nr\":\"110\",\"length\":{\"targetEdit\":5}}}}",
         "isWatched": false
     },
     {
@@ -1727,7 +1727,7 @@
         "targetToSort": "foo 2",
         "targetEdit": "foo 2",
         "targetEditToSort": "foo 2",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_111\":{\"nr\":\"111\",\"length\":{\"targetEdit\":5}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_111\":{\"nr\":\"111\",\"length\":{\"targetEdit\":5}}}}",
         "isWatched": false
     },
     {
@@ -1754,7 +1754,7 @@
         "targetToSort": "foo 3",
         "targetEdit": "foo 3",
         "targetEditToSort": "foo 3",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_112\":{\"nr\":\"112\",\"length\":{\"targetEdit\":5}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":null,\"sizeUnit\":\"\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":0,\"siblingData\":{\"fakeSegId_112\":{\"nr\":\"112\",\"length\":{\"targetEdit\":5}}}}",
         "isWatched": false
     }
 ]

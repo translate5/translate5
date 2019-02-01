@@ -60,6 +60,7 @@ abstract class editor_Workflow_Abstract {
     const STEP_LECTORING = 'lectoring';
     const STEP_TRANSLATORCHECK = 'translatorCheck';
     const STEP_PM_CHECK = 'pmCheck';
+    const STEP_WORKFLOW_ENDED = 'workflowEnded';
     
     //const WORKFLOW_ID = ''; this is the internal used name for this workflow, it has to be defined in each subclass!
     
@@ -83,6 +84,7 @@ abstract class editor_Workflow_Abstract {
         'STEP_LECTORING' => 'Lektorat',
         'STEP_TRANSLATORCHECK' => 'Übersetzer Prüfung',
         'STEP_PM_CHECK' => 'PM Prüfung',
+        'STEP_WORKFLOW_ENDED' => 'Workflow beendet',
     );
     
     /**
@@ -202,6 +204,7 @@ abstract class editor_Workflow_Abstract {
         self::STEP_TRANSLATION,
         self::STEP_LECTORING,
         self::STEP_TRANSLATORCHECK,
+        self::STEP_WORKFLOW_ENDED,
     );
     
     /**
@@ -209,9 +212,9 @@ abstract class editor_Workflow_Abstract {
      * @var array
      */
     protected $steps2Roles = array(
-        self::STEP_TRANSLATION=>self::ROLE_TRANSLATOR,
-        self::STEP_LECTORING=>self::ROLE_LECTOR,
-        self::STEP_TRANSLATORCHECK=>self::ROLE_TRANSLATORCHECK
+        self::STEP_TRANSLATION => self::ROLE_TRANSLATOR,
+        self::STEP_LECTORING => self::ROLE_LECTOR,
+        self::STEP_TRANSLATORCHECK => self::ROLE_TRANSLATORCHECK,
     );
     
     /**
@@ -235,6 +238,11 @@ abstract class editor_Workflow_Abstract {
             self::ROLE_LECTOR => [self::STATE_FINISH],
             self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
         ],
+        self::STEP_WORKFLOW_ENDED => [
+            self::ROLE_TRANSLATOR => [self::STATE_FINISH],
+            self::ROLE_LECTOR => [self::STATE_FINISH],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_FINISH],
+        ],
     ];
     
     /**
@@ -252,23 +260,26 @@ abstract class editor_Workflow_Abstract {
             'notifyAllUsersAboutTaskAssociation',
     ]; 
     
+    protected $nextStepWasSet = [];
+    
     public function __construct() {
         $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
+        
         $events = Zend_EventManager_StaticEventManager::getInstance();
         $events->attach('Editor_TaskuserassocController', 'afterPostAction', function(Zend_EventManager_Event $event){
             $tua = $event->getParam('entity');
             //if entity could not be saved no ID was given, so check for it
             if($tua->getId() > 0) {
-                $this->recalculateWorkflowStep($tua);
                 $this->doUserAssociationAdd($tua);
+                $this->recalculateWorkflowStep($tua);
             }
         });
         
         $events->attach('Editor_TaskuserassocController', 'afterDeleteAction', function(Zend_EventManager_Event $event){
-            $this->recalculateWorkflowStep($event->getParam('entity'));
             $this->doUserAssociationDelete($event->getParam('entity'));
+            $this->recalculateWorkflowStep($event->getParam('entity'));
         });
         
         $events->attach('editor_Models_Import', 'beforeImport', function(Zend_EventManager_Event $event){
@@ -346,25 +357,48 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
+     * Returns next step in stepChain, or STEP_WORKFLOW_ENDED if for nextStep no users are associated
      * @param mixed $step string or null
      * @return string $role OR false if step does not exist
      */
     public function getNextStep(string $step) {
         $stepChain = $this->getStepChain();
+        
+        //if no next step is found, we return false
+        $nextStep = false;
+        
         $position = array_search($step, $stepChain);
         if (isset($stepChain[$position + 1])) {
-            return $stepChain[$position + 1];
+            $nextStep = $stepChain[$position + 1];
         }
-        return false;
+        
+        //1. get used roles in task:
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tuas = $tua->loadByTaskGuidList([$this->newTask->getTaskGuid()]);
+        if(!empty($tuas)) {
+            $roles = array_column($tuas, 'role');
+            $roles = array_unique($roles);
+            // 2. check if roles of given nextStep are associated to the task
+            $nextRole = $this->getRoleOfStep($nextStep);
+            if(! in_array($nextRole, $roles)) {
+                //3. if not, set nextStep to workflow ended
+                return self::STEP_WORKFLOW_ENDED;
+            }
+        }
+        
+        return $nextStep;
     }
+    
     /**
      * @param mixed $step string
      * @return string $role OR false if step does not exist
      */
     public function getRoleOfStep(string $step) {
         $steps2Roles = $this->getSteps2Roles();
-        if(isset($steps2Roles[$step]))
+        if(isset($steps2Roles[$step])) {
             return $steps2Roles[$step];
+        }
         return false;
     }
     
@@ -647,7 +681,24 @@ abstract class editor_Workflow_Abstract {
             return;
         }
         if($this->debug == 1) {
-            error_log(get_class($this).'::'.$name);
+            //error_log(get_class($this).'::'.$name);
+            if(empty($this->newTask)) {
+                return;
+            }
+            $taskGuid = $this->newTask->getTaskGuid();
+            //without that data no loggin is possible
+            if(empty($taskGuid) || empty($this->authenticatedUserModel)) {
+                return;
+            }
+            if(!empty($this->newTaskUserAssoc)) {
+                $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+                /* @var $user ZfExtended_Models_User */
+                $user->loadByGuid($this->newTaskUserAssoc->getUserGuid());
+                editor_Models_LogTask::createWorkflow($taskGuid, $name, $this->authenticatedUserModel, $user);
+            }
+            else {
+                editor_Models_LogTask::createWorkflow($taskGuid, $name, $this->authenticatedUserModel);
+            }
             return;
         }
         if($this->debug == 2) {
@@ -763,7 +814,6 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_TaskUserAssoc $newTua
      */
     public function doWithUserAssoc(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua) {
-        $this->doDebug(__FUNCTION__);
         $this->oldTaskUserAssoc = $oldTua;
         $this->newTaskUserAssoc = $newTua;
         
@@ -776,9 +826,9 @@ abstract class editor_Workflow_Abstract {
         else {
             $task = $this->newTask;
         }
+        $this->doDebug(__FUNCTION__);
         //ensure that segment MV is createad
         $task->createMaterializedView();
-        $this->recalculateWorkflowStep($newTua);
         $state = $this->getTriggeredState($oldTua, $newTua);
         if(!empty($state)) {
             if(method_exists($this, $state)) {
@@ -786,6 +836,7 @@ abstract class editor_Workflow_Abstract {
             } 
             $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
         }
+        $this->recalculateWorkflowStep($newTua);
     }
     
     /**
@@ -884,7 +935,25 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_TaskUserAssoc $tua
      */
     protected function recalculateWorkflowStep(editor_Models_TaskUserAssoc $tua) {
-        $tuas = $tua->loadByTaskGuidList([$tua->getTaskGuid()]);
+        $sendNotice = function($step) {
+            $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
+            /* @var $msg ZfExtended_Models_Messages */
+            $labels = $this->getLabels();
+            $steps = $this->getSteps();
+            $step = $labels[array_search($step, $steps)];
+            $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
+        };
+        
+        $taskGuid = $tua->getTaskGuid();
+        
+        //if the step was recalculated due setNextStep in internal workflow calculations, 
+        // we may not recalculate it here again!
+        if(!empty($this->nextStepWasSet[$taskGuid])) {
+            $sendNotice($this->nextStepWasSet[$taskGuid]['newStep']);
+            return;
+        }
+        
+        $tuas = $tua->loadByTaskGuidList([$taskGuid]);
         
         $areTuasSubset = function($toCompare) use ($tuas){
             foreach($tuas as $tua) {
@@ -900,10 +969,7 @@ abstract class editor_Workflow_Abstract {
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($tua->getTaskGuid());
-        
-        $msg = ZfExtended_Factory::get('ZfExtended_Models_Messages');
-        /* @var $msg ZfExtended_Models_Messages */
+        $task->loadByTaskGuid($taskGuid);
         
         $matchingSteps = [];
         foreach($this->validStates as $step => $roleStates) {
@@ -921,15 +987,13 @@ abstract class editor_Workflow_Abstract {
         }
         //set the first found valid step to the current workflow step
         $step = reset($matchingSteps);
+        $this->doDebug(__FUNCTION__.' recalculate to step: '.$step);
         $task->updateWorkflowStep($step, false);
         $log = ZfExtended_Factory::get('editor_Workflow_Log');
         /* @var $log editor_Workflow_Log */
         $log->log($task, $this->authenticatedUser->userGuid);
         //set $step as new workflow step if different to before!
-        $labels = $this->getLabels();
-        $steps = $this->getSteps();
-        $step = $labels[array_search($step, $steps)];
-        $msg->addNotice('Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!', 'core', null, $step);
+        $sendNotice($step);
         return;
     }
     
@@ -985,7 +1049,13 @@ abstract class editor_Workflow_Abstract {
      * @param string $stepName
      */
     protected function setNextStep(editor_Models_Task $task, $stepName) {
-        $this->doDebug(__FUNCTION__);
+        //store the nextStepWasSet per taskGuid, 
+        // so this mechanism works also when looping over different tasks with the same workflow instance
+        $this->nextStepWasSet[$task->getTaskGuid()] = [
+            'oldStep' => $task->getWorkflowStepName(),
+            'newStep' => $stepName,
+        ];
+        $this->doDebug(__FUNCTION__.' '.print_r($this->nextStepWasSet, 1));
         $task->updateWorkflowStep($stepName, true);
         $log = ZfExtended_Factory::get('editor_Workflow_Log');
         /* @var $log editor_Workflow_Log */
@@ -1039,7 +1109,6 @@ abstract class editor_Workflow_Abstract {
      * @param editor_Models_TaskUserAssoc $tua
      */
     public function doUserAssociationDelete(editor_Models_TaskUserAssoc $tua) {
-        $this->doDebug(__FUNCTION__);
         $this->newTaskUserAssoc = $tua; //"new" is basicly wrong, but with that entity all calculation is done
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
@@ -1050,6 +1119,7 @@ abstract class editor_Workflow_Abstract {
         //if the deleted tua was not finished, we have to recheck the allFinished events after deleting it!
         $wasNotFinished = ($originalState !== self::STATE_FINISH);
         $stat = $this->calculateFinish();
+        $this->doDebug(__FUNCTION__. ' OriginalState: '.$originalState.'; Finish Stat: '.print_r($stat,1));
         if($wasNotFinished && $stat['roleAllFinished']) {
             //in order to trigger the actions correctly we have to assume that the deleted one was "finished" 
             $tua->setState(self::STATE_FINISH);
@@ -1147,9 +1217,9 @@ abstract class editor_Workflow_Abstract {
      * evaluates the role and states of the User Task Association and calls the matching handlers:
      */
     protected function doFinish() {
-        $this->doDebug(__FUNCTION__);
         
         $stat = $this->calculateFinish();
+        $this->doDebug(__FUNCTION__.print_r($stat,1));
         
         if($stat['roleFirstFinished']) {
             $this->handleFirstFinishOfARole($stat);
@@ -1173,9 +1243,12 @@ abstract class editor_Workflow_Abstract {
     protected function calculateFinish() {
         $userTaskAssoc = $this->newTaskUserAssoc;
         $stat = $userTaskAssoc->getUsageStat();
-        //we have to initialize the following two values with true for proper working but with false if there is no tua at all
-        $allFinished = !empty($stat); 
-        $roleAllFinished = !empty($stat);
+        //we have to initialize $allFinished with true for proper working but with false if there is no tua at all
+        $allFinished = !empty($stat);
+        
+        //we have to initialize $roleAllFinished with true for proper working but with false if there is no tua with the current tuas role
+        $usedRoles = array_column($stat, 'role');
+        $roleAllFinished = in_array($userTaskAssoc->getRole(), $usedRoles);
         $roleFirstFinished = false;
         $sum = 0;
         foreach($stat as $entry) {

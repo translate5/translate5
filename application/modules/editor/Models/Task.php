@@ -417,8 +417,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $data['workflowStep'] =  new Zend_Db_Expr('`workflowStep` + 1');
             //step nr is not updated in task entity! For correct value we have to reload the task and load the value form DB.
         }
-        $this->setWorkflowStepName($stepName);
+        $this->__call('setWorkflowStepName', [$stepName]);
         $this->db->update($data, ['taskGuid = ?' => $this->getTaskGuid()]);
+    }
+    
+    /**
+     * This method may not be called directly!
+     * Either call editor_Models_Task::updateWorkflowStep 
+     * or if you are in Workflow Context call editor_Workflow_Abstract::setNextStep
+     * @param string $stepName
+     * @throws BadMethodCallException
+     */
+    public function setWorkflowStepName($stepName) {
+        throw new BadMethodCallException('setWorkflowStepName may not be called directly. Either via Task::updateWorkflowStep or in Workflow Context via Workflow::setNextStep');
     }
     
     /**
