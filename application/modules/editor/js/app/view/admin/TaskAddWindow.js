@@ -30,7 +30,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     extend: 'Ext.window.Window',
     requires:[
         'Editor.view.admin.TaskUpload',
-        'Editor.view.admin.TaskAddWindowViewModel'
+        'Editor.view.admin.TaskAddWindowViewModel',
+        'Editor.view.admin.customer.UserCustomersCombo',
+        'Editor.view.LanguageCombo'
     ],
     mixins:[
         'Editor.controller.admin.IWizardCard'
@@ -46,10 +48,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
         importUploadType: '#UT#Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!',
-        importTbxTip: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
-        importTbxTipDis: '#UT#Wählen Sie die zu importierenden TBX Daten für das TermTagging',
-        importTbxLabel: '#UT#TBX Datei²',
-        importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
         importNews: '#UT#Sie können direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
         
         taskNrLabel: '#UT#Auftragsnummer',
@@ -68,7 +66,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
         lockLockedLabel: '#UT#In importierter Datei gesperrte Segmente sind in translate5 gesperrt',
         sourceEditLabel: '#UT#Ausgangstext ist editierbar',
         bottomInfo: '#UT# ¹ Diese Angaben / Daten werden für den Import zwingend benötigt.',
-        bottomInfo2: '#UT# ² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminology auszuzeichnen.',
         feedbackText: "#UT# Fehler beim Import!",
         feedbackTip: '#UT#Fehler beim Import: Bitte wenden Sie sich an den Support!',
         addBtn: '#UT#Aufgabe Importieren',
@@ -81,7 +78,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     width : 1000,
     modal : true,
     layout: 'anchor',
-    
+    autoScroll: true,
     /***
      * Group of cards before they are added to the window wizard
      * The groups are:preimport, import and postimport
@@ -190,30 +187,26 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     allowBlank: false,
                                     toolTip: me.strings.taskNameTip,
                                     fieldLabel: me.strings.taskNameLabel
-                                },Ext.applyIf({
+                                },{
+                                    xtype: 'languagecombo',
                                     name: 'sourceLang',
-                                    allowBlank: false,
                                     toolTip: me.strings.sourceLangTip,
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
                                     fieldLabel: me.strings.sourceLangLabel
-                                }, langCombo),Ext.applyIf({
+                                },{
+                                    xtype: 'languagecombo',
                                     name: 'targetLang',
-                                    allowBlank: false,
                                     toolTip: me.strings.targetLangTip,
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
                                     fieldLabel: me.strings.targetLangLabel
-                                }, langCombo),Ext.applyIf({
+                                },{
+                                    xtype: 'languagecombo',
                                     name: 'relaisLang',
                                     getSubmitValue: function() {
-                                    return this.getValue();
+                                        return this.getValue();
                                     },
-                                    //each combo needs its own store instance, see EXT6UPD-8
-                                    store: Ext.create(Editor.store.admin.Languages),
+                                    allowBlank: true,
                                     toolTip: me.strings.relaisLangTip,
                                     fieldLabel: me.strings.relaisLangLabel
-                                }, langCombo),{
+                                },{
                                     xtype: 'filefield',
                                     name: 'importUpload',
                                     regex: new RegExp('\.('+Editor.data.import.validExtensions.join('|')+')$', 'i'),
@@ -226,15 +219,9 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     layout: 'auto',
                                     padding: '0 0 10 0',
                                     html: Ext.String.format(me.strings.importNews, Editor.data.pathToRunDir)
-                                },{
-                                    xtype: 'filefield',
-                                    name: 'importTbx',
-                                    regex: /\.tbx$/i,
-                                    regexText: me.strings.importTbxType,
-                                    allowBlank: true,
-                                    toolTip: me.strings.importTbxTip,
-                                    fieldLabel: me.strings.importTbxLabel
                                 }]
+                                // + item for assigning customers to the task
+                                // (added dynamically by Editor.controller.admin.TaskPreferences)
                             },{
                                 xtype: 'container',
                                 flex: 1,
@@ -290,7 +277,7 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                         },{
                             xtype: 'container',
                             padding: '10',
-                            html: me.strings.bottomInfo+'<br />'+me.strings.bottomInfo2,
+                            html: me.strings.bottomInfo,
                             dock : 'bottom'
                         }],
                         triggerNextCard:function(activeItem){

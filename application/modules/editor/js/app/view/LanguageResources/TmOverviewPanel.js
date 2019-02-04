@@ -38,9 +38,10 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     extend : 'Ext.grid.Panel',
+    requires: ['Editor.view.admin.customer.CustomerFilter'],
     alias: 'widget.tmOverviewPanel',
     itemId: 'tmOverviewPanel',
-    title:'#UT#Sprachressourcen',
+    title:'#UT#Sprach-Resourcen',
     strings: {
         name: '#UT#Name',
         edit: '#UT#Bearbeiten',
@@ -51,7 +52,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
         add: '#UT#Hinzufügen',
-        import: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
         noTaskAssigned:'#UT#Keine Aufgaben zugewiesen.',
         sourceLang: '#UT#Quellsprache',
         targetLang: '#UT#Zielsprache',
@@ -63,12 +63,14 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
             unknown: '#UT#unbekannt',
             noconnection: '#UT#Keine Verbindung!',
             import: '#UT#importiert',
-            notloaded: '#UT#verfügbar'
+            notloaded: '#UT#verfügbar',
+            notchecked:'#UT#Nicht geprüft',
+            novalidlicense: '#UT#Keine gültige Lizenz.'
         },
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Standardmässig aktiv für',
-        useAsDefaultTooltip:'#UT#Language Ressource standardmässig aktiv für',
-        taskassocgridcell:'#UT#Zugewiesene Aufgaben'
+        taskassocgridcell:'#UT#Zugewiesene Aufgaben',
+        groupHeader: '#UT#Ressource: {name}'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -83,10 +85,25 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                 plugins: ['gridfilters'],
                 viewConfig: {
                     getRowClass: function(record) {
-                        var cls = record.get('filebased') ? 'match-ressource-filebased' : 'match-ressource-non-filebased';
-                        return cls + ' languageResource-status-'+record.get('status');
+                        //adds service specific handled css to the row 
+                        var service = Editor.util.LanguageResources.getService(record.get('serviceName'));
+                        return service.getTmOverviewRowCls(record).join(' ');
                     }
                 },
+                selModel: {
+                    pruneRemoved: false,
+                    listeners: {
+                        selectionchange: {
+                            fn: 'onGridRowSelect',
+                            scope: me
+                        }
+                    }
+                },
+                features: [{
+                    ftype:'grouping',
+                    hideGroupedHeader: true,
+                    enableGroupingMenu: false
+                }],
                 columns: [{
                     xtype: 'gridcolumn',
                     width: 170,
@@ -119,24 +136,41 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
-                        iconCls: 'ico-tm-edit'
+                        iconCls: 'ico-tm-edit',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
                     },{
                         tooltip: me.strings.erase,
                         action: 'delete',
-                        iconCls: 'ico-tm-delete'
+                        iconCls: 'ico-tm-delete',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
                     },{
                         tooltip: me.strings.tasks,
                         action: 'tasks',
-                        iconCls: 'ico-tm-tasks'
+                        iconCls: 'ico-tm-tasks',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
                     },{
-                        tooltip: me.strings.import,
                         action: 'import',
-                        iconCls: 'ico-tm-import'
+                        iconCls: 'ico-tm-import',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        },
+	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+                            return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip();
+	                    }
                     },{
                         tooltip: me.strings.download,
                         action: 'download',
-                        iconCls: 'ico-tm-download'
-                    }]
+                        iconCls: 'ico-tm-download',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return record.get('status') == 'novalidlicense' ? true : false;
+                        }
+                    }],
                 },{
                     xtype: 'gridcolumn',
                     width: 100,
@@ -162,19 +196,19 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     width: 100,
                     dataIndex:'resourcesCustomers',
                     filter: {
-                        type: 'string'
+                        type: 'customer' // [Multitenancy]
                     },
                     text:me.strings.customers,
                     renderer:me.resourceCustomersRenderer
                 },{
                     xtype: 'gridcolumn',
-                    width: 190,
+                    width: 270,
                     dataIndex:'useAsDefault',
                     filter: {
                         type: 'string'
                     },
                     text:me.strings.useAsDefault,
-                    tooltip:me.strings.useAsDefaultTooltip,
+                    tooltip:me.strings.useAsDefault,
                     renderer:me.defaultCustomersRenderer
                 },
                 {
@@ -194,8 +228,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     renderer: function(value, meta, record) {
                         var str = me.strings.languageResourceStatus,
                             info = record.get('statusInfo');
-                        if(value === "loading") { // show list as soon as possible, show status later due to different latency of the requested TMs
-                            //record.load(); // TODO: handle 404 (= remove from grid)
+                        if(value === "loading") { 
+                            // show list as soon as possible, so show status on click only due to different latency of the requested TMs
                             meta.tdCls = 'loading';
                             meta.tdAttr = 'data-qtip="'+str.loading+'"';
                             return ''; //no string since icon set
@@ -257,12 +291,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         text: me.strings.refresh,
                         tooltip: me.strings.refresh
                     }]
-                },{
-                    xtype: 'pagingtoolbar',
-                    store: 'Editor.store.LanguageResources.LanguageResource',
-                    dock: 'bottom',
-                    displayInfo: true
-            }]
+                }]
       };
 
       if (instanceConfig) {
@@ -295,7 +324,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         if(!value || value.length<1){
             return '';
         }
-        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value).join(',')+'"';
+        meta.tdAttr = 'data-qtip="'+this.getCustomersNames(value,true).join('</br>')+'"';
         return value.length;
     },
 
@@ -310,19 +339,43 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     },
 
     /**
-     * Get customer names by costomer id
+     * Get customer names by customer id.
+     * When addCustomerNumber is true, the customer number will be concatenate to the result in format [customerNumber] customerName
      */
-    getCustomersNames:function(customerIds){
+    getCustomersNames:function(customerIds, addCustomerNumber){
         if(!customerIds || customerIds.length<1){
             return '';
         }
-        var names=[],
-            customerStore=Ext.StoreManager.get('customersStore');
-
-        for(var i=0;i<customerIds.length;i++){
-            var rec=customerStore.getById(customerIds[i]);
+        
+        var names = [], 
+            customerStore = Ext.StoreManager.get('customersStore');
+        
+        Ext.Array.each(customerIds, function(id) {
+            var rec = customerStore.getById(id);
+            if(!rec) {
+                return;
+            }
+            if(addCustomerNumber){
+                names.push('['+rec.get('number')+'] '+rec.get('name'));
+            }
             names.push(rec.get('name'));
+        });
+        return names;
+    },
+
+    /***
+     * Grid row select handler
+     */
+    onGridRowSelect:function(grid,selected){
+        if(selected.length<1){
+            return;
         }
-        return names
+        var record = selected[0],
+            status = record.get('status');
+        if(status != record.STATUS_NOTCHECKED){
+            return;
+        }
+        record.set('status',record.STATUS_LOADING);
+        record.load();
     }
 });

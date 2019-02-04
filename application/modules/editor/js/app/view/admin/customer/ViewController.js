@@ -185,11 +185,8 @@ Ext.define('Editor.view.admin.customer.ViewController', {
 
         me.getView().mask(deleting);
 
-        //remnove the record from the store
-        store.remove(record);
-
-        //sync the store with the proxy
-        store.sync({
+        //remove the record from the store
+        record.erase({
             success:function(){
                 Editor.MessageBox.addSuccess(me.getView().strings.customerDeletedMsg);
                 me.getView().unmask();

@@ -26,16 +26,39 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.LanguageResources.LanguageResource', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.LanguageResource',
-  autoLoad: true,
-  remoteFilter:true,
-  sorters:[{
-	  property:'serviceName'
-  }],
-  groupField: 'serviceName',
-  //INFO:remote sort is not needed since the pageing is removed
-  pageSize: 0
-  //remoteSort:true
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
+ * @extends Ext.panel.Panel
+ */
+Ext.define('Editor.view.LanguageResources.services.TermCollection', {
+    requires: ['Editor.view.LanguageResources.services.Default'],
+    extends: 'Editor.view.LanguageResources.services.Default',
+    id: 'TermCollection',
+
+    addTooltip: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
+
+    /**
+     * returns the row css class for the associated service in the tm overview panel
+     * @param {Editor.model.LanguageResources.LanguageResource} rec
+     * @return {Array}
+     */
+    getTmOverviewRowCls: function(record) {
+        var result = [];
+        result.push('language-ressource-import');
+        result.push('languageResource-status-'+record.get('status'));
+        return result;
+    },
+
+    /***
+     * Term collection tooltip for add/import term collection button. This is rendered in the language resources grid.
+     */
+    getAddTooltip:function(){
+        return this.addTooltip;
+    }
 });

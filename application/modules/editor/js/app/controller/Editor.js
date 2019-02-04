@@ -44,6 +44,8 @@ Ext.define('Editor.controller.Editor', {
         'Editor.controller.editor.PrevNextSegment',
         'Editor.view.task.ConfirmationWindow'
     ],
+    mixins: ['Editor.util.Range'
+        ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
         segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
@@ -76,6 +78,9 @@ Ext.define('Editor.controller.Editor', {
     generalKeyMap: null,
     prevNextSegment: null,
     sourceTags: null,
+    lastClipboardData: '',
+    lastCopiedFromSourceData: '',
+    copiedContentFromSource: null,
     listen: {
         controller: {
             '#Editor.$application': {
@@ -110,6 +115,15 @@ Ext.define('Editor.controller.Editor', {
             
             'taskConfirmationWindow button': {
                 click:'taskConfirm'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceNbsp': {
+                click: 'insertWhitespaceNbsp'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceNewline': {
+                click: 'insertWhitespaceNewline'
+            },
+            '#segmentStatusStrip #btnInsertWhitespaceTab': {
+                click: 'insertWhitespaceTab'
             }
         }
     },
@@ -186,6 +200,8 @@ Ext.define('Editor.controller.Editor', {
         plug.on('beforeedit', me.handleStartEdit, me);
         plug.on('canceledit', disableEditing);
         plug.on('edit', disableEditing)
+        
+        Ext.getDoc().on('copy', me.copySelectionWithInternalTags, me, {priority: 9999, delegated: false});
         
         me.tooltip = Ext.create('Editor.view.ToolTip', {
             target: me.getSegmentGrid().getEl()
@@ -404,6 +420,12 @@ Ext.define('Editor.controller.Editor', {
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
+        
+        // insert whitespace
+        me.keyMapConfig['ctrl-shift-space'] = [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true];
+        me.keyMapConfig['shift-enter'] = [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true];
+        me.keyMapConfig['tab'] = [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true];
+        
         editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: docEl,
             binding: me.getKeyMapConfig()
@@ -412,7 +434,35 @@ Ext.define('Editor.controller.Editor', {
         docEl.on('paste', function(e){
             e.stopPropagation();
             e.preventDefault();
-            editor.insertAtCursor((e.browserEvent.clipboardData || window.clipboardData).getData('Text'));
+            var plug = me.getEditPlugin(),
+                htmlEditor = plug.editor.mainEditor,
+                segmentId = plug.context.record.get('id'),
+                data,
+                clipboardData = (e.browserEvent.clipboardData || window.clipboardData).getData('Text');
+            if (me.copiedContentFromSource != null ) {
+                // Segment A must not copy internal tags into Segment B
+                if (segmentId != me.copiedContentFromSource.selSegmentId) {
+                    data = me.copiedContentFromSource.selDataText;
+                } else {
+                    data = me.copiedContentFromSource.selDataHtml;
+                }
+                // handle CTRL+C within the document (= in copiedContentFromSource) and 
+                // outside of the document (= in clipboard):
+                // if the clipboard-data isn't the same as before copying from the source,
+                // we use the new clipboard-data.
+                // But only if what has been copied from the source has not changed meanwhile.
+                if (me.lastCopiedFromSourceData == me.copiedContentFromSource.selDataHtml
+                        && clipboardData != ''
+                        && me.lastClipboardData != ''
+                        && clipboardData != me.lastClipboardData) {
+                    data = clipboardData;
+                }
+                me.lastCopiedFromSourceData = me.copiedContentFromSource.selDataHtml;
+                editor.insertMarkup(data);
+            } else {
+                editor.insertAtCursor(clipboardData);
+            }
+            me.lastClipboardData = clipboardData;
         }, me, {delegated: false});
         if(me.editorTooltip){
             me.editorTooltip.setTarget(editor.getEditorBody());
@@ -435,8 +485,12 @@ Ext.define('Editor.controller.Editor', {
      * Cleanup stuff in the editor view port
      */
     onCloseEditorViewport: function() {
-        this.clearKeyMaps();
-        this.taskConfirmation && this.taskConfirmation.destroy();
+        var me = this;
+        me.clearKeyMaps();
+        // removing the following handler has no effect, but it should be removed here!
+        //Ext.getDoc().un('copy', me.copySelectionWithInternalTags);
+        me.tooltip && me.tooltip.destroy();
+        me.taskConfirmation && me.taskConfirmation.destroy();
     },
     clearKeyMaps: function() {
         var me = this;
@@ -963,6 +1017,54 @@ Ext.define('Editor.controller.Editor', {
             });
         }
     },
+    copySelectionWithInternalTags: function(event) {
+        if(!this.editorKeyMap) {
+            //if we are not in a task, we may not invoke. Easiest way: check for editorKeyMap 
+            return;
+        }
+        // CTRL+C gets the selected text (including internal tags)
+        var me = this,
+            plug = me.getEditPlugin(),
+            htmlEditor,
+            segmentId,
+            sel,
+            selRange,
+            selDataHtml,
+            selInternalTags,
+            selDataText;
+        //do only something when editing targets:
+        if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
+            return;
+        }
+        htmlEditor = plug.editor.mainEditor;
+        segmentId = plug.context.record.get('id');
+        sel = rangy.getSelection();
+        selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+        selRange = me.getRangeWithFullInternalTags(selRange);
+        
+        // for insert as html
+        // (must not include element-ids that already exist in Ext.cache!)
+        selDataHtml = selRange.toHtml();
+        selDataHtml = selDataHtml.replace(/id="ext-element-[0-9]+"/, '');
+        
+        // for insert as text only
+        // (internal tags are contained as divs; selRange.toString() would not remove them)
+        selDataText = selDataHtml;
+        selInternalTags = selRange.getNodes([1], function(node) {
+            return node.classList.contains('internal-tag');
+        });
+        Ext.Array.each(selInternalTags, function(internalTag) {
+            selDataText = selDataText.replace(internalTag.outerHTML, '');
+        });
+        
+        me.copiedContentFromSource = {
+                'selDataHtml': selDataHtml, // = selected content WITH internal tags
+                'selDataText': selDataText, // = selected content WITHOUT internal tags
+                'selSegmentId': segmentId
+        }
+        
+        event.preventDefault();
+    },
     copySourceToTarget: function() {
         var plug = this.getEditPlugin();
         //do only something when editing targets:
@@ -970,6 +1072,64 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
         plug.editor.mainEditor.insertMarkup(plug.context.record.get('source'));
+    },
+    insertWhitespaceNbsp: function(key,e) {
+        this.insertWhitespace(key,e,'nbsp');
+    },
+    insertWhitespaceNewline: function(key,e) {
+        this.insertWhitespace(key,e,'newline');
+    },
+    insertWhitespaceTab: function(key,e) {
+        this.insertWhitespace(key,e,'tab');
+    },
+    insertWhitespace: function(key,e,whitespaceType) {
+        var me = this,
+            userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
+            userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+            tagNr,
+            plug,
+            editor;
+        if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+            return;
+        }
+        tagNr = me.getNextWhitespaceTagNumber();
+        plug = me.getEditPlugin();
+        editor = plug.editor.mainEditor;
+        editor.insertWhitespaceInEditor(whitespaceType, tagNr);
+        if (e.delegatedTarget.nodeName.toLowerCase() == 'a') {
+            editor.focus();
+        }
+        e.stopEvent();
+    },
+    /**
+     * What's the number for the next Whitespace-Tag?
+     * @return number nextTagNr
+     */
+    getNextWhitespaceTagNumber: function () {
+        var me = this,
+            plug = this.getEditPlugin(),
+            editor = plug.editor.mainEditor,
+            imgInTarget = editor.getDoc().getElementsByTagName("img"),
+            nrTagsInSrc,
+            nrTagsInTarget,
+            nrTagsInSegment;
+        // source
+        if(!me.sourceTags){
+            nrTagsInSrc = 0;
+        } else {
+            nrTagsInSrc = me.sourceTags.length;
+        }
+        // target
+        nrTagsInTarget = 0;
+        Ext.Object.each(imgInTarget, function(key, imgNode){
+            var imgClassList = imgNode.classList;
+            if (imgClassList.contains('single') || imgClassList.contains('open')) {
+                nrTagsInTarget++;
+            }
+        });
+        // use the highest
+        nrTagsInSegment = (nrTagsInSrc >= nrTagsInTarget) ? nrTagsInSrc : nrTagsInTarget;
+        return nrTagsInSegment + 1;
     },
 
         handleInsertTagShift: function(key, e) {
@@ -1037,7 +1197,7 @@ Ext.define('Editor.controller.Editor', {
             but = navi.down('#watchSegmentBtn'),
             success = function(rec, op) {
                 var displayfield = ed.editor.down('displayfield[name="autoStateId"]'),
-                    autoStateCell = Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
+                    autoStateCell = ed.context && Ext.fly(ed.context.row).down('td.x-grid-cell-autoStateColumn div.x-grid-cell-inner');
                 //isWatched
                 record.set('isWatched', !isWatched);
                 record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
@@ -1050,7 +1210,7 @@ Ext.define('Editor.controller.Editor', {
                     me.fireEvent('watchlistRemoved', record, me, rec);
                 }
                 //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
-                displayfield.setValue(autoStateCell.getHtml());
+                autoStateCell && displayfield.setValue(autoStateCell.getHtml());
             },
             failure = function(rec, op) {
                 but.setTooltip(isWatched ? stopText : startText);

@@ -48,7 +48,10 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   idPrefix: 'tag-image-',
   requires: [
       'Editor.view.segments.HtmlEditorLayout',
+      'Editor.view.segments.PixelMapping',
       'Editor.view.segments.StatusStrip'
+  ],
+  mixins: ['Editor.util.SegmentEditorSnapshots'
   ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
@@ -103,7 +106,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     me.metaPanelController = Editor.app.getController('Editor');
     me.segmentsController = Editor.app.getController('Segments');
     me.imageTemplate = new Ext.Template([
-      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" />'
+      '<img id="'+me.idPrefix+'{key}" class="{type}" title="{title}" alt="{text}" src="{path}" data-length="{length}" data-pixellength="{pixellength}" />'
     ]);
     me.imageTemplate.compile();
     me.spanTemplate = new Ext.Template([
@@ -300,14 +303,17 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
         range.setStartAfter(lastNode);
-        range.setEndAfter(lastNode); 
+        range.setEndAfter(lastNode);
+        this.saveSnapshot(); // Keep a snapshot from the new content
         this.fireEvent('afterInsertMarkup', rangeForNode);
       }
   },
   setSegmentSize: function(controller, size, oldSize) {
       var body = Ext.fly(this.getEditorBody());
-      body.removeCls(oldSize);
-      body.addCls(size);
+      if(body) {
+          body.removeCls(oldSize);
+          body.addCls(size);
+      }
       this.currentSegmentSize = size;
   },
   /**
@@ -344,13 +350,15 @@ Ext.define('Editor.view.segments.HtmlEditor', {
     Ext.destroy(me.measure);
     return me.result;
   },
-
+  getInitialData: function() {
+      return {
+          fullPath: Editor.data.segments.fullTagPath,
+          shortPath: Editor.data.segments.shortTagPath
+      };
+  },
   replaceTagToImage: function(rootnode, plainContent) {
     var me = this,
-        data = {
-            fullPath: Editor.data.segments.fullTagPath,
-            shortPath: Editor.data.segments.shortTagPath
-        };
+        data = me.getInitialData();
     
     Ext.each(rootnode.childNodes, function(item){
       var termFoundCls;
@@ -396,8 +404,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName != 'DIV'){
         return;
       }
-      data = me.getData(item,data);
-
+      data = me.getData(item, data); 
+      
       if(me.viewModesController.isFullTag() || data.whitespaceTag) {
         data.path = me.getSvg(data.text, data.fullWidth);
       }
@@ -433,7 +441,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
   /**
    * daten aus den tags holen
    */
-  getData: function (item,data) {
+  getData: function (item, data) {
       var me = this,
           divItem, spanFull, spanShort, split,
           sp, fp, //[short|full]Path shortcuts;
@@ -445,6 +453,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       data.id = spanFull.getAttribute('data-originalid');
       data.title = Ext.htmlEncode(spanShort.getAttribute('title'));
       data.length = spanFull.getAttribute('data-length');
+      
       //old way is to use only the id attribute, new way is to use separate data fields
       // both way are currently used!
       if(!data.id) {
@@ -457,30 +466,16 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           data.nr = 'locked'+data.nr;
       }
       //Fallunterscheidung Tag Typ
-      switch(true){
-        case /open/.test(item.className):
-          data.type = 'open';
-          data.suffix = '-left';
-          data.shortTag = data.nr;
-          break;
-        case /close/.test(item.className):
-          data.type = 'close';
-          data.suffix = '-right';
-          data.shortTag = '/'+data.nr;
-          break;
-        case /single/.test(item.className):
-          data.type = 'single';
-          data.suffix = '-single';
-          data.shortTag = data.nr+'/';
-          break;
-      }
-      data.key = data.type+data.nr;
-      data.shortTag = '&lt;'+data.shortTag+'&gt;';
-      data.whitespaceTag = /nbsp|tab|space|newline/.test(item.className);
-      if(data.whitespaceTag) {
-          data.type += ' whitespace';
-      }
+      data = me.renderTagTypeInData(item.className, data);
 
+      //if it is a whitespace tag we have to precalculate the pixel width of the tag (if possible)
+      if(data.whitespaceTag) {
+          data.pixellength = Editor.view.segments.PixelMapping.getPixelLengthFromTag(item, me.currentSegment.get('metaCache'));
+      }
+      else {
+          data.pixellength = 0;
+      }
+      
       //zusammengesetzte img Pfade:
       this.measure.setHtml(data.text);
       data.fullWidth = this.measure.getSize().width;
@@ -493,10 +488,102 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           fullWidth: data.fullWidth,
           shortWidth: data.shortWidth,
           whitespaceTag: data.whitespaceTag,
-          html: '<div class="'+item.className+'">'+me.spanTemplate.apply(data)+'</div>'
+          html: me.renderInternalTags(item.className, data)
       };
 
       return data;
+  },
+  /**
+   * Add type etc. to data according to tag-type.
+   * @param string className
+   * @param object data
+   * @return object data
+   */
+  renderTagTypeInData: function (className, data) {
+      //Fallunterscheidung Tag Typ
+      switch(true){
+        case /open/.test(className):
+          data.type = 'open';
+          data.suffix = '-left';
+          data.shortTag = data.nr;
+          break;
+        case /close/.test(className):
+          data.type = 'close';
+          data.suffix = '-right';
+          data.shortTag = '/'+data.nr;
+          break;
+        case /single/.test(className):
+          data.type = 'single';
+          data.suffix = '-single';
+          data.shortTag = data.nr+'/';
+          break;
+      }
+      data.key = data.type+data.nr;
+      data.shortTag = '&lt;'+data.shortTag+'&gt;';
+      data.whitespaceTag = /nbsp|tab|space|newline/.test(className);
+      if(data.whitespaceTag) {
+          data.type += ' whitespace';
+      }
+      return data;
+  },
+  /**
+   * Render html for internal Tags displayed as div-Tags.
+   * In case of changes, also check $htmlTagTpl in ImageTag.php
+   * @param string className
+   * @param object data
+   * @return String
+   */
+  renderInternalTags: function(className,data) {
+      var me = this;
+      return '<div class="'+className+'">'+me.spanTemplate.apply(data)+'</div>';
+  },
+  /**
+   * Insert whitespace; we use the ("internal-tag"-)divs here, because insertMarkup() 
+   * will render ("internal-tag"-)divs to the ("tag-image"-)images we finally need.
+   * For titles etc, see also whitespaceTagReplacer() in TagTrait.php
+   * @param string whitespaceType ('nbsp'|'newline'|'tab')
+   * @param number tagNr
+   */
+  insertWhitespaceInEditor: function (whitespaceType, tagNr) {
+      var me = this,
+          userCanModifyWhitespaceTags = Editor.data.segments.userCanModifyWhitespaceTags,
+          userCanInsertWhitespaceTags = Editor.data.segments.userCanInsertWhitespaceTags,
+          classNameForTagType,
+          data,
+          className,
+          html;
+      if (!userCanModifyWhitespaceTags || !userCanInsertWhitespaceTags) {
+          return;
+      }
+      data = me.getInitialData();
+      data.nr = tagNr;
+      switch(whitespaceType){
+          case 'nbsp':
+              classNameForTagType = 'single 636861722074733d226332613022206c656e6774683d2231222f nbsp';
+              data.title = '&lt;'+data.nr+'/&gt;: Non breaking space';
+              data.id = 'char';
+              data.length = '1';
+              data.text = '⎵';
+              break;
+          case 'newline':
+              classNameForTagType = 'single 6861726452657475726e2f newline';
+              data.title = '&lt;'+data.nr+'/&gt;: Newline';
+              data.id = 'hardReturn';
+              data.length = '1';
+              data.text = '↵';
+              break;
+          case 'tab':
+              classNameForTagType = 'single 7461622074733d22303922206c656e6774683d2231222f tab';
+              data.title = '&lt;'+data.nr+'/&gt;: 1 tab character';
+              data.id = 'tab';
+              data.length = '1';
+              data.text = '→';
+              break;
+        }
+      className = classNameForTagType + ' internal-tag ownttip';
+      data = me.renderTagTypeInData(className, data);
+      html = me.renderInternalTags(className, data);
+      me.insertMarkup(html);
   },
   /**
    * ersetzt die images durch div und spans im string 
@@ -701,7 +788,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           if(ignoreWhitespace && /whitespace/.test(img.className)) {
               return;
           }
-          if(Ext.Array.contains(foundIds, img.id) && !img.parentNode.nodeName.toLowerCase()==="del") {
+          if(Ext.Array.contains(foundIds, img.id) && img.parentNode.nodeName.toLowerCase()!=="del") {
               me.duplicatedContentTags.push(me.markupImages[img.id.replace(new RegExp('^'+me.idPrefix), '')]);
           }
           else {
@@ -975,7 +1062,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           div = document.createElement("div"),
           additionalLength = 0,
           meta = me.currentSegment.get('metaCache'),
-          field = me.dataIndex;
+          field = me.dataIndex,
+          textLength;
       
       //function can be called with given text - or not. Then it uses the current value.
       if(!Ext.isDefined(text) || text === null){
@@ -988,24 +1076,14 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       text = text.replace(/<del[^>]*>.*?<\/del>/ig,'');//clean del tag
       
       div.innerHTML = text;
-      //add the length stored in each img tag 
-      Ext.fly(div).select('img').each(function(item){
-          var l = parseInt(item.getAttribute('data-length') || "0");
-          //data-length is -1 if no length provided
-          if(l > 0) {
-              additionalLength += l;
-          }
-      });
       
       //add the length of the text itself 
-      text = div.textContent || div.innerText || "";
-      //remove characters with 0 length:
-      text = text.replace(/\u200B/g, '');
+      textLength = me.getLength(text, meta, div);
       
       div = null;
       
       //only the segment length + the tag lengths:
-      me.lastSegmentLength = additionalLength + text.length;
+      me.lastSegmentLength = additionalLength + textLength;
 
       //add the length of the sibling segments (min max length is given for the whole transunit, not each mrk tag
       if(meta && meta.siblingData) {
@@ -1029,8 +1107,45 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           additionalLength += meta.additionalMrkLength;
       }
       
-      return additionalLength + text.length;
+      //return 30; // for testing
+      return additionalLength + textLength;
   },
+  
+  /**
+   * Return the text's length either based on pixelMapping or as the number of code units in the text.
+   * @return {Integer}
+   */
+  getLength: function (text, meta, div) {
+      var me = this, 
+          pixelMapping = Editor.view.segments.PixelMapping,
+          isPixel = (meta && meta.sizeUnit === pixelMapping.SIZE_UNIT_FOR_PIXELMAPPING),
+          length;
+      text = div.textContent || div.innerText || "";
+      //remove characters with 0 length:
+      text = text.replace(/\u200B/g, '');
+      if (isPixel) {
+          // ----------- pixel-based -------------
+          length = pixelMapping.getPixelLength(text, meta);
+      } 
+      else {
+          // ----------- char-based -------------
+          length = text.length;
+      }
+      
+      //add the length stored in each img tag 
+      Ext.fly(div).select('img').each(function(item){
+          //for performance reasons the pixellength is precalculated on converting the div span to img tags 
+          var attr = (isPixel ? 'data-pixellength' : 'data-length'),
+              l = parseInt(item.getAttribute(attr) || "0");
+          //data-length is -1 if no length provided
+          if(l > 0) {
+              length += l;
+          }
+      });
+      
+      return length;
+  },
+  
   /**
    * returns the last calculated segment length (with tag lengths, without sibling lengths)
    * @return {Integer}

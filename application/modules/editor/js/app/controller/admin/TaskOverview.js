@@ -67,6 +67,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * the flag is true, when import workers are started via ajax
    */
   isImportStarted:false,
+
+  /***
+   * Task state check function pull. Each item/function in this pull will be included in the task state check loop.see:checkImportState
+   */
+  taskStateCheckPull:[],
   
   /**
    * Container for translated task handler confirmation strings
@@ -92,7 +97,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       taskNotDestroyed : '#UT#Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!',
       openTaskAdminBtn: "#UT#Aufgabenübersicht",
       loadingWindowMessage:"#UT#Dateien werden hochgeladen",
-      loading:'#UT#Laden'
+      loading:'#UT#Laden',
+      importTaskMessage:"#UT#Hochladen beendet. Import und Vorbereitung laufen.",
+      deleteTaskDialogMessage:'#UT#Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?',
+      deleteTaskDialogTitle:'#UT#Aufgabe löschen',
+      taskImportButtonText:'#UT#Aufgabe importieren',
+      taskDeleteButtonText:'#UT#Aufgabe löschen'
   },
   init : function() {
       var me = this;
@@ -101,6 +111,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
       
+      //add default task state checker function
+      me.taskStateCheckPull.push(me.isImportingCheck);
+
       me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
       
       me.control({
@@ -231,7 +244,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
   },
   handleInitEditor: function() {
-      this.getHeadToolBar().down('#task-admin-btn').hide();
+      this.getHeadToolBar() && this.getHeadToolBar().down('#task-admin-btn').hide();
   },
   clearTasks: function() {
       this.getAdminTasksStore().removeAll();
@@ -261,33 +274,49 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                   Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskError, rec.get('taskName')));
                   return;
               }
-              if(!rec.isImporting()) {
+              if(!me.checkTaskStateCheckPull(rec)) {
                   Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskImported, rec.get('taskName')));
               }
           };
       tasks.each(function(task){
-          if(!task.isImporting()){
+          if(!me.checkTaskStateCheckPull(task) || task.dropped){
               return;
           }
           task.load({
-              success: taskReloaded
+              success: taskReloaded,
+              failure: function(records, op){
+                  //handle 404, so the user does not receive error messages
+                if(op.getError().status != '404') {
+                    Editor.app.getController('ServerException').handleException(op.error.response);
+                }
+            }
           });
           foundImporting++;
       });
       if(foundImporting == 0) {
           Ext.TaskManager.stop(this.checkImportStateTask);
+          me.cleanTaskStateCheckPull();
       }
   },
   handleChangeImportFile: function(field, val){
       var name = this.getTaskAddForm().down('textfield[name=taskName]'),
           srcLang = this.getTaskAddForm().down('combo[name=sourceLang]'),
           targetLang = this.getTaskAddForm().down('combo[name=targetLang]'),
-          langs = val.match(/-([a-zA-Z]{2,3})-([a-zA-Z]{2,3})\.[^.]+$/);
+          langs = val.match(/-([a-zA-Z]{2,5})-([a-zA-Z]{2,5})\.[^.]+$/);
       if(name.getValue() == '') {
           name.setValue(val.replace(/\.[^.]+$/, '').replace(/^C:\\fakepath\\/,''));
       }
       //simple algorithmus to get the language from the filename
       if(langs && langs.length == 3) {
+          //try to convert deDE language to de-DE for searching in the store
+          var regex = /^([a-z]+)([A-Z]+)$/;
+          if(regex.test(langs[1])) {
+              langs[1] = langs[1].match(/^([a-z]+)([A-Z]+)$/).splice(1).join('-');
+          }
+          if(regex.test(langs[2])) {
+              langs[2] = langs[2].match(/^([a-z]+)([A-Z]+)$/).splice(1).join('-');
+          }
+          
           var srcStore = srcLang.store,
               targetStore = targetLang.store,
               srcIdx = srcStore.find('label', '('+langs[1]+')', 0, true, true),
@@ -514,7 +543,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       
       if(! me[action] || ! Ext.isFunction(me[action])){
           //fire event if no handler function for the action button is defined
-          me.fireEvent('taskActionColumnNoHandler',t,task);
+          me.fireEvent('taskUnhandledAction', action, t, task);
           return;
       }
 
@@ -710,12 +739,31 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       var me = this,
 	      win = me.getTaskAddWindow(),
 	      winLayout=win.getLayout(),
-	      nextStep=winLayout.getNext(),
-	      activeItem=winLayout.getActiveItem();
+          activeItem=winLayout.getActiveItem(),
+          task=activeItem.task;
       
       //if the task exist start it if the import is not started yet
       if(activeItem.task && !me.isImportStarted){
-    	  me.startImport(activeItem.task);
+          Ext.Msg.show({
+            title:me.strings.deleteTaskDialogTitle,
+            message: me.strings.deleteTaskDialogMessage,
+            buttons: Ext.Msg.YESNO,
+            icon: Ext.Msg.QUESTION,
+            closable:false,
+            buttonText: {
+                yes: me.strings.taskDeleteButtonText,
+                no: me.strings.taskImportButtonText
+            },
+            fn: function(btn) {
+                //yes -> the task will be deleted
+                //no  -> the task will be imported
+                if (btn === 'yes') {
+                	me.handleTaskDelete(task);
+                } else if (btn === 'no') {
+                    me.startImport(task);
+                }
+            }
+          });
       }
   },
 
@@ -769,6 +817,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               win.setLoading(false);
               me.getAdminTasksStore().load();
               
+              //set the store reference to the model(it is missing), it is used later when the task is deleted
+              task.store=me.getAdminTasksStore();
+              
               me.setCardsTask(task);
               
               //call the callback if exist
@@ -793,8 +844,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  var me=this,
 	  	  url=Editor.data.restpath+"task/"+task.get('id')+"/import",
 	  	  win = me.getTaskAddWindow();
-	  
-	  win.setLoading(me.strings.loading);
+      
+      //if the window exist, add loading mask
+	  win && win.setLoading(me.strings.loading);
 	  
 	  //set the import started flag
 	  me.isImportStarted=true;
@@ -803,13 +855,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 		 url:url,
 		 method:'GET',
          success: function(response){
-        	 win.setLoading(false);
-             Editor.MessageBox.addSuccess(win.importTaskMessage,2);
+        	 win && win.setLoading(false);
+             Editor.MessageBox.addSuccess(me.strings.importTaskMessage,2);
              me.handleTaskCancel();
              me.isImportStarted=false;
          },
          failure: function(response){
-        	 win.setLoading(false);
+        	 win && win.setLoading(false);
              Editor.app.getController('ServerException').handleException(response);
              me.isImportStarted=false;
          }
@@ -827,6 +879,45 @@ Ext.define('Editor.controller.admin.TaskOverview', {
 	  items.forEach(function(item){
 		  item.task=task;
 	  });
+  },
+
+  /***
+   * Is the given task importing
+   */
+  isImportingCheck:function(task){
+    return task.isImporting();
+  },
+
+  /***
+   * Call each function checker applied to the taskStateCheckPull
+   */
+  checkTaskStateCheckPull:function(task){
+      var me=this,
+          retval=false;
+
+        for(var i=0;i<me.taskStateCheckPull.length;i++){
+            var fn=me.taskStateCheckPull[i];
+            retval=retval || fn(task);
+        }
+    return retval;
+  },
+
+  /***
+   * Add new task state checker function to the task state check pull
+   */
+  addTaskStateCheckPull:function(item){
+      this.taskStateCheckPull.push(item);
+  },
+
+  /***
+   * Clean/reinitialize the taskStateCheckPull with the default/initial importState check.
+   * This will remove all checker functions added by other classes or plugins
+   */
+  cleanTaskStateCheckPull:function(){
+      var me=this;
+      me.taskStateCheckPull=[];
+      me.addTaskStateCheckPull(me.isImportingCheck);
+      me.fireEvent('taskStateCheckPullCleaned',[]);
   }
   
 });

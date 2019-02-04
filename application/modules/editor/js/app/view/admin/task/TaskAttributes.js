@@ -35,6 +35,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     alias: 'widget.taskattributes',
     strings: {
         taskName:'#UT#Aufgabenname',
+        customerName:'#UT#Kunde',
         deliveryDate:'#UT#Lieferdatum (soll)',
         realDeliveryDate:'#UT#Lieferdatum (ist)',
         orderDate:'#UT#Bestelldatum',
@@ -123,6 +124,15 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             auth = Editor.app.authenticatedUser,
             items=[];
 
+        items.push({
+            xtype: 'displayfield',
+            fieldLabel: me.strings.customerName,
+            renderer: me.customerRenderer,
+            bind:{
+                value:'{currentTask.customerId}'
+            }
+        });
+        
         //TODO: the displayfield value is not selectable
         //EXTJSBUG: https://www.sencha.com/forum/showthread.php?330319-Value-not-selectable-in-display-and-text-fields-under-6-2-0
         //is the user allowed to edit the task name
@@ -169,7 +179,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
                 store: Ext.create('Ext.data.Store',{
                     autoLoad: true,
                     model: 'Editor.model.admin.User',
-                    storeId: 'pmUsers',
+                    pageSize: 0,
                     proxy : {
                         type : 'rest',
                         url: Editor.data.restpath+'user/pm',
@@ -268,4 +278,12 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
 
         return items;
     },
+    customerRenderer : function(val) {
+        if (val == undefined) {
+            return val;
+        }
+        var customersStore = Ext.StoreManager.get('customersStore'),
+            customer = customersStore.getById(val);
+        return customer ? customer.get('name') : '';
+    }
   });

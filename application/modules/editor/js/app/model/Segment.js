@@ -83,7 +83,7 @@ Ext.define('Editor.model.Segment', {
             if(!val || val===""){
                 return null;
             }
-            return JSON.parse(val);
+            return Ext.JSON.decode(val);
         }, persist: false},
         {name: 'isWatched', type: 'boolean', persist: false},
         {name: 'segmentUserAssocId', type: 'int', persist: false}

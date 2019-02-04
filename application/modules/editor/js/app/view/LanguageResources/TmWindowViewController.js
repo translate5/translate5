@@ -34,12 +34,21 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.tmwindowviewcontroller',
 
+    listen: {
+        component: {
+            'languagecombo': {
+                change:'onLanguageComboChange'
+            }
+        }
+    },
+    
     /**
      * On add new tm window render handler
      */
     onTmWindowRender:function(){
         var me=this,
             view=me.getView(),
+            resourcesCustomers=view.down('#resourcesCustomers'),
             sdlStore=Ext.StoreManager.get('sdlEngine');
 
         if(sdlStore){
@@ -49,9 +58,21 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
         
         view.getViewModel().set('uploadLabel',view.strings.file);
         me.mergeCustomersToDefault();
+        resourcesCustomers.getStore().on({
+            load:{
+                fn:me.onResourceCustomersStoreLoad,
+                scope:me
+            }
+        })
     },
 
-
+    /***
+     * On resource customers load event handler
+     */
+    onResourceCustomersStoreLoad:function(){
+        this.mergeCustomersToDefault();
+    },
+    
     /**
      * Resource combo handler
      */
@@ -146,6 +167,7 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
      */
     mergeCustomersToDefault:function(){
         var me=this,
+            record=me.getView().down('form').getRecord(),
             resourcesCustomers=me.getView().down('#resourcesCustomers'),
             asDefaultField=me.getView().down('#useAsDefault'),
             defaultStore=asDefaultField.getStore(),
@@ -154,6 +176,9 @@ Ext.define('Editor.view.LanguageResources.TmWindowViewController', {
             records=[],
             selectedValues=[];
         
+        if(!asDefaultSelection || asDefaultSelection.length<1 && record){
+            asDefaultSelection=record.get('useAsDefault');
+        }
         //INFO: bevause of extjs bug, unable to use the selected records from the customers as model data to the defaultCustomers store
         //https://www.sencha.com/forum/showthread.php?304305-Uncaught-TypeError-Cannot-read-property-internalId-of-undefined
         //collect all selected customers to additional array

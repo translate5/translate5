@@ -35,7 +35,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         'Editor.view.admin.customer.UserCustomersCombo',
         'Editor.view.LanguageResources.EngineCombo',
         'Editor.view.LanguageResources.TmWindowViewController',
-        'Editor.view.LanguageResources.TmWindowViewModel'
+        'Editor.view.LanguageResources.TmWindowViewModel',
+        'Editor.view.LanguageCombo'
     ],
     controller: 'tmwindowviewcontroller',
     viewModel: {
@@ -48,15 +49,13 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         add: '#UT#Sprachressource hinzufügen',
         resource: '#UT#Ressource',
         name: '#UT#Name',
-        source: '#UT#Quellsprache',
-        target: '#UT#Zielsprache',
         file: '#UT#TM/TMX-Datei (optional)',
         importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
         cancel: '#UT#Abbrechen',
-        customers:'#UT#Kunden',
+        customers:'#UT#Für diese Kunden nutzen',
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
         mergeTerms:'#UT#Termeinträge verschmelzen',
         deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
@@ -129,35 +128,21 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     allowBlank: false,
                     toolTip:'Name',
                     fieldLabel: me.strings.name
-                },Ext.applyIf({
+                },{
+                    xtype: 'languagecombo',
                     name: 'sourceLang',
-                    listeners:{
-                        change:'onLanguageComboChange'
-                    },
                     bind:{
                         hidden:'{isTermCollectionResource}',
                         disabled:'{isTermCollectionResource}'
-                    },
-                    allowBlank: false,
-                    toolTip: me.strings.source,
-                    //each combo needs its own store instance, see EXT6UPD-8
-                    store: Ext.create(Editor.store.admin.Languages),
-                    fieldLabel: me.strings.source
-                }, langCombo),Ext.applyIf({
+                    }
+                },{
+                    xtype: 'languagecombo',
                     name: 'targetLang',
-                    listeners:{
-                        change:'onLanguageComboChange'
-                    },
                     bind:{
                         hidden:'{isTermCollectionResource}',
                         disabled:'{isTermCollectionResource}'
-                    },
-                    allowBlank: false,
-                    toolTip: me.strings.target,
-                    //each combo needs its own store instance, see EXT6UPD-8
-                    store:Ext.create(Editor.store.admin.Languages),
-                    fieldLabel: me.strings.target
-                }, langCombo),{
+                    }
+                },{
                     xtype:'checkbox',
                     bind:{
                         hidden:'{!isTermCollectionResource}',
@@ -195,7 +180,11 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     fieldLabel:me.strings.customers,
                     itemId:'resourcesCustomers',
                     dataIndex:'resourcesCustomers',
-                    store:'userCustomers'
+                    allowBlank: false,
+                    store:Ext.create('Ext.data.Store', {
+                        model:'Editor.model.admin.Customer',
+                        autoLoad:true
+                    })
                 },{
                     xtype:'hiddenfield',
                     name:'resourcesCustomersHidden'

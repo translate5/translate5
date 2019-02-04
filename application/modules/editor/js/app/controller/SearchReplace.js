@@ -787,13 +787,17 @@ Ext.define('Editor.controller.SearchReplace', {
             params:params,
             method:'GET',
             success: function(response){
-                var responseData = JSON.parse(response.responseText);
+                var responseData = Ext.JSON.decode(response.responseText);
                 if(!responseData){
                     return;
                 }
                 var foundSegments = responseData.rows,
                     message=responseData.message,
                     tabPanelviewModel=tabPanel.getViewModel();
+                
+                if(!tabPanelviewModel){
+                    return;
+                }
 
                 tabPanelviewModel.set('hasMqm',responseData.hasMqm ? true : false);
                 
@@ -902,7 +906,7 @@ Ext.define('Editor.controller.SearchReplace', {
             success: function(response){
                 //stop the loading
                 me.showReplaceAllLoading(false);
-                var responseData = JSON.parse(response.responseText);
+                var responseData = Ext.JSON.decode(response.responseText);
                 if(!responseData){
                     return;
                 }
@@ -1107,11 +1111,16 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     findMatchesGrid:function(cell){
         var me=this,
-            tabPanel=me.getTabPanel(),
-            activeTab=tabPanel.getActiveTab(),
+            tabPanel=me.getTabPanel();
+
+        //the tab panel does not exist (the window can be closed)
+        if(!tabPanel){
+            return;
+        }
+
+        var activeTab=tabPanel.getActiveTab(),
             searchField=activeTab.down('#searchField'),
             searchTerm=searchField.getRawValue(),
-            replaceField=activeTab.down('#replaceField'),
             searchType=activeTab.down('radiofield').getGroupValue(),
             matchCase=activeTab.down('#matchCase').checked;
         
@@ -1383,7 +1392,7 @@ Ext.define('Editor.controller.SearchReplace', {
             params: params,
             scope: me,
             success: function(response){
-                var responseData = JSON.parse(response.responseText);
+                var responseData = Ext.JSON.decode(response.responseText);
                 if(!responseData){
                     return;
                 }
@@ -1534,6 +1543,9 @@ Ext.define('Editor.controller.SearchReplace', {
      * Get segment row index from the segment store
      */
     getSegmentRowNumber:function(record){
+        if(!record || record === undefined){
+            return -1;
+        }
         var grid=this.getSegmentGrid(),
             store=grid.store,
             newRecord=store.findRecord('id',record.id),
@@ -1554,8 +1566,12 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     isContentEditableField:function(){
         var me=this,
-            tabPanel=me.getTabPanel(),
-            activeTab=tabPanel.getActiveTab(),
+            tabPanel=me.getTabPanel();
+        
+        if(!tabPanel){
+            return false;
+        }
+        var activeTab=tabPanel.getActiveTab(),
         searchInField=activeTab.down('#searchInField'),
         searchInFieldSelectedVal=searchInField.getValue();
         return Ext.Array.contains(this.replaceFields,searchInFieldSelectedVal);

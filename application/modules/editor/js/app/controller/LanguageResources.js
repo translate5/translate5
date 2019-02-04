@@ -40,7 +40,12 @@ Ext.define('Editor.controller.LanguageResources', {
   extend: 'Ext.app.Controller',
   views: ['Editor.view.LanguageResources.EditorPanel'],
   models: ['Editor.model.LanguageResources.EditorQuery','Editor.model.LanguageResources.TaskAssoc'],
-  requires: ['Editor.util.SegmentContent'],
+  requires: [
+      'Editor.util.SegmentContent',
+      'Editor.util.LanguageResources',
+      'Editor.view.LanguageResources.services.Default',
+      'Editor.view.LanguageResources.services.TermCollection',
+  ],
   refs:[{
       ref: 'matchgrid',
       selector: '#matchGrid'
@@ -89,6 +94,12 @@ Ext.define('Editor.controller.LanguageResources', {
       msgDisabledMatchRate: '#UT#Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.',
       msgDisabledSourceEdit: '#UT#Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.',
       instantTranslate:'#UT#Sofortübersetzung'
+  },
+  init: function() {
+      //add the default service interceptor instance 
+      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.Default'));
+      //add the specific service instances, if needed
+      Editor.util.LanguageResources.addService(Ext.create('Editor.view.LanguageResources.services.TermCollection'));
   },
   assocStore: null,
   SERVER_STATUS: null,//initialized after center panel is rendered
@@ -161,7 +172,7 @@ Ext.define('Editor.controller.LanguageResources', {
           if(task.get('defaultSegmentLayout')) {
               rec.set('matchRate', matchrate);
               //TODO how to implement a check if user modified the match afterwards to add the "interactive" flag?
-              rec.set('matchRateType', Editor.data.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid')); 
+              rec.set('matchRateType', Editor.data.LanguageResources.matchrateTypeChangedState+';languageResourceid='+matchRecord.get('languageResourceid')); 
               me.getMatchrateDisplay().setRawValue(matchrate);
           }
       }

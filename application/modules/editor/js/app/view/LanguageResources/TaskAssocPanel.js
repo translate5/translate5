@@ -40,9 +40,15 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
     extend : 'Ext.panel.Panel',
     alias : 'widget.languageResourceTaskAssocPanel',
     itemId:'languageResourceTaskAssocPanel',
-    requires: ['Editor.view.admin.TaskActionColumn'],
+    viewModel: {
+        type: 'languageResourceTaskAssocPanel'
+    },
+    requires: [
+        'Editor.view.admin.TaskActionColumn',
+        'Editor.view.LanguageResources.TaskAssocPanelViewModel'
+    ],
     cls : 'adminTaskGrid',
-    title: '#UT#Sprachressourcen zuweisen',
+    title: '#UT#Sprach-Resourcen zuweisen',
     strings: {
         reload: '#UT#Aktualisieren',
         save: '#UT#Speichern',
@@ -63,7 +69,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
             dockedItems : [],
             items : [ {
                 xtype : 'grid',
-                itemId : 'tmTaskAssocGrid',
+                itemId : 'languageResourcesTaskAssocGrid',
                 store : 'Editor.store.LanguageResources.TaskAssocStore',
                 emptyText: me.strings.empty,
                 features : [ {
@@ -79,6 +85,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     tooltip : me.strings.checked,
                     dataIndex : 'checked',
                     sortable : true,
+                    cls: 'taskAssocChecked',
                     width:60,
                 }, {
                     xtype : 'checkcolumn',
@@ -87,10 +94,7 @@ Ext.define('Editor.view.LanguageResources.TaskAssocPanel', {
                     dataIndex : 'segmentsUpdateable',
                     sortable : true,
                     renderer: function(value, meta, record) {
-                        this.disabled = !record.get('writable'); //disable checkbox casually
-                        var res = this.defaultRenderer(value, meta, record);
-                        this.disabled = false; //if disabled remains true, the whole column is not clickable
-                        return res;
+                        return record.get('writable') ? this.defaultRenderer(value, meta, record) : '';
                     },
                     width:60,
                 }, {

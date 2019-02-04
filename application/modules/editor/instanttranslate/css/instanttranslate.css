@@ -53,6 +53,7 @@ h4, p {
 
 .instant-translation-error {
     display: none;
+    padding: 3px;
 }
 
 .overflow {
@@ -84,6 +85,10 @@ h4, p {
 .infotext a:hover,
 .infotext span:hover {
     text-decoration: underline;
+}
+#sourceText.source-text-error,
+#sourceText.source-text-error:focus {
+    border: 1px solid #f00;
 }
 .source-text-error.infotext {
     color: #f00;
@@ -117,17 +122,28 @@ h4, p {
     background-size: auto auto;
     background-size: 150px;
 }
-#languageSelector {
-    flex: 1 0 auto;
+#termPortalButtonContainer{
     order: 2;
+    flex: 1 0 auto;
+    text-align: right;
+    margin-right: 7px;
+}
+#languageSelector {
+    order: 3;
     text-align: right;
     margin-right: 7px;
 }
 #locale-button {width: 9em;}
-#logout {
+#logoutContainer {
     flex: 0 0 80px;
-    order: 3;
+    order: 4;
     text-align: right;
+}
+#logoutContainer a {
+    color: #fff;
+}
+#logoutContainer a:hover {
+    color: #000;
 }
 
 @media (max-width: 500px) {
@@ -138,7 +154,7 @@ h4, p {
     }
     #logo { order: 1; }
     #languageSelector { order: 2; text-align: left; margin-top: 5px;}
-    #logout { order: 3; margin-top: 5px;}
+    #logoutContainer { order: 3; margin-top: 5px;}
 }
 
 /* --------------- spinner --------------- */
@@ -177,10 +193,15 @@ h4, p {
 }
 
 /* --------------- source --------------- */
-    
+
+#sourceLanguageAndContent {
+    padding-right: 10px;
+}
+#sourceContent {
+    z-index: 100;
+}
 #source textarea {
     width: 99%;
-    margin-right: 10px;
     height: 105px;
     font-family: verdana,helvetica,sans-serif;
     font-size: 17px;
@@ -192,7 +213,6 @@ h4, p {
 }
 #sourceFile {
     width: 94%;
-    margin-right: 10px;
 }
 #sourceContent,
 .show-if-source-is-file,
@@ -213,6 +233,9 @@ h4, p {
 
 /* --------------- target --------------- */
 
+#target {
+    z-index: 10;
+}
 #target h2 {
     font-size: 0.9EM;
 }
@@ -291,6 +314,7 @@ h4, p {
 .clearable-clear,
 .copyable-copy,
 .term-info,
+.process-status-attribute,
 .term-status {
   position: absolute;
   user-select: none;
@@ -321,11 +345,17 @@ h4, p {
   bottom: 0px;
   padding: 0px 4px;
 }
+.process-status-attribute{
+  left: 63px;
+  bottom: 0px;
+  padding: 0px 4px;
+}
 .term-status {
   left: 45px;
   bottom: 0px;
   padding: 0px 4px;
 }
+
 
 #countedCharacters {
   position: absolute;
@@ -337,6 +367,13 @@ h4, p {
   font-size: 12px;
   color: #666;
   text-align: right;
+}
+#countedCharacters.source-text-error {
+    background-color: #f00;
+    color: #fff;
+    font-weight: bold;
+    font-size: 15px;
+    right: 14px;
 }
 
 /* --------------- ui-tooltip --------------- */

@@ -168,9 +168,9 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
         var me = this,
             value = value && value.split(';') || [],
             firstType, useAsLabel,
-            prefix = value.shift(),
+            prefix = value.shift(), //import, edited, pretranslated
             isImport = (prefix == 'import'),
-            mode = isImport ? 'import' : 'edited',
+            resourceName='',
             translate = function(value) {
                 return me.strings.type[value] || value;
             },
@@ -184,8 +184,8 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
                 }
             	meta.tdAttr = 'data-qtip="<b>'+msg+'</b>'+desc+'"';
             };
-            
-        if(Editor.LanguageResource && prefix == Editor.LanguageResource.matchrateTypeChangedState) {
+           
+        if(prefix == Editor.data.LanguageResources.matchrateTypeChangedState) {
             return '...'; //do nothing here since pending save
         }
         
@@ -210,32 +210,31 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             return '';
         }
         //unknown, when the given value is not registered in translate5
-        if(firstType == 'unknown') {
+        if(firstType == 'unknown' || prefix == 'pretranslated') {
             useAsLabel = value.shift(); //when unknown remove it to prevent a not found image, the real value is in the next field
         }
-        
+
         //translating and formatting known types 
-        label = Ext.String.format(me.strings[mode], translate(useAsLabel));
-        if(value.length > 0) {
-            label = label + ' (' + value.join(';') + ')';
+        label = Ext.String.format(me.strings[prefix], translate(useAsLabel));
+        if(value.length>0){
+            label = label + ' (' +value.join(';')+ ')';
         }
+
         //using tooltip 
-        qtip(meta, label, me.strings[mode+'Desc'][firstType]);
+        qtip(meta, label, me.strings[prefix+'Desc'][firstType]);
         value.unshift(firstType);
+        var newValue=[];
         //and image
         Ext.Array.each(value, function(val, idx){
             var path;
             if(Editor.data.segments.matchratetypes && Editor.data.segments.matchratetypes[val]) {
                 path = Editor.data.segments.matchratetypes[val];
+                newValue[idx] = {
+                    type: val,
+                    path: path
+                };
             }
-            else {
-                path = Editor.data.moduleFolder+'images/matchratetypes/'+val+'.png';
-            }
-            value[idx] = {
-                type: val,
-                path: path
-            };
         });
-        return me.imgTpl.apply({types: value, edited: !isImport});
+        return me.imgTpl.apply({types: newValue, edited: !isImport});
     }
 });

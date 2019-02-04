@@ -82,8 +82,6 @@ td.direction-rtl.x-grid-td div.x-grid-cell-inner {
 
 .segment-content .x-form-display-field del,
 .segment-content .x-form-display-field img,
-.segment-content .x-form-display-field div.internal-tag,
-.segment-content .x-form-display-field div.internal-tag span,
 .segment-tag-column div.x-grid-cell-inner del,
 .segment-tag-column div.x-grid-cell-inner img,
 .segment-tag-column div.x-grid-cell-inner div.internal-tag,
@@ -346,6 +344,16 @@ background-color: #EAF1FB;
     background-color: #24f324;
 }
 
+#segment-grid .segment-statusstrip .whitespaceIcon {
+    float: left;
+    padding: 5px 3px;
+    margin: 0px !important;
+    border-top:  0px !important;
+    border-right: 1px solid #fff;
+    border-bottom:  0px !important;
+    border-left:  0px !important;
+}
+
 .ico-comment-add {background-image: url("../images/comment_add.png");}
 .ico-comment-edit {background-image: url("../images/comment_edit.png");background-repeat: no-repeat;}
 .ico-comment-delete {background-image: url("../images/comment_delete.png");background-repeat: no-repeat;}
@@ -507,7 +515,6 @@ tr.customState td div {font-style: italic;}
 .adminTaskGrid tr.error td .x-action-col-icon,
 .adminTaskGrid tr.import td .x-action-col-icon {display:none;background-repeat:no-repeat;background-position:center;}
 .adminTaskGrid tr.editorOpenTask .ico-task-open {background-image: url("../images/page_view.png");display:inline-block;}
-.adminTaskGrid tr.editorAnalysisTask .ico-task-analysis {background-image: url("../images/chart_pie.png");display:inline-block;}
 .adminTaskGrid tr.editorEditTask .ico-task-edit {background-image: url("../images/page_edit.png");display:inline-block;}
 .x-menu .ico-task-finish,
 .adminTaskGrid tr.editorFinishTask .ico-task-finish {background-image: url("../images/tick.png");display:inline-block;}
@@ -666,8 +673,8 @@ a.x-btn span.task-confirmation {
 .ico-tm-add {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-information {background-image: url(../images/information.png); background-repeat:no-repeat; background-position:50% 50%;}
 .ico-tm-show-more {background-image: url(../images/show_more.png); background-repeat:no-repeat; background-position:50% 50%;}
-.match-ressource-filebased .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
-.match-ressource-filebased .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
+.language-ressource-import .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
+.language-ressource-export .ico-tm-download {background-image: url(../images/book_go.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-magnifier {background-image: url(../images/magnifier.png) !important;background-repeat:no-repeat;background-position:center;}
 /*
 .matchGrid .x-grid-item-selected .x-grid-item-over > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
@@ -680,6 +687,7 @@ a.x-btn span.task-confirmation {
 .tmOverviewPanel td.loading div {background: url(../images/loading_ico.gif) no-repeat center center;}
 .tmOverviewPanel .languageResource-status-noconnection td.status {color: #ff3232;}
 .tmOverviewPanel .languageResource-status-error td.status {color: #ff3232;}
+.tmOverviewPanel .languageResource-status-novalidlicense td.status {color: #ff3232;}
 
 
 .language-resource-result-panel .match-state-loading.x-grid-row .source > div,
@@ -697,10 +705,20 @@ a.x-btn span.task-confirmation {
     font-weight: bold;
     font-style: italic;
 }
-
+.pretranslateCheckboxIcon:before {
+    content: "";
+    display: block;
+    background-image:url(../images/information.png); 
+    background-repeat:no-repeat; 
+    width: 20px;
+    height: 20px;
+    float: left;
+    margin: 0 0 0 0;
+}
 .adminTaskGrid tr:hover td.taskassocs > div {background-image:url(../images/information.png); background-repeat:no-repeat; background-position:18px center;}
 .adminTaskGrid .x-grid-header-ct .taskassocs > div {background:url(../images/share.png) no-repeat 10px 9px;}
 .adminTaskGrid .x-grid-header-ct .segmentsUpdateable > div {background:url(../images/book_edit.png) no-repeat 10px 9px;}
+.adminTaskGrid .x-grid-header-ct .taskAssocChecked > div {background:url(../images/book_link.png) no-repeat 10px 9px;}
 
 .tmOverviewPanel tr:hover td.infoIcon > div,
 .tmOverviewPanel tr:hover td.taskList > div,
@@ -723,3 +741,9 @@ a.x-btn span.task-confirmation {
 .x-colorpicker-field input {
     background-color: inherit;
 }
+
+.tmMatchGridResultTooltip{
+	background-color: #f9e788;
+} 
+
+.customerPanelGrid .ico-customer-mt-export {background-image: url("../images/database_go.png");display:inline-block;}

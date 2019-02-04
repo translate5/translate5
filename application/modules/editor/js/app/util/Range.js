@@ -388,6 +388,73 @@ Ext.define('Editor.util.Range', {
     // Helpers for the content of/in a range
     // =========================================================================
     
+    /** 
+     * Replace whitespace-images in given range with whitespace-text. Returns the new html.
+     * @params {Object} range
+     * @returns {String} html 
+     */
+    getContentWithWhitespaceImagesAsText: function(range) {
+        var allWhitespaceImages,
+            htmlForImage,
+            html = range.toHtml(),
+            rangeForWhitespace = rangy.createRange();
+        allWhitespaceImages = range.getNodes([1], function(node) {
+            return (node.nodeName == 'IMG' && node.classList.contains('whitespace'));
+        });
+        Ext.Array.each(allWhitespaceImages, function(imgNode) {
+            rangeForWhitespace.selectNode(imgNode);
+            htmlForImage = rangeForWhitespace.toHtml();
+            html = html.replace(imgNode.outerHTML, ' ');
+        });
+        return html;
+    },
+    /**
+     * Fix selections when they start or end in/at an internal tag. 
+     * = Workaround because selected tags might not be fully fetched for ranges,
+     * which will cause errors in getData() of Editor.view.segments.HtmlEditor.
+     * Example:
+     * <div class="close"><span class="short">&lt;/1&gt;</span><span class="full">&lt;/span&gt;</span></div>
+     * Example 1: the selections covers the tag fully, but the range will only fetch:
+     * <div class="close"><span class="short">&lt;/1&gt;</span>
+     * Example 2: user might only select "<1"
+     * @param {Object} selRange
+     * @returns {Object} selRange
+     */
+    getRangeWithFullInternalTags: function(selRange) {
+        var me = this,
+            startContainer = selRange.startContainer,
+            endContainer = selRange.endContainer,
+            commonContainer = me.getContainerForRange(selRange),
+            commonDivTag,
+            allDivTags,
+            getCommonDivTag = function(node){
+                while (node) {
+                    if (node.nodeName.toLowerCase() == 'div' && 
+                            ( node.classList.contains('open') || node.classList.contains('close') || node.classList.contains('single') ) ) {
+                        return node;
+                    }
+                    node = node.parentNode;
+                }
+                return null;
+            };
+        commonDivTag = getCommonDivTag(commonContainer);
+        if (commonDivTag != null) {
+            // Is the selection completely within a divTag?
+            selRange.selectNode(commonDivTag);
+        } else if (commonContainer.nodeType == 1) {
+            // Does the selection start or end within a divTag?
+            allDivTags = commonContainer.getElementsByTagName('div');
+            Ext.Array.each(allDivTags, function(divTag) {
+                if (rangy.dom.isOrIsAncestorOf(divTag, startContainer)) {
+                    selRange.setStartBefore(divTag);
+                }
+                if (rangy.dom.isOrIsAncestorOf(divTag, endContainer)) {
+                    selRange.setEndAfter(divTag);
+                }
+            });
+        }
+        return selRange;
+    },
     /**
      * Returns true if all the relevant content in the editor is selected.
      * (CAUTION: CTRL+A does NOT select everything in this sense.)

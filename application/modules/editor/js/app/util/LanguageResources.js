@@ -31,9 +31,10 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.util.LanguageResources', {
 	strings: {
-    	exactMatch:'#UT#100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument',
-        repetitionMatch:'#UT#Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte',
-        contextMatch:'#UT#103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist'
+		exactMatch:'#UT#101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.',
+        repetitionMatch:'#UT#Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.',
+		contextMatch:'#UT#103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.',
+		termcollectionMatch:'#UT#104% ist ein 100% Treffer, der aus einer Termcollection kommt.'
     },
     
     statics: {
@@ -42,24 +43,54 @@ Ext.define('Editor.util.LanguageResources', {
     	 */
     	getMatchrateTooltip:function(matchrate){
     		return new this().getMatchrateTooltip(matchrate);
-    	}
+		},
+		
+		resourceType:{
+			TM:'tm',
+			MT:'mt',
+			TERM_COLLECTION:'termcollection'
+		},
+		
+		/**
+		 * Adds a service instance to the internal list. Usable for Plugins which deliver LanguageResource services. 
+		 * The core languageResources are added by the LanguageResource controller
+		 * addService and getService are used similar to the ServiceManager in the backend
+		 * @param {Editor.view.LanguageResources.services.Default} serviceTypeInstance
+		 */
+		addService: function (serviceTypeInstance) {
+		    if(!this.serviceInstances) {
+		        this.serviceInstances = new Ext.util.Collection();
+		    }
+		    this.serviceInstances.add(serviceTypeInstance);
+		},
+		/**
+		 * returns the service instance to the given service type, if no specific found the Default instance is returned
+		 * @return {Editor.view.LanguageResources.services.Default}
+		 */
+		getService: function (serviceType) {
+            var service = this.serviceInstances,
+                result = service.get(serviceType);
+            if(!result) {
+                return service.get('Default');
+            }
+            return result;
+		}
     },
     
     /***
-     *  Get the match rate (only for 103,102,101 matches) tooltip depending of the match rate percent
+     *  Get the match rate (only for 104,103,102,101 matches) tooltip depending of the match rate percent
      */
     getMatchrateTooltip:function(matchrate){
     	matchrate=parseInt(matchrate);
     	switch(matchrate) {
     		case 101:
 		    	return this.strings.exactMatch;
-		        break;
 		    case 102:
 		    	return this.strings.repetitionMatch;
-		        break;
 		    case 103:
 		    	return this.strings.contextMatch;
-		        break;
+			case 104:
+		    	return this.strings.termcollectionMatch;
 		    default:
 		    	return "";
 		}

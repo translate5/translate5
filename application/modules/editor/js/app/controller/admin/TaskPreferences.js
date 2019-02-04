@@ -33,6 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.controller.admin.TaskPreferences', {
   extend : 'Ext.app.Controller',
+  requires: ['Editor.view.admin.customer.Combo'],
   models: ['admin.TaskUserAssoc','admin.Task','admin.task.UserPref'],
   //constant to be used as value in the frontend for null values in userGuid and workflowStep:
   FOR_ALL: '_forall',
@@ -71,10 +72,19 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
       entrySaved: '#UT#Eintrag gespeichert',
       entryDeleted: '#UT#Eintrag gelöscht',
       entrySaveError: '#UT#Fehler beim Speichern der Änderungen!',
-      forAll: '#UT#für alle'
+      forAll: '#UT#für alle',
+      customerTip: '#UT#Kunde der Aufgabe (Angabe notwendig)',
+      customerLabel: '#UT#Kunde'
   },
   actualTask: null,
   alias: 'controller.taskPreferencesController',
+  listen: {
+      component: {
+          '#taskMainCard':{
+              render:'onTaskMainCardRender'
+          }
+      }
+  },
   
   init : function() {
       var me = this,
@@ -520,5 +530,36 @@ Ext.define('Editor.controller.admin.TaskPreferences', {
           }
       });
       me.loadAllPreferences(me.actualTask);
+  },
+  
+  /**
+   * Called when task add window (task main card) is rendered.
+   * Adds the item for assigning a customer to the new task.
+   * If there is only one customer filtered (eg by the CustomerSwitch),
+   * this customer is preselected.
+   */
+  onTaskMainCardRender: function(taskMainCard,eOpts) {
+      var me = this,
+          auth = Editor.app.authenticatedUser,
+          taskMainCardContainer = taskMainCard.down('#taskMainCardContainer');
+      
+      // add the customer field to the taskUpload window
+      if (auth.isAllowed('editorCustomerSwitch')) {
+          taskMainCardContainer.add({
+              xtype: 'customersCombo', // user is allowed to see the CustomerSwitch => show all customers
+              name: 'customerId',
+              itemId: 'customerId',
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel + '¹'
+          });
+      } else {
+          taskMainCardContainer.add({
+              xtype: 'usercustomerscombo', // show only those customers that are assigned to the user
+              name: 'customerId',
+              itemId: 'customerId',
+              toolTip: me.strings.customerTip,
+              fieldLabel: me.strings.customerLabel + '¹'
+          });
+      }
   }
 });

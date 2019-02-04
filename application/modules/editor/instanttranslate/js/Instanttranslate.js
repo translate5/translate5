@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 var editIdleTimer = null,
     DEFAULT_FILE_EXT='txt',
     uploadedFiles,//Variable to store uploaded files
-    selectedEngineId = undefined,
+    selectedLanguageResourceId = undefined,
     translateTextResponse = '',
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
@@ -38,37 +38,89 @@ var editIdleTimer = null,
     fileTypesAllowedAndAvailable = [];
 
 /***
- * Stores an array with the allowed file-types according to the available engines.
+ * Store allowed file-types for all available languageResources.
  */
 function setFileTypesAllowedAndAvailable() {
-    var engineId,
-        mtEngine,
-        extensionsFileTranslation = Editor.data.languageresource.fileExtension,
-        extensionsKey,
-        filesTypesForLanguageCombination;
-    for (engineId in machineTranslationEngines) {
-        if(machineTranslationEngines.hasOwnProperty(engineId)){
-            mtEngine = machineTranslationEngines[engineId];
-            extensionsKey = mtEngine.source+","+mtEngine.target;
-            if(extensionsFileTranslation.hasOwnProperty(extensionsKey)){
-                filesTypesForLanguageCombination = [];
-                if(fileTypesAllowedAndAvailable[extensionsKey] === -1) {
-                    filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[extensionsKey];
-                }
-                extensionsFileTranslation[extensionsKey].forEach(function(fileType) {
-                    if(filesTypesForLanguageCombination.indexOf(fileType) === -1) {
-                        filesTypesForLanguageCombination.push(fileType);
-                    }
-                  });
-                if(filesTypesForLanguageCombination.length > 0) {
-                    var item = {'sourceLocale': mtEngine.source,
-                                'targetLocale': mtEngine.target,
-                                'filyTypes': filesTypesForLanguageCombination};
-                    fileTypesAllowedAndAvailable[extensionsKey] = item;
-                }
-            }
+    for (languageResourceId in allLanguageResources) {
+        if(allLanguageResources.hasOwnProperty(languageResourceId)){
+            addFileTypesAllowedAndAvailable(allLanguageResources[languageResourceId]);
         }
     }
+}
+/***
+ * Adds the allowed file-types for the given languageResource.
+ * - If two languageResources for the same language-combination are available and allow fileUploads,
+ *   the one with a domainCode is prioritized.
+ * - Other cases are not defined so far (e.g. what if we have THREE languageResources for the same 
+ *   language-combination and TWO of them have a domainCode / what if they belong to different 
+ *   services / ...).
+ */
+function addFileTypesAllowedAndAvailable(languageResource) {
+    var extensionsFileTranslation,
+        serviceFileExtensions,
+        languageCombination,
+        filesTypesForLanguageCombination;
+    if(languageResource.fileUpload == false){
+        return;
+    }
+    extensionsFileTranslation = Editor.data.languageresource.fileExtension;
+    if(!extensionsFileTranslation.hasOwnProperty(languageResource.serviceName)){
+        return;
+    }
+    serviceFileExtensions = extensionsFileTranslation[languageResource.serviceName];
+    $.each(getLanguageCombinations(languageResource), function(index, languageCombination) {
+        filesTypesForLanguageCombination = [];
+        // Do we already have file-types stored for this language-combination? Then check the domainCode and prioritize accordingly.
+        if(fileTypesAllowedAndAvailable.hasOwnProperty(languageCombination)) {
+            var domainCodeStored = fileTypesAllowedAndAvailable[languageCombination].domainCode,
+                isEmptyDomainCode = (languageResource.domainCode == '' || languageResource.domainCode == null) ? true : false;
+            if (domainCodeStored != '' && isEmptyDomainCode) {
+                return;
+            } 
+        }
+        serviceFileExtensions.forEach(function(fileType) {
+            // Add file-extensions (but only if they are not stored already).
+            if ($.inArray(fileType, filesTypesForLanguageCombination) === -1) {
+                filesTypesForLanguageCombination.push(fileType);
+            }
+          });
+        if(filesTypesForLanguageCombination.length > 0) {
+            var dataForLanguageCombination = {'domainCode': languageResource.domainCode,
+                                              'sourceLocale': languageResource.source,
+                                              'targetLocale': languageResource.target,
+                                              'fileTypes': filesTypesForLanguageCombination};
+            fileTypesAllowedAndAvailable[languageCombination] = dataForLanguageCombination;
+        }
+    });
+}
+/**
+ * Returns all available combinations of source- and target-language for the given languageResource.
+ * - TermCollections can have multiple languages in the source and in the target 
+ *   and can translate in all combinations of their source- and target-languages,
+ *   but not from the source to the SAME target-language.
+ * @param object languageResource
+ * @returns array languageCombination
+ */
+function getLanguageCombinations(languageResource) {
+    var allLanguageCombinations = [];
+    $.each(languageResource.source, function(index, sourceLang) {
+        $.each(languageResource.target, function(index, targetLang) {
+            if (sourceLang != targetLang) {
+                allLanguageCombinations.push(sourceLang+","+targetLang);
+            }
+        });
+    });
+    return allLanguageCombinations;
+}
+/**
+ * Checks if a localeToCheck is ok according to the given allLocalesAvailable.
+ * Formerly used to compare strings, now we check arrays, who knows what's yet to come.
+ * @param string localeToCheck
+ * @param array allLocalesAvailable
+ * @returns boolean
+ */
+function isAvailableLocale(localeToCheck, allLocalesAvailable) {
+    return $.inArray(localeToCheck, allLocalesAvailable) !== -1;
 }
 /**
  * Which fileTypes are allowed for the current language-combination?
@@ -79,58 +131,30 @@ function getAllowedFileTypes() {
         targetLocale = $("#targetLocale").val(),
         filesTypesForLanguageCombination,
         addFileTypes,
-        allowedFileTypes = [],
-        allowedFileTypesUnique;
+        allowedFileTypes = [];
     for (var key in fileTypesAllowedAndAvailable) {
         if (fileTypesAllowedAndAvailable.hasOwnProperty(key)) {
             filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[key];
             addFileTypes = false;
             if (sourceLocale == '-' && targetLocale == '-') {
                 addFileTypes = true;
-            } else if (targetLocale == '-' && filesTypesForLanguageCombination.sourceLocale === sourceLocale) {
+            } else if (targetLocale == '-' && isAvailableLocale(sourceLocale, filesTypesForLanguageCombination.sourceLocale)) {
                 addFileTypes = true;
-            } else if (sourceLocale == '-' && filesTypesForLanguageCombination.targetLocale === targetLocale) {
+            } else if (sourceLocale == '-' && isAvailableLocale(targetLocale, filesTypesForLanguageCombination.targetLocale)) {
                 addFileTypes = true;
-            } else if (filesTypesForLanguageCombination.sourceLocale === sourceLocale && filesTypesForLanguageCombination.targetLocale === targetLocale) {
+            } else if (isAvailableLocale(sourceLocale, filesTypesForLanguageCombination.sourceLocale) && isAvailableLocale(targetLocale, filesTypesForLanguageCombination.targetLocale)) {
                 addFileTypes = true;
             }
             if (addFileTypes) {
-                allowedFileTypes = allowedFileTypes.concat(filesTypesForLanguageCombination.filyTypes);
+                $.each(filesTypesForLanguageCombination.fileTypes, function(index, fileType) {
+                    if ($.inArray(fileType, allowedFileTypes) === -1) {
+                        allowedFileTypes.push(fileType);
+                    }
+                });
             }
         }
     }
-    allowedFileTypesUnique = allowedFileTypes.filter(function(elem, index, self) {
-        return index == self.indexOf(elem);
-    });
-    return allowedFileTypesUnique;
-}
-/***
- * Check if files can be translated for the current language-combination.
- * @returns boolean
- */
-function fileTranslationIsPossible() {
-    var sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val(),
-        filesTypesForLanguageCombination,
-        fileTranslationIsPossible = false;
-    if (sourceLocale == '-' && targetLocale == '-') {
-        fileTranslationIsPossible = true;
-    } else {
-        for (var key in fileTypesAllowedAndAvailable) {
-            if (fileTypesAllowedAndAvailable.hasOwnProperty(key)) {
-                filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[key];
-                if (targetLocale == '-' && filesTypesForLanguageCombination.sourceLocale === sourceLocale) {
-                    fileTranslationIsPossible = true;
-                } else if (sourceLocale == '-' && filesTypesForLanguageCombination.targetLocale === targetLocale) {
-                    fileTranslationIsPossible = true;
-                } else if (filesTypesForLanguageCombination.sourceLocale === sourceLocale && filesTypesForLanguageCombination.targetLocale === targetLocale) {
-                    fileTranslationIsPossible = true;
-                }
-            }
-            if (fileTranslationIsPossible) break;
-        }
-    }
-    return fileTranslationIsPossible;
+    return allowedFileTypes;
 }
 /***
  * If files are allowed for the current language-combination, show text accordingly.
@@ -138,23 +162,23 @@ function fileTranslationIsPossible() {
 function setTextForSource() {
     var textForSourceIsText = Editor.data.languageresource.translatedStrings['enterText'],
         textForSourceIsFile = '',
-        allowedFileTypes;
-    if (fileTranslationIsPossible()) {
         allowedFileTypes = getAllowedFileTypes();
-        
+    if (allowedFileTypes.length === 0) {
+        // No file-upload is possible
+        chosenSourceIsText = true;
+        showSource();
+    } else {
+        // When source is chosen to text
         textForSourceIsText += ' <span class="change-source-type">';
         textForSourceIsText += Editor.data.languageresource.translatedStrings['orTranslateFile'];
         textForSourceIsText += ' (' + allowedFileTypes.join(', ') + ')';
         textForSourceIsText += '</span>';
-
+        // When source is chosen to file
         textForSourceIsFile = Editor.data.languageresource.translatedStrings['uploadFile'];
         textForSourceIsFile += ' (' + allowedFileTypes.join(', ') + ')';
         textForSourceIsFile += ' <span class="change-source-type">';
         textForSourceIsFile += Editor.data.languageresource.translatedStrings['orTranslateText'];
         textForSourceIsFile += '</span>';
-    } else {
-        chosenSourceIsText = true;
-        showSource();
     }
     $("#sourceIsText").html(textForSourceIsText);
     $("#sourceIsFile").html(textForSourceIsFile);
@@ -163,16 +187,16 @@ function setTextForSource() {
 /*  -------------------------------------------------------------------------
  * ORDER OF DISPLAY FOR THE USER:
  * (1) languages are selected from the locales-lists (renderLocalesAsAvailable)
- * (2) every change in the language-selection starts a check if/how many mtEngines 
- *     are available (renderMtEnginesAsAvailable)
- * (3) As soon as there is exactly ONE mtEngine available:
+ * (2) every change in the language-selection starts a check if/how many languageResources 
+ *     are available
+ * (3) As soon as there is exactly ONE languageResource available:
  *     - source- and target-language are set
  *     - (if text is already entered:) translation starts
  *  ------------------------------------------------------------------------- */
 
 /* --------------- locales-list (source, target) ---------------------------- */
 /**
- * Include languages for source/target only if there is an Mt-Engine available 
+ * Include languages for source/target only if there is a languageResource available 
  * for the resulting source-target-combination.
  * - accordingToSourceLocale: sourceLocale is set, targetLocales are rendered
  * - accordingToTargetLocale: targetLocale is set, sourceLocales are rendered
@@ -213,8 +237,8 @@ function renderLocalesAsAvailable(accordingTo) {
         }
     } else if (accordingTo === 'reset' || selectedText === Editor.data.languageresource.translatedStrings['clearBothLists']) {
         // This means a "reset" of one or both the lists:
-        sourceLocalesAvailable = mtSourceLanguageLocales;
-        targetLocalesAvailable = mtTargetLanguageLocales;
+        sourceLocalesAvailable = allSourceLanguageLocales;
+        targetLocalesAvailable = allTargetLanguageLocales;
         source = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
         target = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
     } else {
@@ -269,19 +293,28 @@ function renderLocalesAsAvailable(accordingTo) {
 }
 function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     var localesAvailable = [],
-        engineId,
-        mtEngineToCheck,
-        mtEngineLocaleSet,
-        mtEngineLocaleToAdd;
-    for (engineId in machineTranslationEngines) {
-        if (machineTranslationEngines.hasOwnProperty(engineId)) {
-            mtEngineToCheck = machineTranslationEngines[engineId];
-            mtEngineLocaleSet = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheck.source : mtEngineToCheck.target;
-            if (mtEngineLocaleSet === selectedLocale) {
-                mtEngineLocaleToAdd = (accordingTo === 'accordingToSourceLocale') ? mtEngineToCheck.target : mtEngineToCheck.source;
-                if ($.inArray(mtEngineLocaleToAdd, localesAvailable) === -1) {
-                    localesAvailable.push(mtEngineLocaleToAdd); 
-                }
+        languageResourceId,
+        languageResourceToCheck,
+        languageResourceToCheckAllSources,
+        languageResourceToCheckAllTargets,
+        languageResourceLocaleSet,
+        languageResourceAllLocalesToAdd;
+    for (languageResourceId in allLanguageResources) {
+        if (allLanguageResources.hasOwnProperty(languageResourceId)) {
+            languageResourceToCheck = allLanguageResources[languageResourceId];
+            languageResourceToCheckAllSources = languageResourceToCheck.source;
+            languageResourceToCheckAllTargets = languageResourceToCheck.target;
+            languageResourceLocaleSet = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllSources : languageResourceToCheckAllTargets;
+            if (isAvailableLocale(selectedLocale, languageResourceLocaleSet)) {
+                languageResourceAllLocalesToAdd = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllTargets : languageResourceToCheckAllSources;
+                $.each(languageResourceAllLocalesToAdd, function(index, languageResourceLocaleToAdd) {
+                    // TermCollections can translate in all combinations of their source- and target-languages,
+                    // but not from the source to the SAME target-language.
+                    if (languageResourceLocaleToAdd != selectedLocale
+                        && $.inArray(languageResourceLocaleToAdd, localesAvailable) === -1) {
+                            localesAvailable.push(languageResourceLocaleToAdd); 
+                    }
+                });
             }
         }
     }
@@ -369,15 +402,18 @@ function startFileTranslation(){
         fileType,
         fileTypesAllowed = getAllowedFileTypes(),
         fileTypesErrorList = [];
-    if ($('#sourceFile').val() == "") {
+    if ($('#sourceFile').val() == "" && ($("#sourceLocale").val() != '-' || $("#targetLocale").val() != '-')) {
         showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
+        return;
+    } else if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
+        showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
         return;
     }
     clearAllErrorMessages();
     $.each(uploadedFiles, function(key, value){
         fileName = value.name;
         fileType = fileName.substr(fileName.lastIndexOf('.')+1,fileName.length);
-        if (fileTypesAllowed.indexOf(fileType) === -1) {
+        if ($.inArray(fileType, fileTypesAllowed) === -1) {
             fileTypesErrorList.push(fileType);
         }
     });
@@ -393,7 +429,7 @@ function startTimerForInstantTranslation() {
     terminateTranslation();
     if (instantTranslationIsActive && $("#sourceLocale").val() != '-' && $("#targetLocale").val() != '-') {
         editIdleTimer = setTimeout(function() {
-            startTranslation();
+            startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
         }, 200);
     }
 }
@@ -402,8 +438,20 @@ function startTranslation() {
         translationInProgressID;
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
-        startLoadingState();
-        requestFileTranslate();
+        // --------------- TODO start: we can get here via startTimerForInstantTranslation (= without calling startFileTranslation() first),
+        // ---------------             so we have to run the same validations. Bad!
+        if ($('#sourceFile').val() == "" && ($("#sourceLocale").val() != '-' || $("#targetLocale").val() != '-')) {
+            showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
+            return;
+        } else if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
+            showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
+            return;
+        }
+        // --------------- TODO end
+        if (uploadedFiles != undefined) {
+            startLoadingState();
+            requestFileTranslate();
+        }
         return;
     }
     // otherwise: translate Text
@@ -444,7 +492,7 @@ function translateText(textToTranslate,translationInProgressID){
         statusCode: {
             500: function() {
                 hideTranslations();
-                showMtEngineSelectorError('serverErrorMsg500');
+                showLanguageResourceSelectorError('serverErrorMsg500');
             }
         },
         url: Editor.data.restpath+"instanttranslateapi/translate",
@@ -459,7 +507,7 @@ function translateText(textToTranslate,translationInProgressID){
                 return;
             }
             if (result.errors !== undefined && result.errors != '') {
-                showTranslationError(result.errors);
+                showTargetError(result.errors);
             } else {
                 clearAllErrorMessages();
                 translateTextResponse = result.rows;
@@ -481,7 +529,8 @@ function fillTranslation() {
         term,
         termStatus,
         metaData,
-        resultData;
+        resultData,
+        languageRfc;
     $.each(translateTextResponse, function(serviceName, resource){
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
@@ -492,29 +541,47 @@ function fillTranslation() {
                         fuzzyMatch = {'matchRate': result['matchrate'], 
                                       'sourceDiff': result['sourceDiff']}
                     }
-                    infoText = '';
+                    infoText = [];
                     term = '';
+                    languageRfc=null;
                     termStatus = '';
+                    processStatusAttribute = '';
+                    processStatusAttributeValue = '';
                     if (result['metaData'] != undefined) {
                         metaData = result['metaData'];
-                        if(metaData['definition'] != undefined) {
-                            infoText = metaData['definition'];
+                        if(metaData['definitions'] != undefined && metaData['definitions'].length>0) {
+                        	//add all available definitions as separate row
+                        	for(var i=0;i<metaData['definitions'].length;i++){
+                        		infoText.push(metaData['definitions'][i]);
+                        	}
                         }
                         if(metaData['term'] != undefined) {
                             term = metaData['term'];
                         }
+                        if(metaData['languageRfc'] != undefined) {
+                        	languageRfc = metaData['languageRfc'];
+                        }
                         if(metaData['status'] != undefined) {
                             termStatus = metaData['status'];
                         }
+                        if(metaData['processStatusAttribute'] != undefined) {
+                        	processStatusAttribute = metaData['processStatusAttribute'];
+                        }
+                        if(metaData['processStatusAttributeValue'] != undefined) {
+                        	processStatusAttributeValue = metaData['processStatusAttributeValue'];
+                        }
                     }
-                    resultData = {'engineId': result['languageResourceid'],
+                    resultData = {'languageResourceId': result['languageResourceid'],
                                   'fuzzyMatch': fuzzyMatch,
-                                  'infoText': infoText,
+                                  'infoText': infoText.join('<br/>'),
                                   'resourceName': resourceName,
                                   'serviceName': serviceName,
                                   'term': term,
                                   'termStatus': termStatus,
-                                  'translationText': result['target']
+                                  'translationText': result['target'],
+                    			  'processStatusAttribute':processStatusAttribute,
+                    			  'processStatusAttributeValue':processStatusAttributeValue,
+                    			  'languageRfc':languageRfc
                                   };
                     resultHtml += renderTranslationContainer(resultData);
                 }
@@ -524,6 +591,9 @@ function fillTranslation() {
             translationHtml += resultHtml;
         }
     });
+    if (translationHtml == '') {
+        showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
+    }
     $('#translations').html(translationHtml);
     showTranslations();
 }
@@ -544,21 +614,29 @@ function renderTranslationContainer(resultData) {
     }
     
     translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+resultData.engineId+'">'+resultData.translationText+'</div>';
+    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     if (resultData.term != '') {
-        translationsContainer += '<span class="term-info" id="'+resultData.term+'" title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
+    	//check if for the current term the rfc language value is set, if yes set data property so the language is used in the term portal
+    	var languageRfc=resultData.languageRfc ? ('data-languageRfc="'+resultData.languageRfc+'"') : '';
+        translationsContainer += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
     }
+    
+    if (resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
+        translationsContainer += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
+    }
+    
     if (resultData.termStatus != '') {
         translationsContainer += '<span class="term-status">'+renderTermStatusIcon(resultData.termStatus)+'</span>';
     }
+    
     translationsContainer += '</div>';
     
     if (resultData.infoText != '') {
         translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
     }
     
-    translationsContainer += '<div id="translationError'+resultData.engineId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
+    translationsContainer += '<div id="translationError'+resultData.languageResourceId+'" class="instant-translation-error ui-state-error ui-corner-all"></div>';
     return translationsContainer;
 }
 
@@ -589,14 +667,17 @@ function requestFileTranslate(){
 
     // Create a formdata object and add the files
     var data = new FormData(),
-        ext=getFileExtension();
+        ext=getFileExtension(),
+        languageCombination = $("#sourceLocale").val()+','+$("#targetLocale").val(),
+        dataForLanguageCombination = fileTypesAllowedAndAvailable[languageCombination];
     
     $.each(uploadedFiles, function(key, value){
         data.append(key, value);
     });
-    
+
+    data.append('domainCode', dataForLanguageCombination['domainCode']); // TODO
     data.append('source', $("#sourceLocale").val());
-    data.append('target',$("#targetLocale").val());
+    data.append('target', $("#targetLocale").val());
     
     //when no extension in the file is found, use default file extension
     data.append('fileExtension', ext != "" ? ext : DEFAULT_FILE_EXT);
@@ -637,7 +718,7 @@ function getDownloadUrl(fileId){
         statusCode: {
             500: function() {
                 hideTranslations();
-                showMtEngineSelectorError('serverErrorMsg500');
+                showLanguageResourceSelectorError('serverErrorMsg500');
                 }
         },
         url: Editor.data.restpath+"instanttranslateapi/url",
@@ -721,13 +802,20 @@ $(".clearable").each(function() {
 /* --------------- count characters ----------------------------------------- */
 $('#sourceText').on("input focus", function(){
     var sourceTextLength = $(this).val().length;
-    $('#countedCharacters').html(sourceTextLength);
+    $('#countedCharacters').html(sourceTextLength+'/'+characterLimit);
     if (sourceTextLength === 0) {
         $(".clearable-clear").hide();
         $('#translations').html('');
         $('#translations').hide();
     } else {
         $("#sourceIsText").removeClass('source-text-error');
+    }
+    if (sourceTextLength >= characterLimit) {
+        $("#sourceText").addClass('source-text-error');
+        $("#countedCharacters").addClass('source-text-error');
+    } else {
+        $("#sourceText").removeClass('source-text-error');
+        $("#countedCharacters").removeClass('source-text-error');
     }
 });
 
@@ -757,7 +845,15 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 
 /* --------------- open TermPortal ------------------------------------------ */
 $('#translations').on('touchstart click','.term-info',function(){
-    window.open(Editor.data.restpath+"termportal?term="+$(this).attr('id'), '_blank');
+    var url=Editor.data.restpath+"termportal",
+    	termLanguage=$(this).attr("data-languageRfc"),
+        params="term="+$(this).attr('id')+"&lang="+termLanguage;
+    
+    window.parent.loadIframe('termportal',url,params);
+});
+
+$('#termPortalButton').on('touchstart click',function(){
+    window.parent.loadIframe('termportal',Editor.data.restpath+'termportal');
 });
 
 /* --------------- show/hide: helpers --------------------------------------- */
@@ -768,7 +864,7 @@ function showLanguageSelectsOnly() {
 function showSource() {
     $('#sourceContent').show();
     showInstantTranslationOffOn();
-    if (chosenSourceIsText || fileTranslationIsPossible() === false) {
+    if (chosenSourceIsText || getAllowedFileTypes().length === 0) {
         $('.show-if-source-is-text').show();
         $('.show-if-source-is-file').hide();
         $('#translations').show();
@@ -804,17 +900,12 @@ function showInstantTranslationOffOn() {
     }
 }
 /* --------------- show/hide: errors --------------------------------------- */
-function showMtEngineSelectorError(errorMode) {
-    $('#mtEngineSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
+function showLanguageResourceSelectorError(errorMode) {
+    $('#languageResourceSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
     $('#translationSubmit').hide();
 }
-function showTranslationError(errorText) {
-    var engineId = getSelectedEngineId(),
-        divId = 'translationError'+engineId;
-    debugger;
-    if (engineId !== false && document.getElementById(divId) !== null) {
-        $('#'+divId).html(errorText).show();
-    }
+function showTargetError(errorText) {
+    $('#targetError').html(errorText).show();
 }
 function showSourceError(errorText) {
     $('#sourceError').html(errorText).show();
@@ -822,6 +913,8 @@ function showSourceError(errorText) {
 function clearAllErrorMessages() {
     $('.instant-translation-error').hide();
     $("#sourceIsText").removeClass('source-text-error');
+    $('#sourceError').hide();
+    $("#targetError").hide();
 }
 /* --------------- show/hide: loading spinner ------------------------------- */
 // 'sign' = show indicator in addition to content (currently used for text-translations)
@@ -842,4 +935,3 @@ function startLoadingState() {
 function stopLoadingState() {
     $('.loadingSpinnerLayer').hide();
 }
-

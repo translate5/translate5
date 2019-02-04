@@ -54,16 +54,16 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.store.LanguageResources.SdlEngine'
     ],
     strings: {
-        languageresource: '#UT#Sprachressourcen',
+        languageresource: '#UT#Sprach-Resourcen',
         deleteConfirm: '#UT#Sprachressource endgültig löschen?',
         deleteConfirmText: '#UT#Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?',
         deleteConfirmLocal: '#UT#Sprachressource löschen?',
-        deleteConfirmLocalText: '#UT#Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.',
+        deleteConfirmLocalText: '#UT#Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.',
         deleted: '#UT#Sprachressource gelöscht.',
         edited: '#UT#Die Sprachressource "{0}" wurde erfolgreich geändert.',
         created: '#UT#Die Sprachressource "{0}" wurde erfolgreich erstellt.',
-        noResourcesAssigned: '#UT#Keine Sprachressourcen zugewiesen.',
-        taskassocgridcell:'#UT#Zugewiesene Sprachressourcen',
+        noResourcesAssigned: '#UT#Keine Sprach-Resourcen zugewiesen.',
+        taskassocgridcell:'#UT#Zugewiesene Sprach-Resourcen',
         exportTm: '#UT#als TM Datei exportieren',
         exportTmx: '#UT#als TMX Datei exportieren'
     },
@@ -144,8 +144,7 @@ Ext.define('Editor.controller.TmOverview', {
         },
         store: {
             '#Editor.store.LanguageResources.LanguageResource': {
-                update: 'addRecordToImportCheck',
-                load:'onLanguageResourcesLoad'
+                update: 'addRecordToImportCheck'
             }
         }
     },
@@ -170,7 +169,7 @@ Ext.define('Editor.controller.TmOverview', {
                 var rec;
                 while(me.importingRecords.length > 0) {
                     rec = me.importingRecords.shift();
-                    rec.set('state', rec.STATUS_LOADING);
+                    rec.set('status', rec.STATUS_LOADING);
                     rec.load();
                 }
                 // stop the task when all records are reloaded
@@ -355,21 +354,6 @@ Ext.define('Editor.controller.TmOverview', {
             me.checkImportingRecordsTask.start();
         }
     },
-
-    /***
-     * Language resources store load event landler
-     */
-    onLanguageResourcesLoad:function(store){
-        var overviewPanel=Ext.ComponentQuery.query('#tmOverviewPanel').length>0 ? Ext.ComponentQuery.query('#tmOverviewPanel')[0] : null;
-        //reload the store record(get the resource status) when the resource panel is visible
-        if(!overviewPanel || !overviewPanel.isVisible()){
-            return;
-        }
-        store.each(function(record,id){
-            record.load();
-        });
-    },
-
     /**
      * Loops over the given error array and shows additional non formfield specfific errors
      */
@@ -410,11 +394,13 @@ Ext.define('Editor.controller.TmOverview', {
         win.loadRecord(rec);
         win.show();
     },
-    handleTmGridActionColumnClick:function(view, cell, row, col, ev, evObj) {
+    handleTmGridActionColumnClick:function(view, cell, row, col, ev, record) {
         var me = this,
-            store = view.getStore(),
-            record = store.getAt(row),
+            grid=view.up('tmOverviewPanel'),
             f = ev.getTarget().className.match(/ico-tm-([^ ]+)/);
+        
+        //call the selection row handler
+        grid.onGridRowSelect(grid,[record]);
 
         switch(f && f[1] || '') {
             case 'edit':
@@ -505,6 +491,7 @@ Ext.define('Editor.controller.TmOverview', {
             xtype: 'gridcolumn',
             width: 45,
             dataIndex:'taskassocs',
+            stateId: 'taskassocColumn',
             tdCls: 'taskassocs',
             sortable: false,
             cls: 'taskassocs',

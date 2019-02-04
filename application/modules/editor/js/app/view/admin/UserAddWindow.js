@@ -291,6 +291,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                                 queryMode: 'local',
                                 fieldLabel: me.strings.parentUserLabel
                             }]
+                            // + item for assigning customers to the user
+                            // (added dynamically by Editor.controller.admin.Customer)
                         },{
                             xtype: 'fieldset',
                             margin:5,

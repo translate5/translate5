@@ -51,17 +51,27 @@ END LICENSE AND COPYRIGHT
     background-size: auto auto;
     background-size: 150px;
 }
-#languageSelector {
-    flex: 1 0 auto;
+#instantTranslateButtonContainer{
     order: 2;
+    flex: 1 0 auto;
     text-align: right;
     margin-right: 7px;
 }
-#locale-button {width: 9em;}
-#logout {
-    flex: 0 0 80px;
+#languageSelector {
     order: 3;
     text-align: right;
+}
+#locale-button {width: 9em;}
+#logoutContainer {
+    flex: 0 0 80px;
+    order: 4;
+    text-align: right;
+}
+#logoutContainer a {
+    color: #fff;
+}
+#logoutContainer a:hover {
+    color: #000;
 }
 
 @media (max-width: 500px) {
@@ -72,7 +82,7 @@ END LICENSE AND COPYRIGHT
     }
     #logo { order: 1; }
     #languageSelector { order: 2; text-align: left; margin-top: 5px;}
-    #logout { order: 3; margin-top: 5px;}
+    #logoutContainer { order: 3; margin-top: 5px;}
 }
 
 /* --------------- search --------------- */

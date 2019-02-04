@@ -76,7 +76,7 @@ Ext.define('Editor.view.segments.RowEditorColumnParts', {
             }
             target = target.parentNode;
         }
-        if(cmp) {
+        if(cmp && cmp.dataIndex != "source") { // when the dblclick comes from a source of an opened segment, the user might want to select a word for copy & paste
             me.changeColumnToEdit(cmp);
         }
     },

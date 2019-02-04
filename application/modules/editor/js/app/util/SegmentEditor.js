@@ -195,6 +195,7 @@ Ext.define('Editor.util.SegmentEditor', {
     },
     /**
      * Returns the content in the Editor taking into account its tags:
+     * - whitespace-images are replaced with whitespace
      * - content in delNodes is ignored
      * Does NOT change anything in the content of the Editor.
      * @param {Boolean} collapseWhitespace
@@ -204,29 +205,41 @@ Ext.define('Editor.util.SegmentEditor', {
         var me = this,
             rangeForEditor = rangy.createRange(),
             el,
-            elContent,
+            elContentOriginal,
             invisibleElements,
             editorContentAsText,
-            bookmarkForCaret;
+            bookmarkForCaret,
+            htmlWithWhitespaceImagesAsText;
+        el = me.getEditorBodyExtDomElement();
+        elContentOriginal = el.getHtml();
+        bookmarkForCaret = me.getPositionOfCaret();
+        rangeForEditor.selectNodeContents(me.getEditorBody());
+        
+        // replace whitespace-images with whitespace...
+        htmlWithWhitespaceImagesAsText = me.getContentWithWhitespaceImagesAsText(rangeForEditor);
+        el.setHtml(htmlWithWhitespaceImagesAsText);
+        // ...and update the range:
+        rangeForEditor.selectNodeContents(me.getEditorBody());
+        
+        // ignore delNodes
         me.prepareDelNodeForSearch(true);   // SearchReplaceUtils.js (add display none to all del nodes, with this they are ignored in rangeForEditor.text())
+        
         if (collapseWhitespace) {
             // CAUTION: rangy.innerText collapses whitespace! (https://github.com/timdown/rangy/wiki/Text-Range-Module#visible-text)
-            editorContentAsText = rangy.innerText(me.getEditorBody());
+            editorContentAsText = rangy.innerText(el);
         } else {
             // Do NOT collapse multiple whitespace: Remove invisible content and keep ALL of the rest.
-            el = me.getEditorBodyExtDomElement();
-            bookmarkForCaret = me.getPositionOfCaret();
-            elContent = el.getHtml();
-            // Collect all invisible elements; add selectors as needed:
+            // = Collect all invisible elements; add selectors as needed:
             invisibleElements = el.select('.searchreplace-hide-element'); // SearchReplaceUtils.js
             Ext.Array.each(invisibleElements, function(invisibleEl, index) {
                 invisibleEl.destroy();
             });
-            rangeForEditor.selectNodeContents(me.getEditorBody());
             editorContentAsText = rangeForEditor.toString();
-            el.setHtml(elContent);
-            me.setPositionOfCaret(bookmarkForCaret);
         }
+        
+        el.setHtml(elContentOriginal);
+        me.setPositionOfCaret(bookmarkForCaret);
+        
         me.prepareDelNodeForSearch(false);  // SearchReplaceUtils.js
         return editorContentAsText;
     },

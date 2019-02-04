@@ -51,7 +51,7 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
       selector: 'adminTaskPreferencesWindow > tabpanel'
   },{
       ref: 'grid',
-      selector: '#tmTaskAssocGrid'
+      selector: '#languageResourcesTaskAssocGrid'
   },{
       ref: 'adminTaskWindow',
       selector: 'adminTaskPreferencesWindow'
@@ -74,10 +74,10 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
                   panel.setLoading(false);
               }
           },
-          '#tmTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
+          '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="segmentsUpdateable"]': {
               checkchange: 'handleSegmentsUpdateableChange'
           },
-          '#tmTaskAssocGrid checkcolumn[dataIndex="checked"]': {
+          '#languageResourcesTaskAssocGrid checkcolumn[dataIndex="checked"]': {
               checkchange: 'handleCheckedChange'
           }
       }
@@ -194,10 +194,10 @@ Ext.define('Editor.controller.LanguageResourcesTaskassoc', {
               }
               record.commit();
               me.hideLoadingMask();
-              //when all of the records are saved, fire event
 
+              //fire the event when all active requests are finished
               if(me.requestsCount<1){
-            	  me.fireEvent('taskAssocSavingFinished',me.actualTask);
+            	  me.fireEvent('taskAssocSavingFinished',record,me.getGrid().getStore());
               }
           },
           failure: function(response){

@@ -54,7 +54,7 @@ Ext.define('Editor.view.preferences.Window', {
     item_alikeBehaviour_never_boxLabel: 'Nie automatisch ersetzen und Status setzen',
     item_cancelBtn: 'Abbrechen',
     item_saveBtn: 'Speichern',
-    item_show_on_empty_target:'Zeige auf leeres Ziel',
+    item_show_on_empty_target:'Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist',
     
     initConfig: function(instanceConfig) {
       var me = this,

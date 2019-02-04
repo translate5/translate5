@@ -174,7 +174,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           },
           scope: me,
           success: function(response){
-              var responseData = JSON.parse(response.responseText);
+              var responseData = Ext.JSON.decode(response.responseText);
               if(!responseData){
                   return;
               }

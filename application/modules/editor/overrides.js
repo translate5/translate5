@@ -679,7 +679,7 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             lockingPartner = (view.lockingPartner && !fromLockingPartner && !me.doNotMirror) && view.lockingPartner.bufferedRenderer,
             variableRowHeight = me.variableRowHeight,
             activeEl, containsFocus, i, newRows, newTop, newFocus, noOverlap,
-            oldStart, partnerNewRows, pos, removeCount, topAdditionSize, topBufferZone;
+            oldStart, partnerNewRows, pos, removeCount, topAdditionSize, topBufferZone, topNode;
  
         // View may have been destroyed since the DelayedTask was kicked off. 
         if (view.destroyed) {
@@ -757,7 +757,8 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
                 // Adjust the bodyTop to place the data correctly around the scroll vieport 
                 if (noOverlap && variableRowHeight) {
                     topBufferZone = me.scrollTop < me.position ? me.leadingBufferZone : me.trailingBufferZone;
-                    newTop = Math.max(me.scrollTop - rows.item(rows.startIndex + topBufferZone - 1, true).offsetTop, 0);
+                    topNode = rows.item(rows.startIndex + topBufferZone - 1, true);
+                    newTop = Math.max(me.scrollTop - (topNode ? topNode.offsetTop : 0), 0);
                 }
             }
             // Moved down the dataset (content moved up): remove rows from top, add to end 
@@ -989,5 +990,54 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
             }
         }
         return Math.min(rows.endIndex, me.getFirstVisibleRowIndex() + Math.ceil(clientHeight / me.rowHeight));
+    }
+});
+
+
+/**
+ * Fixing the: TRANSLATE-1544 Cannot read property 'isCollapsedPlaceholder' of undefined
+ * this fix is also related to TRANSLATE-1422
+ */
+Ext.override(Ext.grid.feature.GroupStore, {
+    indexOf: function(record) {
+        var ret = -1;
+        if (record && !record.isCollapsedPlaceholder) {
+            ret = this.data.indexOf(record);
+        }
+        return ret;
+    }
+});
+
+/**
+ * Workaround for bug in ExtJs 6.2.0.
+ * Resolved in current yet unreleased version
+ * Fix link: https://stackoverflow.com/questions/43236899/extjs-6-2-classic-does-not-work-with-firefox-and-a-touchscreen
+ */
+Ext.define('My.override.dom.Element', {
+    override: 'Ext.dom.Element'
+},
+function(){
+    var additiveEvents = this.prototype.additiveEvents,
+        eventMap = this.prototype.eventMap;
+    if(Ext.supports.TouchEvents && Ext.firefoxVersion >= 52 && Ext.os.is.Desktop){
+    	console.log("call")
+        eventMap['touchstart'] = 'mousedown';
+        eventMap['touchmove'] = 'mousemove';
+        eventMap['touchend'] = 'mouseup';
+        eventMap['touchcancel'] = 'mouseup';
+        eventMap['click'] = 'click';
+        eventMap['dblclick'] = 'dblclick';
+        additiveEvents['mousedown'] = 'mousedown';
+        additiveEvents['mousemove'] = 'mousemove';
+        additiveEvents['mouseup'] = 'mouseup';
+        additiveEvents['touchstart'] = 'touchstart';
+        additiveEvents['touchmove'] = 'touchmove';
+        additiveEvents['touchend'] = 'touchend';
+        additiveEvents['touchcancel'] = 'touchcancel';
+
+        additiveEvents['pointerdown'] = 'mousedown';
+        additiveEvents['pointermove'] = 'mousemove';
+        additiveEvents['pointerup'] = 'mouseup';
+        additiveEvents['pointercancel'] = 'mouseup';
     }
 });

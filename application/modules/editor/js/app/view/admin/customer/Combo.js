@@ -15,27 +15,31 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.store.LanguageResources.LanguageResource', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.LanguageResources.LanguageResource',
-  autoLoad: true,
-  remoteFilter:true,
-  sorters:[{
-	  property:'serviceName'
-  }],
-  groupField: 'serviceName',
-  //INFO:remote sort is not needed since the pageing is removed
-  pageSize: 0
-  //remoteSort:true
+Ext.define('Editor.view.admin.customer.Combo', {
+    extend: 'Ext.form.field.ComboBox',
+    alias: 'widget.customersCombo',
+    name:'customersCombo',
+
+    fieldLabel:'#UT#Endkunde',
+
+    allowBlank: false,
+    typeAhead: true,
+    anyMatch: true,
+    forceSelection: true,
+    displayField: 'name',
+    valueField: 'id',
+    store:'customersStore',
+    queryMode: 'local'
 });

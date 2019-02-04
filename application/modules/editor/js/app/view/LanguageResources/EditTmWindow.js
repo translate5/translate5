@@ -108,10 +108,13 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     },
                     fieldLabel: me.strings.resource
                 },{
-                    xtype: 'displayfield',
+                    xtype: 'textfield',
                     name: 'name',
                     toolTip: me.strings.name,
-                    fieldLabel: me.strings.name
+                    fieldLabel: me.strings.name,
+                    maxLength: 255,
+                    allowBlank: false,
+                    toolTip:'Name'
                 },Ext.applyIf({
                     name: 'sourceLang',
                     toolTip: me.strings.source,
@@ -129,7 +132,10 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     itemId:'resourcesCustomers',
                     name:'resourcesCustomers',
                     dataIndex:'resourcesCustomers',
-                    store:'userCustomers'
+                    store:Ext.create('Ext.data.Store', {
+                        model:'Editor.model.admin.Customer',
+                        autoLoad:true
+                    })
                 },{
                     xtype:'hiddenfield',
                     name:'resourcesCustomersHidden'
@@ -139,7 +145,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     itemId:'useAsDefault',
                     fieldLabel:me.strings.useAsDefault,
                     store:Ext.create('Ext.data.Store', {
-                        model:'Editor.model.admin.Customer',
+                        model:'Editor.model.admin.Customer'
                     }),
                     displayField: 'name', 
                     valueField: 'id', 
