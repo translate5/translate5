@@ -7,7 +7,7 @@
     
     	<trans-unit id='TWF0Y2gtQW5hbHlzZQ=='>
 		    <source>Match-Analyse</source>
-		    <target>Match-Analysis</target>
+		    <target>Match analysis</target>
 		</trans-unit>
 		
 		<trans-unit id='QmVlbmRlbg=='>
@@ -35,9 +35,9 @@
 		    <target>Export</target>
 		</trans-unit>
 		
-		<trans-unit id='S2VpbmUgQW5hbHlzZSBmw7xyIGRpZSBha3R1ZWxsZSBBdWZnYWJl'>
-		    <source>Keine Analyse für die aktuelle Aufgabe</source>
-		    <target>No analysis for the current task</target>
+		<trans-unit id='U3RhcnQgZGVyIEFuYWx5c2UgaW0gVGFiIOKAnFNwcmFjaC1SZXNvdXJjZW4genV3ZWlzZW7igJw='>
+		    <source>Start der Analyse im Tab “Sprach-Resourcen zuweisen“</source>
+		    <target>Start analysis in the tab “Associate language resources“</target>
 		</trans-unit>
 
 		<trans-unit id='V2llZGVyaG9sdW5nZW46'>
@@ -52,7 +52,7 @@
 
 		<trans-unit id='TWF0Y2gtQW5hbHlzZSB1bmQgVm9yw7xiZXJzZXR6dW5nZW4gd2VyZGVuIGF1c2dlZsO8aHJ0Lg=='>
 		    <source>Match-Analyse und Vorübersetzungen werden ausgeführt.</source>
-		    <target>Match analysis and pretranslations are running.</target>
+		    <target>Match analysis and pre-translations are running.</target>
 		</trans-unit>
 
 		<trans-unit id='WsOkaGxlIGludGVybmUgRnV6enk='>
@@ -62,22 +62,22 @@
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6dW5ncyBNYXRjaC1SYXRl'>
 		    <source>Vorübersetzungs Match-Rate</source>
-		    <target>Pretranslation match rate</target>
+		    <target>Pre-translation match rate</target>
 		</trans-unit>
 
 		<trans-unit id='Vm9yw7xiZXJzZXR6dW5nIG1pdCBUTS1NYXRjaCwgZGllIGdyw7bDn2VyIG9kZXIgZ2xlaWNoIGRlbSBhdXNnZXfDpGhsdGVuIFdlcnQgaXN0'>
 		    <source>Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist</source>
-		    <target>Pretranslation with TM-Match greater than or equal to the selected value</target>
+		    <target>Pre-translation with TM-Match greater than or equal to the selected value</target>
 		</trans-unit>
 
-		<trans-unit id='QW5hbHlzZSAmIFZvcsO8YmVyc2V0enVuZ2VuIFN0YXJ0ZW4='>
-		    <source>Analyse & Vorübersetzungen Starten</source>
-		    <target>Start analysis & pre-translation</target>
+		<trans-unit id='QW5hbHlzZSAmYW1wOyBWb3LDvGJlcnNldHp1bmdlbiBzdGFydGVu'>
+		    <source>Analyse &amp; Vorübersetzungen Starten</source>
+		    <target>Start analysis &amp; pre-translation</target>
 		</trans-unit>
 
 		<trans-unit id='RGllIFZvcsO8YmVyc2V0enVuZyBsw7ZzdCBhdWNoIGVpbmUgbmV1ZSBBbmFseXNlIGF1cw=='>
 		    <source>Die Vorübersetzung löst auch eine neue Analyse aus</source>
-		    <target>Pretranslation also triggers new analysis</target>
+		    <target>Pre-translation also triggers new analysis</target>
 		</trans-unit>
 
 		<trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='>
@@ -88,6 +88,46 @@
 		<trans-unit id='TWF0Y2gtUmF0ZQ=='>
 		    <source>Match-Rate</source>
 		    <target>Match-Rate</target>
+		</trans-unit>
+
+		<trans-unit id='VHJlZmZlciBhdXMgZGVyIFRlcm1pbm9sb2dpZSB3ZXJkZW4gYmV2b3J6dWd0IHZvcsO8YmVyc2V0enQu'>
+		    <source>Treffer aus der Terminologie werden bevorzugt vorübersetzt.</source>
+		    <target>Search results from the terminology are preferably pre-translated.</target>
+		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKFRNICZhbXA7IFRlcm1lKQ=='>
+		    <source>Vorübersetzen (TM &amp; Terme)</source>
+		    <target>Pre-translate (TM &amp; Terms)</target>
+		</trans-unit>
+
+		<trans-unit id='VHJlZmZlciBhdXMgZGVtIFRNIHdlcmRlbiBiZXZvcnp1Z3Qgdm9yw7xiZXJzZXR6dA=='>
+		    <source>Treffer aus dem TM werden bevorzugt vorübersetzt</source>
+		    <target>Hits from the TM are preferably pre-translated</target>
+		</trans-unit>
+
+		<trans-unit id='Vm9yw7xiZXJzZXR6ZW4gKE1UKQ=='>
+		    <source>Vorübersetzen (MT)</source>
+		    <target>Pre-translate (MT)</target>
+		</trans-unit>
+
+		<trans-unit id='QW5hbHlzZQ=='>
+		    <source>Analyse</source>
+		    <target>Analysis</target>
+		</trans-unit>
+
+		<trans-unit id='RGllIE1hdGNoLUFuYWx5c2UgdW5kIGRpZSBWb3LDvGJlcnNldHp1bmcgc2luZCBhYmdlc2NobG9zc2VuLg=='>
+		    <source>Die Match-Analyse und die Vorübersetzung sind abgeschlossen.</source>
+		    <target>Match analysis and pretranslation are finished.</target>
+		</trans-unit>
+
+		<trans-unit id='VGVybWlub2xvZ2llIHByw7xmZW4gdW5kIG1hcmtpZXJlbg=='>
+		    <source>Terminologie prüfen und markieren</source>
+		    <target>Check and mark terminology</target>
+		</trans-unit>
+
+		<trans-unit id='QW5hbHlzZSBsw6R1ZnQ='>
+		    <source>Analyse läuft</source>
+		    <target>Analysis in progress</target>
 		</trans-unit>
     </body>
   </file>

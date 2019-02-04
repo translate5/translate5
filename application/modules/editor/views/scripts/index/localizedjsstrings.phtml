@@ -174,20 +174,23 @@ Ext.define('Editor.controller.Localizer', {
         text: '<?php echo $this->translate->_('Matchrate Typ');?>',
         strings: {
             import: '<?php echo $this->translate->_('{0} (importiert)');?>',
-            edited: '<?php echo $this->translate->_('{0} (translate5)');?>',
+            edited: '<?php echo $this->translate->_('{0}');?>',
+            pretranslated: '<?php echo $this->translate->_('{0} (vorübersetzt)');?>',
             noTarget: '<?php echo $this->translate->_('Kein Zieltext vorhanden');?>',
             noValueDefined: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
             noValueDefinedDesc: '<?php echo $this->translate->_('Das verwendete Übersetzungswerkzeug hat keine Information zur Herkunft des Matches zur Verfügung gestellt.');?>',
             olddata: '<?php echo $this->translate->_('Keine Information vorhanden');?>',
             olddataDesc: '<?php echo $this->translate->_('Dieser Task wurde importiert, bevor das Match Rate Typ-Feature implementiert wurde.');?>',
             type: {
+                "termcollection": '<?php echo $this->translate->_('Term-Collection');?>',
                 "tm": '<?php echo $this->translate->_('TM-Match');?>',
                 "mt": '<?php echo $this->translate->_('MT-Match');?>',
                 "interactive": '<?php echo $this->translate->_('editiert');?>',
                 "source": '<?php echo $this->translate->_('Quelle übernommen');?>',
                 "auto-propagated": '<?php echo $this->translate->_('Wiederholung');?>',
                 "auto-aligned": '<?php echo $this->translate->_('Alignment');?>',
-                "document-match": '<?php echo $this->translate->_('Dokumenten-Match');?>'
+                "document-match": '<?php echo $this->translate->_('Dokumenten-Match');?>',
+                "internal-fuzzy-available": '<?php echo $this->translate->_('Interner Fuzzy');?>'
             },
             importDesc: {
                 "tm": '<?php echo $this->translate->_('Im ursprünglichen Übersetzungswerkzeug außerhalb von translate5 aus einem TM übernommen');?>',
@@ -201,7 +204,14 @@ Ext.define('Editor.controller.Localizer', {
             },
             editedDesc: {
                 "tm": '<?php echo $this->translate->_('Im Browser aus TM übernommen');?>',
-                "mt": '<?php echo $this->translate->_('Im Browser aus MT übernommen');?>'
+                "mt": '<?php echo $this->translate->_('Im Browser aus MT übernommen');?>',
+                "termcollection": '<?php echo $this->translate->_('Im Browser aus Term-Collection übernommen');?>'
+            },
+            pretranslatedDesc: {
+                "tm": '<?php echo $this->translate->_('Bei der Vorübersetzung aus TM übernommen');?>',
+                "mt": '<?php echo $this->translate->_('Bei der Vorübersetzung aus MT übernommen');?>',
+                "termcollection": '<?php echo $this->translate->_('Bei der Vorübersetzung aus Term-Collection übernommen');?>',
+                "internal-fuzzy-available": '<?php echo $this->translate->_('Interner Fuzzy verfügbar');?>'
             }
         }
     });
@@ -250,7 +260,7 @@ Ext.define('Editor.controller.Localizer', {
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_always_boxLabel = '<?php echo $this->translate->_('Immer automatisch ersetzen und Status setzen');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_individual_boxLabel = '<?php echo $this->translate->_('Bei jeder Wiederholung einzeln entscheiden');?>';
     Editor.view.preferences.Window.prototype.item_alikeBehaviour_never_boxLabel = '<?php echo $this->translate->_('Nie automatisch ersetzen und Status setzen');?>';
-    Editor.view.preferences.Window.prototype.item_show_on_empty_target = '<?php echo $this->translate->_('Zeige auf leeres Ziel');?>';
+    Editor.view.preferences.Window.prototype.item_show_on_empty_target = '<?php echo $this->translate->_('Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist');?>';
     Editor.view.preferences.Window.prototype.item_cancelBtn = '<?php echo $this->translate->_('Abbrechen');?>';
     Editor.view.preferences.Window.prototype.item_saveBtn = '<?php echo $this->translate->_('Speichern');?>';
 
@@ -429,7 +439,12 @@ Ext.define('Editor.controller.Localizer', {
             taskNotDestroyed: '<?php echo $this->translate->_('Aufgabe wird noch verwendet und kann daher nicht gelöscht werden!');?>',
             openTaskAdminBtn: '<?php echo $this->translate->_('Aufgabenübersicht');?>',
             loadingWindowMessage: '<?php echo $this->translate->_('Dateien werden hochgeladen');?>',
-            loading: '<?php echo $this->translate->_('Laden');?>'
+            loading: '<?php echo $this->translate->_('Laden');?>',
+            importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
+            deleteTaskDialogMessage:'<?php echo $this->translate->_('Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?');?>',
+            deleteTaskDialogTitle:'<?php echo $this->translate->_('Aufgabe löschen');?>',
+            taskImportButtonText:'<?php echo $this->translate->_('Aufgabe importieren');?>',
+            taskDeleteButtonText:'<?php echo $this->translate->_('Aufgabe löschen');?>'
         },
         confirmStrings: {
             "finish":       {title: "<?php echo $this->translate->_('Aufgabe abschließen?');?>", msg: "<?php echo $this->translate->_('Wollen Sie die Aufgabe wirklich abschließen?');?>"},
@@ -458,6 +473,7 @@ Ext.define('Editor.controller.Localizer', {
         strings: {
             ended: '<?php echo $this->translate->_('beendet');?>',
             noUsers: '<?php echo $this->translate->_('Keine Benutzer zugeordnet!');?>',
+            notFound: '<?php echo $this->translate->_('nicht gefunden');?>',
             locked: '<?php echo $this->translate->_('in Arbeit');?>',
             lockedBy: '<?php echo $this->translate->_('Bearbeitet und Gesperrt durch {0}');?>',
             lockedSystem: '<?php echo $this->translate->_('Durch das System gesperrt mit dem Status \'{0}\'');?>',
@@ -476,6 +492,7 @@ Ext.define('Editor.controller.Localizer', {
             relaisLang: '<?php echo $this->translate->_('Relaissprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
             state: '<?php echo $this->translate->_('Status');?>',
+            customerId: '<?php echo $this->translate->_('Endkunde');?>',
             pmGuid: '<?php echo $this->translate->_('Projektmanager');?>',
             users: '<?php echo $this->translate->_('Benutzer');?>',
             wordCount: '<?php echo $this->translate->_('Wörter');?>',
@@ -498,6 +515,7 @@ Ext.define('Editor.controller.Localizer', {
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
         strings:{
             taskName: '<?php echo $this->translate->_('Aufgabenname');?>',
+            customerName: '<?php echo $this->translate->_('Kunde');?>',
             deliveryDate: '<?php echo $this->translate->_('Lieferdatum (soll)');?>',
             realDeliveryDate: '<?php echo $this->translate->_('Lieferdatum (ist)');?>',
             orderDate: '<?php echo $this->translate->_('Bestelldatum');?>',
@@ -512,14 +530,10 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.view.admin.TaskAddWindow", {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
-        importTaskMessage:'<?php echo $this->translate->_('Hochladen beendet. Import und Vorbereitung laufen.');?>',
         strings: {
             importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
             importUploadType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!');?>',
-            importTbxTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden TBX Daten für das TermTagging');?>',
-            importTbxLabel: '<?php echo $this->translate->_('TBX Datei²');?>',
-            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>',
             importNews: '<?php echo $this->translate->_('Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.');?>',
             taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
             taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
@@ -537,7 +551,6 @@ Ext.define('Editor.controller.Localizer', {
             orderdate: '<?php echo $this->translate->_('Bestelldatum');?>',
             sourceEditLabel: '<?php echo $this->translate->_('Ausgangstext ist editierbar');?>',
             bottomInfo: '<?php echo $this->translate->_('¹ Diese Angaben / Daten werden für den Import zwingend benötigt.');?>',
-            bottomInfo2: '<?php echo $this->translate->_('² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.');?>',
             feedbackText: '<?php echo $this->translate->_('Fehler beim Import!');?>',
             feedbackTip: '<?php echo $this->translate->_('Fehler beim Import: Bitte wenden Sie sich an den Support!');?>',
             addBtn: '<?php echo $this->translate->_('Aufgabe Importieren');?>',
@@ -675,9 +688,10 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.de.util.LanguageResources", {
         override: "Editor.util.LanguageResources",
         strings: {
-		    exactMatch: '<?php echo $this->translate->_('100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument');?>',
-            repetitionMatch: '<?php echo $this->translate->_('Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte');?>',
-            contextMatch: '<?php echo $this->translate->_('103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist');?>'
+		    exactMatch: '<?php echo $this->translate->_('101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.');?>',
+            repetitionMatch: '<?php echo $this->translate->_('Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.');?>',
+            contextMatch: '<?php echo $this->translate->_('103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.');?>',
+            termcollectionMatch: '<?php echo $this->translate->_('104% ist ein 100% Treffer, der aus einer Termcollection kommt.');?>'
         }
     });
     Ext.define("Editor.locale.de.view.task.ConfirmationWindow", {
@@ -948,7 +962,9 @@ Ext.define('Editor.controller.Localizer', {
       entrySaved: '<?php echo $this->translate->_('Eintrag gespeichert');?>',
       entryDeleted: '<?php echo $this->translate->_('Eintrag gelöscht');?>',
       entrySaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>',
-      forAll: '<?php echo $this->translate->_('für alle');?>'
+      forAll: '<?php echo $this->translate->_('für alle');?>',
+      customerTip: '<?php echo $this->translate->_('Kunde der Aufgabe (Angabe notwendig)');?>',
+      customerLabel: '<?php echo $this->translate->_('Kunde');?>'
     };
 <?php 
     }; //if($hasFrontendController('Editor.controller.admin.TaskPreferences')){
@@ -959,6 +975,7 @@ Ext.define('Editor.controller.Localizer', {
 		override: "Editor.controller.admin.Customer",
         strings: {
             customer:'<?php echo $this->translate->_("Kunden");?>',
+            allCustomers:'<?php echo $this->translate->_("Alle Kunden");?>',
         }
     });
 
@@ -979,8 +996,14 @@ Ext.define('Editor.controller.Localizer', {
             customerSavedMsg:'<?php echo $this->translate->_("Kunde gespeichert!");?>',
             customerDeleteMsg:'<?php echo $this->translate->_("Diesen Kunden löschen?");?>',
             customerDeleteTitle:'<?php echo $this->translate->_("Kunden löschen");?>',
-            customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>'
+            customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>',
+            export:'<?php echo $this->translate->_("Exportieren");?>'
         }
+    });
+
+    Ext.define("Editor.locale.view.admin.customer.Combo", {
+        override: "Editor.view.admin.customer.Combo",
+        fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
     });
 
     Ext.define("Editor.locale.view.admin.customer.TagField", {
@@ -988,42 +1011,17 @@ Ext.define('Editor.controller.Localizer', {
         fieldLabel:'<?php echo $this->translate->_("Endkunde");?>'
     });
     
-    
-     Ext.define("Editor.locale.controller.LanguageResources", {
+<?php 
+    }; //END if($hasFrontendController('Editor.controller.admin.Customer')){
+    if($hasFrontendController('Editor.controller.LanguageResources')){
+?>
+    Ext.define("Editor.locale.controller.LanguageResources", {
         override: "Editor.controller.LanguageResources",
         strings: {
             msgDisabledMatchRate: '<?php echo $this->translate->_('Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.');?>',
             msgDisabledSourceEdit: '<?php echo $this->translate->_('Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.');?>'
         }
     });
-    
-    Ext.define("Editor.locale.controller.TaskAssoc", {
-        override: "Editor.controller.LanguageResourcesTaskassoc",
-        strings: {
-            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
-            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
-            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
-        }
-    });
-    
-    Ext.define("Editor.locale.controller.TmOverview", {
-        override: "Editor.controller.TmOverview",
-        strings: {
-            languageresource: '<?php echo $this->translate->_('Sprachressourcen');?>',
-            deleteConfirm: '<?php echo $this->translate->_('Sprachressource endgültig löschen?');?>',
-            deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?');?>',
-            deleteConfirmLocal: '<?php echo $this->translate->_('Sprachressource löschen?');?>',
-            deleteConfirmLocalText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.');?>',
-            deleted: '<?php echo $this->translate->_('Sprachressource gelöscht.');?>',
-            edited: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich geändert.');?>',
-            created: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich erstellt.');?>',
-            noResourcesAssigned: '<?php echo $this->translate->_('Keine Sprachressourcen zugewiesen.');?>',
-            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Sprachressourcen');?>',
-            exportTm: '<?php echo $this->translate->_('als TM Datei exportieren');?>',
-            exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>',
-        }
-    });
-    
     Ext.define("Editor.locale.view.LanguageResources.MatchGridViewController", {
         override: "Editor.view.LanguageResources.MatchGridViewController",
         strings: {
@@ -1032,6 +1030,7 @@ Ext.define('Editor.controller.Localizer', {
             serverErrorMsgDefault: '<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
             serverErrorMsg500:'<?php echo $this->translate->_('Die Anfrage führte zu einem Fehler im angefragten Dienst.');?>',
             serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
+            delInsTagTooltip:'<?php echo $this->translate->_('Unterschied zu Quellsegment');?>'
         }
     });
     Ext.define("Editor.locale.view.LanguageResources.SearchGridViewController", {
@@ -1045,52 +1044,6 @@ Ext.define('Editor.controller.Localizer', {
             serverErrorMsg408:'<?php echo $this->translate->_('Die Anfrage an die Sprachressource dauerte zu lange.');?>',
         }
     });
-    
-    Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
-        override: "Editor.view.LanguageResources.AddTmWindow",
-        strings: {
-            add: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
-            resource: '<?php echo $this->translate->_('Ressource');?>',
-            name: '<?php echo $this->translate->_('Name');?>',
-            source: '<?php echo $this->translate->_('Quellsprache');?>',
-            target: '<?php echo $this->translate->_('Zielsprache');?>',
-            file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
-            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
-            color: '<?php echo $this->translate->_('Farbe');?>',
-            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
-            save: '<?php echo $this->translate->_('Speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            useAsDefault: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>',
-            customers: '<?php echo $this->translate->_('Kunden');?>',
-            mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
-            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
-            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
-            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
-            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
-        }
-    });
-    
-    Ext.define("Editor.locale.view.LanguageResources.EditTmWindow", {
-        override: "Editor.view.LanguageResources.EditTmWindow",
-        strings: {
-            edit: '<?php echo $this->translate->_('Sprachressource bearbeiten');?>',
-            resource: '<?php echo $this->translate->_('Ressource');?>',
-            name: '<?php echo $this->translate->_('Name');?>',
-            source: '<?php echo $this->translate->_('Quellsprache');?>',
-            target: '<?php echo $this->translate->_('Zielsprache');?>',
-            file: '<?php echo $this->translate->_('TM-Datei');?>',
-            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
-            color: '<?php echo $this->translate->_('Farbe');?>',
-            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
-            save: '<?php echo $this->translate->_('Speichern');?>',
-            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
-            useAsDefault: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>',
-            customers: '<?php echo $this->translate->_('Kunden');?>',
-            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
-            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
-        }
-    });
-    
     Ext.define("Editor.locale.view.LanguageResources.EditorPanel", {
         override: "Editor.view.LanguageResources.EditorPanel",
         strings: {
@@ -1130,14 +1083,26 @@ Ext.define('Editor.controller.Localizer', {
             singleSearch:'<?php echo $this->translate->_('Suche in {0}');?>'
         }
     });
+<?php 
+    }; //END if($hasFrontendController('Editor.controller.LanguageResources')){
+    if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
+?>
+    Ext.define("Editor.locale.controller.TaskAssoc", {
+        override: "Editor.controller.LanguageResourcesTaskassoc",
+        strings: {
+            assocSave: '<?php echo $this->translate->_('Eintrag gespeichert!');?>',
+            assocDeleted: '<?php echo $this->translate->_('Eintrag gelöscht!');?>',
+            assocSaveError: '<?php echo $this->translate->_('Fehler beim Speichern der Änderungen!');?>'
+        }
+    });
     
     Ext.define("Editor.locale.view.LanguageResources.TaskAssocPanel", {
         override: "Editor.view.LanguageResources.TaskAssocPanel",
-        title: '<?php echo $this->translate->_('Sprachressourcen zuweisen');?>',
+        title: '<?php echo $this->translate->_('Sprach-Resourcen zuweisen');?>',
         strings: {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
             save: '<?php echo $this->translate->_('Speichern');?>',
-            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.');?>',
+            empty: '<?php echo $this->translate->_('Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.');?>',
             groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
             checked: '<?php echo $this->translate->_('Ressource in Aufgabe verwenden');?>',
             name: '<?php echo $this->translate->_('Name');?>',
@@ -1146,10 +1111,74 @@ Ext.define('Editor.controller.Localizer', {
             target: '<?php echo $this->translate->_('Zielsprache');?>'
         }
     });
+<?php 
+    }; //END if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
+    if($hasFrontendController('Editor.controller.TmOverview')){
+?>    
+    Ext.define("Editor.locale.controller.TmOverview", {
+        override: "Editor.controller.TmOverview",
+        strings: {
+            languageresource: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
+            deleteConfirm: '<?php echo $this->translate->_('Sprachressource endgültig löschen?');?>',
+            deleteConfirmText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" wirklich endgültig gelöscht werden?');?>',
+            deleteConfirmLocal: '<?php echo $this->translate->_('Sprachressource löschen?');?>',
+            deleteConfirmLocalText: '<?php echo $this->translate->_('Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.');?>',
+            deleted: '<?php echo $this->translate->_('Sprachressource gelöscht.');?>',
+            edited: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich geändert.');?>',
+            created: '<?php echo $this->translate->_('Die Sprachressource "{0}" wurde erfolgreich erstellt.');?>',
+            noResourcesAssigned: '<?php echo $this->translate->_('Keine Sprach-Resourcen zugewiesen.');?>',
+            taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Sprach-Resourcen');?>',
+            exportTm: '<?php echo $this->translate->_('als TM Datei exportieren');?>',
+            exportTmx: '<?php echo $this->translate->_('als TMX Datei exportieren');?>',
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.AddTmWindow", {
+        override: "Editor.view.LanguageResources.AddTmWindow",
+        strings: {
+            add: '<?php echo $this->translate->_('Sprachressource hinzufügen');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            file: '<?php echo $this->translate->_('TM/TMX-Datei (optional)');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
+            mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
+            deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
+            deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.EditTmWindow", {
+        override: "Editor.view.LanguageResources.EditTmWindow",
+        strings: {
+            edit: '<?php echo $this->translate->_('Sprachressource bearbeiten');?>',
+            resource: '<?php echo $this->translate->_('Ressource');?>',
+            name: '<?php echo $this->translate->_('Name');?>',
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            file: '<?php echo $this->translate->_('TM-Datei');?>',
+            importTmxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TM oder TMX Datei!');?>',
+            color: '<?php echo $this->translate->_('Farbe');?>',
+            colorTooltip: '<?php echo $this->translate->_('Farbe dieser Sprachressource');?>',
+            save: '<?php echo $this->translate->_('Speichern');?>',
+            cancel: '<?php echo $this->translate->_('Abbrechen');?>',
+            useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
+            customers: '<?php echo $this->translate->_('Für diese Kunden nutzen');?>',
+            collection: '<?php echo $this->translate->_('TBX-Datei');?>',
+            importTbxType: '<?php echo $this->translate->_('Bitte verwenden Sie eine TBX Datei!');?>'
+        }
+    });
     
     Ext.define("Editor.locale.view.LanguageResources.TmOverviewPanel", {
         override: "Editor.view.LanguageResources.TmOverviewPanel",
-        title: '<?php echo $this->translate->_('Sprachressourcen');?>',
+        title: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
         strings: {
             name: '<?php echo $this->translate->_('Name');?>',
             edit: '<?php echo $this->translate->_('Bearbeiten');?>',
@@ -1161,6 +1190,7 @@ Ext.define('Editor.controller.Localizer', {
             color: '<?php echo $this->translate->_('Farbe');?>',
             add: '<?php echo $this->translate->_('Hinzufügen');?>',
             import: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+            importCollection: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
             noTaskAssigned: '<?php echo $this->translate->_('Keine Aufgaben zugewiesen.');?>',
             sourceLang: '<?php echo $this->translate->_('Quellsprache');?>',
             targetLang: '<?php echo $this->translate->_('Zielsprache');?>',
@@ -1173,18 +1203,31 @@ Ext.define('Editor.controller.Localizer', {
                 noconnection: '<?php echo $this->translate->_('Keine Verbindung!');?>',
                 import: '<?php echo $this->translate->_('importiert');?>',
                 notloaded: '<?php echo $this->translate->_('verfügbar');?>',
+                novalidlicense: '<?php echo $this->translate->_('Keine gültige Lizenz.');?>',
+                notchecked: '<?php echo $this->translate->_('Nicht geprüft');?>',
             },
             taskassocgridcell: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             customers: '<?php echo $this->translate->_('Kunden');?>',
         	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
         	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
-        	useAsDefaultTooltip: '<?php echo $this->translate->_('Language Ressource standardmässig aktiv für');?>'
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
         }
     });
+
+    Ext.define("Editor.locale.view.LanguageResources.services.TermCollection", {
+        override: "Editor.view.LanguageResources.services.TermCollection",
+        addTooltip: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
+    });
+
+    Ext.define("Editor.locale.view.LanguageResources.services.Default", {
+        override: "Editor.view.LanguageResources.services.Default",
+        addTooltip: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+    });
+
     
     Ext.define("Editor.locale.view.LanguageResources.ImportTmWindow", {
         override: "Editor.view.LanguageResources.ImportTmWindow",
-        title: '<?php echo $this->translate->_('Sprachressourcen');?>',
+        title: '<?php echo $this->translate->_('Sprach-Resourcen');?>',
         strings: {
             file: '<?php echo $this->translate->_('TMX-Datei');?>',
             title: '<?php echo $this->translate->_('TMX Datei importieren');?>',
@@ -1225,14 +1268,22 @@ Ext.define('Editor.controller.Localizer', {
             reimportTooltip: '<?php echo $this->translate->_('Ausgewählte Aufgaben erneut ins aktuelle TM importieren');?>'
         }
     });
-    
 <?php 
-    }; //if($hasFrontendController('Editor.controller.admin.Customer')){
+    }; //END if($hasFrontendController('Editor.controller.TmOverview')){
 ?>
 
     Ext.define("Editor.locale.de.view.MaintenancePanel", {
         override: "Editor.view.MaintenancePanel",
         maintenanceMessage: '<?php echo $this->translate->_('<p>Achtung! In Kürze wird eine Wartung am System durchgeführt.</p><p>Translate5 wird ab diesem Zeitpunkt für kurze Zeit nicht erreichbar sein.</p><p>Geplanter Zeitpunkt: {0}</p>');?>' 
+    });
+    
+    Ext.define("Editor.locale.view.LanguageCombo", {
+        override: "Editor.view.LanguageCombo",
+        strings: {
+            source: '<?php echo $this->translate->_('Quellsprache');?>',
+            target: '<?php echo $this->translate->_('Zielsprache');?>',
+            neutral: '<?php echo $this->translate->_('Sprache');?>'
+        }
     });
 
     this.initPluginTranslations();

@@ -115,9 +115,7 @@ class editor_Services_ServiceResult {
     public function addResult($target, $matchrate = 0, array $metaData = null) {
         $result = new stdClass();
         
-        $missingTags = $this->internalTag->diff($this->defaultSource, $target);
-        
-        $result->target = $target.join('', $missingTags);
+        $result->target = $target;
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
         $result->languageResourceid = $this->languageResource->getId();
@@ -147,6 +145,10 @@ class editor_Services_ServiceResult {
         return $this->results;
     }
     
+    public function setResults($results){
+        $this->results=$results;
+    }
+    
     public function resetResult(){
         $this->results=[];
     }
@@ -156,5 +158,23 @@ class editor_Services_ServiceResult {
      */
     public function setLanguageResource(editor_Models_LanguageResources_LanguageResource $languageResource){
         $this->languageResource = $languageResource;
+    }
+    
+    /***
+     * Get meta value by meta name from meta data object
+     * @param array $metaData
+     * @param string $fieldName
+     * @return NULL|string
+     */
+    public function getMetaValue($metaData,$fieldName){
+        if(empty($metaData)){
+            return null;
+        }
+        foreach ($metaData as $data) {
+            if($data->name==$fieldName){
+                return $data->value;
+            }
+        }
+        return null;
     }
 }

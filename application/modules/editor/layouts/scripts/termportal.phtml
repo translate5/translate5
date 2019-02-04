@@ -41,14 +41,15 @@ END LICENSE AND COPYRIGHT
 $config = Zend_Registry::get('config');
 /* @var $config Zend_Config */
 
+$version = '?v='.$this->appVersion;
 echo $this->doctype();
 $jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-1.12.1';
-$this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/termportal/css/termportal.css');
+$this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/termportal/css/termportal.css'.$version);
 $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css');
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <?php echo $this->layout()->title ?>
+        <?php echo $this->headTitle() ?>
         <?php echo $this->headMeta() ?>
         <?php echo $this->headLink() ?>
         <?php echo $this->headStyle() ?>

@@ -41,7 +41,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->moses->matchrate;
+        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->moses->matchrate;
     }
     
     /**
@@ -49,34 +49,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        $this->resultList->setDefaultSource($queryString);
-        
-        //query moses without tags
-        $queryString = $segment->stripTags($queryString);
-        
-        $res = $this->languageResource->getResource();
-        /* @var $res editor_Services_Moses_Resource */
-
-        $rpc = new Zend_XmlRpc_Client($res->getUrl());
-        $proxy = $rpc->getProxy();
-        $params = array(
-            //for the "es ist ein kleines haus" Moses sample data the requests work only with lower case requests:
-            //see T5DEV-86 escape [] brackets from Moses query for info on next line
-            'text' => str_replace(array('[',']'), array('\[','\]'), $queryString), //"es ist ein kleines haus",
-            'align' => 'false',
-            'report-all-factors' => 'false',
-        );
-        
-        $res = $this->sendToProxy($proxy, $params);
-        
-        if(!empty($res['text'])){
-            $res['text'] = str_replace(array('\[','\]'), array('[',']'), $res['text']);
-            $this->resultList->addResult($res['text'], $this->calculateMatchrate());
-            return $this->resultList;
-        }
-        
-        return $this->resultList;
+        return $this->queryMosesApi($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -110,12 +83,59 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
         throw new BadMethodCallException("The Moses MT Connector does not support search requests");
     }
 
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
+        return $this->queryMosesApi($searchString);
+    }
+
+    /***
+     * Query the Moses resource with the given search string
+     * @param string $searchString
+     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @return editor_Services_ServiceResult
+     */
+    protected function queryMosesApi($searchString, $reimportWhitespace = false){
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
+        $res = $this->languageResource->getResource();
+        /* @var $res editor_Services_Moses_Resource */
+        
+        $rpc = new Zend_XmlRpc_Client($res->getUrl());
+        $proxy = $rpc->getProxy();
+        $params = array(
+            //for the "es ist ein kleines haus" Moses sample data the requests work only with lower case requests:
+            //see T5DEV-86 escape [] brackets from Moses query for info on next line
+            'text' => str_replace(array('[',']'), array('\[','\]'), $searchString), //"es ist ein kleines haus",
+            'align' => 'false',
+            'report-all-factors' => 'false',
+        );
+        
+        $res = $this->sendToProxy($proxy, $params);
+        
+        if(!empty($res['text'])){
+            $res['text'] = str_replace(array('\[','\]'), array('[',']'), $res['text']);
+            if($reimportWhitespace) {
+                $res['text'] = $this->importWhitespaceFromTagLessQuery($res['text']);
+            }
+            $this->resultList->addResult($res['text'], $this->calculateMatchrate());
+            return $this->resultList;
+        }
+        
+        return $this->resultList;
+    }
+    
     /**
      * intended to calculate a matchrate out of the MT score
      * @param string $score
      */
     protected function calculateMatchrate($score = null) {
-        return $this->DEFAULT_MATCHRATE;
+        return $this->defaultMatchRate;
     }
     
     /**

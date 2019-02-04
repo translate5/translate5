@@ -67,6 +67,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
+        
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPost#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
+        $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDelete#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
     }
     
     /**
@@ -78,6 +81,44 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         /* @var $meta editor_Models_Import_MetaData */
         $importer = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         $meta->addImporter($importer);
+    }
+    
+    /***
+     * After post action handler in language resources task assoc
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleAfterTermCollectionAssocChange(Zend_EventManager_Event $event){
+        $entity=$event->getParam('entity');
+        /* @var $entity editor_Models_LanguageResources_Taskassoc */
+        $this->removeTerminologieFile($entity->getTaskGuid());
+        
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        //update the terminologie flag, based on if there is a termcollection
+        //as language resource associated to the task
+        $task->updateIsTerminologieFlag($entity->getTaskGuid());
+    }
+    
+    /***
+     * Remove the terminologie file from the disk.
+     * @param string $taskGuid
+     */
+    private function removeTerminologieFile($taskGuid){
+        $task=ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        
+        //get/check if the tbx file exist
+        $tbxPath = new SplFileInfo(editor_Models_Import_TermListParser_Tbx::getTbxPath($task));
+        if ($tbxPath->getPathname()!=null && file_exists($tbxPath->getPathname())){
+            //Remove the file if exist. The file will be recreated on the initial try to tag a segment.
+            unlink($tbxPath);
+        }
+        $meta = $task->meta();
+        //ensure existence of the tbxHash field
+        //$meta->addMeta('tbxHash', $meta::META_TYPE_STRING, null, 'Contains the MD5 hash of the original imported TBX file before adding IDs', 36);
+        $meta->setTbxHash("");
+        $meta->save();
     }
     
     protected function assertConfig() {

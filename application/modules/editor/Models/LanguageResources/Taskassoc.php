@@ -97,12 +97,26 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $db = $this->db;
         $adapter = $db->getAdapter();
         
+        $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languageModel editor_Models_Languages */
+
+        //get source and target language fuzzies
+        $sourceLangs=$languageModel->getFuzzyLanguages($task->getSourceLang());
+        $targetLangs=$languageModel->getFuzzyLanguages($task->getTargetLang());
+        
+        //get all available services
+        $services=ZfExtended_Factory::get('editor_Services_Manager');
+        /* @var $services editor_Services_Manager */
+        $allservices=$services->getAll();
+        
+        $this->filter->addTableForField('taskGuid', 'ta');
         $s = $db->select()
         ->setIntegrityCheck(false)
         ->from(array("languageResource" => "LEK_languageresources"), array("languageResource.*","ta.id AS taskassocid", "ta.segmentsUpdateable"))
         ->join(array("la"=>"LEK_languageresources_languages"), 'languageResource.id=la.languageResourceId',array('la.sourceLang AS sourceLang','la.targetlang AS targetLang'))
-        ->where('la.sourceLang=?',$task->getSourceLang())
-        ->where('la.targetLang=?',$task->getTargetLang());
+        ->where('la.sourceLang IN(?)',$sourceLangs)
+        ->where('la.targetLang IN(?)',$targetLangs)
+        ->where('languageResource.serviceType IN(?)',$allservices);
 
         //check filter is set true when editor needs a list of all used TMs/MTs
         if($this->filter->hasFilter('checked')) {
@@ -124,8 +138,33 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         $on = $adapter->quoteInto('ta.languageResourceId = languageResource.id AND ta.taskGuid = ?', $taskGuid);
         $s->joinLeft(["ta"=>"LEK_languageresources_taskassoc"], $on, $checkColumns);
         
+        // Only match resources can be associated to a task, that are associated to the same client as the task is.
+        $s->join(array("cu"=>"LEK_languageresources_customerassoc"), 'languageResource.id=cu.languageResourceId',array('cu.customerId AS customerId'))
+        ->where('cu.customerId=?',$task->getCustomerId());
+
+        $s->group('languageResource.id');
         return $this->loadFilterdCustom($s);
     }
+    
+    /***
+     * Load the associated language resources to a task by serviceName
+     * @param string $taskGuid
+     * @param string $serviceName
+     * @param array $ignoreAssocs: ignore languageresources task assocs 
+     */
+    public function loadAssocByServiceName($taskGuid,$serviceName,$ignoreAssocs=array()){
+        $s = $this->db->select()
+        ->from(array("assocs" => "LEK_languageresources_taskassoc"), array("assocs.*"))
+        ->setIntegrityCheck(false)
+        ->join(array("lr" => "LEK_languageresources"),"assocs.languageResourceId = lr.id","")
+        ->where('assocs.taskGuid=?', $taskGuid)
+        ->where('lr.serviceName=?', $serviceName);
+        if(!empty($ignoreAssocs)){
+            $s->where('assocs.id NOT IN(?)', $ignoreAssocs);
+        }
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
     /**
      * Returns join between taskassoc table and task table for languageResource's id list
      * @param array $languageResourceids
@@ -162,9 +201,8 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
         };
         
         $result = $this->loadByAssociatedTaskAndLanguage($taskGuid);
-        
         foreach($result as &$languageresource) {
-            $resource = $getResource($languageresource['serviceType'], $languageresource['resourceId']);
+            $resource =$getResource($languageresource['serviceType'], $languageresource['resourceId']);
             if(!empty($resource)) {
                 $languageresource = array_merge($languageresource, $resource->getMetaData());
             }

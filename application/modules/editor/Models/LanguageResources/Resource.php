@@ -241,4 +241,13 @@ class editor_Models_LanguageResources_Resource {
             'filebased' => $this->filebased,
         ];
     }
+    
+    /**
+     * returns the initial status for that resource type for the overview list
+     * @return string
+     */
+    public function getInitialStatus(&$statusInfo) {
+        $statusInfo = 'Wählen Sie die Ressource aus um weitere Infos zu bekommen.';
+        return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
+    }
 }

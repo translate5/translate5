@@ -32,39 +32,39 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.languageResourcesPanel',
+    alias: 'controller.languageResourcesWizardPanel',
 
     handleNextCardClick:function(){
-    	var me=this,
-    		view=me.getView(),
-			cbPreTranslation=view.down('#cbPreTranslation'),
-			cbAnalysis=view.down('#cbAnalysis');
-		
-		if(!cbPreTranslation || !cbAnalysis){
-			view.fireEvent('wizardCardFinished');
-			return;
-		}
-		
-		//if the pretranslation is checked, start the pretranslate operation
-		if(cbPreTranslation.checked){
-			view.fireEvent('startMatchAnalysis',view.task.get('id'),"pretranslation");
-			view.fireEvent('wizardCardFinished');
-			return;
-		}
-		
-		//if the analysis is checked, start the analysis operation
-		if(cbAnalysis.checked){
-			view.fireEvent('startMatchAnalysis',view.task.get('id'),"analysis");
-			view.fireEvent('wizardCardFinished');
-			return;
-		}
-		
-		view.fireEvent('wizardCardFinished');
+    	this.checkAndFinish(null);
     },
     
     handleSkipCardClick:function(){
-        var me=this,
-            view=me.getView();
-        view.fireEvent('wizardCardFinished',3);
-    }
+        this.checkAndFinish(3);
+	},
+	
+	/***
+	 * Check the match analysis and pretranslation status(run or go to next step)
+	 */
+	checkAndFinish:function(skipSteps){
+    	var me=this,
+			view=me.getView(),
+			pretranslateMt=view.down('#pretranslateMt'),
+			pretranslateTmAndTerm=view.down('#pretranslateTmAndTerm');
+		
+		if(!pretranslateMt || !pretranslateTmAndTerm){
+			view.fireEvent('wizardCardFinished', skipSteps);
+			return;
+		}
+		
+		//if one of the pretranslation priority cb is checked, run the pretranslations
+		if(pretranslateMt.checked || pretranslateTmAndTerm.checked){
+			view.fireEvent('startMatchAnalysis',view.task.get('id'),"pretranslation");
+			view.fireEvent('wizardCardFinished', skipSteps);
+			return;
+		}
+		
+		//always start analysis
+		view.fireEvent('startMatchAnalysis',view.task.get('id'),"analysis");
+		view.fireEvent('wizardCardFinished', skipSteps);
+	}
 });

@@ -109,6 +109,12 @@ class editor_Models_Segment_MatchRateType {
      */
     const TYPE_MISSING_TARGET_MRK = 'missing-target-mrk';
     
+    /***
+     * 
+     * @var string
+     */
+    const TYPE_INTERNAL_FUZZY_AVAILABLE='internal-fuzzy-available';
+    
     /**
      * Uses as match rate prefix when the value comes from import
      * @var string
@@ -120,6 +126,19 @@ class editor_Models_Segment_MatchRateType {
      * @var string
      */
     const PREFIX_EDITED = 'edited';
+    
+    /**
+     * Uses as match rate prefix when the value was changed in translate5
+     * @var string
+     */
+    const PREFIX_PRETRANSLATED = 'pretranslated';
+    
+    
+    /***
+     * All match rate types which are requiring an icon
+     * @var array
+     */
+    const TYPES_WITH_ICONS=array(self::TYPE_TM,self::TYPE_MT,self::TYPE_TERM_COLLECTION,self::TYPE_INTERNAL_FUZZY_AVAILABLE);
     
     /**
      * internal map for import conversion 
@@ -144,6 +163,7 @@ class editor_Models_Segment_MatchRateType {
      * @var ZfExtended_Log
      */
     static protected $log;
+    
     
     public function __construct() {
         self::initValidTypes();
@@ -242,13 +262,29 @@ class editor_Models_Segment_MatchRateType {
         if(empty($types)) {
             $types = [self::TYPE_INTERACTIVE];
         }
-        foreach($types as $type) {
+        array_unshift($types, self::PREFIX_EDITED);
+        $this->data = $types;
+        return $this;
+    }
+    
+    /**
+     * creates the match rate type string usable when pretranslated by translate5 or its plugins
+     * @param string $type
+     * @param string $plugin
+     * @return editor_Models_Segment_MatchRateType
+     */
+    public function initPretranslated(... $types) {
+        //fallback when no type was given
+        if(empty($types)) {
+            $types = [self::TYPE_UNKNOWN];
+        }
+        else {
+            $type = reset($types);
             if(!$this->isValidType($type)) {
                 array_unshift($types, self::TYPE_UNKNOWN);
-                break;
             }
         }
-        array_unshift($types, self::PREFIX_EDITED);
+        array_unshift($types, self::PREFIX_PRETRANSLATED);
         $this->data = $types;
         return $this;
     }

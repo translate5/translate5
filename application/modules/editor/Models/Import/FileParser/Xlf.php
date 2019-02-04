@@ -170,6 +170,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     protected $trackTagOutsideMrk = false;
     
     /**
+     * @var editor_Models_PixelMapping
+     */
+    protected $pixelMapping;
+    
+    /**
+     * Container for the lengthRestriction default values
+     * @var array
+     */
+    protected $lengthRestrictionDefaults = ['size-unit' => null, 'minWidth' => null, 'maxWidth' => null, 'font' => null, 'fontSize' => null];
+    
+    /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
      */
@@ -187,6 +198,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->segmentBareInstance = ZfExtended_Factory::get('editor_Models_Segment');
         $this->log = ZfExtended_Factory::get('ZfExtended_Log');
+        $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
+        $this->initLengthRestrictionAttributes();
     }
     
     
@@ -387,7 +400,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         //by definition the first otherContent belongs to the whole transunit - this value is stored in each segment
         // only of preserveWhitespace is true
         if($preserveWhitespace && !empty($otherContent[0])) {
-            $attributes->additionalUnitLength = $this->segmentBareInstance->textLength($text($otherContent[0]));
+            $attributes->additionalUnitLength = $this->segmentBareInstance->textLengthByImportattributes($text($otherContent[0]), $attributes, $this->task->getTaskGuid());
         }
         //the other lengths are stored per affected segment, so if there is none, do nothing
         if(empty($otherContent[$attributes->mrkMid])) {
@@ -409,7 +422,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $content = '';
             }
         }
-        $attributes->additionalMrkLength = $this->segmentBareInstance->textLength($content);
+        $attributes->additionalMrkLength = $this->segmentBareInstance->textLengthByImportattributes($content, $attributes, $this->task->getTaskGuid());
     }
     
     /**
@@ -684,13 +697,61 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         // also in each XLIFF there can be multiple file containers, which must be reflected in the transunitId too. 
         //  Easiest way: each transunit of the xlf file gets a counter   
         $segmentAttributes->transunitId = $this->_fileId.'_'.$this->transUnitCnt.'_'.$transunitId;
-        $sizeUnit = $this->xmlparser->getAttribute($attributes, 'size-unit');
-        if($sizeUnit == 'char') {
-            $segmentAttributes->minWidth = $this->xmlparser->getAttribute($attributes, 'minwidth', null);
-            $segmentAttributes->maxWidth = $this->xmlparser->getAttribute($attributes, 'maxwidth', null);
+        
+        // Length-Restriction-Attributes (as set in xliff's trans-unit; fallback: task-template); optional
+        $unit = $this->xmlparser->getAttribute($attributes, 'size-unit', $this->lengthRestrictionDefaults['size-unit']);
+        if($unit == 'char' || $unit == editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
+            $segmentAttributes->sizeUnit = $unit;
+            foreach ($this->lengthRestrictionDefaults as $key => $value) {
+                if($key == 'size-unit') {
+                    continue;
+                }
+                $segmentAttributes->$key = $this->xmlparser->getAttribute($attributes, $key, $value);
+            }
         }
         
+        $this->ensurePixelWidthDefault($segmentAttributes);
+        
         return $segmentAttributes;
+    }
+    
+    /**
+     * init default values for length-Restriction-Attributes (sizeUnit, font, fontSize, minWidth, maxWidth): 
+     */
+    protected function initLengthRestrictionAttributes () {
+        $keys = array_keys($this->lengthRestrictionDefaults);
+        $taskConfig = Zend_Registry::get('taskTemplate');
+        foreach($keys as $key) {
+            if(empty($taskConfig->pixelmapping->$key)) {
+                continue;
+            }
+            $conf = trim($taskConfig->pixelmapping->$key);
+            if(empty($conf)) {
+                continue;
+            }
+            $this->lengthRestrictionDefaults[$key] = $conf;
+        }
+    }
+    
+    /**
+     * 
+     * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes
+     * @throws ZfExtended_Exception
+     */
+    protected function ensurePixelWidthDefault(editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes) {
+        // When pixelMapping is to be used, the config's defaultPixelWidth for this fontSize must exist.
+        // (We cannot assume that every character will have a pixelWidth set in the pixelMapping-table,
+        // and if there is no pixelWidth set, the calculation of the pixelLength will be not reliable at all.)
+        if ($segmentAttributes->sizeUnit != editor_Models_Segment_PixelLength::SIZE_UNIT_FOR_PIXELMAPPING) {
+            return;
+        }
+        try {
+            $this->pixelMapping->getDefaultPixelWidth($segmentAttributes->fontSize);
+        }
+        catch(ZfExtended_Exception $e) {
+            $msg = 'Import failed for task ' . $this->task->getTaskGuid() . ' at trans-unit id ' . $transunitId . ': ' . $e->getMessage();
+            throw new ZfExtended_Exception($msg, 0, $e);
+        }
     }
     
     protected function calculateMatchRate(editor_Models_Import_FileParser_SegmentAttributes $attributes) {

@@ -60,6 +60,31 @@ class editor_Models_LogTask extends ZfExtended_Models_Entity_Abstract {
     /**
      * Adds a new log entry, save it to the db, and return the entity instance
      * @param string $taskGuid
+     * @param string $message
+     * @param ZfExtended_Models_User $authenticatedUser infos about the currently logged in user, and initiator of the action
+     * @param ZfExtended_Models_User $affectedUser optional, infos about the user associated to the task, this users state was changed, can be empty if state is not associated to an user
+     */
+    public static function createWorkflow(string $taskGuid, string $message, ZfExtended_Models_User $authenticatedUser, ZfExtended_Models_User $affectedUser = null) {
+        $inst = ZfExtended_Factory::get(__CLASS__);
+        $inst->setTaskGuid($taskGuid);
+        $inst->setState('WORKFLOW');
+        $inst->setMessage($message);
+        $inst->setAuthUserGuid($authenticatedUser->getUserGuid());
+        $inst->setAuthUserLogin($authenticatedUser->getLogin());
+        $inst->setAuthUserName($authenticatedUser->getUserName());
+        if(!empty($affectedUser)) {
+            $inst->setUserGuid($affectedUser->getUserGuid());
+            $inst->setUserLogin($affectedUser->getLogin());
+            $inst->setUserName($affectedUser->getUserName());
+        }
+        //created timestamp automatic by DB
+        $inst->save();
+        return $inst;
+    }
+    
+    /**
+     * Adds a new log entry, save it to the db, and return the entity instance
+     * @param string $taskGuid
      * @param string $state
      * @param string $authenticatedUserGuid
      * @param string $affectedUserGuid optional, can be empty if state is not user associated

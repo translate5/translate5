@@ -47,13 +47,13 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     const REGEX_INTERNAL_TAGS = '#<div\s*class="([a-z]*)\s+([gxA-Fa-f0-9]*)[^"]*"\s*.*?(?!</div>)<span[^>]*data-originalid="([^"]*).*?(?!</div>).</div>#s';
     const REGEX_STARTTAG = '#^<div class="open.+class="short">&lt;([0-9]+)&gt;</span>.+</div>$#';
     const REGEX_ENDTAG = '#^<div class="close.+class="short">&lt;/([0-9]+)&gt;</span>.+</div>$#';
+    const REGEX_SINGLETAG = '#^<div class="single.+class="short">&lt;([0-9]+)/&gt;</span>.+</div>$#';
     
     /***
      * Internal tag placeholder template
      * @var string
      */
     const PLACEHOLDER_TEMPLATE='<translate5:escaped id="%s" />';
-    
     
     public function __construct(){
         $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
@@ -93,10 +93,19 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     
     /**
      * restores the original escaped tag
+     * @param string $segment
+     * @param boolean $whitespaceOnly optional, if true restore whitespace tags only 
+     * @return mixed
      */
-    public function restore(string $segment) {
-        return $this->replace($segment, function($match){
+    public function restore(string $segment, $whitespaceOnly = false) {
+        //TODO extend $whitespaceOnly filter so that we can filter for one ore more of the CSS classes (nbsp, newline, tab, space) 
+        return $this->replace($segment, function($match) use ($whitespaceOnly) {
             $id = $match[3];
+            
+            if($whitespaceOnly && !in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+                return $match[0];
+            }
+            
             $data = $match[2];
             //restore packed data
             $result = pack('H*', $data);

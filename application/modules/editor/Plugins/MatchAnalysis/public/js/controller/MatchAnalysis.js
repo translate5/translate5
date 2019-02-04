@@ -56,18 +56,31 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },{
         ref:'matchAnalysisPanel',
         selector: 'matchAnalysisPanel'
+    },{
+        ref:'languageResourceTaskAssocPanel',
+        selector:'languageResourceTaskAssocPanel'
+    },{
+        ref: 'taskAssocGrid',
+        selector: '#languageResourcesTaskAssocGrid'
     }],
         
     strings:{
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
         analysis:'#UT#Analyse Starten',
-        preTranslation:'#UT#Analyse & Vorübersetzungen Starten',
+        preTranslation:'#UT#Analyse &amp; Vorübersetzungen starten',
         preTranslationTooltip:'#UT#Die Vorübersetzung löst auch eine neue Analyse aus',
         startAnalysisMsg:'#UT#Match-Analyse und Vorübersetzungen werden ausgeführt.',
+        finishAnalysisMsg:'#UT#Die Match-Analyse und die Vorübersetzung sind abgeschlossen.',
         internalFuzzy:'#UT#Zähle interne Fuzzy',
         pretranslateMatchRate:'#UT#Vorübersetzungs Match-Rate',
-        pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist'
+        pretranslateMatchRateTooltip:'#UT#Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist',
+        pretranslateTmAndTerm:'#UT#Vorübersetzen (TM &amp; Terme)',
+        pretranslateTmAndTermTooltip:'#UT#Treffer aus der Terminologie werden bevorzugt vorübersetzt.',
+        pretranslateMt:'#UT#Vorübersetzen (MT)',
+        pretranslateMtTooltip:'#UT#Treffer aus dem TM werden bevorzugt vorübersetzt',
+        termtaggerSegment:'#UT#Terminologie prüfen und markieren',
+        analysisLoadingMsg:'#UT#Analyse läuft'
     },
     
     listen:{
@@ -79,41 +92,61 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 beforerender:'onAdminTaskWindowBeforeRender'
             },
             '#languageResourceTaskAssocPanel':{
-            	render:'onLanguageResourcesPanelRender'
+                render:'onLanguageResourcesPanelRender'
             },
-            'LanguageResourcesPanel':{
+            '#languageResourcesWizardPanel':{
             	startMatchAnalysis:'onStartMatchAnalysis'
+            },
+            'taskActionColumn': {
+                itemsinitialized: 'onTaskActionColumnItemsInitialized'
             }
         },
         controller:{
         	'#admin.TaskOverview':{
-        		taskCreated:'onTaskCreated'
-        	}
+        		taskCreated:'onTaskCreated',
+                taskUnhandledAction: 'onTaskActionColumnNoHandler',
+                taskStateCheckPullCleaned:'onTaskStateCheckPullCleaned'
+            },
+            '#LanguageResourcesTaskassoc':{
+                taskAssocSavingFinished:'onTaskAssocSavingFinished'
+            }
+        },
+        store:{
+            '#Editor.store.LanguageResources.TaskAssocStore':{
+                load:'onLanguageResourcesTaskAssocStoreLoad'
+            }
         }
     },
-    
+
+    /**
+     * Task action column items initialized event handler.
+     */
+    onTaskActionColumnItemsInitialized: function(items) {
+        items.push({
+            tooltip:this.strings.taskGridIconTooltip,
+            iconCls: 'ico-task-analysis',
+            isAllowedFor: 'editorAnalysisTask'   ,
+            sortIndex:8,   
+        });
+    },
+    /**
+     * Inserts the language resource card into the task import wizard
+     */
     onAdminTaskWindowBeforeRender:function(window,eOpts){
         var me=this;
         window.insertCard({
-            xtype:'languageResourcesPanel',
+            xtype:'languageResourcesWizardPanel',
             //index where the card should appear in the group
             groupIndex:1,
             listeners:{
                 activate:{
-                	fn:me.onLanguageResourcesPanelActivate,
+                	fn:me.onLanguageResourcesWizardPanelActivate,
                 	scope:me
                 }
             }
         },'postimport');
-        
     },
 
-    init : function() {
-        var me = this,
-            toc = me.application.getController('admin.TaskOverview');
-        toc.on('taskActionColumnNoHandler', me.onTaskActionColumnNoHandler, me);
-    },
-    
     /***
      * On task preferences window tabpanel render
      */
@@ -127,12 +160,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
            task:prefWindow.actualTask
         });
     },
-    
+
     onLanguageResourcesPanelRender:function(panel){
     	var me=this,
     		win=panel.up('window'),
     		task=win.actualTask,
-    		storeData=[];
+    		storeData=[], buttons = [];
     	
     	//init the pretranslate matchrate options (from 0-103)
     	for(var i=0;i<=103;i++){
@@ -140,6 +173,23 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     			id:i,
     			value:i+"%"
     		});
+    	}
+    	
+    	if(task && !task.isImporting()){
+        	buttons = [{
+                xtype:'button',
+                text:this.strings.analysis,
+                itemId:'btnAnalysis',
+                width:150,
+                dock:'bottom',
+                //TODO icon
+                listeners:{
+                    click:{
+                        fn:this.matchAnalysisButtonHandler,
+                        scope:this
+                    }
+                }
+            }];
     	}
     	
     	//the task exist->add buttons in the task assoc panel
@@ -151,7 +201,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 type: 'hbox',
                 pack: 'start'
             },
-            items:[this.getAnalysisConfig(task),this.getPretranslationConfig(task)]
+            items: buttons
         },{
             xtype : 'toolbar',
             dock : 'bottom',
@@ -161,26 +211,75 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 align: 'left'
             },
             items : [{
-    			xtype:'checkbox',
+                xtype:'checkbox',
+                value: 1,
     			boxLabel:this.strings.internalFuzzy,
     			itemId:'cbInternalFuzzy',
     			dock:'bottom'
             },{
-        		xtype:'combobox',
-        		stretch: false,
-        		align: 'left',
-        		itemId:'cbMinMatchrate',
-        		fieldLabel: me.strings.pretranslateMatchRate,
-        		tooltip:me.strings.pretranslateMatchRateTooltip,
-        		store: Ext.create('Ext.data.Store', {
-        			fields: ['id', 'value'],
-        			data : storeData
-        		}),
-        		value:100,
-        		displayField: 'value',
-        		valueField: 'id',
-        		queryMode: 'local',
-        		dock:'bottom'
+                dock:'bottom',
+                xtype:'container',
+                layout: {
+                    type: 'hbox',
+                    align: 'left'
+                },
+                items:[
+                    {
+                        xtype:'checkbox',
+                        bind:{
+                            disabled:'{!hasTmOrCollection}'
+                        },
+                        value: 1,
+                        cls:'pretranslateCheckboxIcon',
+                        boxLabel:me.strings.pretranslateTmAndTerm,
+                        autoEl: {
+                            tag: 'div',
+                            'data-qtip': me.strings.pretranslateTmAndTermTooltip
+                        },
+                        itemId:'pretranslateTmAndTerm',
+                        padding: '0 20 0 0'
+                    },{
+                        xtype:'combobox',
+                        stretch: false,
+                        align: 'left',
+                        itemId:'cbMinMatchrate',
+                        fieldLabel: me.strings.pretranslateMatchRate,
+                        tooltip:me.strings.pretranslateMatchRateTooltip,
+                        store: Ext.create('Ext.data.Store', {
+                            fields: ['id', 'value'],
+                            data : storeData
+                        }),
+                        value:100,
+                        displayField: 'value',
+                        valueField: 'id',
+                        queryMode: 'local',
+                    }
+                ]
+            },{
+                xtype:'checkbox',
+                bind:{
+                    disabled:'{!hasMt}'
+                },
+                value: 1,
+                cls:'pretranslateCheckboxIcon',
+                boxLabel:me.strings.pretranslateMt,
+                autoEl: {
+                    tag: 'div',
+                    'data-qtip': me.strings.pretranslateMtTooltip
+                },
+                itemId:'pretranslateMt',
+            },{
+                xtype:'checkbox',
+                bind:{
+                    disabled:'{!hasTermcollection}'
+                },
+                value: 1,
+                boxLabel:me.strings.termtaggerSegment,
+                autoEl: {
+                    tag: 'div',
+                    'data-qtip': me.strings.termtaggerSegment
+                },
+                itemId:'termtaggerSegment',
             }]
         }]);
     },
@@ -188,8 +287,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     /***
      * When action column click with no click handler is found
      */
-    onTaskActionColumnNoHandler:function(column,task){
-        if(this.getAdminTaskPreferencesWindow()){
+    onTaskActionColumnNoHandler:function(action, column, task){
+        if(action != 'handleTaskAnalysis' || this.getAdminTaskPreferencesWindow()){
             return;
         }
         var me=this,
@@ -206,64 +305,41 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     	this.loadTaskAssoc(task);
     },
     
-    onLanguageResourcesPanelActivate:function(panel){
+    onLanguageResourcesWizardPanelActivate:function(panel){
     	if(!panel.task){
     		return;
     	}
-    	var me=this,
-    		addWindow=panel.up('#adminTaskAddWindow'),
-    		continueBtn=addWindow.down('#continue-wizard-btn');
-
+    	var me=this;
     	me.loadTaskAssoc(panel.task);
-        
-        //set the finish icon text and cls
-        //continueBtn.setIconCls('ico-task-add');
-        //continueBtn.setText(me.strings.finishTask);
     },
     
     /***
      * Load match resources task assoc store
      */
     loadTaskAssoc:function(task){
-        var me=this,
-	        taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
-	    
+        var taskAssoc=Editor.app.getController('Editor.controller.LanguageResourcesTaskassoc');
 	    //load the task assoc store
 	    taskAssoc.handleLoadPreferences(taskAssoc,task);
     },
     
+    /***
+     * On language resource task assoc store load event handler
+     */
+    onLanguageResourcesTaskAssocStoreLoad:function(store){
+        this.updateTaskAssocPanelViewModel(store);
+    },
+
     onStartMatchAnalysis:function(taskId,operation){
     	this.startAnalysis(taskId,operation);
     },
     
-    /***
-     * analysis checkbox check change handler
-     */
-    onCbAnalysisChecked:function(field,newValue,oldValue,eOpts){ 
-    	var me=this,
-    		cbPreTranslation=me.getComponentByItemId('cbPreTranslation'),
-    		win=me.getAdminTaskPreferencesWindow();
-    	if(!newValue){
-    		cbPreTranslation.setValue(newValue);
-    	}
-    },
-    
-    /***
-     * pre translation checkbox check change handler
-     */
-    onCbPreTranslationChecked:function(field,newValue,oldValue,eOpts){ 
-    	var me=this,
-    		cbAnalysis=me.getComponentByItemId('cbAnalysis');
-    	if(newValue){
-    		cbAnalysis.setValue(newValue);
-    	}
-    },
-    
     matchAnalysisButtonHandler:function(button){
     	var me=this,
-			win=button.up('window'),
+            win=button.up('window'),
+            tmAndTermChecked=me.getComponentByItemId('pretranslateTmAndTerm').checked,
+            mTChecked=me.getComponentByItemId('pretranslateMt').checked,
 			task=win.actualTask,
-			operation=button.itemId=="btnAnalysis" ? "analysis" : "pretranslation";
+			operation=(mTChecked || tmAndTermChecked) ? "pretranslation" : "analysis";
     	
     	me.startAnalysis(task.get('id'),operation);
     },
@@ -277,38 +353,51 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     startAnalysis:function(taskId,operation){
     	//'editor/:entity/:id/operation/:operation',
         var me=this;
-        			
-		me.reloadTaskRecord(taskId);
-		
-    	Editor.MessageBox.addInfo(me.strings.startAnalysisMsg);
-    	Ext.Ajax.request({
-            url:Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
-                method: "PUT",
-                params:{
-                	internalFuzzy:me.getComponentByItemId('cbInternalFuzzy').checked,
-                	pretranslateMatchrate:me.getComponentByItemId('cbMinMatchrate').getValue()
-                },
-                scope: this,
-                timeout:120000,
-                success: function(response){
-                	me.reloadTaskRecord(taskId);
-                }, 
-                failure: function(response){
-                	Editor.app.getController('ServerException').handleException(response);
-                	me.reloadTaskRecord(taskId);
-                }
+        
+        me.addLoadingMask();
+        Ext.Ajax.request({
+            url: Editor.data.restpath+'task/'+taskId+'/'+operation+'/operation',
+            method: "PUT",
+            params: {
+            	internalFuzzy: me.isChecboxChecked('cbInternalFuzzy'),
+                pretranslateMatchrate: me.getComponentByItemId('cbMinMatchrate').getValue(),
+                pretranslateTmAndTerm: me.isChecboxChecked('pretranslateTmAndTerm'),
+                pretranslateMt: me.isChecboxChecked('pretranslateMt'),
+                termtaggerSegment: me.isChecboxChecked('termtaggerSegment'),
+                isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
+            },
+            scope: this,
+            timeout:600000,
+            success: function(response){
+                me.checkTaskState(taskId);
+            }, 
+            failure: function(response){
+                me.removeLoadingMask();
+            	Editor.app.getController('ServerException').handleException(response);
+            }
         })
     },
-    
+
     /***
-     * Reload task record
+     * Language resource to task assoc after save event handler
      */
-    reloadTaskRecord:function(taskId){
-    	var me=this,
-    		taskOverview = me.application.getController('admin.TaskOverview'),
-    		taskStore=taskOverview.getAdminTasksStore();
-		//TODO reload only one row
-    	taskStore.reload();
+    onTaskAssocSavingFinished:function(record,store){
+        var me=this;
+        me.updateTaskAssocPanelViewModel(store);
+    },
+
+    /***
+     * Update the language resources task assoc panel view model
+     */
+    updateTaskAssocPanelViewModel:function(assocStore){
+        var me=this,
+            pnl=me.getLanguageResourceTaskAssocPanel(),
+            store=assocStore ? assocStore : (me.getTaskAssocGrid() ? me.getTaskAssocGrid() : null);
+        if(!pnl || !store){
+            return;
+        }
+        //set the view model items variable
+        pnl.getViewModel().set('items',(store.getData().getSource() || store.getData()).getRange());
     },
     
     /***
@@ -317,81 +406,89 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     getComponentByItemId:function(itemId){
     	var cmp=Ext.ComponentQuery.query('#'+itemId);
     	if(cmp.length<1){
-    		return;
+    		return null;
     	}
     	return cmp[0];
     },
-    
+
     /***
-     * Get the analysis config. It can be checkbox or button depending if the task exist or not.
+     * Check if the checbox component is checked
      */
-    getAnalysisConfig:function(task){
-    	if(!task || task.isImporting()){
-    		return {
-    			xtype:'checkbox',
-    			boxLabel:this.strings.analysis,
-    			itemId:'cbAnalysis',
-    			dock:'bottom',
-    			listeners:{
-    				change:{
-    					fn:this.onCbAnalysisChecked,
-    					scope:this
-    				}
-    			}
-    		};
-    	}
-    	return {
-    		xtype:'button',
-			text:this.strings.analysis,
-			itemId:'btnAnalysis',
-			width:150,
-			dock:'bottom',
-			//TODO icon
-			listeners:{
-				click:{
-					fn:this.matchAnalysisButtonHandler,
-					scope:this
-				}
-			}
-    	};
+    isChecboxChecked:function(itemId){
+        var component=this.getComponentByItemId(itemId);
+        if(!component || component.isDisabled()){
+            return 0;
+        }
+        return component.checked ? 1 : 0;
     },
-    
+
     /***
-     * Get the pretranslation config. It can be checkbox or button depending if the task exist or not.
+     * Add tast state check conditional function, so the task reload condition depends also from the matchanalysis state
      */
-    getPretranslationConfig:function(task){
-    	if(!task || task.isImporting()){
-    		return {
-    			xtype:'checkbox',
-    			boxLabel:this.strings.preTranslation,
-    		    autoEl: {
-    		        tag: 'div',
-    		        'data-qtip': this.strings.preTranslationTooltip
-    		    },
-    			itemId:'cbPreTranslation',
-    			dock:'bottom',
-    			listeners:{
-    				change:{
-    					fn:this.onCbPreTranslationChecked,
-    					scope:this
-    				}
-    			}
-    		};
-    	}
-    	return {
-    		xtype:'button',
-			text:this.strings.preTranslation,
-			tooltip:this.strings.preTranslationTooltip,
-			itemId:'btnPreTranslation',
-			width:170,
-			dock:'bottom',
-			//TODO icon
-			listeners:{
-				click:{
-					fn:this.matchAnalysisButtonHandler,
-					scope:this
-				}
-			}
-    	};
+    checkTaskState:function(taskId){
+        //the task needs to be updated, so the last state is fetched from the db
+        var task = Ext.StoreManager.get('admin.Tasks').getById(taskId);
+        if(!task) {
+            return;
+        }
+        task.load({
+            success:function(){
+                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
+                //add match analysis state checker function to the task state checker loop
+                controller.addTaskStateCheckPull(function(rec){
+                    return rec.get('state')=='matchanalysis';
+                });
+                controller.startCheckImportStates();
+            }
+        });
+    },
+
+    /***
+     * Tash state check cleand event handler. This event is fired from Task overview controller.
+     */
+    onTaskStateCheckPullCleaned:function(){
+        this.removeLoadingMask(true);
+    },
+
+    /***
+     * Add loadin mask in match analysis panel and in the task assoc panel
+     */
+    addLoadingMask:function(){
+        var me=this,
+            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
+            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
+        
+        if(assocPanel && assocPanel.getEl()){
+            assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        }
+
+        if(matchAnalysisPanel && matchAnalysisPanel.getEl()){
+            matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        }
+    },
+
+    /***
+     * Remove loading mask from task assoc panel and match analysis panel.
+     * If the reloadStore is set, the analysis panel will be reloaded
+     */
+    removeLoadingMask:function(reloadStore){
+        var me=this,
+            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel'),
+            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel'),
+            matchAnalysisGrid=me.getComponentByItemId('matchAnalysisGrid');
+        
+        if(!assocPanel){
+            return;
+        }
+        assocPanel.unmask();;
+
+        if(!matchAnalysisPanel){
+            return;
+        }
+        if(reloadStore){
+            matchAnalysisGrid.getStore().reload();
+        }
+        matchAnalysisPanel.getEl().unmask(me.strings.analysisLoadingMsg);
     }
+
 });

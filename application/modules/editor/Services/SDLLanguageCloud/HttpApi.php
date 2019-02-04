@@ -28,11 +28,6 @@ END LICENSE AND COPYRIGHT
 
 class editor_Services_SDLLanguageCloud_HttpApi {
     /**
-     * @var editor_Models_LanguageResources_LanguageResource
-     */
-    protected $languageResource;
-    
-    /**
      * @var Zend_Http_Response
      */
     protected $response;
@@ -69,11 +64,10 @@ class editor_Services_SDLLanguageCloud_HttpApi {
      */
     protected $apiUrl;
     
-    public function __construct(editor_Models_LanguageResources_LanguageResource $languageResource) {
-        $this->languageResource = $languageResource;
+    public function __construct() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $urls = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->server;
+        $urls = $config->runtimeOptions->LanguageResources->sdllanguagecloud->server;
         $urls=$urls->toArray();
         if(empty($urls) || empty($urls[0])){
             $exc= new Zend_Exception("Api url is not defined in the zf configuration");
@@ -81,7 +75,7 @@ class editor_Services_SDLLanguageCloud_HttpApi {
         }
         
         $this->apiUrl=$urls[0];
-        $apiKey = $config->runtimeOptions->LanguageResources->sdllnaguagecloud->apiKey;
+        $apiKey = $config->runtimeOptions->LanguageResources->sdllanguagecloud->apiKey;
         
         if(empty($apiKey)){
             $exc= new Zend_Exception("Api key is not defined in the zf configuration");

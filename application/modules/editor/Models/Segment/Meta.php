@@ -41,6 +41,12 @@ END LICENSE AND COPYRIGHT
  * @method void setMinWidth() setMinWidth(integer $width)
  * @method integer getMaxWidth() getMaxWidth()
  * @method void setMaxWidth() setMaxWidth(integer $width)
+ * @method integer getSizeUnit() getSizeUnit()
+ * @method void setSizeUnit() setSizeUnit(string $sizeUnit)
+ * @method integer getFont() getFont()
+ * @method void setFont() setFont(string $font)
+ * @method integer getFontSize() getFontSize()
+ * @method void setFontSize() setFontSize(integer $fontSize)
  * @method integer getAdditionalUnitLength() getAdditionalUnitLength()
  * @method void setAdditionalUnitLength() setAdditionalUnitLength(integer $length)
  * @method integer getAdditionalMrkLength() getAdditionalMrkLength()
@@ -75,8 +81,25 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
             //the additional mrk length is added here to each field, 
             // so that it is available in the frontend out of the cached siblings without providing an additional data field
             // (the additional unit length is added once to the calculation in the frontend!
-            $data->length[$field] = (int)$segment->textLength($value) + (int)$this->getAdditionalMrkLength();
+            $data->length[$field] = (int)$segment->textLengthByMeta($value, $this) + (int)$this->getAdditionalMrkLength();
         }
         $this->__call(__FUNCTION__, [json_encode($data)]);
+    }
+    
+    /**
+     * Return all combinations of font-family and font-size
+     * that are used in all the segments of the task.
+     * This is only a workaround until we get these infos from the config-data
+     * of the taskTemplate (unfortunately not implemented yet).
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getAllFontsInTask($taskGuid) {
+        $sql = $this->db->select()
+                ->from($this->db, array('font','fontSize'))
+                ->distinct()
+                ->where('taskGuid = ?', $taskGuid);
+        $fonts = $this->db->fetchAll($sql);
+        return $fonts->toArray();
     }
 }

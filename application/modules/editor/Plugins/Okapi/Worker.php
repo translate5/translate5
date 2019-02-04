@@ -197,8 +197,12 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      * keep original file and directory structure
      */
     protected function copyOriginalAsReference() {
+        if(!$this->isAttachOriginalAsReference()){
+            return;
+        }
+        $config=Zend_Registry::get('config')->runtimeOptions;
         $params = $this->workerModel->getParameters();
-        $import = Zend_Registry::get('config')->runtimeOptions->import;
+        $import = $config->import;
         
         $realFile = $params['file'];
         $refFolder = $params['importFolder'].'/'.$import->referenceDirectory;
@@ -243,5 +247,20 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$this->task]);
         /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
         $tikal->merge($workfile->__toString());
+    }
+    
+    /***
+     * Is configured the original files to be attached as reference files.
+     * When no config is provided the original will be attached as reference.
+     * @return boolean
+     */
+    protected function isAttachOriginalAsReference() {
+        $config = Zend_Registry::get('config')->runtimeOptions->import;
+        if(!isset($config->fileconverters->attachOriginalFileAsReference)) {
+            //default is true
+            return true;
+        }
+        $attach = $config->fileconverters->attachOriginalFileAsReference->toArray();
+        return isset($attach['okapi']) ? $attach['okapi'] : false;
     }
 }

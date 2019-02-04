@@ -37,8 +37,13 @@ class Editor_SegmentuserassocController extends editor_Controllers_EditorrestCon
     
     public function deleteAction() {
         $id = (int) $this->_getParam('id');
-        $this->entity->load($id);
-        $this->entity->delete();
+        try {
+            $this->entity->load($id);
+            $this->entity->delete();
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //do nothing, since already deleted!
+        }
     }
     
     public function postAction() {
@@ -55,7 +60,16 @@ class Editor_SegmentuserassocController extends editor_Controllers_EditorrestCon
         $this->checkSegmentTaskGuid($this->data->segmentId);
         $this->entity->setSegmentId($this->data->segmentId);
         $this->entity->validate();
-        $this->entity->save();
+        try {
+            $this->entity->save();
+        }
+        catch (Zend_Db_Statement_Exception $e) {
+            if(strpos($e->getMessage(), 'Integrity constraint violation: 1062 Duplicate entry') === false) {
+                //all other errors re-throw:
+                throw $e;
+            }
+            // on duplicate key everything is ok, the entry is already existing
+        }
         $this->view->rows = $this->entity->getDataObject();
     }
     

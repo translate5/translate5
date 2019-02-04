@@ -59,8 +59,10 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_file_filter' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
             'LEK_languages' => false,
-            //TODO:TRANSLATE-1342, should we enable this now ?
-            // matchresource plugin tables disabled for archiving, since task data is not depending from them, and plugin must not be installed at all
+            // languageresources tables disabled for archiving, since task data is not depending from them, and existence of languageresources does not depend on the existence of the task 
+            'LEK_languageresources_customerassoc' => false,
+            'LEK_languageresources_languages' => false,
+            'LEK_languageresources_mt_usage_log' => false,
             'LEK_languageresources_taskassoc' => false,
             'LEK_languageresources' => false,
             'LEK_match_analysis' => 'taskGuid',
@@ -85,11 +87,10 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_terms' => false,
             'LEK_term_attributes'=>false,
             'LEK_term_attributes_label'=>false,
-            'LEK_term_collection'=>false,
-            'LEK_term_collection_taskassoc'=>false,
             'LEK_term_entry'=>false,
             'LEK_term_entry_attributes'=>false,
             'LEK_user_changelog_info' => false,
+            'LEK_user_meta' => false,
             'LEK_visualreview_files' => 'taskGuid',
             'LEK_visualreview_segmentmapping' => 'taskGuid',
             'LEK_workflow_log' => 'taskGuid',
@@ -126,7 +127,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
         $missingInSystem = array_diff($configuredTables, $filtered);  //gib die vom ersten die nicht im zweiten
         
         if(empty($addedToSystem) && empty($missingInSystem)){
-            exit(0); //since used as CLI use CLI exit codes here, 0 is true, other than 0 is error
+            return; //since other checks will follow we can not exit(0) here
         }
         
         if(!empty($addedToSystem)) {

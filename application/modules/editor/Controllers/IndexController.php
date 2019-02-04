@@ -206,6 +206,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
       $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (boolean)$rop->segments->userCanIgnoreTagValidation);
       $this->view->Php2JsVars()->set('segments.userCanModifyWhitespaceTags', (boolean)$rop->segments->userCanModifyWhitespaceTags);
+      $this->view->Php2JsVars()->set('segments.userCanInsertWhitespaceTags', (boolean)$rop->segments->userCanInsertWhitespaceTags);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -214,7 +215,14 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $tagPath = APPLICATION_RUNDIR.'/'.$rop->dir->tagImagesBasePath.'/';
       $this->view->Php2JsVars()->set('segments.shortTagPath', $tagPath);
       $this->view->Php2JsVars()->set('segments.fullTagPath', $tagPath);
-      $this->view->Php2JsVars()->set('segments.matchratetypes', []); //needed to give plugins the abilty to add own icons as matchrate types
+
+      //matchrate type to icon map
+      $typesWihtIcons=array();
+      foreach(editor_Models_Segment_MatchRateType::TYPES_WITH_ICONS as $type){
+          $typesWihtIcons[$type]=$this->view->publicModulePath.'/images/matchratetypes/'.$type.'.png';
+      }
+      
+      $this->view->Php2JsVars()->set('segments.matchratetypes', $typesWihtIcons); //needed to give plugins the abilty to add own icons as matchrate types
       
       if($rop->editor->enableQmSubSegments) {
           $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
@@ -386,7 +394,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments','SearchReplace','Termportal','Instanttranslate');
+            'ChangeAlike', 'Comments','SearchReplace','Termportal');
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */

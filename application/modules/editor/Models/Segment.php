@@ -140,6 +140,16 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $trackChangesTagHelper;
     
     /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /**
+     * @var editor_Models_Segment_PixelLength
+     */
+    protected $pixelLength;
+    
+    /**
      * init the internal segment field and the DB object
      */
     public function __construct()
@@ -147,9 +157,19 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
         parent::__construct();
     }
     
+    /**
+     * "lazy load" for editor_Models_Segment_PixelLength (must fit to the segment's task!).
+     */
+    protected function getPixelLength(string $taskGuid) {
+        if (!isset($this->pixelLength) || $this->pixelLength->getTaskGuid() != $taskGuid) {
+            $this->pixelLength = ZfExtended_Factory::get('editor_Models_Segment_PixelLength',[$taskGuid]);
+        }
+        return $this->pixelLength;
+    }
     
     /***
      * Search the materialized view for given search field,search string and match case.
@@ -421,15 +441,62 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * Get length of a segment's text according to the segment's sizeUnit. 
+     * If the sizeUnit is set to 'pixel', we use pixelMapping, otherwise 
+     * we count by characters (this is for historical reasons of this code; 
+     * other than the XLF-specifications which are not relevant here!).
+     * @param string $segmentContent
+     * @param editor_Models_Segment_Meta $segmentMeta
+     * @return integer
+     */
+    public function textLengthByMeta($segmentContent, editor_Models_Segment_Meta $segmentMeta) {
+        $isPixelBased = ($segmentMeta->getSizeUnit() == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
+        if ($isPixelBased) {
+            return $this->textLengthByPixel($segmentContent, $segmentMeta->getTaskGuid(), $segmentMeta->getFont(), $segmentMeta->getFontSize());
+        }
+        return $this->textLengthByChar($segmentContent);
+    }
+    
+    /**
+     * Same as textLengthByMeta(), but here we use the editor_Models_Import_FileParser_SegmentAttributes
+     * instead of editor_Models_Segment_Meta (on import, the segment and it's meta don't exist yet).
+     * @param string $content
+     * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
+     * @param string $taskGuid (other than in $segmentMeta, the $attributes don't have a taskGuid)
+     * @return integer
+     */
+    public function textLengthByImportattributes($content, editor_Models_Import_FileParser_SegmentAttributes $attributes, $taskGuid) {
+        $isPixelBased = ($attributes->sizeUnit == editor_Models_Segment_PixelLength::SIZE_UNIT_XLF_DEFAULT);
+        if ($isPixelBased) {
+            return $this->textLengthByPixel($content, $taskGuid, $attributes->font, $attributes->fontSize);
+        }
+        return $this->textLengthByChar($content);
+    }
+    
+    /**
+     * Get pixel length of a segment's text according to the given assumed font and fontsize
+     * @param string $segmentContent
+     * @param string $taskGuid
+     * @param string $font
+     * @param string $fontSize
+     * @return integer
+     */
+    public function textLengthByPixel($segmentContent, $taskGuid, $font, $fontSize) {
+        $pixelLength = $this->getPixelLength($taskGuid); // make sure that the pixelLength we use is that for the segment's task!
+        return $pixelLength->textLengthByPixel($segmentContent, $font, intval($fontSize));
+    }
+    
+    
+    /**
      * dedicated method to count chars of given segment content
-     * does a htmlentitydecode, so that 5 char "&amp;" is converted to one char "&" for counting 
+     * does a htmlentitydecode, so that 5 char "&amp;" is converted to one char "&" for counting
      * Further:
      * - content in &gt;del&lt; tags is ignored
      * - all other tags are ignored, if the tag has a length attribute, this length is added
      * @param string $segmentContent
      * @return integer
      */
-    public function textLength($segmentContent) {
+    public function textLengthByChar($segmentContent) {
         return mb_strlen($this->prepareForCount($segmentContent, true));
     }
     
@@ -464,6 +531,30 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             }
         });
         return html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_XHTML);
+    }
+    
+    /**
+     * Remove TrackChange-tags and restore whitespace.
+     * @param string $text
+     * @return string
+     */
+    public function prepareForPixelBasedLengthCount($text) {
+        $text = $this->trackChangesTagHelper->removeTrackChanges($text);
+        $text = $this->restoreWhiteSpace($text);
+        return $text;
+    }
+    
+    /**
+     * Restore whitespace to original real characters.
+     * @param string $segmentContent
+     * @return string $segmentContent
+     */
+    protected function restoreWhiteSpace ($segmentContent) {
+        $segmentContent = $this->tagHelper->restore($segmentContent, true);
+        $segmentContent = $this->whitespaceHelper->unprotectWhitespace($segmentContent);
+        $segmentContent = $this->tagHelper->protect($segmentContent);
+        $segmentContent = html_entity_decode(strip_tags($segmentContent), ENT_QUOTES | ENT_XHTML);
+        return $segmentContent;
     }
     
     /**
@@ -752,6 +843,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
             $this->meta()->setSiblingData($this);
             $this->meta()->save();
             $matView = $this->segmentFieldManager->getView();
+            /* @var $matView editor_Models_Segment_MaterializedView */
             if($matView->exists()) {
                 $matView->updateSegment($this);
                 $matView->updateSiblingMetaCache($this);
@@ -1251,11 +1343,21 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
         $this->segmentFieldManager->initFields($taskGuid);
         $mv = $this->segmentFieldManager->getView();
         $mv->setTaskGuid($taskGuid);
+        
         /* @var $mv editor_Models_Segment_MaterializedView */
         $this->db = ZfExtended_Factory::get($this->dbInstanceClass, array(array(), $mv->getName()));
         $this->dbWritable = ZfExtended_Factory::get($this->dbInstanceClass);
         $db = $this->db;
-        $this->tableName = $db->info($db::NAME);
+        try {
+            $this->tableName = $db->info($db::NAME);
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            if(stripos($e->getMessage(), 'SQLSTATE[42S02]: Base table or view not found') === false) {
+                throw $e;
+            }
+            $mv->create();
+            $this->tableName = $db->info($db::NAME);
+        }
     }
 
     /**

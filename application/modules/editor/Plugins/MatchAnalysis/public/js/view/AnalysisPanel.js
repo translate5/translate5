@@ -51,8 +51,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
       matchCount:'#UT#Gesamtzahl der Wörter',
       tabTitle:"#UT#Analyse",
       exportAnalysis:'#UT#Export',
-	  noAnalysis:'#UT#Keine Analyse für die aktuelle Aufgabe',
-	  languageResources:'#UT#Sprachressourcen',
+	  noAnalysis:'#UT#Start der Analyse im Tab “Sprach-Resourcen zuweisen“',
+	  languageResources:'#UT#Sprach-Resourcen',
 	  analysisDate:'#UT#Datum',
 	  languageResourceName: '#UT#Name',
 	  repetitions:'#UT#Wiederholungen:',
@@ -67,8 +67,8 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
         var me = this,
             config,
             columnRenderer=function(val, meta, record) {
-        		if(val && val.wordCount){
-        			return val.wordCount;
+        		if(val){
+        			return val;
         		}
                 return 0;
             },
@@ -88,6 +88,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             items:[{
                     xtype:'grid',
                     itemId:'matchAnalysisGrid',
+                    cls: 'matchAnalysisGrid',
                     emptyText:me.strings.noAnalysis,
                     store : analysisStore,
                     features: [{
@@ -110,6 +111,20 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         sortable : true
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
+                        flex: 2,
+                        dataIndex: '104',
+                        cellWrap: true,
+                        text: "104%",
+                        tooltip:Editor.util.LanguageResources.getMatchrateTooltip(104),
+                        //summaryType: 'sum',
+                        summaryRenderer: function(value, summaryData, dataIndex) {
+                            return me.calculateRowSum(104,analysisStore);
+                        },
+                        renderer:columnRenderer,
+                    },{
+                        xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '103',
                         cellWrap: true,
@@ -122,6 +137,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         renderer:columnRenderer,
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '102',
                         cellWrap: true,
@@ -134,6 +150,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                         renderer:columnRenderer
                     },{
                         xtype: 'gridcolumn',
+                        cls:'info-icon',
                         flex: 2,
                         dataIndex: '101',
                         cellWrap: true,
@@ -235,7 +252,16 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
                     dockedItems: [{
                         xtype: 'toolbar',
                         dock: 'bottom',
-                        items: [{ 
+                        layout: {
+                            type: 'vbox',
+                            align: 'left'
+                        },
+                        items: [{
+                            xtype: 'container',
+                            padding: '10',
+                            html:"¹ "+me.strings.noAnalysis,
+                            dock : 'bottom'
+                        },{ 
                             xtype: 'button',
                             iconCls:'icon-excel-export',
                             itemId:'exportExcel',
@@ -263,10 +289,6 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 	                        xtype: 'displayfield',
 	                        fieldLabel: me.strings.internalFuzzy,
 	                        itemId:'internalFuzzy'
-                        },{
-	                        xtype: 'displayfield',
-	                        fieldLabel: me.strings.matchRate,
-	                        itemId:'pretranslateMatchrate'
                         }]
                     
                     }]
@@ -287,7 +309,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     	var totalSum=0;
     	store.each(function(record){
     		if(record.get(group)){
-    			totalSum+=record.get(group).wordCount;
+    			totalSum+=record.get(group);
     		}
     	});
     	return totalSum;
@@ -306,9 +328,5 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 		var rec=records[0];
 		me.down('#analysisDatum').setValue(rec.get('created'));
 		me.down('#internalFuzzy').setValue(rec.get('internalFuzzy'));
-		
-		if(rec.get('pretranslateMatchrate')){
-			me.down('#pretranslateMatchrate').setValue(rec.get('pretranslateMatchrate') +"%");
-		}
     }
 });

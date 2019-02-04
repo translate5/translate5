@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.LanguageResources.sdllnaguagecloud.server', '1', 'editor', 'editor', '[\"https://lc-api.sdl.com/\"]', '', '', 'list', 'List of available SdlLanguageCloud server');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.LanguageResources.sdllnaguagecloud.server', '1', 'editor', 'editor', '', '', '', 'list', 'List of available SdlLanguageCloud server');
 
 
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.LanguageResources.sdllnaguagecloud.apiKey', '1', 'editor', 'editor', '8wFVYOBiA1YvyX0Px74PsA%3D%3D', '', '', 'string', 'Api key used for authentication to sdl language cloud api');
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.LanguageResources.sdllnaguagecloud.apiKey', '1', 'editor', 'editor', '', '', '', 'string', 'Api key used for authentication to sdl language cloud api');
 

@@ -760,18 +760,6 @@
         <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
         <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
       </trans-unit>
-      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIFRCWCBEYXRlbiBmw7xyIGRhcyBUZXJtVGFnZ2luZw=='>
-        <source>Wählen Sie die zu importierenden TBX Daten für das TermTagging</source>
-        <target>Please choose the TBX data to be imported for the term tagging</target>
-      </trans-unit>
-      <trans-unit id='VEJYIERhdGVpwrI='>
-        <source>TBX Datei²</source>
-        <target>TBX file²</target>
-      </trans-unit>
-      <trans-unit id='wrIgRWluZSBUQlggRGF0ZWkgaXN0IG9wdGlvbmFsLiBFaW5lIFRCWCBEYXRlaSBpbSBUQlgtQ29yZSBGb3JtYXQgd2lyZCBiZW7DtnRpZ3QgdW0gVGVybWlub2xvZ2llIGF1c3p1emVpY2huZW4u'>
-        <source>² Eine TBX Datei ist optional. Eine TBX Datei im TBX-Core Format wird benötigt um Terminologie auszuzeichnen.</source>
-        <target>² A TBX file is optional. You need a TBX-file in TBX-Core format to mark terminology in your bilingual files.</target>
-      </trans-unit>
       
       
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
@@ -901,6 +889,14 @@
       <trans-unit id='ZsO8ciBhbGxl'>
         <source>für alle</source>
         <target>for all</target>
+      </trans-unit>
+      <trans-unit id='S3VuZGUgZGVyIEF1ZmdhYmUgKEFuZ2FiZSBub3R3ZW5kaWcp'>
+        <source>Kunde der Aufgabe (Angabe notwendig)</source>
+        <target>Task's client (mandatory)</target>
+      </trans-unit>
+      <trans-unit id='bmljaHQgZ2VmdW5kZW4='>
+        <source>nicht gefunden</source>
+        <target>not found</target>
       </trans-unit>
       <trans-unit id='SWhyZSBEYXRlbiBrb25udGVuIG5pY2h0IGdlc3BlaWNoZXJ0IHdlcmRlbiwgYmVpbSBTcGVpY2hlcm4ga2FtIGVzIHp1IGVpbmVtIEtvbmZsaWt0IQ=='>
         <source>Ihre Daten konnten nicht gespeichert werden, beim Speichern kam es zu einem Konflikt!</source>
@@ -1409,9 +1405,13 @@
     <source>{0} (importiert)</source>
     <target>{0} (imported)</target>
 </trans-unit>
-<trans-unit id='ezB9ICh0cmFuc2xhdGU1KQ=='>
-    <source>{0} (translate5)</source>
-    <target>{0} (translate5)</target>
+<trans-unit id='ezB9'>
+  <source>{0}</source>
+  <target>{0}</target>
+</trans-unit>
+<trans-unit id='ezB9ICh2b3LDvGJlcnNldHp0KQ=='>
+    <source>{0} (vorübersetzt)</source>
+    <target>{0} (pre-translated)</target>
 </trans-unit>
 <trans-unit id='S2VpbiBaaWVsdGV4dCB2b3JoYW5kZW4='>
     <source>Kein Zieltext vorhanden</source>
@@ -1436,6 +1436,10 @@
 <trans-unit id='TVQtTWF0Y2g='>
     <source>MT-Match</source>
     <target>MT-Match</target>
+</trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9u'>
+    <source>Term-Collection</source>
+    <target>Term-Collection</target>
 </trans-unit>
 <trans-unit id='ZWRpdGllcnQ='>
     <source>editiert</source>
@@ -1496,6 +1500,22 @@
 <trans-unit id='SW0gQnJvd3NlciBhdXMgTVQgw7xiZXJub21tZW4='>
     <source>Im Browser aus MT übernommen</source>
     <target>Taken over in the browser from a MT</target>
+</trans-unit>
+<trans-unit id='SW0gQnJvd3NlciBhdXMgVGVybS1Db2xsZWN0aW9uIMO8YmVybm9tbWVu'>
+    <source>Im Browser aus Term-Collection übernommen</source>
+    <target>Taken over in the browser from a Term-Collection</target>
+</trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIFRNIMO8YmVybm9tbWVu'>
+    <source>Bei der Vorübersetzung aus TM übernommen</source>
+    <target>Pre-translated from a TM</target>
+</trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIE1UIMO8YmVybm9tbWVu'>
+    <source>Bei der Vorübersetzung aus MT übernommen</source>
+    <target>Pre-translated from a MT</target>
+</trans-unit>
+<trans-unit id='QmVpIGRlciBWb3LDvGJlcnNldHp1bmcgYXVzIFRlcm0tQ29sbGVjdGlvbiDDvGJlcm5vbW1lbg=='>
+    <source>Bei der Vorübersetzung aus Term-Collection übernommen</source>
+    <target>Pre-translated from a Term-Collection</target>
 </trans-unit>
 <trans-unit id='VHlw'>
     <source>Typ</source>
@@ -1632,6 +1652,40 @@
     <target>Translate5 - task finished</target>
 </trans-unit>
 
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgdGVpbHdlaXNlIGFiZ2VzY2hsb3NzZW4='>
+    <source>Translate5 - Aufgabe teilweise abgeschlossen</source>
+    <target>Translate5 - task partly finished</target>
+</trans-unit>
+
+<trans-unit id='SW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gd3VyZGUgZGllIEF1ZmdhYmUgPGI+e3Rhc2sudGFza05yfSAtIHt0YXNrLnRhc2tOYW1lfTwvYj4gZHVyY2ggZWluZW4gQmVudXR6ZXIgZGVyIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+IGFiZ2VzY2hsb3NzZW46PGJyIC8+'>
+    <source>Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> durch einen Benutzer der Rolle <i>{currentRole}</i> abgeschlossen:<br /></source>
+    <target>The task <b>{task.taskNr} - {task.taskName}</b> was finished by one user of the role <i>{currentRole}</i> in the task-portal {portalLink}:<br /></target>
+</trans-unit>
+
+<trans-unit id='QWxsZSBCZW51dHplciBkZXIgYWt0dWVsbGVuIFJvbGxlIDxpPntjdXJyZW50Um9sZX08L2k+Ogp7Y3VycmVudFVzZXJzfTxici8+Cg=='>
+    <source>Alle Benutzer der aktuellen Rolle <i>{currentRole}</i>:
+{currentUsers}<br/>
+</source>
+<target>All users of the current role <i>{currentRole}</i>:
+{currentUsers}<br/>
+</target>
+</trans-unit>
+
+<trans-unit id='e2hlYWRlcn0Ke2FjdGlvbn08YnIgLz4Ke2N1cnJlbnRVc2VyfTxiciAvPgo8YnIgLz4Ke3VzZXJzQ3VycmVudFJvbGV9PGJyIC8+Cntmb290ZXJ9'>
+    <source>{header}
+{action}<br />
+{currentUser}<br />
+<br />
+{usersCurrentRole}<br />
+{footer}</source>
+<target>{header}
+{action}<br />
+{currentUser}<br />
+<br />
+{usersCurrentRole}<br />
+{footer}</target>
+</trans-unit>
+
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgYXV0b21hdGlzY2ggYWJnZXNjaGxvc3Nlbg=='>
     <source>Translate5 - Aufgabe automatisch abgeschlossen</source>
     <target>Translate5 - task finished automatically</target>
@@ -1660,6 +1714,12 @@
     <source>Übersetzer (Überprüfung)</source>
     <target>translator (check)</target>
 </trans-unit>
+
+<trans-unit id='V29ya2Zsb3cgYmVlbmRldA=='>
+    <source>Workflow beendet</source>
+    <target>translator (check)</target>
+</trans-unit>
+
 <trans-unit id='w5xiZXJzZXR6dW5n'>
     <source>Übersetzung</source>
     <target>translation</target>
@@ -1727,7 +1787,7 @@
 <trans-unit id='V2FsaXNpc2NoIChVSyk='><source>Walisisch (UK)</source><target>Welsh (UK)</target></trans-unit>
 <trans-unit id='RMOkbmlzY2ggKETDpG5lbWFyayk='><source>Dänisch (Dänemark)</source><target>Danish (Denmark)</target></trans-unit>
 <trans-unit id='RGV1dHNjaCAoU2Nod2Vpeik='><source>Deutsch (Schweiz)</source><target>German (Switzerland)</target></trans-unit>
-<trans-unit id='RGV1dHNjaCAoRGV1dHNjaGxhbmQp'><source>Deutsch (Deutschland)</source><target>German Germany)</target></trans-unit>
+<trans-unit id='RGV1dHNjaCAoRGV1dHNjaGxhbmQp'><source>Deutsch (Deutschland)</source><target>German (Germany)</target></trans-unit>
 <trans-unit id='RGV1dHNjaCAoTGllY2h0ZW5zdGVpbik='><source>Deutsch (Liechtenstein)</source><target>German (Liechtenstein)</target></trans-unit>
 <trans-unit id='RGV1dHNjaCAoTHV4ZW1idXJnKQ=='><source>Deutsch (Luxemburg)</source><target>German (Luxembourg)</target></trans-unit>
 <trans-unit id='RGhpdmVoaQ=='><source>Dhivehi</source><target>Dhivehi</target></trans-unit>
@@ -2367,12 +2427,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='SWhuZW4gc2luZCBkZXJ6ZWl0IGtlaW5lIEt1bmRlbnZlcmtuw7xwZnVuZ2VuIHVuZCBkYW1pdCBhdWNoIGtlaW5lIFRlcm1Db2xsZWN0aW9ucyB6dWdlb3JkbmV0LiBEYWhlciBpc3QgYXVjaCBrZWluZSBUZXJtc3VjaGUgbcO2Z2xpY2gu'>
 	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
-	<target>There are currently no customers connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
+	<target>There are currently no clients connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
 </trans-unit>
 
 <trans-unit id='RXMgd3VyZGVuIGtlaW5lIHZlcmbDvGdiYXJlbiB0ZXJtQ29sbGVjdGlvbiBmw7xyIGRlbiBJaG5lbiB6dWdlb3JkbmV0ZW4gS3VuZGVuIGdlZnVuZGVuLg=='>
 	<source>Es wurden keine verfügbaren termCollection für den Ihnen zugeordneten Kunden gefunden.</source>
-	<target>No available term collections were found for the customer that is associated to you.</target>
+	<target>No available term collections were found for the clients that are associated to you.</target>
 </trans-unit>
 
 <trans-unit id='VGVybWU='>
@@ -2386,13 +2446,19 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
     <source>Kunden</source>
-    <target>Customers</target>
+    <target>Clients</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='>
     <source>Kundenübersicht</source>
-    <target>Customers overview</target>
+    <target>Clients overview</target>
 </trans-unit>
+
+<trans-unit id="QWxsZSBLdW5kZW4=">
+    <source>Alle Kunden</source>
+    <target>All clients</target>
+</trans-unit>
+
 
 <trans-unit id='SGluenVmw7xnZW4='>
     <source>Hinzufügen</source>
@@ -2401,52 +2467,52 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='S3VuZGVubmFtZQ=='>
     <source>Kundenname</source>
-    <target>Customer name</target>
+    <target>Client name</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGVubnVtbWVy'>
     <source>Kundennummer</source>
-    <target>Customer number</target>
+    <target>Client number</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgYmVhcmJlaXRlbg=='>
     <source>Kunde bearbeiten</source>
-    <target>Edit customer</target>
+    <target>Edit client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgaGluenVmw7xnZW4='>
     <source>Kunde hinzufügen</source>
-    <target>Add a customer</target>
+    <target>Add a client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgd2lyZCBnZXNwZWljaGVydC4u'>
     <source>Kunde wird gespeichert...</source>
-    <target>Customer is saved ...</target>
+    <target>Client is saved ...</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgZ2VzcGVpY2hlcnQh'>
     <source>Kunde gespeichert!</source>
-    <target>Customer saved!</target>
+    <target>Client saved!</target>
 </trans-unit>
 
 <trans-unit id='RGllc2VuIEt1bmRlbiBsw7ZzY2hlbj8='>
     <source>Diesen Kunden löschen?</source>
-    <target>Delete this customer ?</target>
+    <target>Delete this client?</target>
 </trans-unit>
 
     <trans-unit id='S3VuZGVuIGzDtnNjaGVu'>
     <source>Kunden löschen</source>
-    <target>Delete customer</target>
+    <target>Delete client</target>
 </trans-unit>
 
 <trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'>
     <source>Kunde gelöscht</source>
-    <target>Customer deleted</target>
+    <target>Client deleted</target>
 </trans-unit>
 
 <trans-unit id='RW5ka3VuZGU='>
     <source>Endkunde</source>
-    <target>End customer</target>
+    <target>Client</target>
 </trans-unit>
 <trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='>
     <source>no existing attributes</source>
@@ -2460,19 +2526,25 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source>
     <target>ATTENTION: TARGET CONTENT CONTAINED IN PREVIOUS OR FOLLOWING SEGMENT</target>
 </trans-unit>
-<trans-unit id='MTAwJSBtYXRjaGVzIG1pdCBkZW1zZWxiZW4gRG9rdW1lbnRuYW1lbiB3aWUgZGFzIGFrdHVlbGwgw7xiZXJzZXR6dGUgRG9rdW1lbnQ='>
-    <source>100% matches mit demselben Dokumentnamen wie das aktuell übersetzte Dokument</source>
-    <target>100% matches with the same document name as the currently translated document</target>
+
+<trans-unit id='MTAxJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdC4='>
+  <source>101% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt.</source>
+  <target>101% is a 100% match, that originates from a file with the same name.</target>
 </trans-unit>
 
-<trans-unit id='RWluZSBXaWVkZXJob2x1bmcgaXN0IGVpbiBTZWdtZW50LCBkYXMgYmVyZWl0cyBiZWkgZGVyc2VsYmVuIEF1ZmdhYmUgbWl0IGRlciBnbGVpY2hlbiBXb3J0LSB1bmQgVGFnLVJlaWhlbmZvbGdlIHdlaXRlciBvYmVuIGF1ZnRhdWNodGU='>
-    <source>Eine Wiederholung ist ein Segment, das bereits bei derselben Aufgabe mit der gleichen Wort- und Tag-Reihenfolge weiter oben auftauchte</source>
-    <target>A repetition is a segment, that already showed up with the same words and tag order further above in the same task</target>
+<trans-unit id='V2llZGVyaG9sdW5nLiBFaW5lIFdpZWRlcmhvbHVuZyBpc3QgZWluIFRyZWZmZXIsIGRlciBpZGVudGlzY2ggaW4gZGVyIGFrdHVlbGxlbiBBdWZnYWJlIG5vY2htYWxzIHZvcmtvbW10Lg=='>
+<source>Wiederholung. Eine Wiederholung ist ein Treffer, der identisch in der aktuellen Aufgabe nochmals vorkommt.</source>
+<target>Repetition. A repetition is a match that occurs identically in the current task again.</target>
 </trans-unit>
 
-<trans-unit id='MTAzJSBpc3QgZWluZSBleGFjdC1leGFjdC1tYXRjaCgxMDElIG1hdGNoKSwgYmVpIGRlciB6dXPDpHR6bGljaCBkZXIgZ2xlaWNoZSBLb250ZXh0IGluIFRNIHdpZSBpbSBEb2t1bWVudCBmZXN0Z2VsZWd0IGlzdA=='>
-    <source>103% ist eine exact-exact-match(101% match), bei der zusätzlich der gleiche Kontext in TM wie im Dokument festgelegt ist</source>
-    <target>103% match is an exact-exact match (101% match), that in addition has the same context set in TM as in the document</target>
+<trans-unit id='MTAzJSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIHVyc3Byw7xuZ2xpY2ggYXVzIGVpbmVyIERhdGVpIG1pdCBkZW0gc2VsYmVuIE5hbWVuIHN0YW1tdCAod2llIGVpbiAxMDElIFRyZWZmZXIpLiBadXPDpHR6bGljaCB6dW0gMTAxJSBUcmVmZmVyIGlzdCBkaWUgU2VnbWVudC1JRCBub2NoIGlkZW50aXNjaCBvZGVyIGdsZWljaCBtaXQgZGVyIFNlZ21lbnQtSUQgaW4gZGVyIGFrdHVlbGxlbiBEYXRlaS4='>
+<source>103% ist ein 100% Treffer, der ursprünglich aus einer Datei mit dem selben Namen stammt (wie ein 101% Treffer). Zusätzlich zum 101% Treffer ist die Segment-ID noch identisch oder gleich mit der Segment-ID in der aktuellen Datei.</source>
+<target>103% is a 100% match that originally came from a file with the same name (like a 101% match). In addition to the 101% match, the segment ID is still the same or equal to the segment ID in the current file.</target>
+</trans-unit>
+
+<trans-unit id='MTA0JSBpc3QgZWluIDEwMCUgVHJlZmZlciwgZGVyIGF1cyBlaW5lciBUZXJtY29sbGVjdGlvbiBrb21tdC4='>
+<source>104% ist ein 100% Treffer, der aus einer Termcollection kommt.</source>
+<target>104% is a 100% match coming from a term collection.</target>
 </trans-unit>
 
 <trans-unit id='RXJzdGVsbHVuZw=='>     
@@ -2482,7 +2554,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='VmVyYW50d29ydGxpY2g='>     
 <source>Verantwortlich</source>     
-<target>Responsible</target> 
+<target>Responsibility</target> 
 </trans-unit>  
 
 <trans-unit id='RGF0dW0='>     
@@ -2492,7 +2564,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='TGV0enRlIMOEbmRlcnVuZw=='>     
 <source>Letzte Änderung</source>     
-<target>Last modification</target> 
+<target>Modification</target> 
 </trans-unit>  
 
 <trans-unit id='VGVybSBUeXA='>     
@@ -2507,7 +2579,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
 <trans-unit id='QWJrw7xyenVuZyBmw7xy'>     
 <source>Abkürzung für</source>     
-<target>Abbreviation of</target> 
+<target>Abbreviated form for</target> 
 </trans-unit>  
 
 <trans-unit id='QXVzc3ByYWNoZQ=='>     
@@ -2517,7 +2589,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 
  <trans-unit id='RWluc3R1ZnVuZw=='>     
  <source>Einstufung</source>     
- <target>Normative Authorization</target> 
+ <target>Normative authorization</target> 
  </trans-unit>
 <trans-unit id='RGFzIFByb2pla3QgZW50aMOkbHQgYWx0ZXJuYXRpdmUgw5xiZXJzZXR6dW5nZW4uIEJlaSBkZXIgw5xiZXJuYWhtZSB2b24gTWF0Y2hlcyB3aXJkIGRpZSBTZWdtZW50IE1hdGNocmF0ZSBkYWhlciBuaWNodCB2ZXLDpG5kZXJ0Lg=='>
   <source>Das Projekt enthält alternative Übersetzungen. Bei der Übernahme von Matches wird die Segment Matchrate daher nicht verändert.</source>
@@ -2527,8 +2599,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Beim Bearbeiten der Quellspalte können Matches nicht übernommen werden.</source>
   <target>On editing the source language column no matches can be taken over.</target>
 </trans-unit>
-<trans-unit id='U3ByYWNocmVzc291cmNlbg=='>
-  <source>Sprachressourcen</source>
+<trans-unit id='U3ByYWNoLVJlc291cmNlbg=='>
+  <source>Sprach-Resourcen</source>
   <target>Language resources</target>
 </trans-unit>
 <trans-unit id='U3ByYWNocmVzc291cmNlIGVuZGfDvGx0aWcgbMO2c2NoZW4/'>
@@ -2643,13 +2715,13 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Suche in {0}</source>
     <target>Search in {0}</target>
 </trans-unit>
-<trans-unit id='U3ByYWNocmVzc291cmNlbiB6dXdlaXNlbg=='>
-  <source>Sprachressourcen zuweisen</source>
+<trans-unit id='U3ByYWNoLVJlc291cmNlbiB6dXdlaXNlbg=='>
+  <source>Sprach-Resourcen zuweisen</source>
   <target>Associate language resources</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='>
-  <source>Keine Sprachressource in der Sprachkombination des geöffneten Tasks verfügbar.</source>
-  <target>No language resource available for the language combination of the opened task.</target>
+  <source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source>
+  <target>No language resource available for the language combination and client of the opened task.</target>
 </trans-unit>
 <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
   <source>Ressource: {name}</source>
@@ -2667,16 +2739,16 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>{0} Ergebnisse</source>
   <target>{0} results</target>
 </trans-unit>
-<trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlbiB6dWdld2llc2VuLg=='>
-  <source>Keine Sprachressourcen zugewiesen.</source>
+<trans-unit id='S2VpbmUgU3ByYWNoLVJlc291cmNlbiB6dWdld2llc2VuLg=='>
+  <source>Keine Sprach-Resourcen zugewiesen.</source>
   <target>No match resources associated.</target>
 </trans-unit>
 <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='>
   <source>Keine Aufgaben zugewiesen.</source>
   <target>No tasks associated.</target>
 </trans-unit>
-<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNocmVzc291cmNlbg=='>
-    <source>Zugewiesene Sprachressourcen</source>
+<trans-unit id='WnVnZXdpZXNlbmUgU3ByYWNoLVJlc291cmNlbg=='>
+    <source>Zugewiesene Sprach-Resourcen</source>
     <target>Associated language resources</target>
 </trans-unit>
 <trans-unit id='WnVnZXdpZXNlbmUgQXVmZ2FiZW4='>
@@ -2702,6 +2774,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='V2VpdGVyZSBUTSBEYXRlbiBpbiBGb3JtIGVpbmVyIFRNWCBEYXRlaSBpbXBvcnRpZXJlbiB1bmQgZGVtIFRNIGhpbnp1ZsO8Z2Vu'>
     <source>Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen</source>
     <target>Import TMX to TM</target>
+</trans-unit>
+<trans-unit id='V2VpdGVyZSBUZXJtLUNvbGxlY3Rpb24gRGF0ZW4gaW4gRm9ybSBlaW5lciBUQlggRGF0ZWkgaW1wb3J0aWVyZW4gdW5kIGRlbSBUZXJtLUNvbGxlY3Rpb24gaGluenVmw7xnZW4='>
+    <source>Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen</source>
+    <target>Import TBX to Term-Collection</target>
 </trans-unit>
 <trans-unit id='VE1YLURhdGVp'>
     <source>TMX-Datei</source>
@@ -2743,14 +2819,17 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Sprachressource löschen?</source>
     <target>Delete language resource?</target>
 </trans-unit>
-<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaHJlc3NvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
-    <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprachressourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
+<trans-unit id='U29sbCBkaWUgZ2V3w6RobHRlIFNwcmFjaHJlc3NvdXJjZSAiezB9IiBhdXMgZGVyIExpc3RlIGRlciBoaWVyIGFuZ2V6ZWlndGVuIFNwcmFjaC1SZXNvdXJjZW4gZ2Vsw7ZzY2h0IHdlcmRlbj8gPGJyIC8+IEVzIHdlcmRlbiBrZWluZSBEYXRlbiBpbSB2ZXJrbsO8cGZ0ZW4gVE0gU3lzdGVtIGdlbMO2c2NodCwgZGEga2VpbmUgVmVyYmluZHVuZyBiZXN0ZWh0Lg=='>
+    <source>Soll die gewählte Sprachressource "{0}" aus der Liste der hier angezeigten Sprach-Resourcen gelöscht werden? <br /> Es werden keine Daten im verknüpften TM System gelöscht, da keine Verbindung besteht.</source>
     <target>Do you really want to remove the language resource &quot;{0}&quot; from the here listed language resources? <br /> No data will be deleted in the associated TM system, since there is currently no connection to the TM system.</target>
-    
 </trans-unit>
 <trans-unit id='U3RhdHVzaW5mb3JtYXRpb25lbiB3ZXJkZW4gZ2VsYWRlbg=='>
     <source>Statusinformationen werden geladen</source>
     <target>Status information is loaded</target>
+</trans-unit>
+<trans-unit id='TmljaHQgZ2VwcsO8ZnQ='>
+    <source>Nicht geprüft</source>
+    <target>Not checked</target>
 </trans-unit>
 <trans-unit id='dmVyZsO8Z2Jhcg=='>
     <source>verfügbar</source>
@@ -2763,6 +2842,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='S2VpbmUgVmVyYmluZHVuZyE='>
     <source>Keine Verbindung!</source>
     <target>No connection!</target>
+</trans-unit>
+<trans-unit id='S2VpbmUgZ8O8bHRpZ2UgTGl6ZW56Lg=='>
+    <source>Keine gültige Lizenz.</source>
+    <target>No valid license.</target>
 </trans-unit>
 <trans-unit id='aW1wb3J0aWVydA=='>
     <source>importiert</source>
@@ -2784,15 +2867,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='S3VuZGUgYmVyZWl0cyBkZXIgUmVzc291cmNlIHswfSBhbHMgU3RhbmRhcmQgZsO8ciB7MX0gYmlzIHsyfSB6dWdld2llc2VuIC0gWnVvcmRudW5nIGVudGZlcm5lbiB1bmQgZGVyIGFrdHVlbGxlbiBSZXNzb3VyY2UgenV3ZWlzZW4/'>
 <source>Kunde bereits der Ressource {0} als Standard für {1} bis {2} zugewiesen - Zuordnung entfernen und der aktuellen Ressource zuweisen?</source>
-<target>Customer already assigned to resource {0} as default for {1} to {2} - Remove assignment and assign to current resource?</target>
-</trans-unit>
-<trans-unit id='S3VuZGVu'>
-<source>Kunden</source>
-<target>Customers</target>
+<target>Client already assigned to resource {0} as default for {1} to {2} - Remove assignment and assign to current resource?</target>
 </trans-unit>
 <trans-unit id='U3RhbmRhcmRrdW5kZQ=='>
 <source>Standardkunde</source>
-<target>Default customer</target>
+<target>Default client</target>
 </trans-unit>
 <trans-unit id='SW1wb3J0YXJjaGl2IGhlcnVudGVybGFkZW4='>
     <source>Importarchiv herunterladen</source>
@@ -2863,6 +2942,185 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Info zum Term-Collection</source>
     <target>Term-Collection info</target>
 </trans-unit>
+<trans-unit id='U3RhbmRhcmRtw6Rzc2lnIGFrdGl2IGbDvHI='>
+    <source>Standardmässig aktiv für</source>
+    <target>Language Ressource used by default for</target>
+</trans-unit>
+<trans-unit id='RsO8ciBkaWVzZSBLdW5kZW4gbnV0emVu'>
+    <source>Für diese Kunden nutzen</source>
+    <target>Use for selected clients</target>
+</trans-unit>
+
+<trans-unit id='RmFjaGdlYmlldA=='>
+    <source>Fachgebiet</source>
+    <target>Subject field</target>
+</trans-unit>
+
+<trans-unit id='VmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Verwandtes Konzept</source>
+    <target>Related concept</target>
+</trans-unit>
+
+<trans-unit id='RXJ3ZWl0ZXJ0ZXMgdmVyd2FuZHRlcyBLb256ZXB0'>
+    <source>Erweitertes verwandtes Konzept</source>
+    <target>Related broader concept</target>
+</trans-unit>
+
+<trans-unit id='UHJvZHVrdC1VbnRlcm1lbmdl'>
+    <source>Produkt-Untermenge</source>
+    <target>Product subset</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlbmlkZW50aWZpa2F0b3I='>
+    <source>Quellenidentifikator</source>
+    <target>Source identifier</target>
+</trans-unit>
+
+<trans-unit id='V29ydGFydA=='>
+    <source>Wortart</source>
+    <target>Part of speech</target>
+</trans-unit>
+
+<trans-unit id='S29udGV4dA=='>
+    <source>Kontext</source>
+    <target>Context</target>
+</trans-unit>
+
+<trans-unit id='VGVpbGJlcmVpY2ggZGVyIEdlc2Now6RmdHNlaW5oZWl0'>
+    <source>Teilbereich der Geschäftseinheit</source>
+    <target>Business unit subset</target>
+</trans-unit>
+
+<trans-unit id='UHJvamVrdHVudGVybWVuZ2U='>
+    <source>Projektuntermenge</source>
+    <target>Project subset</target>
+</trans-unit>
+
+<trans-unit id='R3JhbW1hdGlrYWxpc2NoZXMgR2VzY2hsZWNodA=='>
+    <source>Grammatikalisches Geschlecht</source>
+    <target>Grammatical gender</target>
+</trans-unit>
+
+<trans-unit id='QW5tZXJrdW5n'>
+    <source>Anmerkung</source>
+    <target>Note</target>
+</trans-unit>
+
+<trans-unit id='QWRtaW5pc3RyYXRpdmVyIFN0YXR1cw=='>
+    <source>Administrativer Status</source>
+    <target>Administrative status</target>
+</trans-unit>
+
+<trans-unit id='w5xiZXJ0cmFndW5nc2tvbW1lbnRhcg=='>
+    <source>Übertragungskommentar</source>
+    <target>Transfer comment</target>
+</trans-unit>
+
+<trans-unit id='UXVlbGxlIGRlcyBFaW50cmFncw=='>
+    <source>Quelle des Eintrags</source>
+    <target>Entry source</target>
+</trans-unit>
+
+<trans-unit id='U29sbHRlIGRlciBUYXNrIGdlbMO2c2NodCBvZGVyIG1pdCBkZW4gYWt0dWVsbGVuIEVpbnN0ZWxsdW5nZW4gaW1wb3J0aWVydCB3ZXJkZW4/'>
+    <source>Sollte der Task gelöscht oder mit den aktuellen Einstellungen importiert werden?</source>
+    <target>Should the task be deleted or imported with the current settings?</target>
+</trans-unit>
+
+<trans-unit id='QXVmZ2FiZSBsw7ZzY2hlbg=='>
+    <source>Aufgabe löschen</source>
+    <target>Delete task</target>
+</trans-unit>
+
+<trans-unit id='UmVzc291cmNlOiB7bmFtZX0='>
+    <source>Ressource: {name}</source>
+    <target>Ressource: {name}</target>
+</trans-unit>
+
+<trans-unit id='QXVmZ2FiZSBpbXBvcnRpZXJlbg=='>
+    <source>Aufgabe importieren</source>
+    <target>Import task</target>
+</trans-unit>
+
+<trans-unit id='VW50ZXJzY2hpZWQgenUgUXVlbGxzZWdtZW50'>
+    <source>Unterschied zu Quellsegment</source>
+    <target>Diff to source</target>
+</trans-unit>
+
+<trans-unit id='RGllc2UgUmVzc291cmNlIHdpcmQgZW50ZmVybnQ='>
+    <source>Diese Ressource wird entfernt</source>
+    <target>This resource is removed</target>
+</trans-unit>
+
+<trans-unit id='V2llZGVyaG9sdW5nIG51ciBhdXRvbWF0aXNjaCBlcnNldHplbiBiencuIEVyc2V0enVuZyBkZXIgV2llZGVyaG9sdW5nIHZvcnNjaGxhZ2VuLCB3ZW5uIFppZWwgbGVlciBpc3Q='>
+    <source>Wiederholung nur automatisch ersetzen bzw. Ersetzung der Wiederholung vorschlagen, wenn Ziel leer ist</source>
+    <target>Only replace repetition automatically / propose replacement of repetition, if target is empty</target>
+</trans-unit>
+
+<trans-unit id='VHJlZmZlcmFuYWx5c2U='>
+    <source>Trefferanalyse</source>
+    <target>Match-Analysis</target>
+</trans-unit>
+
+<trans-unit id='VGVybUNvbGxlY3Rpb24gVHJlZmZlciAoMTA0JSk='>
+    <source>TermCollection Treffer (104%)</source>
+    <target>TermCollection Match (104%)</target>
+</trans-unit>
+
+<trans-unit id='S29udGV4dCBUcmVmZmVyICgxMDMlKQ=='>
+    <source>Kontext Treffer (103%)</source>
+    <target>Kontext Match (103%)</target>
+</trans-unit>
+
+<trans-unit id='V2llZGVyaG9sdW5nICgxMDIlKQ=='>
+    <source>Wiederholung (102%)</source>
+    <target>Repetition (102%)</target>
+</trans-unit>
+
+<trans-unit id='RXhhY3QtZXhhY3QgVHJlZmZlciAoMTAxJSk='>
+    <source>Exact-exact Treffer (101%)</source>
+    <target>Exact-exact Match (101%)</target>
+</trans-unit>
+
+<trans-unit id='U3VtbWUgV8O2cnRlcg=='>
+    <source>Summe Wörter</source>
+    <target>Sum words</target>
+</trans-unit>
+
+<trans-unit id='VHJlZmZlciBSYXRl'>
+    <source>Treffer Rate</source>
+    <target>Match Rate</target>
+</trans-unit>
+
+<trans-unit id='SW50ZXJuZXIgRnV6enkgYWt0aXY='>
+    <source>Interner Fuzzy aktiv</source>
+    <target>Internal fuzzy active</target>
+</trans-unit>
+
+<trans-unit id='RXJzdGVsbHVuZ3NkYXR1bQ=='>
+    <source>Erstellungsdatum</source>
+    <target>Creation date</target>
+</trans-unit>
+
+<trans-unit id='QXV0b8O8YmVyc2V0enQ='>
+  <source>Autoübersetzt</source>
+  <target>Auto-translated</target>
+</trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS1hcHBz'>
+    <source>translate5-apps</source>
+    <target>translate5-apps</target>
+</trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS1pbnN0YW50dHJhbnNsYXRl'>
+    <source>translate5-instanttranslate</source>
+    <target>Instant-Translate</target>
+</trans-unit>
+
+<trans-unit id='dHJhbnNsYXRlNS10ZXJtcG9ydGFs'>
+    <source>translate5-termportal</source>
+    <target>Terminologieportal</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>

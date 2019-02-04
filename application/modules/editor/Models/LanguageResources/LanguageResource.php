@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
  * @method string getServiceName() getServiceName()
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getSpecificData() getSpecificData()
- * @method void setSpecificData() setSpecificData(string $specificData)
+ * @method void setSpecificData() setSpecificData(string $value)
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
  * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(integer $autoCreatedOnImport)
  * @method string getResourceType() getResourceType()
@@ -94,9 +94,17 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function loadAllByServices(){
         $services=ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $services editor_Services_Manager */
-        $allservices=$services->getAll();
+        
+        //get all service types from the available resources
+        $resources=$services->getAllResources();
+        $allservices=[];
+        foreach ($resources as $resource) {
+            /* @var $resource editor_Models_LanguageResources_Resource */
+            $allservices[]=$resource->getServiceType();
+        }
+        $allservices=array_unique($allservices);
         $s=$this->db->select()
-        ->where('serviceType IN(?)',$allservices);
+        ->where('LEK_languageresources.serviceType IN(?)',$allservices);
         return $this->loadFilterdCustom($s);
     }
     
@@ -114,14 +122,13 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         //get all available tm resources
         foreach($resources as $resource) {
             /* @var $resource editor_Models_LanguageResources_Resource */
-            if($resource->getType()==editor_Models_Segment_MatchRateType::TYPE_MT && !in_array($resource->getService(), $mtRes)){
+            if(!in_array($resource->getService(), $mtRes)){
                 $mtRes[]=$resource->getService();
             }
         }
         
         //filter assoc resources by mt
         $engines=$this->loadByUserCustomerAssocs($mtRes);
-        
         //check if results are found
         if(empty($engines)){
             return $engines;
@@ -138,12 +145,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * Load all resources associated customers of a user
      * 
      * @param array $serviceNames: add service name as filter
-     * @param string $sourceLang: add source language as filter
-     * @param string $targetLang: add target language as filter
+     * @param array $sourceLang: add source languages as filter
+     * @param array $targetLang: add target languages as filter
      * 
      * @return array|array
      */
-    public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=null,$targetLang=null){
+    public function loadByUserCustomerAssocs($serviceNames=array(),$sourceLang=array(),$targetLang=array()){
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();
@@ -161,15 +168,15 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
                 $s->where('tm.serviceName IN(?)',$serviceNames);
             }
             
-            if($sourceLang){
-                $s->where('l.sourceLang=?',$sourceLang);
+            if(!empty($sourceLang)){
+                $s->where('l.sourceLang IN(?)',$sourceLang);
             }
             
-            if($targetLang){
-                $s->where('l.targetLang=?',$targetLang);
+            if(!empty($targetLang)){
+                $s->where('l.targetLang IN(?)',$targetLang);
             }
-            $s->group('tm.id');
-            return $this->db->fetchAll($s)->toArray();
+            $resutl=$this->db->fetchAll($s)->toArray();
+            return $this->mergeLanguages($resutl);
             
         }
         return [];
@@ -204,29 +211,35 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /**
-     * loads the ids, names and additional information of all TMs for the given serviceName
-     * @param string $serviceName
+     * loads the task to languageResource assocs by list of taskGuids and resourceTypes
+     * @param array $taskGuid
+     * @param array $resourceTypes
      * @return array
      */
-    public function loadByServiceName(string $serviceName) {
-        $db = $this->db;
-        $s = $db->select()
-            ->from($db->info($db::NAME), ['id','name','specificData'])
-            ->where('LEK_languageresources.serviceName LIKE ?', $serviceName);
-        return $this->db->fetchAll($s)->toArray(); 
+    public function loadByAssociatedTaskGuidListAndResourcesType(array $taskGuidList,array $resourceTypes) {
+        if(empty($taskGuidList)){
+            return $taskGuidList;
+        }
+        $assocDb = new editor_Models_Db_Taskassoc();
+        $tableName=$this->db->info($assocDb::NAME);
+        $assocName = $assocDb->info($assocDb::NAME);
+        $s = $this->db->select()
+        ->from($this->db, array('*',$assocName.'.taskGuid', $assocName.'.segmentsUpdateable'))
+        ->setIntegrityCheck(false)
+        ->join($assocName, $assocName.'.`languageResourceId` = '.$tableName.'.`id`', '')
+        ->where($assocName.'.`taskGuid` IN (?)', $taskGuidList)
+        ->where($tableName.'.resourceType IN(?)',$resourceTypes);
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /**
-     * loads the ids and names of all TMs for the given name
-     * @param string $name
+     * loads the language resources to a specific service resource ID (language resource to a specific server (=resource))
+     * @param string $serviceResourceId
      * @return array
      */
-    public function loadByName(string $name) {
-        $db = $this->db;
-        $s = $db->select()
-        ->from($db->info($db::NAME), ['id','name'])
-        ->where('LEK_languageresources.name LIKE ?', $name);
-        return $this->db->fetchAll($s)->toArray();
+    public function loadByResourceId(string $serviceResourceId) {
+        $s = $this->db->select()->where('resourceId = ?', $serviceResourceId);
+        return $this->db->fetchAll($s)->toArray(); 
     }
     
     /**
@@ -358,21 +371,40 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /***
-     * Get property value from the specific data json text
+     * Get specificData field value. The returned value will be json decoded.
+     * If $propertyName is provided, only the value for this field will be returned if exisit.
      * @param string $propertyName
      * @return mixed|NULL
      */
-    public function getSpecificDataByProperty($propertyName){
-        $specificData=$this->getSpecificData();
-        //try to decode the data, and set the domainCode if exist
-        if(!empty($specificData)){
-            try {
-                $specificData=json_decode($specificData);
-                return $specificData->$propertyName;
-            } catch (Exception $e) {
+    public function getSpecificData($propertyName=null){
+        $specificData=$this->__call('getSpecificData', array());
+        
+        if(empty($specificData)){
+            return null;
+        }
+        //try to decode the data
+        try {
+            $specificData=json_decode($specificData);
+            
+            //return the property name value if exist
+            if(isset($propertyName)){
+                return isset($specificData->$propertyName) ? $specificData->$propertyName : null;
             }
+            return $specificData;
+        } catch (Exception $e) {
+            
         }
         return null;
+    }
+    
+    /***
+     * Set the specificData field. The given value will be json encoded.
+     * @param string $value
+     */
+    public function setSpecificData($value){
+        $this->__call('setSpecificData', array(
+            json_encode($value)
+        ));
     }
     
     /***
@@ -384,20 +416,63 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     public function addSpecificData($propertyName,$value) {
         $specificData=$this->getSpecificData();
         if(empty($specificData)){
-            $this->setSpecificData(json_encode(array($propertyName=>$value)));
+            $this->setSpecificData(array($propertyName=>$value));
             return true;
-        }
-        
-        //try to decude the database json
-        try {
-            $specificData=json_decode($specificData);
-        } catch (Exception $e) {
-            //it is invalide json
-            $specificData=new stdClass();
         }
         //set the property name into the specific data
         $specificData->$propertyName=$value;
-        $this->setSpecificData(json_encode($specificData));
+        $this->setSpecificData($specificData);
         return true;
+    }
+    
+    /***
+     * Merge the group the languages by language resource. In the return array for each language resource, all available languages ids and 
+     * rfc language values will be in separate array.
+     * NOTE: the function is used to merge the languages from ungrouped results from "loadByUserCustomerAssocs" function.
+     * 
+     * @param array $languageResources
+     * @return array
+     */
+    private function mergeLanguages(array $languageResources){
+        
+        $resIndex=array();
+        foreach ($languageResources as $key=>$res) {
+            $removeMeAfter=true;
+            if(!isset($resIndex[$res['id']])){
+                //save the index of the language resource
+                $resIndex[$res['id']]=$key;
+                
+                //init the language resource languages array, and save the first language
+                $languageResources[$key]['sourceLang']=[];
+                $languageResources[$key]['sourceLangRfc5646']=[];
+                $languageResources[$key]['sourceLang'][]=$res['sourceLang'];
+                $languageResources[$key]['sourceLangRfc5646'][]=$res['sourceLangRfc5646'];
+                
+                $languageResources[$key]['targetLang']=[];
+                $languageResources[$key]['targetLangRfc5646']=[];
+                $languageResources[$key]['targetLang'][]=$res['targetLang'];
+                $languageResources[$key]['targetLangRfc5646'][]=$res['targetLangRfc5646'];
+                
+                $removeMeAfter=false;
+            }
+            
+            //check if the language allready exist for the language resource
+            if(!in_array($res['sourceLang'], $languageResources[$resIndex[$res['id']]]['sourceLang'])){
+                $languageResources[$resIndex[$res['id']]]['sourceLang'][]=$res['sourceLang'];
+                $languageResources[$resIndex[$res['id']]]['sourceLangRfc5646'][]=$res['sourceLangRfc5646'];
+            }
+            if(!in_array($res['targetLang'], $languageResources[$resIndex[$res['id']]]['targetLang'])){
+                $languageResources[$resIndex[$res['id']]]['targetLang'][]=$res['targetLang'];
+                $languageResources[$resIndex[$res['id']]]['targetLangRfc5646'][]=$res['targetLangRfc5646'];
+            }
+            
+            //remove the result from the array
+            //the only valid result is in $resIndex[$res['id']]
+            if($removeMeAfter){
+                unset($languageResources[$key]);
+            }
+        }
+        //re-index the array
+        return array_values($languageResources);
     }
 }

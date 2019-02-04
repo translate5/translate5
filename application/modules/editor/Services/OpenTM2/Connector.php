@@ -49,14 +49,30 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public $fileNameCache=array();
     
     
+    /***
+     * Unsupported unicode characters by opentm2 and their replace mapping
+     * @var array
+     */
+    protected $replaceMap=array(
+        '&#x1E;'=>'___tag___INFORMATION SEPARATOR TWO___tag___',
+        '&#x8;'=>'___tag___backspace___tag___',
+    );
+    
+    /**
+     * @var editor_Models_Import_FileParser_XmlParser
+     */
+    protected $xmlparser;
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
+        parent::connectTo($languageResource, $sourceLang, $targetLang);
         $class = 'editor_Services_OpenTM2_HttpApi';
         $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+        $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $parser editor_Models_Import_FileParser_XmlParser */
     }
     
     /**
@@ -64,7 +80,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::open()
      */
     public function open() {
-        //This call is not necessary, since TMs are opened automatically.
+        //This call is not necessary, since this resource is opened automatically.
     }
     
     /**
@@ -72,11 +88,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::open()
      */
     public function close() {
-    /*
-     * This call deactivated, since openTM2 has a access time based garbage collection
-     * If we close a TM and another Task still uses this TM this bad for performance,
-     *  since the next request to the TM has to reopen it
-     */
+        //This call is not necessary, since this resource is closed automatically.
     }
     
     /**
@@ -115,8 +127,12 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return false;
         }
         
+        //replace the unsupported unicodes
+        $data=file_get_contents($fileinfo['tmp_name']);
+        $data=$this->replaceUnicodes($data);
+        
         //initial upload is a TM file
-        if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
+        if($this->api->createMemory($name, $sourceLang, $data)){
             $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
             return true;
         }
@@ -131,7 +147,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
-        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
+        $data=file_get_contents($fileinfo['tmp_name']);
+        $data=$this->replaceUnicodes($data);
+        if($this->api->importMemory($data)) {
             return true;
         }
         $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." LanguageResource: \n");
@@ -161,9 +179,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     public function update(editor_Models_Segment $segment) {
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
         $messages = Zend_Registry::get('rest_messages');
         /* @var $messages ZfExtended_Models_Messages */
         
@@ -175,12 +190,16 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         /* @var $trackChange editor_Models_Segment_TrackChangeTag */
         
         $source= $trackChange->removeTrackChanges($this->getQueryString($segment));
-        
-        $source = $internalTag->toXliffPaired($source);
+        //restore the whitespaces to real characters
+        $source = $this->internalTag->restore($source, true);
+        $source = $this->whitespaceHelper->unprotectWhitespace($source);
+        $source = $this->internalTag->toXliffPaired($source);
         
         $target= $trackChange->removeTrackChanges($segment->getTargetEdit());
-        
-        $target = $internalTag->toXliffPaired($target);
+        //restore the whitespaces to real characters
+        $target = $this->internalTag->restore($target, true);
+        $target = $this->whitespaceHelper->unprotectWhitespace($target);
+        $target = $this->internalTag->toXliffPaired($target);
         
         if($this->api->update($source, $target, $segment, $file->getFileName())) {
             $messages->addNotice('Segment im TM aktualisiert!');
@@ -229,14 +248,25 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         // we have to set the default source here to fill the be added internal tags 
         $this->resultList->setDefaultSource($queryString);
         
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
+        $queryString = $this->restoreWhitespaceForQuery($queryString);
         
-        //$map is returned by reference
-        $queryString = $internalTag->toXliffPaired($queryString, true, $map);
+        //$map is set by reference
+        $map = [];
+        $queryString = $this->internalTag->toXliffPaired($queryString, true, $map);
         $mapCount = count($map);
         
-        if($this->api->lookup($segment, $queryString, $fileName)){
+        //we have to use the XML parser to restore whitespace, otherwise protectWhitespace would destroy the tags
+        $xmlParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlParser editor_Models_Import_FileParser_XmlParser */
+        
+        $this->shortTagIdent = $mapCount + 1;
+        $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
+            $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true); 
+            $textNode = $this->whitespaceTagReplacer($textNode);
+            $xmlParser->replaceChunk($key, $textNode);
+        });
+        
+        if($this->api->lookup($segment,$queryString, $fileName)){
             $result = $this->api->getResult();
             if((int)$result->NumOfFoundProposals === 0){
                 return $this->resultList; 
@@ -245,18 +275,21 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 if(!$this->validateInternalTags($found, $segment)) {
                     continue;
                 }
-                $target = $internalTag->reapply2dMap($found->target, $map);
+                //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied, 
+                // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
+                $target = $xmlParser->parse($found->target);
+                $target = $this->internalTag->reapply2dMap($target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
-                
-                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found), $segment, $fileName);
-                
+                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
                 $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
-                
-                $source = $internalTag->reapply2dMap($found->source, $map);
+
+                //about whitespace see target
+                $source = $xmlParser->parse($found->source);
+                $source = $this->internalTag->reapply2dMap($source, $map);
                 $source = $this->replaceAdditionalTags($source, $mapCount);
                 $this->resultList->setSource($source);
             }
-            return $this->resultList; 
+            return $this->getResultListGrouped();
         }
         $this->throwBadGateway();
     }
@@ -290,18 +323,37 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     protected function validateInternalTags($result, editor_Models_Segment $seg) {
         //just concat source and target to check both:
         if(preg_match('#<(it|ph)[^>]*>#', $result->source.$result->target)) {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $sub = 'OpenTM2 result contains <it> or <ph> tags! Segment not shown as match result!';
-            $msg = 'The <ph> or <it> tag could not be reconverted to a usable tag, so that match result was ignored! '."\n\n";
-            $msg .= 'OpenTM2 Result: '.print_r($result,1)."\n";
-            $msg .= 'Segment: '.print_r($seg->getDataObject(),1)."\n";
-            $msg .= 'LanguageResource: '.print_r($this->languageResource->getDataObject(),1)."\n";
-            $log->log($sub,$msg);
-            return false;
+            $result->source=$this->replaceItAndPhTags($result->source);
+            $result->target=$this->replaceItAndPhTags($result->target);
         }
         return true;
     }
+    
+    /***
+     * Replace it and ph tags with empty content
+     * @param string $content
+     * @param string $replace: the replace content of the chunk
+     * @return string
+     */
+    protected function replaceItAndPhTags($content,$replace=''){
+        //surround the content with tmp tags(used later as selectors)
+        $content='<opentm2result>'.$content.'</opentm2result>';
+        
+        
+        $this->xmlparser->registerElement('opentm2result > it,opentm2result > ph',null, function($tag, $key, $opener) use($replace){
+            $this->xmlparser->replaceChunk($opener['openerKey'],$replace,$opener['isSingle'] ? 1 : $key-$opener['openerKey']);
+        });
+        //parse the content
+        $content=$this->xmlparser->parse($content);
+        
+        //remove the helper tags
+        $content=strtr($content,array(
+            '<opentm2result>'=>'',
+            '</opentm2result>'=>''
+        ));
+        return $content;
+    }
+    
     
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
@@ -369,6 +421,54 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->throwBadGateway();
     }
     
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
+        //return empty result when no search string
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
+        
+        $this->resultList->setDefaultSource($searchString);
+        
+        //$map is returned by reference
+        $searchString = $this->internalTag->toXliffPaired($searchString, true, $map);
+        $mapCount = count($map);
+        
+        //create dummy segment so we can use the lookup
+        $dummySegment=ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $dummySegment editor_Models_Segment */
+        $dummySegment->init();
+        
+        if($this->api->lookup($dummySegment,$searchString, 'source')){
+            $result = $this->api->getResult();
+            if((int)$result->NumOfFoundProposals === 0){
+                return $this->resultList;
+            }
+            foreach($result->results as $found) {
+                if(!$this->validateInternalTags($found, $dummySegment)) {
+                    continue;
+                }
+                $target = $this->internalTag->reapply2dMap($found->target, $map);
+                $target = $this->replaceAdditionalTags($target, $mapCount);
+                
+                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$dummySegment,'InstantTranslate');
+                
+                $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                
+                $source = $this->internalTag->reapply2dMap($found->source, $map);
+                $source = $this->replaceAdditionalTags($source, $mapCount);
+                $this->resultList->setSource($source);
+            }
+            return $this->resultList;
+        }
+        $this->throwBadGateway();
+    }
+    
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_FilebasedAbstract::delete()
@@ -430,7 +530,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        $name = $this->languageResource->getSpecificDataByProperty('fileName');
+        $name = $this->languageResource->getSpecificData('fileName');
         if(empty($name)) {
             $moreInfo = 'The internal stored filename is invalid';
             return self::STATUS_NOCONNECTION;
@@ -463,6 +563,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return self::STATUS_UNKNOWN;
         }
         
+        //Warning: this evaluates to "available" in the GUI, see the following explanation:
         //a 404 response from the status call means: 
         // - OpenTM2 is online
         // - the requested TM is currently not loaded, so there is no info about the existence
@@ -525,32 +626,128 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /***
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
      * The fuzzy languageResource name format is: oldname+Fuzzy-Analysis
+     * @param integer $analysisId
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */
-    public function initFuzzyAnalysis() {
+    public function initForFuzzyAnalysis($analysisId) {
+        $suffix = '-fuzzy-'.$analysisId;
         $mime="TM";
-
+        $this->isInternalFuzzy = true;
         $validExportTypes = $this->getValidFiletypes();
         
         if(empty($validExportTypes[$mime])){
             throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
         }
         $data = $this->getTm($validExportTypes[$mime]);
-        $memoryName=$this->languageResource->getName().'-Fuzzy-Analysis';
-        $this->api->createMemory($memoryName, $this->languageResource->getSourceLangRfc5646(), $data);
         
-        $fuzzyLanguageResource=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        $fuzzyName = $this->languageResource->getSpecificData('fileName').$suffix;
+        $this->api->createMemory($fuzzyName, $this->languageResource->getSourceLangRfc5646(), $data);
+        
+        $fuzzyLanguageResource = clone $this->languageResource;
         /* @var $fuzzyLanguageResource editor_Models_LanguageResources_LanguageResource  */
         
-        $fuzzyLanguageResource=clone $this->languageResource;
-        
-        $fuzzyLanguageResource->setName($memoryName);
-        $fuzzyLanguageResource->addSpecificData('fileName',$memoryName);
+        //visualized name:
+        $fuzzyLanguageResource->setName($this->languageResource->getName().$suffix);
+        $fuzzyLanguageResource->addSpecificData('fileName', $fuzzyName);
         $fuzzyLanguageResource->setId(null);
         
-        $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $serviceManager editor_Services_Manager */
-        return $serviceManager->getConnector($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());;
+        $connector = ZfExtended_Factory::get(get_class($this));
+        /* @var $connector editor_Services_Connector */
+        $connector->connectTo($fuzzyLanguageResource,$this->languageResource->getSourceLang(),$this->languageResource->getTargetLang());
+        $connector->isInternalFuzzy = true;
+        return $connector;
+    }
+    
+    /***
+     * Get the result list where the >=100 matches with the same target are grouped as 1 match.
+     * @return editor_Services_ServiceResult|number
+     */
+    public function getResultListGrouped() {
+        $allResults=$this->resultList->getResult();
+        if(empty($allResults)){
+            return $this->resultList;
+        }
+        
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $showMultiple100PercentMatches = $config->runtimeOptions->LanguageResources->opentm2->showMultiple100PercentMatches;
+        
+        $other=array();
+        $differentTargetResult=array();
+        $document=array();
+        $target=null;
+        $resultlist=$this->resultList;
+        //filter and collect the results
+        //all 100>= matches with same target will be collected
+        //all <100 mathes will be collected
+        //all documentName and documentShortName will be collected from matches >=100
+        $filterArray = array_filter($allResults, function ($var) use(&$other,&$document,&$target,&$differentTargetResult,$resultlist,$showMultiple100PercentMatches) {
+            //collect lower then 100 matches to separate array
+            if($var->matchrate<100){
+                $other[]=$var;
+                return false;
+            }
+            //set the compare target
+            if(!isset($target)){
+                $target=$var->target;
+            }
+            
+            //is with same target or show multiple id disabled collect >=100 match for later sorting
+            if($var->target==$target || !$showMultiple100PercentMatches){
+                $document[]=array(
+                    'documentName'=>$resultlist->getMetaValue($var->metaData, 'documentName'),
+                    'documentShortName'=>$resultlist->getMetaValue($var->metaData, 'documentShortName'),
+                );
+                return true;
+            }
+            //collect different target result 
+            $differentTargetResult[]=$var;
+            return false;
+        });
+        
+        //sort by highes matchrate from the >=100 match results, when same matchrate sort by timestamp
+        usort($filterArray,function($item1,$item2) use($resultlist){
+            if ($item1->matchrate == $item2->matchrate){
+                return date($resultlist->getMetaValue($item1->metaData, 'timestamp'))<date($resultlist->getMetaValue($item2->metaData, 'timestamp')) ? 1 : -1;
+            }
+            return ($item1->matchrate < $item2->matchrate) ? 1 : -1;
+        });
+        
+        if(!empty($filterArray)){
+            //get the highest >=100 match, and apply the documentName and documentShrotName from all >=100 matches
+            $filterArray=$filterArray[0];
+            foreach ($filterArray->metaData as $md) {
+                if($md->name=='documentName'){
+                    $md->value=implode(';',array_column($document, 'documentName'));
+                }
+                if($md->name=='documentShortName'){
+                    $md->value=implode(';',array_column($document, 'documentShortName'));
+                }
+            }
+        }
+
+        //if it is single result, init it as array
+        if(!is_array($filterArray)){
+            $filterArray=[$filterArray];
+        }
+        
+        //merge all available results
+        $result=array_merge($filterArray,$differentTargetResult);
+        $result=array_merge($result,$other);
+        
+        $this->resultList->resetResult();
+        $this->resultList->setResults($result);
+        return $this->resultList;
+    }
+    
+    /***
+     * Replace unsupported unicodes in the given text with there defined replacement
+     * @param string $data: tbx file content
+     * @return string
+     */
+    protected function replaceUnicodes($data){
+        return strtr($data,$this->replaceMap);
+        
     }
 }

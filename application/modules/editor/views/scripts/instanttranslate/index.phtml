@@ -28,36 +28,42 @@
 ?>
 
 <?php
-    // Which languages are available according to the MachineTranslation-Engines?
-    // (The result might add translations from resources with more langauges, e.g. TermCollections,
-    //  but their language-combinations are not taken into account here.)
-    $machineTranslationEngines = $this->machineTranslationEngines;
-    $mtSourceLanguageLocales = array();
-    $mtTargetLanguageLocales = array();
+    // Which languages are available according to the LanguageResources?
+    // (We only the need the single lists here, not in which combination they work.)
+    // In order to save time we use this loop to calculate the characterLimit, too.
+    $allCharacterLimits = array();
+    $allSourceLanguageLocales = array();
+    $allTargetLanguageLocales = array();
     
-    $rfcToIsoMap=array();
-    
-    foreach ($machineTranslationEngines as $mtEngine) {
-        $mtSourceLocale = $mtEngine['source'];
-        $mtTargetLocale = $mtEngine['target'];
-        
-        if(!isset($rfcToIsoMap[$mtSourceLocale])){
-            $rfcToIsoMap[$mtSourceLocale]=$mtEngine['sourceIso'];
+    foreach ($this->machineTranslationEngines as $languageResource) {
+        $allCharacterLimits[] = $languageResource['characterLimit'];
+        foreach ($languageResource['source'] as $sourceLocale) {
+            //are the sublanguages used as dropdown selections
+            $useLanguage=strpos($sourceLocale, '-') === false || $this->showSublanguages;
+            if (!in_array($sourceLocale, $allSourceLanguageLocales) && $useLanguage) {
+                $allSourceLanguageLocales[] = $sourceLocale;
+            }
         }
-        
-        if(!isset($rfcToIsoMap[$mtTargetLocale])){
-            $rfcToIsoMap[$mtTargetLocale]=$mtEngine['targetIso'];
-        }
-        
-        if (!in_array($mtSourceLocale, $mtSourceLanguageLocales)) {
-            $mtSourceLanguageLocales[] = $mtSourceLocale;
-        }
-        if (!in_array($mtTargetLocale, $mtTargetLanguageLocales)) {
-            $mtTargetLanguageLocales[] = $mtTargetLocale;
+        foreach ($languageResource['target']as $key => $targetLocale) {
+            //are the sublanguages used as dropdown selections
+            $useLanguage=strpos($targetLocale, '-') === false || $this->showSublanguages;
+            if (!in_array($targetLocale, $allTargetLanguageLocales) && $useLanguage) {
+                $allTargetLanguageLocales[] = $targetLocale;
+            }
         }
     }
-    sort($mtSourceLanguageLocales);
-    sort($mtTargetLanguageLocales);
+    sort($allSourceLanguageLocales);
+    sort($allTargetLanguageLocales);
+    
+    // the lowest number of characters that any of the LanguageResources can handle 
+    // is our limit for what the user is allowed to enter:
+    if(empty($allCharacterLimits)) {
+        $characterLimit = 3;
+    }
+    else {
+        $characterLimit = min($allCharacterLimits);
+    }
+    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
 ?>
 
 <div class="loadingSpinnerLayer"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
@@ -65,12 +71,49 @@
 <div id="containerHeader" class="container">
     <div id="logo"></div>
 <?php 
+
+    $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+    /* @var $userModel ZfExtended_Models_User */
+    $isUserAllowed=$userModel->isAllowed("editor_termportal","all");
+    
+    //check if the user is allowed to acces the term portal
+    if($isUserAllowed){
+        echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("Terminologieportal").'</a></div>';
+    }else{
+        echo '<div id="termPortalButtonContainer"></div>';
+    }
+    
     // see View_Helper_LanguageSelector
     $session = new Zend_Session_Namespace();
-    $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+    
     $availableTranslations = $translate->getAvailableTranslations();
     asort($availableTranslations);
     $languageSelector=[];
+    
+    //translated strings
+    $this->translations=array(
+        "clearText"                 => $translate->_("Text zurücksetzen"),
+        "copy"                      => $translate->_("Kopieren"),
+        "enterText"                 => $translate->_("Geben Sie Text ein"),
+        "serverErrorMsg500"         => $translate->_("Die Anfrage führte zu einem Fehler im angefragten Dienst."),
+        "noResultsFound"            => $translate->_("Es wurden keine Ergebnisse gefunden."),
+        "translate"                 => $translate->_("Übersetzen"),
+        "orTranslateFile"           => $translate->_("oder lassen Sie ein Dokument übersetzen"),
+        "orTranslateText"           => $translate->_("oder lassen Sie Text übersetzen, den Sie eingeben."),
+        "turnOffInstantTranslation" => $translate->_("Sofortübersetzung deaktivieren"),
+        "turnOnInstantTranslation"  => $translate->_("Sofortübersetzung aktivieren"),
+        "uploadFile"                => $translate->_("Laden Sie eine Datei hoch"),
+        "uploadFileNotFound"        => $translate->_("Bitte wählen Sie eine Datei aus."),
+        "pleaseChoose"              => $translate->_("Bitte auswählen"),
+        "clearBothLists"            => $translate->_("Beide Listen zurücksetzen"),
+        "showAllAvailableFor"       => $translate->_("Alle anzeigen für"),
+        "notAllowed"                => $translate->_("nicht erlaubt"),
+        "openInTermPortal"          => $translate->_("Term in Terminologie-Portal öffnen"),
+        "attentionFuzzyMatch"       => $translate->_("Achtung! FuzzyMatch ({0})"),
+        "differenceIsHighlighted"   => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben"),
+        "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung.")
+    );
+    $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
     
     $languageSelector[]='<form action="#" method="post" name="languageSelector" id="languageSelector">';
     $languageSelector[]='<select id="locale">';
@@ -82,7 +125,8 @@
     $languageSelector[]='</form>';
     echo implode(' ', $languageSelector);
 ?>
-    <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
+    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
+    
 </div>
 
 <div id="containerTranslation" class="container">
@@ -90,14 +134,9 @@
         <form id="sourceLanguageAndContent">
             <select id="sourceLocale" name="sourceLocale">
                 <?php
-                    $sourceLangLocalesFound = array();
-                    foreach ($mtSourceLanguageLocales as $sourceLangLocale) {
-                        $sourceLangLocalesFound[] = $sourceLangLocale;
-                    }
-                    sort($sourceLangLocalesFound);
                     $optionValues=[];
                     $optionValues[]='<option value="-">-</option>';
-                    foreach ($sourceLangLocalesFound as $sourceLangLocale) {
+                    foreach ($allSourceLanguageLocales as $sourceLangLocale) {
                         $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
@@ -119,14 +158,9 @@
         <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
                 <?php
-                    $targetLangLocalesFound = array();
-                    foreach ($mtTargetLanguageLocales as $targetLangLocale) {
-                        $targetLangLocalesFound[] = $targetLangLocale;
-                    }
-                    sort($targetLangLocalesFound);
                     $optionValues=[];
                     $optionValues[]='<option value="-">-</option>';
-                    foreach ($targetLangLocalesFound as $targetLangLocale) {
+                    foreach ($allTargetLanguageLocales as $targetLangLocale) {
                         $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
@@ -137,7 +171,7 @@
             <div id="instantTranslationIsOff" class="click-starts-translation instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOnInstantTranslation"];?></a></div>
             <div id="instantTranslationIsOn" class="instant-translation-toggle infotext"><a href="#"><?php echo $this->translations["turnOffInstantTranslation"];?></a></div>
         </form>
-        <div id="mtEngineSelectorError" class="instant-translation-error ui-state-error ui-corner-all"></div>
+        <div id="targetError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         <div class="loadingSpinnerIndicator"><img src="<?php echo $this->publicModulePath; ?>/images/loading-spinner.gif"/></div>
         <div id="translations">
             <!-- inject translations here  -->
@@ -146,16 +180,26 @@
 </div>
 
 <script type="text/javascript">
-    var mtSourceLanguageLocales = '<?php echo json_encode($mtSourceLanguageLocales);?>';
-    mtSourceLanguageLocales = JSON.parse(mtSourceLanguageLocales);
-    var mtTargetLanguageLocales = '<?php echo json_encode($mtTargetLanguageLocales);?>';
-    mtTargetLanguageLocales = JSON.parse(mtTargetLanguageLocales);
-    var machineTranslationEngines = '<?php echo json_encode($this->machineTranslationEngines);?>';
-    machineTranslationEngines = JSON.parse(machineTranslationEngines);
+    var allSourceLanguageLocales = '<?php echo json_encode($allSourceLanguageLocales);?>';
+    allSourceLanguageLocales = JSON.parse(allSourceLanguageLocales);
+    var allTargetLanguageLocales = '<?php echo json_encode($allTargetLanguageLocales);?>';
+    allTargetLanguageLocales = JSON.parse(allTargetLanguageLocales);
+    var allLanguageResources = '<?php echo json_encode($this->machineTranslationEngines);?>';
+    allLanguageResources = JSON.parse(allLanguageResources);
+    var characterLimit = '<?php echo $characterLimit;?>';
 </script>
 
 <script type="text/javascript">
 $( function() {
+    $('#logout a').mouseover(function(){
+        $(this).removeClass("ui-state-active");
+    });
+    $('#logout a').mouseout(function(){
+            $(this).addClass("ui-state-active");
+        });
+    $('#logout').on("click",function(){
+        window.location = Editor.data.loginUrl;
+    });
     $('#locale').selectmenu({
         change: function() {
             var action = $(this).val();
@@ -198,7 +242,7 @@ $( function() {
     } else {
         renderLocalesAsAvailable('reset');
     }
-    
+    $("#sourceText").attr('maxlength',characterLimit);
     clearAllErrorMessages();
     setFileTypesAllowedAndAvailable();
     setTextForSource();

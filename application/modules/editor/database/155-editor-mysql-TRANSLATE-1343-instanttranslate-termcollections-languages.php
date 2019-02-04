@@ -47,6 +47,37 @@ if(empty($this) || empty($argv) || $argc < 5 || $argc > 7) {
     die("please dont call the script direct! Call it by using DBUpdater!\n\n");
 }
 
+//check for terms with null term collection
+$db = Zend_Db_Table::getDefaultAdapter();
+$s=$db->select()->from('LEK_terms',array('id'))->where('collectionId IS NULL');
+$result=$db->fetchAll($s);
+if(!empty($result)){
+    $result=array_column($result, 'id');
+
+    //create the term collection which will hold the terms without termcollection
+    $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+    /* @var $collection editor_Models_TermCollection_TermCollection */
+    $collection->setName('Lost and Found Terms');
+    
+    $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+    /* @var $service editor_Services_TermCollection_Service */
+    $nsp=$service->getServiceNamespace();
+    $collection->setResourceId($nsp);
+    $collection->setServiceType($nsp);
+    $collection->setServiceName($service->getName());
+    $collection->setColor($service::DEFAULT_COLOR);
+    $resourceId=$collection->save();
+    
+    //add the terms to the new termcollection
+    $termDb=ZfExtended_Factory::get('editor_Models_Db_Terms');
+    /* @var $termDb editor_Models_Db_Terms */
+    $data = array(
+        'collectionId'      => $resourceId
+    );
+    $where = $termDb->getAdapter()->quoteInto('id IN(?)', $result);
+    $termDb->update($data, $where);
+}
+
 $model=ZfExtended_Factory::get('editor_Models_Term');
 /* @var $model editor_Models_Term */
 $model->updateAssocLanguages();

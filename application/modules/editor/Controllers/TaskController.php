@@ -97,8 +97,17 @@ class editor_TaskController extends ZfExtended_RestController {
      * @var Zend_Config
      */
     protected $config;
-
+    
     public function init() {
+        $this->_filterTypeMap = [
+            'customerId' => [
+                //'string' => new ZfExtended_Models_Filter_JoinHard('editor_Models_Db_Customer', 'name', 'id', 'customerId')
+                'string' => new ZfExtended_Models_Filter_Join('LEK_customer', 'name', 'id', 'customerId')
+            ]
+        ];
+        //set same join for sorting!
+        $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
+        
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $this->user = new Zend_Session_Namespace('user');
@@ -202,6 +211,8 @@ class editor_TaskController extends ZfExtended_RestController {
             array_push($taskassocs[$res['taskGuid']], $res);
         }
         
+        $customerData = $this->getCustomersForRendering($rows);
+        
         foreach ($rows as &$row) {
             $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
@@ -211,6 +222,8 @@ class editor_TaskController extends ZfExtended_RestController {
                 $row['qmSubEnabled'] = true;
             }
             unset($row['qmSubsegmentFlags']);
+            
+            $row['customerName'] = empty($customerData[$row['customerId']]) ? '' : $customerData[$row['customerId']];
             
             $this->addUserInfos($row, $row['taskGuid'], $userAssocInfos, $allAssocInfos);
             $row['fileCount'] = empty($fileCount[$row['taskGuid']]) ? 0 : $fileCount[$row['taskGuid']];
@@ -303,6 +316,30 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
+     * Returns a mapping of customerIds and Names to the given rows of tasks
+     * @param array $rows
+     * @return array
+     */
+    protected function getCustomersForRendering(array $rows) {
+        if(empty($rows)){
+           return [];
+        }
+        
+        $customerIds = array_map(function($item){
+            return $item['customerId'];
+        },$rows);
+
+        if(empty($customerIds)){
+            throw new ZfExtended_BadMethodCallException("No customers are found in the task list. The list of was: ".error_log(print_r($rows,1)));
+        }
+        
+        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $customerData = $customer->loadByIds($customerIds);
+        return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
+    }
+    
+    /**
      * creates a task and starts import of the uploaded task files 
      * (non-PHPdoc)
      * @see ZfExtended_RestController::postAction()
@@ -334,6 +371,11 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
+        if(empty($this->data['customerId'])){
+            $this->entity->setDefaultCustomerId();
+            $this->data['customerId'] = $this->entity->getCustomerId();
+        }
+        
         //init workflow id for the task
         $defaultWorkflow = $this->config->runtimeOptions->import->taskWorkflow;
         $this->entity->setWorkflow($this->workflowManager->getIdToClass($defaultWorkflow));
@@ -344,11 +386,43 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->processUploadedFile();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
+            
+            // Language resources that are assigned as default language resource for a client,
+            // are associated automatically with tasks for this client.
+            $this->addDefaultLanguageResources();
+            
             if($this->data['autoStartImport']) {
                 $this->startImportWorkers();
             }
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
+        }
+    }
+    
+    /**
+     * Assign language resources by default that are set as useAsDefault for the task's client
+     * (but only if the language combination matches).
+     */
+    protected function addDefaultLanguageResources() {
+        $customerAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        $allUseAsDefaultCustomers = $customerAssoc->loadByCustomerIdsDefault($this->data['customerId']);
+        if(empty($allUseAsDefaultCustomers)) {
+            return;
+        }
+        $languages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languages editor_Models_LanguageResources_Languages */
+        $taskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        foreach ($allUseAsDefaultCustomers as $defaultCustomer) {
+            $languageResourceId = $defaultCustomer['languageResourceId'];
+            if ($languages->isInCollection($this->entity->getSourceLang(),'sourceLang',$languageResourceId)
+                    && $languages->isInCollection($this->entity->getTargetLang(),'targetLang',$languageResourceId) ) {
+                        $taskAssoc->init();
+                        $taskAssoc->setLanguageResourceId($languageResourceId);
+                        $taskAssoc->setTaskGuid($this->entity->getTaskGuid());
+                        $taskAssoc->save();
+            }
         }
     }
     
@@ -443,6 +517,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['lockingUser']);
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();
+        editor_Models_LogRequest::create($this->entity->getTaskGuid());
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
         ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
@@ -484,6 +559,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->checkStateAllowsActions();
         
         $taskguid = $this->entity->getTaskGuid();
+        editor_Models_LogRequest::create($taskguid);
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
@@ -552,6 +628,22 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             unset($this->view->rows->qmSubsegmentFlags);
         }
+        
+        // Add pixelMapping-data for the fonts used in the task.
+        // We do this here to have it immediately available e.g. when opening segments.
+        $this->addPixelMapping();
+    }
+    
+    protected function addPixelMapping() {
+        $pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
+        /* @var $pixelMapping editor_Models_PixelMapping */
+        try {
+            $pixelMappingForTask = $pixelMapping->getPixelMappingForTask(intval($this->entity->getCustomerId()), $this->entity->getAllFontsInTask());
+        }
+        catch(ZfExtended_Exception $e) {
+            $pixelMappingForTask = [];
+        }
+        $this->view->rows->pixelMapping = $pixelMappingForTask;
     }
     
     /**
@@ -849,15 +941,21 @@ class editor_TaskController extends ZfExtended_RestController {
         $resultlist =$languageResourcemodel->loadByAssociatedTaskGuidList(array($taskguid));
         $this->view->rows->taskassocs = $resultlist;
         
+        // Add pixelMapping-data for the fonts used in the task.
+        // We do this here to have it immediately available e.g. when opening segments.
+        $this->addPixelMapping();
     }
     
     public function deleteAction() {
         $forced = $this->getParam('force', false) && $this->isAllowed('backend', 'taskForceDelete');
         $this->entityLoad();
         //if task is erroneous then it is also deleteable, regardless of its locking state
-        if(!$this->entity->isErroneous() && !$forced){
+        if(!$this->entity->isImporting() && !$this->entity->isErroneous() && !$forced){
             $this->entity->checkStateAllowsActions();
         }
+        //we enable task deletion for importing task
+        $forced=$forced || $this->entity->isImporting();
+        
         $this->processClientReferenceVersion();
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array($this->entity));
         /* @var $remover editor_Models_Task_Remover */
@@ -1031,6 +1129,7 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new BadMethodCallException('Only HTTP method POST allowed!');
         }
         $this->entityLoad();
+        editor_Models_LogRequest::create($this->entity->getTaskGuid());
         $this->initWorkflow($this->entity->getWorkflow());
         $this->view->trigger = $this->getParam('trigger');
         $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));

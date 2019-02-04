@@ -25,7 +25,16 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE `LEK_languages` ADD COLUMN `rtl` tinyint(1) DEFAULT 0 COMMENT 'defines if the language is a rtl language';
+
+DELIMITER ;;
+CREATE PROCEDURE ALTER_LANGUAGES()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR 1060 BEGIN END;
+    ALTER TABLE `LEK_languages` ADD COLUMN `rtl` tinyint(1) DEFAULT 0 COMMENT 'defines if the language is a rtl language';
+END;;
+DELIMITER ;
+CALL ALTER_LANGUAGES();
+DROP PROCEDURE ALTER_LANGUAGES;
 
 -- rtl languages are so far:
 -- ar      Arabic

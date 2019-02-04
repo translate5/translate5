@@ -59,6 +59,7 @@ class editor_Models_Import_FileParser_XmlParser {
     protected $handlerElementOpener = [];
     protected $handlerElementCloser = [];
     protected $handlerOther;
+    protected $handlerError;
     
     /**
      * if >0 disables the processing of the registered handlers
@@ -250,7 +251,7 @@ class editor_Models_Import_FileParser_XmlParser {
         $tag = $this->parseSelector($selector, $filter);
         if($tag === false) {
             //see parseSelector for possible selectors!
-            throw new ZfExtended_Exception('The given XLF tag selector could not be parsed: '.$selector);
+            throw new ZfExtended_Exception('The given XML tag selector could not be parsed: '.$selector);
         }
         if(!empty($opener)) {
             settype($this->handlerElementOpener[$tag], 'array');
@@ -270,6 +271,18 @@ class editor_Models_Import_FileParser_XmlParser {
      */
     public function registerOther(callable $handler = null) {
         $this->handlerOther = $handler;
+    }
+    
+    /**
+     * Registers a handler for XML structure errors. If no handler is registered, a exception is thrown instead 
+     * leave $handler empty to unregister it
+     * @param callable $handler Parameters: $currentOpener, $receivedTag, $currentKey
+     *                          Result: If handler returns false, the processing of the current end tag is stopped as there was no tag in the chunk
+     *                                  Otherwise the returned value is used as new current tag value. 
+     *                                  The returned value is NOT added to the chunklist automatically, this must be done by hand in the handler!
+     */
+    public function registerError(callable $handler = null) {
+        $this->handlerError = $handler;
     }
     
     /**
@@ -525,8 +538,16 @@ class editor_Models_Import_FileParser_XmlParser {
         $this->log("END#".$tag.'#');
         
         if($opener['tag'] !== $tag) {
-            //if you got here because of an XML error: use an external tool like xmllint to get more details!
-            throw new ZfExtended_Exception('Invalid XML: expected closing "'.$opener['tag'].'" tag, but got tag "'.$tag.'". Opening tag was: '.print_r($opener,1));
+            if(empty($this->handlerError)){
+                //if you got here because of an XML error: use an external tool like xmllint to get more details!
+                throw new ZfExtended_Exception('Invalid XML: expected closing "'.$opener['tag'].'" tag, but got tag "'.$tag.'". Opening tag was: '.print_r($opener,1));
+            }
+            else {
+                $tag = call_user_func($this->handlerError, $opener, $tag, $key);
+                if($tag === false) {
+                    return;
+                }
+            }
         }
         if(!empty($opener['disableUntilEndTag'])) {
             $this->disableHandlerCount--;

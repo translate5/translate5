@@ -109,12 +109,21 @@ class editor_Models_Import_MetaData {
                 'task' => $task, 'metaImporter' => $this
         ));
         
-        //Meta Data import from Core Features, currently XML for MQM: 
-        $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_QmSubsegments'));
+        //Meta Data import from Core Features, currently:
+        // - XML for MQM: 
+        $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_MetaData_QmSubsegments'));
+        // - PixelMapping:
+        $this->addImporter(ZfExtended_Factory::get('editor_Models_Import_MetaData_PixelMapping'));
         
-        foreach($this->importers as $importer) {
-            /* @var $import editor_Models_Import_IMetaDataImporter */
-            $importer->import($task, $this);
+        try {
+            foreach($this->importers as $importer) {
+                /* @var $import editor_Models_Import_MetaData_IMetaDataImporter */
+                $importer->import($task, $this);
+            }
+        }
+        catch(Exception $e) {
+            //FIXME should be some specific Exception
+            throw new ZfExtended_Exception('Task import of meta data failed. Task: '.$task->getTaskName().' ('.$task->getTaskNr().')', 0, $e);
         }
     }
 
@@ -152,9 +161,9 @@ class editor_Models_Import_MetaData {
 
     /**
      * adds a given importer to the internal importer list for further standardized processing
-     * @param editor_Models_Import_IMetaDataImporter $importer
+     * @param editor_Models_Import_MetaData_IMetaDataImporter $importer
      */
-    public function addImporter(editor_Models_Import_IMetaDataImporter $importer) {
+    public function addImporter(editor_Models_Import_MetaData_IMetaDataImporter $importer) {
         $this->importers[] = $importer;
     }
 }

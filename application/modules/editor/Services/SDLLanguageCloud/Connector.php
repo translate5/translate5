@@ -36,17 +36,12 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      */
     protected $api;
     
-    /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::connectTo()
-     */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
-        $class = 'editor_Services_SDLLanguageCloud_HttpApi';
-        $this->api = ZfExtended_Factory::get($class, [$languageResource]);
+    public function __construct() {
+        parent::__construct();        
+        $this->api = ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi');
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate;
+        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->sdllanguagecloud->matchrate;
     }
     
     /**
@@ -54,7 +49,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::open()
      */
     public function open() {
-        //This call is not necessary, since TMs are opened automatically.
+        //This call is not necessary, since this resource is opened automatically.
     }
     
     /**
@@ -62,11 +57,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::open()
      */
     public function close() {
-    /*
-     * This call deactivated, since openTM2 has a access time based garbage collection
-     * If we close a TM and another Task still uses this TM this bad for performance,
-     *  since the next request to the TM has to reopen it
-     */
+        //This call is not necessary, since this resource is closed automatically.
     }
     
     /**
@@ -74,19 +65,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
-        if(empty($queryString)) {
-            return $this->resultList;
-        }
-        
-        $this->resultList->setDefaultSource($queryString);
-        
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
-        $queryString = $internalTag->toXliffPaired($queryString, true);
-        return $this->querySdlApi($queryString);
+        return $this->querySdlApi($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -94,15 +73,30 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
+        throw new BadMethodCallException("The SDL Language Cloud Connector does not support search requests");
+    }
+    
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
         return $this->querySdlApi($searchString);
     }
     
-    protected function querySdlApi($searchString){
+    
+    /***
+     * Query the sdl cloud api and get the available results as editor_Services_ServiceResult
+     * @param string $searchString
+     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @return editor_Services_ServiceResult
+     */
+    protected function querySdlApi($searchString, $reimportWhitespace = false){
         if(empty($searchString)) {
             return $this->resultList;
         }
-        
-        $this->resultList->setDefaultSource($searchString);
         
         //load all languages (sdl api use iso6393 langage shortcuts)
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
@@ -111,7 +105,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         
         $result=null;
         $params=[
-            'domainCode'=>$this->languageResource->getSpecificDataByProperty('domainCode'),
+            'domainCode'=>$this->languageResource->getSpecificData('domainCode'),
             'text'=>$searchString,
             'from'=>$lngs[$this->sourceLang],
             'to'=>$lngs[$this->targetLang]
@@ -119,20 +113,13 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         if($this->api->search($params)){
             $result=$this->api->getResult();
         }
-        $this->resultList->addResult(isset($result->translation) ? $result->translation : "",$this->DEFAULT_MATCHRATE);
+        $translation = isset($result->translation) ? $result->translation : "";
+        if($reimportWhitespace) {
+            $translation = $this->importWhitespaceFromTagLessQuery($translation);
+        }
+        $this->resultList->addResult($translation,$this->defaultMatchRate);
         return $this->resultList;
     }
-    /**
-     * Throws a ZfExtended_BadGateway exception containing the underlying errors
-     * @throws ZfExtended_BadGateway
-     */
-    protected function throwBadGateway() {
-        $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setOrigin('LanguageResources');
-        $e->setErrors($this->api->getErrors());
-        throw $e;
-    }
-    
     
     /**
      * {@inheritDoc}

@@ -24,5 +24,7 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
-ALTER TABLE `LEK_match_analysis` 
-ADD COLUMN `internalFuzzy` TINYINT(1) NULL AFTER `analysisId`;
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`)
+VALUES ('editor', 'pm', 'frontend', 'customerAdministration')
+ON DUPLICATE KEY UPDATE `module`='editor';

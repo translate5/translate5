@@ -52,7 +52,6 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         
         $createdDate=null;
         $internalFuzzy=null;
-        $pretranslateMatchrate=null;
         //add to all groups 'Group' sufix, php excel does not handle integer keys
         foreach ($rows as $rowKey=>$row){
             $newRows=[];
@@ -68,7 +67,6 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                     continue;
                 }
                 if($key=="pretranslateMatchrate"){
-                    $pretranslateMatchrate=$value;
                     continue;
                 }
                 //do not use resourceColor in export
@@ -80,14 +78,18 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
                     $value=$translate->_("Repetitions");
                 }
                 
+                //change the key to $key+Group, since the excel export does not accepts numerical keys
                 if(is_numeric($key)){
                     $newKey=$key.'Group';
+                }
+                
+                //update the totals when collectable group is found
+                if(is_numeric($key) || $key=="noMatch"){
                     $wordCountTotal+=$value;
                 }
                 $newRows[$newKey]=$value;
             }
             $newRows['wordCountTotal']=$wordCountTotal;
-            $newRows['pretranslateMatchrate']=$pretranslateMatchrate;
             $newRows['internalFuzzy']=$internalFuzzy;
             $newRows['created']=$createdDate;
             
@@ -100,14 +102,15 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $excel->setPreCalculateFormulas(true);
         
         // set property for export-filename
-        $excel->setProperty('filename', 'Match analysis');
+        $excel->setProperty('filename', $translate->_('Trefferanalyse'));
         
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
         //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
         $excel->setLabel('resourceName', $translate->_("Name"));
-        $excel->setLabel('103Group', $translate->_("Context match (103%)"));
+        $excel->setLabel('104Group', $translate->_("TermCollection Treffer (104%)"));
+        $excel->setLabel('103Group', $translate->_("Kontext Treffer (103%)"));
         $excel->setLabel('102Group', $translate->_("Wiederholung (102%)"));
-        $excel->setLabel('101Group', $translate->_("Exact-exact match (101%)"));
+        $excel->setLabel('101Group', $translate->_("Exact-exact Treffer (101%)"));
         $excel->setLabel('100Group', '100%');
         $excel->setLabel('99Group', '99%-90%');
         $excel->setLabel('89Group', '89%-80%');
@@ -115,13 +118,13 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $excel->setLabel('69Group', '69%-60%');
         $excel->setLabel('59Group', '59%-51%');
         $excel->setLabel('noMatch', '50%-0%');
-        $excel->setLabel('wordCountTotal', $translate->_("Gesamtzahl der Wörter"));
+        $excel->setLabel('wordCountTotal', $translate->_("Summe Wörter"));
         $excel->setLabel('created', $translate->_("Erstellungsdatum"));
-        $excel->setLabel('internalFuzzy', $translate->_("Interne Fuzzy verwendet"));
-        $excel->setLabel('pretranslateMatchrate', $translate->_("Match-Rate"));
+        $excel->setLabel('internalFuzzy', $translate->_("Interner Fuzzy aktiv"));
 
         $rowsCount=count($rows);
         $rowIndex=$rowsCount+2;
+        
         
         $sheet=$excel->getPhpExcel()->getActiveSheet();
         
@@ -137,6 +140,7 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $sheet->setCellValue("J".$rowIndex, "=SUM(J2:J".($rowIndex-1).")");
         $sheet->setCellValue("K".$rowIndex, "=SUM(K2:K".($rowIndex-1).")");
         $sheet->setCellValue("L".$rowIndex, "=SUM(L2:L".($rowIndex-1).")");
+        $sheet->setCellValue("M".$rowIndex, "=SUM(M2:M".($rowIndex-1).")");
         
         //set the cell autosize
         $excel->simpleArrayToExcel($rows,function($phpExcel){

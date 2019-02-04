@@ -69,6 +69,11 @@
 		    <source>Laden</source>
 		    <target>Loading</target>
 		</trans-unit>
+
+		<trans-unit id='RsO8ciBkaWUgYWt0dWVsbGUgU3ByYWNoa29tYmluYXRpb24gZXhpc3RpZXJ0IGtlaW5lIEVuZ2luZSBpbiBHbG9iYWxlc2UuIEJpdHRlIMO8YmVyc3ByaW5nZW4gU2llIGRlbiBHbG9iYWxlc2UgU2Nocml0dCBmw7xyIGRpZXNlbiBJbXBvcnQu'>
+		    <source>Für die aktuelle Sprachkombination existiert keine Engine in Globalese. Bitte überspringen Sie den Globalese Schritt für diesen Import.</source>
+		    <target>No engine exists in Globalese for the current language combination. Please skip the Globalese step of the import.</target>
+		</trans-unit>
 		
     </body>
   </file>

@@ -37,16 +37,21 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Services_Connector_Abstract {
     
+    //FIXME this is just a temporary solution until TagTrait is refactored into smaller reusable classes, see TRANSLATE-1509 
+    use editor_Models_Import_FileParser_TagTrait;
+    
+    const STATUS_NOTCHECKED = 'notchecked';
     const STATUS_ERROR = 'error';
     const STATUS_AVAILABLE = 'available';
     const STATUS_UNKNOWN = 'unknown';
     const STATUS_NOCONNECTION = 'noconnection';
+    const STATUS_NOVALIDLICENSE = 'novalidlicense';
     
     /*** 
      * Default resource matchrate
      * @var integer
      */
-    protected $DEFAULT_MATCHRATE=0;
+    protected $defaultMatchRate=0;
     
     /**
      * @var editor_Models_LanguageResources_LanguageResource
@@ -58,6 +63,7 @@ abstract class editor_Services_Connector_Abstract {
      * @var editor_Services_ServiceResult
      */
     protected $resultList;
+    
 
     /***
      * connector source language
@@ -72,12 +78,45 @@ abstract class editor_Services_Connector_Abstract {
      */
     protected $targetLang;
     
+
+    /***
+     * Flag for if the current connector supports internal fuzzy calculations
+     * @var boolean
+     */
+    protected $isInternalFuzzy = false;
+    
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
+    
+    /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /**
+     * @var editor_Models_Segment_TrackChangeTag
+     */
+    protected $trackChange;
+    
+    /**
+     * Internal flag which stores the info if tags where stripped by the query call or not
+     * @var string
+     */
+    protected $tagsWereStripped = true;
     
     /**
      * initialises the internal result list
      */
     public function __construct() {
         $this->resultList = ZfExtended_Factory::get('editor_Services_ServiceResult');
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->trackChange = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        
+        $this->initHelper();
+            //$this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $this->initImageTags();
     }
     
     /**
@@ -89,12 +128,14 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /**
-     * Link this Connector Instance to the given LanguageResource and its resource
+     * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     * @param integer $sourceLang language id 
+     * @param integer $targetLang language id 
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        $this->sourceLang=$sourceLang;
-        $this->targetLang=$targetLang;
+    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
+        $this->sourceLang = $sourceLang;
+        $this->targetLang = $targetLang;
         $this->languageResource = $languageResource;
         $this->resultList->setLanguageResource($languageResource);
         $this->languageResource->sourceLangRfc5646=$this->languageResource->getSourceLangRfc5646();
@@ -117,6 +158,22 @@ abstract class editor_Services_Connector_Abstract {
     public function resetResultList(){
         $this->resultList->resetResult();
     }
+    
+    /***
+     * Get the connector language ressource
+     * @return editor_Models_LanguageResources_LanguageResource
+     */
+    public function getLanguageResource(){
+        return $this->languageResource;
+    }
+    
+    /***
+     * Return the connectors default matchrate.(this should be configured in the zf config)
+     * @return number
+     */
+    public function getDefaultMatchRate(){
+        return $this->defaultMatchRate;
+    }
 
     /**
      * makes a tm / mt / file query to find a match / translation
@@ -132,12 +189,61 @@ abstract class editor_Services_Connector_Abstract {
      * @param editor_Models_Segment $segment
      * @return string
      */
-    protected function getQueryString(editor_Models_Segment $segment) {
+    public function getQueryString(editor_Models_Segment $segment) {
         $sfm = editor_Models_SegmentFieldManager::getForTaskGuid($segment->getTaskGuid());
         $source = editor_Models_SegmentField::TYPE_SOURCE;
         $sourceMeta = $sfm->getByName($source);
         $isSourceEdit = ($sourceMeta !== false && $sourceMeta->editable == 1);
         return $isSourceEdit ? $segment->getFieldEdited($source) : $segment->getFieldOriginal($source);
+    }
+    
+    /**
+     * prepares and gets the query string in a default manner:
+     * - restore whitespace
+     * - remove all translate5 tags 
+     * the single steps from that function can be reused if needed the query string in a different way 
+     * @param editor_Models_Segment $segment
+     * @return string 
+     */
+    protected function prepareDefaultQueryString(editor_Models_Segment $segment) {
+        //1. organizational preparation
+        $qs = $this->getQueryString($segment);
+        $this->resultList->setDefaultSource($qs);
+        if(empty($qs)) {
+            return $qs;
+        }
+        
+        //2. whitespace preparation
+        $qs = $this->restoreWhitespaceForQuery($qs);
+        
+        //3. set flag if tags were removed or not (= if the segment was containing flags)
+        $this->tagsWereStripped = $this->internalTag->count($qs) > 0;
+        
+        //4. strip tags
+        return $segment->stripTags($qs);
+    }
+    
+    /**
+     * restores whitespace in segment content and removes track changes before
+     * @param string $queryString
+     * @return string
+     */
+    protected function restoreWhitespaceForQuery($queryString) {
+        $qs = $this->trackChange->removeTrackChanges($queryString);
+        //restore the whitespaces to real characters
+        $qs = $this->internalTag->restore($qs, true);
+        return $this->whitespaceHelper->unprotectWhitespace($qs);
+    }
+    
+    /**
+     * converts whitespace coming from the connected resource to translate5 usable whitespace tags
+     * Warning: text may not contain other tags - they will be destroyed! For more complex solution see OpenTM2
+     * 
+     * @param string $textNode
+     */
+    protected function importWhitespaceFromTagLessQuery($textNode) {
+        $textNode = $this->whitespaceHelper->protectWhitespace($textNode, false);
+        return $this->whitespaceTagReplacer($textNode);
     }
     
     /**
@@ -152,6 +258,15 @@ abstract class editor_Services_Connector_Abstract {
      * @return the status of the connected resource and additional information if there is some
      */
     abstract public function getStatus(& $moreInfo);
+    
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language 
+     * 
+     * @param string $searchString plain text without tags
+     * @return editor_Services_ServiceResult
+     */
+    abstract public function translate(string $searchString);
     
     /**
      * Opens the with connectTo given TM on the configured Resource (on task open, not on each request)
@@ -171,10 +286,19 @@ abstract class editor_Services_Connector_Abstract {
     }
     
     /***
-     * Initialyze fuzzy connectors. Currently only is used in opentm2
-     * @return boolean|editor_Services_Connector_Abstract
+     * Initialize fuzzy connectors. Returns the current instance if not supported.
+     * @param integer $analysisId
+     * @return editor_Services_Connector_Abstract
      */
-    public function initFuzzyAnalysis() {
-        return null;
+    public function initForFuzzyAnalysis($analysisId) {
+        return $this;
+    }
+    
+    /***
+     * Is internal fuzzy connector
+     * @return boolean
+     */
+    public function isInternalFuzzy() {
+        return $this->isInternalFuzzy;
     }
 }

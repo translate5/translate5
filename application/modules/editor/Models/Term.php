@@ -161,7 +161,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collections=$assoc->getCollectionsForTask($task->getTaskGuid());
-        $result = $this->getSortedTermGroups($collections, $termIds, $task->getSourceLang());
+        if(empty($collections)) {
+            return array();
+        }
+        $result = $this->getSortedTermGroups($collections, $termIds,$task->getSourceLang(),$task->getTargetLang());
         
         if(empty($result)) {
             return array();
@@ -297,10 +300,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $collectionIds term collections associated to the task
      * @param array $termIds as 2-dimensional array('source' => array(), 'target' => array())
      * @param $sourceLang
+     * @param $sourceLang
      * 
      * @return array
      */
-    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang) {
+    protected function getSortedTermGroups(array $collectionIds, array $termIds, $sourceLang,$targetLang) {
         $sourceIds = array();
         $targetIds = array();
         $transFoundSearch = array();
@@ -323,7 +327,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 ->join(array('l' =>'LEK_languages'), 't2.language = l.id', 'rtl')
                 ->where('t1.collectionId IN(?)', $collectionIds)
                 ->where('t2.collectionId IN(?)', $collectionIds)
-                ->where('t1.mid IN('.$serialIds.')');
+                ->where('t1.mid IN('.$serialIds.')')
+                ->where('t1.language IN (?)',array($sourceLang,$targetLang))
+                ->where('t2.language IN (?)',array($sourceLang,$targetLang));
        
         $terms = $this->db->getAdapter()->fetchAll($sql);
         
@@ -464,14 +470,25 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param editor_Models_Export_Tbx $exporteur
      */
     public function export(editor_Models_Task $task, editor_Models_Export_Terminology_Tbx $exporteur) {
-        $langs = array($task->getSourceLang(), $task->getTargetLang());
-        if($task->getRelaisLang() > 0) {
-            $langs[] = $task->getRelaisLang();
-        }
+        $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $languageModel editor_Models_Languages */
         
         $assoc=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collectionIds=$assoc->getCollectionsForTask($task->getTaskGuid());
+        
+        if(empty($collectionIds)){
+            return null;
+        }
+        
+        //get source and target language fuzzies
+        $langs=[];
+        $langs=array_merge($langs,$languageModel->getFuzzyLanguages($task->getSourceLang()));
+        $langs=array_merge($langs,$languageModel->getFuzzyLanguages($task->getTargetLang()));
+        if($task->getRelaisLang() > 0) {
+            $langs=array_merge($langs,$languageModel->getFuzzyLanguages($task->getRelaisLang()));
+        }
+        $langs=array_unique($langs);
         
         $data=$this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
         if(!$data) {
@@ -641,7 +658,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
         ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'))
         ->where('groupId=?',$groupId)
-        ->where('LEK_term_attributes.collectionId IN(?)',$collectionIds)
+        ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('label');
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
@@ -714,13 +731,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         
         foreach($data as $key=>$value) {
             $alreadyProcessed = array();
+            //the term collection contains terms with only one language
+            $isSingleCombination=count($value)==1;
             foreach ($value as $x) {
                 foreach ($value as $y) {
                     //keep track of what is already processed
                     $combination = array($x['language'], $y['language']);
                     
-                    //it is not the same number and thay are not already processed
-                    if ($x['language'] === $y['language'] || in_array($combination, $alreadyProcessed)) {
+                    //it is not the same number or single language combination and thay are not already processed
+                    if (($x['language'] === $y['language'] && !$isSingleCombination) || in_array($combination, $alreadyProcessed)) {
                         continue;
                     }
                     //Add it to the list of what you've already processed
@@ -742,6 +761,38 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 }
             }
         }
+    }
+    
+    /***
+     * Get all definitions in the given entryIds. The end results will be grouped by $entryIds as a key. 
+     * @param array $entryIds
+     * @return array
+     */
+    public function getDeffinitionsByEntryIds(array $entryIds){
+        if(empty($entryIds)){
+            return array();
+        }
+        $s=$this->db->select()
+        ->where('termEntryId IN(?)',$entryIds);
+        $return=$this->db->fetchAll($s)->toArray();
+        
+        if(empty($return)){
+            return array();
+        }
+
+        //group the definitions by termEntryId as a key
+        $result=array();
+        foreach ($return as $r) {
+            if(!isset($result[$r['termEntryId']])){
+                $result[$r['termEntryId']]=array();
+            }
+            
+            if(!in_array($r['definition'], $result[$r['termEntryId']]) && !empty($r['definition'])){
+                $result[$r['termEntryId']][]=$r['definition'];
+            }
+        }
+        
+        return $result;
     }
 
     /**

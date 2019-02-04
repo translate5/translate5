@@ -36,13 +36,20 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
         strings: {
             finishTask:'<?php echo $this->translate->_("Beenden");?>',
             taskGridIconTooltip:'<?php echo $this->translate->_("Match-Analyse");?>',
-            preTranslation:'<?php echo $this->translate->_("Analyse & Vorübersetzungen Starten");?>',
+            preTranslation:'<?php echo $this->translate->_("Analyse &amp; Vorübersetzungen starten");?>',
             preTranslationTooltip:'<?php echo $this->translate->_("Die Vorübersetzung löst auch eine neue Analyse aus");?>',
             analysis:'<?php echo $this->translate->_("Analyse Starten");?>',
             startAnalysisMsg:'<?php echo $this->translate->_("Match-Analyse und Vorübersetzungen werden ausgeführt.");?>',
+            finishAnalysisMsg:'<?php echo $this->translate->_("Die Match-Analyse und die Vorübersetzung sind abgeschlossen.");?>',
             internalFuzzy:'<?php echo $this->translate->_("Zähle interne Fuzzy");?>',
             pretranslateMatchRate:'<?php echo $this->translate->_("Vorübersetzungs Match-Rate");?>',
-            pretranslateMatchRateTooltip:'<?php echo $this->translate->_("Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist");?>'
+            pretranslateMatchRateTooltip:'<?php echo $this->translate->_("Vorübersetzung mit TM-Match, die größer oder gleich dem ausgewählten Wert ist");?>',
+            pretranslateTmAndTerm:'<?php echo $this->translate->_("Vorübersetzen (TM &amp; Terme)");?>',
+            pretranslateTmAndTermTooltip:'<?php echo $this->translate->_("Treffer aus der Terminologie werden bevorzugt vorübersetzt.");?>',
+            pretranslateMt:'<?php echo $this->translate->_("Vorübersetzen (MT)");?>',
+            pretranslateMtTooltip:'<?php echo $this->translate->_("Treffer aus dem TM werden bevorzugt vorübersetzt");?>',
+            termtaggerSegment:'<?php echo $this->translate->_("Terminologie prüfen und markieren");?>',
+            analysisLoadingMsg:'<?php echo $this->translate->_("Analyse läuft");?>'
         }
     });
     
@@ -53,8 +60,8 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
             matchCount:'<?php echo $this->translate->_("Gesamtzahl der Wörter");?>',
             tabTitle:'<?php echo $this->translate->_("Analyse");?>',
             exportAnalysis:'<?php echo $this->translate->_("Export");?>',
-            noAnalysis:'<?php echo $this->translate->_("Keine Analyse für die aktuelle Aufgabe");?>',
-            languageResources:'<?php echo $this->translate->_("Sprachressourcen");?>',
+            noAnalysis:'<?php echo $this->translate->_("Start der Analyse im Tab “Sprach-Resourcen zuweisen“");?>',
+            languageResources:'<?php echo $this->translate->_("Sprach-Resourcen");?>',
             analysisDate:'<?php echo $this->translate->_("Datum");?>',
             languageResourceName:'<?php echo $this->translate->_("Name");?>',
             repetitions:'<?php echo $this->translate->_("Wiederholungen:");?>',
@@ -67,7 +74,7 @@ Editor.controller.Localizer.addPluginInit('matchAnalysis', function() {
     Ext.define("Editor.locale.plugins.MatchAnalysis.view.LanguageResources", {
         override: "Editor.plugins.MatchAnalysis.view.LanguageResources",
         strings: {
-            wizardTitle:'<?php echo $this->translate->_("Sprachressourcen zuweisen");?>'
+            wizardTitle:'<?php echo $this->translate->_("Sprach-Resourcen zuweisen");?>'
         }
     });
 });

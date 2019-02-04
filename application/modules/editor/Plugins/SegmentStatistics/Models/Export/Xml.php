@@ -40,7 +40,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xml extends editor_Plugins_
     public function writeToDisk(string $filename) {
         $xml = new SimpleXMLElement('<statistics/>');
         $xml->addChild('taskGuid', $this->taskGuid);
-        $xml->addChild('taskName', $this->statistics->taskName);
+        $xml->addChild('taskName', htmlentities($this->statistics->taskName,ENT_XML1));
         $this->addFiltered($xml);
         $xml->addChild('segmentCount', $this->statistics->segmentCount);
         $xml->addChild('segmentCountEditable', $this->statistics->segmentCountEditable);

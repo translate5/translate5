@@ -61,152 +61,184 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     protected $dbInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Db_MatchAnalysis';
     protected $validatorInstanceClass = 'editor_Plugins_MatchAnalysis_Models_Validator_MatchAnalysis';
     
+    /***
+     * Match analysis groups and calculation borders
+     * 
+     * 104%, 103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
+     */ 
+    protected $groupBorder=['103'=>'104','102'=>'103','101'=>'102','100'=>'101','99'=>'100','89'=>'99','79'=>'89','69'=>'79','59'=>'69','50'=>'59','noMatch'=>'noMatch'];
     
     /***
      * Load the result by best match rate. The results will be grouped in the followed groups:
      * Real groups:        103%, 102%, 101%, 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
      * Group result index: 103,  102,  101,  100,  99,      89,      79,      69,      59,      noMatch
      * 
-     * The result array will contain the total word count in the result.
+     * Ex: group index 99 is every matchrate between 90 and 99 
+     * 
      * @param string $taskGuid
      * @param boolean $isExport: is the data requested for export
      * @return array
      */
     public function loadByBestMatchRate($taskGuid,$isExport=false){
+        //load the latest analysis for the given taskGuid
+        $analysisAssoc=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
+        /* @var $analysisAssoc editor_Plugins_MatchAnalysis_Models_TaskAssoc */
+        $analysisAssoc=$analysisAssoc->loadNewestByTaskGuid($taskGuid);
         
-        $sql='SELECT m.*
-              FROM LEK_match_analysis m 
+        $sqlV1='SELECT wordCount,languageResourceid,matchRate,analysisId,internalFuzzy,segmentId FROM (
+                SELECT SUM(o.wordCount) wordCount,o.languageResourceid,o.matchRate,o.analysisId,o.internalFuzzy,o.segmentId
+                FROM LEK_match_analysis o
                   LEFT JOIN LEK_match_analysis b
-                      ON m.languageResourceid = b.languageResourceid and m.segmentId = b.segmentId 
-                      AND b.matchRate > m.matchRate 
-              WHERE b.matchRate IS NULL 
-              AND m.taskGuid=? 
-              AND m.analysisId = (
-				  SELECT MAX(id)
-				  FROM LEK_match_analysis_taskassoc
-				  WHERE taskGuid = ?
-			   )';
-        
-        $resultArray=$this->db->getAdapter()->query($sql,[$taskGuid,$taskGuid])->fetchAll();
+                      ON o.segmentId = b.segmentId AND IF(o.matchRate IS NULL,0,o.matchRate) < IF(b.matchRate IS NULL,0,b.matchRate)
+                WHERE b.matchRate is NULL
+                AND o.analysisId=?
+                GROUP BY o.internalFuzzy,o.languageResourceid,o.matchRate # group by internal fuzzie so we get it as separate row if exist
+                ORDER BY o.languageResourceid DESC,o.matchRate DESC
+                ) s GROUP BY s.segmentId;';
+        $sqlV2='SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount  FROM (
+                SELECT t1.*
+                FROM LEK_match_analysis AS t1
+                LEFT OUTER JOIN LEK_match_analysis AS t2
+                ON t1.segmentId = t2.segmentId 
+                        AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 0 AND t2.analysisId = ?
+                WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 0
+                UNION
+                SELECT t1.*
+                FROM LEK_match_analysis AS t1
+                LEFT OUTER JOIN LEK_match_analysis AS t2
+                ON t1.segmentId = t2.segmentId 
+                        AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.internalFuzzy = 1 AND t2.analysisId = ?
+                WHERE t2.segmentId IS NULL AND t1.analysisId = ? AND t1.internalFuzzy = 1
+            ) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
+        $sqlV3='SELECT bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate, SUM(bestRates.wordCount) wordCount  FROM (
+                SELECT t1.*
+                	FROM LEK_match_analysis AS t1
+                	LEFT OUTER JOIN LEK_match_analysis AS t2
+                	ON t1.segmentId = t2.segmentId 
+                			AND (t1.matchRate < t2.matchRate OR t1.matchRate = t2.matchRate AND t1.id < t2.id) AND t2.analysisId =?
+                	WHERE t2.segmentId IS NULL AND t1.analysisId = ?) bestRates GROUP BY bestRates.internalFuzzy,bestRates.languageResourceid,bestRates.matchRate;';
+        //$resultArray=$this->db->getAdapter()->query($sqlV2,[$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
+        //$resultArray=$this->db->getAdapter()->query($sqlV1,[$analysisAssoc['id']])->fetchAll();
+        $resultArray=$this->db->getAdapter()->query($sqlV3,[$analysisAssoc['id'],$analysisAssoc['id']])->fetchAll();
         if(empty($resultArray)){
             return array();
         }
-        return $this->groupByMatchrate($resultArray,$isExport);
+        return $this->groupByMatchrate($resultArray,$analysisAssoc);
     }
     
     /***
-     * Group the results by match rate group.
+     * Group the results by matchrate. Each row is one language resource result group.
      * @param array $results
-     * @return array[]
+     * @param array $analysisAssoc
+     * @return array
      */
-    private function groupByMatchrate($results,$isExport=false){
-        
-        $groupedResults=[];
-        
-        //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
-        $groupBorder=[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59','noMatch'=>'noMatch'];
-        
-        $analysisCreated=null;
-        
-        $bestLanguageResourceMatches=[];
-        $segmentBest=[];
-        //count only the best match rate from the tm
-        foreach ($results as $res){
-            if(!isset($bestLanguageResourceMatches[$res['segmentNrInTask']])){
-                $bestLanguageResourceMatches[$res['segmentNrInTask']]=$res['matchRate'];
-                $segmentBest[$res['segmentNrInTask']]=$res['languageResourceid'];
-            }
-            if($bestLanguageResourceMatches[$res['segmentNrInTask']]<$res['matchRate']){
-                $segmentBest[$res['segmentNrInTask']]=$res['languageResourceid'];
-            }
-        }
-        
-        unset($bestLanguageResourceMatches);
-        
+    protected function groupByMatchrate(array $results,array $analysisAssoc){
+
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
+        //init the language reources group array
+        $groupedResults=$this->initResultArray($analysisAssoc['taskGuid'],$analysisAssoc['internalFuzzy']=='1');
         foreach ($results as $res){
-        
-            //for each languageResource separate array
-            if(!isset($groupedResults[$res['languageResourceid']])){
-                $groupedResults[$res['languageResourceid']]=[];
-                $groupedResults[$res['languageResourceid']]['resourceName']="";
-                $groupedResults[$res['languageResourceid']]['resourceColor']="";
-                //set languageResource color and name
-                if($res['languageResourceid']>0){
-                    $languageResourceModel=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-                    /* $languageResourceModel editor_Models_LanguageResources_LanguageResource */
-                    try {
-                        $languageResourceModel->load($res['languageResourceid']);
-                        $groupedResults[$res['languageResourceid']]['resourceName']=$languageResourceModel->getName();
-                        $groupedResults[$res['languageResourceid']]['resourceColor']=$languageResourceModel->getColor();
-                    } catch (Exception $e) {
-                        $groupedResults[$res['languageResourceid']]['resourceName']="This resource is removed";
-                        $groupedResults[$res['languageResourceid']]['resourceColor']="";
-                    }
-                }
-                
-                
-            }
             
+            //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+            //because for the internal fuzzy additional row is displayed
+            $rowKey=$res['languageResourceid'].($res['internalFuzzy']=='1' ? 'fuzzy' : '');
             
+            //results found in group
             $resultFound=false;
             
             //check on which border group this result belongs to
-            foreach ($groupBorder as $border=>$value){
+            foreach ($this->groupBorder as $border=>$value){
                 
-                if(!isset($groupedResults[$res['languageResourceid']][$value])){
-                    if(!$isExport){
-                        $groupedResults[$res['languageResourceid']][$value]=[];
-                        $groupedResults[$res['languageResourceid']][$value]['rateCount']=0;
-                        $groupedResults[$res['languageResourceid']][$value]['wordCount']=0;
-                    }else{
-                        $groupedResults[$res['languageResourceid']][$value]=0;
-                    }
+                //check if the language resource is not initialized by group initializer
+                if(!isset($groupedResults[$rowKey]) && $res['languageResourceid']>0){
+                    //the resource is removed for the assoc, but the analysis stays
+                    $groupedResults[$rowKey]['resourceName']=$translate->_("Diese Ressource wird entfernt");
+                    $groupedResults[$rowKey]['resourceColor']="";
                 }
+                
+                //set the group key in the array
+                if(!isset($groupedResults[$rowKey][$value])){
+                    $groupedResults[$rowKey][$value]=0;
+                }
+                
                 //if result is found, create only empty column
-                if($resultFound || $segmentBest[$res['segmentNrInTask']]!=$res['languageResourceid']){
+                if($resultFound){
                     continue;
                 }
-
+                
                 //check matchrate border
                 if($res['matchRate']>$border){
-                    if(!$isExport){
-                        $groupedResults[$res['languageResourceid']][$value]['rateCount']++;
-                        $groupedResults[$res['languageResourceid']][$value]['wordCount']+=$res['wordCount'];
-                    }else{
-                        $groupedResults[$res['languageResourceid']][$value]+=$res['wordCount'];
-                    }
+                    $groupedResults[$rowKey][$value]+=$res['wordCount'];
                     $resultFound=true;
                 }
             }
+            //if no results match group is found, the result is in noMatch group
             if(!$resultFound){
-                if(!$isExport){
-                    $groupedResults[$res['languageResourceid']]['noMatch']['rateCount']++;
-                    $groupedResults[$res['languageResourceid']]['noMatch']['wordCount']+=$res['wordCount'];
-                }else{
-                    $groupedResults[$res['languageResourceid']]['noMatch']+=$res['wordCount'];
+                $groupedResults[$rowKey]['noMatch']+=$res['wordCount'];
+            }
+            
+            $groupedResults[$rowKey]['created']=$analysisAssoc['created'];
+            $groupedResults[$rowKey]['internalFuzzy']=filter_var($analysisAssoc['internalFuzzy'], FILTER_VALIDATE_BOOLEAN) ? $translate->_("Ja"): $translate->_("Nein");
+        }
+        return array_values($groupedResults);
+    }
+    
+    /***
+     * Init match analysis result array. Fore each assoc language resource one row will be created.
+     * @param string $taskGuid
+     * @param boolean $internalFuzzy
+     * @return array|number
+     */
+    protected function initResultArray($taskGuid,$internalFuzzy){
+        $taskAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+        /* @var $taskAssoc editor_Models_LanguageResources_Taskassoc */
+        $result=$taskAssoc->loadByTaskGuids([$taskGuid]);
+        
+        //create empty group for given key,name and color
+        $initRow=function($key,$name,$color){
+            $row=[];
+            $row[$key]=[];
+            $row[$key]['resourceName']="";
+            $row[$key]['resourceColor']="";
+            //set languageResource color and name
+            //if the resource is internal fuzzy, change the name
+            $row[$key]['resourceName']=$name;
+            $row[$key]['resourceColor']=$color;
+            
+            //init the result borders
+            foreach ($this->groupBorder as $border=>$value){
+                if(!isset($row[$key][$value])){
+                    $row[$key][$value]=0;
                 }
             }
+            return $row;
+        };
+        
+        $openTm2=ZfExtended_Factory::get('editor_Services_OpenTM2_Service');
+        /* @var $openTm2 editor_Services_OpenTM2_Service */
+        $serviceName=$openTm2->getName();
+        $initGroups=[];
+        foreach ($result as $res){
+            $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+            /* @var $lr editor_Models_LanguageResources_LanguageResource */
+            $lr->load($res['languageResourceId']);
             
-            //get the analysis created date
-            if(!$analysisCreated){
-                $model=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_TaskAssoc');
-                /* @var $model editor_Plugins_MatchAnalysis_Models_TaskAssoc */
-                $model->load($res['analysisId']);
-                $analysisCreated=$model->getCreated();
-                $internalFuzzy=$model->getInternalFuzzy();
-                $pretranslateMatchrate=$model->getPretranslateMatchrate();
+            //init the group
+            $initGroups=$initGroups+$initRow($lr->getId(),$lr->getName(),$lr->getColor());
+            
+            //if internal fuzzy is activated, and the curent language resource is opentm2, add additional row for the internal fuzzy
+            if($internalFuzzy && $lr->getServiceName()==$serviceName){
+                //the key will be languageResourceId + fuzzy flag (ex: "OpenTm2 memoryfuzzy")
+                //for each internal fuzzy, additional row is displayed
+                $initGroups=$initGroups+$initRow(($lr->getId().'fuzzy'),($lr->getName().' - internal Fuzzies'),$lr->getColor());
             }
-            
-            $groupedResults[$res['languageResourceid']]['created']=$analysisCreated;
-            $groupedResults[$res['languageResourceid']]['internalFuzzy']=filter_var($internalFuzzy, FILTER_VALIDATE_BOOLEAN) ? $translate->_("Ja"): $translate->_("Nein");
-            $groupedResults[$res['languageResourceid']]['pretranslateMatchrate']=$pretranslateMatchrate;
         }
-        unset($segmentBest);
-        return $this->sortByTm($groupedResults);
+        //init the repetition
+        $initGroups=$initGroups+$initRow(0,"","");
+        return $initGroups;
     }
-
+    
     /***
      * Sort by best  languageResource
      * TODO: implement me

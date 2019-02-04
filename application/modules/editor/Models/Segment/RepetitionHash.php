@@ -29,9 +29,6 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Models_Segment_RepetitionHash {
-    
-    //FIXME here befüllen mit der logik aus dem RepHash processor. Der Wrappt dann nur noch auf die dortigen Gegebenheiten!
-    
     /**
      * @var editor_Models_Segment_InternalTag
      */

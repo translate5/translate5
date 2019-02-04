@@ -69,6 +69,7 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
     public function postAction(){
         try {
             parent::postAction();
+            $this->fireAfterAssocChangeEvent('post' ,$this->entity);
         }
         catch(Zend_Db_Statement_Exception $e){
             $m = $e->getMessage();
@@ -90,7 +91,9 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             if($task->isUsed($this->entity->getTaskGuid())) {
                 throw new ZfExtended_VersionConflictException("Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht gelöscht werden!");
             }
+            $clone=clone $this->entity;
             $this->entity->delete();
+            $this->fireAfterAssocChangeEvent('delete' ,$clone);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             //do nothing since it was already deleted, and thats ok since user tried to delete it
@@ -116,5 +119,28 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         
         //segments can only be updated when resource is writable:
         $this->data->segmentsUpdateable = $resource->getWritable() && $this->data->segmentsUpdateable;
+    }
+    
+    /***
+     * Fire after post/delete special event with language resources service name in it.
+     * The event and the service name will be separated with #
+     * ex: afterPost#OpenTM2
+     *     afterDelete#TermCollection
+     *     
+     * @param string $action
+     * @param editor_Models_LanguageResources_Taskassoc
+     */
+    protected function fireAfterAssocChangeEvent($action,editor_Models_LanguageResources_Taskassoc $entity){
+        $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $lr editor_Models_LanguageResources_LanguageResource */
+        $lr->load($entity->getLanguageResourceId());
+        
+        //fire event with name of the saved language resource service name
+        //separate with # so it is more clear that is is not regular after/before action event
+        //ex: afterPost#OpenTM2
+        $eventName="after".ucfirst($action).'#'.$lr->getServiceName();
+        $this->events->trigger($eventName, $this, array(
+            'entity' => $entity,
+        ));
     }
 }

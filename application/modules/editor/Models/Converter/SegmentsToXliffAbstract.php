@@ -421,7 +421,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
      */
     protected function escape($text, $isAttribute = true) {
         if($isAttribute) {
-            return htmlspecialchars($string, ENT_XML1 | ENT_COMPAT, 'UTF-8');
+            return htmlspecialchars($text, ENT_XML1 | ENT_COMPAT, 'UTF-8');
         }
         return htmlspecialchars($text, ENT_XML1, 'UTF-8');
     }

@@ -35,22 +35,16 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      */
     protected $api;
 
-    /***
-     * api class
-     * @var string
-     */
-    protected $apiClass='editor_Services_Google_HttpApi';
-    
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::connectTo()
+     * @see editor_Services_Connector_Abstract::__construct()
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
-        $this->api = ZfExtended_Factory::get($this->apiClass, [$languageResource]);
+    public function __construct() {
+        parent::__construct();
+        $this->api = ZfExtended_Factory::get('editor_Services_Google_HttpApi');
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->google->matchrate;
+        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->google->matchrate;
     }
     
     /**
@@ -78,14 +72,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
-        if(empty($queryString)) {
-            return $this->resultList;
-        }
-        $this->resultList->setDefaultSource($queryString);
-        return $this->queryGoogleApi($queryString);
+        return $this->queryGoogleApi($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -93,20 +80,29 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
+        throw new BadMethodCallException("The Google Translation Connector does not support search requests");
+    }
+    
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language 
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
         return $this->queryGoogleApi($searchString);
     }
     
     /***
      * Query the google cloud api for the search string
      * @param string $searchString
+     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
-    protected function queryGoogleApi($searchString){
+    protected function queryGoogleApi($searchString, $reimportWhitespace = false){
         if(empty($searchString)) {
             return $this->resultList;
         }
-        
-        $this->resultList->setDefaultSource($searchString);
         
         //load all languages (sdl api use iso6393 langage shortcuts)
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
@@ -117,21 +113,15 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
         if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang])){
             $result=$this->api->getResult();
         }
-        $this->resultList->addResult(isset($result['text']) ? $result['text'] : '',$this->DEFAULT_MATCHRATE);
+        
+        $translation = isset($result['text']) ? $result['text'] : "";
+        if($reimportWhitespace) {
+            $translation = $this->importWhitespaceFromTagLessQuery($translation);
+        }
+        
+        $this->resultList->addResult($translation, $this->defaultMatchRate);
         return $this->resultList;
     }
-    
-    /**
-     * Throws a ZfExtended_BadGateway exception containing the underlying errors
-     * @throws ZfExtended_BadGateway
-     */
-    protected function throwBadGateway() {
-        $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setOrigin('LanguageResources');
-        $e->setErrors($this->api->getErrors());
-        throw $e;
-    }
-    
     
     /**
      * {@inheritDoc}

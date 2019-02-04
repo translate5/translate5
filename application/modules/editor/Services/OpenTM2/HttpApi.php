@@ -142,7 +142,7 @@ class editor_Services_OpenTM2_HttpApi {
      * @return Zend_Http_Client
      */
     protected function getHttpWithMemory($method, $urlSuffix = '') {
-        return $this->getHttp($method, urlencode($this->languageResource->getSpecificDataByProperty('fileName')).'/'.ltrim($urlSuffix, '/'));
+        return $this->getHttp($method, urlencode($this->languageResource->getSpecificData('fileName')).'/'.ltrim($urlSuffix, '/'));
     }
     
     /**

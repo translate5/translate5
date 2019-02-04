@@ -44,10 +44,20 @@
     }
     echo '</select>';
     echo '</form>';
+    
+    $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+    /* @var $userModel ZfExtended_Models_User */
+    $isUserAllowed=$userModel->isAllowed("editor_instanttranslate","all");
+    
+    //check if the user is allowed to acces the term portal
+    if($isUserAllowed){
+        echo '<div id="instantTranslateButtonContainer"><a id="instantTranslateButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("Sofortübersetzung").'</a></div>';
+    }else{
+        echo '<div id="instantTranslateButtonContainer"></div>';
+    }
 ?>
-    <div id="logout"><a href="/login/logout" class="ui-button ui-widget ui-corner-all">Logout</a></div>
+    <div id="logoutContainer"><a id="logout" href="#" class="ui-button ui-widget ui-corner-all ui-state-active ui-state-focus">Logout</a></div>
 </div>
-        
 <?php 
 if(isset($this->error)){
     echo '<div class="container ui-state-error ui-corner-all">';
@@ -57,7 +67,6 @@ if(isset($this->error)){
 }    
 ?>
 <div id="container-content" class="container">
-
     
     <div class="wrap">
             <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
@@ -68,10 +77,17 @@ if(isset($this->error)){
                     uasort($languages, function($a, $b) {
                         return strcmp($a['rfc5646'], $b['rfc5646']);
                     });
+                    $preselectedLang = false;
+                    if (isset($_GET['lang'])) {
+                        // if param 'lang' is given, select it
+                        $preselectedLang = $_GET['lang'];
+                    } else if (!empty($this->preselectedLang)) {
+                        // if the preselectedLang exist, select it
+                        $preselectedLang = $this->preselectedLang;
+                    }
                     echo '<select name="languages" id="languages">';
                     foreach ($languages as $lang){
-                        //if the preselectedLang exist, select it
-                        $isSelected=!empty($this->preselectedLang) && ($this->preselectedLang==$lang["rfc5646"]);
+                        $isSelected=($preselectedLang !== false) && ($preselectedLang == $lang["rfc5646"]);
                         echo '<option '.($isSelected ? 'selected="selected"' : '').' value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
                     }
                     echo '</select>';
@@ -101,6 +117,8 @@ if(isset($this->error)){
           </div>
         </div>
     </div>
+    
+</div>
 
 <script type="text/javascript">
 //init the labels here, for later usage
@@ -110,7 +128,6 @@ attributeLabels = JSON.parse(attributeLabels);
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
 var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
-var REST_PATH='<?php echo $this->restPath; ?>';
 var SESSION_LOCALE='<?php echo $session->locale; ?>';
 var noExistingAttributes='<?php echo $this->translations["noExistingAttributes"];?>';
 
@@ -132,6 +149,15 @@ function setSizesInFinalResultContent(){
 }
 
 $( function() {
+    $('#logout a').mouseover(function(){
+            $(this).removeClass("ui-state-active");
+        });
+    $('#logout a').mouseout(function(){
+            $(this).addClass("ui-state-active");
+        });
+    $('#logout').on("click",function(){
+        window.location = Editor.data.loginUrl;
+    });
     $('#languages').selectmenu({
         change: function( event, ui ) {
             startAutocomplete();
@@ -156,7 +182,6 @@ $( function() {
 
 </script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
-
 <script type="text/javascript">
     checkDirectSearch();
 </script>

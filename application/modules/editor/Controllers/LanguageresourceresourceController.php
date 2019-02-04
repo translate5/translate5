@@ -61,7 +61,16 @@ class editor_LanguageresourceresourceController extends ZfExtended_RestControlle
                 $result[] = $resource->getDataObject();
             }
         }
-        $this->view->rows = $result;
+        
+        //sort the results alphabetically by name
+        $customSort = function($a,$b){
+            if ($a->name == $b->name){
+                return 0;
+            }
+            return ($a->name<$b->name) ? -1 : 1;
+        };
+        usort($result,$customSort);
+		$this->view->rows = array_values($result);
         $this->view->total = count($result);
     }
     public function getAction() {

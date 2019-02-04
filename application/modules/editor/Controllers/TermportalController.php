@@ -30,6 +30,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
     
     public function indexAction(){
 
+        Zend_Layout::getMvcInstance()->setLayout('termportal');
+        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
+        $this->view->render('termportal/layoutConfig.php');
+        $this->view->appVersion = ZfExtended_Utils::getAppVersion();
+        
+        $this->view->Php2JsVars()->set('termportal.restPath', APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
+        
         //if term param exist, open this term on portal load
         if($this->getRequest()->getParam('term')!=null){
             $this->view->Php2JsVars()->set('term', $this->getRequest()->getParam('term'));
@@ -53,11 +60,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $model=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
-        
-        Zend_Layout::getMvcInstance()->setLayout('termportal');
-        Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH.'/modules/editor/layouts/scripts');
-        $this->view->render('termportal/layoutConfig.php');
-        
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
@@ -131,9 +133,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $this->view->preselectedLang=$preselectedLang;
         
-        
-        $this->view->restPath=APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/';
-        
         $this->view->Php2JsVars()->set('termStatusMap', $config->runtimeOptions->tbx->termLabelMap->toArray());
         $this->view->Php2JsVars()->set('termStatusLabel', [
             'permitted' => $this->translate->_('erlaubte Benennung'),
@@ -141,6 +140,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             'preferred' => $this->translate->_('Vorzugsbenennung'),
             'unknown' => $this->translate->_('Unbekannter Term Status'),
         ]);
+        $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$config->runtimeOptions->loginUrl);
         
         //translated strings for some of the result tables
         $translatedStrings=array(

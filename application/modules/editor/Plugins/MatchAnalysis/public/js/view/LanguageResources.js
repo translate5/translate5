@@ -38,8 +38,9 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     extend:'Ext.panel.Panel',
-    alias: 'widget.languageResourcesPanel',
-    controller: 'languageResourcesPanel',
+    alias: 'widget.languageResourcesWizardPanel',
+    controller: 'languageResourcesWizardPanel',
+    itemId:'languageResourcesWizardPanel',
     requires: [
         'Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController',
         'Editor.view.LanguageResources.TaskAssocPanel'
@@ -50,9 +51,10 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     importType:'postimport',
     
     task:null,
+    autoScroll: true,
     
     strings:{
-        wizardTitle:'#UT#Sprachressourcen zuweisen'
+        wizardTitle:'#UT#Sprach-Resourcen zuweisen'
     },
     initConfig: function(instanceConfig) {
         var me = this,
@@ -89,7 +91,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResources', {
     },
     
     disableCancelButton:function(){
-        return true;
+        return false;
     }
     
 });

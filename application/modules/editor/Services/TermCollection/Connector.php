@@ -31,15 +31,17 @@ END LICENSE AND COPYRIGHT
 class editor_Services_TermCollection_Connector extends editor_Services_Connector_FilebasedAbstract {
 
     /**
-     * {@inheritDoc}
-     * @see editor_Services_Connector_Abstract::connectTo()
+     * If the query for the term had tags, the match rate must be less then 100% so that the user has to fix the tags
+     * @var integer
      */
-    public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
-        parent::connectTo($languageResource,$sourceLang,$targetLang);
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->termcollection->matchrate;
+    const TERMCOLLECTION_TAG_MATCH_VALUE = 99;
+    
+    public function __construct() {
+        parent::__construct();
+        //the translations from the term collections are with high priority, that is why 104 (this is the highest matchrate in translate5)
+        $this->defaultMatchRate = self::TERMCOLLECTION_MATCH_VALUE;
     }
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::addTm()
@@ -97,20 +99,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        $queryString = $this->getQueryString($segment);
-        //if source is empty, OpenTM2 will return an error, therefore we just return an empty list
-        if(empty($queryString)) {
-            return $this->resultList;
-        }
-        
-        $this->resultList->setDefaultSource($queryString);
-        
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
-        
-        $queryString = $internalTag->toXliffPaired($queryString, true);
-        
-        return $this->queryCollectionResults($queryString);
+        return $this->queryCollectionResults($this->prepareDefaultQueryString($segment), true);
     }
     
     /**
@@ -118,28 +107,66 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
+        $this->resultList->setDefaultSource($searchString);
+        return $this->queryCollectionResults($searchString);
+    }
+    
+    /***
+     * Search the resource for available translation. Where the source text is in resource source language and the received results
+     * are in the resource target language
+     * {@inheritDoc}
+     * @see editor_Services_Connector_Abstract::translate()
+     */
+    public function translate(string $searchString){
         return $this->queryCollectionResults($searchString);
     }
     
     /***
      * Search the terms in the term collection with the given query string
      * @param string $queryString
+     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
-    protected function queryCollectionResults($queryString){
+    protected function queryCollectionResults($queryString, $reimportWhitespace = false){
+        if(empty($queryString)) {
+            return $this->resultList;
+        }
         $entity=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $entity editor_Models_TermCollection_TermCollection */
         $entity->load($this->languageResource->getId());
         
         $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
         
+        //load all available languages, so we can set the term rfc value to the frontend
+        $langModel=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $lngs=$langModel->loadAllKeyValueCustom('id','rfc5646');
+        
+        $groupids=array_column($results, 'termEntryId');
+        $groupids=array_unique($groupids);
+        
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $definitions=$term->getDeffinitionsByEntryIds($groupids);
+        
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $groups=$term->sortTerms([$results]);
         foreach ($groups as $group){
             foreach ($group as $res){
+                //add all available definitions from the term termEntry
+                if(isset($definitions[$res['termEntryId']])){
+                    $res['definitions']=$definitions[$res['termEntryId']];
+                }
                 //convert back to array
-                $this->resultList->addResult($res['term'],$this->DEFAULT_MATCHRATE,$res);
+                $matchRate = $this->tagsWereStripped ? self::TERMCOLLECTION_TAG_MATCH_VALUE : $this->defaultMatchRate;
+                if($reimportWhitespace) {
+                    $res['term'] = $this->importWhitespaceFromTagLessQuery($res['term']);
+                }
+                if(isset($res['language'])){
+                    $res['languageRfc']=isset($lngs[$res['language']]) ? $lngs[$res['language']] : null;
+                }
+                $this->resultList->addResult($res['term'], $matchRate,$res);
             }
         }
         
@@ -179,12 +206,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
     }
     
-    protected function handleCollectionImport(){
-        
-    }
-    
     /**
-     * In difference to $this->throwBadGateway this method generates an 400 error
+     * This method generates an 400 error
      *   which shows additional error information in the frontend
      *
      * @param string $logMsg
@@ -200,6 +223,4 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         $data  = print_r($this->languageResource->getDataObject(),1);
         $log->logError($logMsg, $data);
     }
-
-
 }

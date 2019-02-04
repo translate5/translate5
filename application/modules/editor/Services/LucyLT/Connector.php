@@ -41,12 +41,14 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
         parent::__construct();
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        $this->DEFAULT_MATCHRATE = $config->runtimeOptions->LanguageResources->lucylt->matchrate;
+        $this->defaultMatchRate = $config->runtimeOptions->LanguageResources->lucylt->matchrate;
     }
     
     /**
      * (non-PHPdoc)
      * @see editor_Services_Connector_Abstract::query()
+     * 
+     * FIXME currently no unified whitespace handling is used (see other connectors), should be refactored on demand
      */
     public function query(editor_Models_Segment $segment) {
         $queryString = $this->getQueryString($segment);
@@ -217,13 +219,17 @@ class editor_Services_LucyLT_Connector extends editor_Services_Connector_Abstrac
     public function search(string $searchString, $field = 'source', $offset = null) {
         throw new BadMethodCallException("The Lucy LT Connector does not support search requests");
     }
+    
+    public function translate(string $searchString){
+        throw new BadMethodCallException("The Lucy LT Connector does not support translate requests");
+    }
 
     /**
      * intended to calculate a matchrate out of the MT score
      * @param string $score
      */
     protected function calculateMatchrate($score = null) {
-        return $this->DEFAULT_MATCHRATE;
+        return $this->defaultMatchRate;
     }
     
     public function getStatus(& $moreInfo){

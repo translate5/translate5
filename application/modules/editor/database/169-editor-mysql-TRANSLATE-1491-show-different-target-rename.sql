@@ -25,6 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-ALTER TABLE `LEK_match_analysis_taskassoc` 
-ADD COLUMN `internalFuzzy` TINYINT(1) NULL DEFAULT 0 AFTER `created`,
-ADD COLUMN `pretranslateMatchrate` INT(11) NULL AFTER `internalFuzzy`;
+UPDATE `Zf_configuration` SET `name`='runtimeOptions.LanguageResources.opentm2.showDifferendTarget' 
+WHERE `name`='runtimeOptions.LanguageResources.opentm2.differentTargetCollect';

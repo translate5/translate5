@@ -30,7 +30,16 @@ class editor_Services_TermCollection_Resource extends editor_Models_LanguageReso
     public function __construct(string $id, string $name) {
         $this->id = $id;
         $this->name = $name;
-        $this->analysable=false;//is used by match analysis
+        $this->analysable = true;//is used by match analysis
+        $this->writable = false; //single terms can not be updated 
         $this->type = editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
+    }
+    
+    /**
+     * returns the initial status for that resource type for the overview list
+     */
+    public function getInitialStatus(&$statusInfo) {
+        $statusInfo = ''; //no addtional info here
+        return editor_Services_Connector_Abstract::STATUS_AVAILABLE;
     }
 }

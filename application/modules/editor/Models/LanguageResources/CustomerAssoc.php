@@ -46,7 +46,9 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_CustomerAssoc';
     
     /***
-     * Save customer assoc from the request parametars for the given language resource
+     * Save customer assoc from the request parametars for the given language resource.
+     * A language resource that is saved must have at least one customer assigned
+     * (if none is given, we use the defaultcustomer).
      * @param mixed $data
      */
     public function saveAssocRequest($data){
@@ -56,6 +58,14 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         
         //the data is in json
         $customers=json_decode($data['resourcesCustomersHidden']);
+        
+        // Check if (at least one) customer is set and use the 'defaultcustomer' if not
+        if (empty($customers)) {
+            $customer = ZfExtended_Factory::get('editor_Models_Customer');
+            /* @var $customer editor_Models_Customer */
+            $customer->loadByDefaultCustomer();
+            $customers[] = $customer->getId();
+        }
         
         $this->addAssocs($customers, $data['id']);
     }

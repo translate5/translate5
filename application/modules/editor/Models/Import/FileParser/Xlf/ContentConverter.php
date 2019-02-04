@@ -99,6 +99,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         $this->task = $task;
         $this->filename = $filename;
         $this->initImageTags();
+        $this->initHelper();
         
         $this->useTagContentOnlyNamespace = $this->namespaces->useTagContentOnly();
         
@@ -158,7 +159,11 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             case 'bx':
             case 'ex':
                 $type = '_singleTag';
-                $rid = 0;
+                
+                //we use the content as rid, so we can match tag numbers in source and target
+                // if there is sub content, it must be removed since the sub content in different languages produces different md5 hashes
+                // since sub tags can contained nested content wthe greedy approach is ok to remove from first <sub> to last </sub>
+                $rid = md5(preg_replace('#<sub>.*</sub>#','<sub/>',$originalContent));
                 break;
             case 'bpt':
                 //the tagNr depends here on the existence of an entry with the same RID 
@@ -181,7 +186,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
             $text = htmlentities($originalContent);
         }
         $tagNr = $this->getShortTagNumber($rid);
-        $p = $this->getTagParams($originalContent, $tagNr, $tag, $text);
+        $p = $this->getTagParams($originalContent, $tagNr, $rid, $text);
         return $this->{$type}->getHtmlTag($p);
     }
     
@@ -273,7 +278,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         }
         else {
             //if we parse the target, we have to reuse the tagNrs found in source
-            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : max($this->shortTagNumbers);
+            $this->shortTagIdent = empty($this->shortTagNumbers) ? 1 : (max($this->shortTagNumbers) + 1);
         }
         $this->source = $source;
         //get the flag just from outside, must not be parsed by inline element parser, since xml:space may occur only outside of inline content 
@@ -320,7 +325,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
         //we have to decode entities here, otherwise our generated XLF wont be valid
         // although the whitespace of the content may not be preserved here, if there remain multiple spaces or other space characters, 
         // we have to protect them here 
-        $text = $this->protectWhitespace($text);
+        $text = $this->whitespaceHelper->protectWhitespace($text);
         $text = $this->whitespaceTagReplacer($text);
         $this->result[] = $text;
     }

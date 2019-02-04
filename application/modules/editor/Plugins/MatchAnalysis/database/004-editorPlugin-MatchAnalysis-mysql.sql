@@ -25,11 +25,18 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+-- due numbering mismatch of the alter SQLs, the previous file were merged in one new file (this one here) which deletes all previous stuff and reapplies
+-- all the modifications so that structure and status of imported SQLs is clean again
+
+DROP TABLE IF EXISTS `LEK_match_analysis`;
+DROP TABLE IF EXISTS `LEK_match_analysis_taskassoc`;
 
 CREATE TABLE `LEK_match_analysis_taskassoc` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `taskGuid` VARCHAR(38) NULL,
   `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `internalFuzzy` TINYINT(1) NULL DEFAULT 0,
+  `pretranslateMatchrate` INT(11) NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_LEK_match_analysis_taskassoc_1_idx` (`taskGuid` ASC),
   CONSTRAINT `fk_LEK_match_analysis_taskassoc_1`
@@ -38,16 +45,16 @@ CREATE TABLE `LEK_match_analysis_taskassoc` (
     ON DELETE CASCADE 
     ON UPDATE CASCADE);
 
-
 CREATE TABLE `LEK_match_analysis` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `taskGuid` varchar(38) DEFAULT NULL,
+  `analysisId` int(11) DEFAULT NULL,
   `segmentId` int(11) DEFAULT NULL,
   `segmentNrInTask` int(11) DEFAULT NULL,
+  `internalFuzzy` TINYINT(1),  
   `languageResourceid` int(11) DEFAULT NULL,
   `matchRate` int(11) DEFAULT NULL,
   `wordCount` int(11) DEFAULT NULL,
-  `analysisId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_LEK_match_analysis_1_idx` (`taskGuid`),
   KEY `index3` (`segmentId`),
@@ -57,23 +64,25 @@ CREATE TABLE `LEK_match_analysis` (
   CONSTRAINT `fk_LEK_match_analysis_2` FOREIGN KEY (`analysisId`) REFERENCES `LEK_match_analysis_taskassoc` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
+DELETE FROM `Zf_worker_dependencies` where `worker` =  'editor_Plugins_MatchAnalysis_Worker' OR `dependency` = 'editor_Plugins_MatchAnalysis_Worker';
 
 INSERT INTO  `Zf_worker_dependencies` (`worker`,`dependency`) VALUES 
 ('editor_Plugins_MatchAnalysis_Worker',  'editor_Models_Import_Worker'),
 ('editor_Plugins_TermTagger_Worker_TermTaggerImport',  'editor_Plugins_MatchAnalysis_Worker'),
-('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Plugins_MatchAnalysis_Worker');
+('editor_Models_Import_Worker_SetTaskToOpen',  'editor_Plugins_MatchAnalysis_Worker'),
+('editor_Plugins_GlobalesePreTranslation_Worker', 'editor_Plugins_MatchAnalysis_Worker');
 
+DELETE FROM `Zf_configuration` 
+WHERE `name` = 'runtimeOptions.worker.editor_Plugins_MatchAnalysis_Worker.maxParallelWorkers';
 
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES
 ('runtimeOptions.worker.editor_Plugins_MatchAnalysis_Worker.maxParallelWorkers', 1, 'editor', 'worker', 1, 1, '', 'integer', 'Max parallel running workers of the MatchAnalysis worker');
 
+DELETE FROM `Zf_acl_rules` WHERE `right` = 'pluginMatchAnalysisMatchAnalysis' AND `resource` = 'frontend' AND `role` = 'pm' AND `module` = 'editor';
+DELETE FROM `Zf_acl_rules` WHERE `right` = 'all' AND `resource` = 'editor_plugins_matchanalysis_matchanalysis' AND `role` = 'pm' AND `module` = 'editor';
+DELETE FROM `Zf_acl_rules` WHERE `right` = 'editorAnalysisTask' AND `resource` = 'frontend' AND `role` = 'pm' AND `module` = 'editor';
+
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'pluginMatchAnalysisMatchAnalysis');
-
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'editor_plugins_matchanalysis_matchanalysis', 'all');
-
 INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorAnalysisTask');
-
-INSERT INTO `Zf_worker_dependencies` (`worker`, `dependency`) VALUES ('editor_Plugins_GlobalesePreTranslation_Worker', 'editor_Plugins_MatchAnalysis_Worker');
-

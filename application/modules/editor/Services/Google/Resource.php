@@ -32,9 +32,9 @@ class editor_Services_Google_Resource extends editor_Models_LanguageResources_Re
         $this->id = $id;
         $this->name = $name;
         $this->filebased = false; //forced to be no filebased
-        $this->searchable = false; //forced to be non searchable
+        $this->searchable = false; //forced to be non searchable (concordance search)
         $this->writable = false; //forced to be non writeable
-        $this->analysable=false;//is used by match analysis
+        $this->analysable = true;//is used by match analysis
         $this->type = editor_Models_Segment_MatchRateType::TYPE_MT;
     }
     
@@ -44,9 +44,7 @@ class editor_Services_Google_Resource extends editor_Models_LanguageResources_Re
      * @see editor_Models_LanguageResources_Resource::hasSourceLang()
      */
     public function hasSourceLang(editor_Models_Languages $sourceLang) {
-        $api=ZfExtended_Factory::get('editor_Services_Google_HttpApi',[
-            new editor_Models_LanguageResources_LanguageResource()
-        ]);
+        $api = ZfExtended_Factory::get('editor_Services_Google_HttpApi');
         /* @var $api editor_Services_Google_HttpApi */
         return $api->isValidLanguage($sourceLang->getRfc5646());
     }
@@ -57,9 +55,7 @@ class editor_Services_Google_Resource extends editor_Models_LanguageResources_Re
      * @see editor_Models_LanguageResources_Resource::hasTargetLang()
      */
     public function hasTargetLang(editor_Models_Languages $targetLang) {
-        $api=ZfExtended_Factory::get('editor_Services_Google_HttpApi',[
-            new editor_Models_LanguageResources_LanguageResource()
-        ]);
+        $api = ZfExtended_Factory::get('editor_Services_Google_HttpApi');
         /* @var $api editor_Services_Google_HttpApi */
         return $api->isValidLanguage($targetLang->getRfc5646());
     }

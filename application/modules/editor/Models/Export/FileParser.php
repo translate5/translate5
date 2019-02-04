@@ -124,6 +124,11 @@ abstract class editor_Models_Export_FileParser {
     protected $termTagHelper;
     
     /**
+     * @var editor_Models_Segment_Whitespace
+     */
+    protected $whitespaceHelper;
+    
+    /**
      * @var ZfExtended_EventManager
      */
     protected $events;
@@ -156,6 +161,7 @@ abstract class editor_Models_Export_FileParser {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+        $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
 
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
@@ -314,13 +320,13 @@ abstract class editor_Models_Export_FileParser {
         //count length after removing removeTrackChanges and removeTermTags 
         // so that the same remove must not be done again inside of textLength
         //also add additionalMrkLength to the segment length for final length calculation 
-        $this->lastSegmentLength = $segment->textLength($edited) + $segmentMeta->getAdditionalMrkLength();
+        $this->lastSegmentLength = $segment->textLengthByMeta($edited,$segmentMeta) + $segmentMeta->getAdditionalMrkLength();
         
         $edited = $this->parseSegment($edited);
         $edited = $this->revertNonBreakingSpaces($edited);
         
         if(!$this->_diff){
-            return $this->unprotectWhitespace($edited);
+            return $this->whitespaceHelper->unprotectWhitespace($edited);
         }
         
         $original = (string) $segment->getFieldOriginal($field);
@@ -335,7 +341,7 @@ abstract class editor_Models_Export_FileParser {
                 $segment->getTimestamp(),
                 $segment->getUserName());
         // unprotectWhitespace must be done after diffing!
-        return $this->unprotectWhitespace($diffed);
+        return $this->whitespaceHelper->unprotectWhitespace($diffed);
     }
     
     /**
@@ -418,35 +424,6 @@ abstract class editor_Models_Export_FileParser {
         $this->disableMqmExport = true;
         $segment = $this->parseSegment($segment);
         $segment = $this->revertNonBreakingSpaces($segment);
-        return $this->unprotectWhitespace($segment);
-    }
-    
-    /**
-     * unprotects tag protected whitespace inside the given segment content
-     * keep attention to the different invocation points for this method!
-     * @param string $content
-     * @return string
-     */
-    protected function unprotectWhitespace($content) {
-        $search = array(
-          '<hardReturn/>',
-          '<softReturn/>',
-          '<macReturn/>',
-          '<hardReturn />',
-          '<softReturn />',
-          '<macReturn />',
-        );
-        $replace = array(
-          "\r\n",  
-          "\n",  
-          "\r",
-          "\r\n",  
-          "\n",  
-          "\r",
-        );
-        $content = str_replace($search, $replace, $content);
-        return preg_replace_callback('#<(space|char|tab) ts="([A-Fa-f0-9]*)"( length="[0-9]+")?/>#', function ($match) {
-                    return pack('H*', $match[2]);
-                }, $content);
+        return $this->whitespaceHelper->unprotectWhitespace($segment);
     }
 }

@@ -37,12 +37,8 @@ class editor_Models_LanguageResources_SdlResources {
      * @return array
      */
     public function getAllEngines(){
-        $dummy=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $dummy editor_Models_LanguageResources_LanguageResource */
-        
-        $api=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi',[$dummy]);
+        $api = ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_HttpApi');
         /* @var $api editor_Services_SDLLanguageCloud_HttpApi */
-        
         
         $result=null;
         //load all available engines
@@ -74,8 +70,15 @@ class editor_Models_LanguageResources_SdlResources {
         $config = Zend_Registry::get('config');
         
         $engineCharacterLimit=null;
+        //set the character limit as languageResourceId as key an characterlimit as value so easy can be accesed
         if(isset($config->runtimeOptions->LanguageResources->searchCharacterLimit)){
-            $engineCharacterLimit=$config->runtimeOptions->LanguageResources->searchCharacterLimit->toArray();
+            $charLimit=$config->runtimeOptions->LanguageResources->searchCharacterLimit->toArray();
+            foreach ($charLimit as $limit){
+                $limit = json_decode(json_encode($limit),true);
+                foreach ($limit as $key=>$value) {
+                    $engineCharacterLimit[$key]=$value;
+                }
+            }
         }
         
         //get the maximum allowed characters for the engine
@@ -94,9 +97,33 @@ class editor_Models_LanguageResources_SdlResources {
             }
         };
         
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $customerLimit=$userModel->getUserCustomerMinCharacters();
+        $getIsoLangs=function($languages) use($lngs){
+          $ret=[];
+          foreach ($languages as $l){
+              $ret[]=isset($lngs[$l]) ? $lngs[$l] : null;
+          }
+          return $ret;
+        };
+        
+        
+        $sdlService=ZfExtended_Factory::get('editor_Services_SDLLanguageCloud_Service');
+        /* @var $sdlService editor_Services_SDLLanguageCloud_Service */
+        
+        //check if the resource supports the file upload. For now only the sdl cloud resources support.
+        $isFileUpload=function($engine) use ($sdlService){
+            if(is_object($engine) && isset($engine->serviceName)){
+                return $engine->serviceName == $sdlService->getName();
+            }
+            if(is_array($engine) && isset($engine['serviceName'])){
+                return $engine['serviceName'] == $sdlService->getName();
+            }
+            
+            return false;
+        };
+        
+        $customer=ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $customerLimit=$customer->getMinCharactersByUser();
         
         //if the customer config is not defined, set the customer limit to max int, so it is compared against engine limit
         if($customerLimit < 1){
@@ -110,15 +137,20 @@ class editor_Models_LanguageResources_SdlResources {
             //get character limit per engine (if configured)
             $engineLimit=isset($engineCharacterLimit[$id]) ? $engineCharacterLimit[$id] : PHP_INT_MAX;
             
+            //check if the engine support file uploads
+            $fileUpload=$isFileUpload($engine);
+            
             $data=array(
                 'id'=>is_array($engine) ? $engine['id'] :'mt'.$engineCounter,
-                'name' =>is_array($engine) ? $engine['serviceName'] : $engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
+                'name' =>is_array($engine) ? $engine['name'] : $engine->type.', ['.$engine->fromCulture.','.$engine->toCulture.']',
                 'source' => is_array($engine) ? $engine['sourceLangRfc5646'] : $engine->fromCulture,
-                'sourceIso' => is_array($engine) ? $lngs[$engine['sourceLang']] : $engine->from->code,
+                'sourceIso' => is_array($engine) ? $getIsoLangs($engine['sourceLang']) : $engine->from->code,
                 'target' => is_array($engine) ? $engine['targetLangRfc5646']: $engine->toCulture,
-                'targetIso' => is_array($engine) ?$lngs[$engine['targetLang']]:$engine->to->code,
+                'targetIso' => is_array($engine) ? $getIsoLangs($engine['targetLang']):$engine->to->code,
                 'domainCode' => is_array($engine) ? $getDomainCode($engine['specificData']):$engine->domainCode,
                 'characterLimit' => $getCharacterLimit([$customerLimit,$engineLimit]),
+                'fileUpload'=> $fileUpload,
+                'serviceName'=>is_array($engine) ?  $engine['serviceName'] : $sdlService->getName()
             );
             
             if($addArrayId){

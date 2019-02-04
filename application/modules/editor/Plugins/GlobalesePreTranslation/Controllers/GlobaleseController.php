@@ -118,6 +118,11 @@ class editor_Plugins_GlobalesePreTranslation_GlobaleseController extends ZfExten
             'apiKey'=>$data->apiKey
         ];
         
+        //validate the params
+        if(empty($params['group']) || empty($params['engine']) || empty($params['apiUsername']) || empty($params['apiKey'])) {
+            return;
+        }
+        
         // init worker and queue it
         if (!$worker->init($task->getTaskGuid(), $params)) {
             $this->log->logError('GlobalesePreTranslation-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');

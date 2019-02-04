@@ -54,12 +54,12 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     const CONFIG_COLUMN_MID = 'mid';
     
     /**
-     * @var type array order of the columns - which column is mid, source and target
+     * @var array order of the columns - which column is mid, source and target
      */
     protected $colOrder = array();
     
     /**
-     * @var type string line break chars of the csv file
+     * @var string line break chars of the csv file
      */
     protected $break;
     
@@ -128,6 +128,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
+        $this->initHelper();
         
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
@@ -395,15 +396,18 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         
         return $this->parseSegmentReplacePlaceholders($segment);
     }
+    
     /**
      * protects whitespace inside a segment with a tag
      *
      * @param string $segment
+     * @param callable $textNodeCallback not used in CSV Fileparsing!
+     * 
      * @return string $segment
      */
-    protected function parseSegmentProtectWhitespace($segment) {
+    protected function parseSegmentProtectWhitespace($segment, callable $textNodeCallback = null) {
         //since CSV has escaped all tags before, we can call directly protectWhitespace instead of parseSegmentProtectWhitespace which splits the content up
-        $segment = $this->protectWhitespace($segment, false);
+        $segment = $this->whitespaceHelper->protectWhitespace($segment, false);
         //In CSV we have to directly replace our whitespace tags with their HTML replacement
         $segment = $this->whitespaceTagReplacer($segment);
         $segment = $this->parseSegmentInsertPlaceholders($segment,$this->regexInternalTags);

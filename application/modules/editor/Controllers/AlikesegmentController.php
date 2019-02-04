@@ -54,44 +54,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * Feld.
      * @var array array($field => array(origType => newType),...)
      */
-    protected $_filterTypeMap = array(
-                    array('qmId'=>array('list'=>'listAsString'))
-    );
+    protected $_filterTypeMap = [
+        'qmId' => ['list' => 'listAsString']
+    ];
     
     
-
-    public function init() {
-      parent::init();
-      $this->initEvents();
-    }
-    
-    //attach to the events
-    protected function initEvents(){
-        $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
-    }
-    
-    /**
-     * When using change alikes, the transFound information in the source has to be changed.
-     * This is done by this handler.
-     *
-     * @param Zend_EventManager_Event $event
-     */
-    public function handleBeforeSaveAlike(Zend_EventManager_Event $event) {
-        $alikeSegment = $event->getParam('alikeSegment');
-        /* @var $alikeSegment editor_Models_Segment */
-        
-        $type = $alikeSegment->getMatchRateType();
-        
-        $matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        /* @var $matchRateType editor_Models_Segment_MatchRateType */
-        $matchRateType->init($type);
-        
-        if($matchRateType->isEdited()) {
-            $matchRateType->add($matchRateType::TYPE_AUTO_PROPAGATED);
-            $alikeSegment->setMatchRateType((string) $matchRateType);
-        }
-    }
-
     public function preDispatch() {
         parent::preDispatch();
         $this->entity->setEnableWatchlistJoin();
@@ -254,6 +221,16 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $entity->setMatchRateType($this->entity->getMatchRateType());
                 
                 $entity->setAutoStateId($states->calculateAlikeState($entity, $tua));
+                
+                
+                $matchRateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
+                /* @var $matchRateType editor_Models_Segment_MatchRateType */
+                $matchRateType->init($entity->getMatchRateType());
+                
+                if($matchRateType->isEdited()) {
+                    $matchRateType->add($matchRateType::TYPE_AUTO_PROPAGATED);
+                    $entity->setMatchRateType((string) $matchRateType);
+                }
                 
                 //is called before save the alike to the DB, after doing all alike data handling (include recalc of the autostate)
                 $this->events->trigger('beforeSaveAlike', $this, array(

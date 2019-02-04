@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -25,21 +25,8 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+SELECT @cust_id := id
+FROM LEK_customer
+WHERE name = 'defaultcustomer';
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
-
-/**
- * Defines the default interface for MetaData Importers
- */
-interface editor_Models_Import_IMetaDataImporter {
-    /**
-     * calls the internal import mechanisim
-     * @param editor_Models_Task $task
-     * @param editor_Models_Import_MetaData $meta
-     */
-    public function import(editor_Models_Task $task, editor_Models_Import_MetaData $meta);
-}
+UPDATE LEK_languageresources_customerassoc SET customerId=@cust_id,useAsDefault=0 where customerId IS NULL;

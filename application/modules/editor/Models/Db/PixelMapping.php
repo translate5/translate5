@@ -26,15 +26,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TaskAssoc extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Collection task assoc
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('taskGuid', 'guid');
-  }
+/**
+ * DB Model for pixel mapping
+ */
+class editor_Models_Db_PixelMapping extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_pixel_mapping';
+    public $_primary = 'id';
 }
