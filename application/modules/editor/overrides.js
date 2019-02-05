@@ -1020,7 +1020,6 @@ function(){
     var additiveEvents = this.prototype.additiveEvents,
         eventMap = this.prototype.eventMap;
     if(Ext.supports.TouchEvents && Ext.firefoxVersion >= 52 && Ext.os.is.Desktop){
-    	console.log("call")
         eventMap['touchstart'] = 'mousedown';
         eventMap['touchmove'] = 'mousemove';
         eventMap['touchend'] = 'mouseup';
