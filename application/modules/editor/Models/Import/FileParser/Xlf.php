@@ -422,6 +422,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $content = '';
             }
         }
+        //the other lengths are stored per affected segment (and is already added to the length stored in metaCache per segment)
         $attributes->additionalMrkLength = $this->segmentBareInstance->textLengthByImportattributes($content, $attributes, $this->task->getTaskGuid());
     }
     
@@ -720,6 +721,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function initLengthRestrictionAttributes () {
         $keys = array_keys($this->lengthRestrictionDefaults);
+        if(!Zend_Registry::isRegistered('taskTemplate')) {
+            return;
+        }
         $taskConfig = Zend_Registry::get('taskTemplate');
         foreach($keys as $key) {
             if(empty($taskConfig->pixelmapping->$key)) {
@@ -910,7 +914,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_SOURCE_MRK;
             }
             
-            //first we save the previous other content length to the previous segment
+            //first we save the previous other content length to the previous segment (only if preserveWhitespace true)
             $this->saveTargetOtherContentLength($attributes, $hasNoTarget || $hasEmptyTarget, $preserveWhitespace);
             
             //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
