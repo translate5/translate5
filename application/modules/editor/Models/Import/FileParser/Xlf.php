@@ -720,10 +720,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * init default values for length-Restriction-Attributes (sizeUnit, font, fontSize, minWidth, maxWidth): 
      */
     protected function initLengthRestrictionAttributes () {
-        $keys = array_keys($this->lengthRestrictionDefaults);
         if(!Zend_Registry::isRegistered('taskTemplate')) {
             return;
         }
+        $keys = array_keys($this->lengthRestrictionDefaults);
         $taskConfig = Zend_Registry::get('taskTemplate');
         foreach($keys as $key) {
             if(empty($taskConfig->pixelmapping->$key)) {
