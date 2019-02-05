@@ -87,6 +87,7 @@ Ext.define('Editor.util.SegmentEditor', {
     /**
      * Returns true if the Segment-Editor is "empty" (= includes nothing but isContainerToIgnore or Selection-Boundary), e.g.:
      * - true: <body><img class="duplicatesavecheck"></body>
+     * - true: <body><del>abc</del><img class="duplicatesavecheck"></body>
      * - true: <body><ins><span id="selectionBoundary"></span></ins><img class="duplicatesavecheck"></body>
      * @returns {Boolean}
      */
@@ -103,14 +104,21 @@ Ext.define('Editor.util.SegmentEditor', {
                 if (!me.isContainerToIgnore(node)) {
                     return false;
                 }
+                if (node.nodeName === 'DEL') {
+                    return false;
+                }
                 return true;
             } else {
                 // selection-boundary-spans do include #text (data: \ufeff)
-                if (node.parentNode != null && me.isContainerToIgnore(node.parentNode)) {
+                if (node.parentNode && me.isContainerToIgnore(node.parentNode)) {
                     return false;
                 }
                 //its unclear if to use here textContainsEmptyIns or textIsEmptyIns, according to the implementation date the first one makes sense
                 if (Editor.plugins.TrackChanges && me.textContainsEmptyIns(node.data)) {
+                    return false;
+                }
+                // (checking parent is enough; del-Nodes should never be nested:)
+                if (node.parentNode && node.parentNode.nodeName === 'DEL') {
                     return false;
                 }
                 return node.data != "";
