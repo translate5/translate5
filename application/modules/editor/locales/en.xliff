@@ -1101,6 +1101,7 @@
 	  <source>Trotzdem speichern</source>
 	  <target>Save anyway</target>
 	</trans-unit>
+    <trans-unit id='RG9wcGVsa2xpY2sgYXVmIGRpZSBaZWlsZSDDvGJlcm5pbW10IGRpZXNlbiBNYXRjaCBpbiBkYXMgZ2XDtmZmbmV0ZSBTZWdtZW50Lg=='><source>Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.</source><target>Doubleclick to take over the match into the opened segment.</target></trans-unit>
         <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can proofread SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
 
 <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Support of translate5 development</target></trans-unit>
