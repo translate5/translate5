@@ -296,6 +296,7 @@ Ext.define('Editor.controller.Editor', {
             }
             return true;
         }
+        this.fireEvent('prepareTrackChangesForSaving');
         this.fireEvent('saveSegment', {
             scope: this,
             segmentUsageFinished: function(){
