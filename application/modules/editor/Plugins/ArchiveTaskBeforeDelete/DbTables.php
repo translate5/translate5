@@ -93,7 +93,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_user_meta' => false,
             'LEK_visualreview_files' => 'taskGuid',
             'LEK_visualreview_segmentmapping' => 'taskGuid',
-            'LEK_workflow_log' => 'taskGuid',
             'LEK_workflow_action' => false,
             'LEK_workflow_userpref' => 'taskGuid',
             'Zf_dbversion' => true

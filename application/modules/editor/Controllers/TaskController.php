@@ -98,6 +98,16 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected $config;
     
+    /**
+     * @var ZfExtended_Logger
+     */
+    protected $taskLog;
+    
+    /**
+     *  @var editor_Logger_Workflow
+     */
+    protected $log = false;
+
     public function init() {
         $this->_filterTypeMap = [
             'customerId' => [
@@ -115,6 +125,15 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->upload = ZfExtended_Factory::get('editor_Models_Import_UploadProcessor');
         $this->config = Zend_Registry::get('config');
+
+        //create a new logger instance writing only to the configured taskLogger
+        $this->taskLog = ZfExtended_Factory::get('ZfExtended_Logger', [[
+            'writer' => [
+                'tasklog' => $this->config->resources->ZfExtended_Resource_Logger->writer->tasklog
+            ] 
+        ]]);
+        
+        $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', $this->entity);
         
         //add context xliff2 as valid format
         $this->_helper
@@ -517,7 +536,7 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['lockingUser']);
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();
-        editor_Models_LogRequest::create($this->entity->getTaskGuid());
+        $this->log->request();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
         ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
@@ -534,7 +553,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * returns the tasks events
+     * returns the logged events for the given task
      */
     public function eventsAction() {
         $this->getAction();
@@ -559,7 +578,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->checkStateAllowsActions();
         
         $taskguid = $this->entity->getTaskGuid();
-        editor_Models_LogRequest::create($taskguid);
+        $this->log->request();
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
@@ -597,12 +616,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->workflow->doWithTask($oldTask, $this->entity);
         
         if($oldTask->getState() != $this->entity->getState()) {
-            $log = Zend_Registry::get('logger');
-            /* @var $log ZfExtended_Logger */
-            $log->info('E1011', 'Status change to {status}', [
-                'task' => $this->entity->getDataObject(),
-                'status' => $this->entity->getState(),
-            ], ['tasklog']); //if logger is used at other places here too, consider to make a own instance with just the tasklog writer!
+            $this->logInfo('Status change to {status}', ['status' => $this->entity->getState()]);
+        }
+        else {
+            //id is always set as modified, therefore we don't log task changes if id is the only modified
+            $modified = $this->entity->getModifiedValues();
+            if(array_key_exists('id', $modified) && count($modified) == 1) {
+                $this->logInfo('Task modified:');
+            }
         }
         
         //updateUserState does also call workflow "do" methods!
@@ -865,7 +886,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->setUsedState($this->data->userState);
         } else {
             if($isPmOverride && $isEditAllTasks) {
-                editor_Models_LogTask::createWithUserGuid($taskGuid, $this->data->userState, $this->user->data->userGuid);
+                $this->log->info('E1011', 'PM left task');
                 $userTaskAssoc->deletePmOverride();
                 return;
             }
@@ -887,7 +908,11 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         
         if($oldUserTaskAssoc->getState() != $this->data->userState){
-            editor_Models_LogTask::createWithUserGuid($taskGuid, $this->data->userState, $this->user->data->userGuid);
+            $this->log->info('E1011', 'job status changed from {oldState} to {newState}', [
+                'tua' => $oldUserTaskAssoc,
+                'oldState' => $oldUserTaskAssoc->getState(),
+                'newState' => $this->data->userState,
+            ]);
         }
     }
     
@@ -1078,46 +1103,34 @@ class editor_TaskController extends ZfExtended_RestController {
         return $this->user->data->userGuid===$taskPmGuid;
     }
     
-    /***
-     * Check if the user has rights to modefi the task attributes:taskName, targetDeliveryDate, realDeliveryDate, orderdate, pmGuid, pmName
+    /**
+     * Check if the user has rights to modify task attributes
      */
     protected function checkTaskAttributeField(){
+        $fieldToRight = [
+            'taskName' => 'editorEditTaskTaskName',
+            'targetDeliveryDate' => 'editorEditTaskDeliveryDate',
+            'realDeliveryDate' => 'editorEditTaskRealDeliveryDate',
+            'orderdate' => 'editorEditTaskOrderDate',
+            'pmGuid' => 'editorEditTaskPm',
+            'pmName' => 'editorEditTaskPm',
+        ];
         
-        if(!empty($this->data->taskName) && !$this->isAllowed('frontend','editorEditTaskTaskName')) {
-            unset($this->data->taskName);
-            error_log("The user is not allowed to modifi the taskName. taskGuid->".$this->data->taskGuid);
-        }
-        
-        if(!empty($this->data->targetDeliveryDate) && !$this->isAllowed('frontend','editorEditTaskDeliveryDate')) {
-            unset($this->data->targetDeliveryDate);
-            error_log("The user is not allowed to modifi the targetDeliveryDate. taskGuid->".$this->data->taskGuid);
-        }
-        
-        if(!empty($this->data->realDeliveryDate) && !$this->isAllowed('frontend','editorEditTaskRealDeliveryDate')) {
-            unset($this->data->realDeliveryDate);
-            error_log("The user is not allowed to modifi the realDeliveryDate. taskGuid->".$this->data->taskGuid);
-        }
-        
-        if(!empty($this->data->orderdate) && !$this->isAllowed('frontend','editorEditTaskOrderDate')) {
-            unset($this->data->orderdate);
-            error_log("The user is not allowed to modifi the orderdate. taskGuid->".$this->data->taskGuid);
-        }
-        
-        if(!empty($this->data->pmGuid) && !$this->isAllowed('frontend','editorEditTaskPm')) {
-            unset($this->data->pmGuid);
-            error_log("The user is not allowed to modifi the pmGuid. taskGuid->".$this->data->taskGuid);
-        }else if(!empty($this->data->pmGuid)){
-            //if the pmGuid is modefied, set the pmName
-            $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        //pre check pm change first
+        if(!empty($this->data->pmGuid) && $this->isAllowed('frontend', 'editorEditTaskPm')){
+            //if the pmGuid is modified, set the pmName
+            $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
             /* @var $userModel  ZfExtended_Models_User*/
-            $user=$userModel->loadByGuid($this->data->pmGuid);
-            $this->data->pmName=$user->getUsernameLong();
+            $user = $userModel->loadByGuid($this->data->pmGuid);
+            $this->data->pmName = $user->getUsernameLong();
         }
         
-        //we need to check also the pm name
-        if(!empty($this->data->pmName) && !$this->isAllowed('frontend','editorEditTaskPm')) {
-            unset($this->data->pmName);
-            error_log("The user is not allowed to modifi the pmName. taskGuid->".$this->data->taskGuid);
+        //then loop over all allowed fields
+        foreach($fieldToRight as $field => $right) {
+            if(!empty($this->data->$field) && !$this->isAllowed('frontend', $right)) {
+                unset($this->data->$field);
+                $this->log->warn('E1011', 'The user is not allowed to modify the tasks field {field}', ['field' => $field]);
+            }
         }
     }
     
@@ -1129,7 +1142,7 @@ class editor_TaskController extends ZfExtended_RestController {
             throw new BadMethodCallException('Only HTTP method POST allowed!');
         }
         $this->entityLoad();
-        editor_Models_LogRequest::create($this->entity->getTaskGuid());
+        $this->log->request();
         $this->initWorkflow($this->entity->getWorkflow());
         $this->view->trigger = $this->getParam('trigger');
         $this->view->success = $this->workflow->doDirectTrigger($this->entity, $this->getParam('trigger'));
@@ -1143,4 +1156,14 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->handleValidateException($e);
     }
     
+    /**
+     * Logs a info message to the current task to the task_log table ONLY!
+     * @param string $message message to be logged
+     * @param array $extraData optional, extra data to the log entry
+     */
+    protected function logInfo($message, array $extraData = []) {
+        // E1011 is he default multipurpose error code for task logging
+        $extraData['task'] = $this->entity;
+        $this->taskLog->info('E1011', $message, $extraData);
+    }
 }
