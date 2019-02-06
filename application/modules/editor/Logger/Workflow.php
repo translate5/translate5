@@ -44,7 +44,7 @@ class editor_Logger_Workflow extends ZfExtended_Logger {
     public function request(array $additionalData = []) {
         //FIXME remove the following config from DB and migrate request log table
         // $config->runtimeOptions->requestLogging
-        $this->request(['task' => $this->task]);
+        parent::request(['task' => $this->task]);
     }
     
     /**
@@ -54,9 +54,10 @@ class editor_Logger_Workflow extends ZfExtended_Logger {
      */
     public function __call($name, $arguments) {
         $logger = Zend_Registry::get('logger');
-        $origOrigin = $logger->origin;
-        $logger->origin = 'workflow';
+        /* @var $logger ZfExtended_Logger */
+        $origDomain = $logger->domain;
+        $logger->domain = 'workflow';
         call_user_func_array([$logger, $name], $arguments);
-        $logger->origin = $origOrigin;
+        $logger->domain = $origDomain;
     }
 }

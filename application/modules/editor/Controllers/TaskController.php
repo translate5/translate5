@@ -133,7 +133,7 @@ class editor_TaskController extends ZfExtended_RestController {
             ] 
         ]]);
         
-        $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', $this->entity);
+        $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->entity]);
         
         //add context xliff2 as valid format
         $this->_helper

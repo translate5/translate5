@@ -686,7 +686,7 @@ abstract class editor_Workflow_Abstract {
         }
         //get the logger for the task
         if(empty($this->log[$taskGuid])) {
-            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->task]);
+            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->newTask]);
         }
         $log = $this->log[$taskGuid];
         /* @var $log editor_Logger_Workflow */
