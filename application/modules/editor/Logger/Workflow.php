@@ -57,6 +57,13 @@ class editor_Logger_Workflow extends ZfExtended_Logger {
         /* @var $logger ZfExtended_Logger */
         $origDomain = $logger->domain;
         $logger->domain = 'workflow';
+        //add task to the logged event
+        if(count($arguments) < 3) {
+            $arguments[2] = ['task' => $this->task];
+        }
+        else {
+            $arguments[2]['task'] = $this->task;
+        }
         call_user_func_array([$logger, $name], $arguments);
         $logger->domain = $origDomain;
     }
