@@ -66,10 +66,6 @@ Ext.define('Editor.view.admin.task.LogWindow', {
         return me.callParent([config]);
     },
     load: function(options) {
-        var store = this.down('editorAdminTaskLogGrid').getStore();
-        store.loadData([], false);
-        store.load({
-            url: Editor.data.restpath+'task/'+this.task.getId()+'/events'
-        });
+        this.down('editorAdminTaskLogGrid').load(this.task.getId());
     }
 });

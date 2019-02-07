@@ -80,6 +80,16 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
+            tabs.push({
+                xtype: 'editorAdminTaskLogGrid',
+                title: '#UT# Task Log',
+                listeners: {
+                    show: function() {
+                        this.load(me.actualTask.getId());
+                    }
+                }
+            });
+        
         config = {
             height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),
             width: 1000,

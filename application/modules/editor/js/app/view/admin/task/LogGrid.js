@@ -106,5 +106,12 @@ Ext.define('Editor.view.admin.task.LogGrid', {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
+    },
+    load: function(taskId) {
+        var store = this.getStore();
+        store.loadData([], false);
+        store.load({
+            url: Editor.data.restpath+'task/'+taskId+'/events'
+        });
     }
 });
