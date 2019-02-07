@@ -403,7 +403,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             $controllers = array_merge($controllers, $pluginFrontendControllers);
         }
         
-        if($acl->isInAllowedRoles($userSession->data->roles,'headPanelFrontendController')){
+        $editorOnly = $ed->editorViewPort == 'Editor.view.ViewPortSingle';
+        if(!$editorOnly && $acl->isInAllowedRoles($userSession->data->roles,'headPanelFrontendController')){
             $controllers[] = 'HeadPanel';
         }
         if($acl->isInAllowedRoles($userSession->data->roles,'userPrefFrontendController')){
