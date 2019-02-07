@@ -403,8 +403,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName == 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)){
           return;
       }
-      if(item.tagName != 'DIV'){
-        return;
+      //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
+      if(item.tagName != 'DIV' || !/(^|[\s])internal-tag([\s]|$)/.test(item.className)){
+          return;
       }
       data = me.getData(item, data); 
       

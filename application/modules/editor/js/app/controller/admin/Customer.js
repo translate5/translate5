@@ -122,7 +122,7 @@ Ext.define('Editor.controller.admin.Customer', {
      * hide the customers button when editor is opened
      */
     onEditorViewportOpen:function(){
-        this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(true);
+        this.getHeadToolBar() && this.getHeadToolBar().down('#btnCustomerOverviewWindow').setHidden(true);
     },
 
     /**
