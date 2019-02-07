@@ -3,6 +3,18 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.0.5] - 2019-02-07
+###Bugfixes
+TRANSLATE-1570: Editor-only usage (embedded translate5) was not working properly due JS errors
+TRANSLATE-1548: TrackChanges: nested DEL tags in the frontend
+TRANSLATE-1526: TrackChanges: pasting content into the editor could lead to an JS error
+TRANSLATE-1566: Segment pixel length restriction does not work with globalese pretranslation
+TRANSLATE-1556: pressing ctrl-c in language resource panel produced an JS error
+TRANSLATE-910: Fast clicking on segment bookmark button produces an error on server side
+TRANSLATE-1545: Term details are not displayed in term portal
+TRANSLATE-1525: TrackChanges: seldom error in the GUI fixed
+TRANSLATE-1230: Translate5 was not usable on touch devices
+
 ## [3.0.4] - 2019-01-31
 ###Changed
 TRANSLATE-1555: Okapi Import: Add SRX segmentation rules for most common languages
