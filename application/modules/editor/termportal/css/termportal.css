@@ -60,6 +60,7 @@ END LICENSE AND COPYRIGHT
 #languageSelector {
     order: 3;
     text-align: right;
+    margin-right: 7px;
 }
 #locale-button {width: 9em;}
 #logoutContainer {
@@ -71,7 +72,9 @@ END LICENSE AND COPYRIGHT
     color: #fff;
 }
 #logoutContainer a:hover {
-    color: #000;
+    background-color: #e6e6e6;
+    border-color:#c5c5c5;
+    color: #454545;
 }
 
 @media (max-width: 500px) {

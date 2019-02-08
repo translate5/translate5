@@ -143,7 +143,9 @@ h4, p {
     color: #fff;
 }
 #logoutContainer a:hover {
-    color: #000;
+    background-color: #e6e6e6;
+    border-color:#c5c5c5;
+    color: #454545;
 }
 
 @media (max-width: 500px) {
@@ -190,6 +192,15 @@ h4, p {
     height: 20px;
     margin-left: 5px;
     margin-bottom: -4px;
+}
+
+/* ----------- language-locales ---------- */
+
+.localesSelectList li.notavailable div {
+    color: #999;
+}
+.localesSelectList li.notavailable div:hover {
+    color: #eee;
 }
 
 /* --------------- source --------------- */
@@ -241,13 +252,6 @@ h4, p {
 }
 
 #translationSubmit {
-    display: none;
-}
-
-#translationSubmit,
-#translationSubmit:hover,
-#translationSubmit:focus ,
-#translationSubmit:active {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -259,6 +263,14 @@ h4, p {
     background-image: linear-gradient(top,#4d90fe,#4787ed);
     border: 1px solid #3079ed;
     color: #fff;
+}
+#translationSubmit:hover,
+#translationSubmit:focus,
+#translationSubmit:active {
+    background-image: none;
+    background-color: #e6e6e6;
+    border-color:#c5c5c5;
+    color: #454545;
 }
 #translations {
     width: 100%;
