@@ -33,6 +33,22 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_GlobalesePreTranslation_Connector {
     
     /***
+     *
+     * Globalese file statuses
+     */
+    const GLOBALESE_FILESTATUS_OK = 'ok';
+    const GLOBALESE_FILESTATUS_TRANSLATED='translated';
+    const GLOBALESE_FILESTATUS_IN_TRANSLATION= 'in_translation';
+    const GLOBALESE_FILESTATUS_ERROR= 'error';
+    
+    /***
+     * Request timeout for the api
+     *
+     * @var integer
+     */
+    const REQUEST_TIMEOUT_SECONDS = 360;
+    
+    /***
      * 
      * @var $config Zend_Config
      */
@@ -105,21 +121,16 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * @var editor_Models_Task
      */
     private $m_task;
+    
+    
     /***
-     * 
-     * Globalese file statuses
+     * Ignore error messages from globalese
+     * @var array
      */
-    const GLOBALESE_FILESTATUS_OK = 'ok';
-    const GLOBALESE_FILESTATUS_TRANSLATED='translated';
-    const GLOBALESE_FILESTATUS_IN_TRANSLATION= 'in_translation';
-    const GLOBALESE_FILESTATUS_ERROR= 'error';
-
-    /***
-     * Request timeout for the api
-     * 
-     * @var integer
-     */
-    const REQUEST_TIMEOUT_SECONDS = 360;
+    private $ignoreErrorMessages=[
+        'Error uploading file. The uploaded file contains no untranslated segments.'
+    ];
+    
     
     public function __construct() {
         $this->globaleseConfig= Zend_Registry::get('config')->runtimeOptions->plugins->GlobalesePreTranslation;
@@ -384,8 +395,12 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         } catch (ZfExtended_Exception $ex) {
             $this->deleteFile($fileId);
             /* @var $erroLog ZfExtended_Log */
-            $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
-            $erroLog->logError("Error occurred during file download (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
+            $message=$ex->getMessage();
+            $message=json_decode($message);
+            if(!in_array($message->error, $this->ignoreErrorMessages)){
+                $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+                $erroLog->logError("Error occurred during file download (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
+            }
         }
         if($remove){
             $this->deleteFile($fileId);
