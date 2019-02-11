@@ -66,7 +66,11 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeleteMsg:'#UT#Diesen Kunden löschen?',
         customerDeleteTitle:'#UT#Kunden löschen',
         customerDeletedMsg:'#UT#Kunde gelöscht',
-        export:'#UT#Exportieren'
+        export:'#UT#Exportieren',
+        domain:'#UT#Domain',
+        openIdServer:'#UT#OpenID server',
+        openIdAuth2Url:'#UT#OpenID OAuth url',
+        rolesLabel: '#UT#Systemrollen'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -78,7 +82,21 @@ Ext.define('Editor.view.admin.customer.Panel', {
 
     initConfig: function(instanceConfig) {
         var me = this,
-            config = {
+        	roles=[];
+        
+        Ext.Object.each(Editor.data.app.roles, function(key, value) {
+            //if the role is not setable for the user, do not create an check box for it
+            if(!value.setable){
+                return;
+            }
+            roles.push({
+                boxLabel: value.label, 
+                name: 'roles_helper', 
+                value: key,
+                handler: me.roleCheckChange
+            });
+        });
+        var config = {
                 title: me.title, //see EXT6UPD-9
                 items: [
                     {
@@ -180,6 +198,61 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         name: 'number',
                                         allowBlank: false,
                                         maxLength: 255
+                                    },{
+                                    	xtype:'textfield',
+                                    	fieldLabel:me.strings.domain,
+                                    	name:'domain',
+                                    	setAllowBlank:me.setFieldAllowBlank,
+                                    	listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                    	bind:{
+                                    		allowBlank:'{!isOpenIdRequired}'
+                                    	}
+                                    },{
+                                    	xtype:'textfield',
+                                    	fieldLabel:me.strings.openIdServer,
+                                    	name:'openIdServer',
+                                    	setAllowBlank:me.setFieldAllowBlank,
+                                    	listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                    	bind:{
+                                    		allowBlank:'{!isOpenIdRequired}'
+                                    	}
+                                    },{
+                                    	xtype:'textfield',
+                                    	fieldLabel:me.strings.openIdAuth2Url,
+                                    	name:'openIdAuth2Url',
+                                    	setAllowBlank:me.setFieldAllowBlank,
+                                    	listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                    	bind:{
+                                    		allowBlank:'{!isOpenIdRequired}'
+                                    	}
+                                    },{
+                                        xtype: 'hidden',
+                                        name: 'openIdServerRoles'
+                                    },{
+	                                    xtype: 'checkboxgroup',
+	                                    itemId: 'rolesGroup',
+	                                    cls: 'x-check-group-alt',
+	                                    fieldLabel: me.strings.rolesLabel,
+	                                    items: roles,
+	                                    columns: 3,
+	                                    bind:{
+                                    		visible:'{isOpenIdRequired}'
+                                    	}
                                     },
                                     {
                                         xtype: 'container',
@@ -277,14 +350,34 @@ Ext.define('Editor.view.admin.customer.Panel', {
         }
         return me.callParent([config]);
     },
+    
     initComponent: function() {
         var me = this;
         me.callParent(arguments);
     },
     
+    setFieldAllowBlank:function(value){
+    	this.allowBlank=value;
+    	this.up('form').isValid();
+    },
+    
     onViewBeforeRefresh: function(dataview, eOpts) {
         //workaround / fix for TMUE-11
         dataview.getSelectionModel().deselectAll();
+    },
+    
+    /**
+     * merge and save the checked roles into the hidden roles field
+     * @param {Ext.form.field.Checkbox} box
+     * @param {Boolean} checked
+     */
+    roleCheckChange: function(box, checked) {
+        var roles = [],
+            boxes = box.up('#rolesGroup').query('checkbox[checked=true]');
+        Ext.Array.forEach(boxes, function(box){
+            roles.push(box.initialConfig.value);
+        });
+        box.up('form').down('hidden[name="openIdServerRoles"]').setValue(roles.join(','));
     },
 
     /***

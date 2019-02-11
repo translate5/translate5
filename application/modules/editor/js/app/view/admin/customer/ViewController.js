@@ -35,14 +35,22 @@ Ext.define('Editor.view.admin.customer.ViewController', {
      * Set record for editing
      */
     dblclick: function(dataview, record, item, index, e, eOpts) {
-        var formPanel = this.getReferences().form,
-            removeButton = this.getReferences().removeButton,
-            vm = this.getViewModel();
+        var me=this,
+        	formPanel = me.getReferences().form,
+            removeButton = me.getReferences().removeButton,
+            vm = me.getViewModel();
 
         vm.set('record', record);
-        vm.set('title', this.getView().strings.editCustomerTitle);
+        vm.set('title', me.getView().strings.editCustomerTitle);
 
         formPanel.loadRecord(record);
+        
+        var roles = record.get('openIdServerRoles').split(','),
+        	rolesBoxes=me.getView().down('#rolesGroup').items.items;
+        Ext.Array.forEach(rolesBoxes, function(item) {
+            item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
+        });
+        
         removeButton.setDisabled(false);
     },
 
@@ -226,5 +234,23 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     //when customers panel is displayed,this function is executed
     reloadCustomerStore:function(){
         Ext.StoreManager.get('customersStore').load();
-    }
+    },
+    
+    onOpenIdFieldChange:function(field,newValue,oldValue,eOpts){
+    	var me=this,
+    		form=me.getView().down('form').getForm(),
+    		vm=me.getViewModel(),
+    		fields=['domain','openIdServer','openIdAuth2Url'],
+    		isOpenIdRequired=false;
+    	
+    	//for each of the openid fields, check if one of them contains value
+    	//if yes all other fields are required
+        Ext.Array.forEach(fields, function(field) {
+        	if(!isOpenIdRequired){
+        		isOpenIdRequired=form.findField(field).getValue()!='';
+        	}
+        });
+        
+    	vm.set('isOpenIdRequired',isOpenIdRequired);
+    },
 });
