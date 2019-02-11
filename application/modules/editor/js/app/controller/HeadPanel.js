@@ -124,6 +124,10 @@ Ext.define('Editor.controller.HeadPanel', {
    * shows the sub components needed by the editor (hide others)
    */
   handleInitEditor: function() {
+      //head panel may be disabled in editor view
+      if(!this.getHeadPanel()) {
+          return;
+      }
       var hp = this.getHeadPanel(),
           data = {
               user: Editor.app.authenticatedUser.data,
