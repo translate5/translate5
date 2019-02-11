@@ -269,6 +269,11 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         } catch (Exception $ex) {
             $this->deleteFile($fileId);
             /* @var $erroLog ZfExtended_Log */
+            $message=$ex->getMessage();
+            $message=json_decode($message);
+            if(in_array($message->error, $this->ignoreErrorMessages)){
+                return "";
+            }
             $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
             $erroLog->logError("Error occurred during file upload or translation (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
         }
@@ -395,12 +400,8 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
         } catch (ZfExtended_Exception $ex) {
             $this->deleteFile($fileId);
             /* @var $erroLog ZfExtended_Log */
-            $message=$ex->getMessage();
-            $message=json_decode($message);
-            if(!in_array($message->error, $this->ignoreErrorMessages)){
-                $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
-                $erroLog->logError("Error occurred during file download (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
-            }
+            $erroLog= ZfExtended_Factory::get('ZfExtended_Log');
+            $erroLog->logError("Error occurred during file download (taskGuid=".$this->getTask()->getTaskGuid()."),(globalese file id = ".$fileId.")".$ex->getMessage());
         }
         if($remove){
             $this->deleteFile($fileId);
