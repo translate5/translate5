@@ -104,14 +104,12 @@
         "turnOnInstantTranslation"  => $translate->_("Sofortübersetzung aktivieren"),
         "uploadFile"                => $translate->_("Laden Sie eine Datei hoch"),
         "uploadFileNotFound"        => $translate->_("Bitte wählen Sie eine Datei aus."),
-        "pleaseChoose"              => $translate->_("Bitte auswählen"),
-        "clearBothLists"            => $translate->_("Beide Listen zurücksetzen"),
-        "showAllAvailableFor"       => $translate->_("Alle anzeigen für"),
         "notAllowed"                => $translate->_("nicht erlaubt"),
         "openInTermPortal"          => $translate->_("Term in Terminologie-Portal öffnen"),
         "attentionFuzzyMatch"       => $translate->_("Achtung! FuzzyMatch ({0})"),
         "differenceIsHighlighted"   => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben"),
-        "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung.")
+        "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung."),
+        "noLanguageResource"        => $translate->_("Für diese Sprachkombination steht keine SprachResource zur Verfügung.")
     );
     $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
     
@@ -135,7 +133,6 @@
             <select id="sourceLocale" name="sourceLocale">
                 <?php
                     $optionValues=[];
-                    $optionValues[]='<option value="-">-</option>';
                     foreach ($allSourceLanguageLocales as $sourceLangLocale) {
                         $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
@@ -159,7 +156,6 @@
             <select id="targetLocale" name="targetLocale">
                 <?php
                     $optionValues=[];
-                    $optionValues[]='<option value="-">-</option>';
                     foreach ($allTargetLanguageLocales as $targetLangLocale) {
                         $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
@@ -208,15 +204,21 @@ $( function() {
         }
       });
     $('#sourceLocale').selectmenu({
-        change: function( event, ui ) {
-            renderLocalesAsAvailable('accordingToSourceLocale');
+        open: function() {
+            updateLocalesSelectLists($(this));
+        },
+        change: function() {
+            handleAfterLocalesChange();
         }
-      }).selectmenu("menuWidget").addClass("overflow");
+      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     $('#targetLocale').selectmenu({
-        change: function( event, ui ) {
-            renderLocalesAsAvailable('accordingToTargetLocale');
+        open: function() {
+            updateLocalesSelectLists($(this));
+        },
+        change: function() {
+            handleAfterLocalesChange();
         }
-      }).selectmenu("menuWidget").addClass("overflow");
+      }).selectmenu("menuWidget").addClass("overflow localesSelectList");
     $('#sourceFile').button();
     $('#translationSubmit').button();
     $('#sourceContent').tooltip({
@@ -234,14 +236,8 @@ $( function() {
     $('#translations .term-status').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".term-info" }
     });
-    // start with locales as stored for user
-    if ($("#sourceLocale").val() !== '-') {
-        renderLocalesAsAvailable('accordingToSourceLocale');
-    } else if ($("#targetLocale").val() !== '-') {
-        renderLocalesAsAvailable('accordingToTargetLocale');
-    } else {
-        renderLocalesAsAvailable('reset');
-    }
+    // start with checking according to the locales as stored for user
+    handleAfterLocalesChange($('#targetLocale'));
     $("#sourceText").attr('maxlength',characterLimit);
     clearAllErrorMessages();
     setFileTypesAllowedAndAvailable();

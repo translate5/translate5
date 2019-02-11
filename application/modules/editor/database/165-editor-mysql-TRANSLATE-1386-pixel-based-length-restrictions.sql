@@ -48,6 +48,18 @@ ADD `sizeUnit` VARCHAR(6) NOT NULL DEFAULT '' COMMENT 'char or pixel' AFTER `max
 ADD `font` VARCHAR(255) NOT NULL DEFAULT '' COMMENT 'font-family' AFTER `sizeUnit`,
 ADD `fontSize` INT(3) NOT NULL DEFAULT 0 AFTER `font`;
 
+DELIMITER ;;
+CREATE PROCEDURE ALTER_SEGMETA()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR 1060 BEGIN END;
+    ALTER TABLE `LEK_segments_meta` ADD COLUMN `termtagState` varchar(36) DEFAULT 'untagged' COMMENT 'Contains the TermTagger-state for this segment while importing';
+    ALTER TABLE `LEK_segments_meta` ADD COLUMN `transitLockedForRefMat` tinyint(4) DEFAULT 0 COMMENT 'Is set to true if segment is locked for reference material in transit file';
+    ALTER TABLE `LEK_segments_meta` ADD COLUMN `noMissingTargetTermOnImport` tinyint(4) DEFAULT 0 COMMENT 'Is set to false if a term in source does not exist in target column';
+END;;
+DELIMITER ;
+CALL ALTER_SEGMETA();
+DROP PROCEDURE ALTER_SEGMETA;
+
 -- Migration-script: Segments might have been imported without saving their meta-data-information,
 -- hence we need to make sure that from now on their (empty) meta-data-information exists.
 INSERT INTO `LEK_segments_meta` (`taskGuid`, `segmentId`, `termtagState`, `transitLockedForRefMat`, `noMissingTargetTermOnImport`) 
