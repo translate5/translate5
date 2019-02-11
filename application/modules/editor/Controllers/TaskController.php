@@ -607,6 +607,7 @@ class editor_TaskController extends ZfExtended_RestController {
             //if the task was already in session, we must delete it. 
             //If not the user will always receive an error in JS, and would not be able to do anything.
             $this->unregisterTask(); //FIXME XXX the changes in the session made by this method is not stored in the session!
+            //wir laufen auf dem server hier öfters rein
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
@@ -621,8 +622,8 @@ class editor_TaskController extends ZfExtended_RestController {
         else {
             //id is always set as modified, therefore we don't log task changes if id is the only modified
             $modified = $this->entity->getModifiedValues();
-            if(array_key_exists('id', $modified) && count($modified) == 1) {
-                $this->logInfo('Task modified:');
+            if(!array_key_exists('id', $modified) || count($modified) > 1) {
+                $this->logInfo('Task modified: ');
             }
         }
         

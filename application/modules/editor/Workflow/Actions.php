@@ -213,7 +213,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     
     /***
      * Delete all tasks where the task status is 'end',
-     * and the last entry for this task in LEK_task_log table is older than x days (where x is zf_config variable)
+     * and the last modified date for this task is older than x days (where x is zf_config variable)
      */
     public function deleteOldEndedTasks(){
         $taskModel=ZfExtended_Factory::get('editor_Models_Task');
