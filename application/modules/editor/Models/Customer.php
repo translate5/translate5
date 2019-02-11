@@ -49,6 +49,18 @@
  * @method integer getSearchCharacterLimit() getSearchCharacterLimit()
  * @method void setSearchCharacterLimit() setSearchCharacterLimit(integer $searchCharacterLimit)
  * 
+ * @method string getDomain() getDomain()
+ * @method void setDomain() setDomain(string $domain)
+ * 
+ * @method string getOpenIdServer() getOpenIdServer()
+ * @method void setOpenIdServer() setOpenIdServer(string $openIdServer)
+ * 
+ * @method string getOpenIdAuth2Url() getOpenIdAuth2Url()
+ * @method void setOpenIdAuth2Url() setOpenIdAuth2Url(string $openIdAuth2Url)
+ * 
+ * @method string getOpenIdServerRoles() getOpenIdServerRoles()
+ * @method void setOpenIdServerRoles() setOpenIdServerRoles(string $openIdServerRoles)
+ * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
@@ -149,6 +161,20 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
      */
     public function loadByDefaultCustomer(){
         $this->loadRow('number=?',self::DEFAULTCUSTOMER_NUMBER);
+    }
+    
+    /***
+     * Find customer by given openid domain
+     * @param string $domain
+     */
+    public function findByDomain($domain) {
+        $s = $this->db->select();
+        $s->where('domain=?',$domain);
+        $row=$this->db->fetchRow($s);
+        if(empty($row)){
+            return;
+        }
+        $this->row =$row;
     }
     
     /***

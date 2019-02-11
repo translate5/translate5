@@ -51,5 +51,14 @@ class editor_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstr
         $this->addValidator('number', 'stringLength', array('min' => 0, 'max' => 255));
         
         $this->addValidator('searchCharacterLimit', 'int');
+        
+        $this->addValidator('domain', 'stringLength', array('min' => 0, 'max' => 255));
+        
+        $this->addValidator('openIdServer', 'stringLength', array('min' => 0, 'max' => 255));
+        
+        $this->addValidator('openIdServerRoles', 'stringLength', array('min' => 0, 'max' => 255));
+        
+        $this->addValidator('openIdAuth2Url', 'stringLength', array('min' => 0, 'max' => 255));
+        
     }
 }
