@@ -48,7 +48,27 @@ class LoginController extends ZfExtended_Controllers_Login {
         $lock = ZfExtended_Factory::get('ZfExtended_Models_Db_SessionUserLock');
         /* @var $lock ZfExtended_Models_Db_SessionUserLock */
         $this->view->lockedUsers = $lock->getLocked();
-        return parent::indexAction();
+        parent::indexAction();
+        //if the login status is required, try to authenticate with openid connect
+        if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_REQUIRED){
+            $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+            //the openid authentication is valid
+            if($oidc->authenticate()){
+                //chreate the user in the translate5 system
+                $user = $oidc->createUser();
+                if(!$user){
+                    return;
+                }
+                //init the user session and redirect to the editor
+                
+                $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
+                /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
+                $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
+                $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
+                $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
+                $this->initDataAndRedirect();
+            }
+        }
     }
     
     public function doOnLogout() {
