@@ -40,6 +40,6 @@ class editor_Services_TermCollection_Resource extends editor_Models_LanguageReso
      */
     public function getInitialStatus(&$statusInfo) {
         $statusInfo = ''; //no addtional info here
-        return editor_Services_Connector_Abstract::STATUS_AVAILABLE;
+        return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
     }
 }
