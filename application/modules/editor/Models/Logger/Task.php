@@ -85,6 +85,21 @@ class editor_Models_Logger_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * loads last 5 fatals / errors / warnings for given taskGuid
+     * @param string $taskGuid
+     * @return array
+     */
+    public function loadLastErrors($taskGuid) {
+        $errornousLevels = [ZfExtended_Logger::LEVEL_FATAL, ZfExtended_Logger::LEVEL_ERROR, ZfExtended_Logger::LEVEL_WARN];
+        $s = $this->db->select();
+        $s->where('taskGuid = ?', $taskGuid);
+        $s->where('level in (?)', [$errornousLevels]);
+        $s->order('id DESC');
+        $s->limit('5');
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /**
      * loads all events to the given taskGuid
      * sorts from newest to oldest 
      * @param string $taskGuid

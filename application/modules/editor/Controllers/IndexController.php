@@ -234,6 +234,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       //inject helUrl variable used in frontend
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
+      $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
       //maintenance start date
       if(isset($rop->maintenance->startDate)) {

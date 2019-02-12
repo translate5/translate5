@@ -40,3 +40,10 @@ UPDATE `LEK_task` t, (
 ) log
 SET t.modified = log.created
 WHERE t.taskGuid = log.taskGuid;
+
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'admin', 'frontend', 'editorLogTask');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'pm', 'frontend', 'editorLogTask');
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.errorCodesUrl', '1', 'app', 'system', 'https://confluence.translate5.net/display/TAD/ErrorCodes#ErrorCodes-{0}', 'https://confluence.translate5.net/display/TAD/ErrorCodes#ErrorCodes-{0}', '', 'string', 'Url for information to the error codes. The placeholder "{0}" will be replaced by the error code.');
+

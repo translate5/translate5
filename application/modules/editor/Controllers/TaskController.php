@@ -233,6 +233,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $customerData = $this->getCustomersForRendering($rows);
         
         foreach ($rows as &$row) {
+            $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
             $this->initWorkflow($row['workflow']);
             //adding QM SubSegment Infos to each Task
             $row['qmSubEnabled'] = false;
@@ -534,9 +535,9 @@ class editor_TaskController extends ZfExtended_RestController {
         unset($data['workflowStep']);
         unset($data['locked']);
         unset($data['lockingUser']);
+        $data['state'] = 'import';
         $this->entity->init($data);
         $this->entity->createTaskGuidIfNeeded();
-        $this->log->request();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
         ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
@@ -547,6 +548,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
+            $this->log->request();
             $this->view->success = true;
             $this->view->rows = $this->entity->getDataObject();
         }
@@ -559,6 +561,22 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->getAction();
         $events = ZfExtended_Factory::get('editor_Models_Logger_Task');
         /* @var $events editor_Models_Logger_Task */
+        
+        //filter and limit for events entity
+        $offset = $this->_getParam('start');
+        $limit = $this->_getParam('limit');
+        settype($offset, 'integer');
+        settype($limit, 'integer');
+        $events->limit(max(0, $offset), $limit);
+        
+        $filter = ZfExtended_Factory::get($this->filterClass,array(
+            $events,
+            $this->_getParam('filter')
+        ));
+
+        $filter->setSort($this->_getParam('sort', '[{"property":"id","direction":"DESC"}]'));
+        $events->filterAndSort($filter);
+        
         $this->view->rows = $events->loadByTaskGuid($this->entity->getTaskGuid());
         $this->view->total = $events->getTotalByTaskGuid($this->entity->getTaskGuid());
     }
@@ -654,6 +672,7 @@ class editor_TaskController extends ZfExtended_RestController {
         // Add pixelMapping-data for the fonts used in the task.
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
+        $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
     }
     
     protected function addPixelMapping() {
@@ -666,6 +685,20 @@ class editor_TaskController extends ZfExtended_RestController {
             $pixelMappingForTask = [];
         }
         $this->view->rows->pixelMapping = $pixelMappingForTask;
+    }
+    
+    /**
+     * returns the last error to the taskGuid if given taskStatus is error
+     * @param string $taskGuid
+     * @param string $taskStatus
+     */
+    protected function getLastErrorMessage($taskGuid, $taskStatus) {
+        if($taskStatus != editor_Models_Task::STATE_ERROR) {
+            return [];
+        }
+        $events = ZfExtended_Factory::get('editor_Models_Logger_Task');
+        /* @var $events editor_Models_Logger_Task */
+        return $events->loadLastErrors($taskGuid);
     }
     
     /**
@@ -970,6 +1003,7 @@ class editor_TaskController extends ZfExtended_RestController {
         // Add pixelMapping-data for the fonts used in the task.
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
+        $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
     }
     
     public function deleteAction() {
