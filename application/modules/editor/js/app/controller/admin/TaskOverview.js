@@ -357,11 +357,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           isState = (dataIdx == 'state'),
           isTaskNr = (dataIdx == 'taskNr'),
           dbl = e.type == 'dblclick'; 
+      if(rec.isErroneous() || rec.isImporting()) {
+          if(isState || dbl) {
+              this.handleTaskLog(rec);
+          }
+          return;
+      }
       if(!rec.isLocked() && (isTaskNr || dbl)) {
           this.openTaskRequest(rec);
-      }
-      if(isState && rec.isErroneous()) {
-          this.openTaskLog(rec);
       }
   },
   /**
@@ -376,7 +379,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       }
       Editor.util.TaskActions.openTask(task, readonly);
   },
-  openTaskLog: function(task) {
+  handleTaskLog: function(task) {
       var win = Ext.widget('adminTaskLogWindow',{
           actualTask: task
       });

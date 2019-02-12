@@ -34,7 +34,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.admin.task.Logs', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.admin.task.Log',
-  remoteSort: false,
-  autoLoad: false
-  //pageSize: 20,
+  remoteSort: true,
+  remoteFilter: true,
+  autoLoad: false,
+  pageSize: 0
 });

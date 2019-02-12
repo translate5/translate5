@@ -34,6 +34,7 @@ Ext.define('Editor.view.admin.task.LogWindow', {
     strings: {
         close: '#UT#Fenster schließen'
     },
+    closeAction: 'destroy',
     layout: 'fit',
     task: null,
     modal: true,
@@ -50,7 +51,7 @@ Ext.define('Editor.view.admin.task.LogWindow', {
         var me = this,
             auth = Editor.app.authenticatedUser,
             config;
-        me.task = me.initialConfig.actualTask;        
+        me.task = me.initialConfig.actualTask;
         config = {
             height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),
             width: 1000,
