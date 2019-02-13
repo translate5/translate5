@@ -236,21 +236,39 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         Ext.StoreManager.get('customersStore').load();
     },
     
+    /***
+     * Return boolean if one of the given fields in the form is changed/has value
+     */
+    handleRequiredFields:function(form,fields){
+    	var me=this,
+			isRequired=false;
+		
+		//for each of the openid, check if one of them contains value
+		//if yes all other fields are required
+	    Ext.Array.forEach(fields, function(field) {
+	    	if(!isRequired){
+	    		isRequired=form.findField(field).getValue()!='';
+	    	}
+	    });
+	    return isRequired;
+    },
+    
     onOpenIdFieldChange:function(field,newValue,oldValue,eOpts){
     	var me=this,
     		form=me.getView().down('form').getForm(),
     		vm=me.getViewModel(),
-    		fields=['domain','openIdServer','openIdAuth2Url'],
-    		isOpenIdRequired=false;
+    		fields=['domain','openIdServer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
     	
-    	//for each of the openid fields, check if one of them contains value
-    	//if yes all other fields are required
-        Ext.Array.forEach(fields, function(field) {
-        	if(!isOpenIdRequired){
-        		isOpenIdRequired=form.findField(field).getValue()!='';
-        	}
-        });
-        
-    	vm.set('isOpenIdRequired',isOpenIdRequired);
+    	vm.set('isOpenIdRequired',me.handleRequiredFields(form,fields));
     },
+    
+    onOpenIdRedirectLabelChange:function(field,newValue,oldValue,eOpts){
+    	var me=this,
+			form=me.getView().down('form').getForm(),
+			fields=['openIdRedirectLabel','openIdRedirectCheckbox'],
+			vm=me.getViewModel();
+    	
+    	vm.set('isOpenIdRedirectLabelRequired',me.handleRequiredFields(form,fields));
+    }
+
 });

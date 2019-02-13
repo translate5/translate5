@@ -34,6 +34,7 @@ Ext.define('Editor.view.admin.customer.ViewModel', {
     data: {
         title: '',
         record: false,
-        isOpenIdRequired:false
+        isOpenIdRequired:false,
+        isOpenIdRedirectLabelRequired:false
     }
 });
