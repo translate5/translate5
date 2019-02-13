@@ -48,13 +48,40 @@ class LoginController extends ZfExtended_Controllers_Login {
         $lock = ZfExtended_Factory::get('ZfExtended_Models_Db_SessionUserLock');
         /* @var $lock ZfExtended_Models_Db_SessionUserLock */
         $this->view->lockedUsers = $lock->getLocked();
+        
         parent::indexAction();
         //if the login status is required, try to authenticate with openid connect
         if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_REQUIRED){
             $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
             //the openid authentication is valid
+            
+            //set the redirect label if the customer exist
+            if($oidc->isOpenIdCustomerSet() && !$oidc->getCustomer()->getOpenIdRedirectCheckbox()){
+                
+                //add form hidden field, which is used when redirec to openid is needed
+                $redirect = new Zend_Form_Element_Hidden('redirect');
+                $this->_form->addElement($redirect);
+                
+                //create the link field which needs to redirect the login via the configured openid server
+                $link=new Zend_Form_Element_Note(array(
+                    'name' => 'openidredirect',
+                    'value' => $oidc->getCustomer()->getOpenIdRedirectLabel(),
+                    'decorators' => array(
+                        array('ViewHelper'),
+                        array('HtmlTag', array(
+                            'tag' => 'a',
+                            'href' => 'javascript:void(0);',
+                            'onclick'=>'document.getElementById("redirect").value="openid"; document.getElementById("submit").click();'
+                        )),
+                        
+                    )
+                ));
+                $link->setOrder(0);
+                $this->_form->addElement($link);
+            }
+            //authenticate with the configured openid client
             if($oidc->authenticate()){
-                //chreate the user in the translate5 system
+                //create the user in the translate5 system or update if the user already exist
                 $user = $oidc->createUser();
                 if(!$user){
                     return;
