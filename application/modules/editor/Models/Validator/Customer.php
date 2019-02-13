@@ -60,5 +60,12 @@ class editor_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstr
         
         $this->addValidator('openIdAuth2Url', 'stringLength', array('min' => 0, 'max' => 255));
         
+        $this->addValidator('openIdClientId', 'stringLength', array('min' => 0, 'max' => 1024));
+        
+        $this->addValidator('openIdClientSecret', 'stringLength', array('min' => 0, 'max' => 1024));
+        
+        $this->addValidator('openIdRedirectLabel', 'stringLength', array('min' => 0, 'max' => 1024));
+        
+        $this->addValidator('openIdRedirectCheckbox', 'int');
     }
 }

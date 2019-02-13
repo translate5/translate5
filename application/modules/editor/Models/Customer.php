@@ -61,6 +61,18 @@
  * @method string getOpenIdServerRoles() getOpenIdServerRoles()
  * @method void setOpenIdServerRoles() setOpenIdServerRoles(string $openIdServerRoles)
  * 
+ * @method string getOpenIdClientId() getOpenIdClientId()
+ * @method void setOpenIdClientId() setOpenIdClientId(string $openIdClientId)
+ * 
+ * @method string getOpenIdClientSecret() getOpenIdClientSecret()
+ * @method void setOpenIdClientSecret() setOpenIdClientSecret(string $openIdClientSecret)
+ * 
+ * @method string getOpenIdRedirectLabel() getOpenIdRedirectLabel()
+ * @method void setOpenIdRedirectLabel() setOpenIdRedirectLabel(string $openIdRedirectLabel)
+ * 
+ * @method integer getOpenIdRedirectCheckbox() getOpenIdRedirectCheckbox()
+ * @method void setOpenIdRedirectCheckbox() setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
+ * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
