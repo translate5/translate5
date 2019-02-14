@@ -203,122 +203,128 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         allowBlank: false,
                                         maxLength: 255
                                     },{
-                                    	xtype:'textfield',
-                                    	fieldLabel:me.strings.domain,
-                                    	name:'domain',
-                                    	setAllowBlank:me.setFieldAllowBlank,
-                                    	listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
+                                    	xtype:'fieldset',
+                                    	title:'OpenId',
+                                    	items:[
+                                    		{
+                                            	xtype:'textfield',
+                                            	fieldLabel:me.strings.domain,
+                                            	name:'domain',
+                                            	setAllowBlank:me.setFieldAllowBlank,
+                                            	listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdFieldChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                            	bind:{
+                                            		allowBlank:'{!isOpenIdRequired}'
+                                            	}
+                                            },{
+                                            	xtype:'textfield',
+                                            	fieldLabel:me.strings.openIdServer,
+                                            	name:'openIdServer',
+                                            	setAllowBlank:me.setFieldAllowBlank,
+                                            	listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdFieldChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                            	bind:{
+                                            		allowBlank:'{!isOpenIdRequired}'
+                                            	}
+                                            },
+                                            {
+                                            	xtype:'textfield',
+                                            	fieldLabel:me.strings.openIdClientId,
+                                            	name:'openIdClientId',
+                                            	setAllowBlank:me.setFieldAllowBlank,
+                                            	listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdFieldChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                            	bind:{
+                                            		allowBlank:'{!isOpenIdRequired}'
+                                            	}
+                                            },
+                                            {
+                                            	xtype:'textfield',
+                                            	fieldLabel:me.strings.openIdClientSecret,
+                                            	name:'openIdClientSecret',
+                                            	setAllowBlank:me.setFieldAllowBlank,
+                                            	listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdFieldChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                            	bind:{
+                                            		allowBlank:'{!isOpenIdRequired}'
+                                            	}
+                                            },
+                                            {
+                                            	xtype:'textfield',
+                                            	fieldLabel:me.strings.openIdAuth2Url,
+                                            	name:'openIdAuth2Url',
+                                            	setAllowBlank:me.setFieldAllowBlank,
+                                            	listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdFieldChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                            	bind:{
+                                            		allowBlank:'{!isOpenIdRequired}'
+                                            	}
+                                            },{
+                                                xtype: 'hidden',
+                                                name: 'openIdServerRoles'
+                                            },{
+        	                                    xtype: 'checkboxgroup',
+        	                                    itemId: 'rolesGroup',
+        	                                    cls: 'x-check-group-alt',
+        	                                    fieldLabel: me.strings.rolesLabel,
+        	                                    items: roles,
+        	                                    columns: 3,
+        	                                    bind:{
+                                            		visible:'{isOpenIdRequired}'
+                                            	}
+                                            },{
+                                            	xtype:'textfield',
+                                            	fieldLabel:me.strings.openIdRedirectLabel,
+                                            	name:'openIdRedirectLabel',
+                                            	setAllowBlank:me.setFieldAllowBlank,
+                                            	listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdRedirectLabelChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                            	bind:{
+                                            		visible:'{isOpenIdRequired}',
+                                            		allowBlank:'{isOpenIdRedirectLabelRequired}'
+                                            	}
+                                            },{
+                                            	xtype:'checkbox',
+                                                boxLabel:me.strings.openIdRedirectCheckbox,
+                                                name:'openIdRedirectCheckbox',
+                                                setAllowBlank:me.setFieldAllowBlank,
+                                                inputValue:1,
+                                                uncheckedValue:0,
+                                                listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdRedirectLabelChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                                bind:{
+                                            		visible:'{isOpenIdRequired}'
+                                            	}
                                             }
-                                        },
-                                    	bind:{
-                                    		allowBlank:'{!isOpenIdRequired}'
-                                    	}
-                                    },{
-                                    	xtype:'textfield',
-                                    	fieldLabel:me.strings.openIdServer,
-                                    	name:'openIdServer',
-                                    	setAllowBlank:me.setFieldAllowBlank,
-                                    	listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                    	bind:{
-                                    		allowBlank:'{!isOpenIdRequired}'
-                                    	}
-                                    },
-                                    {
-                                    	xtype:'textfield',
-                                    	fieldLabel:me.strings.openIdClientId,
-                                    	name:'openIdClientId',
-                                    	setAllowBlank:me.setFieldAllowBlank,
-                                    	listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                    	bind:{
-                                    		allowBlank:'{!isOpenIdRequired}'
-                                    	}
-                                    },
-                                    {
-                                    	xtype:'textfield',
-                                    	fieldLabel:me.strings.openIdClientSecret,
-                                    	name:'openIdClientSecret',
-                                    	setAllowBlank:me.setFieldAllowBlank,
-                                    	listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                    	bind:{
-                                    		allowBlank:'{!isOpenIdRequired}'
-                                    	}
-                                    },
-                                    {
-                                    	xtype:'textfield',
-                                    	fieldLabel:me.strings.openIdAuth2Url,
-                                    	name:'openIdAuth2Url',
-                                    	setAllowBlank:me.setFieldAllowBlank,
-                                    	listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                    	bind:{
-                                    		allowBlank:'{!isOpenIdRequired}'
-                                    	}
-                                    },{
-                                        xtype: 'hidden',
-                                        name: 'openIdServerRoles'
-                                    },{
-	                                    xtype: 'checkboxgroup',
-	                                    itemId: 'rolesGroup',
-	                                    cls: 'x-check-group-alt',
-	                                    fieldLabel: me.strings.rolesLabel,
-	                                    items: roles,
-	                                    columns: 3,
-	                                    bind:{
-                                    		visible:'{isOpenIdRequired}'
-                                    	}
-                                    },{
-                                    	xtype:'textfield',
-                                    	fieldLabel:me.strings.openIdRedirectLabel,
-                                    	name:'openIdRedirectLabel',
-                                    	setAllowBlank:me.setFieldAllowBlank,
-                                    	listeners: {
-                                            change: {
-                                                fn: 'onOpenIdRedirectLabelChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                    	bind:{
-                                    		visible:'{isOpenIdRequired}',
-                                    		allowBlank:'{isOpenIdRedirectLabelRequired}'
-                                    	}
-                                    },{
-                                    	xtype:'checkbox',
-                                        boxLabel:me.strings.openIdRedirectCheckbox,
-                                        name:'openIdRedirectCheckbox',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        inputValue:1,
-                                        uncheckedValue:0,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdRedirectLabelChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                    		visible:'{isOpenIdRequired}'
-                                    	}
+                                    	]
                                     },{
                                         xtype: 'container',
                                         padding: 10,
