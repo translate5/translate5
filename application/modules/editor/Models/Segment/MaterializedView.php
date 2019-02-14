@@ -360,7 +360,7 @@ class editor_Models_Segment_MaterializedView {
         $sql = 'select table_name from INFORMATION_SCHEMA.TABLES t where t.TABLE_SCHEMA = database() and t.TABLE_NAME like ? and t.create_time < (CURRENT_TIMESTAMP - INTERVAL ? DAY);';
         $viewToDelete = $db->fetchAll($sql, array($viewLike, $lifeTime), Zend_Db::FETCH_COLUMN);
         
-        $sql = 'select t.taskGuid from LEK_task t WHERE modified > (CURRENT_TIMESTAMP - INTERVAL ? DAY));';
+        $sql = 'select t.taskGuid from LEK_task t WHERE modified > (CURRENT_TIMESTAMP - INTERVAL ? DAY);';
         $tasksInUse = $db->fetchAll($sql, array($lifeTime), Zend_Db::FETCH_COLUMN);
         $viewsInUse = array_map(array($this, 'makeViewName'),$tasksInUse);
         
