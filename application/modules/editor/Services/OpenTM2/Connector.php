@@ -322,27 +322,26 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     protected function validateInternalTags($result, editor_Models_Segment $seg) {
         //just concat source and target to check both:
-        if(preg_match('#<(it|ph)[^>]*>#', $result->source.$result->target)) {
-            $result->source=$this->replaceItAndPhTags($result->source);
-            $result->target=$this->replaceItAndPhTags($result->target);
+        if(preg_match('#<(it|ph|ept|bpt)[^>]*>#', $result->source.$result->target)) {
+            $this->xmlparser->registerElement('opentm2result > it,opentm2result > ph,opentm2result > ept,opentm2result > bpt',null, function($tag, $key, $opener){
+                $this->xmlparser->replaceChunk($opener['openerKey'],'',$opener['isSingle'] ? 1 : $key-$opener['openerKey']);
+            });
+            $result->source=$this->replaceInvalidTags($result->source);
+            $result->target=$this->replaceInvalidTags($result->target);
         }
         return true;
     }
     
     /***
-     * Replace it and ph tags with empty content
+     * Replace the invalid tags with empty content
+     * 
      * @param string $content
-     * @param string $replace: the replace content of the chunk
      * @return string
      */
-    protected function replaceItAndPhTags($content,$replace=''){
+    protected function replaceInvalidTags($content){
         //surround the content with tmp tags(used later as selectors)
         $content='<opentm2result>'.$content.'</opentm2result>';
         
-        
-        $this->xmlparser->registerElement('opentm2result > it,opentm2result > ph',null, function($tag, $key, $opener) use($replace){
-            $this->xmlparser->replaceChunk($opener['openerKey'],$replace,$opener['isSingle'] ? 1 : $key-$opener['openerKey']);
-        });
         //parse the content
         $content=$this->xmlparser->parse($content);
         
