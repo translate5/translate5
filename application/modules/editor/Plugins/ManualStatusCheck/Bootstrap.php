@@ -62,7 +62,7 @@ class editor_Plugins_ManualStatusCheck_Bootstrap extends ZfExtended_Plugin_Abstr
         $row = $segment->fetchRow($s);
         if($row->unsetStatusCount > 0) {
             $msg = 'Der Task kann nicht abgeschlossen werden, da nicht alle Segmente einen Status gesetzt haben. Bitte verwenden Sie die Filterfunktion um die betroffenen Segmente zu finden.';
-            $e = new ZfExtended_NotAcceptableException($msg);
+            $e = new ZfExtended_Models_Entity_Conflict($msg);
             $e->setMessage($msg, true);
             $e->setLogging(false);
             throw $e;

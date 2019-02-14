@@ -885,7 +885,7 @@ class editor_TaskController extends ZfExtended_RestController {
         }
 
         if(!in_array($this->data->userState, $this->workflow->getStates())) {
-            throw new ZfExtended_Models_Entity_NotAcceptableException('Given UserState '.$this->data->userState.' does not exist.');
+            throw new ZfExtended_ValidateException('Given UserState '.$this->data->userState.' does not exist.');
         }
         
         $isEditAllTasks = $this->isAllowed('backend', 'editAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
