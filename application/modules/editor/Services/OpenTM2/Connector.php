@@ -316,7 +316,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
-     * Checks OpenTM2 result on valid segments: <it> and <ph> are invalid since they can not handled by the replaceAdditionalTags method
+     * Checks OpenTM2 result on valid segments: <it> ,<ph>,<bpt> and <ept> are invalid since they can not handled by the replaceAdditionalTags method
      * @param string $segmentContent
      * @return boolean true if tags were valid
      */
