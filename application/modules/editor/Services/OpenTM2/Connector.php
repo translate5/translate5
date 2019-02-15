@@ -275,19 +275,44 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 if(!$this->validateInternalTags($found, $segment)) {
                     continue;
                 }
-                //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied, 
-                // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
-                $target = $xmlParser->parse($found->target);
-                $target = $this->internalTag->reapply2dMap($target, $map);
-                $target = $this->replaceAdditionalTags($target, $mapCount);
-                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
-                $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                
+                //check if the found source has invalid xml
+                if($xmlParser->isStringValidXml($found->target)){
+                    //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied, 
+                    // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
+                    $target = $xmlParser->parse($found->target);
+                    $target = $this->internalTag->reapply2dMap($target, $map);
+                    $target = $this->replaceAdditionalTags($target, $mapCount);
+                    $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
+                    $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                    
+                    //about whitespace see target
+                    $source = $xmlParser->parse($found->source);
+                    $source = $this->internalTag->reapply2dMap($source, $map);
+                    $source = $this->replaceAdditionalTags($source, $mapCount);
+                    $this->resultList->setSource($source);
+                    
+                }else{
+                    //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
+                    $matchrate=$this->reduceMatchrate($found->matchRate,2);
+                    $found->target=strip_tags($found->target);
+                    $this->resultList->addResult($found->target, $matchrate, $this->getMetaData($found));
+                }
+                
+                //check if the source has invalid xml
+                if($xmlParser->isStringValidXml($found->source)){
+                    //about whitespace see target
+                    $source = $xmlParser->parse($found->source);
+                    $source = $this->internalTag->reapply2dMap($source, $map);
+                    $source = $this->replaceAdditionalTags($source, $mapCount);
+                    $this->resultList->setSource($source);
+                }else{
+                    //the source has invalid xml -> remove all tags
+                    $this->resultList->setSource(strip_tags($found->source));
+                }
+                
+                
 
-                //about whitespace see target
-                $source = $xmlParser->parse($found->source);
-                $source = $this->internalTag->reapply2dMap($source, $map);
-                $source = $this->replaceAdditionalTags($source, $mapCount);
-                $this->resultList->setSource($source);
             }
             return $this->getResultListGrouped();
         }
@@ -328,6 +353,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             });
             $result->source=$this->replaceInvalidTags($result->source);
             $result->target=$this->replaceInvalidTags($result->target);
+            //the invalid tags are removed, reduce the matchrate by 2 percent
+            $result->matchRate=$this->reduceMatchrate($result->matchRate,2);
         }
         return true;
     }
@@ -738,6 +765,27 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $this->resultList->resetResult();
         $this->resultList->setResults($result);
         return $this->resultList;
+    }
+    
+    /***
+     * Reduce the given matchrate to given percent.
+     * It is used when unsupported tags are found in the response result, and those tags are removed.
+     * @param integer $matchrate
+     * @param integer $reducePercent
+     * @return number
+     */
+    protected function reduceMatchrate($matchrate,$reducePercent) {
+        //reset higher matches than 100% to 100% match
+        if($matchrate>100){
+            $matchrate=100;
+        }
+        //if the matchrate is higher than 0, reduce it by $reducePercent %
+        if($matchrate>0){
+            $matchrate=$matchrate - ($matchrate*($reducePercent/100));
+            $matchrate=round($matchrate);
+        }
+        
+        return $matchrate;
     }
     
     /***
