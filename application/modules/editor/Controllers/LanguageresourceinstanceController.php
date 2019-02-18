@@ -341,6 +341,34 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
     }
     
+    
+    /**
+     * returns the logged events for the given language resource
+     */
+    public function eventsAction() {
+        $this->getAction();
+        $events = ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $events editor_Models_Logger_LanguageResources */
+        
+        //filter and limit for events entity
+        $offset = $this->_getParam('start');
+        $limit = $this->_getParam('limit');
+        settype($offset, 'integer');
+        settype($limit, 'integer');
+        $events->limit(max(0, $offset), $limit);
+        
+        $filter = ZfExtended_Factory::get($this->filterClass,array(
+            $events,
+            $this->_getParam('filter')
+        ));
+        
+        $filter->setSort($this->_getParam('sort', '[{"property":"id","direction":"DESC"}]'));
+        $events->filterAndSort($filter);
+        
+        $this->view->rows = $events->loadAll();
+        $this->view->total = $events->getTotalCount();
+    }
+    
     private function prepareTaskInfo($languageResourceids) {
         /* @var $assocs editor_Models_LanguageResources_Taskassoc */
         $assocs = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
