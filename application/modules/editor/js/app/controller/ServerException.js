@@ -190,6 +190,9 @@ Ext.define('Editor.controller.ServerException', {
                  });
                 return;
         }
+        if(json.errorMessage) {
+            statusText += ': '+json.errorMessage;
+        }
         Ext.Msg.alert(str.title, text+tpl.apply([_status, statusText]));
     },
     /**
