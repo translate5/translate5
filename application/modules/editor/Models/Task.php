@@ -651,6 +651,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * generates a task overview statistics summary
+     * @return array
+     */
+    public function getSummary() {
+        $stmt = $this->db->getAdapter()->query('select state, count(*) taskCount, sum(wordCount) wordCountSum from LEK_task group by state');
+        return $stmt->fetchAll();
+    }
+    
+    /**
      * convenient method to get the task meta data
      * @return editor_Models_Task_Meta
      */
