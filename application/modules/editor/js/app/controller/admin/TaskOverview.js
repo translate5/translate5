@@ -34,9 +34,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.controller.admin.TaskOverview', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.admin.ExportMenu'],
-  models: ['admin.Task'],
-  stores: ['admin.Users', 'admin.Tasks','admin.Languages'],
-  views: ['admin.TaskGrid', 'admin.TaskAddWindow'],
+  models: ['admin.Task', 'admin.task.Log'],
+  stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs'],
+  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow'],
   refs : [{
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
@@ -353,8 +353,16 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleGridClick: function(view, colEl, colIdx, rec, rowEl, rowIdxindex, e, eOpts) {
       //logic for handling single clicks on column taskNr and dblclick on other cols
-      var isTaskNr = (view.up('grid').getColumns()[colIdx].dataIndex == 'taskNr'),
+      var dataIdx = view.up('grid').getColumns()[colIdx].dataIndex,
+          isState = (dataIdx == 'state'),
+          isTaskNr = (dataIdx == 'taskNr'),
           dbl = e.type == 'dblclick'; 
+      if(rec.isErroneous() || rec.isImporting()) {
+          if(isState || dbl) {
+              this.handleTaskLog(rec);
+          }
+          return;
+      }
       if(!rec.isLocked() && (isTaskNr || dbl)) {
           this.openTaskRequest(rec);
       }
@@ -370,6 +378,13 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return;
       }
       Editor.util.TaskActions.openTask(task, readonly);
+  },
+  handleTaskLog: function(task) {
+      var win = Ext.widget('adminTaskLogWindow',{
+          actualTask: task
+      });
+      win.show();
+      win.load();
   },
   handleTaskCancel: function() {
 	  var me=this;
