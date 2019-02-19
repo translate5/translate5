@@ -286,6 +286,10 @@ background-color: #EAF1FB;
 .app-msg .icon-status-notice {background-image: url("../images/information.png");}
 .app-msg .icon-status-ok {background-image: url("../images/tick.png");}
 
+.taskUploadCard h1 {
+	background:url("../images/exclamation.png") no-repeat left center; padding-left: 20px;
+}
+
 /* error levels */
 .icon-error-level-fatal {background-image: url("../images/errorLevels/fatal.png");height:16px; width: 16px;}
 .icon-error-level-error {background-image: url("../images/errorLevels/error.png");height:16px; width: 16px;}

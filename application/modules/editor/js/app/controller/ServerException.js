@@ -196,6 +196,22 @@ Ext.define('Editor.controller.ServerException', {
         }
         Ext.Msg.alert(str.title, text+tpl.apply([_status, statusText]));
     },
+    renderHtmlMessage(title, response){
+        var me = this,
+            str = me.strings,
+            tpl = new Ext.Template(str.serverMsg),
+            result = '<h1>'+title+'</h1>';
+        
+        if(response.errorMessage && response.errorMessage.length > 0) {
+            result += '<p>'+response.errorMessage+'</p>';
+        }
+        if(response.messages && response.messages.length > 0) {
+            Ext.Array.each(response.messages, function(item){
+                result += '<p>'+item+'</p>';
+            });
+        }
+        return result;
+    },
     /**
      * Helper to redirect to the login page
      */

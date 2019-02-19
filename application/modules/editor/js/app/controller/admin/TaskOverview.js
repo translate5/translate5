@@ -797,12 +797,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   saveTask:function(successCallback){
       var me = this,
           win = me.getTaskAddWindow(),
-          error = win.down('#feedbackBtn');
-      error.hide();
+          form = this.getTaskAddForm();
       
       win.setLoading(me.strings.loadingWindowMessage);
       
-      this.getTaskAddForm().submit({
+      form.submit({
           //Accept Header of submitted file uploads could not be changed:
           //http://stackoverflow.com/questions/13344082/fileupload-accept-header
           //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
@@ -832,9 +831,14 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           },
           failure: function(form, submit) {
               win.setLoading(false);
-              if(submit.failureType == 'server' && submit.result && submit.result.errors){//FIXME why is this chech ? && !Ext.isDefined(submit.result.success)) {
-                  //all other failures should mark a field invalid
-                  error.show();
+              if(submit.failureType == 'server' && submit.result && !submit.result.success){
+                  if(submit.result.httpStatus == "422") {
+                      win.getLayout().setActiveItem('taskMainCard');
+                      form.markInvalid(submit.result.extra);
+                  }
+                  else {
+                      win.down('#taskUploadCard').update(Editor.app.getController('ServerException').renderHtmlMessage(me.strings.taskError, submit.result));
+                  }
               }
           }
       });
