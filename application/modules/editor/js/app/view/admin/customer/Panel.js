@@ -209,6 +209,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                     		{
                                             	xtype:'textfield',
                                             	fieldLabel:me.strings.domain,
+                                            	vtype: 'url',
                                             	name:'domain',
                                             	setAllowBlank:me.setFieldAllowBlank,
                                             	listeners: {
@@ -223,6 +224,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                             },{
                                             	xtype:'textfield',
                                             	fieldLabel:me.strings.openIdServer,
+                                            	vtype: 'url',
                                             	name:'openIdServer',
                                             	setAllowBlank:me.setFieldAllowBlank,
                                             	listeners: {
@@ -268,6 +270,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                             {
                                             	xtype:'textfield',
                                             	fieldLabel:me.strings.openIdAuth2Url,
+                                            	vtype: 'url',
                                             	name:'openIdAuth2Url',
                                             	setAllowBlank:me.setFieldAllowBlank,
                                             	listeners: {

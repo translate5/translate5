@@ -45,7 +45,8 @@ Ext.define('Editor.view.admin.UserGrid', {
       gender: '#UT#Geschlecht',
       email: '#UT#E-Mail',
       locale: '#UT#Sprache',
-      roles: '#UT#Systemrollen'
+      roles: '#UT#Systemrollen',
+      openIdIssuer:'#UT#OpenId Emittent'
   },
   strings: {
       addUser: '#UT#Benutzer hinzufügen',
@@ -111,6 +112,16 @@ Ext.define('Editor.view.admin.UserGrid', {
               type: 'string'
           },
           text: me.text_cols.surName
+      },{
+          xtype: 'gridcolumn',
+          width: 100,
+          dataIndex: 'openIdIssuer',
+          stateId: 'openIdIssuer',
+          hidden:true,
+          filter: {
+              type: 'string'
+          },
+          text: me.text_cols.openIdIssuer
       },{
           xtype: 'gridcolumn',
           width: 60,
