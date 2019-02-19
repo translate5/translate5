@@ -33,16 +33,8 @@ Ext.define('Editor.view.admin.customer.ViewModel', {
 
     data: {
         title: '',
-        record: false
-    },
-
-    initConfig: function(instanceConfig) {
-        var me = this,
-            config = {
-            };
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
+        record: false,
+        isOpenIdRequired:false,
+        isOpenIdRedirectLabelRequired:false
     }
 });
