@@ -21,16 +21,42 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.LogGrid', {
-    extend: 'Editor.view.admin.log.Grid',
-    requires: ['Editor.view.admin.log.Grid'],
-    alias: 'widget.editorAdminTaskLogGrid',
-    store: 'admin.task.Logs',
-    cls: 'editorAdminTaskLogGrid',
-    entityUrlPart: 'task'
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * @class Editor.view.admin.log.GridViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.admin.log.WindowViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.editorlogWindowViewController',
+    listen: {
+        component: {
+            '#closeBtn': {
+                click: 'close'
+            },
+            '#detailview': {
+                show: 'detailShow',
+                hide: 'detailHide'
+            }
+        }
+    },
+    detailShow: function() {
+        this.getView().down('#mainToolbar').hide();
+    },
+    detailHide: function() {
+        this.getView().down('#mainToolbar').show();
+    },
+    close: function() {
+        this.getView().close();
+    }
 });

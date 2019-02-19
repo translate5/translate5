@@ -293,6 +293,7 @@ background-color: #EAF1FB;
 .icon-error-level-info {background-image: url("../images/errorLevels/info.png");height:16px; width: 16px;}
 .icon-error-level-debug {background-image: url("../images/errorLevels/debug.png");height:16px; width: 16px;}
 .icon-error-level-trace {background-image: url("../images/errorLevels/trace.png");height:16px; width: 16px;}
+.icon-log-more-info {background-image: url("../images/errorLevels/table.png");height:16px; width: 16px;vertical-align: text-bottom;cursor: pointer;}
 
 /* filetree */
 .fileTree .x-grid-item-selected .x-grid-cell, .x-grid-item-selected .x-grid-rowwrap-div {

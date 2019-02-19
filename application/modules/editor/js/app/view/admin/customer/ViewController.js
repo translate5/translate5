@@ -76,6 +76,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         me.getView().mask(saving);
 
         record.save({
+            preventDefaultHandler: true,
             success: function() {
                 Editor.MessageBox.addSuccess(me.getView().strings.customerSavedMsg);
                 store.load();
