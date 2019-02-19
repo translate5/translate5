@@ -39,13 +39,22 @@ Ext.define('Editor.model.admin.task.Log', {
         "32": 'trace',
     },
     fields: [
-        {type: 'int',name: 'id',persist: false},
-        {type: 'int',name: 'level'},
-        {type: 'string',name: 'state'},
-        {type: 'string',name: 'eventCode'},
-        {type: 'string',name: 'domain'},
-        {type: 'string',name: 'message'},
-        {type: 'string',name: 'authUser'},
+        {name: 'id', type: 'int', persist: false},
+        {name: 'level', type: 'int'},
+        {name: 'state', type: 'string'},
+        {name: 'eventCode', type: 'string'},
+        {name: 'domain', type: 'string'},
+        {name: 'message', type: 'string'},
+        {name: 'authUser', type: 'string'},
+        {name: 'extra', convert: function(val) {
+            if(Ext.isObject(val)){
+                return val;
+            }
+            if(!val || val===""){
+                return null;
+            }
+            return Ext.JSON.decode(val);
+        }},
         {name: 'created', type: 'date', dateFormat: Editor.DATE_ISO_FORMAT}
     ],
 

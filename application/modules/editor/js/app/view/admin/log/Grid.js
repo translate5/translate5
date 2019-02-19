@@ -27,9 +27,10 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.log.Grid', {
-    extend: 'Ext.grid.Panel',
+    extend: 'Ext.panel.Panel',
     alias: 'widget.editorAdminLogGrid',
-    plugins: ['gridfilters'],
+    requires: ['Editor.view.admin.log.GridViewController'],
+    controller: 'editorlogGridViewController',
     strings: {
         reload: '#UT# Aktualisieren',
         level: '#UT# Typ',
@@ -43,8 +44,10 @@ Ext.define('Editor.view.admin.log.Grid', {
         eventCode: '#UT# Fehlercode',
         domain: '#UT# Bereich',
         message: '#UT# Fehler',
-        created: '#UT# Zeitpunkt'
+        created: '#UT# Zeitpunkt',
+        moreInfo: '#UT# Mehr Info'
     },
+    layout: 'fit',
     entityUrlPart: null,
     imgTpl: new Ext.Template('<img valign="text-bottom" class="icon-error-level-{0}" src="'+Ext.BLANK_IMAGE_URL+'" alt="{0}" />'),
     constructor: function(config) {
@@ -68,95 +71,138 @@ Ext.define('Editor.view.admin.log.Grid', {
             });
         });
         config = {
-            columns: [
-                {
-                    xtype: 'datecolumn',
-                    dataIndex: 'created',
-                    text: me.strings.created,
-                    width: 100,
-                    filter: {
-                        type: 'date',
-                        dateFormat: Editor.DATE_ISO_FORMAT
-                    }
-                },
-                {
-                    xtype: 'gridcolumn',
-                    dataIndex: 'level',
-                    text: me.strings.level,
-                    width: 50,
-                    tdCls: 'error-level',
-                    renderer: function(v, meta, rec) {
-                        var level = rec.getLevelName(),
-                            img = me.imgTpl.apply([level]);
-                        meta.tdAttr = 'data-qtip="' + me.strings['level_'+level]+'"';
-                        return img;
-                    },
-                    filter: {
-                        type: 'list',
-                        options: levelFilter,
-                        phpMode: false
-                    }
-                },
-                {
-                    xtype: 'gridcolumn',
-                    dataIndex: 'eventCode',
-                    width: 85,
-                    text: me.strings.eventCode,
-                    renderer: function(v, meta, rec) {
-                        if(!Editor.data.errorCodesUrl) {
-                            return v;
+            items : [{
+                xtype: 'gridpanel',
+                plugins: ['gridfilters'],
+                store: me.store,
+                columns: [
+                    {
+                        xtype: 'datecolumn',
+                        dataIndex: 'created',
+                        text: me.strings.created,
+                        width: 100,
+                        format: Ext.grid.column.Date.prototype.format + ' H:i:s',
+                        filter: {
+                            type: 'date',
+                            dateFormat: Editor.DATE_ISO_FORMAT
                         }
-                        var url = Ext.String.format(Editor.data.errorCodesUrl, v);
-                        return '<a href="'+url+'" target="_blank">'+v+'</a>';
                     },
-                    filter: {
-                        type: 'string'
-                    }
-                },
-                {
-                    flex: 1,
-                    xtype: 'gridcolumn',
-                    dataIndex: 'message',
-                    renderer: function(v) {
-                        return v.replace(/\n/, "<br>\n");
+                    {
+                        xtype: 'gridcolumn',
+                        dataIndex: 'level',
+                        text: me.strings.level,
+                        width: 50,
+                        tdCls: 'error-level',
+                        renderer: function(v, meta, rec) {
+                            var level = rec.getLevelName(),
+                                img = me.imgTpl.apply([level]);
+                            meta.tdAttr = 'data-qtip="' + me.strings['level_'+level]+'"';
+                            return img;
+                        },
+                        filter: {
+                            type: 'list',
+                            options: levelFilter,
+                            phpMode: false
+                        }
                     },
-                    text: me.strings.message,
-                    variableRowHeight: true, 
-                    filter: {
-                        type: 'string'
+                    {
+                        xtype: 'gridcolumn',
+                        dataIndex: 'eventCode',
+                        width: 85,
+                        text: me.strings.eventCode,
+                        renderer: function(v, meta, rec) {
+                            if(!Editor.data.errorCodesUrl) {
+                                return v;
+                            }
+                            var url = Ext.String.format(Editor.data.errorCodesUrl, v);
+                            return '<a href="'+url+'" target="_blank">'+v+'</a>';
+                        },
+                        filter: {
+                            type: 'string'
+                        }
+                    },
+                    {
+                        flex: 1,
+                        xtype: 'gridcolumn',
+                        dataIndex: 'message',
+                        tdCls: 'message',
+                        renderer: function(v, meta, rec) {
+                            var data = rec.get('extra');
+                            if(data) {
+                                v += ' <img class="icon-log-more-info" src="'+Ext.BLANK_IMAGE_URL+'" alt="'+me.strings.moreInfo+'">';
+                            }
+                            return v.replace(/\n/, "<br>\n");
+                        },
+                        text: me.strings.message,
+                        variableRowHeight: true, 
+                        filter: {
+                            type: 'string'
+                        }
+                    },
+                    {
+                        width: 180,
+                        xtype: 'gridcolumn',
+                        dataIndex: 'authUser',
+                        text: me.strings.colUsername,
+                        filter: {
+                            type: 'string'
+                        }
+                    },
+                    {
+                        width: 100,
+                        xtype: 'gridcolumn',
+                        dataIndex: 'domain',
+                        text: me.strings.domain,
+                        filter: {
+                            type: 'string'
+                        }
                     }
-                },
-                {
-                    width: 180,
-                    xtype: 'gridcolumn',
-                    dataIndex: 'authUser',
-                    text: me.strings.colUsername,
-                    filter: {
-                        type: 'string'
-                    }
-                },
-                {
-                    width: 100,
-                    xtype: 'gridcolumn',
-                    dataIndex: 'domain',
-                    text: me.strings.domain,
-                    filter: {
-                        type: 'string'
-                    }
-                }
-            ],
-            dockedItems: [{
-                xtype: 'toolbar',
-                dock: 'top',
-                items: [{
-                    xtype: 'button',
-                    itemId: 'userPrefReload',
-                    iconCls: 'ico-refresh',
-                    text: me.strings.reload,
-                    handler: function() {
-                        me.store.reload();
-                    }
+                ],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [{
+                        xtype: 'button',
+                        itemId: 'userPrefReload',
+                        iconCls: 'ico-refresh',
+                        text: me.strings.reload,
+                        handler: function() {
+                            me.store.reload();
+                        }
+                    }]
                 }]
+                
+            },{
+                itemId: 'detailview',
+                xtype: 'panel',
+                hidden: true,
+                scrollable: 'y',
+                items: [{
+                    xtype: 'container',
+                    itemId: 'eventdata'
+                },{
+                    title: me.strings.details,
+                    nameColumnWidth: 200,
+                    xtype: 'propertygrid'
+                }],
+                dockedItems: [
+                    {
+                        xtype: 'toolbar',
+                        dock: 'bottom',
+                        ui: 'footer',
+                        items: [
+                            {
+                                xtype: 'tbfill'
+                            },
+                            {
+                                xtype: 'button',
+                                itemId: 'cancelBtn',
+                                iconCls : 'ico-cancel',
+                                text: me.strings.btnBack
+                            }
+                        ]
+                    }
+                ]
             }]
         };
 
@@ -166,9 +212,10 @@ Ext.define('Editor.view.admin.log.Grid', {
         return me.callParent([config]);
     },
     load: function(id) {
-        var store = this.getStore();
+        var grid = this.down('gridpanel'),
+        store = grid.getStore();
         store.suppressNextFilter = true;
-        this.filters.clearFilters();
+        grid.filters.clearFilters();
         //see store definition why we do this:
         store.suppressNextFilter = false;
         store.loadData([], false);
