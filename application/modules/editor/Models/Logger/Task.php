@@ -45,6 +45,8 @@ END LICENSE AND COPYRIGHT
  * @method void setWorker() setWorker(string $worker)
  * @method string getMessage() getMessage()
  * @method void setMessage() setMessage(string $message)
+ * @method string getExtra() getExtra()
+ * @method void setExtra() setExtra(string $extra)
  * @method string getAuthUserGuid() getAuthUserGuid()
  * @method void setAuthUserGuid() setAuthUserGuid(string $authUserGuid)
  * @method string getAuthUser() getAuthUser()

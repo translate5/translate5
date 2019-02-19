@@ -406,4 +406,13 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         );
         $this->setStaticAuthHash($guidHelper->create(false));
     }
+    
+    /**
+     * generates a task overview statistics summary
+     * @return array
+     */
+    public function getSummary() {
+        $stmt = $this->db->getAdapter()->query('select state, role, usedstate, count(*) jobCount from LEK_taskUserAssoc group by state,role, usedstate');
+        return $stmt->fetchAll();
+    }
 }

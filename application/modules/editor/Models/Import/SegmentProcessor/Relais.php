@@ -161,32 +161,29 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     public function postParseHandler(editor_Models_Import_FileParser $parser) {
         $this->saveFieldWidth($parser);
         
-        if(!empty($this->errors)) {
-            $errors = [
-                'Task: '.$this->task->getTaskName(),
-                'TaskNr: '.$this->task->getTaskNr(),
-                'TaskGuid: '.$this->task->getTaskGuid(),
-                'FileName: '.$this->fileName,
-                ''
-            ];
-            if(!empty($this->errors['source-not-found'])){
-                $errors[] = 'For the following MIDs the source segment was not found to the MID of relais file. The Relais segment was ignored.';
-                $errors[] = join(', ', $this->errors['source-not-found'])."\n";
-            }
-            if(!empty($this->errors['source-different'])){
-                $errors[] = 'Source of relais file is not identical with source of translated file.';
-                $errors[] = 'Relais target is left empty.';
-                $errors[] = join("\n", $this->errors['source-different'])."\n";
-            }
-            if(!empty($this->errors['source-missing'])){
-                $errors[] = 'Errors in adding relais segment: Source of original segment and source of relais segment are identical,';
-                $errors[] = 'but still original Segment not found in the database:';
-                $errors[] = join("\n", $this->errors['source-missing'])."\n";
-            }
-            
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError('Errors in processing relais files', join("\n", $errors));
+        if(empty($this->errors)) {
+            return;
+        }
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
+        $logData = [
+            'task' => $this->task,
+            'fileName' => $this->fileName,
+        ];
+        if(!empty($this->errors['source-not-found'])){
+            $msg = 'Errors in processing relais files: '."\n";
+            $msg .= 'The following MIDs are present in the relais file "{fileName}" but could not be found in the source file, the relais segment(s) was/were ignored.﻿ See Details.';
+            $logger->warn('E1020', $msg, array_merge($logData, ['midList' => join(', ', $this->errors['source-not-found'])]));
+        }
+        if(!empty($this->errors['source-different'])){
+            $msg = 'Errors in processing relais files: '."\n";
+            $msg .= 'Source-content of relais file "{fileName}" is not identical with source of translated file. Relais target is left empty. See Details.';
+            $logger->warn('E1021', $msg, array_merge($logData, ['segments' => join(",\n ", $this->errors['source-different'])]));
+        }
+        if(!empty($this->errors['source-missing'])){
+            $msg = 'Errors in adding relais segment: '."\n";
+            $msg .= 'Source-content of relais file "{fileName}" is identical with source of translated file, but still original segment not found in the database.﻿ See Details.';
+            $logger->warn('E1022', $msg, array_merge($logData, ['segments' => join(",\n ", $this->errors['source-missing'])]));
         }
     }
     

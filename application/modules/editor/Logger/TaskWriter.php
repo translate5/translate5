@@ -32,9 +32,20 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
         /* @var $taskLog editor_Models_Logger_Task */
         if($task->isModified()) {
-            $event->message .= print_r($task->getModifiedValues(),1);
+            $modified = $task->getModifiedValues();
+            foreach($modified as $field => $value) {
+                //we get also modified values if value is the same, but the type was changed (integer vs string)
+                // therefore we check == for 0, so we get all falsy value changes
+                // otherwise we compare typeless to get only changed values 
+                if($value == 0 || $value != $task->get($field)) {
+                    $event->extra['Task field '.$field] = $value;
+                }
+            }
         }
         $taskLog->setFromEventAndTask($event, $task);
+        // we don't log the task data again, thats implicit via the taskGuid
+        unset($event->extra['task']); 
+        $taskLog->setExtra($this->toJson($event->extra));
         $taskLog->save();
         return;
     }
