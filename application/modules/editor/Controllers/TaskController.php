@@ -330,7 +330,7 @@ class editor_TaskController extends ZfExtended_RestController {
         },$rows);
 
         if(empty($customerIds)){
-            throw new ZfExtended_BadMethodCallException("No customers are found in the task list. The list of was: ".error_log(print_r($rows,1)));
+            throw new ZfExtended_Exception('No customers were found in the provided task list. The task list was:'.error_log(print_r($rows,1)));
         }
         
         $customer = ZfExtended_Factory::get('editor_Models_Customer');

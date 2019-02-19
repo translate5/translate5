@@ -842,7 +842,8 @@ Ext.define('Editor.controller.Localizer', {
         gender: '<?php echo $this->translate->_('Anrede');?>',
         email: '<?php echo $this->translate->_('E-Mail');?>',
         locale: '<?php echo $this->translate->_('Sprache');?>',
-        roles: '<?php echo $this->translate->_('Systemrollen');?>'
+        roles: '<?php echo $this->translate->_('Systemrollen');?>',
+        openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
     };
     Editor.view.admin.UserGrid.prototype.strings = {
         addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
@@ -900,7 +901,8 @@ Ext.define('Editor.controller.Localizer', {
         targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
         languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
         localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
-        parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>'
+        parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
+        bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
     };
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')
@@ -985,7 +987,15 @@ Ext.define('Editor.controller.Localizer', {
             customerDeleteMsg:'<?php echo $this->translate->_("Diesen Kunden löschen?");?>',
             customerDeleteTitle:'<?php echo $this->translate->_("Kunden löschen");?>',
             customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>',
-            export:'<?php echo $this->translate->_("Exportieren");?>'
+            export:'<?php echo $this->translate->_("Exportieren");?>',
+            domain:'<?php echo $this->translate->_("Domain");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenID server");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenID OAuth url");?>',
+            rolesLabel:'<?php echo $this->translate->_("Systemrollen");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenID Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenID Passwort");?>',
+            openIdRedirectLabel:'<?php echo $this->translate->_("Label-Text umleiten");?>',
+            openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn das checkbox nicht aktiviert ist, wird dem Benutzer eine verknüpfte Nachricht 'Anmelden mit xxx' über dem Anmeldeformular angezeigt.");?>'
         }
     });
 
