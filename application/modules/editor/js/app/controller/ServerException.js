@@ -95,6 +95,7 @@ Ext.define('Editor.controller.ServerException', {
             str = me.strings,
             _status = status.toString(),
             text = str.text,
+    //FIXME here unknown error also in new JSON structure!
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
             json = null,
             tpl = new Ext.Template(str.serverMsg),
@@ -190,7 +191,7 @@ Ext.define('Editor.controller.ServerException', {
                  });
                 return;
         }
-        if(json.errorMessage) {
+        if(json && json.errorMessage) {
             statusText += ': '+json.errorMessage;
         }
         Ext.Msg.alert(str.title, text+tpl.apply([_status, statusText]));

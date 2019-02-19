@@ -37,5 +37,7 @@ Ext.define('Editor.store.admin.task.Logs', {
   remoteSort: true,
   remoteFilter: true,
   autoLoad: false,
+  // must then be set to false after initing the grid and store
+  suppressNextFilter: true, 
   pageSize: 0
 });
