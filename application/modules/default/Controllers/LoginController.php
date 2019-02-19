@@ -52,49 +52,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         parent::indexAction();
         //if the login status is required, try to authenticate with openid connect
         if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_REQUIRED){
-            $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
-            //the openid authentication is valid
-            
-            //set the redirect label if the customer exist
-            if($oidc->isOpenIdCustomerSet() && !$oidc->getCustomer()->getOpenIdRedirectCheckbox()){
-                
-                //add form hidden field, which is used when redirec to openid is needed
-                $redirect = new Zend_Form_Element_Hidden('redirect');
-                $this->_form->addElement($redirect);
-                
-                //create the link field which needs to redirect the login via the configured openid server
-                $link=new Zend_Form_Element_Note(array(
-                    'name' => 'openidredirect',
-                    'value' => $oidc->getCustomer()->getOpenIdRedirectLabel(),
-                    'decorators' => array(
-                        array('ViewHelper'),
-                        array('HtmlTag', array(
-                            'tag' => 'a',
-                            'href' => 'javascript:void(0);',
-                            'onclick'=>'document.getElementById("redirect").value="openid"; document.getElementById("submit").click();'
-                        )),
-                        
-                    )
-                ));
-                $link->setOrder(0);
-                $this->_form->addElement($link);
-            }
-            //authenticate with the configured openid client
-            if($oidc->authenticate()){
-                //create the user in the translate5 system or update if the user already exist
-                $user = $oidc->createUser();
-                if(!$user){
-                    return;
-                }
-                //init the user session and redirect to the editor
-                
-                $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
-                /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
-                $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
-                $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
-                $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
-                $this->initDataAndRedirect();
-            }
+            $this->handleOpenIdRequest();
         }
     }
     
@@ -152,5 +110,55 @@ class LoginController extends ZfExtended_Controllers_Login {
             throw new ZfExtended_NoAccessException("No initial_page resource is found.");
         }
         exit;
+    }
+    
+    /***
+     * Check if the current request is valid for the openid. If it is a valid openid request, the user
+     * login will be redirected to the openid client server
+     */
+    protected function handleOpenIdRequest() {
+        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        //the openid authentication is valid
+        
+        //set the redirect label if the customer exist
+        if($oidc->isOpenIdCustomerSet() && !$oidc->getCustomer()->getOpenIdRedirectCheckbox()){
+            
+            //add form hidden field, which is used when redirec to openid is needed
+            $redirect = new Zend_Form_Element_Hidden('redirect');
+            $this->_form->addElement($redirect);
+            
+            //create the link field which needs to redirect the login via the configured openid server
+            $link=new Zend_Form_Element_Note(array(
+                'name' => 'openidredirect',
+                'value' => $oidc->getCustomer()->getOpenIdRedirectLabel(),
+                'decorators' => array(
+                    array('ViewHelper'),
+                    array('HtmlTag', array(
+                        'tag' => 'a',
+                        'href' => 'javascript:void(0);',
+                        'onclick'=>'document.getElementById("redirect").value="openid"; document.getElementById("submit").click();'
+                    )),
+                    
+                )
+            ));
+            $link->setOrder(0);
+            $this->_form->addElement($link);
+        }
+        //authenticate with the configured openid client
+        if($oidc->authenticate()){
+            //create the user in the translate5 system or update if the user already exist
+            $user = $oidc->createUser();
+            if(!$user){
+                return;
+            }
+            //init the user session and redirect to the editor
+            
+            $invalidLoginCounter = ZfExtended_Factory::get('ZfExtended_Models_Invalidlogin',array($user->getLogin()));
+            /* @var $invalidLoginCounter ZfExtended_Models_Invalidlogin */
+            $invalidLoginCounter->resetCounter(); // bei erfolgreichem login den counter zurücksetzen
+            $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
+            $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
+            $this->initDataAndRedirect();
+        }
     }
 }
