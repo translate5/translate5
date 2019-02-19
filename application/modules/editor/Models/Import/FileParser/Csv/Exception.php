@@ -25,11 +25,17 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
- * DB encapsulation class
+ * Should be used for errors in the context of CSV import processing
  */
-class editor_Models_Db_LogRequest extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_request_log';
-    public $_primary = 'id';
+class editor_Models_Import_FileParser_Csv_Exception extends editor_Models_Import_FileParser_Exception {
+    /**
+     * @var string
+     */
+    protected $origin = 'import.fileparser.csv';
+    
+    static protected $localErrorCodes = [
+        'E1017' => 'The regex {regex} matches the placeholderCSV string {placeholder} that is used in the editor_Models_Import_FileParser_Csv class to manage the protection loop. This is not allowed. Please find another solution to protect what you need to protect in your CSV via Regular Expression.',
+        'E1018' => 'The string $this->placeholderCSV ({placeholder}) had been present in the segment before parsing it. This is not allowed.',
+    ];
 }

@@ -162,6 +162,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             )
         ));
         
+        $this->front->getRouter()->addRoute('editorTaskEvents', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/events',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'events'
+            )
+        ));
+        
         $this->front->getRouter()->addRoute('editorTaskImport', new ZfExtended_Controller_RestLikeRoute(
             'editor/task/:id/import',
             array(

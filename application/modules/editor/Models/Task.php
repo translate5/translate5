@@ -704,23 +704,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         
-        /**
-         * SELECT `t`.taskGuid,`t`.taskName, t.id 
-         * FROM LEK_task AS `t`  
-         * LEFT JOIN `LEK_task_log` AS `tl` ON   
-         * WHERE `t`.`state` = 'end' AND `tl`.id IS NULL;
-         */
-        
-        $daysOffset = (int)$daysOffset; //ensure that it is plain integer, which can be savely given to DB without binding 
-        //find all ended tasks which are not modified in the last X days
-        // which are not modified → get all modified and make a left join with id = null (faster as not exists)
+        $daysOffset = (int)$daysOffset; //ensure that it is plain integer
         $s = $this->db->select()
-             ->setIntegrityCheck(false)
-             ->from(['t' => 'LEK_task'],'t.id AS id')
-             ->joinLeft(['tl' => 'LEK_task_log'], 
-                 '`t`.`taskGuid` = `tl`.`taskGuid` AND `tl`.`created` > CURRENT_DATE - INTERVAL '.$daysOffset.' DAY','')
-            ->where('`t`.`state`=?',self::STATE_END)
-            ->where('`tl`.id IS NULL');
+            ->where('`state` = ?', self::STATE_END)
+            ->where('`modified` < (CURRENT_DATE - INTERVAL ? DAY)', $daysOffset);
         $tasks = $this->db->getAdapter()->fetchAll($s);
 
         if(empty($tasks)){
@@ -746,8 +733,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $removedTasks[]=$taskEntity->getTaskName();
             $remover->remove();
         }
-        error_log("Number of tasks removed: ".count($removedTasks));
-        error_log("Tasks removed by taskname: ".implode(',', $removedTasks));
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
+        $logger->info('E1011', 'removeOldTasks - removed {taskCount} tasks', [
+            'taskCount' => count($removedTasks),
+            'taskNames' => $removedTasks
+        ]);
     }
     
     /***

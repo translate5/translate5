@@ -128,15 +128,6 @@ abstract class editor_Workflow_Abstract {
      * @var string
      */
     protected $newUtaState;
-
-    /**
-     * enables / disables debugging (logging), can be enabled by setting runtimeOptions.debug.core.workflow = 1 in installation.ini
-     * 0 => disabled
-     * 1 => log called handler methods (logging must be manually implemented in the handler methods by usage of $this->doDebug)
-     * 2 => log also $this
-     * @var integer
-     */
-    protected $debug = 0;
     
     /**
      * @var stdClass
@@ -261,9 +252,15 @@ abstract class editor_Workflow_Abstract {
     ]; 
     
     protected $nextStepWasSet = [];
+
+    /**
+     * Holds workflow log instance per affected task
+     * Accesable via doDebug method
+     * @var array
+     */
+    protected $log = [];
     
     public function __construct() {
-        $this->debug = ZfExtended_Debug::getLevel('core', 'workflow');
         $this->loadAuthenticatedUser();
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(__CLASS__));
         
@@ -673,37 +670,36 @@ abstract class editor_Workflow_Abstract {
     }
     
     /**
-     * simple debugging
-     * @param string $name
+     * debugging workflow 
+     * @param string $msg
+     * @param array $data optional debuggin data
+     * @param boolean $levelInfo optional, if true log in level info instead debug
      */
-    protected function doDebug($name) {
-        if(empty($this->debug)) {
+    protected function doDebug($msg, array $data = [], $levelInfo = false) {
+        if(empty($this->newTask)) {
             return;
         }
-        if($this->debug == 1) {
-            //error_log(get_class($this).'::'.$name);
-            if(empty($this->newTask)) {
-                return;
-            }
-            $taskGuid = $this->newTask->getTaskGuid();
-            //without that data no loggin is possible
-            if(empty($taskGuid) || empty($this->authenticatedUserModel)) {
-                return;
-            }
-            if(!empty($this->newTaskUserAssoc)) {
-                $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-                /* @var $user ZfExtended_Models_User */
-                $user->loadByGuid($this->newTaskUserAssoc->getUserGuid());
-                editor_Models_LogTask::createWorkflow($taskGuid, $name, $this->authenticatedUserModel, $user);
-            }
-            else {
-                editor_Models_LogTask::createWorkflow($taskGuid, $name, $this->authenticatedUserModel);
-            }
+        $taskGuid = $this->newTask->getTaskGuid();
+        //without that data no loggin is possible
+        if(empty($taskGuid)) {
             return;
         }
-        if($this->debug == 2) {
-            error_log($name);
-            error_log(print_r($this, 1));
+        //get the logger for the task
+        if(empty($this->log[$taskGuid])) {
+            $this->log[$taskGuid] = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->newTask]);
+        }
+        $log = $this->log[$taskGuid];
+        /* @var $log editor_Logger_Workflow */
+        
+        //add the job / tua
+        if(!empty($this->newTaskUserAssoc)) {
+            $data['job'] = $this->newTaskUserAssoc;
+        }
+        if($levelInfo) {
+            $log->info('E1013', $msg, $data);
+        }
+        else {
+            $log->debug('E1013', $msg, $data);
         }
     }
     
@@ -848,10 +844,16 @@ abstract class editor_Workflow_Abstract {
      */
     protected function callActions($trigger, $step = null, $role = null, $state = null) {
         $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
+        $debugData = [
+            'trigger' => $trigger,
+            'step' => $step, 
+            'role' => $role,
+            'state' => $state,
+        ];
         /* @var $actions editor_Models_Workflow_Action */
         $workflows = $this->getIdList();
         $actions = $actions->loadByTrigger($workflows, $trigger, $step, $role, $state);
-        $this->doDebug($this->actionDebugMessage($workflows, $trigger, $step, $role, $state));
+        $this->actionDebugMessage($workflows, $debugData);
         $instances = [];
         foreach($actions as $action) {
             $class = $action['actionClass'];
@@ -866,8 +868,7 @@ abstract class editor_Workflow_Abstract {
                 $instance = $instances[$class];
             }
             
-            $msg = $this->actionDebugMessage($action, $trigger, $step, $role, $state);
-            $this->doDebug($msg);
+            $this->actionDebugMessage($action, $debugData);
             if(empty($action['parameters'])) {
                 call_user_func([$instance, $method]);
                 continue;
@@ -882,34 +883,22 @@ abstract class editor_Workflow_Abstract {
     /**
      * generates a debug message for called actions
      * @param array $action
-     * @param string $trigger
-     * @param string $step
-     * @param string $role
-     * @param string $state
+     * @param array $data
      * @return string
      */
-    protected function actionDebugMessage(array $action, $trigger, $step, $role, $state) {
+    protected function actionDebugMessage(array $action, array $data) {
         if(!empty($action) && empty($action['actionClass'])) {
             //called in context before action load
-            $msg = ' Try to load actions for workflow(s) "'.join(', ', $action).'" through trigger '.$trigger;
+            $msg = ' Try to load actions for workflow(s) "'.join(', ', $action).'" through trigger {trigger}';
         }
         else {
             //called in context after action loaded
-            $msg = ' Workflow called action '.$action['actionClass'].'::'.$action['action'].'() through trigger '.$trigger;
-        }
-        if(!empty($step)) {
-            $msg .= "\n".' with step '.$step;
-        }
-        if(!empty($role)) {
-            $msg .= "\n".' with role '.$role;
-        }
-        if(!empty($state)) {
-            $msg .= "\n".' and state '.$state;
+            $msg = ' Workflow called action '.$action['actionClass'].'::'.$action['action'].'() through trigger {trigger}';
         }
         if(!empty($action['parameters'])) {
-            $msg .= "\n".' and parameters '.$action['parameters'];
+            $data['parameters'] = $action['parameters'];
         }
-        return $msg;
+        $this->doDebug($msg, $data);
     }
     
     /**
@@ -987,11 +976,8 @@ abstract class editor_Workflow_Abstract {
         }
         //set the first found valid step to the current workflow step
         $step = reset($matchingSteps);
-        $this->doDebug(__FUNCTION__.' recalculate to step: '.$step);
+        $this->doDebug('recalculate workflow to step {step} ', ['step' => $step], true);
         $task->updateWorkflowStep($step, false);
-        $log = ZfExtended_Factory::get('editor_Workflow_Log');
-        /* @var $log editor_Workflow_Log */
-        $log->log($task, $this->authenticatedUser->userGuid);
         //set $step as new workflow step if different to before!
         $sendNotice($step);
         return;
@@ -1055,11 +1041,8 @@ abstract class editor_Workflow_Abstract {
             'oldStep' => $task->getWorkflowStepName(),
             'newStep' => $stepName,
         ];
-        $this->doDebug(__FUNCTION__.' '.print_r($this->nextStepWasSet, 1));
+        $this->doDebug(__FUNCTION__.': workflow next step "{newStep}"; oldstep: "{oldStep}"', $this->nextStepWasSet[$task->getTaskGuid()], true);
         $task->updateWorkflowStep($stepName, true);
-        $log = ZfExtended_Factory::get('editor_Workflow_Log');
-        /* @var $log editor_Workflow_Log */
-        $log->log($task, $this->authenticatedUser->userGuid);
         //call action directly without separate handler method
         $newTua = $this->newTaskUserAssoc;
         $this->callActions('handleSetNextStep', $stepName, $newTua->getRole(), $newTua->getState());
@@ -1071,11 +1054,8 @@ abstract class editor_Workflow_Abstract {
      * @param string $stepName
      */
     protected function initWorkflowStep(editor_Models_Task $task, $stepName) {
+        $this->doDebug('workflow init step to "{step}"', ['step' => $stepName], true);
         $task->updateWorkflowStep($stepName, false);
-        $log = ZfExtended_Factory::get('editor_Workflow_Log');
-        /* @var $log editor_Workflow_Log */
-        //since we are in the import, we don't have the current user, so we use the pmGuid user of the task:
-        $log->log($task, $task->getPmGuid()); 
     }
     
     /*
