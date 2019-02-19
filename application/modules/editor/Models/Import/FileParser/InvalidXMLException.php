@@ -25,16 +25,17 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
+
 /**
+ *
  */
-class editor_Models_LanguageResources_Exception extends ZfExtended_ErrorCodeException {
+class editor_Models_Import_FileParser_InvalidXMLException extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $origin = 'languageresources';
+    protected $origin = 'import.fileparser';
     
     static protected $localErrorCodes = [
-        //TODO: message!!
-        'E1023' => 'The LanguageResource "{languageResource}" error!',
+        'E1024'=>'Invalid XML: expected closing "{closingTag}" tag, but got tag "{receivedTag}". Opening tag was: {openingTag}'
     ];
 }

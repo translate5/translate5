@@ -545,8 +545,11 @@ class editor_Models_Import_FileParser_XmlParser {
         
         if($opener['tag'] !== $tag) {
             if(empty($this->handlerError)){
-                //if you got here because of an XML error: use an external tool like xmllint to get more details!
-                throw new ZfExtended_Exception('Invalid XML: expected closing "'.$opener['tag'].'" tag, but got tag "'.$tag.'". Opening tag was: '.print_r($opener,1));
+                throw new editor_Models_Import_FileParser_InvalidXMLException('E1024',[
+                    'closingTag' => $opener['tag'],
+                    'receivedTag' => $tag,
+                    'openingTag' => print_r($opener,1)
+                ]);
             }
             else {
                 $tag = call_user_func($this->handlerError, $opener, $tag, $key);
