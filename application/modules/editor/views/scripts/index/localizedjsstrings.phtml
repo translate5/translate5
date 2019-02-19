@@ -842,7 +842,8 @@ Ext.define('Editor.controller.Localizer', {
         gender: '<?php echo $this->translate->_('Anrede');?>',
         email: '<?php echo $this->translate->_('E-Mail');?>',
         locale: '<?php echo $this->translate->_('Sprache');?>',
-        roles: '<?php echo $this->translate->_('Systemrollen');?>'
+        roles: '<?php echo $this->translate->_('Systemrollen');?>',
+        openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
     };
     Editor.view.admin.UserGrid.prototype.strings = {
         addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
@@ -900,7 +901,8 @@ Ext.define('Editor.controller.Localizer', {
         targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
         languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
         localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
-        parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>'
+        parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
+        bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
     };
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')

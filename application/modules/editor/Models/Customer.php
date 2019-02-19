@@ -176,10 +176,10 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Find customer by given openid domain
+     * Load customer entity by given openid domain
      * @param string $domain
      */
-    public function findByDomain($domain) {
+    public function loadByDomain($domain) {
         $s = $this->db->select();
         $s->where('domain=?',$domain);
         $row=$this->db->fetchRow($s);

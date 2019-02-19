@@ -272,9 +272,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return $this->resultList; 
             }
             foreach($result->results as $found) {
-                if(!$this->validateInternalTags($found, $segment)) {
-                    continue;
-                }
+                
+                $this->validateInternalTags($found, $segment);
                 
                 //check if the found source has invalid xml
                 if($xmlParser->isStringValidXml($found->target)){
@@ -343,7 +342,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /**
      * Checks OpenTM2 result on valid segments: <it> ,<ph>,<bpt> and <ept> are invalid since they can not handled by the replaceAdditionalTags method
      * @param string $segmentContent
-     * @return boolean true if tags were valid
      */
     protected function validateInternalTags($result, editor_Models_Segment $seg) {
         //just concat source and target to check both:
@@ -356,7 +354,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             //the invalid tags are removed, reduce the matchrate by 2 percent
             $result->matchRate=$this->reduceMatchrate($result->matchRate,2);
         }
-        return true;
     }
     
     /***
@@ -476,9 +473,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return $this->resultList;
             }
             foreach($result->results as $found) {
-                if(!$this->validateInternalTags($found, $dummySegment)) {
-                    continue;
-                }
+                
+                $this->validateInternalTags($found, $dummySegment);
+                
                 $target = $this->internalTag->reapply2dMap($found->target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
                 
