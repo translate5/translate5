@@ -45,12 +45,8 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
             return false;
         }
         return true;
-    } 
-    
-    public function init($taskGuid,$params) {
-        $this->handleUploadFile($params['fileinfo']);
-        return parent::init($taskGuid,$params);
     }
+    
     /**
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::work()
@@ -59,18 +55,9 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         return $this->doImport();
     }
     
-    /***
-     * Move the upload file to the tem directory so it can be used by the worker
-     * @param array $fileinfo
-     */
-    protected function handleUploadFile(&$fileinfo){
-        $newFileLocation=APPLICATION_PATH.'/../data'.$fileinfo['tmp_name'];
-        move_uploaded_file($fileinfo['tmp_name'],$newFileLocation);
-        $fileinfo['tmp_name']=$newFileLocation;
-    }
-
     /**
-     * Uploads one file to Okapi to convert it to an XLIFF file importable by translate5
+     * Import languaeg resources file from the upload file
+     * @return boolean
      */
     protected function doImport() {
         $params = $this->workerModel->getParameters();

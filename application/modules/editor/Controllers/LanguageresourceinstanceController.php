@@ -685,6 +685,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $worker editor_Services_ImportWorker */
         
         $params=$this->getAllParams();
+        
+        $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
+        
         $params['languageResourceId']=$this->entity->getId();
         $params['fileinfo']=$importInfo[self::FILE_UPLOAD_NAME];
         $params['addnew']=$addnew;
@@ -699,6 +702,21 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->entity->save();
         
         $worker->queue();
+    }
+    
+    /***
+     * Move the upload file to the tem directory so it can be used by the worker.
+     * The fileinfo temp_name will be modefied
+     * @param array $fileinfo
+     */
+    protected function handleUploadLanguageResourcesFile(&$fileinfo){
+        //create unique temp file name
+        $newFileLocation=tempnam('LanguageResources', $fileinfo['name']);
+        if (!is_dir(dirname($newFileLocation))) {
+            mkdir(dirname($newFileLocation), 0777, true);
+        }
+        move_uploaded_file($fileinfo['tmp_name'],$newFileLocation);
+        $fileinfo['tmp_name']=$newFileLocation;
     }
     
     
