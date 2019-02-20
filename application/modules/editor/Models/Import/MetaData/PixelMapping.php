@@ -77,9 +77,18 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      * if exist update table LEK_pixel_mapping
      */
     public function importFromSpreadsheet() {
-        $this->loadSpreadsheet();
-        $this->updateDb();
-        $this->logIgnoredLines();
+        try {
+            $this->loadSpreadsheet();
+            $this->updateDb();
+            $this->logIgnoredLines();
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //no customer to the number found, proceed with the below Exception
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            //no customer to the number found, proceed with the below Exception
+        }
+        throw new ZfExtended_Exception('Pixel-Mapping: Import failed due not found client specified by client number in excel - client nr: '. $dataToBind['customerId']);
     }
     
     /**

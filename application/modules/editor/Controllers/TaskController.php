@@ -479,7 +479,18 @@ class editor_TaskController extends ZfExtended_RestController {
         $import->setTask($this->entity);
         $dp = $this->upload->getDataProvider();
         
-        $import->import($dp);
+        try {
+            $import->import($dp);
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            //check if the error comes from the customer assoc or not
+            if(! $e->isInMessage('REFERENCES `LEK_customer`')) {
+                throw $e;
+            }
+            throw new ZfExtended_UnprocessableEntity([
+                'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
+            ], $e);
+        }
     }
     
     /**
