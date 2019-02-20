@@ -830,14 +830,19 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               }
           },
           failure: function(form, submit) {
+              var card, errorHandler = Editor.app.getController('ServerException');
               win.setLoading(false);
               if(submit.failureType == 'server' && submit.result && !submit.result.success){
                   if(submit.result.httpStatus == "422") {
                       win.getLayout().setActiveItem('taskMainCard');
-                      form.markInvalid(submit.result.extra);
+                      form.markInvalid(submit.result.errorsTranslated);
                   }
                   else {
-                      win.down('#taskUploadCard').update(Editor.app.getController('ServerException').renderHtmlMessage(me.strings.taskError, submit.result));
+                      card = win.down('#taskUploadCard');
+                      if(card.isVisible()){
+                          card.update(errorHandler.renderHtmlMessage(me.strings.taskError, submit.result));
+                      }
+                      errorHandler.handleException(submit.response);
                   }
               }
           }

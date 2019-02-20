@@ -77,19 +77,8 @@ Ext.define('Editor.view.admin.customer.ViewController', {
                 me.cancelEdit();
             },
             failure: function(rec, op) {
-                var error,
-                    errorRes = op.error && op.error.response,
-                    errorHandler = Editor.app.getController('ServerException');
-                
                 me.getView().unmask();
-                if(errorRes && errorRes.responseText) {
-                    error = Ext.decode(errorRes.responseText);
-                    if(error.errors && op.error && op.error.status == '400') {
-                        form.markInvalid(error.errors);
-                        return;
-                    }
-                }
-                errorHandler.handleCallback.apply(errorHandler, arguments); 
+                Editor.app.getController('ServerException').handleFormFailure(form, rec, op);
             }
         });
     },
@@ -195,19 +184,9 @@ Ext.define('Editor.view.admin.customer.ViewController', {
                 //me.getView().fireEvent('customerRemoved');
             },
             failure: function(rec, op) {
-                var error,
-                    errorRes = op.error && op.error.response,
-                    errorHandler = Editor.app.getController('ServerException');
-                
+                store.load();
                 me.getView().unmask();
-                if(errorRes && errorRes.responseText) {
-                    error = Ext.decode(errorRes.responseText);
-                    if(error.errors && op.error && op.error.status == '400') {
-                        form.markInvalid(error.errors);
-                        return;
-                    }
-                }
-                errorHandler.handleCallback.apply(errorHandler, arguments); 
+                Editor.app.getController('ServerException').handleCallback(rec, op, false);
             }
         });
     },
