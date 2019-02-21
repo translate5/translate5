@@ -63,7 +63,11 @@ class Editor_SegmentuserassocController extends editor_Controllers_EditorrestCon
         try {
             $this->entity->save();
         }
-        catch (ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+        catch (Zend_Db_Statement_Exception $e) {
+            if(strpos($e->getMessage(), 'Integrity constraint violation: 1062 Duplicate entry') === false) {
+                //all other errors re-throw:
+                throw $e;
+            }
             // on duplicate key everything is ok, the entry is already existing
         }
         $this->view->rows = $this->entity->getDataObject();

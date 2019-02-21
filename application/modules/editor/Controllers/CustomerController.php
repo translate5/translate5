@@ -63,7 +63,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
         try {
             return parent::postAction();
         }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+        catch(Zend_Db_Statement_Exception $e) {
             $this->handleDuplicateNumber($e);
         }
     }
@@ -76,7 +76,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
         try {
             return parent::putAction();
         }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+        catch(Zend_Db_Statement_Exception $e) {
             $this->handleDuplicateNumber($e);
         }
     }
@@ -85,8 +85,12 @@ class Editor_CustomerController extends ZfExtended_RestController {
         try {
             parent::deleteAction();
         }
-        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-             throw new ZfExtended_Models_Entity_Conflict('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
+        catch(Zend_Db_Statement_Exception $e) {
+            $m = $e->getMessage();
+            if(stripos($m, 'Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails') !== false) {
+                 throw new ZfExtended_Models_Entity_Conflict('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
+            }
+            throw $e;
         }
     }
     
@@ -148,12 +152,18 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @param Zend_Db_Statement_Exception $e
      * @throws Zend_Db_Statement_Exception
      */
-    protected function handleDuplicateNumber(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+    protected function handleDuplicateNumber(Zend_Db_Statement_Exception $e) {
+        $msg = $e->getMessage();
+        if(stripos($msg, 'Duplicate entry') === false || stripos($msg, "for key ") === false) {
+            throw $e; //otherwise throw this again
+        }
+    
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */;;
     
-        throw new ZfExtended_UnprocessableEntity([
-            'number' => ['duplicateClientNumber' => $t->_('Diese Kundennummer wird bereits verwendet.')]
-        ]);
+        $errors = array('number' => $t->_('Diese Kundennummer wird bereits verwendet.'));
+        $e = new ZfExtended_ValidateException();
+        $e->setErrors($errors);
+        $this->handleValidateException($e);
     }
 }
