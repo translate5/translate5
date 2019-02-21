@@ -95,18 +95,9 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             $this->db->getAdapter()->query($sql, $dataToBind);
             return;
         }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //no customer to the number found, proceed with the below Exception
-        }
         catch(Zend_Db_Statement_Exception $e) {
-            if(strpos($e->getMessage(), 'Integrity constraint violation: 1452 Cannot add or update a child row') === false) {
-                throw $e;
-            }
-            if(strpos($e->getMessage(), 'FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`)') === false) {
-                throw $e;
-            }
+                $this->handleIntegrityConstraintException($e);
         }
-        throw new ZfExtended_Exception('Pixel-Mapping: Import failed due not found client specified by client number in excel - client nr: '. $dataToBind['customerId']);
     }
     
     /**

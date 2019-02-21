@@ -76,6 +76,12 @@ class editor_Models_Import_UploadProcessor {
             //there is already set a data provider
             return;
         }
+        
+        if(!$this->upload->isValid('importUpload')) {
+            $this->uploadErrors = $this->upload->getMessages();
+            $this->throwOnUploadError();
+        }
+        
         //mandatory upload file
         $importInfo = $this->upload->getFileInfo('importUpload');
         
@@ -97,9 +103,6 @@ class editor_Models_Import_UploadProcessor {
      * @return string
      */
     protected function checkAndGetImportType(array $importInfo) {
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        //mit oder ohne importUpload
-        $importFile = $importInfo['importUpload']['tmp_name'];
         $importName = pathinfo($importInfo['importUpload']['name']);
         settype($importName['extension'], 'string');
         $ext = strtolower($importName['extension']);
@@ -113,21 +116,26 @@ class editor_Models_Import_UploadProcessor {
             $this->validUploadTypes[$ext] = $allValidExtensions[$ext];
         }
         
-        if(!empty($this->validUploadTypes[$ext])){
+        $isEmptySize = empty($importInfo['importUpload']['size']);
+        if(!$isEmptySize && !empty($this->validUploadTypes[$ext])){
             return $ext;
         }
         
-        if(empty($importInfo['importUpload']['size'])) {
+        
+        if($isEmptySize) {
             $this->addUploadError('emptyUploadFile', $importInfo['importUpload']['name']);
         }
         else {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError('Unknown extension "'.$ext.'" discovered',
-                            'Someone tried the file extension "'.$ext.'" which is not registered');
+            $log = Zend_Registry::get('logger');
+            /* @var $log ZfExtended_Logger */
+            $log->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', [
+                'ext' => $ext,
+                'filename' => $importInfo['importUpload']['name'],
+            ]);
+            
+            
             $this->addUploadError('noValidUploadFile', $importInfo['importUpload']['name']);
         }
-        
         $this->throwOnUploadError();
     }
     
@@ -205,7 +213,7 @@ class editor_Models_Import_UploadProcessor {
     
     /**
      * Adds an upload error
-     * @see throwOnUploadError
+     * @see editor_Models_Import_UploadProcessor::throwOnUploadError
      * @param string $errorType
      */
     protected function addUploadError($errorType) {
@@ -229,16 +237,14 @@ class editor_Models_Import_UploadProcessor {
 
     /**
      * throws upload errors if some occured 
-     * @throws ZfExtended_ValidateException
+     * @throws ZfExtended_FileUploadException
      */
     protected function throwOnUploadError() {
         if(empty($this->uploadErrors)) {
             return;
         }
         $errors = array('importUpload' => $this->uploadErrors);
-        $e = new ZfExtended_ValidateException(print_r($errors, 1));
-        $e->setErrors($errors);
-        throw $e;
+        throw new ZfExtended_FileUploadException($errors);
     }
     
 }

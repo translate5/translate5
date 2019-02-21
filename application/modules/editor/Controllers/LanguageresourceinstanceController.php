@@ -480,7 +480,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //check and save customer assoc db entry
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
         /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
-        $customerAssoc->saveAssocRequest($this->data);
+        try {
+            $customerAssoc->saveAssocRequest($this->data);
+        }
+        catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->entity->delete();
+            throw $e;
+        }
         
         //save the resource languages to
         $resourceLanguages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
@@ -688,7 +694,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         
         if($errorNr !== UPLOAD_ERR_OK) {
-            $this->uploadErrors[] = ZfExtended_FileUploadException::getErrorMessage($errorNr);
+            $this->uploadErrors[] = ZfExtended_FileUploadException::getUploadErrorMessage($errorNr);
             return $importInfo;
         }
         
