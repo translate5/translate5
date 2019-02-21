@@ -172,6 +172,7 @@ Ext.define('Editor.controller.ServerException', {
         if(json && status != json.httpStatus) {
             status = json.httpStatus;
             statusText = json.message;
+            _status = status.toString();
         }
         switch(status) {
             case -1:
@@ -243,9 +244,9 @@ Ext.define('Editor.controller.ServerException', {
                 return;
         }
         if(json && json.errorMessage) {
-            statusText += ': '+json.errorMessage;
+            statusText += ': <br>'+json.errorMessage;
         }
-        Ext.Msg.alert(str.title, text+tpl.apply([_status, statusText]));
+        Editor.MessageBox.addError(text+tpl.apply([_status, statusText]));
     },
     renderHtmlMessage(title, response){
         var me = this,
