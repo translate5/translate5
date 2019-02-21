@@ -53,6 +53,27 @@ Ext.define('Editor.controller.ServerException', {
         timeout: '#UT#Die Anfrage über das Internet an den Server dauerte zu lange. Dies kann an Ihrer Internetverbindung oder an einer Überlastung des Servers liegen. Bitte versuchen Sie es erneut.',
         serverMsg: '#UT#<br />Meldung vom Server: <i>{0} {1}</i>'
     },
+    
+    /**
+     * Can be used in Operation callbacks to trigger the "default ServerException" failure behaviour
+     * handles only failed requests, ignores successfully HTTP 2XX requests
+     * @param {Array} records
+     * @param {Ext.data.Operation} operation
+     * @param {Boolean} success [not yet, ext > 4.0.7]
+     * @return {Boolean} true if request was successfull, false otherwise
+     */
+    handleFormFailure: function(form, record, operation) {
+        var json, resp = operation.error && operation.error.response;
+        if(resp && resp.responseText) {
+            json = Ext.decode(resp.responseText);
+            if(json.errorsTranslated && operation.error && operation.error.status == '422') {
+                form.markInvalid(json.errorsTranslated);
+                return;
+            }
+        }
+        this.handleCallback(record, operation, false);
+    },
+    
     /**
      * Can be used in Operation callbacks to trigger the "default ServerException" failure behaviour
      * handles only failed requests, ignores successfully HTTP 2XX requests
@@ -91,16 +112,23 @@ Ext.define('Editor.controller.ServerException', {
      * @param {Object} response
      */
     handleFailedRequest: function(status, statusText, response) {
+        
+        //FIXME refactor / clean up that function!
+        //from bottom up, first remove all unneeded stuff at the bottom, then clean up the head.
+        
         var me = this,
             str = me.strings,
             _status = status.toString(),
             text = str.text,
-    //FIXME here unknown error also in new JSON structure!
+            //FIXME here unknown error also in new JSON structure!
             respText = response && response.responseText || '{"errors": [{"_errorMessage": "unknown"}]}',
             json = null,
             tpl = new Ext.Template(str.serverMsg),
             action = response && response.request && response.request.options.action,
             getServerMsg = function() {
+                if(json.errorMessage){
+                    return json.errorMessage;
+                }
                 if(!json.errors && json.message){
                     return json.message;
                 }
@@ -122,6 +150,29 @@ Ext.define('Editor.controller.ServerException', {
             status = 0; 
         }
             
+        //it can happen on submit requests, that we receive the content in XML instead JSON:
+        if(response.responseText.length == 0 && Ext.DomQuery.isXml(response.responseXML)) {
+            json.httpStatus = status = Ext.DomQuery.selectNumber('httpStatus', response.responseXML);
+            _status = Ext.DomQuery.selectValue('httpStatus', response.responseXML);
+            json.message = statusText = Ext.DomQuery.selectValue('errorMessage', response.responseXML);
+            json.errorMessage = '';
+            
+            //when we get here, calling form.markInvalid is over, so we dont need to fill the JSON structure, 
+            // but have to add the errors to the message for plain output to the user 
+            Ext.Array.each(Ext.DomQuery.select('errorsTranslated', response.responseXML), function(error) {
+                Ext.Array.each(error.children, function(field) {
+                    Ext.Array.each(field.children, function(singleErrors) {
+                        json.errorMessage = json.errorMessage+singleErrors.firstChild.nodeValue+'<br>';
+                    });
+                });
+            });
+        }
+            
+        //form submits have here always a status of 200, so we have to get the real status from JSON
+        if(json && status != json.httpStatus) {
+            status = json.httpStatus;
+            statusText = json.message;
+        }
         switch(status) {
             case -1:
                 //if the XHR was aborted, do nothing here, since this is "wanted" behaviour
@@ -195,6 +246,22 @@ Ext.define('Editor.controller.ServerException', {
             statusText += ': '+json.errorMessage;
         }
         Ext.Msg.alert(str.title, text+tpl.apply([_status, statusText]));
+    },
+    renderHtmlMessage(title, response){
+        var me = this,
+            str = me.strings,
+            tpl = new Ext.Template(str.serverMsg),
+            result = '<h1>'+title+'</h1>';
+        
+        if(response.errorMessage && response.errorMessage.length > 0) {
+            result += '<p>'+response.errorMessage+'</p>';
+        }
+        if(response.messages && response.messages.length > 0) {
+            Ext.Array.each(response.messages, function(item){
+                result += '<p>'+item+'</p>';
+            });
+        }
+        return result;
     },
     /**
      * Helper to redirect to the login page

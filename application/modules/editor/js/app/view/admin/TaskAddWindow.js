@@ -321,14 +321,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                     pack: 'start'
                 },
                 items : [{
-                    xtype: 'button',
-                    hidden: true,
-                    itemId: 'feedbackBtn',
-                    text: me.strings.feedbackText,
-                    tooltip: me.strings.feedbackTip,
-                    iconCls: 'ico-error',
-                    ui: 'default-toolbar'
-                },{
                     xtype: 'tbfill'
                 },{
                     xtype : 'button',
