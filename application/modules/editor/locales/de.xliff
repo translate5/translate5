@@ -1856,7 +1856,11 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
     <source>translate5-termportal</source>
     <target>Terminologieportal</target>
 </trans-unit>
-
+<trans-unit id='RGllIMO8YmVyZ2ViZW5lIFF1ZWxsc3ByYWNoZSAie2xhbmd1YWdlfSIgaXN0IHVuZ8O8bHRpZyE='><source>Die übergebene Quellsprache "{language}" ist ungültig!</source><target>Die übergebene Quellsprache "{language}" ist ungültig!</target></trans-unit>
+<trans-unit id='RGllIMO8YmVyZ2ViZW5lIFppZWxzcHJhY2hlICJ7bGFuZ3VhZ2V9IiBpc3QgdW5nw7xsdGlnIQ=='><source>Die übergebene Zielsprache "{language}" ist ungültig!</source><target>Die übergebene Zielsprache "{language}" ist ungültig!</target></trans-unit>
+<trans-unit id='RXMgd3VyZGUgZWluZSBSZWxhaXNzcHJhY2hlIGdlc2V0enQsIGFiZXIgaW0gSW1wb3J0cGFrZXQgYmVmaW5kZW4gc2ljaCBrZWluZSBSZWxhaXNkYXRlbi4='><source>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</source><target>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</target></trans-unit>
+<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbiBnw7xsdGlnZXMgIntwcm9vZlJlYWR9IiBWZXJ6ZWljaG5pcy4='><source>Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.</source><target>Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.</target></trans-unit>
+<trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbmUgRGF0ZWllbiBpbSAie3Byb29mUmVhZH0iIFZlcnplaWNobmlzLg=='><source>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</source><target>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -149,11 +149,8 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @throws Zend_Db_Statement_Exception
      */
     protected function handleDuplicateNumber(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
-    
         throw new ZfExtended_UnprocessableEntity([
-            'number' => ['duplicateClientNumber' => $t->_('Diese Kundennummer wird bereits verwendet.')]
+            'number' => ['duplicateClientNumber' => 'Diese Kundennummer wird bereits verwendet.']
         ]);
     }
 }
