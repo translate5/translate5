@@ -366,6 +366,17 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'tasks'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
+        
+        
+        $this->front->getRouter()->addRoute('editorLanguageResourcesEvents', new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/:id/events',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'events'
+            )
+        ));
+        
         #Language resource rutes end
     }
     

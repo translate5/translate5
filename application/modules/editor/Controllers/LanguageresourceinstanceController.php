@@ -444,7 +444,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $validExportTypes = $connector->getValidFiletypes();
         
         if(empty($validExportTypes[$type])){
-            throw new ZfExtended_NotFoundException('Can not download in format '.$type);
+            throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format '.$type);
         }
         
         $data = $connector->getTm($validExportTypes[$type]);
@@ -522,7 +522,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $resource = $serviceManager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
         if(!$resource->getFilebased()) {
-            throw new ZfExtended_Models_Entity_NotFoundException('Requested languageResource is not filebased!');
+            throw new ZfExtended_ValidateException('Requested languageResource is not filebased!');
         }
         
         //upload errors are handled in handleAdditionalFileUpload

@@ -525,6 +525,12 @@ Ext.define('Editor.controller.Localizer', {
     	}
     });
     
+    
+    Ext.define("Editor.locale.de.view.LanguageResources.log.LogWindow", {
+        override: "Editor.view.LanguageResources.log.LogWindow",
+        title: '<?php echo $this->translate->_('Ereignisse zu Sprachresource "{0}"');?>'
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
         override: "Editor.view.admin.task.TaskAttributes",
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
@@ -1244,7 +1250,8 @@ Ext.define('Editor.controller.Localizer', {
             customers: '<?php echo $this->translate->_('Kunden');?>',
         	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
         	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
-            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
+            log: '<?php echo $this->translate->_('log');?>'
         }
     });
 

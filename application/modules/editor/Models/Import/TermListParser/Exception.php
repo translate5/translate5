@@ -25,26 +25,18 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
+ * Should be used for errors in the context of tbx import processing
  */
-class editor_Models_Logger_LanguageResources extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_Logger_LanguageResources';
-  
-    
+class editor_Models_Import_TermListParser_Exception extends ZfExtended_ErrorCodeException {
     /**
-     * Sets the internal data from the given Event class
-     * @param ZfExtended_Logger_Event $event
+     * @var string
      */
-    public function setFromEventAndLanguageResource(ZfExtended_Logger_Event $event, editor_Models_LanguageResources_LanguageResource $languageResource) {
-        $this->setLanguageResourceId($languageResource->getId());
-        $this->setEventCode($event->eventCode);
-        $this->setLevel($event->level);
-        $this->setDomain($event->domain);
-        $this->setWorker($event->worker);
-        $this->setMessage($event->message);
-        $this->setAuthUserGuid($event->userGuid);
-        $this->setAuthUser($event->userLogin);
-        $this->setCreated($event->created);
-    }
+    protected $origin = 'import.termlistparser';
+    
+    static protected $localErrorCodes = [
+        'E1028' => '{message}. \n Term collection name: {name}',
+        //'E1055' => 'Unable to read the provided tbx file {filename}',
+        //'E1056' => 'Error happen while tbx parsing was running.The error was:{message} \n termcollectionid:{id},termcollectionname:{name}',
+    ];
 }
