@@ -26,32 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.LanguageResources.log.LogWindow', {
-    extend: 'Editor.view.admin.log.Window',
-    alias: 'widget.languageResourcesLogLogWindow',
-    requires: [
-        'Editor.view.LanguageResources.log.LogGrid',
-        'Editor.view.admin.log.Window'
-    ],
-    languageResource: null,
-    title: '#UT#Ereignisse zu Sprachresource "{0}"',
-    initConfig: function(instanceConfig) {
-        var me = this,
-            config;
-        me.languageResource =instanceConfig.languageResource;
-        config = {
-    		title: Ext.String.format(me.title, me.languageResource.get('name')),
-            items : [{
-                xtype: 'languageResourcesLogLogGrid'
-            }] 
-        };
-        
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
-    },
-    load: function(options) {
-        this.down('languageResourcesLogLogGrid').load(this.languageResource.getId());
-    }
+/**
+ * @class Editor.store.LanguageResources.Logs
+ * @extends Ext.data.Store
+ */
+Ext.define('Editor.store.LanguageResources.Logs', {
+  extend : 'Ext.data.Store',
+  model: 'Editor.model.LanguageResources.Log',
+  remoteSort: true,
+  remoteFilter: true,
+  autoLoad: false,
+  // must then be set to false after initing the grid and store
+  suppressNextFilter: true, 
+  pageSize: 0
 });

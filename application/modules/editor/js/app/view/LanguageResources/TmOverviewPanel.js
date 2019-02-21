@@ -70,7 +70,8 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Standardmässig aktiv für',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben',
-        groupHeader: '#UT#Ressource: {name}'
+        groupHeader: '#UT#Ressource: {name}',
+        log:'#UT#Log'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -132,7 +133,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     text: me.strings.name
                 },{
                     xtype: 'actioncolumn',
-                    width: 98,
+                    width: 120,
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
@@ -169,6 +170,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         iconCls: 'ico-tm-download',
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return record.get('status') == 'novalidlicense' ? true : false;
+                        }
+                    },{
+                        tooltip: me.strings.log,
+                        action: 'log',
+                        iconCls: 'ico-tm-log',
+                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
+                            return false;
                         }
                     }],
                 },{

@@ -1,4 +1,3 @@
-
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,11 +25,10 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.LanguageResources.Log.LogGrid', {
-    extend: 'Ext.grid.Panel',
+Ext.define('Editor.view.LanguageResources.log.LogGrid', {
+    extend: 'Editor.view.admin.log.Grid',
     alias: 'widget.languageResourcesLogLogGrid',
-    store: 'LanguageResources.Logs',
-    strings: {
-    },
-    cls: 'languageResourcesLogLogGrid'
+    store: 'Editor.store.LanguageResources.Logs',
+    cls: 'languageResourcesLogLogGrid',
+    entityUrlPart: 'languageresourceinstance'
 });
