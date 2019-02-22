@@ -174,10 +174,12 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },{
                         tooltip: me.strings.log,
                         action: 'log',
-                        iconCls: 'ico-tm-log',
-                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return false;
-                        }
+                        getTip:function(view,metadata,record,rowIndex,colIndex,store){
+                            return record.get('eventsCount') > 0 ? me.strings.log : '';
+	                    },
+	                    getClass:function(view,metadata,record,rowIndex,colIndex,store){
+	                    	return record.get('eventsCount') > 0 ? 'ico-tm-log' : '';
+	                    }
                     }],
                 },{
                     xtype: 'gridcolumn',
