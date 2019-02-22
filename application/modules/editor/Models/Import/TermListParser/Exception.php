@@ -35,8 +35,7 @@ class editor_Models_Import_TermListParser_Exception extends ZfExtended_ErrorCode
     protected $origin = 'import.termlistparser';
     
     static protected $localErrorCodes = [
-        'E1028' => '{message}. \n Term collection name: {name}',
-        //'E1055' => 'Unable to read the provided tbx file {filename}',
-        //'E1056' => 'Error happen while tbx parsing was running.The error was:{message} \n termcollectionid:{id},termcollectionname:{name}',
+        'E1023' => 'Unable to read the provided tbx file {filename}',
+        'E1028' => '{message}. \n Term collection name: {name}'
     ];
 }

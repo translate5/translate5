@@ -47,4 +47,36 @@ class editor_Models_Logger_LanguageResources extends ZfExtended_Models_Entity_Ab
         $this->setAuthUser($event->userLogin);
         $this->setCreated($event->created);
     }
+    
+    /***
+     * Load events by language resource id
+     * @param integer $languageResourceId
+     * @return array
+     */
+    public function loadByLanguageResourceId($languageResourceId){
+        $s = $this->db->select();
+        $s->where('languageResourceId = ?', $languageResourceId);
+        return $this->loadFilterdCustom($s);
+    }
+    
+    /**
+     * loads all events to the given languageResource
+     * sorts from newest to oldest
+     * @param integer $languageResourceId
+     * @return array
+     */
+    public function getTotalByLanguageResourceId($taskGuid) {
+        $s = $this->db->select();
+        $s->where('languageResourceId = ?', $taskGuid);
+        return $this->computeTotalCount($s);;
+    }
+    
+    public function getEventsCountGruped($languageResourcesIds) {
+        $s = $this->db->select()
+        ->from('LEK_languageresources_log',array('count(*) as logCount','languageResourceId'))
+        ->where('languageResourceId IN(?)', $languageResourcesIds)
+        ->group('languageResourceId');
+        $result=$this->db->fetchAll($s)->toArray();
+        return array_combine(array_column($result,'languageResourceId'),array_column($result,'logCount'));
+    }
 }

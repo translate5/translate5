@@ -76,7 +76,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
             $customerAssoc->addAssocs($customers, $resourceId);
         }
-        return $resourceId;
+        return $this;
     }
     
     /***

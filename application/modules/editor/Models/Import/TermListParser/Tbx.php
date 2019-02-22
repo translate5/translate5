@@ -276,12 +276,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             throw new Zend_Exception('LIBXML_VERSION must be at least 2.6.20 (or as integer 20620).');
         }
         $this->config = Zend_Registry::get('config');
-        //create a new logger instance writing only to the configured taskLogger
-        $this->logger = ZfExtended_Factory::get('ZfExtended_Logger', [[
-            'writer' => [
-                'languageresourcesLog' => $this->config->resources->ZfExtended_Resource_Logger->writer->languageresourcesLog
-            ]
-        ]]);
+        
+        //init the logger (this will write in the language resources log and in the main log)
+        $this->logger=Zend_Registry::get('logger');
     }
 
     /**
@@ -315,8 +312,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         //all tbx files in the same term collection
         foreach($tbxfiles as $file) {
             if(!$file->isReadable()){
-                throw new editor_Models_Import_TermListParser_Exception('E1055',[
-                    'filename'=>$file
+                throw new editor_Models_Import_TermListParser_Exception('E1023',[
+                    'filename'=>$file,
+                    'languageResource'=>$this->termCollection
                 ]);
             }
             $this->task->setTerminologie(1);
@@ -348,7 +346,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             foreach ($filePath as $path){
                 $this->termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
                 $this->termCollection->load($termCollectionId);
-
+                
                 $tmpName=isset($path['tmp_name']) ? $path['tmp_name'] : $path;
                 $fileName=isset($path['name']) ? $path['name'] : null;;
                 
@@ -356,7 +354,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 //$this->xml->open(self::getTbxPath($task));
                 $this->xml->open($tmpName, null, LIBXML_PARSEHUGE);
                 
-
                 //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
                 while($this->fastForwardTo('termEntry')) {
                     $this->setActualLevel();
@@ -372,11 +369,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->updateCollectionLanguage();
             }
         }catch (Exception $e){
-            $this->logger->error('E1056','',[
-                'message' => $e->getMessage(),
-                'id'=>$this->termCollection->getId(),
-                'name'=>$this->termCollection->getName(),
-                'languageResource'=>$this->termCollection
+            $this->logger->exception($e,[
+                'level'=>ZfExtended_Logger::LEVEL_WARN
             ]);
             return false;
         }
@@ -1104,14 +1098,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         return ($this->xml->nodeType === XmlReader::ELEMENT);
     }
 
-    protected function log($logMessage) {
+    protected function log($logMessage,$code='E1028') {
         $data=[
             'languageResource'=>$this->termCollection
         ];
         if(!empty($this->task)){
             $data['task']=$this->task;
         }
-        $this->logger->info('E1028',$logMessage,$data);
+        $this->logger->info($code,$logMessage,$data);
     }
     
     private function getIdTermEntry() {

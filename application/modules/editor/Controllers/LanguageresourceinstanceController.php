@@ -96,7 +96,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return $resources[$id] = $serviceManager->getResourceById($serviceType, $id);
         };
         
-        $this->prepareTaskInfo(array_column($this->view->rows, 'id'));
+        $languageResourcesId=array_column($this->view->rows, 'id');
+        $this->prepareTaskInfo($languageResourcesId);
+        
+        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $eventLogger editor_Models_Logger_LanguageResources */
+        $eventLoggerGroupped=$eventLogger->getEventsCountGruped($languageResourcesId);
         
         //get all assocs grouped by language resource id
         $customerAssocModel=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
@@ -132,6 +137,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['useAsDefault'] = $this->getCustassocDefault($custAssoc, 'useAsDefault', $id);
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
+            //TODO: move me to the frontend, and also to the get action
+            $languageresource['eventsCount'] = isset($eventLoggerGroupped[$id]) ? (integer)$eventLoggerGroupped[$id] : 0;
         }
     }
     
@@ -232,6 +239,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         foreach($meta as $key => $v) {
             $this->view->rows->{$key} = $v;
         }
+        
+        $eventLogger=ZfExtended_Factory::get('editor_Models_Logger_LanguageResources');
+        /* @var $eventLogger editor_Models_Logger_LanguageResources */
+        $eventLoggerGroupped=$eventLogger->getEventsCountGruped([$this->entity->getId()]);
+        $this->view->rows->eventsCount = isset($eventLoggerGroupped[$this->entity->getId()]) ? (integer)$eventLoggerGroupped[$this->entity->getId()] : 0;
         
         $moreInfo = ''; //init as empty string, filled on demand by reference
         $connector = $serviceManager->getConnector($this->entity);
@@ -365,8 +377,8 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $filter->setSort($this->_getParam('sort', '[{"property":"id","direction":"DESC"}]'));
         $events->filterAndSort($filter);
         
-        $this->view->rows = $events->loadAll();
-        $this->view->total = $events->getTotalCount();
+        $this->view->rows = $events->loadByLanguageResourceId($this->entity->getId());
+        $this->view->total = $events->getTotalByLanguageResourceId($this->entity->getId());
     }
     
     private function prepareTaskInfo($languageResourceids) {
