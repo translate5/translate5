@@ -3131,7 +3131,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</source>
     <target>⁴ Unable to edit the user. This user is auto created by translate5 after OpenId authentication.</target>
 </trans-unit>
-
+<trans-unit id='dHJhbnNsYXRlNSB3aXJkIGdlbGFkZW46'><source>translate5 wird geladen:</source><target>translate5 is loading:</target></trans-unit>
     </body>
   </file>
 </xliff>
