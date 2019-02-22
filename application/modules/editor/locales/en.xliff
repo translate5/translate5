@@ -3122,6 +3122,16 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Terminologieportal</target>
 </trans-unit>
 
+<trans-unit id='T3BlbklkIEVtaXR0ZW4='>
+    <source>OpenId Emitten</source>
+    <target>OpenId Issuer</target>
+</trans-unit>
+
+<trans-unit id='4oG0IERlciBCZW51dHplciBrYW5uIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLiBEaWVzZXIgQmVudXR6ZXIgd2lyZCB2b24gdHJhbnNsYXRlNSBuYWNoIGRlciBPcGVuSWQtQXV0aGVudGlmaXppZXJ1bmcgYXV0b21hdGlzY2ggZXJzdGVsbHQu'>
+    <source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</source>
+    <target>⁴ Unable to edit the user. This user is auto created by translate5 after OpenId authentication.</target>
+</trans-unit>
+
     </body>
   </file>
 </xliff>

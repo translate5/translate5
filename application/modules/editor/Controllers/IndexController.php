@@ -315,6 +315,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function setJsAppData() {
         $userSession = new Zend_Session_Namespace('user');
         $userSession->data->passwd = '********';
+        $userSession->data->openIdSubject = '';
         $userRoles = $userSession->data->roles;
         
         $acl = ZfExtended_Acl::getInstance();
