@@ -27,5 +27,5 @@
 ALTER TABLE `LEK_customer` 
 ADD COLUMN `domain` VARCHAR(255) NULL AFTER `searchCharacterLimit`,
 ADD COLUMN `openIdServer` VARCHAR(255) NULL AFTER `domain`,
-ADD COLUMN `openIdServerRoles` VARCHAR(255) NULL AFTER `openIdServer`;
+ADD COLUMN `openIdServerRoles` VARCHAR(255) NULL AFTER `openIdServer`,
 ADD COLUMN `openIdAuth2Url` VARCHAR(255) NULL AFTER `openIdServerRoles`;
