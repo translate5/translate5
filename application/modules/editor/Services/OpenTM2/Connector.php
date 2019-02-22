@@ -49,15 +49,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public $fileNameCache=array();
     
     
-    /***
-     * Unsupported unicode characters by opentm2 and their replace mapping
-     * @var array
-     */
-    protected $replaceMap=array(
-        '&#x1E;'=>'___tag___INFORMATION SEPARATOR TWO___tag___',
-        '&#x8;'=>'___tag___backspace___tag___',
-    );
-    
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -127,12 +118,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return false;
         }
         
-        //replace the unsupported unicodes
-        $data=file_get_contents($fileinfo['tmp_name']);
-        $data=$this->replaceUnicodes($data);
-        
         //initial upload is a TM file
-        if($this->api->createMemory($name, $sourceLang, $data)){
+        if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
             $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
             return true;
         }
@@ -147,9 +134,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
-        $data=file_get_contents($fileinfo['tmp_name']);
-        $data=$this->replaceUnicodes($data);
-        if($this->api->importMemory($data)) {
+        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
         $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." LanguageResource: \n");
@@ -783,15 +768,5 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
         
         return $matchrate;
-    }
-    
-    /***
-     * Replace unsupported unicodes in the given text with there defined replacement
-     * @param string $data: tbx file content
-     * @return string
-     */
-    protected function replaceUnicodes($data){
-        return strtr($data,$this->replaceMap);
-        
     }
 }
