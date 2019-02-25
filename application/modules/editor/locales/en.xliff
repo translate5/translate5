@@ -1701,11 +1701,7 @@
     <source>%s - bearbeitet</source>
     <target>%s - edited</target>
 </trans-unit>
-<trans-unit id='QXV0b1N0YXR1cw=='>
-    <source>AutoStatus</source>
-    <target>AutoStatus</target>
-</trans-unit>
-
+<trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'><source>Bearbeitungsstatus</source><target>Processing status</target></trans-unit>
 <trans-unit id='UGFzc3dvcnQgc2V0emVu'>
   <source>Passwort setzen</source>
   <target>Reset password</target>

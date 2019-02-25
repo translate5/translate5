@@ -102,7 +102,6 @@
 <trans-unit id='UU0='><source>QM</source><target>QM</target></trans-unit>
 <trans-unit id='TWF0Y2hyYXRl'><source>Matchrate</source><target>Matchrate</target></trans-unit>
 <trans-unit id='WmllbHRleHQgw7xiZXJhcmJlaXRldA=='><source>Zieltext überarbeitet</source><target>Zieltext überarbeitet</target></trans-unit>
-<trans-unit id='QXV0b3N0YXR1cw=='><source>Autostatus</source><target>Autostatus</target></trans-unit>
 <trans-unit id='QXVzZ2FuZ3N0ZXh0'><source>Ausgangstext</source><target>Ausgangstext</target></trans-unit>
 <trans-unit id='QXVzZ2FuZ3N0ZXh0IMO8YmVyYXJiZWl0ZXQ='><source>Ausgangstext überarbeitet</source><target>Ausgangstext überarbeitet</target></trans-unit>
 <trans-unit id='U3RhdHVz'><source>Status</source><target>Status</target></trans-unit>
@@ -771,7 +770,7 @@
 <trans-unit id='U2VociBnZWVocnRlciBIZXJy'><source>Sehr geehrter Herr</source><target>Sehr geehrter Herr</target></trans-unit>
 <trans-unit id='bGVjdG9y'><source>lector</source><target>lector</target></trans-unit>
 <trans-unit id='JXMgLSBiZWFyYmVpdGV0'><source>%s - bearbeitet</source><target>%s - bearbeitet</target></trans-unit>
-<trans-unit id='QXV0b1N0YXR1cw=='><source>AutoStatus</source><target>AutoStatus</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'><source>Bearbeitungsstatus</source><target>Bearbeitungsstatus</target></trans-unit>
 <trans-unit id='RXMgaXN0IElobmVuIG5pY2h0IGVybGF1YnQsIGRlbiBTZWdtZW50aW5oYWx0IHp1IGJlYXJiZWl0ZW4uIEJpdHRlIHZlcndlbmRlbiBTaWUgU1RSRytaIHVtIElocmUgw4RuZGVydW5nZW4genVyw7xja3p1c2V0emVuIG9kZXIgYnJlY2hlbiBTaWUgZGFzIEJlYXJiZWl0ZW4gZGVzIFNlZ21lbnRzIGFiLg=='><source>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</source><target>Es ist Ihnen nicht erlaubt, den Segmentinhalt zu bearbeiten. Bitte verwenden Sie STRG+Z um Ihre Änderungen zurückzusetzen oder brechen Sie das Bearbeiten des Segments ab.</target></trans-unit>
 <trans-unit id='RmlsdGVydGV4dCBlaW5nZWJlbi4uLg=='><source>Filtertext eingeben...</source><target>Filtertext eingeben...</target></trans-unit>
 <trans-unit id='TnVyIE1RTS10YWdzIGJlYXJiZWl0ZW4='><source>Nur MQM-tags bearbeiten</source><target>Nur MQM-tags bearbeiten</target></trans-unit>
