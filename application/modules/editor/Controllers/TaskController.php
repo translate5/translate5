@@ -350,7 +350,7 @@ class editor_TaskController extends ZfExtended_RestController {
         },$rows);
 
         if(empty($customerIds)){
-            throw new ZfExtended_BadMethodCallException("No customers are found in the task list. The list of was: ".error_log(print_r($rows,1)));
+           return [];
         }
         
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
@@ -513,9 +513,15 @@ class editor_TaskController extends ZfExtended_RestController {
             'level' => ZfExtended_Logger::LEVEL_INFO
         ]);
         
-        throw new ZfExtended_UnprocessableEntity([
+        throw ZfExtended_UnprocessableEntity::createResponse([
+            //fieldName => error message to field
             $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
-        ], $e, $e->getErrors());
+        ], $e->getErrors(), $e);
+        
+        throw ZfExtended_UnprocessableEntity::createResponse([
+            //fieldName => error message to field
+            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+        ], $e->getErrors(), $e);
     }
     
     /**
@@ -529,9 +535,9 @@ class editor_TaskController extends ZfExtended_RestController {
         if(! $e->isInMessage('REFERENCES `LEK_customer`')) {
             throw $e;
         }
-        throw new ZfExtended_UnprocessableEntity([
+        throw ZfExtended_UnprocessableEntity::createResponse([
             'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
-        ], $e);
+        ], [], $e);
     }
     
     /**

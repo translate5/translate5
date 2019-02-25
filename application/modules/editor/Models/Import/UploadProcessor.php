@@ -243,8 +243,7 @@ class editor_Models_Import_UploadProcessor {
         if(empty($this->uploadErrors)) {
             return;
         }
-        $errors = array('importUpload' => $this->uploadErrors);
-        throw new ZfExtended_FileUploadException($errors);
+        throw new ZfExtended_FileUploadException('E1026', ['importUpload' => $this->uploadErrors]);
     }
     
 }

@@ -86,7 +86,10 @@ class Editor_CustomerController extends ZfExtended_RestController {
             parent::deleteAction();
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
-             throw new ZfExtended_Models_Entity_Conflict('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1047' => 'A client cannot be deleted as long as tasks are assigned to this client.'
+            ]);
+            throw new ZfExtended_Models_Entity_Conflict('E1047');
         }
     }
     
@@ -149,7 +152,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @throws Zend_Db_Statement_Exception
      */
     protected function handleDuplicateNumber(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-        throw new ZfExtended_UnprocessableEntity([
+        throw ZfExtended_UnprocessableEntity::createResponse([
             'number' => ['duplicateClientNumber' => 'Diese Kundennummer wird bereits verwendet.']
         ]);
     }

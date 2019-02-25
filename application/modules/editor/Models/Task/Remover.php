@@ -105,21 +105,27 @@ class editor_Models_Task_Remover {
     protected function checkRemovable() {
         $taskGuid = $this->task->getTaskGuid();
         
-        $e = new ZfExtended_BadMethodCallException();
-        $e->setLogging(false);
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1042' => 'The task can not be removed due it is used by a user.',
+            'E1043' => 'The task can not be removed due it is locked by a user.',
+            'E1044' => 'The task can not be locked for deletion.',
+        ]);
         
         if($this->task->isUsed($taskGuid)) {
-            $e->setMessage("Die Aufgabe wird von einem Benutzer benutzt", true);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1042', [
+                'Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.'
+            ], ['task' => $this->task]);
         }
         
         if($this->task->isLocked($taskGuid) && !$this->task->isErroneous()) {
-            $e->setMessage("Die Aufgabe ist durch einen Benutzer gesperrt", true);
-            throw $e; 
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1043', [
+                'Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.'
+            ], ['task' => $this->task]);
         }
         
         if(!$this->task->lock(NOW_ISO, true)) {
-            throw new ZfExtended_Models_Entity_Conflict();
+            //this should not happen, therefore it is not translated
+            throw new ZfExtended_Models_Entity_Conflict('E1044', ['task' => $this->task]);
         }
         return true;
     }

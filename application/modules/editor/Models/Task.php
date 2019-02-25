@@ -685,15 +685,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function checkStateAllowsActions() {
         if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
-            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
-            $e->setErrors([
-                    'task' => $this->getTaskGuid(),
-                    'taskState' => $this->getState(),
-                    'isLocked' => $this->isLocked($this->getTaskGuid()),
-                    'isErroneous' => $this->isErroneous(),
-                    'isExclusiveState' => $this->isExclusiveState(),
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1046' => 'The current task status does not allow that action.',
             ]);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1046', [
+                'Der aktuelle Status der Aufgabe verbietet diese Aktion!'
+            ], [
+                'task' => $this,
+                'isLocked' => $this->isLocked($this->getTaskGuid()),
+                'isErroneous' => $this->isErroneous(),
+                'isExclusiveState' => $this->isExclusiveState(),
+            ]);
         }
     }
     
