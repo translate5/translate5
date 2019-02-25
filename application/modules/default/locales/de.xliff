@@ -73,7 +73,7 @@
 <trans-unit id='QmxhdSB1bnRlcnN0cmljaGVuOiBUZXJtIHVuZCDDnGJlcnNldHp1bmcgdm9yaGFuZGVu'><source>Blau unterstrichen: Term und Übersetzung vorhanden</source><target>Blau unterstrichen: Term und Übersetzung vorhanden</target></trans-unit>
 <trans-unit id='Um90IHVudGVyc3RyaWNoZW46IFRlcm0gZmVobHQgaW4gw5xiZXJzZXR6dW5n'><source>Rot unterstrichen: Term fehlt in Übersetzung</source><target>Rot unterstrichen: Term fehlt in Übersetzung</target></trans-unit>
 <trans-unit id='VmlvbGV0dCBoaW50ZXJsZWd0OiBWZXJ3ZW5kZXRlciBUZXJtIGlzdCB2ZXJib3RlbmUgQmVuZW5udW5n'><source>Violett hinterlegt: Verwendeter Term ist verbotene Benennung</source><target>Violett hinterlegt: Verwendeter Term ist verbotene Benennung</target></trans-unit>
-<trans-unit id='QXV0b3N0YXR1cw=='><source>Autostatus</source><target>Autostatus</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'><source>Bearbeitungsstatus</source><target>Bearbeitungsstatus</target></trans-unit>
 <trans-unit id='V2lyZCBiZWkgU3BlaWNoZXJuIGRlcyBTZWdtZW50cyBhdXRvbWF0aXNjaCBnZXNldHp0'><source>Wird bei Speichern des Segments automatisch gesetzt</source><target>Wird bei Speichern des Segments automatisch gesetzt</target></trans-unit>
 <trans-unit id='SMOka2NoZW46IFd1cmRlIGxla3RvcmllcnQ='><source>Häkchen: Wurde lektoriert</source><target>Häkchen: Wurde lektoriert</target></trans-unit>
 <trans-unit id='WmFobnJhZDogQXV0b21hdGlzY2ggYW5nZXBhc3N0ZSBXaWVkZXJob2x1bmc='><source>Zahnrad: Automatisch angepasste Wiederholung</source><target>Zahnrad: Automatisch angepasste Wiederholung</target></trans-unit>
