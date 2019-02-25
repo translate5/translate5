@@ -211,7 +211,14 @@ class editor_TaskController extends ZfExtended_RestController {
             array_push($taskassocs[$res['taskGuid']], $res);
         }
         
+        //if the config for mailto link in task grid pm user column is configured
+        $isMailTo=$this->config->runtimeOptions->frontend->tasklist->pmMailTo;
+        
         $customerData = $this->getCustomersForRendering($rows);
+
+        if($isMailTo){
+            $userData=$this->getUsersForRendering($rows);
+        }
         
         foreach ($rows as &$row) {
             $this->initWorkflow($row['workflow']);
@@ -231,6 +238,10 @@ class editor_TaskController extends ZfExtended_RestController {
             //add task assoc if exist
             if(isset($taskassocs[$row['taskGuid']])){
                 $row['taskassocs'] = $taskassocs[$row['taskGuid']];
+            }
+            
+            if($isMailTo) {
+                $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
         }
         return $rows;
@@ -337,6 +348,30 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds($customerIds);
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
+    }
+    
+    /***
+     * Return a mapping of user guid and user email
+     * @param array $rows
+     * @return array|array
+     */
+    protected function getUsersForRendering(array $rows) {
+        if(empty($rows)){
+            return [];
+        }
+        
+        $userGuids = array_map(function($item){
+            return $item['pmGuid'];
+        },$rows);
+            
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $userData = $user->loadByGuids($userGuids);
+        $ret=[];
+        foreach ($userData as $data){
+            $ret[$data['userGuid']]=$data['email'];
+        }
+        return $ret;
     }
     
     /**

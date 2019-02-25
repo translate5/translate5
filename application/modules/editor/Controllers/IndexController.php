@@ -274,6 +274,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //default state configuration for frontend components(grid)
       $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
       
+      //create mailto link in the task list grid pm name column
+      $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (boolean)$rop->frontend->tasklist->pmMailTo);
+      
       $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
       
       //flag if the segment count status strip component should be displayed
