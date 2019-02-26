@@ -172,8 +172,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         split: true,
                         reference: 'display',
                         width: 150,
-                        layout: 'card',
                         bodyBorder: true,
+                        scrollable:true,
                         items: [
                             {
                                 xtype: 'form',
@@ -431,7 +431,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     },
     
     setFieldAllowBlank:function(value){
-    	this.allowBlank=value;
+    	this.allowBlank=value || this.isDisabled();
     	this.up('form').isValid();
     },
     
