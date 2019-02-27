@@ -458,7 +458,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
             	  	  ret=v;
             	  if(Editor.data.frontend.tasklist.pmMailTo){
             		  tooltip=rec.get('pmMail');
-            		  ret='<a alt="'+tooltip+'" href=mailto:'+tooltip+'>'+v+'</a>';
+            		  ret='<a alt="'+tooltip+'" href="mailto:'+tooltip+'">'+v+'</a>';
             		  meta.tdAttr = 'data-qtip="'+tooltip+'"';
             	  }
                   return ret;
