@@ -3140,6 +3140,22 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</source>
   <target>The imported package did not contain valid data in the "{proofRead}" directory.</target>
 </trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dCwgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbi4='>
+  <source>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</source>
+  <target>The task is in use, and cannot be deleted therefore!</target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0LCB1bmQga2FubiBkYWhlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuLg=='>
+  <source>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</source>
+  <target>The task is locked by a user, and cannot be deleted therefore!</target>
+</trans-unit>
+<trans-unit id='RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc291cmNlIGdpYnQgZXMgbmljaHQh'>
+  <source>Die gewünschte Sprachresource gibt es nicht!</source>
+  <target>The chosen language resource does not exist.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCBiZWFyYmVpdGV0LCBkaWUgU3ByYWNocmVzb3VyY2Uga2FubiBkYWhlciBpbSBNb21lbnQgbmljaHQgdm9uIGRlciBBdWZnYWJlIGVudGZlcm50IHdlcmRlbiE='>
+  <source>Die Aufgabe wird bearbeitet, die Sprachresource kann daher im Moment nicht von der Aufgabe entfernt werden!</source>
+  <target>The Task is in use, the language resource can not be removed from the task at the meoment!</target>
+</trans-unit>
 
     </body>
   </file>
