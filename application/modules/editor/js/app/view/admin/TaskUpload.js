@@ -47,6 +47,9 @@ Ext.define('Editor.view.admin.TaskUpload', {
     listeners: {
         activate:'onTaskUploadActivate'
     },
+    cls: 'taskUploadCard',
+    border: 0,
+    padding:20,
     
     //card type, used for card display order
     importType:'postimport',

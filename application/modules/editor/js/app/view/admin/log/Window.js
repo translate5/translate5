@@ -26,32 +26,52 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.LogWindow', {
-    extend: 'Editor.view.admin.log.Window',
-    alias: 'widget.adminTaskLogWindow',
-    requires: [
-        'Editor.view.admin.task.LogGrid',
-        'Editor.view.admin.log.Window'
-    ],
-    task: null,
-    title: '#UT#Ereignisse zu Aufgabe "{0}"',
+Ext.define('Editor.view.admin.log.Window', {
+    extend: 'Ext.window.Window',
+    alias: 'widget.adminLogWindow',
+    requires: ['Editor.view.admin.log.WindowViewController'],
+    controller: 'editorlogWindowViewController',
+    strings: {
+        close: '#UT#Fenster schließen',
+        details: '#UT#Detailansicht',
+        btnBack: '#UT#Zurück zu den Ereignissen'
+    },
+    closeAction: 'destroy',
+    layout: 'fit',
+    modal: true,
     initConfig: function(instanceConfig) {
         var me = this,
             config;
-        me.task = me.initialConfig.actualTask;
         config = {
-            title: Ext.String.format(me.title, me.task.get('taskName')),
-            items : [{
-                xtype: 'editorAdminTaskLogGrid'
-            }] 
+            height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),
+            width: 1000,
+            dockedItems: [
+                {
+                    xtype: 'toolbar',
+                    itemId: 'mainToolbar',
+                    dock: 'bottom',
+                    ui: 'footer',
+                    items: [
+                        {
+                            xtype: 'tbfill'
+                        },
+                        {
+                            xtype: 'button',
+                            itemId: 'closeBtn',
+                            iconCls : 'ico-cancel',
+                            text: me.strings.close
+                        }
+                    ]
+                }
+            ]
         };
+        
+        config.items = Ext.Array.merge(config.items, instanceConfig.items);
+        delete instanceConfig.items;
         
         if (instanceConfig) {
             me.self.getConfigurator().merge(me, config, instanceConfig);
         }
         return me.callParent([config]);
-    },
-    load: function(options) {
-        this.down('editorAdminTaskLogGrid').load(this.task.getId());
     }
 });

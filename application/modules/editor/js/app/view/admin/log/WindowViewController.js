@@ -21,37 +21,42 @@ START LICENSE AND COPYRIGHT
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+             http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
 
 END LICENSE AND COPYRIGHT
 */
 
-Ext.define('Editor.view.admin.task.LogWindow', {
-    extend: 'Editor.view.admin.log.Window',
-    alias: 'widget.adminTaskLogWindow',
-    requires: [
-        'Editor.view.admin.task.LogGrid',
-        'Editor.view.admin.log.Window'
-    ],
-    task: null,
-    title: '#UT#Ereignisse zu Aufgabe "{0}"',
-    initConfig: function(instanceConfig) {
-        var me = this,
-            config;
-        me.task = me.initialConfig.actualTask;
-        config = {
-            title: Ext.String.format(me.title, me.task.get('taskName')),
-            items : [{
-                xtype: 'editorAdminTaskLogGrid'
-            }] 
-        };
-        
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
+/**#@++
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+/**
+ * @class Editor.view.admin.log.GridViewController
+ * @extends Ext.app.ViewController
+ */
+Ext.define('Editor.view.admin.log.WindowViewController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.editorlogWindowViewController',
+    listen: {
+        component: {
+            '#closeBtn': {
+                click: 'close'
+            },
+            '#detailview': {
+                show: 'detailShow',
+                hide: 'detailHide'
+            }
         }
-        return me.callParent([config]);
     },
-    load: function(options) {
-        this.down('editorAdminTaskLogGrid').load(this.task.getId());
+    detailShow: function() {
+        this.getView().down('#mainToolbar').hide();
+    },
+    detailHide: function() {
+        this.getView().down('#mainToolbar').show();
+    },
+    close: function() {
+        this.getView().close();
     }
 });
