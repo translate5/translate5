@@ -512,12 +512,18 @@ Ext.define('Editor.controller.Localizer', {
     
     Ext.define("Editor.locale.de.view.admin.task.LogWindow", {
         override: "Editor.view.admin.task.LogWindow",
-        title: '<?php echo $this->translate->_('Ereignisse zu Aufgabe "{0}"');?>',
+        title: '<?php echo $this->translate->_('Ereignisse zu Aufgabe "{0}"');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.log.Window", {
+        override: "Editor.view.admin.log.Window",
         strings: {
-            close: '<?php echo $this->translate->_('Fenster schließen');?>'
+            close: '<?php echo $this->translate->_('Fenster schließen');?>',
+            details: '<?php echo $this->translate->_('Detailansicht');?>',
+            btnBack: '<?php echo $this->translate->_('Zurück zu den Ereignissen');?>'
     	}
     });
-
+    
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
         override: "Editor.view.admin.task.TaskAttributes",
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
@@ -617,8 +623,8 @@ Ext.define('Editor.controller.Localizer', {
         }
     });
     
-    Ext.define("Editor.locale.de.view.admin.task.LogGrid", {
-        override: "Editor.view.admin.task.LogGrid",
+    Ext.define("Editor.locale.de.view.admin.log.Grid", {
+        override: "Editor.view.admin.log.Grid",
         strings: {
             reload: '<?php echo $this->translate->_('Aktualisieren');?>',
             level: '<?php echo $this->translate->_('Typ');?>',
@@ -632,7 +638,8 @@ Ext.define('Editor.controller.Localizer', {
             eventCode: '<?php echo $this->translate->_('Fehlercode');?>',
             domain: '<?php echo $this->translate->_('Bereich');?>',
             message: '<?php echo $this->translate->_('Fehler');?>',
-            created: '<?php echo $this->translate->_('Zeitpunkt');?>'
+            created: '<?php echo $this->translate->_('Zeitpunkt');?>',
+            moreInfo: '<?php echo $this->translate->_('Mehr Info');?>'
         }
     });
     

@@ -830,7 +830,7 @@ abstract class editor_Workflow_Abstract {
             if(method_exists($this, $state)) {
                 $this->{$state}();
             } 
-            $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
+            $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua, 'task' => $task));
         }
         $this->recalculateWorkflowStep($newTua);
     }

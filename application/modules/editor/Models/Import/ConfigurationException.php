@@ -25,39 +25,23 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
- * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
  */
-class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
-    
-    public function loadByTaskGuid($taskGuid) {
-        return $this->loadRow('taskGuid = ?', $taskGuid);
-    }
-    
+class editor_Models_Import_ConfigurationException extends ZfExtended_ErrorCodeException {
     /**
-     * Adds an empty meta data rowset to the DB.
+     * @var string
      */
-    public function initEmptyRowset(){
-        $db = new $this->dbInstanceClass;
-        /* @var $db Zend_Db_Table_Abstract */
-        try {
-            $db->insert(array('taskGuid' => $this->getTaskGuid()));
-        }
-        catch(Zend_Db_Statement_Exception $e) {
-            try {
-                $this->handleIntegrityConstraintException($e);
-                throw $e;
-            }
-            catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-                //"duplicate entry" errors are ignored. 
-                return;
-            }
-        }
-    }
+    protected $origin = 'import.configuration';
+    
+    static protected $localErrorCodes = [
+        'E1032' => 'The passed source language "{language}" is not valid.',
+        'E1033' => 'The passed target language "{language}" is not valid.',
+        'E1034' => 'The import did not contain files for the relais language "{language}".',
+        'E1035' => 'The given taskGuid "{taskGuid}" was not valid GUID.',
+        'E1036' => 'The given userGuid "{userGuid}" was not valid GUID.',
+        'E1037' => 'The given userName "{userName}" was not valid user name.',
+        'E1038' => 'The import root folder does not exist. Path "{folder}".',
+        'E1039' => 'The imported package did not contain a valid "{proofRead}" folder.',
+        'E1040' => 'The imported package did not contain any files in the "{proofRead}" folder.',
+    ];
 }

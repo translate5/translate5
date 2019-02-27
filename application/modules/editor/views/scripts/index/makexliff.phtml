@@ -26,38 +26,32 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
- */
-class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
-    
-    public function loadByTaskGuid($taskGuid) {
-        return $this->loadRow('taskGuid = ?', $taskGuid);
+?>
+<form method="post">
+	<h2>Input plain String</h2>
+	<textarea name="input"><?php echo htmlspecialchars($this->input); ?></textarea>
+	<h3>matchrate - reduce to get more fuzzy results</h3>
+	<input type="text" name="matchrate" value="<?php echo htmlspecialchars($this->matchrate); ?>" />
+	<button type="submit">GO</button>
+	<?php if(!empty($this->input)) { ?>
+	<h2>de.xliff</h2>
+	<textarea name="deOut" rows="5"><?php echo htmlspecialchars($this->deOut); ?></textarea>
+	<?php
+	   if($this->exactMatch) {
+    	    echo '<h2>en.xliff - found already in translations</h2>';
+    	}
+    	else {
+    	    echo '<h2>en.xliff with multiple fuzzy matches</h2>';
+    	}
+    	if($this->noMatch) {
+    	    echo '<p>No match found - reduce matchrate or translate manually</p>';
+    	}
+    	foreach($this->enOut as $enOut) {
+    	    ?>
+    	    <p>Matchrate: <?php echo $enOut['matchrate'];?></p>
+    		<textarea name="enOut" rows="5"><?php echo htmlspecialchars($enOut['text']); ?></textarea>
+    	    <?php 
+    	}
     }
-    
-    /**
-     * Adds an empty meta data rowset to the DB.
-     */
-    public function initEmptyRowset(){
-        $db = new $this->dbInstanceClass;
-        /* @var $db Zend_Db_Table_Abstract */
-        try {
-            $db->insert(array('taskGuid' => $this->getTaskGuid()));
-        }
-        catch(Zend_Db_Statement_Exception $e) {
-            try {
-                $this->handleIntegrityConstraintException($e);
-                throw $e;
-            }
-            catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-                //"duplicate entry" errors are ignored. 
-                return;
-            }
-        }
-    }
-}
+	?>
+</form>

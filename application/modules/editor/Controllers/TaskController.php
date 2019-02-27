@@ -350,7 +350,7 @@ class editor_TaskController extends ZfExtended_RestController {
         },$rows);
 
         if(empty($customerIds)){
-            throw new ZfExtended_BadMethodCallException("No customers are found in the task list. The list of was: ".error_log(print_r($rows,1)));
+           return [];
         }
         
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
@@ -479,7 +479,65 @@ class editor_TaskController extends ZfExtended_RestController {
         $import->setTask($this->entity);
         $dp = $this->upload->getDataProvider();
         
-        $import->import($dp);
+        try {
+            $import->import($dp);
+        }
+        catch(editor_Models_Import_ConfigurationException $e) {
+            $this->handleConfigurationException($e);
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->handleIntegrityConstraint($e);
+        }
+    }
+    
+    /**
+     * Converts the ConfigurationException caused by wrong user input to ZfExtended_UnprocessableEntity exceptions
+     * @param editor_Models_Import_ConfigurationException $e
+     * @throws editor_Models_Import_ConfigurationException
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    protected function handleConfigurationException(editor_Models_Import_ConfigurationException $e) {
+        $codeToFieldAndMessage = [
+            'E1032' => ['sourceLang', 'Die übergebene Quellsprache "{language}" ist ungültig!'],
+            'E1033' => ['targetLang', 'Die übergebene Zielsprache "{language}" ist ungültig!'],
+            'E1034' => ['relaisLang', 'Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.'],
+            'E1039' => ['importUpload', 'Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.'],
+            'E1040' => ['importUpload', 'Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.'],
+        ];
+        $code = $e->getErrorCode();
+        if(empty($codeToFieldAndMessage[$code])) {
+            throw $e;
+        }
+        // the config exceptions causing unprossable entity exceptions are logged on level info
+        $this->log->exception($e, [
+            'level' => ZfExtended_Logger::LEVEL_INFO
+        ]);
+        
+        throw ZfExtended_UnprocessableEntity::createResponse([
+            //fieldName => error message to field
+            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+        ], $e->getErrors(), $e);
+        
+        throw ZfExtended_UnprocessableEntity::createResponse([
+            //fieldName => error message to field
+            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+        ], $e->getErrors(), $e);
+    }
+    
+    /**
+     * Converts the IntegrityConstraint Exceptions caused by wrong user input to ZfExtended_UnprocessableEntity exceptions
+     * @param ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    protected function handleIntegrityConstraint(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+        //check if the error comes from the customer assoc or not
+        if(! $e->isInMessage('REFERENCES `LEK_customer`')) {
+            throw $e;
+        }
+        throw ZfExtended_UnprocessableEntity::createResponse([
+            'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
+        ], [], $e);
     }
     
     /**
