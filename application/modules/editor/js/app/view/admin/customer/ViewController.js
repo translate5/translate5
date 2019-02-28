@@ -262,13 +262,12 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     	vm.set('isOpenIdRequired',me.handleRequiredFields(form,fields));
     },
     
-    onOpenIdRedirectLabelChange:function(field,newValue,oldValue,eOpts){
+    onOpenIdRedirectCheckboxChange:function(field){
     	var me=this,
 			form=me.getView().down('form').getForm(),
-			fields=['openIdRedirectLabel','openIdRedirectCheckbox'],
-			vm=me.getViewModel();
-    	
-    	vm.set('isOpenIdRedirectLabelRequired',me.handleRequiredFields(form,fields));
+			openIdRedirectLabel=form.findField('openIdRedirectLabel');
+
+		openIdRedirectLabel.setAllowBlank(field.checked);
     }
 
 });

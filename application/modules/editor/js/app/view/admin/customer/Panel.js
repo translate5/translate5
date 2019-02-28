@@ -67,14 +67,14 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeleteTitle:'#UT#Kunden löschen',
         customerDeletedMsg:'#UT#Kunde gelöscht',
         export:'#UT#Exportieren',
-        domain:'#UT#Domain',
-        openIdServer:'#UT#OpenID server',
-        openIdAuth2Url:'#UT#OpenID OAuth url',
+        domain:'#UT#translate5 Domain',
+        openIdServer:'#UT#OpenId server',
+        openIdClientId:'#UT#OpenId Benutzername',
+        openIdClientSecret:'#UT#OpenId Passwort',
+        openIdAuth2Url:'#UT#OpenId OAuth URL',
         rolesLabel: '#UT#Systemrollen',
-        openIdClientId:'#UT#OpenID Benutzername',
-        openIdClientSecret:'#UT#OpenID Passwort',
-        openIdRedirectLabel:'#UT#Label-Text umleiten',
-        openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn das checkbox nicht aktiviert ist, wird dem Benutzer eine verknüpfte Nachricht "Anmelden mit xxx" über dem Anmeldeformular angezeigt.'
+        openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
+        openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -204,7 +204,9 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         maxLength: 255
                                     },{
                                     	xtype:'fieldset',
-                                    	title:'OpenId',
+                                    	collapsible: true,
+                                    	collapsed: true,
+                                    	title:'OpenId Connect',
                                     	items:[
                                     		{
                                             	xtype:'textfield',
@@ -291,41 +293,25 @@ Ext.define('Editor.view.admin.customer.Panel', {
         	                                    cls: 'x-check-group-alt',
         	                                    fieldLabel: me.strings.rolesLabel,
         	                                    items: roles,
-        	                                    columns: 3,
-        	                                    bind:{
-                                            		visible:'{isOpenIdRequired}'
-                                            	}
+        	                                    columns: 3
                                             },{
                                             	xtype:'textfield',
                                             	fieldLabel:me.strings.openIdRedirectLabel,
                                             	name:'openIdRedirectLabel',
-                                            	setAllowBlank:me.setFieldAllowBlank,
-                                            	listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdRedirectLabelChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                            	bind:{
-                                            		visible:'{isOpenIdRequired}',
-                                            		allowBlank:'{isOpenIdRedirectLabelRequired}'
-                                            	}
+                                            	setAllowBlank:me.setFieldAllowBlank
                                             },{
                                             	xtype:'checkbox',
                                                 boxLabel:me.strings.openIdRedirectCheckbox,
                                                 name:'openIdRedirectCheckbox',
-                                                setAllowBlank:me.setFieldAllowBlank,
                                                 inputValue:1,
                                                 uncheckedValue:0,
+                                                checked:1,
                                                 listeners: {
                                                     change: {
-                                                        fn: 'onOpenIdRedirectLabelChange',
+                                                        fn: 'onOpenIdRedirectCheckboxChange',
                                                         scope: 'controller'
                                                     }
-                                                },
-                                                bind:{
-                                            		visible:'{isOpenIdRequired}'
-                                            	}
+                                                }
                                             }
                                     	]
                                     },{
