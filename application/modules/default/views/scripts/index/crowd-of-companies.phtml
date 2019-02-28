@@ -39,9 +39,9 @@ $session = new Zend_Session_Namespace();
  * @param string $link
  * @param string $name
  * @param string $image
- * @param integer $width
- * @param integer $height
- * @param boolean $clear
+ * @param int $width
+ * @param int $height
+ * @param bool $clear
  */
 function renderSupporterEntrySite($link, $name, $image, $width, $height, $clear = FALSE) {
     $template = '<a href="%s" class="crowdlink" style="width: %s; %s" target="_blank" title="%s"><img src="'.APPLICATION_RUNDIR.'/images/supporter2018/%s" width="%d" height="%d" alt="%s" /></a>'."\n";
