@@ -42,7 +42,7 @@ Ext.define('Editor.view.segments.column.AutoState', {
   alias: 'widget.autoStateColumn',
   mixins: ['Editor.view.segments.column.InfoToolTipMixin'],
   dataIndex: 'autoStateId',
-  text: 'Autostatus',
+  text: 'Bearbeitungsstatus',
   showInMetaTooltip: true,
   isErgonomicVisible: true,
   isErgonomicSetWidth: true,
