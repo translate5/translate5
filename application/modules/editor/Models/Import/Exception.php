@@ -26,20 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Okapi Exception
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
-    /**
-     * @var string
-     */
-    protected $origin = 'plugins.okapi';
-    
-    static protected $localErrorCodes = [
-        'E1055' => 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
-        'E1056' => 'Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix: {workfile}',
-        'E1057' => 'Okapi Plug-In: Data dir not writeable: {okapiDataDir}',
-        'E1058' => 'Okapi Plug-In: Error in converting a file: "{message}" on converting file {file}',
-        'E1059' => 'Okapi Plug-In: Configuration error - no Okapi server URL is configured!',
-    ];
+
+class editor_Models_Import_Exception extends ZfExtended_ErrorCodeException {
+        /**
+         * @var string
+         */
+        protected $origin = 'import';
+        
+        static protected $localErrorCodes = [
+            'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.'
+        ];
 }
