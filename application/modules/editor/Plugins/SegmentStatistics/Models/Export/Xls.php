@@ -157,9 +157,9 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
     
     /**
      * Uses a given row of a given Sheet as template and adds new rows with the defined values
-     * @param integer $tplRow
-     * @param integer $sheetIdx
-     * @param integer $sumRow Row Index where the sum formulas has to be fixed
+     * @param int $tplRow
+     * @param int $sheetIdx
+     * @param int $sumRow Row Index where the sum formulas has to be fixed
      */
     protected function fillByTemplate($tplRow, $sheetIdx, $sumRow = 4){
         $sheet = $this->xls->setActiveSheetIndex($sheetIdx);

@@ -153,10 +153,10 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     
     /**
      * @param editor_Models_Converter_SegmentsToXliff $xliffConverter
-     * @param integer $fileId
+     * @param int $fileId
      * @param array $oneFileSegments
      */
-    protected function convertAndPreTranslate(editor_Models_Converter_SegmentsToXliff $xliffConverter, integer $fileId, array $oneFileSegments) {
+    protected function convertAndPreTranslate(editor_Models_Converter_SegmentsToXliff $xliffConverter, int $fileId, array $oneFileSegments) {
         $xliff = $xliffConverter->convert($this->task, $oneFileSegments);
         $this->logplugin('XLIFF generated for file '.$fileId);
         $globaleseFileId = $this->api->upload($this->getFilename($fileId), $xliff);
@@ -206,10 +206,10 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     
     /**
      * Stores the generated xliff on the disk to import it
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $xliff
      */
-    protected function storeXlf(integer $fileId, string $xliff) {
+    protected function storeXlf(int $fileId, string $xliff) {
         $path = $this->task->getAbsoluteTaskDataPath();
         $path .= '/GlobalesePreTranslation/';
         if(!is_dir($path) && !@mkdir($path)) {
@@ -222,10 +222,10 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     
     /**
      * reimport the pretranslated file
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $path
      */
-    protected function importPretranslated(integer $fileId, string $path) {
+    protected function importPretranslated(int $fileId, string $path) {
         //define FileParser Constructor Parameters:
         $params = [
             $path,
@@ -253,7 +253,7 @@ class editor_Plugins_GlobalesePreTranslation_Worker extends editor_Models_Import
     
     /**
      * returns the file name of the temporary used XLF 
-     * @param integer $fileId
+     * @param int $fileId
      * @return string
      */
     protected function getFilename($fileId) {

@@ -414,7 +414,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @param array $segment
      */
     protected function processComment(array $segment) {
-        $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $this->task->getTaskGuid());
+        $comments = $this->comment->loadBySegmentAndTaskPlain((int)$segment['id'], $this->task->getTaskGuid());
         
         
         //add the comment only once

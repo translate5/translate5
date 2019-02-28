@@ -929,7 +929,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Save term entry attribute in the database.
      * 
-     * @param integer $parentId
+     * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
      * @return boolean|editor_Models_TermCollection_TermEntryAttributes
@@ -951,7 +951,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Save term attribute in the database
      * 
-     * @param integer $parentId
+     * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
      * @return void|editor_Models_TermCollection_TermEntryAttributes
@@ -973,7 +973,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Get the term attribute or term entry attribute model
      * 
-     * @param boolean $isTermAttribute
+     * @param bool $isTermAttribute
      * @param mixed $parentId
      * 
      * @return editor_Models_TermCollection_TermEntryAttributes
@@ -1282,7 +1282,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $term->setMid($this->actualTermIdTbx);
             //the status will be updated when is found from the termNote
             $term->setDefinition($this->actualDefinition);
-            $term->setLanguage((integer)$this->actualLangId);
+            $term->setLanguage((int)$this->actualLangId);
             $term->setCollectionId($this->termCollectionId);
             $term->setUpdated(date("Y-m-d H:i:s"));
             
@@ -1350,7 +1350,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         //the status will be updated when is found from the termNote
         $term->setDefinition($this->actualDefinition);
         $term->setGroupId($this->actualTermEntry);
-        $term->setLanguage((integer)$this->actualLangId);
+        $term->setLanguage((int)$this->actualLangId);
         $term->setCollectionId($this->termCollectionId);
         $term->setTermEntryId($this->actualTermEntryIdDb);
         $term->setUpdated(date("Y-m-d H:i:s"));

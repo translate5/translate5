@@ -116,10 +116,10 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * 
      * @param string $path
      * @param string $fileName
-     * @param integer $fileId
+     * @param int $fileId
      * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
         $this->initHelper();
@@ -224,9 +224,9 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
     /**
      * @param array $transUnit array('source' => DOM_DOCUMENT,'target' => DOM_DOCUMENT)
      * @param string $targetText
-     * @param integer $segmentId 
+     * @param int $segmentId 
      */
-    protected function setSegmentsMeta(editor_Plugins_Transit_Segment $targetseg,string $targetText,integer $segmentId) {
+    protected function setSegmentsMeta(editor_Plugins_Transit_Segment $targetseg,string $targetText,int $segmentId) {
         $save = false;
         if($targetseg->getAccessStatus()===editor_Plugins_Transit_Segment::ACCESS_NO_REFMAT){
             $save = true;
@@ -248,7 +248,7 @@ class editor_Models_Import_FileParser_Transit extends editor_Models_Import_FileP
      * Konvertiert in einem Segment (bereits ohne umschließende Tags) die PH-Tags für ExtJs
      *
      * @param string $segment
-     * @param boolean $isSource
+     * @param bool $isSource
      * @return string $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */

@@ -202,11 +202,11 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $manualStates = $rop->segments->stateFlags->toArray();
       $manualStates[0] = $this->translate->_('Nicht gesetzt');
       $this->setJsSegmentFlags('segments.stateFlags', $manualStates);
-      $this->view->Php2JsVars()->set('segments.showStatus', (boolean)$rop->segments->showStatus);
-      $this->view->Php2JsVars()->set('segments.showQM', (boolean)$rop->segments->showQM);
-      $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (boolean)$rop->segments->userCanIgnoreTagValidation);
-      $this->view->Php2JsVars()->set('segments.userCanModifyWhitespaceTags', (boolean)$rop->segments->userCanModifyWhitespaceTags);
-      $this->view->Php2JsVars()->set('segments.userCanInsertWhitespaceTags', (boolean)$rop->segments->userCanInsertWhitespaceTags);
+      $this->view->Php2JsVars()->set('segments.showStatus', (bool)$rop->segments->showStatus);
+      $this->view->Php2JsVars()->set('segments.showQM', (bool)$rop->segments->showQM);
+      $this->view->Php2JsVars()->set('segments.userCanIgnoreTagValidation', (bool)$rop->segments->userCanIgnoreTagValidation);
+      $this->view->Php2JsVars()->set('segments.userCanModifyWhitespaceTags', (bool)$rop->segments->userCanModifyWhitespaceTags);
+      $this->view->Php2JsVars()->set('segments.userCanInsertWhitespaceTags', (bool)$rop->segments->userCanInsertWhitespaceTags);
       $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
       /* @var $states editor_Models_Segment_AutoStates */
       $this->setJsSegmentFlags('segments.autoStateFlags', $states->getLabelMap());
@@ -227,7 +227,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       if($rop->editor->enableQmSubSegments) {
           $this->view->Php2JsVars()->set('segments.subSegment.tagPath', $tagPath);
       }
-      $this->view->Php2JsVars()->set('enable100pEditWarning', (boolean) $rop->editor->enable100pEditWarning);
+      $this->view->Php2JsVars()->set('enable100pEditWarning', (bool) $rop->editor->enable100pEditWarning);
       
       $this->view->Php2JsVars()->set('preferences.alikeBehaviour', $rop->alike->defaultBehaviour);
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
@@ -256,16 +256,16 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('translations', $this->translate->getAvailableTranslations());
       
       //Editor.data.enableSourceEditing → still needed for enabling / disabling the whole feature (Checkbox at Import).
-      $this->view->Php2JsVars()->set('enableSourceEditing', (boolean) $rop->import->enableSourceEditing);
+      $this->view->Php2JsVars()->set('enableSourceEditing', (bool) $rop->import->enableSourceEditing);
       
       $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
       /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
       $this->view->Php2JsVars()->set('import.validExtensions', array_keys($supportedFiles->getSupportedTypes()));
       
       $this->view->Php2JsVars()->set('columns.widthFactorHeader', (float)$rop->editor->columns->widthFactorHeader);
-      $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (integer)$rop->editor->columns->widthOffsetEditable);
+      $this->view->Php2JsVars()->set('columns.widthOffsetEditable', (int)$rop->editor->columns->widthOffsetEditable);
       $this->view->Php2JsVars()->set('columns.widthFactorErgonomic', (float)$rop->editor->columns->widthFactorErgonomic);
-      $this->view->Php2JsVars()->set('columns.maxWidth', (integer)$rop->editor->columns->maxWidth);
+      $this->view->Php2JsVars()->set('columns.maxWidth', (int)$rop->editor->columns->maxWidth);
       
       $this->view->Php2JsVars()->set('browserAdvice', $rop->browserAdvice);
       if($rop->showSupportedBrowsersMsg) {
@@ -278,10 +278,10 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
       
       //flag if the segment count status strip component should be displayed
-      $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (boolean)$rop->segments->enableCountSegmentLength);
+      $this->view->Php2JsVars()->set('segments.enableCountSegmentLength', (bool)$rop->segments->enableCountSegmentLength);
 
       //needed for enabling download link of archive zip
-      $this->view->Php2JsVars()->set('import.createArchivZip', (boolean)$rop->import->createArchivZip);
+      $this->view->Php2JsVars()->set('import.createArchivZip', (bool)$rop->import->createArchivZip);
       
       $this->setLanguageResourceJsVars();
       

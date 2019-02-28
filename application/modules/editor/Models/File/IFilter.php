@@ -38,14 +38,14 @@ interface editor_Models_File_IFilter {
     /**
      * Setting the filter manager so that it can be used internally
      * @param editor_Models_File_FilterManager $manager
-     * @param integer $parentWorkerId
+     * @param int $parentWorkerId
      * @param editor_Models_Import_Configuration $importConfig
      */
     public function initFilter(editor_Models_File_FilterManager $manager, $parentWorkerId, editor_Models_Import_Configuration $importConfig = null);
     
     /**
      * @param editor_Models_Task $task
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $filePath
      * @param array $parameters
      * @return the filename of the file (can be changed internally for further processing)
@@ -54,7 +54,7 @@ interface editor_Models_File_IFilter {
     
     /**
      * @param editor_Models_Task $task
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $filePath
      * @param array $parameters
      * @return the filename of the file (can be changed internally for further processing)

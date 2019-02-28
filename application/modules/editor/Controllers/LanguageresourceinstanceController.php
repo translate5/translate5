@@ -139,7 +139,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrieves specific language from the given language container
      * @param array $data
      * @param string $index the datafield to get
-     * @param integer $id the language resource id 
+     * @param int $id the language resource id 
      * @return array
      */
     protected function getLanguage(array $languages, $index, $id) {
@@ -153,7 +153,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrieves specific data from the given data container
      * @param array $data
      * @param string $index the datafield to get
-     * @param integer $id the language resource id 
+     * @param int $id the language resource id 
      * @return array
      */
     protected function getCustassoc(array $data, $index, $id) {
@@ -168,7 +168,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrives the useAsDefault customers for the given language resource
      * @param array $data
      * @param string $index the datafield to get
-     * @param integer $id the language resource id 
+     * @param int $id the language resource id 
      * @return array
      */
     protected function getCustassocDefault(array $data, $index, $id){

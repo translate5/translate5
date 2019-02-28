@@ -99,8 +99,8 @@ class editor_Models_SearchAndReplace_FindMatchesHtml{
     /***
      * Find the real pisition in the html text based on the match position from the text without html tags
      * 
-     * @param integer $contentPosition
-     * @param boolean $isEnd - search for end index
+     * @param int $contentPosition
+     * @param bool $isEnd - search for end index
      * @return integer
      */
     public function findPosition($contentPosition,$isEnd=false){
@@ -130,7 +130,7 @@ class editor_Models_SearchAndReplace_FindMatchesHtml{
      * length -> the match content length (html tags included)
      * 
      * @param string $searchQuery the search string
-     * @param boolean $isRegex is a regular expression search
+     * @param bool $isRegex is a regular expression search
      * @return array 
      */
     public function findContent($searchQuery,$searchType){

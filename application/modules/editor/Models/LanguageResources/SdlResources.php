@@ -58,7 +58,7 @@ class editor_Models_LanguageResources_SdlResources {
     /***
      * Merge engine data required for the frontend layout
      * @param array $engines
-     * @param boolean $addArrayId : if true(default true), the array key will be the language resource id
+     * @param bool $addArrayId : if true(default true), the array key will be the language resource id
      * @return array[]
      */
     public function mergeEngineData($engines,$addArrayId=true) {

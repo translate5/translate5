@@ -81,7 +81,7 @@ class editor_Models_Import_FileParser_XmlParser {
      *  If the attribute is not given, the parent node is considered.
      *  The initial root value (preserve or ignore) is given here as boolean parameter 
      * @param string $xml
-     * @param boolean $preserveWhitespaceRoot 
+     * @param bool $preserveWhitespaceRoot 
      * @return string the parsed string with all callbacks applied
      */
     public function parse($xml, $preserveWhitespaceRoot = false) {
@@ -104,7 +104,7 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * walks through the given XML chunk array and fires the registered callbacks for each found node 
      * @param array $chunks
-     * @param boolean $preserveWhitespaceRoot see method parse
+     * @param bool $preserveWhitespaceRoot see method parse
      */
     public function parseList(array $chunks, $preserveWhitespaceRoot = false) {
         $this->preserveWhitespace = $preserveWhitespaceRoot;
@@ -170,8 +170,8 @@ class editor_Models_Import_FileParser_XmlParser {
     
     /**
      * return one or more chunks by index(offset) and length
-     * @param integer $offset
-     * @param integer $length
+     * @param int $offset
+     * @param int $length
      */
     public function getChunk($index) {
         return $this->xmlChunks[$index];
@@ -179,9 +179,9 @@ class editor_Models_Import_FileParser_XmlParser {
     
     /**
      * replaces the chunk at the given index with the given replacement
-     * @param integer $index the chunk index to replace
-     * @param string|callable $replacement the new chunk string content, or a callable (array|Closure) which receives the following parameters: integer $index, string $oldContent
-     * @param integer $length repeats the replacement for the amount if chunks as specified in $length, defaults to 1
+     * @param int $index the chunk index to replace
+     * @param string|callable $replacement the new chunk string content, or a callable (array|Closure) which receives the following parameters: int $index, string $oldContent
+     * @param int $length repeats the replacement for the amount if chunks as specified in $length, defaults to 1
      */
     public function replaceChunk($index, $replacement, $length = 1) {
         for ($i = 0; $i < $length; $i++) {
@@ -195,8 +195,8 @@ class editor_Models_Import_FileParser_XmlParser {
     
     /**
      * return one or more chunks by index(offset) and length
-     * @param integer $offset
-     * @param integer $length
+     * @param int $offset
+     * @param int $length
      * @return array
      */
     public function getChunks($offset, $length = 1) {
@@ -206,9 +206,9 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * return one or more chunks by start index(offset) and end index(offset)
      * lower end offset as start offset results in empty result
-     * @param integer $startOffset
-     * @param integer $endOffset
-     * @param boolean $asString defaults to false
+     * @param int $startOffset
+     * @param int $endOffset
+     * @param bool $asString defaults to false
      * @return array|string depends on parameter $asString
      */
     public function getRange($startOffset, $endOffset, $asString = false) {
@@ -228,8 +228,8 @@ class editor_Models_Import_FileParser_XmlParser {
      * registers handlers to the given tag type
      * The handlers can be null, if only one of both is needed
      * @param string $tag CSS selector like tag definition, see $this->parseSelector
-     * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
-     * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
+     * @param callable $opener Parameters: string $tag, array $attributes, int $key, bool $isSingle
+     * @param callable $closer Parameters: string $tag, int $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
      * @return [int] a list of the indizes of the added handlers 
      */
     public function registerElement($tag, callable $opener = null, callable $closer = null) {
@@ -244,8 +244,8 @@ class editor_Models_Import_FileParser_XmlParser {
      * registers handlers to the given tag type
      * The handlers can be null, if only one of both is needed
      * @param string $selector tag selector which should be handled, or empty string to handle all other non registered tags
-     * @param callable $opener Parameters: string $tag, array $attributes, integer $key, boolean $isSingle
-     * @param callable $closer Parameters: string $tag, integer $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
+     * @param callable $opener Parameters: string $tag, array $attributes, int $key, bool $isSingle
+     * @param callable $closer Parameters: string $tag, int $key, array $opener where opener is an assoc array: ['openerKey' => $key,'tag' => $tag,'attributes' => $attributes]
      */
     protected function registerSingleElement($selector, callable $opener = null, callable $closer = null) {
         $tag = $this->parseSelector($selector, $filter);
@@ -375,7 +375,7 @@ class editor_Models_Import_FileParser_XmlParser {
     /**
      * checks if the given selector parts are matched by the current XML Stack (including the current Node)
      * @param array $selectorParts
-     * @param integer $startStackIndex optional, defaults to the idx of the last item in the stack
+     * @param int $startStackIndex optional, defaults to the idx of the last item in the stack
      * @return boolean
      */
     protected function doesSelectorMatch(array $selectorParts, $startStackIndex = null) {
@@ -486,10 +486,10 @@ class editor_Models_Import_FileParser_XmlParser {
     
     /**
      * Handles a start tag (single tags are a start and an end tag at once)
-     * @param integer $key the tag offset in the node list
+     * @param int $key the tag offset in the node list
      * @param string $tag the found tag
      * @param array $attributes the tag attributes
-     * @param boolean $isSingle is true if it is a single tag
+     * @param bool $isSingle is true if it is a single tag
      */
     protected function handleElementStart($key, $tag, $attributes, $isSingle) {
         $tag = $handleTag = $this->normalizeTag($tag);
@@ -528,7 +528,7 @@ class editor_Models_Import_FileParser_XmlParser {
     
     /**
      * Handles a end tag
-     * @param integer $key the tag offset in the node list
+     * @param int $key the tag offset in the node list
      * @param string $tag the found tag
      * @throws ZfExtended_Exception
      */

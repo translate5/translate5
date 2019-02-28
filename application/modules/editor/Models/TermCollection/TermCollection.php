@@ -84,8 +84,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * All fuzzy languages will be included in the search.('en' as search language will result with search using 'en','en-US','en-GB' etc)
      * 
      * @param string $queryString
-     * @param integer $sourceLang
-     * @param integer $targetLang
+     * @param int $sourceLang
+     * @param int $targetLang
      * 
      * @return array
      */
@@ -183,7 +183,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      *      'termsAtributeCount'=>number,
      *      'termsEntryAtributeCount'=>number,
      *  ]
-     * @param integer $collectionId
+     * @param int $collectionId
      * @return array
      */
     public function getAttributesCountForCollection($collectionId){
@@ -298,7 +298,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Remove term collection from the disk
-     * @param integer $collectionId
+     * @param int $collectionId
      */
     protected function removeCollectionDir($collectionId){
         $collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;

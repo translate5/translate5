@@ -30,11 +30,11 @@ END LICENSE AND COPYRIGHT
  * Logger Task Entity Object
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method integer getLevel() getLevel()
- * @method void setLevel() setLevel(integer $level)
+ * @method void setLevel() setLevel(int $level)
  * @method string getState() getState()
  * @method void setState() setState(string $state)
  * @method string getEventCode() getEventCode()

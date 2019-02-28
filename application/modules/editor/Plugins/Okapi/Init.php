@@ -239,7 +239,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the
      * result
      *
-     * @param integer $fileId
+     * @param int $fileId
      * @param SplFileInfo $file
      * @param array $params
      * @return boolean

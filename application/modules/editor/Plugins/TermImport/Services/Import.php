@@ -442,7 +442,7 @@ class editor_Plugins_TermImport_Services_Import {
     
     /***
      * Remove term entries older than $importDate
-     * @param integer $collectionId
+     * @param int $collectionId
      */
     private function removeEntriesOlderThenImport($collectionId){
         //check if delete old entries is configured in the config file

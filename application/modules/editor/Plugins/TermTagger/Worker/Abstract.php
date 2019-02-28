@@ -109,7 +109,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
     /**
      * @todo forking should be transfered to ZfExtended_Worker_Abstract to make it usable for other workers.
      * it should be based on maxParallelProcesses instead of just having one running worker per slot. maxParallelProcesses is ignored so far.
-     * @param integer $parentId
+     * @param int $parentId
      * @param string $state
      * 
      * @see ZfExtended_Worker_Abstract::queue()

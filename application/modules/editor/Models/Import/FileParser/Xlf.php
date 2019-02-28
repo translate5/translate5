@@ -191,7 +191,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * Init tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initNamespaces();
         $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
@@ -374,8 +374,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *    This will change with implementing merging and splitting.
      *    
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
-     * @param boolean $useSourceOtherContent
-     * @param boolean $preserveWhitespace
+     * @param bool $useSourceOtherContent
+     * @param bool $preserveWhitespace
      */
     protected function saveTargetOtherContentLength(editor_Models_Import_FileParser_SegmentAttributes $attributes, $useSourceOtherContent, $preserveWhitespace) {
         $otherContent = $useSourceOtherContent ? $this->otherContentSource : $this->otherContentTarget;
@@ -446,7 +446,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *   <seg-source>                   tag, plain content or
      *   <seg-source> <mrk mtype="seg">  content of the mrk type=seg tags inside the seg-source
      * @param string $tag
-     * @param integer $key
+     * @param int $key
      * @param array $opener
      */
     protected function handleSourceTag($tag, $key, $opener) {
@@ -476,7 +476,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * calculates the MID for mapping source to target fragment (is NOT related to the segments MID)
      * @param array $opener
-     * @param boolean $source defines for which column the content is calculated: true if source, false if target  
+     * @param bool $source defines for which column the content is calculated: true if source, false if target  
      * @return string
      */
     protected function calculateMid(array $opener, $source) {
@@ -633,7 +633,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * Checks if the given xliff is in the correct (supported) version
      * @param string $xliffTag
-     * @param integer $key
+     * @param int $key
      * @throws ZfExtended_Exception
      */
     protected function checkXliffVersion($attributes, $key) {
@@ -665,7 +665,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * parses the TransUnit attributes
      * @param array $attributes transUnit attributes
-     * @param integer $mid MRK tag mid or 0 if no mrk mtype seg used
+     * @param int $mid MRK tag mid or 0 if no mrk mtype seg used
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
     protected function parseSegmentAttributes($attributes, $mid) {
@@ -926,7 +926,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $segmentId = $this->setAndSaveSegmentValues();
             //only with a segmentId (in case of ProofProcessor) we can save comments
             if($segmentId !== false && is_numeric($segmentId)) {
-                $this->importComments((integer) $segmentId);
+                $this->importComments((int) $segmentId);
             }
             if($currentTarget !== self::MISSING_MRK) {
                 //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
@@ -1079,7 +1079,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     /**
      * Imports the comments of last processed segment
-     * @param integer $segmentId
+     * @param int $segmentId
      */
     protected function importComments($segmentId) {
         $comments = $this->namespaces->getComments();
@@ -1200,10 +1200,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * Checks recursivly if target and source starts/ends with the same chunks, 
      *   if there are some tags in the start/end chunks it checks if they are paired tags. 
      *   if source and target start and ends just with that paired tags (no other content expect whitespace) then the tags are ignored in import 
-     * @param boolean $preserveWhitespace 
+     * @param bool $preserveWhitespace 
      * @param array $source
      * @param array $target
-     * @param boolean $foundTag used for recursive call
+     * @param bool $foundTag used for recursive call
      * @return boolean returns false if there are no matching leading/trailing tags at all 
      */
     protected function hasSameStartAndEndTags($preserveWhitespace, array $source, array $target, $foundTag = false) {
@@ -1312,7 +1312,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * returns true if target is a single tag (<target/>) or is empty <target></target>, where whitespace between the both targets matters for emptiness depending on preserveWhitespace
      * @param array $openerMeta
-     * @param integer $closerKey
+     * @param int $closerKey
      * @return boolean
      */
     protected function isEmptyTarget(array $openerMeta, $closerKey) {

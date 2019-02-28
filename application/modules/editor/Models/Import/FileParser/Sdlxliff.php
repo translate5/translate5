@@ -555,7 +555,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      *   für die Rückkonvertierung und den Bezug zu den tagMappings im sdlxliff-header
      *
      * @param string $segment
-     * @param boolean isSource
+     * @param bool isSource
      * @return string $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */

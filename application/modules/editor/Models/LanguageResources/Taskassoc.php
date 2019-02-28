@@ -30,13 +30,13 @@ END LICENSE AND COPYRIGHT
  * LanguageResource TaskAssoc Entity Object
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method integer getLanguageResourceId() getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(integer $languageResourceid)
+ * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceid)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method boolean getSegmentsUpdateable() getSegmentsUpdateable()
- * @method void setSegmentsUpdateable() setSegmentsUpdateable(boolean $updateable)
+ * @method void setSegmentsUpdateable() setSegmentsUpdateable(bool $updateable)
  */
 class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Taskassoc';
@@ -45,7 +45,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
      * loads one assoc entry, returns the loaded row as array
      * 
      * @param string $taskGuid
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @return Ambigous <multitype:, array>
      */
     public function loadByTaskGuidAndTm(string $taskGuid, $languageResourceId) {
@@ -227,7 +227,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
     
     /***
      * Get all tasks that are assigned to the provided languageResourceId.
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @return array
      */
     public function getAssocTasksByLanguageResourceId($languageResourceId){

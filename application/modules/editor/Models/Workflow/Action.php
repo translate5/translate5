@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Workflow_Action Entity Objekt
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getWorkflow() getWorkflow()
  * @method void setWorkflow() setWorkflow(string $workflowId)
  * @method string getTrigger() getTrigger()

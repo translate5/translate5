@@ -124,7 +124,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
     /***
      * Search the terms in the term collection with the given query string
      * @param string $queryString
-     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
     protected function queryCollectionResults($queryString, $reimportWhitespace = false){

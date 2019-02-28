@@ -209,8 +209,8 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
      * @param string $queryString
      * @param string $source
      * @param string $target
-     * @param boolean $isSource
-     * @param integer $idx
+     * @param bool $isSource
+     * @param int $idx
      */
     protected function makeSearch($queryString, $source, $target, $isSource) {
         $isSearchHit = stripos($isSource ? $source : $target, $queryString) !== false;

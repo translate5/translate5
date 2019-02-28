@@ -28,16 +28,16 @@ END LICENSE AND COPYRIGHT
 
 /**
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * 
  * @method integer getLanguageResourceId getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(integer $languageResourceId)
+ * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
  * 
  * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(integer $customerId)
+ * @method void setCustomerId() setCustomerId(int $customerId)
  * 
  * @method integer getUseAsDefault() getUseAsDefault()
- * @method void setUseAsDefault() setUseAsDefault(integer $useAsDefault)
+ * @method void setUseAsDefault() setUseAsDefault(int $useAsDefault)
  * 
  */
 class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_Entity_Abstract {
@@ -119,7 +119,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     /***
      * Get all assocs by $languageResourceId (languageResourceId).
      * If no $languageResourceId is provided, all assoc will be loaded
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @return array
      */
     public function loadByLanguageResourceId($languageResourceId=null){
@@ -163,7 +163,7 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
     
     /***
      * Get all customers for $languageResourceId (languageResourceId)
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @return array
      */
     public function loadCustomerIds($languageResourceId) {

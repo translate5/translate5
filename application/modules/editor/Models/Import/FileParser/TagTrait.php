@@ -180,7 +180,7 @@ trait editor_Models_Import_FileParser_TagTrait {
      *
      * @param string $tag enthält den Tag als String
      * @param string $tagName enthält den Tagnamen
-     * @param boolean $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
+     * @param bool $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
      * @return string $id ID des Tags im JS
      */
     protected function parseSegmentGetStorageClass($tag) {

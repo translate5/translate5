@@ -61,7 +61,7 @@ class editor_Services_ServiceResult {
      * A default source text for the results and a defaultMatchrate can be set
      * The default values are the used as initial value for new added result sets
      * @param string $defaultSource
-     * @param integer $defaultMatchrate
+     * @param int $defaultMatchrate
      */
     public function __construct($defaultSource = '', $defaultMatchrate = 0) {
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -88,7 +88,7 @@ class editor_Services_ServiceResult {
     /**
      * sets the resultlist count total which should be send to the server
      * How the total is calculated, depends on the service.
-     * @param integer $total
+     * @param int $total
      */
     public function setNextOffset($offset) {
         $this->nextOffset = $offset;
@@ -107,7 +107,7 @@ class editor_Services_ServiceResult {
      * All additonal data can be provided by 
      * 
      * @param string $target
-     * @param integer $matchrate
+     * @param int $matchrate
      * @param array $metaData metadata container
      * 
      * @return stdClass the last added result

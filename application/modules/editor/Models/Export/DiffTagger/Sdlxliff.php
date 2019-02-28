@@ -455,7 +455,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      *
      * @param array $d Array('deleted')
      * @param array $getGTagsToComplement array as returned by function getGTagsToComplement
-     * @param integer $diffKey
+     * @param int $diffKey
      * @return string deletions inclosed by <mrk mtype="x-sdl-deleted" sdl:revid="REVID">'deletions'</mrk>' )
      */
     protected function markDeletion($d, $getGTagsToComplement, $diffKey) {

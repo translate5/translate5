@@ -123,11 +123,11 @@ class editor_Models_Segment_EditablesFinder {
      * calculcates the next/prev editable segment and return the segment position as integer and null if there is no next/prev segment
      * 
      * @param editor_Models_Segment $this
-     * @param boolean $next
+     * @param bool $next
      * @param array $autoStateIds
      * @return NULL|integer
      */
-    public function find(boolean $next, array $autoStateIds = null) {
+    public function find(bool $next, array $autoStateIds = null) {
         $outerSql = $this->getOuterSql();
 
         //for the inner sort we have to swap the direction for the prev filter
@@ -166,7 +166,7 @@ class editor_Models_Segment_EditablesFinder {
     /**
      * gets the segment position (grid index) to the given segmentId and the configured filters
      * returns null if the segment is not in the filtered list 
-     * @param integer $segmentId
+     * @param int $segmentId
      * @return NULL|number
      */
     public function getIndex($segmentId) {
@@ -230,12 +230,12 @@ class editor_Models_Segment_EditablesFinder {
         DESC NEXT    sortField < currentSortValue || sortField = currentSortValue && idField > currentIdValue
         ASC PREV     sortField < currentSortValue || sortField = currentSortValue && idField < currentIdValue
         DESC PREV    sortField > currentSortValue || sortField = currentSortValue && idField < currentIdValue
-     * @param unknown $sql
-     * @param unknown $prop
-     * @param unknown $next
-     * @param unknown $isAsc
+     * @param Zend_Db_Table_Select $sql
+     * @param string $prop
+     * @param bool $next
+     * @param bool $isAsc
      */
-    protected function addSortInner(Zend_Db_Table_Select $sql, string $prop, boolean $next, boolean $isAsc) {
+    protected function addSortInner(Zend_Db_Table_Select $sql, string $prop, bool $next, bool $isAsc) {
         $value = $this->segment->get($prop);
             
         $idComparator = $next ? '>' : '<';
@@ -253,9 +253,9 @@ class editor_Models_Segment_EditablesFinder {
                 DESC NEXT/PREV  sortField > innerSortValue || sortField = innerSortValue && idField > innerIdValue
      * @param Zend_Db_Table_Select $sql
      * @param string $prop
-     * @param boolean $isAsc
+     * @param bool $isAsc
      */
-    protected function addSortOuter(Zend_Db_Table_Select $sql, string $prop, boolean $isAsc) {
+    protected function addSortOuter(Zend_Db_Table_Select $sql, string $prop, bool $isAsc) {
         //id comparator depends only on prev/next, since order for id is always ASC!
         $comparator = $isAsc ? '<' : '>';
         $where = 'list.`%1$s` %2$s pos.`%1$s`';

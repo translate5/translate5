@@ -92,10 +92,10 @@ class editor_Models_QmsubsegmentAlikes {
     /**
      * parse / split the given segment string, load the qm SubSegment Data to the found 
      * @param string $segment
-     * @param integer $segmentid
+     * @param int $segmentid
      * @throws Zend_Exception
      */
-    public function parseSegment(string $segment, integer $segmentid) {
+    public function parseSegment(string $segment, int $segmentid) {
         $this->segmentId = $segmentid;
         $this->segment = $segment;
         $this->foundQmIds = array();
@@ -114,11 +114,11 @@ class editor_Models_QmsubsegmentAlikes {
     /**
      * duplicates the DB QM Sub Segment entries from the parsed segment to another
      * returnes the segment content with the new IDs
-     * @param integer $alikeSegmentId
+     * @param int $alikeSegmentId
      * @param string $fieldedited
      * @return string
      */
-    public function cloneAndUpdate(integer $alikeSegmentId, $fieldedited) {
+    public function cloneAndUpdate(int $alikeSegmentId, $fieldedited) {
         $s = $this->segment;
         $ids = array();
         foreach($this->foundQmIds as $id) {

@@ -292,7 +292,7 @@ class editor_Models_Segment_MatchRateType {
     /**
      * Adds a valid type
      * @param string $type
-     * @param boolean $unique optional, per default add only types not existing already
+     * @param bool $unique optional, per default add only types not existing already
      */
     public function add(string $type, $unique = true) {
         if($this->isValidType($type) && (!$unique || ($unique && !in_array($type, $this->data)))) {

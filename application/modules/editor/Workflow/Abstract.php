@@ -596,7 +596,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
      * @return boolean
      */
     public function isReadable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
@@ -606,7 +606,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * checks if the given TaskUserAssoc Instance allows writing to the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
      * @return boolean
      */
     public function isWriteable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
@@ -632,7 +632,7 @@ abstract class editor_Workflow_Abstract {
      * @param array $roles
      * @param array $states
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param boolean $useUsedState
+     * @param bool $useUsedState
      * @return boolean
      */
     protected function isTuaAllowed(array $roles, array $states, editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
@@ -673,7 +673,7 @@ abstract class editor_Workflow_Abstract {
      * debugging workflow 
      * @param string $msg
      * @param array $data optional debuggin data
-     * @param boolean $levelInfo optional, if true log in level info instead debug
+     * @param bool $levelInfo optional, if true log in level info instead debug
      */
     protected function doDebug($msg, array $data = [], $levelInfo = false) {
         if(empty($this->newTask)) {

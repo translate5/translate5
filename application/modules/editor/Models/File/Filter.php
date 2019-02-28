@@ -34,9 +34,9 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method integer getFileId() getFileId()
- * @method void setFileId() setFileId(integer $fileId)
+ * @method void setFileId() setFileId(int $fileId)
  * @method string getType() getType()
  * @method void setType() setType(string $type)
  * @method string getFilter() getFilter()
@@ -51,7 +51,7 @@ class editor_Models_File_Filter extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Loads all file filters for a specific file and type 
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $type
      * @return Zend_Db_Table_Rowset_Abstract
      */

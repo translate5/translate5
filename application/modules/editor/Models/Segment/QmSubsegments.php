@@ -42,7 +42,7 @@ class editor_Models_Segment_QmSubsegments {
      * It accepts the following parameters:
      *     string $tag = original img tag, 
      *     array $cls css classes, 
-     *     integer $issueId the qm issue id, 
+     *     int $issueId the qm issue id, 
      *     string $issueName the untranslated qm issue name, 
      *     string $sev the untranslated sev textual id, 
      *     string $sevName the untranslated sev string, 

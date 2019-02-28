@@ -38,7 +38,7 @@
  * Customer Entity Objekt
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * 
  * @method string getName() getName()
  * @method void setName() setName(string $name)
@@ -47,7 +47,7 @@
  * @method void setNumber() setNumber(string $number)
  * 
  * @method integer getSearchCharacterLimit() getSearchCharacterLimit()
- * @method void setSearchCharacterLimit() setSearchCharacterLimit(integer $searchCharacterLimit)
+ * @method void setSearchCharacterLimit() setSearchCharacterLimit(int $searchCharacterLimit)
  * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {

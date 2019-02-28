@@ -158,7 +158,7 @@ class editor_Plugins_MtComparEval_Worker extends ZfExtended_Worker_Abstract {
     
     /**
      * removes an experiment in MT-ComparEval
-     * @param integer $id
+     * @param int $id
      * @param editor_Models_Task $task
      * @param editor_Plugins_MtComparEval_Bootstrap $plugin
      * @return boolean

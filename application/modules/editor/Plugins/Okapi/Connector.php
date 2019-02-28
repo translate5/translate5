@@ -142,7 +142,7 @@ class editor_Plugins_Okapi_Connector {
     /**
      * Remove the project from Okapi server.
      * 
-     * @param integer $projectId
+     * @param int $projectId
      */
     public function removeProject() {
         $url=$this->projectUrl;

@@ -99,7 +99,7 @@ abstract class editor_Models_Segment_TagAbstract {
     /***
      * Return the placeholder template with id
      *
-     * @param integer $id
+     * @param int $id
      * @return string
      */
     protected function getPlaceholderTemplate($id){

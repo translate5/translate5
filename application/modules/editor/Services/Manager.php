@@ -97,8 +97,8 @@ class editor_Services_Manager {
      * returns the desired connector, connection to the given resource
      * 
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param integer $sourceLang
-     * @param integer $targetLang
+     * @param int $sourceLang
+     * @param int $targetLang
      * @return editor_Services_Connector
      */
     public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {

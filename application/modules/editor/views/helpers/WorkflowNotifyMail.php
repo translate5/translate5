@@ -134,7 +134,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
     /**
      * returns a date in the locale of the receiver
      * 
-     * @param string/integer $date
+     * @param string/int $date
      * @return string
      */
     public function dateFormat($date) {

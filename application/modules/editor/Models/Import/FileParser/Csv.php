@@ -124,7 +124,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         return array('text/plain','application/xml','text/html'); //this is due to the fact, that csv-files may contain html or xml fragments. In these cases the php-mime-type extension may recognize them as such.
     }
     
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
@@ -368,7 +368,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     /**
      *
      * @param mixed $segment
-     * @param boolean isSource
+     * @param bool isSource
      * @return string $segment
      */
     protected function parseSegment($segment,$isSource){

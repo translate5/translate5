@@ -170,7 +170,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific Notification after all users of a role have finished a task
      * @param string $triggeringRole
-     * @param boolean $isCron
+     * @param bool $isCron
      */
     public function notifyAllFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
@@ -228,7 +228,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific PM Notification after one users of a role have finished a task
      * @param string $triggeringRole
-     * @param boolean $isCron
+     * @param bool $isCron
      */
     public function notifyOneFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());

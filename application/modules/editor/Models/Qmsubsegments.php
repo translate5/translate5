@@ -55,11 +55,11 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
       *   This [X 1]is[/X 1] the [X 2]testtext[/X 2].
       * 
       * @param string $segment
-      * @param integer $segmentId
+      * @param int $segmentId
       * @param string $field edited Segmentfield (must be target or source)  
       * @return string $segment
       */
-    public function updateQmSubSegments(string $segment, integer $segmentId, string $field) {
+    public function updateQmSubSegments(string $segment, int $segmentId, string $field) {
         $sArr = $this->splitSegment($segment);
         $count = count($sArr);
         $openTags = array();
@@ -262,7 +262,7 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
      * @param array $qmIds
      * @param string $fieldedited
      */
-    public function deleteUnused(integer $segmentId,array $qmIds, string $fieldedited) {
+    public function deleteUnused(int $segmentId,array $qmIds, string $fieldedited) {
         $rows = $this->getQmSubSegsBySegmentId($segmentId);
         $delete = array();
         foreach ($rows as $row) {
@@ -278,10 +278,10 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
     /**
      * loads all qmsubsegment entries by a segmentId
      * 
-     * @param integer $segmentId
+     * @param int $segmentId
      * @return array as returned by $this->db->getAdapter()->fetchAll
      */
-    public function getQmSubSegsBySegmentId(integer $segmentId) {
+    public function getQmSubSegsBySegmentId(int $segmentId) {
         $q = $this->db->getAdapter()->select()
                 ->from(array('q' => 'LEK_qmsubsegments'))
                 ->where('segmentId = ?', $segmentId);
@@ -459,7 +459,7 @@ class editor_Models_Qmsubsegments extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * set the given segmentId for the given MQM Ids in the second parameter. 
-     * @param integer $segmentId
+     * @param int $segmentId
      * @param array $ids
      */
     public function updateSegmentId($segmentId, array $ids) {

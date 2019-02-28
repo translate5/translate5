@@ -189,7 +189,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * one analysis will be saved
      * 
      * @param editor_Models_Segment $segment
-     * @param boolean $saveAnalysis
+     * @param bool $saveAnalysis
      * @return NULL|stdClass
      */
     protected function getBestMatchrate(editor_Models_Segment $segment,$saveAnalysis=true){
@@ -260,7 +260,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /**
      * Checks how many errors the connector has produced. If too much, disable it.
      * @param editor_Services_Connector $connector
-     * @param integer $id
+     * @param int $id
      * @return boolean
      */
     protected function isDisabledDueErrors(editor_Services_Connector_Abstract $connector, $id) {
@@ -280,7 +280,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     /**
      * Log and count the connection error
      * @param Exception $e
-     * @param integer $id
+     * @param int $id
      */
     protected function handleConnectionError(Exception $e, $id) {
         settype($this->connectorErrorCount[$id], 'integer');
@@ -289,7 +289,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     /**
      * @param editor_Services_Connector $connector
-     * @param boolean $isMtResource
+     * @param bool $isMtResource
      * @return editor_Services_ServiceResult
      */
     protected function getMatches(editor_Services_Connector_Abstract $connector, editor_Models_Segment $segment, $isMtResource) {
@@ -329,8 +329,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * Save match analysis to the database
      * 
      * @param editor_Models_Segment $segment
-     * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or integer (only the matchrate)
-     * @param integer $languageResourceid
+     * @param mixed $matchRateResult : it can be stdClass (opentm2 match result) or int (only the matchrate)
+     * @param int $languageResourceid
      */
     public function saveAnalysis($segment,$matchRateResult,$languageResourceid){
         //error_log('segmentNrInTask='.$segment->getSegmentNrInTask().' wordCount:'.$this->wordCount->getSourceCount().' totalCount:');

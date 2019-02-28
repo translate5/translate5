@@ -231,8 +231,8 @@ class editor_Models_Segment_AutoStates {
     
     /**
      * calculates the initial autoStateId of an segment in the import process
-     * @param boolean $isEditable
-     * @param boolean $isTranslated
+     * @param bool $isEditable
+     * @param bool $isTranslated
      * @return integer
      */
     public function calculateImportState($isEditable, $isTranslated) {

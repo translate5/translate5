@@ -297,7 +297,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /**
      * replace additional tags from the TM to internal tags which are ignored in the frontend then
      * @param string $segment
-     * @param integer $mapCount used as start number for the short tag numbering
+     * @param int $mapCount used as start number for the short tag numbering
      * @return string
      */
     protected function replaceAdditionalTags($segment, $mapCount) {
@@ -584,7 +584,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Calculate the new matchrate value.
      * Check if the current match is of type context-match or exact-exact match
      * 
-     * @param integer $matchRate
+     * @param int $matchRate
      * @param array $metaData
      * @param editor_Models_Segment $segment
      * @param string $filename
@@ -626,7 +626,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /***
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
      * The fuzzy languageResource name format is: oldname+Fuzzy-Analysis
-     * @param integer $analysisId
+     * @param int $analysisId
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */

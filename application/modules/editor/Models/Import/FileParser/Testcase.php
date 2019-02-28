@@ -56,7 +56,7 @@ class editor_Models_Import_FileParser_Testcase extends editor_Models_Import_File
     /**
      * Init tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
     }
 

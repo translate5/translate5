@@ -35,15 +35,15 @@ END LICENSE AND COPYRIGHT
 /**
  * Default Model for Plugin SegmentStatistics
  * 
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method void setSegmentId() setSegmentId(integer $segmentid)
- * @method void setFileId() setFileId(integer $fileid)
+ * @method void setSegmentId() setSegmentId(int $segmentid)
+ * @method void setFileId() setFileId(int $fileid)
  * @method void setFieldName() setFieldName(string $name)
  * @method void setFieldType() setFieldType(string $type)
- * @method void setTermFound() setTermFound(integer $count)
- * @method void setTermNotFound() setTermNotFound(integer $count)
- * @method void setCharCount() setCharCount(integer $count)
+ * @method void setTermFound() setTermFound(int $count)
+ * @method void setTermNotFound() setTermNotFound(int $count)
+ * @method void setCharCount() setCharCount(int $count)
  * 
  * @method integer getId() getId()
  * @method string getTaskGuid() getTaskGuid()
@@ -100,7 +100,7 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
      * returns the statistics summary for the given taskGuid and type
      * @param string $taskGuid
      * @param string $type (import or export)
-     * @param integer &$fileCount returned by reference
+     * @param int &$fileCount returned by reference
      * @return array
      */
     public function calculateSummary($taskGuid, $type, &$fileCount = 0) {
@@ -228,7 +228,7 @@ class editor_Plugins_SegmentStatistics_Models_Statistics extends ZfExtended_Mode
     /**
      * returns the segment count of the given taskGuid
      * @param string $taskGuid
-     * @param boolean $editable
+     * @param bool $editable
      * @return integer the segment count
      */
     public function calculateSegmentCountFiltered($taskGuid, $onlyEditable=false) {
