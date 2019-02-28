@@ -90,9 +90,9 @@ class Models_Installer_PreconditionCheck {
     protected function checkLocale() {
         $locale = setlocale(LC_CTYPE, 0);
         $win = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        if(!$win && stripos($locale, 'utf-8') === false) {
-            $this->errorsEnvironment[] = 'Your system locale is not UTF-8 capable, it is set to: LC_CTYPE='.$locale;
-            $this->errorsEnvironment[] = 'Please use a UTF-8 based locale to avoid problems with special characters in filenames.';
+        if(!$win && stripos($locale, 'utf-8') === false && stripos($locale, 'utf8') === false) {
+            $this->errorsEnvironment[] = 'Your system wide used locale is not UTF-8 capable, it is set to: LC_CTYPE='.$locale;
+            $this->errorsEnvironment[] = 'Please use a UTF-8 based locale like en_US.UTF-8 to avoid problems with special characters in filenames.';
         }
         if ($win) {
             $this->infosEnvironment[] = 'You are using WINDOWS as server environment. Please ensure that the configuration runtimeOptions.fileSystemEncoding is set correct.';
