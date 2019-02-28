@@ -122,8 +122,18 @@ class editor_Models_Import_MetaData {
             }
         }
         catch(Exception $e) {
-            //FIXME should be some specific Exception
-            throw new ZfExtended_Exception('Task import of meta data failed. Task: '.$task->getTaskName().' ('.$task->getTaskNr().')', 0, $e);
+            $logger = Zend_Registry::get('logger');
+            /* @var $logger ZfExtended_Logger */
+            if($e instanceof ZfExtended_Exception) {
+                $data = $e->getErrors();
+            } else {
+                $data = []; 
+            }
+            //Some of the tasks metaData can not be imported, see previous error
+            throw new editor_Models_Import_MetaData_Exception('E1052',[
+                'task' => $task,
+                'previousMessage' => $logger->formatMessage($e->getMessage(), $data),
+            ], $e);
         }
     }
 

@@ -124,9 +124,9 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         if (array_key_exists($fontSize, $this->defaultPixelWidths)) {
             return $this->defaultPixelWidths[$fontSize];
         }
-        $msg = 'pixelMapping cannot be implemented due to missing default-values for pixel-width for font-size ' . $fontSize . '.';
-        $msg .= ' Add the missing value in your defaultPixelWidths-settings in the config.';
-        throw new ZfExtended_Exception($msg);
+        throw new editor_Models_Import_MetaData_Exception('E1054',[
+            'fontSize' => $fontSize
+        ]);
     }
     
     /**
