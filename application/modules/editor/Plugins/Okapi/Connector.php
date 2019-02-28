@@ -156,7 +156,8 @@ class editor_Plugins_Okapi_Connector {
      */
     public function uploadOkapiConfig(array $bconfPaths){
         if(empty($bconfPaths) || empty($bconfPaths[0]) || !file_exists($bconfPaths[0])) {
-            throw new editor_Plugins_Okapi_Exception('Bconf not given or not found: '.$bconfPaths[0]);
+             // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
+             throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPaths[0]]);
         }
         $url = $this->projectUrl.'/batchConfiguration';
         $http = $this->getHttpClient($url);

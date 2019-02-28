@@ -598,7 +598,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
-        ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
+        ZfExtended_Utils::cleanZipPaths($copy, editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT);
         $this->upload->initByGivenZip($copy);
         
         if($this->validate()) {

@@ -106,16 +106,32 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
             $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
         }catch (Exception $e){
-            // in case of an exception we just ignore that file, log it, and proceed with the import
-            $debug = [
-                'fileId' => $fileId,
-                'file' => $file->__toString(),
-            ];
-            $this->log->logError('Okapi Error: Error on converting a file. Task: '.$this->taskGuid.'; File: '.print_r($debug, 1).'; Error was: '.$e);
-        }finally {
+            $this->handleException($e, $file, $fileId);
+        } finally {
             $api->removeProject();
         }
         return true;
+    }
+    
+    protected function handleException(Exception $e, SplFileInfo $file, $fileId) {
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
+        $logger->exception($e, [
+            'extra' => ['task' => $this->task],
+        ]);
+        
+        $absFile = $file->__toString();
+        $tmpImport = editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT;
+        $relFile = mb_strpos($absFile, $tmpImport);
+        $relFile = mb_substr($absFile, $relFile + strlen($tmpImport));
+        // in case of an exception we just ignore that file, log it, and proceed with the import
+        $logger->warn('E1058', 'Okapi Plug-In: Error in converting a file: "{message}" on converting file {file}', [
+            'task' => $this->task,
+            'message' => get_class($e).': '.$e->getMessage(),
+            'fileId' => $fileId,
+            'file' => $relFile,
+            'filePath' => $absFile,
+        ]);
     }
     
     /**
@@ -231,7 +247,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             mkdir((string) $okapiDataDir, 0777, true);
         }
         if(!$okapiDataDir->isWritable()) {
-            throw new editor_Plugins_Okapi_Exception("Okapi Data dir not writeable: ".$okapiDataDir);
+            //Okapi Plug-In: Data dir not writeable
+            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $okapiDataDir]);
         }
         return $okapiDataDir;
     }
@@ -242,7 +259,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      */
     protected function doTikalFallback(SplFileInfo $workfile) {
         if(strtolower($workfile->getExtension()) !== 'xlf') {
-            throw new editor_Plugins_Okapi_Exception('Okapi tikal fallback can not be used, workfile does not contain the XLF suffix: '.$workfile);
+            // Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix',
+            throw new editor_Plugins_Okapi_Exception('E1056', ['workfile' => $workfile]);
         }
         $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$this->task]);
         /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
