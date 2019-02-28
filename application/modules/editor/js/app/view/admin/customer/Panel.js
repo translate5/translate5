@@ -180,8 +180,10 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 reference: 'form',
                                 bodyPadding: 10,
                             	tools:[{
-                            	    type:'help',
-                            	    tooltip: 'OpenID connect',
+                            		itemId: 'home',
+                            		type: 'home',
+                            		cls:'tools-help-icon',
+                            		qtip: 'OpenID connect',
                             	    handler: function(panel, tool, event) {
                             	    	window.open('https://confluence.translate5.net/display/BUS/OpenID+connect+in+translate5', '_blank');
                             	    }
