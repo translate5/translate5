@@ -49,15 +49,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public $fileNameCache=array();
     
     
-    /***
-     * Unsupported unicode characters by opentm2 and their replace mapping
-     * @var array
-     */
-    protected $replaceMap=array(
-        '&#x1E;'=>'___tag___INFORMATION SEPARATOR TWO___tag___',
-        '&#x8;'=>'___tag___backspace___tag___',
-    );
-    
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -127,12 +118,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return false;
         }
         
-        //replace the unsupported unicodes
-        $data=file_get_contents($fileinfo['tmp_name']);
-        $data=$this->replaceUnicodes($data);
-        
         //initial upload is a TM file
-        if($this->api->createMemory($name, $sourceLang, $data)){
+        if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
             $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
             return true;
         }
@@ -147,9 +134,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
-        $data=file_get_contents($fileinfo['tmp_name']);
-        $data=$this->replaceUnicodes($data);
-        if($this->api->importMemory($data)) {
+        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
         $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." LanguageResource: \n");
@@ -272,22 +257,46 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return $this->resultList; 
             }
             foreach($result->results as $found) {
-                if(!$this->validateInternalTags($found, $segment)) {
-                    continue;
+                
+                $this->validateInternalTags($found, $segment);
+                
+                //check if the found source has invalid xml
+                if($xmlParser->isStringValidXml($found->target)){
+                    //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied, 
+                    // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
+                    $target = $xmlParser->parse($found->target);
+                    $target = $this->internalTag->reapply2dMap($target, $map);
+                    $target = $this->replaceAdditionalTags($target, $mapCount);
+                    $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
+                    $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                    
+                    //about whitespace see target
+                    $source = $xmlParser->parse($found->source);
+                    $source = $this->internalTag->reapply2dMap($source, $map);
+                    $source = $this->replaceAdditionalTags($source, $mapCount);
+                    $this->resultList->setSource($source);
+                    
+                }else{
+                    //the source has invalid xml -> remove all tags from the result, and reduce the matchrate by 2%
+                    $matchrate=$this->reduceMatchrate($found->matchRate,2);
+                    $found->target=strip_tags($found->target);
+                    $this->resultList->addResult($found->target, $matchrate, $this->getMetaData($found));
                 }
-                //since protectWhitespace should run on plain text nodes we have to call it before the internal tags are reapplied, 
-                // since then the text contains xliff tags and the xliff tags should not contain affected whitespace
-                $target = $xmlParser->parse($found->target);
-                $target = $this->internalTag->reapply2dMap($target, $map);
-                $target = $this->replaceAdditionalTags($target, $mapCount);
-                $calcMatchRate=$this->calculateMatchRate($found->matchRate, $this->getMetaData($found),$segment, $fileName);
-                $this->resultList->addResult($target, $calcMatchRate, $this->getMetaData($found));
+                
+                //check if the source has invalid xml
+                if($xmlParser->isStringValidXml($found->source)){
+                    //about whitespace see target
+                    $source = $xmlParser->parse($found->source);
+                    $source = $this->internalTag->reapply2dMap($source, $map);
+                    $source = $this->replaceAdditionalTags($source, $mapCount);
+                    $this->resultList->setSource($source);
+                }else{
+                    //the source has invalid xml -> remove all tags
+                    $this->resultList->setSource(strip_tags($found->source));
+                }
+                
+                
 
-                //about whitespace see target
-                $source = $xmlParser->parse($found->source);
-                $source = $this->internalTag->reapply2dMap($source, $map);
-                $source = $this->replaceAdditionalTags($source, $mapCount);
-                $this->resultList->setSource($source);
             }
             return $this->getResultListGrouped();
         }
@@ -316,33 +325,32 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
 
     /**
-     * Checks OpenTM2 result on valid segments: <it> and <ph> are invalid since they can not handled by the replaceAdditionalTags method
+     * Checks OpenTM2 result on valid segments: <it> ,<ph>,<bpt> and <ept> are invalid since they can not handled by the replaceAdditionalTags method
      * @param string $segmentContent
-     * @return boolean true if tags were valid
      */
     protected function validateInternalTags($result, editor_Models_Segment $seg) {
         //just concat source and target to check both:
-        if(preg_match('#<(it|ph)[^>]*>#', $result->source.$result->target)) {
-            $result->source=$this->replaceItAndPhTags($result->source);
-            $result->target=$this->replaceItAndPhTags($result->target);
+        if(preg_match('#<(it|ph|ept|bpt)[^>]*>#', $result->source.$result->target)) {
+            $this->xmlparser->registerElement('opentm2result > it,opentm2result > ph,opentm2result > ept,opentm2result > bpt',null, function($tag, $key, $opener){
+                $this->xmlparser->replaceChunk($opener['openerKey'],'',$opener['isSingle'] ? 1 : $key-$opener['openerKey']);
+            });
+            $result->source=$this->replaceInvalidTags($result->source);
+            $result->target=$this->replaceInvalidTags($result->target);
+            //the invalid tags are removed, reduce the matchrate by 2 percent
+            $result->matchRate=$this->reduceMatchrate($result->matchRate,2);
         }
-        return true;
     }
     
     /***
-     * Replace it and ph tags with empty content
+     * Replace the invalid tags with empty content
+     * 
      * @param string $content
-     * @param string $replace: the replace content of the chunk
      * @return string
      */
-    protected function replaceItAndPhTags($content,$replace=''){
+    protected function replaceInvalidTags($content){
         //surround the content with tmp tags(used later as selectors)
         $content='<opentm2result>'.$content.'</opentm2result>';
         
-        
-        $this->xmlparser->registerElement('opentm2result > it,opentm2result > ph',null, function($tag, $key, $opener) use($replace){
-            $this->xmlparser->replaceChunk($opener['openerKey'],$replace,$opener['isSingle'] ? 1 : $key-$opener['openerKey']);
-        });
         //parse the content
         $content=$this->xmlparser->parse($content);
         
@@ -450,9 +458,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
                 return $this->resultList;
             }
             foreach($result->results as $found) {
-                if(!$this->validateInternalTags($found, $dummySegment)) {
-                    continue;
-                }
+                
+                $this->validateInternalTags($found, $dummySegment);
+                
                 $target = $this->internalTag->reapply2dMap($found->target, $map);
                 $target = $this->replaceAdditionalTags($target, $mapCount);
                 
@@ -742,12 +750,23 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     }
     
     /***
-     * Replace unsupported unicodes in the given text with there defined replacement
-     * @param string $data: tbx file content
-     * @return string
+     * Reduce the given matchrate to given percent.
+     * It is used when unsupported tags are found in the response result, and those tags are removed.
+     * @param integer $matchrate
+     * @param integer $reducePercent
+     * @return number
      */
-    protected function replaceUnicodes($data){
-        return strtr($data,$this->replaceMap);
+    protected function reduceMatchrate($matchrate,$reducePercent) {
+        //reset higher matches than 100% to 100% match
+        if($matchrate>100){
+            $matchrate=100;
+        }
+        //if the matchrate is higher than 0, reduce it by $reducePercent %
+        if($matchrate>0){
+            $matchrate=$matchrate - ($matchrate*($reducePercent/100));
+            $matchrate=round($matchrate);
+        }
         
+        return $matchrate;
     }
 }

@@ -70,6 +70,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterPost#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
         $this->eventManager->attach('editor_LanguageresourcetaskassocController', 'afterDelete#TermCollection', array($this, 'handleAfterTermCollectionAssocChange'));
+        
+        //trigger the check also if the default customer is assigned in the task post action
+        $this->eventManager->attach('editor_TaskController', 'afterPostAction', array($this, 'handleAfterTermCollectionAssocChange'));
     }
     
     /**

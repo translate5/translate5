@@ -259,11 +259,11 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     /**
      * Checks how many errors the connector has produced. If too much, disable it.
-     * @param editor_Services_Connector $connector
+     * @param mixed $connector
      * @param integer $id
      * @return boolean
      */
-    protected function isDisabledDueErrors(editor_Services_Connector_Abstract $connector, $id) {
+    protected function isDisabledDueErrors($connector, $id) {
         if(!isset($this->connectorErrorCount[$id]) || $this->connectorErrorCount[$id] <= self::MAX_ERROR_PER_CONNECTOR) {
             return false;
         }

@@ -179,7 +179,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::getStatus()
      */
     public function getStatus(& $moreInfo){
-        return self::STATUS_AVAILABLE;
+        $status=$this->languageResource->getSpecificData('status');
+        if(empty($status)){
+            $status=self::STATUS_AVAILABLE;
+        }
+        return $status;
     }
     
     /**
