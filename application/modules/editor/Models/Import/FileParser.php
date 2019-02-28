@@ -133,7 +133,7 @@ abstract class editor_Models_Import_FileParser {
      * @param integer $fileId
      * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         $this->config = Zend_Registry::get('config');
         $this->_origFile = file_get_contents($path);
         $this->_path = $path;

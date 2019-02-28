@@ -94,7 +94,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Initiert Tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $task);

@@ -119,7 +119,7 @@ class editor_Models_File_FilterManager {
     /**
      * @param array $params
      */
-    protected function applyFilters($type, string $path, integer $fileId) {
+    protected function applyFilters($type, string $path, int $fileId) {
         if(empty($this->filters[$fileId])) {
             return $path;
         }

@@ -81,6 +81,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
             $this->loadSpreadsheet();
             $this->updateDb();
             $this->logIgnoredLines();
+            return;
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             //no customer to the number found, proceed with the below Exception

@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Entity Model for segment fields
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method string getName() getName()
