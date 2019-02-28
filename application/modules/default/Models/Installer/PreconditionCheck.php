@@ -113,6 +113,7 @@ class Models_Installer_PreconditionCheck {
             'mbstring',
             'pdo_mysql',
             'zip',
+            'curl'
         ];
         $missing = array_diff($needed, $loaded);
         if(empty($missing)) {
