@@ -53,7 +53,23 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
         //our zend xliff uses just ids instead mids, so we generate them out of the very long ids:
         //override completly the mid calculation, since we dont use subs or mrks!
         $transUnit = $this->xmlparser->getParent('trans-unit');
-        return md5($this->xmlparser->getAttribute($transUnit['attributes'], 'id'));
+        return $this->shortenMid($this->xmlparser->getAttribute($transUnit['attributes'], 'id'));
+    }
+    
+    private function shortenMid($mid) {
+        return md5($mid);
+    }
+    
+    /**
+     * override to deal with the base64 long mids
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser::setMid()
+     */
+    protected function setMid($mid) {
+        $mid = explode('_', $mid);
+        $segmentCount = array_pop($mid);
+        $mid = $this->shortenMid(join('_', $mid));
+        parent::setMid($mid.'_'.$segmentCount);
     }
     
     protected function parse() {
