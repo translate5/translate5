@@ -120,8 +120,9 @@ class LoginController extends ZfExtended_Controllers_Login {
         $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
         //the openid authentication is valid
         
+        $isCustomerSet=$oidc->isOpenIdCustomerSet();
         //set the redirect label if the customer exist
-        if($oidc->isOpenIdCustomerSet() && !$oidc->getCustomer()->getOpenIdRedirectCheckbox()){
+        if($isCustomerSet && !$oidc->getCustomer()->getOpenIdRedirectCheckbox()){
             
             //add form hidden field, which is used when redirec to openid is needed
             $redirect = new Zend_Form_Element_Hidden('redirect');
@@ -144,8 +145,9 @@ class LoginController extends ZfExtended_Controllers_Login {
             $link->setOrder(0);
             $this->_form->addElement($link);
         }
+        
         //authenticate with the configured openid client
-        if($oidc->authenticate()){
+        if($isCustomerSet && $oidc->authenticate()){
             //create the user in the translate5 system or update if the user already exist
             $user = $oidc->createUser();
             if(!$user){
