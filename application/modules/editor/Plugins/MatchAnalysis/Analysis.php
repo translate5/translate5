@@ -342,7 +342,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->setAnalysisId($this->analysisId);
         $matchAnalysis->setLanguageResourceid($languageResourceid);
         $matchAnalysis->setWordCount($this->wordCount->getSourceCount());
-        $matchAnalysis->setMatchRate(isset($matchRateResult->matchrate) ? $matchRateResult->matchrate : $matchRateResult);
+        $matchAnalysis->setMatchRate($matchRateResult->matchrate ?? $matchRateResult);
 
         $isFuzzy=false;
         if(isset($matchRateResult) && is_object($matchRateResult)){

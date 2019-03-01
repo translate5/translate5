@@ -96,9 +96,9 @@ class editor_Models_LanguageResources_CustomerAssoc extends ZfExtended_Models_En
         foreach ($customers as $customer){
             $model=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $model editor_Models_LanguageResources_CustomerAssoc */
-            $model->setCustomerId(isset($customer->customerId) ? $customer->customerId : $customer);
+            $model->setCustomerId($customer->customerId ?? $customer);
             $model->setLanguageResourceId($languageResourceId);
-            $model->setUseAsDefault(isset($customer->useAsDefault) ? $customer->useAsDefault : 0);
+            $model->setUseAsDefault($customer->useAsDefault ?? 0);
             $model->save();
         }
     }

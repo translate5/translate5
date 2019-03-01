@@ -261,6 +261,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             return true;
         }
         $attach = $config->fileconverters->attachOriginalFileAsReference->toArray();
-        return isset($attach['okapi']) ? $attach['okapi'] : false;
+        return $attach['okapi'] ?? false;
     }
 }

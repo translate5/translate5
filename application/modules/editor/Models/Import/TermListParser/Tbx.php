@@ -335,8 +335,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         try {
             foreach ($filePath as $path){
                 
-                $tmpName=isset($path['tmp_name']) ? $path['tmp_name'] : $path;
-                $fileName=isset($path['name']) ? $path['name'] : null;;
+                $tmpName = $path['tmp_name'] ?? $path;
+                $fileName = $path['name'] ?? null;
                 
                 $this->xml = new XmlReader();
                 //$this->xml->open(self::getTbxPath($task));

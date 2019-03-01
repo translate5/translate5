@@ -242,8 +242,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
         $queryString=$parameters['searchField'];
         $searchInField=$parameters['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
-        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
-        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
+        $searchType = $parameters['searchType'] ?? null;
+        $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true') : false;
         
         //search type regular expression
         if($searchType==='regularExpressionSearch'){

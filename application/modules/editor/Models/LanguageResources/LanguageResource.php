@@ -388,7 +388,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             
             //return the property name value if exist
             if(isset($propertyName)){
-                return isset($specificData->$propertyName) ? $specificData->$propertyName : null;
+                return $specificData->$propertyName ?? null;
             }
             return $specificData;
         } catch (Exception $e) {

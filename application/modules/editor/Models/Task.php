@@ -708,7 +708,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
 
         
-        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : 100;
+        $daysOffset = $taskLifetimeDays ?? 100;
         
         if(!$daysOffset){
             throw new Zend_Exception('No task taskLifetimeDays configuration defined.');

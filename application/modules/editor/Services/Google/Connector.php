@@ -114,7 +114,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             $result=$this->api->getResult();
         }
         
-        $translation = isset($result['text']) ? $result['text'] : "";
+        $translation = $result['text'] ?? "";
         if($reimportWhitespace) {
             $translation = $this->importWhitespaceFromTagLessQuery($translation);
         }

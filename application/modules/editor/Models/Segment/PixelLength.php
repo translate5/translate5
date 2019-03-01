@@ -126,7 +126,7 @@ class editor_Models_Segment_PixelLength {
             $this->addPixelMappingForFont($fontFamily, $fontSize);
             $pixelMappingForTask = $this->pixelMappingForTask;
         }
-        return isset($pixelMappingForTask[$fontFamily][$fontSize]) ? $pixelMappingForTask[$fontFamily][$fontSize] : [];
+        return $pixelMappingForTask[$fontFamily][$fontSize] ?? [];
     }
     
     /**

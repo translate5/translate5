@@ -108,7 +108,7 @@ class editor_Plugins_TermTagger_RecalcTransFound {
             if(empty($groupedTerms)) {
                 $this->notPresentInTbxTarget[$groupId] = true;
             }
-            $transFound = (isset($this->groupCounter[$groupId]))?$this->groupCounter[$groupId]:0;
+            $transFound = $this->groupCounter[$groupId] ?? 0;
             foreach ($groupedTerms as $groupedTerm) {
                 $targetMidsKey = array_search($groupedTerm['mid'], $targetMids);
                 if($targetMidsKey!==false){

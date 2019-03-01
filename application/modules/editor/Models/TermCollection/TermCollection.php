@@ -38,10 +38,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     public function importTbx(array $filePath,array $params){
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $import editor_Models_Import_TermListParser_Tbx */
-        $import->mergeTerms=isset($params['mergeTerms']) ? $params['mergeTerms'] : false;
+        $import->mergeTerms = $params['mergeTerms'] ?? false;
         
         //import source (filesystem or crosspai)
-        $import->importSource=isset($params['importSource']) ? $params['importSource'] : "";
+        $import->importSource = $params['importSource'] ?? "";
         
         $import->customerIds=$params['customerIds'];
         return $import->parseTbxFile($filePath,$params['collectionId']);

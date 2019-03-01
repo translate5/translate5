@@ -97,7 +97,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    */
   public function loadBySegmentId(int $segmentId, string $taskGuid) {
       $sessionUser = new Zend_Session_Namespace('user');
-      $userGuid = isset($sessionUser->data->userGuid) ? $sessionUser->data->userGuid : null;
+      $userGuid = $sessionUser->data->userGuid ?? null;
       $comments = $this->loadBySegmentAndTaskPlain($segmentId, $taskGuid);
       $editable = true;
       //comment is editable until an other user has edited it. 

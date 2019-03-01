@@ -113,7 +113,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         if($this->api->search($params)){
             $result=$this->api->getResult();
         }
-        $translation = isset($result->translation) ? $result->translation : "";
+        $translation = $result->translation ?? "";
         if($reimportWhitespace) {
             $translation = $this->importWhitespaceFromTagLessQuery($translation);
         }

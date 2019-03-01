@@ -164,7 +164,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                     $res['term'] = $this->importWhitespaceFromTagLessQuery($res['term']);
                 }
                 if(isset($res['language'])){
-                    $res['languageRfc']=isset($lngs[$res['language']]) ? $lngs[$res['language']] : null;
+                    $res['languageRfc'] = $lngs[$res['language']] ?? null;
                 }
                 $this->resultList->addResult($res['term'], $matchRate,$res);
             }
