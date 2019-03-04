@@ -35,7 +35,8 @@ var editIdleTimer = null,
     latestTextToTranslate = '',
     instantTranslationIsActive = true,
     chosenSourceIsText = true,
-    fileTypesAllowedAndAvailable = [];
+    fileTypesAllowedAndAvailable = [],
+    additionalTranslationsHtmlContainer='';
 
 /***
  * Store allowed file-types for all available languageResources.
@@ -457,7 +458,11 @@ function fillTranslation() {
         termStatus,
         metaData,
         resultData,
-        languageRfc;
+        languageRfc,
+        alternativeTranslations;
+    
+    //reset the additional translations
+    additionalTranslationsHtmlContainer='';
     $.each(translateTextResponse, function(serviceName, resource){
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
@@ -474,6 +479,7 @@ function fillTranslation() {
                     termStatus = '';
                     processStatusAttribute = '';
                     processStatusAttributeValue = '';
+                    alternativeTranslations=[];
                     if (result['metaData'] != undefined) {
                         metaData = result['metaData'];
                         if(metaData['definitions'] != undefined && metaData['definitions'].length>0) {
@@ -497,6 +503,9 @@ function fillTranslation() {
                         if(metaData['processStatusAttributeValue'] != undefined) {
                         	processStatusAttributeValue = metaData['processStatusAttributeValue'];
                         }
+                        if(metaData['alternativeTranslations'] != undefined) {
+                        	alternativeTranslations = metaData['alternativeTranslations'];
+                        }
                     }
                     resultData = {'languageResourceId': result['languageResourceid'],
                                   'fuzzyMatch': fuzzyMatch,
@@ -508,7 +517,8 @@ function fillTranslation() {
                                   'translationText': result['target'],
                     			  'processStatusAttribute':processStatusAttribute,
                     			  'processStatusAttributeValue':processStatusAttributeValue,
-                    			  'languageRfc':languageRfc
+                    			  'languageRfc':languageRfc,
+                    			  'alternativeTranslations':alternativeTranslations
                                   };
                     resultHtml += renderTranslationContainer(resultData);
                 }
@@ -520,6 +530,10 @@ function fillTranslation() {
     });
     if (translationHtml == '') {
         showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
+    }
+    //when there is aditional translations, display them at the end
+    if(additionalTranslationsHtmlContainer!=''){
+    	translationHtml+=additionalTranslationsHtmlContainer;
     }
     $('#translations').html(translationHtml);
     showTranslations();
@@ -557,8 +571,35 @@ function renderTranslationContainer(resultData) {
         translationsContainer += '<span class="term-status">'+renderTermStatusIcon(resultData.termStatus)+'</span>';
     }
     
+    if (resultData.alternativeTranslations != undefined) {
+    	var at=resultData.alternativeTranslations,
+    		highestConfidenceTranslation='',
+    		atHtml=[],
+    		atHtmlTotal=[];
+    	
+    	$.each(at, function(key, result){
+    		alternativeTranslationsHtml='';
+    		atHtml=[];
+    		atHtml.push('<progress value="'+result['confidence']+'" max="1" style="width:5% !important;"></progress>');
+    		atHtml.push('<b>'+result['displayTarget']+': ('+result['posTag']+')</b>');
+        	$.each(result.backTranslations, function(keyBt, resultBt){
+        		
+        		if(highestConfidenceTranslation==''){
+        			highestConfidenceTranslation='<span>'+Editor.data.languageresource.translatedStrings['translationsForLabel']+'<b> '+result['displayTarget']+'</b></span></br>';
+        		}
+        		atHtml.push(resultBt.displayText);
+        	});
+        	
+        	atHtmlTotal.push(atHtml.join(',')+'</br>');
+    	});
+    }
+    
     translationsContainer += '</div>';
     
+    //collect the additional translations, thay are rendered at the end of the result list
+    additionalTranslationsHtmlContainer +=highestConfidenceTranslation;
+    additionalTranslationsHtmlContainer +=atHtmlTotal.join('');
+	
     if (resultData.infoText != '') {
         translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
     }
