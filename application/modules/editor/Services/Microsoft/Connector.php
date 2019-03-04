@@ -97,7 +97,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      */
     public function translate(string $searchString){
         //the dictonary lookup translation is active only for less than or equal to DICTONARY_SEARCH_CHARACTERS_BORDER
-        $this->api->setIsDictionaryLookup(count($searchString)<=self::DICTONARY_SEARCH_CHARACTERS_BORDER);
+        $this->api->setIsDictionaryLookup(strlen($searchString)<=self::DICTONARY_SEARCH_CHARACTERS_BORDER);
         return $this->queryMicrosoftApi($searchString);
     }
     
@@ -122,12 +122,23 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
             $result=$this->api->getResult();
         }
         
-        $translation = isset($result['text']) ? $result['text'] : "";
-        if($reimportWhitespace) {
-            $translation = $this->importWhitespaceFromTagLessQuery($translation);
+        if(empty($result)){
+            return $this->resultList;
         }
-        
-        $this->resultList->addResult($translation, $this->defaultMatchRate);
+        $metaData=[];
+        $translation="";
+        foreach ($result as $res) {
+            if(empty($translation)){
+                $translation=$res['text'];
+                if($reimportWhitespace) {
+                    $translation = $this->importWhitespaceFromTagLessQuery($translation);
+                }
+            }
+            if(isset($res['metaData'])){
+                $metaData[]=$res['metaData'];
+            }
+        }
+        $this->resultList->addResult($translation, $this->defaultMatchRate,['alternativeTranslations'=>$metaData]);
         return $this->resultList;
     }
     

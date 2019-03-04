@@ -176,20 +176,28 @@ class editor_Services_Microsoft_HttpApi {
      * @return boolean
      */
     protected function processResponse($response) {
-        //TODO: handle the dictonary response
         $result=json_decode($response,true);
-        $result=!empty($result)?$result[0]:"";
-        if(empty($result)){
-            return;
+        $translation=isset($result[0]['translations']) ? $result[0]['translations'] : [];
+        if(empty($translation)){
+            return empty($this->error);
         }
-        //the microsoft api provides the resulti in different layout, convert it to our needs
-        foreach ($result as $res){
-            foreach ($res as $translation) {
-                if(empty($this->result)){
-                    $this->result=$translation;
-                }
+        
+        $collection=[];
+        foreach ($translation as $single) {
+            //the response layout contains only text, when no dictonary lookup is used
+            if(isset($single['text'])){
+                $collection[]=[
+                    'text'=>$single['text']
+                ];
+            }else{
+                //the request is triggered for dictonary lookup, collect the additinal translations
+                $collection[]=[
+                    'text'=>isset($single['displayTarget']) ? $single['displayTarget'] : '',
+                    'metaData'=>$single
+                ];
             }
         }
+        $this->result=$collection;
         return empty($this->error);
     }
     
