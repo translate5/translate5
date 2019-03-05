@@ -311,6 +311,23 @@ h4, p {
     display: none;
 }
 
+/* -- alternativeTranslations -- */
+h5.translationsForLabel {
+	color: #999;
+	margin: 0px;
+}
+h5.translationsForLabel .displayTarget {
+	color: #000;
+}
+table.translationsForLabel td {
+    font-size: 90%;
+    vertical-align: top;
+}
+table.translationsForLabel progress {
+	width: 30px !important;
+	margin-right: 5px;
+}
+
 /* --------------- additional infos --------------- */
 /* -- https://stackoverflow.com/a/6258628 -- */
 

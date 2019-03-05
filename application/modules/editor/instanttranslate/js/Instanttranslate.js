@@ -574,23 +574,27 @@ function renderTranslationContainer(resultData) {
     if (resultData.alternativeTranslations != undefined) {
     	var at=resultData.alternativeTranslations,
     		highestConfidenceTranslation='',
-    		atHtml=[],
-    		atHtmlTotal=[];
-    	
+    		atHtmlTableStart = '',
+    		atHtmlTableEnd = '',
+    		atHtmlTable='',
+    		atHtmlBt=[];
+    	if (at.length > 0) {
+    		atHtmlTableStart = '<table class="translationsForLabel">';
+    		atHtmlTableEnd = '</table>';
+    	}
     	$.each(at, function(key, result){
-    		alternativeTranslationsHtml='';
-    		atHtml=[];
-    		atHtml.push('<progress value="'+result['confidence']+'" max="1" style="width:5% !important;"></progress>');
-    		atHtml.push('<b>'+result['displayTarget']+': ('+result['posTag']+')</b>');
+    		atHtmlTable += '<tr>';
+    		atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
+    		atHtmlTable += '<td><b>'+result['displayTarget']+' ('+result['posTag']+'):</b></td>';
+    		atHtmlBt=[];
         	$.each(result.backTranslations, function(keyBt, resultBt){
-        		
         		if(highestConfidenceTranslation==''){
-        			highestConfidenceTranslation='<span>'+Editor.data.languageresource.translatedStrings['translationsForLabel']+'<b> '+result['displayTarget']+'</b></span></br>';
+        			highestConfidenceTranslation='<h5 class="translationsForLabel">'+Editor.data.languageresource.translatedStrings['translationsForLabel']+'<span class="displayTarget"> '+result['displayTarget']+'</span></h5>';
         		}
-        		atHtml.push(resultBt.displayText);
+        		atHtmlBt.push(resultBt.displayText);
         	});
-        	
-        	atHtmlTotal.push(atHtml.join(',')+'</br>');
+        	atHtmlTable += '<td>'+atHtmlBt.join(', ')+'</td>';
+        	atHtmlTable += '</tr>';
     	});
     }
     
@@ -598,7 +602,9 @@ function renderTranslationContainer(resultData) {
     
     //collect the additional translations, thay are rendered at the end of the result list
     additionalTranslationsHtmlContainer +=highestConfidenceTranslation;
-    additionalTranslationsHtmlContainer +=atHtmlTotal.join('');
+    additionalTranslationsHtmlContainer +=atHtmlTableStart;
+    additionalTranslationsHtmlContainer +=atHtmlTable;
+    additionalTranslationsHtmlContainer +=atHtmlTableEnd;
 	
     if (resultData.infoText != '') {
         translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
