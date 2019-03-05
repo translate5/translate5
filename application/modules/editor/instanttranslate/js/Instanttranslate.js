@@ -574,6 +574,7 @@ function renderTranslationContainer(resultData) {
     if (resultData.alternativeTranslations != undefined) {
     	var at=resultData.alternativeTranslations,
     		highestConfidenceTranslation='',
+    		atHtmlTableResultPosTag = '',
     		atHtmlTableStart = '',
     		atHtmlTableEnd = '',
     		atHtmlTable='',
@@ -583,9 +584,13 @@ function renderTranslationContainer(resultData) {
     		atHtmlTableEnd = '</table>';
     	}
     	$.each(at, function(key, result){
+    		if (atHtmlTableResultPosTag == '') {
+    			// This assumes that result['posTag'] is the same for all results!
+    			atHtmlTableResultPosTag = '<tr><td colspan="3"><b>'+result['posTag']+'</b></td></tr>';
+    		}
     		atHtmlTable += '<tr>';
     		atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
-    		atHtmlTable += '<td><b>'+result['displayTarget']+' ('+result['posTag']+'):</b></td>';
+    		atHtmlTable += '<td><b>'+result['displayTarget']+':</b></td>';
     		atHtmlBt=[];
         	$.each(result.backTranslations, function(keyBt, resultBt){
         		if(highestConfidenceTranslation==''){
@@ -603,6 +608,7 @@ function renderTranslationContainer(resultData) {
     //collect the additional translations, thay are rendered at the end of the result list
     additionalTranslationsHtmlContainer +=highestConfidenceTranslation;
     additionalTranslationsHtmlContainer +=atHtmlTableStart;
+    additionalTranslationsHtmlContainer +=atHtmlTableResultPosTag;
     additionalTranslationsHtmlContainer +=atHtmlTable;
     additionalTranslationsHtmlContainer +=atHtmlTableEnd;
 	
