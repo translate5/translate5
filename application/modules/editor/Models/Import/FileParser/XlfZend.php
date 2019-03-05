@@ -67,9 +67,13 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
      */
     protected function setMid($mid) {
         $mid = explode('_', $mid);
-        $segmentCount = array_pop($mid);
+        //remove the segment count part from MID. 
+        // 1. Not needed since we don't have MRKs
+        // 2. can not be used otherwise relais matching won't work since our de.xliff and en.xliff are not aligned in segment position. 
+        // therefore there would be different MIDs for same content then. 
+        array_pop($mid); 
         $mid = $this->shortenMid(join('_', $mid));
-        parent::setMid($mid.'_'.$segmentCount);
+        parent::setMid($mid);
     }
     
     protected function parse() {
