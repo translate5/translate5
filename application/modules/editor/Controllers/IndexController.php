@@ -289,6 +289,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //disable language resources match panel in editor when only termcollection is assigned to the task
       $this->view->Php2JsVars()->set('editor.LanguageResources.disableIfOnlyTermCollection',(boolean)$rop->editor->LanguageResources->disableIfOnlyTermCollection);
       
+      //is the openid data visible for the default customer
+      $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
+      
       $this->setLanguageResourceJsVars();
       
       $this->setJsAppData();
