@@ -38,7 +38,8 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         var me=this,
         	formPanel = me.getReferences().form,
             removeButton = me.getReferences().removeButton,
-            vm = me.getViewModel();
+            vm = me.getViewModel(),
+            isOpenIdHidden=record.get('number')==Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
 
         vm.set('record', record);
         vm.set('title', me.getView().strings.editCustomerTitle);
@@ -52,6 +53,10 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         });
         
         removeButton.setDisabled(false);
+        
+        //hide the openid data for the default customer if it is configured so
+    	formPanel.down('#openIdDomain').setVisible(!isOpenIdHidden);
+    	formPanel.down('#openIdFieldset').setVisible(!isOpenIdHidden);
     },
 
     /**

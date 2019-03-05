@@ -212,27 +212,28 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         allowBlank: false,
                                         maxLength: 255
                                     },{
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.domain,
+                                        name:'domain',
+                                        itemId:'openIdDomain',
+                                        setAllowBlank:me.setFieldAllowBlank,
+                                        listeners: {
+                                            change: {
+                                                fn: 'onOpenIdFieldChange',
+                                                scope: 'controller'
+                                            }
+                                        },
+                                        bind:{
+                                            allowBlank:'{!isOpenIdRequired}',
+                                        }
+                                    },{
                                     	xtype:'fieldset',
+                                    	itemId:'openIdFieldset',
                                     	collapsible: true,
                                     	collapsed: true,
                                     	title:'OpenId Connect',
                                     	items:[
                                     		{
-                                            	xtype:'textfield',
-                                            	fieldLabel:me.strings.domain,
-                                            	vtype: 'url',
-                                            	name:'domain',
-                                            	setAllowBlank:me.setFieldAllowBlank,
-                                            	listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdFieldChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                            	bind:{
-                                            		allowBlank:'{!isOpenIdRequired}'
-                                            	}
-                                            },{
                                             	xtype:'textfield',
                                             	fieldLabel:me.strings.openIdServer,
                                             	vtype: 'url',

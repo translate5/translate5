@@ -31,6 +31,10 @@ Ext.define('Editor.model.admin.Customer', {
     extend: 'Ext.data.Model',
     alias: 'model.customer',
 
+    statics: {
+    	DEFAULTCUSTOMER_NUMBER:'default for legacy data'
+    },
+    
     fields: [
         {type: 'int',name: 'id',persist: false},
         {type: 'string',name: 'name',validations: [{type: 'presence'},{type: 'length',max: 255,min: 3}]},
