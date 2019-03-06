@@ -66,11 +66,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      * @see editor_Services_Connector_Abstract::open()
      */
     public function close() {
-    /*
-     * This call deactivated, since openTM2 has a access time based garbage collection
-     * If we close a TM and another Task still uses this TM this bad for performance,
-     *  since the next request to the TM has to reopen it
-     */
+        //This call is not necessary, since TMs are closed automatically.
     }
     
     /**
@@ -97,7 +93,7 @@ class editor_Services_Microsoft_Connector extends editor_Services_Connector_Abst
      */
     public function translate(string $searchString){
         //the dictonary lookup translation is active only for less than or equal to DICTONARY_SEARCH_CHARACTERS_BORDER
-        $this->api->setIsDictionaryLookup(strlen($searchString)<=self::DICTONARY_SEARCH_CHARACTERS_BORDER);
+        $this->api->setIsDictionaryLookup(mb_strlen($searchString)<=self::DICTONARY_SEARCH_CHARACTERS_BORDER);
         return $this->queryMicrosoftApi($searchString);
     }
     

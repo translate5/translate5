@@ -68,12 +68,12 @@ class editor_Services_Microsoft_HttpApi {
         
         $this->apiKey = isset($config->runtimeOptions->LanguageResources->microsoft->apiKey) ?$config->runtimeOptions->LanguageResources->microsoft->apiKey:null ;
         if(empty($this->apiKey)){
-            throw new ZfExtended_BadGateway("Microsoft translator api key is not defined");
+            throw new ZfExtended_Exception("Microsoft translator api key is not defined");
         }
         
         $this->apiUrl=isset($config->runtimeOptions->LanguageResources->microsoft->apiUrl) ?$config->runtimeOptions->LanguageResources->microsoft->apiUrl:null ;
         if(empty($this->apiUrl)){
-            throw new ZfExtended_BadGateway("Microsoft translator api url is not defined");
+            throw new ZfExtended_Exception("Microsoft translator api url is not defined");
         }
     }
     
