@@ -41,13 +41,12 @@ class editor_Models_LogTask extends ZfExtended_Models_Entity_Abstract {
      * @param ZfExtended_Models_User $affectedUser optional, infos about the user associated to the task, this users state was changed, can be empty if state is not associated to an user
      */
     public static function create(string $taskGuid, string $state, ZfExtended_Models_User $authenticatedUser, ZfExtended_Models_User $affectedUser = null) {
-        return;
         $inst = ZfExtended_Factory::get(__CLASS__);
         $inst->setTaskGuid($taskGuid);
         $inst->setState($state);
         $inst->setAuthUserGuid($authenticatedUser->getUserGuid());
-        //$inst->setAuthUserLogin($authenticatedUser->getLogin());
-        $inst->setAuthUser($authenticatedUser->getUserName());
+        $inst->setAuthUserLogin($authenticatedUser->getLogin());
+        $inst->setAuthUserName($authenticatedUser->getUserName());
         if(!empty($affectedUser)) {
             $inst->setUserGuid($affectedUser->getUserGuid());
             $inst->setUserLogin($affectedUser->getLogin());
@@ -66,7 +65,6 @@ class editor_Models_LogTask extends ZfExtended_Models_Entity_Abstract {
      * @param ZfExtended_Models_User $affectedUser optional, infos about the user associated to the task, this users state was changed, can be empty if state is not associated to an user
      */
     public static function createWorkflow(string $taskGuid, string $message, ZfExtended_Models_User $authenticatedUser, ZfExtended_Models_User $affectedUser = null) {
-        return;
         $inst = ZfExtended_Factory::get(__CLASS__);
         $inst->setTaskGuid($taskGuid);
         $inst->setState('WORKFLOW');
@@ -92,7 +90,6 @@ class editor_Models_LogTask extends ZfExtended_Models_Entity_Abstract {
      * @param string $affectedUserGuid optional, can be empty if state is not user associated
      */
     public static function createWithUserGuid(string $taskGuid, string $state, string $authenticatedUserGuid, $affectedUserGuid = null) {
-        return;
         $authUser = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $authUser ZfExtended_Models_User */
         $authUser->loadByGuid($authenticatedUserGuid);
