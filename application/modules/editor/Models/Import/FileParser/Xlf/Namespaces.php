@@ -56,6 +56,15 @@ class editor_Models_Import_FileParser_Xlf_Namespaces extends editor_Models_Impor
     }
     
     /**
+     * Adds manually a specific XLF namespace handler
+     * @param string $key
+     * @param editor_Models_Import_FileParser_Xlf_AbstractNamespace $namespace
+     */
+    public function addNamespace($key, editor_Models_Import_FileParser_Xlf_AbstractNamespace $namespace) {
+        $this->namespaces[$key] = $namespace;
+    }
+    
+    /**
      * 
      * @param array $attributes
      * @param editor_Models_Import_FileParser_SegmentAttributes $segmentAttributes

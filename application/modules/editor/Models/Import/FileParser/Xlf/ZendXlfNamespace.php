@@ -26,33 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/* * #@+
+/** #@+
  * @author Marc Mittag
  * @package editor
  * @version 1.0
  */
 
-/**
- * Just an empty class since default XLF export can be used for Zend XLF
- */
-class editor_Models_Export_FileParser_XlfZend extends editor_Models_Export_FileParser_Xlf {
 
+/**
+ * XLF Fileparser Add On to parse Zend XLF specific dialect
+ */
+class editor_Models_Import_FileParser_Xlf_ZendXlfNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
     /**
-     * restores the original HTML tags from the ph and bpt ept tags
      * {@inheritDoc}
-     * @see editor_Models_Export_FileParser_Xlf::getSegmentContent()
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
-    protected function getSegmentContent($segmentId, $field) {
-        $content = parent::getSegmentContent($segmentId, $field);
-        $parser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $parser editor_Models_Import_FileParser_XmlParser */
-        $parser->registerElement('bpt,ept,ph', null, function($tag, $key, $opener) use ($parser){
-            $textContent = $parser->getRange($opener['openerKey'] + 1, $key - 1, true);
-            $textContent = htmlspecialchars_decode($textContent);
-            $parser->replaceChunk($opener['openerKey'], $textContent);
-            $parser->replaceChunk($opener['openerKey'] + 1, '', $key - $opener['openerKey']);
-        });
-        return $parser->parse($content);
+    public function useTagContentOnly() {
+        return true;
     }
-    
 }
