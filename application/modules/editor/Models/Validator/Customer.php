@@ -52,7 +52,7 @@ class editor_Models_Validator_Customer extends ZfExtended_Models_Validator_Abstr
         
         $this->addValidator('searchCharacterLimit', 'int');
         
-        $this->addValidator('domain', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('domain', 'stringLength', array('min' => 0, 'max' => 255),true);
         
         $this->addValidator('openIdServer', 'stringLength', array('min' => 0, 'max' => 255));
         
