@@ -26,7 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-require_once('ZfExtended/ThirdParty/PHPExcel/PHPExcel.php');
+require APPLICATION_PATH.'/../library/PhpSpreadsheet/vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 /**
  * Default Model for Plugin SegmentStatistics
@@ -49,7 +51,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
     protected $data = array();
     
     /**
-     * @var PHPExcel
+     * @var PhpOffice\PhpSpreadsheet\Spreadsheet
      */
     protected $xls;
     
@@ -85,7 +87,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
         
         $this->allowFileWorksheets = ($this->statistics->fileCount <= $config->disableFileWorksheetCount);
         
-        $this->xls = PHPExcel_IOFactory::load($tpl);
+        $this->xls = \PhpOffice\PhpSpreadsheet\IOFactory::load($tpl);
         $this->fillSheetOverview();
         $this->fillSheetSummary();
         $this->fillSheetTermStat();
@@ -133,14 +135,14 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
      * @param string $filename
      */
     public function writeToDisk(string $filename) {
-        $w = new PHPExcel_Writer_Excel2007($this->xls);
+        $w = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->xls);
         //enabling this, see TRANSLATE-544
         // if we got bad write performance we can disable it again!
         $w->setPreCalculateFormulas(true);
         $w->save($filename.self::FILE_SUFFIX);
         
         if($this->debug) {
-            $w = new PHPExcel_Writer_CSV($this->xls);
+            $w = new \PhpOffice\PhpSpreadsheet\Writer\Csv($this->xls);
             $w->save($filename.'.csv');
             $taskName = $this->task->getTaskName().' ('.$this->taskGuid.")";
             error_log("Statistics ".basename($filename).self::FILE_SUFFIX." for task ".$taskName." written.");
@@ -180,7 +182,7 @@ class editor_Plugins_SegmentStatistics_Models_Export_Xls extends editor_Plugins_
                 $isTpl = (strpos($tpl, self::TPL_PREFIX) === 0);
                 if(!$isTpl) {
                     if(substr($tpl, 0, 1) === '=') {
-                        $sheet->setCellValueExplicit($col.$i, $this->fixFormulaRow($tpl, $i), PHPExcel_Cell_DataType::TYPE_FORMULA);
+                        $sheet->setCellValueExplicit($col.$i, $this->fixFormulaRow($tpl, $i), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_FORMULA);
                     }
                     else {
                         $sheet->setCellValue($col.$i, $tpl);
