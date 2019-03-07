@@ -208,6 +208,11 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     //replaceAllSegmentIndex:null,
     
+    /***
+     * The index of replaced segments on manuel replace click
+     */
+    replacedSegmentsIndex:[],
+    
     strings:{
         searchInfoMessage:'#UT#Die Suche wird nur auf den gefilterten Segmenten durchgeführt',
         comboFieldLabel:'#UT#Ersetzen',
@@ -326,7 +331,6 @@ Ext.define('Editor.controller.SearchReplace', {
         var me=this;
         me.cleanMarkTags();
         me.removeReplaceClass();
-        me.resetSearchParametars();
     },
     
     /***
@@ -432,6 +436,17 @@ Ext.define('Editor.controller.SearchReplace', {
         //fire event when the replace is done
         me.fireEvent('editorTextReplaced',iframeDocument.body.innerHTML);
 
+        //check if the segment is allready visited
+        if(Ext.Array.contains(me.replacedSegmentsIndex,me.activeSegment.nextSegmentIndex)){
+        	//reset the search aprametars
+        	me.resetSearchParametars();
+        	//save the currently opened segment
+        	Editor.app.getController('Editor').save();
+        	return;
+        }
+    	//cache the next replace segment
+    	me.replacedSegmentsIndex.push(me.activeSegment.currentSegmentIndex);
+    	
         me.jumpToNextSegment();
     },
 
@@ -1305,7 +1320,10 @@ Ext.define('Editor.controller.SearchReplace', {
         if(goToIndex>=0){
             callback(goToIndex);
         }else{
-            me.searchIndex(results[me.activeSegment.nextSegmentIndex].segmentNrInTask,callback);
+        	var nextSegmenInTaskt=results[me.activeSegment.nextSegmentIndex];
+        	if(nextSegmenInTaskt!=undefined){
+        		me.searchIndex(nextSegmenInTaskt.segmentNrInTask,callback);
+        	}
         }
     },
 
@@ -1483,6 +1501,8 @@ Ext.define('Editor.controller.SearchReplace', {
         activeTabViewModel.set('resultsCount',0);
         activeTabViewModel.set('result',[]);
         activeTabViewModel.set('showResultsLbel',false);
+        
+        me.replacedSegmentsIndex=[];
 
         me.searchRequired=true;
     },
