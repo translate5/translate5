@@ -107,8 +107,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_Abstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        $this->resultList->setDefaultSource($searchString);
-        return $this->queryCollectionResults($searchString);
+        $searchString='%'.$searchString.'%';
+        return $this->queryCollectionResults($searchString,false,$field);
     }
     
     /***
@@ -125,9 +125,11 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * Search the terms in the term collection with the given query string
      * @param string $queryString
      * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @param string $field optional, the field where the search will be performed
+     * 
      * @return editor_Services_ServiceResult
      */
-    protected function queryCollectionResults($queryString, $reimportWhitespace = false){
+    protected function queryCollectionResults($queryString, $reimportWhitespace = false,$field='source'){
         if(empty($queryString)) {
             return $this->resultList;
         }
@@ -135,7 +137,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         /* @var $entity editor_Models_TermCollection_TermCollection */
         $entity->load($this->languageResource->getId());
         
-        $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang);
+        $results=$entity->searchCollection($queryString,$this->sourceLang,$this->targetLang,$field);
         
         //load all available languages, so we can set the term rfc value to the frontend
         $langModel=ZfExtended_Factory::get('editor_Models_Languages');
@@ -166,7 +168,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                 if(isset($res['language'])){
                     $res['languageRfc']=isset($lngs[$res['language']]) ? $lngs[$res['language']] : null;
                 }
-                $this->resultList->addResult($res['term'], $matchRate,$res);
+                //set the default source and the result depending of where the search is triggered
+                $this->resultList->setDefaultSource($field == 'source' ? $res['default'.$field] : $res['term']);
+                $this->resultList->addResult($field == 'source' ? $res['term'] : $res['default'.$field],$matchRate,$res);
             }
         }
         
