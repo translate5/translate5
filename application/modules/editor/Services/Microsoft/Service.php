@@ -26,20 +26,37 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_TermCollection_Resource extends editor_Models_LanguageResources_Resource {
-    public function __construct(string $id, string $name) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->analysable = true;//is used by match analysis
-        $this->writable = false; //single terms can not be updated 
-        $this->type = editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
+/**
+ */
+class editor_Services_Microsoft_Service extends editor_Services_ServiceAbstract {
+    const DEFAULT_COLOR = '2581f4';
+    
+    protected $resourceClass = 'editor_Services_Microsoft_Resource';
+    
+    public function __construct() {
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $microsoftConfig=isset($config->runtimeOptions->LanguageResources->microsoft) ? $config->runtimeOptions->LanguageResources->microsoft : null;
+        if(!isset($microsoftConfig)){
+            return;
+        }
+        $apiKey = isset($microsoftConfig->apiKey) ? $microsoftConfig->apiKey:null ;
+        if(empty($apiKey)){
+            return;
+        }
+        
+        $apiUrl=isset($microsoftConfig->apiUrl) ?$microsoftConfig->apiUrl:null ;
+        if(empty($apiUrl)){
+            return;
+        }
+        $this->addResource([$this->getServiceNamespace(), $this->getName()]);
     }
     
     /**
-     * returns the initial status for that resource type for the overview list
+     * (non-PHPdoc)
+     * @see editor_Services_ServiceAbstract::getName()
      */
-    public function getInitialStatus(&$statusInfo) {
-        $statusInfo = ''; //no addtional info here
-        return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
+    public function getName() {
+        return "Microsoft";
     }
 }

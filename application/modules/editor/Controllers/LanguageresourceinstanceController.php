@@ -608,13 +608,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             //$this->uploadErrors = "dadada"
         //}
         
+        if(!empty($this->uploadErrors)){
+            return ;
+        }
+        
         //setting the TM filename here, but can be overwritten in the connectors addTm method
         // for example when we get a new name from the service
         $this->entity->addSpecificData('fileName', $importInfo[self::FILE_UPLOAD_NAME]['name']);
         
-        if(empty($this->uploadErrors) && !$connector->addTm($importInfo[self::FILE_UPLOAD_NAME],$this->getAllParams())) {
-            $this->uploadErrors[] = 'Hochgeladene TM Datei konnte nicht hinzugefügt werden.';
-        }
+        $this->queueServiceImportWorker($importInfo, true);
     }
     
     /**
@@ -631,9 +633,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return;
         }
         
-        if(empty($this->uploadErrors) && !$connector->addAdditionalTm($importInfo[self::FILE_UPLOAD_NAME],$this->getAllParams())) {
-            $this->uploadErrors[] = 'Hochgeladene TMX Datei konnte nicht hinzugefügt werden.';
+        if(!empty($this->uploadErrors)){
+            return ;
         }
+        
+        $this->queueServiceImportWorker($importInfo, false);
     }
     
     /**
@@ -676,6 +680,54 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         return $importInfo;
     }
+    
+    /***
+     * Init and queue the servce import worker
+     * @param array $importInfo
+     * @param boolean $addnew
+     */
+    protected function queueServiceImportWorker($importInfo,$addnew){
+        $worker=ZfExtended_Factory::get('editor_Services_ImportWorker');
+        /* @var $worker editor_Services_ImportWorker */
+        
+        $params=$this->getAllParams();
+        
+        $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
+        
+        $params['languageResourceId']=$this->entity->getId();
+        $params['fileinfo']=!empty($importInfo[self::FILE_UPLOAD_NAME])? $importInfo[self::FILE_UPLOAD_NAME]:[];
+        $params['addnew']=$addnew;
+        
+        if (!$worker->init(null, $params)) {
+            $this->uploadErrors[] = 'File import in language resources Error on worker init()';
+            return;
+        }
+        
+        //set the language resource status to importing
+        $this->entity->addSpecificData('status',editor_Services_Connector_FilebasedAbstract::STATUS_IMPORT);
+        $this->entity->save();
+        
+        $worker->queue();
+    }
+    
+    /***
+     * Move the upload file to the tem directory so it can be used by the worker.
+     * The fileinfo temp_name will be modefied
+     * @param array $fileinfo
+     */
+    protected function handleUploadLanguageResourcesFile(&$fileinfo){
+        if(!$fileinfo){
+            return;
+        }
+        //create unique temp file name
+        $newFileLocation=tempnam('LanguageResources', $fileinfo['name']);
+        if (!is_dir(dirname($newFileLocation))) {
+            mkdir(dirname($newFileLocation), 0777, true);
+        }
+        move_uploaded_file($fileinfo['tmp_name'],$newFileLocation);
+        $fileinfo['tmp_name']=$newFileLocation;
+    }
+    
     
     /**
      * translates and transport upload errors to the frontend

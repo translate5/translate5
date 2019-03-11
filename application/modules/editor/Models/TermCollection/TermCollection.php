@@ -86,10 +86,15 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param string $queryString
      * @param integer $sourceLang
      * @param integer $targetLang
+     * @param string $field
      * 
      * @return array
      */
-    public function searchCollection($queryString,$sourceLang,$targetLang){
+    public function searchCollection($queryString,$sourceLang,$targetLang,$field){
+        //set the default value for the $field, it can be also passed as null
+        if(empty($field)){
+            $field='source';
+        }
         $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languageModel editor_Models_Languages */
         
@@ -109,26 +114,40 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
             ->from('LEK_terms')
             ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString)
             ->where('collectionId=?',$this->getId())
-            ->where('language IN(?)',$sourceLangs)
+            ->where('language IN(?)',$field=='source' ? $sourceLangs : $targetLangs)
             ->group('groupId');
         $rows=$this->db->fetchAll($s)->toArray();
-        
         if(empty($rows)){
             return array();
         }
         
 		$groupIds = array();
+		$groupIdSearch=[];
 		foreach($rows as $res){
 			$groupIds[] = $res['groupId'];
+			//collect the searched terms, so thay are merged with the results
+			if(!isset($groupIdSearch[$res['groupId']])){
+			    $groupIdSearch[$res['groupId']]=[];
+			}
+		    array_push($groupIdSearch[$res['groupId']], $res['term']);
 		}
 		$s=$this->db->select()
     		->setIntegrityCheck(false)
     		->from(array('t'=>'LEK_terms'))
     		->joinLeft(array('ta'=>'LEK_term_attributes'), 'ta.termId=t.id AND ta.attrType="processStatus"',array('ta.attrType AS processStatusAttribute','ta.value AS processStatusAttributeValue'))
     		->where('t.groupId IN(?)',$groupIds)
-    		->where('t.language IN(?)',$targetLangs)
+    		->where('t.language IN(?)',$field=='source' ? $targetLangs : $sourceLangs)
     		->where('t.collectionId=?',$this->getId());
-		return $this->db->fetchAll($s)->toArray();
+		$targetResults=$this->db->fetchAll($s)->toArray();
+		
+		//merge the searched terms with the result
+		foreach ($targetResults as &$single){
+		    $single['default'.$field]='';
+		    if(!empty($groupIdSearch[$single['groupId']])){
+		        $single['default'.$field]=$groupIdSearch[$single['groupId']][0];
+		    }
+		}
+		return $targetResults;
     }
     
     /***

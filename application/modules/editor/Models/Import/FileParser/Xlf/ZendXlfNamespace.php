@@ -26,20 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Services_TermCollection_Resource extends editor_Models_LanguageResources_Resource {
-    public function __construct(string $id, string $name) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->analysable = true;//is used by match analysis
-        $this->writable = false; //single terms can not be updated 
-        $this->type = editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION;
-    }
-    
+/** #@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ */
+
+
+/**
+ * XLF Fileparser Add On to parse Zend XLF specific dialect
+ */
+class editor_Models_Import_FileParser_Xlf_ZendXlfNamespace extends editor_Models_Import_FileParser_Xlf_AbstractNamespace{
     /**
-     * returns the initial status for that resource type for the overview list
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser_Xlf_AbstractNamespace::useTagContentOnly()
      */
-    public function getInitialStatus(&$statusInfo) {
-        $statusInfo = ''; //no addtional info here
-        return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
+    public function useTagContentOnly() {
+        return true;
     }
 }

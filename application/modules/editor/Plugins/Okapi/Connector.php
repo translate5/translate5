@@ -228,7 +228,7 @@ class editor_Plugins_Okapi_Connector {
      * Run the file conversion. For each uploaded files converted file will be created
      */
     public function ping(){
-        $url = $this->projectUrl;
+        $url = $this->apiUrl;
         if(empty($url)) {
             return 'Okapi NOT configured!';
         }

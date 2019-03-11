@@ -358,7 +358,7 @@ abstract class editor_Workflow_Abstract {
      * @param mixed $step string or null
      * @return string $role OR false if step does not exist
      */
-    public function getNextStep(string $step) {
+    public function getNextStep($step) {
         $stepChain = $this->getStepChain();
         
         //if no next step is found, we return false

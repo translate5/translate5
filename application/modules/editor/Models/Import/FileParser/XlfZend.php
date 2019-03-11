@@ -40,7 +40,20 @@ END LICENSE AND COPYRIGHT
  * This name should not provide any connection between Zend and Xliff in general, only in the context of translate5!
  */
 class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileParser_Xlf {
+    //since we replace chunks in the XML the content converter has to reparse it
+    const XML_REPARSE_CONTENT = true;
+    
+    /**
+     * Storing the original source chunks containing the original HTML and Mail Placeholders for the skeleton
+     * @var array
+     */
     protected $originalSourceChunks = [];
+    
+    protected function initNamespaces() {
+        parent::initNamespaces();
+        $this->namespaces->addNamespace('zxliff', new editor_Models_Import_FileParser_Xlf_ZendXlfNamespace());
+    }
+    
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_FileParser::getFileExtensions()
@@ -53,7 +66,27 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
         //our zend xliff uses just ids instead mids, so we generate them out of the very long ids:
         //override completly the mid calculation, since we dont use subs or mrks!
         $transUnit = $this->xmlparser->getParent('trans-unit');
-        return md5($this->xmlparser->getAttribute($transUnit['attributes'], 'id'));
+        return $this->shortenMid($this->xmlparser->getAttribute($transUnit['attributes'], 'id'));
+    }
+    
+    private function shortenMid($mid) {
+        return md5($mid);
+    }
+    
+    /**
+     * override to deal with the base64 long mids
+     * {@inheritDoc}
+     * @see editor_Models_Import_FileParser::setMid()
+     */
+    protected function setMid($mid) {
+        $mid = explode('_', $mid);
+        //remove the segment count part from MID. 
+        // 1. Not needed since we don't have MRKs
+        // 2. can not be used otherwise relais matching won't work since our de.xliff and en.xliff are not aligned in segment position. 
+        // therefore there would be different MIDs for same content then. 
+        array_pop($mid); 
+        $mid = $this->shortenMid(join('_', $mid));
+        parent::setMid($mid);
     }
     
     protected function parse() {
@@ -92,16 +125,45 @@ class editor_Models_Import_FileParser_XlfZend extends editor_Models_Import_FileP
      * @return string
      */
     protected function protectHtml($nodeInfo) {
+        $j = 0;
         $start = $nodeInfo['opener'] + 1; //we have to exclude the <source>|<target> tags them self
-        for ($i = $start; $i < $nodeInfo['closer']; $i++) {
-            $chunk = $this->xmlparser->getChunk($i);
-            //if it is a tag, then we replace it with a <ph> tag
-            if(substr($chunk, 0, 1) == '<' && substr($chunk, -1) == '>') {
-                $this->originalSourceChunks[$i] = $chunk;
-                $chunk = '<x id="'.$i.'" translate5OriginalContent="'.htmlspecialchars($chunk).'"/>';
-                $this->xmlparser->replaceChunk($i, $chunk);
+        $end = $nodeInfo['closer'] - 1;
+        $parser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $parser editor_Models_Import_FileParser_XmlParser */
+        
+        //register other content to replace the mail template placeholders there
+        $parser->registerOther(function($other, $i) use (&$j, $start){
+            $origKey = $start + $i;
+            //mask {variables} as tags
+            $other = preg_replace_callback('#({[a-zA-Z0-9_-]+})#', function($matches) use ($other, &$j, $origKey){
+                $this->originalSourceChunks[$origKey] = $other;
+                return '<ph id="'.(++$j).'">'.htmlspecialchars($matches[1]).'</ph>';
+            }, $other);
+            $this->xmlparser->replaceChunk($origKey, $other);
+        });
+        
+        //register to all XML nodes to replace html tags, this is currently the only valid tag content between <source></source> and target tags 
+        $parser->registerElement('*', null, function($tag, $key, $opener) use (&$j, $start, $parser){
+            $origOpenerKey = $start + $opener['openerKey'];
+            $origEndKey = $start + $key;
+            
+            $chunk = $parser->getChunk($opener['openerKey']);
+            $this->originalSourceChunks[$origOpenerKey] = $chunk;
+            if($opener['isSingle']) {
+                $chunk = '<ph id="'.(++$j).'">'.htmlspecialchars($chunk).'</ph>';
             }
-        }
+            else {
+                $chunk = '<bpt id="'.(++$j).'" rid="'.($j).'">'.htmlspecialchars($chunk).'</bpt>';
+            }
+            $this->xmlparser->replaceChunk($origOpenerKey, $chunk);
+            if(!$opener['isSingle']) {
+                $chunk = $parser->getChunk($key);
+                $this->originalSourceChunks[$origEndKey] = $chunk;
+                $chunk = '<ept rid="'.($j).'" id="'.(++$j).'">'.htmlspecialchars($chunk).'</ept>';
+                $this->xmlparser->replaceChunk($origEndKey, $chunk);
+            }
+        });
+        $parser->parseList($this->xmlparser->getRange($start, $end));
     }
     
     /**
