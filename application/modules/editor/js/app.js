@@ -106,6 +106,7 @@ Ext.application({
       
       this.applyDefaultState();
       this.callParent(arguments);
+      this.logoutOnWindowClose();
   },
   launch : function() {
       var me = this,
@@ -133,6 +134,31 @@ Ext.application({
             usedWidth: viewSize.width
         }
     });
+  },
+  /**
+   * If configured the user is logged out on window close
+   */
+  logoutOnWindowClose: function() {
+      if(!Editor.data.logoutOnWindowClose) {
+          return;
+      }      
+      var notRun = true,
+          logout = function() {
+              notRun = false;
+              //use the hardcoded URL since we don't want to redirect to a custom logout page, 
+              //but we just want to foirce a session destroy
+              Ext.Ajax.request({
+                  url: Editor.data.pathToRunDir+'/login/logout',
+                  method: 'get',
+                  async: false
+              });
+          };
+      Ext.EventManager.on(window, 'beforeunload', function() {
+          notRun && logout();
+      });
+      Ext.EventManager.on(window, 'unload', function() {
+          notRun && logout();
+      });
   },
   /**
    * opens the editor with the given Task

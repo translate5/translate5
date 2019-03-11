@@ -247,10 +247,6 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                     submitFormat: Editor.DATE_ISO_FORMAT,
                                     value: now,
                                     fieldLabel: me.strings.targetDeliveryLabel
-                                },{
-                                    xtype: 'numberfield',
-                                    name: 'wordCount',
-                                    fieldLabel: me.strings.numberFieldLabel
                                 },(Editor.data.enableSourceEditing  ? {
                                     xtype: 'checkbox',
                                     inputValue: 1,

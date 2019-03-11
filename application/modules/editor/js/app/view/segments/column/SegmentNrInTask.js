@@ -44,7 +44,7 @@ Ext.define('Editor.view.segments.column.SegmentNrInTask', {
     width: 50,
     tdCls: 'segmentNrInTask',
     dataIndex: 'segmentNrInTask',
-    text: 'Nr.',
+    text: '#UT#Nr.',
     alias: 'widget.segmentNrInTaskColumn',
     mixins: [
         'Editor.view.segments.column.BaseMixin',

@@ -58,7 +58,8 @@ Ext.define('Editor.controller.Editor', {
         editorMoveTitle: '#UT#Verschiebbarer Editor und hilfreiche Tastaturkürzel',
         editorMove: '#UT#Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.',
         takeTagTooltip: '#UT#STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.',
-        saveAnyway: '#UT# Trotzdem speichern'
+        saveAnyway: '#UT# Trotzdem speichern',
+        doubleclickToTakeMatch: '#UT# Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.'
     },
     DEC_DIGITS: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57],
     refs : [{
@@ -295,6 +296,7 @@ Ext.define('Editor.controller.Editor', {
             }
             return true;
         }
+        this.fireEvent('prepareTrackChangesForSaving');
         this.fireEvent('saveSegment', {
             scope: this,
             segmentUsageFinished: function(){
@@ -1027,18 +1029,81 @@ Ext.define('Editor.controller.Editor', {
             plug = me.getEditPlugin(),
             htmlEditor,
             segmentId,
+            rangeForCell,
             sel,
             selRange,
             selDataHtml,
             selInternalTags,
-            selDataText;
+            selDataText,
+            activeElement,
+            position,
+            isElementWithInternalTags = function(el){
+                var classNames = el.className.split(' ');
+                if (classNames.indexOf('segment-tag-container')>=0
+                    || classNames.indexOf('segment-tag-column')>=0) {
+                    return true;
+                }
+                return false;
+            },
+            isElementInMatchGrid = function(el,cls){
+                if (!el.parentNode) {
+                    return false;
+                }
+                if (el.className.split(' ').indexOf(cls)>=0) {
+                    return true;
+                }
+                return isElementInMatchGrid(el.parentNode, cls);
+            },
+            isElementSourceSegment = function(el){
+                var classNames = el.className.split(' ');
+                if (classNames.indexOf('segment-tag-container')>=0
+                    || classNames.indexOf('type-source')>=0) {
+                    return true;
+                }
+                return false;
+            };
+            
         //do only something when editing targets:
         if(!me.isEditing || !/^target/.test(plug.editor.columnToEdit)){
             return;
         }
+
+        activeElement = Ext.Element.getActiveElement();
+        // language resource match panel: print a message to double click on the segment to overtake it. 
+        if (isElementInMatchGrid(activeElement,'matchGrid')) {
+            if (!isElementInMatchGrid(activeElement,'match-state-noresult')) {
+                Editor.MessageBox.addInfo(me.messages.doubleclickToTakeMatch);
+            }
+            return;
+        }
+        // if the focus is not in an element that can use internal tags, we have nothing to do.
+        if (!isElementWithInternalTags(activeElement)) {
+            return;
+        }
+
         htmlEditor = plug.editor.mainEditor;
         segmentId = plug.context.record.get('id');
         sel = rangy.getSelection();
+        
+        // selections that need extra handling:
+        switch(true) {
+            case isElementSourceSegment(activeElement):
+                // whole source segment selected? Then select the content within only.
+                // (= without the surrounding "<div (...) class="segment-tag-container (...) type-source">(...)</div>"
+                selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+                position = me.getPositionInfoForRange(selRange,activeElement);
+                if(position.atStart && position.atEnd){
+                    sel.selectAllChildren(activeElement);
+                }
+                break;
+            case isElementInMatchGrid(activeElement,'language-resource-result-panel'):
+                // language resource concordance panel: copy content of selected cell
+                rangeForCell = rangy.createRange();
+                rangeForCell.selectNodeContents(activeElement.firstChild);
+                sel.setSingleRange(rangeForCell);
+                break;
+        } 
+        
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
         selRange = me.getRangeWithFullInternalTags(selRange);
         

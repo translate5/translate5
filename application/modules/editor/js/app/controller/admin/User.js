@@ -137,7 +137,7 @@ Ext.define('Editor.controller.admin.User', {
    * handle after show of usergrid
    */
   handleAfterShow: function(grid) {
-      this.getHeadToolBar().down('#user-admin-btn').hide();
+      this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').hide();
     //set the value used for displaying the help pages
       Editor.data.helpSection = 'useroverview';
       Editor.data.helpSectionTitle = grid.getTitle();
@@ -146,7 +146,7 @@ Ext.define('Editor.controller.admin.User', {
    * handle after hide of usergrid
    */
   handleAfterHide: function() {
-      this.getHeadToolBar().down('#user-admin-btn').show();
+      this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').show();
   },
   /**
    * opens the task grid, hides all other
@@ -170,7 +170,7 @@ Ext.define('Editor.controller.admin.User', {
       }
   },
   handleInitEditor: function() {
-      this.getHeadToolBar().down('#user-admin-btn').hide();
+      this.getHeadToolBar() && this.getHeadToolBar().down('#user-admin-btn').hide();
   },
   /**
    * Handles the different user action on the action column

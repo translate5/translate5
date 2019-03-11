@@ -63,7 +63,7 @@ Ext.define('Editor.controller.Termportal', {
      * hide the termportal button when editor is opened
      */
     onEditorViewportOpen:function(){
-        this.getHeadToolBar().down('#btnTermPortal').setHidden(true);
+        this.getHeadToolBar() && this.getHeadToolBar().down('#btnTermPortal').setHidden(true);
     },
 
     /**
