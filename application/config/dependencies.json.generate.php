@@ -259,6 +259,25 @@ $dep->dependencies = [[
             "license" => "MIT",
             "relpath" => "docs/third-party-licenses/Simple-Cache-license.md"
         ]]
+    ],[
+        "name" => "OpenID-Connect-PHP",
+        "label" => "OpenID-Connect-PHP",
+        "version" => "0.8.0",
+        "url" => "RELEASE:OpenID-Connect-PHP.zip",
+        "target" => "library/OpenID-Connect-PHP/",
+        "licenses" => [[
+            "uses" => "Composer",
+            "license" => "Expat",
+            "relpath" => "docs/third-party-licenses/OpenID-Connect-PHP-Composer-license.txt"
+        ],[
+            "uses" => "OpenID Connect PHP",
+            "license" => "Apache License 2.0",
+            "relpath" => "docs/third-party-licenses/OpenID-Connect-PHP-license.txt"
+        ],[
+            "uses" => "phpseclib - PHP Secure Communications Library",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/OpenID-Connect-PHP-phpseclib-license.txt"
+        ]]
     ]
 ];
 

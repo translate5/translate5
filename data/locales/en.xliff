@@ -302,9 +302,9 @@
                 <source>Zieltext &#xFC;berarbeitet</source>
                 <target state="needs-review-adaptation">Target text reworked</target>
             </trans-unit>
-            <trans-unit id="QXV0b3N0YXR1cw==">
-                <source>Autostatus</source>
-                <target state="needs-review-adaptation">Autostatus</target>
+            <trans-unit id="QmVhcmJlaXR1bmdzc3RhdHVz">
+                <source>Bearbeitungsstatus</source>
+                <target state="needs-review-adaptation">Processing status</target>
             </trans-unit>
             <trans-unit id="QXVzZ2FuZ3N0ZXh0">
                 <source>Ausgangstext</source>
