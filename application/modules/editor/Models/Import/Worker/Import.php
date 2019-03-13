@@ -224,7 +224,7 @@ class editor_Models_Import_Worker_Import {
      * 
      * If this function is once called with "false", the addup-process will be canceled for the whole import-process
      * 
-     * @param int or boolean false $count
+     * @param int or bool false $count
      */
     private function countWords($count)
     {
