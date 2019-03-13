@@ -245,9 +245,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       }
       $this->view->Php2JsVars()->set('maintenance.startDate',$startDate);
       //maintenance warning panel is showed
-      $this->view->Php2JsVars()->set('maintenance.timeToNotify',isset($rop->maintenance->timeToNotify)?$rop->maintenance->timeToNotify:'');
+      $this->view->Php2JsVars()->set('maintenance.timeToNotify', $rop->maintenance->timeToNotify ?? '');
       //minutes before the point in time of the update the application is locked for new log-ins
-      $this->view->Php2JsVars()->set('maintenance.timeToLoginLock',isset($rop->maintenance->timeToLoginLock)?$rop->maintenance->timeToLoginLock:'');
+      $this->view->Php2JsVars()->set('maintenance.timeToLoginLock', $rop->maintenance->timeToLoginLock ??'');
       
       $this->view->Php2JsVars()->set('messageBox.delayFactor', $rop->messageBox->delayFactor);
       
