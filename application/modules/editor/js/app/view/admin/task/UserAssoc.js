@@ -75,6 +75,9 @@ Ext.define('Editor.view.admin.task.UserAssoc', {
               hidden: true,
               bodyPadding: 10,
               region: 'east',
+              defaults: {
+                  labelAlign: 'top'  
+              },
               items:[{
                   anchor: '100%',
                   xtype: 'combo',
