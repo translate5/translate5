@@ -1,30 +1,30 @@
 <?php
 /*
-START LICENSE AND COPYRIGHT
-
+ START LICENSE AND COPYRIGHT
+ 
  This file is part of translate5
  
  Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
-
+ 
  Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
-
+ 
  This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
- as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
- included in the packaging of this file.  Please review the following information 
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt
+ included in the packaging of this file.  Please review the following information
  to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
  http://www.gnu.org/licenses/agpl.html
-  
+ 
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or
  plugin-exception.txt in the root folder of translate5.
-  
+ 
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
  @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
-			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
-
-END LICENSE AND COPYRIGHT
-*/
+ http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+ 
+ END LICENSE AND COPYRIGHT
+ */
 
 class editor_Services_Microsoft_HttpApi {
     /**
@@ -42,7 +42,7 @@ class editor_Services_Microsoft_HttpApi {
     protected $apiKey;
     
     /***
-     * 
+     *
      * @var string
      */
     protected $apiUrl;
@@ -79,60 +79,71 @@ class editor_Services_Microsoft_HttpApi {
     
     /**
      * Search the api for given source/target language by domainCode
-     * 
+     *
      * @param string $text
      * @param string $sourceLang
      * @param string $targetLang
      * @return boolean
      */
     public function search($text,$sourceLang,$targetLang) {
-        try {
-            
-            $requestBody = array (
-                array (
+        
+        //set the default mode, only translation
+        $path="/translate?api-version=3.0";
+        //if it is dictonary lookup, change the path
+        if($this->isDictionaryLookup){
+            $path="/dictionary/lookup?api-version=3.0";
+        }
+        $params = "&from=".$sourceLang."&to=".$targetLang;
+        
+        try{
+            $requestBody =[
+                [
                     'Text' => $text,
-                ),
-            );
+                ]
+            ];
             $content = json_encode($requestBody);
             
-            $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
-                'Guid'
-                );
-            $guid=$guidHelper->create(true);
-            
-            $headers = "Content-type: application/json\r\n" .
-                "Content-length: " . strlen($content) . "\r\n" .
-                "Ocp-Apim-Subscription-Key:". $this->apiKey."\r\n" .
-                "X-ClientTraceId: " . $guid . "\r\n";
-            
-            // NOTE: Use the key 'http' even if you are making an HTTPS request. See:
-            // http://php.net/manual/en/function.stream-context-create.php
-            $options = array (
-                'http' => array (
-                    'header' => $headers,
-                    'method' => 'POST',
-                    'content' => $content
-                )
-            );
-            $context  = stream_context_create ($options);
-            
-            //set the default mode, only translation
-            $path="/translate?api-version=3.0";
-            
-            //if it is dictonary lookup, change the path
-            if($this->isDictionaryLookup){
-                $path="/dictionary/lookup?api-version=3.0";
-            }
-                
-            $url=$this->apiUrl.$path."&from=".$sourceLang."&to=".$targetLang;
-            $result = file_get_contents ($url, false, $context);
+            $result = $this->searchApi($path,$params, $content);
             
             return $this->processResponse($result);
-            
         } catch (Exception $e) {
             $this->badGateway($e);
             return false;
         }
+    }
+    
+    /***
+     * Query the microsoft api
+     * 
+     * @param string $path
+     * @param string $params
+     * @param string $content
+     * @return string
+     */
+    protected function searchApi($path,$params,$content) {
+        
+        $guidHelper = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
+            'Guid'
+            );
+        $guid=$guidHelper->create(true);
+        
+        $headers = "Content-type: application/json\r\n" .
+            "Content-length: " . strlen($content) . "\r\n" .
+            "Ocp-Apim-Subscription-Key: $this->apiKey\r\n" .
+            "X-ClientTraceId: " . $guid . "\r\n";
+        
+        // NOTE: Use the key 'http' even if you are making an HTTPS request. See:
+        // https://php.net/manual/en/function.stream-context-create.php
+        $options = array (
+            'http' => array (
+                'header' => $headers,
+                'method' => 'POST',
+                'content' => $content
+            )
+        );
+        $context  = stream_context_create ($options);
+        $result = file_get_contents ($this->apiUrl . $path . $params, false, $context);
+        return $result;
     }
     
     /** Check the api status
