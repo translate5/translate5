@@ -90,7 +90,9 @@ class editor_Services_Microsoft_HttpApi {
         //set the default mode, only translation
         $path="/translate?api-version=3.0";
         //if it is dictonary lookup, change the path
-        if($this->isDictionaryLookup){
+        
+        $isDirecotrLookup=$this->isValidDictionaryLookup($sourceLang, $targetLang);
+        if($isDirecotrLookup){
             $path="/dictionary/lookup?api-version=3.0";
         }
         $params = "&from=".$sourceLang."&to=".$targetLang;
@@ -104,10 +106,17 @@ class editor_Services_Microsoft_HttpApi {
             $content = json_encode($requestBody);
             
             $result = $this->searchApi($path,$params, $content);
-            
-            return $this->processResponse($result);
+            $result=$this->processResponse($result);
+            //if in directory lookup the result is empty, trigger a normal result so translation from microsoft is received
+            if(empty($this->result) && $isDirecotrLookup){
+                $path="/translate?api-version=3.0";
+                $result = $this->searchApi($path,$params,$content);
+                return $this->processResponse($result);
+            }
+            return $result;
         } catch (Exception $e) {
-            $this->badGateway($e);
+            error_log(print_r($e->getMessage(),1));
+            //$this->badGateway($e);
             return false;
         }
     }
@@ -144,6 +153,18 @@ class editor_Services_Microsoft_HttpApi {
         $context  = stream_context_create ($options);
         $result = file_get_contents ($this->apiUrl . $path . $params, false, $context);
         return $result;
+    }
+    
+    /***
+     * Check if it is valid direcory lookup for the given language combination.
+     * The microsoft translator supports only from en or to en directory lookup.
+     * More info: https://docs.microsoft.com/en-us/azure/cognitive-services/Translator/language-support
+     * @param string $sourceLang
+     * @param string $targetLang
+     * @return boolean
+     */
+    protected function isValidDictionaryLookup($sourceLang,$targetLang){
+        return $this->isDictionaryLookup && (mb_substr(strtolower($sourceLang), 0,2)=='en' || mb_substr(strtolower($targetLang), 0,2)=='en');
     }
     
     /** Check the api status
