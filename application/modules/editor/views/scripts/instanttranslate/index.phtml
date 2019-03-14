@@ -72,12 +72,8 @@
     <div id="logo"></div>
 <?php 
 
-    $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-    /* @var $userModel ZfExtended_Models_User */
-    $isUserAllowed=$userModel->isAllowed("editor_termportal","all");
-    
     //check if the user is allowed to acces the term portal
-    if($isUserAllowed){
+    if($this->isUserTermportalAllowed){
         echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("Terminologieportal").'</a></div>';
     }else{
         echo '<div id="termPortalButtonContainer"></div>';
