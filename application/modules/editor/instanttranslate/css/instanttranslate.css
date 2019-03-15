@@ -370,17 +370,17 @@ table.translationsForLabel progress {
   bottom: 1px;
 }
 .term-info {
-  left: 25px;
+left: 45px;
   bottom: 0px;
   padding: 0px 4px;
 }
 .process-status-attribute{
-  left: 63px;
+  left: 63px;  
   bottom: 0px;
   padding: 0px 4px;
 }
 .term-status {
-  left: 45px;
+  left: 25px;
   bottom: 0px;
   padding: 0px 4px;
 }

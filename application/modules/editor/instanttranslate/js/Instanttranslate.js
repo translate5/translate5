@@ -557,14 +557,15 @@ function renderTranslationContainer(resultData) {
     translationsContainer += '<div class="copyable">';
     translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
+    
+    if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
+        translationsContainer += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
+    }
+    
     if (resultData.term != '' && Editor.data.isUserTermportalAllowed) {
     	//check if for the current term the rfc language value is set, if yes set data property so the language is used in the term portal
     	var languageRfc=resultData.languageRfc ? ('data-languageRfc="'+resultData.languageRfc+'"') : '';
         translationsContainer += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
-    }
-    
-    if (resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
-        translationsContainer += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
     }
     
     if (resultData.termStatus != '') {
