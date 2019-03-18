@@ -395,10 +395,16 @@ class editor_TaskController extends ZfExtended_RestController {
             //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
             $this->data['autoStartImport'] = true;
         }
-        $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
-        $pm->init((array)$this->user->data);
+        if(empty($this->data['pmGuid']) || !$this->isAllowed('frontend','editorEditTaskPm')) {
+            $this->data['pmGuid'] = $this->user->data->userGuid;
+            $pm->init((array)$this->user->data);
+        }
+        else {
+            //TODO test what happens with new error logging if PM does not exist? 
+            $pm->loadByGuid($this->data['pmGuid']);
+        }
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
         $this->convertToLanguageIds();
