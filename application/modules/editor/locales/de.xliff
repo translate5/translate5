@@ -1874,6 +1874,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='T3BlbklkIE9BdXRoIFVSTA=='><source>OpenId OAuth URL</source><target>OpenId OAuth URL</target></trans-unit>
 <trans-unit id='VmVybGlua3RlciBUZXh0IExvZ2luc2VpdGU='><source>Verlinkter Text Loginseite</source><target>Verlinkter Text Loginseite</target></trans-unit>
 <trans-unit id='QW5tZWxkZXNlaXRlIG5pY2h0IGFuemVpZ2VuOiBBdXRvbWF0aXNjaCB6dW0gT3BlbklEIENvbm5lY3QtU2VydmVyIHVtbGVpdGVuLCB3ZW5uIGtlaW5lIEJlbnV0emVyc2l0enVuZyBpbiB0cmFuc2xhdGU1IHZvcmhhbmRlbiBpc3QuIFdlbm4gZGllc2UgQ2hlY2tib3ggbmljaHQgYWt0aXZpZXJ0IGlzdCwgd2lyZCBkZXIgaW0gdW50ZW5zdGVoZW5kZW4gVGV4dGZlbGQgZGVmaW5pZXJ0ZSBUZXh0IGF1ZiBkZXIgTG9naW5zZWl0ZSB2b24gdHJhbnNsYXRlNSBtaXQgZGVtIE9wZW5JRCBDb25uZWN0IFNlcnZlciB2ZXJsaW5rdC4='><source>Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.</source><target>Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.</target></trans-unit>
+<trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>Ansichtsmodus</target></trans-unit>
   </body>
  </file>
 </xliff>
