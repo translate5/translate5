@@ -419,6 +419,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.spellCheckInProgressID = spellCheckProcessID;
         me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
         
+        // TrackChanges must remove it's placeholders.
+        me.fireEvent('removePlaceholdersInEditor');
+        
         // where is the caret at the moment?
         me.bookmarkForCaret = me.getPositionOfCaret();
         
