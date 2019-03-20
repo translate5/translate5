@@ -42,9 +42,8 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
      * @param editor_Models_SegmentFieldManager $sfm
      */
     public function __construct(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment) {
-        $this->entity = $segment;
         $this->segmentFieldManager = $sfm;
-        parent::__construct();
+        parent::__construct($segment);
     }
     
     /**
