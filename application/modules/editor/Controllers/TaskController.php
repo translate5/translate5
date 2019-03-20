@@ -544,6 +544,7 @@ class editor_TaskController extends ZfExtended_RestController {
         copy($oldTaskPath, $copy);
         
         $data = (array) $this->entity->getDataObject();
+        $oldTaskGuid=$data['taskGuid'];
         unset($data['id']);
         unset($data['taskGuid']);
         unset($data['state']);
@@ -560,6 +561,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         if($this->validate()) {
             $this->processUploadedFile();
+            $this->cloneLanguageResources($oldTaskGuid,$this->entity->getTaskGuid());
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
@@ -1161,6 +1163,29 @@ class editor_TaskController extends ZfExtended_RestController {
         $e->setErrors($errors);
         $this->view->validTrigger = $this->workflow->getDirectTrigger();
         $this->handleValidateException($e);
+    }
+
+    /***
+     * Clone existing language resources from oldTaskGuid for newTaskGuid.
+     */
+    protected function cloneLanguageResources(string $oldTaskGuid,string $newTaskGuid){
+        try{
+
+            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+            /* @var $model editor_Models_LanguageResources_Taskassoc */
+            $assocs=$model->loadByTaskGuids([$oldTaskGuid]);
+            if(empty($assocs)){
+                return;
+            }
+            foreach($assocs as $assoc){
+                unset($assoc['id']);
+                $assoc['taskGuid']=$newTaskGuid;
+                $model->init($assoc);
+                $model->save();
+            }
+        }catch(ZfExtended_Models_Entity_NotFoundException $e){
+            return;
+        }
     }
     
 }
