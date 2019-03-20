@@ -323,7 +323,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //saving history directly before normal saving, 
         // so no exception between can lead to history entries without changing the master segment
         $history->save();
-        $this->entity->setTimestamp(null); //see TRANSLATE-922
+        $this->entity->setTimestamp(NOW_ISO); //see TRANSLATE-922
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         
