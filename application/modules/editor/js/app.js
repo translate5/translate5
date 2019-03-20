@@ -154,10 +154,10 @@ Ext.application({
               });
           };
       Ext.EventManager.on(window, 'beforeunload', function() {
-          notRun && logout();
+          Editor.data.logoutOnWindowClose && notRun && logout();
       });
       Ext.EventManager.on(window, 'unload', function() {
-          notRun && logout();
+          Editor.data.logoutOnWindowClose && notRun && logout();
       });
   },
   /**
@@ -378,6 +378,7 @@ Ext.application({
           // Create the form
           form = Ext.DomHelper.append(Ext.getBody(), formSpec);
 
+      Editor.data.logoutOnWindowClose = false;
       form.submit();
   },
   browserAdvice: function() {
