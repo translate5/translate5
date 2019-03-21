@@ -169,7 +169,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             plug,
             editor;
-        me.consoleLog('- SpellCheck: initEditor.');
+        me.consoleLog('SpellCheck: initEditor.');
         // Initialize Editor in general:
         plug = me.getSegmentGrid().editingPlugin;
         editor = plug.editor;           // → this is the row editor component;
@@ -262,7 +262,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     startTimerForSpellCheck: function() {
         var me = this;
-        if (me.isSupportedLanguage === false) {
+        if (!me.isSupportedLanguage) {
             me.consoleLog('startTimerForSpellCheck not started because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
@@ -295,6 +295,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     handleKeyDown: function(event) {
         var me = this;
         me.consoleLog('SpellCheck: handleKeyDown...');
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('handleKeyDown stopped because language is not supported or SpellCheck-Tool does not run.');
+            return;
+        }
         me.initKeyDownEvent(event);
         if(me.eventHasToBeIgnored() || me.eventIsCtrlV()){ // CTRL+V: SpellCheck will run anyway after insert markup (afterInsertMarkup); don't start it twice
             me.consoleLog(" => Ignored for SpellCheck.");
@@ -376,7 +380,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         // Stop if the language is not supported (or we cannot tell yet) or the tool does not run.
-        if (me.isSupportedLanguage !== true) {
+        if (!me.isSupportedLanguage) {
             me.consoleLog('(SpellCheck:) handleAfterContentUpdate => NO SpellCheck; the language is not supported or the SpellCheck-Tool does not run.');
             return;
         }
@@ -409,7 +413,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             spellCheckProcessID,
             editorContentAsText;
         
-        if (me.isSupportedLanguage !== true) { // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
+        if (!me.isSupportedLanguage) { // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
             me.consoleLog('startSpellCheck failed eg because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
@@ -462,6 +466,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     terminateSpellCheck: function() {
         var me = this;
         me.consoleLog('terminateSpellCheck.');
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('terminateSpellCheck stopped eg because language is not supported or SpellCheck-Tool does not run.');
+            return;
+        }
         clearTimeout(me.editIdleTimer);
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
@@ -485,8 +493,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         if (!me.allMatchesOfTool.length > 0) {
-            me.consoleLog('allMatchesOfTool: no results.');
-            me.cleanSpellCheckMarkupInEditor(); // in case there have been results marked before
+            me.consoleLog('allMatchesOfTool: no errors.');
+            me.cleanSpellCheckMarkupInEditor(); // in case there have been errors marked before
             me.bookmarkForCaret = null;
             me.finishSpellCheck(spellCheckProcessID);
             return;
@@ -751,7 +759,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             editorBody = me.getEditorBody();
         editorBody.spellcheck = (me.isSupportedLanguage === true) ? false : true;
-        me.consoleLog('- Browser-Spellcheck is set to: ' + editorBody.spellcheck + '.');
+        me.consoleLog('Browser-Spellcheck is set to: ' + editorBody.spellcheck + '.');
     },
     /**
      * Inject CSS into the Editor
