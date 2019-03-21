@@ -82,6 +82,7 @@ Ext.define('Editor.util.SegmentEditorSnapshots', {
         me.removeNewerSnapshots(); // delete newer items if there are any.
         me.editorSnapshotHistory.push({content: contentForSnaphot, bookmark: bookmarkForSnapshot});
         me.editorSnapshotReference = me.editorSnapshotHistory.length - 1;
+    	me.consoleLog("snapshot saved");
     },
     /**
      * Return the content of the newest snaphot-item.
@@ -140,13 +141,33 @@ Ext.define('Editor.util.SegmentEditorSnapshots', {
      */ 
     restoreSnapshotInEditor: function() {
         var me = this,
-            currentSnapshot = me.editorSnapshotHistory[me.editorSnapshotReference],
-            selectionForSnapshot = rangy.getSelection(me.getEditorBody());
+            currentSnapshot = me.editorSnapshotHistory[me.editorSnapshotReference];
         if (currentSnapshot != undefined) {
+        	me.consoleLog("restore snapshot (content)...");
             me.getEditorBodyExtDomElement().setHtml(currentSnapshot.content);
-            selectionForSnapshot.moveToBookmark(currentSnapshot.bookmark);
+            me.restorePositionOfCaret(currentSnapshot.bookmark);
         } else {
             me.consoleLog("currentSnapshot does not exist for editorSnapshotReference = " + me.editorSnapshotReference);
+        }
+    },
+    /**
+     * Move the cursor to the position of the bookmark.
+     */
+    restorePositionOfCaret: function(bookmark) {
+        var me = this,
+        	editorBody = me.getEditorBody(),
+        	selectionForSnapshot = rangy.getSelection(editorBody),
+            rangeForCaret;
+    	me.consoleLog("restore snapshot (caret)...");
+        if (bookmark.rangeBookmarks.length === 0) {
+        	// The first snapshot after opening a segment does not always recognize a position of the cursor in the Editor.
+        	// Workaround: If no bookmark is given, we place the cursor at the beginning of the editor (= this is where the cursor is after opening a segment).
+        	rangeForCaret = rangy.createRange();
+        	rangeForCaret.selectNodeContents(editorBody);
+        	rangeForCaret.collapse(true);
+        	selectionForSnapshot.setSingleRange(rangeForCaret);
+        } else {
+        	selectionForSnapshot.moveToBookmark(bookmark);
         }
     },
     /**
