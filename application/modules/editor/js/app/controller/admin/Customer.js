@@ -344,7 +344,6 @@ Ext.define('Editor.controller.admin.Customer', {
         if (!me.getCustomerSwitch()) {
             return;
         }
-        console.log("setCustomerSwitchValue for customerId: " + val);
         me.getCustomerSwitch().setValue(val);
     },
 
