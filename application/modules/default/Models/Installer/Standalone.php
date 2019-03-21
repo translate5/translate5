@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 8;
+    const INSTALLER_VERSION = 9;
     
     /**
      * @var string
