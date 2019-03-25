@@ -162,7 +162,6 @@ Ext.define('Editor.controller.SnapshotHistory', {
     		return;
     	}
         if (me.editorSnapshotHistory == null) {
-        	debugger; // TODO: remove 'debugger', is for testing only
             me.initSnapshotHistory();
         }
         if (me.editorBodyExtDomElement == null) {
