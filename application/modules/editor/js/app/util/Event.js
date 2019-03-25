@@ -214,9 +214,9 @@ Ext.define('Editor.util.Event', {
                         // Caution: ALL DIGITS without alt and without ctrl ARE handled by keyMapConfig, but only for checking the handleDigit()-procedure.
                         if (Ext.Array.contains(me.editor.DEC_DIGITS,bindedKey)) {
                             isHandledByKeyMapConfig = (bindings[index].defaultEventAction == 'stopEvent');
-                            me.consoleLog("(is DEC_DIGITS; defaultEventAction checked => track: " + !isHandledByKeyMapConfig + ".)");
+                            me.consoleLog("(is DEC_DIGITS; defaultEventAction checked; handled by keyMapConfig?: " + isHandledByKeyMapConfig + ".)");
                         } else {
-                            me.consoleLog("(see keyMapConfig => track nothing.)");
+                            me.consoleLog("(handled by keyMapConfig, see there for what it does.)");
                             isHandledByKeyMapConfig = true;
                         }
                     }

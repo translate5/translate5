@@ -44,8 +44,9 @@ Ext.define('Editor.controller.Editor', {
         'Editor.controller.editor.PrevNextSegment',
         'Editor.view.task.ConfirmationWindow'
     ],
-    mixins: ['Editor.util.Range'
-        ],
+    mixins: ['Editor.util.Event',
+        	 'Editor.util.Range'
+    ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
         segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
@@ -86,6 +87,9 @@ Ext.define('Editor.controller.Editor', {
             '#Editor.$application': {
                 editorViewportClosed: 'onCloseEditorViewport',
                 editorViewportOpened: 'onOpenEditorViewport'
+            },
+            '#QmSubSegments': {
+            	afterInsertMqmTag: 'handleAfterContentChange'
             }
         },
         component: {
@@ -94,7 +98,8 @@ Ext.define('Editor.controller.Editor', {
             },
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
-                contentErrors: 'handleSaveWithErrors'
+                contentErrors: 'handleSaveWithErrors',
+                afterInsertMarkup: 'handleAfterContentChange'
             },
             'roweditor': {
                 destroy: 'handleDestroyRoweditor'
@@ -140,6 +145,8 @@ Ext.define('Editor.controller.Editor', {
             'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
             'ctrl-g':         ["G",{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-z':         ["Z",{ctrl: true, alt: false}, me.undo],
+            'ctrl-y':         ["Y",{ctrl: true, alt: false}, me.redo],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -431,6 +438,9 @@ Ext.define('Editor.controller.Editor', {
             binding: me.getKeyMapConfig()
         });
         editor.DEC_DIGITS = me.DEC_DIGITS;
+
+        docEl.on('keyup', me.handleKeyUp, me, {priority: 9999, delegated: false});
+        
         docEl.on('paste', function(e){
             e.stopPropagation();
             e.preventDefault();
@@ -535,6 +545,39 @@ Ext.define('Editor.controller.Editor', {
             me.fireEvent('prepareTrackChangesForSaving');
             me.fireEvent('saveSegment');
         }
+    },
+    /**
+     * Handler for CTRL+X
+     */
+    undo: function() {
+        this.fireEvent('undo'); // see SnapshotHistory
+    },
+    /**
+     * Handler for CTRL+Y
+     */
+    redo: function() {
+        this.fireEvent('redo'); // see SnapshotHistory
+    },
+    /**
+     * handleAfterContentChange: save snapshot.
+     */
+    handleAfterContentChange: function() {
+    	this.fireEvent('saveSnapshot'); // see SnapshotHistory
+    },
+    /**
+     * After keyboard-event: handleAfterContentChange if event is not to be ignored.
+     * ('change'-event from segmentsHtmleditor does not work; is not really envoked when we need it!)
+     * @param event
+     */
+    handleKeyUp: function(event) {
+        var me = this
+        	me.event = event; // Editor.util.Event
+	    // Ignore 
+        // - keys that don't produce content (strg,alt,shift itself, arrows etc)
+        // - keys that must not change the content in the Editor (e.g. strg-z will not always do what the user expects)
+	    if (!me.eventIsCtrlZ() && !me.eventIsCtrlY() && !me.eventHasToBeIgnored() && !me.eventHasToBeIgnoredAndStopped()) {
+	    	me.handleAfterContentChange();
+	    }
     },
     /**
      * Special Universal preparation Handler for pressing DIGIT keys
