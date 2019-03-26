@@ -55,6 +55,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
         controller: {
             '#Editor': {
             	saveSnapshot: 'saveSnapshot',
+            	updateSnapshotBookmark: 'updateSnapshotBookmark',
                 undo: 'undo',
                 redo: 'redo'
             },
@@ -159,7 +160,6 @@ Ext.define('Editor.controller.SnapshotHistory', {
     saveSnapshot: function() {
         var me = this,
             contentForSnaphot,
-            selectionForSnapshot,
             bookmarkForSnapshot;
     	if(!me.editorSnapshotHistoryActived) {
     		return;
@@ -176,13 +176,24 @@ Ext.define('Editor.controller.SnapshotHistory', {
             me.consoleLog("saveSnapshot: no snapshop saved because the content is not new."); 
             return;
         }
-        selectionForSnapshot = rangy.getSelection(me.getEditorBody());
-        bookmarkForSnapshot = selectionForSnapshot.getBookmark(me.getEditorBody());
+        bookmarkForSnapshot = me.getCurrentBookmark();
         me.removeNewerSnapshots(); // delete newer items if there are any.
         me.editorSnapshotHistory.push({content: contentForSnaphot, bookmark: bookmarkForSnapshot});
         me.editorSnapshotReference = me.editorSnapshotHistory.length - 1;
     	me.consoleLog("~~~~~~~~ SNAPSHOTHISTORY: snapshot saved (me.editorSnapshotReference: " + me.editorSnapshotReference + ')');
     	me.consoleLog(me.editorSnapshotHistory);
+    },
+    /**
+     * Save the new position of the cursor in the current bookmark.
+     * (We don't check if the current position is the same as before in order to save time.)
+     */
+    updateSnapshotBookmark: function() {
+    	var me = this;
+    	if(!me.editorSnapshotHistoryActived) {
+    		return;
+    	}
+		me.editorSnapshotHistory[me.editorSnapshotReference].bookmark = me.getCurrentBookmark();
+    	me.consoleLog('~~~~~~~~SNAPSHOTHISTORY:  position of cursor updated.');
     },
     /**
      * Emulate CTRL+Z: Restore older snapshot.
@@ -208,6 +219,18 @@ Ext.define('Editor.controller.SnapshotHistory', {
     	me.consoleLog('~~~~~~~~ SNAPSHOTHISTORY: redo');
         me.fastforwardSnapshot();
         me.restoreSnapshotInEditor();
+    },
+    
+    // =========================================================================
+    // Internal helpers.
+    // =========================================================================
+    
+    /**
+     * Where is the cursor in the Editor?
+     */
+    getCurrentBookmark: function() {
+    	var me = this;
+        return rangy.getSelection(me.getEditorBody()).getBookmark(me.getEditorBody());
     },
     /**
      * Return the content of the newest snaphot-item.

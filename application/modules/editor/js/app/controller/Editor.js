@@ -440,6 +440,8 @@ Ext.define('Editor.controller.Editor', {
         editor.DEC_DIGITS = me.DEC_DIGITS;
 
         docEl.on('keyup', me.handleKeyUp, me, {priority: 9999, delegated: false});
+        docEl.on('mouseup', me.handleMouseUp, me, {priority: 9999, delegated: false});
+        docEl.on('singletap', me.handleMouseUp, me, {priority: 9999, delegated: false});
         
         docEl.on('paste', function(e){
             e.stopPropagation();
@@ -565,19 +567,39 @@ Ext.define('Editor.controller.Editor', {
     	this.fireEvent('saveSnapshot'); // see SnapshotHistory
     },
     /**
-     * After keyboard-event: handleAfterContentChange if event is not to be ignored.
+     * handleAfterCursorMove: save new position of cursor if necessary.
+     */
+    handleAfterCursorMove: function() {
+    	this.fireEvent('updateSnapshotBookmark'); // see SnapshotHistory
+    },
+    /**
+     * After keyboard-event: handle changes if event is not to be ignored.
      * ('change'-event from segmentsHtmleditor does not work; is not really envoked when we need it!)
      * @param event
      */
     handleKeyUp: function(event) {
         var me = this
         	me.event = event; // Editor.util.Event
-	    // Ignore 
+	    // New content? 
+        // Ignore 
         // - keys that don't produce content (strg,alt,shift itself, arrows etc)
         // - keys that must not change the content in the Editor (e.g. strg-z will not always do what the user expects)
 	    if (!me.eventIsCtrlZ() && !me.eventIsCtrlY() && !me.eventHasToBeIgnored() && !me.eventHasToBeIgnoredAndStopped()) {
 	    	me.handleAfterContentChange();
+	    	return;
 	    }
+	    // New position of cursor?
+	    if (me.eventIsArrowKey()) {
+	    	me.handleAfterCursorMove();
+	    	return;
+	    }
+    },
+    /**
+     * After mouse-click.
+     */
+    handleMouseUp: function() {
+        var me = this;
+        me.handleAfterCursorMove();
     },
     /**
      * Special Universal preparation Handler for pressing DIGIT keys
