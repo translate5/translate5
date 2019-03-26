@@ -139,10 +139,13 @@ Ext.define('Editor.controller.SnapshotHistory', {
     /**
      * Initialize the snapshot-history and save first snapshot.
      */ 
-    initSnapshotHistory: function() {
+    initSnapshotHistory: function(editor) {
         var me = this;
     	if(!me.editorSnapshotHistoryActived) {
     		return;
+    	}
+    	if(me.editor == null) {
+    		me.init(editor);
     	}
         me.consoleLog('~~~~~~~~ Initialize Snapshot-History.');
         me.editorSnapshotHistory = [];
