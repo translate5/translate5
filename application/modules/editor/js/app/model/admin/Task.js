@@ -77,6 +77,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'qmSubEnabled', type: 'boolean'},
     {name: 'qmSubFlags', type: 'auto'},
     {name: 'qmSubSeverities', type: 'auto'},
+    {name: 'lastErrors', type: 'auto'},
     {name: 'emptyTargets', type: 'boolean', persist: false},
     {name: 'userState', type: 'string', isEqual: function() {
       return false;

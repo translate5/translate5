@@ -289,7 +289,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
                   if(rec.isImporting() || rec.isErroneous()) {
                       addQtip(meta, me.errorTipTpl.apply(rec.get('lastErrors')));
-                      return rec.get('state'); //FIXME better output here with fixing worker error handling
+                      return rec.get('state');
                   }
                   if(rec.isLocked() && rec.isCustomState()) {
                       addQtip(meta, Ext.String.format(me.strings.lockedSystem, rec.get('state')));
