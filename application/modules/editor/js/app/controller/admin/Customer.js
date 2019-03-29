@@ -330,7 +330,6 @@ Ext.define('Editor.controller.admin.Customer', {
         if (!this.handleFiltering) {
             return;
         }
-        console.log('---- resetCustomerSwitch ----');
         if(Ext.ComponentQuery.query('#customerSwitch')[0]){
              Ext.ComponentQuery.query('#customerSwitch')[0].setValue('0');
         }
@@ -421,11 +420,9 @@ Ext.define('Editor.controller.admin.Customer', {
                 if (val == '' && gridId != grid.getId()) {
                     gridToCheck = Ext.ComponentQuery.query(gridId)[0];
                     val = me.getCustomerFilterValInGrid(gridToCheck);
-                    console.log('- ' + gridId + ' val : ' + val);
                 }
             });
         }
-        console.log(grid.getId() + ': onGridAfterRender (val: ' + val + ')');
         if (val != '') {
             me.setGridFilter(grid,val);
         }
@@ -441,7 +438,6 @@ Ext.define('Editor.controller.admin.Customer', {
             return;
         }
         val = me.getCustomerName(me.getCustomerSwitchValue());
-        console.log('onCustomerSwitchSelect: ' + me.getCustomerSwitchValue() + '/' + val);
         me.setCustomerFilterForAllGrids(val,me.customerSwitchId);
     },
 
@@ -456,7 +452,6 @@ Ext.define('Editor.controller.admin.Customer', {
             tasksGrid = Ext.ComponentQuery.query('#adminTaskGrid')[0],
             usersGrid = Ext.ComponentQuery.query('#adminUserGrid')[0],
             languageResourcesGrid = Ext.ComponentQuery.query('#tmOverviewPanel')[0];
-        console.log('=> OK, setCustomerFilterForAllGrids mit val: ' + val + ' / from: ' + from);
         me.beforeStoreFiltering();
         me.setGridFilter(tasksGrid,val);
         me.setGridFilter(usersGrid,val);
@@ -468,7 +463,6 @@ Ext.define('Editor.controller.admin.Customer', {
      * [Multitenancy:] Internal settings before the stores are being filtered.
      */
     beforeStoreFiltering: function() {
-        console.log('****** beforeStoreFiltering *******');
         this.handleFiltering = false;
     },
 
@@ -476,7 +470,6 @@ Ext.define('Editor.controller.admin.Customer', {
      * [Multitenancy:] Internal "resets" after the stores have been filtered.
      */
     afterStoreFiltering: function() {
-        console.log('****** afterStoreFiltering *******');
         this.isFromGridFilter = false;
         this.handleFiltering = true;
     },
@@ -501,11 +494,9 @@ Ext.define('Editor.controller.admin.Customer', {
             sorters.clear();
         }
         if (val == '') {
-            console.log('GRID ' + grid.getId() + ' remove customer-filter');
             customerColumn = grid.columnManager.getHeaderByDataIndex(customerColumnName);
             customerColumn.filter.setActive(false);
         } else {
-            console.log('GRID ' + grid.getId() + ' add customer-filter');
             gridFilters.addFilters([{
                 type: 'customer',
                 dataIndex: customerColumnName,
