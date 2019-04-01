@@ -468,14 +468,18 @@ Ext.define('Editor.controller.Editor', {
                         && me.lastClipboardData != ''
                         && clipboardData != me.lastClipboardData) {
                     data = clipboardData;
+                    me.copiedContentFromSource = null;
+                    me.lastCopiedFromSourceData = '';
+                } else {
+                    me.lastCopiedFromSourceData = me.copiedContentFromSource.selDataHtml;
                 }
-                me.lastCopiedFromSourceData = me.copiedContentFromSource.selDataHtml;
                 editor.insertMarkup(data);
             } else {
                 editor.insertAtCursor(clipboardData);
             }
             me.lastClipboardData = clipboardData;
         }, me, {delegated: false});
+        
         if(me.editorTooltip){
             me.editorTooltip.setTarget(editor.getEditorBody());
             me.editorTooltip.targetIframe = editor.iframeEl;
