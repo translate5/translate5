@@ -54,10 +54,15 @@ Ext.define('Editor.controller.SnapshotHistory', {
     listen: {
         controller: {
             '#Editor': {
-            	saveSnapshot: 'saveSnapshot',
+                activateSnapshotHistory: 'activateSnapshotHistory',
+                // ----------------------------------------------------------------------------
+                // pls try to control the following four main SnapshotHistory-events completely 
+                // via the Editor-Controller, not from different places around the code:
+            	saveSnapshot: 'saveSnapshot', 
             	updateSnapshotBookmark: 'updateSnapshotBookmark',
                 undo: 'undo',
                 redo: 'redo'
+                // ----------------------------------------------------------------------------
             },
             '#Editor.plugins.SpellCheck.controller.Editor': {
             	activateSnapshotHistory: 'activateSnapshotHistory'
@@ -68,8 +73,10 @@ Ext.define('Editor.controller.SnapshotHistory', {
         },
         component:{
             'segmentsHtmleditor': {
-                initialize: 'init',
-                push: 'initSnapshotHistory'
+                initialize: 'init'
+            },
+            '#segmentgrid': {
+                beforeedit: 'initSnapshotHistory' // start new everytime we open a segment
             }
         }
     },
@@ -97,7 +104,6 @@ Ext.define('Editor.controller.SnapshotHistory', {
     	}
     	me.editor = editor;
     	me.editorBodyExtDomElement = me.getEditorBodyExtDomElement();
-        me.initSnapshotHistory();
     },
     /***
      * Use this function to get the editor
@@ -151,7 +157,6 @@ Ext.define('Editor.controller.SnapshotHistory', {
         me.consoleLog('~~~~~~~~ Initialize Snapshot-History.');
         me.editorSnapshotHistory = [];
         me.editorSnapshotReference = null;
-        me.saveSnapshot();
     	me.consoleLog(me.editorSnapshotHistory);
     },
     /**

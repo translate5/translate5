@@ -99,7 +99,8 @@ Ext.define('Editor.controller.Editor', {
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
                 contentErrors: 'handleSaveWithErrors',
-                afterInsertMarkup: 'handleAfterContentChange'
+                afterInsertMarkup: 'handleAfterContentChange',
+                afterSetValueAndMarkup: 'handleAfterContentChange'
             },
             'roweditor': {
                 destroy: 'handleDestroyRoweditor'
@@ -443,6 +444,9 @@ Ext.define('Editor.controller.Editor', {
         docEl.on('mouseup', me.handleMouseUp, me, {priority: 9999, delegated: false});
         docEl.on('singletap', me.handleMouseUp, me, {priority: 9999, delegated: false});
         
+        // Paste does not reach the browser's clipboard-functionality,
+        // so we need our own SnapshotHistory for handling CTRL+Z and CTRL+Y.
+        me.fireEvent('activateSnapshotHistory');
         docEl.on('paste', function(e){
             e.stopPropagation();
             e.preventDefault();
@@ -473,9 +477,11 @@ Ext.define('Editor.controller.Editor', {
                 } else {
                     me.lastCopiedFromSourceData = me.copiedContentFromSource.selDataHtml;
                 }
-                editor.insertMarkup(data);
+                editor.insertMarkup(data); 
+                // handleAfterContentChange() is triggered from THERE
             } else {
                 editor.insertAtCursor(clipboardData);
+                me.handleAfterContentChange();
             }
             me.lastClipboardData = clipboardData;
         }, me, {delegated: false});

@@ -197,6 +197,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
       me.statusStrip.updateSegment(segment, fieldName);
+      me.fireEvent('afterSetValueAndMarkup');
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
