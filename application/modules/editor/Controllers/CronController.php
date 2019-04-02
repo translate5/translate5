@@ -87,7 +87,7 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
         foreach($workflows as $wfId => $cls) {
             $workflow = $wfm->get($wfId);
             /* @var $workflow editor_Workflow_Abstract */
-            //$workflow->doCronDaily();
+            $workflow->doCronDaily();
         }
 
         $summary = ZfExtended_Factory::get('ZfExtended_Logger_Summary');
