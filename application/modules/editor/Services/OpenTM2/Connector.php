@@ -493,7 +493,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     protected function throwBadGateway() {
         $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setOrigin('LanguageResources');
+        $e->setDomain('LanguageResources');
         $e->setErrors($this->api->getErrors());
         throw $e;
     }
