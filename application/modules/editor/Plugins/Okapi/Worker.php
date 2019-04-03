@@ -125,7 +125,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         $relFile = mb_strpos($absFile, $tmpImport);
         $relFile = mb_substr($absFile, $relFile + strlen($tmpImport));
         // in case of an exception we just ignore that file, log it, and proceed with the import
-        $logger->warn('E1058', 'Okapi Plug-In: Error in converting a file: "{message}" on converting file {file}', [
+        $logger->warn('E1058', 'Okapi Plug-In: Error in converting file {file}. See log details for more information.', [
             'task' => $this->task,
             'message' => get_class($e).': '.$e->getMessage(),
             'fileId' => $fileId,
