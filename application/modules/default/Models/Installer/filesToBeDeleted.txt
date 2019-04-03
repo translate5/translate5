@@ -233,3 +233,4 @@
 /application/modules/editor/Plugins/MatchResource/public/.vscode
 /application/modules/editor/Plugins/MatchResource/public/.vscode/settings.json
 /application/modules/editor/Plugins/MatchResource/public/.vscode/launch.json
+/library/ZfExtended/Controllers/Plugins/ConfigureApplication.php
