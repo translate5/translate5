@@ -86,9 +86,9 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* @var $workflow editor_Workflow_Abstract */
         $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         
-        $this->setQualityValidator(array_keys($config->segments->qualityFlags->toArray()));
+        $this->setQualityValidator(array_keys($config->runtimeOptions->segments->qualityFlags->toArray()));
         
-        $allowedValues = array_keys($config->segments->stateFlags->toArray());
+        $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());
         $allowedValues[] = 0; //adding "not set" state
         $this->addValidator('stateId', 'inArray', array($allowedValues));
         
