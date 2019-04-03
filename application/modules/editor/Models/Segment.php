@@ -566,9 +566,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return string $segmentContent
      */
     public function stripTermTagsAndTrackChanges($segmentContent) {
-        $logger = Zend_Registry::get('ZfExtended_Logger');
-        /* @var $logger ZfExtended_Logger */
-        $logger->();
         $tag = $this->tagHelper;
         $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
         $segmentContent = $tag->protect($segmentContent);
