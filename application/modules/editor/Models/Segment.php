@@ -566,36 +566,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return string $segmentContent
      */
     public function stripTermTagsAndTrackChanges($segmentContent) {
-        try {
-            $options = array(
-                    'format_output' => false,
-                    'encoding' => 'utf-8',
-                    'convert_to_encoding' => 'utf-8',
-                    'convert_from_encoding' => 'utf-8',
-                    'ignore_parser_warnings' => true,
-            );
-            $segmentContent= $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
-            
-            $seg = qp('<div id="root">'.$segmentContent.'</div>', NULL, $options);
-            /* @var $seg QueryPath\\DOMQuery */
-            //advise libxml not to throw exceptions, but collect warnings and errors internally:
-            libxml_use_internal_errors(true);
-            foreach ($seg->find('div.term') as $element){
-                $element->replaceWith($element->innerHTML());
-            }
-            $this->collectLibXmlErrors();
-            $seg = $seg->find('div#root');
-            $segmentContent = $seg->innerHTML();
-        } catch (Exception $exc) {
-            $log = new ZfExtended_Log();
-            $msg = 'Notice: No valid HTML in translate5 segment';
-            if(ZfExtended_Debug::hasLevel('core', 'Segment')){
-                $msg .= (string) $exc;
-                $msg .= "\n#".'<div id="root">'.$segmentContent."#\n";
-            }
-            $log->logError($msg);
-        }
-        return $segmentContent;
+        $logger = Zend_Registry::get('ZfExtended_Logger');
+        /* @var $logger ZfExtended_Logger */
+        $logger->();
+        $tag = $this->tagHelper;
+        $segmentContent = $this->trackChangesTagHelper->removeTrackChanges($segmentContent);
+        $segmentContent = $tag->protect($segmentContent);
+        //keep internal tags and MQM, remove all other
+        $segmentContent = strip_tags($segmentContent, '<img>'.$tag::PLACEHOLDER_TAG);
+        return $tag->unprotect($segmentContent);
     }
     
     /**
