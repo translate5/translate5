@@ -389,7 +389,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * This method is very opentm2 specific. If we want more generalization: 
      *  - JS needs to know about the valid export types of the requested TM system
      *  - The Connector must be able to decide if a given type can be exported or not
-     *    (like for uploads the getValidFiletypes, just for exports there should be a getValidExportTypes)
      */
     public function downloadAction() {
         //call GET to load entity internally
@@ -412,8 +411,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $connector = $serviceManager->getConnector($this->entity);
         /* @var $connector editor_Services_Connector */
         
-        //just reuse importvalidtypes here, nothing other implemented yet 
-        $validExportTypes = $connector->getValidFiletypes();
+        $validExportTypes = $connector->getValidExportTypes();
         
         if(empty($validExportTypes[$type])){
             throw new ZfExtended_NotFoundException('Can not download in format '.$type);
@@ -645,10 +643,51 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //check if connector / resource can deal with the uploaded file type
         $validTypes = $connector->getValidFiletypes();
+        $validMimeType = array_values($validTypes);
+        $validExtension = array_keys($validTypes);
+        
+        // =============== workaround (start) ==========================================
+        // with array_values($validTypes), $validMimeType currently is (example):
+        /*
+        Array
+        (
+            [0] => Array
+                (
+                    [0] => application/zip
+                )
+        
+            [1] => Array
+                (
+                    [0] => application/xml
+                    [1] => text/xml
+                )
+        
+        )
+
+        */
+        // but Zend_Validate_File_MimeType needs (example):
+        /*
+        Array
+        (
+            [0] => application/zip
+            [1] => application/xml
+            [2] => text/xml
+        )
+
+        */
+        $allValidMimeTypes = [];
+        foreach ($validMimeType as $key1 => $value1) {
+            foreach ($value1 as $key2 => $value2) {
+                $allValidMimeTypes[] = $value2;
+            }
+        }
+        // =============== workaround (end) ============================================
         $upload->addValidators([
-            new Zend_Validate_File_MimeType(array_values($validTypes)),
-            new Zend_Validate_File_Extension(array_keys($validTypes)),
+            new Zend_Validate_File_MimeType($allValidMimeTypes),
+            new Zend_Validate_File_Extension($validExtension),
         ]);
+        // CAUTON: The validators don't know which extensions are allowed for which extension.
+        // The only know ALL extensions that are allowed and all MimeTypes that are allowed.
         
         //init validations
         $upload->isValid(self::FILE_UPLOAD_NAME);

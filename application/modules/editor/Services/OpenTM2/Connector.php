@@ -162,6 +162,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function getValidFiletypes() {
         return [
+            'TM' => ['application/zip'],
+            'TMX' => ['application/xml','text/xml'],
+        ];
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypeForExport()
+     */
+    public function getValidExportTypes() {
+        return [
             'TM' => 'application/zip',
             'TMX' => 'application/xml',
         ];
@@ -634,7 +645,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $suffix = '-fuzzy-'.$analysisId;
         $mime="TM";
         $this->isInternalFuzzy = true;
-        $validExportTypes = $this->getValidFiletypes();
+        $validExportTypes = $this->getValidExportTypes();
         
         if(empty($validExportTypes[$mime])){
             throw new ZfExtended_NotFoundException('Can not download in format '.$mime);

@@ -147,9 +147,13 @@ class editor_Services_OpenTM2_HttpApi {
     
     /**
      * retrieves the TM as TM file
+     * @param string|array $mime
      * @return boolean
      */
     public function get($mime) {
+        if(is_array($mime)) {
+            $mime = implode(',', $mime);
+        }
         $http = $this->getHttpWithMemory('GET');
         $http->setConfig(['timeout' => 1200]);
         $http->setHeaders('Accept', $mime);

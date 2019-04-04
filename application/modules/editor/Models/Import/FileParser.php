@@ -490,6 +490,6 @@ abstract class editor_Models_Import_FileParser {
      * @return string[]
      */
     public static function getValidMimeTypes() {
-        return ['application/xml'];
+        return ['application/xml','text/xml'];
     }
 }

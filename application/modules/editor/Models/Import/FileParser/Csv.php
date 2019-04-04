@@ -121,7 +121,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return string[]
      */
     public static function getValidMimeTypes() {
-        return array('text/plain','application/xml','text/html'); //this is due to the fact, that csv-files may contain html or xml fragments. In these cases the php-mime-type extension may recognize them as such.
+        return array('text/plain','application/xml','text/xml','text/html'); //this is due to the fact, that csv-files may contain html or xml fragments. In these cases the php-mime-type extension may recognize them as such.
     }
     
     public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {

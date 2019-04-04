@@ -188,6 +188,18 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      */
     public function getValidFiletypes() {
         return [
+            'TBX' => ['application/xml','text/xml'],
+        ];
+    }
+    
+    /**
+     *
+     * {@inheritdoc}
+     * @see editor_Services_Connector_FilebasedAbstract::getValidExportTypes()
+     */
+    public function getValidExportTypes()
+    {
+        return [
             'TBX' => 'application/xml',
         ];
     }

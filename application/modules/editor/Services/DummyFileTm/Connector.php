@@ -239,6 +239,9 @@ class editor_Services_DummyFileTm_Connector extends editor_Services_Connector_Fi
     }
     public function getValidFiletypes()
     {}
+    
+    public function getValidExportTypes()
+    {}
 
     public function getStatus($moreInfo)
     {}
