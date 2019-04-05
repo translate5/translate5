@@ -369,7 +369,9 @@ class editor_Services_OpenTM2_HttpApi {
             $error->method = $this->httpMethod;
             $this->error[] = $error;
         }
-        $result = json_decode(trim($response->getBody()));
+        
+        $responseBody = trim($response->getBody());
+        $result = (empty($responseBody)) ? '' : json_decode($responseBody);
         
         //check for JSON errors
         if(json_last_error() > 0){
