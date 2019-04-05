@@ -110,9 +110,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $this->languageResource->addSpecificData('fileName',$name);
         
+        // If we are adding a TMX file as LanguageResource, we must create an empty memory first.
+        $validFileTypes = $this->getValidFiletypes();
+        if(empty($validFileTypes['TMX'])){
+            throw new ZfExtended_NotFoundException('OpenTM2: Cannot addTm for TMX-file; valid file types are missing.');
+        }
         $noFile = empty($fileinfo);
-        $tmxUpload = !$noFile && $fileinfo['type'] == 'application/xml' && preg_match('/\.tmx$/', $fileinfo['name']);
-        
+        $tmxUpload = !$noFile && in_array($fileinfo['type'], $validFileTypes['TMX']) && preg_match('/\.tmx$/', $fileinfo['name']);
         if($noFile || $tmxUpload) {
             if($this->api->createEmptyMemory($name, $sourceLang)){
                 $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
