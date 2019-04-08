@@ -3,7 +3,7 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-## [3.1.2] - 2019-03-21
+## [3.1.3] - 2019-04-08
 ###Added
 TRANSLATE-1600: TrackChanges: Make tracked change marks hideable via a button and keyboard short-cut
 TRANSLATE-1390: Microsoft translator can be used as language resource
