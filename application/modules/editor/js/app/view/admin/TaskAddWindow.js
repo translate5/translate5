@@ -45,11 +45,10 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
     },
     title: '#UT#Aufgabe erstellen',
     strings: {
-        importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)',
+        importUploadTip: '#UT#Wählen Sie die zu importierenden Daten (Angabe notwendig)',
         importUploadLabel: '#UT#Import Datei¹',
-        importUploadType: '#UT#Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!',
-        importNews: '#UT#Sie können direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen! <a target="_blank" href="{0}/index/usage">Mehr Info</a>.',
-        
+        importUploadType: '#UT#Das Dateiformat der ausgewählten Datei wird nicht unterstützt!',
+        importNews: '#UT#<a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">Mehr Informationen</a> zu den importierbaren Dateiformaten.',
         taskNrLabel: '#UT#Auftragsnummer',
         taskNameTip: '#UT#Projektname (frei wählbar, Angabe notwendig)',
         taskNameLabel: '#UT#Projektname¹',
