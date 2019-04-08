@@ -26,10 +26,22 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * DB encapsulation class
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class editor_Models_Db_LogRequest extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_request_log';
-    public $_primary = 'id';
+
+class editor_Models_Import_MetaData_Exception extends editor_Models_Import_Exception {
+        /**
+         * @var string
+         */
+        protected $origin = 'import.metadata';
+        
+        static protected $localErrorCodes = [
+            'E1052' => 'Some of the tasks metaData can not be imported, previous error message: {previousMessage}',
+            'E1053' => 'Pixel-Mapping: Import failed due not found customer specified by customer number in excel - client nr: {lastClientNr}',
+            'E1054' => 'Pixel-Mapping: missing default-values for pixel-width for font-size {fontSize}. Add the missing values to the config.',
+        ];
 }

@@ -101,7 +101,11 @@ Ext.define('Editor.plugins.ChangeLog.view.Changelog', {
                     },
                     text: me.strings.description,
                     renderer: function(v, meta, rec) {
-                        return '<b>'+rec.get('title')+'</b><br>'+v;
+                        var t = rec.get('title');
+                        if(t == v) {
+                            return '<b>'+t+'</b>';
+                        }
+                        return '<b>'+t+'</b><br>'+v;
                     }
                 }],
                 dockedItems:[{

@@ -62,6 +62,8 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      */
     protected $ignoredLines = [];
     
+    protected $lastCustomerId;
+    
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
@@ -77,9 +79,22 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      * if exist update table LEK_pixel_mapping
      */
     public function importFromSpreadsheet() {
-        $this->loadSpreadsheet();
-        $this->updateDb();
-        $this->logIgnoredLines();
+        try {
+            $this->loadSpreadsheet();
+            $this->updateDb();
+            $this->logIgnoredLines();
+            return;
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //no customer to the number found, proceed with the below Exception
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            //no customer to the number found, proceed with the below Exception
+        }
+        //FIXME reset level before setting as previous?
+        throw new editor_Models_Import_MetaData_Exception('E1053',[
+            'lastClientNr' => $this->lastCustomerId
+        ]);
     }
     
     /**
@@ -122,6 +137,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
                 $this->ignoredLines[] = join(', ', $values);
                 continue;
             }
+            $this->lastCustomerId = $values[0];
             $pixelMappingModel->insertPixelMappingRow($values);
         }
     }

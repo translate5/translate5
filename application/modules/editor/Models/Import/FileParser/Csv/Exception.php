@@ -25,33 +25,17 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
+ * Should be used for errors in the context of CSV import processing
  */
-class editor_Models_LogRequest extends ZfExtended_Models_Entity_Abstract {
-    
-    protected $dbInstanceClass = 'editor_Models_Db_LogRequest';
-
+class editor_Models_Import_FileParser_Csv_Exception extends editor_Models_Import_FileParser_Exception {
     /**
-     * Adds a new log entry, save it to the db, and return the entity instance
-     * @param string $taskGuid
+     * @var string
      */
-    public static function create($taskGuid) {
-        $config = Zend_Registry::get('config');
-        if(empty($config->runtimeOptions->requestLogging)) {
-            return;
-        }
-        $userSession = new Zend_Session_Namespace('user');
-        $inst = ZfExtended_Factory::get(__CLASS__);
-        $inst->setTaskGuid($taskGuid);
-        $inst->setMethod($_SERVER['REQUEST_METHOD']);
-        $inst->setRequestUri($_SERVER['REQUEST_URI']);
-        $inst->setParameters(print_r($_REQUEST,1));
-        $inst->setAuthUserGuid($userSession->data->userGuid);
-        $inst->setAuthUserLogin($userSession->data->login);
-        $inst->setAuthUserName($userSession->data->userName);
-        //created timestamp automatic by DB
-        $inst->save();
-        return $inst;
-    }
+    protected $origin = 'import.fileparser.csv';
+    
+    static protected $localErrorCodes = [
+        'E1017' => 'The regex {regex} matches the placeholderCSV string {placeholder} that is used in the editor_Models_Import_FileParser_Csv class to manage the protection loop. This is not allowed. Please find another solution to protect what you need to protect in your CSV via Regular Expression.',
+        'E1018' => 'The string $this->placeholderCSV ({placeholder}) had been present in the segment before parsing it. This is not allowed.',
+    ];
 }

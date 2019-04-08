@@ -75,6 +75,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
         $eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', $cleanUp);
         $eventManager->attach('LoginController', 'afterLogoutAction', $cleanUp);
         $eventManager->attach('editor_SessionController', 'afterDeleteAction', $cleanUp);
+        $eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
     
@@ -159,6 +160,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'module' => 'editor',
                 'controller' => 'task',
                 'action' => 'clone'
+            )
+        ));
+        
+        $this->front->getRouter()->addRoute('editorTaskEvents', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/events',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'events'
             )
         ));
         
@@ -379,5 +389,21 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'pluginpublic'
             ));
         $this->front->getRouter()->addRoute('editorPluginPublic', $pluginJs);
+    }
+    
+    /**
+     * Checks if the configured okapi instance is reachable
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleApplicationState(Zend_EventManager_Event $event) {
+        $applicationState = $event->getParam('applicationState');
+        $applicationState->tasks = new stdClass();
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $applicationState->tasks->overview = $task->getSummary();
+        
+        $jobs = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $jobs editor_Models_TaskUserAssoc */
+        $applicationState->tasks->jobs = $jobs->getSummary();
     }
 }

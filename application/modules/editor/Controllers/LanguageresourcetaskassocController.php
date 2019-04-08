@@ -44,6 +44,14 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
      */
     protected $postBlacklist = array('id');
     
+    public function init() {
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1050' => 'Referenced language resource not found.',
+            'E1051' => 'Cannot remove language resource from task, since task is used at the moment.',
+        ]);
+        parent::init();
+    }
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
@@ -89,7 +97,9 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             $task = ZfExtended_Factory::get('editor_Models_Task');
             /* @var $task editor_Models_Task */
             if($task->isUsed($this->entity->getTaskGuid())) {
-                throw new ZfExtended_VersionConflictException("Die Aufgabe wird bearbeitet, die Sprachressource kann daher im Moment nicht gelöscht werden!");
+                throw ZfExtended_Models_Entity_Conflict::createResponse('E1050',[
+                    'Die Aufgabe wird bearbeitet, die Sprachresource kann daher im Moment nicht von der Aufgabe entfernt werden!'
+                ]);
             }
             $clone=clone $this->entity;
             $this->entity->delete();
@@ -113,7 +123,9 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
             $languageresource->load($this->data->languageResourceId);
         }
         catch(ZfExtended_NotFoundException $e) {
-            throw new ZfExtended_Conflict('Die gewünschte languageResource Resource gibt es nicht! ID:'.$this->data->languageResourceId);
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1050', [
+                'languageResourceId' => 'Die gewünschte Sprachresource gibt es nicht!'
+            ],['languageresourceId' => $this->data->languageResourceId]);
         }
         $resource = $languageresource->getResource();
         

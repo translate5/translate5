@@ -26,38 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Entity Model for segment meta data
- * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getTaskGuid() getTaskGuid()
- * @method void setTaskGuid() setTaskGuid(string $guid)
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
  */
-class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TaskMeta';
-    
-    public function loadByTaskGuid($taskGuid) {
-        return $this->loadRow('taskGuid = ?', $taskGuid);
-    }
-    
-    /**
-     * Adds an empty meta data rowset to the DB.
-     */
-    public function initEmptyRowset(){
-        $db = new $this->dbInstanceClass;
-        /* @var $db Zend_Db_Table_Abstract */
-        try {
-            $db->insert(array('taskGuid' => $this->getTaskGuid()));
-        }
-        catch(Zend_Db_Statement_Exception $e) {
-            try {
-                $this->handleIntegrityConstraintException($e);
-                throw $e;
-            }
-            catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-                //"duplicate entry" errors are ignored. 
-                return;
-            }
-        }
-    }
+
+class editor_Models_Import_Exception extends ZfExtended_ErrorCodeException {
+        /**
+         * @var string
+         */
+        protected $origin = 'import';
+        
+        static protected $localErrorCodes = [
+            'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.'
+        ];
 }
