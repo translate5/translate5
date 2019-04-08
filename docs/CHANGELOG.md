@@ -3,6 +3,23 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.1.2] - 2019-03-21
+###Added
+TRANSLATE-1600: TrackChanges: Make tracked change marks hideable via a button and keyboard short-cut
+TRANSLATE-1390: Microsoft translator can be used as language resource
+
+###Bugfixes
+TRANSLATE-1613: The segment timestamp is not set properly with MySQL 8
+TRANSLATE-1612: Task clone does not clone language resources
+TRANSLATE-1604: Jobs may not be created with status finished
+TRANSLATE-1609: API Usage: On task creation no PM can be explicitly defined
+TRANSLATE-1603: Show the link to TermPortal in InstantTranslate only, if user has TermPortal access rights
+TRANSLATE-1595: Match analysis export button is disabled erroneously
+TRANSLATE-1597: Concordance search uses only the source language
+TRANSLATE-1607: Feature logout on page change disables language switch
+TRANSLATE-1599: Error in Search and Replace repaired
+T5DEV-266: Sessions can be hijacked
+
 ## [3.1.1] - 2019-02-28
 ###Added
 TRANSLATE-1589: Separate button to sync the GroupShare TMs in LanguageResources panel
