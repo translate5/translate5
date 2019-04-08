@@ -46,6 +46,23 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     protected $postBlacklist = array('id');
     
     /**
+     *  @var editor_Logger_Workflow
+     */
+    protected $log = false;
+    
+    /**
+     * contains if available the task to the current tua 
+     * @var editor_Models_Task
+     */
+    protected $task;
+    
+    public function init() {
+        parent::init();
+        $this->task = ZfExtended_Factory::get('editor_Models_Task');
+        $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->task]);
+    }
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_RestController::indexAction()
      */
@@ -83,9 +100,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             return parent::validate();
         }
         settype($this->data->taskGuid, 'string');
-        $t = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $t editor_Models_Task */
-        $t->loadByTaskGuid($this->data->taskGuid);
+        $this->task->loadByTaskGuid($this->data->taskGuid);
         
         $valid = parent::validate();
         //add the login hash AFTER validating, since we don't need any validation for it
@@ -116,8 +131,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     public function putAction() {
         $this->entityLoad();
-        editor_Models_LogRequest::create($this->entity->getTaskGuid());
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->entity->getTaskGuid());
+        $this->task->loadByTaskGuid($this->entity->getTaskGuid());
+        $this->log->request();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
         /* @var $workflow editor_Workflow_Abstract */
         $oldEntity = clone $this->entity;
         $this->decodePutData();
@@ -142,8 +158,11 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->getDataObject();
         $this->addUserInfoToResult();
         if(isset($this->data->state) && $oldEntity->getState() != $this->data->state){
-            $userSession = new Zend_Session_Namespace('user');
-            editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $userSession->data->userGuid, $this->entity->getUserGuid());
+            $this->log->info('E1012', 'job status changed from {oldState} to {newState}', [
+                'tua' => $this->entity,
+                'oldState' => $oldEntity->getState(),
+                'newState' => $this->data->state,
+            ]);
         }
         $this->applyEditableAndDeletable();
     }
@@ -154,17 +173,17 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      */
     public function postAction() {
         parent::postAction();
-        editor_Models_LogRequest::create($this->entity->getTaskGuid());
+        $this->log->request();
         $this->addUserInfoToResult();
-        $userSession = new Zend_Session_Namespace('user');
-        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), $this->data->state, $userSession->data->userGuid, $this->entity->getUserGuid());
+        $this->log->info('E1012', 'job created', ['tua' => $this->entity]);
         $this->applyEditableAndDeletable();
     }
     
     public function deleteAction(){
         $this->entityLoad();
-        editor_Models_LogRequest::create($this->entity->getTaskGuid());
-        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->entity->getTaskGuid());
+        $this->task->loadByTaskGuid($this->entity->getTaskGuid());
+        $this->log->request();
+        $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
         /* @var $workflow editor_Workflow_Abstract */
         $this->checkAuthenticatedIsParentOfEntity();
         $this->processClientReferenceVersion();
@@ -172,8 +191,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->entity->setId(0);
         //we have to perform the delete call on cloned object, since the delete call resets the data in the entity, but we need it for post processing 
         $entity->delete();
-        $userSession = new Zend_Session_Namespace('user');
-        editor_Models_LogTask::createWithUserGuid($this->entity->getTaskGuid(), "DELETED", $userSession->data->userGuid, $this->entity->getUserGuid());
+        $this->log->info('E1012', 'job deleted', ['tua' => $this->entity]);
     }
     
     /**

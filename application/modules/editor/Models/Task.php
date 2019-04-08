@@ -651,6 +651,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * generates a task overview statistics summary
+     * @return array
+     */
+    public function getSummary() {
+        $stmt = $this->db->getAdapter()->query('select state, count(*) taskCount, sum(wordCount) wordCountSum from LEK_task group by state');
+        return $stmt->fetchAll();
+    }
+    
+    /**
      * convenient method to get the task meta data
      * @return editor_Models_Task_Meta
      */
@@ -676,15 +685,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function checkStateAllowsActions() {
         if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
-            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
-            $e->setErrors([
-                    'task' => $this->getTaskGuid(),
-                    'taskState' => $this->getState(),
-                    'isLocked' => $this->isLocked($this->getTaskGuid()),
-                    'isErroneous' => $this->isErroneous(),
-                    'isExclusiveState' => $this->isExclusiveState(),
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1046' => 'The current task status does not allow that action.',
             ]);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1046', [
+                'Der aktuelle Status der Aufgabe verbietet diese Aktion!'
+            ], [
+                'task' => $this,
+                'isLocked' => $this->isLocked($this->getTaskGuid()),
+                'isErroneous' => $this->isErroneous(),
+                'isExclusiveState' => $this->isExclusiveState(),
+            ]);
         }
     }
     
@@ -704,23 +715,10 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         
-        /**
-         * SELECT `t`.taskGuid,`t`.taskName, t.id 
-         * FROM LEK_task AS `t`  
-         * LEFT JOIN `LEK_task_log` AS `tl` ON   
-         * WHERE `t`.`state` = 'end' AND `tl`.id IS NULL;
-         */
-        
-        $daysOffset = (int)$daysOffset; //ensure that it is plain integer, which can be savely given to DB without binding 
-        //find all ended tasks which are not modified in the last X days
-        // which are not modified → get all modified and make a left join with id = null (faster as not exists)
+        $daysOffset = (int)$daysOffset; //ensure that it is plain integer
         $s = $this->db->select()
-             ->setIntegrityCheck(false)
-             ->from(['t' => 'LEK_task'],'t.id AS id')
-             ->joinLeft(['tl' => 'LEK_task_log'], 
-                 '`t`.`taskGuid` = `tl`.`taskGuid` AND `tl`.`created` > CURRENT_DATE - INTERVAL '.$daysOffset.' DAY','')
-            ->where('`t`.`state`=?',self::STATE_END)
-            ->where('`tl`.id IS NULL');
+            ->where('`state` = ?', self::STATE_END)
+            ->where('`modified` < (CURRENT_DATE - INTERVAL ? DAY)', $daysOffset);
         $tasks = $this->db->getAdapter()->fetchAll($s);
 
         if(empty($tasks)){
@@ -746,8 +744,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $removedTasks[]=$taskEntity->getTaskName();
             $remover->remove();
         }
-        error_log("Number of tasks removed: ".count($removedTasks));
-        error_log("Tasks removed by taskname: ".implode(',', $removedTasks));
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
+        $logger->info('E1011', 'removeOldTasks - removed {taskCount} tasks', [
+            'taskCount' => count($removedTasks),
+            'taskNames' => $removedTasks
+        ]);
     }
     
     /***

@@ -169,23 +169,33 @@ class editor_Workflow_Manager {
     
     /**
      * returns the workflow for the given taskGuid, if no taskGuid given take config.import.taskWorkflow as default
-     * @param $taskGuid
+     * @param string|editor_Models_Task $taskOrGuid
      * @return editor_Workflow_Abstract
      */
-    public function getActive($taskGuid = null) {
-        if(empty($taskGuid)) {
+    public function getActive($taskOrGuid = null) {
+        if(empty($taskOrGuid)) {
             $config = Zend_Registry::get('config');
             if(empty($config->runtimeOptions->import->taskWorkflow)) {
                 return null;
             }
             return $this->get($this->getIdToClass($config->runtimeOptions->import->taskWorkflow));
         }
+        //process given task instead guid 
+        if($taskOrGuid instanceof editor_Models_Task) {
+            $task = $taskOrGuid;
+            $taskGuid = $task->getTaskGuid();
+        }
+        else {
+            $taskGuid = $taskOrGuid;
+        }
         if(!empty(self::$workflowTaskCache[$taskGuid])) {
             return self::$workflowTaskCache[$taskGuid];
         }
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
+        if(empty($task)) {
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($taskGuid);
+        }
         return self::$workflowTaskCache[$taskGuid] = $this->get($task->getWorkflow());
     }
     

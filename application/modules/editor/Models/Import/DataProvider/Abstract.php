@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Models_Import_DataProvider_Abstract {
     const TASK_ARCHIV_ZIP_NAME = 'ImportArchiv.zip';
+    const TASK_TEMP_IMPORT = '_tempImport';
+    
     protected $task;
     protected $taskPath;
     protected $importFolder;
@@ -65,7 +67,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @throws Zend_Exception
      */
     protected function checkAndMakeTempImportFolder() {
-        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.'_tempImport';
+        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
         if(is_dir($this->importFolder)) {
             throw new Zend_Exception('Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' already exists!');
         }

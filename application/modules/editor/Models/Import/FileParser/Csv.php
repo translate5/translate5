@@ -186,7 +186,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 continue;
             }
             if(preg_match($regEx, $this->placeholderCSV)===1){
-                throw new ZfExtended_NotAcceptableException('The regex '.$regEx.' matches the placeholderCSV string '.$this->placeholderCSV.' that is used in the editor_Models_Import_FileParser_Csv class to manage the protection loop. This is not allowed. Please find another solution to protect what you need to protect in your CSV via Regular Expression.');
+                throw new editor_Models_Import_FileParser_Csv_Exception('E1017', ['regex' => $regEx, 'placeholder' => $this->placeholderCSV]);
             }
             $regexArray =& $this->$regexArrayName;
             $regexArray[] = $regEx;
@@ -374,7 +374,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     protected function parseSegment($segment,$isSource){
         //check, if $this->placeholderCSV is present in segment - this must lead to error
         if(strpos($segment, $this->placeholderCSV)!==false){
-            throw new ZfExtended_Exception('The string $this->placeholderCSV ('.$this->placeholderCSV.') had been present in the segment before parsing it. This is not allowed.');
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1018', ['placeholder' => $this->placeholderCSV]);
         }
         $this->shortTagIdent = 1;
         

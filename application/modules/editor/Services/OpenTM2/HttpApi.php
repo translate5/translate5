@@ -332,7 +332,7 @@ class editor_Services_OpenTM2_HttpApi {
     
     protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
         $badGateway = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setOrigin('LanguageResources');
+        $badGateway->setDomain('LanguageResources');
         
         $error = new stdClass();
         $error->type = 'HTTP';

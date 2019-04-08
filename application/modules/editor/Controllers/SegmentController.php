@@ -592,7 +592,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         $log->logError('Possible Error on saving a segment!', $logText);
         
-        $e = new ZfExtended_Models_Entity_NotAcceptableException();
+        $e = new ZfExtended_Exception();
         $e->setMessage('Aufgrund der langsamen Verarbeitung von Javascript im Internet Explorer konnte das Segment nicht korrekt gespeichert werden. Bitte öffnen Sie das Segment nochmals und speichern Sie es erneut. Sollte das Problem bestehen bleiben, drücken Sie bitte F5 und bearbeiten dann das Segment erneut. Vielen Dank!',true);
         throw $e;
     }

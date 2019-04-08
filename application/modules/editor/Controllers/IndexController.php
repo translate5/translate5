@@ -235,6 +235,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       //inject helUrl variable used in frontend
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
+      $this->view->Php2JsVars()->set('errorCodesUrl',$rop->errorCodesUrl);
       
       //maintenance start date
       if(isset($rop->maintenance->startDate)) {
@@ -614,6 +615,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
             throw new ZfExtended_NotFoundException();
         }
 
+        $absolutePath = null;
         //get public files of the plugin to make a whitelist check of the file string from userland
         $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
         $file = join($slash, $js);
@@ -632,6 +634,67 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         header('Content-Type: '.$types[$extension]);
         readfile($wholePath);
         exit;
+    }
+    
+    public function makexliffAction() {
+        $input = $this->getParam('input', '');
+        $matchrate = (integer) $this->getParam('matchrate', 50);
+        $this->view->input = $input;
+        $this->view->matchrate = $matchrate;
+        if(empty($input)) {
+            return;
+        }
+        
+        $inputKey = base64_encode($input);
+        
+        $enTrans = ZfExtended_Factory::get('ZfExtended_Zendoverwrites_Translate', ['en']);
+        $enMessages = $enTrans->getAdapter()->getMessages('en');
+        
+        $enXliff = function($key, $de, $en) {
+            return "<trans-unit id='".$key."'>\n  <source>".$de."</source>\n  <target>".$en."</target>\n</trans-unit>\n";
+        };
+        
+        $this->view->enOut = [];
+        $this->view->deOut = "<trans-unit id='".$inputKey."'><source>".$input."</source><target>".$input."</target></trans-unit>\n";
+        if(empty($enMessages[$input])) {
+            $deTrans = ZfExtended_Factory::get('ZfExtended_Zendoverwrites_Translate', ['de']);
+            /* @var $deTrans ZfExtended_Zendoverwrites_Translate */
+            $deMessages = $deTrans->getAdapter()->getMessages('de');
+            $results = [];
+            foreach($deMessages as $key => $message) {
+                $percentage = 0;
+                similar_text($input, $message, $percentage);
+                $percentage = round($percentage);
+                if($percentage > $matchrate) {
+                    $results[$key] = (integer) ceil($percentage);
+                }
+            }
+            asort($results);
+            $results = array_reverse($results, true);
+            foreach($results as $key => $percentage) {
+                if(empty($enMessages[$key])) {
+                    continue;
+                }
+                $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $enMessages[$key]), 'matchrate' => $percentage];
+                if(count($this->view->enOut) >= 5) {
+                    break;
+                }
+            }
+            $this->view->exactMatch = false;
+            $this->view->noMatch = false;
+        }
+        else {
+            $this->view->exactMatch = true;
+            $this->view->noMatch = false;
+            $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $enMessages[$input]), 'matchrate' => 100];
+        }
+        if(empty($this->view->enOut)) {
+            $this->view->exactMatch = false;
+            $this->view->noMatch = true;
+            $this->view->enOut[] = ['text' => $enXliff($inputKey, $input, $input), 'matchrate' => 0];
+        }
+        
+        
     }
     
     public function testnotifyAction() {
