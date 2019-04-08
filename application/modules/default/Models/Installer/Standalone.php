@@ -603,10 +603,13 @@ class Models_Installer_Standalone {
         if(!$this->isInstallation){
             $this->hostname = $config->runtimeOptions->server->name;
         }
+        $version = ZfExtended_Utils::getAppVersion();
+        $this->log('Current translate5 version '.$version);
     }
     
     protected function done() {
-        $this->log("\nTranslate5 installation / update done.\n");
+        $version = ZfExtended_Utils::getAppVersion();
+        $this->log("\nTranslate5 installation / update to version $version done.\n");
         if(!empty($this->hostname)) {
             $this->log("\nPlease visit http://".$this->hostname."/ to enjoy Translate5.\n");
             $this->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");
