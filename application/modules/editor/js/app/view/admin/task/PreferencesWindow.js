@@ -33,12 +33,15 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                'Editor.view.admin.task.PreferencesWindowViewModel',
                'Editor.view.admin.task.UserAssoc',
                'Editor.view.admin.task.Preferences',
-               'Editor.view.admin.task.TaskAttributes'
+               'Editor.view.admin.task.TaskAttributes',
+               'Editor.view.admin.task.LogGrid',
+               'Editor.view.admin.task.LogWindow'
                ],
     itemId: 'adminTaskPreferencesWindow',
     title: '#UT#Einstellungen zu Aufgabe "{0}"',
     strings: {
-        close: '#UT#Fenster schließen'
+        close: '#UT#Fenster schließen',
+        events: '#UT#Ereignisse'
     },
     layout: 'fit',
     modal: true,
@@ -79,6 +82,16 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                 xtype: 'taskattributes'
             });
         }
+        
+            tabs.push({
+                xtype: 'editorAdminTaskLogGrid',
+                title: this.strings.events,
+                listeners: {
+                    show: function() {
+                        this.load(me.actualTask.getId());
+                    }
+                }
+            });
         
         config = {
             height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),

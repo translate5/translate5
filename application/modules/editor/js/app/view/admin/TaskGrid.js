@@ -184,6 +184,16 @@ Ext.define('Editor.view.admin.TaskGrid', {
     var me = this,
         actions;
 
+    me.errorTipTpl = new Ext.XTemplate(
+        '<tpl for=".">',
+        '<img valign="text-bottom" class="icon-error-level-{[this.getLevel(values)]}" alt="{[this.getLevel(values)]}" src="'+Ext.BLANK_IMAGE_URL+'"/>{message}<br>',
+        '</tpl>',
+        {
+            getLevel: function(values) {
+                return Editor.model.admin.task.Log.prototype.getLevelName(values.level)
+            }
+        }
+    );
     me.userTipTpl = new Ext.XTemplate(
             '<tpl>',
             '<table class="task-users">',
@@ -227,7 +237,10 @@ Ext.define('Editor.view.admin.TaskGrid', {
           config,
           //we must have here an own ordered list of states to be filtered 
           stateFilterOrder = ['user_state_open','user_state_waiting','user_state_finished','locked', 'task_state_end', 'task_state_unconfirmed', 'task_state_import'],
-          relaisLanguages = Ext.Array.clone(Editor.data.languages);
+          relaisLanguages = Ext.Array.clone(Editor.data.languages),
+          addQtip = function(meta, text) {
+              meta.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(text)+'"';
+          };
           
           //we're hardcoding the state filter options order, all other (unordered) workflow states are added below
           Ext.Array.each(stateFilterOrder, function(state){
@@ -274,37 +287,38 @@ Ext.define('Editor.view.admin.TaskGrid', {
                       wfMeta = rec.getWorkflowMetaData(),
                       allStates = me.prepareStates(wfMeta);
 
-                  if(rec.isImporting()) {
-                      return rec.get('state'); //FIXME better output here with fixing worker error handling
+                  if(rec.isImporting() || rec.isErroneous()) {
+                      addQtip(meta, me.errorTipTpl.apply(rec.get('lastErrors')));
+                      return rec.get('state');
                   }
                   if(rec.isLocked() && rec.isCustomState()) {
-                      meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedSystem, rec.get('state'))+'"';
+                      addQtip(meta, Ext.String.format(me.strings.lockedSystem, rec.get('state')));
                       return me.strings.locked;
                   }
                   if(rec.isLocked() && rec.isUnconfirmed()) {
-                      meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
+                      addQtip(meta, Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername')));
                       return me.strings.locked;
                   }
                   if(rec.isUnconfirmed()) {
-                      meta.tdAttr = 'data-qtip="' + me.states.task_state_unconfirmed+'"';
+                      addQtip(meta, me.states.task_state_unconfirmed);
                       return me.states.task_state_unconfirmed;
                   }
                   if(rec.isLocked()) {
-                      meta.tdAttr = 'data-qtip="' + Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername'))+'"';
+                      addQtip(meta, Ext.String.format(me.strings.lockedBy, rec.get('lockingUsername')));
                       return me.strings.locked;
                   }
                   if(rec.isEnded()) {
-                      meta.tdAttr = 'data-qtip="' + me.strings.ended +'"';
+                      addQtip(meta, me.strings.ended);
                       return me.strings.ended;
                   }
                   if(!userState || userState.length == 0) {
                       //if we got only v here, the state should be handled like locked or ended above
                       v = allStates[v] ? allStates[v] : v;
-                      meta.tdAttr = 'data-qtip="' + v +'"';
+                      addQtip(meta, v);
                       return v; 
                   }
                   //if no global state is applicable, use userState instead
-                  meta.tdAttr = 'data-qtip="' + allStates[userState] +'"';
+                  addQtip(meta, allStates[userState]);
                   return allStates[userState];
               },
               text: me.text_cols.state,

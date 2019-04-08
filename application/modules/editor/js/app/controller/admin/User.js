@@ -271,18 +271,9 @@ Ext.define('Editor.controller.admin.User', {
           //prevent default ServerException handling
           preventDefaultHandler: true,
           failure: function(rec, op) {
-              var error,
-                  errorRes = op.error && op.error.response,
-                  errorHandler = Editor.app.getController('ServerException');
               win.setLoading(false);
-              if(errorRes && errorRes.responseText) {
-                  error = Ext.decode(errorRes.responseText);
-                  if(error.errors && op.error && op.error.status == '400') {
-                      basic.markInvalid(error.errors);
-                      return;
-                  }
-              }
-              errorHandler.handleCallback.apply(errorHandler, arguments); 
+              var errorHandler = Editor.app.getController('ServerException');
+              errorHandler.handleFormFailure(basic, rec, op);
           },
           success: function() {
               var user = rec.get('surName')+', '+rec.get('firstName')+' ('+rec.get('login')+')',
