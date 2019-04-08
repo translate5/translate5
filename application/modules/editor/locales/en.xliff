@@ -2881,14 +2881,6 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source>
     <target>The user cannot be deleted, since it is used as PM in one or more tasks.</target>
 </trans-unit>
-<trans-unit id="RWRpdG9ybW9kaQ==">
-    <source>Editormodi</source>
-    <target>Editor modes</target>
-</trans-unit>
-<trans-unit id="VGFnbW9kaQ==">
-    <source>Tagmodi</source>
-    <target>Tag modes</target>
-</trans-unit>
 <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2VybiAoU1RSRyArICsp">
     <source>Segmentschriftgrad vergrößern (STRG + +)</source>
     <target>increase segment font-size (STRG + +)</target>
@@ -3191,6 +3183,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source>
     <target>The referenced customer does not exist (anymore).</target>
 </trans-unit>
+<trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>View mode</target></trans-unit>
     </body>
   </file>
 </xliff>

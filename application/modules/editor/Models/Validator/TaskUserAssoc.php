@@ -39,7 +39,15 @@ class editor_Models_Validator_TaskUserAssoc extends ZfExtended_Models_Validator_
         $this->addValidator('id', 'int');
         $this->addValidator('taskGuid', 'guid');
         $this->addValidator('userGuid', 'guid');
-        $this->addValidator('state', 'inArray', array($workflow->getStates()));
+        
+        //remove status finish from the valid states on job creation
+        $id = $this->entity->getId();
+        $states = $workflow->getStates();
+        if(empty($id)) {
+            $states = array_diff($states, [$workflow::STATE_FINISH]);
+        }
+        $this->addValidator('state', 'inArray', array($states));
+        
         $this->addValidator('role', 'inArray', array($workflow->getRoles()));
         $this->addValidator('usedState', 'inArray', array($workflow->getStates()));
         $this->addValidator('usedInternalSessionUniqId', 'stringLength', array('min' => 0, 'max' => 32));
