@@ -118,6 +118,10 @@ class editor_TaskController extends ZfExtended_RestController {
         //set same join for sorting!
         $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
         
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1064' => 'The referenced customer does not exist (anymore).'
+        ], 'editor.task');
+        
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $this->user = new Zend_Session_Namespace('user');
@@ -548,15 +552,10 @@ class editor_TaskController extends ZfExtended_RestController {
             'level' => ZfExtended_Logger::LEVEL_INFO
         ]);
         
-        throw ZfExtended_UnprocessableEntity::createResponse([
+        throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
             //fieldName => error message to field
             $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
-        ], $e->getErrors(), $e);
-        
-        throw ZfExtended_UnprocessableEntity::createResponse([
-            //fieldName => error message to field
-            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
-        ], $e->getErrors(), $e);
+        ]);
     }
     
     /**
@@ -570,7 +569,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(! $e->isInMessage('REFERENCES `LEK_customer`')) {
             throw $e;
         }
-        throw ZfExtended_UnprocessableEntity::createResponse([
+        throw ZfExtended_UnprocessableEntity::createResponse('E1064', [
             'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
         ], [], $e);
     }
@@ -1125,8 +1124,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $diff = (boolean)$this->getRequest()->getParam('diff');
         
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        
         switch ($context) {
             case 'importArchive':
+                $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
                 return;
                 
@@ -1184,6 +1185,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $suffix = '.zip';
         }
         
+        $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
         $this->provideZipDownload($zipFile, $suffix);
         
         //rename file after usage to export.zip to keep backwards compatibility

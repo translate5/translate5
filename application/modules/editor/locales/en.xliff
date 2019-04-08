@@ -748,19 +748,26 @@
         <source>Französisch (Belgien)</source>
         <target>French (Belgium)</target>
       </trans-unit>
-      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIFhMSUZGOyBBbmdhYmUgbm90d2VuZGlnKQ=='>
-          <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</source>
-          <target>Select the data to be imported (ZIP, CSV, SDLXLIFF, XLIFF; specifying required)</target>
-      </trans-unit>
       <trans-unit id='SW1wb3J0IERhdGVpwrk='>
           <source>Import Datei¹</source>
           <target>Import Datei¹</target>
       </trans-unit>
-      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWLCBYTElGRiBvZGVyIFNETFhMSUZGIERhdGVpIQ=='>
-        <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
-        <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
+      <trans-unit id='RGVyIERhdGVpdHlwICJ7ZXh0fSIgZGVyIGF1c2dld8OkaGx0ZW4gRGF0ZWkgIntmaWxlbmFtZX0iIHdpcmQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+          <source>Der Dateityp "{ext}" der ausgewählten Datei "{filename}" wird nicht unterstützt.</source>
+          <target>The file-type "{ext}" of the selected file "{filename}" is not supported.</target>
       </trans-unit>
-      
+      <trans-unit id='PGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHBzOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9kaXNwbGF5L0JVUy9TdXBwb3J0ZWQrZmlsZStmb3JtYXRzIj5NZWhyIEluZm9ybWF0aW9uZW48L2E+IHp1IGRlbiBpbXBvcnRpZXJiYXJlbiBEYXRlaWZvcm1hdGVuLg=='>
+          <source><a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">Mehr Informationen</a> zu den importierbaren Dateiformaten.</source>
+          <target><a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">More information</a> about the importable file formats.</target>
+      </trans-unit>
+      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChBbmdhYmUgbm90d2VuZGlnKQ=='>
+          <source>Wählen Sie die zu importierenden Daten (Angabe notwendig)</source>
+          <target>Select the data to be imported (specifying required)</target>
+      </trans-unit>
+      <trans-unit id='RGFzIERhdGVpZm9ybWF0IGRlciBhdXNnZXfDpGhsdGVuIERhdGVpIHdpcmQgbmljaHQgdW50ZXJzdMO8dHp0IQ=='>
+          <source>Das Dateiformat der ausgewählten Datei wird nicht unterstützt!</source>
+          <target>The file-format of the selected file is not supported!</target>
+      </trans-unit>
       
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
         <source>Bitte verwenden Sie eine TBX Datei!</source>
@@ -1533,10 +1540,6 @@
 <trans-unit id='Q2hhbmdl'>
     <source>Change</source>
     <target>Change</target>
-</trans-unit>
-<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='>
-    <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
-    <target>In addition to our ZIP-container format you can also use SDLXLIFF, XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
 </trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
@@ -3179,6 +3182,14 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRpZSBBdWZnYWJlIGR1cmNoIGRlbiBCZW51dHplciBnZXNwZXJydCBpc3Qu'>
     <source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</source>
     <target>The association between a task and a user could not be removed, because the task is currently locked by the user.</target>
+</trans-unit>
+<trans-unit id='RGllc2UgS3VuZGVubnVtbWVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'>
+    <source>Diese Kundennummer wird bereits verwendet.</source>
+    <target>This client-number is already in use.</target>
+</trans-unit>
+<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKe+7vy4='>
+    <source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source>
+    <target>The referenced customer does not exist (anymore).</target>
 </trans-unit>
     </body>
   </file>
