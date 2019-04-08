@@ -70,6 +70,7 @@ Ext.define('Editor.util.Event', {
             keyCodesToIgnore.push(me.extEv.C);                                                      // Ctrl+C
             keyCodesToIgnore.push(171);                                                             // Ctrl+-
             keyCodesToIgnore.push(173);                                                             // Ctrl++
+            keyCodesToIgnore.push(190);                                                             // Ctrl+.
         }
         if(!Ext.isOpera) {
             keyCodesToIgnore.push(91, 92, 93, 224);                                                 // Branded keys cont.; see also: http://unixpapa.com/js/key.html
@@ -191,9 +192,9 @@ Ext.define('Editor.util.Event', {
         }
         
         // check if our event (pressed key, alt, ctrl, shift) is an item in the keyMapConfig
-        eventAlt = me.event.altKey,
-        eventCtrl = me.event.ctrlKey,
-        eventShift = me.event.shiftKey,
+        eventAlt = me.event.altKey;
+        eventCtrl = me.event.ctrlKey;
+        eventShift = me.event.shiftKey;
         editorKeyMapBinding = editorKeyMap.binding;
         Ext.each(editorKeyMapBinding, function(name, index, bindings) {
             // check alt, ctrl, shift

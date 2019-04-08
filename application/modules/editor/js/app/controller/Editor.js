@@ -142,6 +142,7 @@ Ext.define('Editor.controller.Editor', {
         
         //set the default config
         //'xyz': [key(s), {ctrl, alt, shift}, fn, defaultEventAction==stopEvent]
+        // **** CAUTION: with any changes, please check if they affect Editor.util.Event ****
         me.keyMapConfig = {
             'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
@@ -169,7 +170,7 @@ Ext.define('Editor.controller.Editor', {
             // DEC_DIGITS:
             // (If you change the setting for a defaultEventAction for DEC_DIGITS,
             // please check if eventIsTranslate5() still works as expected 
-            // in Editor.plugins.TrackChanges.controller.UtilEvent).
+            // in Editor.util.Event).
             'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
             'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
             'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
