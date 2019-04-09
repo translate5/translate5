@@ -762,3 +762,6 @@ a.x-btn span.task-confirmation {
 } 
 
 .customerPanelGrid .ico-customer-mt-export {background-image: url("../images/database_go.png");display:inline-block;}
+.tools-help-icon .x-tool-home{
+	background-image:url(../images/help.png) !important;
+}

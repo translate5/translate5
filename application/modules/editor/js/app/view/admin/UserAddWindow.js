@@ -70,7 +70,8 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         targetLangageTip:'#UT#Zielsprache(n)',
         languageInfo: '#UT#Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.',
         localeLabel:'#UT#Benutzersprache',
-        parentUserLabel: '#UT#Übergeordneter Benutzer'
+        parentUserLabel: '#UT#Übergeordneter Benutzer',
+        bottomOpenIdNoEditInfo: '#UT# ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.'
     },
     modal : true,
     layout:'fit',
@@ -114,7 +115,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         });
         config = {
             title: me.title, //see EXT6UPD-9
-            height: Math.min(720, parseInt(Ext.getBody().getViewSize().height * 0.8)),
+            height: Math.min(720, parseInt(Ext.getBody().getViewSize().height * 0.9)),
             width : 900,
             flex:1,
             items : [{
@@ -406,10 +407,20 @@ Ext.define('Editor.view.admin.UserAddWindow', {
      * @param record
      */
     loadRecord: function(record) {
-        var roles = record.get('roles').split(',');
-        this.down('form').loadRecord(record);
+        var me=this,
+        	form=me.down('form'),
+        	roles = record.get('roles').split(',');
+        form.loadRecord(record);
         Ext.Array.forEach(this.query('#rolesGroup checkbox'), function(item) {
             item.setValue(Ext.Array.indexOf(roles, item.initialConfig.value) >= 0);
         });
+        
+        if(form.isDisabled() && record.get('openIdIssuer')!=''){
+        	form.add({
+                xtype: 'container',
+                html: '<p>'+me.strings.bottomOpenIdNoEditInfo+'</p><p style="margin-top:5px;margin-left:5px;"></p>',
+                dock : 'bottom'
+        	});
+        }
     }
 });

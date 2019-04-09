@@ -28,14 +28,15 @@ END LICENSE AND COPYRIGHT
 
 var editIdleTimer = null,
     DEFAULT_FILE_EXT='txt',
+    NOT_AVAILABLE_CLS = 'notavailable', // css if a (source-/target-)locale is not available in combination with the other (target-/source-)locale that is set
     uploadedFiles,//Variable to store uploaded files
-    selectedLanguageResourceId = undefined,
     translateTextResponse = '',
     latestTranslationInProgressID = false,
     latestTextToTranslate = '',
     instantTranslationIsActive = true,
     chosenSourceIsText = true,
-    fileTypesAllowedAndAvailable = [];
+    fileTypesAllowedAndAvailable = [],
+    additionalTranslationsHtmlContainer='';
 
 /***
  * Store allowed file-types for all available languageResources.
@@ -136,13 +137,7 @@ function getAllowedFileTypes() {
         if (fileTypesAllowedAndAvailable.hasOwnProperty(key)) {
             filesTypesForLanguageCombination = fileTypesAllowedAndAvailable[key];
             addFileTypes = false;
-            if (sourceLocale == '-' && targetLocale == '-') {
-                addFileTypes = true;
-            } else if (targetLocale == '-' && isAvailableLocale(sourceLocale, filesTypesForLanguageCombination.sourceLocale)) {
-                addFileTypes = true;
-            } else if (sourceLocale == '-' && isAvailableLocale(targetLocale, filesTypesForLanguageCombination.targetLocale)) {
-                addFileTypes = true;
-            } else if (isAvailableLocale(sourceLocale, filesTypesForLanguageCombination.sourceLocale) && isAvailableLocale(targetLocale, filesTypesForLanguageCombination.targetLocale)) {
+            if (isAvailableLocale(sourceLocale, filesTypesForLanguageCombination.sourceLocale) && isAvailableLocale(targetLocale, filesTypesForLanguageCombination.targetLocale)) {
                 addFileTypes = true;
             }
             if (addFileTypes) {
@@ -184,113 +179,84 @@ function setTextForSource() {
     $("#sourceIsFile").html(textForSourceIsFile);
 }
 
-/*  -------------------------------------------------------------------------
- * ORDER OF DISPLAY FOR THE USER:
- * (1) languages are selected from the locales-lists (renderLocalesAsAvailable)
- * (2) every change in the language-selection starts a check if/how many languageResources 
- *     are available
- * (3) As soon as there is exactly ONE languageResource available:
- *     - source- and target-language are set
- *     - (if text is already entered:) translation starts
- *  ------------------------------------------------------------------------- */
-
 /* --------------- locales-list (source, target) ---------------------------- */
+
 /**
- * Include languages for source/target only if there is a languageResource available 
- * for the resulting source-target-combination.
- * - accordingToSourceLocale: sourceLocale is set, targetLocales are rendered
- * - accordingToTargetLocale: targetLocale is set, sourceLocales are rendered
- * - reset: starts the same process as for 'Clear both lists'
- * - if the selected text is 'Clear both lists', then both lists are rendered
- * - if the selected text is 'Show all available for...', then this list is rendered
- * @param string accordingTo ('accordingToSourceLocale'|'accordingToTargetLocale'|'reset')
+ * When one of the select-lists is opened, it will show the
+ * availability of it's options according to the value in the 
+ * other select-list that is currently NOT opened.
+ * @param el
  */
-function renderLocalesAsAvailable(accordingTo) {
+function updateLocalesSelectLists(el) {
+    var elId = el.attr('id'),
+        referenceList,
+        accordingToReference,
+        selectedLocaleInReference,
+        localesAvailable;
+    // the list that the user IS NOT editing is now the reference;
+    // in case the selected item was not set as available, it now is!
+    referenceList = (elId === 'sourceLocale') ? 'targetLocale' : 'sourceLocale';
+    $('#'+referenceList+' .ui-selected').removeClass(NOT_AVAILABLE_CLS);
+    // the list that the user IS editing:
+    // what items are available according to the reference now?
+    accordingToReference = (referenceList === 'sourceLocale') ? 'accordingToSourceLocale' : 'accordingToTargetLocale';
+    selectedLocaleInReference = $("#"+referenceList).val();
+    localesAvailable = getLocalesAccordingToReference(accordingToReference,selectedLocaleInReference);
+    $('#'+elId+'-menu li.ui-menu-item').each(function(i){
+        if (localesAvailable.indexOf($(this).text()) === -1) {
+            $(this).addClass(NOT_AVAILABLE_CLS);
+        } else {
+            $(this).removeClass(NOT_AVAILABLE_CLS);
+        }
+    })
+}
+
+/**
+ * Every change in the language-selection starts a check if any lnguageResources
+ * are available. If yes and text is already entered, the translation starts.
+ */
+function handleAfterLocalesChange() {
+    // When the language-combination changes, former translations are not valid any longer (= the text hasn't been translated already):
+    latestTextToTranslate = '';
+    $('#translations').html('');
+    // Neither are former error-messages valid any longer:
+    clearAllErrorMessages();
+    // Check if any engines are available for that language-combination.
+    if (!hasEnginesForLanguageCombination()) {
+        hideTranslations();
+        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
+        return;
+    };
+    // Translations can be submitted:
+    showTranslations();
+    // If fileUpload is possible for currently chosen languages, show text accordingly:
+    setTextForSource();
+    // When instantTranslation is not active; hide former translations and wait.
+    if (!instantTranslationIsActive) {
+        hideTranslations();
+        return;
+    }
+    // Start translation:
+    startTimerForInstantTranslation();
+}
+
+/**
+ * Check if any engines are available for the current language-combination.
+ * @returns {Boolean}
+ */
+function hasEnginesForLanguageCombination() {
     var sourceLocale = $("#sourceLocale").val(),
         targetLocale = $("#targetLocale").val(),
-        selectedText = (accordingTo === 'accordingToSourceLocale') ? $( "#sourceLocale option:selected" ).text() : $( "#targetLocale option:selected" ).text(),
-        localesAvailable = [],
-        sourceLocalesAvailable = [],
-        targetLocalesAvailable = [],
-        sourceLocaleOptions = [],
-        targetLocaleOptions = [],
-        selectedLocale,
-        source = {},
-        target = {};
-    clearAllErrorMessages();
-    latestTextToTranslate = ''; // when the language changes, former translations are not valid any longer = the text hasn't been translated already.
-    if (sourceLocale != '-' && targetLocale != '-') {
-        // This means that the user has chosen a final combination of source AND target. The list contains only the selected locale and the "clear"-options.
-        sourceLocalesAvailable.push(sourceLocale);
-        targetLocalesAvailable.push(targetLocale);
-        localesAvailable = getLocalesAccordingToReference ('accordingToTargetLocale', targetLocale);
-        if (localesAvailable.length == 1) {
-            source = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: false, localeForReference: targetLocale, selectedValue: sourceLocale};
-        } else {
-            source = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: targetLocale, selectedValue: sourceLocale};
-        }
-        localesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceLocale);
-        if (localesAvailable.length == 1) {
-            target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: false, localeForReference: sourceLocale, selectedValue: targetLocale};
-        } else {
-            target = {hasPlsChoose: false, hasClearBoth: true,  hasShowAllAvailable: true,  localeForReference: sourceLocale, selectedValue: targetLocale};
-        }
-    } else if (accordingTo === 'reset' || selectedText === Editor.data.languageresource.translatedStrings['clearBothLists']) {
-        // This means a "reset" of one or both the lists:
-        sourceLocalesAvailable = allSourceLanguageLocales;
-        targetLocalesAvailable = allTargetLanguageLocales;
-        source = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
-        target = {hasPlsChoose: true,  hasClearBoth: false, hasShowAllAvailable: false, localeForReference: '',            selectedValue: '-'};
-    } else {
-        if (selectedText === Editor.data.languageresource.translatedStrings['showAllAvailableFor']+' '+targetLocale) {
-            accordingTo = 'accordingToTargetLocale';
-        } else if (selectedText === Editor.data.languageresource.translatedStrings['showAllAvailableFor']+' '+sourceLocale) {
-            accordingTo = 'accordingToSourceLocale';
-        } 
-        // "Default": update the locales according to what is set on the other side
-        selectedLocale = (accordingTo === 'accordingToSourceLocale') ? sourceLocale : targetLocale;
-        localesAvailable = getLocalesAccordingToReference (accordingTo, selectedLocale);
-        if (accordingTo === 'accordingToSourceLocale') {
-            sourceLocalesAvailable.push(sourceLocale);
-            targetLocalesAvailable = localesAvailable;
-            source = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: sourceLocale};
-            if (localesAvailable.length == 1) {
-                target = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: localesAvailable[0]};
-            } else {
-                target = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: ''};
-            }
-        } else {
-            sourceLocalesAvailable = localesAvailable;
-            targetLocalesAvailable.push(targetLocale);
-            if (localesAvailable.length == 1) {
-                source = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: localesAvailable[0]};
-            } else {
-                source = {hasPlsChoose: true,  hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',    selectedValue: ''};
-            }
-            target = {hasPlsChoose: false, hasClearBoth: true, hasShowAllAvailable: false, localeForReference: '',        selectedValue: targetLocale};
-        }
-    }
-    // render lists as set now:
-    if (sourceLocalesAvailable.length > 0) {
-        source.localeList = sourceLocalesAvailable;
-        sourceLocaleOptions = renderLocaleOptionList(source);
-        refreshSelectList('sourceLocale', sourceLocaleOptions, source.selectedValue);
-    }
-    if (targetLocalesAvailable.length > 0) {
-        target.localeList = targetLocalesAvailable;
-        targetLocaleOptions = renderLocaleOptionList(target);
-        refreshSelectList('targetLocale', targetLocaleOptions, target.selectedValue);
-    }
-    // if fileUpload is possible for currently chosen languages, show text accordingly.
-    setTextForSource();
-    // start translation?
-    if (sourceLocalesAvailable.length == 1 && targetLocalesAvailable.length == 1) {
-        $('#translationSubmit').show();
-        startTimerForInstantTranslation();
-    } else {
-        $('#translationSubmit').hide();
-    }
+        targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceLocale);
+    return targetLocalesAvailable.indexOf(targetLocale) !== -1;
 }
+
+/**
+ * What locales are available for translation for the given locale?
+ * @param {String} accordingTo ('accordingToSourceLocale'|'accordingToTargetLocale')
+ * @param {String} selectedLocale
+ * @returns {Array} 
+ */
 function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     var localesAvailable = [],
         languageResourceId,
@@ -321,53 +287,17 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
     localesAvailable.sort();
     return localesAvailable;
 }
-function renderLocaleOptionList(list) {
-    var localeOptionsList = []
-        option = {};
-    if (list.hasPlsChoose) {
-        option = {};
-        option.value = '-';
-        option.name = Editor.data.languageresource.translatedStrings['pleaseChoose'] + ' ('+list.localeList.length+'):';
-        localeOptionsList.push(option);
-    }
-    if (list.hasClearBoth) {
-        option = {};
-        option.value = '-';
-        option.name = Editor.data.languageresource.translatedStrings['clearBothLists'];
-        localeOptionsList.push(option);
-    }
-    if (list.hasShowAllAvailable) {
-        option = {};
-        option.value = '-';
-        option.name = Editor.data.languageresource.translatedStrings['showAllAvailableFor']+' '+list.localeForReference;
-        localeOptionsList.push(option);
-    }
-    for (i = 0; i < list.localeList.length; i++) {
-        option = {};
-        option.value = list.localeList[i];
-        option.name = list.localeList[i];
-        localeOptionsList.push(option);
-    }
-    return localeOptionsList;
-}
-function refreshSelectList(selectListId, options, selectedOptionValue) {
-    var optionList = [];
-    for (i = 0; i < options.length; i++) {
-        optionList.push("<option value='" + options[i].value + "'>" + options[i].name + "</option>");
-    }
-    $('#'+selectListId).find('option').remove().end();
-    $('#'+selectListId).append(optionList.join(""));
-    if (selectedOptionValue != '') {
-        $('#'+selectListId).val(selectedOptionValue);
-    }
-    $('#'+selectListId).selectmenu("refresh");
-    $('#'+selectListId).selectmenu("widget").show();
-}
 
 /* --------------- start translation instantly or manually: events  --------- */
 
 //start instant (sic!) translation automatically
 $('#sourceText').bind('keyup', function() {
+    // Check if any engines are available for that language-combination.
+    if (!hasEnginesForLanguageCombination()) {
+        hideTranslations();
+        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
+        return;
+    };
     if($('#sourceText').val().length > 0 && $('#sourceText').val() === latestTextToTranslate) {
         return;
     }
@@ -402,11 +332,8 @@ function startFileTranslation(){
         fileType,
         fileTypesAllowed = getAllowedFileTypes(),
         fileTypesErrorList = [];
-    if ($('#sourceFile').val() == "" && ($("#sourceLocale").val() != '-' || $("#targetLocale").val() != '-')) {
+    if ($('#sourceFile').val() == "") {
         showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
-        return;
-    } else if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
-        showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
         return;
     }
     clearAllErrorMessages();
@@ -427,27 +354,28 @@ function startFileTranslation(){
 /* --------------- prepare, start and terminate translations  --------------- */
 function startTimerForInstantTranslation() {
     terminateTranslation();
-    if (instantTranslationIsActive && $("#sourceLocale").val() != '-' && $("#targetLocale").val() != '-') {
-        editIdleTimer = setTimeout(function() {
-            startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
-        }, 200);
-    }
+    editIdleTimer = setTimeout(function() {
+        startTranslation(); // TODO: this can start a filetranslation without calling startFileTranslation()
+    }, 200);
 }
 function startTranslation() {
     var textToTranslate,
         translationInProgressID;
+    // Check if any engines are available for that language-combination.
+    if (!hasEnginesForLanguageCombination()) {
+        hideTranslations();
+        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
+        return;
+    };
     // translate a file?
     if ($('#sourceText').not(":visible") && $('#sourceFile').is(":visible")) {
-        // --------------- TODO start: we can get here via startTimerForInstantTranslation (= without calling startFileTranslation() first),
-        // ---------------             so we have to run the same validations. Bad!
-        if ($('#sourceFile').val() == "" && ($("#sourceLocale").val() != '-' || $("#targetLocale").val() != '-')) {
+        // TODO: we can get here via startTimerForInstantTranslation 
+        // (= without calling startFileTranslation() first),
+        // so we have to run the same validation. Bad!
+        if ($('#sourceFile').val() == "") {
             showSourceError(Editor.data.languageresource.translatedStrings['uploadFileNotFound']);
             return;
-        } else if($("#sourceLocale").val() == '-' || $("#targetLocale").val() == '-'){
-            showSourceError(Editor.data.languageresource.translatedStrings['selectLanguages']);
-            return;
         }
-        // --------------- TODO end
         if (uploadedFiles != undefined) {
             startLoadingState();
             requestFileTranslate();
@@ -530,7 +458,11 @@ function fillTranslation() {
         termStatus,
         metaData,
         resultData,
-        languageRfc;
+        languageRfc,
+        alternativeTranslations;
+    
+    //reset the additional translations
+    additionalTranslationsHtmlContainer='';
     $.each(translateTextResponse, function(serviceName, resource){
         resultHtml = '';
         $.each(resource, function(resourceName, allResults){
@@ -547,6 +479,7 @@ function fillTranslation() {
                     termStatus = '';
                     processStatusAttribute = '';
                     processStatusAttributeValue = '';
+                    alternativeTranslations=[];
                     if (result['metaData'] != undefined) {
                         metaData = result['metaData'];
                         if(metaData['definitions'] != undefined && metaData['definitions'].length>0) {
@@ -570,6 +503,9 @@ function fillTranslation() {
                         if(metaData['processStatusAttributeValue'] != undefined) {
                         	processStatusAttributeValue = metaData['processStatusAttributeValue'];
                         }
+                        if(metaData['alternativeTranslations'] != undefined) {
+                        	alternativeTranslations = metaData['alternativeTranslations'];
+                        }
                     }
                     resultData = {'languageResourceId': result['languageResourceid'],
                                   'fuzzyMatch': fuzzyMatch,
@@ -581,7 +517,8 @@ function fillTranslation() {
                                   'translationText': result['target'],
                     			  'processStatusAttribute':processStatusAttribute,
                     			  'processStatusAttributeValue':processStatusAttributeValue,
-                    			  'languageRfc':languageRfc
+                    			  'languageRfc':languageRfc,
+                    			  'alternativeTranslations':alternativeTranslations
                                   };
                     resultHtml += renderTranslationContainer(resultData);
                 }
@@ -593,6 +530,10 @@ function fillTranslation() {
     });
     if (translationHtml == '') {
         showTargetError(Editor.data.languageresource.translatedStrings['noResultsFound']);
+    }
+    //when there is aditional translations, display them at the end
+    if(additionalTranslationsHtmlContainer!=''){
+    	translationHtml+=additionalTranslationsHtmlContainer;
     }
     $('#translations').html(translationHtml);
     showTranslations();
@@ -616,22 +557,62 @@ function renderTranslationContainer(resultData) {
     translationsContainer += '<div class="copyable">';
     translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
-    if (resultData.term != '') {
+    
+    if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
+        translationsContainer += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
+    }
+    
+    if (resultData.term != '' && Editor.data.isUserTermportalAllowed) {
     	//check if for the current term the rfc language value is set, if yes set data property so the language is used in the term portal
     	var languageRfc=resultData.languageRfc ? ('data-languageRfc="'+resultData.languageRfc+'"') : '';
         translationsContainer += '<span class="term-info" id="'+resultData.term+'" '+languageRfc+' title="'+Editor.data.languageresource.translatedStrings['openInTermPortal']+'"><span class="ui-icon ui-icon-info"></span></span>';
-    }
-    
-    if (resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
-        translationsContainer += '<span class="process-status-attribute"><img src="' + Editor.data.publicModulePath + 'images/tick.png" alt="finalized" title="finalized"></span>';
     }
     
     if (resultData.termStatus != '') {
         translationsContainer += '<span class="term-status">'+renderTermStatusIcon(resultData.termStatus)+'</span>';
     }
     
+    if (resultData.alternativeTranslations != undefined) {
+    	var at=resultData.alternativeTranslations,
+    		highestConfidenceTranslation='',
+    		atHtmlTableResultPosTag = '',
+    		atHtmlTableStart = '',
+    		atHtmlTableEnd = '',
+    		atHtmlTable='',
+    		atHtmlBt=[];
+    	if (at.length > 0) {
+    		atHtmlTableStart = '<table class="translationsForLabel">';
+    		atHtmlTableEnd = '</table>';
+    	}
+    	$.each(at, function(key, result){
+    		if (atHtmlTableResultPosTag == '') {
+    			// This assumes that result['posTag'] is the same for all results!
+    			atHtmlTableResultPosTag = '<tr><td colspan="3"><b>'+result['posTag']+'</b></td></tr>';
+    		}
+    		atHtmlTable += '<tr>';
+    		atHtmlTable += '<td><progress value="'+result['confidence']+'" max="1"></progress></td>';
+    		atHtmlTable += '<td><b>'+result['displayTarget']+':</b></td>';
+    		atHtmlBt=[];
+        	$.each(result.backTranslations, function(keyBt, resultBt){
+        		if(highestConfidenceTranslation==''){
+        			highestConfidenceTranslation='<h5 class="translationsForLabel">'+Editor.data.languageresource.translatedStrings['translationsForLabel']+'<span class="displayTarget"> '+result['displayTarget']+'</span></h5>';
+        		}
+        		atHtmlBt.push(resultBt.displayText);
+        	});
+        	atHtmlTable += '<td>'+atHtmlBt.join(', ')+'</td>';
+        	atHtmlTable += '</tr>';
+    	});
+    }
+    
     translationsContainer += '</div>';
     
+    //collect the additional translations, thay are rendered at the end of the result list
+    additionalTranslationsHtmlContainer +=highestConfidenceTranslation;
+    additionalTranslationsHtmlContainer +=atHtmlTableStart;
+    additionalTranslationsHtmlContainer +=atHtmlTableResultPosTag;
+    additionalTranslationsHtmlContainer +=atHtmlTable;
+    additionalTranslationsHtmlContainer +=atHtmlTableEnd;
+	
     if (resultData.infoText != '') {
         translationsContainer += '<div class="translation-infotext">'+resultData.infoText+'</div>';
     }
@@ -857,10 +838,6 @@ $('#termPortalButton').on('touchstart click',function(){
 });
 
 /* --------------- show/hide: helpers --------------------------------------- */
-function showLanguageSelectsOnly() {
-    $('#translationSubmit').hide();
-    hideTranslations();
-}
 function showSource() {
     $('#sourceContent').show();
     showInstantTranslationOffOn();
@@ -881,14 +858,10 @@ function showTranslations() {
         $('#translations').html('');
     }
     $('#translations').show();
-    $('#translationSubmit').show();
     showInstantTranslationOffOn();
 }
 function hideTranslations() {
     $('#translations').hide();
-    $('#translationSubmit').hide();
-    $('#instantTranslationIsOn').hide();
-    $('#instantTranslationIsOff').hide();
 }
 function showInstantTranslationOffOn() {
     if (instantTranslationIsActive) {
@@ -902,7 +875,6 @@ function showInstantTranslationOffOn() {
 /* --------------- show/hide: errors --------------------------------------- */
 function showLanguageResourceSelectorError(errorMode) {
     $('#languageResourceSelectorError').html(Editor.data.languageresource.translatedStrings[errorMode]).show();
-    $('#translationSubmit').hide();
 }
 function showTargetError(errorText) {
     $('#targetError').html(errorText).show();
@@ -911,10 +883,16 @@ function showSourceError(errorText) {
     $('#sourceError').html(errorText).show();
 }
 function clearAllErrorMessages() {
-    $('.instant-translation-error').hide();
+    $('.instant-translation-error').html('').hide();
     $("#sourceIsText").removeClass('source-text-error');
-    $('#sourceError').hide();
-    $("#targetError").hide();
+    $('#sourceError').html('').hide();
+    $("#targetError").html('').hide();
+    // ALWAYS: Check if any engines are available for that language-combination.
+    if (!hasEnginesForLanguageCombination()) {
+        hideTranslations();
+        showTargetError(Editor.data.languageresource.translatedStrings['noLanguageResource']);
+        return;
+    };
 }
 /* --------------- show/hide: loading spinner ------------------------------- */
 // 'sign' = show indicator in addition to content (currently used for text-translations)

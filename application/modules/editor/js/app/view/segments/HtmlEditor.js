@@ -146,11 +146,13 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @returns string
    */
   getDocMarkup: function() {
+      //FIXME die app version an htmleditor.css hängen!
     var me = this,
+        version = Editor.data.app.version,
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
         body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;" class="{3}"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=16" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v='+version+'" />'; //disable Img resizing
     return Ext.String.format(body, me.iframePad, additionalCss, dir, me.currentSegmentSize);
   },
   /**
@@ -301,8 +303,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         range = sel.getRangeAt(0); // range might have changed during handling the beforeInsertMarkup
         range.insertNode(frag);
         rangeForNode = range.cloneRange();
-        range.setStartAfter(lastNode);
-        range.setEndAfter(lastNode);
+        if (lastNode !== undefined) {
+        	range.setStartAfter(lastNode);
+        	range.setEndAfter(lastNode);
+        }
+        this.saveSnapshot(); // Keep a snapshot from the new content
         this.fireEvent('afterInsertMarkup', rangeForNode);
       }
   },
@@ -399,8 +404,9 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       if(item.tagName == 'DIV' && /(^|[\s])ignoreInEditor([\s]|$)/.test(item.className)){
           return;
       }
-      if(item.tagName != 'DIV'){
-        return;
+      //if we copy and paste content there could be other divs, so we allow only internal-tag divs:
+      if(item.tagName != 'DIV' || !/(^|[\s])internal-tag([\s]|$)/.test(item.className)){
+          return;
       }
       data = me.getData(item, data); 
       

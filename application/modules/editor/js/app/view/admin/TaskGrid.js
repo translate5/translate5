@@ -289,7 +289,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
                   if(rec.isImporting() || rec.isErroneous()) {
                       addQtip(meta, me.errorTipTpl.apply(rec.get('lastErrors')));
-                      return rec.get('state'); //FIXME better output here with fixing worker error handling
+                      return rec.get('state');
                   }
                   if(rec.isLocked() && rec.isCustomState()) {
                       addQtip(meta, Ext.String.format(me.strings.lockedSystem, rec.get('state')));
@@ -467,9 +467,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
               filter: {
                   type: 'string'
               },
-              renderer: function(v, meta) {
-                  meta.tdAttr = 'data-qtip="' + v + '"';
-                  return v;
+              renderer: function(v, meta,rec) {
+            	  var tooltip=v,
+            	  	  ret=v;
+            	  if(Editor.data.frontend.tasklist.pmMailTo){
+            		  tooltip=rec.get('pmMail');
+            		  ret='<a alt="'+tooltip+'" href="mailto:'+tooltip+'">'+v+'</a>';
+            		  meta.tdAttr = 'data-qtip="'+tooltip+'"';
+            	  }
+                  return ret;
               },
               text: me.text_cols.pmGuid
           },{

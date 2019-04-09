@@ -31,10 +31,22 @@ Ext.define('Editor.model.admin.Customer', {
     extend: 'Ext.data.Model',
     alias: 'model.customer',
 
+    statics: {
+    	DEFAULTCUSTOMER_NUMBER:'default for legacy data'
+    },
+    
     fields: [
         {type: 'int',name: 'id',persist: false},
         {type: 'string',name: 'name',validations: [{type: 'presence'},{type: 'length',max: 255,min: 3}]},
-        {type: 'string',name: 'number',validations: [{type: 'presence'},{type: 'length',max: 255}]}
+        {type: 'string',name: 'number',validations: [{type: 'presence'},{type: 'length',max: 255}]},
+        {type: 'string',name: 'domain',validations: [{type: 'presence'},{type: 'length',max: 255}]},
+        {type: 'string',name: 'openIdServer',validations: [{type: 'presence'},{type: 'length',max: 255}]},
+        {type: 'string',name: 'openIdServerRoles',validations: [{type: 'presence'},{type: 'length',max: 255}]},
+        {type: 'string',name: 'openIdAuth2Url',validations: [{type: 'presence'},{type: 'length',max: 255}]},
+        {type: 'string',name: 'openIdClientId',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
+        {type: 'string',name: 'openIdClientSecret',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
+        {type: 'string',name: 'openIdRedirectLabel',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
+        {type: 'auto',name: 'openIdRedirectCheckbox'}
     ],
 
     idProperty: 'id',

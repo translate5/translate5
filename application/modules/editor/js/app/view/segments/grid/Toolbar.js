@@ -42,12 +42,11 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
     alias: 'widget.segmentsToolbar',
 
     //Item Strings: 
-    item_viewModesMenu: '#UT#Editormodi',
+    item_viewModesMenu: '#UT#Ansichtsmodus',
     item_viewModeBtn: '#UT#Details (nur Lesemodus)',
     item_editModeBtn: '#UT#Details',
     item_ergonomicModeBtn: '#UT#Normal',
     item_ergonomicModeReadonlyBtn: '#UT#Normal (nur Lesemodus)',
-    item_tagModesMenu: '#UT#Tagmodi',
     item_hideTagBtn: '#UT#Tags verbergen',
     item_shortTagBtn: '#UT#Tag-Kurzansicht',
     item_fullTagBtn: '#UT#Tag-Vollansicht',
@@ -136,17 +135,9 @@ Ext.define('Editor.view.segments.grid.Toolbar', {
                             text: me.item_ergonomicModeReadonlyBtn,
                             group: 'toggleView',
                             textAlign: 'left'
-                        }]
-                    }
-                },{
-                    xtype: 'tbseparator'
-                },{
-                    xtype: 'button',
-                    text: me.item_tagModesMenu,
-                    itemId: 'tagModeMenu',
-                    menu: {
-                        xtype: 'menu',
-                        items: [{
+                        },{
+                            xtype: 'menuseparator'
+                        },{
                             xtype: 'menucheckitem',
                             itemId: 'hideTagBtn',
                             bind: {
