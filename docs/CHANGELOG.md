@@ -3,6 +3,58 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.1.3] - 2019-04-08
+###Added
+TRANSLATE-1600: TrackChanges: Make tracked change marks hideable via a button and keyboard short-cut
+TRANSLATE-1390: Microsoft translator can be used as language resource
+
+###Bugfixes
+TRANSLATE-1613: The segment timestamp is not set properly with MySQL 8
+TRANSLATE-1612: Task clone does not clone language resources
+TRANSLATE-1604: Jobs may not be created with status finished
+TRANSLATE-1609: API Usage: On task creation no PM can be explicitly defined
+TRANSLATE-1603: Show the link to TermPortal in InstantTranslate only, if user has TermPortal access rights
+TRANSLATE-1595: Match analysis export button is disabled erroneously
+TRANSLATE-1597: Concordance search uses only the source language
+TRANSLATE-1607: Feature logout on page change disables language switch
+TRANSLATE-1599: Error in Search and Replace repaired
+T5DEV-266: Sessions can be hijacked
+
+## [3.1.1] - 2019-02-28
+###Added
+TRANSLATE-1589: Separate button to sync the GroupShare TMs in LanguageResources panel
+TRANSLATE-1586: Close session on browser window close
+TRANSLATE-1581: Click on PM Name in task overview opens e-mail program to send an e-mail to the PM
+TRANSLATE-1457: Use OpenID Connect optionally for authentication and is now able to run under different domains
+
+###Changed
+TRANSLATE-1583: VisualReview: Change the button layout in "leave visual review" messagebox
+TRANSLATE-1584: Rename "Autostatus" to "Bearbeitungsstatus" in translate5 editor (german GUI)
+TRANSLATE-1542: InstantTranslate: Improve language selection in InstantTranslate
+TRANSLATE-1587: Enable session delete to delete via internalSessionUniqId
+
+###Bugfixes
+TRANSLATE-1579: TermTagger is not tagging terminology automatically on task import wizard
+TRANSLATE-1588: Pre-translation is running although it was disabled
+TRANSLATE-1572: Import language resources in background
+TRANSLATE-1575: Unable to take over match from language resources match grid in editor
+TRANSLATE-1567: Globalese integration: Error occurred during file upload or translation
+TRANSLATE-1560: Introduce a config switch to disable match resource panel
+TRANSLATE-1580: Remove word count field from the task import wizard
+TRANSLATE-1571: Copy and paste segment content does not work when selecting whole source segment
+
+## [3.0.5] - 2019-02-07
+###Bugfixes
+TRANSLATE-1570: Editor-only usage (embedded translate5) was not working properly due JS errors
+TRANSLATE-1548: TrackChanges: nested DEL tags in the frontend
+TRANSLATE-1526: TrackChanges: pasting content into the editor could lead to an JS error
+TRANSLATE-1566: Segment pixel length restriction does not work with globalese pretranslation
+TRANSLATE-1556: pressing ctrl-c in language resource panel produced an JS error
+TRANSLATE-910: Fast clicking on segment bookmark button produces an error on server side
+TRANSLATE-1545: Term details are not displayed in term portal
+TRANSLATE-1525: TrackChanges: seldom error in the GUI fixed
+TRANSLATE-1230: Translate5 was not usable on touch devices
+
 ## [3.0.4] - 2019-01-31
 ###Changed
 TRANSLATE-1555: Okapi Import: Add SRX segmentation rules for most common languages
