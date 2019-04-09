@@ -1000,7 +1000,7 @@ abstract class editor_Workflow_Abstract {
      * 
      * @param editor_Models_TaskUserAssoc $oldTua
      * @param editor_Models_TaskUserAssoc $newTua
-     * @param $prefix optional, defaults to "do"
+     * @param string $prefix optional, defaults to "do"
      * @return string
      */
     public function getTriggeredState(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, $prefix = 'do') {
@@ -1117,7 +1117,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * can be triggered via API, valid triggers are currently
      * @param editor_Models_Task $task
-     * @param unknown $trigger
+     * @param string $trigger
      */
     public function doDirectTrigger(editor_Models_Task $task, $trigger) {
         if(!in_array($trigger, $this->validDirectTrigger)) {
