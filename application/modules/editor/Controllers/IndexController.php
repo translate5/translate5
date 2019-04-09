@@ -231,6 +231,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       
       $this->view->Php2JsVars()->set('preferences.alikeBehaviour', $rop->alike->defaultBehaviour);
       $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$rop->loginUrl);
+      $this->view->Php2JsVars()->set('logoutOnWindowClose', APPLICATION_RUNDIR.$rop->logoutOnWindowClose);
       
       //inject helUrl variable used in frontend
       $this->view->Php2JsVars()->set('helpUrl',$rop->helpUrl);
@@ -275,6 +276,9 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
       //default state configuration for frontend components(grid)
       $this->view->Php2JsVars()->set('frontend.defaultState', $rop->frontend->defaultState->toArray());
       
+      //create mailto link in the task list grid pm name column
+      $this->view->Php2JsVars()->set('frontend.tasklist.pmMailTo', (boolean)$rop->frontend->tasklist->pmMailTo);
+      
       $this->view->Php2JsVars()->set('frontend.importTask.fieldsDefaultValue', $rop->frontend->importTask->fieldsDefaultValue->toArray());
       
       //flag if the segment count status strip component should be displayed
@@ -282,6 +286,12 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
 
       //needed for enabling download link of archive zip
       $this->view->Php2JsVars()->set('import.createArchivZip', (bool)$rop->import->createArchivZip);
+      
+      //disable language resources match panel in editor when only termcollection is assigned to the task
+      $this->view->Php2JsVars()->set('editor.LanguageResources.disableIfOnlyTermCollection',(boolean)$rop->editor->LanguageResources->disableIfOnlyTermCollection);
+      
+      //is the openid data visible for the default customer
+      $this->view->Php2JsVars()->set('customers.openid.showOpenIdDefaultCustomerData',(boolean)$rop->customers->openid->showOpenIdDefaultCustomerData);
       
       $this->setLanguageResourceJsVars();
       
@@ -316,6 +326,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
     protected function setJsAppData() {
         $userSession = new Zend_Session_Namespace('user');
         $userSession->data->passwd = '********';
+        $userSession->data->openIdSubject = '';
         $userRoles = $userSession->data->roles;
         
         $acl = ZfExtended_Acl::getInstance();

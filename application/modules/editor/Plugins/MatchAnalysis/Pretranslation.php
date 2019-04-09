@@ -312,7 +312,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segment->setTimeTrackData($duration);
         
         $history->save();
-        $segment->setTimestamp(null);
+        $segment->setTimestamp(NOW_ISO);
         $segment->save();
     }
     

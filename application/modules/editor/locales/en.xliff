@@ -748,19 +748,26 @@
         <source>Französisch (Belgien)</source>
         <target>French (Belgium)</target>
       </trans-unit>
-      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChaSVAsIENTViwgU0RMWExJRkYsIFhMSUZGOyBBbmdhYmUgbm90d2VuZGlnKQ=='>
-          <source>Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)</source>
-          <target>Select the data to be imported (ZIP, CSV, SDLXLIFF, XLIFF; specifying required)</target>
-      </trans-unit>
       <trans-unit id='SW1wb3J0IERhdGVpwrk='>
           <source>Import Datei¹</source>
           <target>Import Datei¹</target>
       </trans-unit>
-      <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFpJUCwgQ1NWLCBYTElGRiBvZGVyIFNETFhMSUZGIERhdGVpIQ=='>
-        <source>Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!</source>
-        <target>Please use a ZIP, CSV, XLIFF or SDLXLIFF file only!</target>
+      <trans-unit id='RGVyIERhdGVpdHlwICJ7ZXh0fSIgZGVyIGF1c2dld8OkaGx0ZW4gRGF0ZWkgIntmaWxlbmFtZX0iIHdpcmQgbmljaHQgdW50ZXJzdMO8dHp0Lg=='>
+          <source>Der Dateityp "{ext}" der ausgewählten Datei "{filename}" wird nicht unterstützt.</source>
+          <target>The file-type "{ext}" of the selected file "{filename}" is not supported.</target>
       </trans-unit>
-      
+      <trans-unit id='PGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHBzOi8vY29uZmx1ZW5jZS50cmFuc2xhdGU1Lm5ldC9kaXNwbGF5L0JVUy9TdXBwb3J0ZWQrZmlsZStmb3JtYXRzIj5NZWhyIEluZm9ybWF0aW9uZW48L2E+IHp1IGRlbiBpbXBvcnRpZXJiYXJlbiBEYXRlaWZvcm1hdGVuLg=='>
+          <source><a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">Mehr Informationen</a> zu den importierbaren Dateiformaten.</source>
+          <target><a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">More information</a> about the importable file formats.</target>
+      </trans-unit>
+      <trans-unit id='V8OkaGxlbiBTaWUgZGllIHp1IGltcG9ydGllcmVuZGVuIERhdGVuIChBbmdhYmUgbm90d2VuZGlnKQ=='>
+          <source>Wählen Sie die zu importierenden Daten (Angabe notwendig)</source>
+          <target>Select the data to be imported (specifying required)</target>
+      </trans-unit>
+      <trans-unit id='RGFzIERhdGVpZm9ybWF0IGRlciBhdXNnZXfDpGhsdGVuIERhdGVpIHdpcmQgbmljaHQgdW50ZXJzdMO8dHp0IQ=='>
+          <source>Das Dateiformat der ausgewählten Datei wird nicht unterstützt!</source>
+          <target>The file-format of the selected file is not supported!</target>
+      </trans-unit>
       
       <trans-unit id='Qml0dGUgdmVyd2VuZGVuIFNpZSBlaW5lIFRCWCBEYXRlaSE='>
         <source>Bitte verwenden Sie eine TBX Datei!</source>
@@ -1101,6 +1108,7 @@
 	  <source>Trotzdem speichern</source>
 	  <target>Save anyway</target>
 	</trans-unit>
+    <trans-unit id='RG9wcGVsa2xpY2sgYXVmIGRpZSBaZWlsZSDDvGJlcm5pbW10IGRpZXNlbiBNYXRjaCBpbiBkYXMgZ2XDtmZmbmV0ZSBTZWdtZW50Lg=='><source>Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.</source><target>Doubleclick to take over the match into the opened segment.</target></trans-unit>
         <trans-unit id='TWl0IHRyYW5zbGF0ZTUga8O2bm5lbiBTaWUgU0RMWExJRkYtIHVuZCBDU1YtRGF0ZWllbiBpbSBCcm93c2VyIGxla3RvcmllcmVuIGxhc3NlbiAtIG9obmUgTGl6ZW56a29zdGVuIC0gYXVmIE9wZW4gU291cmNlLUJhc2lzLg=='><source>Mit translate5 können Sie SDLXLIFF- und CSV-Dateien im Browser lektorieren lassen - ohne Lizenzkosten - auf Open Source-Basis.</source><target>With translate5 you can proofread SDLXLIFF, openTM2-XLIFF and CSV files in the browser - without licensing costs and on open-source basis</target></trans-unit>
 
 <trans-unit id='VW50ZXJzdMO8dHp1bmcgZGVyIEVudHdpY2tsdW5nIHZvbiB0cmFuc2xhdGU1'><source>Unterstützung der Entwicklung von translate5</source><target>Support of translate5 development</target></trans-unit>
@@ -1533,10 +1541,6 @@
     <source>Change</source>
     <target>Change</target>
 </trans-unit>
-<trans-unit id='U2llIGvDtm5uZW4gbmViZW4gdW5zZXJlbSBaSVAtQ29udGFpbmVyLUZvcm1hdCBhdWNoIGRpcmVrdCBTRExYTElGRiwgWExJRkYgb2RlciBDU1YgRGF0ZWllbiBiZW51dHplbi4gPGEgdGFyZ2V0PSJfYmxhbmsiIGhyZWY9Imh0dHA6Ly9jb25mbHVlbmNlLnRyYW5zbGF0ZTUubmV0L2Rpc3BsYXkvQlVTL0Jhc2ljK3VzYWdlIj5NZWhyIEluZm88L2E+Lg=='>
-    <source>Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.</source>
-    <target>In addition to our ZIP-container format you can also use SDLXLIFF, XLIFF or CSV files directly. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">More information</a>.</target>
-</trans-unit>
 <trans-unit id='KHp1ciBJbXBvcnR6ZWl0KQ=='>
     <source>(zur Importzeit)</source>
     <target>(at time of import)</target>
@@ -1700,11 +1704,7 @@
     <source>%s - bearbeitet</source>
     <target>%s - edited</target>
 </trans-unit>
-<trans-unit id='QXV0b1N0YXR1cw=='>
-    <source>AutoStatus</source>
-    <target>AutoStatus</target>
-</trans-unit>
-
+<trans-unit id='QmVhcmJlaXR1bmdzc3RhdHVz'><source>Bearbeitungsstatus</source><target>Processing status</target></trans-unit>
 <trans-unit id='UGFzc3dvcnQgc2V0emVu'>
   <source>Passwort setzen</source>
   <target>Reset password</target>
@@ -2881,14 +2881,6 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.</source>
     <target>The user cannot be deleted, since it is used as PM in one or more tasks.</target>
 </trans-unit>
-<trans-unit id="RWRpdG9ybW9kaQ==">
-    <source>Editormodi</source>
-    <target>Editor modes</target>
-</trans-unit>
-<trans-unit id="VGFnbW9kaQ==">
-    <source>Tagmodi</source>
-    <target>Tag modes</target>
-</trans-unit>
 <trans-unit id="U2VnbWVudHNjaHJpZnRncmFkIHZlcmdyw7bDn2VybiAoU1RSRyArICsp">
     <source>Segmentschriftgrad vergrößern (STRG + +)</source>
     <target>increase segment font-size (STRG + +)</target>
@@ -3140,7 +3132,58 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</source>
   <target>The imported package did not contain valid data in the "{proofRead}" directory.</target>
 </trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dCwgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbi4='>
+  <source>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</source>
+  <target>The task is in use, and cannot be deleted therefore!</target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0LCB1bmQga2FubiBkYWhlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuLg=='>
+  <source>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</source>
+  <target>The task is locked by a user, and cannot be deleted therefore!</target>
+</trans-unit>
+<trans-unit id='RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc291cmNlIGdpYnQgZXMgbmljaHQh'>
+  <source>Die gewünschte Sprachresource gibt es nicht!</source>
+  <target>The chosen language resource does not exist.</target>
+</trans-unit>
+<trans-unit id='RGllIEF1ZmdhYmUgd2lyZCBiZWFyYmVpdGV0LCBkaWUgU3ByYWNocmVzb3VyY2Uga2FubiBkYWhlciBpbSBNb21lbnQgbmljaHQgdm9uIGRlciBBdWZnYWJlIGVudGZlcm50IHdlcmRlbiE='>
+  <source>Die Aufgabe wird bearbeitet, die Sprachresource kann daher im Moment nicht von der Aufgabe entfernt werden!</source>
+  <target>The Task is in use, the language resource can not be removed from the task at the meoment!</target>
+</trans-unit>
 
+<trans-unit id='T3BlbklkIEVtaXR0ZW4='>
+    <source>OpenId Emitten</source>
+    <target>OpenId Issuer</target>
+</trans-unit>
+
+<trans-unit id='4oG0IERlciBCZW51dHplciBrYW5uIG5pY2h0IGJlYXJiZWl0ZXQgd2VyZGVuLiBEaWVzZXIgQmVudXR6ZXIgd2lyZCB2b24gdHJhbnNsYXRlNSBuYWNoIGRlciBPcGVuSWQtQXV0aGVudGlmaXppZXJ1bmcgYXV0b21hdGlzY2ggZXJzdGVsbHQu'>
+    <source>⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.</source>
+    <target>⁴ Unable to edit the user. This user is auto created by translate5 after OpenId authentication.</target>
+</trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSB3aXJkIGdlbGFkZW46'><source>translate5 wird geladen:</source><target>translate5 is loading:</target></trans-unit>
+<trans-unit id='dHJhbnNsYXRlNSBEb21haW4='><source>translate5 Domain</source><target>translate5 domain</target></trans-unit>
+<trans-unit id='T3BlbklkIHNlcnZlcg=='><source>OpenId server</source><target>OpenId server</target></trans-unit>
+<trans-unit id='T3BlbklkIEJlbnV0emVybmFtZQ=='><source>OpenId Benutzername</source><target>OpenId user name</target></trans-unit>
+<trans-unit id='T3BlbklkIFBhc3N3b3J0'><source>OpenId Passwort</source><target>OpenId password</target></trans-unit>
+<trans-unit id='T3BlbklkIE9BdXRoIFVSTA=='><source>OpenId OAuth URL</source><target>OpenId OAuth URL</target></trans-unit>
+<trans-unit id='VmVybGlua3RlciBUZXh0IExvZ2luc2VpdGU='><source>Verlinkter Text Loginseite</source><target>Linked text on login page</target></trans-unit>
+<trans-unit id='QW5tZWxkZXNlaXRlIG5pY2h0IGFuemVpZ2VuOiBBdXRvbWF0aXNjaCB6dW0gT3BlbklEIENvbm5lY3QtU2VydmVyIHVtbGVpdGVuLCB3ZW5uIGtlaW5lIEJlbnV0emVyc2l0enVuZyBpbiB0cmFuc2xhdGU1IHZvcmhhbmRlbiBpc3QuIFdlbm4gZGllc2UgQ2hlY2tib3ggbmljaHQgYWt0aXZpZXJ0IGlzdCwgd2lyZCBkZXIgaW0gdW50ZW5zdGVoZW5kZW4gVGV4dGZlbGQgZGVmaW5pZXJ0ZSBUZXh0IGF1ZiBkZXIgTG9naW5zZWl0ZSB2b24gdHJhbnNsYXRlNSBtaXQgZGVtIE9wZW5JRCBDb25uZWN0IFNlcnZlciB2ZXJsaW5rdC4='><source>Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.</source><target>Do not show login page: Automatically redirect to OpenID Connect server if there is no user session in translate5. If this checkbox is not activated, the text defined in the text box below will be linked to the OpenID Connect server on the login page of translate5.</target></trans-unit>
+<trans-unit id='TnIu'><source>Nr.</source><target>Nr.</target></trans-unit>
+<trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRlciBCZW51dHplciBkaWVzZSBha3R1ZWxsIGJlbnV0enQu'>
+  <source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.</source>
+  <target>The association between a task and a user could not be removed, because the user is currently using the task.</target>
+</trans-unit>
+<trans-unit id='RGllIFp1d2Vpc3VuZyB6d2lzY2hlbiBBdWZnYWJlIHVuZCBCZW51dHplciBrYW5uIG5pY2h0IGdlbMO2c2NodCB3ZXJkZW4sIGRhIGRpZSBBdWZnYWJlIGR1cmNoIGRlbiBCZW51dHplciBnZXNwZXJydCBpc3Qu'>
+    <source>Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.</source>
+    <target>The association between a task and a user could not be removed, because the task is currently locked by the user.</target>
+</trans-unit>
+<trans-unit id='RGllc2UgS3VuZGVubnVtbWVyIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'>
+    <source>Diese Kundennummer wird bereits verwendet.</source>
+    <target>This client-number is already in use.</target>
+</trans-unit>
+<trans-unit id='RGVyIHJlZmVyZW56aWVydGUgS3VuZGUgZXhpc3RpZXJ0IG5pY2h0IChtZWhyKe+7vy4='>
+    <source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source>
+    <target>The referenced customer does not exist (anymore).</target>
+</trans-unit>
+<trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>View mode</target></trans-unit>
     </body>
   </file>
 </xliff>

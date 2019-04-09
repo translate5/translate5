@@ -51,8 +51,8 @@ class Editor_CustomerController extends ZfExtended_RestController {
         if(!$this->isAllowed("backend","customerAdministration")){
             throw new ZfExtended_NoAccessException();
         }
-        
-        return parent::indexAction();
+        parent::indexAction();
+        $this->cleanUpOpenIdForDefault();
     }
     
     public function postAction() {
@@ -88,7 +88,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1047' => 'A client cannot be deleted as long as tasks are assigned to this client.'
-            ]);
+            ], 'editor.customer');
             throw new ZfExtended_Models_Entity_Conflict('E1047');
         }
     }
@@ -135,6 +135,54 @@ class Editor_CustomerController extends ZfExtended_RestController {
         });
     }
     
+    protected function decodePutData(){
+        parent::decodePutData();
+        $this->handleDomainField();
+    }
+    
+    /***
+     * Handle the domain field from the post/put request data.
+     */
+    protected function handleDomainField(){
+        if(!isset($this->data->domain)){
+            return;
+        }
+        //because it is uniqe key, do not allow empty value
+        if(empty($this->data->domain)){
+            $this->data->domain=null;
+            return;
+        }
+        //add always / at the end of the url
+        if(substr($this->data->domain,-1)!=='/'){
+            $this->data->domain.='/';
+        }
+    }
+    
+    /***
+     * Remove the openid data for the default customer if it is configured so
+     */
+    protected function cleanUpOpenIdForDefault(){
+        $config = Zend_Registry::get('config');
+        $showOpenIdForDefault=(boolean)$config->runtimeOptions->customers->openid->showOpenIdDefaultCustomerData;
+        if($showOpenIdForDefault){
+            return;
+        }
+        
+        foreach ($this->view->rows as &$row){
+            if($row['number']!=editor_Models_Customer::DEFAULTCUSTOMER_NUMBER){
+                continue;
+            }
+            $row['domain']=null;
+            $row['openIdServer']=null;
+            $row['openIdAuth2Url']=null;
+            $row['openIdServerRoles']=null;
+            $row['openIdClientId']=null;
+            $row['openIdClientSecret']=null;
+            $row['openIdRedirectLabel']=null;
+            $row['openIdRedirectCheckbox']=null;
+        }
+    }
+    
     /**
      * Protect the default customer from being edited or deleted.
      */
@@ -152,7 +200,11 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @throws Zend_Db_Statement_Exception
      */
     protected function handleDuplicateNumber(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-        throw ZfExtended_UnprocessableEntity::createResponse([
+        //TODO: handle duplicate for the OpenId domain
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1063' => 'The given client-number is already in use.'
+        ], 'editor.customer');
+        throw ZfExtended_UnprocessableEntity::createResponse('E1063', [
             'number' => ['duplicateClientNumber' => 'Diese Kundennummer wird bereits verwendet.']
         ]);
     }

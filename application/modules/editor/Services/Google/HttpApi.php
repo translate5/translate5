@@ -166,7 +166,7 @@ class editor_Services_Google_HttpApi {
     
     protected function badGateway(Exception $e) {
         $badGateway = new ZfExtended_BadGateway('Die angefragte Google Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setOrigin('Google Api');
+        $badGateway->setDomain('Google Api');
         
         $error = new stdClass();
         $error->type = 'HTTP';

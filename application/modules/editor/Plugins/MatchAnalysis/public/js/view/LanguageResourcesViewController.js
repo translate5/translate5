@@ -57,7 +57,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.LanguageResourcesViewController', 
 		}
 		
 		//if one of the pretranslation priority cb is checked, run the pretranslations
-		if(pretranslateMt.checked || pretranslateTmAndTerm.checked){
+		if((!pretranslateMt.isDisabled() && pretranslateMt.checked) || (!pretranslateTmAndTerm.isDisabled() && pretranslateTmAndTerm.checked)){
 			view.fireEvent('startMatchAnalysis',view.task.get('id'),"pretranslation");
 			view.fireEvent('wizardCardFinished', skipSteps);
 			return;

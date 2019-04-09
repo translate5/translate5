@@ -130,12 +130,11 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.Grid.prototype.target_original = ' <?php echo $this->translate->_('(zur Importzeit)');?>';
   	
   	var gridToolbar = Editor.view.segments.grid.Toolbar.prototype;
-  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Editormodi');?>';
+  	gridToolbar.item_viewModesMenu = '<?php echo $this->translate->_('Ansichtsmodus');?>';
   	gridToolbar.item_viewModeBtn = '<?php echo $this->translate->_('Details (nur Lesemodus)');?>';
   	gridToolbar.item_editModeBtn = '<?php echo $this->translate->_('Details');?>';
   	gridToolbar.item_ergonomicModeBtn = '<?php echo $this->translate->_('Normal');?>';
   	gridToolbar.item_ergonomicModeReadonlyBtn = '<?php echo $this->translate->_('Normal (nur Lesemodus)');?>';
-  	gridToolbar.item_tagModesMenu = '<?php echo $this->translate->_('Tagmodi');?>';
   	gridToolbar.item_hideTagBtn = '<?php echo $this->translate->_('Tags verbergen');?>';
   	gridToolbar.item_shortTagBtn = '<?php echo $this->translate->_('Tag-Kurzansicht');?>';
   	gridToolbar.item_fullTagBtn = '<?php echo $this->translate->_('Tag-Vollansicht');?>';
@@ -217,7 +216,7 @@ Ext.define('Editor.controller.Localizer', {
     });
   	
   	Editor.view.ui.segments.column.Editable.prototype.text = '<?php echo $this->translate->_('Gesperrt');?>';
-  	Editor.view.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Autostatus');?>';
+  	Editor.view.segments.column.AutoState.prototype.text = '<?php echo $this->translate->_('Bearbeitungsstatus');?>';
   	Editor.view.ui.segments.column.State.prototype.text = '<?php echo $this->translate->_('Status');?>';
   	Editor.view.ui.segments.column.UserName.prototype.text = '<?php echo $this->translate->_('letzter Bearbeiter');?>';
   	Editor.view.segments.column.WorkflowStep.prototype.text = '<?php echo $this->translate->_('bearbeitet bei');?>';
@@ -225,7 +224,9 @@ Ext.define('Editor.controller.Localizer', {
   	Editor.view.segments.column.Comments.prototype.text_morecomments = '<?php echo $this->translate->_('({0} weitere Kommentare)');?>';
   	Editor.view.segments.column.Comments.prototype.text_morecomment = '<?php echo $this->translate->_('({0} weiterer Kommentar)');?>';
   	Editor.view.segments.column.Comments.prototype.text_tooltip_icon = '<?php echo $this->translate->_('Dem ausgewählten Segment einen Kommentar hinzufügen. (ALT + C)');?>';
-  	
+
+	Editor.view.segments.column.SegmentNrInTask.prototype.text = '<?php echo $this->translate->_('Nr.');?>';  	
+    
     Ext.define("Editor.locale.de.controller.ViewModes", {
         override: "Editor.controller.ViewModes",
         messageIsViewMode: '<?php echo $this->translate->_('Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.');?>'
@@ -302,6 +303,7 @@ Ext.define('Editor.controller.Localizer', {
             takeTagTooltip: '<?php echo $this->translate->_('STRG + EINFG (alternativ STRG + . (Punkt)) kopiert den kompletten Quelltext in den Zieltext<br />STRG + , (Komma) + &gt;Nummer&lt; kopiert den entsprechenden Tag in den Zieltext (Null entspricht Tag Nr. 10)<br />STRG + SHIFT + , (Komma) + &gt;Nummer&lt; kopiert die Tags mit den Nummern 11 bis 20 in den Zieltext.');?>',
             editorMoveTitle: '<?php echo $this->translate->_('Verschiebbarer Editor und hilfreiche Tastaturkürzel');?>',
             editorMove: '<?php echo $this->translate->_('Der Segmenteditor kann mit der Maus beliebig positioniert werden. <br />Dazu lediglich den Segmenteditor anklicken und dann verschieben.');?>',
+            doubleclickToTakeMatch: '<?php echo $this->translate->_('Doppelklick auf die Zeile übernimmt diesen Match in das geöffnete Segment.');?>'
         }
     });
     
@@ -545,10 +547,10 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
         strings: {
-            importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)');?>',
+            importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
-            importUploadType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!');?>',
-            importNews: '<?php echo $this->translate->_('Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.');?>',
+            importUploadType: '<?php echo $this->translate->_('Das Dateiformat der ausgewählten Datei wird nicht unterstützt!');?>',
+            importNews: '<?php echo $this->translate->_('<a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">Mehr Informationen</a> zu den importierbaren Dateiformaten.');?>',
             taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
             taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
             taskNameLabel: '<?php echo $this->translate->_('Projektname¹');?>',
@@ -877,7 +879,8 @@ Ext.define('Editor.controller.Localizer', {
         gender: '<?php echo $this->translate->_('Anrede');?>',
         email: '<?php echo $this->translate->_('E-Mail');?>',
         locale: '<?php echo $this->translate->_('Sprache');?>',
-        roles: '<?php echo $this->translate->_('Systemrollen');?>'
+        roles: '<?php echo $this->translate->_('Systemrollen');?>',
+        openIdIssuer: '<?php echo $this->translate->_('OpenId Emitten');?>'
     };
     Editor.view.admin.UserGrid.prototype.strings = {
         addUser: '<?php echo $this->translate->_('Benutzer hinzufügen');?>',
@@ -935,7 +938,8 @@ Ext.define('Editor.controller.Localizer', {
         targetLangageTip: '<?php echo $this->translate->_('Zielsprache(n)');?>',
         languageInfo: '<?php echo $this->translate->_('Beim Import von Aufgaben werden "Editor" Benutzer mit den passenden Sprachen <a href="http://confluence.translate5.net/pages/viewpage.action?pageId=557164" target="_blank" title="mehr Info">automatisch der Aufgabe zugewiesen</a>.');?>',
         localeLabel: '<?php echo $this->translate->_('Benutzersprache');?>',
-        parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>'
+        parentUserLabel: '<?php echo $this->translate->_('Übergeordneter Benutzer');?>',
+        bottomOpenIdNoEditInfo: '<?php echo $this->translate->_(' ⁴ Der Benutzer kann nicht bearbeitet werden. Dieser Benutzer wird von translate5 nach der OpenId-Authentifizierung automatisch erstellt.');?>'
     };
 <?php
     } //END if $this->hasFrontendController('Editor.controller.admin.User')
@@ -1020,7 +1024,15 @@ Ext.define('Editor.controller.Localizer', {
             customerDeleteMsg:'<?php echo $this->translate->_("Diesen Kunden löschen?");?>',
             customerDeleteTitle:'<?php echo $this->translate->_("Kunden löschen");?>',
             customerDeletedMsg:'<?php echo $this->translate->_("Kunde gelöscht");?>',
-            export:'<?php echo $this->translate->_("Exportieren");?>'
+            export:'<?php echo $this->translate->_("Exportieren");?>',
+            domain:'<?php echo $this->translate->_("translate5 Domain");?>',
+            openIdServer:'<?php echo $this->translate->_("OpenId server");?>',
+            openIdAuth2Url:'<?php echo $this->translate->_("OpenId OAuth URL");?>',
+            rolesLabel:'<?php echo $this->translate->_("Systemrollen");?>',
+            openIdClientId:'<?php echo $this->translate->_("OpenId Benutzername");?>',
+            openIdClientSecret:'<?php echo $this->translate->_("OpenId Passwort");?>',
+            openIdRedirectLabel:'<?php echo $this->translate->_("Verlinkter Text Loginseite");?>',
+            openIdRedirectCheckbox:'<?php echo $this->translate->_("Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.");?>'
         }
     });
 

@@ -118,6 +118,10 @@ class editor_TaskController extends ZfExtended_RestController {
         //set same join for sorting!
         $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
         
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1064' => 'The referenced customer does not exist (anymore).'
+        ], 'editor.task');
+        
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $this->user = new Zend_Session_Namespace('user');
@@ -230,7 +234,14 @@ class editor_TaskController extends ZfExtended_RestController {
             array_push($taskassocs[$res['taskGuid']], $res);
         }
         
+        //if the config for mailto link in task grid pm user column is configured
+        $isMailTo=$this->config->runtimeOptions->frontend->tasklist->pmMailTo;
+        
         $customerData = $this->getCustomersForRendering($rows);
+
+        if($isMailTo){
+            $userData=$this->getUsersForRendering($rows);
+        }
         
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
@@ -251,6 +262,10 @@ class editor_TaskController extends ZfExtended_RestController {
             //add task assoc if exist
             if(isset($taskassocs[$row['taskGuid']])){
                 $row['taskassocs'] = $taskassocs[$row['taskGuid']];
+            }
+            
+            if($isMailTo) {
+                $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
         }
         return $rows;
@@ -350,13 +365,37 @@ class editor_TaskController extends ZfExtended_RestController {
         },$rows);
 
         if(empty($customerIds)){
-           return [];
+            return [];
         }
         
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds($customerIds);
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
+    }
+    
+    /***
+     * Return a mapping of user guid and user email
+     * @param array $rows
+     * @return array|array
+     */
+    protected function getUsersForRendering(array $rows) {
+        if(empty($rows)){
+            return [];
+        }
+        
+        $userGuids = array_map(function($item){
+            return $item['pmGuid'];
+        },$rows);
+            
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $userData = $user->loadByGuids($userGuids);
+        $ret=[];
+        foreach ($userData as $data){
+            $ret[$data['userGuid']]=$data['email'];
+        }
+        return $ret;
     }
     
     /**
@@ -380,10 +419,16 @@ class editor_TaskController extends ZfExtended_RestController {
             //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
             $this->data['autoStartImport'] = true;
         }
-        $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
-        $pm->init((array)$this->user->data);
+        if(empty($this->data['pmGuid']) || !$this->isAllowed('frontend','editorEditTaskPm')) {
+            $this->data['pmGuid'] = $this->user->data->userGuid;
+            $pm->init((array)$this->user->data);
+        }
+        else {
+            //TODO test what happens with new error logging if PM does not exist? 
+            $pm->loadByGuid($this->data['pmGuid']);
+        }
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
         $this->convertToLanguageIds();
@@ -513,15 +558,10 @@ class editor_TaskController extends ZfExtended_RestController {
             'level' => ZfExtended_Logger::LEVEL_INFO
         ]);
         
-        throw ZfExtended_UnprocessableEntity::createResponse([
+        throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
             //fieldName => error message to field
             $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
-        ], $e->getErrors(), $e);
-        
-        throw ZfExtended_UnprocessableEntity::createResponse([
-            //fieldName => error message to field
-            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
-        ], $e->getErrors(), $e);
+        ]);
     }
     
     /**
@@ -535,7 +575,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(! $e->isInMessage('REFERENCES `LEK_customer`')) {
             throw $e;
         }
-        throw ZfExtended_UnprocessableEntity::createResponse([
+        throw ZfExtended_UnprocessableEntity::createResponse('E1064', [
             'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
         ], [], $e);
     }
@@ -587,6 +627,7 @@ class editor_TaskController extends ZfExtended_RestController {
         copy($oldTaskPath, $copy);
         
         $data = (array) $this->entity->getDataObject();
+        $oldTaskGuid=$data['taskGuid'];
         unset($data['id']);
         unset($data['taskGuid']);
         unset($data['state']);
@@ -598,11 +639,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
-        ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
+        ZfExtended_Utils::cleanZipPaths($copy, editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT);
         $this->upload->initByGivenZip($copy);
         
         if($this->validate()) {
             $this->processUploadedFile();
+            $this->cloneLanguageResources($oldTaskGuid,$this->entity->getTaskGuid());
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
@@ -1090,8 +1132,10 @@ class editor_TaskController extends ZfExtended_RestController {
         $diff = (boolean)$this->getRequest()->getParam('diff');
         
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        
         switch ($context) {
             case 'importArchive':
+                $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
                 return;
                 
@@ -1149,6 +1193,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $suffix = '.zip';
         }
         
+        $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
         $this->provideZipDownload($zipFile, $suffix);
         
         //rename file after usage to export.zip to keep backwards compatibility
@@ -1247,6 +1292,29 @@ class editor_TaskController extends ZfExtended_RestController {
         $e->setErrors($errors);
         $this->view->validTrigger = $this->workflow->getDirectTrigger();
         $this->handleValidateException($e);
+    }
+
+    /***
+     * Clone existing language resources from oldTaskGuid for newTaskGuid.
+     */
+    protected function cloneLanguageResources(string $oldTaskGuid,string $newTaskGuid){
+        try{
+
+            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+            /* @var $model editor_Models_LanguageResources_Taskassoc */
+            $assocs=$model->loadByTaskGuids([$oldTaskGuid]);
+            if(empty($assocs)){
+                return;
+            }
+            foreach($assocs as $assoc){
+                unset($assoc['id']);
+                $assoc['taskGuid']=$newTaskGuid;
+                $model->init($assoc);
+                $model->save();
+            }
+        }catch(ZfExtended_Models_Entity_NotFoundException $e){
+            return;
+        }
     }
     
     /**

@@ -54,6 +54,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @var string
      */
     const PLACEHOLDER_TEMPLATE='<translate5:escaped id="%s" />';
+    const PLACEHOLDER_TAG='<translate5:escaped>';
     
     public function __construct(){
         $this->replacerRegex=self::REGEX_INTERNAL_TAGS;

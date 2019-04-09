@@ -85,10 +85,9 @@ class editor_Plugins_Okapi_Connector {
     private $inputFile;
     
     public function __construct() {
-        $this->okapiConfig= Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
-        /* @var $config Zend_Config */
+        $this->okapiConfig = Zend_Registry::get('config')->runtimeOptions->plugins->Okapi;
         
-        $this->apiUrl=$this->okapiConfig->api->url;
+        $this->apiUrl = $this->okapiConfig->api->url;
     }
     
     /**
@@ -128,10 +127,11 @@ class editor_Plugins_Okapi_Connector {
     
     /**
      * Create the project on Okapi server.
-     * 
-     * @return integer Okapi project id
      */
     public function createProject() {
+        if(empty($this->apiUrl)) {
+            throw new editor_Plugins_Okapi_Exception('E1059');
+        }
         $http = $this->getHttpClient($this->apiUrl.'projects/new');
         $response = $http->request('POST');
         $this->processResponse($response);
@@ -141,12 +141,12 @@ class editor_Plugins_Okapi_Connector {
     
     /**
      * Remove the project from Okapi server.
-     * 
-     * @param int $projectId
      */
     public function removeProject() {
-        $url=$this->projectUrl;
-        $http = $this->getHttpClient($url);
+        if(empty($this->projectUrl)) {
+            return;
+        };
+        $http = $this->getHttpClient($this->projectUrl);
         $response= $http->request('DELETE');
         $this->processResponse($response);
     }
@@ -156,7 +156,8 @@ class editor_Plugins_Okapi_Connector {
      */
     public function uploadOkapiConfig(array $bconfPaths){
         if(empty($bconfPaths) || empty($bconfPaths[0]) || !file_exists($bconfPaths[0])) {
-            throw new editor_Plugins_Okapi_Exception('Bconf not given or not found: '.$bconfPaths[0]);
+             // 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
+             throw new editor_Plugins_Okapi_Exception('E1055', ['bconfFile' => $bconfPaths[0]]);
         }
         $url = $this->projectUrl.'/batchConfiguration';
         $http = $this->getHttpClient($url);
@@ -227,7 +228,7 @@ class editor_Plugins_Okapi_Connector {
      * Run the file conversion. For each uploaded files converted file will be created
      */
     public function ping(){
-        $url = $this->projectUrl;
+        $url = $this->apiUrl;
         if(empty($url)) {
             return 'Okapi NOT configured!';
         }

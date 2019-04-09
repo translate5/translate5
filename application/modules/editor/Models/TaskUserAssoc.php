@@ -248,20 +248,24 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $taskGuid = $this->get('taskGuid');
         $task = ZfExtended_Factory::get('editor_Models_Task');
 
-        $e = new ZfExtended_BadMethodCallException();
-        $e->setLogging(false);
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1061' => 'The job can not be removed, since the user is using the task.',
+            'E1062' => 'The job can not be removed, since the task is locked by the user.',
+        ]);
         
         if($this->isUsed()) {
-            $e->setMessage("Die Aufgabe wird von einem Benutzer benutzt", true);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1061', [
+                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.'
+            ], ['job' => $this]);
         }
         
         /* @var $task editor_Models_Task */
         if($task->isLocked($taskGuid, $this->getUserGuid())) {
-            $e->setMessage("Die Aufgabe ist durch einen Benutzer gesperrt", true);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1062', [
+                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.'
+            ], ['job' => $this]);
         }
-
+        
         $result = parent::delete();
         $this->updateTask($taskGuid);
         return $result;

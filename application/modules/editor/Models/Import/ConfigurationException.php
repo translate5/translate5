@@ -31,7 +31,7 @@ class editor_Models_Import_ConfigurationException extends ZfExtended_ErrorCodeEx
     /**
      * @var string
      */
-    protected $origin = 'import.configuration';
+    protected $domain = 'editor.import.configuration';
     
     static protected $localErrorCodes = [
         'E1032' => 'The passed source language "{language}" is not valid.',

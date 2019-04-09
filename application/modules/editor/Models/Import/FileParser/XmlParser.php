@@ -75,6 +75,12 @@ class editor_Models_Import_FileParser_XmlParser {
     
     protected $nonXmlBlocks = [];
     
+    /***
+     * Used for string as valid xml check
+     * @var DOMDocument
+     */
+    protected $domDocument;
+    
     /**
      * walks through the given XML string and fires the registered callbacks for each found node 
      * Preserving whitespace in XML is defined by the xml:space attribute on each node. 
@@ -583,6 +589,34 @@ class editor_Models_Import_FileParser_XmlParser {
             call_user_func($this->handlerOther, $other, $key);
         }
         $this->log("Other#".$other.'#');
+    }
+    
+    /***
+     * Check if the given string is valid xml
+     * @param string $string
+     * @return boolean
+     */
+    public function isStringValidXml($string){
+        libxml_use_internal_errors(true);
+        
+        //surround with dummy tags so the string validation can be done with domdocument
+        $testString='<dummytag>'.$string.'</dummytag>';
+        if(!isset($this->domDocument)){
+            $this->domDocument=new DOMDocument('1.0', 'utf-8');
+        }
+        $this->domDocument->loadXML($testString);
+        
+        $errors = libxml_get_errors();
+        
+        if(empty($errors)){
+            return true;
+        }
+        
+        $error = $errors[0];
+        if($error->level < 3){
+            return true;
+        }
+        return false;
     }
     
     /**

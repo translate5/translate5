@@ -176,20 +176,19 @@ trait editor_Models_Import_FileParser_TagTrait {
     }
     
     /**
-     * Hilfsfunktion für parseSegment: Verpackung verschiedener Strings zur Zwischenspeicherung als HTML-Klassenname im JS
+     * helper for parseSegment: encode the tag content without leading and trailing <>
+     * checks if $tag starts with < and ends with >
      *
-     * @param string $tag enthält den Tag als String
-     * @param string $tagName enthält den Tagnamen
-     * @param bool $locked gibt an, ob der übergebene Tag die Referenzierung auf einen gesperrten inline-Text im sdlxliff ist
-     * @return string $id ID des Tags im JS
+     * @param string $tag contains the tag
+     * @return string encoded tag content
      */
     protected function parseSegmentGetStorageClass($tag) {
-        $tagContent = preg_replace('"^<(.*)>$"', '\\1', $tag);
-        if($tagContent == $tag){
-            trigger_error('The Tag ' . $tag .
-                    ' has not the structure of a tag.', E_USER_ERROR);
+        if(substr($tag, 0, 1) !== '<' || substr($tag, -1) !== '>'){
+            trigger_error('The Tag ' . $tag . ' has not the structure of a tag.', E_USER_ERROR);
         }
-        return implode('', unpack('H*', $tagContent));
+        //we store the tag content without leading < and trailing >
+        //since we expect to cut of just two ascii characters no mb_ function is needed, the UTF8 content inbetween is untouched
+        return implode('', unpack('H*', substr($tag, 1, -1)));
     }
     
     /**

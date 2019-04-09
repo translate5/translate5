@@ -286,7 +286,7 @@ class editor_Services_SDLLanguageCloud_HttpApi {
     
     protected function badGateway(Zend_Exception $e, $url) {
         $badGateway = new ZfExtended_BadGateway('Die angefragte SdlLanguageCloud Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setOrigin('LanguageResources');
+        $badGateway->setDomain('LanguageResources');
         
         $error = new stdClass();
         $error->type = 'HTTP';

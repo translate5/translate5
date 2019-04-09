@@ -35,16 +35,15 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
     /**
      * @var editor_Models_Segment
      */
-    protected $segment;
+    protected $entity;
     
     /**
      * Segment Validator needs a instanced editor_Models_SegmentFieldManager
      * @param editor_Models_SegmentFieldManager $sfm
      */
     public function __construct(editor_Models_SegmentFieldManager $sfm, editor_Models_Segment $segment) {
-        $this->segment = $segment;
         $this->segmentFieldManager = $sfm;
-        parent::__construct();
+        parent::__construct($segment);
     }
     
     /**
@@ -86,12 +85,9 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* @var $workflow editor_Workflow_Abstract */
         $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         
-        $session = new Zend_Session_Namespace();
-        $flagConfig = $session->runtimeOptions->segments;
-    
-        $this->setQualityValidator(array_keys($flagConfig->qualityFlags->toArray()));
+        $this->setQualityValidator(array_keys($config->runtimeOptions->segments->qualityFlags->toArray()));
         
-        $allowedValues = array_keys($flagConfig->stateFlags->toArray());
+        $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());
         $allowedValues[] = 0; //adding "not set" state
         $this->addValidator('stateId', 'inArray', array($allowedValues));
         
@@ -124,7 +120,7 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
    * @return boolean
    */
   protected function validateLength($value, $field){
-      $data = $this->segment->getDataObject();
+      $data = $this->entity->getDataObject();
       if(!property_exists($data, 'metaCache') || empty($data->metaCache)) {
           return true;
       }
@@ -142,9 +138,9 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
           if(!array_key_exists($field, $data['length'])){
               return true;
           }
-          if($id == $this->segment->getId()) {
+          if($id == $this->entity->getId()) {
               //if the found sibling is the segment itself, use the length of the value to be stored
-              $length += (int)$this->segment->textLengthByMeta($value, $this->segment->meta());
+              $length += (int)$this->entity->textLengthByMeta($value, $this->entity->meta());
               //normally, the length of one segment contains also the additionalMrkLength, 
               //for the current segment this is added below, the siblings in the next line contain their additionalMrk data already
           }

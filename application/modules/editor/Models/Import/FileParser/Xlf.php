@@ -41,6 +41,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     const PREFIX_SUB = 'sub-';
     const MISSING_MRK = 'missing-mrk';
     
+    /**
+     * defines if the content parser should reparse the chunks
+     * false default, better performance
+     * true used in subclasses, sometimes thats needed because of changes done in the XML structure
+     * @var boolean
+     */
+    const XML_REPARSE_CONTENT = false;
+    
     private $wordCount = 0;
     private $segmentCount = 1;
     
@@ -422,6 +430,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $content = '';
             }
         }
+        //the other lengths are stored per affected segment (and is already added to the length stored in metaCache per segment)
         $attributes->additionalMrkLength = $this->segmentBareInstance->textLengthByImportattributes($content, $attributes, $this->task->getTaskGuid());
     }
     
@@ -719,6 +728,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * init default values for length-Restriction-Attributes (sizeUnit, font, fontSize, minWidth, maxWidth): 
      */
     protected function initLengthRestrictionAttributes () {
+        if(!Zend_Registry::isRegistered('taskTemplate')) {
+            return;
+        }
         $keys = array_keys($this->lengthRestrictionDefaults);
         $taskConfig = Zend_Registry::get('taskTemplate');
         foreach($keys as $key) {
@@ -817,7 +829,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             else {
                 //parse the source chunks
-                $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1);
+                $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1, static::XML_REPARSE_CONTENT);
                 $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
                 
@@ -849,9 +861,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
                 else {
                     //parse the target chunks, store the real chunks from the XLF separatly 
-                    $targetChunksOriginal = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
+                    $targetChunksOriginal = $targetChunks = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
+                    
+                    //if reparse content is enabled, we convert the chunks to a string, so reparsing is triggerd
+                    if(static::XML_REPARSE_CONTENT) {
+                        $targetChunks = $this->xmlparser->join($targetChunks);
+                    }
                     //in targetChunks the content is converted (tags, whitespace etc)
-                    $targetChunks = $this->contentConverter->convert($targetChunksOriginal, false, $currentTarget['openerMeta']['preserveWhitespace']);
+                    $targetChunks = $this->contentConverter->convert($targetChunks, false, $currentTarget['openerMeta']['preserveWhitespace']);
                     unset($this->currentTarget[$mid]);
                 }
             }
@@ -910,7 +927,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $attributes->matchRateType = editor_Models_Segment_MatchRateType::TYPE_MISSING_SOURCE_MRK;
             }
             
-            //first we save the previous other content length to the previous segment
+            //first we save the previous other content length to the previous segment (only if preserveWhitespace true)
             $this->saveTargetOtherContentLength($attributes, $hasNoTarget || $hasEmptyTarget, $preserveWhitespace);
             
             //The internal $mid has to be added to the DB mid of <sub> element, needed for exporting the content again
