@@ -78,7 +78,7 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         'targetAfterEdit' => 'I repeat <div title="" class="term preferredTerm exact" data-tbxid="term_0000004_001_en_001_0000006">me</div> in the <div title="" class="term preferredTerm exact" data-tbxid="term_0000002_001_en_001_0000004">targettext</div>',
     );
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass():void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -295,7 +295,7 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($targetCompareString, $segments[6]->sourceEdit);
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');

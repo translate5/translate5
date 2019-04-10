@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -178,7 +178,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->logout();
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');

@@ -36,7 +36,7 @@ END LICENSE AND COPYRIGHT
 class Translate682Test extends \ZfExtended_Test_ApiTestcase {
     protected static $expectedCsvResult;
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -103,7 +103,7 @@ class Translate682Test extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(rtrim($expectedData), rtrim($exportedData), 'Exported result does not equal to expected SDLXLIFF content');
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');

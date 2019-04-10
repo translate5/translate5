@@ -31,7 +31,7 @@
 class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
     protected static $expectedCsvResult;
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -110,7 +110,7 @@ class TrackChangesTest extends \ZfExtended_Test_ApiTestcase {
        $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to expected-export-testcase-de-en.xlf');
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));

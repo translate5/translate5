@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * Testcase for TRANSLATE-1475 Merging of term tagger result and track changes content leads to several errors 
  */
 class Translate1475Test extends \ZfExtended_Test_ApiTestcase {
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -119,7 +119,7 @@ class Translate1475Test extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(self::$api->getFileContent('expectedSegmentsEdited.json'), $data, 'Imported segments are not as expected!');
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
