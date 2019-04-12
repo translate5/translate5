@@ -81,6 +81,16 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     
     /**
+     * Returns a Zend_Config Object; if customer specific settings exist, they are set now.
+     * @return Zend_Config
+     */
+    public function getConfig() {
+        // This is a temporary preparation for implementing TRANSLATE-471.
+        // TODO: use customer-specific config
+        return Zend_Registry::get('config');
+    }
+    
+    /**
      * Loads customers by a given list of ids
      * @param array $ids
      * @return array

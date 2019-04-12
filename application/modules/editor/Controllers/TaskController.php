@@ -289,7 +289,7 @@ class editor_TaskController extends ZfExtended_RestController {
             if($userGuid == $assoc['userGuid']) {
                 $userAssocInfos[$assoc['taskGuid']] = $assoc;
             }
-            $userInfo = $this->getUserinfo($assoc['userGuid']);
+            $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
             $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];
             $assoc['login'] = $userInfo['login'];
             //set only not pmOverrides
@@ -317,8 +317,10 @@ class editor_TaskController extends ZfExtended_RestController {
      * replaces the userGuid with the username
      * Doing this on client side would be possible, but then it must be ensured that UsersStore is always available and loaded before TaskStore. 
      * @param string $userGuid
+     * @param string $taskGuid
+     * @return array
      */
-    protected function getUserinfo($userGuid) {
+    protected function getUserinfo($userGuid, $taskGuid) {
         $notfound = array(); //should not be, but can occur after migration of old data!
         if(empty($userGuid)) {
             return $notfound;
@@ -335,8 +337,21 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$row) {
             return $notfound; 
         }
-        $this->cachedUserInfo[$userGuid] = $row->toArray();
-        return $row->toArray(); 
+        $userInfo = $row->toArray();
+        // anonymize userinfo?
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        if ($task->anonymizeUsers()) {
+            $anonymize = ['firstName','login','surName'];
+            array_walk($userInfo, function( &$value, $key) use ($anonymize) {
+                if (in_array($key, $anonymize)) {
+                    // TODO: get data from tracking-table
+                    $value = 'xxx';
+                }
+            });
+        }
+        $this->cachedUserInfo[$userGuid] = $userInfo;
+        return $userInfo; 
     }
     
     /**
@@ -345,7 +360,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function getUsername(array $userinfo) {
         if(empty($userinfo)) {
-            return '- not found -'; //should not be, but can occur after migration of old data!
+            return '- not found -'; //should not be, but can occur e.g. after migration of old data or for lockingUsername
         }
         return $userinfo['firstName'].' '.$userinfo['surName'].' ('.$userinfo['login'].')';
     }
@@ -829,7 +844,20 @@ class editor_TaskController extends ZfExtended_RestController {
             $row['users'] = $allAssocInfos[$taskguid];
         }
         
-        $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser']));
+        $row['lockingUsername'] = null;
+        
+        if(!empty($row['lockingUser'])){
+            $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser'],$taskguid));
+            // anonymize userinfo?
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($taskguid);
+            if ($task->anonymizeUsers()) {
+                // TODO: get data from tracking-table
+                $row['lockingUser'] = 'xxx';
+                $row['lockingUsername'] = 'xxx';
+            }
+        }
         
         $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $fields editor_Models_SegmentField */

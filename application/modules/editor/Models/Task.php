@@ -127,6 +127,48 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
+    
+    /**
+     * Returns a Zend_Config Object; if task specific settings exist, they are set now.
+     * @return Zend_Config
+     */
+    protected function getConfig() {
+        // This is a temporary preparation for implementing TRANSLATE-471.
+        $taskConfig = new Zend_Config([], true);
+        
+        // Step 1: start with systemwide config
+        $origConfig = Zend_Registry::get('config');
+        /* @var $origConfig Zend_Config */
+        $taskConfig->merge($origConfig);
+        
+        // Step 2: anything customer-specific for this task?
+        if (is_int($this->getCustomerId())) {
+            $customer = ZfExtended_Factory::get('editor_Models_Customer');
+            /* @var $customer editor_Models_Customer */
+            $customerConfig = $customer->getConfig();
+            $taskConfig->merge($customerConfig);
+        }
+        
+        // Step 3: anything task-specific for this task?
+        // TODO...
+        
+        $taskConfig->setReadOnly();
+        return $taskConfig;
+    }
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_Models_Entity_Abstract::load()
+     */
+    public function load($id) {
+        parent::load($id);
+        $this->config = $this->getConfig();
+    }
 
     /**
      * loads the task to the given guid
@@ -823,5 +865,13 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                  [fontSize] => 14
          )
          */
+    }
+    
+    /**
+     * Are the usernames for the task to be anonymized?
+     * @return boolean
+     */
+    public function anonymizeUsers() {
+        return true; // TODO: get from config
     }
 }

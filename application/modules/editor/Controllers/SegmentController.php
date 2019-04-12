@@ -105,7 +105,25 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function indexAction() {
         $taskGuid = $this->session->taskGuid;
-        $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
+        
+        $rows = $this->entity->loadByTaskGuid($taskGuid);
+        // anonymize users for view?
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        if ($task->anonymizeUsers()) {
+            $anonymize = ['userGuid','userName'];
+            foreach ($rows as &$row) {
+                array_walk($row, function( &$value, $key) use ($anonymize) {
+                    if (in_array($key, $anonymize)) {
+                        // TODO: get data from tracking-table
+                        $value = 'xxx';
+                    }
+                });
+            }
+        }
+        
+        $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
         
         $this->addIsWatchedFlag();

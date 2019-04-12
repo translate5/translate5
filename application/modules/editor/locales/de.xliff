@@ -1530,6 +1530,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RGVyIEluaGFsdCB3dXJkZSBuaWNodCBpbiBkYXMgQ2xpcGJvYXJkIMO8YmVybm9tbWVuLg=='><source>Der Inhalt wurde nicht in das Clipboard übernommen.</source><target>Der Inhalt wurde nicht in das Clipboard übernommen.</target></trans-unit>
 <trans-unit id='RGllIFBvc2l0aW9uIGRlcyBDdXJzb3JzIGJ6dy4gZGllIEF1c3dhaGwgaW0gVGV4dCB3dXJkZSBuaWNodCBlcmthbm50LiBCaXR0ZSBub2NobWFsIHByb2JpZXJlbiB1bmQgZ2dmLiBkaWUgQWRtaW5zIGJlbmFjaHJpY2h0aWdlbi4='><source>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</source><target>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</target></trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='><source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source><target>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</target></trans-unit>
+<trans-unit id='QWRtaW5Y'><source>AdminX</source><target>AdminX</target></trans-unit>
+<trans-unit id='TWllbGVhZG1pbg=='><source>Mieleadmin</source><target>Mieleadmin</target></trans-unit>
   </body>
  </file>
 </xliff>

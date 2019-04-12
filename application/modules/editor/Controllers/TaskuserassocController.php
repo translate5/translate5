@@ -67,7 +67,21 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        $this->view->rows = $this->entity->loadAllWithUserInfo();
+        $rows = $this->entity->loadAllWithUserInfo();
+        // anonymize users for view?
+        if ($this->task->anonymizeUsers()) {
+            $anonymize = ['firstName','login','surName'];
+            foreach ($rows as &$row) {
+                array_walk($row, function( &$value, $key) use ($anonymize) { 
+                    if (in_array($key, $anonymize)) {
+                        // TODO: get data from tracking-table
+                        $value = 'xxx'; 
+                    }
+                 });
+            }
+        }
+        $this->view->rows = $rows;
+        
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
     }
