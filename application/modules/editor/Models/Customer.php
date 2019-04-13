@@ -81,13 +81,44 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     
     /**
+     * @var Zend_Config
+     */
+    protected $config = null;
+    
+    /**
      * Returns a Zend_Config Object; if customer specific settings exist, they are set now.
      * @return Zend_Config
      */
     public function getConfig() {
         // This is a temporary preparation for implementing TRANSLATE-471.
-        // TODO: use customer-specific config
-        return Zend_Registry::get('config');
+        
+        if (!is_null($this->config)) {
+            return $this->config;
+        }
+        
+        $config = new Zend_Config([], true);
+        
+        // Step 1: start with systemwide config
+        $origConfig = Zend_Registry::get('config');
+        /* @var $origConfig Zend_Config */
+        $config->merge($origConfig);
+        
+        // Step 2: anything customer-specific?
+        if (!empty($this->getId())) {
+            // TODO: get and merge Zend_Config for customerId,
+            //       this is just a quick & dirty workaround for customerId and anonymizeUsers
+            $customerId = $this->getId();
+            $customerConfiguration = ZfExtended_Factory::get('editor_Models_CustomerConfiguration');
+            /* @var $customerConfiguration editor_Models_CustomerConfiguration */
+            $anonymizeUsers = $customerConfiguration->getValueForCustomerIdAndName(intval($customerId), 'runtimeOptions.customers.anonymizeUsers');
+            if(!is_null($anonymizeUsers)) {
+                $config->runtimeOptions->customers->anonymizeUsers = $anonymizeUsers;
+            }
+        }
+        
+        $config->setReadOnly();
+        $this->config = $config;
+        return $config;
     }
     
     /**

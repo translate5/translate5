@@ -107,19 +107,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $taskGuid = $this->session->taskGuid;
         
         $rows = $this->entity->loadByTaskGuid($taskGuid);
+        
         // anonymize users for view?
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         if ($task->anonymizeUsers()) {
-            $anonymize = ['userGuid','userName'];
+            $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+            /* @var $taskUserTracking editor_Models_TaskUserTracking */
+            $taskUserTracking->loadByTaskGuid($taskGuid);
             foreach ($rows as &$row) {
-                array_walk($row, function( &$value, $key) use ($anonymize) {
-                    if (in_array($key, $anonymize)) {
-                        // TODO: get data from tracking-table
-                        $value = 'xxx';
-                    }
-                });
+                $row = $taskUserTracking->anonymizeUserdata($row);
             }
         }
         

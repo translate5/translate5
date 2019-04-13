@@ -290,6 +290,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 $userAssocInfos[$assoc['taskGuid']] = $assoc;
             }
             $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
+            $assoc['userGuid'] = $userInfo['userGuid']; // might be anonymized now
             $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];
             $assoc['login'] = $userInfo['login'];
             //set only not pmOverrides
@@ -314,7 +315,7 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * replaces the userGuid with the username
+     * returns the username for the given userGuid (anonymized, if configured accordingly for task's customer).
      * Doing this on client side would be possible, but then it must be ensured that UsersStore is always available and loaded before TaskStore. 
      * @param string $userGuid
      * @param string $taskGuid
@@ -325,8 +326,9 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($userGuid)) {
             return $notfound;
         }
-        if(isset($this->cachedUserInfo[$userGuid])) {
-            return $this->cachedUserInfo[$userGuid];
+        if(isset($this->cachedUserInfo[$userGuid][$taskGuid])) {
+            // cache for user AND task (anonymizing might differ from task to task)
+            return $this->cachedUserInfo[$userGuid][$taskGuid];
         }
         if(empty($this->tmpUserDb)) {
             $this->tmpUserDb = ZfExtended_Factory::get('ZfExtended_Models_Db_User');
@@ -338,18 +340,19 @@ class editor_TaskController extends ZfExtended_RestController {
             return $notfound; 
         }
         $userInfo = $row->toArray();
+        
         // anonymize userinfo?
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        $test = $taskGuid;
         if ($task->anonymizeUsers()) {
-            $anonymize = ['firstName','login','surName'];
-            array_walk($userInfo, function( &$value, $key) use ($anonymize) {
-                if (in_array($key, $anonymize)) {
-                    // TODO: get data from tracking-table
-                    $value = 'xxx';
-                }
-            });
+            $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+            /* @var $taskUserTracking editor_Models_TaskUserTracking */
+            $taskUserTracking->loadByTaskGuid($taskGuid);
+            $userInfo = $taskUserTracking->anonymizeUserdata($userInfo);
         }
+        
         $this->cachedUserInfo[$userGuid] = $userInfo;
         return $userInfo; 
     }
@@ -853,9 +856,10 @@ class editor_TaskController extends ZfExtended_RestController {
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskguid);
             if ($task->anonymizeUsers()) {
-                // TODO: get data from tracking-table
-                $row['lockingUser'] = 'xxx';
-                $row['lockingUsername'] = 'xxx';
+                $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+                /* @var $taskUserTracking editor_Models_TaskUserTracking */
+                $taskUserTracking->loadByTaskGuid($taskGuid);
+                $row = $taskUserTracking->anonymizeUserdata($row);
             }
         }
         

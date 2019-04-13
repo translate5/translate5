@@ -69,15 +69,13 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
     public function indexAction(){
         $rows = $this->entity->loadAllWithUserInfo();
         // anonymize users for view?
-        if ($this->task->anonymizeUsers()) {
-            $anonymize = ['firstName','login','surName'];
-            foreach ($rows as &$row) {
-                array_walk($row, function( &$value, $key) use ($anonymize) { 
-                    if (in_array($key, $anonymize)) {
-                        // TODO: get data from tracking-table
-                        $value = 'xxx'; 
-                    }
-                 });
+        foreach ($rows as &$row) {            
+            $this->task->loadByTaskGuid($row['taskGuid']); // FIXME: don't load task and taskUserTracking for each row! (taskGuid is always the same, because we are in the same task all the time, but where is it??)
+            if ($this->task->anonymizeUsers()) {
+                $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+                /* @var $taskUserTracking editor_Models_TaskUserTracking */
+                $taskUserTracking->loadByTaskGuid($taskGuid);
+                $row = $taskUserTracking->anonymizeUserdata($row);
             }
         }
         $this->view->rows = $rows;
