@@ -56,32 +56,99 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
     
     /**
-     * load all TaskUserTracking entries to one task
-     * @param int $id
-     * @return array|null
+     * loads the TaskUserTracking-entry for the given task and user (= unique)
+     * @param string $taskGuid
+     * @param string $userGuid
      */
-    public function loadByTaskGuid($taskGuid) {
+    protected function loadEntry($taskGuid, $userGuid) {
         try {
-            $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
-            return $this->db->fetchAll($s)->toArray();
+            $s = $this->db->select()
+                ->where('taskGuid = ?', $taskGuid)
+                ->where('userGuid = ?', $userGuid);
+            $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
-            return null;
+            // Don't throw a not-found. There might correctly not exist any data for the user; e.g.
+            // - if a task has been imported and opened before TaskUserTracking has been implemented
+            // - if a user is assigned to a task, but has never opened the task so far
+        }
+        if ($row) {
+            //load implies loading one Row, so use only the first row
+            $this->row = $row;
         }
     }
     
     /**
-     * Anonymize all user-related data by keys in $data (= User1, User2, ...etc) 
+     * returns the taskOpenerNumber of the currently loaded entry or null (we might not have a TaskUserTracking-entry loaded; that's ok).
+     * @return NULL|number
+     */
+    protected function getTaskOpenerNumberForUser(){
+        return $this->getTaskOpenerNumber() ?? null;
+    }
+    
+    /**
+     * renders an anonymized version using the kind of data that is given:
+     * - e.g. "userName-1", "userName-2", ... if tracking-data is available
+     * - "-" otherwise
+     * @param string $userDataKey
+     * @return string
+     */
+    protected function renderAnonymizeUserdata ($userDataKey) {
+        $taskOpenerNumber = $this->getTaskOpenerNumberForUser();
+        return (is_null($taskOpenerNumber) ? '-' : $key.'-'.$taskOpenerNumber);
+    }
+    
+    /**
+     * anonymizes all user-related data by keys in $data
+     * @param string $taskGuid
      * @param array $data
      * @return array
      */
-    public function anonymizeUserdata (array $data) {
+    public function anonymizeUserdata($taskGuid, array $data) {
         $keysToAnonymize = ['firstName','lockingUser','lockingUsername','login','userGuid','userName','surName'];
-        array_walk($data, function( &$value, $key) use ($keysToAnonymize) {
+        array_walk($data, function( &$value, $key) use ($keysToAnonymize, $taskOpenerNumber) {
             if (in_array($key, $keysToAnonymize)) {
-                // TODO: get data from tracking-table
-                $value = 'xyz';
+                $value = $this->renderAnonymizeUserdata($key);
             }
         });
         return $data;
+    }
+    
+    /**
+     * insert or update TaskUserTracking entry. 
+     * If  users have already opened the task before, we only keep their data updated.
+     * @param string $taskguid
+     * @param string $userGuid
+     * @param string $role
+     */
+    public function insertTaskUserTrackingEntry($taskguid, $userGuid, $role) {
+        $taskOpenerNumber = $this->getTotalByTaskGuid($taskguid) + 1;
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByGuid($userGuid);
+        $firstName = $user->getFirstName();
+        $surName = $user->getSurName();
+        $sql= 'INSERT INTO LEK_taskUserTracking (`taskGuid`,`userGuid`,`taskOpenerNumber`,`firstName`,`surName`,`role`) VALUES (?, ?, ?, ?, ?, ?)
+               ON DUPLICATE KEY UPDATE `firstName` = ?,`surName` = ?,`role` = ?';
+        $bindings = array(
+            $taskguid, $userGuid, $taskOpenerNumber, $firstName, $surName, $role, 
+            $firstName, $surName, $role
+        );
+        try {
+            $res = $this->db->getAdapter()->query($sql, $bindings);
+        }
+        catch(Zend_Db_Statement_Exception $e) {
+            $this->handleIntegrityConstraintException($e); // TODO (können ja auch andere Fehler sein)
+        }
+        
+    }
+    
+    /**
+     * How many users have opened the task already?
+     */
+    protected function getTotalByTaskGuid($taskguid) {
+        $s = $this->db->select();
+        $s->where('taskGuid = ?', $taskguid);
+        return $this->computeTotalCount($s);
+        
     }
 }

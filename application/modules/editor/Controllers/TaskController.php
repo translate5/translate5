@@ -349,8 +349,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if ($task->anonymizeUsers()) {
             $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
             /* @var $taskUserTracking editor_Models_TaskUserTracking */
-            $taskUserTracking->loadByTaskGuid($taskGuid);
-            $userInfo = $taskUserTracking->anonymizeUserdata($userInfo);
+            $userInfo = $taskUserTracking->anonymizeUserdata($taskGuid, $userInfo);
         }
         
         $this->cachedUserInfo[$userGuid] = $userInfo;
@@ -775,6 +774,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $userAssocInfos = array();
         $allAssocInfos = $this->getUserAssocInfos(array($taskguid), $userAssocInfos);
         
+        $this->invokeTaskUserTracking($taskguid, $userAssocInfos);
+        
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj; 
         $this->addUserInfos($row, $taskguid, $userAssocInfos, $allAssocInfos);
@@ -858,8 +859,7 @@ class editor_TaskController extends ZfExtended_RestController {
             if ($task->anonymizeUsers()) {
                 $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
                 /* @var $taskUserTracking editor_Models_TaskUserTracking */
-                $taskUserTracking->loadByTaskGuid($taskGuid);
-                $row = $taskUserTracking->anonymizeUserdata($row);
+                $row = $taskUserTracking->anonymizeUserdata($taskguid, $row);
             }
         }
         
@@ -930,6 +930,20 @@ class editor_TaskController extends ZfExtended_RestController {
         return $editOnly && $s == $workflow::STATE_EDIT 
            || !$editOnly && ($s == $workflow::STATE_EDIT || $s == $workflow::STATE_VIEW)
            || $viewOnly && $s == $workflow::STATE_VIEW;
+    }
+    
+    /**
+     * invokes taskUserTracking if its an opening or an editing request
+     * param string $taskguid
+     * @param array $userAssocInfos
+     */
+    protected function invokeTaskUserTracking($taskguid, $userAssocInfos) {
+        if(!$this->isOpenTaskRequest()){
+            return;
+        }
+        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $taskUserTracking editor_Models_TaskUserTracking */
+        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->user->data->userGuid, $userAssocInfos[$taskguid]['role']);
     }
     
     /**

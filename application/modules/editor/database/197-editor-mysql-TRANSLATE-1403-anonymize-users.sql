@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `LEK_taskUserTracking` (
   `role` VARCHAR(60) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-ALTER TABLE `LEK_taskUserTracking` ADD UNIQUE(`taskGuid`,`userGuid`,`role`);
+ALTER TABLE `LEK_taskUserTracking` ADD UNIQUE(`taskGuid`,`userGuid`);
 ALTER TABLE `LEK_taskUserTracking` ADD FOREIGN KEY (`taskGuid` ) REFERENCES `LEK_task` (`taskGuid` ) ON DELETE CASCADE;
 ALTER TABLE `LEK_taskUserTracking` ADD FOREIGN KEY (`userGuid` ) REFERENCES `Zf_users` (`userGuid` ) ON DELETE CASCADE;
 
