@@ -40,6 +40,11 @@ ALTER TABLE `LEK_taskConfiguration` ADD FOREIGN KEY (`taskGuid`) REFERENCES `LEK
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.customers.anonymizeUsers', '1', 'editor', 'metadata', '1', '0', '', 'boolean', 'Are the users per default to be anonymized for customers? (Can be overwritten in LEK_customerConfiguration.)');
 
+# workaround for new attribute on customer level: Anonymize users in workflow
+# (= will later be handled via LEK_customerConfiguration)
+ALTER TABLE `LEK_customer`ADD COLUMN `anonymizeUsers` TINYINT(0) NOT NULL DEFAULT 0;
+
+
 # add table for tracking the order of users who opened a task (and their name and role)
 CREATE TABLE IF NOT EXISTS `LEK_taskUserTracking` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

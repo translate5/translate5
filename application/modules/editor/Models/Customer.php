@@ -73,6 +73,10 @@
  * @method integer getOpenIdRedirectCheckbox() getOpenIdRedirectCheckbox()
  * @method void setOpenIdRedirectCheckbox() setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
  * 
+ * @method boolean getAnonymizeUsers() getAnonymizeUsers()
+ * @method void setAnonymizeUsers() getAnonymizeUsers(boolean $anonymizeUsers)
+ * 
+ * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
@@ -106,14 +110,8 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
         // Step 2: anything customer-specific?
         if (!empty($this->getId())) {
             // TODO: get and merge Zend_Config for customerId,
-            //       this is just a quick & dirty workaround for customerId and anonymizeUsers
-            $customerId = $this->getId();
-            $customerConfiguration = ZfExtended_Factory::get('editor_Models_CustomerConfiguration');
-            /* @var $customerConfiguration editor_Models_CustomerConfiguration */
-            $anonymizeUsers = $customerConfiguration->getValueForCustomerIdAndName(intval($customerId), 'runtimeOptions.customers.anonymizeUsers');
-            if(!is_null($anonymizeUsers)) {
-                $config->runtimeOptions->customers->anonymizeUsers = $anonymizeUsers;
-            }
+            //       this is just a quick & dirty workaround for anonymizeUsers
+            $config->runtimeOptions->customers->anonymizeUsers = $this->getAnonymizeUsers();
         }
         
         $config->setReadOnly();

@@ -2514,6 +2514,12 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Endkunde</source>
     <target>Client</target>
 </trans-unit>
+
+<trans-unit id='VXNlciBhbm9ueW1pc2llcmVuPw=='>
+    <source>User anonymisieren?</source>
+    <target>Anonymize users in workflow?</target>
+</trans-unit>
+
 <trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='>
     <source>no existing attributes</source>
     <target>No existing attributes</target>
