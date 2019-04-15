@@ -169,7 +169,7 @@ Ext.define('Editor.controller.ServerException', {
         }
             
         //form submits have here always a status of 200, so we have to get the real status from JSON
-        if(json && status != json.httpStatus) {
+        if(json && json.httpStatus && status != json.httpStatus) {
             status = json.httpStatus;
             statusText = json.message;
             _status = status.toString();
@@ -224,6 +224,17 @@ Ext.define('Editor.controller.ServerException', {
             case 409: //Conflict: show message from server
                 Editor.MessageBox.addError(appendServerMsg(str["409"]));
                 return;
+            //422 unprocessable entity: normally the errors are shown via form.markInvalid. 
+            // If not, we add up the error message with info from the payload
+            case 422: 
+                if(json.errorMessage && json.errorsTranslated) {
+                    Ext.Object.each(json.errorsTranslated, function(key, errors) {
+                        Ext.Array.each(errors, function(error) {
+                            json.errorMessage = json.errorMessage+'<br>'+error;
+                        });
+                    });
+                }
+                break;
             case 406: //Not Acceptable: show message from server
                 Editor.MessageBox.addError(getServerMsg());
             case 502: //Bad Gateway → the real error is coming from a requested third party system
