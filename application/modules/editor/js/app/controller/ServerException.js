@@ -228,8 +228,15 @@ Ext.define('Editor.controller.ServerException', {
             // If not, we add up the error message with info from the payload
             case 422: 
                 if(json.errorMessage && json.errorsTranslated) {
-                    Ext.Object.each(json.errorsTranslated, function(key, errors) {
+                    Ext.Object.each(json.errorsTranslated, function(field, errors) {
                         Ext.Array.each(errors, function(error) {
+                            json.errorMessage = json.errorMessage+'<br>'+error;
+                        });
+                    });
+                }
+                if(json.errorMessage && json.errors) {
+                    Ext.Object.each(json.errors, function(field, errors) {
+                        Ext.Object.each(errors, function(key, error) {
                             json.errorMessage = json.errorMessage+'<br>'+error;
                         });
                     });
