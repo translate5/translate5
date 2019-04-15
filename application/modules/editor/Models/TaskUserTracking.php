@@ -105,7 +105,7 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      */
     public function anonymizeUserdata($taskGuid, array $data) {
         $keysToAnonymize = ['firstName','lockingUser','lockingUsername','login','userGuid','userName','surName'];
-        array_walk($data, function( &$value, $key) use ($keysToAnonymize, $taskOpenerNumber) {
+        array_walk($data, function( &$value, $key) use ($keysToAnonymize) {
             if (in_array($key, $keysToAnonymize)) {
                 $value = $this->renderAnonymizeUserdata($key);
             }
