@@ -612,6 +612,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns a Zend_Config Object with task specific settings
+     * @deprecated must be changed with TRANSLATE-471
      * @return Zend_Config
      */
     public function getAsConfig() {

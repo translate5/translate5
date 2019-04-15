@@ -46,6 +46,22 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         parent::__construct($segment);
     }
     
+    public function isValid($data) {
+        if(parent::isValid($data)) {
+            return true;
+        }
+        $messages = $this->getMessages();
+        $errorCode = 'E1065';
+        foreach($messages as $errors){
+            if(array_key_exists('segmentToShort', $errors) || array_key_exists('segmentToLong', $errors)){
+                //if the segment length is invalid we have to provide a separate error code for separate error level
+                $errorCode = 'E1066';
+                break;
+            }
+        }
+        throw editor_Models_Segment_UnprocessableException::createResponse($errorCode, $this->getMessages());
+    }
+    
     /**
      * Validators for Segment Entity
      * Validation will be done on calling entity->validate

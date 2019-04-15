@@ -55,15 +55,15 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     public function testEmptyCredentials() {
         $response = $this->api()->request('editor/session', 'POST');
         
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'givenLogin']);
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['passwd' => 'givenPasswd']);
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
     }
     
@@ -72,7 +72,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testWrongCredentials() {
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'wrongUsername', 'passwd' => 'wrongPassword']);
-        $msg403 = '{"errors":[{"_errorMessage":"Keine Zugriffsberechtigung!","_errorCode":403}]}';
+        $msg403 = '{"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false,"messages":[]}';
         
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());

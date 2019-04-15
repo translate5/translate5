@@ -279,6 +279,7 @@ class ChangeAlikeTranslate683Test extends \ZfExtended_Test_ApiTestcase {
     public function testSourceEditing() {
         if(!$this->api()->getTask()->enableSourceEditing) {
             //if no sourceEditing pass this test
+            $this->markTestSkipped('Skipped in this run since source editing disabled.');
             return;
         }
         //get segment list again to check if change alikes were applied correctly
