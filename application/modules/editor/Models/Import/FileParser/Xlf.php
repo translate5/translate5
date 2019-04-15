@@ -504,15 +504,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                     return $prefix.$parent['tag'].'-'.$parent['attributes']['id'];
                 }
             }
-            $msg  = 'SUB tag of '.($source ? 'source' : 'target').' is not unique due missing ID in the parent node and is ignored as separate segment therefore.'."\n";
-            $this->throwSegmentationException($msg);
+            $this->throwSegmentationException('E1070', ['field' => ($source ? 'source' : 'target')]);
             return '';
         }
         if($opener['tag'] == 'mrk') {
             $prefix = self::PREFIX_MRK;
             if($this->xmlparser->getAttribute($opener['attributes'], 'mid') === false) {
-                $msg  = 'MRK tag of '.($source ? 'source' : 'target').' has no MID attribute.';
-                $this->throwSegmentationException($msg);
+                $this->throwSegmentationException('E1071', ['field' => ($source ? 'source' : 'target')]);
             }
         }
         if(!($opener['tag'] == 'mrk' && $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid'))) {
@@ -532,15 +530,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * @param string $msg
+     * Throws Xlf Exception
+     * @param string $errorCode
+     * @param string $data
      * @throws ZfExtended_Exception
      */
-    protected function throwSegmentationException($msg, $transUnitId = false) {
-        if($transUnitId === false) {
-            $transUnitId = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
+    protected function throwSegmentationException($errorCode, array $data) {
+        if(!array_key_exists('transUnitId', $data)) {
+            $data['transUnitId'] = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
         }
-        $msg .= "\n".'Transunit mid: '.$transUnitId.' and TaskGuid: '.$this->task->getTaskGuid();
-        throw new ZfExtended_Exception($msg);
+        $data['task'] = $this->task;
+        throw new editor_Models_Import_FileParser_Xlf_Exception($errorCode);
     }
     
     /**
@@ -841,9 +841,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             
             if($sourceEdit && $isSourceMrkMissing || $hasTargets && empty($this->currentTarget[$mid])){
-                $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-                $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
-                $this->throwSegmentationException($msg, $transUnitMid);
+                $this->throwSegmentationException('E1067', [
+                    'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
+                    'mid' => $mid,
+                ]);
             }
             if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
                 $targetChunksOriginal = $targetChunks = [];
@@ -952,9 +953,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         
         if(!empty($this->currentTarget)){
-            $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-            $msg  = 'MRK/SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
-            $this->throwSegmentationException($msg, $transUnitMid);
+            $this->throwSegmentationException('E1068', [
+                'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
+                'mids' => join(', ', array_keys($this->currentTarget)),
+            ]);
         }
         
         //if we dont find any usable segment, we dont have to place the placeholder
@@ -1030,7 +1032,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $otherContent = join(array_merge($otherContentSource, $otherContentTarget));
         if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
             $data = array_merge($otherContentSource, $otherContentTarget);
-            $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
+            $this->throwSegmentationException('E1069', [
+                'content' => print_r($data,1),
+            ]);
         }
         
         $otherContent = $useSourceContent ? $otherContentSource : $otherContentTarget;
