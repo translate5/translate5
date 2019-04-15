@@ -540,7 +540,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $data['transUnitId'] = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
         }
         $data['task'] = $this->task;
-        throw new editor_Models_Import_FileParser_Xlf_Exception($errorCode);
+        throw new editor_Models_Import_FileParser_Xlf_Exception($errorCode, $data);
     }
     
     /**
