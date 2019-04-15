@@ -59,7 +59,10 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
                 break;
             }
         }
-        throw editor_Models_Segment_UnprocessableException::createResponse($errorCode, $this->getMessages());
+        
+//FIXME this is an incomplete non perfect example how validations and exceptions should work
+// create something like a ::createValidationResponse? The main problem is again the translation, since validations are in english and therefore not translatable
+        throw new editor_Models_Segment_UnprocessableException($errorCode, ['errors' => $this->getMessages()]);
     }
     
     /**

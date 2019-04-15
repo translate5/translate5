@@ -50,19 +50,4 @@ class editor_Models_Segment_UnprocessableException extends ZfExtended_Unprocessa
             $this->level = ZfExtended_Logger::LEVEL_WARN;
         }
     }
-    
-    /**
-     * @param string $errorCode
-     * @param array $invalidFields
-     * @param array $data
-     * @param Exception $previous
-     * @return ZfExtended_ErrorCodeException
-     */
-    public static function createResponse($errorCode, array $invalidFields, array $data = [], Exception $previous = null) {
-        $e = parent::createResponse($errorCode, $invalidFields, $data, $previous);
-        if($errorCode == 'E1066') {
-            $e->level = ZfExtended_Logger::LEVEL_WARN;
-        }
-        return $e;
-    }
 }
