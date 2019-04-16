@@ -290,6 +290,9 @@ class Models_Installer_Standalone {
             }
             $cwd = realpath($this->currentWorkingDir);
             $toDelete = realpath($this->currentWorkingDir.$toDelete);
+            if(!$toDelete){
+                continue;
+            }
             //ensure that file/dir to be deleted is in the currentWorkingDir
             if(strpos($toDelete, $cwd) !== 0 || $cwd == $toDelete) {
                 $this->log('Won\'t delete file '.$toDelete);
@@ -301,6 +304,7 @@ class Models_Installer_Standalone {
             }
             if($file->isDir() && $file->isReadable()) {
                 ZfExtended_Models_Installer_Downloader::removeRecursive($file);
+                rmdir($file);
             }
         }
     }
