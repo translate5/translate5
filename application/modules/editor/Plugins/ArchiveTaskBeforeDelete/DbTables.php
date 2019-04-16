@@ -71,7 +71,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_plugin_segmentstatistic_terms' => 'taskGuid',
             'LEK_plugin_segmentstatistics' => 'taskGuid',
             'LEK_qmsubsegments' => 'taskGuid',
-            'LEK_request_log' => false, //its just logging, we dont archive that
+            'LEK_workflow_log' => false, //its just logging, we dont archive that
             'LEK_segment_data' => 'taskGuid',
             'LEK_segment_field' => 'taskGuid',
             'LEK_segment_history' => 'taskGuid',
