@@ -266,7 +266,7 @@ Ext.define('Editor.controller.ServerException', {
         }
         Editor.MessageBox.addError(text+tpl.apply([_status, statusText]));
     },
-    renderHtmlMessage(title, response){
+    renderHtmlMessage: function(title, response){
         var me = this,
             str = me.strings,
             tpl = new Ext.Template(str.serverMsg),
