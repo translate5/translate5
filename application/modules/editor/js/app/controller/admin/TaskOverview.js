@@ -380,6 +380,9 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Editor.util.TaskActions.openTask(task, readonly);
   },
   handleTaskLog: function(task) {
+      if(!this.isAllowed('editorTaskLog')){
+          return;
+      }
       var win = Ext.widget('adminTaskLogWindow',{
           actualTask: task
       });
