@@ -52,20 +52,20 @@ class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->addImportFile($this->api()->getFile('ibm-opentm2-fail3.xlf'), 'application/xml');
         $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with sub tags in tags without IDs did not produce a task state error!');
         $task = $this->api()->getTask();
-        //$this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
+        $this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
     }
     
     public function testImportFailOnContentOutsideMrkSource() {
         $this->api()->addImportFile($this->api()->getFile('contentOutsideMrkSource.xlf'), 'application/xml');
         $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with content outside of source mrk does not produce an import error.');
         $task = $this->api()->getTask();
-        //$this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
+        $this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
     }
     
     public function testImportFailOnContentOutsideMrkTarget() {
         $this->api()->addImportFile($this->api()->getFile('contentOutsideMrkTarget.xlf'), 'application/xml');
         $this->assertFalse($this->api()->import($this->taskConfig, false), 'XLF with content outside of target mrk does not produce an import error.');
         $task = $this->api()->getTask();
-        //$this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
+        $this->api()->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
