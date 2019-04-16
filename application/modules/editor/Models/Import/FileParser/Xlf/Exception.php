@@ -31,7 +31,7 @@ class editor_Models_Import_FileParser_Xlf_Exception extends editor_Models_Import
     /**
      * @var string
      */
-    protected $origin = 'translate5.import.fileparser.xlf';
+    protected $domain = 'editor.import.fileparser.xlf';
     
     static protected $localErrorCodes = [
         'E1067' => 'MRK/SUB tag of source not found in target with Mid: "{mid}"',

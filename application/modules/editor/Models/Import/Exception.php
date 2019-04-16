@@ -37,7 +37,7 @@ class editor_Models_Import_Exception extends ZfExtended_ErrorCodeException {
         /**
          * @var string
          */
-        protected $origin = 'import';
+        protected $domain = 'editor.import';
         
         static protected $localErrorCodes = [
             'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.'
