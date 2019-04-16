@@ -288,9 +288,19 @@ class Models_Installer_Standalone {
             if(empty($toDelete) || strpos($toDelete, '#') === 0){
                 continue;
             }
-            $file = new SplFileInfo($this->currentWorkingDir.$toDelete);
+            $cwd = realpath($this->currentWorkingDir);
+            $toDelete = realpath($this->currentWorkingDir.$toDelete);
+            //ensure that file/dir to be deleted is in the currentWorkingDir
+            if(strpos($toDelete, $cwd) !== 0 || $cwd == $toDelete) {
+                $this->log('Won\'t delete file '.$toDelete);
+                continue;
+            }
+            $file = new SplFileInfo($toDelete);
             if($file->isFile() && $file->isReadable()) {
                 unlink($file);
+            }
+            if($file->isDir() && $file->isReadable()) {
+                ZfExtended_Models_Installer_Downloader::removeRecursive($file);
             }
         }
     }
