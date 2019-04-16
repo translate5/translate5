@@ -85,8 +85,8 @@ $dep->dependencies = [[
     ],[
         "name" => "z1-php7.3",
         "label" => "PHP Zend (z1-php7.3)",
-        "url" => "RELEASE:Zend-z1-php7.3-1.13.2.zip",
-        "version" => "1.13.2",
+        "url" => "RELEASE:Zend-z1-php7.3-1.13.2-p1.zip",
+        "version" => "1.13.2-p1",
         "target" => "library/zend/",
         "licenses" => [[
             "uses" => "z1-php7.3 (a fork of PHP Zend 1)",
