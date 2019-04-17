@@ -83,6 +83,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
             });
         }
         
+        if(auth.isAllowed('editorTaskLog')) {
             tabs.push({
                 xtype: 'editorAdminTaskLogGrid',
                 title: this.strings.events,
@@ -92,6 +93,7 @@ Ext.define('Editor.view.admin.task.PreferencesWindow', {
                     }
                 }
             });
+        }
         
         config = {
             height: Math.min(800, parseInt(Ext.getBody().getViewSize().height * 0.8)),

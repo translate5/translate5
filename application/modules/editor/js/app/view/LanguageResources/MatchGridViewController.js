@@ -301,22 +301,24 @@ Ext.define('Editor.view.LanguageResources.MatchGridViewController', {
                 break;
             case 500:
             case 502:
-                json = Ext.JSON.decode(response.responseText);
                 respStatusMsg = me.strings.serverErrorMsg500;
-                if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
-                    targetMsg = json.errors[0]._errorMessage;
-                }
-                else if(json.errors && json.errors[0] && json.errors[0].msg) {
-                    respStatusMsg = json.errors[0].msg;
-                    if(json.errors[0].data) {
-                        targetMsg = Editor.MessageBox.dataTable(json.errors[0].data);
+                if (response.responseText != "") { // don't try to decode an invalid JSON String
+                    json = Ext.JSON.decode(response.responseText);
+                    if(json.errors && json.errors[0] && json.errors[0]._errorMessage) {
+                        targetMsg = json.errors[0]._errorMessage;
                     }
-                }
-                else if(json.errors && json.errors.message) {
-                    targetMsg = json.errors.message;
-                }
-                else {
-                    targetMsg = response.responseText;
+                    else if(json.errors && json.errors[0] && json.errors[0].msg) {
+                        respStatusMsg = json.errors[0].msg;
+                        if(json.errors[0].data) {
+                            targetMsg = Editor.MessageBox.dataTable(json.errors[0].data);
+                        }
+                    }
+                    else if(json.errors && json.errors.message) {
+                        targetMsg = json.errors.message;
+                    }
+                    else {
+                        targetMsg = response.responseText;
+                    }
                 }
                 //;
                 break;

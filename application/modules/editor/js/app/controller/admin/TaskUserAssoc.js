@@ -279,7 +279,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           me.getUserAssoc().excludeLogins = store.collect('login');
       }
       //disable the button if there is no record in the store
-      assocNotifyBtn.setDisabled(store.getCount()< 1)
+      assocNotifyBtn && assocNotifyBtn.setDisabled(store.getCount()< 1)
   },
   /**
    * sets the initial state value dependent on the role
