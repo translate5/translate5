@@ -47,13 +47,13 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             //FIXME WARNING: Only suffixes are used. MimeTypes are not needed anymore, since mimetype check was deactivated in UploadProcessor
             // but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
             
-            'okapi' => ['application/xml'], //currently needed, see TRANSLATE-1019
+            'okapi' => ['application/xml','text/xml'], //currently needed, see TRANSLATE-1019
             
             'pdf' => ['text/html'],
             
             'html' => ['text/html'],
             'htm' => ['text/html'],
-            'xml' => ['application/xml'],
+            'xml' => ['application/xml','text/xml'],
             //'csv' => ['text/csv'], disabled due our own importer
             'txt' => ['text/plain'],
             'dita' => ['application/dita+xml'],
@@ -239,7 +239,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * Run for each file a separate worker, the worker will upload the file to the okapi, convert the file, and download the
      * result
      *
-     * @param integer $fileId
+     * @param int $fileId
      * @param SplFileInfo $file
      * @param array $params
      * @return boolean

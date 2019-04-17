@@ -881,8 +881,8 @@ class editor_TaskController extends ZfExtended_RestController {
      * returns true if PUT Requests opens a task for editing or readonly
      * 
      * - its not allowed to set both parameters to true
-     * @param boolean $editOnly if set to true returns true only if its a real editing (not readonly) request
-     * @param boolean $viewOnly if set to true returns true only if its a readonly request
+     * @param bool $editOnly if set to true returns true only if its a real editing (not readonly) request
+     * @param bool $viewOnly if set to true returns true only if its a readonly request
      * 
      * @return boolean
      */
@@ -977,7 +977,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * Updates the transferred User Assoc State to the given userGuid (normally the current user)
      * Per Default all state changes trigger something in the workflow. In some circumstances this should be disabled.
      * @param string $userGuid
-     * @param boolean $disableWorkflowEvents optional, defaults to false
+     * @param bool $disableWorkflowEvents optional, defaults to false
      */
     protected function updateUserState(string $userGuid, $disableWorkflowEvents = false) {
         if(empty($this->data->userState)) {

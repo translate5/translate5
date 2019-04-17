@@ -117,7 +117,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * Queue the match analysis worker
      * 
      * @param string $taskGuid
-     * @param boolean $pretranlsate
+     * @param bool $pretranlsate
      * @param array $eventParams
      * @return void|boolean
      */
@@ -154,7 +154,7 @@ class editor_Plugins_MatchAnalysis_Init extends ZfExtended_Plugin_Abstract {
      * Operation action handler. Run analysis and pretranslate if $pretranslate is true.
      * 
      * @param Zend_EventManager_Event $event
-     * @param boolean $pretranlsate
+     * @param bool $pretranlsate
      */
     protected function handleOperation(Zend_EventManager_Event $event, $pretranslate = false){
         $task = $event->getParam('entity');

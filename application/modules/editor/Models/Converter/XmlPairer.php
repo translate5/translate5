@@ -145,7 +145,7 @@ class editor_Models_Converter_XmlPairer {
     
     /**
      * parses one given node
-     * @param integer $idx
+     * @param int $idx
      * @param string $node
      */
     protected function parseNode($idx, $node) {
@@ -177,7 +177,7 @@ class editor_Models_Converter_XmlPairer {
     
     /**
      * creates a XmlPairerNode by the given nod
-     * @param integer $idx
+     * @param int $idx
      * @param string $node
      * @return boolean|editor_Models_Converter_XmlPairerNode
      */
@@ -296,10 +296,10 @@ class editor_Models_Converter_XmlPairerNode {
     public $children = [];
     
     /**
-     * @param integer $idx The node index in the original node array
-     * @param boolean $open true when open tag, false when closing tag
+     * @param int $idx The node index in the original node array
+     * @param bool $open true when open tag, false when closing tag
      * @param mixed $rid The reference ID to match open and close tag
-     * @param integer $id The reference ID to match open and close tag
+     * @param int $id The reference ID to match open and close tag
      */
     public function __construct($idx, $open, $rid, $id) {
         $this->idx = $idx;

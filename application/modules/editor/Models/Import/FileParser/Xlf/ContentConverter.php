@@ -235,7 +235,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * returns true if the tag content should only be used as text for the internal tags. 
      * On false the surrounding tags (ph, ept, bpt, it) are also displayed.
      * @param string $tag
-     * @param integer $key
+     * @param int $key
      * @param array $opener
      * @return boolean
      */
@@ -264,8 +264,8 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * the result is not returned as string but as array for post processing of the generated chunks
      * 
      * @param array|string $chunks can be either an array of chunks or a string which then will be parsed
-     * @param boolean $source
-     * @param boolean $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
+     * @param bool $source
+     * @param bool $preserveWhitespace defines if the whitespace in the XML nodes should be preserved or not
      * @return array
      */
     public function convert($chunks, $source, $preserveWhitespace = false) {
@@ -341,7 +341,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     /**
      * Handler for X tags
      * @param string $tag
-     * @param integer $key
+     * @param int $key
      * @param array $opener
      */
     public function handleReplacerTag($tag, $key, $opener) {
@@ -365,7 +365,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
      * Handler for G tags
      * @param string $tag
      * @param array $attributes
-     * @param integer $key
+     * @param int $key
      */
     public function handleGTagOpener($tag, $attributes, $key) {
         $chunk = $this->xmlparser->getChunk($key);
@@ -381,7 +381,7 @@ class editor_Models_Import_FileParser_Xlf_ContentConverter {
     /**
      * Handler for G tags
      * @param string $tag
-     * @param integer $key
+     * @param int $key
      * @param array $opener
      */
     public function handleGTagCloser($tag, $key, $opener) {

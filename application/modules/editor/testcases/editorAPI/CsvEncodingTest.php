@@ -35,7 +35,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
     /**
      * Setting up the test task by fresh import, adds the lector and translator users
      */
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass():void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -203,7 +203,7 @@ class CsvEncodingTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
 
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         self::$api->login('testmanager');
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');

@@ -1392,6 +1392,24 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RXMgd3VyZGUgZWluZSBSZWxhaXNzcHJhY2hlIGdlc2V0enQsIGFiZXIgaW0gSW1wb3J0cGFrZXQgYmVmaW5kZW4gc2ljaCBrZWluZSBSZWxhaXNkYXRlbi4='><source>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</source><target>Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.</target></trans-unit>
 <trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbiBnw7xsdGlnZXMgIntwcm9vZlJlYWR9IiBWZXJ6ZWljaG5pcy4='><source>Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.</source><target>Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.</target></trans-unit>
 <trans-unit id='RGFzIGltcG9ydGllcnRlIFBha2V0IGJlaW5oYWx0ZXQga2VpbmUgRGF0ZWllbiBpbSAie3Byb29mUmVhZH0iIFZlcnplaWNobmlzLg=='><source>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</source><target>Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.</target></trans-unit>
+<trans-unit id='VW5zZXJlIEFkbWluaXN0cmF0b3JlbiB3ZXJkZW4gw7xiZXIgZGVuIEZlaGxlciBhdXRvbWF0aXNjaCBiZW5hY2hyaWNodGlndC4gRmFsbHMgd2VpdGVyZSBGcmFnZW4gb2RlciBVbmtsYXJoZWl0ZW4gYmVzdGVoZW4sIHdlbmRlbiBTaWUgc2ljaCBiaXR0ZSBhbiBkZW4gU3VwcG9ydC4='><source>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</source><target>Unsere Administratoren werden über den Fehler automatisch benachrichtigt. Falls weitere Fragen oder Unklarheiten bestehen, wenden Sie sich bitte an den Support.</target></trans-unit>
+<trans-unit id='U3VwcG9ydCBFLU1haWw6'><source>Support E-Mail:</source><target>Support E-Mail:</target></trans-unit>
+<trans-unit id='VGFnbW9kaQ=='><source>Tagmodi</source><target>Tagmodi</target></trans-unit>
+<trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'><source>Ereignisse zu Aufgabe "{0}"</source><target>Ereignisse zu Aufgabe "{0}"</target></trans-unit>
+<trans-unit id='RGV0YWlsYW5zaWNodA=='><source>Detailansicht</source><target>Detailansicht</target></trans-unit>
+<trans-unit id='WnVyw7xjayB6dSBkZW4gRXJlaWduaXNzZW4='><source>Zurück zu den Ereignissen</source><target>Zurück zu den Ereignissen</target></trans-unit>
+<trans-unit id='QXVmZ2FiZSBGZWhsZXJoaXN0b3JpZQ=='><source>Aufgabe Fehlerhistorie</source><target>Aufgabe Fehlerhistorie</target></trans-unit>
+<trans-unit id='RXJlaWduaXNzZQ=='><source>Ereignisse</source><target>Ereignisse</target></trans-unit>
+<trans-unit id='RmF0YWw='><source>Fatal</source><target>Fatal</target></trans-unit>
+<trans-unit id='RXJyb3I='><source>Error</source><target>Error</target></trans-unit>
+<trans-unit id='V2FybnVuZw=='><source>Warnung</source><target>Warnung</target></trans-unit>
+<trans-unit id='SW5mbw=='><source>Info</source><target>Info</target></trans-unit>
+<trans-unit id='RGVidWc='><source>Debug</source><target>Debug</target></trans-unit>
+<trans-unit id='VHJhY2U='><source>Trace</source><target>Trace</target></trans-unit>
+<trans-unit id='RmVobGVyY29kZQ=='><source>Fehlercode</source><target>Fehlercode</target></trans-unit>
+<trans-unit id='QmVyZWljaA=='><source>Bereich</source><target>Bereich</target></trans-unit>
+<trans-unit id='WmVpdHB1bmt0'><source>Zeitpunkt</source><target>Zeitpunkt</target></trans-unit>
+<trans-unit id='TWVociBJbmZv'><source>Mehr Info</source><target>Mehr Info</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgd2lyZCB2b24gZWluZW0gQmVudXR6ZXIgYmVudXR6dCwgdW5kIGthbm4gZGFoZXIgbmljaHQgZ2Vsw7ZzY2h0IHdlcmRlbi4='><source>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</source><target>Die Aufgabe wird von einem Benutzer benutzt, und kann daher nicht gelöscht werden.</target></trans-unit>
 <trans-unit id='RGllIEF1ZmdhYmUgaXN0IGR1cmNoIGVpbmVuIEJlbnV0emVyIGdlc3BlcnJ0LCB1bmQga2FubiBkYWhlciBuaWNodCBnZWzDtnNjaHQgd2VyZGVuLg=='><source>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</source><target>Die Aufgabe ist durch einen Benutzer gesperrt, und kann daher nicht gelöscht werden.</target></trans-unit>
 <trans-unit id='RGllIGdld8O8bnNjaHRlIFNwcmFjaHJlc291cmNlIGdpYnQgZXMgbmljaHQh'><source>Die gewünschte Sprachresource gibt es nicht!</source><target>Die gewünschte Sprachresource gibt es nicht!</target></trans-unit>
@@ -1508,6 +1526,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='U3VtbWU6'><source>Summe:</source><target>Summe:</target></trans-unit>
 <trans-unit id='SW50ZXJuZSBGdXp6eSB2ZXJ3ZW5kZXQ='><source>Interne Fuzzy verwendet</source><target>Interne Fuzzy verwendet</target></trans-unit>
 <trans-unit id='TWF0Y2gtUmF0ZQ=='><source>Match-Rate</source><target>Match-Rate</target></trans-unit>
+<trans-unit id='SW4gYmVyZWl0cyBnZWzDtnNjaHRlIEluaGFsdGUga8O2bm5lbiBrZWluZSBNUU0tVGFncyBlaW5nZWbDvGd0IHdlcmRlbi4='><source>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</source><target>In bereits gelöschte Inhalte können keine MQM-Tags eingefügt werden.</target></trans-unit>
+<trans-unit id='RGVyIEluaGFsdCB3dXJkZSBuaWNodCBpbiBkYXMgQ2xpcGJvYXJkIMO8YmVybm9tbWVuLg=='><source>Der Inhalt wurde nicht in das Clipboard übernommen.</source><target>Der Inhalt wurde nicht in das Clipboard übernommen.</target></trans-unit>
+<trans-unit id='RGllIFBvc2l0aW9uIGRlcyBDdXJzb3JzIGJ6dy4gZGllIEF1c3dhaGwgaW0gVGV4dCB3dXJkZSBuaWNodCBlcmthbm50LiBCaXR0ZSBub2NobWFsIHByb2JpZXJlbiB1bmQgZ2dmLiBkaWUgQWRtaW5zIGJlbmFjaHJpY2h0aWdlbi4='><source>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</source><target>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</target></trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='><source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source><target>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</target></trans-unit>
   </body>
  </file>

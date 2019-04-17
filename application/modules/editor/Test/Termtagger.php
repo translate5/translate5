@@ -40,7 +40,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
      */
     protected static $workflow;
 
-    public static function setUpBeforeClass(){
+    public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         self::setTestResources();
         self::setTaskValues();
@@ -198,7 +198,7 @@ class editor_Test_Termtagger extends editor_Test_Termtagger_Abstract {
         $dp = $upload->getDataProvider();
         $import->import($dp);
     }
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
         
         $remover = ZfExtended_Factory::get('editor_Models_Task_Remover', array(self::$testTask));

@@ -25,32 +25,19 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
- * Entity Model for History Data Entries
  */
-class editor_Models_SegmentHistoryData  extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_SegmentsHistoryData';
-    
+class editor_Models_Import_FileParser_Xlf_Exception extends editor_Models_Import_FileParser_Exception {
     /**
-     * loads the history data entries to one segment, DESC sorted by id (creation)
-     *  can be limited with $limit parameter
-     *  can be filtered to one datafield with optional parameter $field 
-     * @param int $id
-     * @param string $field optional, defaults to null which means all fields
-     * @param number $limit optional, defaults to 0 which means no limit
-     * @return array
+     * @var string
      */
-    public function loadBySegmentId($id, $field = null, $limit = 0) {
-        $s = $this->db->select();
-        $s->where('segmentId = ?', $id);
-        if(!empty($field)) {
-            $s->where('name = ?', $field);
-        }
-        $s->order('id DESC');
-        if($limit > 0) {
-            $s->limit($limit);
-        }
-        return $this->db->fetchAll($s)->toArray();
-    }
+    protected $domain = 'editor.import.fileparser.xlf';
+    
+    static protected $localErrorCodes = [
+        'E1067' => 'MRK/SUB tag of source not found in target with Mid: "{mid}"',
+        'E1068' => 'MRK/SUB tag of target not found in source with Mid(s): "{mids}"',
+        'E1069' => 'There is other content as whitespace outside of the mrk tags. Found content: {content}',
+        'E1070' => 'SUB tag of {field} is not unique due missing ID in the parent node and is ignored as separate segment therefore.',
+        'E1071' => 'MRK tag of {field} has no MID attribute.',
+    ];
 }

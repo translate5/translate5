@@ -67,7 +67,7 @@ class editor_Models_Task_Remover {
     
     /**
      * Removes a task from translate5 regardless of its task and locking state
-     * @param boolean $removeFiles optional, per default true, data directory is removed, if false data directory remains on disk
+     * @param bool $removeFiles optional, per default true, data directory is removed, if false data directory remains on disk
      */
     public function removeForced($removeFiles = true) {
         $taskGuid = $this->task->getTaskGuid();

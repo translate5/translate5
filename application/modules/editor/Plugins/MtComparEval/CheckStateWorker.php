@@ -82,7 +82,7 @@ class editor_Plugins_MtComparEval_CheckStateWorker extends ZfExtended_Worker_Abs
     
     /**
      * Gets the experiment status from MT-ComparEval
-     * @param integer $experimentId
+     * @param int $experimentId
      * @return boolean returns true if experiment is ready
      */
     protected function getExperimentStatus($experimentId, editor_Plugins_MtComparEval_Bootstrap $plugin) {

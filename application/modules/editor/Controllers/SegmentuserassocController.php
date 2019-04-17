@@ -71,10 +71,10 @@ class Editor_SegmentuserassocController extends editor_Controllers_EditorrestCon
     
     /**
      * compares the taskGuid of the desired segment and the actually loaded taskGuid
-     * @param integer $segmentId
+     * @param int $segmentId
      * @throws ZfExtended_Models_Entity_NoAccessException
      */
-    protected function checkSegmentTaskGuid(integer $segmentId) {
+    protected function checkSegmentTaskGuid(int $segmentId) {
         $session = new Zend_Session_Namespace();
         $segment = ZfExtended_Factory::get('editor_Models_Segment');
         /* @var $segment editor_Models_Segment */

@@ -25,10 +25,6 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-UPDATE `LEK_customer` SET `domain` = null WHERE `domain` = '';
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) 
+VALUES ('editor', 'pm', 'frontend', 'editorTaskLog');
 
-ALTER TABLE `LEK_customer` 
-ADD UNIQUE INDEX `domain_UNIQUE` (`domain` ASC);
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
-VALUES ('runtimeOptions.customers.openid.showOpenIdDefaultCustomerData', '1', 'editor', 'editor', '0', '0', '', 'boolean', 'Is the openid defined data visible for the default customer');

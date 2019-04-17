@@ -176,7 +176,7 @@ trait editor_Models_Import_FileParser_TagTrait {
     }
     
     /**
-     * herlper for parseSegment: encode the tag content without leading and trailing <>
+     * helper for parseSegment: encode the tag content without leading and trailing <>
      * checks if $tag starts with < and ends with >
      *
      * @param string $tag contains the tag

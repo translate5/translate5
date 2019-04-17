@@ -161,7 +161,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
      * Also the function checks for the invalid decoded json.
      * 
      * @param Zend_Http_Response $response
-     * @param boolean $responseAsXlif true if we expect xlif file as response
+     * @param bool $responseAsXlif true if we expect xlif file as response
      * @throws ZfExtended_BadGateway
      * @throws ZfExtended_Exception
      * @return stdClass|string
@@ -233,7 +233,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     /**
      * Remove the project from globalese server.
      * 
-     * @param integer $projectId
+     * @param int $projectId
      */
     public function removeProject() {
         $url='projects/'.$this->globaleseProjectId;
@@ -387,8 +387,8 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     /**
      * Gets the file content to the given fileid 
      * 
-     * @param integer $fileId
-     * @param boolean $remove default true, if true removes the fetched file immediatelly from Globalese project
+     * @param int $fileId
+     * @param bool $remove default true, if true removes the fetched file immediatelly from Globalese project
      * @return string (translated file from globalese as string)
      */
     public function getFileContent($fileId, $remove = true) {

@@ -40,7 +40,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected static $collId;
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
@@ -87,9 +87,9 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      * Run single test for each file. Test against the content and attributes count
      * 
      * @param string $fileName
-     * @param integer $termCount : the count of the terms after the import
-     * @param integer $termsAtributeCount : the count afo the term attributes after the import
-     * @param integer $termsEntryAtributeCount : the count of the term entry attributes after the import
+     * @param int $termCount : the count of the terms after the import
+     * @param int $termsAtributeCount : the count afo the term attributes after the import
+     * @param int $termsEntryAtributeCount : the count of the term entry attributes after the import
      */
     private function singleTest($fileName,$termCount,$termsAtributeCount,$termsEntryAtributeCount){
         $this->api()->addFile($fileName, $this->api()->getFile($fileName), "application/xml");
@@ -116,7 +116,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue($termsEntryAtributeCount==$attributes->termsEntryAtributeCount, $fileName.' file test.Invalid number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
         self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
     }

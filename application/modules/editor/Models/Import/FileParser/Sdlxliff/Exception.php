@@ -31,7 +31,7 @@ class editor_Models_Import_FileParser_Sdlxliff_Exception extends editor_Models_I
     /**
      * @var string
      */
-    protected $origin = 'import.fileparser.sdlxliff';
+    protected $domain = 'editor.import.fileparser.sdlxliff';
     
     static protected $localErrorCodes = [
         'E1000' => 'The file "{filename}" contains SDL comments which are currently not supported!',

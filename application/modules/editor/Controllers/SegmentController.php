@@ -453,8 +453,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $results=$this->entity->search($parameters);
         
         $searchInField=$parameters['searchInField'];
-        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
-        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
+        $searchType = $parameters['searchType'] ?? null;
+        $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true') : false;
         
         if(!$results || empty($results)){
             $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');

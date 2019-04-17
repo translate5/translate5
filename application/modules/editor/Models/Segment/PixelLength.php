@@ -126,7 +126,7 @@ class editor_Models_Segment_PixelLength {
             $this->addPixelMappingForFont($fontFamily, $fontSize);
             $pixelMappingForTask = $this->pixelMappingForTask;
         }
-        return isset($pixelMappingForTask[$fontFamily][$fontSize]) ? $pixelMappingForTask[$fontFamily][$fontSize] : [];
+        return $pixelMappingForTask[$fontFamily][$fontSize] ?? [];
     }
     
     /**
@@ -136,6 +136,8 @@ class editor_Models_Segment_PixelLength {
      */
     protected function addPixelMappingForFont(string $fontFamily, int $fontSize) {
         $fontFamily = strtolower($fontFamily);
+        settype($this->pixelMappingForTask[$fontFamily], 'array');
+        settype($this->pixelMappingForTask[$fontFamily][$fontSize], 'array');
         // If there is anything set in the database, add it:
         $pixelMappingForFont = $this->pixelMapping->getPixelMappingByFont($this->customerId, $fontFamily, $fontSize);
         if (!empty($pixelMappingForFont)) {

@@ -49,7 +49,7 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns all users to the segmentId of the given SegmentUserAssoc
-     * @param integer $segmentId
+     * @param int $segmentId
      * @return [array] list with user arrays
      */
     public function getUsersOfSegment($segmentId){

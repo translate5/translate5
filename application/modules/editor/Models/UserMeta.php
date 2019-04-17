@@ -29,13 +29,13 @@ END LICENSE AND COPYRIGHT
 /**
  * User meta Entity Object
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method integer getUserId() getUserId()
- * @method void setUserId() setUserId(integer $userId)
+ * @method void setUserId() setUserId(int $userId)
  * @method integer getSourceLangDefault() getSourceLangDefault()
- * @method void setSourceLangDefault() setSourceLangDefault(integer $sourceLangDefault)
+ * @method void setSourceLangDefault() setSourceLangDefault(int $sourceLangDefault)
  * @method integer getTargetLangDefault() getTargetLangDefault()
- * @method void setTargetLangDefault() setTargetLangDefault(integer $targetLangDefault)
+ * @method void setTargetLangDefault() setTargetLangDefault(int $targetLangDefault)
  */
 class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_UserMeta';
@@ -65,7 +65,7 @@ class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
     
     /***
      * Load model for the given user
-     * @param integer $userId
+     * @param int $userId
      */
     public function loadByUser($userId){
         $this->loadRow('userId=?',$userId);

@@ -323,7 +323,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     
     /**
      * returns the export fileparser of the affected file
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $filename
      * @return mixed|object
      */
@@ -353,7 +353,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
         
     /**
      * stores the content tags in the xliff header - omitted with CONFIG_PLAIN_INTERNAL_TAGS
-     * @param integer $fileMapKey the index of the filemap placeholder in the result array 
+     * @param int $fileMapKey the index of the filemap placeholder in the result array 
      */
     protected function storeTagsInHeader($fileMapKey) {
         if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
@@ -416,7 +416,7 @@ abstract class editor_Models_Converter_SegmentsToXliffAbstract {
     /**
      * escapes a string to be used in XML
      * @param string $text
-     * @param boolean $isAttribute set to false, if value is not used as attribute (no double quote escaping)
+     * @param bool $isAttribute set to false, if value is not used as attribute (no double quote escaping)
      * @return string
      */
     protected function escape($text, $isAttribute = true) {

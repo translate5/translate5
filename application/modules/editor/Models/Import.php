@@ -63,7 +63,7 @@ class editor_Models_Import {
     /**
      * sets the Importer to check mode: additional debug output on import
      * does not effect pre import checks
-     * @param boolean $check optional, per default true 
+     * @param bool $check optional, per default true 
      */
     public function setCheck($check = true){
         $this->importConfig->isCheckRun = $check;

@@ -44,7 +44,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
              'Editor.util.Event',
              'Editor.util.Range',
              'Editor.util.SegmentEditor',
-             'Editor.util.SegmentEditorSnapshots',
              'Editor.plugins.SpellCheck.controller.UtilLanguageTool',
              'Editor.controller.SearchReplace',
              'Editor.util.SearchReplaceUtils'],
@@ -169,7 +168,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this,
             plug,
             editor;
-        me.consoleLog('- SpellCheck: initEditor.');
+        me.consoleLog('SpellCheck: initEditor.');
         // Initialize Editor in general:
         plug = me.getSegmentGrid().editingPlugin;
         editor = plug.editor;           // → this is the row editor component;
@@ -180,6 +179,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.initKeyboardEvents();
         me.initMouseEvents();
         me.setBrowserSpellcheck();
+        me.setSnapshotHistory();
     },
     /**
      * Init ToolTips
@@ -215,7 +215,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         var me = this;
         me.consoleLog('SpellCheck: initKeyboardEvents...');
         Ext.get(me.editor.getDoc()).on('keydown', me.handleKeyDown, me, {priority: 9980, delegated: false});
-        Ext.get(me.editor.getDoc()).on('keyup', me.handleKeyUp, me, {priority: 9980, delegated: false});
     },
     initMouseEvents: function() {
         var me = this,
@@ -262,7 +261,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     startTimerForSpellCheck: function() {
         var me = this;
-        if (me.isSupportedLanguage === false) {
+        if (!me.isSupportedLanguage) {
             me.consoleLog('startTimerForSpellCheck not started because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
@@ -295,13 +294,17 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     handleKeyDown: function(event) {
         var me = this;
         me.consoleLog('SpellCheck: handleKeyDown...');
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('handleKeyDown stopped because language is not supported or SpellCheck-Tool does not run.');
+            return;
+        }
         me.initKeyDownEvent(event);
         if(me.eventHasToBeIgnored() || me.eventIsCtrlV()){ // CTRL+V: SpellCheck will run anyway after insert markup (afterInsertMarkup); don't start it twice
             me.consoleLog(" => Ignored for SpellCheck.");
             me.ignoreEvent = true;
             me.stopEvent = false;
         }
-        if(me.eventHasToBeIgnoredAndStopped()){
+        if(me.eventIsCtrlZ() || me.eventIsCtrlY() || me.eventHasToBeIgnoredAndStopped()){
             me.consoleLog(" => Ignored for SpellCheck and stopped.");
             me.ignoreEvent = true;
             me.stopEvent = true;
@@ -319,34 +322,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             break;
         }
         
-        if(!me.ignoreEvent) {
-            switch(true) {
-                case me.eventIsCtrlZ():
-                    // Restore older snapshot...
-                    me.cleanupSnapshotHistory();
-                    me.rewindSnapshot();
-                    me.restoreSnapshotInEditor();
-                    // .... reset timer ...
-                    me.startTimerForSpellCheck();
-                    // ... and stop the event
-                    me.ignoreEvent = true;
-                    me.stopEvent = true;
-                break;
-                case me.eventIsCtrlY():
-                    // Restore newer snapshot...
-                    me.fastforwardSnapshot();
-                    me.restoreSnapshotInEditor();
-                    // .... reset timer ...
-                    me.startTimerForSpellCheck();
-                    // ... and stop the event
-                    me.ignoreEvent = true;
-                    me.stopEvent = true;
-                break;
-                default:
-                    me.startTimerForSpellCheck();
-                break;
-            }
-        }
+        me.startTimerForSpellCheck();
         
         // Stop event?
         if(me.stopEvent) {
@@ -354,18 +330,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
     },
     /**
-     * Handle KeyUp-Events of Editor.view.segments.HtmlEditor
-     */
-    handleKeyUp: function() {
-        var me = this;
-        if(me.ignoreEvent) {
-            return;
-        }
-        // Keep a snapshot from the new content
-        me.saveSnapshot();
-    },
-    /**
-     * After each push etc.: When the content in the Editor gets updated, we save a snapshot and start the timer for running the next SpellCheck.
+     * After each push etc.: When the content in the Editor gets updated, we start the timer for running the next SpellCheck.
      */
     handleAfterContentUpdate: function() {
         var me = this;
@@ -376,24 +341,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         // Stop if the language is not supported (or we cannot tell yet) or the tool does not run.
-        if (me.isSupportedLanguage !== true) {
+        if (!me.isSupportedLanguage) {
             me.consoleLog('(SpellCheck:) handleAfterContentUpdate => NO SpellCheck; the language is not supported or the SpellCheck-Tool does not run.');
             return;
         }
         
         me.consoleLog('(SpellCheck:) handleAfterContentUpdate (' + me.targetLangCode + '/' + me.isSupportedLanguage + ')');
         
-        // New segment opened?
-        me.consoleLog("segmentId: " + me.segmentId + "/" + me.getSegmentGrid().editingPlugin.context.record.get('id'));
-        if (me.segmentId != me.getSegmentGrid().editingPlugin.context.record.get('id')) {
-            // New segment opened? Then start a new snapshot-history.
-            me.segmentId = me.getSegmentGrid().editingPlugin.context.record.get('id');
-            me.initSnapshotHistory();
-        }
-        
-        // (1) keep a snapshot from the current content
-        me.saveSnapshot();
-        // (2) run SpellCheck
         me.startSpellCheck();
     },
     
@@ -409,7 +363,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             spellCheckProcessID,
             editorContentAsText;
         
-        if (me.isSupportedLanguage !== true) { // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
+        if (!me.isSupportedLanguage) { // Should not be the case when we got here already, but that is not enough: it MUST NOT happen.
             me.consoleLog('startSpellCheck failed eg because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
@@ -418,6 +372,9 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         spellCheckProcessID = Ext.Date.format(new Date(), 'time');
         me.spellCheckInProgressID = spellCheckProcessID;
         me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
+        
+        // TrackChanges must remove it's placeholders.
+        me.fireEvent('removePlaceholdersInEditor');
         
         // where is the caret at the moment?
         me.bookmarkForCaret = me.getPositionOfCaret();
@@ -459,6 +416,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     terminateSpellCheck: function() {
         var me = this;
         me.consoleLog('terminateSpellCheck.');
+        if (!me.isSupportedLanguage) {
+            me.consoleLog('terminateSpellCheck stopped eg because language is not supported or SpellCheck-Tool does not run.');
+            return;
+        }
         clearTimeout(me.editIdleTimer);
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
@@ -482,8 +443,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         }
         
         if (!me.allMatchesOfTool.length > 0) {
-            me.consoleLog('allMatchesOfTool: no results.');
-            me.cleanSpellCheckMarkupInEditor(); // in case there have been results marked before
+            me.consoleLog('allMatchesOfTool: no errors.');
+            me.cleanSpellCheckMarkupInEditor(); // in case there have been errors marked before
             me.bookmarkForCaret = null;
             me.finishSpellCheck(spellCheckProcessID);
             return;
@@ -561,8 +522,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.spellCheckTooltip.hide();
         
         me.collapseMultipleWhitespaceInEditor();
-        
-        me.saveSnapshot();
         
         // new DOM after replacement => find and apply the matches again:
         me.startSpellCheck();
@@ -747,8 +706,20 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     setBrowserSpellcheck: function(){
         var me = this,
             editorBody = me.getEditorBody();
-        editorBody.spellcheck = (me.isSupportedLanguage === true) ? false : true;
-        me.consoleLog('- Browser-Spellcheck is set to: ' + editorBody.spellcheck + '.');
+        editorBody.spellcheck = (me.isSupportedLanguage) ? false : true;
+        me.consoleLog('Browser-Spellcheck is set to: ' + editorBody.spellcheck + '.');
+    },
+    /**
+     * Enable SnapshotHistory if needed.
+     */
+    setSnapshotHistory: function(){
+        var me = this;
+    	if (me.isSupportedLanguage) {
+            me.fireEvent('activateSnapshotHistory');
+            me.consoleLog('Spellcheck activateSnapshotHistory: yes');
+    	} else {
+            me.consoleLog('Spellcheck activateSnapshotHistory: no');
+    	}
     },
     /**
      * Inject CSS into the Editor

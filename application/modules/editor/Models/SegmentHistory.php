@@ -62,7 +62,7 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     
     /**
      * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter 
-     * @param integer $id
+     * @param int $id
      * @param number $limit
      * @return array
      */

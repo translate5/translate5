@@ -130,10 +130,10 @@ abstract class editor_Models_Import_FileParser {
      * FIXME change first Parameter to SplFileInfo!
      * @param string $path pfad zur Datei in der Kodierung des Filesystems (also runtimeOptions.fileSystemEncoding)
      * @param string $fileName Dateiname utf-8 kodiert
-     * @param integer $fileId
+     * @param int $fileId
      * @param editor_Models_Task $task
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task){
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task){
         $this->config = Zend_Registry::get('config');
         $this->_origFile = file_get_contents($path);
         $this->_path = $path;
@@ -295,7 +295,7 @@ abstract class editor_Models_Import_FileParser {
     
     /**
      * returns a placeholder for reexport the edited content
-     * @param integer $segmentId
+     * @param int $segmentId
      * @param string $name
      */
     protected function getFieldPlaceholder($segmentId, $name) {
@@ -430,7 +430,7 @@ abstract class editor_Models_Import_FileParser {
      * - speichert die Tags in der Datenbank
      *
      * @param mixed $segment
-     * @param boolean isSource
+     * @param bool isSource
      * @return mixed $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
@@ -490,6 +490,6 @@ abstract class editor_Models_Import_FileParser {
      * @return string[]
      */
     public static function getValidMimeTypes() {
-        return ['application/xml'];
+        return ['application/xml','text/xml'];
     }
 }

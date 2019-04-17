@@ -70,12 +70,12 @@ class editor_Services_Google_HttpApi {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
         
-        $this->apiKey = isset($config->runtimeOptions->LanguageResources->google->apiKey) ?$config->runtimeOptions->LanguageResources->google->apiKey:null ;
+        $this->apiKey = $config->runtimeOptions->LanguageResources->google->apiKey ?? null ;
         if(empty($this->apiKey)){
             throw new ZfExtended_BadGateway("Google translate api key is not defined");
         }
         
-        $this->projectId=isset($config->runtimeOptions->LanguageResources->google->projectId) ?$config->runtimeOptions->LanguageResources->google->projectId:null ;
+        $this->projectId = $config->runtimeOptions->LanguageResources->google->projectId ?? null ;
         if(empty($this->projectId)){
             throw new ZfExtended_BadGateway("Google translate project id is not defined");
         }

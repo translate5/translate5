@@ -35,19 +35,29 @@ END LICENSE AND COPYRIGHT
 /**
  * Default Model for Plugin SegmentStatistics
  * 
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method void setTaskGuid() setTaskGuid(string $guid)
- * @method void setMid() setmid(integer $Mid)
+ * @method void setMid() setmid(string $Mid)
+ * @method void setSegmentId() setSegmentId(int $segmentId)
+ * @method void setField() setField(int $field)
+ * @method void setFieldName() setFieldName(string $fieldName)
+ * @method void setFieldType() setFieldType(string $fieldType)
  * @method void setTerm() setTerm(string $term)
- * @method void setFoundCount() setFoundCount(integer $count)
- * @method void setNotFoundCount() setNotFoundCount(integer $count)
+ * @method void setNotFoundCount() setNotFoundCount(int $count)
+ * @method void setFoundCount() setFoundCount(int $count)
+ * @method void setType() setType(string $type)
  * 
  * @method integer getId() getId()
  * @method string getTaskGuid() getTaskGuid()
- * @method integer getMid() getMid()
- * @method integer getTerm() getTerm()
- * @method integer getFoundCount() getFoundCount()
+ * @method string getMid() getMid()
+ * @method integer getSegmentId() getSegmentId()
+ * @method integer getField() getField()
+ * @method string getFieldName() getFieldName()
+ * @method string getFieldType() getFieldType()
+ * @method string getTerm() getTerm()
  * @method integer getNotFoundCount() getNotFoundCount()
+ * @method integer getFoundCount() getFoundCount()
+ * @method string getType() getType()
  */
 class editor_Plugins_SegmentStatistics_Models_TermStatistics extends ZfExtended_Models_Entity_Abstract {
     const COUNT_FOUND = 'foundCount';

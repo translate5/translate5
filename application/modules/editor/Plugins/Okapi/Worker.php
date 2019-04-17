@@ -190,7 +190,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     
     /**
      * returns the manifest.rkm file for a stored file
-     * @param integer $fileId
+     * @param int $fileId
      * @return string
      */
     protected function getManifestFile($fileId) {
@@ -199,7 +199,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     
     /**
      * returns the original file for a stored file (stored in the okapi data dir)
-     * @param integer $fileId
+     * @param int $fileId
      * @return string
      */
     protected function findOriginalFile($fileId) {
@@ -279,6 +279,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             return true;
         }
         $attach = $config->fileconverters->attachOriginalFileAsReference->toArray();
-        return isset($attach['okapi']) ? $attach['okapi'] : false;
+        return $attach['okapi'] ?? false;
     }
 }

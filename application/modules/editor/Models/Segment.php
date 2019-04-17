@@ -37,7 +37,7 @@ END LICENSE AND COPYRIGHT
  * Segment Entity Object
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method int getSegmentNrInTask() getSegmentNrInTask()
  * @method void setSegmentNrInTask() setSegmentNrInTask(int $nr)
  * @method int getFileId() getFileId()
@@ -64,13 +64,13 @@ END LICENSE AND COPYRIGHT
  * @method int getStateId() getStateId()
  * @method void setStateId() setStateId(int $id)
  * @method integer getAutoStateId() getAutoStateId()
- * @method void setAutoStateId() setAutoStateId(integer $id)
+ * @method void setAutoStateId() setAutoStateId(int $id)
  * @method int getFileOrder() getFileOrder()
  * @method void setFileOrder() setFileOrder(int $order)
  * @method string getComments() getComments()
  * @method void setComments() setComments(string $comments)
  * @method integer getWorkflowStepNr() getWorkflowStepNr()
- * @method void setWorkflowStepNr() setWorkflowStepNr(integer $stepNr)
+ * @method void setWorkflowStepNr() setWorkflowStepNr(int $stepNr)
  * @method string getWorkflowStep() getWorkflowStep()
  * @method void setWorkflowStep() setWorkflowStep(string $name)
  * 
@@ -242,8 +242,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
         $queryString=$parameters['searchField'];
         $searchInField=$parameters['searchInField'].editor_Models_SegmentFieldManager::_TOSORT_PREFIX;
-        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
-        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
+        $searchType = $parameters['searchType'] ?? null;
+        $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true') : false;
         
         //search type regular expression
         if($searchType==='regularExpressionSearch'){
@@ -516,7 +516,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Reconverts html entities so that several count operations can be performed.
      * @param string $text
-     * @param boolean $padTagLength if true, replace tags with a length with a padded string in that length
+     * @param bool $padTagLength if true, replace tags with a length with a padded string in that length
      * @return string
      */
     protected function prepareForCount($text, $padTagLength = false) {
@@ -596,7 +596,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads the Entity by Primary Key Id
-     * @param integer $id
+     * @param int $id
      * @return Zend_Db_Table_Row
      */
     public function load($id) {
@@ -643,7 +643,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * gets the time tracking information as stdClass and sets the values into the separated data objects per field
      * @param stdClass $durations
-     * @param integer $divisor optional, default = 1; if greater than 1 divide the duration through this value (for changeAlikes)
+     * @param int $divisor optional, default = 1; if greater than 1 divide the duration through this value (for changeAlikes)
      */
     public function setTimeTrackData(stdClass $durations, $divisor = 1) {
         $sfm = $this->segmentFieldManager;
@@ -691,10 +691,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads segment entity
-     * @param integer $fileId
+     * @param int $fileId
      * @param type $mid
      */
-    public function loadByFileidMid(integer $fileId, $mid) {
+    public function loadByFileidMid(int $fileId, $mid) {
         $taskGuid = $this->getTaskGuid();
         $s = $this->db->select()->from($this->tableName, array('id'));
         $segmentId = new Zend_Db_Expr('('.$s
@@ -706,7 +706,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads segment entity
-     * @param integer $segmentNrInTask
+     * @param int $segmentNrInTask
      * @param string $taskGuid
      */
     public function loadBySegmentNrInTask($segmentNrInTask, $taskGuid) {
@@ -722,7 +722,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * identified by MID and fileId. taskGuid MUST be given by setTaskGuid before!
      * 
      * @param Zend_Db_Table_Row_Abstract $field
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $mid
      * @param array $data
      * @throws ZfExtended_Models_Entity_NotFoundException if the segment where the content should be added could not be found
@@ -933,7 +933,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns the first and the last EDITABLE segment of the actual filtered request
      * @param array $autoStateIds a list of autoStates where the prev/next page segments are additionaly compared to
-     * @param integer $total
+     * @param int $total
      * @return array
      */
     public function findSurroundingEditables($next, array $autoStateIds = null) {
@@ -954,7 +954,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * First Segment is defined as the segment with the lowest id of the task
      * 
      * @param string $taskGuid
-     * @param integer $fileId optional, loads first file of given fileId in task
+     * @param int $fileId optional, loads first file of given fileId in task
      * @return editor_Models_Segment
      */
     public function loadFirst($taskGuid, $fileId = null) {
@@ -976,8 +976,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * next is defined as the segment with the next higher segmentId
      * This method assumes that segmentFieldManager was already loaded internally
      * @param string $taskGuid
-     * @param integer $id
-     * @param integer $fileId optional, loads first file of given fileId in task
+     * @param int $id
+     * @param int $fileId optional, loads first file of given fileId in task
      * @return editor_Models_Segment | null if no next found
      */
     public function loadNext($taskGuid, $id, $fileId = null) {
@@ -1005,7 +1005,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * returns the segment count of the given taskGuid
      * filters are not applied since the overall count is needed for statistics
      * @param string $taskGuid
-     * @param boolean $editable
+     * @param bool $editable
      * @return integer the segment count
      */
     public function count($taskGuid,$onlyEditable=false) {
@@ -1113,7 +1113,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * Loads segments by a specific workflowStep, fetch only specific fields.
      * @param string $taskGuid
      * @param string $workflowStep
-     * @param integer $workflowStepNr
+     * @param int $workflowStepNr
      */
     public function loadByWorkflowStep(string $taskGuid, string $workflowStep, $workflowStepNr) {
         $config = Zend_Registry::get('config');
@@ -1183,7 +1183,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * enables the watchlist filter join, for performance issues only if the user 
      *   really wants to see the watchlist (isWatched is in the filter list)
-     * @param boolean $value optional, to force enable/disable watchlist
+     * @param bool $value optional, to force enable/disable watchlist
      */
     public function setEnableWatchlistJoin($value = null) {
         if(is_null($value)) {
@@ -1247,7 +1247,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * Syncs the Files fileorder to the Segments Table, for faster sorted reading from segment table
      * @param string $taskguid
-     * @param boolean $omitView if true do not update the view
+     * @param bool $omitView if true do not update the view
      */
     public function syncFileOrderFromFiles(string $taskguid, $omitView = false) {
         $infokey = Zend_Db_Table_Abstract::NAME;
@@ -1432,11 +1432,11 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * If userGuid and username are set in this segment instance, the this values are also set in the affected segments
      * FIXME test me for translation workflow!
      * @param string $taskGuid
-     * @param integer $oldState
-     * @param integer $newState
-     * @param boolean $emptyEditedOnly if true only segments where all alternative targets are empty are affected
+     * @param int $oldState
+     * @param int $newState
+     * @param bool $emptyEditedOnly if true only segments where all alternative targets are empty are affected
      */
-    public function updateAutoState(string $taskGuid, integer $oldState, integer $newState, $emptyEditedOnly = false) {
+    public function updateAutoState(string $taskGuid, int $oldState, int $newState, $emptyEditedOnly = false) {
         $sfm = $this->segmentFieldManager;
         $sfm->initFields($taskGuid);
         $db = $this->db;
@@ -1508,9 +1508,9 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /***
      * Find last editor from segment history, and update it in the lek segment table
      * @param string $taskGuid
-     * @param integer $autoState
+     * @param int $autoState
      */
-    public function updateLastAuthorFromHistory(string $taskGuid,integer $autoState){
+    public function updateLastAuthorFromHistory(string $taskGuid,int $autoState){
         if(empty($taskGuid) || empty($autoState)){
             return;
         }

@@ -229,7 +229,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
         
     /**
      * stores the content tags in the xliff header - omitted with CONFIG_PLAIN_INTERNAL_TAGS
-     * @param integer $fileMapKey the index of the filemap placeholder in the result array 
+     * @param int $fileMapKey the index of the filemap placeholder in the result array 
      */
     protected function storeTagsInHeader($fileMapKey) {
         if($this->options[self::CONFIG_PLAIN_INTERNAL_TAGS]) {
@@ -362,7 +362,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
      * @param array $segment
      */
     protected function processComment(array $segment) {
-        $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $this->task->getTaskGuid());
+        $comments = $this->comment->loadBySegmentAndTaskPlain((int)$segment['id'], $this->task->getTaskGuid());
         $note = '<dx:note dx:modified-by="%1$s" dx:annotates="target" dx:modified-at="%2$s">%3$s</dx:note>';
         foreach($comments as $comment) {
             $modified = new DateTime($comment['modified']);

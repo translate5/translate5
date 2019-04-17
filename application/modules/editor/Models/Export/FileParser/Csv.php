@@ -50,7 +50,7 @@ class editor_Models_Export_FileParser_Csv extends editor_Models_Export_FileParse
      */
     protected $_enclosure;
 
-    public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task,string $path) {
+    public function __construct(int $fileId, bool $diff,editor_Models_Task $task,string $path) {
         parent::__construct($fileId, $diff,$task,$path);
         $this->_delimiter = $this->config->runtimeOptions->import->csv->delimiter;
         $this->_enclosure = $this->config->runtimeOptions->import->csv->enclosure;
