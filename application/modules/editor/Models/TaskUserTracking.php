@@ -56,6 +56,12 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
     
     /**
+     * Cached map of userdata to anonymized userdata by task and user
+     * @var array
+     */
+    protected $cachedUserdata = array();
+    
+    /**
      * loads the TaskUserTracking-entry for the given task and user (= unique)
      * @param string $taskGuid
      * @param string $userGuid
@@ -83,34 +89,6 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      */
     protected function getTaskOpenerNumberForUser(){
         return $this->getTaskOpenerNumber() ?? null;
-    }
-    
-    /**
-     * renders an anonymized version using the kind of data that is given:
-     * - e.g. "userName-1", "userName-2", ... if tracking-data is available
-     * - "-" otherwise
-     * @param string $userDataKey
-     * @return string
-     */
-    protected function renderAnonymizeUserdata ($userDataKey) {
-        $taskOpenerNumber = $this->getTaskOpenerNumberForUser();
-        return (is_null($taskOpenerNumber) ? '-' : $key.'-'.$taskOpenerNumber);
-    }
-    
-    /**
-     * anonymizes all user-related data by keys in $data
-     * @param string $taskGuid
-     * @param array $data
-     * @return array
-     */
-    public function anonymizeUserdata($taskGuid, array $data) {
-        $keysToAnonymize = ['firstName','lockingUser','lockingUsername','login','userGuid','userName','surName'];
-        array_walk($data, function( &$value, $key) use ($keysToAnonymize) {
-            if (in_array($key, $keysToAnonymize)) {
-                $value = $this->renderAnonymizeUserdata($key);
-            }
-        });
-        return $data;
     }
     
     /**
@@ -150,5 +128,75 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
         $s->where('taskGuid = ?', $taskguid);
         return $this->computeTotalCount($s);
         
+    }
+    
+    // -------------------------------------------------------------------------
+    // ANONYMIZING (could be refactored into a class on it's own)
+    // -------------------------------------------------------------------------
+    
+    /**
+     * anonymizes all user-related data by keys in $data
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @param array $data
+     * @return array
+     */
+    public function anonymizeUserdata($taskGuid, $userGuid, array $data) {
+        $cacheKey = $taskGuid.$userGuid;
+        if(isset($this->cachedUserdata[$cacheKey])) {
+            return $this->cachedUserdata[$cacheKey];
+        }
+        $keysToAnonymize = ['firstName','lockingUser','lockingUsername','login','userName','surName'];
+        //TODO: don't anonymize userGuid too early, we might still need it...
+        array_walk($data, function( &$value, $key) use ($taskGuid, $userGuid, $keysToAnonymize) {
+            if (in_array($key, $keysToAnonymize)) {
+                switch ($key) {
+                    case 'userName':
+                        $value = $this->renderAsRole($taskGuid, $userGuid);
+                        break;
+                    case 'login':
+                        $value = $this->renderAsEmpty();
+                        break;
+                    default:
+                        $value = $this->renderAsTracked($taskGuid, $key);
+                    break;
+                }
+            }
+        });
+        $this->cachedUserdata[$cacheKey] = $data;
+        return $data;
+    }
+    
+    /**
+     * renders an anonymized version using the kind of data that is given:
+     * - e.g. "userName-1", "userName-2", ... if tracking-data is available
+     * - "-" otherwise
+     * @param string $userDataKey
+     * @return string
+     */
+    protected function renderAsTracked ($taskGuid, $userDataKey) {
+        $taskOpenerNumber = $this->getTaskOpenerNumberForUser();
+        return (is_null($taskOpenerNumber) ? '-' : $userDataKey.'-'.$taskOpenerNumber);
+    }
+    
+    /**
+     * anonymizes userguid (as stored for segments, for example:) return empty string
+     * @return string
+     */
+    protected function renderAsEmpty() {
+        return '';
+    }
+    
+    /**
+     * anonymizes usernames (as stored for segments, for example:) show role only
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @return string
+     */
+    protected function renderAsRole($taskGuid, $userGuid) {
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tua->loadByParams($userGuid,$taskGuid);
+        return $tua->getRole();
     }
 }

@@ -116,7 +116,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
             /* @var $taskUserTracking editor_Models_TaskUserTracking */
             foreach ($rows as &$row) {
-                $row = $taskUserTracking->anonymizeUserdata($taskGuid, $row);
+                $row = $taskUserTracking->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
             }
         }
         

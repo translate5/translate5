@@ -51,7 +51,8 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $entity;
     
     /**
-     * Cached map of userGuids to userNames
+     * Cached map of userGuids and taskGuid to userNames
+     * (might differ if a task is anonymized or not)
      * @var array
      */
     protected $cachedUserInfo = array();
@@ -290,15 +291,21 @@ class editor_TaskController extends ZfExtended_RestController {
                 $userAssocInfos[$assoc['taskGuid']] = $assoc;
             }
             $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
-            $assoc['userGuid'] = $userInfo['userGuid']; // might be anonymized now
             $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];
             $assoc['login'] = $userInfo['login'];
+            if ($userInfo['userinfoIsAnonymized']) {
+                $assoc['userName'] = '';
+                $assoc['login'] = '';
+            }
             //set only not pmOverrides
             if(empty($assoc['isPmOverride'])) {
                 $res[$assoc['taskGuid']][] = $assoc;
             }
         }
         $userSorter = function($first, $second){
+            if(!isset($first['userName']) || !isset($second['userName'])) {
+                return 0;
+            }
             if($first['userName'] > $second['userName']) {
                 return 1;
             }
@@ -326,9 +333,10 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($userGuid)) {
             return $notfound;
         }
-        if(isset($this->cachedUserInfo[$userGuid][$taskGuid])) {
+        $cacheKey = $userGuid.$taskGuid;
+        if(isset($this->cachedUserInfo[$cacheKey])) {
             // cache for user AND task (anonymizing might differ from task to task)
-            return $this->cachedUserInfo[$userGuid][$taskGuid];
+            return $this->cachedUserInfo[$cacheKey];
         }
         if(empty($this->tmpUserDb)) {
             $this->tmpUserDb = ZfExtended_Factory::get('ZfExtended_Models_Db_User');
@@ -341,18 +349,20 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $userInfo = $row->toArray();
         
+        // add flag if the userinfo is anonymized
+        $userInfo['userinfoIsAnonymized'] = false;
         // anonymize userinfo?
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-        $test = $taskGuid;
         if ($task->anonymizeUsers()) {
+            $userInfo['userinfoIsAnonymized'] = true;
             $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
             /* @var $taskUserTracking editor_Models_TaskUserTracking */
-            $userInfo = $taskUserTracking->anonymizeUserdata($taskGuid, $userInfo);
+            $userInfo = $taskUserTracking->anonymizeUserdata($taskGuid, $userGuid, $userInfo);
         }
         
-        $this->cachedUserInfo[$userGuid] = $userInfo;
+        $this->cachedUserInfo[$cacheKey] = $userInfo;
         return $userInfo; 
     }
     
@@ -859,7 +869,9 @@ class editor_TaskController extends ZfExtended_RestController {
             if ($task->anonymizeUsers()) {
                 $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
                 /* @var $taskUserTracking editor_Models_TaskUserTracking */
-                $row = $taskUserTracking->anonymizeUserdata($taskguid, $row);
+                foreach ($row['users'] as $key => $user) {
+                    $row['users'][$key] = $taskUserTracking->anonymizeUserdata($taskguid, $user['userGuid'], $user);
+                }
             }
         }
         

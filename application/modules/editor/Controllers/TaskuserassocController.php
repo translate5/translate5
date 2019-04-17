@@ -74,7 +74,7 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
             if ($this->task->anonymizeUsers()) {
                 $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
                 /* @var $taskUserTracking editor_Models_TaskUserTracking */
-                $row = $taskUserTracking->anonymizeUserdata($row['taskGuid'], $row);
+                $row = $taskUserTracking->anonymizeUserdata($row['taskGuid'], $row['userGuid'], $row);
             }
         }
         $this->view->rows = $rows;
