@@ -1533,6 +1533,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='><source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source><target>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</target></trans-unit>
 <trans-unit id='QWRtaW5Y'><source>AdminX</source><target>AdminX</target></trans-unit>
 <trans-unit id='TWllbGVhZG1pbg=='><source>Mieleadmin</source><target>Mieleadmin</target></trans-unit>
+<trans-unit id='RGllIFJlc3NvdXJjZSBpc3QgZ2VuZXJlbGwgdmVyZsO8Z2Jhciwgc3RlbGx0IGFiZXIga2VpbmUgSW5mb3JtYXRpb25lbiDDvGJlciBkYXMgYW5nZWZyYWd0ZSBUTSBiZXJlaXQsIGRhIGRpZXMgbmljaHQgZ2VsYWRlbiBpc3Qu'><source>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</source><target>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</target></trans-unit>
+<trans-unit id='SFRUUDogNDAx'><source>HTTP: 401</source><target>HTTP: 401</target></trans-unit>
   </body>
  </file>
 </xliff>

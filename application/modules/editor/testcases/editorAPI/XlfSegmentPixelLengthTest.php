@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * edits segments and checks then the edited ones again on correct content
  */
 class XlfSegmentPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -137,7 +137,7 @@ class XlfSegmentPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         return;
         $task = self::$api->getTask();
         //open task for whole testcase

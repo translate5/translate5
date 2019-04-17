@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -55,15 +55,15 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
     public function testEmptyCredentials() {
         $response = $this->api()->request('editor/session', 'POST');
         
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."},{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'givenLogin']);
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"passwd","msg":"No password given."}],"message":"NOT OK","success":false}', $response->getBody());
         
         $response = $this->api()->request('editor/session', 'POST', ['passwd' => 'givenPasswd']);
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(422, $response->getStatus());
         $this->assertEquals('{"errors":[{"id":"login","msg":"No login given."}],"message":"NOT OK","success":false}', $response->getBody());
     }
     
@@ -72,7 +72,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     public function testWrongCredentials() {
         $response = $this->api()->request('editor/session', 'POST', ['login' => 'wrongUsername', 'passwd' => 'wrongPassword']);
-        $msg403 = '{"errors":[{"_errorMessage":"Keine Zugriffsberechtigung!","_errorCode":403}]}';
+        $msg403 = '{"httpStatus":403,"errorMessage":"Keine Zugriffsberechtigung!","message":"Forbidden","success":false,"messages":[]}';
         
         $this->assertEquals(403, $response->getStatus());
         $this->assertEquals($msg403, $response->getBody());
@@ -178,7 +178,7 @@ class SessionApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->logout();
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');

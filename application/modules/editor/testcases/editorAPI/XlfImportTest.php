@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * edits segments and checks then the edited ones again on correct content
  */
 class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -217,7 +217,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $this->markTestIncomplete('Could not be tested due missing task template functionality to set the preserve config to true.');
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');

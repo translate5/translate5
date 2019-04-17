@@ -40,7 +40,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
      */
     protected static $collId;
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
@@ -116,7 +116,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertTrue($termsEntryAtributeCount==$attributes->termsEntryAtributeCount, $fileName.' file test.Invalid number of entry attribute created.Terms entry attribute count:'.$attributes->termsEntryAtributeCount.', expected:'.$termsEntryAtributeCount);
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         self::$api->login('testmanager');
         self::$api->requestJson('editor/termcollection/'.self::$collId,'DELETE');
     }

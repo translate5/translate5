@@ -25,21 +25,19 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
+/**
  */
-
-class editor_Models_Import_Exception extends ZfExtended_ErrorCodeException {
-        /**
-         * @var string
-         */
-        protected $domain = 'editor.import';
-        
-        static protected $localErrorCodes = [
-            'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.'
-        ];
+class editor_Models_Import_FileParser_Xlf_Exception extends editor_Models_Import_FileParser_Exception {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.import.fileparser.xlf';
+    
+    static protected $localErrorCodes = [
+        'E1067' => 'MRK/SUB tag of source not found in target with Mid: "{mid}"',
+        'E1068' => 'MRK/SUB tag of target not found in source with Mid(s): "{mids}"',
+        'E1069' => 'There is other content as whitespace outside of the mrk tags. Found content: {content}',
+        'E1070' => 'SUB tag of {field} is not unique due missing ID in the parent node and is ignored as separate segment therefore.',
+        'E1071' => 'MRK tag of {field} has no MID attribute.',
+    ];
 }

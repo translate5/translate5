@@ -33,7 +33,7 @@ class editor_Models_Import_FileParser_Exception extends ZfExtended_ErrorCodeExce
     /**
      * @var string
      */
-    protected $origin = 'import.fileparser';
+    protected $domain = 'editor.import.fileparser';
     
     static protected $localErrorCodes = [
     ];

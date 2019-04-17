@@ -33,7 +33,7 @@ class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $origin = 'plugins.okapi';
+    protected $domain = 'plugin.okapi';
     
     static protected $localErrorCodes = [
         'E1055' => 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',

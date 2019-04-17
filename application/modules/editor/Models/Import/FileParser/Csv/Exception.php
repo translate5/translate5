@@ -32,7 +32,7 @@ class editor_Models_Import_FileParser_Csv_Exception extends editor_Models_Import
     /**
      * @var string
      */
-    protected $origin = 'import.fileparser.csv';
+    protected $domain = 'editor.import.fileparser.csv';
     
     static protected $localErrorCodes = [
         'E1017' => 'The regex {regex} matches the placeholderCSV string {placeholder} that is used in the editor_Models_Import_FileParser_Csv class to manage the protection loop. This is not allowed. Please find another solution to protect what you need to protect in your CSV via Regular Expression.',

@@ -37,7 +37,7 @@ class editor_Models_Import_MetaData_Exception extends editor_Models_Import_Excep
         /**
          * @var string
          */
-        protected $origin = 'import.metadata';
+        protected $domain = 'editor.import.metadata';
         
         static protected $localErrorCodes = [
             'E1052' => 'Some of the tasks metaData can not be imported, previous error message: {previousMessage}',
