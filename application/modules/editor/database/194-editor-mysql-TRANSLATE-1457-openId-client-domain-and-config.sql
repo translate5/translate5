@@ -24,6 +24,9 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
+
+UPDATE `LEK_customer` SET `domain` = null WHERE `domain` = '';
+
 ALTER TABLE `LEK_customer` 
 ADD UNIQUE INDEX `domain_UNIQUE` (`domain` ASC);
 
