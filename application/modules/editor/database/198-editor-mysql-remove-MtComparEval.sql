@@ -25,10 +25,14 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MtComparEval.url', 1, 'editor', 'plugins', 'http://localhost:8080', 'http://localhost:8080', '', 'string', 'Base URL to the MT-ComparEval Tool, for format see default value');
+DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.MtComparEval.url';
 
+ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalState;
+ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalId;
+ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalStart;
 
-ALTER TABLE `LEK_task_meta` ADD COLUMN mtCompareEvalState enum('notsent','importing','imported') NOT NULL DEFAULT 'notsent' COMMENT 'Contains the current state of MT-ComparEval experiment to this task';
-ALTER TABLE `LEK_task_meta` ADD COLUMN mtCompareEvalId varchar(256) NULL DEFAULT NULL COMMENT 'Contains the MT-ComparEval experiment ID';
-ALTER TABLE `LEK_task_meta` ADD COLUMN mtCompareEvalStart datetime NULL DEFAULT NULL COMMENT 'Contains the datetime when export to MT-ComparEval was started';
+-- remove the NoMissingTargetTerminology Plug-In from the active plugins
+UPDATE `Zf_configuration` SET `value` = 
+REPLACE(`value`, ',"editor_Plugins_MtComparEval_Bootstrap"', '') WHERE `name` = 'runtimeOptions.plugins.active' AND `value` != '[]';
+UPDATE `Zf_configuration` SET `value` = 
+REPLACE(`value`, '"editor_Plugins_MtComparEval_Bootstrap",', '') WHERE `name` = 'runtimeOptions.plugins.active' AND `value` != '[]';
