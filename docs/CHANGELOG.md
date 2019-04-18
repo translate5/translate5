@@ -3,6 +3,23 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.0] - 2019-04-17
+###Added
+VISUAL-63: VisualReview for translation tasks
+TRANSLATE-355: Better error handling and user communication on import and export errors
+
+###Changed
+TRANSLATE-702: Migrate translate5 to be using PHP 7.3
+TRANSLATE-613: Refactor error messages and error handling
+TRANSLATE-293: create separate config for error mails receiver
+
+###Bugfixes
+TRANSLATE-1605: TrackChanges splits up the words send to the languagetool
+TRANSLATE-1624: TrackChanges: type after CTRL+A after choosing a match
+TRANSLATE-1256: In the editor CTRL-Z (undo) does not work after pasting content
+TRANSLATE-1356: In the editor the caret is placed wrong after CTRL+Z
+TRANSLATE-1520: Last CTRL+Z "loses" the caret in the Edtior
+
 ## [3.1.3] - 2019-04-08
 ###Added
 TRANSLATE-1600: TrackChanges: Make tracked change marks hideable via a button and keyboard short-cut
