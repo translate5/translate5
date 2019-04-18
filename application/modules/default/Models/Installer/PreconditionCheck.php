@@ -209,7 +209,6 @@ class Models_Installer_PreconditionCheck {
     }
     
     public function checkUsers() {
-        session_start();
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         $result = $db->query('SELECT count(*) active FROM session where modified + lifetime > unix_timestamp()');
@@ -221,27 +220,6 @@ class Models_Installer_PreconditionCheck {
         echo "Session Summary:\n";
         echo "Active Sessions:               ".$activeSessions."\n";
         echo "Active Sessions (last hour):   ".$lastHourSessions."\n";
-        
-        //$result = $db->query('SELECT session_data FROM session where modified + lifetime > unix_timestamp()');
-        $result = $db->query('SELECT * FROM session where modified + 3600 > unix_timestamp()');
-        
-        echo "Session Users (last hour):\n";
-        while($row = $result->fetchObject()) {
-            session_decode($row->session_data);
-            if(!empty($_SESSION['user']) && !empty($_SESSION['user']['data']) && !empty($_SESSION['user']['data']->login)){
-                $data = $_SESSION['user']['data'];
-                settype($data->firstName, 'string');
-                settype($data->surName, 'string');
-                settype($data->login, 'string');
-                settype($data->email, 'string');
-                $username = $data->firstName.' '.$data->surName.' ('.$data->login.': '.$data->email.')';
-                echo "                               ".$username."\n";
-            }
-            else {
-                echo "                               No User\n";
-            }
-        }
-        session_destroy();
     }
     
     public function checkWorkers() {
