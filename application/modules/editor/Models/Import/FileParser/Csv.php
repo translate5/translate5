@@ -248,7 +248,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         else{
             //no linebreak found in CSV: {file}
             throw new editor_Models_Import_FileParser_Csv_Exception('E1077',[
-                'line' => $this->_fileName,
+                'file' => $this->_fileName,
                 'task' => $this->task,
             ]);
         }
@@ -268,7 +268,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         if($header === false) {
             //no header column found in CSV: {file}
             throw new editor_Models_Import_FileParser_Csv_Exception('E1078',[
-                'line' => $this->_fileName,
+                'file' => $this->_fileName,
                 'task' => $this->task,
             ]);
         }
@@ -279,14 +279,14 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             // in application.ini configured column-header(s) "{headers}" not found in CSV: {file}
             throw new editor_Models_Import_FileParser_Csv_Exception('E1079',[
                 'headers' => join(';', $missing),
-                'line' => $this->_fileName,
+                'file' => $this->_fileName,
                 'task' => $this->task,
             ]);
         }
         if(count($header) < 3) {
             // source and mid given but no more data columns found in CSV: {file}
             throw new editor_Models_Import_FileParser_Csv_Exception('E1080',[
-                'line' => $this->_fileName,
+                'file' => $this->_fileName,
                 'task' => $this->task,
             ]);
         }
