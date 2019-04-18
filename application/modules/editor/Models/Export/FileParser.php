@@ -149,7 +149,10 @@ abstract class editor_Models_Export_FileParser {
      */
     public function __construct(int $fileId,bool $diff,editor_Models_Task $task, string $path) {
         if(is_null($this->_classNameDifftagger)){
-            throw new Zend_Exception('$this->_classNameDifftagger muss in der Child-Klasse definiert sein.');
+            //this->_classNameDifftagger must be defined in the child class.
+            throw new editor_Models_Export_FileParser_Exception('E1085', [
+                'task' => $task,
+            ]);
         }
         $this->_fileId = $fileId;
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
@@ -194,24 +197,25 @@ abstract class editor_Models_Export_FileParser {
     protected function parse() {
         $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, null, PREG_SPLIT_DELIM_CAPTURE);
 
-        //reusable exception creation
-        $exception = function($val) {
-            $e  = 'Error in Export-Fileparsing. instead of a id="INT" and a optional ';
-            $e .= 'field="STRING" attribute the following content was extracted: ' . $val;
-            return new Zend_Exception($e);
-        };
-        
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
             $file[$i] = $this->preProcessReplacement($file[$i]);
             if (!preg_match('#^\s*id="([^"]+)"\s*(field="([^"]+)"\s*)?$#', $file[$i], $matches)) {
-                throw $exception($file[$i]);
+                //Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"
+                throw new editor_Models_Export_FileParser_Exception('E1086', [
+                    'task' => $this->_task,
+                    'content' => $file[$i],
+                ]);
             }
           
             //check $matches[1] for integer (segmentId) if empty throw an exception
             settype($matches[1], 'int');
             if(empty($matches[1])) {
-                throw $exception($file[$i]);
+                //Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"
+                throw new editor_Models_Export_FileParser_Exception('E1087', [
+                    'task' => $this->_task,
+                    'content' => $file[$i],
+                ]);
             }
           
             //alternate column is optional, use target as default
@@ -334,12 +338,16 @@ abstract class editor_Models_Export_FileParser {
         $original = $this->removeTermTags($original);
         $original = $this->tagHelper->unprotect($original);
         $original = $this->parseSegment($original);
-        
-        $diffed = $this->_diffTagger->diffSegment(
-                $original,
-                $edited,
-                $segment->getTimestamp(),
-                $segment->getUserName());
+        try {
+            $diffed = $this->_diffTagger->diffSegment($original, $edited, $segment->getTimestamp(), $segment->getUserName());
+        }
+        catch (Exception $e) {
+            throw new editor_Models_Export_FileParser_Exception('E1088', [
+                'task' => $this->_task,
+                'fileId' => $this->_fileId,
+            ], $e);
+            
+        }
         // unprotectWhitespace must be done after diffing!
         return $this->whitespaceHelper->unprotectWhitespace($diffed);
     }

@@ -27,16 +27,19 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * Covers all errors in the task export
  */
-class editor_Models_Import_FileParser_Exception extends ZfExtended_ErrorCodeException {
+class editor_Models_Export_FileParser_Exception extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $domain = 'editor.import.fileparser';
+    protected $domain = 'editor.export.fileparser';
     
     static protected $localErrorCodes = [
-        'E1083' => 'The encoding of the file "{fileName}" is none of the encodings utf-8, iso-8859-1 and win-1252.',
-        'E1084' => 'Given MID was to long (max 1000 chars), MID: "{mid}".',
+        'E1085' => 'this->_classNameDifftagger must be defined in the child class.',
+        'E1086' => 'Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"',
+        //duplicates E1086 at different place
+        'E1087' => 'Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"',
+        'E1088' => 'Error in diff tagging of export. For details see the previous exception.',
     ];
 }

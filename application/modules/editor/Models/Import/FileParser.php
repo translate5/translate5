@@ -322,10 +322,11 @@ abstract class editor_Models_Import_FileParser {
         if($convert) {
             $enc = $this->checkAndConvert2utf8();
             if(!$enc){
-                trigger_error('The encoding of the file "'.
-                        $this->_fileName.
-                        '" is none of the encodings utf-8, iso-8859-1 and win-1252.',
-                        E_USER_ERROR);
+                //'The encoding of the file "{fileName}" is none of the encodings utf-8, iso-8859-1 and win-1252.'
+                throw new editor_Models_Import_FileParser_Exception('E1083', [
+                    'fileName' => $this->_fileName,
+                    'task' => $this->task,
+                ]);
             }
             $file->setEncoding($enc);
         }
@@ -363,7 +364,11 @@ abstract class editor_Models_Import_FileParser {
      */
     protected function setMid($mid) {
         if(mb_strlen($mid) > 1000) {
-            trigger_error('Given MID was to long (max 1000 chars), MID: "'.$mid.'"', E_USER_ERROR);
+            //Given MID was to long (max 1000 chars)
+            throw new editor_Models_Import_FileParser_Exception('E1084', [
+                'mid' => $mid,
+                'task' => $this->task,
+            ]);
         }
         $this->_mid = $mid;
     }

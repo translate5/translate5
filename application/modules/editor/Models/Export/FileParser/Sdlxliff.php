@@ -85,7 +85,7 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     /**
      * @param array $file that contains file as array as splitted by parse function
      * @param int $i position of current segment in the file array
-     * @param $id id of the comment(s) inside of $this->comments array
+     * @param string $id of the comment(s) inside of $this->comments array
      * @return array
      */
     protected function writeCommentGuidToSegment(array $file, int $i, $id) {
