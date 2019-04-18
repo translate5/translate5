@@ -138,7 +138,6 @@ class XlfSegmentPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
     }
     
     public static function tearDownAfterClass(): void {
-        return;
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');
