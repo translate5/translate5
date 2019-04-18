@@ -85,20 +85,11 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
     
     /**
-     * @var Zend_Config
-     */
-    protected $config = null;
-    
-    /**
      * Returns a Zend_Config Object; if customer specific settings exist, they are set now.
      * @return Zend_Config
      */
     public function getConfig() {
         // This is a temporary preparation for implementing TRANSLATE-471.
-        
-        if (!is_null($this->config)) {
-            return $this->config;
-        }
         
         $config = new Zend_Config([], true);
         
@@ -115,7 +106,6 @@ class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
         }
         
         $config->setReadOnly();
-        $this->config = $config;
         return $config;
     }
     

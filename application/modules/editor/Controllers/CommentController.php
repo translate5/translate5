@@ -55,6 +55,18 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $segmentId = (int)$this->_getParam('segmentId');
         $this->view->rows = $this->entity->loadBySegmentId($segmentId, $this->session->taskGuid);
         $this->view->total = count($this->view->rows);
+        
+        // anonymize users for view?
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->session->taskGuid);
+        if ($task->anonymizeUsers()) {
+            $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+            /* @var $taskUserTracking editor_Models_TaskUserTracking */
+            foreach ($this->view->rows as &$row) {
+                $row = $taskUserTracking->anonymizeUserdata($this->session->taskGuid, $row);
+            }
+        }
     }
 
     public function putAction() {

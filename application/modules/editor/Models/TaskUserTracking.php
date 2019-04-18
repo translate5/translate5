@@ -137,17 +137,16 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     /**
      * anonymizes all user-related data by keys in $data
      * @param string $taskGuid
-     * @param string $userGuid
      * @param array $data
      * @return array
      */
-    public function anonymizeUserdata($taskGuid, $userGuid, array $data) {
+    public function anonymizeUserdata($taskGuid, array $data) {
+        $userGuid = $data['userGuid'];
         $cacheKey = $taskGuid.$userGuid;
         if(isset($this->cachedUserdata[$cacheKey])) {
             return $this->cachedUserdata[$cacheKey];
         }
         $keysToAnonymize = ['firstName','lockingUser','lockingUsername','login','userName','surName'];
-        //TODO: don't anonymize userGuid too early, we might still need it...
         array_walk($data, function( &$value, $key) use ($taskGuid, $userGuid, $keysToAnonymize) {
             if (in_array($key, $keysToAnonymize)) {
                 switch ($key) {

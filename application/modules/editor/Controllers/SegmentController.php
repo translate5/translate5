@@ -107,6 +107,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $taskGuid = $this->session->taskGuid;
         
         $rows = $this->entity->loadByTaskGuid($taskGuid);
+        $this->view->rows = $rows;
+        $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
+        
+        $this->addIsWatchedFlag();
+        $this->addFirstEditable();
+        $this->addIsFirstFileInfo($taskGuid);
         
         // anonymize users for view?
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -115,17 +121,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         if ($task->anonymizeUsers()) {
             $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
             /* @var $taskUserTracking editor_Models_TaskUserTracking */
-            foreach ($rows as &$row) {
-                $row = $taskUserTracking->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
+            foreach ($this->view->rows as &$row) {
+                $row = $taskUserTracking->anonymizeUserdata($taskGuid, $row);
             }
         }
-        
-        $this->view->rows = $rows;
-        $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
-        
-        $this->addIsWatchedFlag();
-        $this->addFirstEditable();
-        $this->addIsFirstFileInfo($taskGuid);
     }
     
     public function nextsegmentsAction() {

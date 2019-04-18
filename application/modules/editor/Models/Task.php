@@ -129,20 +129,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     protected $taskDataPath;
     
     /**
-     * @var Zend_Config
-     */
-    protected $config = null;
-    
-    /**
      * Returns a Zend_Config Object; if task specific settings exist, they are set now.
      * @return Zend_Config
      */
     protected function getConfig() {
         // This is a temporary preparation for implementing TRANSLATE-471.
-        
-        if (!is_null($this->config)) {
-            return $this->config;
-        }
         
         $config = new Zend_Config([], true);
         
@@ -153,7 +144,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         
         // Step 2: anything customer-specific for this task?
         if (!empty($this->getCustomerId())) {
-            $test = $this->getCustomerId();
             $customer = ZfExtended_Factory::get('editor_Models_Customer');
             /* @var $customer editor_Models_Customer */
             $customer->load($this->getCustomerId());
@@ -165,7 +155,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         // TODO...
         
         $config->setReadOnly();
-        $this->config = $config;
         return $config;
     }
 
