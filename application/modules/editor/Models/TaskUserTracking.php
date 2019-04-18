@@ -56,12 +56,6 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
     
     /**
-     * Cached map of userdata to anonymized userdata by task and user
-     * @var array
-     */
-    protected $cachedUserdata = array();
-    
-    /**
      * loads the TaskUserTracking-entry for the given task and user (= unique)
      * @param string $taskGuid
      * @param string $userGuid
@@ -142,10 +136,6 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      */
     public function anonymizeUserdata($taskGuid, array $data) {
         $userGuid = $data['userGuid'];
-        $cacheKey = $taskGuid.$userGuid;
-        if(isset($this->cachedUserdata[$cacheKey])) {
-            return $this->cachedUserdata[$cacheKey];
-        }
         $keysToAnonymize = ['firstName','lockingUser','lockingUsername','login','userName','surName'];
         array_walk($data, function( &$value, $key) use ($taskGuid, $userGuid, $keysToAnonymize) {
             if (in_array($key, $keysToAnonymize)) {
@@ -162,7 +152,6 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
                 }
             }
         });
-        $this->cachedUserdata[$cacheKey] = $data;
         return $data;
     }
     
