@@ -197,7 +197,7 @@ class editor_TaskController extends ZfExtended_RestController {
             if ($task->anonymizeUsers()) { 
                 if(!empty($rowTask['users'])) {
                     foreach ($rowTask['users'] as &$row) {
-                        $row = $taskUserTracking->anonymizeUserdata($row['taskGuid'], $row);
+                        $row = $taskUserTracking->anonymizeOtherUserdata($row['taskGuid'], $row);
                     }
                 }
             }
@@ -807,7 +807,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
                 /* @var $taskUserTracking editor_Models_TaskUserTracking */
                 foreach ($this->view->rows->users as &$user) {
-                    $user = $taskUserTracking->anonymizeUserdata($taskguid, $user);
+                    $user = $taskUserTracking->anonymizeOtherUserdata($taskguid, $user);
                 }
             }
         }

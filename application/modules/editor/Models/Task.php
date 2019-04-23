@@ -864,6 +864,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return bool
      */
     public function anonymizeUsers() {
+        return true;
         $config = $this->getConfig();
         if (!$config->runtimeOptions->customers->anonymizeUsers) {
             return false;

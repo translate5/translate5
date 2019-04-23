@@ -157,7 +157,23 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     // -------------------------------------------------------------------------
     
     /**
-     * anonymizes all user-related data by keys in $data
+     * anonymizes all user-related data of other workflow users
+     * @param string $taskGuid
+     * @param array $data
+     * @return array
+     */
+    public function anonymizeOtherUserdata($taskGuid, array $data) {
+        $userGuid = $data['userGuid'];
+        // anonymize data about OTHER workflow users only
+        $sessionUser = new Zend_Session_Namespace('user');
+        if ($userGuid === $sessionUser->data->userGuid) {
+            return $data;
+        }
+        return $this->anonymizeUserdata($taskGuid, $data);
+    }
+    
+    /**
+     * anonymizes all user-related data in $data
      * @param string $taskGuid
      * @param array $data
      * @return array
@@ -191,7 +207,6 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * @return string
      */
     protected function renderAnonymizedComment($value) {
-        $test = "1";
         // replace author given in <span class="author">xyz</span>
         return $this->commentHelper->renderAnonymizedComment($value);
     }
@@ -215,7 +230,7 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * @return string
      */
     protected function renderAnonymizedTargetEdit($value) {
-        // replace data-userguid und data-username in TrackChanges
+        // replace data-userguid und data-username in TrackChanges:
         return $this->trackChangeTagHelper->renderAnonymizedTrackChangeData($value);
     }
 }
