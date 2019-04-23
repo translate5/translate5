@@ -34,7 +34,7 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.admin.Users', {
   extend : 'Ext.data.Store',
   model: 'Editor.model.admin.User',
-  autoLoad: true,
+  autoLoad: false,
   remoteFilter: true,
   remoteSort: true,
   pageSize: 20,
