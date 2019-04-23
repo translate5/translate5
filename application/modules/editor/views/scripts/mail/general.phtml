@@ -82,3 +82,7 @@ $this->footer = $this->templateApply('<br/>
 <br/>{companyName}
 <br/>
 <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!', $data);
+
+//set the variables so they can be used when this template is rendered in other views
+$this->data=$data;
+$this->taskData=isset($taskData) ? $taskData : null;

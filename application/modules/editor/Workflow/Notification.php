@@ -123,7 +123,17 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             foreach($receiverRoleMap as $recRole => $roles) {
                 if($recRole == '*' || $recRole == $receiverRole) {
                     foreach($roles as $role) {
-                        $users = $tua->getUsersOfRoleOfTask($role, $task->getTaskGuid());
+                        $users=array_merge($users,$tua->getUsersOfRoleOfTask($role, $task->getTaskGuid()));
+                    }
+                }
+                if($recRole == 'byUserLogin') {
+                    $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+                    /* @var $userModel ZfExtended_Models_User */
+                    foreach($roles as $singleUser) {
+                        $return=$userModel->loadByLogin($singleUser);
+                        if(isset($return)){
+                            $users[] = $return->toArray();
+                        }
                     }
                 }
             }
@@ -380,6 +390,76 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
         $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
         $this->notify((array) $user->getDataObject());
+    }
+    
+    
+    /***
+     * Notify the lectors when the delivery date is over the defined days in the config
+     */
+    public function notifyOverdueTasks(){
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        //load all tasks where the delivery date overdue the current date - days offset
+        $db = Zend_Registry::get('db');
+        /* @var $db Zend_Db_Table */
+        $s = $db->select()
+        ->from(array('tua' => 'LEK_taskUserAssoc'), ['taskGuid'])
+        ->distinct()
+        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
+        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
+        ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
+        ->where('t.state = ?', $task::STATE_OPEN)
+        ->where('targetDeliveryDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
+        $tasks = $db->fetchAll($s);
+        
+        $this->tua = $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        
+        $wf = $this->config->workflow;
+        
+        $notifyRole=$wf::ROLE_LECTOR;
+        if(isset($triggerConfig->receiverRole)){
+            $notifyRole=$triggerConfig->receiverRole;
+        }
+        $template=__FUNCTION__;
+        if(isset($triggerConfig->template)){
+            $template=$triggerConfig->template;
+        }
+        
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        if(isset($triggerConfig->receiverUser)){
+            $user->loadByLogin($triggerConfig->receiverUser);
+        }
+        
+        foreach($tasks as $oneTask) {
+            $task->loadByTaskGuid($oneTask['taskGuid']);
+            $this->config->task = clone $task;
+            
+            //if the receiverUser user is configured, send mail only to receiverUser
+            if(isset($triggerConfig->receiverUser)){
+                $user->loadByLogin($triggerConfig->receiverUser);
+                $proofreaders=[(array)$user->getDataObject()];
+            }else{
+                $proofreaders = $tua->getUsersOfRoleOfTask($notifyRole, $oneTask['taskGuid'], ['state']);
+            }
+            
+            $params = [
+                'task' => $this->config->task,
+                'proofreaders' => $proofreaders,
+            ];
+            
+            foreach($proofreaders as $proofreader) {
+                $this->createNotification($notifyRole, $template, $params);
+                $this->addCopyReceivers($triggerConfig, $notifyRole);
+                $this->notify($proofreader);
+            }
+        }
     }
     
     /**
