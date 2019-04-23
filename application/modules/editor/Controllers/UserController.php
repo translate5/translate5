@@ -28,18 +28,6 @@ END LICENSE AND COPYRIGHT
 
 class Editor_UserController extends ZfExtended_UserController {
     
-    /**
-     * 
-     * {@inheritDoc}
-     * @see ZfExtended_UserController::getAction()
-     */
-    public function getAction() {
-        parent::getAction();
-        // TODO: 
-        // - What to do if any of the users belongs to a task with anonymizeUser-config for it's customer?
-        // - (And what if the same user also belongs to a task that does NOT have anonymizeUser set?)
-    }
-    
     public function deleteAction() {
         //parent is calling load again, but nevermind, this should be bearable...
         $this->entityLoad();
