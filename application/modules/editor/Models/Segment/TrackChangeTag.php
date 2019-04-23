@@ -130,7 +130,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         
         $node=[];
         $node[]='<'.$nodeName;
-        $node[]='class="'.$this->getTrachChangesCss($nodeName).'"';
+        $node[]='class="'.$this->getTrackChangesCss($nodeName).'"';
         
         // id to identify the user who did the editing (also used for verifying checks)
         $node[]=self::ATTRIBUTE_USERGUID.'="'.$sessionUser->data->userGuid.'"';
@@ -159,7 +159,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * @param string $nodeName
      * @return string
      */
-    public function getTrachChangesCss($nodeName){
+    public function getTrackChangesCss($nodeName){
         switch(strtolower($nodeName)) {
             case self::NODE_NAME_DEL:
                 return self::CSS_CLASSNAME_DEL;
@@ -180,6 +180,19 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $segment= preg_replace('/ +<'.self::PLACEHOLDER_TAG_DEL.'[^>]+> +/', ' ', $segment);
         $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
         return $segment;
+    }
+    
+    /**
+     * anonymizes user-data in TrackChange-Tags in the given string 
+     * (= replace data-userguid und data-username)
+     * @param string $text
+     */
+    public function renderAnonymizedTrackChangeData (string $text) {
+        // The different users can be distinguished by the css-colors,
+        // hence here we skip turning e.g. "Project Manager" into e.g. "User1".
+        $text = preg_replace('/data-userguid=".*?"/', 'data-userguid=""', $text);
+        $text = preg_replace('/data-username=".*?"/', 'data-username=""', $text);
+        return $text;
     }
 
 }

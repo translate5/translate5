@@ -858,10 +858,20 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Are the usernames for the task to be anonymized?
-     * @return boolean
+     * No personal information about other workflow users is visible in the workflow,
+     * (1) if anonymizeUsers is checked (set to true)
+     * (2) for all users that do not have the roles admin, pm or api 
+     * @return bool
      */
     public function anonymizeUsers() {
         $config = $this->getConfig();
-        return $config->runtimeOptions->customers->anonymizeUsers;
+        if (!$config->runtimeOptions->customers->anonymizeUsers) {
+            return false;
+        }
+        $sessionUser = new Zend_Session_Namespace('user');
+        $userGuid = $sessionUser->data->userGuid ?? null;
+        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        return !($userModel->loadByGuid($userGuid)->isAdminOrPMOrApi());
     }
 }

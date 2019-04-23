@@ -56,6 +56,32 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
     
     /**
+     * @var ZfExtended_Zendoverwrites_Translate
+     */
+    protected $translate;
+    
+    /**
+     * @var editor_Models_Comment
+     */
+    protected $commentHelper;
+    
+    /**
+     * @var editor_Models_Segment_TrackChangeTag
+     */
+    protected $trackChangeTagHelper;
+    
+    
+    
+    /**
+     */
+    public function __construct(){
+        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
+        $this->commentHelper = ZfExtended_Factory::get('editor_Models_Comment');
+        $this->trackChangeTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        parent::__construct();
+    }
+    
+    /**
      * loads the TaskUserTracking-entry for the given task and user (= unique)
      * @param string $taskGuid
      * @param string $userGuid
@@ -74,6 +100,8 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
         if ($row) {
             //load implies loading one Row, so use only the first row
             $this->row = $row;
+        } else {
+            $this->row = null;
         }
     }
     
@@ -136,19 +164,22 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      */
     public function anonymizeUserdata($taskGuid, array $data) {
         $userGuid = $data['userGuid'];
-        $keysToAnonymize = ['firstName','lockingUser','lockingUsername','login','userName','surName'];
+        $keysToAnonymize = ['comments','firstName','lockingUser','lockingUsername','login','userGuid','userName','surName','targetEdit'];
         array_walk($data, function( &$value, $key) use ($taskGuid, $userGuid, $keysToAnonymize) {
-            if (in_array($key, $keysToAnonymize)) {
+            if ($value != '' && in_array($key, $keysToAnonymize)) {
                 switch ($key) {
-                    case 'userName':
-                        $value = $this->renderAsRole($taskGuid, $userGuid);
+                    case 'comments':
+                        $value = $this->renderAnonymizedComment($value);
                         break;
-                    case 'login':
-                        $value = $this->renderAsEmpty();
+                    case 'targetEdit':
+                        $value = $this->renderAnonymizedTargetEdit($value);
+                        break;
+                    case 'userName':
+                        $value = $this->renderAnonymizedUserName($taskGuid, $userGuid);
                         break;
                     default:
-                        $value = $this->renderAsTracked($taskGuid, $key);
-                    break;
+                        $value = '';
+                        break;
                 }
             }
         });
@@ -156,35 +187,35 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * renders an anonymized version using the kind of data that is given:
-     * - e.g. "userName-1", "userName-2", ... if tracking-data is available
-     * - "-" otherwise
-     * @param string $userDataKey
+     * renders anonymized comment as markedUp in "comment.phtml"
      * @return string
      */
-    protected function renderAsTracked ($taskGuid, $userDataKey) {
-        $taskOpenerNumber = $this->getTaskOpenerNumberForUser();
-        return (is_null($taskOpenerNumber) ? '-' : $userDataKey.'-'.$taskOpenerNumber);
+    protected function renderAnonymizedComment($value) {
+        $test = "1";
+        // replace author given in <span class="author">xyz</span>
+        return $this->commentHelper->renderAnonymizedComment($value);
     }
     
     /**
-     * anonymizes userguid (as stored for segments, for example:) return empty string
+     * renders an anonymized version of the username:
+     * - "User1", "User2" etc if tracking-data is available
+     * - "User" otherwise
      * @return string
      */
-    protected function renderAsEmpty() {
-        return '';
+    protected function renderAnonymizedUserName ($taskGuid, $userGuid) {
+        $this->loadEntry($taskGuid, $userGuid);
+        if(is_null($this->row)) {
+            return $this->translate->_('Benutzer');
+        }
+        return $this->translate->_('Benutzer') . '' . $this->getTaskOpenerNumberForUser();
     }
     
     /**
-     * anonymizes usernames (as stored for segments, for example:) show role only
-     * @param string $taskGuid
-     * @param string $userGuid
+     * renders anonymized target
      * @return string
      */
-    protected function renderAsRole($taskGuid, $userGuid) {
-        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $tua->loadByParams($userGuid,$taskGuid);
-        return $tua->getRole();
+    protected function renderAnonymizedTargetEdit($value) {
+        // replace data-userguid und data-username in TrackChanges
+        return $this->trackChangeTagHelper->renderAnonymizedTrackChangeData($value);
     }
 }
