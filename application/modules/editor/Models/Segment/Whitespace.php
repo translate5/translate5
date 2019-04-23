@@ -139,7 +139,7 @@ class editor_Models_Segment_Whitespace {
     /**
      * Does the entity encoding, see inline comments
      * @param string $textNode
-     * @param boolean $xmlBased
+     * @param bool $xmlBased
      * @return string
      */
     public function entityCleanup($textNode, $xmlBased = true) {
@@ -168,7 +168,7 @@ class editor_Models_Segment_Whitespace {
      * Creates the internal Space/Tab/SpecialChar tags
      * @param string $type
      * @param string $toBeProtected
-     * @param integer $length
+     * @param int $length
      * @return string
      */
     protected function maskSpecialContent($type, $toBeProtected, $length) {

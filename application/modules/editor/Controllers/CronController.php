@@ -89,6 +89,11 @@ class Editor_CronController extends ZfExtended_Controllers_Action {
             /* @var $workflow editor_Workflow_Abstract */
             $workflow->doCronDaily();
         }
+
+        $summary = ZfExtended_Factory::get('ZfExtended_Logger_Summary');
+        /* @var $summary ZfExtended_Logger_Summary */
+        $summary->sendSummaryToAdmins();
+        
         echo "OK";
     }
 }

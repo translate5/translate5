@@ -90,6 +90,12 @@ class editor_Plugins_SpellCheck_SpellCheckQueryController extends ZfExtended_Res
         /* @var $languagesModel editor_Models_Languages */
         $sublanguage = $languagesModel->getSublanguageByRfc5646($targetLangCode);
         $iso = $languagesModel->getIso3166Part1alpha2ByRfc5646($targetLangCode);
+	//next 5 lines workaround for TRANSLATE-1630 "Workaround for east asian problems with spellchecker"
+	$explode = explode('-',$targetLangCode);	
+	$mainLang = $explode[0];
+	if($mainLang == 'ko' || $mainLang == 'zh' || $mainLang == 'ja'){
+	    return false;
+	}
         foreach ($supportedLanguages as $lang) {
             if ($lang->longCode == $sublanguage) {      // priority: longCode (e.g. "de-DE") is the default sublanguage ("de-DE") of the targetLangCode ("de")
                 return $lang;

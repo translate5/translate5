@@ -27,9 +27,19 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * DB encapsulation class
+ * Covers all errors in the task export
  */
-class editor_Models_Db_LogRequest extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_request_log';
-    public $_primary = 'id';
+class editor_Models_Export_FileParser_Exception extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.export.fileparser';
+    
+    static protected $localErrorCodes = [
+        'E1085' => 'this->_classNameDifftagger must be defined in the child class.',
+        'E1086' => 'Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"',
+        //duplicates E1086 at different place
+        'E1087' => 'Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"',
+        'E1088' => 'Error in diff tagging of export. For details see the previous exception.',
+    ];
 }

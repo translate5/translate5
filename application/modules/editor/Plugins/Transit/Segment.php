@@ -434,7 +434,7 @@ class editor_Plugins_Transit_Segment{
      * @param unknown $newpartdata
      *      the new data for this part.
      *      
-     * @param boolean $append
+     * @param bool $append
      *      if true $newpartdata will be append to the existing partdata.
      *      Default will replace the existing partdata.
      * 

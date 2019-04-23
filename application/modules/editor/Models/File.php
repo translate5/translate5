@@ -35,14 +35,14 @@ END LICENSE AND COPYRIGHT
 /**
  * Foldertree Object Instanz wie in der Applikation benötigt
  *
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method void setFileName() setFileName(string $name)
  * @method void setFileParser() setFileParser(string $parser)
- * @method void setSourceLang() setSourceLang(integer $source)
- * @method void setTargetLang() setTargetLang(integer $target)
- * @method void setRelaisLang() setRelaisLang(integer $target)
- * @method void setFileOrder() setFileOrder(integer $order)
+ * @method void setSourceLang() setSourceLang(int $source)
+ * @method void setTargetLang() setTargetLang(int $target)
+ * @method void setRelaisLang() setRelaisLang(int $target)
+ * @method void setFileOrder() setFileOrder(int $order)
  * @method integer getId() getId()
  * @method string getTaskGuid() getTaskGuid()
  * @method string getFileName() getFileName()

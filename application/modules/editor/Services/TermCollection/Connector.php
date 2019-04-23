@@ -126,7 +126,6 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @param string $queryString
      * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @param string $field optional, the field where the search will be performed
-     * 
      * @return editor_Services_ServiceResult
      */
     protected function queryCollectionResults($queryString, $reimportWhitespace = false,$field='source'){
@@ -166,7 +165,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
                     $res['term'] = $this->importWhitespaceFromTagLessQuery($res['term']);
                 }
                 if(isset($res['language'])){
-                    $res['languageRfc']=isset($lngs[$res['language']]) ? $lngs[$res['language']] : null;
+                    $res['languageRfc'] = $lngs[$res['language']] ?? null;
                 }
                 //set the default source and the result depending of where the search is triggered
                 $this->resultList->setDefaultSource($field == 'source' ? $res['default'.$field] : $res['term']);
@@ -195,6 +194,18 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
      */
     public function getValidFiletypes() {
+        return [
+            'TBX' => ['application/xml','text/xml'],
+        ];
+    }
+    
+    /**
+     *
+     * {@inheritdoc}
+     * @see editor_Services_Connector_FilebasedAbstract::getValidExportTypes()
+     */
+    public function getValidExportTypes()
+    {
         return [
             'TBX' => 'application/xml',
         ];

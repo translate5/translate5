@@ -135,7 +135,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param int $segmentId
      * @return array
      */
-    public function getByTaskGuidAndSegment(string $taskGuid, integer $segmentId) {
+    public function getByTaskGuidAndSegment(string $taskGuid, int $segmentId) {
         if(empty($taskGuid) || empty($segmentId)) {
             return array();
         }
@@ -540,7 +540,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /***
      * Check if the given term entry exist in the collection
      * @param mixed $termEntry
-     * @param integer $collectionId
+     * @param int $collectionId
      * @return boolean
      */
     public function isTermEntryInCollection($termEntry,$collectionId){

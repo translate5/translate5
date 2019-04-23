@@ -245,7 +245,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $this->updateTargetHashAndOriginal($entity, $hasher);
                 
                 $history->save();
-                $entity->setTimestamp(null); //see TRANSLATE-922
+                $entity->setTimestamp(NOW_ISO); //see TRANSLATE-922
                 $entity->save();
             }
             catch (Exception $e) {
@@ -303,7 +303,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * See TRANSLATE-885 for details!
      * 
      * @param editor_Models_Segment $entity
-     * @param integer $editedSegmentId
+     * @param int $editedSegmentId
      * @param editor_Models_Segment_RepetitionHash $hasher
      * @return boolean
      */

@@ -27,29 +27,16 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
+ *
  */
-class editor_Models_Import_FileParser_Exception extends ZfExtended_Exception {
+class editor_Models_Import_FileParser_Exception extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $origin = 'import.fileparser';
+    protected $domain = 'editor.import.fileparser';
     
-    /**
-     * the error/event level of this exception (how "important" that error is)
-     * By default all Exceptions are of level error
-     * @var integer
-     */
-    protected $level = ZfExtended_Logger::LEVEL_ERROR;
-    
-    /**
-     * 
-     * @param string $msg
-     * @param string $code
-     * @param array $extra
-     * @param Exception $previous
-     */
-    public function __construct($msg, $code, array $extra = null, Exception $previous = null) {
-        parent::__construct($msg, $code, $previous);
-        $this->setErrors($extra);
-    }
+    static protected $localErrorCodes = [
+        'E1083' => 'The encoding of the file "{fileName}" is none of the encodings utf-8, iso-8859-1 and win-1252.',
+        'E1084' => 'Given MID was to long (max 1000 chars), MID: "{mid}".',
+    ];
 }

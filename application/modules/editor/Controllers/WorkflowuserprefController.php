@@ -48,14 +48,14 @@ class editor_WorkflowuserprefController extends ZfExtended_RestController {
             unset($this->data->id); //don't set the ID from client side
             //a new default entry cannot be created, also a workflow step must always be set!
             if(empty($this->data->workflowStep) || empty($this->data->workflowStep) && empty($this->data->userGuid)) {
-                throw new ZfExtended_Models_Entity_NotAcceptableException();
+                throw new ZfExtended_ValidateException('Missing workflow step in given data');
             }
         }
         if($this->_request->isPut()) {
             //we cant update an existing userpref entry to workflow step = null,
             //since only the default entry can have an empty worflow step
             if(property_exists($this->data, 'workflowStep') && empty($this->data->workflowStep)) {
-                throw new ZfExtended_Models_Entity_NotAcceptableException();
+                throw new ZfExtended_ValidateException('Missing workflow step in given data');
             }
             if($this->entity->isDefault()) {
                 unset($this->data->workflowStep); //don't update the workflowStep of the default entry

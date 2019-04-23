@@ -144,7 +144,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
     /**
      * creates the SQL command ready for exec
      * @param Zend_Config $credentials
-     * @param boolean $dataOnly → true to dump data only, false to dump structure only
+     * @param bool $dataOnly → true to dump data only, false to dump structure only
      */
     protected function makeSqlCmd(Zend_Config $credentials, $dataOnly = true) {
         $mysqlExecutable = $this->getMysqlDumpExec();

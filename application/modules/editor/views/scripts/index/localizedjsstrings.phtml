@@ -26,8 +26,8 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/* @var $translate ZfExtended_Zendoverwrites_Translate */
 /* @var $this Zend_View */
-
 $this->translate->setJsonEncode(true);
 //Datei muss als Javascript ausgespielt werden.
   header('Content-Type: text/javascript', TRUE);
@@ -511,7 +511,21 @@ Ext.define('Editor.controller.Localizer', {
             emptyTargets: '<?php echo $this->translate->_('Übersetzungsaufgabe (kein Review)');?>'
         }
     });
-
+    
+    Ext.define("Editor.locale.de.view.admin.task.LogWindow", {
+        override: "Editor.view.admin.task.LogWindow",
+        title: '<?php echo $this->translate->_('Ereignisse zu Aufgabe "{0}"');?>'
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.log.Window", {
+        override: "Editor.view.admin.log.Window",
+        strings: {
+            close: '<?php echo $this->translate->_('Fenster schließen');?>',
+            details: '<?php echo $this->translate->_('Detailansicht');?>',
+            btnBack: '<?php echo $this->translate->_('Zurück zu den Ereignissen');?>'
+    	}
+    });
+    
     Ext.define("Editor.locale.de.view.admin.task.TaskAttributes", {
         override: "Editor.view.admin.task.TaskAttributes",
         title: '<?php echo $this->translate->_('Eigenschaften');?>',
@@ -533,10 +547,10 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.TaskAddWindow",
         title: '<?php echo $this->translate->_('Aufgabe erstellen');?>',
         strings: {
-            importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (ZIP, CSV, SDLXLIFF, XLIFF; Angabe notwendig)');?>',
+            importUploadTip: '<?php echo $this->translate->_('Wählen Sie die zu importierenden Daten (Angabe notwendig)');?>',
             importUploadLabel: '<?php echo $this->translate->_('Import Datei¹');?>',
-            importUploadType: '<?php echo $this->translate->_('Bitte verwenden Sie eine ZIP, CSV, XLIFF oder SDLXLIFF Datei!');?>',
-            importNews: '<?php echo $this->translate->_('Sie können neben unserem ZIP-Container-Format auch direkt SDLXLIFF, XLIFF oder CSV Dateien benutzen. <a target="_blank" href="http://confluence.translate5.net/display/BUS/Basic+usage">Mehr Info</a>.');?>',
+            importUploadType: '<?php echo $this->translate->_('Das Dateiformat der ausgewählten Datei wird nicht unterstützt!');?>',
+            importNews: '<?php echo $this->translate->_('<a target="_blank" href="https://confluence.translate5.net/display/BUS/Supported+file+formats">Mehr Informationen</a> zu den importierbaren Dateiformaten.');?>',
             taskNrLabel: '<?php echo $this->translate->_('Auftragsnummer');?>',
             taskNameTip: '<?php echo $this->translate->_('Projektname (frei wählbar, Angabe notwendig)');?>',
             taskNameLabel: '<?php echo $this->translate->_('Projektname¹');?>',
@@ -583,6 +597,7 @@ Ext.define('Editor.controller.Localizer', {
             actionUnFinishAll: '<?php echo $this->translate->_('Aufgabe für alle Benutzer wieder öffnen');?>',
             actionEnd: '<?php echo $this->translate->_('Aufgabe komplett beenden');?>',
             actionDelete: '<?php echo $this->translate->_('Aufgabe komplett löschen');?>',
+            actionLog: '<?php echo $this->translate->_('Aufgabe Fehlerhistorie');?>',
             assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
             taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
             actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
@@ -605,7 +620,29 @@ Ext.define('Editor.controller.Localizer', {
         override: "Editor.view.admin.task.PreferencesWindow",
         title: '<?php echo $this->translate->_('Einstellungen zu Aufgabe "{0}"');?>',
         strings: {
-            close: '<?php echo $this->translate->_('Fenster schließen');?>'
+            close: '<?php echo $this->translate->_('Fenster schließen');?>',
+            events: '<?php echo $this->translate->_('Ereignisse');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.log.Grid", {
+        override: "Editor.view.admin.log.Grid",
+        strings: {
+            reload: '<?php echo $this->translate->_('Aktualisieren');?>',
+            level: '<?php echo $this->translate->_('Typ');?>',
+            level_fatal: '<?php echo $this->translate->_('Schwerer Fehler');?>',
+            level_error: '<?php echo $this->translate->_('Fehler');?>',
+            level_warn: '<?php echo $this->translate->_('Warnung');?>',
+            level_info: '<?php echo $this->translate->_('Info');?>',
+            level_debug: '<?php echo $this->translate->_('Debug');?>',
+            level_trace: '<?php echo $this->translate->_('Trace');?>',
+            colUsername: '<?php echo $this->translate->_('Benutzer');?>',
+            eventCode: '<?php echo $this->translate->_('Code');?>',
+            eventCodeLong: '<?php echo $this->translate->_('Ereignis- bzw. Fehlercode');?>',
+            domain: '<?php echo $this->translate->_('Bereich');?>',
+            message: '<?php echo $this->translate->_('Fehler');?>',
+            created: '<?php echo $this->translate->_('Zeitpunkt');?>',
+            moreInfo: '<?php echo $this->translate->_('Mehr Info');?>'
         }
     });
     

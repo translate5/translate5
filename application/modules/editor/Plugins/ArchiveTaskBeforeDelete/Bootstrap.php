@@ -52,7 +52,8 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Bootstrap extends ZfExtended_Plugin
         $archive = ZfExtended_Factory::get('editor_Plugins_ArchiveTaskBeforeDelete_Archive');
         /* @var $archive editor_Plugins_ArchiveTaskBeforeDelete_Archive */
         if(!$archive->createFor($taskGuid)){
-            throw new ZfExtended_Models_Entity_Conflict('Task could not be archived, stopping therefore the delete call');
+            ZfExtended_Models_Entity_Conflict::addCodes(['E1049' => 'Task could not be locked for archiving, stopping therefore the delete call.']);
+            throw new ZfExtended_Models_Entity_Conflict('E1049', ['task' => $task]);
         }
     }
 }

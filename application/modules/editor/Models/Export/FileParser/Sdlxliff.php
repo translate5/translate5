@@ -53,10 +53,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     
     /**
      * sets $this->comments[$guid] = '<cmt-def id="'.$guid.'"><Comments><Comment severity="Medium" user="userName" date="2016-07-21T19:40:01.80725+02:00" version="1.0">comment content</Comment>...</Comments></cmt-def>';
-     * @param integer $segmentId
+     * @param int $segmentId
      * @return string $id of comments index in $this->comments | null if no comments exist
      */
-    protected function getSegmentComments(integer $segmentId){
+    protected function getSegmentComments(int $segmentId){
         $commentModel = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $commentModel editor_Models_Comment */
         $comments = $commentModel->loadBySegmentAndTaskPlain($segmentId, $this->_taskGuid);
@@ -84,11 +84,11 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
 
     /**
      * @param array $file that contains file as array as splitted by parse function
-     * @param integer $i position of current segment in the file array
-     * @param $id id of the comment(s) inside of $this->comments array
+     * @param int $i position of current segment in the file array
+     * @param string $id of the comment(s) inside of $this->comments array
      * @return array
      */
-    protected function writeCommentGuidToSegment(array $file, integer $i, $id) {
+    protected function writeCommentGuidToSegment(array $file, int $i, $id) {
         $file[$i] = '<mrk mtype="x-sdl-comment" sdl:cid="'.$id.'">'.$file[$i].'</mrk>';
         return $file;
     }
@@ -96,10 +96,10 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
     /**
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
-     * @param integer $i position of current segment in the file array
+     * @param int $i position of current segment in the file array
      * @return array
      */
-    protected function writeMatchRate(array $file, integer $i) {
+    protected function writeMatchRate(array $file, int $i) {
         $matchRate = $this->_segmentEntity->getMatchRate();
         $mid = $this->_segmentEntity->getMid();
         $segPart =& $file[$i+1];

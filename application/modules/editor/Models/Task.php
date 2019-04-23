@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Task Object Instance as needed in the application
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method string getTaskNr() getTaskNr()
@@ -47,11 +47,11 @@ END LICENSE AND COPYRIGHT
  * @method string getForeignName() getForeignName()
  * @method void setForeignName() setForeignName(string $name)
  * @method integer getSourceLang() getSourceLang()
- * @method void setSourceLang() setSourceLang(integer $id)
+ * @method void setSourceLang() setSourceLang(int $id)
  * @method integer getTargetLang() getTargetLang()
- * @method void setTargetLang() setTargetLang(integer $id)
+ * @method void setTargetLang() setTargetLang(int $id)
  * @method integer getRelaisLang() getRelaisLang()
- * @method void setRelaisLang() setRelaisLang(integer $id)
+ * @method void setRelaisLang() setRelaisLang(int $id)
  * @method string getLockedInternalSessionUniqId() getLockedInternalSessionUniqId()
  * @method void setLockedInternalSessionUniqId() setLockedInternalSessionUniqId(string $id)
  * @method string getLocked() getLocked()
@@ -66,11 +66,11 @@ END LICENSE AND COPYRIGHT
  * @method string getWorkflow() getWorkflow()
  * @method void setWorkflow() setWorkflow(string $workflow)
  * @method integer getWorkflowStep() getWorkflowStep()
- * @method void setWorkflowStep() setWorkflowStep(integer $stepNr)
+ * @method void setWorkflowStep() setWorkflowStep(int $stepNr)
  * @method string getWorkflowStepName() getWorkflowStepName()
  * @method void setWorkflowStepName() setWorkflowStepName(string $stepName)
  * @method integer getWordCount() getWordCount()
- * @method void setWordCount() setWordCount(integer $wordcount)
+ * @method void setWordCount() setWordCount(int $wordcount)
  * @method string getTargetDeliveryDate() getTargetDeliveryDate()
  * @method void setTargetDeliveryDate() setTargetDeliveryDate(string $datetime)
  * @method string getRealDeliveryDate() getRealDeliveryDate()
@@ -78,24 +78,24 @@ END LICENSE AND COPYRIGHT
  * @method string getOrderdate() getOrderdate()
  * @method void setOrderdate() setOrderdate(string $datetime)
  * @method boolean getReferenceFiles() getReferenceFiles()
- * @method void setReferenceFiles() setReferenceFiles(boolean $flag)
+ * @method void setReferenceFiles() setReferenceFiles(bool $flag)
  * @method boolean getTerminologie() getTerminologie()
- * @method void setTerminologie() setTerminologie(boolean $flag)
+ * @method void setTerminologie() setTerminologie(bool $flag)
  * @method boolean getEnableSourceEditing() getEnableSourceEditing()
- * @method void setEnableSourceEditing() setEnableSourceEditing(boolean $flag)
+ * @method void setEnableSourceEditing() setEnableSourceEditing(bool $flag)
  * @method boolean getEdit100PercentMatch() getEdit100PercentMatch()
- * @method void setEdit100PercentMatch() setEdit100PercentMatch(boolean $flag)
+ * @method void setEdit100PercentMatch() setEdit100PercentMatch(bool $flag)
  * @method boolean getLockLocked() getLockLocked()
- * @method void setLockLocked() setLockLocked(boolean $flag)
+ * @method void setLockLocked() setLockLocked(bool $flag)
  * @method string getQmSubsegmentFlags() getQmSubsegmentFlags() get Original Flags from DB
  * @method void setQmSubsegmentFlags() setQmSubsegmentFlags(string $flags) set Original Flags in DB
  * @method void delete() delete() see editor_Models_Task_Remover for complete task removal
  * @method boolean getEmptyTargets() getEmptyTargets()
- * @method void setEmptyTargets() setEmptyTargets(boolean $emptyTargets)
+ * @method void setEmptyTargets() setEmptyTargets(bool $emptyTargets)
  * @method string getImportAppVersion() getImportAppVersion()
  * @method void setImportAppVersion() setImportAppVersion(string $version)
  * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(integer $customerId)
+ * @method void setCustomerId() setCustomerId(int $customerId)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -160,7 +160,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $loadAll optional, per default false 
+     * @param bool $loadAll optional, per default false 
      * @return array
      */
     public function loadListByUserAssoc(string $userGuid, $loadAll = false) {
@@ -183,7 +183,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $loadAll
+     * @param bool $loadAll
      * @return number
      */
     public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false) {
@@ -200,7 +200,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      *   if false only the associated tasks to the user
      * @param string $userGuid
      * @param string $cols column definition
-     * @param boolean $loadAll 
+     * @param bool $loadAll 
      * @return Zend_Db_Table_Select
      */
     protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
@@ -233,7 +233,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * @param boolean $asJson if true, json is returned, otherwhise assoc-array
+     * @param bool $asJson if true, json is returned, otherwhise assoc-array
      * @return mixed depending on $asJson
      */
     public function getQmSubsegmentIssuesTranslated($asJson = true){
@@ -305,7 +305,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      *   id: 'sev2',
      *   text: 'Severity 2'
      * }]
-     * @param boolean $asJson
+     * @param bool $asJson
      * @param Zend_Db_Table_Row_Abstract $row | null - if null, $this->row is used
      * @return string|array depends on $asJson
      */
@@ -407,7 +407,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * update the workflowStep of a specific task 
      * @param string $stepName
-     * @param boolean $increaseStep optional, by default true, increases then the workflow step nr
+     * @param bool $increaseStep optional, by default true, increases then the workflow step nr
      */
     public function updateWorkflowStep(string $stepName, $increaseStep = true) {
         $data = [
@@ -491,7 +491,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      * 
      * @param string $datetime
-     * @param boolean $sessionIndependant optional, default false. If true the lock is session independant, and must therefore revoked manually! 
+     * @param bool $sessionIndependant optional, default false. If true the lock is session independant, and must therefore revoked manually! 
      * @return boolean
      * @throws Zend_Exception if something went wrong
      */
@@ -612,6 +612,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns a Zend_Config Object with task specific settings
+     * @deprecated must be changed with TRANSLATE-471
      * @return Zend_Config
      */
     public function getAsConfig() {
@@ -651,6 +652,15 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * generates a task overview statistics summary
+     * @return array
+     */
+    public function getSummary() {
+        $stmt = $this->db->getAdapter()->query('select state, count(*) taskCount, sum(wordCount) wordCountSum from LEK_task group by state');
+        return $stmt->fetchAll();
+    }
+    
+    /**
      * convenient method to get the task meta data
      * @return editor_Models_Task_Meta
      */
@@ -676,15 +686,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     public function checkStateAllowsActions() {
         if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
-            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
-            $e->setErrors([
-                    'task' => $this->getTaskGuid(),
-                    'taskState' => $this->getState(),
-                    'isLocked' => $this->isLocked($this->getTaskGuid()),
-                    'isErroneous' => $this->isErroneous(),
-                    'isExclusiveState' => $this->isExclusiveState(),
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1046' => 'The current task status does not allow that action.',
             ]);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1046', [
+                'Der aktuelle Status der Aufgabe verbietet diese Aktion!'
+            ], [
+                'task' => $this,
+                'isLocked' => $this->isLocked($this->getTaskGuid()),
+                'isErroneous' => $this->isErroneous(),
+                'isExclusiveState' => $this->isExclusiveState(),
+            ]);
         }
     }
     
@@ -697,30 +709,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
 
         
-        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : 100;
+        $daysOffset = $taskLifetimeDays ?? 100;
         
         if(!$daysOffset){
             throw new Zend_Exception('No task taskLifetimeDays configuration defined.');
             return;
         }
         
-        /**
-         * SELECT `t`.taskGuid,`t`.taskName, t.id 
-         * FROM LEK_task AS `t`  
-         * LEFT JOIN `LEK_task_log` AS `tl` ON   
-         * WHERE `t`.`state` = 'end' AND `tl`.id IS NULL;
-         */
-        
-        $daysOffset = (int)$daysOffset; //ensure that it is plain integer, which can be savely given to DB without binding 
-        //find all ended tasks which are not modified in the last X days
-        // which are not modified → get all modified and make a left join with id = null (faster as not exists)
+        $daysOffset = (int)$daysOffset; //ensure that it is plain integer
         $s = $this->db->select()
-             ->setIntegrityCheck(false)
-             ->from(['t' => 'LEK_task'],'t.id AS id')
-             ->joinLeft(['tl' => 'LEK_task_log'], 
-                 '`t`.`taskGuid` = `tl`.`taskGuid` AND `tl`.`created` > CURRENT_DATE - INTERVAL '.$daysOffset.' DAY','')
-            ->where('`t`.`state`=?',self::STATE_END)
-            ->where('`tl`.id IS NULL');
+            ->where('`state` = ?', self::STATE_END)
+            ->where('`modified` < (CURRENT_DATE - INTERVAL ? DAY)', $daysOffset);
         $tasks = $this->db->getAdapter()->fetchAll($s);
 
         if(empty($tasks)){
@@ -746,8 +745,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             $removedTasks[]=$taskEntity->getTaskName();
             $remover->remove();
         }
-        error_log("Number of tasks removed: ".count($removedTasks));
-        error_log("Tasks removed by taskname: ".implode(',', $removedTasks));
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
+        $logger->info('E1011', 'removeOldTasks - removed {taskCount} tasks', [
+            'taskCount' => count($removedTasks),
+            'taskNames' => $removedTasks
+        ]);
     }
     
     /***

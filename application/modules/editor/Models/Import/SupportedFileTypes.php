@@ -96,7 +96,11 @@ class editor_Models_Import_SupportedFileTypes {
      */
     public function getParser($ext) {
         if(empty(self::$extensionParserMap[$ext])) {
-            throw new Zend_Exception('For the fileextension "'.$ext.'" no parser is registered. Available parsers: '.print_r(self::$extensionParserMap,1));
+            //'For the given fileextension no parser is registered.'
+            throw new editor_Models_Import_Exception('E1060', [
+                'extension' => $ext,
+                'availableParsers' => print_r(self::$extensionParserMap,1),
+            ]);
         }
         return self::$extensionParserMap[$ext];
     }

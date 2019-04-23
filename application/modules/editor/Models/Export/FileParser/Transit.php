@@ -75,7 +75,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
      */
     protected $currentId;
     
-    public function __construct(integer $fileId, boolean $diff,editor_Models_Task $task,string $path) {
+    public function __construct(int $fileId, bool $diff,editor_Models_Task $task,string $path) {
         parent::__construct($fileId, $diff, $task, $path);
         $this->targetFileName = basename($path);
         //stand: herausfinden von source-namen anhand des path und speichern der source-Datei im exportfolder
@@ -168,9 +168,9 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     /**
      * 
      * @param editor_Plugins_Transit_Segment $transitSegment
-     * @param integer $segId segId from transit-file - identical with mid from db
+     * @param int $segId segId from transit-file - identical with mid from db
      */
-    protected function setSegmentInfoField(editor_Plugins_Transit_Segment &$transitSegment,integer $segId) {
+    protected function setSegmentInfoField(editor_Plugins_Transit_Segment &$transitSegment,int $segId) {
         if((int)$this->config->runtimeOptions->plugins->transit->writeInfoField->enabled !== 1){
             return;
         }
@@ -223,7 +223,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
      * to prevent loading again while switching between fields
      * 
      * overrides parent, because parent needs id of segment and transit-parser only knows mid
-     * @param integer $segId as found in untouch transit file - has to be identical with mid of found segment
+     * @param int $segId as found in untouch transit file - has to be identical with mid of found segment
      * @return editor_Models_Segment
      */
     protected function getSegment($segId){

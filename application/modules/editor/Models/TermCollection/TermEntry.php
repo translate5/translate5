@@ -33,8 +33,8 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
     
     /***
      * Get term entry by given collectionId and groupId (termEntry tbx id) 
-     * @param integer $termEntryId
-     * @param integer $collectionId
+     * @param int $termEntryId
+     * @param int $collectionId
      * @return Zend_Db_Table_Row_Abstract|NULL
      */
     public function getTermEntryByIdAndCollection($termEntryId,$collectionId){
@@ -78,7 +78,7 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
      * Remove term entry older than $olderThan date from a specific term collection
      * The date format should be equivalent to mysql date format 'YYYY-MM-DD HH:MM:SS'
      * 
-     * @param integer $collectionId
+     * @param int $collectionId
      * @param string $olderThan
      * @return boolean : true if rows are removed
      */

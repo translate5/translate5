@@ -205,11 +205,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
     /**
      * dedicated to write the match-Rate to the right position in the target format
      * @param array $file that contains file as array as splitted by parse function
-     * @param integer $i position of current segment in the file array
+     * @param int $i position of current segment in the file array
      * @return string
      * 
      */
-    protected function writeMatchRate(array $file, integer $i) {
+    protected function writeMatchRate(array $file, int $i) {
         // FIXME This code is disabled, because: 
         //  - the mid is not unique (due multiple files in the XLF) this code is buggy
         //  - the tmgr:matchratio should only be exported for OpenTM2 XLF and not in general

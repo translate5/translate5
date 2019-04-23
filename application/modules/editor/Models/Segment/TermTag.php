@@ -105,7 +105,7 @@ class editor_Models_Segment_TermTag {
     /**
      * Removes term tags. Warning: if unsure if your content contains internal tags set parameter preserveInternal to true!
      * @param string $segment the segment content
-     * @param boolean $preserveInternal if true, internal tags are masked before removing term tags.
+     * @param bool $preserveInternal if true, internal tags are masked before removing term tags.
      */
     public function remove(string $segment, $preserveInternal = false) {
         

@@ -94,7 +94,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     /**
      * Initiert Tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         //add sdlxliff tagMapping
         $this->addSldxliffTagMappings();
         parent::__construct($path, $fileName, $fileId, $task);
@@ -149,13 +149,15 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * Checks, if there are any change-markers in the sdlxliff. If yes, triggers an error
      */
     protected function checkForSdlChangeMarker() {
-        if (strpos($this->_origFile, 'mtype="x-sdl-added"')!== false or 
-                strpos($this->_origFile, 'mtype="x-sdl-deleted"')!== false or 
-                strpos($this->_origFile, '<rev-defs>')!== false) {
-            trigger_error('There are change Markers in the sdlxliff-file "'.
-                    $this->_fileName.' Task: '.$this->task->getTaskName().' ('.$this->task->getTaskGuid().') '.
-                    '". Please clear them first and then try to check in the file again.',
-                    E_USER_ERROR);
+        $added = strpos($this->_origFile, 'mtype="x-sdl-added"')!== false;
+        $deleted = strpos($this->_origFile, 'mtype="x-sdl-deleted"')!== false;
+        $refs = strpos($this->_origFile, '<rev-defs>')!== false;
+        if ($added || $deleted || $refs) {
+            //There are change Markers in the sdlxliff-file which are not supported!
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1003', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+            ]);
         }
     }
     
@@ -178,7 +180,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function setLockedTagContent($tag, $tagId) {
         if (strstr($tag, 'xid=')=== false) {
-            trigger_error('Locked-Tag-Inhalt wurde angefordert, aber Tag enthält keine xid', E_USER_ERROR);
+            //Locked-tag-content was requested but tag does not contain a xid attribute.',
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1004', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+                'tagId' => $tagId,
+                'tag' => $tag,
+            ]);
         }
         $xid = preg_replace('"<.* xid=\"([^\"]*)\".*>"', '\\1', $tag);
         $xid = preg_replace('"<.* xid=\"([^\"]*)\".*>"', '\\1', $tag);
@@ -270,8 +278,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $end = strpos($transunit, '</sdl:seg-defs>') + 15; //set end after the end tag
         
         if ($start === false || $end === false) {
-            trigger_error('<sdl:seg-defs wurde in der folgenden transunit nicht gefunden: ' . $transunit, E_USER_ERROR);
-            return;
+            //<sdl:seg-defs was not found in the current transunit
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1005', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+                'transunit' => $transunit,
+            ]);
         }
         
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
@@ -329,7 +341,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $tags = preg_replace('"&#x[0-9A-Fa-f]+;"', 'UNICODE_ENTITY', $tags);
         $dom = new DomDocument();
         if (!$dom->loadXML($tags)) {
-            trigger_error('Das Laden der Taginformationen aus dem Header der sdlxliff-Datei schlug fehl', E_USER_ERROR);
+            //loading the taginformation from the SDLXLIFF header has failed!
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1006', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+            ]);
         }
         $tagList = $dom->getElementsByTagName('tag');
         foreach ($tagList as $node) {
@@ -347,10 +363,21 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $this->_tagMapping[$id]['imgEptText'] = $eptText;
             }
             if (!isset($this->_tagDefMapping[$name])) {
-                trigger_error('Der Tag ' . $name . ' ist nicht im Array _tagDefMapping definiert', E_USER_ERROR);
+                //the tag is not defined in _tagDefMapping array
+                throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1007', [
+                    'task' => $this->task,
+                    'filename' => $this->_fileName,
+                    'tagname' => $name,
+                ]);
             }
+            
             if (strpos($id, '-')!== false) {
-                trigger_error('Die Tag-Id ' . $id . ' enthielt einen Bindestrich - dies ist nicht erlaubt, da die Syntax für das JS-Frontend auf Bindestriche als Trennzeichen setzt', E_USER_ERROR);
+                //the tag id contains a dash - which is not allowed since this may interfere with the GUI 
+                throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1008', [
+                    'task' => $this->task,
+                    'filename' => $this->_fileName,
+                    'tagId' => $id,
+                ]);
             }
         }
     }
@@ -416,9 +443,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $targetExp[1][0] = preg_split('"(<mrk[^>]*mtype=\"seg\"[^>]*>)"', $targetExp[1][0], NULL, PREG_SPLIT_DELIM_CAPTURE);
         $countTargetMrk = count($targetExp[1][0]);
         if ($countTargetMrk !== $countSourceMrk) {
-            trigger_error(
-                    'Die Anzahl der Zielsegmente entsprach nicht der Zahl der Quellsegmente in der transunit ' .
-                    $transUnit, E_USER_ERROR);
+            //source and target segment count does not match 
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1009', [
+                'filename' => $this->_fileName,
+                'task' => $this->task,
+                'transunit' => $transUnit
+            ]);
         }
         //füge target-Segmente in einem String wieder für den kompletten Rückzusammen-
         //bau der transunit wieder zusammen. Beginne mit den für die Segmentextraktion
@@ -501,9 +531,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function verifyTagName($tagName,$data) {
          if (!in_array($tagName, $this->_tagDefMapping)) {
-            trigger_error('Der Tag ' . $tagName .
-                    ' kam im folgenden Segment vor, ist aber nicht definiert: ' .
-                    implode('', $data->segment), E_USER_ERROR);
+            //the tag in the segment was not defined in the tag mapping list
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1010', [
+                'filename' => $this->_fileName,
+                'task' => $this->task,
+                'tagname' => $tagName,
+                'segment' => implode('', $data->segment),
+            ]);
         }
     }
 
@@ -521,7 +555,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      *   für die Rückkonvertierung und den Bezug zu den tagMappings im sdlxliff-header
      *
      * @param string $segment
-     * @param boolean isSource
+     * @param bool isSource
      * @return string $segment enthält anstelle der Tags die vom JS benötigten Replacement-Tags
      *         wobei die id die ID des Segments in der Tabelle Segments darstellt
      */
@@ -531,7 +565,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return $segment;
         }
         if(preg_match('/<mrk[^>]+mtype="x-sdl-comment"/', $segment)){
-            throw new ZfExtended_Exception('The file "'.$this->_fileName.'" of Task "'.$this->task->getTaskGuid().'" contains SDL comments which are currently not supported!');
+            //The file contains SDL comments which are currently not supported!
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1000', [
+                'filename' => $this->_fileName,
+                'task' => $this->task
+            ]);
         }
         $segment = $this->parseSegmentUnifyInternalTags($segment);
         $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
@@ -594,11 +632,14 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $tagId = $this->parseSegmentGetTagId($tag, $tagName);
         $shortTagIdent = $data->j;
         if (strpos($tagId, 'locked')!== false) {
-            trigger_error('Der öffnende Tag ' . $tagName .
-                    ' enthielt die tagId ' . $tagId . ', was lt. bisherigen
-                            Erfahrungen durch sdlxliff nicht vorgesehen ist.
-                            Das betroffene Segment war: ' .
-                    implode('', $data->segment), E_USER_ERROR);
+            //The opening tag $tagName contains a non valid tagId according to our reverse engineering
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1001', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+                'tagName' => $tagName,
+                'tagId' => $tagId,
+                'segment' => implode('', $data->segment),
+            ]);
         }
         $data->openTags[$data->openCounter]['tagName'] = $tagName;
         $data->openTags[$data->openCounter]['tagId'] = $tagId;
@@ -620,7 +661,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function parseRightTag($data) {
         if(empty($data->openTags[$data->openCounter])){
-            trigger_error('Schließender Tag ohne einen öffnenden gefunden. Aktuelle Segment Mid: '.$this->_mid.'. Aktueller Tag:  ' .join('', $data->segment), E_USER_ERROR);
+            //Found a closing tag without an opening one!
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1002', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+                'mid' => $this->_mid,
+                'currentTag' => join('', $data->segment),
+            ]);
         }
         $openTag = $data->openTags[$data->openCounter];
         $mappedTag = $this->_tagMapping[$openTag['tagId']];

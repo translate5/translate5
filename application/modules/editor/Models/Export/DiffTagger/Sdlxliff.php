@@ -455,7 +455,7 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
      *
      * @param array $d Array('deleted')
      * @param array $getGTagsToComplement array as returned by function getGTagsToComplement
-     * @param integer $diffKey
+     * @param int $diffKey
      * @return string deletions inclosed by <mrk mtype="x-sdl-deleted" sdl:revid="REVID">'deletions'</mrk>' )
      */
     protected function markDeletion($d, $getGTagsToComplement, $diffKey) {
@@ -535,8 +535,10 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 $openIds[$open] = $id;
             } elseif (strpos($segment[$i], '</mrk>') !== false) {
                 if (!isset($openIds[$open])) {
-                    trigger_error(
-                            'In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks. The Segment had been: ' . implode('', $segment), E_USER_ERROR);
+                    //In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks. The Segment had been: "{segment}"
+                    throw new editor_Models_Export_DiffTagger_Exception('E1089',[
+                        'segment' => implode('', $segment),
+                    ]);
                 }
                 $segment[$i] = str_replace('</mrk', '</g id="' . $openIds[$open] . '"', $segment[$i]);
                 unset($openIds[$open]);
@@ -545,8 +547,10 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
             $i++;
         }
         if (count($openIds) > 0) {
-            trigger_error(
-                    'The number of opening and closing g-Tags had not been the same! The Segment had been: ' . implode('', $segment), E_USER_ERROR);
+            //The number of opening and closing g-Tags had not been the same! 
+            throw new editor_Models_Export_DiffTagger_Exception('E1090',[
+                'segment' => implode('', $segment),
+            ]);
         }
         return $segment;
     }
@@ -572,9 +576,10 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
                 $openIds[$open] = preg_replace('".*<g[^>]*id=\"([^\"]+)\".*"', '\\1', $segment[$i]);
             } elseif (strpos($segment[$i], '</g>') !== false) {
                 if (!isset($openIds[$open])) {
-                    error_log(print_r(debug_backtrace(2),1));
-                    trigger_error(
-                            'In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks. The Segment had been: ' . implode('', $segment), E_USER_ERROR);
+                    //In this segment for one closing tag no corresponding opening tag exists - or the tagorder had been syntactically incorrect already before the import in the editor. Therefore it is not possible to create an export with sdl-change-marks in it. Try to export without change-marks.
+                    throw new editor_Models_Export_DiffTagger_Exception('E1091',[
+                        'segment' => implode('', $segment),
+                    ]);
                 }
                 $segment[$i] = str_replace('</g', '</g id="' . $openIds[$open] . '"', $segment[$i]);
                 unset($openIds[$open]);
@@ -583,8 +588,10 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
             $i++;
         }
         if (count($openIds) > 0) {
-            trigger_error(
-                    'The number of opening and closing g-Tags had not been the same! The Segment had been: ' . implode('', $segment), E_USER_ERROR);
+            //The number of opening and closing g-Tags had not been the same! The Segment had been: ' . implode('', $segment), E_USER_ERROR);
+            throw new editor_Models_Export_DiffTagger_Exception('E1092',[
+                'segment' => implode('', $segment),
+            ]);
         }
         return $segment;
     }
@@ -627,8 +634,10 @@ class editor_Models_Export_DiffTagger_Sdlxliff extends editor_Models_Export_Diff
         }
         foreach ($still2Mark as $i => $val) {
             if (count($openIds) < 1) {
-                trigger_error(
-                        'The number of opening and closing g-Tags had not been the same! The Segment had been: ' . implode('', $segment), E_USER_ERROR);
+                //The number of opening and closing g-Tags had not been the same!
+                throw new editor_Models_Export_DiffTagger_Exception('E1093',[
+                    'segment' => implode('', $segment),
+                ]);
             }
             $id = array_pop($openIds);
             $segment[$i] = str_replace('</g', '</g id="' . $id . '"', $segment[$i]);

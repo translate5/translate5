@@ -141,15 +141,18 @@ abstract class editor_Models_Export_FileParser {
     
     /**
      * 
-     * @param integer $fileId
-     * @param boolean $diff
+     * @param int $fileId
+     * @param bool $diff
      * @param editor_Models_Task $task
      * @param string $path 
      * @throws Zend_Exception
      */
-    public function __construct(integer $fileId,boolean $diff,editor_Models_Task $task, string $path) {
+    public function __construct(int $fileId,bool $diff,editor_Models_Task $task, string $path) {
         if(is_null($this->_classNameDifftagger)){
-            throw new Zend_Exception('$this->_classNameDifftagger muss in der Child-Klasse definiert sein.');
+            //this->_classNameDifftagger must be defined in the child class.
+            throw new editor_Models_Export_FileParser_Exception('E1085', [
+                'task' => $task,
+            ]);
         }
         $this->_fileId = $fileId;
         $this->_diffTagger = ZfExtended_Factory::get($this->_classNameDifftagger);
@@ -194,24 +197,25 @@ abstract class editor_Models_Export_FileParser {
     protected function parse() {
         $file = preg_split('#<lekTargetSeg([^>]+)/>#', $this->_skeletonFile, null, PREG_SPLIT_DELIM_CAPTURE);
 
-        //reusable exception creation
-        $exception = function($val) {
-            $e  = 'Error in Export-Fileparsing. instead of a id="INT" and a optional ';
-            $e .= 'field="STRING" attribute the following content was extracted: ' . $val;
-            return new Zend_Exception($e);
-        };
-        
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
             $file[$i] = $this->preProcessReplacement($file[$i]);
             if (!preg_match('#^\s*id="([^"]+)"\s*(field="([^"]+)"\s*)?$#', $file[$i], $matches)) {
-                throw $exception($file[$i]);
+                //Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"
+                throw new editor_Models_Export_FileParser_Exception('E1086', [
+                    'task' => $this->_task,
+                    'content' => $file[$i],
+                ]);
             }
           
             //check $matches[1] for integer (segmentId) if empty throw an exception
             settype($matches[1], 'int');
             if(empty($matches[1])) {
-                throw $exception($file[$i]);
+                //Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"
+                throw new editor_Models_Export_FileParser_Exception('E1087', [
+                    'task' => $this->_task,
+                    'content' => $file[$i],
+                ]);
             }
           
             //alternate column is optional, use target as default
@@ -242,19 +246,19 @@ abstract class editor_Models_Export_FileParser {
     /**
      * for overwriting purposes only
      * @param array $file
-     * @param integer $i
+     * @param int $i
      * @param type $id
      */
-    protected function writeCommentGuidToSegment(array $file, integer $i, $id) {
+    protected function writeCommentGuidToSegment(array $file, int $i, $id) {
     }
     
     /**
      * for setting $this-comments, if needed by the child class
      * for overwriting purposes only
-     * @param integer $segmentId
+     * @param int $segmentId
      * @return string $id of comments index in $this->comments | null if no comments exist
      */
-    protected function getSegmentComments(integer $segmentId) {
+    protected function getSegmentComments(int $segmentId) {
         return null;
     }
     
@@ -272,10 +276,10 @@ abstract class editor_Models_Export_FileParser {
      * dedicated to write the match-Rate to the right position in the target format
      * for overwriting purposes only
      * @param array $file that contains file as array as splitted by parse function
-     * @param integer $i position of current segment in the file array
+     * @param int $i position of current segment in the file array
      * @return string
      */
-    protected function writeMatchRate(array $file, integer $i) {
+    protected function writeMatchRate(array $file, int $i) {
         return $file;
     }
     
@@ -287,7 +291,7 @@ abstract class editor_Models_Export_FileParser {
      * space in HTML). For the export they have to be reconverted to normal 
      * spaces
      * 
-     * @param integer $segmentId
+     * @param int $segmentId
      * @param string $segment
      * @return string $segment
      */
@@ -297,7 +301,7 @@ abstract class editor_Models_Export_FileParser {
     }
     /**
      * returns the segment content for the given segmentId and field. Adds optional diff markup, and handles tags.
-     * @param integer $segmentId
+     * @param int $segmentId
      * @param string $field fieldname to get the content from
      * @return string
      */
@@ -334,12 +338,16 @@ abstract class editor_Models_Export_FileParser {
         $original = $this->removeTermTags($original);
         $original = $this->tagHelper->unprotect($original);
         $original = $this->parseSegment($original);
-        
-        $diffed = $this->_diffTagger->diffSegment(
-                $original,
-                $edited,
-                $segment->getTimestamp(),
-                $segment->getUserName());
+        try {
+            $diffed = $this->_diffTagger->diffSegment($original, $edited, $segment->getTimestamp(), $segment->getUserName());
+        }
+        catch (Exception $e) {
+            throw new editor_Models_Export_FileParser_Exception('E1088', [
+                'task' => $this->_task,
+                'fileId' => $this->_fileId,
+            ], $e);
+            
+        }
         // unprotectWhitespace must be done after diffing!
         return $this->whitespaceHelper->unprotectWhitespace($diffed);
     }
@@ -347,7 +355,7 @@ abstract class editor_Models_Export_FileParser {
     /**
      * loads the segment to the given Id, caches a limited count of segments internally 
      * to prevent loading again while switching between fields
-     * @param integer $segmentId
+     * @param int $segmentId
      * @return editor_Models_Segment
      */
     protected function getSegment($segmentId){
@@ -377,7 +385,7 @@ abstract class editor_Models_Export_FileParser {
      * and removes the information about trans[Not]Found
      * 
      * @param string $segment
-     * @param boolean $removeTermTags, default = true
+     * @param bool $removeTermTags, default = true
      * @return string $segment
      */
     protected function removeTermTags($segment) {

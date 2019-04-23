@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * DB encapsulation class
  */
-class editor_Models_Db_LogWorkflow extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_workflow_log';
+class editor_Models_Db_Logger_Task extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_task_log';
     public $_primary = 'id';
 }

@@ -25,33 +25,23 @@ START LICENSE AND COPYRIGHT
 
 END LICENSE AND COPYRIGHT
 */
-
 /**
  */
-class editor_Models_LogRequest extends ZfExtended_Models_Entity_Abstract {
-    
-    protected $dbInstanceClass = 'editor_Models_Db_LogRequest';
-
+class editor_Models_Import_ConfigurationException extends ZfExtended_ErrorCodeException {
     /**
-     * Adds a new log entry, save it to the db, and return the entity instance
-     * @param string $taskGuid
+     * @var string
      */
-    public static function create($taskGuid) {
-        $config = Zend_Registry::get('config');
-        if(empty($config->runtimeOptions->requestLogging)) {
-            return;
-        }
-        $userSession = new Zend_Session_Namespace('user');
-        $inst = ZfExtended_Factory::get(__CLASS__);
-        $inst->setTaskGuid($taskGuid);
-        $inst->setMethod($_SERVER['REQUEST_METHOD']);
-        $inst->setRequestUri($_SERVER['REQUEST_URI']);
-        $inst->setParameters(print_r($_REQUEST,1));
-        $inst->setAuthUserGuid($userSession->data->userGuid);
-        $inst->setAuthUserLogin($userSession->data->login);
-        $inst->setAuthUserName($userSession->data->userName);
-        //created timestamp automatic by DB
-        $inst->save();
-        return $inst;
-    }
+    protected $domain = 'editor.import.configuration';
+    
+    static protected $localErrorCodes = [
+        'E1032' => 'The passed source language "{language}" is not valid.',
+        'E1033' => 'The passed target language "{language}" is not valid.',
+        'E1034' => 'The import did not contain files for the relais language "{language}".',
+        'E1035' => 'The given taskGuid "{taskGuid}" was not valid GUID.',
+        'E1036' => 'The given userGuid "{userGuid}" was not valid GUID.',
+        'E1037' => 'The given userName "{userName}" was not valid user name.',
+        'E1038' => 'The import root folder does not exist. Path "{folder}".',
+        'E1039' => 'The imported package did not contain a valid "{proofRead}" folder.',
+        'E1040' => 'The imported package did not contain any files in the "{proofRead}" folder.',
+    ];
 }

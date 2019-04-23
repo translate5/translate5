@@ -59,7 +59,7 @@ class editor_Plugins_SegmentStatistics_Models_SegmentMetaJoin {
     
     /**
      * Since this class is used at multiple places it can be completly disabled in a static manner
-     * @param boolean $enabled
+     * @param bool $enabled
      */
     public static function setEnabled($enabled = true) {
         self::$enabled = $enabled;

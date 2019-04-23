@@ -42,7 +42,7 @@ class editor_Models_Segment_QmSubsegments {
      * It accepts the following parameters:
      *     string $tag = original img tag, 
      *     array $cls css classes, 
-     *     integer $issueId the qm issue id, 
+     *     int $issueId the qm issue id, 
      *     string $issueName the untranslated qm issue name, 
      *     string $sev the untranslated sev textual id, 
      *     string $sevName the untranslated sev string, 
@@ -86,8 +86,8 @@ class editor_Models_Segment_QmSubsegments {
             $sev = array_intersect($severities, $cls);
             $sev = reset($sev);
             $sev = empty($sev) ? 'sevnotfound' : $sev;
-            $sevName = (isset(self::$severityCache[$tg]->$sev) ? self::$severityCache[$tg]->$sev : '');
-            $issueName = (isset(self::$issueCache[$tg][$issueId]) ? self::$issueCache[$tg][$issueId] : '');
+            $sevName = self::$severityCache[$tg]->$sev ?? '';
+            $issueName = self::$issueCache[$tg][$issueId] ?? '';
             
             $parts[$idx] = $replacer($part, $cls, $issueId, $issueName, $sev, $sevName, $comment);
         }

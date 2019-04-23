@@ -30,16 +30,16 @@ END LICENSE AND COPYRIGHT
  * MatchAnalysis TaskAssoc Entity Object
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * 
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * 
  * @method boolean getInternalFuzzy() getInternalFuzzy()
- * @method void setInternalFuzzy() setInternalFuzzy(boolean $internalFuzzy)
+ * @method void setInternalFuzzy() setInternalFuzzy(bool $internalFuzzy)
  * 
  * @method integer getPretranslateMatchrate() getPretranslateMatchrate()
- * @method void setPretranslateMatchrate() setPretranslateMatchrate(integer $pretranslateMatchrate)
+ * @method void setPretranslateMatchrate() setPretranslateMatchrate(int $pretranslateMatchrate)
  * 
  * @method integer getCreated() getCreated()
  * @method void setCreated() setCreated(string $created)

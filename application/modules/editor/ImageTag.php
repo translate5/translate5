@@ -67,7 +67,7 @@ abstract class editor_ImageTag {
     /**
      * @var string
      * Unterhalb diesen Pfades speichert die save methode die Grafiken
-     * - wird im Konstruktor mit $session->runtimeOptions->dir->tagImagesBasePath
+     * - wird im Konstruktor mit $config->runtimeOptions->dir->tagImagesBasePath
      *   befüllt
      */
     protected $basePath;

@@ -38,10 +38,10 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     public function importTbx(array $filePath,array $params){
         $import=ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $import editor_Models_Import_TermListParser_Tbx */
-        $import->mergeTerms=isset($params['mergeTerms']) ? $params['mergeTerms'] : false;
+        $import->mergeTerms = $params['mergeTerms'] ?? false;
         
         //import source (filesystem or crosspai)
-        $import->importSource=isset($params['importSource']) ? $params['importSource'] : "";
+        $import->importSource = $params['importSource'] ?? "";
         
         $import->customerIds=$params['customerIds'];
         return $import->parseTbxFile($filePath,$params['collectionId']);
@@ -87,7 +87,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param integer $sourceLang
      * @param integer $targetLang
      * @param string $field
-     * 
      * @return array
      */
     public function searchCollection($queryString,$sourceLang,$targetLang,$field){
@@ -202,7 +201,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      *      'termsAtributeCount'=>number,
      *      'termsEntryAtributeCount'=>number,
      *  ]
-     * @param integer $collectionId
+     * @param int $collectionId
      * @return array
      */
     public function getAttributesCountForCollection($collectionId){
@@ -317,7 +316,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     
     /***
      * Remove term collection from the disk
-     * @param integer $collectionId
+     * @param int $collectionId
      */
     protected function removeCollectionDir($collectionId){
         $collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;

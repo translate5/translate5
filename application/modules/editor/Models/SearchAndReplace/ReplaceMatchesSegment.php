@@ -104,7 +104,7 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
      * @param string $queryString
      * @param string $replaceText
      * @param string $searchType
-     * @param boolean $matchCase
+     * @param bool $matchCase
      */
     public function replaceText($queryString, $replaceText,$searchType,$matchCase=false){
         
@@ -238,8 +238,8 @@ class editor_Models_SearchAndReplace_ReplaceMatchesSegment{
      * Insert the text at range and return the result
      * 
      * @param string $text        - text to be inserted
-     * @param integer $startIndex - start index 
-     * @param integer $endIndex   - end index
+     * @param int $startIndex - start index 
+     * @param int $endIndex   - end index
      * @return string
      */
     private function insertTextAtRange($text, $startIndex, $endIndex){

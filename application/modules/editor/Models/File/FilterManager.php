@@ -74,7 +74,7 @@ class editor_Models_File_FilterManager {
     /**
      * loads all file filters for a given task
      * @param editor_Models_Task $task
-     * @param integer $workerId
+     * @param int $workerId
      */
     public function initExport(editor_Models_Task $task, $workerId) {
         $this->parentWorkerId = $workerId;
@@ -101,7 +101,7 @@ class editor_Models_File_FilterManager {
     /**
      * returns the filename of the affected file (could be changed by the filters due conversion)
      * @param string $path
-     * @param integer $fileId
+     * @param int $fileId
      * @return string
      */
     public function applyImportFilters($path, $fileId, array &$filelist) {
@@ -110,7 +110,7 @@ class editor_Models_File_FilterManager {
     
     /**
      * @param string $path
-     * @param integer $fileId
+     * @param int $fileId
      */
     public function applyExportFilters($path, $fileId) {
         $this->applyFilters(self::TYPE_EXPORT, $path, $fileId);
@@ -119,7 +119,7 @@ class editor_Models_File_FilterManager {
     /**
      * @param array $params
      */
-    protected function applyFilters($type, string $path, integer $fileId) {
+    protected function applyFilters($type, string $path, int $fileId) {
         if(empty($this->filters[$fileId])) {
             return $path;
         }
@@ -143,7 +143,7 @@ class editor_Models_File_FilterManager {
      * Adds the given file filter for the given file
      * @param string $type
      * @param string $taskGuid
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $filterClass
      */
     public function addFilter($type,$taskGuid, $fileId, $filterClass) {

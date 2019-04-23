@@ -30,13 +30,13 @@ END LICENSE AND COPYRIGHT
  * Languageresources Entity Object
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getName() getName()
  * @method void setName() setName(string $name)
  * @method string getColor() getColor()
  * @method void setColor() setColor(string $color)
- * @method string getResourceId() getResourceId()
- * @method void setResourceId() setResourceId(integer $resourceId)
+ * @method integer getResourceId() getResourceId()
+ * @method void setResourceId() setResourceId(int $resourceId)
  * @method string getServiceType() getServiceType()
  * @method void setServiceType() setServiceType(string $type)
  * @method string getServiceName() getServiceName()
@@ -44,7 +44,7 @@ END LICENSE AND COPYRIGHT
  * @method string getSpecificData() getSpecificData()
  * @method void setSpecificData() setSpecificData(string $value)
  * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
- * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(integer $autoCreatedOnImport)
+ * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
  * @method string getResourceType() getResourceType()
  * @method void setResourceType() setResourceType(string $resourceType)
  */
@@ -110,7 +110,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     /***
      * Get all available language resources for customers of loged user
-     * @param boolean $addArrayId : if true(default true), the array key will be the language resource id
+     * @param bool $addArrayId : if true(default true), the array key will be the language resource id
      * @return array
      */
     public function getEnginesByAssoc($addArrayId=true){
@@ -265,12 +265,12 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
      * checks if the given languageResource (and segmentid - optional) is usable by the given task
      * 
      * @param string $taskGuid
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @param editor_Models_Segment $segment
      * @throws ZfExtended_Models_Entity_NoAccessException
      * 
      */
-    public function checkTaskAndLanguageResourceAccess(string $taskGuid,integer $languageResourceId, editor_Models_Segment $segment = null) {
+    public function checkTaskAndLanguageResourceAccess(string $taskGuid,int $languageResourceId, editor_Models_Segment $segment = null) {
         
         //checks if the queried languageResource is associated to the task:
         $languageResourceTaskAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
@@ -388,7 +388,7 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
             
             //return the property name value if exist
             if(isset($propertyName)){
-                return isset($specificData->$propertyName) ? $specificData->$propertyName : null;
+                return $specificData->$propertyName ?? null;
             }
             return $specificData;
         } catch (Exception $e) {

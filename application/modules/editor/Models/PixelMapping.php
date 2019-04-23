@@ -35,18 +35,18 @@
  */
 
 /**
- * @method string getId() getId()
- * @method void setId() setId(integer $id)
+ * @method integer getId() getId()
+ * @method void setId() setId(int $id)
  * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(integer $customerId)
+ * @method void setCustomerId() setCustomerId(int $customerId)
  * @method string getFont() getFont()
  * @method void setFont() setFont(string $font)
  * @method integer getFontsize() getFontsize()
- * @method void setFontsize() setFontsize(integer $fontsize)
+ * @method void setFontsize() setFontsize(int $fontsize)
  * @method string getUnicodeChar() getUnicodeChar()
  * @method void setUnicodeChar() setUnicodeChar(string $unicodeChar)
  * @method integer getPixelWidth() getPixelWidth()
- * @method void setPixelWidth() setPixelWidth(integer $pixelWidth)
+ * @method void setPixelWidth() setPixelWidth(int $pixelWidth)
 */
 class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_PixelMapping';
@@ -95,18 +95,9 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
             $this->db->getAdapter()->query($sql, $dataToBind);
             return;
         }
-        catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            //no customer to the number found, proceed with the below Exception
-        }
         catch(Zend_Db_Statement_Exception $e) {
-            if(strpos($e->getMessage(), 'Integrity constraint violation: 1452 Cannot add or update a child row') === false) {
-                throw $e;
-            }
-            if(strpos($e->getMessage(), 'FOREIGN KEY (`customerId`) REFERENCES `LEK_customer` (`id`)') === false) {
-                throw $e;
-            }
+                $this->handleIntegrityConstraintException($e);
         }
-        throw new ZfExtended_Exception('Pixel-Mapping: Import failed due not found client specified by client number in excel - client nr: '. $dataToBind['customerId']);
     }
     
     /**
@@ -133,9 +124,9 @@ class editor_Models_PixelMapping extends ZfExtended_Models_Entity_Abstract {
         if (array_key_exists($fontSize, $this->defaultPixelWidths)) {
             return $this->defaultPixelWidths[$fontSize];
         }
-        $msg = 'pixelMapping cannot be implemented due to missing default-values for pixel-width for font-size ' . $fontSize . '.';
-        $msg .= ' Add the missing value in your defaultPixelWidths-settings in the config.';
-        throw new ZfExtended_Exception($msg);
+        throw new editor_Models_Import_MetaData_Exception('E1054',[
+            'fontSize' => $fontSize
+        ]);
     }
     
     /**

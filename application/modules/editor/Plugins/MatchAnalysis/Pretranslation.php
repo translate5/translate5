@@ -281,7 +281,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Check if the given language resource id is a valid termcollection resource
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @return boolean
      */
     protected function isTermCollection($languageResourceId){
@@ -312,7 +312,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segment->setTimeTrackData($duration);
         
         $history->save();
-        $segment->setTimestamp(null);
+        $segment->setTimestamp(NOW_ISO);
         $segment->save();
     }
     
@@ -330,7 +330,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Set pretranslate from Mt priority flag
-     * @param boolean $usePretranslateMT
+     * @param bool $usePretranslateMT
      */
     public function setPretranslateMt($usePretranslateMT) {
         $this->usePretranslateMT=$usePretranslateMT;
@@ -338,7 +338,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Set the pretranslate from the Tm and termcollection priority flag. This flag also will run the pretranslations
-     * @param boolean $usePretranslateTMAndTerm
+     * @param bool $usePretranslateTMAndTerm
      */
     public function setPretranslateTmAndTerm($usePretranslateTMAndTerm) {
         $this->usePretranslateTMAndTerm=$usePretranslateTMAndTerm;

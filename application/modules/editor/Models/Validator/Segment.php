@@ -46,6 +46,25 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         parent::__construct($segment);
     }
     
+    public function isValid($data) {
+        if(parent::isValid($data)) {
+            return true;
+        }
+        $messages = $this->getMessages();
+        $errorCode = 'E1065';
+        foreach($messages as $errors){
+            if(array_key_exists('segmentToShort', $errors) || array_key_exists('segmentToLong', $errors)){
+                //if the segment length is invalid we have to provide a separate error code for separate error level
+                $errorCode = 'E1066';
+                break;
+            }
+        }
+        
+//FIXME this is an incomplete non perfect example how validations and exceptions should work
+// create something like a ::createValidationResponse? The main problem is again the translation, since validations are in english and therefore not translatable
+        throw new editor_Models_Segment_UnprocessableException($errorCode, ['errors' => $this->getMessages()]);
+    }
+    
     /**
      * Validators for Segment Entity
      * Validation will be done on calling entity->validate
@@ -85,12 +104,9 @@ class editor_Models_Validator_Segment extends ZfExtended_Models_Validator_Abstra
         /* @var $workflow editor_Workflow_Abstract */
         $this->addValidator('workflowStep', 'inArray', array($workflow->getSteps()));
         
-        $session = new Zend_Session_Namespace();
-        $flagConfig = $session->runtimeOptions->segments;
-    
-        $this->setQualityValidator(array_keys($flagConfig->qualityFlags->toArray()));
+        $this->setQualityValidator(array_keys($config->runtimeOptions->segments->qualityFlags->toArray()));
         
-        $allowedValues = array_keys($flagConfig->stateFlags->toArray());
+        $allowedValues = array_keys($config->runtimeOptions->segments->stateFlags->toArray());
         $allowedValues[] = 0; //adding "not set" state
         $this->addValidator('stateId', 'inArray', array($allowedValues));
         

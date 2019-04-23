@@ -54,6 +54,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @var string
      */
     const PLACEHOLDER_TEMPLATE='<translate5:escaped id="%s" />';
+    const PLACEHOLDER_TAG='<translate5:escaped>';
     
     public function __construct(){
         $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
@@ -94,7 +95,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * restores the original escaped tag
      * @param string $segment
-     * @param boolean $whitespaceOnly optional, if true restore whitespace tags only 
+     * @param bool $whitespaceOnly optional, if true restore whitespace tags only 
      * @return mixed
      */
     public function restore(string $segment, $whitespaceOnly = false) {
@@ -132,9 +133,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      *  and the replaced original tags. Warning: it is no usual key => value map, to be compatible with toXliffPaired (details see there)
      *  
      * @param string $segment
-     * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
+     * @param bool $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
-     * @param integer &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
+     * @param int &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
      * @return string segment with xliff tags
      */
     public function toXliff(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
@@ -182,7 +183,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * Converts internal tags to xliff2 format
      * @see editor_Models_Segment_InternalTag::toXliff for details see toXliff
      * @param string $segment
-     * @param boolean $removeOther
+     * @param bool $removeOther
      * @param array $replaceMap
      * @param number $newid
      * @return string|mixed
@@ -254,9 +255,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      *  There fore the map is a 2d array: [[</g>, replacement 1],[</g>, replacement 2]] 
      *  
      * @param string $segment
-     * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
+     * @param bool $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
-     * @param integer &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
+     * @param int &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
      * @return string segment with xliff tags
      */
     public function toXliffPaired(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
@@ -270,7 +271,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * @see self::toXliffPaired
      * @param string $segment
-     * @param boolean $removeOther
+     * @param bool $removeOther
      * @param array &$replaceMap
      * @param number &$newid
      * @return string segment with xliff2 tags

@@ -192,7 +192,7 @@ class editor_Services_Microsoft_HttpApi {
     
     protected function badGateway(Exception $e) {
         $badGateway = new ZfExtended_BadGateway('Die angefragte Microsoft Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setOrigin('Microsoft Api');
+        $badGateway->setDomain('Microsoft Api');
         
         $error = new stdClass();
         $error->type = 'HTTP';

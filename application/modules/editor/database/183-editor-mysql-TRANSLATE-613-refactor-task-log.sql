@@ -25,8 +25,12 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.MtComparEval.url';
+DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.requestLogging';
 
-ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalState;
-ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalId;
-ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalStart;
+ 
+INSERT INTO `Zf_errorlog` (`eventCode`, `level`, `domain`, `method`, `url`, `message`, `extra`, `userGuid`, `userLogin`, `created`)
+SELECT 'E1012', 16, 'workflow', `method`, `requestUri`, 'request - migrated', CONCAT('TaskGuid:',`taskGuid`,'; Parameters: ', `parameters`, ')'), `authUserGuid`, CONCAT(`authUserLogin`, ' (', `authUserName`, ')'), `created`
+FROM `LEK_request_log`;
+
+
+DROP TABLE `LEK_request_log`;

@@ -90,7 +90,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
     /***
      * Query the sdl cloud api and get the available results as editor_Services_ServiceResult
      * @param string $searchString
-     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
     protected function querySdlApi($searchString, $reimportWhitespace = false){
@@ -113,7 +113,7 @@ class editor_Services_SDLLanguageCloud_Connector extends editor_Services_Connect
         if($this->api->search($params)){
             $result=$this->api->getResult();
         }
-        $translation = isset($result->translation) ? $result->translation : "";
+        $translation = $result->translation ?? "";
         if($reimportWhitespace) {
             $translation = $this->importWhitespaceFromTagLessQuery($translation);
         }

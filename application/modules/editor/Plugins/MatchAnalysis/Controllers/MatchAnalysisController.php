@@ -96,37 +96,37 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
             unset($rows[$rowKey]);
             $rows[$rowKey]=$newRows;
         }
-        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        $spreadsheet = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         /* @var $excel ZfExtended_Models_Entity_ExcelExport */
         
-        $excel->setPreCalculateFormulas(true);
+        $spreadsheet->setPreCalculateFormulas(true);
         
         // set property for export-filename
-        $excel->setProperty('filename', $translate->_('Trefferanalyse'));
+        $spreadsheet->setProperty('filename', $translate->_('Trefferanalyse'));
         
         //103%, 102%, 101%. 100%, 99%-90%, 89%-80%, 79%-70%, 69%-60%, 59%-51%, 50% - 0%
         //[102=>'103',101=>'102',100=>'101',99=>'100',89=>'99',79=>'89',69=>'79',59=>'69',50=>'59'];
-        $excel->setLabel('resourceName', $translate->_("Name"));
-        $excel->setLabel('104Group', $translate->_("TermCollection Treffer (104%)"));
-        $excel->setLabel('103Group', $translate->_("Kontext Treffer (103%)"));
-        $excel->setLabel('102Group', $translate->_("Wiederholung (102%)"));
-        $excel->setLabel('101Group', $translate->_("Exact-exact Treffer (101%)"));
-        $excel->setLabel('100Group', '100%');
-        $excel->setLabel('99Group', '99%-90%');
-        $excel->setLabel('89Group', '89%-80%');
-        $excel->setLabel('79Group', '79%-70%');
-        $excel->setLabel('69Group', '69%-60%');
-        $excel->setLabel('59Group', '59%-51%');
-        $excel->setLabel('noMatch', '50%-0%');
-        $excel->setLabel('wordCountTotal', $translate->_("Summe Wörter"));
-        $excel->setLabel('created', $translate->_("Erstellungsdatum"));
-        $excel->setLabel('internalFuzzy', $translate->_("Interner Fuzzy aktiv"));
+        $spreadsheet->setLabel('resourceName', $translate->_("Name"));
+        $spreadsheet->setLabel('104Group', $translate->_("TermCollection Treffer (104%)"));
+        $spreadsheet->setLabel('103Group', $translate->_("Kontext Treffer (103%)"));
+        $spreadsheet->setLabel('102Group', $translate->_("Wiederholung (102%)"));
+        $spreadsheet->setLabel('101Group', $translate->_("Exact-exact Treffer (101%)"));
+        $spreadsheet->setLabel('100Group', '100%');
+        $spreadsheet->setLabel('99Group', '99%-90%');
+        $spreadsheet->setLabel('89Group', '89%-80%');
+        $spreadsheet->setLabel('79Group', '79%-70%');
+        $spreadsheet->setLabel('69Group', '69%-60%');
+        $spreadsheet->setLabel('59Group', '59%-51%');
+        $spreadsheet->setLabel('noMatch', '50%-0%');
+        $spreadsheet->setLabel('wordCountTotal', $translate->_("Summe Wörter"));
+        $spreadsheet->setLabel('created', $translate->_("Erstellungsdatum"));
+        $spreadsheet->setLabel('internalFuzzy', $translate->_("Interner Fuzzy aktiv"));
 
         $rowsCount=count($rows);
         $rowIndex=$rowsCount+2;
         
         
-        $sheet=$excel->getPhpExcel()->getActiveSheet();
+        $sheet=$spreadsheet->getSpreadsheet()->getActiveSheet();
         
         $sheet->setCellValue("A".$rowIndex,$translate->_("Summe"));
         $sheet->setCellValue("B".$rowIndex, "=SUM(B2:B".($rowIndex-1).")");
@@ -143,15 +143,15 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
         $sheet->setCellValue("M".$rowIndex, "=SUM(M2:M".($rowIndex-1).")");
         
         //set the cell autosize
-        $excel->simpleArrayToExcel($rows,function($phpExcel){
-            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
+        $spreadsheet->simpleArrayToExcel($rows,function($phpSpreadsheet){
+            foreach ($phpSpreadsheet->getWorksheetIterator() as $worksheet) {
 
-                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
+                $phpSpreadsheet->setActiveSheetIndex($phpSpreadsheet->getIndex($worksheet));
                 
-                $sheet = $phpExcel->getActiveSheet();
+                $sheet = $phpSpreadsheet->getActiveSheet();
                 $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(true);
-                /** @var PHPExcel_Cell $cell */
+                /** @var PhpOffice\PhpSpreadsheet\Cell\Cell $cell */
                 foreach ($cellIterator as $cell) {
                     $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
                 }

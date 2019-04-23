@@ -77,7 +77,7 @@ abstract class editor_Models_Import_SegmentProcessor {
     
     /**
      * Setzt die Dateispezifischen Informationen zum Segment
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $filename
      */
     public function setSegmentFile($fileId, $filename){
@@ -100,7 +100,7 @@ abstract class editor_Models_Import_SegmentProcessor {
     /**
      * Template Method which is called after all segment processors were processed
      * @param editor_Models_Import_FileParser $parser
-     * @param integer $segmentId
+     * @param int $segmentId
      */
     public function postProcessHandler(editor_Models_Import_FileParser $parser, $segmentId) {}
     

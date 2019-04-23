@@ -55,7 +55,7 @@ class editor_Models_Export {
 
     /**
      * @param editor_Models_Task $task
-     * @param boolean $diff
+     * @param bool $diff
      */
     public function setTaskToExport(editor_Models_Task $task, bool $diff) {
         $this->task = $task;
@@ -67,7 +67,7 @@ class editor_Models_Export {
     /**
      * exports a task
      * @param string $exportRootFolder
-     * @param integer $workerId
+     * @param int $workerId
      */
     public function export(string $exportRootFolder, $workerId) {
         umask(0); // needed for samba access
@@ -121,7 +121,7 @@ class editor_Models_Export {
      * @return editor_Models_Import_FileParser
      * @throws Zend_Exception
      */
-    protected function getFileParser(integer $fileId, string $path){
+    protected function getFileParser(int $fileId, string $path){
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($fileId);

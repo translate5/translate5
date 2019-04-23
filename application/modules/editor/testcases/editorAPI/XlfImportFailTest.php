@@ -37,7 +37,7 @@ class XlfImportFailTest extends \ZfExtended_Test_ApiTestcase {
         'lockLocked' => 1,
     ];
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         self::assertNeededUsers(); //last authed user is testmanager

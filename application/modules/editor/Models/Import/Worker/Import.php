@@ -224,7 +224,7 @@ class editor_Models_Import_Worker_Import {
      * 
      * If this function is once called with "false", the addup-process will be canceled for the whole import-process
      * 
-     * @param int or boolean false $count
+     * @param int or bool false $count
      */
     private function countWords($count)
     {
@@ -245,7 +245,13 @@ class editor_Models_Import_Worker_Import {
      */
     protected function getFileParser(string $path,array $params){
         $ext = strtolower(preg_replace('".*\.([^.]*)$"i', '\\1', $path));
-        $parserClass = $this->supportedFiles->getParser($ext);
+        try {
+            $parserClass = $this->supportedFiles->getParser($ext);
+        } catch(editor_Models_Import_Exception $e) {
+            //in supportedFiles the task is missing, so we have to add it here to the exception
+            $e->addExtraData(['task' => $this->task]);
+            throw $e;
+        }
         $parser = ZfExtended_Factory::get($parserClass,$params)->getChainedParser();
         /* var $parser editor_Models_Import_FileParser */
         $parser->setSegmentFieldManager($this->segmentFieldManager);

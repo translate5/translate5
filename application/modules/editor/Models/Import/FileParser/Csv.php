@@ -121,10 +121,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
      * @return string[]
      */
     public static function getValidMimeTypes() {
-        return array('text/plain','application/xml','text/html'); //this is due to the fact, that csv-files may contain html or xml fragments. In these cases the php-mime-type extension may recognize them as such.
+        return array('text/plain','application/xml','text/xml','text/html'); //this is due to the fact, that csv-files may contain html or xml fragments. In these cases the php-mime-type extension may recognize them as such.
     }
     
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         ini_set('auto_detect_line_endings', true);//to tell php to respect mac-lineendings
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initImageTags();
@@ -186,7 +186,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 continue;
             }
             if(preg_match($regEx, $this->placeholderCSV)===1){
-                throw new ZfExtended_NotAcceptableException('The regex '.$regEx.' matches the placeholderCSV string '.$this->placeholderCSV.' that is used in the editor_Models_Import_FileParser_Csv class to manage the protection loop. This is not allowed. Please find another solution to protect what you need to protect in your CSV via Regular Expression.');
+                throw new editor_Models_Import_FileParser_Csv_Exception('E1017', [
+                    'regex' => $regEx, 
+                    'placeholder' => $this->placeholderCSV,
+                    'task' => $this->task,
+                ]);
             }
             $regexArray =& $this->$regexArrayName;
             $regexArray[] = $regEx;
@@ -195,7 +199,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     /**
      * returns the csv content of one line, or false if line was empty / or eof reached
-     * @param handle $handle
+     * @param SplTempFileObject $handle
      * @return array $line or boolean false if nothing found in line
      */
     protected function prepareLine(SplTempFileObject $csv){
@@ -206,14 +210,18 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
         
         if($line === false){
-            trigger_error('Error on parsing a line of CSV. Current line is: '.$csv->current()
-                            .'. Error could also be in previous line!', E_USER_ERROR);
+            //Error on parsing a line of CSV. Current line is: "{line}". Error could also be in previous line!
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1075',[
+                'line' => $csv->current(),
+                'task' => $this->task,
+            ]);
         }
         if(!isset($line[2])){
-            trigger_error('In the line "'.
-                implode($this->_enclosure.$this->_delimiter.$this->_enclosure,$line).
-                '" there is no third column.',
-                E_USER_ERROR);
+            //In the line "{line}" there is no third column.
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1076',[
+                'line' => implode($this->_enclosure.$this->_delimiter.$this->_enclosure,$line),
+                'task' => $this->task,
+            ]);
         }
         return $line;
     }
@@ -238,7 +246,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $this->break = "\r";
         }
         else{
-            trigger_error('no linebreak found in CSV: '.$this->_fileName,E_USER_ERROR);
+            //no linebreak found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1077',[
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         
         //for this ini set see php docu: http://de2.php.net/manual/en/filesystem.configuration.php#ini.auto-detect-line-endings
@@ -254,17 +266,29 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         //$csvSettings quelle => source, mid => mid
         $header = $this->prepareLine($csv);
         if($header === false) {
-            trigger_error('no header column found in CSV: '.$this->_fileName,E_USER_ERROR);
+            //no header column found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1078',[
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         $skel = array($this->str_putcsv($header, $this->_delimiter, $this->_enclosure, $this->break));
         
         $missing = array_diff($csvSettings, $header);
         if(!empty($missing)) {
-            trigger_error('in application.ini configured column-header(s) '.
-                            join(';', $missing).' not found in CSV: '.$this->_fileName,E_USER_ERROR);
+            // in application.ini configured column-header(s) "{headers}" not found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1079',[
+                'headers' => join(';', $missing),
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         if(count($header) < 3) {
-            trigger_error('source and mid given but no more data columns found in CSV: '.$this->_fileName,E_USER_ERROR);
+            // source and mid given but no more data columns found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1080',[
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         $i=0;
         $csvSettings = array_flip($csvSettings);
@@ -368,13 +392,16 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     /**
      *
      * @param mixed $segment
-     * @param boolean isSource
+     * @param bool isSource
      * @return string $segment
      */
     protected function parseSegment($segment,$isSource){
         //check, if $this->placeholderCSV is present in segment - this must lead to error
         if(strpos($segment, $this->placeholderCSV)!==false){
-            throw new ZfExtended_Exception('The string $this->placeholderCSV ('.$this->placeholderCSV.') had been present in the segment before parsing it. This is not allowed.');
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1018', [
+                'placeholder' => $this->placeholderCSV,
+                'task' => $this->task,
+            ]);
         }
         $this->shortTagIdent = 1;
         

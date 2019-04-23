@@ -150,7 +150,7 @@ class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Termi
     
     /**
      * returns the Rfc5646 language code to the given language id
-     * @param integer $langId
+     * @param int $langId
      * @return string
      */
     protected function getLanguage($langId) {

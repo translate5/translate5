@@ -41,15 +41,15 @@ END LICENSE AND COPYRIGHT
  * @method string getRole() getRole()
  * @method string getUsedState() getUsedState()
  * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
- * @method string getIsPmOverride() getIsPmOverride()
- * @method void setId() setId(integer $id)
+ * @method boolean getIsPmOverride() getIsPmOverride()
+ * @method void setId() setId(int $id)
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method void setState() setState(string $state)
  * @method void setRole() setRole(string $role)
  * @method void setUsedState() setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
- * @method void setIsPmOverride() setIsPmOverride(boolean $isPmOverride)
+ * @method void setIsPmOverride() setIsPmOverride(bool $isPmOverride)
  * @method string getStaticAuthHash() getStaticAuthHash()
  * @method void setStaticAuthHash() setStaticAuthHash(string $hash)
  * 
@@ -248,20 +248,24 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $taskGuid = $this->get('taskGuid');
         $task = ZfExtended_Factory::get('editor_Models_Task');
 
-        $e = new ZfExtended_BadMethodCallException();
-        $e->setLogging(false);
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1061' => 'The job can not be removed, since the user is using the task.',
+            'E1062' => 'The job can not be removed, since the task is locked by the user.',
+        ]);
         
         if($this->isUsed()) {
-            $e->setMessage("Die Aufgabe wird von einem Benutzer benutzt", true);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1061', [
+                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.'
+            ], ['job' => $this]);
         }
         
         /* @var $task editor_Models_Task */
         if($task->isLocked($taskGuid, $this->getUserGuid())) {
-            $e->setMessage("Die Aufgabe ist durch einen Benutzer gesperrt", true);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1062', [
+                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.'
+            ], ['job' => $this]);
         }
-
+        
         $result = parent::delete();
         $this->updateTask($taskGuid);
         return $result;
@@ -405,5 +409,14 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             'Guid'
         );
         $this->setStaticAuthHash($guidHelper->create(false));
+    }
+    
+    /**
+     * generates a task overview statistics summary
+     * @return array
+     */
+    public function getSummary() {
+        $stmt = $this->db->getAdapter()->query('select state, role, usedstate, count(*) jobCount from LEK_taskUserAssoc group by state,role, usedstate');
+        return $stmt->fetchAll();
     }
 }

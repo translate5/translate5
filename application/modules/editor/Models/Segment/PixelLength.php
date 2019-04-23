@@ -65,6 +65,11 @@ class editor_Models_Segment_PixelLength {
     protected $segment;
     
     /**
+     * @var editor_Models_Task
+     */
+    protected $task;
+    
+    /**
      * This class must be linked to a task, otherwise we might use wrong data!
      * @var string
      */
@@ -87,18 +92,39 @@ class editor_Models_Segment_PixelLength {
      */
     protected $pixelMappingForTask;
     
+    protected $logMissingData = [];
+    
     public function __construct(string $taskGuid)
     {
         $this->segment = ZfExtended_Factory::get('editor_Models_Segment');
         
         $this->taskGuid = $taskGuid;
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        $this->customerId = intval($task->getCustomerId());
+        $this->task = ZfExtended_Factory::get('editor_Models_Task');
+        $this->task->loadByTaskGuid($taskGuid);
+        $this->customerId = intval($this->task->getCustomerId());
         $this->pixelMapping = ZfExtended_Factory::get('editor_Models_PixelMapping');
         /* @var $pixelMapping editor_Models_PixelMapping */
-        $this->pixelMappingForTask = $this->pixelMapping->getPixelMappingForTask(intval($task->getCustomerId()), $task->getAllFontsInTask());
+        $this->pixelMappingForTask = $this->pixelMapping->getPixelMappingForTask(intval($this->task->getCustomerId()), $this->task->getAllFontsInTask());
+    }
+    
+    public function __destruct() {
+        $logMsg = 'Segment length calculation: missing pixel width'; 
+        $logMsg .= 'No pixel-width set for several characters.'."\n";
+        $logMsg .= 'Default width is used. See affected characters in extra data.';
+        
+        $logger = Zend_Registry::get('logger');
+        /* @var $logger ZfExtended_Logger */
+        $logger = $logger->cloneMe('editor.segment.pixellength');
+        
+        $customer = ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $customer->load($this->customerId);
+        
+        $logger->warn('E0000', $logMsg, [
+            'affectedCharacters' => $this->logMissingData,
+            'task' => $this->task,
+            'customer' => $customer->getName().' ('.$customer->getNumber().'; id: '.$customer->getId().')',
+        ]);
     }
     
     /**
@@ -126,7 +152,7 @@ class editor_Models_Segment_PixelLength {
             $this->addPixelMappingForFont($fontFamily, $fontSize);
             $pixelMappingForTask = $this->pixelMappingForTask;
         }
-        return isset($pixelMappingForTask[$fontFamily][$fontSize]) ? $pixelMappingForTask[$fontFamily][$fontSize] : [];
+        return $pixelMappingForTask[$fontFamily][$fontSize] ?? [];
     }
     
     /**
@@ -136,6 +162,8 @@ class editor_Models_Segment_PixelLength {
      */
     protected function addPixelMappingForFont(string $fontFamily, int $fontSize) {
         $fontFamily = strtolower($fontFamily);
+        settype($this->pixelMappingForTask[$fontFamily], 'array');
+        settype($this->pixelMappingForTask[$fontFamily][$fontSize], 'array');
         // If there is anything set in the database, add it:
         $pixelMappingForFont = $this->pixelMapping->getPixelMappingByFont($this->customerId, $fontFamily, $fontSize);
         if (!empty($pixelMappingForFont)) {
@@ -195,9 +223,11 @@ class editor_Models_Segment_PixelLength {
             }
             
             if (is_null($charWidth)) {
-                $msg = 'textlength by pixel failed; most probably data about the pixelWidth is missing';
-                $msg .= ' ('. $fontFamily. ', font-size ' . $fontSize . ')';
-                throw new ZfExtended_Exception($msg);
+                //textlength by pixel failed; most probably data about the pixelWidth is missing
+                throw new editor_Models_Segment_Exception('E10', [
+                    'fontFamily' => $fontFamily,
+                    'fontSize' => $fontSize,
+                ]);
             }
             
             $pixelLength += $charWidth;
@@ -206,15 +236,13 @@ class editor_Models_Segment_PixelLength {
         
         if (!empty($charsNotSet)) {
             sort($charsNotSet);
-            $customer = ZfExtended_Factory::get('editor_Models_Customer');
-            /* @var $customer editor_Models_Customer */
-            $customer->load($this->customerId);
             
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $logMsg = 'No pixel-width set for ('.$fontFamily . ', font-size: '. $fontSize .', Customer: ' . $customer.')' . "\n";
-            $logMsg .= 'Default width '.$pixelMappingForSegment['default'].'px for character used. Affected characters: '."\n".$charsNotSetMsg;
-            $log->log('Segment length calculation: missing pixel width', $logMsg);
+            $logData = new stdClass();
+            $logData->fontFamily = $fontFamily;
+            $logData->fontSize = $fontSize;
+            $logData->default = $pixelMappingForSegment['default'];
+            $logData->affectedCharacters = $charsNotSetMsg;
+            $this->logMissingData[] = $logData;
         }
         
         return $pixelLength;

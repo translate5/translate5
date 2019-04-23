@@ -68,7 +68,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /**
-     * Updates the tasks real delivery date to the current timestamp
+     * ends the task
      */
     public function endTask() {
         $task = $this->config->task;
@@ -87,8 +87,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         }
         
         if($oldTask->getState() != $task->getState()) {
-            $user = new Zend_Session_Namespace('user');
-            editor_Models_LogTask::createWithUserGuid($task->getTaskGuid(), $task->getState(), $user->data->userGuid);
+            $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
+            $log->debug('E1013', 'task ended via workflow action');
         }
         
         $task->save();
@@ -195,13 +195,10 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         ->where('targetDeliveryDate < CURRENT_DATE');
         $taskRows = $db->fetchAll($s);
         
-        //affected user:
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         foreach($taskRows as $row) {
             $task->loadByTaskGuid($row['taskGuid']);
             //its much easier to load the entity as setting it (INSERT instead UPDATE issue on save, because of internal zend things on initing rows)
             $tua->load($row['id']);
-            $user->loadByGuid($row['userGuid']);
             $workflow->doWithTask($task, $task); //nothing changed on task directly, but call is needed
             $tuaNew = clone $tua;
             $tuaNew->setState($workflow::STATE_FINISH);
@@ -209,13 +206,14 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $workflow->triggerBeforeEvents($tua, $tuaNew);
             $tuaNew->save();
             $workflow->doWithUserAssoc($tua, $tuaNew);
-            editor_Models_LogTask::create($row['taskGuid'], $workflow::STATE_FINISH, $this->config->authenticatedUser, $user);
         }
+        $log = ZfExtended_Factory::get('editor_Logger_Workflow', [$task]);
+        $log->debug('E1013', 'finish overdued task via workflow action');
     }
     
     /***
      * Delete all tasks where the task status is 'end',
-     * and the last entry for this task in LEK_task_log table is older than x days (where x is zf_config variable)
+     * and the last modified date for this task is older than x days (where x is zf_config variable)
      */
     public function deleteOldEndedTasks(){
         $taskModel=ZfExtended_Factory::get('editor_Models_Task');

@@ -29,5 +29,17 @@ END LICENSE AND COPYRIGHT
 /**
  * Okapi Exception
  */
-class editor_Plugins_Okapi_Exception extends ZfExtended_Exception {
+class editor_Plugins_Okapi_Exception extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'plugin.okapi';
+    
+    static protected $localErrorCodes = [
+        'E1055' => 'Okapi Plug-In: Bconf not given or not found: {bconfFile}',
+        'E1056' => 'Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix: {workfile}',
+        'E1057' => 'Okapi Plug-In: Data dir not writeable: {okapiDataDir}',
+        'E1058' => 'Okapi Plug-In: Error in converting a file: "{message}" on converting file {file}',
+        'E1059' => 'Okapi Plug-In: Configuration error - no Okapi server URL is configured!',
+    ];
 }
