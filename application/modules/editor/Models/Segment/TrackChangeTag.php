@@ -188,11 +188,12 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * @param string $text
      */
     public function renderAnonymizedTrackChangeData (string $text) {
-        // The different users can be distinguished by the css-colors,
-        // hence here we skip turning e.g. "Project Manager" into e.g. "User1".
-        $text = preg_replace('/data-userguid=".*?"/', 'data-userguid=""', $text);
-        $text = preg_replace('/data-username=".*?"/', 'data-username=""', $text);
         return $text;
+        // TODO: WHAT to do??
+        // - After really removing the user-data, it will be gone forever
+        // when the segment gets saved.
+        // - But when anonymizing the tool-tip only, the user-data is still
+        // set and accessable in the INS- and DEL-Tags.
     }
 
 }

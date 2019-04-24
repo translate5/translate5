@@ -167,6 +167,8 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
         // anonymize data about OTHER workflow users only
         $sessionUser = new Zend_Session_Namespace('user');
         if ($userGuid === $sessionUser->data->userGuid) {
+            // TODO: this will not work for anonymizing user-data in TrackChange-Tags; 
+            // the users they list are completely independent from anything given here
             return $data;
         }
         return $this->anonymizeUserdata($taskGuid, $data);
