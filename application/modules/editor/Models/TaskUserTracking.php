@@ -163,7 +163,10 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function anonymizeOtherUserdata($taskGuid, array $data) {
-        $userGuid = $data['userGuid'];
+        $userGuid = $data['userGuid'] ?? null;
+        if (is_null($userGuid)) {
+            $userGuid = $data['lockingUser'] ?? '';
+        }
         // anonymize data about OTHER workflow users only
         $sessionUser = new Zend_Session_Namespace('user');
         if ($userGuid === $sessionUser->data->userGuid) {
@@ -181,13 +184,17 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function anonymizeUserdata($taskGuid, array $data) {
-        $userGuid = $data['userGuid'];
+        $userGuid = $data['userGuid'] ?? '';
+        $lockingUser = $data['lockingUser'] ?? '';
         $keysToAnonymize = ['comments','firstName','lockingUser','lockingUsername','login','userGuid','userName','surName','targetEdit'];
-        array_walk($data, function( &$value, $key) use ($taskGuid, $userGuid, $keysToAnonymize) {
+        array_walk($data, function( &$value, $key) use ($keysToAnonymize, $lockingUser, $taskGuid, $userGuid) {
             if ($value != '' && in_array($key, $keysToAnonymize)) {
                 switch ($key) {
                     case 'comments':
                         $value = $this->renderAnonymizedComment($value);
+                        break;
+                    case 'lockingUsername':
+                        $value = $this->renderAnonymizedUserName($taskGuid, $lockingUser);
                         break;
                     case 'targetEdit':
                         $value = $this->renderAnonymizedTargetEdit($value);
@@ -206,6 +213,7 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * renders anonymized comment as markedUp in "comment.phtml"
+     * @param string $value
      * @return string
      */
     protected function renderAnonymizedComment($value) {
@@ -217,6 +225,8 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * renders an anonymized version of the username:
      * - "User1", "User2" etc if tracking-data is available
      * - "User" otherwise
+     * @param string $taskGuid
+     * @param string $userGuid
      * @return string
      */
     protected function renderAnonymizedUserName ($taskGuid, $userGuid) {
@@ -229,6 +239,7 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * renders anonymized target
+     * @param string $value
      * @return string
      */
     protected function renderAnonymizedTargetEdit($value) {

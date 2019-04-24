@@ -194,7 +194,8 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $taskUserTracking editor_Models_TaskUserTracking */
         foreach ($this->view->rows as &$rowTask) {
             $task->loadByTaskGuid($rowTask['taskGuid']);
-            if ($task->anonymizeUsers()) { 
+            if ($task->anonymizeUsers()) {
+                $rowTask = $taskUserTracking->anonymizeOtherUserdata($rowTask['taskGuid'], $rowTask);
                 if(!empty($rowTask['users'])) {
                     foreach ($rowTask['users'] as &$row) {
                         $row = $taskUserTracking->anonymizeOtherUserdata($row['taskGuid'], $row);
