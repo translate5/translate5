@@ -56,37 +56,11 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
     
     /**
-     * @var ZfExtended_Zendoverwrites_Translate
-     */
-    protected $translate;
-    
-    /**
-     * @var editor_Models_Comment
-     */
-    protected $commentHelper;
-    
-    /**
-     * @var editor_Models_Segment_TrackChangeTag
-     */
-    protected $trackChangeTagHelper;
-    
-    
-    
-    /**
-     */
-    public function __construct(){
-        $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        $this->commentHelper = ZfExtended_Factory::get('editor_Models_Comment');
-        $this->trackChangeTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        parent::__construct();
-    }
-    
-    /**
      * loads the TaskUserTracking-entry for the given task and user (= unique)
      * @param string $taskGuid
      * @param string $userGuid
      */
-    protected function loadEntry($taskGuid, $userGuid) {
+    public function loadEntry($taskGuid, $userGuid) {
         try {
             $s = $this->db->select()
                 ->where('taskGuid = ?', $taskGuid)
@@ -109,8 +83,11 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * returns the taskOpenerNumber of the currently loaded entry or null (we might not have a TaskUserTracking-entry loaded; that's ok).
      * @return NULL|number
      */
-    protected function getTaskOpenerNumberForUser(){
-        return $this->getTaskOpenerNumber() ?? null;
+    public function getTaskOpenerNumberForUser(){
+        if (is_null($this->row)){
+            return null;
+        }
+        return $this->getTaskOpenerNumber();
     }
     
     /**
@@ -150,100 +127,5 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
         $s->where('taskGuid = ?', $taskguid);
         return $this->computeTotalCount($s);
         
-    }
-    
-    // -------------------------------------------------------------------------
-    // ANONYMIZING (could be refactored into a class on it's own)
-    // -------------------------------------------------------------------------
-    
-    /**
-     * anonymizes all user-related data of other workflow users
-     * @param string $taskGuid
-     * @param array $data
-     * @return array
-     */
-    public function anonymizeOtherUserdata($taskGuid, array $data) {
-        $userGuid = $data['userGuid'] ?? null;
-        if (is_null($userGuid)) {
-            $userGuid = $data['lockingUser'] ?? '';
-        }
-        // anonymize data about OTHER workflow users only
-        $sessionUser = new Zend_Session_Namespace('user');
-        if ($userGuid === $sessionUser->data->userGuid) {
-            // TODO: this will not work for anonymizing user-data in TrackChange-Tags; 
-            // the users they list are completely independent from anything given here
-            return $data;
-        }
-        return $this->anonymizeUserdata($taskGuid, $data);
-    }
-    
-    /**
-     * anonymizes all user-related data in $data
-     * @param string $taskGuid
-     * @param array $data
-     * @return array
-     */
-    public function anonymizeUserdata($taskGuid, array $data) {
-        $userGuid = $data['userGuid'] ?? '';
-        $lockingUser = $data['lockingUser'] ?? '';
-        $keysToAnonymize = ['comments','firstName','lockingUser','lockingUsername','login','userGuid','userName','surName','targetEdit'];
-        array_walk($data, function( &$value, $key) use ($keysToAnonymize, $lockingUser, $taskGuid, $userGuid) {
-            if ($value != '' && in_array($key, $keysToAnonymize)) {
-                switch ($key) {
-                    case 'comments':
-                        $value = $this->renderAnonymizedComment($value);
-                        break;
-                    case 'lockingUsername':
-                        $value = $this->renderAnonymizedUserName($taskGuid, $lockingUser);
-                        break;
-                    case 'targetEdit':
-                        $value = $this->renderAnonymizedTargetEdit($value);
-                        break;
-                    case 'userName':
-                        $value = $this->renderAnonymizedUserName($taskGuid, $userGuid);
-                        break;
-                    default:
-                        $value = '';
-                        break;
-                }
-            }
-        });
-        return $data;
-    }
-    
-    /**
-     * renders anonymized comment as markedUp in "comment.phtml"
-     * @param string $value
-     * @return string
-     */
-    protected function renderAnonymizedComment($value) {
-        // replace author given in <span class="author">xyz</span>
-        return $this->commentHelper->renderAnonymizedComment($value);
-    }
-    
-    /**
-     * renders an anonymized version of the username:
-     * - "User1", "User2" etc if tracking-data is available
-     * - "User" otherwise
-     * @param string $taskGuid
-     * @param string $userGuid
-     * @return string
-     */
-    protected function renderAnonymizedUserName ($taskGuid, $userGuid) {
-        $this->loadEntry($taskGuid, $userGuid);
-        if(is_null($this->row)) {
-            return $this->translate->_('Benutzer');
-        }
-        return $this->translate->_('Benutzer') . '' . $this->getTaskOpenerNumberForUser();
-    }
-    
-    /**
-     * renders anonymized target
-     * @param string $value
-     * @return string
-     */
-    protected function renderAnonymizedTargetEdit($value) {
-        // replace data-userguid und data-username in TrackChanges:
-        return $this->trackChangeTagHelper->renderAnonymizedTrackChangeData($value);
     }
 }

@@ -861,7 +861,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * No personal information about other workflow users is visible in the workflow,
      * (1) if anonymizeUsers is checked (set to true)
      * (2) for all users that do not have the roles admin, pm or api 
-     * @return bool
+     * @return boolean
      */
     public function anonymizeUsers() {
         $config = $this->getConfig();

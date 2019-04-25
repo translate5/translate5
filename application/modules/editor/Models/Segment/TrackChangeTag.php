@@ -186,14 +186,55 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * anonymizes user-data in TrackChange-Tags in the given string 
      * (= replace data-userguid und data-username)
      * @param string $text
+     * @param string $taskGuid
+     * @return string
      */
-    public function renderAnonymizedTrackChangeData (string $text) {
+    public function renderAnonymizedTrackChangeData (string $text, $taskGuid) {
         return $text;
-        // TODO: WHAT to do??
-        // - After really removing the user-data, it will be gone forever
-        // when the segment gets saved.
-        // - But when anonymizing the tool-tip only, the user-data is still
-        // set and accessable in the INS- and DEL-Tags.
+        // TODOs before using this:
+        // - reset unananomyized data before saving (putAction() in SegmentController)
+        // - update TrackChange-Plugin to not use usename and guid eg when checking for same user etc
+        
+        $textAnon = $text;
+        $textAnon = preg_replace('/data-userguid=".*?"/', 'data-userguid=""', $textAnon);
+        $textAnon = preg_replace('/data-username=".*?"/', 'data-username=""', $textAnon);
+        
+        if (strcmp($textAnon, $text) === 0) {
+            return $text;
+        }
+        
+        $output = [];
+        $trackingData = array();
+        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+        /* @var $workflowAnonymize editor_Workflow_Anonymize */
+        $anonymizeUserguid = function($matchUserguid) use ($output, $taskGuid, &$trackingData, $userModel, $workflowAnonymize) {
+            parse_str($matchUserguid[0],$output);
+            $userGuid = trim($output['data-userguid'],'"');
+            $userName = $userModel->loadByGuid($userGuid)->getUserName();            
+            $userNameAnon = $workflowAnonymize->renderAnonymizedUserName($userName, $userGuid, $taskGuid);
+            if(!array_key_exists($userName, $trackingData)){
+                $trackingData[$userName] = $userNameAnon;
+            }
+            return 'data-userguid="'.$userNameAnon.'"'; // keep this info in order to later get the userGuid again
+        };
+        $anonymizeUsername = function($matchUsername) use ($output, &$trackingData) {
+            parse_str($matchUsername[0],$output);
+            $userName = trim($output['data-username'],'"');
+            return 'data-username="'.$trackingData[$userName].'"';
+        };
+        
+        $textAnon = $text;
+        $textAnon = preg_replace_callback(
+            '/data-userguid=".*?"/',
+            $anonymizeUserguid,
+            $textAnon);
+        $textAnon = preg_replace_callback(
+            '/data-username=".*?"/',
+            $anonymizeUsername,
+            $textAnon);
+        return $textAnon;
     }
 
 }

@@ -190,15 +190,15 @@ class editor_TaskController extends ZfExtended_RestController {
         // anonymize userinfo for view?
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
-        /* @var $taskUserTracking editor_Models_TaskUserTracking */
+        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+        /* @var $workflowAnonymize editor_Workflow_Anonymize */
         foreach ($this->view->rows as &$rowTask) {
             $task->loadByTaskGuid($rowTask['taskGuid']);
             if ($task->anonymizeUsers()) {
-                $rowTask = $taskUserTracking->anonymizeOtherUserdata($rowTask['taskGuid'], $rowTask);
+                $rowTask = $workflowAnonymize->anonymizeUserdata($rowTask['taskGuid'], $rowTask);
                 if(!empty($rowTask['users'])) {
                     foreach ($rowTask['users'] as &$row) {
-                        $row = $taskUserTracking->anonymizeOtherUserdata($row['taskGuid'], $row);
+                        $row = $workflowAnonymize->anonymizeUserdata($row['taskGuid'], $row);
                     }
                 }
             }
@@ -805,10 +805,10 @@ class editor_TaskController extends ZfExtended_RestController {
             /* @var $task editor_Models_Task */
             $task->loadByTaskGuid($taskguid);
             if ($task->anonymizeUsers()) {
-                $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
-                /* @var $taskUserTracking editor_Models_TaskUserTracking */
+                $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+                /* @var $workflowAnonymize editor_Workflow_Anonymize */
                 foreach ($this->view->rows->users as &$user) {
-                    $user = $taskUserTracking->anonymizeOtherUserdata($taskguid, $user);
+                    $user = $workflowAnonymize->anonymizeUserdata($taskguid, $user);
                 }
             }
         }

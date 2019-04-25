@@ -61,10 +61,10 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->session->taskGuid);
         if ($task->anonymizeUsers()) {
-            $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
-            /* @var $taskUserTracking editor_Models_TaskUserTracking */
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
             foreach ($this->view->rows as &$row) {
-                $row = $taskUserTracking->anonymizeOtherUserdata($this->session->taskGuid, $row);
+                $row = $workflowAnonymize->anonymizeUserdata($this->session->taskGuid, $row);
             }
         }
     }

@@ -119,10 +119,10 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
         if ($task->anonymizeUsers()) {
-            $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
-            /* @var $taskUserTracking editor_Models_TaskUserTracking */
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
             foreach ($this->view->rows as &$row) {
-                $row = $taskUserTracking->anonymizeOtherUserdata($taskGuid, $row);
+                $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row);
             }
         }
     }
