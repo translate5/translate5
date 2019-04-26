@@ -52,7 +52,6 @@ class editor_TaskController extends ZfExtended_RestController {
     
     /**
      * Cached map of userGuids and taskGuid to userNames
-     * (might differ if a task is anonymized or not)
      * @var array
      */
     protected $cachedUserInfo = array();

@@ -118,6 +118,7 @@ class editor_Workflow_Anonymize {
      * renders anonymized value as empty value
      * (anonymizes data about OTHER workflow users only)
      * @param string $value
+     * @param string $userGuid
      * @return string
      */
     protected function renderAnonymizedAsEmpty($value, $userGuid) {
@@ -131,6 +132,7 @@ class editor_Workflow_Anonymize {
      * renders anonymized comment as markedUp in "comment.phtml"
      * (anonymizes data about OTHER workflow users only)
      * @param string $value
+     * @param string $userGuid
      * @return string
      */
     protected function renderAnonymizedComment($value, $userGuid) {
@@ -146,19 +148,41 @@ class editor_Workflow_Anonymize {
      * - "User1", "User2" etc if tracking-data is available
      * - "User" otherwise
      * (anonymizes data about OTHER workflow users only)
-     * @param string $taskGuid
+     * @param string $value
      * @param string $userGuid
+     * @param string $taskGuid
      * @return string
      */
     public function renderAnonymizedUserName ($value, $userGuid, $taskGuid) {
         if (!$this->isOtherWorkflowUser($userGuid)) {
             return $value;
         }
+        $userPrefix = $this->translate->_('Benutzer');
         $this->taskUserTracking->loadEntry($taskGuid, $userGuid);
         if(is_null($this->taskUserTracking->getTaskOpenerNumberForUser())) {
-            return $this->translate->_('Benutzer');
+            return $userPrefix;
         }
-        return $this->translate->_('Benutzer') . '' . $this->taskUserTracking->getTaskOpenerNumberForUser();
+        return $userPrefix . '' . $this->taskUserTracking->getTaskOpenerNumberForUser();
+    }
+    
+    /**
+     * renders the real username of the given anonymized username (= as anonymized by renderAnonymizedUserName()!)
+     * @param string $taskGuid
+     * @param string $userNameAnon
+     * @param string $taskGuid
+     * @return string
+     */
+    public function renderUnanonymizedUserName($value, $userNameAnon, $taskGuid) {
+        $userPrefix = $this->translate->_('Benutzer');
+        $taskOpenerNumber = substr($userNameAnon, strlen($userPrefix));
+        if(!filter_var($taskOpenerNumber, FILTER_VALIDATE_INT)){
+            return $userNameAnon;
+        }
+        $this->taskUserTracking->loadEntryByTaskOpenerNumber($taskGuid, $taskOpenerNumber);
+        if(is_null($this->taskUserTracking->getUsernameForUser())) {
+            return $userNameAnon;
+        }
+        return $this->taskUserTracking->getUsernameForUser();
     }
     
     /**

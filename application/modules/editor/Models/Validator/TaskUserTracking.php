@@ -45,6 +45,8 @@ class editor_Models_Validator_TaskUserTracking extends ZfExtended_Models_Validat
         $this->addValidator('firstName', 'stringLength', array('min' => 0, 'max' => 255));
         //`surName` varchar(255) NOT NULL,
         $this->addValidator('surName', 'stringLength', array('min' => 0, 'max' => 255));
+        //`userName` varchar(255) NOT NULL,
+        $this->addValidator('userName', 'stringLength', array('min' => 0, 'max' => 255));
         //`role` varchar(60) NOT NULL,
         $this->addValidator('role', 'stringLength', array('min' => 0, 'max' => 60));
         

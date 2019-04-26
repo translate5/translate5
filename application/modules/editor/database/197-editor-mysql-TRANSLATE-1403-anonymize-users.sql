@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `LEK_taskUserTracking` (
   `taskOpenerNumber` INT(3) NOT NULL,
   `firstName` VARCHAR(255) NOT NULL,
   `surName` VARCHAR(255) NOT NULL,
+  `userName` VARCHAR(255) NOT NULL,
   `role` VARCHAR(60) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

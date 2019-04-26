@@ -184,22 +184,17 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     
     /**
      * anonymizes user-data in TrackChange-Tags in the given string 
-     * (= replace data-userguid und data-username)
+     * (= replace data-userguid und data-username with anonymized version)
      * @param string $text
-     * @param string $taskGuid
+     * @param string $taskGuid (needed to access TaskUserTracking if matches are found)
      * @return string
      */
     public function renderAnonymizedTrackChangeData (string $text, $taskGuid) {
         return $text;
         // TODOs before using this:
-        // - reset unananomyized data before saving (putAction() in SegmentController)
-        // - update TrackChange-Plugin to not use usename and guid eg when checking for same user etc
+        // - update TrackChange-Plugin to not use username and guid eg when checking for same user etc
         
-        $textAnon = $text;
-        $textAnon = preg_replace('/data-userguid=".*?"/', 'data-userguid=""', $textAnon);
-        $textAnon = preg_replace('/data-username=".*?"/', 'data-username=""', $textAnon);
-        
-        if (strcmp($textAnon, $text) === 0) {
+        if (!$this->hasUserdataToAnonymize($text, $taskGuid)) { 
             return $text;
         }
         
@@ -212,7 +207,12 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $anonymizeUserguid = function($matchUserguid) use ($output, $taskGuid, &$trackingData, $userModel, $workflowAnonymize) {
             parse_str($matchUserguid[0],$output);
             $userGuid = trim($output['data-userguid'],'"');
-            $userName = $userModel->loadByGuid($userGuid)->getUserName();            
+            try {
+                $userModel->loadByGuid($userGuid);
+            } catch (Exception $e) {
+                return $matchUserguid[0];
+            }
+            $userName = $userModel->getUserName();
             $userNameAnon = $workflowAnonymize->renderAnonymizedUserName($userName, $userGuid, $taskGuid);
             if(!array_key_exists($userName, $trackingData)){
                 $trackingData[$userName] = $userNameAnon;
@@ -222,19 +222,107 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $anonymizeUsername = function($matchUsername) use ($output, &$trackingData) {
             parse_str($matchUsername[0],$output);
             $userName = trim($output['data-username'],'"');
-            return 'data-username="'.$trackingData[$userName].'"';
+            if(array_key_exists($userName, $trackingData)) {
+                return 'data-username="'.$trackingData[$userName].'"';
+            } else {
+                return $matchUsername[0];
+            }
         };
         
-        $textAnon = $text;
-        $textAnon = preg_replace_callback(
+        $text = preg_replace_callback(
             '/data-userguid=".*?"/',
             $anonymizeUserguid,
-            $textAnon);
-        $textAnon = preg_replace_callback(
+            $text);
+        $text = preg_replace_callback(
             '/data-username=".*?"/',
             $anonymizeUsername,
-            $textAnon);
-        return $textAnon;
+            $text);
+        return $text;
+    }
+    
+    /**
+     * resets anonymized user-data in TrackChange-Tags in the given string
+     * (= replace data-userguid und data-username with real userguid and username)
+     * @param string $text
+     * @param string $taskGuid (needed to access TaskUserTracking if matches are found)
+     * @return string
+     */
+    public function renderUnanonymizedTrackChangeData (string $text, $taskGuid) {
+        return $text;
+        // TODOs before using this:
+        // - update TrackChange-Plugin to not use username and guid eg when checking for same user etc
+        
+        if (!$this->hasUserdataToAnonymize($text, $taskGuid)) {
+            return $text;
+        }
+        
+        $output = [];
+        $trackingData = array();
+        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $taskUserTracking editor_Models_TaskUserTracking */
+        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+        /* @var $workflowAnonymize editor_Workflow_Anonymize */
+        $unanonymizeUsername = function($matchUsername) use ($output, $taskGuid, $taskUserTracking, &$trackingData, $userModel, $workflowAnonymize) {
+            parse_str($matchUsername[0],$output);
+            $userNameAnon = trim($output['data-username'],'"');
+            $userName = $workflowAnonymize->renderUnanonymizedUserName($userNameAnon, $userNameAnon, $taskGuid);
+            try {
+                $taskUserTracking->loadEntryByUserName($taskGuid, $userName);
+            } catch (Exception $e) {
+                return $matchUsername[0];
+            }
+            $userGuid = $taskUserTracking->getUserGuid();
+            if(!array_key_exists($userNameAnon, $trackingData)){
+                $trackingData[$userNameAnon] = $userGuid;
+            }
+            return 'data-username="'.$userName.'"';
+        };
+        $unanonymizeUserguid = function($matchUserguid) use ($output, &$trackingData) {
+            parse_str($matchUserguid[0],$output);
+            $userNameAnon = trim($output['data-userguid'],'"'); // the anonymized version of the userguid contains the anonymized username
+            if(array_key_exists($userNameAnon, $trackingData)) {
+                return 'data-userguid="'.$trackingData[$userNameAnon].'"';
+            } else {
+                return $matchUserguid[0];
+            }
+        };
+        
+        $text = preg_replace_callback(
+            '/data-username=".*?"/',
+            $unanonymizeUsername,
+            $text);
+        $text = preg_replace_callback(
+            '/data-userguid=".*?"/',
+            $unanonymizeUserguid,
+            $text);
+        return $text;
+    }
+    
+    /**
+     * Does the given text contain any user-related data for anonymizing?
+     * @param string $text
+     * @return boolean
+     */
+    protected function hasUserdataToAnonymize($text, $taskGuid) {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        if (!$task->anonymizeUsers()) {
+            // If the task's users are not to be anonymized, there is nothing to anonymize anyway
+            return false;
+        }
+        
+        $hasUserguid = preg_match('/data-userguid=".*?"/', $text);
+        if ($hasUserguid === 1) {
+            return true;
+        }
+        $hasUsername = preg_match('/data-username=".*?"/', $text);
+        if ($hasUsername === 1) {
+            return true;
+        }
+        return false;
     }
 
 }

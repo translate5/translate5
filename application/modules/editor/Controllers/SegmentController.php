@@ -619,6 +619,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $nbsp = json_decode('"\u00a0"');
         $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $internalTag editor_Models_Segment_InternalTag */
+        $trackChangeTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChangeTagHelper editor_Models_Segment_TrackChangeTag */
         foreach($this->data as $key => $data) {
             //consider only changeable datafields:
             if(! in_array($key, $fieldnames)) {
@@ -638,6 +640,9 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
             // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
             $data = $this->parseSegmentProtectWhitespace($data, 'strip_tags');
+            
+            // ... and get real userdata instead of anonymized versions in TrackChange-Tags ...
+            $data = $trackChangeTagHelper->renderUnanonymizedTrackChangeData($data, $this->entity->getTaskGuid());
 
             //revoke the internaltag replacement
             $data = $internalTag->unprotect($data);

@@ -47,6 +47,8 @@ END LICENSE AND COPYRIGHT
  * @method void setFirstName() setFirstName(string $guid)
  * @method string getSurName() getSurName()
  * @method void setSurName() setSurName(string $guid)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $guid)
  * @method string getRole() getRole()
  * @method void setRole() setRole(string $guid)
  * 
@@ -56,11 +58,12 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
     
     /**
-     * loads the TaskUserTracking-entry for the given task and user (= unique)
+     * loads the TaskUserTracking-entry for the given task and userGuid (= unique)
      * @param string $taskGuid
      * @param string $userGuid
      */
     public function loadEntry($taskGuid, $userGuid) {
+        $row = null;
         try {
             $s = $this->db->select()
                 ->where('taskGuid = ?', $taskGuid)
@@ -71,12 +74,50 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
             // - if a task has been imported and opened before TaskUserTracking has been implemented
             // - if a user is assigned to a task, but has never opened the task so far
         }
-        if ($row) {
-            //load implies loading one Row, so use only the first row
-            $this->row = $row;
-        } else {
-            $this->row = null;
+        //load implies loading one Row, so use only the first row (or null if no entry exists)
+        $this->row = $row;
+    }
+    
+    /**
+     * loads the TaskUserTracking-entry for the given task and userName (= unique)
+     * @param string $taskGuid
+     * @param string $userGuid
+     */
+    public function loadEntryByUserName($taskGuid, $userName) {
+        $row = null;
+        try {
+            $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('userName = ?', $userName);
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            // Don't throw a not-found. There might correctly not exist any data for the user; e.g.
+            // - if a task has been imported and opened before TaskUserTracking has been implemented
+            // - if a user is assigned to a task, but has never opened the task so far
         }
+        //load implies loading one Row, so use only the first row (or null if no entry exists)
+        $this->row = $row;
+    }
+    
+    /**
+     * loads the TaskUserTracking-entry for the given task and taskOpenerNumber (= unique)
+     * @param string $taskGuid
+     * @param string $userGuid
+     */
+    public function loadEntryByTaskOpenerNumber($taskGuid, $taskOpenerNumber) {
+        $row = null;
+        try {
+            $s = $this->db->select()
+            ->where('taskGuid = ?', $taskGuid)
+            ->where('taskOpenerNumber = ?', $taskOpenerNumber);
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            // Don't throw a not-found. There might correctly not exist any data for the user; e.g.
+            // - if a task has been imported and opened before TaskUserTracking has been implemented
+            // - if a user is assigned to a task, but has never opened the task so far
+        }
+        //load implies loading one Row, so use only the first row (or null if no entry exists)
+        $this->row = $row;
     }
     
     /**
@@ -88,6 +129,17 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
             return null;
         }
         return $this->getTaskOpenerNumber();
+    }
+    
+    /**
+     * returns the (real, as tracked) username of the currently loaded entry or null (we might not have a TaskUserTracking-entry loaded; that's ok).
+     * @return NULL|string
+     */
+    public function getUsernameForUser(){
+        if (is_null($this->row)){
+            return null;
+        }
+        return $this->getUserName();
     }
     
     /**
@@ -104,11 +156,12 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
         $user->loadByGuid($userGuid);
         $firstName = $user->getFirstName();
         $surName = $user->getSurName();
-        $sql= 'INSERT INTO LEK_taskUserTracking (`taskGuid`,`userGuid`,`taskOpenerNumber`,`firstName`,`surName`,`role`) VALUES (?, ?, ?, ?, ?, ?)
-               ON DUPLICATE KEY UPDATE `firstName` = ?,`surName` = ?,`role` = ?';
+        $userName = $user->getUserName();
+        $sql= 'INSERT INTO LEK_taskUserTracking (`taskGuid`,`userGuid`,`taskOpenerNumber`,`firstName`,`surName`,`userName`,`role`) VALUES (?, ?, ?, ?, ?, ?, ?)
+               ON DUPLICATE KEY UPDATE `firstName` = ?,`surName` = ?,`userName` = ?,`role` = ?';
         $bindings = array(
-            $taskguid, $userGuid, $taskOpenerNumber, $firstName, $surName, $role, 
-            $firstName, $surName, $role
+            $taskguid, $userGuid, $taskOpenerNumber, $firstName, $surName, $userName, $role, 
+            $firstName, $surName, $userName, $role
         );
         try {
             $res = $this->db->getAdapter()->query($sql, $bindings);
