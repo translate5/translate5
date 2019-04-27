@@ -341,6 +341,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         
+        // anonymize users for view?
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            $rows = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 2 must be of the type array
+            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $rows);
+        }
+        
         //call after segment put handler
         $this->handleAfterSegmentPut();
     }

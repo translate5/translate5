@@ -110,7 +110,6 @@ class editor_Workflow_Anonymize {
      * @return boolean
      */
     public function isOtherWorkflowUser($userGuid) {
-        return true;
         return $userGuid !== $this->sessionUserGuid;
     }
     

@@ -190,9 +190,6 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * @return string
      */
     public function renderAnonymizedTrackChangeData (string $text, $taskGuid) {
-        return $text;
-        // TODOs before using this:
-        // - update TrackChange-Plugin to not use username and guid eg when checking for same user etc
         
         if (!$this->hasUserdataToAnonymize($text, $taskGuid)) { 
             return $text;
@@ -209,15 +206,18 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
             $userGuid = trim($output['data-userguid'],'"');
             try {
                 $userModel->loadByGuid($userGuid);
+                $userName = $userModel->getUserName();
+                $userNameAnon = $workflowAnonymize->renderAnonymizedUserName($userName, $userGuid, $taskGuid);
             } catch (Exception $e) {
-                return $matchUserguid[0];
+                $userNameAnon = $userName;
             }
-            $userName = $userModel->getUserName();
-            $userNameAnon = $workflowAnonymize->renderAnonymizedUserName($userName, $userGuid, $taskGuid);
+            if (!$workflowAnonymize->isOtherWorkflowUser($userGuid)) {
+                $userNameAnon = $userName;
+            }
             if(!array_key_exists($userName, $trackingData)){
                 $trackingData[$userName] = $userNameAnon;
             }
-            return 'data-userguid="'.$userNameAnon.'"'; // keep this info in order to later get the userGuid again
+            return 'data-userguid="'.$userNameAnon.'"'; // keep $userNameAnon in order to later get the userGuid again; see renderUnanonymizedTrackChangeData()
         };
         $anonymizeUsername = function($matchUsername) use ($output, &$trackingData) {
             parse_str($matchUsername[0],$output);
@@ -248,9 +248,6 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * @return string
      */
     public function renderUnanonymizedTrackChangeData (string $text, $taskGuid) {
-        return $text;
-        // TODOs before using this:
-        // - update TrackChange-Plugin to not use username and guid eg when checking for same user etc
         
         if (!$this->hasUserdataToAnonymize($text, $taskGuid)) {
             return $text;
@@ -270,14 +267,17 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
             $userName = $workflowAnonymize->renderUnanonymizedUserName($userNameAnon, $userNameAnon, $taskGuid);
             try {
                 $taskUserTracking->loadEntryByUserName($taskGuid, $userName);
+                $userGuid = $taskUserTracking->getUserGuid();
+                if(!$workflowAnonymize->isOtherWorkflowUser($userGuid)) {
+                    $userName = $userNameAnon;
+                }
+                if(!array_key_exists($userNameAnon, $trackingData)){
+                    $trackingData[$userNameAnon] = $userGuid;
+                }
+                return 'data-username="'.$userName.'"';
             } catch (Exception $e) {
                 return $matchUsername[0];
             }
-            $userGuid = $taskUserTracking->getUserGuid();
-            if(!array_key_exists($userNameAnon, $trackingData)){
-                $trackingData[$userNameAnon] = $userGuid;
-            }
-            return 'data-username="'.$userName.'"';
         };
         $unanonymizeUserguid = function($matchUserguid) use ($output, &$trackingData) {
             parse_str($matchUserguid[0],$output);
