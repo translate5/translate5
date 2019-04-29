@@ -168,7 +168,7 @@ Ext.define('Editor.view.admin.log.Grid', {
                         iconCls: 'ico-refresh',
                         text: me.strings.reload,
                         handler: function() {
-                            me.store.reload();
+                            me.down('gridpanel').store.reload();
                         }
                     }]
                 }]
