@@ -147,7 +147,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     
     /**
      * Associates automatically a different PM (The one who starts the import is the default) to the task by the PMs languages
-     * @return the new PM user, false if no one found
+     * @return ZfExtended_Models_User|false the new PM user, false if no one found
      */
     public function autoAssociateTaskPm() {
         $task = $this->config->task;

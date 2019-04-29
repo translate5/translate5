@@ -595,7 +595,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * http://jira.translate5.net/browse/TRANSLATE-781
      * 
      * @param string $segment
-     * @return type
+     * @return string
      */
     protected function parseSegmentUnifyInternalTags($segment) {
         $search = array(

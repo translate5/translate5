@@ -326,7 +326,7 @@ class editor_Plugins_GlobalesePreTranslation_Connector {
     
     /***
      * Start the translation for file with the given fileid
-     * @param unknown $fileId
+     * @param string $fileId
      */
     private function translateFile($fileId){
         $url='translation-files/'.$fileId.'/translate';

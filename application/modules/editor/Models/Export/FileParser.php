@@ -247,7 +247,7 @@ abstract class editor_Models_Export_FileParser {
      * for overwriting purposes only
      * @param array $file
      * @param int $i
-     * @param type $id
+     * @param string $id
      */
     protected function writeCommentGuidToSegment(array $file, int $i, $id) {
     }

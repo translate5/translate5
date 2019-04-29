@@ -98,7 +98,7 @@ class editor_Services_Connector {
      * Invoke search resource action so the MT logger can be used
      * @param string $searchString
      * @param string $field
-     * @param unknown $offset
+     * @param integer $offset
      * @return editor_Services_ServiceResult
      */
     public function search(string $searchString, $field = 'source', $offset = null) {

@@ -96,7 +96,7 @@ class editor_Models_Export_FileParser_Transit extends editor_Models_Export_FileP
     /**
      * sets $this->_skeletonFile to the contents of the target instead of the zip, which is in DB
      * moves the sourcefile to the exportDir
-     * @param type $extractDir
+     * @param string $extractDir
      * @throws Zend_Exception
      */
     protected function setSkeletonFiles($extractDir) {

@@ -34,7 +34,7 @@ trait editor_Plugins_Transit_TraitParse {
     
     /**
      * 
-     * @param type $text
+     * @param string $text
      * @return boolean
      */
     protected function containsOnlyTagsOrEmpty($text){

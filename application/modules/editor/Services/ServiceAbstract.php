@@ -67,7 +67,7 @@ abstract class editor_Services_ServiceAbstract {
     
     /**
      * Adds resource for a given list of URLs
-     * @see addResource
+     * @see self::addResource
      * @param string $name
      * @param array $urls
      */

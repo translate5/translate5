@@ -97,7 +97,7 @@ class editor_Models_Converter_SegmentsToXliff extends editor_Models_Converter_Se
     
     
     /**
-     * @var current tag map of replaced internal tags with g/x/bx/ex tags
+     * @var array current tag map of replaced internal tags with g/x/bx/ex tags
      */
     protected $tagMap;
     

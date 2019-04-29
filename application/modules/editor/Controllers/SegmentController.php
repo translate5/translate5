@@ -791,7 +791,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /***
      * Check if the task contains mqm tags for some of the segments
-     * @param taskGuid $taskGuid
+     * @param string $taskGuid
      * @return boolean
      */
     private function isMqmTask($taskGuid){

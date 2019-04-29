@@ -127,9 +127,7 @@ class editor_Plugins_TermTagger_Service {
     
     /**
      * Checks if there is a TermTagger-server behind $url.
-     * 
-     * @param url $url url of the TermTagger-Server
-     * 
+     * @param string $url url of the TermTagger-Server
      * @return boolean true if there is a TermTagger-Server behind $url 
      */
     public function testServerUrl(string $url, &$version = null) {
@@ -267,7 +265,7 @@ class editor_Plugins_TermTagger_Service {
     /**
      * TermTaggs segment-text(s) in $data on TermTagger-server $url 
      * 
-     * @param unknown $url
+     * @param string $url
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
      * 
      * @return Zend_Http_Response or null on error

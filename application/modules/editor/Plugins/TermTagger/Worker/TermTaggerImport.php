@@ -94,7 +94,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     
     /**
      * Method for CallBack Workers to reset the termtag state
-     * @param unknown $taskGuid
+     * @param string $taskGuid
      */
     public function resetTermtagState($taskGuid) {
         $segMetaDb = ZfExtended_Factory::get('editor_Models_Db_SegmentMeta');
@@ -297,7 +297,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
     /**
      * Save TermTagged-segments for $task povided in $segments
      * 
-     * @param unknown $segments
+     * @param array $segments
      */
     private function saveSegments($segments) {
         $fieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');

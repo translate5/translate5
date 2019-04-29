@@ -48,7 +48,7 @@ interface editor_Models_File_IFilter {
      * @param int $fileId
      * @param string $filePath
      * @param array $parameters
-     * @return the filename of the file (can be changed internally for further processing)
+     * @return string the filename of the file (can be changed internally for further processing)
      */
     public function applyImportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters);
     
@@ -57,7 +57,7 @@ interface editor_Models_File_IFilter {
      * @param int $fileId
      * @param string $filePath
      * @param array $parameters
-     * @return the filename of the file (can be changed internally for further processing)
+     * @return string the filename of the file (can be changed internally for further processing)
      */
     public function applyExportFilter(editor_Models_Task $task, $fileId, $filePath, $parameters);
 }

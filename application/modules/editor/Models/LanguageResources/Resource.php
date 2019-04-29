@@ -77,7 +77,7 @@ class editor_Models_LanguageResources_Resource {
     /**
      * index is the fieldname for export values in the controller
      * value is the internal fieldname / getter
-     * @var unknown
+     * @var array
      */
     protected $fieldsForController = array(
             'id' => 'id',

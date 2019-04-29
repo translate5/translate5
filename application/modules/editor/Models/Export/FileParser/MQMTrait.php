@@ -285,7 +285,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
     /**
      * 
      * @param array $array
-     * @param type $indexToPointTo
+     * @param mixed $indexToPointTo
      * @return boolean if successful or not
      */
     protected function setArrayPointer(array &$array, $indexToPointTo) {
