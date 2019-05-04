@@ -64,7 +64,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
             foreach ($this->view->rows as &$row) {
-                $row = $workflowAnonymize->anonymizeUserdata($this->session->taskGuid, $row);
+                $row = $workflowAnonymize->anonymizeUserdata($this->session->taskGuid, $row['userGuid'], $row);
             }
         }
     }

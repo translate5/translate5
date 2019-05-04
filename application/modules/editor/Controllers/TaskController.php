@@ -194,10 +194,10 @@ class editor_TaskController extends ZfExtended_RestController {
         foreach ($this->view->rows as &$rowTask) {
             $task->loadByTaskGuid($rowTask['taskGuid']);
             if ($task->anonymizeUsers()) {
-                $rowTask = $workflowAnonymize->anonymizeUserdata($rowTask['taskGuid'], $rowTask);
+                // anonymizeUserdata for $rowTask not needed, doesn't contain any user-related data but the lockinguser
                 if(!empty($rowTask['users'])) {
                     foreach ($rowTask['users'] as &$row) {
-                        $row = $workflowAnonymize->anonymizeUserdata($row['taskGuid'], $row);
+                        $row = $workflowAnonymize->anonymizeUserdata($row['taskGuid'], $row['userGuid'], $row);
                     }
                 }
             }
@@ -807,7 +807,7 @@ class editor_TaskController extends ZfExtended_RestController {
                 $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
                 /* @var $workflowAnonymize editor_Workflow_Anonymize */
                 foreach ($this->view->rows->users as &$user) {
-                    $user = $workflowAnonymize->anonymizeUserdata($taskguid, $user);
+                    $user = $workflowAnonymize->anonymizeUserdata($taskguid, $user['userGuid'], $user);
                 }
             }
         }
@@ -944,6 +944,7 @@ class editor_TaskController extends ZfExtended_RestController {
     
     /**
      * invokes taskUserTracking if its an opening or an editing request
+     * (no matter if the workflow-users of the task are to be anonymized or not)
      * param string $taskguid
      * @param array $userAssocInfos
      */

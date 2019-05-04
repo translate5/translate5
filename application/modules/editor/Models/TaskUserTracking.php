@@ -33,7 +33,15 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * TaskUserTracking Object Instance as needed in the application
+ * TaskUserTracking Object Instance as needed in the application.
+ * 
+ * The TaskController invokes the tracking everytime a task is opened,
+ * no matter if the workflow-users of the task are to be anonymized or not.
+ * Hence, the anonymizing of a task can be switched on and off at any time.
+ * 
+ * However, there might correctly not exist any data for a user of a task; e.g.
+ * - if a task has been imported and opened before TaskUserTracking has been implemented
+ * - if a user is assigned to a task, but has never opened the task so far
  * 
  * @method integer getId() getId()
  * @method void setId() setId(int $id)
@@ -58,45 +66,26 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     protected $validatorInstanceClass = 'editor_Models_Validator_TaskUserTracking';
     
     /**
+     * has a row been loaded at all?
+     * We correctly might not have any data for a user of a task; e.g.
+     * - if a task has been imported and opened before TaskUserTracking has been implemented
+     * - if a user is assigned to a task, but has never opened the task so far
+     * @return boolean
+     */
+    public function hasEntry() {
+        return (!is_null($this->row));
+    }
+    
+    /**
      * loads the TaskUserTracking-entry for the given task and userGuid (= unique)
      * @param string $taskGuid
      * @param string $userGuid
      */
     public function loadEntry($taskGuid, $userGuid) {
-        $row = null;
-        try {
-            $s = $this->db->select()
-                ->where('taskGuid = ?', $taskGuid)
-                ->where('userGuid = ?', $userGuid);
-            $row = $this->db->fetchRow($s);
-        } catch (Exception $e) {
-            // Don't throw a not-found. There might correctly not exist any data for the user; e.g.
-            // - if a task has been imported and opened before TaskUserTracking has been implemented
-            // - if a user is assigned to a task, but has never opened the task so far
-        }
-        //load implies loading one Row, so use only the first row (or null if no entry exists)
-        $this->row = $row;
-    }
-    
-    /**
-     * loads the TaskUserTracking-entry for the given task and userName (= unique)
-     * @param string $taskGuid
-     * @param string $userGuid
-     */
-    public function loadEntryByUserName($taskGuid, $userName) {
-        $row = null;
-        try {
-            $s = $this->db->select()
+        $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
-            ->where('userName = ?', $userName);
-            $row = $this->db->fetchRow($s);
-        } catch (Exception $e) {
-            // Don't throw a not-found. There might correctly not exist any data for the user; e.g.
-            // - if a task has been imported and opened before TaskUserTracking has been implemented
-            // - if a user is assigned to a task, but has never opened the task so far
-        }
-        //load implies loading one Row, so use only the first row (or null if no entry exists)
-        $this->row = $row;
+            ->where('userGuid = ?', $userGuid);
+        $this->row = $this->db->fetchRow($s);
     }
     
     /**
@@ -105,19 +94,10 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * @param string $userGuid
      */
     public function loadEntryByTaskOpenerNumber($taskGuid, $taskOpenerNumber) {
-        $row = null;
-        try {
-            $s = $this->db->select()
+        $s = $this->db->select()
             ->where('taskGuid = ?', $taskGuid)
             ->where('taskOpenerNumber = ?', $taskOpenerNumber);
-            $row = $this->db->fetchRow($s);
-        } catch (Exception $e) {
-            // Don't throw a not-found. There might correctly not exist any data for the user; e.g.
-            // - if a task has been imported and opened before TaskUserTracking has been implemented
-            // - if a user is assigned to a task, but has never opened the task so far
-        }
-        //load implies loading one Row, so use only the first row (or null if no entry exists)
-        $this->row = $row;
+        $this->row = $this->db->fetchRow($s);
     }
     
     /**
@@ -125,7 +105,7 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * @return NULL|number
      */
     public function getTaskOpenerNumberForUser(){
-        if (is_null($this->row)){
+        if (!$this->hasEntry()){
             return null;
         }
         return $this->getTaskOpenerNumber();
@@ -136,49 +116,37 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * @return NULL|string
      */
     public function getUsernameForUser(){
-        if (is_null($this->row)){
+        if (!$this->hasEntry()){
             return null;
         }
         return $this->getUserName();
     }
     
     /**
-     * insert or update TaskUserTracking entry. 
-     * If  users have already opened the task before, we only keep their data updated.
-     * @param string $taskguid
+     * insert or update TaskUserTracking entry.
+     * If users have already opened the task before, we only keep their data updated.
+     * If it's a user who hasn't opened the task before, the user will get the next taskOpenerNumber for this task.
+     * @param string $taskGuid
      * @param string $userGuid
      * @param string $role
      */
-    public function insertTaskUserTrackingEntry($taskguid, $userGuid, $role) {
-        $taskOpenerNumber = $this->getTotalByTaskGuid($taskguid) + 1;
+    public function insertTaskUserTrackingEntry($taskGuid, $userGuid, $role) {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         $user->loadByGuid($userGuid);
         $firstName = $user->getFirstName();
         $surName = $user->getSurName();
         $userName = $user->getUserName();
-        $sql= 'INSERT INTO LEK_taskUserTracking (`taskGuid`,`userGuid`,`taskOpenerNumber`,`firstName`,`surName`,`userName`,`role`) VALUES (?, ?, ?, ?, ?, ?, ?)
+        // TODO: is this SQL-statement safe regarding  race conditions? (see https://stackoverflow.com/a/5360154)
+        $sql= 'INSERT INTO LEK_taskUserTracking (`taskGuid`, `userGuid`, `taskOpenerNumber`, `firstName`, `surName`, `userName`, `role`)
+               VALUES (?, ?, 
+                       (SELECT coalesce(MAX(`taskOpenerNumber`), 0) FROM LEK_taskUserTracking t2 WHERE t2.taskGuid = ?) + 1, 
+                       ?, ?, ?, ?)
                ON DUPLICATE KEY UPDATE `firstName` = ?,`surName` = ?,`userName` = ?,`role` = ?';
         $bindings = array(
-            $taskguid, $userGuid, $taskOpenerNumber, $firstName, $surName, $userName, $role, 
+            $taskGuid, $userGuid, $taskGuid, $firstName, $surName, $userName, $role, 
             $firstName, $surName, $userName, $role
         );
-        try {
-            $res = $this->db->getAdapter()->query($sql, $bindings);
-        }
-        catch(Zend_Db_Statement_Exception $e) {
-            $this->handleIntegrityConstraintException($e); // TODO (können ja auch andere Fehler sein)
-        }
-        
-    }
-    
-    /**
-     * How many users have opened the task already?
-     */
-    protected function getTotalByTaskGuid($taskguid) {
-        $s = $this->db->select();
-        $s->where('taskGuid = ?', $taskguid);
-        return $this->computeTotalCount($s);
-        
+        $this->db->getAdapter()->query($sql, $bindings);
     }
 }

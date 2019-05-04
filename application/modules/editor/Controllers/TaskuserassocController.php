@@ -72,9 +72,6 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
-        
-        // anonymize users for view?
-        // TODO: is this really necessary? (who is allowed to see this?)
     }
     
     public function postDispatch() {

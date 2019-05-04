@@ -89,8 +89,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * Attributes for the trackchange-Node 
      * @var string
      */
-    const ATTRIBUTE_USERGUID='data-userguid';
-    const ATTRIBUTE_USERNAME='data-username';
+    const ATTRIBUTE_USERTRACKINGID='data-usertrackingid';
     const ATTRIBUTE_USERCSSNR='data-usercssnr';
     const ATTRIBUTE_WORKFLOWSTEP='data-workflowstep';
     const ATTRIBUTE_TIMESTAMP='data-timestamp';
@@ -100,7 +99,12 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     const ATTRIBUTE_USERCSSNR_VALUE_PREFIX='usernr';
     
     /**
-     * Array of JSON with the userColorMap from DB's task_meta-Info
+     * the id of the user in the taskUserTracking-table
+     */
+    public $userTrackingId;
+    
+    /**
+     * number for usercss-color (= taskOpenerNumber from taskUserTracking)
      */
     public $userColorNr;
     
@@ -133,10 +137,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $node[]='class="'.$this->getTrackChangesCss($nodeName).'"';
         
         // id to identify the user who did the editing (also used for verifying checks)
-        $node[]=self::ATTRIBUTE_USERGUID.'="'.$sessionUser->data->userGuid.'"';
-        
-        // name of the user who did the editing
-        $node[]=self::ATTRIBUTE_USERNAME.'="'.$sessionUser->data->userName.'"';
+        $node[]=self::ATTRIBUTE_USERTRACKINGID.'="'.$this->userTrackingId.'"';
         
         // css-selector with specific number for this user
         $node[]=self::ATTRIBUTE_USERCSSNR.'="'.self::ATTRIBUTE_USERCSSNR_VALUE_PREFIX.$this->userColorNr.'"';
@@ -181,148 +182,4 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
         return $segment;
     }
-    
-    /**
-     * anonymizes user-data in TrackChange-Tags in the given string 
-     * (= replace data-userguid und data-username with anonymized version)
-     * @param string $text
-     * @param string $taskGuid (needed to access TaskUserTracking if matches are found)
-     * @return string
-     */
-    public function renderAnonymizedTrackChangeData (string $text, $taskGuid) {
-        
-        if (!$this->hasUserdataToAnonymize($text, $taskGuid)) { 
-            return $text;
-        }
-        
-        $output = [];
-        $trackingData = array();
-        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-        /* @var $workflowAnonymize editor_Workflow_Anonymize */
-        $anonymizeUserguid = function($matchUserguid) use ($output, $taskGuid, &$trackingData, $userModel, $workflowAnonymize) {
-            parse_str($matchUserguid[0],$output);
-            $userGuid = trim($output['data-userguid'],'"');
-            try {
-                $userModel->loadByGuid($userGuid);
-                $userName = $userModel->getUserName();
-                $userNameAnon = $workflowAnonymize->renderAnonymizedUserName($userName, $userGuid, $taskGuid);
-            } catch (Exception $e) {
-                $userNameAnon = $userName;
-            }
-            if (!$workflowAnonymize->isOtherWorkflowUser($userGuid)) {
-                $userNameAnon = $userName;
-            }
-            if(!array_key_exists($userName, $trackingData)){
-                $trackingData[$userName] = $userNameAnon;
-            }
-            return 'data-userguid="'.$userNameAnon.'"'; // keep $userNameAnon in order to later get the userGuid again; see renderUnanonymizedTrackChangeData()
-        };
-        $anonymizeUsername = function($matchUsername) use ($output, &$trackingData) {
-            parse_str($matchUsername[0],$output);
-            $userName = trim($output['data-username'],'"');
-            if(array_key_exists($userName, $trackingData)) {
-                return 'data-username="'.$trackingData[$userName].'"';
-            } else {
-                return $matchUsername[0];
-            }
-        };
-        
-        $text = preg_replace_callback(
-            '/data-userguid=".*?"/',
-            $anonymizeUserguid,
-            $text);
-        $text = preg_replace_callback(
-            '/data-username=".*?"/',
-            $anonymizeUsername,
-            $text);
-        return $text;
-    }
-    
-    /**
-     * resets anonymized user-data in TrackChange-Tags in the given string
-     * (= replace data-userguid und data-username with real userguid and username)
-     * @param string $text
-     * @param string $taskGuid (needed to access TaskUserTracking if matches are found)
-     * @return string
-     */
-    public function renderUnanonymizedTrackChangeData (string $text, $taskGuid) {
-        
-        if (!$this->hasUserdataToAnonymize($text, $taskGuid)) {
-            return $text;
-        }
-        
-        $output = [];
-        $trackingData = array();
-        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
-        /* @var $taskUserTracking editor_Models_TaskUserTracking */
-        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-        /* @var $workflowAnonymize editor_Workflow_Anonymize */
-        $unanonymizeUsername = function($matchUsername) use ($output, $taskGuid, $taskUserTracking, &$trackingData, $userModel, $workflowAnonymize) {
-            parse_str($matchUsername[0],$output);
-            $userNameAnon = trim($output['data-username'],'"');
-            $userName = $workflowAnonymize->renderUnanonymizedUserName($userNameAnon, $userNameAnon, $taskGuid);
-            try {
-                $taskUserTracking->loadEntryByUserName($taskGuid, $userName);
-                $userGuid = $taskUserTracking->getUserGuid();
-                if(!$workflowAnonymize->isOtherWorkflowUser($userGuid)) {
-                    $userName = $userNameAnon;
-                }
-                if(!array_key_exists($userNameAnon, $trackingData)){
-                    $trackingData[$userNameAnon] = $userGuid;
-                }
-                return 'data-username="'.$userName.'"';
-            } catch (Exception $e) {
-                return $matchUsername[0];
-            }
-        };
-        $unanonymizeUserguid = function($matchUserguid) use ($output, &$trackingData) {
-            parse_str($matchUserguid[0],$output);
-            $userNameAnon = trim($output['data-userguid'],'"'); // the anonymized version of the userguid contains the anonymized username
-            if(array_key_exists($userNameAnon, $trackingData)) {
-                return 'data-userguid="'.$trackingData[$userNameAnon].'"';
-            } else {
-                return $matchUserguid[0];
-            }
-        };
-        
-        $text = preg_replace_callback(
-            '/data-username=".*?"/',
-            $unanonymizeUsername,
-            $text);
-        $text = preg_replace_callback(
-            '/data-userguid=".*?"/',
-            $unanonymizeUserguid,
-            $text);
-        return $text;
-    }
-    
-    /**
-     * Does the given text contain any user-related data for anonymizing?
-     * @param string $text
-     * @return boolean
-     */
-    protected function hasUserdataToAnonymize($text, $taskGuid) {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($taskGuid);
-        if (!$task->anonymizeUsers()) {
-            // If the task's users are not to be anonymized, there is nothing to anonymize anyway
-            return false;
-        }
-        
-        $hasUserguid = preg_match('/data-userguid=".*?"/', $text);
-        if ($hasUserguid === 1) {
-            return true;
-        }
-        $hasUsername = preg_match('/data-username=".*?"/', $text);
-        if ($hasUsername === 1) {
-            return true;
-        }
-        return false;
-    }
-
 }

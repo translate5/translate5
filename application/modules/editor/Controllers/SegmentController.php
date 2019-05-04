@@ -114,7 +114,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
         
-        // anonymize users for view?
+        // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
@@ -122,7 +122,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
             foreach ($this->view->rows as &$row) {
-                $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row);
+                $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
             }
         }
     }
@@ -341,15 +341,15 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         
-        // anonymize users for view?
+        // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->entity->getTaskGuid());
         if ($task->anonymizeUsers()) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
-            $rows = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 2 must be of the type array
-            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $rows);
+            $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
+            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
         }
         
         //call after segment put handler
@@ -498,6 +498,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             if(isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']){
                 $replace->trackChangeTag->attributeWorkflowstep=$parameters['attributeWorkflowstep'];
                 $replace->trackChangeTag->userColorNr=$parameters['userColorNr'];
+                $replace->trackChangeTag->userTrackingId=$parameters['userTrackingId'];
                 $replace->isActiveTrackChanges=$parameters['isActiveTrackChanges'];
             }
             
@@ -651,9 +652,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
             // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
             $data = $this->parseSegmentProtectWhitespace($data, 'strip_tags');
-            
-            // ... and get real userdata instead of anonymized versions in TrackChange-Tags ...
-            $data = $trackChangeTagHelper->renderUnanonymizedTrackChangeData($data, $this->entity->getTaskGuid());
 
             //revoke the internaltag replacement
             $data = $internalTag->unprotect($data);

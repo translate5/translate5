@@ -25,25 +25,14 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-# add config-tables for customers and tasks (see also "TRANSLATE-471 overwrite config by task template")
-# 1) create tables with same basic structure as Zf_configuration
-CREATE TABLE `LEK_customerConfiguration` LIKE `Zf_configuration`;
-CREATE TABLE `LEK_taskConfiguration` LIKE `Zf_configuration`;
-# 2) add column to refer to customer/task
-ALTER TABLE `LEK_customerConfiguration`	ADD COLUMN `customerId` INT(11) NOT NULL COMMENT 'Client (= id from table LEK_customer)' AFTER `id`;
-ALTER TABLE `LEK_taskConfiguration` ADD COLUMN `taskGuid` VARCHAR(38) NOT NULL AFTER `id`;
-# 3) add foreign key
-ALTER TABLE `LEK_customerConfiguration` ADD FOREIGN KEY (`customerId` ) REFERENCES `LEK_customer` (`id`) ON DELETE CASCADE;
-ALTER TABLE `LEK_taskConfiguration` ADD FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE;
 
 # add system-wide config-default
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
 VALUES ('runtimeOptions.customers.anonymizeUsers', '1', 'editor', 'metadata', '1', '0', '', 'boolean', 'Are the users per default to be anonymized for customers? (Can be overwritten in LEK_customerConfiguration.)');
 
 # workaround for new attribute on customer level: Anonymize users in workflow
-# (= will later be handled via LEK_customerConfiguration)
+# (= will later be handled via config-tables)
 ALTER TABLE `LEK_customer`ADD COLUMN `anonymizeUsers` TINYINT(0) NOT NULL DEFAULT 0;
-
 
 # add table for tracking the order of users who opened a task (and their name and role)
 CREATE TABLE IF NOT EXISTS `LEK_taskUserTracking` (
@@ -61,3 +50,6 @@ ALTER TABLE `LEK_taskUserTracking` ADD UNIQUE(`taskGuid`,`userGuid`);
 ALTER TABLE `LEK_taskUserTracking` ADD FOREIGN KEY (`taskGuid` ) REFERENCES `LEK_task` (`taskGuid` ) ON DELETE CASCADE;
 ALTER TABLE `LEK_taskUserTracking` ADD FOREIGN KEY (`userGuid` ) REFERENCES `Zf_users` (`userGuid` ) ON DELETE CASCADE;
 
+# permission for new taskusertrackings-store
+INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'editor', 'editor_taskusertracking', 'all');

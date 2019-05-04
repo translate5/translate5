@@ -685,25 +685,28 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected function trackChangesAsMrk($text){
         $insOpenTag='/<ins[^>]*>/i';
         $delOpenTag='/<del[^>]*>/i';
-        $attributesRegex='/(data-userguid|data-username|data-timestamp)=("[^"]*")/i';
+        $attributesRegex='/(data-userguid|data-username|data-usertrackingid|data-timestamp)=("[^"]*")/i';
         //parametar map between ins/del tags and the new mrk ins/del tags
         $paramMap=[
-                'data-userguid'=>'translate5:userGuid',
-                'data-username'=>'translate5:username',
-                'data-timestamp'=>'translate5:date'
+            'data-userguid'=>'translate5:userGuid', // keep userGuid and username for tasks with TrackChange-Tags before anonymizing was implemented
+            'data-username'=>'translate5:username',
+            'data-usertrackingid'=>'translate5:userName',
+            'data-timestamp'=>'translate5:date'
         ];
         
         //find the ins or delete tags
         $mrkConverter=function($inputText,$regex,$attributesRegex,$paramMap,$trackChangeType){
+            $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+            /* @var $taskUserTracking editor_Models_TaskUserTracking */
             
             //for each match find the ins del tags arguments
-            $inputText=preg_replace_callback($regex, function($match) use ($attributesRegex,$paramMap,$trackChangeType){
+            $inputText=preg_replace_callback($regex, function($match) use ($attributesRegex,$paramMap,$trackChangeType, $taskUserTracking){
                 
                 $retVal=$match[0];
                 $buildTag=[];
                 
                 //for each argument match, get the value and key
-                $retVal=preg_replace_callback($attributesRegex, function($match2) use (&$buildTag,$paramMap,$trackChangeType){
+                $retVal=preg_replace_callback($attributesRegex, function($match2) use (&$buildTag,$paramMap,$trackChangeType, $taskUserTracking){
                     $argValue=$match2[2];
                     $argName=$paramMap[$match2[1]];
                     
@@ -717,6 +720,14 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                             
                         }
                         $argValue='"'.$argValue.'"';
+                    }
+                    
+                    //convert the userName from data-usertrackingid
+                    if($argName==='translate5:userName'){
+                        $userTrackingId = str_replace('"','', $argValue);
+                        $taskUserTracking->load($userTrackingId);
+                        $userName = $taskUserTracking->getUserName();
+                        $argValue='"'.$userName.'"';
                     }
                     
                     $buildTag[$argName]=$argValue;
