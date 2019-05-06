@@ -156,6 +156,14 @@ class Editor_CustomerController extends ZfExtended_RestController {
         if(substr($this->data->domain,-1)!=='/'){
             $this->data->domain.='/';
         }
+        
+        //remove always the protocol if it is provided by the api or frontend
+        $disallowed = array('http://', 'https://');
+        foreach($disallowed as $d) {
+            if(strpos($this->data->domain, $d) === 0) {
+                $this->data->domain=str_replace($d, '', $this->data->domain);
+            }
+        }
     }
     
     /***
