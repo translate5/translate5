@@ -174,6 +174,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
             }
             $row['domain']=null;
             $row['openIdServer']=null;
+            $row['openIdIssuer']=null;
             $row['openIdAuth2Url']=null;
             $row['openIdServerRoles']=null;
             $row['openIdClientId']=null;
