@@ -57,6 +57,7 @@ class LoginController extends ZfExtended_Controllers_Login {
     }
     
     public function doOnLogout() {
+        $this->handleOpenIdLogout();
         //init editor module on logout, so that specific logout handling can be triggered via events
         $base = ZfExtended_BaseIndex::getInstance();
         $base->setModule('editor');
@@ -148,6 +149,10 @@ class LoginController extends ZfExtended_Controllers_Login {
         
         //authenticate with the configured openid client
         if($isCustomerSet && $oidc->authenticate()){
+            if($this->_request->getParam('id_token')!=null){
+                $userSession = new Zend_Session_Namespace('openId');
+                $userSession->data->idToken = $this->_request->getParam('id_token');
+            }
             //create the user in the translate5 system or update if the user already exist
             $user = $oidc->createUser();
             if(!$user){
@@ -161,6 +166,26 @@ class LoginController extends ZfExtended_Controllers_Login {
             $this->_userModel->setUserSessionNamespaceWithoutPwCheck($user->getLogin());
             $this->getFrontController()->getPlugin('ZfExtended_Controllers_Plugins_SessionRegenerate')->updateSession(true);
             $this->initDataAndRedirect();
+        }
+    }
+    
+    /***
+     * Sign out if the openid provider supports sign out and the end_session_endpoint is defined in the wellknow config, 
+     */
+    protected function handleOpenIdLogout(){
+        $oidc = new ZfExtended_OpenIDConnectClient($this->getRequest());
+        //the openid authentication is valid
+        if($oidc->isOpenIdCustomerSet()){
+            $userSession = new Zend_Session_Namespace('openId');
+            $idToken=$userSession->data->idToken ? $userSession->data->idToken : null;
+            $userSession=null;
+            if($idToken){
+                try {
+                    $oidc->signOut($idToken,$oidc->getRedirectDomainUrl());
+                } catch (Exception $e) {
+                    
+                }
+            }
         }
     }
 }
