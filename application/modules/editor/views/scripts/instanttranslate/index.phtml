@@ -191,7 +191,12 @@ $( function() {
             $(this).addClass("ui-state-active");
         });
     $('#logout').on("click",function(){
-        window.location = Editor.data.loginUrl;
+    	//check if it is used from iframe
+        if(window.parent!=undefined){
+            window.parent.location = Editor.data.loginUrl;
+        }else{
+        	window.parent.location = Editor.data.loginUrl;
+        }
     });
     $('#locale').selectmenu({
         change: function() {
