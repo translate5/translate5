@@ -44,7 +44,7 @@ Ext.define('Editor.view.admin.log.Grid', {
         eventCode: '#UT# Code',
         eventCodeLong: '#UT# Ereignis- bzw. Fehlercode',
         domain: '#UT# Bereich',
-        message: '#UT# Fehler',
+        message: '#UT# Ereignis',
         created: '#UT# Zeitpunkt',
         moreInfo: '#UT# Mehr Info'
     },
