@@ -55,6 +55,9 @@
  * @method string getOpenIdServer() getOpenIdServer()
  * @method void setOpenIdServer() setOpenIdServer(string $openIdServer)
  * 
+ * @method string getOpenIdIssuer() getOpenIdIssuer()
+ * @method void setOpenIdIssuer() setOpenIdIssuer(string $openIdIssuer)
+ * 
  * @method string getOpenIdAuth2Url() getOpenIdAuth2Url()
  * @method void setOpenIdAuth2Url() setOpenIdAuth2Url(string $openIdAuth2Url)
  * 
