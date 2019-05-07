@@ -1400,6 +1400,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='WnVyw7xjayB6dSBkZW4gRXJlaWduaXNzZW4='><source>Zurück zu den Ereignissen</source><target>Zurück zu den Ereignissen</target></trans-unit>
 <trans-unit id='QXVmZ2FiZSBGZWhsZXJoaXN0b3JpZQ=='><source>Aufgabe Fehlerhistorie</source><target>Aufgabe Fehlerhistorie</target></trans-unit>
 <trans-unit id='RXJlaWduaXNzZQ=='><source>Ereignisse</source><target>Ereignisse</target></trans-unit>
+<trans-unit id='RXJlaWduaXM='><source>Ereignis</source><target>Ereignis</target></trans-unit>
 <trans-unit id='U2Nod2VyZXIgRmVobGVy'><source>Schwerer Fehler</source><target>Schwerer Fehler</target></trans-unit>
 <trans-unit id='V2FybnVuZw=='><source>Warnung</source><target>Warnung</target></trans-unit>
 <trans-unit id='SW5mbw=='><source>Info</source><target>Info</target></trans-unit>
