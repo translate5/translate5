@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchAnalysis_Pretranslation{
     use editor_Models_Import_FileParser_TagTrait;
+    use ZfExtended_Logger_DebugTrait;
     
     /***
      * 
@@ -96,6 +97,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $mtConnectors=array();
     
+    public function __construct(){
+        $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
+    }
     
     /***
      * Use the given TM analyse (or MT if analyse was empty) result to update the segment
