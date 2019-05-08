@@ -216,17 +216,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         xtype:'textfield',
                                         fieldLabel:me.strings.domain,
                                         name:'domain',
-                                        itemId:'openIdDomain',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}',
-                                        }
+                                        itemId:'openIdDomain'
                                     },{
                                     	xtype:'fieldset',
                                     	itemId:'openIdFieldset',
