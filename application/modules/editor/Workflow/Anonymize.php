@@ -99,16 +99,18 @@ class editor_Workflow_Anonymize {
         if (!$this->isOtherWorkflowUserAndNotPM()) {
             return $data;
         }
-        $keysToAnonymize = ['comments','email','firstName','login','userGuid','userName','surName'];
+        $keysToAnonymize = ['comments','email','firstName','lockingUser','lockingUsername','login','userGuid','userName','surName'];
         array_walk($data, function( &$value, $key) use ($keysToAnonymize) {
             if ($value != '' && in_array($key, $keysToAnonymize)) {
                 switch ($key) {
                     case 'comments':
                         $value = $this->renderAnonymizedComment($value);
                         break;
+                    case 'lockingUser':
                     case 'userGuid':
                         $value = $this->renderAnonymizedUserGuid($value);
                         break;
+                    case 'lockingUsername':
                     case 'userName':
                         $value = $this->renderAnonymizedUserName($value);
                         break;

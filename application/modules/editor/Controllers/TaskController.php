@@ -185,23 +185,6 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->view->rows = $this->loadAll();
         $this->view->total = $this->totalCount;
-        
-        // anonymize userinfo for view?
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-        /* @var $workflowAnonymize editor_Workflow_Anonymize */
-        foreach ($this->view->rows as &$rowTask) {
-            $task->loadByTaskGuid($rowTask['taskGuid']);
-            if ($task->anonymizeUsers()) {
-                // anonymizeUserdata for $rowTask not needed, doesn't contain any user-related data but the lockinguser
-                if(!empty($rowTask['users'])) {
-                    foreach ($rowTask['users'] as &$row) {
-                        $row = $workflowAnonymize->anonymizeUserdata($row['taskGuid'], $row['userGuid'], $row);
-                    }
-                }
-            }
-        }
     }
     
     /**
@@ -797,20 +780,6 @@ class editor_TaskController extends ZfExtended_RestController {
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
-        
-        // anonymize userinfo for view?
-        if($this->isOpenTaskRequest()){
-            $task = ZfExtended_Factory::get('editor_Models_Task');
-            /* @var $task editor_Models_Task */
-            $task->loadByTaskGuid($taskguid);
-            if ($task->anonymizeUsers()) {
-                $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
-                /* @var $workflowAnonymize editor_Workflow_Anonymize */
-                foreach ($this->view->rows->users as &$user) {
-                    $user = $workflowAnonymize->anonymizeUserdata($taskguid, $user['userGuid'], $user);
-                }
-            }
-        }
     }
     
     protected function addPixelMapping() {
@@ -840,7 +809,8 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * Adds additional user based infos to the given array
+     * Adds additional user based infos to the given array.
+     * If the given taskguid is assigned to a client for anonymizing data, the added user-data is anonymized already.
      * @param array $row gets the row to modify as reference
      * @param string $taskguid
      * @param array $userAssocInfos
@@ -917,6 +887,23 @@ class editor_TaskController extends ZfExtended_RestController {
         $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
             return $field['name'];
         }, $row['segmentFields']));
+        
+        // anonymize userinfo?
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskguid);
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            if(!empty($row['lockingUser'])) {
+                $row = $workflowAnonymize->anonymizeUserdata($taskguid, $row['lockingUser'], $row);
+            }
+            if(!empty($row['users'])) {
+                foreach ($row['users'] as &$rowUser) {
+                    $rowUser = $workflowAnonymize->anonymizeUserdata($taskguid, $rowUser['userGuid'], $rowUser);
+                }
+            }
+        }
     }
     
     /**
