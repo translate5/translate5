@@ -101,6 +101,20 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * gets all TaskUserTracking-data for the given taskGuid
+     * @param string $taskGuid
+     * @return array
+     */
+    public function getByTaskGuid($taskGuid) {
+        try {
+            $s = $this->db->select()->where('taskGuid = ?', $taskGuid);
+            return $this->db->fetchAll($s)->toArray();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+    
+    /**
      * returns the taskOpenerNumber of the currently loaded entry or null (we might not have a TaskUserTracking-entry loaded; that's ok).
      * @return NULL|number
      */

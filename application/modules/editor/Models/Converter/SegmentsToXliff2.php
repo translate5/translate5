@@ -166,6 +166,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     private $xliffCommentsApplied=[
     ];
     
+    /**
+     * Array with taskUserTracking-data of our task
+     * @var array
+     */
+    protected $trackingData = [];
+    
     /***
      * Segment id xliff prefix
      * @var string
@@ -265,6 +271,13 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             
         },$allUsers);
         
+        // prepare tracking-data of this task
+        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $taskUserTracking editor_Models_TaskUserTracking */
+        $taskUserTrackingData = $taskUserTracking->getByTaskGuid($this->task->getTaskGuid());
+        foreach ($taskUserTrackingData as $value) {
+            $this->trackingData[$value['id']] = (object)['userGuid' => $value['userGuid'],'userName' => $value['userName']];
+        }
         
         //init the manual status
         $this->config = Zend_Registry::get('config');
@@ -690,23 +703,21 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         $paramMap=[
             'data-userguid'=>'translate5:userGuid', // keep userGuid and username for tasks with TrackChange-Tags before anonymizing was implemented
             'data-username'=>'translate5:username',
-            'data-usertrackingid'=>'translate5:userName',
+            'data-usertrackingid'=>'translate5:username', // NOT userName, must be the same as before from data-username
             'data-timestamp'=>'translate5:date'
         ];
         
         //find the ins or delete tags
         $mrkConverter=function($inputText,$regex,$attributesRegex,$paramMap,$trackChangeType){
-            $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
-            /* @var $taskUserTracking editor_Models_TaskUserTracking */
             
             //for each match find the ins del tags arguments
-            $inputText=preg_replace_callback($regex, function($match) use ($attributesRegex,$paramMap,$trackChangeType, $taskUserTracking){
+            $inputText=preg_replace_callback($regex, function($match) use ($attributesRegex,$paramMap,$trackChangeType){
                 
                 $retVal=$match[0];
                 $buildTag=[];
                 
                 //for each argument match, get the value and key
-                $retVal=preg_replace_callback($attributesRegex, function($match2) use (&$buildTag,$paramMap,$trackChangeType, $taskUserTracking){
+                $retVal=preg_replace_callback($attributesRegex, function($match2) use (&$buildTag,$paramMap,$trackChangeType){
                     $argValue=$match2[2];
                     $argName=$paramMap[$match2[1]];
                     
@@ -722,12 +733,15 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                         $argValue='"'.$argValue.'"';
                     }
                     
-                    //convert the userName from data-usertrackingid
-                    if($argName==='translate5:userName'){
+                    //convert the username and userGuid from data-usertrackingid ...
+                    if($argName==='translate5:username'){
                         $userTrackingId = str_replace('"','', $argValue);
-                        $taskUserTracking->load($userTrackingId);
-                        $userName = $taskUserTracking->getUserName();
-                        $argValue='"'.$userName.'"';
+                        // ... but only when from data-usertrackingid (= e.g "90"), not from data-username (= e.g. "Project Manager")
+                        // (in other words: if a taskUserTracking-entry exists; the data-username might be "1001" and thus numeric, too)
+                        if(array_key_exists($userTrackingId, $this->trackingData)) {
+                            $tracked = $this->trackingData[$userTrackingId];
+                            $argValue='"'.$tracked->userName.'" translate5:userGuid="'.$tracked->userGuid.'"';
+                        }
                     }
                     
                     $buildTag[$argName]=$argValue;
