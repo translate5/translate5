@@ -178,8 +178,7 @@ Ext.application({
       Editor.data.task = task;
       Editor.model.Segment.redefine(task.segmentFields());
       
-      taskUserTrackingsStore = Ext.create('Editor.store.admin.TaskUserTrackings');
-      Editor.data.taskUserTracking = taskUserTrackingsStore.load();
+      Editor.data.taskUserTracking = Ext.create('Editor.store.admin.TaskUserTrackings').load();
 
       Editor.data.taskLanguages = {
           source: languages.getById(task.get('sourceLang')),

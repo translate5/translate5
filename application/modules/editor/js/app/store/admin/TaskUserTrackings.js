@@ -38,6 +38,7 @@ Ext.define('Editor.store.admin.TaskUserTrackings', {
     extend : 'Ext.data.Store',
     model: 'Editor.model.admin.TaskUserTracking',
     autoLoad: true,
+    pageSize: 0,
     /**
      * returns the (anonymized) username for the user with the given trackingId
      * @param {string|integer} trackingId
