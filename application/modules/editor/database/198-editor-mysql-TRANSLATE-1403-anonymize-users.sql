@@ -53,3 +53,14 @@ ALTER TABLE `LEK_taskUserTracking` ADD FOREIGN KEY (`userGuid` ) REFERENCES `Zf_
 # permission for new taskusertrackings-store
 INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
 ('editor', 'editor', 'editor_taskusertracking', 'all');
+
+# TrackChange-Plugin: userColorMap is not needed any longer (is now handled via taskUserTracking); no migration needed
+DELIMITER ;;
+CREATE PROCEDURE DROP_USERCOLORMAP()
+BEGIN
+   DECLARE CONTINUE HANDLER FOR 1091 BEGIN END;
+   ALTER TABLE `LEK_task_meta` DROP `userColorMap`;
+END;;
+DELIMITER ;
+CALL DROP_USERCOLORMAP();
+DROP PROCEDURE DROP_USERCOLORMAP;
