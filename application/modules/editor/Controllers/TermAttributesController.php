@@ -26,35 +26,17 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermAttributes extends editor_Models_TermCollection_Attributes{
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributes';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributes';
+/**
+ *
+ */
+class editor_TermEntryAttributesController extends ZfExtended_RestController {
+
+    protected $entityClass = 'editor_Models_TermCollection_TermEntryAttributes';
     
-    
-    /***
-     * Update the term transacGrp attributes.
-     * TransacGrp layout example:
-     * 
-     * <transacGrp>
-     *  <transac>modification</transac>
-     *  <date>2018-01-12</date>
-     *  <transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
-     * </transacGrp>
-     * 
+    /**
+     * @var editor_Models_TermCollection_TermEntryAttributes
      */
-    public function updateTransacGrp(int $termId,string $transac,string $date=null,string $transacNote=null){
-        $s=$this->db->select()
-        ->where('termId=?',$termId)
-        ->where('name="transac"')
-        ->where('attrType=?',$transac);
-        $result=$this->db->fetchAll($s)->toArray();
-        if(empty($result)){
-            return;
-        }
-        
-        foreach ($result as $res){
-            
-        }
-    }
+    protected $entity;
     
+    //TODO: implement me
 }

@@ -123,6 +123,10 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
      * Search term entry and term attributes in group
      */
     public function searchattributeAction(){
+        
+        // Starting clock time in seconds
+        $start_time = microtime(true);
+
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
@@ -146,7 +150,51 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         }
         
         $this->view->rows=$responseArray;
+        
+        // End clock time in seconds
+        $end_time = microtime(true);
+        // Calculate script execution time
+        $execution_time = ($end_time - $start_time);
+        error_log(" Execution time of script = ".$execution_time." sec"); 
     }
+    
+    
+    //we can also go with only one action for proposals.
+    //and define the target via route.
+    //ex: 'editor/termcollection/:id/:type'
+    //where the id is the proposal parent id, and the type is the proposal type: term,termattribute,termentry,termentryattribute
+    // based on the type, separate function will be called and the request will be handled there
+    // Question: how do we handle alc roles per user here ?
+    // 
+    /***
+     * Term
+     */
+    public function proposetermAction(){
+        
+    }
+    
+    /***
+     * Term attribute
+     */
+    public function proposetermattributeAction(){
+        
+    }
+    
+    
+    /***
+     * Term entry
+     */
+    public function proposetermentryAction(){
+        
+    }
+    
+    /***
+     * Term entry attribute
+     */
+    public function proposetermentryattributeAction(){
+        
+    }
+    
     
     /***
      * This action is only used in a test at the moment! 

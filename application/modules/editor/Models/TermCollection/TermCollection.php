@@ -314,6 +314,27 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         }
     }
     
+    public function proposeTerm(int $termParentId,string $newTerm) {
+        $newTerm=trim($newTerm);
+        if($termParentId<1 || empty($newTerm)){
+            return;
+        }
+        
+        $parentTerm=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $parentTerm editor_Models_Term */
+        $parentTerm->load($termParentId);
+        $parentTerm->setParentTermId($parentTerm->getId());
+        $parentTerm->setId(null);
+        $parentTerm->setTerm($newTerm);
+        $parentTerm->setCreated(null);
+        $parentTerm->setUpdated(date(NOW_ISO));
+        
+        //update the parent term processStatus attribute value
+        //update the transac modification value
+        $termAttribute=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributes');
+        /* @var $termAttribute editor_Models_TermCollection_TermAttributes */
+    }
+    
     /***
      * Remove term collection from the disk
      * @param int $collectionId

@@ -170,9 +170,6 @@ $( function() {
             $("#languageSelector").submit();
         }
       });
-    $("#searchTermsSelect").on( "selectableselected", function( event, ui ) {
-        findTermsAndAttributes($(ui.selected).attr('data-value'));
-    });
     $("#resultTermsHolder").tabs();
     $("#search").focus();
     $(window).resize(function() {
@@ -181,6 +178,9 @@ $( function() {
 } );
 
 </script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Attribute.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/TermEntry.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Term.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <script type="text/javascript">
     checkDirectSearch();
