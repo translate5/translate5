@@ -51,7 +51,7 @@ class LoginController extends ZfExtended_Controllers_Login {
         
         parent::indexAction();
         //if the login status is required, try to authenticate with openid connect
-        if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_REQUIRED){
+        if($this->view->loginStatus==ZfExtended_Models_SessionUserInterface::LOGIN_STATUS_OPENID){
             $this->handleOpenIdRequest();
         }
     }
