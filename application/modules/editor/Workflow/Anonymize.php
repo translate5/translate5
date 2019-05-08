@@ -99,7 +99,7 @@ class editor_Workflow_Anonymize {
         if (!$this->isOtherWorkflowUserAndNotPM()) {
             return $data;
         }
-        $keysToAnonymize = ['comments','firstName','login','userGuid','userName','surName'];
+        $keysToAnonymize = ['comments','email','firstName','login','userGuid','userName','surName'];
         array_walk($data, function( &$value, $key) use ($keysToAnonymize) {
             if ($value != '' && in_array($key, $keysToAnonymize)) {
                 switch ($key) {
