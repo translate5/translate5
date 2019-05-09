@@ -48,7 +48,7 @@ class editor_LanguageresourcetaskassocController extends ZfExtended_RestControll
         ZfExtended_Models_Entity_Conflict::addCodes([
             'E1050' => 'Referenced language resource not found.',
             'E1051' => 'Cannot remove language resource from task, since task is used at the moment.',
-        ]);
+        ], 'editor.languageresource.taskassoc');
         parent::init();
     }
     

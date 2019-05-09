@@ -38,5 +38,68 @@ class editor_TermController extends ZfExtended_RestController {
      */
     protected $entity;
     
-    //TODO: implement me
+    /**
+     * @var editor_Models_TermCollection_TermProposal
+     */
+    protected $proposal;
+    
+    /**
+     * Extend the term with the proposal - if there is any
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::getAction()
+     */
+    public function getAction() {
+        parent::getAction();
+        $this->proposal = ZfExtended_Factory::get('editor_Models_TermCollection_TermProposal');
+        /* @var $proposal editor_Models_TermCollection_TermProposal */
+        try {
+            $this->proposal->loadByTermId($this->entity->getId());
+            $this->view->rows->proposal = $this->proposal->getDataObject();
+        }
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->proposal->init();
+            $this->view->rows->proposal = null;
+            //do nothing if no proposal found
+        }
+    }
+    
+    /**
+     * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::putAction()
+     */
+    public function proposeOperation() {
+        $this->decodePutData();
+        
+        $this->proposal->setTermId($this->entity->getId());
+        $this->proposal->setCollectionId($this->entity->getCollectionId());
+        $this->proposal->setTerm($this->data->term);
+        $this->proposal->validate();
+
+        //we don't save the term, but we save it to a proposal: 
+        $this->proposal->save();
+        
+        //update the view
+        $this->view->rows->proposal = $this->proposal->getDataObject();
+    }
+    
+    /**
+     * confirm the proposal and saves the proposed data into the term
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    public function confirmproposalOperation() {
+        if(empty($this->view->rows->proposal)) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1105' => 'There is no proposal which can be confirmed.'
+            ], 'editor.term');
+            throw new ZfExtended_UnprocessableEntity('E1105');
+        }
+        //take over data from proposal
+        $this->entity->setTerm($this->proposal->getTerm());
+        $this->entity->setProcessStatus($this->entity::PROCESS_STATUS_PROV_PROCESSED);
+        $this->entity->save();
+        $this->proposal->delete();
+        $this->view->rows = $this->entity->getDataObject();
+        $this->view->rows->proposal = null;
+    }
 }
