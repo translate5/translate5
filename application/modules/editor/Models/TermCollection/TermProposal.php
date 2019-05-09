@@ -27,37 +27,23 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * 
+  `term` varchar(19000) NOT NULL DEFAULT '' COMMENT 'the proposed term',
+  `created` timestamp NOT NULL DEFAULT current_timestamp(),
+ * 
+ * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method string getTerm() getTerm()
+ * @method void setTerm() setTerm(string $term)
+ * @method integer getTermId() getTermId()
+ * @method void setTermId() setTermId(integer $id)
+ * @method integer getCollectionId() getCollectionId()
+ * @method void setCollectionId() setCollectionId(integer $id)
+ * @method string getCreated() getCreated()
+ * @method void setCreated() setCreated(string $date)
  */
-class editor_TermController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Models_Term';
-    
-    /**
-     * @var editor_Models_Term
-     */
-    protected $entity;
-    
-    /**
-     * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
-     * {@inheritDoc}
-     * @see ZfExtended_RestController::putAction()
-     */
-    public function proposeOperation() {
-        $this->decodePutData();
-        
-        $proposal = ZfExtended_Factory::get('editor_Models_TermCollection_TermProposal');
-        /* @var $proposal editor_Models_TermCollection_TermProposal */
-        $proposal->setTermId($this->entity->getId());
-        $proposal->setCollectionId($this->entity->getCollectionId());
-        $proposal->setTerm($this->data->term);
-        $proposal->validate();
-
-        //we don't save the term, but we save it to a proposal: 
-        $proposal->save();
-        
-        //update the view
-        $this->view->rows = $this->entity->getDataObject();
-        $this->view->rows->proposal = $proposal->getDataObject();
-    }
+class editor_Models_TermCollection_TermProposal extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermProposal';
+    protected $validatorInstanceClass = 'editor_Models_Validator_TermCollection_TermProposal';
 }

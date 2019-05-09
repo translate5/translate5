@@ -33,9 +33,18 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * Term Instanz
- * 
  * TODO refactor this class, so that code to deal with the term mark up will be moved in editor_Models_Segment_TermTag
  * 
+ * TODO add missing setter and getters:
+ * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method string getTerm() getTerm()
+ * @method void setTerm() setTerm(string $term)
+ * @method integer getTermEntryId() getTermEntryId()
+ * @method void setTermEntryId() setTermEntryId(integer $id)
+ * @method integer getCollectionId() getCollectionId()
+ * @method void setCollectionId() setCollectionId(integer $id)
  */
 class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     const STAT_PREFERRED = 'preferredTerm';
@@ -58,6 +67,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @var array
      */
     protected static $statusCache = [];
+    
+    protected $validatorInstanceClass = 'editor_Models_Validator_TermCollection_Term';
     
     protected $statOrder = array(
         self::STAT_PREFERRED => 1,
@@ -601,18 +612,38 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $queryString=$queryString.'%';
         }
         
-        $s=$this->db->select()
-        ->from($this->db, array('definition','groupId', 'term as label','id as value','term as desc'))
-        ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString)
-        ->where('language IN(?)',explode(',', $languages))
-        ->where('collectionId IN(?)',$collectionIds)
-        ->order('term asc');
+        $tableTerm = $this->db->info($this->db::NAME);
+        $tableProposal = (new editor_Models_Db_TermCollection_TermProposal)->info($this->db::NAME);
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from($tableTerm, array('definition','groupId', 'term as label','id as value','term as desc'))
+        ->joinLeft($tableProposal, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['term', 'id', 'created']) 
+        ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
+        ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
+        ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
+        ->order($tableTerm.'.term asc');
         if($limit){
             $s->limit($limit);
         }
         $rows=$this->db->fetchAll($s)->toArray();
+        $mergeProposal = function($item) {
+            if(empty($item['id'])){
+                $item['proposal'] = null;
+            }
+            else {
+                $item['proposal'] = [
+                    'id' => $item['id'],
+                    'term' => $item['term'],
+                    'created' => $item['created'],
+                ];
+            }
+            unset($item['id']);
+            unset($item['term']);
+            unset($item['created']);
+            return $item;
+        };
         if(!empty($rows)){
-            return $rows;
+            return array_map($mergeProposal, $rows);
         }
         return null;
     }

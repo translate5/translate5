@@ -25,12 +25,19 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
+('editor', 'pm', 'editor_term', 'all');
+
+CREATE TABLE `LEK_term_proposal` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `term` varchar(19000) NOT NULL DEFAULT '' COMMENT 'the proposed term',
+  `collectionId` int(11) NOT NULL COMMENT 'links to the collection',
+  `termId` int(11) DEFAULT NULL COMMENT 'links to the term',
+  `created` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  CONSTRAINT FOREIGN KEY (`termId`) REFERENCES `LEK_terms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FOREIGN KEY (`collectionId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 ALTER TABLE `LEK_terms` 
-ADD COLUMN `linkTermId` INT(11) NULL AFTER `updated`,
-ADD INDEX `fk_LEK_terms_3_idx` (`linkTermId` ASC);
-ALTER TABLE `LEK_terms` 
-ADD CONSTRAINT `fk_LEK_terms_3`
-  FOREIGN KEY (`linkTermId`)
-  REFERENCES `LEK_terms` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
+ADD COLUMN `processStatus` VARCHAR(128) DEFAULT 'finalized' AFTER status;
