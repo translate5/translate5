@@ -146,7 +146,7 @@ const Attribute={
 		//the proposal is allready defined, render the proposal
 		if(attributeData.proposal && attributeData.proposal!=''){
 			htmlCollection.push('<del>'+attributeData.attValue+'</del>');
-			htmlCollection.push('<ins>'+attributeData.proposal+'</ins>');
+			htmlCollection.push('<ins>'+attributeData.proposal.term+'</ins>');
 			return htmlCollection.join(' ');
 		}
 		//the user has proposal rights -> init attribute proposal span

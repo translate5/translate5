@@ -3,9 +3,23 @@ const ComponentEditor={
 	$_termTable:null,
 	$_termAttributeTable:null,
 	
+	typeRouteMap:[],
+	
+	typeRequestDataKeyMap:[],
+	
 	init:function(){
-		this.cacheDom();
-		this.initEvents();
+		var me=this;
+		
+		me.cacheDom();
+		me.initEvents();
+		
+		me.typeRouteMap['term']='term/{ID}/propose/operation';
+		me.typeRouteMap['termEntryAttribute']='';//TODO:
+		me.typeRouteMap['termAttribute']='';//TODO:
+		
+		me.typeRequestDataKeyMap['term']='term';//TODO:
+		me.typeRequestDataKeyMap['termEntryAttribute']='value';//TODO:
+		me.typeRequestDataKeyMap['termAttribute']='value';//TODO:
 	},
 	
 	cacheDom:function(){
@@ -27,16 +41,38 @@ const ComponentEditor={
 		$el.replaceWith( $input );
 	  
 		$input.one('blur', function(){
-			var $p = $el.text($input.val());
-			$input.replaceWith($p);
-			me.saveComponentChange($el.data('id'),$el.data('type'),$input.val());
+			me.saveComponentChange($el,$input);
 		}).focus();
 	},
 	
-	saveComponentChange:function(id,type,value){
-		//TODO: ajax request to the neede api
-		console.log("ajax request",id,type,value);
+	saveComponentChange:function($el,$input){
+		var me=this,
+			route=me.typeRouteMap[$el.data('type')],
+			dataKey=me.typeRequestDataKeyMap[$el.data('type')],
+			url=Editor.data.termportal.restPath+route.replace("{ID}",$el.data('id')),
+			requestData={};
+		
+		requestData[dataKey]=$input.val();
+		 $.ajax({
+	        url: url,
+	        dataType: "json",
+	        type: "POST",
+	    	data:{
+	    		'data':JSON.stringify(requestData)
+	    	},
+	        success: function(result){
+	        	console.log(result);
+	        	me.updateComponent($el,$input,result.rows);
+	        }
+	    });
+	},
+	
+	updateComponent:function($el,$input,result){
+		var renderData=Attribute.getAttributeRenderData(result);
+		//var $p = $el.text($input.val());
+		$input.replaceWith(renderData);
 	}
+	
 };
 
 ComponentEditor.init();

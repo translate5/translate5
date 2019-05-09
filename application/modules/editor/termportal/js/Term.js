@@ -384,9 +384,9 @@ const Term={
 			}
 			
 			//the proposal is allready defined, render the proposal
-			if(termData.proposal && termData.proposal!=''){
+			if(termData.proposal && termData.proposal!=undefined){
 				htmlCollection.push('<del>'+termData.desc+'</del>');
-				htmlCollection.push('<ins>'+termData.proposal+'</ins>');
+				htmlCollection.push('<ins>'+termData.proposal.term+'</ins>');
 				return htmlCollection.join(' ');
 			}
 			//the user has proposal rights -> init term proposal span
