@@ -69,6 +69,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
         export:'#UT#Exportieren',
         domain:'#UT#translate5 Domain',
         openIdServer:'#UT#OpenId server',
+        openIdIssuer:'#UT#OpenId Issuer',
         openIdClientId:'#UT#OpenId Benutzername',
         openIdClientSecret:'#UT#OpenId Passwort',
         openIdAuth2Url:'#UT#OpenId OAuth URL',
@@ -215,17 +216,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         xtype:'textfield',
                                         fieldLabel:me.strings.domain,
                                         name:'domain',
-                                        itemId:'openIdDomain',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}',
-                                        }
+                                        itemId:'openIdDomain'
                                     },{
                                     	xtype:'fieldset',
                                     	itemId:'openIdFieldset',
@@ -238,6 +229,22 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                             	fieldLabel:me.strings.openIdServer,
                                             	vtype: 'url',
                                             	name:'openIdServer',
+                                            	setAllowBlank:me.setFieldAllowBlank,
+                                            	listeners: {
+                                                    change: {
+                                                        fn: 'onOpenIdFieldChange',
+                                                        scope: 'controller'
+                                                    }
+                                                },
+                                            	bind:{
+                                            		allowBlank:'{!isOpenIdRequired}'
+                                            	}
+                                            },
+                                            {
+                                            	xtype:'textfield',
+                                            	fieldLabel:me.strings.openIdIssuer,
+                                            	vtype: 'url',
+                                            	name:'openIdIssuer',
                                             	setAllowBlank:me.setFieldAllowBlank,
                                             	listeners: {
                                                     change: {
