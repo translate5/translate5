@@ -1126,7 +1126,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           length;
       text = div.textContent || div.innerText || "";
       //remove characters with 0 length:
-      text = text.replace(/\u200B/g, '');
+      text = text.replace(/\u200B|\uFEFF/g, '');
       if (isPixel) {
           // ----------- pixel-based -------------
           length = pixelMapping.getPixelLength(text, meta);
