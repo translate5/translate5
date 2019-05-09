@@ -47,6 +47,10 @@ END LICENSE AND COPYRIGHT
  * @method void setCollectionId() setCollectionId(integer $id)
  */
 class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
+    const PROCESS_STATUS_UNPROCESSED = 'unprocessed';
+    const PROCESS_STATUS_PROV_PROCESSED = 'provisionallyProcessed';
+    const PROCESS_STATUS_FINALIZED = 'finalized';
+    
     const STAT_PREFERRED = 'preferredTerm';
     const STAT_ADMITTED = 'admittedTerm';
     const STAT_LEGAL = 'legalTerm';

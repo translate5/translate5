@@ -46,4 +46,13 @@ END LICENSE AND COPYRIGHT
 class editor_Models_TermCollection_TermProposal extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermProposal';
     protected $validatorInstanceClass = 'editor_Models_Validator_TermCollection_TermProposal';
+    
+    /**
+     * Loads a proposal by termId
+     * @param integer $termId
+     * @return Zend_Db_Table_Row_Abstract
+     */
+    public function loadByTermId(int $termId): Zend_Db_Table_Row_Abstract {
+        return $this->loadRow('termId = ?', $termId);
+    }
 }
