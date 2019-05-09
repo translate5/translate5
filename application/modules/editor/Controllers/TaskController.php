@@ -51,7 +51,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $entity;
     
     /**
-     * Cached map of userGuids to userNames
+     * Cached map of userGuids and taskGuid to userNames
      * @var array
      */
     protected $cachedUserInfo = array();
@@ -289,7 +289,7 @@ class editor_TaskController extends ZfExtended_RestController {
             if($userGuid == $assoc['userGuid']) {
                 $userAssocInfos[$assoc['taskGuid']] = $assoc;
             }
-            $userInfo = $this->getUserinfo($assoc['userGuid']);
+            $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
             $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];
             $assoc['login'] = $userInfo['login'];
             //set only not pmOverrides
@@ -314,16 +314,19 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * replaces the userGuid with the username
+     * returns the username for the given userGuid.
      * Doing this on client side would be possible, but then it must be ensured that UsersStore is always available and loaded before TaskStore. 
      * @param string $userGuid
+     * @param string $taskGuid
+     * @return array
      */
-    protected function getUserinfo($userGuid) {
+    protected function getUserinfo($userGuid, $taskGuid) {
         $notfound = array(); //should not be, but can occur after migration of old data!
         if(empty($userGuid)) {
             return $notfound;
         }
         if(isset($this->cachedUserInfo[$userGuid])) {
+            // cache for user
             return $this->cachedUserInfo[$userGuid];
         }
         if(empty($this->tmpUserDb)) {
@@ -335,8 +338,10 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$row) {
             return $notfound; 
         }
-        $this->cachedUserInfo[$userGuid] = $row->toArray();
-        return $row->toArray(); 
+        $userInfo = $row->toArray();
+        
+        $this->cachedUserInfo[$userGuid] = $userInfo;
+        return $userInfo; 
     }
     
     /**
@@ -345,7 +350,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function getUsername(array $userinfo) {
         if(empty($userinfo)) {
-            return '- not found -'; //should not be, but can occur after migration of old data!
+            return '- not found -'; //should not be, but can occur e.g. after migration of old data or for lockingUsername
         }
         return $userinfo['firstName'].' '.$userinfo['surName'].' ('.$userinfo['login'].')';
     }
@@ -757,6 +762,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $userAssocInfos = array();
         $allAssocInfos = $this->getUserAssocInfos(array($taskguid), $userAssocInfos);
         
+        $this->invokeTaskUserTracking($taskguid, $userAssocInfos);
+        
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj; 
         $this->addUserInfos($row, $taskguid, $userAssocInfos, $allAssocInfos);
@@ -802,7 +809,8 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * Adds additional user based infos to the given array
+     * Adds additional user based infos to the given array.
+     * If the given taskguid is assigned to a client for anonymizing data, the added user-data is anonymized already.
      * @param array $row gets the row to modify as reference
      * @param string $taskguid
      * @param array $userAssocInfos
@@ -829,7 +837,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $row['users'] = $allAssocInfos[$taskguid];
         }
         
-        $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser']));
+        $row['lockingUsername'] = null;
+        
+        if(!empty($row['lockingUser'])){
+            $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser'],$taskguid));
+        }
         
         $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $fields editor_Models_SegmentField */
@@ -875,6 +887,23 @@ class editor_TaskController extends ZfExtended_RestController {
         $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
             return $field['name'];
         }, $row['segmentFields']));
+        
+        // anonymize userinfo?
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskguid);
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            if(!empty($row['lockingUser'])) {
+                $row = $workflowAnonymize->anonymizeUserdata($taskguid, $row['lockingUser'], $row);
+            }
+            if(!empty($row['users'])) {
+                foreach ($row['users'] as &$rowUser) {
+                    $rowUser = $workflowAnonymize->anonymizeUserdata($taskguid, $rowUser['userGuid'], $rowUser);
+                }
+            }
+        }
     }
     
     /**
@@ -898,6 +927,21 @@ class editor_TaskController extends ZfExtended_RestController {
         return $editOnly && $s == $workflow::STATE_EDIT 
            || !$editOnly && ($s == $workflow::STATE_EDIT || $s == $workflow::STATE_VIEW)
            || $viewOnly && $s == $workflow::STATE_VIEW;
+    }
+    
+    /**
+     * invokes taskUserTracking if its an opening or an editing request
+     * (no matter if the workflow-users of the task are to be anonymized or not)
+     * param string $taskguid
+     * @param array $userAssocInfos
+     */
+    protected function invokeTaskUserTracking($taskguid, $userAssocInfos) {
+        if(!$this->isOpenTaskRequest()){
+            return;
+        }
+        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $taskUserTracking editor_Models_TaskUserTracking */
+        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->user->data->userGuid, $userAssocInfos[$taskguid]['role']);
     }
     
     /**
