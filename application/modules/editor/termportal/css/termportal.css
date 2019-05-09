@@ -199,4 +199,11 @@ h4, p {
     -webkit-margin-end: 0px;
 }
 
+.proposeTermBtn{
+	background-image: url("../../images/user_edit.png");
+	float: right;
+	width: 16px;
+	height:16px;
+}
+
 

@@ -100,7 +100,6 @@ const Attribute={
 	 */
 	handleAttributeHeaderText:function(attribute,addColon){
 	    var me=this,
-	    	attVal=me.getAttributeValue(attribute),
 	    	noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : ""),
 	    	headerText=attribute.headerText ? attribute.headerText :  noHeaderName;//if no headerText use attribute name + if exist attribute type
 	    
@@ -113,22 +112,45 @@ const Attribute={
 	 * @returns
 	 */
 	getAttributeValue:function(attribute){
-	    var attVal=attribute.attrValue ? attribute.attrValue : "";
+	    var me=this,
+	    	attVal=attribute.attrValue ? attribute.attrValue : "";
+	    
 	    //if it is a date attribute, handle the date format
 	    if(attribute.name=="date"){
 	        var dateFormat='dd.mm.yy';
 	        if(SESSION_LOCALE=="en"){
 	            dateFormat='mm/dd/yy';
 	        }
-	        return $.datepicker.formatDate(dateFormat, new Date(attVal*1000));
+	        attVal=$.datepicker.formatDate(dateFormat, new Date(attVal*1000));
 	    }
 	    if (attribute.attrType == "processStatus" && attVal == "finalized") {
-	        return '<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
+	    	attVal='<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
 	    }else if(attribute.attrType == "processStatus" && attVal == "provisionallyProcessed"){
-	    	return "-";
+	    	attVal="-";
 	    } else {
-	        return attVal.replace(/$/mg,'<br>');
+	    	attVal=attVal.replace(/$/mg,'<br>');
 	    }
+	    
+	    return me.getAttributeRenderData(attribute,attVal);
+	},
+	
+	getAttributeRenderData:function(attributeData,attValue){
+		var me=this,
+			htmlCollection=[],
+			userHasAttributeProposalRights=true;//TODO: get me from backend
+		
+		if(!userHasAttributeProposalRights){
+			return attValue;
+		}
+		
+		//the proposal is allready defined, render the proposal
+		if(attributeData.proposal && attributeData.proposal!=''){
+			htmlCollection.push('<del>'+attributeData.attValue+'</del>');
+			htmlCollection.push('<ins>'+attributeData.proposal+'</ins>');
+			return htmlCollection.join(' ');
+		}
+		//the user has proposal rights -> init attribute proposal span
+		return '<span data-editable data-type="'+attributeData.attributeOriginType+'" data-id="'+attributeData.attributeId+'">'+attValue+'</span>';
 	}
 };
 

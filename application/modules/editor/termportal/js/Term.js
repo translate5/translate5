@@ -240,15 +240,47 @@ const Term={
 		    
 		    var count=0,
 		        rfcLanguage,
-		        termAttributesHtmlContainer=[];
+		        termAttributesHtmlContainer=[],
+		        userProposalRights=true;//TODO: get me from the backend
 		    
 		    
 		    for(var i=0;i<me.termAttributeContainer.length;i++){
 		    	var attribute=me.termAttributeContainer[i],
 		    		rfcLanguage = getLanguageFlag(attribute[0].language),
-		    		statusIcon=me.checkTermStatusIcon(attribute);//check if the term contains attribute with status icon
-		        
-		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'">'+ rfcLanguage + ' ' + attribute[0].desc +' '+(statusIcon ? statusIcon : '') + '</h3><div>' + me.drawTermAttributes(count) + '</div>');
+		    		statusIcon=me.checkTermStatusIcon(attribute),//check if the term contains attribute with status icon
+		    		termProposal=attribute[0].proposal ? attribute[0].proposal : false; 
+
+		    	//draw term header
+		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'">');
+		    	
+		    	//add empty space between
+		    	termAttributesHtmlContainer.push(' ');
+		    	
+		    	//add language flag
+		    	termAttributesHtmlContainer.push(rfcLanguage);
+		    	
+		    	//add empty space between
+		    	termAttributesHtmlContainer.push(' ');
+		    	
+		    	//get term render data
+		    	termAttributesHtmlContainer.push(me.getTermRenderData(attribute[0]));
+		    	
+		    	if(statusIcon){
+		    		termAttributesHtmlContainer.push(statusIcon);
+		    	}
+		    	
+		    	if(userProposalRights){
+		    		termAttributesHtmlContainer.push('<button class="proposeTermBtn"></button>');
+		    	}
+		    	
+		    	termAttributesHtmlContainer.push('</h3>');
+		    	
+		    	//draw term attriubtes
+		    	termAttributesHtmlContainer.push('<div>');
+		    	termAttributesHtmlContainer.push(me.drawTermAttributes(count));
+		    	termAttributesHtmlContainer.push('</div>');
+		    	
+		    	//termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'">'+ rfcLanguage + ' ' + attribute[0].desc +' '+(statusIcon ? statusIcon : '') + '</h3><div>' + me.drawTermAttributes(count) + '</div>');
 		        count++;
 		    }
 		    
@@ -336,8 +368,30 @@ const Term={
 		    label = labels[status]+' ('+attribute[0].termStatus+')';
 		    retVal += ' <img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'">';
 		    return retVal;
+		},
+		
+		
+		/***
+		 * Get the term render data. If the user has proposal tights, the term proposal render data will be set.
+		 */
+		getTermRenderData:function(termData){
+			var me=this,
+				htmlCollection=[],
+				userHasTermProposalRights=true;//TODO: get me from backend
+			
+			if(!userHasTermProposalRights){
+				return termData.desc;
+			}
+			
+			//the proposal is allready defined, render the proposal
+			if(termData.proposal && termData.proposal!=''){
+				htmlCollection.push('<del>'+termData.desc+'</del>');
+				htmlCollection.push('<ins>'+termData.proposal+'</ins>');
+				return htmlCollection.join(' ');
+			}
+			//the user has proposal rights -> init term proposal span
+			return '<span data-editable data-type="term" data-id="'+termData.termId+'">'+termData.desc+'</span>';
 		}
-
 };
 
 Term.init();
