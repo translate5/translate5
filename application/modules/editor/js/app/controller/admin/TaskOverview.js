@@ -35,7 +35,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   extend : 'Ext.app.Controller',
   requires: ['Editor.view.admin.ExportMenu'],
   models: ['admin.Task', 'admin.task.Log'],
-  stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs'],
+  stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs', 'admin.TaskUserTrackings'],
   views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow'],
   refs : [{
       ref: 'headToolBar',
@@ -72,6 +72,11 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Task state check function pull. Each item/function in this pull will be included in the task state check loop.see:checkImportState
    */
   taskStateCheckPull:[],
+  
+  /**
+   * Anonymizing workflow-users will need the taskUserTracking-data
+   */
+  taskUserTrackingsStore: null,
   
   /**
    * Container for translated task handler confirmation strings
@@ -251,6 +256,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   loadTasks: function() {
       this.getAdminTasksStore().load();
+      this.taskUserTrackingsStore = Ext.create('Editor.store.admin.TaskUserTrackings');
+      this.taskUserTrackingsStore.load();
   },
   startCheckImportStates: function(store) {
       if(!this.checkImportStateTask) {
@@ -514,6 +521,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   handleTaskReload: function () {
       this.getAdminTasksStore().load();
+      this.taskUserTrackingsStore.load();
   },
   /**
    * calls local task handler, dispatching is done by the icon CSS class of the clicked img

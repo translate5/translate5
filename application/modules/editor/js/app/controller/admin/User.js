@@ -80,7 +80,6 @@ Ext.define('Editor.controller.admin.User', {
       
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearUsers, me);
-      Editor.app.on('adminViewportOpened', me.loadUsers, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
       
       me.control({
@@ -240,9 +239,6 @@ Ext.define('Editor.controller.admin.User', {
   },
   clearUsers: function() {
       this.getAdminUsersStore().removeAll();
-  },
-  loadUsers: function() {
-      this.getAdminUsersStore().load();
   },
   handleUserCancel: function() {
       this.getUserForm().getForm().reset();
