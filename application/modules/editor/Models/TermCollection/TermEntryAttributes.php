@@ -54,7 +54,8 @@ class editor_Models_TermCollection_TermEntryAttributes extends editor_Models_Ter
                 'LEK_term_entry_attributes.value AS attrValue',
                 'LEK_term_entry_attributes.created AS attrCreated',
                 'LEK_term_entry_attributes.updated AS attrUpdated',
-                'LEK_term_entry.collectionId AS collectionId'
+                'LEK_term_entry.collectionId AS collectionId',
+                new Zend_Db_Expr('"termEntryAttribute" as attributeOriginType')//this is needed as fixed value
         );
         
         $s=$this->db->select()

@@ -639,6 +639,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 'LEK_term_attributes.created AS attrCreated',
                 'LEK_term_attributes.updated AS attrUpdated',
                 'LEK_term_attributes.attrDataType AS attrDataType',
+                new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
         );
         
         $cols=array(
