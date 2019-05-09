@@ -63,7 +63,7 @@ class editor_Plugins_Okapi_Tikal_Connector {
     
     /**
      * Starts tikal to extract the content from the given file to a XLF file
-     * @param unknown $file
+     * @param string $file
      * @return boolean
      */
     public function extract($file) {
@@ -185,9 +185,9 @@ class editor_Plugins_Okapi_Tikal_Connector {
     }
     
     /**
-     * @param unknown $filepath
+     * @param string $filepath
      * @param string $import
-     * @return unknown
+     * @return string
      */
     protected function makeCmd($filepath, $import = true) {
         $cmd = array(escapeshellarg($this->executable));

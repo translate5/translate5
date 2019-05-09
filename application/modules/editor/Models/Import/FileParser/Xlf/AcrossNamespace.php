@@ -96,7 +96,7 @@ class editor_Models_Import_FileParser_Xlf_AcrossNamespace extends editor_Models_
                     $currentComment->setComment($value);
                     break;
                 case 'created':
-                    $value = date(DATE_ISO8601, strtotime('10/05/2017 11:13:38'));
+                    $value = date(DATE_ISO8601, strtotime($value));
                     $currentComment->setCreated($value);
                     $currentComment->setModified($value);
                     break;

@@ -255,7 +255,7 @@ abstract class editor_Services_Connector_Abstract {
     abstract public function search(string $searchString, $field = 'source', $offset = null);
     
     /**
-     * @return the status of the connected resource and additional information if there is some
+     * @return editor_Services_ServiceResult the status of the connected resource and additional information if there is some
      */
     abstract public function getStatus(& $moreInfo);
     

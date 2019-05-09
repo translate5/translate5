@@ -218,7 +218,7 @@ class AcrossSoapConnector extends SoapClient  {
      * Get the content of the file $fileGuid created from Across.
      * 
      * @param string $fileGuid
-     * @return binary
+     * @return string (binary)
      */
     protected function getFileFromServer($fileGuid) {
         $params = [$this->securityToken, $fileGuid];

@@ -27,16 +27,15 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * MatchAnalysis Exception
  */
-class editor_Models_Import_FileParser_Exception extends ZfExtended_ErrorCodeException {
+class editor_Plugins_MatchAnalysis_Exception extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $domain = 'editor.import.fileparser';
+    protected $domain = 'plugin.matchanalysis';
     
     static protected $localErrorCodes = [
-        'E1083' => 'The encoding of the file "{fileName}" is none of the encodings utf-8, iso-8859-1 and win-1252.',
-        'E1084' => 'Given MID was to long (max 1000 chars), MID: "{mid}".',
+        'E1103' => 'MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid',
     ];
 }

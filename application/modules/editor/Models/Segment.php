@@ -145,9 +145,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     protected $whitespaceHelper;
     
     /**
+     * static so that only one instance is used, for performance and logging issues
      * @var editor_Models_Segment_PixelLength
      */
-    protected $pixelLength;
+    protected static $pixelLength;
     
     /**
      * init the internal segment field and the DB object
@@ -165,10 +166,10 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * "lazy load" for editor_Models_Segment_PixelLength (must fit to the segment's task!).
      */
     protected function getPixelLength(string $taskGuid) {
-        if (!isset($this->pixelLength) || $this->pixelLength->getTaskGuid() != $taskGuid) {
-            $this->pixelLength = ZfExtended_Factory::get('editor_Models_Segment_PixelLength',[$taskGuid]);
+        if (!isset(self::$pixelLength) || self::$pixelLength->getTaskGuid() != $taskGuid) {
+            self::$pixelLength = ZfExtended_Factory::get('editor_Models_Segment_PixelLength',[$taskGuid]);
         }
-        return $this->pixelLength;
+        return self::$pixelLength;
     }
     
     /***
@@ -560,7 +561,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * strips all tags including tag description
      * FIXME WARNING do not use this method other than it is used currently
-     * @see therefore TRANSLATE-487
+     * see therefore TRANSLATE-487
      * 
      * @param string $segmentContent
      * @return string $segmentContent
@@ -692,7 +693,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     /**
      * loads segment entity
      * @param int $fileId
-     * @param type $mid
+     * @param string $mid
      */
     public function loadByFileidMid(int $fileId, $mid) {
         $taskGuid = $this->getTaskGuid();

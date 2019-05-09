@@ -3189,7 +3189,74 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Der referenzierte Kunde existiert nicht (mehr)﻿.</source>
     <target>The referenced customer does not exist (anymore).</target>
 </trans-unit>
-<trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>View mode</target></trans-unit>
+<trans-unit id='QW5zaWNodHNtb2R1cw=='>
+    <source>Ansichtsmodus</source>
+    <target>View mode</target>
+</trans-unit>
+<trans-unit id='RXJlaWduaXNzZSB6dSBBdWZnYWJlICJ7MH0i'>
+    <source>Ereignisse zu Aufgabe "{0}"</source>
+    <target>Events to task "{0}"</target>
+</trans-unit>
+<trans-unit id='RGV0YWlsYW5zaWNodA=='>
+    <source>Detailansicht</source>
+    <target>Details</target>
+</trans-unit>
+<trans-unit id='WnVyw7xjayB6dSBkZW4gRXJlaWduaXNzZW4='>
+    <source>Zurück zu den Ereignissen</source>
+    <target>Back to the events</target>
+</trans-unit>
+<trans-unit id='QXVmZ2FiZSBGZWhsZXJoaXN0b3JpZQ=='>
+    <source>Aufgabe Fehlerhistorie</source>
+    <target>Task error-history</target>
+</trans-unit>
+<trans-unit id='RXJlaWduaXNzZQ=='>
+    <source>Ereignisse</source>
+    <target>Events</target>
+</trans-unit>
+<trans-unit id='U2Nod2VyZXIgRmVobGVy'>
+    <source>Schwerer Fehler</source>
+    <target>Fatal error</target>
+</trans-unit>
+<trans-unit id='RmVobGVy'>
+    <source>Fehler</source>
+    <target>Error</target>
+</trans-unit>
+<trans-unit id='V2FybnVuZw=='>
+    <source>Warnung</source>
+    <target>Warning</target>
+</trans-unit>
+<trans-unit id='SW5mbw=='>
+    <source>Info</source>
+    <target>Info</target>
+</trans-unit>
+<trans-unit id='RGVidWc='>
+    <source>Debug</source>
+    <target>Debug</target>
+</trans-unit>
+<trans-unit id='VHJhY2U='>
+    <source>Trace</source>
+    <target>Trace</target>
+</trans-unit>
+<trans-unit id='Q29kZQ=='>
+    <source>Code</source>
+    <target>Code</target>
+</trans-unit>
+<trans-unit id='RXJlaWduaXMtIGJ6dy4gRmVobGVyY29kZQ=='>
+    <source>Ereignis- bzw. Fehlercode</source>
+    <target>Eventcode / errorcode</target>
+</trans-unit>
+<trans-unit id='QmVyZWljaA=='>
+    <source>Bereich</source>
+    <target>Domain</target>
+</trans-unit>
+<trans-unit id='WmVpdHB1bmt0'>
+    <source>Zeitpunkt</source>
+    <target>Date / time</target>
+</trans-unit>
+<trans-unit id='TWVociBJbmZv'>
+    <source>Mehr Info</source>
+    <target>more information</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

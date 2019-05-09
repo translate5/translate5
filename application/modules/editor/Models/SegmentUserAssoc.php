@@ -59,7 +59,7 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads all segments to the given user guid
-     * @param guid $userGuid
+     * @param string $userGuid
      * @return array|null
      */
     public function loadByUserGuid(string $userGuid){
@@ -74,7 +74,7 @@ class editor_Models_SegmentUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads all users to the given segmentId
-     * @param guid $segmentId
+     * @param string $segmentId
      * @return array|null
      */
     public function loadBySegmentId(string $segmentId){

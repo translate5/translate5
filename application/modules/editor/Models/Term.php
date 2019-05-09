@@ -467,7 +467,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /**
      * @param editor_Models_Task $task
     //FIXME editor_Models_Export_Tbx durch entsprechendes Interface ersetzen
-     * @param editor_Models_Export_Tbx $exporteur
+     * @param editor_Models_Export_Terminology_Tbx $exporteur
      */
     public function export(editor_Models_Task $task, editor_Models_Export_Terminology_Tbx $exporteur) {
         $languageModel=ZfExtended_Factory::get('editor_Models_Languages');

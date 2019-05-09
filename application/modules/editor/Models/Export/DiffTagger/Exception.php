@@ -27,16 +27,21 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- *
+ * Covers all errors in the diff tagging
  */
-class editor_Models_Import_FileParser_Exception extends ZfExtended_ErrorCodeException {
+class editor_Models_Export_DiffTagger_Exception extends ZfExtended_ErrorCodeException {
     /**
      * @var string
      */
-    protected $domain = 'editor.import.fileparser';
+    protected $domain = 'editor.export.difftagger';
     
     static protected $localErrorCodes = [
-        'E1083' => 'The encoding of the file "{fileName}" is none of the encodings utf-8, iso-8859-1 and win-1252.',
-        'E1084' => 'Given MID was to long (max 1000 chars), MID: "{mid}".',
+        'E1089' => 'Tag syntax error in the segment content. No diff export is possible. The segment had been: "{segment}"',
+        'E1090' => 'The number of opening and closing g-Tags had not been the same! The Segment had been: "{segment}"',
+        //duplicated error:
+        'E1091' => 'Tag syntax error in the segment content. No diff export is possible. The segment had been: "{segment}"',
+        //duplicated errors:
+        'E1092' => 'The number of opening and closing g-Tags had not been the same! The Segment had been: "{segment}"',
+        'E1093' => 'The number of opening and closing g-Tags had not been the same! The Segment had been: "{segment}"',
     ];
 }

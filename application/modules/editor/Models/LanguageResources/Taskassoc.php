@@ -46,7 +46,7 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
      * 
      * @param string $taskGuid
      * @param int $languageResourceId
-     * @return Ambigous <multitype:, array>
+     * @return array
      */
     public function loadByTaskGuidAndTm(string $taskGuid, $languageResourceId) {
         try {
@@ -67,8 +67,8 @@ class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity
     
     /**
      * loads all associated languageResource's to one taskGuid
-     * @param unknown $taskGuid
-     * @return Ambigous <Zend_Db_Table_Row_Abstract, NULL>
+     * @param string $taskGuid
+     * @return Zend_Db_Table_Row_Abstract|null
      */
     public function loadByTaskGuid($taskGuid) {
         return $this->loadRow('taskGuid = ?', $taskGuid);

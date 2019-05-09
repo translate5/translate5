@@ -55,7 +55,7 @@ class editor_Plugins_MatchAnalysis_Models_TaskAssoc extends ZfExtended_Models_En
      */
     public function loadNewestByTaskGuid($taskGuid) {
         $s=$this->db->select()
-        ->where('taskGuid=?',$taskGuid)->order('id DESC')->limit(1);
+        ->where('taskGuid = ?', $taskGuid)->order('id DESC')->limit(1);
         $row=$this->db->fetchRow($s);
         if(!$row){
             return null;

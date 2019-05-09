@@ -186,7 +186,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
                 continue;
             }
             if(preg_match($regEx, $this->placeholderCSV)===1){
-                throw new editor_Models_Import_FileParser_Csv_Exception('E1017', ['regex' => $regEx, 'placeholder' => $this->placeholderCSV]);
+                throw new editor_Models_Import_FileParser_Csv_Exception('E1017', [
+                    'regex' => $regEx, 
+                    'placeholder' => $this->placeholderCSV,
+                    'task' => $this->task,
+                ]);
             }
             $regexArray =& $this->$regexArrayName;
             $regexArray[] = $regEx;
@@ -195,7 +199,7 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     
     /**
      * returns the csv content of one line, or false if line was empty / or eof reached
-     * @param handle $handle
+     * @param SplTempFileObject $handle
      * @return array $line or boolean false if nothing found in line
      */
     protected function prepareLine(SplTempFileObject $csv){
@@ -206,14 +210,18 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         }
         
         if($line === false){
-            trigger_error('Error on parsing a line of CSV. Current line is: '.$csv->current()
-                            .'. Error could also be in previous line!', E_USER_ERROR);
+            //Error on parsing a line of CSV. Current line is: "{line}". Error could also be in previous line!
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1075',[
+                'line' => $csv->current(),
+                'task' => $this->task,
+            ]);
         }
         if(!isset($line[2])){
-            trigger_error('In the line "'.
-                implode($this->_enclosure.$this->_delimiter.$this->_enclosure,$line).
-                '" there is no third column.',
-                E_USER_ERROR);
+            //In the line "{line}" there is no third column.
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1076',[
+                'line' => implode($this->_enclosure.$this->_delimiter.$this->_enclosure,$line),
+                'task' => $this->task,
+            ]);
         }
         return $line;
     }
@@ -238,7 +246,11 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
             $this->break = "\r";
         }
         else{
-            trigger_error('no linebreak found in CSV: '.$this->_fileName,E_USER_ERROR);
+            //no linebreak found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1077',[
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         
         //for this ini set see php docu: http://de2.php.net/manual/en/filesystem.configuration.php#ini.auto-detect-line-endings
@@ -254,17 +266,29 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
         //$csvSettings quelle => source, mid => mid
         $header = $this->prepareLine($csv);
         if($header === false) {
-            trigger_error('no header column found in CSV: '.$this->_fileName,E_USER_ERROR);
+            //no header column found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1078',[
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         $skel = array($this->str_putcsv($header, $this->_delimiter, $this->_enclosure, $this->break));
         
         $missing = array_diff($csvSettings, $header);
         if(!empty($missing)) {
-            trigger_error('in application.ini configured column-header(s) '.
-                            join(';', $missing).' not found in CSV: '.$this->_fileName,E_USER_ERROR);
+            // in application.ini configured column-header(s) "{headers}" not found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1079',[
+                'headers' => join(';', $missing),
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         if(count($header) < 3) {
-            trigger_error('source and mid given but no more data columns found in CSV: '.$this->_fileName,E_USER_ERROR);
+            // source and mid given but no more data columns found in CSV: {file}
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1080',[
+                'file' => $this->_fileName,
+                'task' => $this->task,
+            ]);
         }
         $i=0;
         $csvSettings = array_flip($csvSettings);
@@ -374,7 +398,10 @@ class editor_Models_Import_FileParser_Csv extends editor_Models_Import_FileParse
     protected function parseSegment($segment,$isSource){
         //check, if $this->placeholderCSV is present in segment - this must lead to error
         if(strpos($segment, $this->placeholderCSV)!==false){
-            throw new editor_Models_Import_FileParser_Csv_Exception('E1018', ['placeholder' => $this->placeholderCSV]);
+            throw new editor_Models_Import_FileParser_Csv_Exception('E1018', [
+                'placeholder' => $this->placeholderCSV,
+                'task' => $this->task,
+            ]);
         }
         $this->shortTagIdent = 1;
         

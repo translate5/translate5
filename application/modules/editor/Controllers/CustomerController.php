@@ -64,7 +64,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
             return parent::postAction();
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            $this->handleDuplicateNumber($e);
+            $this->handleDuplicate($e);
         }
     }
     
@@ -77,7 +77,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
             return parent::putAction();
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            $this->handleDuplicateNumber($e);
+            $this->handleDuplicate($e);
         }
     }
     
@@ -156,6 +156,14 @@ class Editor_CustomerController extends ZfExtended_RestController {
         if(substr($this->data->domain,-1)!=='/'){
             $this->data->domain.='/';
         }
+        
+        //remove always the protocol if it is provided by the api or frontend
+        $disallowed = array('http://', 'https://');
+        foreach($disallowed as $d) {
+            if(strpos($this->data->domain, $d) === 0) {
+                $this->data->domain=str_replace($d, '', $this->data->domain);
+            }
+        }
     }
     
     /***
@@ -174,6 +182,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
             }
             $row['domain']=null;
             $row['openIdServer']=null;
+            $row['openIdIssuer']=null;
             $row['openIdAuth2Url']=null;
             $row['openIdServerRoles']=null;
             $row['openIdClientId']=null;
@@ -199,8 +208,16 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @param Zend_Db_Statement_Exception $e
      * @throws Zend_Db_Statement_Exception
      */
-    protected function handleDuplicateNumber(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-        //TODO: handle duplicate for the OpenId domain
+    protected function handleDuplicate(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+        if($e->isInMessage('domain_UNIQUE')){
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1104' => 'The given domain is already in use.'
+            ], 'editor.customer');
+            throw ZfExtended_UnprocessableEntity::createResponse('E1104', [
+                'domain' => ['duplicateDomain' => 'Diese Domain wird bereits verwendet.']
+            ]);
+        }
+        
         ZfExtended_UnprocessableEntity::addCodes([
             'E1063' => 'The given client-number is already in use.'
         ], 'editor.customer');

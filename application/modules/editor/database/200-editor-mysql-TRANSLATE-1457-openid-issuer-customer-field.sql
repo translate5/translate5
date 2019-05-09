@@ -24,11 +24,5 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
-
-INSERT INTO Zf_configuration (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES
-('runtimeOptions.plugins.MtComparEval.url', 1, 'editor', 'plugins', 'http://localhost:8080', 'http://localhost:8080', '', 'string', 'Base URL to the MT-ComparEval Tool, for format see default value');
-
-
-ALTER TABLE `LEK_task_meta` ADD COLUMN mtCompareEvalState enum('notsent','importing','imported') NOT NULL DEFAULT 'notsent' COMMENT 'Contains the current state of MT-ComparEval experiment to this task';
-ALTER TABLE `LEK_task_meta` ADD COLUMN mtCompareEvalId varchar(256) NULL DEFAULT NULL COMMENT 'Contains the MT-ComparEval experiment ID';
-ALTER TABLE `LEK_task_meta` ADD COLUMN mtCompareEvalStart datetime NULL DEFAULT NULL COMMENT 'Contains the datetime when export to MT-ComparEval was started';
+ALTER TABLE `LEK_customer` 
+ADD COLUMN `openIdIssuer` VARCHAR(255) NULL AFTER `openIdRedirectCheckbox`;

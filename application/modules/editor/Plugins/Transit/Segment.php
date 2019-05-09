@@ -427,15 +427,9 @@ class editor_Plugins_Transit_Segment{
     } // end of public function getPart
     
     /**
-     * 
-     * @param unknown $partid
-     *      the "ID" for the part. Normaly some fancy unicode.
-     *      
-     * @param unknown $newpartdata
-     *      the new data for this part.
-     *      
-     * @param bool $append
-     *      if true $newpartdata will be append to the existing partdata.
+     * @param string $partid the "ID" for the part. Normaly some fancy unicode.
+     * @param string $newpartdata the new data for this part.
+     * @param bool $append if true $newpartdata will be append to the existing partdata.
      *      Default will replace the existing partdata.
      * 
      * @return boolean

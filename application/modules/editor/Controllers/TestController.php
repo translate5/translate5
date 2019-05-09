@@ -203,16 +203,16 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
             echo '<a href="#'.$filename.'"><b style="color: '.$color.'">'.$filename.'</b></a><br>';
         }
     }
+    
     /**
-     * 
-     * @param PHPUnit_Framework_TestResult $result
+     * @param PHPUnit\Framework\TestResult $result
      * @return boolean
      */
-    protected function echoResults(PHPUnit_Framework_TestResult $result,\SplFileInfo $file) {
+    protected function echoResults(PHPUnit\Framework\TestResult $result,\SplFileInfo $file) {
         echo '<a name="'.$file->getFilename().'"><h2>'.$file->getFilename()."/ ".$this->testcase->getProperty('name')->getValue()."</h2></a>";
         echo "<h3>Description: ".$this->testcase->getProperty('description')->getValue()."</h3>";
             
-        /* @var $result PHPUnit_Framework_TestResult */
+        /* @var $result PHPUnit\Framework\TestResult */
         $errors = $result->errors();
         $failures = $result->failures();
         
@@ -237,7 +237,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
         if($errorCount>0){
             echo '<p style="color:'.$this->errorColor.'">There have been errors in the execution. Test '.$file->getFilename().' could not run.</p><ol style="color:'.$this->errorColor.'">';
             foreach ($errors as $key => $error ) {
-                /* @var $failure PHPUnit_Framework_TestFailure */
+                /* @var $failure PHPUnit\Framework\TestFailure */
                 echo '<li>'.$error->exceptionMessage().'</li>';
             }
             echo "</ol>";
@@ -248,7 +248,7 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
         if($failureCount>0){
             echo '<p style="color:'.$this->errorColor.'">Main Test failed.</p><ol style="color:'.$this->errorColor.'">';
             foreach ($failures as $key => $failure ) {
-                /* @var $failure PHPUnit_Framework_TestFailure */
+                /* @var $failure PHPUnit\Framework\TestFailure */
                 echo '<li>'.$failure->exceptionMessage().'</li>';
             }
             echo "</ol>";
@@ -265,9 +265,9 @@ class Editor_TestController extends ZfExtended_Controllers_Action  {
     protected function runTests(\SplFileInfo $file, \ReflectionClass $class) {
         $initMethod = $class->getMethod('init');
         $initMethod->invoke(null,$file);
-        $testsuite = new PHPUnit_Framework_TestSuite($class);
+        $testsuite = new PHPUnit\Framework\TestSuite($class);
 
-        /* @var $testsuite PHPUnit_Framework_TestSuite */
+        /* @var $testsuite PHPUnit\Framework\TestSuite */
         return $testsuite->run();
     }
     

@@ -78,7 +78,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * loads all tasks to the given user guid
-     * @param guid $userGuid
+     * @param string $userGuid
      * @return array|null
      */
     public function loadByUserGuid(string $userGuid){

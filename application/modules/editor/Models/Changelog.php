@@ -106,7 +106,7 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
      * Saves to one user which changelog id he has seen last, the saved id is returned
      * @param int $userId
      * @param int $changelogId
-     * @return the id on which was updated
+     * @return integer the id on which was updated
      */
     public function updateChangelogUserInfo(stdClass $userData){
         $changelogId = $this->maxChangeLogId($this->getUsergroup($userData));

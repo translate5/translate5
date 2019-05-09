@@ -233,7 +233,7 @@ class editor_Services_Microsoft_HttpApi {
         return empty($this->error);
     }
     
-    public function setIsDictionaryLookup(boolean $value){
+    public function setIsDictionaryLookup(bool $value){
         $this->isDictionaryLookup=$value;
     }
 }

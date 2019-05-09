@@ -160,7 +160,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * loads the task to the given guid
-     * @param guid $taskGuid
+     * @param string $taskGuid
      */
     public function loadByTaskGuid(string $taskGuid){
         try {

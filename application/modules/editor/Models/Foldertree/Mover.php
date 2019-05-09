@@ -61,7 +61,7 @@ class editor_Models_Foldertree_Mover {
   
   /**
    * needs the actual Foldertree to move the Files in
-   * @param Models_Foldertree $actualTree
+   * @param editor_Models_Foldertree $actualTree
    */
   public function __construct(editor_Models_Foldertree $actualTree){
     $this->actualTree = $actualTree;

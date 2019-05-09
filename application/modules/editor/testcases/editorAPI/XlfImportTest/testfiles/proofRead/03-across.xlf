@@ -137,6 +137,15 @@
       <trans-unit id="92" translate="no" ax:state-name="KeepSource" ax:state-id="1" ax:state-flags="1024">
         <source>ohne match</source>
         <target>without match</target>
+        <ax:named-properties>
+          <ax:named-property name="Comment">
+            <ax:named-value ax:name="Annotates">Target</ax:named-value>
+            <ax:named-value ax:name="Author">tester</ax:named-value>
+            <ax:named-value ax:name="Text">Imported Comment Text</ax:named-value>
+            <ax:named-value ax:name="Created">02/20/2019 12:55:20</ax:named-value>
+            <ax:named-value ax:name="Title">Imported Comment Title</ax:named-value>
+          </ax:named-property>
+        </ax:named-properties>
       </trans-unit>
     </body>
   </file>

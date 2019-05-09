@@ -30,3 +30,9 @@ DELETE FROM `Zf_configuration` WHERE `name` = 'runtimeOptions.plugins.MtComparEv
 ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalState;
 ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalId;
 ALTER TABLE `LEK_task_meta` DROP COLUMN mtCompareEvalStart;
+
+-- remove the NoMissingTargetTerminology Plug-In from the active plugins
+UPDATE `Zf_configuration` SET `value` = 
+REPLACE(`value`, ',"editor_Plugins_MtComparEval_Bootstrap"', '') WHERE `name` = 'runtimeOptions.plugins.active' AND `value` != '[]';
+UPDATE `Zf_configuration` SET `value` = 
+REPLACE(`value`, '"editor_Plugins_MtComparEval_Bootstrap",', '') WHERE `name` = 'runtimeOptions.plugins.active' AND `value` != '[]';
