@@ -27,44 +27,34 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Store for Editor.model.admin.User
- * @class Editor.store.admin.Users
- * @extends Ext.data.Store
+ * @class Editor.model.admin.TaskUserTracking
+ * @extends Ext.data.Model
  */
-Ext.define('Editor.store.admin.Users', {
-  extend : 'Ext.data.Store',
-  model: 'Editor.model.admin.User',
-  autoLoad: false,
-  remoteFilter: true,
-  remoteSort: true,
-  pageSize: 20,
-  userGuidName: {},
-  /**
-   * returns the Username either by id or by guid
-   * getting by guid caches the association guid => username internally
-   */
-  getUserName: function(id) {
-      var me = this, 
-          user = null,
-          idx = -1;
-
-      if(Ext.isString(id)){
-          if(me.userGuidName[id]) {
-              return me.userGuidName[id].getUserName();
-          }
-          idx = me.find('userGuid', id);
-          if(idx < 0) {
-              return '';
-          }
-          user = me.getAt(idx);
-          me.userGuidName[id] = user;
-      }
-      else if(Ext.isNumeric(id)) {
-          user = me.getById(id);
-      }
-      if(user) {
-          return user.getUserName(); 
-      }
-      return '';
+Ext.define('Editor.model.admin.TaskUserTracking', {
+  extend: 'Ext.data.Model',
+  fields: [
+    {name: 'id', type: 'int'},
+    {name: 'taskGuid', type: 'string'},
+    {name: 'userGuid', type: 'string'},
+    {name: 'taskOpenerNumber', type: 'integer'},
+    {name: 'firstName', type: 'string'},
+    {name: 'taskName', type: 'string'},
+    {name: 'surName', type: 'string'},
+    {name: 'userName', type: 'string'},
+    {name: 'role', type: 'string'}
+  ],
+  idProperty: 'id',
+  proxy : {
+    type : 'rest',
+    url: Editor.data.restpath+'taskusertracking',
+    reader : {
+      rootProperty: 'rows',
+      type : 'json'
+    },
+    writer: {
+      encode: true,
+      rootProperty: 'data',
+      writeAllFields: false
+    }
   }
 });

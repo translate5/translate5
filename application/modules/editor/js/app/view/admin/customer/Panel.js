@@ -75,7 +75,8 @@ Ext.define('Editor.view.admin.customer.Panel', {
         openIdAuth2Url:'#UT#OpenId OAuth URL',
         rolesLabel: '#UT#Systemrollen',
         openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
-        openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.'
+        openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
+        anonymizeUsers:'#UT#User anonymisieren?'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -133,6 +134,15 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 filter: {
                                     type: 'string'
                                 }
+                            },
+                            {
+                                xtype: 'owncheckcolumn',
+                                dataIndex: 'anonymizeUsers',
+                                text: me.strings.anonymizeUsers,
+                                filter: {
+                                    type: 'boolean'
+                                },
+                                width: 70
                             }
                             /*{
                                 xtype: 'actioncolumn',
@@ -212,21 +222,19 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         name: 'number',
                                         allowBlank: false,
                                         maxLength: 255
+                                    },
+                                    {
+                                        xtype: 'checkbox',
+                                        fieldLabel: me.strings.anonymizeUsers,
+                                        name: 'anonymizeUsers',
+                                        inputValue:1,
+                                        uncheckedValue:0,
+                                        checked:1
                                     },{
                                         xtype:'textfield',
                                         fieldLabel:me.strings.domain,
                                         name:'domain',
-                                        itemId:'openIdDomain',
-                                        setAllowBlank:me.setFieldAllowBlank,
-                                        listeners: {
-                                            change: {
-                                                fn: 'onOpenIdFieldChange',
-                                                scope: 'controller'
-                                            }
-                                        },
-                                        bind:{
-                                            allowBlank:'{!isOpenIdRequired}',
-                                        }
+                                        itemId:'openIdDomain'
                                     },{
                                     	xtype:'fieldset',
                                     	itemId:'openIdFieldset',
