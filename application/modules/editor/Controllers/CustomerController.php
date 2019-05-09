@@ -64,7 +64,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
             return parent::postAction();
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            $this->handleDuplicateNumber($e);
+            $this->handleDuplicate($e);
         }
     }
     
@@ -77,7 +77,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
             return parent::putAction();
         }
         catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-            $this->handleDuplicateNumber($e);
+            $this->handleDuplicate($e);
         }
     }
     
@@ -208,8 +208,16 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @param Zend_Db_Statement_Exception $e
      * @throws Zend_Db_Statement_Exception
      */
-    protected function handleDuplicateNumber(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
-        //TODO: handle duplicate for the OpenId domain
+    protected function handleDuplicate(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+        if($e->isInMessage('domain_UNIQUE')){
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1104' => 'The given domain is already in use.'
+            ], 'editor.customer');
+            throw ZfExtended_UnprocessableEntity::createResponse('E1104', [
+                'domain' => ['duplicateDomain' => 'Diese Domain wird bereits verwendet.']
+            ]);
+        }
+        
         ZfExtended_UnprocessableEntity::addCodes([
             'E1063' => 'The given client-number is already in use.'
         ], 'editor.customer');
