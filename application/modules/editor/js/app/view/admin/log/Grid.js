@@ -34,14 +34,15 @@ Ext.define('Editor.view.admin.log.Grid', {
     strings: {
         reload: '#UT# Aktualisieren',
         level: '#UT# Typ',
-        level_fatal: '#UT# Fatal',
-        level_error: '#UT# Error',
+        level_fatal: '#UT# Schwerer Fehler',
+        level_error: '#UT# Fehler',
         level_warn: '#UT# Warnung',
         level_info: '#UT# Info',
         level_debug: '#UT# Debug',
         level_trace: '#UT# Trace',
         colUsername: '#UT# Benutzer',
-        eventCode: '#UT# Fehlercode',
+        eventCode: '#UT# Code',
+        eventCodeLong: '#UT# Ereignis- bzw. Fehlercode',
         domain: '#UT# Bereich',
         message: '#UT# Fehler',
         created: '#UT# Zeitpunkt',
@@ -167,7 +168,7 @@ Ext.define('Editor.view.admin.log.Grid', {
                         iconCls: 'ico-refresh',
                         text: me.strings.reload,
                         handler: function() {
-                            me.store.reload();
+                            me.down('gridpanel').store.reload();
                         }
                     }]
                 }]

@@ -242,7 +242,7 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     	var me=this,
     		form=me.getView().down('form').getForm(),
     		vm=me.getViewModel(),
-    		fields=['domain','openIdServer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
+    		fields=['openIdServer','openIdIssuer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
     	
     	vm.set('isOpenIdRequired',me.handleRequiredFields(form,fields));
     },

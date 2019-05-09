@@ -151,7 +151,7 @@ Ext.define('Editor.controller.ServerException', {
         }
             
         //it can happen on submit requests, that we receive the content in XML instead JSON:
-        if(response.responseText.length == 0 && Ext.DomQuery.isXml(response.responseXML)) {
+        if((!response.responseText || response.responseText.length == 0) && Ext.DomQuery.isXml(response.responseXML)) {
             json.httpStatus = status = Ext.DomQuery.selectNumber('httpStatus', response.responseXML);
             _status = Ext.DomQuery.selectValue('httpStatus', response.responseXML);
             json.message = statusText = Ext.DomQuery.selectValue('errorMessage', response.responseXML);
