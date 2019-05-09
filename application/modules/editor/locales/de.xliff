@@ -1309,6 +1309,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='S3VuZGVuIGzDtnNjaGVu'><source>Kunden löschen</source><target>Kunden löschen</target></trans-unit>
 <trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'><source>Kunde gelöscht</source><target>Kunde gelöscht</target></trans-unit>
 <trans-unit id='RW5ka3VuZGU='><source>Endkunde</source><target>Endkunde</target></trans-unit>
+<trans-unit id='VXNlciBhbm9ueW1pc2llcmVuPw=='><source>User anonymisieren?</source><target>User in Workflow anonymisieren?</target></trans-unit>
 <trans-unit id='bm8gZXhpc3RpbmcgYXR0cmlidXRlcw=='><source>no existing attributes</source><target>Keine Eigenschaften hinterlegt</target></trans-unit>
 <trans-unit id='QUNIVFVORzogUVVFTExTUFJBQ0hMSUNIRVIgSU5IQUxUIElOIFZPUkhFUklHRU0gT0RFUiBOQUNIRk9MR0VOREVNIFNFR01FTlQ='><source>ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source><target>ACHTUNG: QUELLSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</target></trans-unit>
 <trans-unit id='QUNIVFVORzogWklFTFNQUkFDSExJQ0hFUiBJTkhBTFQgSU4gVk9SSEVSSUdFTSBPREVSIE5BQ0hGT0xHRU5ERU0gU0VHTUVOVA=='><source>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</source><target>ACHTUNG: ZIELSPRACHLICHER INHALT IN VORHERIGEM ODER NACHFOLGENDEM SEGMENT</target></trans-unit>
@@ -1531,6 +1532,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RGVyIEluaGFsdCB3dXJkZSBuaWNodCBpbiBkYXMgQ2xpcGJvYXJkIMO8YmVybm9tbWVuLg=='><source>Der Inhalt wurde nicht in das Clipboard übernommen.</source><target>Der Inhalt wurde nicht in das Clipboard übernommen.</target></trans-unit>
 <trans-unit id='RGllIFBvc2l0aW9uIGRlcyBDdXJzb3JzIGJ6dy4gZGllIEF1c3dhaGwgaW0gVGV4dCB3dXJkZSBuaWNodCBlcmthbm50LiBCaXR0ZSBub2NobWFsIHByb2JpZXJlbiB1bmQgZ2dmLiBkaWUgQWRtaW5zIGJlbmFjaHJpY2h0aWdlbi4='><source>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</source><target>Die Position des Cursors bzw. die Auswahl im Text wurde nicht erkannt. Bitte nochmal probieren und ggf. die Admins benachrichtigen.</target></trans-unit>
 <trans-unit id='V8OkaGxlbiBTaWUgZGllIFJlc3NvdXJjZSBhdXMgdW0gd2VpdGVyZSBJbmZvcyB6dSBiZWtvbW1lbi4='><source>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</source><target>Wählen Sie die Ressource aus um weitere Infos zu bekommen.</target></trans-unit>
+<trans-unit id='QWRtaW5Y'><source>AdminX</source><target>AdminX</target></trans-unit>
+<trans-unit id='RGllIFJlc3NvdXJjZSBpc3QgZ2VuZXJlbGwgdmVyZsO8Z2Jhciwgc3RlbGx0IGFiZXIga2VpbmUgSW5mb3JtYXRpb25lbiDDvGJlciBkYXMgYW5nZWZyYWd0ZSBUTSBiZXJlaXQsIGRhIGRpZXMgbmljaHQgZ2VsYWRlbiBpc3Qu'><source>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</source><target>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</target></trans-unit>
+<trans-unit id='SFRUUDogNDAx'><source>HTTP: 401</source><target>HTTP: 401</target></trans-unit>
   </body>
  </file>
 </xliff>

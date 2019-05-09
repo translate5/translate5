@@ -105,12 +105,26 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function indexAction() {
         $taskGuid = $this->session->taskGuid;
-        $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
+        
+        $rows = $this->entity->loadByTaskGuid($taskGuid);
+        $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
         
         $this->addIsWatchedFlag();
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
+        
+        // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            foreach ($this->view->rows as &$row) {
+                $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
+            }
+        }
     }
     
     public function nextsegmentsAction() {
@@ -327,6 +341,17 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         
+        // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
+            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
+        }
+        
         //call after segment put handler
         $this->handleAfterSegmentPut();
     }
@@ -473,6 +498,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             if(isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']){
                 $replace->trackChangeTag->attributeWorkflowstep=$parameters['attributeWorkflowstep'];
                 $replace->trackChangeTag->userColorNr=$parameters['userColorNr'];
+                $replace->trackChangeTag->userTrackingId=$parameters['userTrackingId'];
                 $replace->isActiveTrackChanges=$parameters['isActiveTrackChanges'];
             }
             
@@ -605,6 +631,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $nbsp = json_decode('"\u00a0"');
         $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $internalTag editor_Models_Segment_InternalTag */
+        $trackChangeTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $trackChangeTagHelper editor_Models_Segment_TrackChangeTag */
         foreach($this->data as $key => $data) {
             //consider only changeable datafields:
             if(! in_array($key, $fieldnames)) {

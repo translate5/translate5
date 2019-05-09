@@ -26,30 +26,36 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_UserController extends ZfExtended_UserController {
+/**
+ *
+ */
+class editor_TaskusertrackingController extends ZfExtended_RestController {
+
+    protected $entityClass = 'editor_Models_TaskUserTracking';
     
-    public function deleteAction() {
-        //parent is calling load again, but nevermind, this should be bearable...
-        $this->entityLoad();
+    /**
+     * @var editor_Models_TaskUserTracking
+     */
+    protected $entity;
+    
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::indexAction()
+     */
+    public function indexAction(){
+        $rows = $this->entity->loadAll();
+        $this->view->rows = $rows;
+        
+        // anonymize userinfo for view?
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
-        $tasks = $task->loadListByPmGuid($this->entity->getUserGuid());
-        if(empty($tasks)) {
-            parent::deleteAction();
-            return;
+        $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+        /* @var $workflowAnonymize editor_Workflow_Anonymize */
+        foreach ($this->view->rows as &$row) {
+            $task->loadByTaskGuid($row['taskGuid']);
+            if ($task->anonymizeUsers()) {
+                $row = $workflowAnonymize->anonymizeUserdata($row['taskGuid'], $row['userGuid'], $row);
+            }
         }
-        $taskGuids = array_column($tasks, 'taskGuid');
-        
-        ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1048' => 'The user can not be deleted, he is PM in one or more tasks.'
-        ]);
-        throw ZfExtended_Models_Entity_Conflict::createResponse('E1048', [
-            'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.'
-        ],[
-            'tasks' => join(', ', $taskGuids),
-            'user' => $this->entity->getUserGuid(),
-            'userLogin' => $this->entity->getLogin(),
-            'userEmail' => $this->entity->getEmail(),
-        ]);
     }
 }

@@ -127,6 +127,36 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+    
+    /**
+     * Returns a Zend_Config Object; if task specific settings exist, they are set now.
+     * @return Zend_Config
+     */
+    protected function getConfig() {
+        // This is a temporary preparation for implementing TRANSLATE-471.
+        
+        $config = new Zend_Config([], true);
+        
+        // Step 1: start with systemwide config
+        $origConfig = Zend_Registry::get('config');
+        /* @var $origConfig Zend_Config */
+        $config->merge($origConfig);
+        
+        // Step 2: anything customer-specific for this task?
+        if (!empty($this->getCustomerId())) {
+            $customer = ZfExtended_Factory::get('editor_Models_Customer');
+            /* @var $customer editor_Models_Customer */
+            $customer->load($this->getCustomerId());
+            $customerConfig = $customer->getConfig();
+            $config->merge($customerConfig);
+        }
+        
+        // Step 3: anything task-specific for this task?
+        // TODO...
+        
+        $config->setReadOnly();
+        return $config;
+    }
 
     /**
      * loads the task to the given guid
@@ -824,5 +854,33 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                  [fontSize] => 14
          )
          */
+    }
+    
+    /**
+     * Are the usernames for the task to be anonymized?
+     * No personal information about other workflow users is visible in the workflow,
+     * (1) if anonymizeUsers is checked (set to true)
+     * (2) for all users that do not have the roles admin, PM or api.
+     * If no $userGuid is given, we assume that the user we check is the session-user.
+     * If the $userGuid-param is set to "false", the user-check is omitted (= only the
+     * task's anonymizeUsers-config is taken into account).
+     * @param string|false $userGuid (optional)
+     * @return boolean
+     */
+    public function anonymizeUsers($userGuid = null) {
+        $config = $this->getConfig();
+        if(!$config->runtimeOptions->customers->anonymizeUsers) {
+            return false;
+        }
+        if($userGuid === false) {
+            return $config->runtimeOptions->customers->anonymizeUsers; // = true if we get here
+        }
+        if(is_null($userGuid)) {
+            $sessionUser = new Zend_Session_Namespace('user');
+            $userGuid = $sessionUser->data->userGuid;
+        }
+        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        return !($userModel->loadByGuid($userGuid)->isAdminOrPMOrApi());
     }
 }
