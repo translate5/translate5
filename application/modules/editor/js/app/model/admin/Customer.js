@@ -47,7 +47,8 @@ Ext.define('Editor.model.admin.Customer', {
         {type: 'string',name: 'openIdClientId',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
         {type: 'string',name: 'openIdClientSecret',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
         {type: 'string',name: 'openIdRedirectLabel',validations: [{type: 'presence'},{type: 'length',max: 1024}]},
-        {type: 'auto',name: 'openIdRedirectCheckbox'}
+        {type: 'auto',name: 'openIdRedirectCheckbox'},
+        {type: 'boolean', name: 'anonymizeUsers'}
     ],
 
     idProperty: 'id',
