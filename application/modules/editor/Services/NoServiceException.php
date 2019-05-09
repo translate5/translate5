@@ -26,30 +26,23 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class Editor_UserController extends ZfExtended_UserController {
+/**#@+
+ * @author Marc Mittag
+ * @package editor
+ * @version 1.0
+ *
+ */
+
+/**
+ * is thrown if a service is accessed, which does not exist any more, or where the corresponding plug-in was disabled.
+ */
+class editor_Services_NoServiceException extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.languageresource.service';
     
-    public function deleteAction() {
-        //parent is calling load again, but nevermind, this should be bearable...
-        $this->entityLoad();
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $tasks = $task->loadListByPmGuid($this->entity->getUserGuid());
-        if(empty($tasks)) {
-            parent::deleteAction();
-            return;
-        }
-        $taskGuids = array_column($tasks, 'taskGuid');
-        
-        ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1048' => 'The user can not be deleted, he is PM in one or more tasks.'
-        ]);
-        throw ZfExtended_Models_Entity_Conflict::createResponse('E1048', [
-            'Der Benutzer kann nicht gelöscht werden, er ist PM in einer oder mehreren Aufgaben.'
-        ],[
-            'tasks' => join(', ', $taskGuids),
-            'user' => $this->entity->getUserGuid(),
-            'userLogin' => $this->entity->getLogin(),
-            'userEmail' => $this->entity->getEmail(),
-        ]);
-    }
+    static protected $localErrorCodes = [
+        'E1106' => 'Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!',
+    ];
 }

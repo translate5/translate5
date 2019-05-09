@@ -480,7 +480,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         if(!assocPanel){
             return;
         }
-        assocPanel.unmask();;
+        assocPanel.unmask();
 
         if(!matchAnalysisPanel){
             return;

@@ -67,6 +67,18 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   }
   
   /**
+   * anonymizes a comment that has been markedUp using comment.phtml 
+   * (= replace author given in <span class="author">xyz</span>)
+   * @param string $text
+   */
+  public function renderAnonymizedComment (string $text) {
+      // Details regarding the author ("User1", "User2", ...) are available in the segment's context-column,
+      // hence here we skip turning the given data to "User1" etc.
+      $text = preg_replace('/<span class="author">.*?<\/span>/', '<span class="author"></span>', $text);
+      return $text;
+  }
+  
+  /**
    * updates the segments comments field by merging all comments to the segment, and apply HTML markup to each comment
    * @param int $segmentId
    * @param string $taskGuid

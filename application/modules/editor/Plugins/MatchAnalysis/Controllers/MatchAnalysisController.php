@@ -38,8 +38,13 @@ class editor_Plugins_MatchAnalysis_MatchAnalysisController extends ZfExtended_Re
     protected $entity;
     
     public function indexAction(){
-        $params=$this->getAllParams();
-        $this->view->rows=$this->entity->loadByBestMatchRate($params['taskGuid']);
+        $taskGuid = $this->getParam('taskGuid', false);
+        if(empty($taskGuid)) {
+            // MatchAnalysis Plug-In: tried to load analysis data without providing a valid taskGuid
+            // Reason is unfixed: TRANSLATE-1637: MatchAnalysis: Errors in Frontend when analysing multiple tasks
+            throw new editor_Plugins_MatchAnalysis_Exception("E1103");
+        }
+        $this->view->rows=$this->entity->loadByBestMatchRate($taskGuid);
     }
     
     public function exportAction(){

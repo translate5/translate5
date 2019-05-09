@@ -46,6 +46,18 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
      * @return string
      */
     public function renderUserList(array $users) {
+        // anonymize users?
+        $task = $this->view->task;
+        /* @var $task editor_Models_Task */
+        $taskGuid = $task->getTaskGuid();
+        if ($task->anonymizeUsers(false)) { // = anonymize $users for task without taking the addressed user into account
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            foreach($users as &$user) {
+                $user = $workflowAnonymize->anonymizeUserdata($taskGuid, $user['userGuid'], $user);
+            }
+        }
+        
         $firstUser = reset($users);
         $hasState = !empty($firstUser) && array_key_exists('state', $firstUser);
         $hasRole = !empty($firstUser) && array_key_exists('role', $firstUser);
