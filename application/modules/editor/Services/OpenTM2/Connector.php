@@ -261,6 +261,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $this->shortTagIdent = $mapCount + 1;
         $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
+            //for communication with OpenTM2 we assume that the segment content is XML/XLIFF therefore we assume xmlBased here 
             $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true); 
             $textNode = $this->whitespaceTagReplacer($textNode);
             $xmlParser->replaceChunk($key, $textNode);

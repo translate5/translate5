@@ -3261,6 +3261,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Mehr Info</source>
     <target>more information</target>
 </trans-unit>
+<trans-unit id='RGllc2UgRG9tYWluIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'>
+    <source>Diese Domain wird bereits verwendet.</source>
+    <target>This domain is already in use.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
