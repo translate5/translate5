@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  * Out of this table all desired analysis are calculated. 
  *
  */
-class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation{
+class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis_Pretranslation {
     const MAX_ERROR_PER_CONNECTOR = 2;
     
     /***
@@ -76,6 +76,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $this->analysisId=$analysisId;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         $this->initHelper();
+        parent::__construct();
     }
     
     /***
@@ -268,11 +269,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             return false;
         }
         $langRes = $connector->getLanguageResource();
-        $msg = __CLASS__.'::getBestMatchrate: ';
-        $msg .= 'Disabled the following Language Resource for analysing and pretranslation due too much errors. ';
-        $msg .= 'Errors see above in log. Task: '.$this->task->getTaskName().' - '.$this->task->getTaskNr().' ('.$this->task->getTaskGuid().')';
-        $msg .= 'Language Resource: '.$langRes->getName().' ('.$langRes->getServiceName().'; ID: '.$id.')';
-        error_log($msg);
+        $this->log->warn('E1101', 'Disabled Language Resource {name} ({service}) for analysing and pretranslation due too much errors.',[
+            task => $this->task,
+            languageResource => $langRes,
+            name => $langRes->getName(),
+            service => $langRes->getServiceName(),
+        ]);
         unset($this->connectors[$id]);
         return true;
     }
@@ -283,6 +285,10 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param int $id
      */
     protected function handleConnectionError(Exception $e, $id) {
+        $this->log->exception($e, [
+            'level' => $this->log::LEVEL_WARN,
+            'domain' => $this->log->getDomain(),
+        ]);
         settype($this->connectorErrorCount[$id], 'integer');
         $this->connectorErrorCount[$id]++;
     }
@@ -292,7 +298,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param bool $isMtResource
      * @return editor_Services_ServiceResult
      */
-    protected function getMatches(editor_Services_Connector_Abstract $connector, editor_Models_Segment $segment, $isMtResource) {
+    protected function getMatches(editor_Services_Connector $connector, editor_Models_Segment $segment, $isMtResource) {
         if($isMtResource){
             //the resource is of type mt, so we do not need to query the mt for results, since we will receive always the default MT defined matchrate
             //the mt resource only will be searched when pretranslating
@@ -333,7 +339,6 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
      * @param int $languageResourceid
      */
     public function saveAnalysis($segment,$matchRateResult,$languageResourceid){
-        //error_log('segmentNrInTask='.$segment->getSegmentNrInTask().' wordCount:'.$this->wordCount->getSourceCount().' totalCount:');
         $matchAnalysis=ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Models_MatchAnalysis');
         /* @var $matchAnalysis editor_Plugins_MatchAnalysis_Models_MatchAnalysis */
         $matchAnalysis->setSegmentId($segment->getId());
@@ -391,7 +396,17 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 //store the languageResource
                 $this->resources[$languageresource->getId()] = $languageresource;
             } catch (ZfExtended_Exception $e) {
-                error_log("Unable to use connector from Language Resource: resourceName: ".$languageresource->getName().', resourceId: '.$languageresource->getId().'. Error was: '.$e);
+                $this->log->warn('E1102', 'Unable to use connector from Language Resource "{name}". Error was: "{msg}".', [
+                    'task' => $this->task,
+                    'name' => $languageresource->getName(),
+                    'msg' => $e->getMessage(),
+                    'languageResource' => $languageresource,
+                ]);
+                $this->log->exception($e, [
+                    'task' => $this->task,
+                    'level' => $this->log::LEVEL_WARN,
+                    'domain' => $this->log->getDomain(),
+                ]);
                 continue;
             }
             

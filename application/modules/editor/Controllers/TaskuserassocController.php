@@ -67,7 +67,9 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::indexAction()
      */
     public function indexAction(){
-        $this->view->rows = $this->entity->loadAllWithUserInfo();
+        $rows = $this->entity->loadAllWithUserInfo();
+        $this->view->rows = $rows;
+        
         $this->view->total = $this->entity->getTotalCount();
         $this->applyEditableAndDeletable();
     }
