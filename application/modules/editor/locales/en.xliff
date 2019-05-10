@@ -3213,6 +3213,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Ereignisse</source>
     <target>Events</target>
 </trans-unit>
+<trans-unit id='RXJlaWduaXM='>
+    <source>Ereignis</source>
+    <target>Event</target>
+</trans-unit>
 <trans-unit id='U2Nod2VyZXIgRmVobGVy'>
     <source>Schwerer Fehler</source>
     <target>Fatal error</target>
