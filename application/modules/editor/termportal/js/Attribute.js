@@ -143,6 +143,8 @@ const Attribute={
 			return attValue;
 		}
 		
+		console.log(attributeData);
+		
 		//the proposal is allready defined, render the proposal
 		if(attributeData.proposal && attributeData.proposal!=''){
 			htmlCollection.push('<del>'+attributeData.attValue+'</del>');
@@ -150,7 +152,15 @@ const Attribute={
 			return htmlCollection.join(' ');
 		}
 		//the user has proposal rights -> init attribute proposal span
-		return '<span data-editable data-type="'+attributeData.attributeOriginType+'" data-id="'+attributeData.attributeId+'">'+attValue+'</span>';
+		return me.getProposalDefaultHtml(attributeData.attributeOriginType,attributeData.attributeId,attValue);
+	},
+
+	/***
+	 * Get the proposalable component default html. 
+	 * This will init the component as editable and set the type,id and value so thay can be used by the ComponentEditor
+	 */
+	getProposalDefaultHtml:function(type,id,value){
+		return '<span data-editable data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
 	}
 };
 

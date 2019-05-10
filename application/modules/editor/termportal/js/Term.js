@@ -1,10 +1,14 @@
 const Term={
 		
 		$_searchTermsSelect:null,
+		
 		searchTermsResponse:[],
 		termGroupsCache:[],
 		termAttributeContainer:[],
+
 		disableLimit:false,
+		reloadTermEntry:false,//shoul the term entry be reloaded or fatched from the cache
+		
 		KEY_TERM:"term",
 		KEY_TERM_ATTRIBUTES:"termAttributes",
 		
@@ -164,7 +168,7 @@ const Term={
 		    Attribute.languageDefinitionContent=[];
 		    
 		    //check the cache
-		    if(me.termGroupsCache[termGroupid]){
+		    if(!me.reloadTermEntry && me.termGroupsCache[termGroupid]){
 		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termGroupid].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 		        me.groupTermAttributeData(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
 		        return;
@@ -183,6 +187,9 @@ const Term={
 		            
 		            TermEntry.drawTermEntryAttributes(result.rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 		            me.groupTermAttributeData(result.rows[me.KEY_TERM_ATTRIBUTES]);
+		            
+		            //reset term entry reload flag
+		            me.reloadTermEntry=false;
 		        }
 		    })
 		},
@@ -247,8 +254,7 @@ const Term={
 		    for(var i=0;i<me.termAttributeContainer.length;i++){
 		    	var attribute=me.termAttributeContainer[i],
 		    		rfcLanguage = getLanguageFlag(attribute[0].language),
-		    		statusIcon=me.checkTermStatusIcon(attribute),//check if the term contains attribute with status icon
-		    		termProposal=attribute[0].proposal ? attribute[0].proposal : false; 
+		    		statusIcon=me.checkTermStatusIcon(attribute);//check if the term contains attribute with status icon
 
 		    	//draw term header
 		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'">');
@@ -264,7 +270,7 @@ const Term={
 		    	
 		    	//get term render data
 		    	termAttributesHtmlContainer.push(me.getTermRenderData(attribute[0]));
-		    	
+
 		    	if(statusIcon){
 		    		termAttributesHtmlContainer.push(statusIcon);
 		    	}
@@ -380,17 +386,17 @@ const Term={
 				userHasTermProposalRights=true;//TODO: get me from backend
 			
 			if(!userHasTermProposalRights){
-				return termData.desc;
+				return termData.desc!=undefined ? termData.desc : termData.term;
 			}
 			
 			//the proposal is allready defined, render the proposal
-			if(termData.proposal && termData.proposal!=undefined){
-				htmlCollection.push('<del>'+termData.desc+'</del>');
-				htmlCollection.push('<ins>'+termData.proposal.term+'</ins>');
+			if(termData.proposal && termData.proposal!=''){
+				htmlCollection.push('<del>'+termData.desc!=undefined ? termData.desc : termData.term+'</del>');
+				htmlCollection.push('<ins>'+termData.proposal+'</ins>');
 				return htmlCollection.join(' ');
 			}
 			//the user has proposal rights -> init term proposal span
-			return '<span data-editable data-type="term" data-id="'+termData.termId+'">'+termData.desc+'</span>';
+			return Attribute.getProposalDefaultHtml('term',termData.termId,termData.desc!=undefined ? termData.desc : termData.term);
 		}
 };
 

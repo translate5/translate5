@@ -38,7 +38,7 @@ const ComponentEditor={
 			$el = $(this),
 			$input = $('<input/>').val($el.text());
 	  
-		$el.replaceWith( $input );
+		$el.replaceWith($input);
 	  
 		$input.one('blur', function(){
 			me.saveComponentChange($el,$input);
@@ -52,7 +52,22 @@ const ComponentEditor={
 			url=Editor.data.termportal.restPath+route.replace("{ID}",$el.data('id')),
 			requestData={};
 		
+		//is the modefied text empty or the same as the initial one
+		if($input.val()=='' || $el.text()==$input.val()){
+			
+			//get initial html for the component
+			var dummyData={
+					'attributeOriginType':$el.data('type'),
+					'attributeId':$el.data('id')
+			},
+			componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
+			$input.replaceWith(componentRenderData);
+			return;
+		}
+		
 		requestData[dataKey]=$input.val();
+		
+		//send proposal request
 		 $.ajax({
 	        url: url,
 	        dataType: "json",
@@ -61,18 +76,25 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-	        	console.log(result);
 	        	me.updateComponent($el,$input,result.rows);
 	        }
 	    });
 	},
 	
+	/***
+	 * Update component html with the proposed result. The editor component also will be destroyed. 
+	 */
 	updateComponent:function($el,$input,result){
-		var renderData=Attribute.getAttributeRenderData(result);
-		//var $p = $el.text($input.val());
+		var renderData='';
+		if($el.data('type')=='term'){
+			renderData=Term.getTermRenderData(result);
+		}else{
+			renderData=Attribute.getAttributeRenderData(result);
+		}
 		$input.replaceWith(renderData);
+		//on the next term click, fatch the data from the server, and update the cache
+		Term.reloadTermEntry=true;
 	}
-	
 };
 
 ComponentEditor.init();
