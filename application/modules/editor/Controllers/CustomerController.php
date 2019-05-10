@@ -211,7 +211,7 @@ class Editor_CustomerController extends ZfExtended_RestController {
     protected function handleDuplicate(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
         if($e->isInMessage('domain_UNIQUE')){
             ZfExtended_UnprocessableEntity::addCodes([
-                'E1104' => 'The given domain is already in use.'
+                'E1104' => 'This domain is already in use.'
             ], 'editor.customer');
             throw ZfExtended_UnprocessableEntity::createResponse('E1104', [
                 'domain' => ['duplicateDomain' => 'Diese Domain wird bereits verwendet.']
