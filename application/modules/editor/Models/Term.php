@@ -677,23 +677,32 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
         );
         
-        $cols=array(
-                'definition',
-                'groupId', 
-                'term as label',
-                'id as value',
-                'term as desc',
-                'status as termStatus',
-                'id as termId',
-                'collectionId',
-                'language as languageId'
-        );
+        $cols=[
+            'definition',
+            'groupId',
+            'term as label',
+            'id as value',
+            'term as desc',
+            'status as termStatus',
+            'id as termId',
+            'collectionId',
+            'language as languageId'
+        ];
+        
+        //TODO: define user proposal rights
+        $userHasProposalRights=true;
         
         $s=$this->db->select()
         ->from($this->db,$cols)
         ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
-        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'))
-        ->where('groupId=?',$groupId)
+        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'));
+        
+        //TODO: define user proposal rights
+        if($userHasProposalRights){
+            $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',['LEK_term_proposal.term as proposal']);
+        }
+        
+        $s->where('groupId=?',$groupId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('label');
         $s->setIntegrityCheck(false);
