@@ -28,6 +28,34 @@ const Term={
 		    });
 		},
 		
+        initProposals: function (){
+            var userProposalRights=true, //TODO: get me from the backend;
+                htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-squaresmall-plus"></span>',
+                htmlProposalEditIcon = '<span class="proposeTermBtn editTerm ui-icon ui-icon-pencil"></span>',
+                htmlProposalDeleteIcon = '<span class="proposeTermBtn deleteTerm ui-icon ui-icon-trash-b"></span>';
+            if(userProposalRights){
+                // TODO: Tooltips: use translations and check if the user has the rights to propose only
+                // term-entries
+                $('#resultTermsHolder > ul').append(htmlProposalDeleteIcon+htmlProposalEditIcon);
+                $('#resultTermsHolder > ul .editTerm').prop('title', 'Edit TermEntry');
+                $('#resultTermsHolder > ul .deleteTerm').prop('title', 'Delete TermEntry');
+                $('#searchTermsSelect').append(htmlProposalAddIcon);
+                $('#searchTermsSelect .addTerm').prop('title', 'Add new TermEntry');
+                // terms
+                $('.term-data').append(htmlProposalDeleteIcon+htmlProposalEditIcon);
+                $('.term-data .editTerm').prop('title', 'Edit Term');
+                $('.term-data .deleteTerm').prop('title', 'Delete Term');
+                $('#termTable').append(htmlProposalAddIcon);
+                $('#termTable .addTerm').prop('title', 'Add new Term');
+                // attributes
+                $('.attribute-data').append(htmlProposalDeleteIcon+htmlProposalEditIcon);
+                $('.attribute-data .editTerm').prop('title', 'Edit Attribute');
+                $('.attribute-data .deleteTerm').prop('title', 'Delete Attribute');
+                $('.term-data').next('div').append(htmlProposalAddIcon);
+                $('.term-data').next('div').find('.addTerm').prop('title', 'Add new Attribute');
+            }
+        },
+		
 		/***
 		 * Search the term in the language and term collection
 		 * @param searchString
@@ -228,6 +256,8 @@ const Term={
 		    
 		    //draw the term groups
 		    me.drawTermGroups();
+		    
+		    me.initProposals();
 		},
 		
 		/***
@@ -247,8 +277,7 @@ const Term={
 		    
 		    var count=0,
 		        rfcLanguage,
-		        termAttributesHtmlContainer=[],
-		        userProposalRights=true;//TODO: get me from the backend
+		        termAttributesHtmlContainer=[];
 		    
 		    
 		    for(var i=0;i<me.termAttributeContainer.length;i++){
@@ -257,7 +286,7 @@ const Term={
 		    		statusIcon=me.checkTermStatusIcon(attribute);//check if the term contains attribute with status icon
 
 		    	//draw term header
-		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'">');
+		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'" class="term-data">');
 		    	
 		    	//add empty space between
 		    	termAttributesHtmlContainer.push(' ');
@@ -273,10 +302,6 @@ const Term={
 
 		    	if(statusIcon){
 		    		termAttributesHtmlContainer.push(statusIcon);
-		    	}
-		    	
-		    	if(userProposalRights){
-		    		termAttributesHtmlContainer.push('<button class="proposeTermBtn"></button>');
 		    	}
 		    	
 		    	termAttributesHtmlContainer.push('</h3>');
