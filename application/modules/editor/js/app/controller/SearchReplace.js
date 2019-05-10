@@ -1672,6 +1672,7 @@ Ext.define('Editor.controller.SearchReplace', {
         if(me.isActiveTrackChanges()){
             params['isActiveTrackChanges']=true;
             params['attributeWorkflowstep']=Editor.data.task.get('workflowStepName')+Editor.data.task.get('workflowStep');
+            params['userTrackingId']=Editor.data.task.get('userTrackingId');
             params['userColorNr']=Editor.data.task.get('userColorNr');
         }
 
