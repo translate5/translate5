@@ -876,6 +876,6 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         }
         $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
-        return !($userModel->readAnonymyzedUsers());
+        return !($userModel->readAnonymizedUsers());
     }
 }

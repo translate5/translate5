@@ -83,6 +83,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             //'LEK_skeletonfiles' => array('--single-transaction', "--where=fileId in (select id from LEK_files where taskGuid = '{TASKGUID}')"),
             'LEK_task' => 'taskGuid',
             'LEK_taskUserAssoc' => 'taskGuid',
+            'LEK_taskUserTracking' => 'taskGuid',
             'LEK_task_log' => 'taskGuid',
             'LEK_task_meta' => 'taskGuid',
             'LEK_task_migration' => 'taskGuid',
