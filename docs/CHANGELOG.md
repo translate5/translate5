@@ -3,6 +3,29 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.1] - 2019-05-10
+###Added
+TRANSLATE-1403: Anonymize users in the workflow
+
+###Changed
+TRANSLATE-1648: Disable the drop down menu in the column head of the task grid via ACL
+TRANSLATE-1636: OpenID Connect: Automatically remove protocol from translate5 domain
+VISUAL-64: VisualReview: Improve texts on leaving visualReview task
+
+###Bugfixes
+TRANSLATE-1646: The frontend inserts invisible BOM (EFBBBF) characters into the saved segment
+TRANSLATE-1642: Saving client with duplicate "translate5 domain" shows wrong error message
+T5DEV-267: GroupShare Integration pre-translation and analysis does not work
+TRANSLATE-1635: OpenID Connect: Logout URL of TermPortal leads to error, when directly login again with OpenID via MS ActiveDirectory
+TRANSLATE-1633: Across XLF comment import does provide wrong comment date
+TRANSLATE-1641: Adjust the translate5 help window width and height
+TRANSLATE-1640: OpenID Connect: Customer domain is mandatory for OpenId group
+TRANSLATE-1632: JS: Cannot read property 'length' of undefined
+TRANSLATE-1631: JS: me.store.reload is not a function
+TRANSLATE-337: uniqid should not be used for security relevant issues
+TRANSLATE-1639: OpenID Connect: OpenId authorization redirect after wrong translate5 password
+TRANSLATE-1638: OpenID Connect: OpenId created user is not editable
+
 ## [3.2.0] - 2019-04-17
 ###Added
 VISUAL-63: VisualReview for translation tasks
