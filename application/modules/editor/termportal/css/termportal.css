@@ -209,12 +209,13 @@ h4, p {
     float: left;
     margin-left: 0px;
 }
-#searchTermsSelect .proposeTermBtn.addTerm ,
-#termTable > .proposeTermBtn.addTerm {
+#searchTermsHolder .proposeTermBtn.addTerm,
+#termTable > .proposeTermBtn.addTerm{
     color: #007fff;
     font-size: 60px;
 }
-#termTable > div .proposeTermBtn.addTerm {
+#termTable > div .proposeTermBtn.addTerm,
+#termAttributeTable > .proposeTermBtn.addTerm  {
     color: #454545;
     font-size: 40px;
 }

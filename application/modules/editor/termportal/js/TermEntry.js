@@ -35,6 +35,9 @@ const TermEntry={
 	    });
 	    
 	    me.$_termAttributeTable.append(drawDataContainer.join(''));
+
+        Term.drawProposalButtons('term-entry');
+        Term.drawProposalButtons('term-entry-attributes');
 	}
 };
 

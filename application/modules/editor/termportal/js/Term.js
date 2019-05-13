@@ -1,6 +1,8 @@
 const Term={
 		
 		$_searchTermsSelect:null,
+		$_searchTermsHolder:null,
+		$_resultTermsHolderUl:null,
 		
 		searchTermsResponse:[],
 		termGroupsCache:[],
@@ -19,42 +21,16 @@ const Term={
 		
 		cacheDom:function(){
 			this.$_searchTermsSelect=$('#searchTermsSelect');
+	        this.$_searchTermsHolder=$('#searchTermsHolder');
+            this.$_resultTermsHolderUl = $('#resultTermsHolder > ul');
 		},
 		
 		initEvents:function(){
 			var me=this;
-			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) {
+			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) { // TODO: why does this take so long? maybe not global, but on each separately?
 				me.findTermsAndAttributes($(ui.selected).attr('data-value'));
 		    });
 		},
-		
-        initProposals: function (){
-            var userProposalRights=true, //TODO: get me from the backend;
-                htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-squaresmall-plus"></span>',
-                htmlProposalEditIcon = '<span class="proposeTermBtn editTerm ui-icon ui-icon-pencil"></span>',
-                htmlProposalDeleteIcon = '<span class="proposeTermBtn deleteTerm ui-icon ui-icon-trash-b"></span>';
-            if(userProposalRights){
-                // TODO: Tooltips: use translations and check if the user has the rights to propose only
-                // term-entries
-                $('#resultTermsHolder > ul').append(htmlProposalDeleteIcon+htmlProposalEditIcon);
-                $('#resultTermsHolder > ul .editTerm').prop('title', 'Edit TermEntry');
-                $('#resultTermsHolder > ul .deleteTerm').prop('title', 'Delete TermEntry');
-                $('#searchTermsSelect').append(htmlProposalAddIcon);
-                $('#searchTermsSelect .addTerm').prop('title', 'Add new TermEntry');
-                // terms
-                $('.term-data').append(htmlProposalDeleteIcon+htmlProposalEditIcon);
-                $('.term-data .editTerm').prop('title', 'Edit Term');
-                $('.term-data .deleteTerm').prop('title', 'Delete Term');
-                $('#termTable').append(htmlProposalAddIcon);
-                $('#termTable .addTerm').prop('title', 'Add new Term');
-                // attributes
-                $('.attribute-data').append(htmlProposalDeleteIcon+htmlProposalEditIcon);
-                $('.attribute-data .editTerm').prop('title', 'Edit Attribute');
-                $('.attribute-data .deleteTerm').prop('title', 'Delete Attribute');
-                $('.term-data').next('div').append(htmlProposalAddIcon);
-                $('.term-data').next('div').find('.addTerm').prop('title', 'Add new Attribute');
-            }
-        },
 		
 		/***
 		 * Search the term in the language and term collection
@@ -133,6 +109,8 @@ const Term={
 				if(me.searchTermsResponse.length>0){
 					showFinalResultContent();
 				}
+				
+                me.drawProposalButtons('term-entries');
 				
 			}
 			
@@ -256,8 +234,6 @@ const Term={
 		    
 		    //draw the term groups
 		    me.drawTermGroups();
-		    
-		    me.initProposals();
 		},
 		
 		/***
@@ -346,6 +322,9 @@ const Term={
 		            
 		        }
 		    });
+
+            me.drawProposalButtons('terms-attribute');
+            me.drawProposalButtons('terms');
 		    
 		    setSizesInFinalResultContent();
 		},
@@ -372,6 +351,73 @@ const Term={
 		    
 		    return html.join('');
 		},
+        
+		/**
+		 * Append the buttons for proposals in the DOM.
+		 * Address elements as specific as possible (= avoid long jQuery-selects).
+         * @param elements
+		 */
+        drawProposalButtons: function (elements){
+            var me = this,
+                userProposalRights=true, //TODO: get me from the backend;
+                userProposalDecideRights=false, //TODO: get me from the backend;
+                htmlProposalAddIcon,
+                htmlProposalEditIcon,
+                htmlProposalDeleteIcon,
+                $_selector,$_selectorAdd,
+                $titleAdd, $titleDelete, $titleEdit, $titleAddition;
+            if(userProposalRights){
+                // TODO: Tooltips: use translations
+                htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-squaresmall-plus"></span>';
+                htmlProposalDeleteIcon = '<span class="proposeTermBtn deleteTerm ui-icon ui-icon-trash-b"></span>';
+                htmlProposalEditIcon = '<span class="proposeTermBtn editTerm ui-icon ui-icon-pencil"></span>';
+                switch(elements) {
+                    case "term-entries":
+                        $_selector = false;
+                        $_selectorAdd = me.$_searchTermsHolder;
+                        $titleAdd = 'Add Term-Entry';
+                      break;
+                    case "term-entry":
+                        $_selector = me.$_resultTermsHolderUl;
+                        $_selectorAdd = false;
+                        $titleDelete = 'Delete Term-Entry';
+                        $titleEdit = 'Edit Term-Entry';
+                        break;
+                    case "term-entry-attributes":
+                        $_selector = $('#termAttributeTable .attribute-data');
+                        $_selectorAdd = $('#termAttributeTable');
+                        $titleAdd = 'Add Term-Entry-Attribute';
+                        $titleDelete = 'Delete Term-Entry-Attribute';
+                        $titleEdit = 'Edit Term-Entry-Attribute';
+                      break;
+                    case "terms":
+                        $_selector = $('#termTable .term-data');
+                        $_selectorAdd = $('#termTable');
+                        $titleAdd = 'Add Term';
+                        $titleDelete = 'Delete Term';
+                        $titleEdit = 'Edit Term';
+                        break;
+                    case "terms-attribute":
+                        $_selector = $('#termTable .attribute-data');
+                        $_selectorAdd = $('#termTable .term-data').next('div');
+                        $titleAdd = 'Add Term-Attribute';
+                        $titleDelete = 'Delete Term-Attribute';
+                        $titleEdit = 'Edit Term-Attribute';
+                      break;
+                }
+                $titleAddition = (userProposalDecideRights) ? '' : ' (Proposal only)';
+                if ($_selector && $_selector.children('.proposeTermBtn').length === 0) {
+                    $_selector.append(htmlProposalDeleteIcon+htmlProposalEditIcon);
+                    $_selector.children('.editTerm').prop('title', $titleEdit + $titleAddition);
+                    $_selector.children('.deleteTerm').prop('title', $titleDelete + $titleAddition);
+                }
+                if ($_selectorAdd && $_selectorAdd.children('.proposeTermBtn').length === 0) {
+                    $_selectorAdd.append(htmlProposalAddIcon);
+                    $_selectorAdd.find('.addTerm').prop('title', $titleAdd + $titleAddition);
+                }
+                
+            }
+        },
 		
 		/***
 		 * Check the term status icon in the term attributes.
