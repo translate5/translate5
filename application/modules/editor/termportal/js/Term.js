@@ -411,6 +411,7 @@ const Term={
                     $_selector.children('.editTerm').prop('title', $titleEdit + $titleAddition);
                     $_selector.children('.deleteTerm').prop('title', $titleDelete + $titleAddition);
                 }
+                return; // Add-Buttons are not implemented currently
                 if ($_selectorAdd && $_selectorAdd.children('.proposeTermBtn').length === 0) {
                     $_selectorAdd.append(htmlProposalAddIcon);
                     $_selectorAdd.find('.addTerm').prop('title', $titleAdd + $titleAddition);
