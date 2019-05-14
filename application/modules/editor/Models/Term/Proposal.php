@@ -43,9 +43,9 @@ END LICENSE AND COPYRIGHT
  * @method string getCreated() getCreated()
  * @method void setCreated() setCreated(string $date)
  */
-class editor_Models_TermCollection_TermProposal extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermProposal';
-    protected $validatorInstanceClass = 'editor_Models_Validator_TermCollection_TermProposal';
+class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_Term_Proposal';
+    protected $validatorInstanceClass = 'editor_Models_Validator_Term_Proposal';
     
     /**
      * Loads a proposal by termId

@@ -26,17 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- *
- */
-class editor_TermAttributesController extends ZfExtended_RestController {
-
-    protected $entityClass = 'editor_Models_TermCollection_TermAttributes';
-    
-    /**
-     * @var editor_Models_TermCollection_TermAttributes
-     */
-    protected $entity;
-    
-    //TODO: implement me
+class editor_Models_Db_Term_AttributeHistory extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_term_attribute_history';
+    public $_primary = 'id';
 }

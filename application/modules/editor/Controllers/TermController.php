@@ -39,7 +39,7 @@ class editor_TermController extends ZfExtended_RestController {
     protected $entity;
     
     /**
-     * @var editor_Models_TermCollection_TermProposal
+     * @var editor_Models_Term_Proposal
      */
     protected $proposal;
     
@@ -50,8 +50,8 @@ class editor_TermController extends ZfExtended_RestController {
      */
     public function getAction() {
         parent::getAction();
-        $this->proposal = ZfExtended_Factory::get('editor_Models_TermCollection_TermProposal');
-        /* @var $proposal editor_Models_TermCollection_TermProposal */
+        $this->proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
+        /* @var $proposal editor_Models_Term_Proposal */
         try {
             $this->proposal->loadByTermId($this->entity->getId());
             $this->view->rows->proposal = $this->proposal->getDataObject();
@@ -73,7 +73,7 @@ class editor_TermController extends ZfExtended_RestController {
         
         $this->proposal->setTermId($this->entity->getId());
         $this->proposal->setCollectionId($this->entity->getCollectionId());
-        $this->proposal->setTerm($this->data->term);
+        $this->proposal->setTerm(trim($this->data->term));
         $this->proposal->validate();
 
         //we don't save the term, but we save it to a proposal: 

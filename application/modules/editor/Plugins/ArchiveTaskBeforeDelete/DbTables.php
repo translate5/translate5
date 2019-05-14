@@ -91,7 +91,6 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_term_attributes'=>false,
             'LEK_term_attributes_label'=>false,
             'LEK_term_entry'=>false,
-            'LEK_term_entry_attributes'=>false,
             'LEK_user_changelog_info' => false,
             'LEK_user_meta' => false,
             'LEK_visualreview_files' => 'taskGuid',

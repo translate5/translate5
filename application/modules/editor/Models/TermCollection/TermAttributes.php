@@ -26,35 +26,121 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermAttributes extends editor_Models_TermCollection_Attributes{
+class editor_Models_TermCollection_TermAttributes extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributes';
     protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributes';
     
+    /***
+     * Attribute fields which are not updatable
+     * @var array
+     */
+    public $unupdatebleField = [
+        'transac'
+    ];
     
     /***
-     * Update the term transacGrp attributes.
-     * TransacGrp layout example:
-     * 
-     * <transacGrp>
-     *  <transac>modification</transac>
-     *  <date>2018-01-12</date>
-     *  <transacNote type="responsiblePerson">Aleksandar Mitrev</transacNote>
-     * </transacGrp>
-     * 
+     * Save or update an attribute
+     *
+     * @return mixed|array
      */
-    public function updateTransacGrp(int $termId,string $transac,string $date=null,string $transacNote=null){
-        $s=$this->db->select()
-        ->where('termId=?',$termId)
-        ->where('name="transac"')
-        ->where('attrType=?',$transac);
-        $result=$this->db->fetchAll($s)->toArray();
-        if(empty($result)){
-            return;
+    public function saveOrUpdate(){
+        $s = $this->db->select();
+        $toSave=$this->row->toArray();
+        $notCheckField=array(
+            'id',
+            'created',
+            'updated'
+        );
+        
+        //check if the field is unupdatable
+        $isUnupdatable=in_array($toSave['name'], $this->unupdatebleField);
+        foreach ($toSave as $key=>$value){
+            //if notcheck column
+            if(in_array($key, $notCheckField)){
+                continue;
+            }
+            
+            //ignore the value check in all updatable column
+            //the value check is needed only in the unupdatable columns
+            if(!$isUnupdatable && $key==='value'){
+                continue;
+            }
+            
+            //if the value is null
+            if($value==null){
+                $s->where($key.' IS NULL');
+                continue;
+            }
+            
+            $s->where($key.'=?',$value);
         }
         
-        foreach ($result as $res){
-            
+        //check if the field exist
+        $checkRow=$this->db->fetchRow($s);
+        if(empty($checkRow)){
+            $this->setUpdated(date("Y-m-d H:i:s"));
+            //the field does not exist
+            return $this->save();
         }
+        //the field exist, set the id it is needed for parentId
+        $this->setId($checkRow['id']);
+        if($isUnupdatable){
+            return $checkRow['id'];
+        }
+        //the same values, ignore
+        if($checkRow['value']===$toSave['value']){
+            $this->load($checkRow['id']);
+            $this->setUpdated(date("Y-m-d H:i:s"));
+            return $this->save();
+        }
+        
+        //new value is found, update the attribute
+        //load the record
+        $this->load($checkRow['id']);
+        $this->setValue($toSave['value']);
+        $this->setUpdated(date("Y-m-d H:i:s"));
+        return $this->save();
     }
     
+    /***
+     * Get all attributes for the given term entry (groupId)
+     * @param string $groupId - original termEntry id from the tbx
+     * @param array $collectionIds
+     * @return array|NULL
+     */
+    public function getAttributesForTermEntry($groupId,$collectionIds){
+        $cols = array(
+            'LEK_term_attributes.id AS attributeId',
+            'LEK_term_attributes.labelId as labelId',
+            'LEK_term_attributes.termEntryId AS termEntryId',
+            'LEK_term_attributes.parentId AS parentId',
+            'LEK_term_attributes.internalCount AS internalCount',
+            'LEK_term_attributes.language AS language',
+            'LEK_term_attributes.name AS name',
+            'LEK_term_attributes.attrType AS attrType',
+            'LEK_term_attributes.attrDataType AS attrDataType',
+            'LEK_term_attributes.attrTarget AS attrTarget',
+            'LEK_term_attributes.attrId AS attrId',
+            'LEK_term_attributes.attrLang AS attrLang',
+            'LEK_term_attributes.value AS attrValue',
+            'LEK_term_attributes.created AS attrCreated',
+            'LEK_term_attributes.updated AS attrUpdated',
+            'LEK_term_entry.collectionId AS collectionId',
+            new Zend_Db_Expr('"termEntryAttribute" as attributeOriginType')//this is needed as fixed value
+        );
+        
+//FIXME testen ob hier die korrekten Attribute geladen werden
+        $s=$this->db->select()
+        ->from($this->db)
+        ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_attributes.termEntryId',$cols)
+        ->where('LEK_term_attributes.termId is null')
+        ->where('LEK_term_entry.groupId=?',$groupId)
+        ->where('LEK_term_entry.collectionId IN(?)',$collectionIds);
+        $s->setIntegrityCheck(false);
+        $rows=$this->db->fetchAll($s)->toArray();
+        if(!empty($rows)){
+            return $rows;
+        }
+        return null;
+    }
 }

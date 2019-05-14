@@ -37,7 +37,7 @@ CREATE TABLE `LEK_term_proposal` (
   PRIMARY KEY (`id`),
   CONSTRAINT FOREIGN KEY (`termId`) REFERENCES `LEK_terms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT FOREIGN KEY (`collectionId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-);
+) ENGINE=InnoDB;
 
 ALTER TABLE `LEK_terms` 
 ADD COLUMN `processStatus` VARCHAR(128) DEFAULT 'finalized' AFTER status;

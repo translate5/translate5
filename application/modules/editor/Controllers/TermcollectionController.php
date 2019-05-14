@@ -143,8 +143,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         if(isset($params['groupId'])){
             $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId'],$collectionIds);
             
-            $entryAttr=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntryAttributes');
-            /* @var $entryAttr editor_Models_TermCollection_TermEntryAttributes */
+            $entryAttr=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributes');
+            /* @var $entryAttr editor_Models_TermCollection_TermAttributes */
             $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId'],$collectionIds);
             
         }

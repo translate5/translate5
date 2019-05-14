@@ -209,8 +209,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->setIntegrityCheck(false)
         ->from(array('tc' => 'LEK_languageresources'), array('id'))
         ->join(array('t' => 'LEK_terms'),'tc.id=t.collectionId', array('count(DISTINCT t.id) as termsCount'))
-        ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId', array('count(DISTINCT ta.id) as termsAtributeCount'))
-        ->join(array('tea' => 'LEK_term_entry_attributes'),'tc.id=tea.collectionId', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
+        ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId AND not ta.termId is null', array('count(DISTINCT ta.id) as termsAtributeCount'))
+        ->join(array('tea' => 'LEK_term_attributes'),'tc.id=tea.collectionId AND tea.termId is null', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
         ->where('tc.id =?',$collectionId);
         return $this->db->fetchRow($s)->toArray();
     }
@@ -312,27 +312,6 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         if(!$lngAssoc->isInCollection($language, 'targetLang', $collectionId)){
             $lngAssoc->saveLanguages(null, $language, $collectionId);
         }
-    }
-    
-    public function proposeTerm(int $termParentId,string $newTerm) {
-        $newTerm=trim($newTerm);
-        if($termParentId<1 || empty($newTerm)){
-            return;
-        }
-        
-        $parentTerm=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $parentTerm editor_Models_Term */
-        $parentTerm->load($termParentId);
-        $parentTerm->setParentTermId($parentTerm->getId());
-        $parentTerm->setId(null);
-        $parentTerm->setTerm($newTerm);
-        $parentTerm->setCreated(null);
-        $parentTerm->setUpdated(date(NOW_ISO));
-        
-        //update the parent term processStatus attribute value
-        //update the transac modification value
-        $termAttribute=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributes');
-        /* @var $termAttribute editor_Models_TermCollection_TermAttributes */
     }
     
     /***

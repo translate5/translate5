@@ -617,7 +617,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         }
         
         $tableTerm = $this->db->info($this->db::NAME);
-        $tableProposal = (new editor_Models_Db_TermCollection_TermProposal)->info($this->db::NAME);
+        $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from($tableTerm, array('definition','groupId', 'term as label','id as value','term as desc'))
@@ -705,26 +705,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s->where('groupId=?',$groupId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('label');
-        $s->setIntegrityCheck(false);
-        $rows=$this->db->fetchAll($s)->toArray();
-        if(!empty($rows)){
-            return $rows;
-        }
-        return null;
-    }
-    
-    /***
-     * Find term entry attributes in the given term entry (lek_terms groupId)
-     * 
-     * @param string $groupId
-     * @return array|NULL
-     */
-    public function searchTermEntryAttributesInTermentry($groupId){
-        $s=$this->db->select()
-        ->from($this->db, array('definition','groupId', 'term','id as termId'))
-        ->join('LEK_term_entry_attributes', 'LEK_term_entry_attributes.termEntryId = LEK_terms.termEntryId')
-        ->where('LEK_terms.groupId=?',$groupId)
-        ->group('LEK_terms.groupId');
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
