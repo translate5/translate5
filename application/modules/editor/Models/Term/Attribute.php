@@ -57,6 +57,8 @@ END LICENSE AND COPYRIGHT
  * @method void setAttrLang() setAttrLang(string $attrLang)
  * @method string getValue() getValue()
  * @method void setValue() setValue(string $value)
+ * @method string getHistoryCreated() getHistoryCreated()
+ * @method void setHistoryCreated() setHistoryCreated(string $created)
  * @method string getCreated() getCreated()
  * @method void setCreated() setCreated(string $created)
  * @method string getUpdated() getUpdated()
@@ -79,6 +81,23 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     public $unupdatebleField = [
         'transac'
     ];
+    
+    /**
+     * creates a new, unsaved term attribute history entity
+     * @return editor_Models_Term_AttributeHistory
+     */
+    public function getNewHistoryEntity() {
+        $history = ZfExtended_Factory::get('editor_Models_Term_AttributeHistory');
+        /* @var $history editor_Models_Term_AttributeHistory */
+        $history->setAttributeId($this->getId());
+        $history->setHistoryCreated(NOW_ISO);
+        
+        $fields = $history->getFieldsToUpdate();
+        foreach ($fields as $field) {
+            $history->__call('set' . ucfirst($field), array($this->get($field)));
+        }
+        return $history;
+    }
     
     /***
      * Save or update an attribute

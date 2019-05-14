@@ -101,7 +101,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
         }
         $history = $this->entity->getNewHistoryEntity();
         //take over new data from proposal:
-        $this->entity->setTerm($this->proposal->getTerm());
+        $this->entity->setValue($this->proposal->getValue());
         $this->entity->setProcessStatus($this->entity::PROCESS_STATUS_PROV_PROCESSED);
         $this->entity->setUserName($this->proposal->getUserName());
         $this->entity->setUserGuid($this->proposal->getUserGuid());
