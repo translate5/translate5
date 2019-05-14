@@ -26,6 +26,48 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method integer getLabelId() getLabelId()
+ * @method void setLabelId() setLabelId(integer $labelId)
+ * @method integer getCollectionId() getCollectionId()
+ * @method void setCollectionId() setCollectionId(integer $collectionId)
+ * @method integer getTermId() getTermId()
+ * @method void setTermId() setTermId(integer $termId)
+ * @method integer getParentId() getParentId()
+ * @method void setParentId() setParentId(integer $parentId)
+ * @method integer getInternalCount() getInternalCount()
+ * @method void setInternalCount() setInternalCount(integer $internalCount)
+ * @method integer getTermEntryId() getTermEntryId()
+ * @method void setTermEntryId() setTermEntryId(integer $termEntryId)
+ * @method string getLanguage() getLanguage()
+ * @method void setLanguage() setLanguage(string $language)
+ * @method string getName() getName()
+ * @method void setName() setName(string $name)
+ * @method string getAttrType() getAttrType()
+ * @method void setAttrType() setAttrType(string $attrType)
+ * @method string getAttrDataType() getAttrDataType()
+ * @method void setAttrDataType() setAttrDataType(string $attrDataType)
+ * @method string getAttrTarget() getAttrTarget()
+ * @method void setAttrTarget() setAttrTarget(string $attrTarget)
+ * @method string getAttrId() getAttrId()
+ * @method void setAttrId() setAttrId(string $attrId)
+ * @method string getAttrLang() getAttrLang()
+ * @method void setAttrLang() setAttrLang(string $attrLang)
+ * @method string getValue() getValue()
+ * @method void setValue() setValue(string $value)
+ * @method string getCreated() getCreated()
+ * @method void setCreated() setCreated(string $created)
+ * @method string getUpdated() getUpdated()
+ * @method void setUpdated() setUpdated(string $updated)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $userGuid)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $userName)
+ * @method string getProcessStatus() getProcessStatus()
+ * @method void setProcessStatus() setProcessStatus(string $processStatus)
+ */
 class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Term_Attribute';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Term_Attribute';

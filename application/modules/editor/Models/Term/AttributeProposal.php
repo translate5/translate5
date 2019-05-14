@@ -27,32 +27,31 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
-  `term` varchar(19000) NOT NULL DEFAULT '' COMMENT 'the proposed term',
-  `created` timestamp NOT NULL DEFAULT current_timestamp(),
- * 
- * 
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
- * @method string getTerm() getTerm()
- * @method void setTerm() setTerm(string $term)
- * @method integer getTermId() getTermId()
- * @method void setTermId() setTermId(integer $id)
  * @method integer getCollectionId() getCollectionId()
- * @method void setCollectionId() setCollectionId(integer $id)
+ * @method void setCollectionId() setCollectionId(integer $collectionId)
+ * @method integer getAttributeId() getAttributeId()
+ * @method void setAttributeId() setAttributeId(integer $attributeId)
+ * @method string getValue() getValue()
+ * @method void setValue() setValue(string $value)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $userGuid)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $userName)
  * @method string getCreated() getCreated()
- * @method void setCreated() setCreated(string $date)
+ * @method void setCreated() setCreated(string $created)
  */
 class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Term_AttributeProposal';
     protected $validatorInstanceClass = 'editor_Models_Validator_Term_AttributeProposal';
     
     /**
-     * Loads a proposal by termId
-     * @param integer $termId
+     * Loads a proposal by attributeId
+     * @param integer $attributeId
      * @return Zend_Db_Table_Row_Abstract
      */
-    public function loadByTermId(int $termId): Zend_Db_Table_Row_Abstract {
-        return $this->loadRow('termId = ?', $termId);
+    public function loadByAttributeId(int $attributeId): Zend_Db_Table_Row_Abstract {
+        return $this->loadRow('attributeId = ?', $attributeId);
     }
 }
