@@ -17,7 +17,9 @@ const Attribute={
 	    }
 	    
 	    var me=this,
-	    	html='';
+	    	html='',
+	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data">',
+	    	headerTagClose='</h4>';
 	    
 	    switch(attribute.name) {
 	        case "transac":
@@ -25,7 +27,7 @@ const Attribute={
 	            
 	            var header=me.handleAttributeHeaderText(attribute,true);
 	            
-	            html += '<h4 class="ui-widget-header ui-corner-all">' + header + '</h4>';
+	            html += headerTagOpen + header + headerTagClose;
 	            
 	            if(attribute.children && attribute.children.length>0){
 	                var childData=[];
@@ -63,7 +65,7 @@ const Attribute={
 	                headerText =me.handleAttributeHeaderText(attribute)+":";
 	            }
 	            
-	            html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
+	            html=headerTagOpen + headerText + headerTagClose + '<p>' + attVal + '</p>';
 	            
 	            //if it is definition on language level, get store the data in variable so it is displayed also on term language level
 	            if(attribute.attrType=="definition" && attribute.language){
@@ -85,7 +87,7 @@ const Attribute={
 	            
 	            var headerText = me.handleAttributeHeaderText(attribute,true);
 	            
-	            html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
+	            html=headerTagOpen + headerText + headerTagClose + '<p>' + attVal + '</p>';
 	            break;
 	    }
 	    return html;

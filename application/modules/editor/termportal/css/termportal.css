@@ -199,11 +199,47 @@ h4, p {
     -webkit-margin-end: 0px;
 }
 
-.proposeTermBtn{
-	background-image: url("../../images/user_edit.png");
-	float: right;
-	width: 16px;
-	height:16px;
+/* --------------- proposals --------------- */
+
+.proposeTermBtn.deleteTerm,
+.proposeTermBtn.editTerm {
+    float: right;
+}
+.proposeTermBtn.addTerm {
+    float: left;
+    margin-left: 0px;
+}
+#searchTermsHolder .proposeTermBtn.addTerm,
+#termTable > .proposeTermBtn.addTerm{
+    color: #007fff;
+    font-size: 60px;
+}
+#termTable > div .proposeTermBtn.addTerm,
+#termAttributeTable > .proposeTermBtn.addTerm  {
+    color: #454545;
+    font-size: 40px;
+}
+html .proposeTermBtn.ui-icon.deleteTerm,
+html .proposeTermBtn.ui-icon.editTerm {
+    margin-left: 5px;
+}
+#resultTermsHolder ul .proposeTermBtn.ui-icon {
+    margin-top: 5px;
+    font-size: 20px;
+    color: #007fff;
+}
+.term-data .proposeTermBtn.ui-icon {
+    font-size: 16px;
+}
+.term-data.ui-accordion-header-collapsed .proposeTermBtn.ui-icon {
+    color: #007fff;
+}
+.term-data.ui-accordion-header-active .proposeTermBtn.ui-icon{
+    color: #fffff;
+}
+
+.ui-tooltip-content {
+    font-size:10pt;
 }
 
 
