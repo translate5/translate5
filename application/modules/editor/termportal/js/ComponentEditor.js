@@ -2,6 +2,7 @@ const ComponentEditor={
 		
 	$_termTable:null,
 	$_termAttributeTable:null,
+	$_commentEditor:null,
 	
 	typeRouteMap:[],
 	
@@ -23,8 +24,10 @@ const ComponentEditor={
 	},
 	
 	cacheDom:function(){
-		this.$_termTable=$('#termTable');
-		this.$_termAttributeTable=$('#termAttributeTable');
+		var me=this;
+		me.$_termTable=$('#termTable');
+		me.$_termAttributeTable=$('#termAttributeTable');
+		me.$_commentEditor=$('<input />')
 	},
 	
 	initEvents:function(){
@@ -36,7 +39,7 @@ const ComponentEditor={
 	addComponentEditor:function(event){
 		var me=event.data.scope,
 			$el = $(this),
-			$input = $('<input/>').val($el.text());
+			$input = $('<input type="text" style="min-width: 150px;" onkeyup="this.size = Math.max(this.value.length, 1)"/>').val($el.text());
 	  
 		$el.replaceWith($input);
 	  

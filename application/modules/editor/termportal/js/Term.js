@@ -4,7 +4,6 @@ const Term={
 		
 		searchTermsResponse:[],
 		termGroupsCache:[],
-		termAttributeContainer:[],
 
 		disableLimit:false,
 		reloadTermEntry:false,//shoul the term entry be reloaded or fatched from the cache
@@ -170,7 +169,7 @@ const Term={
 		    //check the cache
 		    if(!me.reloadTermEntry && me.termGroupsCache[termGroupid]){
 		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termGroupid].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
-		        me.groupTermAttributeData(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
+		        me.drawTermGroups(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
 		        return;
 		    }
 		    
@@ -186,8 +185,8 @@ const Term={
 		            me.termGroupsCache[termGroupid]=result;
 		            
 		            TermEntry.drawTermEntryAttributes(result.rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
-		            me.groupTermAttributeData(result.rows[me.KEY_TERM_ATTRIBUTES]);
-		            
+
+		            me.drawTermGroups(result.rows[me.KEY_TERM_ATTRIBUTES]);
 		            //reset term entry reload flag
 		            me.reloadTermEntry=false;
 		        }
@@ -195,69 +194,31 @@ const Term={
 		},
 		
 		/***
-		 * Fill the termAttributeContainer grouped by term.
-		 * 
-		 * @param data
-		 * @returns
-		 */
-		groupTermAttributeData:function(data){
-		    if(!data || data.length<1){
-		        return;
-		    }
-		    var me=this;
-		    
-		    me.termAttributeContainer=[];
-		    var oldKey="",
-		        newKey="",
-		        count=-1;
-		    
-		    for(var i=0;i<data.length;i++){
-		        newKey = data[i].termId;
-		        if(newKey !=oldKey){
-		            count++;
-		            me.termAttributeContainer[count]=[];
-		        }        
-		        me.termAttributeContainer[count].push(data[i]);
-		        oldKey = data[i].termId
-		    }
-		    
-		    //merge the childs
-		    for(var i=0;i<me.termAttributeContainer.length;i++){
-		    	me.termAttributeContainer[i]=groupChildData(me.termAttributeContainer[i]);
-		    }
-		    
-		    //draw the term groups
-		    me.drawTermGroups();
-		},
-		
-		/***
 		 * Draw the tearm groups
 		 * @returns
 		 */
-		drawTermGroups:function(){
+		drawTermGroups:function(termsData){
 			var me=this,
 				$_termTable=$('#termTable');
 			
-		    if(!me.termAttributeContainer || me.termAttributeContainer.length<1){
+		    if(!termsData || termsData.length<1){
 		        return;
 		    }
-		    
+		    console.log(termsData)
 		    $_termTable.empty();
 		    $("#resultTermsHolder").show();
 		    
-		    var count=0,
-		        rfcLanguage,
-		        termAttributesHtmlContainer=[],
+		    var termAttributesHtmlContainer=[],
 		        userProposalRights=true;//TODO: get me from the backend
 		    
 		    
-		    for(var i=0;i<me.termAttributeContainer.length;i++){
-		    	var attribute=me.termAttributeContainer[i],
-		    		rfcLanguage = getLanguageFlag(attribute[0].language),
-		    		statusIcon=me.checkTermStatusIcon(attribute);//check if the term contains attribute with status icon
-
+		    $.each(termsData, function (i, term) {
+		    	var termRflLang=term.attributes[0]!=undefined ? term.attributes[0].language : '',
+		    		rfcLanguage = getLanguageFlag(termRflLang),
+		    		statusIcon=me.checkTermStatusIcon(term);//check if the term contains attribute with status icon
+	
 		    	//draw term header
-		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'">');
+		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+term.desc+'">');
 		    	
 		    	//add empty space between
 		    	termAttributesHtmlContainer.push(' ');
@@ -269,8 +230,8 @@ const Term={
 		    	termAttributesHtmlContainer.push(' ');
 		    	
 		    	//get term render data
-		    	termAttributesHtmlContainer.push(me.getTermRenderData(attribute[0]));
-
+		    	termAttributesHtmlContainer.push(me.getTermRenderData(term));
+	
 		    	if(statusIcon){
 		    		termAttributesHtmlContainer.push(statusIcon);
 		    	}
@@ -283,13 +244,9 @@ const Term={
 		    	
 		    	//draw term attriubtes
 		    	termAttributesHtmlContainer.push('<div>');
-		    	termAttributesHtmlContainer.push(me.drawTermAttributes(count));
+		    	termAttributesHtmlContainer.push(me.drawTermAttributes(term.attributes,termRflLang));
 		    	termAttributesHtmlContainer.push('</div>');
-		    	
-		    	//termAttributesHtmlContainer.push('<h3 data-term-value="'+attribute[0].desc+'">'+ rfcLanguage + ' ' + attribute[0].desc +' '+(statusIcon ? statusIcon : '') + '</h3><div>' + me.drawTermAttributes(count) + '</div>');
-		        count++;
-		    }
-		    
+		    });
 		    if(termAttributesHtmlContainer.length>0){
 		    	$_termTable.append(termAttributesHtmlContainer.join(''));
 		    }
@@ -328,17 +285,16 @@ const Term={
 		/***
 		 * Render term attributes by given term
 		 * 
-		 * @param termId
+		 * @param attributes
+		 * @param termLang
 		 * @returns {String}
 		 */
-		drawTermAttributes:function(termId){
+		drawTermAttributes:function(attributes,termLang){
 		    var me=this,
-		    	attributes=me.termAttributeContainer[termId],
-		        html = [],
-		        tmpLang=attributes[0].language;
+		        html = [];
 		    
-		    if(Attribute.languageDefinitionContent[tmpLang]){
-		    	html.push(Attribute.languageDefinitionContent[tmpLang]);
+		    if(Attribute.languageDefinitionContent[termLang]){
+		    	html.push(Attribute.languageDefinitionContent[termLang]);
 		    }
 		    
 		    for(var i=0;i<attributes.length;i++){
@@ -351,27 +307,28 @@ const Term={
 		/***
 		 * Check the term status icon in the term attributes.
 		 * Return the image html if such an attribute is found
-		 * @param attribute
+		 * @param term
 		 * @returns
 		 */
-		checkTermStatusIcon:function(attribute){
+		checkTermStatusIcon:function(term){
 		    var retVal="", 
+		    	attributes=term.attributes,
 		        status = 'unknown', 
 		        map = Editor.data.termStatusMap,
 		        labels = Editor.data.termStatusLabel,
 		        label;
-		    $.each($(attribute), function (i, attr) {
+		    $.each(attributes, function (i, attr) {
 		        var statusIcon=Attribute.getAttributeValue(attr),
 		        	cmpStr='<img src="';
 		        if(statusIcon && statusIcon.slice(0, cmpStr.length) == cmpStr){
 		            retVal+=statusIcon;
 		        }
 		    });
-		    if(map[attribute[0].termStatus]) {
-		        status = map[attribute[0].termStatus];
+		    if(map[term.termStatus]) {
+		        status = map[term.termStatus];
 		    }
 		    //FIXME encoding of the string!
-		    label = labels[status]+' ('+attribute[0].termStatus+')';
+		    label = labels[status]+' ('+term.termStatus+')';
 		    retVal += ' <img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'">';
 		    return retVal;
 		},
@@ -389,14 +346,16 @@ const Term={
 				return termData.desc!=undefined ? termData.desc : termData.term;
 			}
 			
-			//the proposal is allready defined, render the proposal
-			if(termData.proposal && termData.proposal!=''){
-				htmlCollection.push('<del>'+termData.desc!=undefined ? termData.desc : termData.term+'</del>');
-				htmlCollection.push('<ins>'+termData.proposal+'</ins>');
-				return htmlCollection.join(' ');
+			//the proposal is not set, init the component editor
+			if(!termData.proposal){
+				//the user has proposal rights -> init term proposal span
+				return Attribute.getProposalDefaultHtml('term',termData.termId,(termData.desc!=undefined ? termData.desc : termData.term));
 			}
-			//the user has proposal rights -> init term proposal span
-			return Attribute.getProposalDefaultHtml('term',termData.termId,termData.desc!=undefined ? termData.desc : termData.term);
+			
+			//the proposal is allready defined, render the proposal
+			htmlCollection.push('<del>'+(termData.desc!=undefined ? termData.desc : termData.term)+'</del>');
+			htmlCollection.push('<ins>'+termData.proposal+'</ins>');
+			return htmlCollection.join(' ');
 		}
 };
 

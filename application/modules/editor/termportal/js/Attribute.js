@@ -1,8 +1,7 @@
 const Attribute={
 	languageDefinitionContent:[],
-		
+	
 	init:function(){
-		
 	},
 	
 	/***
@@ -28,7 +27,7 @@ const Attribute={
 	            
 	            html += '<h4 class="ui-widget-header ui-corner-all">' + header + '</h4>';
 	            
-	            if(attribute.children.length>0){
+	            if(attribute.children && attribute.children.length>0){
 	                var childData=[];
 	                attribute.children.forEach(function(child) {
 	                    //get the header text
@@ -69,7 +68,7 @@ const Attribute={
 	            //if it is definition on language level, get store the data in variable so it is displayed also on term language level
 	            if(attribute.attrType=="definition" && attribute.language){
 	                me.languageDefinitionContent[attribute.language]="";
-	                if(attribute.children.length>0){
+	                if(attribute.children && attribute.children.length>0){
 	                    attribute.children.forEach(function(child) {
 	                        html+=me.handleAttributeDrawData(child);
 	                    });
@@ -139,11 +138,9 @@ const Attribute={
 			htmlCollection=[],
 			userHasAttributeProposalRights=true;//TODO: get me from backend
 		
-		if(!userHasAttributeProposalRights){
+		if(!userHasAttributeProposalRights && !me.isAttributeProposable()){
 			return attValue;
 		}
-		
-		console.log(attributeData);
 		
 		//the proposal is allready defined, render the proposal
 		if(attributeData.proposal && attributeData.proposal!=''){
@@ -161,6 +158,31 @@ const Attribute={
 	 */
 	getProposalDefaultHtml:function(type,id,value){
 		return '<span data-editable data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
+	},
+	
+	isAttributeProposable:function(attribute){
+		
+		if(attribute.name=='date'){
+			return false;
+		}
+		
+		if(attribute.name=='termNote' && attribute.attrType=='processStatus'){
+			return false;
+		}
+		
+		if(attribute.name=='transacNote' && attribute.attrType=='responsiblePerson'){
+			return false;
+		}
+		
+		if(attribute.name=='transac' && attribute.attrType=='creation'){
+			return false;
+		}
+		
+		if(attribute.name=='transac' && attribute.attrType=='modification'){
+			return false;
+		}
+		
+		return true;
 	}
 };
 
