@@ -100,6 +100,23 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * creates a new, unsaved term history entity
+     * @return editor_Models_Term_History
+     */
+    public function getNewHistoryEntity() {
+        $history = ZfExtended_Factory::get('editor_Models_Term_History');
+        /* @var $history editor_Models_Term_History */
+        $history->setTermId($this->getId());
+        $history->setHistoryCreated(NOW_ISO);
+        
+        $fields = $history->getFieldsToUpdate();
+        foreach ($fields as $field) {
+            $history->__call('set' . ucfirst($field), array($this->get($field)));
+        }
+        return $history;
+    }
+    
+    /**
      * returns for a termId the associated termentries by group 
      * @param array $collectionIds associated collections to the task
      * @param string $termId

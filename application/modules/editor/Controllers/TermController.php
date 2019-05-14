@@ -69,13 +69,17 @@ class editor_TermController extends ZfExtended_RestController {
      * @see ZfExtended_RestController::putAction()
      */
     public function proposeOperation() {
+        $sessionUser = new Zend_Session_Namespace('user');
+        
         $this->decodePutData();
         
         $this->proposal->setTermId($this->entity->getId());
         $this->proposal->setCollectionId($this->entity->getCollectionId());
         $this->proposal->setTerm(trim($this->data->term));
         $this->proposal->validate();
-
+        $this->proposal->setUserGuid($sessionUser->data->userGuid);
+        $this->proposal->setUserName($sessionUser->data->userName);
+        
         //we don't save the term, but we save it to a proposal: 
         $this->proposal->save();
         
@@ -94,11 +98,15 @@ class editor_TermController extends ZfExtended_RestController {
             ], 'editor.term');
             throw new ZfExtended_UnprocessableEntity('E1105');
         }
-        //take over data from proposal
+        $history = $this->entity->getNewHistoryEntity();
+        //take over new data from proposal:
         $this->entity->setTerm($this->proposal->getTerm());
         $this->entity->setProcessStatus($this->entity::PROCESS_STATUS_PROV_PROCESSED);
+        $this->entity->setUserName($this->proposal->getUserName());
+        $this->entity->setUserGuid($this->proposal->getUserGuid());
         $this->entity->save();
         $this->proposal->delete();
+        $history->save();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
     }

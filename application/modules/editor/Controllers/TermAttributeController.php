@@ -26,24 +26,16 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TermAttributes extends ZfExtended_Models_Validator_Abstract {
-  
-  /**
-   * Validators for Term Attributes
-   */
-  protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
-    $this->addValidator('id', 'int');
-    $this->addValidator('labelId', 'int');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('termId', 'int');
-    $this->addValidator('parentId', 'int');
-    $this->addValidator('language', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('attrType', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('attrTarget', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('attrId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('attrLang', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 255));
-  }
+/**
+ *
+ */
+class editor_TermAttributeController extends ZfExtended_RestController {
+
+    protected $entityClass = 'editor_Models_Term_Attribute';
+    
+    /**
+     * @var editor_Models_Term_Attribute
+     */
+    protected $entity;
+    
 }

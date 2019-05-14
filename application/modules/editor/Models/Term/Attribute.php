@@ -26,9 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermAttributes extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributes';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributes';
+class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_Term_Attribute';
+    protected $validatorInstanceClass   = 'editor_Models_Validator_Term_Attribute';
     
     /***
      * Attribute fields which are not updatable

@@ -27,36 +27,47 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * 
-  `term` varchar(19000) NOT NULL DEFAULT '' COMMENT 'the proposed term',
-  `created` timestamp NOT NULL DEFAULT current_timestamp(),
- * 
- * 
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
  * @method string getTerm() getTerm()
  * @method void setTerm() setTerm(string $term)
+ * @method string getDefinition() getDefinition()
+ * @method void setDefinition() setDefinition(string $term)
  * @method integer getTermId() getTermId()
  * @method void setTermId() setTermId(integer $id)
  * @method integer getCollectionId() getCollectionId()
  * @method void setCollectionId() setCollectionId(integer $id)
- * @method string getUserGuid() getUserGuid()
- * @method void setUserGuid() setUserGuid(string $userGuid)
- * @method string getUserName() getUserName()
- * @method void setUserName() setUserName(string $userName)
  * @method string getCreated() getCreated()
  * @method void setCreated() setCreated(string $date)
+ * @method string getHistoryCreated() getHistoryCreated()
+ * @method void setHistoryCreated() setHistoryCreated(string $date)
+ * @method string getCreated() getCreated()
+ * @method void setCreated() setCreated(string $date)
+ * @method string getUpdated() getUpdated()
+ * @method void setUpdated() setUpdated(string $date)
+ * @method string getStatus() getStatus()
+ * @method void setStatus() setStatus(string $status)
+ * @method string getProcessStatus() getProcessStatus()
+ * @method void setProcessStatus() setProcessStatus(string $status)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $status)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $status)
  */
-class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_Term_Proposal';
-    protected $validatorInstanceClass = 'editor_Models_Validator_Term_Proposal';
+class editor_Models_Term_History extends ZfExtended_Models_Entity_Abstract {
+    protected $dbInstanceClass = 'editor_Models_Db_Term_History';
     
-    /**
-     * Loads a proposal by termId
-     * @param integer $termId
-     * @return Zend_Db_Table_Row_Abstract
-     */
-    public function loadByTermId(int $termId): Zend_Db_Table_Row_Abstract {
-        return $this->loadRow('termId = ?', $termId);
+    public function getFieldsToUpdate() {
+        return [
+            'collectionId',
+            'term',
+            'status',
+            'processStatus',
+            'definition',
+            'userGuid',
+            'userName',
+            'created',
+            'updated',
+        ];
     }
 }

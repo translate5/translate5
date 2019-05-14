@@ -33,6 +33,10 @@ ADD COLUMN `userGuid` varchar(38) NOT NULL,
 ADD COLUMN `userName` varchar(255) NOT NULL DEFAULT '',
 ADD UNIQUE KEY (`termId`);
 
+ALTER TABLE `LEK_terms` 
+ADD COLUMN `userGuid` varchar(38) NOT NULL,
+ADD COLUMN `userName` varchar(255) NOT NULL DEFAULT '';
+
 ALTER TABLE `LEK_term_attributes`
 ADD COLUMN `userGuid` varchar(38) NOT NULL,
 ADD COLUMN `userName` varchar(255) NOT NULL DEFAULT '',

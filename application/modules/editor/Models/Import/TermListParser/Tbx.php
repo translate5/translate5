@@ -552,8 +552,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             }
         }
         
-        $termEntryAttributes=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermAttributes');
-        /* @var $termEntryAttributes editor_Models_Db_TermCollection_TermAttributes */
+        $termEntryAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
+        /* @var $termEntryAttributes editor_Models_Db_Term_Attribute */
         $deleteParams=array();
         
         $deleteParams['termEntryId = ?']=$this->actualTermEntryIdDb;
@@ -805,8 +805,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         if(!$this->isInsideTig){
             //remove unneeded term attributes
-            $termAttributes=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermAttributes');
-            /* @var $termAttributes editor_Models_Db_TermCollection_TermAttributes */
+            $termAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
+            /* @var $termAttributes editor_Models_Db_Term_Attribute */
             
             $deleteParams=array();
             $deleteParams['termId = ?'] = $this->actualTermIdDb;
@@ -933,7 +933,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
-     * @return boolean|editor_Models_TermCollection_TermAttributes
+     * @return boolean|editor_Models_Term_Attribute
      */
     protected function saveEntryAttribute($parentId,$internalCount=null){
         if(!$this->isStartTag()){
@@ -955,7 +955,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
-     * @return void|editor_Models_TermCollection_TermAttributes
+     * @return void|editor_Models_Term_Attribute
      */
     protected function saveTermAttribute($parentId,$internalCount=null){
         if(!$this->isStartTag()){
@@ -978,10 +978,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * @param bool $isTermAttribute
      * @param mixed $parentId
      * 
-     * @return editor_Models_TermCollection_TermEntryAttributes
+     * @return editor_Models_Term_Attribute
      */
     protected function getAttributeObject($parentId){
-        $attribute = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributes');
+        $attribute = ZfExtended_Factory::get('editor_Models_Term_Attribute');
         
         $attribute->setCollectionId($this->termCollectionId);
         
