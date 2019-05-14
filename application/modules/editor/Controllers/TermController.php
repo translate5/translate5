@@ -80,7 +80,7 @@ class editor_TermController extends ZfExtended_RestController {
         $this->proposal->save();
         
         //update the view
-        $this->view->rows->proposal = $this->proposal->getDataObject();
+        $this->view->rows->proposal = $this->proposal->getDataObject()->term;
     }
     
     /**

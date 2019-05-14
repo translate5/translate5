@@ -123,10 +123,6 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
      * Search term entry and term attributes in group
      */
     public function searchattributeAction(){
-        
-        // Starting clock time in seconds
-        $start_time = microtime(true);
-
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
@@ -148,14 +144,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             $responseArray['termEntryAttributes']=$entryAttr->getAttributesForTermEntry($params['groupId'],$collectionIds);
             
         }
-        
         $this->view->rows=$responseArray;
-        
-        // End clock time in seconds
-        $end_time = microtime(true);
-        // Calculate script execution time
-        $execution_time = ($end_time - $start_time);
-        error_log(" Execution time of script = ".$execution_time." sec"); 
     }
     
     
