@@ -25,9 +25,7 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-
--- FIXME rights for new role etc.
-
+-- add user data fields
 ALTER TABLE `LEK_term_proposal` 
 ADD COLUMN `userGuid` varchar(38) NOT NULL,
 ADD COLUMN `userName` varchar(255) NOT NULL DEFAULT '',
@@ -41,12 +39,28 @@ ALTER TABLE `LEK_term_attributes`
 ADD COLUMN `userGuid` varchar(38) NOT NULL,
 ADD COLUMN `userName` varchar(255) NOT NULL DEFAULT '',
 ADD COLUMN `termEntryId` int(11) DEFAULT NULL AFTER termId,
+ADD COLUMN `oldId` int(11) DEFAULT NULL AFTER termEntryId,
 ADD COLUMN `processStatus` varchar(128) DEFAULT 'finalized' COMMENT "old term processStatus",
 ADD CONSTRAINT FOREIGN KEY (`termEntryId`) REFERENCES `LEK_term_entry` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
-INSERT INTO `LEK_term_attributes` (`id`, `labelId`, `collectionId`, `termId`, `termEntryId`, `parentId`,  `internalCount`, `language`, `name`, `attrType`, `attrDataType`, `attrTarget`, `attrId`, `attrLang`, `value`, `created`, `updated`)
-SELECT null as `id`, `labelId`, `collectionId`, null as `termId`, `termEntryId`, `parentId`,  `internalCount`, `language`, `name`, `attrType`, `attrDataType`, `attrTarget`, `attrId`, `attrLang`, `value`, `created`, `updated` FROM `LEK_term_entry_attributes`;
+-- copy term entry attributes into term attributes
+INSERT INTO `LEK_term_attributes` (`id`, `oldId`, `labelId`, `collectionId`, `termId`, `termEntryId`, `parentId`,  `internalCount`, `language`, `name`, `attrType`, `attrDataType`, `attrTarget`, `attrId`, `attrLang`, `value`, `created`, `updated`)
+SELECT null as `id`, `id` as `oldId`, `labelId`, `collectionId`, null as `termId`, `termEntryId`, `parentId`,  `internalCount`, `language`, `name`, `attrType`, `attrDataType`, `attrTarget`, `attrId`, `attrLang`, `value`, `created`, `updated` FROM `LEK_term_entry_attributes`;
 
+-- update the parentId values of the copied term entry attributes to the new ids of the entries
+UPDATE `LEK_term_attributes` attr_target, `LEK_term_attributes` attr_source
+SET attr_target.`parentId` = attr_source.`id`
+WHERE 
+  NOT attr_target.`parentId` IS NULL 
+  AND attr_target.`parentId` = attr_source.`oldId`
+  AND attr_target.`termId` IS NULL 
+  AND attr_source.`termId` IS NULL;
+
+-- remove helper field
+ALTER TABLE `LEK_term_attributes`
+DROP COLUMN `oldId`;
+
+-- remove old entry table
 DROP TABLE `LEK_term_entry_attributes`;
 
 CREATE TABLE `LEK_term_history` (
