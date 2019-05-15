@@ -91,7 +91,12 @@ if(isset($this->error)){
                     }
                     echo '</select>';
                 ?>
+                <?php //TODO: fill option-list from back-end ?>
+                <select name="collection" id="collection"><option value="all">collection</option><option value="collection1">collection1</option><option value="collection2">collection2</option></select>
+                <select name="client" id="client"><option value="all">client</option><option value="client1">client1</option><option value="client2">client2</option></select>
             </div>
+            <ul id="searchFilterTags">
+            </ul>
     </div>
     
     <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
@@ -181,7 +186,28 @@ $( function() {
     });  
     $( document ).tooltip({
         position: { my: "left center", at: "right center" }
+    });
+    // filter
+    $('#searchFilterTags').tagit({
+        beforeTagRemoved: function (event, ui) {
+            // TODO: never delete language-filter; can only be CHANGED via dropdown-list
+        },
+        afterTagRemoved: function (event, ui) {
+            $('#searchFilterTags .filter.' + ui.tagLabel).remove();
+            // TODO: snychronize dropdown-list (back to "all")
+        }
+	});
+    $('#client').selectmenu({
+        change: function() {
+            addSearchFilter($(this).find(':selected').text(),$(this).val(),$(this).attr('id'));
+        }
       });
+    $('#collection').selectmenu({
+        change: function() {
+            addSearchFilter($(this).find(':selected').text(),$(this).val(),$(this).attr('id'));
+        }
+      });
+    addSearchFilter($('#languages').find(':selected').text(),$('#languages').val(), 'language');
 } );
 
 </script>
