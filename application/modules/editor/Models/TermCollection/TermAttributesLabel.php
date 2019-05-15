@@ -30,23 +30,29 @@ class editor_Models_TermCollection_TermAttributesLabel extends ZfExtended_Models
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributesLabel';
     protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributesLabel';
     
-    /***
-     * Get the label by given label name and label type
-     * 
+    /**
+     * Loads the label with given name and type, if it does not exist, the label will be created
      * @param string $labelName
      * @param string $labelType
      */
-    public function getLabelByNameAndType($labelName,$labelType){
+    public function loadOrCreate($labelName, $labelType) {
         $s = $this->db->select()
         ->from($this->db)
         ->where('label=?', $labelName);
-        if($labelType){
+        if(!empty($labelType)){
+            $this->setType($labelType);
             $s->where('type=?', $labelType);
         }
-        return $this->db->fetchAll($s)->toArray();
+        $row = $this->db->fetchRow($s);
+        if ($row) {
+            $this->row = $row;
+            return;
+        }
+        $this->setLabel($labelName);
+        $this->save();
     }
     
-    /***
+    /**
      * Return all labels with translated labelText
      * @return array
      */

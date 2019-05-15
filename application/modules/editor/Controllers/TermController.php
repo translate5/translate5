@@ -89,6 +89,47 @@ class editor_TermController extends ZfExtended_RestController {
     }
     
     /**
+     * Tries to update or insert a value "comment" into langSet>descripGrp>note of the term
+     */
+    public function commentOperation() {
+        $sessionUser = new Zend_Session_Namespace('user');
+        $commentAttribute = ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $commentAttribute editor_Models_Term_Attribute */
+        try {
+            $commentAttribute->loadByTermAndName($this->entity, 'note', $commentAttribute::ATTR_LEVEL_LANGSET);
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $lang = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $lang editor_Models_Languages */
+            $lang->loadById($id);
+            $subLanguage = strtolower($lang->getSublanguage());
+            
+            $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+            /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+            $label->loadOrCreate('note', null);
+            
+            $commentAttribute->init([
+                'name' => 'note',
+                'created' => NOW_ISO,
+                'internalCount' => 1,
+                'collectionId' => $this->entity->getCollectionId(),
+                //we don't set termId here, since level shall be langSet
+                'termEntryId' => $this->entity->getTermEntryId(),
+                'language' => $subLanguage,
+                'attrLang' => $subLanguage,
+                'labelId' => $label->getId(),
+            ]);
+        }
+        $commentAttribute->setValue(trim($this->data->term));
+        $commentAttribute->validate();
+        $commentAttribute->setUserGuid($sessionUser->data->userGuid);
+        $commentAttribute->setUserName($sessionUser->data->userName);
+        $commentAttribute->setUpdated(NOW_ISO);
+        $commentAttribute->save();
+        $this->view->rows = $commentAttribute->getDataObject();
+    }
+    
+    /**
      * confirm the proposal and saves the proposed data into the term
      * @throws ZfExtended_UnprocessableEntity
      */

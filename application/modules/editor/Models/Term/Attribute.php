@@ -71,6 +71,10 @@ END LICENSE AND COPYRIGHT
  * @method void setProcessStatus() setProcessStatus(string $processStatus)
  */
 class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
+    const ATTR_LEVEL_ENTRY = 'termEntry';
+    const ATTR_LEVEL_LANGSET = 'langSet';
+    const ATTR_LEVEL_TERM = 'term';
+    
     protected $dbInstanceClass = 'editor_Models_Db_Term_Attribute';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Term_Attribute';
     
@@ -97,6 +101,37 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $history->__call('set' . ucfirst($field), array($this->get($field)));
         }
         return $history;
+    }
+    
+    /**
+     * Loads an attribute for the given term
+     */
+    public function loadByTermAndName(editor_Models_Term $term, $name, $level = self::ATTR_LEVEL_TERM) {
+        $s = $this->db->select()->where('collectionId = ?', $term->getCollectionId());
+        $s->where('termEntryId = ?', $term->getTermEntryId());
+        if($level == self::ATTR_LEVEL_LANGSET || $level == self::ATTR_LEVEL_TERM) {
+            $lang = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $lang editor_Models_Languages */
+            $lang->loadById($id);
+            $s->where('language = ?', $lang->getSublanguage());
+        }
+        else {
+            $s->where('language is null');
+        }
+        
+        if($level == self::ATTR_LEVEL_TERM) {
+            $s->where('termId = ?', $term->getId());
+        }
+        else {
+            $s->where('termId is null');
+        }
+        
+        $row = $this->db->fetchRow($s);
+        if (!$row) {
+            $this->notFound(__CLASS__ . '#termAndName', $term->getId.'; '.$name);
+        }
+        //load implies loading one Row, so use only the first row
+        $this->row = $row;
     }
     
     /***
