@@ -84,7 +84,8 @@ if(isset($this->error)){
                         // if the preselectedLang exist, select it
                         $preselectedLang = $this->preselectedLang;
                     }
-                    echo '<select name="languages" id="languages">';
+                    echo '<select class="searchFilter" name="language" id="language">';
+                    echo '<option value="all">language</option>';
                     foreach ($languages as $lang){
                         $isSelected=($preselectedLang !== false) && ($preselectedLang == $lang["rfc5646"]);
                         echo '<option '.($isSelected ? 'selected="selected"' : '').' value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
@@ -92,8 +93,8 @@ if(isset($this->error)){
                     echo '</select>';
                 ?>
                 <?php //TODO: fill option-list from back-end ?>
-                <select name="collection" id="collection"><option value="all">collection</option><option value="collection1">collection1</option><option value="collection2">collection2</option></select>
-                <select name="client" id="client"><option value="all">client</option><option value="client1">client1</option><option value="client2">client2</option></select>
+                <select class="searchFilter" name="collection" id="collection"><option value="all">collection</option><option value="collection1">collection1</option><option value="collection2">collection2</option></select>
+                <select class="searchFilter" name="client" id="client"><option value="all">client</option><option value="client1">client1</option><option value="client2">client2</option></select>
             </div>
             <ul id="searchFilterTags">
             </ul>
@@ -167,7 +168,7 @@ $( function() {
         	window.parent.location = Editor.data.loginUrl;
         }
     });
-    $('#languages').selectmenu({
+    $('#language').selectmenu({
         change: function( event, ui ) {
             startAutocomplete();
         }
@@ -187,27 +188,21 @@ $( function() {
     $( document ).tooltip({
         position: { my: "left center", at: "right center" }
     });
-    // filter
+    // filter & tag-fields
     $('#searchFilterTags').tagit({
         beforeTagRemoved: function (event, ui) {
-            // TODO: never delete language-filter; can only be CHANGED via dropdown-list
-        },
-        afterTagRemoved: function (event, ui) {
-            $('#searchFilterTags .filter.' + ui.tagLabel).remove();
-            // TODO: snychronize dropdown-list (back to "all")
+            return beforeFilterTagRemoved(ui.tagLabel);
         }
 	});
-    $('#client').selectmenu({
+    handleAddSearchFilter('language',$('#language').find(':selected').text(),$('#language').val());
+    $('.searchFilter').selectmenu({
         change: function() {
-            addSearchFilter($(this).find(':selected').text(),$(this).val(),$(this).attr('id'));
+            handleAddSearchFilter($(this).attr('id'),$(this).find(':selected').text(),$(this).val());
         }
-      });
-    $('#collection').selectmenu({
-        change: function() {
-            addSearchFilter($(this).find(':selected').text(),$(this).val(),$(this).attr('id'));
-        }
-      });
-    addSearchFilter($('#languages').find(':selected').text(),$('#languages').val(), 'language');
+    });
+    $(document).on("mousedown",function(){
+        $('#error-filter-tags').hide();
+    });
 } );
 
 </script>
