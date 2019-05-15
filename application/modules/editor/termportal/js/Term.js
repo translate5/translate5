@@ -3,6 +3,7 @@ const Term={
 		$_searchTermsSelect:null,
 		$_searchTermsHolder:null,
 		$_resultTermsHolderUl:null,
+		$_termTable:null,
 		
 		searchTermsResponse:[],
 		termGroupsCache:[],
@@ -22,6 +23,7 @@ const Term={
 			this.$_searchTermsSelect=$('#searchTermsSelect');
 	        this.$_searchTermsHolder=$('#searchTermsHolder');
             this.$_resultTermsHolderUl = $('#resultTermsHolder > ul');
+            this.$_termTable=$('#termTable');
 		},
 		
 		initEvents:function(){
@@ -29,6 +31,7 @@ const Term={
 			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) { // TODO: why does this take so long? maybe not global, but on each separately?
 				me.findTermsAndAttributes($(ui.selected).attr('data-value'));
 		    });
+			me.$_termTable.on('click', ".editTerm",me.onEditTermClick);
 		},
 		
 		/***
@@ -204,14 +207,13 @@ const Term={
 		 * @returns
 		 */
 		drawTermGroups:function(termsData){
-			var me=this,
-				$_termTable=$('#termTable');
+			var me=this;
 			
 		    if(!termsData || termsData.length<1){
 		        return;
 		    }
-		    console.log(termsData)
-		    $_termTable.empty();
+		    
+		    me.$_termTable.empty();
 		    $("#resultTermsHolder").show();
 		    
 		    var termAttributesHtmlContainer=[],
@@ -223,7 +225,8 @@ const Term={
 		    		statusIcon=me.checkTermStatusIcon(term);//check if the term contains attribute with status icon
 	
 		    	//draw term header
-		    	termAttributesHtmlContainer.push('<h3 data-term-value="'+term.desc+'"> class="term-data"');
+		    	termAttributesHtmlContainer.push('<h3 class="term-data" data-term-value="'+term.desc+'">');
+		    	
 		    	
 		    	//add empty space between
 		    	termAttributesHtmlContainer.push(' ');
@@ -249,13 +252,13 @@ const Term={
 		    	termAttributesHtmlContainer.push('</div>');
 		    });
 		    if(termAttributesHtmlContainer.length>0){
-		    	$_termTable.append(termAttributesHtmlContainer.join(''));
+		    	me.$_termTable.append(termAttributesHtmlContainer.join(''));
 		    }
 		    
-		    if ($_termTable.hasClass('ui-accordion')) {
-		    	$_termTable.accordion('refresh');
+		    if (me.$_termTable.hasClass('ui-accordion')) {
+		    	me.$_termTable.accordion('refresh');
 		    } else {
-		    	$_termTable.accordion({
+		    	me.$_termTable.accordion({
 		            active: false,
 		            collapsible: true,
 		            heightStyle: "content"
@@ -265,13 +268,13 @@ const Term={
 		    //find the selected item form the search result and expand it
 		    $.each($("#searchTermsSelect li"), function (i, item) {
 		        if($(item).hasClass('ui-state-active')){
-		        	$_termTable.accordion({
+		        	me.$_termTable.accordion({
 		                active:false
 		            });
 		            
 		            $.each($("#termTable h3"), function (i, termitem) {
 		                if(termitem.dataset.termValue === item.textContent){
-		                	$_termTable.accordion({
+		                	me.$_termTable.accordion({
 		                        active:i
 		                    });
 		                }
@@ -428,6 +431,14 @@ const Term={
 			htmlCollection.push('<del>'+(termData.desc!=undefined ? termData.desc : termData.term)+'</del>');
 			htmlCollection.push('<ins>'+termData.proposal+'</ins>');
 			return htmlCollection.join(' ');
+		},
+		
+		onEditTermClick:function(){
+			var element=$(this),
+				parent=element.parent(),
+				search=parent.find("span[data-editable]" );
+			ComponentEditor.addComponentEditor(search);
+			console.log(search);
 		}
 };
 

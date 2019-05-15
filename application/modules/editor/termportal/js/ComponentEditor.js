@@ -32,19 +32,28 @@ const ComponentEditor={
 	
 	initEvents:function(){
 		var me=this;
-		me.$_termTable.on('click', '[data-editable]',{scope:me},me.addComponentEditor);
-		me.$_termAttributeTable.on('click', '[data-editable]',{scope:me},me.addComponentEditor);
+		me.$_termTable.on('click', '[data-editable]',{scope:me},me.onEditableComponentClick);
+		me.$_termAttributeTable.on('click', '[data-editable]',{scope:me},me.onEditableComponentClick);
 	},
 	
-	addComponentEditor:function(event){
+	onEditableComponentClick:function(event){
 		var me=event.data.scope,
-			$el = $(this),
-			$input = $('<input type="text" style="min-width: 150px;" onkeyup="this.size = Math.max(this.value.length, 1)"/>').val($el.text());
+			$el = $(this);
+		
+		me.addComponentEditor($el);
+	},
+	
+	addComponentEditor:function($element){
+		var me=this,
+			$input= $('<textarea />').val($element.text());
+			//$input = $('<input type="text" style="min-width: 150px;" onkeyup="this.size = Math.max(this.value.length, 1)"/>').val($element.text());
 	  
-		$el.replaceWith($input);
+		$element.replaceWith($input);
 	  
+		$input.focus();
+		
 		$input.one('blur', function(){
-			me.saveComponentChange($el,$input);
+			me.saveComponentChange($element,$input);
 		}).focus();
 	},
 	
