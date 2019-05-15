@@ -186,6 +186,17 @@ function startAutocomplete(){
     $("#search").autocomplete( "search", $("#search").val());
 }
 
+function addSearchFilter(tagLabel, filterValue, filterName) {
+    // TODO: handle selections of filterValue "all" (= remove filter)
+    if ($('#searchFilterTags input[name="'+filterName+'"].filter').length) {
+        var tagLabelOld = $('#searchFilterTags input[name="'+filterName+'"].filter').val();
+        $("#searchFilterTags").tagit("removeTagByLabel", tagLabelOld);
+        $('#searchFilterTags input[name="'+filterName+'"].filter').remove();
+    }
+    $('#searchFilterTags').tagit("createTag", tagLabel);
+    $('#searchFilterTags').append('<input type="hidden" value="'+filterValue+'" name="'+filterName+'" class="filter '+filterName+' '+tagLabel+'">');
+}
+
 function showFinalResultContent() {
     $('#finalResultContent').show();
     setSizesInFinalResultContent();
