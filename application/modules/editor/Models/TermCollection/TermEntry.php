@@ -87,10 +87,10 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
         //the query will find the lates modefied term entry attribute, if the term entry attribute update date is older than $olderThan, remove the termEntry
         $collectionId = (int) $collectionId;
         return $this->db->delete(['id IN (SELECT t.termEntryId
-            	FROM LEK_term_entry_attributes t
-            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_entry_attributes WHERE collectionId = '.$collectionId.' GROUP BY termEntryId)
+            	FROM LEK_term_attributes t
+            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_attributes WHERE termId is null AND collectionId = '.$collectionId.' GROUP BY termEntryId)
             	tm ON t.termEntryId = tm.termEntryId AND t.updated = tm.MaxDate
-            	WHERE t.collectionId = '.$collectionId.' AND t.updated < ?
+            	WHERE t.termId is null AND t.collectionId = '.$collectionId.' AND t.updated < ?
             	GROUP BY t.termEntryId)'=>$olderThan])>0;
     }
 }

@@ -29,17 +29,17 @@ END LICENSE AND COPYRIGHT
 /**
  *
  */
-class editor_TermController extends ZfExtended_RestController {
+class editor_TermattributeController extends ZfExtended_RestController {
 
-    protected $entityClass = 'editor_Models_Term';
+    protected $entityClass = 'editor_Models_Term_Attribute';
     
     /**
-     * @var editor_Models_Term
+     * @var editor_Models_Term_Attribute
      */
     protected $entity;
     
     /**
-     * @var editor_Models_Term_Proposal
+     * @var editor_Models_Term_AttributeProposal
      */
     protected $proposal;
     
@@ -50,10 +50,10 @@ class editor_TermController extends ZfExtended_RestController {
      */
     public function getAction() {
         parent::getAction();
-        $this->proposal = ZfExtended_Factory::get('editor_Models_Term_Proposal');
+        $this->proposal = ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
         /* @var $proposal editor_Models_Term_Proposal */
         try {
-            $this->proposal->loadByTermId($this->entity->getId());
+            $this->proposal->loadByAttributeId($this->entity->getId());
             $this->view->rows->proposal = $this->proposal->getDataObject();
         }
         catch (ZfExtended_Models_Entity_NotFoundException $e) {
@@ -71,25 +71,21 @@ class editor_TermController extends ZfExtended_RestController {
         
         $this->decodePutData();
         
-        $this->proposal->setTermId($this->entity->getId());
+        $this->proposal->setAttributeId($this->entity->getId());
         $this->proposal->setCollectionId($this->entity->getCollectionId());
-        $this->proposal->setTerm(trim($this->data->term));
+        $this->proposal->setValue(trim($this->data->term));
         $this->proposal->validate();
-
-        //set system fields after validation, so we don't have to provide a validator for them 
+        
+        //set system fields after validation, so we don't have to provide a validator for them
         $this->proposal->setUserGuid($sessionUser->data->userGuid);
         $this->proposal->setUserName($sessionUser->data->userName);
         $this->proposal->setCreated(NOW_ISO);
         
-        //we don't save the term, but we save it to a proposal: 
+        //we don't save the term, but we save it to a proposal:
         $this->proposal->save();
         
-        $attribute=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributes');
-        /* @var $attribute editor_Models_TermCollection_TermAttributes */
-        
-        $attribute->updateModificationGroupAttributes($this->entity);
         //update the view
-        $this->view->rows->proposal = $this->proposal->getDataObject()->term;
+        $this->view->rows->proposal = $this->proposal->getDataObject();
     }
     
     /**
@@ -99,13 +95,13 @@ class editor_TermController extends ZfExtended_RestController {
     public function confirmproposalOperation() {
         if(empty($this->view->rows->proposal)) {
             ZfExtended_UnprocessableEntity::addCodes([
-                'E1105' => 'There is no proposal which can be confirmed.'
-            ], 'editor.term');
-            throw new ZfExtended_UnprocessableEntity('E1105');
+                'E1108' => 'There is no attribute proposal which can be confirmed.'
+            ], 'editor.term.attribute');
+            throw new ZfExtended_UnprocessableEntity('E1108');
         }
         $history = $this->entity->getNewHistoryEntity();
         //take over new data from proposal:
-        $this->entity->setTerm($this->proposal->getTerm());
+        $this->entity->setValue($this->proposal->getValue());
         $this->entity->setProcessStatus($this->entity::PROCESS_STATUS_PROV_PROCESSED);
         $this->entity->setUserName($this->proposal->getUserName());
         $this->entity->setUserGuid($this->proposal->getUserGuid());
@@ -115,4 +111,5 @@ class editor_TermController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
     }
+    
 }

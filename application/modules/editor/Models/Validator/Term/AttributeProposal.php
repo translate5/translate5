@@ -26,24 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_TermEntryAttributes extends ZfExtended_Models_Validator_Abstract {
-  
+class editor_Models_Validator_Term_AttributeProposal extends ZfExtended_Models_Validator_Abstract {
   /**
-   * Validators for Term Entry Attributes
+   * Validators for Term Attributes
    */
   protected function defineValidators() {
-    //comment = string, without length contrain. No validator needed / possible 
     $this->addValidator('id', 'int');
-    $this->addValidator('labelId', 'int');
-    $this->addValidator('collectionId', 'int');
-    $this->addValidator('termEntryId', 'int');
-    $this->addValidator('parentId', 'int');
-    $this->addValidator('language', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('name', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('attrType', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('attrTarget', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('attrId', 'stringLength', array('min' => 0, 'max' => 100));
-    $this->addValidator('attrLang', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 255));
+    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 255)); //TODO why the restriction to 255 in editor_Models_Validator_Term_Attribute?
+    $this->addDontValidateField('collectionId');
+    $this->addDontValidateField('attributeId');
   }
 }

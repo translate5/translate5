@@ -100,6 +100,23 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * creates a new, unsaved term history entity
+     * @return editor_Models_Term_History
+     */
+    public function getNewHistoryEntity() {
+        $history = ZfExtended_Factory::get('editor_Models_Term_History');
+        /* @var $history editor_Models_Term_History */
+        $history->setTermId($this->getId());
+        $history->setHistoryCreated(NOW_ISO);
+        
+        $fields = $history->getFieldsToUpdate();
+        foreach ($fields as $field) {
+            $history->__call('set' . ucfirst($field), array($this->get($field)));
+        }
+        return $history;
+    }
+    
+    /**
      * returns for a termId the associated termentries by group 
      * @param array $collectionIds associated collections to the task
      * @param string $termId
@@ -617,7 +634,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         }
         
         $tableTerm = $this->db->info($this->db::NAME);
-        $tableProposal = (new editor_Models_Db_TermCollection_TermProposal)->info($this->db::NAME);
+        $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from($tableTerm, array('definition','groupId', 'term as label','id as value','term as desc'))
@@ -710,26 +727,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         
         $rows=$this->db->fetchAll($s)->toArray();
         $rows=$this->groupTermsAndAttributes($rows);
-        if(!empty($rows)){
-            return $rows;
-        }
-        return null;
-    }
-    
-    /***
-     * Find term entry attributes in the given term entry (lek_terms groupId)
-     * 
-     * @param string $groupId
-     * @return array|NULL
-     */
-    public function searchTermEntryAttributesInTermentry($groupId){
-        $s=$this->db->select()
-        ->from($this->db, array('definition','groupId', 'term','id as termId'))
-        ->join('LEK_term_entry_attributes', 'LEK_term_entry_attributes.termEntryId = LEK_terms.termEntryId')
-        ->where('LEK_terms.groupId=?',$groupId)
-        ->group('LEK_terms.groupId');
-        $s->setIntegrityCheck(false);
-        $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
             return $rows;
         }
