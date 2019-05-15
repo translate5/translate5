@@ -43,13 +43,15 @@ const Term={
 		 */
 		searchTerm:function(searchString,successCallback){
 			var me=this,
-				lng=$('#languages').val();
+				lng=$('#languages').val(),
+				filter = JSON.stringify(me.getSearchFilter());
 			
 			if(!lng){
 				lng=$("input[name='languages']:checked").val();
 			}
 			console.log("searchTerm() for: " + searchString);
 			console.log("searchTerm() for language: " + lng);
+            console.log("searchTerm() with filter: " + filter);
 			me.searchTermsResponse=[];  
 			$.ajax({
 				url: Editor.data.termportal.restPath+"termcollection/search",
@@ -58,6 +60,7 @@ const Term={
 				data: {
 					'term':searchString,
 					'language':lng,
+					'filter':filter,
 					'collectionIds':collectionIds,
 					'disableLimit':me.disableLimit
 				},
@@ -70,6 +73,18 @@ const Term={
 				}
 			});
 		},
+        
+        /**
+         * Return all the filters that are set in the tag field
+         * @returns {JSON string}
+         */
+        getSearchFilter: function() {
+            filter = {};
+            $( '#searchFilterTags .filter' ).each(function( index, el ) {
+                filter[el.name] = el.value;
+            });
+            return JSON.stringify(filter);
+        },
 		
 		/***
 		 * Fill up the term option component with the search results
@@ -127,7 +142,7 @@ const Term={
 			//fill the term component with the search results
 			for(var i=0;i<me.searchTermsResponse.length;i++){
 				var item=me.searchTermsResponse[i];
-				me.$_searchTermsSelect.append(
+				me.$_searchTermsSelect.append( // FIXME; this takes too long
 						$('<li>').attr('data-value', item.groupId).attr('class', 'ui-widget-content search-terms-result').append(
 								$('<div>').attr('class', 'ui-widget').append(item.desc)
 						));

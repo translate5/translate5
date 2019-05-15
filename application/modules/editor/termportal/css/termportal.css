@@ -116,6 +116,16 @@ END LICENSE AND COPYRIGHT
     order: 3;
     margin-right: 0px;
 }
+#client-button {
+    flex: 0 0 80px;
+    order: 3;
+    margin-right: 0px;
+}
+#collection-button {
+    flex: 0 0 80px;
+    order: 3;
+    margin-right: 0px;
+}
 
 @media (max-width: 600px) {
     #search {
