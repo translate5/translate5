@@ -84,8 +84,12 @@ class editor_TermController extends ZfExtended_RestController {
         //we don't save the term, but we save it to a proposal: 
         $this->proposal->save();
         
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        $attribute->updateModificationGroupAttributes($this->entity);
         //update the view
-        $this->view->rows->proposal = $this->proposal->getDataObject();
+        $this->view->rows->proposal = $this->proposal->getDataObject()->term;
     }
     
     /**

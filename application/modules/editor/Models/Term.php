@@ -638,7 +638,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s = $this->db->select()
         ->setIntegrityCheck(false)
         ->from($tableTerm, array('definition','groupId', 'term as label','id as value','term as desc'))
-        ->joinLeft($tableProposal, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['term', 'id', 'created']) 
+        ->joinLeft($tableProposal, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['term', 'id', 'created'])
         ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
         ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
         ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
@@ -646,6 +646,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if($limit){
             $s->limit($limit);
         }
+        
         $rows=$this->db->fetchAll($s)->toArray();
         $mergeProposal = function($item) {
             if(empty($item['id'])){
@@ -723,7 +724,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('label');
         $s->setIntegrityCheck(false);
+        
         $rows=$this->db->fetchAll($s)->toArray();
+        $rows=$this->groupTermsAndAttributes($rows);
         if(!empty($rows)){
             return $rows;
         }
@@ -835,6 +838,120 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         }
         
         return $result;
+    }
+    
+    /***
+     * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
+     * The term attributes itself will be grouped in parent-child structure
+     * @param array $data
+     * @return array
+     */
+    protected function groupTermsAndAttributes(array $data){
+        
+        //get the translated labels
+        $labelsModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        /* @var $labelsModel editor_Models_TermCollection_TermAttributesLabel */
+        $labels=$labelsModel->loadAllTranslated();
+        
+        //group attributes parent-child by parrent id
+        $groupChildData=function($list) use($labels){
+            $map =[];
+            $node=null;
+            $roots = [];
+            $labelTrans=null;
+            
+            for ($i = 0; $i < count($list); $i += 1) {
+                $map[$list[$i]['attributeId']] = $i; // initialize the map
+                $list[$i]['children'] = []; // initialize the children
+            }
+            
+            //search label function. If the label is translated, replace the translation text
+            $searchLabel=function($nodeId) use($labels){
+                for ($k = 0; $k < count($labels);$k++) {
+                    if ($labels[$k]['id'] === $nodeId){
+                        return $labels[$k];
+                    }
+                }
+                return null;
+            };
+            
+            //merge the children in the parent array
+            for($i = 0; $i < count($list);$i += 1) {
+                $node = $list[$i];
+                $labelTrans =$searchLabel($node['labelId']);
+                
+                $node['headerText']=null;
+                if(!empty($labelTrans) && isset($labelTrans['labelText'])){
+                    $node['headerText']=$labelTrans['labelText'];
+                }
+                if (!empty($node['parentId'])) {
+                    // if you have dangling branches check that map[node.parentId] exists
+                    array_push($list[$map[$node['parentId']]]['children'],$node);
+                } else {
+                    array_push($roots,$node);
+                }
+            }
+            
+            //merge the roots and the childrens
+            foreach ($list as $l){
+                foreach ($roots as &$r){
+                    if(!empty($l['children']) && $l['attributeId'] == $r['attributeId']){
+                        $r['children']=$l['children'];
+                    }
+                }
+            }
+            return $roots;
+        };
+        
+        $map=[];
+        $termColumns=[
+            'definition',
+            'groupId',
+            'label',
+            'value',
+            'desc',
+            'termStatus',
+            'termId',
+            'collectionId',
+            'languageId',
+            'proposal'
+        ];
+        
+        //Group term-termattribute data by term. For each grouped attributes field will be created
+        $oldKey='';
+        $groupOldKey=false;
+        foreach ($data as $tmp){
+            $termKey=$tmp['termId'];
+            if(!isset($map[$termKey])){
+                $termKey=$tmp['termId'];
+                $map[$termKey]=[];
+                $map[$termKey]['attributes']=[];
+                if(!empty($oldKey) && !empty($map[$oldKey])){
+                    error_log(print_r($map[$oldKey]['attributes'],1));
+                    $map[$oldKey]['attributes']=$groupChildData($map[$oldKey]['attributes']);
+                    $groupOldKey=true;
+                }
+            }
+            
+            //split the term fields and term attributes
+            $atr=[];
+            foreach ($tmp as $key=>$value){
+                if(!in_array($key,$termColumns)){
+                    $atr[$key]=$value;
+                }else{
+                    $map[$termKey][$key]=$value;
+                }
+            }
+            array_push($map[$termKey]['attributes'],$atr);
+            $oldKey = $tmp['termId'];
+            $groupOldKey=false;
+        }
+        //if not grouped after foreach, group the last result
+        if(!$groupOldKey){
+            $map[$oldKey]['attributes']=$groupChildData($map[$oldKey]['attributes']);
+        }
+        
+        return $map;
     }
 
     /**
