@@ -111,7 +111,7 @@ END LICENSE AND COPYRIGHT
     order: 2;
     margin-right: 0px;
 }
-#languages-button {
+#language-button {
     flex: 0 0 80px;
     order: 3;
     margin-right: 0px;
@@ -148,7 +148,7 @@ END LICENSE AND COPYRIGHT
     }
 }
 
-#languages label {
+#language label {
     margin-right: 5px;
 }
 

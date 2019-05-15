@@ -43,11 +43,11 @@ const Term={
 		 */
 		searchTerm:function(searchString,successCallback){
 			var me=this,
-				lng=$('#languages').val(),
+				lng=$('#language').val(),
 				filter = JSON.stringify(me.getSearchFilter());
 			
 			if(!lng){
-				lng=$("input[name='languages']:checked").val();
+				lng=$("input[name='language']:checked").val();
 			}
 			console.log("searchTerm() for: " + searchString);
 			console.log("searchTerm() for language: " + lng);
@@ -79,9 +79,10 @@ const Term={
          * @returns {JSON string}
          */
         getSearchFilter: function() {
-            filter = {};
-            $( '#searchFilterTags .filter' ).each(function( index, el ) {
-                filter[el.name] = el.value;
+            var filter = {};
+            $( '#searchFilterTags input.filter' ).each(function( index, el ) {
+                var dropdownId = el.name.split(': ',1);
+                filter[dropdownId[0]] = el.value;
             });
             return JSON.stringify(filter);
         },
