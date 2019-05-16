@@ -215,7 +215,11 @@ function addSearchFilter(dropdownId, text, value) {
  */
 function beforeFilterTagRemoved(tagLabel) {
     // remove hidden input
-    $('#searchFilterTags input[name="'+tagLabel+'"].filter').remove();
+    $('#searchFilterTags input.filter' ).each(function( index, el ) {
+        if (el.name == tagLabel) {
+            el.remove();
+        }
+    });
     // remove tag field: will be handled by tag-it
 }
 
