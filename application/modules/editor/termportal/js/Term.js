@@ -145,7 +145,7 @@ const Term={
 				var item=me.searchTermsResponse[i];
 				me.$_searchTermsSelect.append( // FIXME; this takes too long
 						$('<li>').attr('data-value', item.groupId).attr('class', 'ui-widget-content search-terms-result').append(
-								$('<div>').attr('class', 'ui-widget').append(item.desc)
+								$('<div>').attr('class', 'ui-widget').append(item.term)
 						));
 			}
 			
@@ -241,7 +241,7 @@ const Term={
 		    		statusIcon=me.checkTermStatusIcon(term);//check if the term contains attribute with status icon
 	
 		    	//draw term header
-		    	termAttributesHtmlContainer.push('<h3 class="term-data" data-term-value="'+term.desc+'">');
+		    	termAttributesHtmlContainer.push('<h3 class="term-data" data-term-value="'+term.term+'">');
 		    	
 		    	
 		    	//add empty space between
@@ -276,7 +276,7 @@ const Term={
 		    } else {
 		    	me.$_termTable.accordion({
 		            active: false,
-		            collapsible: true,
+		            //collapsible: true,
 		            heightStyle: "content"
 		        });
 		    }
@@ -441,18 +441,18 @@ const Term={
 				userHasTermProposalRights=true;//TODO: get me from backend
 			
 			if(!userHasTermProposalRights){// || !attributeData.proposable){
-				return termData.desc!=undefined ? termData.desc : termData.term;
+				return termData.term;
 			}
 			
 			//the proposal is not set, init the component editor
 			if(!termData.proposal){
 				//the user has proposal rights -> init term proposal span
-				return Attribute.getProposalDefaultHtml('term',termData.termId,(termData.desc!=undefined ? termData.desc : termData.term),termData);
+				return Attribute.getProposalDefaultHtml('term',termData.termId,termData.term,termData);
 			}
 			
 			//the proposal is allready defined, render the proposal
-			htmlCollection.push('<del>'+(termData.desc!=undefined ? termData.desc : termData.term)+'</del>');
-			htmlCollection.push('<ins>'+termData.proposal+'</ins>');
+			htmlCollection.push('<del>'+termData.term+'</del>');
+			htmlCollection.push('<ins>'+termData.proposal.term+'</ins>');
 			return htmlCollection.join(' ');
 		},
 		

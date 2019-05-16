@@ -160,11 +160,11 @@ const Attribute={
 	 * This will init the component as editable and set the type,id and value so thay can be used by the ComponentEditor
 	 */
 	getProposalDefaultHtml:function(type,id,value,attributeData){
-		var dataAttribute='data-editable';
+		var data='data-editable';
 		if(attributeData && attributeData.name=='note'){
-			dataAttribute='data-editable-comment';
+			data='data-editable-comment';
 		}
-		return '<span '+dataAttribute+' data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
+		return '<span '+data+' data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
 	}
 };
 
