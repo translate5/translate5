@@ -84,8 +84,7 @@ if(isset($this->error)){
                         // if the preselectedLang exist, select it
                         $preselectedLang = $this->preselectedLang;
                     }
-                    echo '<select class="searchFilter" name="language" id="language">';
-                    echo '<option value="all">language</option>';
+                    echo '<select name="language" id="language">';
                     foreach ($languages as $lang){
                         $isSelected=($preselectedLang !== false) && ($preselectedLang == $lang["rfc5646"]);
                         echo '<option '.($isSelected ? 'selected="selected"' : '').' value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
@@ -93,8 +92,8 @@ if(isset($this->error)){
                     echo '</select>';
                 ?>
                 <?php //TODO: fill option-list from back-end ?>
-                <select class="searchFilter" name="collection" id="collection"><option value="all">collection</option><option value="collection1">collection1</option><option value="collection2">collection2</option></select>
-                <select class="searchFilter" name="client" id="client"><option value="all">client</option><option value="client1">client1</option><option value="client2">client2</option></select>
+                <select class="searchFilter" name="collection" id="collection"><option value="none">collection</option><option value="collection1">collection1</option><option value="collection2">collection2</option></select>
+                <select class="searchFilter" name="client" id="client"><option value="none">client</option><option value="client1">client1</option><option value="client2">client2</option></select>
             </div>
             <ul id="searchFilterTags">
             </ul>
@@ -194,10 +193,9 @@ $( function() {
             return beforeFilterTagRemoved(ui.tagLabel);
         }
 	});
-    handleAddSearchFilter('language',$('#language').find(':selected').text(),$('#language').val());
     $('.searchFilter').selectmenu({
         change: function() {
-            handleAddSearchFilter($(this).attr('id'),$(this).find(':selected').text(),$(this).val());
+            addSearchFilter($(this).attr('id'),$(this).find(':selected').text(),$(this).val());
         }
     });
     $(document).on("mousedown",function(){
