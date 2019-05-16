@@ -104,27 +104,42 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected $workflowStep = null;
     
     /***
-      Mapping of translate5 autostates to xliff 2.x default segment state is as follows:
-			translate5 autostatus			->	mapped xliff status
-			--------------------------------------------------------
-			untranslated		 			-> initial
-			blocked							-> initial
+      Mapping of translate5 autostates to xliff 2.x substate to xliff 2.x default segment state is as follows.
+      
+			Please note: 
+			- "auto-set" are status flags, that are set by the "translate5 repetition editor" (auto-propagate)
+			- "untouched, auto-set" are status flags, that are changed automatically when a user finishes its job, because the finish means approval of everything, he did not touch manually.
 			
-			translated						-> translated
-			auto-translated					-> translated
+			translate5 autostatus			->	xliff 2.x substate	->	mapped xliff status
+			--------------------------------------------------------------------------------
+
+		//before translate5 workflow starts
+			not translated		 			->	not_translated				->	initial
+			blocked							->	blocked						->	initial
+		
+		//1st default translate5 workflow step: set in translation step or initial status before review only workflow
+			translated						->	translated					->	translated
+			translated, auto-set			->	translated_auto				->	translated
 			
-			reviewed					    -> reviewed
-			auto-reviewed					-> reviewed
-			reviewed, untouched, auto-set	-> reviewed
-			reviewed, untouched				-> reviewed
-			auto-reviewed, untouched		-> reviewed
+		//2nd default translate5 workflow step: set in review workflow step
+			reviewed					    ->	reviewed					->	reviewed
+			reviewed, auto-set				->	reviewed_auto				->	reviewed
+			reviewed, untouched, auto-set
+				at finish of workflow step	->	reviewed_untouched			->	reviewed 
+			reviewed, unchanged				->	reviewed_unchanged			->	reviewed
+			reviewed, unchanged, auto-set	->	reviewed_unchanged_auto		->	reviewed
+		
+		//3rd default translate5 workflow step: set during check of the review by the translator
+			Review checked by translator	->	reviewed_translator			->	final
+			Review checked by translator, 
+				auto-set					->	reviewed_translator_auto	->	final
 			
-			translator reviewed				-> final
-			translator autoreviewed			-> final
-			PM reviewed						-> final
-			PM auto-reviewed				-> final
-			PM reviewed, unchanged			-> final
-			PM auto-reviewed, unchanged 	-> final
+		//Not part of the translate5 workflow - done by the PM at any time of the workflow
+			PM reviewed						->	reviewed_pm					->	final
+			PM reviewed, auto-set			->	reviewed_pm_auto			->	final
+			PM reviewed, unchanged			->	reviewed_pm_unchanged		->	final
+			PM reviewed, unchanged, auto-set->	reviewed_pm_unchanged_auto	->	final
+			
        @var array
      */
     protected $segmentStateMap=[

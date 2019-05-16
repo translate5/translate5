@@ -133,20 +133,20 @@ class editor_Models_Segment_AutoStates {
     
     protected $states = array(
         self::TRANSLATED => 'Übersetzt',
-        self::TRANSLATED_AUTO => 'Autoübersetzt',
+        self::TRANSLATED_AUTO => 'Übersetzt, auto',
         self::NOT_TRANSLATED => 'Nicht übersetzt',
         self::REVIEWED => 'Lektoriert',
-        self::REVIEWED_AUTO => 'Autolektoriert',
+        self::REVIEWED_AUTO => 'Lektoriert, auto',
         self::BLOCKED => 'Gesperrt',
-        self::REVIEWED_UNTOUCHED => 'Lektoriert, unberührt, auto-gesetzt',
+        self::REVIEWED_UNTOUCHED => 'Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss',
         self::REVIEWED_UNCHANGED => 'Lektoriert, unverändert',
-        self::REVIEWED_UNCHANGED_AUTO => 'Autolektoriert, unverändert',
-        self::REVIEWED_TRANSLATOR => 'Übersetzer geprüft',
-        self::REVIEWED_TRANSLATOR_AUTO => 'Übersetzer autogeprüft',
-        self::REVIEWED_PM => 'PM geprüft',
-        self::REVIEWED_PM_AUTO => 'PM Autogeprüft',
-        self::REVIEWED_PM_UNCHANGED => 'PM geprüft, unverändert',
-        self::REVIEWED_PM_UNCHANGED_AUTO => 'PM Autogeprüft, unverändert',
+        self::REVIEWED_UNCHANGED_AUTO => 'Lektoriert, unverändert, auto',
+        self::REVIEWED_TRANSLATOR => 'Lektorat durch Übersetzer geprüft',
+        self::REVIEWED_TRANSLATOR_AUTO => 'Lektorat durch Übersetzer geprüft, auto',
+        self::REVIEWED_PM => 'PM lektoriert',
+        self::REVIEWED_PM_AUTO => 'PM lektoriert, auto',
+        self::REVIEWED_PM_UNCHANGED => 'PM lektoriert, unverändert',
+        self::REVIEWED_PM_UNCHANGED_AUTO => 'PM lektoriert, unverändert, auto',
     );
     
     /**
