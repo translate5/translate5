@@ -168,47 +168,69 @@ The tags cannot handle values => use hidden fields, too.
 (https://github.com/aehlke/tag-it/issues/266)
 
 Example:
-- dropdown:     id = "language" | text = "de" | value = "4,359"
-- field-tag:    tagLabel = "language: de"
-- hidden input: class = "filter language" | name = "language: de" | value = "4,359"
+- dropdown:     id = "client" | text = "client1" | value = "123"
+- field-tag:    tagLabel = "client: client1"
+- hidden input: class = "filter client" | name = "client: client1" | value = "123"
 
 ----------------------------------------------------------------------*/
 
-function renderTagLabel(dropdownId, text) {
-    return dropdownId + ': ' + text
-}
-function getDropdownId(tagLabel) {
-    var dropdownId = tagLabel.split(': ',1);
-    return dropdownId[0];
+/**
+ * Render tagLabel from selected dropdown (e.g. "client1").
+ * This is also used as name for corresponding hidden input.
+ * @param {String} text
+ * @returns {String}
+ */
+function renderTagLabel(text) {
+    // Using the text only works as long the filtered never have the same text.
+    return text;
 }
 
+/**
+ * When a user has selected something from the dropdown, we 
+ * - reset the dropdown (they only serve for choosing, not as chosen selection)
+ * - add the tag-field
+ * - add the hidden field
+ * @param {String} dropdownId
+ * @param {String} text
+ * @param {String} value
+ */
 function addSearchFilter(dropdownId, text, value) {
-    var tagLabel = this.renderTagLabel(dropdownId, text);
+    var tagLabel = this.renderTagLabel(text),
+        $_searchFilterTags = $("#searchFilterTags");
     // synchronize dropdown
     $('#'+dropdownId).val('none');
     $('#'+dropdownId).selectmenu("refresh");
     // add hidden input
-    if ($('#searchFilterTags input[name="'+tagLabel+'"][value="'+value+'"].filter.'+dropdownId).length === 0) {
-        $('#searchFilterTags').append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'">');
+    if ($_searchFilterTags.children('input[name="'+tagLabel+'"][value="'+value+'"].filter.'+dropdownId).length === 0) {
+        $_searchFilterTags.append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'">');
     }
     // add tag field
-    $('#searchFilterTags').tagit("createTag", tagLabel);
+    $_searchFilterTags.tagit("createTag", tagLabel);
 }
 
-function removeSearchFilter(dropdownId) {
-    var $_filterToRemove = $('#searchFilterTags .filter.'+dropdownId),
-        tagLabelToRemove;
-    if ($_filterToRemove.length > 0) {
-        tagLabelToRemove = $_filterToRemove.attr('name');
-        $("#searchFilterTags").tagit("removeTagByLabel", tagLabelToRemove);
-        $_filterToRemove.remove();
-    }
-}
-
+/**
+ * When a user removes a tag-field, we also need to remove it's corresponding hidden input.
+ * The tag-field itself will be removed by the tag-it-library.
+ * @param {String} tagLabel
+ */
 function beforeFilterTagRemoved(tagLabel) {
-    var dropdownId = getDropdownId(tagLabel);
     // remove hidden input
-    $('#searchFilterTags input.filter.'+dropdownId).remove();
+    $('#searchFilterTags input.filter' ).each(function( index, el ) {
+        if (el.name == tagLabel) {
+            el.remove();
+        }
+    });
     // remove tag field: will be handled by tag-it
 }
 
+/**
+ * Show placeholder if no tag-field exists, hide otherwise.
+ */
+function handlePlaceholder() {
+    var $_searchFilterTags = $("#searchFilterTags");
+    if ($_searchFilterTags.tagit("assignedTags").length > 0) {
+        $_searchFilterTags.data("ui-tagit").tagInput.attr("placeholder", "");
+    } else {
+        $_searchFilterTags.data("ui-tagit").tagInput.attr("placeholder", searchFilterPlaceholderText);
+    }
+}

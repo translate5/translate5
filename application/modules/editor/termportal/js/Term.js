@@ -44,14 +44,15 @@ const Term={
 		searchTerm:function(searchString,successCallback){
 			var me=this,
 				lng=$('#language').val(),
-				filter = JSON.stringify(me.getSearchFilter());
+				collectionIds = me.getFilteredCollections(),
+                clientIds = me.getFilteredClients(),
+                processStats = me.getFilteredProcessStats();
 			
 			if(!lng){
 				lng=$("input[name='language']:checked").val();
 			}
 			console.log("searchTerm() for: " + searchString);
 			console.log("searchTerm() for language: " + lng);
-            console.log("searchTerm() with filter: " + filter);
 			me.searchTermsResponse=[];  
 			$.ajax({
 				url: Editor.data.termportal.restPath+"termcollection/search",
@@ -60,8 +61,9 @@ const Term={
 				data: {
 					'term':searchString,
 					'language':lng,
-					'filter':filter,
 					'collectionIds':collectionIds,
+                    'clientIds':clientIds,
+                    'processStats':processStats,
 					'disableLimit':me.disableLimit
 				},
 				success: function(result){
@@ -75,16 +77,39 @@ const Term={
 		},
         
         /**
-         * Return all the filters that are set in the tag field
-         * @returns {JSON string}
+         * Return all the collections that are set in the tag field.
+         * @returns {Array}
          */
-        getSearchFilter: function() {
-            var filter = {};
-            $( '#searchFilterTags input.filter' ).each(function( index, el ) {
-                var dropdownId = el.name.split(': ',1);
-                filter[dropdownId[0]] = el.value;
+        getFilteredCollections: function() {
+            var filteredCollections = [];
+            $( '#searchFilterTags input.filter.collection' ).each(function( index, el ) {
+                filteredCollections.push(el.value);
             });
-            return JSON.stringify(filter);
+            return filteredCollections;
+        },
+        
+        /**
+         * Return all the clients that are set in the tag field.
+         * @returns {Array}
+         */
+        getFilteredClients: function() {
+            var filteredClients = [];
+            $( '#searchFilterTags input.filter.client' ).each(function( index, el ) {
+                filteredClients.push(el.value);
+            });
+            return filteredClients;
+        },
+        
+        /**
+         * Return all the prcoessStats that are set in the tag field.
+         * @returns {Array}
+         */
+        getFilteredProcessStats: function() {
+            var filteredProcessStats = [];
+            $( '#searchFilterTags input.filter.processStatus' ).each(function( index, el ) {
+                filteredProcessStats.push(el.value);
+            });
+            return filteredProcessStats;
         },
 		
 		/***

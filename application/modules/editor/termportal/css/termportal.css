@@ -115,7 +115,8 @@ END LICENSE AND COPYRIGHT
 }
 #language-button,
 #client-button,
-#collection-button {
+#collection-button,
+#processStatus-button {
     flex: 0 0 80px;
     order: 3;
     margin-right: 0px;
