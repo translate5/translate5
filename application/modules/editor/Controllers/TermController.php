@@ -63,6 +63,11 @@ class editor_TermController extends ZfExtended_RestController {
         }
     }
     
+    public function postAction() {
+        //FIXME groupId may not be set directly, but implicitly via termEntry
+        parent::postAction();
+    }
+    
     /**
      * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
      */
@@ -70,10 +75,21 @@ class editor_TermController extends ZfExtended_RestController {
         $sessionUser = new Zend_Session_Namespace('user');
         
         $this->decodePutData();
+        $term = trim($this->data->term);
+        
+        //check if the term text exist in the term collection within the language
+        $tmpTermValue = $this->entity->findTermInCollection($term);
+        
+        if($tmpTermValue && $tmpTermValue->count()>0){
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1111' => 'The made term proposal does already exist as different term in the same language in the current term collection.'
+            ], 'editor.term');
+            throw new ZfExtended_Models_Entity_Conflict('E1111');
+        }
         
         $this->proposal->setTermId($this->entity->getId());
         $this->proposal->setCollectionId($this->entity->getCollectionId());
-        $this->proposal->setTerm(trim($this->data->term));
+        $this->proposal->setTerm($term);
         $this->proposal->validate();
 
         //set system fields after validation, so we don't have to provide a validator for them 

@@ -32,19 +32,37 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 /**
- * Term Instanz
+ * Term Instance
  * TODO refactor this class, so that code to deal with the term mark up will be moved in editor_Models_Segment_TermTag
- * 
- * TODO add missing setter and getters:
  * 
  * @method integer getId() getId()
  * @method void setId() setId(integer $id)
  * @method string getTerm() getTerm()
  * @method void setTerm() setTerm(string $term)
- * @method integer getTermEntryId() getTermEntryId()
- * @method void setTermEntryId() setTermEntryId(integer $id)
+ * @method string getMid() getMid()
+ * @method void setMid() setMid(string $mid)
+ * @method string getStatus() getStatus()
+ * @method void setStatus() setStatus(string $status)
+ * @method string getProcessStatus() getProcessStatus()
+ * @method void setProcessStatus() setProcessStatus(string $processStatus)
+ * @method string getDefinition() getDefinition()
+ * @method void setDefinition() setDefinition(string $definition)
+ * @method string getGroupId() getGroupId()
+ * @method void setGroupId() setGroupId(string $groupId)
+ * @method integer getLanguage() getLanguage()
+ * @method void setLanguage() setLanguage(integer $languageId)
  * @method integer getCollectionId() getCollectionId()
  * @method void setCollectionId() setCollectionId(integer $id)
+ * @method integer getTermEntryId() getTermEntryId()
+ * @method void setTermEntryId() setTermEntryId(integer $id)
+ * @method string getCreated() getCreated()
+ * @method void setCreated() setCreated(string $created)
+ * @method string getUpdated() getUpdated()
+ * @method void setUpdated() setUpdated(string $updated)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $userGuid)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $userName)
  */
 class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     const PROCESS_STATUS_UNPROCESSED = 'unprocessed';
@@ -599,14 +617,18 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s);
     }
     
-    /***
+    /**
      * Find term in collection by given language and term value
+     * @param string $termText
+     * @param integer $languageId optional, if omitted use internal value
+     * @param integer $termCollection optional, if omitted use internal value
+     * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function findTermInCollection($termText,$languageId,$termCollection){
+    public function findTermInCollection(string $termText, int $languageId = null, int $termCollection = null){
         $s = $this->db->select()
-        ->where('language = ?', $languageId)
         ->where('term = ?', $termText)
-        ->where('collectionId = ?',$termCollection);
+        ->where('language = ?', $languageId ?? $this->getLanguage())
+        ->where('collectionId = ?',$termCollection ?? $this->getCollectionId());
         return $this->db->fetchAll($s);
     }
     
