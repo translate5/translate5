@@ -263,7 +263,7 @@ const Term={
 		    	termAttributesHtmlContainer.push('</h3>');
 		    	
 		    	//draw term attriubtes
-		    	termAttributesHtmlContainer.push('<div>');
+		    	termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'">');
 		    	termAttributesHtmlContainer.push(me.drawTermAttributes(term.attributes,termRflLang));
 		    	termAttributesHtmlContainer.push('</div>');
 		    });
