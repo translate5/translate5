@@ -618,10 +618,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $collectionIds
      * @param mixed $limit
      * 
-     * @return array|NULL
+     * @return array
      */
     public function searchTermByLanguage($queryString,$languages,$collectionIds,$limit=null){
-        
         //if wildcards are used, adopt them to the mysql needs
         $queryString=str_replace("*","%",$queryString);
         $queryString=str_replace("?","_",$queryString);
@@ -647,27 +646,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $s->limit($limit);
         }
         
-        $rows=$this->db->fetchAll($s)->toArray();
-        $mergeProposal = function($item) {
-            if(empty($item['id'])){
-                $item['proposal'] = null;
-            }
-            else {
-                $item['proposal'] = [
-                    'id' => $item['id'],
-                    'term' => $item['term'],
-                    'created' => $item['created'],
-                ];
-            }
-            unset($item['id']);
-            unset($item['term']);
-            unset($item['created']);
-            return $item;
-        };
-        if(!empty($rows)){
-            return array_map($mergeProposal, $rows);
-        }
-        return null;
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /***
@@ -675,7 +654,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * 
      * @param string $groupId
      * @param array $collectionIds
-     * @return array|NULL
+     * @return array
      */
     public function searchTermAttributesInTermentry($groupId,$collectionIds){
         $attCols=array(
@@ -725,12 +704,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s->where('groupId=?',$groupId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('label');
-        $rows=$this->db->fetchAll($s)->toArray();
-        $rows=$this->groupTermsAndAttributes($rows);
-        if(!empty($rows)){
-            return $rows;
-        }
-        return null;
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /***
@@ -840,66 +814,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $result;
     }
     
-    /***
-     * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
-     * The term attributes itself will be grouped in parent-child structure
-     * @param array $data
-     * @return array
-     */
-    protected function groupTermsAndAttributes(array $data){
-        $map=[];
-        $termColumns=[
-            'definition',
-            'groupId',
-            'label',
-            'value',
-            'desc',
-            'termStatus',
-            'termId',
-            'collectionId',
-            'languageId',
-            'proposal'
-        ];
-        
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        
-        //Group term-termattribute data by term. For each grouped attributes field will be created
-        $oldKey='';
-        $groupOldKey=false;
-        foreach ($data as $tmp){
-            $termKey=$tmp['termId'];
-            if(!isset($map[$termKey])){
-                $termKey=$tmp['termId'];
-                $map[$termKey]=[];
-                $map[$termKey]['attributes']=[];
-                if(!empty($oldKey) && !empty($map[$oldKey])){
-                    $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
-                    $groupOldKey=true;
-                }
-            }
-            
-            //split the term fields and term attributes
-            $atr=[];
-            foreach ($tmp as $key=>$value){
-                if(!in_array($key,$termColumns)){
-                    $atr[$key]=$value;
-                }else{
-                    $map[$termKey][$key]=$value;
-                }
-            }
-            array_push($map[$termKey]['attributes'],$atr);
-            $oldKey = $tmp['termId'];
-            $groupOldKey=false;
-        }
-        //if not grouped after foreach, group the last result
-        if(!$groupOldKey){
-            $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
-        }
-        
-        return $map;
-    }
-
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array

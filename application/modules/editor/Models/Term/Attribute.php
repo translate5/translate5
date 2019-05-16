@@ -102,6 +102,24 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return $history;
     }
+
+    /**
+     * returns true if the attribute is proposable according to its values. 
+     * Additional ACL checks must be done outside (in the controllers)
+     * @param string $name optional, if both parameters are empty the values from $this are used 
+     * @param string $type optional, if both parameters are empty the values from $this are used 
+     */
+    public function isProposable($name = null, $type = null) {
+        if(empty($name) && empty($type)) {
+            $name = $this->getName();
+            $type = $this->getAttrType();
+        }
+        return !($name == 'date'   
+            || $name=='termNote' && $type=='processStatus'
+            || $name=='transacNote' && $type=='responsiblePerson'
+            || $name=='transac' && $type=='creation'
+            || $name=='transac' && $type=='modification');
+    }
     
     /**
      * Loads an attribute for the given term

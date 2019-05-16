@@ -113,10 +113,43 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 $termCount=null;
             }
             
-            $responseArray['term']=$model->searchTermByLanguage($params['term'],$languages,$collectionIds,$termCount);
+            $responseArray['term'] = $this->mergeProposalData($model->searchTermByLanguage($params['term'],$languages,$collectionIds,$termCount));
+            
         }
         
         $this->view->rows=$responseArray;
+    }
+    
+    /**
+     * Merge / convert the proposal information in the result data 
+     * @param array $rows
+     * @return array|null
+     */
+    protected function mergeProposalData($rows) {
+        $mergeProposal = function($item) {
+            
+            //FIXME: compute proposable also via ACLs here!
+            $item['proposable'] = true;
+            
+            if(empty($item['id'])){
+                $item['proposal'] = null;
+            }
+            else {
+                $item['proposal'] = [
+                    'id' => $item['id'],
+                    'term' => $item['term'],
+                    'created' => $item['created'],
+                ];
+            }
+            unset($item['id']);
+            unset($item['term']);
+            unset($item['created']);
+            return $item;
+        };
+        if(empty($rows)){
+            return null;
+        }
+        return array_map($mergeProposal, $rows);
     }
     
     /***
@@ -137,7 +170,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         /* @var $model editor_Models_Term */
         
         if(isset($params['groupId'])){
-            $responseArray['termAttributes']=$model->searchTermAttributesInTermentry($params['groupId'],$collectionIds);
+            $responseArray['termAttributes'] = $this->groupTermsAndAttributes($model->searchTermAttributesInTermentry($params['groupId'],$collectionIds));
             
             $entryAttr=ZfExtended_Factory::get('editor_Models_Term_Attribute');
             /* @var $entryAttr editor_Models_Term_Attribute */
@@ -147,6 +180,74 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $this->view->rows=$responseArray;
     }
     
+    /***
+     * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
+     * The term attributes itself will be grouped in parent-child structure
+     * @param array $data
+     * @return array
+     */
+    protected function groupTermsAndAttributes(array $data){
+        $map=[];
+        $termColumns=[
+            'definition',
+            'groupId',
+            'label',
+            'value',
+            'desc',
+            'termStatus',
+            'termId',
+            'collectionId',
+            'languageId',
+            'proposal'
+        ];
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        //Group term-termattribute data by term. For each grouped attributes field will be created
+        $oldKey='';
+        $groupOldKey=false;
+        foreach ($data as $tmp){
+            $termKey=$tmp['termId'];
+            
+            
+            if(!isset($map[$termKey])){
+                $termKey=$tmp['termId'];
+                $map[$termKey]=[];
+                $map[$termKey]['attributes']=[];
+                if(!empty($oldKey) && !empty($map[$oldKey])){
+                    $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
+                    $groupOldKey=true;
+                }
+            }
+            
+            //split the term fields and term attributes
+            $atr=[];
+            foreach ($tmp as $key=>$value){
+                if(!in_array($key,$termColumns)){
+                    $atr[$key]=$value;
+                }else{
+                    $map[$termKey][$key]=$value;
+                }
+            }
+            
+//FIXME add ACL checking into the proposable calculation here 
+            $atr['proposable'] = $attribute->isProposable($atr['name'], $atr['attrType']);
+            
+            array_push($map[$termKey]['attributes'],$atr);
+            $oldKey = $tmp['termId'];
+            $groupOldKey=false;
+        }
+        //if not grouped after foreach, group the last result
+        if(!$groupOldKey){
+            $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
+        }
+        
+        if(empty($map)){
+            return null;
+        }
+        return $map;
+    }
     
     /***
      * This action is only used in a test at the moment! 

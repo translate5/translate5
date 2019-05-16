@@ -43,6 +43,21 @@ class editor_TermattributeController extends ZfExtended_RestController {
      */
     protected $proposal;
     
+    public function indexAction() {
+        //term attributes are currently not listable via REST API
+        throw new BadMethodCallException();
+    }
+    
+    public function putAction() {
+        //term attributes are currently not editable via REST API
+        throw new BadMethodCallException();
+    }
+    
+    public function postAction() {
+        //term attributes are currently not createable via REST API
+        throw new BadMethodCallException();
+    }
+    
     /**
      * Extend the term with the proposal - if there is any
      * {@inheritDoc}
@@ -61,6 +76,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
             $this->view->rows->proposal = null;
             //do nothing if no proposal found
         }
+        $this->view->rows->proposable = $this->entity->isProposable(); 
     }
     
     /**
