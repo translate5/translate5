@@ -156,4 +156,20 @@ class editor_TermController extends ZfExtended_RestController {
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
     }
+    
+    /**
+     * removes a proposal
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    public function removeproposalOperation() {
+        if(empty($this->view->rows->proposal)) {
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1109' => 'There is no proposal which can be deleted.'
+            ], 'editor.term.attribute');
+            throw new ZfExtended_UnprocessableEntity('E1109');
+        }
+        $this->proposal->delete();
+        $this->view->rows = $this->entity->getDataObject();
+        $this->view->rows->proposal = null;
+    }
 }
