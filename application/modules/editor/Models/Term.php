@@ -853,6 +853,14 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         self::initConstStatus();
         return self::$statusCache['translation'];
     }
+    /**
+     * returns a map CONSTNAME => value of all process-status
+     * @return array
+     */
+    static public function getAllProcessStatus() {
+        self::initConstStatus();
+        return self::$statusCache['processstatus'];
+    }
     
     /**
      * creates a internal list of the status constants
@@ -862,12 +870,16 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         self::$statusCache = [
+            'processstatus' => [],
             'status' => [],
             'translation' => [],
         ];
         $refl = new ReflectionClass(__CLASS__);
         $constants = $refl->getConstants();
         foreach($constants as $key => $val) {
+            if(strpos($key, 'PROCESS_STATUS') === 0) {
+                self::$statusCache['processstatus'][$key] = $val;
+            }
             if(strpos($key, 'STAT_') === 0) {
                 self::$statusCache['status'][$key] = $val;
             }

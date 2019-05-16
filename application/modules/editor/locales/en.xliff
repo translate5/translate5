@@ -2452,6 +2452,18 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<source>Eigenschaften des Eintrags</source>
 	<target>Entry attributes</target>
 </trans-unit>
+<trans-unit id='dW5wcm9jZXNzZWQ='>
+    <source>unprocessed</source>
+    <target>proposal</target>
+</trans-unit>
+<trans-unit id='cHJvdmlzaW9uYWxseVByb2Nlc3NlZA=='>
+    <source>provisionallyProcessed</source>
+    <target>reviewed</target>
+</trans-unit>
+<trans-unit id='ZmluYWxpemVk'>
+    <source>finalized</source>
+    <target>approved</target>
+</trans-unit>
 <trans-unit id='S3VuZGVu'>
     <source>Kunden</source>
     <target>Clients</target>

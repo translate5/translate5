@@ -112,6 +112,15 @@ if(isset($this->error)){
                     }
                     echo '</select>';
                 ?>
+                <?php 
+                    $allProcessstatus = $this->allProcessstatus;
+                    asort($allProcessstatus);
+                    echo '<select class="searchFilter" name="processStatus" id="processStatus"><option value="none">processStatus</option>';
+                    foreach ($allProcessstatus as $key => $value){
+                        echo '<option value="'.$key.'">'.$value.'</option>';
+                    }
+                    echo '</select>';
+                ?>
                 <ul id="searchFilterTags">
                 </ul>
             </div>

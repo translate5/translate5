@@ -172,6 +172,15 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $clients[$id] = $customer->getName();
         }
         $this->view->clients = $clients;
+        
+        // for filtering in front-end: get processtats
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $allProcessStatus = [];
+        foreach ($term->getAllProcessStatus() as $processstatus) {
+            $allProcessStatus[$processstatus] = $this->translate->_($processstatus);
+        }
+        $this->view->allProcessstatus = $allProcessStatus;
     }
     
     /**
