@@ -26,12 +26,20 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_TermCollection_Term extends ZfExtended_Models_Validator_Abstract {
+class editor_Models_Validator_Term_Term extends ZfExtended_Models_Validator_Abstract {
   /**
    * Validators for Terms
    */
   protected function defineValidators() {
     $this->addValidator('id', 'int');
-    $this->addValidator('term', 'stringLength', array('min' => 0, 'max' => 19000));
+    $this->addValidator('term', 'stringLength', ['min' => 0, 'max' => 19000]);
+    $this->addValidator('mid', 'stringLength', ['min' => 0, 'max' => 60]);
+    $this->addDontValidateField('definition');
+    $this->addValidator('collectionId', 'int');
+    $this->addValidator('termEntryId', 'int');
+    $this->addValidator('groupId', 'stringLength', ['min' => 0, 'max' => 255]);
+    $this->addValidator('language', 'int');
+    $this->addValidator('status', 'inArray', [editor_Models_Term::getAllStatus()]);
+    $this->addValidator('processStatus', 'inArray', [editor_Models_Term::getAllProcessStatus()]);
   }
 }

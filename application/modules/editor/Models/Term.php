@@ -90,7 +90,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      */
     protected static $statusCache = [];
     
-    protected $validatorInstanceClass = 'editor_Models_Validator_TermCollection_Term';
+    protected $validatorInstanceClass = 'editor_Models_Validator_Term_Term';
     
     protected $statOrder = array(
         self::STAT_PREFERRED => 1,
@@ -853,6 +853,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * returns a map CONSTNAME => value of all term process-status
+     * @return array
+     */
+    static public function getAllProcessStatus() {
+        self::initConstStatus();
+        return self::$statusCache['processStatus'];
+    }
+    
+    /**
      * returns a map CONSTNAME => value of all translation status
      * @return array
      */
@@ -871,6 +880,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         self::$statusCache = [
             'status' => [],
             'translation' => [],
+            'processStatus' => [],
         ];
         $refl = new ReflectionClass(__CLASS__);
         $constants = $refl->getConstants();
@@ -880,6 +890,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             }
             if(strpos($key, 'TRANSSTAT_') === 0) {
                 self::$statusCache['translation'][$key] = $val;
+            }
+            if(strpos($key, 'PROCESS_STATUS_') === 0) {
+                self::$statusCache['processStatus'][$key] = $val;
             }
         }
     }
