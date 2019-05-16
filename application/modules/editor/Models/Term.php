@@ -711,8 +711,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $userHasProposalRights=true;
         
         $s=$this->db->select()
+        ->setIntegrityCheck(false)
         ->from($this->db,$cols)
         ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
+        ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
         ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'));
         
         //TODO: define user proposal rights
@@ -723,8 +725,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s->where('groupId=?',$groupId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('label');
-        $s->setIntegrityCheck(false);
-        
         $rows=$this->db->fetchAll($s)->toArray();
         $rows=$this->groupTermsAndAttributes($rows);
         if(!empty($rows)){
@@ -847,62 +847,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     protected function groupTermsAndAttributes(array $data){
-        
-        //get the translated labels
-        $labelsModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
-        /* @var $labelsModel editor_Models_TermCollection_TermAttributesLabel */
-        $labels=$labelsModel->loadAllTranslated();
-        
-        //group attributes parent-child by parrent id
-        $groupChildData=function($list) use($labels){
-            $map =[];
-            $node=null;
-            $roots = [];
-            $labelTrans=null;
-            
-            for ($i = 0; $i < count($list); $i += 1) {
-                $map[$list[$i]['attributeId']] = $i; // initialize the map
-                $list[$i]['children'] = []; // initialize the children
-            }
-            
-            //search label function. If the label is translated, replace the translation text
-            $searchLabel=function($nodeId) use($labels){
-                for ($k = 0; $k < count($labels);$k++) {
-                    if ($labels[$k]['id'] === $nodeId){
-                        return $labels[$k];
-                    }
-                }
-                return null;
-            };
-            
-            //merge the children in the parent array
-            for($i = 0; $i < count($list);$i += 1) {
-                $node = $list[$i];
-                $labelTrans =$searchLabel($node['labelId']);
-                
-                $node['headerText']=null;
-                if(!empty($labelTrans) && isset($labelTrans['labelText'])){
-                    $node['headerText']=$labelTrans['labelText'];
-                }
-                if (!empty($node['parentId'])) {
-                    // if you have dangling branches check that map[node.parentId] exists
-                    array_push($list[$map[$node['parentId']]]['children'],$node);
-                } else {
-                    array_push($roots,$node);
-                }
-            }
-            
-            //merge the roots and the childrens
-            foreach ($list as $l){
-                foreach ($roots as &$r){
-                    if(!empty($l['children']) && $l['attributeId'] == $r['attributeId']){
-                        $r['children']=$l['children'];
-                    }
-                }
-            }
-            return $roots;
-        };
-        
         $map=[];
         $termColumns=[
             'definition',
@@ -917,6 +861,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             'proposal'
         ];
         
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
         //Group term-termattribute data by term. For each grouped attributes field will be created
         $oldKey='';
         $groupOldKey=false;
@@ -927,8 +874,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 $map[$termKey]=[];
                 $map[$termKey]['attributes']=[];
                 if(!empty($oldKey) && !empty($map[$oldKey])){
-                    error_log(print_r($map[$oldKey]['attributes'],1));
-                    $map[$oldKey]['attributes']=$groupChildData($map[$oldKey]['attributes']);
+                    $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
                     $groupOldKey=true;
                 }
             }
@@ -948,7 +894,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         }
         //if not grouped after foreach, group the last result
         if(!$groupOldKey){
-            $map[$oldKey]['attributes']=$groupChildData($map[$oldKey]['attributes']);
+            $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
         }
         
         return $map;

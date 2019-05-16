@@ -192,13 +192,16 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         
 //FIXME testen ob hier die korrekten Attribute geladen werden
         $s=$this->db->select()
-        ->from($this->db)
+        ->from($this->db,[])
         ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_attributes.termEntryId',$cols)
+        ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
         ->where('LEK_term_attributes.termId is null')
         ->where('LEK_term_entry.groupId=?',$groupId)
         ->where('LEK_term_entry.collectionId IN(?)',$collectionIds);
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
+        
+        $rows=$this->createChildTree($rows);
         if(!empty($rows)){
             return $rows;
         }
@@ -301,5 +304,28 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setAttrLang($languagesArray[$term->getLanguage()]);
         $this->setValue($fullName);
         $this->save();
+    }
+    
+    /***
+     * Group the attributes by parent-child
+     *
+     * @param array $list
+     * @param int $parentId
+     * @return array
+     */
+    public function createChildTree(array $list, $parentId = 0){
+        $tree = array();
+        foreach ($list as $element) {
+            if ($element['parentId'] == $parentId) {
+                $children = $this->createChildTree($list, $element['attributeId']);
+                if ($children) {
+                    $element['children'] = $children;
+                }else{
+                    $element['children'] = [];
+                }
+                $tree[] = $element;
+            }
+        }
+        return $tree;
     }
 }
