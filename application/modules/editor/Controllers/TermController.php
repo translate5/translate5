@@ -69,6 +69,100 @@ class editor_TermController extends ZfExtended_RestController {
     }
     
     /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::decodePutData()
+     */
+    protected function decodePutData() {
+        parent::decodePutData();
+        $this->convertToLanguageId();
+        if($this->_request->isPut()) {
+            //the following fields may not be changed via PUT:
+            unset($this->data->language);
+            unset($this->data->termEntryId);
+            unset($this->data->mid);
+            unset($this->data->groupId);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_RestController::additionalValidations()
+     */
+    protected function additionalValidations() {
+        //for POST and PUT update always the usage after entity validation
+        $this->updateUsageData($this->entity);
+        
+        if($this->_request->isPost()) {
+            $this->initTermOnPost();
+        }
+    }
+    
+    /**
+     * converts a given language value as lcid or Rfc5646 value to the needed ID 
+     */
+    protected function convertToLanguageId() {
+        //ignoring if already integer like value or empty
+        if((int)$this->data->language > 0) {
+            return; 
+        }
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        try {
+            $matches = null;
+            if(preg_match('/^lcid-([0-9]+)$/i', $this->data->language, $matches)) {
+                $language->loadByLcid($matches[1]);
+            }else {
+                $language->loadByRfc5646($this->data->language);
+            }
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->data->language = 0;
+            return;
+        }
+        $this->data->language = $language->getId();
+    }
+
+    /**
+     * Creates a term entry if a term is tried to be created without any termEntryId and groupId given
+     */
+    protected function initTermOnPost() {
+        $this->entity->setCreated(NOW_ISO);
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1112' => 'Missing mandatory collectionId for term creation',
+            'E1113' => 'Missing mandatory language (ID) for term creation',
+            'E1114' => 'GroupId was set explicitly, this is not allowed. Must be set implicit via a given termEntryId',
+        ]);
+        if(empty($this->data->collectionId)) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1112', ['collectionId' => 'Bitte wählen Sie eine TermCollection aus, welcher dieser Term hinzugefügt werden soll.']);
+        }
+        if(empty($this->data->language)) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1113', ['language' => 'Bitte wählen Sie die Sprache des Terms aus.']);
+        }
+        if(!empty($this->data->groupId)) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1114', ['groupId' => 'Die GroupId kann nicht direkt gesetzt werden, nur indirekt über eine gegebene TermEntryId.']);
+        }
+        if(empty($this->data->processStatus)) {
+            //TODO: this initial value will depend on the ACL with Phase 3 implementation of termportal
+            $this->entity->setProcessStatus(editor_Models_Term::PROCESS_STATUS_UNPROCESSED);
+        }
+        if(empty($this->data->status)) {
+            $this->entity->setStatus(editor_Models_Term::STAT_ADMITTED);
+        }
+        if(empty($this->data->mid)) {
+            $this->entity->setMid($this->_helper->guid->create());
+        }
+        if(empty($this->data->termEntryId)) {
+            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+            /* @var $entry editor_Models_TermCollection_TermEntry */
+            $entry->setCollectionId($this->entity->getCollectionId());
+            $entry->setGroupId($this->_helper->guid->create());
+            $entry->save();
+            $this->entity->setTermEntryId($entry->getId());
+            $this->entity->setGroupId($entry->getGroupId());
+        }
+    }
+    
+    /**
      * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
      */
     public function proposeOperation() {
@@ -93,9 +187,7 @@ class editor_TermController extends ZfExtended_RestController {
         $this->proposal->validate();
 
         //set system fields after validation, so we don't have to provide a validator for them 
-        $this->proposal->setUserGuid($sessionUser->data->userGuid);
-        $this->proposal->setUserName($sessionUser->data->userName);
-        $this->proposal->setCreated(NOW_ISO);
+        $this->updateUsageData($this->proposal);
         
         //we don't save the term, but we save it to a proposal: 
         $this->proposal->save();
@@ -142,9 +234,7 @@ class editor_TermController extends ZfExtended_RestController {
         }
         $commentAttribute->setValue(trim($this->data->term));
         $commentAttribute->validate();
-        $commentAttribute->setUserGuid($sessionUser->data->userGuid);
-        $commentAttribute->setUserName($sessionUser->data->userName);
-        $commentAttribute->setUpdated(NOW_ISO);
+        $this->updateUsageData($commentAttribute);
         $commentAttribute->save();
         $this->view->rows = $commentAttribute->getDataObject();
     }
@@ -164,8 +254,7 @@ class editor_TermController extends ZfExtended_RestController {
         //take over new data from proposal:
         $this->entity->setTerm($this->proposal->getTerm());
         $this->entity->setProcessStatus($this->entity::PROCESS_STATUS_PROV_PROCESSED);
-        $this->entity->setUserName($this->proposal->getUserName());
-        $this->entity->setUserGuid($this->proposal->getUserGuid());
+        $this->updateUsageData($this->entity, $this->proposal->getUserName(), $this->proposal->getUserGuid());
         $this->entity->save();
         $this->proposal->delete();
         $history->save();
@@ -187,5 +276,18 @@ class editor_TermController extends ZfExtended_RestController {
         $this->proposal->delete();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
+    }
+    
+    /**
+     * Helper function to update the userGuid, userName and updated field of the given entity
+     * @param ZfExtended_Models_Entity_Abstract $entity
+     * @param string $userName optional, defaults to userName of authenticated user in session
+     * @param string $userGuid optional, defaults to userGuid of authenticated user in session
+     */
+    protected function updateUsageData(ZfExtended_Models_Entity_Abstract $entity, string $userName = null, string $userGuid = null) {
+        $sessionUser = new Zend_Session_Namespace('user');
+        $entity->setUserGuid($userGuid ?? $sessionUser->data->userGuid);
+        $entity->setUserName($userName ?? $sessionUser->data->userName);
+        $entity->setUpdated(NOW_ISO);
     }
 }
