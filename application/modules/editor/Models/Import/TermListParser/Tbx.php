@@ -1003,19 +1003,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         $attribute->setAttrType($attrType);
         
-        $label=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $label editor_Models_TermCollection_TermAttributesLabel */
-        $labelResult=$label->getLabelByNameAndType($this->xml->name,$attrType);
-        
-        //if the label is not found, insert a new label entry
-        if(empty($labelResult)){
-            $label->setLabel($attrName);
-            $label->setType($attrType);
-            $labelResult=$label->save();
-            $attribute->setLabelId($labelResult);
-        }else{
-            $attribute->setLabelId($labelResult[0]['id']);
-        }
+        $label->loadOrCreate($this->xml->name, $attrType);
+        $attribute->setLabelId($label->getId());
         
         $attribute->setAttrDataType($this->xml->getAttribute('datatype'));
         $attribute->setAttrTarget($this->xml->getAttribute('target'));
