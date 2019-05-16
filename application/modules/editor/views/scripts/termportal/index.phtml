@@ -91,12 +91,15 @@ if(isset($this->error)){
                     }
                     echo '</select>';
                 ?>
+            </div>
+            <div id="searchFilterForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
                 <?php //TODO: fill option-list from back-end ?>
+                <?php //TODO: interdependencies collections & clients ?>
                 <select class="searchFilter" name="collection" id="collection"><option value="none">collection</option><option value="collection1">collection1</option><option value="collection2">collection2</option></select>
                 <select class="searchFilter" name="client" id="client"><option value="none">client</option><option value="client1">client1</option><option value="client2">client2</option></select>
+                <ul id="searchFilterTags">
+                </ul>
             </div>
-            <ul id="searchFilterTags">
-            </ul>
     </div>
     
     <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
