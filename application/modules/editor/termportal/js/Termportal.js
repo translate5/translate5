@@ -182,22 +182,15 @@ function getDropdownId(tagLabel) {
     return dropdownId[0];
 }
 
-function handleAddSearchFilter(dropdownId, text, value) {
-    var me = this,
-        tagLabel = me.renderTagLabel(dropdownId, text);
-    me.removeSearchFilter(dropdownId);
-    if (value === "all") {
-        return; // filterValue "all" = remove old filter only, don't set anew
-    }
-    me.addSearchFilter(tagLabel, dropdownId, value);
-}
-
-function addSearchFilter(tagLabel, dropdownId, value) {
+function addSearchFilter(dropdownId, text, value) {
+    var tagLabel = this.renderTagLabel(dropdownId, text);
     // synchronize dropdown
-    $('#'+dropdownId).val(value);
+    $('#'+dropdownId).val('none');
     $('#'+dropdownId).selectmenu("refresh");
     // add hidden input
-    $('#searchFilterTags').append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'">');
+    if ($('#searchFilterTags input[name="'+tagLabel+'"][value="'+value+'"].filter.'+dropdownId).length === 0) {
+        $('#searchFilterTags').append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'">');
+    }
     // add tag field
     $('#searchFilterTags').tagit("createTag", tagLabel);
 }
@@ -214,9 +207,6 @@ function removeSearchFilter(dropdownId) {
 
 function beforeFilterTagRemoved(tagLabel) {
     var dropdownId = getDropdownId(tagLabel);
-    // synchronize dropdown
-    $('#'+dropdownId).val('all');
-    $('#'+dropdownId).selectmenu("refresh");
     // remove hidden input
     $('#searchFilterTags input.filter.'+dropdownId).remove();
     // remove tag field: will be handled by tag-it
