@@ -700,6 +700,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             'definition',
             'groupId',
             'term as label',
+            'term as term',//for consistency
             'id as value',
             'term as desc',
             'status as termStatus',
@@ -716,11 +717,17 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->from($this->db,$cols)
         ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
         ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
-        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'));
+        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',['LEK_languages.rfc5646 AS language']);
         
         //TODO: define user proposal rights
         if($userHasProposalRights){
-            $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',['LEK_term_proposal.term as proposal']);
+            $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',[
+                'LEK_term_proposal.term as proposalTerm',
+                'LEK_term_proposal.id as proposalId',
+                'LEK_term_proposal.created as proposalCreated',
+                'LEK_term_proposal.userGuid as proposalUserGuid',
+                'LEK_term_proposal.userName as proposalUserName',
+            ]);
         }
         
         $s->where('groupId=?',$groupId)

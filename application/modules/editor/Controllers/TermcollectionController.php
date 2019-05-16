@@ -198,7 +198,23 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             'termId',
             'collectionId',
             'languageId',
-            'proposal'
+            'term'
+        ];
+        //available proposal columns
+        $termProposalColumns=[
+            'proposalTerm',
+            'proposalId',
+            'proposalCreated',
+            'proposalUserGuid',
+            'proposalUserName'
+        ];
+        //maping between database name and proposal table real name (on the frontend we have under the proposal array the real names)
+        $termProposalColumnsNameMap=[
+            'proposalTerm'=>'term',
+            'proposalId'=>'id',
+            'proposalCreated'=>'created',
+            'proposalUserGuid'=>'userGuid',
+            'proposalUserName'=>'userName'
         ];
         
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
@@ -207,6 +223,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         //Group term-termattribute data by term. For each grouped attributes field will be created
         $oldKey='';
         $groupOldKey=false;
+        $termProposalData=[];
+        
         foreach ($data as $tmp){
             $termKey=$tmp['termId'];
             
@@ -218,6 +236,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 if(!empty($oldKey) && !empty($map[$oldKey])){
                     $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
                     $groupOldKey=true;
+                    $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
+                    $termProposalData=[];
                 }
             }
             
@@ -226,6 +246,9 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             foreach ($tmp as $key=>$value){
                 if(!in_array($key,$termColumns)){
                     $atr[$key]=$value;
+                    if(in_array($key,$termProposalColumns)){
+                        $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
+                    }
                 }else{
                     $map[$termKey][$key]=$value;
                 }
@@ -241,6 +264,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         //if not grouped after foreach, group the last result
         if(!$groupOldKey){
             $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
+            $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
         }
         
         if(empty($map)){
