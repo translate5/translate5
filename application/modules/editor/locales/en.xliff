@@ -2435,6 +2435,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<target>No available term collections were found for the clients that are associated to you.</target>
 </trans-unit>
 
+<trans-unit id='VGVybS1FaW50csOkZ2U='>
+    <source>Term-Einträge</source>
+    <target>TermEntry</target>
+</trans-unit>
+
 <trans-unit id='VGVybWU='>
 	<source>Terme</source>
 	<target>Terms</target>

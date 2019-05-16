@@ -144,6 +144,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         //translated strings for some of the result tables
         $translatedStrings=array(
+                "termEntries"=>$this->translate->_("Term-Einträge"),
                 "termTableTitle"=>$this->translate->_("Terme"),
                 "termEntryAttributeTableTitle"=>$this->translate->_("Eigenschaften des Eintrags"),
                 "search" => $this->translate->_('Suche'),
