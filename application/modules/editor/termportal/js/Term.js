@@ -44,7 +44,8 @@ const Term={
 		searchTerm:function(searchString,successCallback){
 			var me=this,
 				lng=$('#language').val(),
-				collectionIds = me.getFilteredCollections();
+				collectionIds = me.getFilteredCollections(),
+                clientIds = me.getFilteredClients();
 			
 			if(!lng){
 				lng=$("input[name='language']:checked").val();
@@ -60,6 +61,7 @@ const Term={
 					'term':searchString,
 					'language':lng,
 					'collectionIds':collectionIds,
+                    'clientIds':clientIds,
 					'disableLimit':me.disableLimit
 				},
 				success: function(result){
@@ -82,6 +84,18 @@ const Term={
                 filteredCollections.push(el.value);
             });
             return filteredCollections;
+        },
+        
+        /**
+         * Return all the clients that are set in the tag field.
+         * @returns {Array}
+         */
+        getFilteredClients: function() {
+            var filteredClients = [];
+            $( '#searchFilterTags input.filter.client' ).each(function( index, el ) {
+                filteredClients.push(el.value);
+            });
+            return filteredClients;
         },
 		
 		/***
