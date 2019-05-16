@@ -71,14 +71,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             return;
         }
         
-        // for filtering in front-end: get the names for the available collectionIds
-        $collections = [];
-        foreach ($collectionIds as $id) {
-            $collection->load($id);
-            $collections[$id] = $collection->getName();
-        }
-        $this->view->collections = $collections;
-        
         //get all languages in the term collections
         $langsArray=$collection->getLanguagesInTermCollections($collectionIds);
         
@@ -162,6 +154,24 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         );
         
         $this->view->translations=$translatedStrings;
+        
+        // for filtering in front-end: get the names for the available collectionIds
+        $collections = [];
+        foreach ($collectionIds as $id) {
+            $collection->load($id);
+            $collections[$id] = $collection->getName();
+        }
+        $this->view->collections = $collections;
+        
+        // for filtering in front-end: get the names for the available clients
+        $customer=ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $clients = [];
+        foreach ($customers as $id) {
+            $customer->load($id);
+            $clients[$id] = $customer->getName();
+        }
+        $this->view->clients = $clients;
     }
     
     /**

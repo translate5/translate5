@@ -93,6 +93,7 @@ if(isset($this->error)){
                 ?>
             </div>
             <div id="searchFilterForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
+                <?php //TODO: interdependencies collections & clients ?>
                 <?php 
                     $collections = $this->collections;
                     asort($collections);
@@ -102,8 +103,15 @@ if(isset($this->error)){
                     }
                     echo '</select>';
                 ?>
-                <?php //TODO: interdependencies collections & clients ?>
-                <select class="searchFilter" name="client" id="client"><option value="none">client</option><option value="client1">client1</option><option value="client2">client2</option></select>
+                <?php 
+                    $clients = $this->clients;
+                    asort($clients);
+                    echo '<select class="searchFilter" name="client" id="client"><option value="none">client</option>';
+                    foreach ($clients as $key => $value){
+                        echo '<option value="'.$key.'">'.$value.'</option>';
+                    }
+                    echo '</select>';
+                ?>
                 <ul id="searchFilterTags">
                 </ul>
             </div>
