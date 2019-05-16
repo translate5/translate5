@@ -846,7 +846,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * returns a map CONSTNAME => value of all term status
+     * returns a map CONSTNAME => value of all term process-status
      * @return array
      */
     static public function getAllProcessStatus() {
