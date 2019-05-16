@@ -2424,7 +2424,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Terminology portal</target>
 </trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
-
+<trans-unit id='RmlsdGVy'>
+    <source>Filter</source>
+    <target>Filter</target>
+</trans-unit>
 <trans-unit id='SWhuZW4gc2luZCBkZXJ6ZWl0IGtlaW5lIEt1bmRlbnZlcmtuw7xwZnVuZ2VuIHVuZCBkYW1pdCBhdWNoIGtlaW5lIFRlcm1Db2xsZWN0aW9ucyB6dWdlb3JkbmV0LiBEYWhlciBpc3QgYXVjaCBrZWluZSBUZXJtc3VjaGUgbcO2Z2xpY2gu'>
 	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
 	<target>There are currently no clients connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>

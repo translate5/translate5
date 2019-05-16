@@ -142,6 +142,7 @@ var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
 var SESSION_LOCALE='<?php echo $session->locale; ?>';
 var noExistingAttributes='<?php echo $this->translations["noExistingAttributes"];?>';
+var searchFilterPlaceholderText='<?php echo $this->translations["filter"];?>'+'...';
 
 function setSizesInFinalResultContent(){
     var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
@@ -197,9 +198,16 @@ $( function() {
         position: { my: "left center", at: "right center" }
     });
     // filter & tag-fields
-    $('#searchFilterTags').tagit({
+    $("#searchFilterTags").tagit({
+        placeholderText: searchFilterPlaceholderText,
+        afterTagAdded: function() {
+            handlePlaceholder();
+        },
         beforeTagRemoved: function (event, ui) {
             return beforeFilterTagRemoved(ui.tagLabel);
+        },
+        afterTagRemoved: function() {
+            handlePlaceholder();
         }
 	});
     $('.searchFilter').selectmenu({
