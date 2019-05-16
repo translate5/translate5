@@ -166,6 +166,13 @@ END LICENSE AND COPYRIGHT
     }
 }
 
+#searchTermsHolder > ul {
+    width: 100%
+}
+#searchTermsHolder-1 {
+    padding: 1em 0em 0em;
+}
+
 #searchTermsSelect,
 #searchTermsSelect ul,
 #searchTermsSelect li  { width: 100%;}
@@ -211,19 +218,19 @@ h4, p {
 .proposeTermBtn.editTerm {
     float: right;
 }
-.proposeTermBtn.addTerm {
-    float: left;
-    margin-left: 0px;
-}
 #searchTermsHolder .proposeTermBtn.addTerm,
 #termTable > .proposeTermBtn.addTerm{
+    float: right;
     color: #007fff;
-    font-size: 60px;
+    font-size: 25px;
+    margin-top: 4px;
 }
 #termTable > div .proposeTermBtn.addTerm,
 #termAttributeTable > .proposeTermBtn.addTerm  {
+    float: left;
     color: #454545;
     font-size: 40px;
+    margin-left: 0px;
 }
 html .proposeTermBtn.ui-icon.deleteTerm,
 html .proposeTermBtn.ui-icon.editTerm {

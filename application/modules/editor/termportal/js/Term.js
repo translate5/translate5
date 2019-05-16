@@ -1,7 +1,7 @@
 const Term={
 		
 		$_searchTermsSelect:null,
-		$_searchTermsHolder:null,
+		$_searchTermsHolderUl:null,
 		$_resultTermsHolderUl:null,
 		$_termTable:null,
 		
@@ -21,7 +21,7 @@ const Term={
 		
 		cacheDom:function(){
 			this.$_searchTermsSelect=$('#searchTermsSelect');
-	        this.$_searchTermsHolder=$('#searchTermsHolder');
+	        this.$_searchTermsHolderUl=$('#searchTermsHolder > ul');
             this.$_resultTermsHolderUl = $('#resultTermsHolder > ul');
             this.$_termTable=$('#termTable');
 		},
@@ -356,8 +356,9 @@ const Term={
                 switch(elements) {
                     case "term-entries":
                         $_selector = false;
-                        $_selectorAdd = me.$_searchTermsHolder;
+                        $_selectorAdd = me.$_searchTermsHolderUl;
                         $titleAdd = 'Add Term-Entry';
+                        htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-plus"></span>';
                       break;
                     case "term-entry":
                         $_selector = me.$_resultTermsHolderUl;
@@ -367,21 +368,21 @@ const Term={
                         break;
                     case "term-entry-attributes":
                         $_selector = $('#termAttributeTable .attribute-data');
-                        $_selectorAdd = $('#termAttributeTable');
+                        $_selectorAdd = false; // $_selectorAdd = $('#termAttributeTable');
                         $titleAdd = 'Add Term-Entry-Attribute';
                         $titleDelete = 'Delete Term-Entry-Attribute';
                         $titleEdit = 'Edit Term-Entry-Attribute';
                       break;
                     case "terms":
                         $_selector = $('#termTable .term-data');
-                        $_selectorAdd = $('#termTable');
+                        $_selectorAdd = false; // $_selectorAdd = $('#termTable');
                         $titleAdd = 'Add Term';
                         $titleDelete = 'Delete Term';
                         $titleEdit = 'Edit Term';
                         break;
                     case "terms-attribute":
                         $_selector = $('#termTable .attribute-data');
-                        $_selectorAdd = $('#termTable .term-data').next('div');
+                        $_selectorAdd = false; // $_selectorAdd = $('#termTable .term-data').next('div');
                         $titleAdd = 'Add Term-Attribute';
                         $titleDelete = 'Delete Term-Attribute';
                         $titleEdit = 'Edit Term-Attribute';
@@ -393,7 +394,6 @@ const Term={
                     $_selector.children('.editTerm').prop('title', $titleEdit + $titleAddition);
                     $_selector.children('.deleteTerm').prop('title', $titleDelete + $titleAddition);
                 }
-                return; // Add-Buttons are not implemented currently
                 if ($_selectorAdd && $_selectorAdd.children('.proposeTermBtn').length === 0) {
                     $_selectorAdd.append(htmlProposalAddIcon);
                     $_selectorAdd.find('.addTerm').prop('title', $titleAdd + $titleAddition);
