@@ -71,6 +71,14 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             return;
         }
         
+        // for filtering in front-end: get the names for the available collectionIds
+        $collections = [];
+        foreach ($collectionIds as $id) {
+            $collection->load($id);
+            $collections[$id] = $collection->getName();
+        }
+        $this->view->collections = $collections;
+        
         //get all languages in the term collections
         $langsArray=$collection->getLanguagesInTermCollections($collectionIds);
         
