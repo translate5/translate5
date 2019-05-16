@@ -101,9 +101,14 @@ END LICENSE AND COPYRIGHT
     margin: 5px 0px;
 }
 
+#search {
+    flex: 1 1 auto;
+}
+#searchFilterTags {
+    flex: 1 1 60%;
+}
 #search,
 #searchFilterTags {
-    flex: 1 1 auto;
     order: 1;
     padding: 0px 5px;
     margin: 0px;

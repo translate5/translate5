@@ -224,6 +224,46 @@ function beforeFilterTagRemoved(tagLabel) {
 }
 
 /**
+ * Only show termCollections belonging to the selected clients.
+ */
+function checkFilterDependencies() {
+    var selectedClients = [],
+        clientsForCollection = [],
+        showCollection,
+        tagLabel;
+    $('#searchFilterTags input.filter.client').each(function( index, el ) {
+        selectedClients.push(el.value);
+    });
+    if(selectedClients.length === 0) {
+        return;
+    }
+    $('#collection option' ).each(function( index, el ) {
+        if (el.value == undefined || el.value == 'none') {
+            return; // "continue"
+        }
+        showCollection = false;
+        clientsForCollection = collectionsClients[el.value];
+        jQuery.each(clientsForCollection, function( i, val ) {
+            // is any of the collection's customers currently selected?
+            if(selectedClients.indexOf(val.toString()) != -1) {
+                showCollection = true;
+                return false; // "break"
+            }
+          });
+        // (not) disable select-item
+        $(this).attr('disabled', !showCollection);
+        // remove from tag-field
+        if(!showCollection) {
+            tagLabel = $(this).text();
+            if ($("#searchFilterTags").tagit("assignedTags").indexOf(tagLabel) != -1) {
+                $("#searchFilterTags").tagit("removeTagByLabel", tagLabel);
+            }
+        }
+    });
+    $('#collection').selectmenu("refresh");
+}
+
+/**
  * Show placeholder if no tag-field exists, hide otherwise.
  */
 function handlePlaceholder() {
