@@ -204,7 +204,6 @@ class editor_TermController extends ZfExtended_RestController {
      * Tries to update or insert a value "comment" into langSet>descripGrp>note of the term
      */
     public function commentOperation() {
-        $sessionUser = new Zend_Session_Namespace('user');
         $commentAttribute = ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $commentAttribute editor_Models_Term_Attribute */
         try {
@@ -213,7 +212,7 @@ class editor_TermController extends ZfExtended_RestController {
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             $lang = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $lang editor_Models_Languages */
-            $lang->loadById($id);
+            $lang->loadById($this->entity->getLanguage());
             $subLanguage = strtolower($lang->getSublanguage());
             
             $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
