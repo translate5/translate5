@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
 }
 
 .wrap {
-    margin-bottom: 2em;
+    margin-bottom: 1em;
 }
 
 /* --------------- header --------------- */
@@ -90,7 +90,8 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- search --------------- */
 
-#searchForm {
+#searchForm,
+#searchFilterForm {
     display: flex;
     flex-flow: row wrap;
     align-items: stretch;
@@ -100,35 +101,30 @@ END LICENSE AND COPYRIGHT
     margin: 5px 0px;
 }
 
-#search {
+#search,
+#searchFilterTags {
     flex: 1 1 auto;
     order: 1;
     padding: 0px 5px;
-    margin-right: 0px;
+    margin: 0px;
 }
 #searchButton {
     flex: 0 0 20px;
     order: 2;
     margin-right: 0px;
 }
-#language-button {
-    flex: 0 0 80px;
-    order: 3;
-    margin-right: 0px;
-}
-#client-button {
-    flex: 0 0 80px;
-    order: 3;
-    margin-right: 0px;
-}
+#language-button,
+#client-button,
 #collection-button {
     flex: 0 0 80px;
     order: 3;
     margin-right: 0px;
+    height: 25px;
 }
 
 @media (max-width: 600px) {
-    #search {
+    #search,
+    #searchFilterTags {
         flex: 20 0 90%;
         height: 30px;
         margin-bottom: 5px;
