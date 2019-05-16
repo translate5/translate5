@@ -45,7 +45,8 @@ const Term={
 			var me=this,
 				lng=$('#language').val(),
 				collectionIds = me.getFilteredCollections(),
-                clientIds = me.getFilteredClients();
+                clientIds = me.getFilteredClients(),
+                processStats = me.getFilteredProcessStats();
 			
 			if(!lng){
 				lng=$("input[name='language']:checked").val();
@@ -62,6 +63,7 @@ const Term={
 					'language':lng,
 					'collectionIds':collectionIds,
                     'clientIds':clientIds,
+                    'processStats':processStats,
 					'disableLimit':me.disableLimit
 				},
 				success: function(result){
@@ -96,6 +98,18 @@ const Term={
                 filteredClients.push(el.value);
             });
             return filteredClients;
+        },
+        
+        /**
+         * Return all the prcoessStats that are set in the tag field.
+         * @returns {Array}
+         */
+        getFilteredProcessStats: function() {
+            var filteredProcessStats = [];
+            $( '#searchFilterTags input.filter.processStatus' ).each(function( index, el ) {
+                filteredProcessStats.push(el.value);
+            });
+            return filteredProcessStats;
         },
 		
 		/***

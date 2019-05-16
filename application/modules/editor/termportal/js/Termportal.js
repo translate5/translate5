@@ -175,14 +175,14 @@ Example:
 ----------------------------------------------------------------------*/
 
 /**
- * Render tagLabel from selected dropdown (e.g. "client: client1").
+ * Render tagLabel from selected dropdown (e.g. "client1").
  * This is also used as name for corresponding hidden input.
- * @param {String} dropdownId
  * @param {String} text
  * @returns {String}
  */
-function renderTagLabel(dropdownId, text) {
-    return dropdownId + ': ' + text
+function renderTagLabel(text) {
+    // Using the text only works as long the filtered never have the same text.
+    return text;
 }
 
 /**
@@ -195,7 +195,7 @@ function renderTagLabel(dropdownId, text) {
  * @param {String} value
  */
 function addSearchFilter(dropdownId, text, value) {
-    var tagLabel = this.renderTagLabel(dropdownId, text),
+    var tagLabel = this.renderTagLabel(text),
         $_searchFilterTags = $("#searchFilterTags");
     // synchronize dropdown
     $('#'+dropdownId).val('none');
