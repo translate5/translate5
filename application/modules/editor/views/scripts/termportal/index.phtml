@@ -106,8 +106,13 @@ if(isset($this->error)){
     
     <div class="wrap" id="finalResultContent" style="display: none;">
     	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
+          <ul>
+            <li><a href="#searchTermsHolder-1"><?php echo $this->translations["termEntries"];?></a></li>
+          </ul>
+          <div id="searchTermsHolder-1">
         	<ul id="searchTermsSelect" size="10" style="display: inline-block;">
         	</ul>
+          </div>
     	</div>
     	<div id="resultTermsHolder">
           <ul>
@@ -183,6 +188,7 @@ $( function() {
         }
       });
     $("#resultTermsHolder").tabs();
+    $("#searchTermsHolder").tabs();
     $("#search").focus();
     $(window).resize(function() {
         setSizesInFinalResultContent();
