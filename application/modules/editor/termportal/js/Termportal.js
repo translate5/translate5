@@ -155,18 +155,70 @@ function startAutocomplete(){
     $("#search").autocomplete( "search", $("#search").val());
 }
 
-function addSearchFilter(tagLabel, filterValue, filterName) {
-    // TODO: handle selections of filterValue "all" (= remove filter)
-    if ($('#searchFilterTags input[name="'+filterName+'"].filter').length) {
-        var tagLabelOld = $('#searchFilterTags input[name="'+filterName+'"].filter').val();
-        $("#searchFilterTags").tagit("removeTagByLabel", tagLabelOld);
-        $('#searchFilterTags input[name="'+filterName+'"].filter').remove();
-    }
-    $('#searchFilterTags').tagit("createTag", tagLabel);
-    $('#searchFilterTags').append('<input type="hidden" value="'+filterValue+'" name="'+filterName+'" class="filter '+filterName+' '+tagLabel+'">');
-}
-
 function showFinalResultContent() {
     $('#finalResultContent').show();
     setSizesInFinalResultContent();
 }
+
+/* ---------------------------------------------------------------------
+// ------------------- handle tag fields and filters -------------------
+//----------------------------------------------------------------------
+
+The tags cannot handle values => use hidden fields, too.
+(https://github.com/aehlke/tag-it/issues/266)
+
+Example:
+- dropdown:     id = "language" | text = "de" | value = "4,359"
+- field-tag:    tagLabel = "language: de"
+- hidden input: class = "filter language" | name = "language: de" | value = "4,359"
+
+----------------------------------------------------------------------*/
+
+function renderTagLabel(dropdownId, text) {
+    return dropdownId + ': ' + text
+}
+function getDropdownId(tagLabel) {
+    var dropdownId = tagLabel.split(': ',1);
+    return dropdownId[0];
+}
+
+function handleAddSearchFilter(dropdownId, text, value) {
+    var me = this,
+        tagLabel = me.renderTagLabel(dropdownId, text);
+    me.removeSearchFilter(dropdownId);
+    if (value === "all") {
+        return; // filterValue "all" = remove old filter only, don't set anew
+    }
+    me.addSearchFilter(tagLabel, dropdownId, value);
+}
+
+function addSearchFilter(tagLabel, dropdownId, value) {
+    // synchronize dropdown
+    $('#'+dropdownId).val(value);
+    $('#'+dropdownId).selectmenu("refresh");
+    // add hidden input
+    $('#searchFilterTags').append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'">');
+    // add tag field
+    $('#searchFilterTags').tagit("createTag", tagLabel);
+}
+
+function removeSearchFilter(dropdownId) {
+    var $_filterToRemove = $('#searchFilterTags .filter.'+dropdownId),
+        tagLabelToRemove;
+    if ($_filterToRemove.length > 0) {
+        tagLabelToRemove = $_filterToRemove.attr('name');
+        $("#searchFilterTags").tagit("removeTagByLabel", tagLabelToRemove);
+        $_filterToRemove.remove();
+    }
+}
+
+function beforeFilterTagRemoved(tagLabel) {
+    var dropdownId = getDropdownId(tagLabel);
+    // synchronize dropdown
+    $('#'+dropdownId).val('all');
+    $('#'+dropdownId).selectmenu("refresh");
+    // remove hidden input
+    $('#searchFilterTags input.filter.'+dropdownId).remove();
+    // remove tag field: will be handled by tag-it
+}
+
