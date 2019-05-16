@@ -140,7 +140,7 @@ const Attribute={
 			htmlCollection=[],
 			userHasAttributeProposalRights=true;//TODO: get me from backend
 		
-		if(!userHasAttributeProposalRights && !me.isAttributeProposable()){
+		if(!userHasAttributeProposalRights || !attributeData.proposable){
 			return attValue;
 		}
 		
@@ -150,41 +150,21 @@ const Attribute={
 			htmlCollection.push('<ins>'+attributeData.proposal.term+'</ins>');
 			return htmlCollection.join(' ');
 		}
+		
 		//the user has proposal rights -> init attribute proposal span
-		return me.getProposalDefaultHtml(attributeData.attributeOriginType,attributeData.attributeId,attValue);
+		return me.getProposalDefaultHtml(attributeData.attributeOriginType,attributeData.attributeId,attValue,attributeData);
 	},
 
 	/***
 	 * Get the proposalable component default html. 
 	 * This will init the component as editable and set the type,id and value so thay can be used by the ComponentEditor
 	 */
-	getProposalDefaultHtml:function(type,id,value){
-		return '<span data-editable data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
-	},
-	
-	isAttributeProposable:function(attribute){
-		
-		if(attribute.name=='date'){
-			return false;
+	getProposalDefaultHtml:function(type,id,value,attributeData){
+		var dataAttribute='data-editable';
+		if(attributeData && attributeData.name=='note'){
+			dataAttribute='data-editable-comment';
 		}
-		
-		if(attribute.name=='termNote' && attribute.attrType=='processStatus'){
-			return false;
-		}
-		
-		if(attribute.name=='transacNote' && attribute.attrType=='responsiblePerson'){
-			return false;
-		}
-		
-		if(attribute.name=='transac' && attribute.attrType=='creation'){
-			return false;
-		}
-		
-		if(attribute.name=='transac' && attribute.attrType=='modification'){
-			return false;
-		}
-		
-		return true;
+		return '<span '+dataAttribute+' data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
 	}
 };
 

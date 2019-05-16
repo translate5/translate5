@@ -111,37 +111,6 @@ function getLanguageFlag(rfcLanguage) {
     }
 }
 
-/***
- * Group childs by parent id to the nodes
- * 
- * @param list
- * @returns
- */
-function groupChildData(list) {
-    var map = {}, node, roots = [], i,labelTrans;
-    for (i = 0; i < list.length; i += 1) {
-        map[list[i].attributeId] = i; // initialize the map
-        list[i].children = []; // initialize the children
-    }
-    
-    for (i = 0; i < list.length; i += 1) {
-        node = list[i];
-        labelTrans = $.grep(attributeLabels, function(e){ return e.id == node.labelId; });
-        
-        node.headerText=null;
-        if(labelTrans.length==1 && labelTrans[0].labelText){
-            node.headerText=labelTrans[0].labelText;
-        }
-        if (node.parentId !== null) {
-            // if you have dangling branches check that map[node.parentId] exists
-            list[map[node.parentId]].children.push(node);
-        } else {
-            roots.push(node);
-        }
-    }
-    return roots;
-}
-
 $("#searchButton" ).button({
     icon:"ui-icon-search"
 }).click(function(){

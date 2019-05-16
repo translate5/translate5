@@ -27,12 +27,19 @@ const TermEntry={
 	    me.$_termAttributeTable.empty();
 	    me.$_resultTermsHolder.show();
 	    
-	    entryAttribute = groupChildData(entryAttribute);
+	    var drawDataContainer=[],
+	    	commentAttribute=[];
 	    
-	    var drawDataContainer=[];
 	    entryAttribute.forEach(function(attribute) {
-	    	drawDataContainer.push(Attribute.handleAttributeDrawData(attribute));
+	    	//comment attribute should always appear as first
+	    	if(attribute.name=='note'){
+	    		commentAttribute.push(Attribute.handleAttributeDrawData(attribute));
+	    	}else{
+	    		drawDataContainer.push(Attribute.handleAttributeDrawData(attribute));
+	    	}
 	    });
+	    //merge the comments and the other attributes
+	    drawDataContainer=commentAttribute.concat(drawDataContainer);
 	    
 	    me.$_termAttributeTable.append(drawDataContainer.join(''));
 

@@ -313,15 +313,22 @@ const Term={
 		 */
 		drawTermAttributes:function(attributes,termLang){
 		    var me=this,
-		        html = [];
+		        html = [],
+		        commentAttribute=[];
 		    
 		    if(Attribute.languageDefinitionContent[termLang]){
 		    	html.push(Attribute.languageDefinitionContent[termLang]);
 		    }
 		    
 		    for(var i=0;i<attributes.length;i++){
+		    	//comment attribute should always appear as first
+		    	if(attributes[i].name=='note'){
+		    		commentAttribute.push(Attribute.handleAttributeDrawData(attributes[i]));
+		    		continue;
+		    	}
 		    	html.push(Attribute.handleAttributeDrawData(attributes[i]));
 		    }
+		    html=commentAttribute.concat(html);
 		    
 		    return html.join('');
 		},
@@ -432,14 +439,14 @@ const Term={
 				htmlCollection=[],
 				userHasTermProposalRights=true;//TODO: get me from backend
 			
-			if(!userHasTermProposalRights){
+			if(!userHasTermProposalRights){// || !attributeData.proposable){
 				return termData.desc!=undefined ? termData.desc : termData.term;
 			}
 			
 			//the proposal is not set, init the component editor
 			if(!termData.proposal){
 				//the user has proposal rights -> init term proposal span
-				return Attribute.getProposalDefaultHtml('term',termData.termId,(termData.desc!=undefined ? termData.desc : termData.term));
+				return Attribute.getProposalDefaultHtml('term',termData.termId,(termData.desc!=undefined ? termData.desc : termData.term),termData);
 			}
 			
 			//the proposal is allready defined, render the proposal
