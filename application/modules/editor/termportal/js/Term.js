@@ -266,7 +266,7 @@ const Term={
 		    		statusIcon=me.checkTermStatusIcon(term);//check if the term contains attribute with status icon
 	
 		    	//draw term header
-		    	termAttributesHtmlContainer.push('<h3 class="term-data" data-term-value="'+term.term+'">');
+		    	termAttributesHtmlContainer.push('<h3 class="term-data" data-term-value="'+term.term+'" data-term-id="'+term.termId+'">');
 		    	
 		    	
 		    	//add empty space between
@@ -413,7 +413,7 @@ const Term={
             if ($_selector && $_selector.children('.proposeTermBtn').length === 0) {
                 $_selector.append(htmlProposalDeleteIcon+htmlProposalEditIcon);
                 $_selector.children('.editTerm').prop('title', $titleEdit);
-                $_selector.children('.deleteTerm').prop('title', $titleDelete);
+                $_selector.children('.deleteTerm').prop('title', $titleDelete).click({scope:me},me.onDeleteTermClick);
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposeTermBtn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
@@ -475,12 +475,44 @@ const Term={
 			return htmlCollection.join(' ');
 		},
 		
+		/***
+		 * On edit term icon click handler
+		 */
 		onEditTermClick:function(){
 			var element=$(this),
 				parent=element.parent(),
-				search=parent.find("span[data-editable]" );
+				search=parent.find("span[data-editable]");
 			ComponentEditor.addComponentEditor(search);
-			console.log(search);
+		},
+		
+		/***
+		 * On remove proposal click handler
+		 */
+		onDeleteTermClick:function(eventData){
+			var $element=$(this),
+				$parent=$element.parents('h3[data-term-id]');
+			
+			if(parent.length==0){
+				return;
+			}
+			
+			//ajax call to the remove proposal action
+			var me=eventData.data.scope,
+				url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id'));
+			$.ajax({
+		        url: url,
+		        dataType: "json",	
+		        type: "POST",
+		        success: function(result){
+		        	//the term proposal is removed, render the initial term proposable content
+		        	var renderData=me.getTermRenderData(result.rows),
+		        		ins=$parent.find('ins');
+		        		
+		        	ins.replaceWith(renderData);
+		        	$parent.find('del').empty();
+		        	
+		        }
+		    });
 		}
 };
 

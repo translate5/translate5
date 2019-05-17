@@ -16,7 +16,7 @@ const ComponentEditor={
 		
 		me.typeRouteMap['term']='term/{ID}/propose/operation';
 		me.typeRouteMap['termEntryAttribute']='';//TODO:
-		me.typeRouteMap['termAttribute']='';//TODO:
+		me.typeRouteMap['termAttribute']='termattribute/{ID}/propose/operation';
 		
 		me.typeRequestDataKeyMap['term']='term';//TODO:
 		me.typeRequestDataKeyMap['termEntryAttribute']='value';//TODO:
@@ -34,7 +34,7 @@ const ComponentEditor={
 		var me=this;
 		me.$_termTable.on('click', '[data-editable]',{scope:me},me.onEditableComponentClick);
 		me.$_termAttributeTable.on('click', '[data-editable]',{scope:me},me.onEditableComponentClick);
-		me.$_termTable.on('click', '[data-editable-comment]',{scope:me},me.onEditableCommentComponentClick);
+		me.$_termTable.on('click', 'span[data-editable-comment]',{scope:me},me.onEditableCommentComponentClick);
 	},
 	
 	onEditableCommentComponentClick:function(event){
@@ -53,18 +53,32 @@ const ComponentEditor={
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
 			$parent=me.$_termTable.find('[data-term-id="' + $element.data('id') + '"]'),
-			$commentPanel=$parent.find('.comment-attribute');
+			$commentPanel=$parent.find('[data-editable-comment]');
 		
 			//$input = $('<input type="text" style="min-width: 150px;" onkeyup="this.size = Math.max(this.value.length, 1)"/>').val($element.text());
 	  
-		if($commentPanel.length>0){
+		//the comment field does not exist for the term, create new
+		if($commentPanel.length==0){
+			var dummyCommentAttribute={
+					attributeId:-1,
+					name:'note',
+					attrValue:'',
+					attrType:null,
+					headerText:'',
+					proposable:true
+			},
+			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
+			
+			$parent.prepend(drawData);
+			$commentPanel=$parent.find('[data-editable-comment]');
+		}
+		
+		if($commentPanel.prop('tagName')=='SPAN'){
 			me.addCommentAttributeEditor($commentPanel);
 		}
 		
 		$element.replaceWith($input);
 	  
-		$input.focus();
-		
 		$input.one('blur', function(){
 			me.saveComponentChange($element,$input);
 		}).focus();
@@ -72,7 +86,7 @@ const ComponentEditor={
 	
 	addCommentAttributeEditor:function($element){
 		var me=this,
-			$input= $('<textarea />').val($element.text());
+			$input= $('<textarea data-editable-comment />').val($element.text());
 		
 		$element.replaceWith($input);
 		
@@ -136,7 +150,6 @@ const ComponentEditor={
 			return;
 		}
 
-		debugger;
 		var me=this,
 			$parent=$input.parents('div[data-term-id]'),//get the parrent div container and find the termid from there
 			url=Editor.data.termportal.restPath+'term/{ID}/comment/operation'.replace("{ID}",$parent.data('term-id')),
@@ -152,7 +165,7 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-	        	me.updateComponent($element,$input,result.rows);
+	        	me.updateComponentComment($element,$input,result.rows);
 	        }
 	    });
 	},
@@ -165,9 +178,18 @@ const ComponentEditor={
 		if($el.data('type')=='term'){
 			renderData=Term.getTermRenderData(result);
 		}else{
-			renderData=Attribute.getAttributeRenderData(result);
+			renderData=Attribute.getAttributeRenderData(result,result.value);
 		}
 		$input.replaceWith(renderData);
+		//on the next term click, fatch the data from the server, and update the cache
+		Term.reloadTermEntry=true;
+	},
+	
+	/***
+	 * Update comment component in the table results
+	 */
+	updateComponentComment:function($el,$input,result){
+		$input.replaceWith(Attribute.getProposalDefaultHtml(result.attributeOriginType,result.id,result.value,result));
 		//on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
 	}

@@ -138,17 +138,16 @@ const Attribute={
 	
 	getAttributeRenderData:function(attributeData,attValue){
 		var me=this,
-			htmlCollection=[],
-			userHasAttributeProposalRights=true;//TODO: get me from backend
+			htmlCollection=[];
 		
-		if(!userHasAttributeProposalRights || !attributeData.proposable){
+		if(!attributeData.proposable){
 			return attValue;
 		}
 		
 		//the proposal is allready defined, render the proposal
-		if(attributeData.proposal && attributeData.proposal!=''){
-			htmlCollection.push('<del>'+attributeData.attValue+'</del>');
-			htmlCollection.push('<ins>'+attributeData.proposal.term+'</ins>');
+		if(attributeData.proposal && attributeData.proposal!=undefined){
+			htmlCollection.push('<del>'+attValue+'</del>');
+			htmlCollection.push('<ins>'+attributeData.proposal.value+'</ins>');
 			return htmlCollection.join(' ');
 		}
 		
