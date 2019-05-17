@@ -63,11 +63,6 @@ class editor_TermController extends ZfExtended_RestController {
         }
     }
     
-    public function postAction() {
-        //FIXME groupId may not be set directly, but implicitly via termEntry
-        parent::postAction();
-    }
-    
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
@@ -102,7 +97,7 @@ class editor_TermController extends ZfExtended_RestController {
      */
     protected function convertToLanguageId() {
         //ignoring if already integer like value or empty
-        if(!isset($this->data->language) || (int)$this->data->language > 0) {
+        if(empty($this->data->language) || (int)$this->data->language > 0) {
             return; 
         }
         $language = ZfExtended_Factory::get('editor_Models_Languages');
@@ -289,6 +284,6 @@ class editor_TermController extends ZfExtended_RestController {
         $sessionUser = new Zend_Session_Namespace('user');
         $entity->setUserGuid($userGuid ?? $sessionUser->data->userGuid);
         $entity->setUserName($userName ?? $sessionUser->data->userName);
-        $entity->setUpdated(NOW_ISO);
+        $entity->hasField('updated') && $entity->setUpdated(NOW_ISO);
     }
 }
