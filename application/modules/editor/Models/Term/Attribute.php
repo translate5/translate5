@@ -280,7 +280,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $ret=$ret[0];
             $this->db->update(['updated'=>null],['id=?'=>$ret['id']]);
             $this->db->update(['updated'=>null,'value'=>time()],['parentId=?'=>$ret['id'],'name="date"']);
-            $this->db->update(['updated'=>null,'value'=>$fullName],['parentId=?'=>$ret['id'],'name="transacNote"','attrType="responsiblePerson"']);
+            $this->db->update(['updated'=>null,'value'=>$fullName],['parentId=?'=>$ret['id'],'name="transacNote"']);
             return;
         }
         //the transacgroups are not existing, create new

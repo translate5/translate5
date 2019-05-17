@@ -89,7 +89,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
         
         $this->proposal->setAttributeId($this->entity->getId());
         $this->proposal->setCollectionId($this->entity->getCollectionId());
-        $this->proposal->setValue(trim($this->data->term));
+        $this->proposal->setValue(trim($this->data->value));
         $this->proposal->validate();
         
         //set system fields after validation, so we don't have to provide a validator for them

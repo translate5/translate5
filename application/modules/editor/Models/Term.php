@@ -711,6 +711,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         
         //TODO: define user proposal rights
         $userHasProposalRights=true;
+        //TODO:
+        $userHasTermAttributeProposalRights=true;
         
         $s=$this->db->select()
         ->setIntegrityCheck(false)
@@ -723,10 +725,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if($userHasProposalRights){
             $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',[
                 'LEK_term_proposal.term as proposalTerm',
-                'LEK_term_proposal.id as proposalId',
-                'LEK_term_proposal.created as proposalCreated',
-                'LEK_term_proposal.userGuid as proposalUserGuid',
-                'LEK_term_proposal.userName as proposalUserName',
+                'LEK_term_proposal.id as proposalId'
+            ]);
+        }
+        
+        //TODO: define user proposal rights
+        if($userHasTermAttributeProposalRights){
+            $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = LEK_term_attributes.id',[
+                'LEK_term_attribute_proposal.value as proposalAttributeValue',
+                'LEK_term_attribute_proposal.id as proposalAttributelId',
             ]);
         }
         

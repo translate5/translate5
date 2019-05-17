@@ -200,21 +200,27 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             'languageId',
             'term'
         ];
-        //available proposal columns
+        //available term proposal columns
         $termProposalColumns=[
             'proposalTerm',
-            'proposalId',
-            'proposalCreated',
-            'proposalUserGuid',
-            'proposalUserName'
+            'proposalId'
         ];
-        //maping between database name and proposal table real name (on the frontend we have under the proposal array the real names)
+        //maping between database name and term proposal table real name
         $termProposalColumnsNameMap=[
             'proposalTerm'=>'term',
-            'proposalId'=>'id',
-            'proposalCreated'=>'created',
-            'proposalUserGuid'=>'userGuid',
-            'proposalUserName'=>'userName'
+            'proposalId'=>'id'
+        ];
+        
+        //available attribute proposal columns
+        $attributeProposalColumns=[
+            'proposalAttributeValue',
+            'proposalAttributelId'
+        ];
+        
+        //maping between database name and attribute proposal table real name
+        $attributeProposalColumnsNameMap=[
+            'proposalAttributeValue'=>'value',
+            'proposalAttributelId'=>'id'
         ];
         
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
@@ -243,19 +249,31 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             
             //split the term fields and term attributes
             $atr=[];
+            $attProposal=[];
             foreach ($tmp as $key=>$value){
-                if(!in_array($key,$termColumns)){
-                    $atr[$key]=$value;
-                    if(in_array($key,$termProposalColumns)){
-                        $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
-                    }
-                }else{
+                //check if it is term specific data
+                if(in_array($key,$termColumns)){
                     $map[$termKey][$key]=$value;
+                    continue;
                 }
+                //is term attribute proposal specific data
+                if(in_array($key,$attributeProposalColumns)){
+                    $attProposal[$attributeProposalColumnsNameMap[$key]]=$value;
+                    continue;
+                }
+                //is term proposal specific columnt
+                if(in_array($key,$termProposalColumns)){
+                    $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
+                    continue;
+                }
+                //it is attribute column
+                $atr[$key]=$value;
             }
             
 //FIXME add ACL checking into the proposable calculation here (with Phase 3)
             $atr['proposable'] = $attribute->isProposable($atr['name'], $atr['attrType']);
+            $atr['proposal']=!empty($attProposal['id']) ? $attProposal : null;
+            $attProposal=[];
             
             array_push($map[$termKey]['attributes'],$atr);
             $oldKey = $tmp['termId'];
