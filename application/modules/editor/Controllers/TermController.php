@@ -102,7 +102,7 @@ class editor_TermController extends ZfExtended_RestController {
      */
     protected function convertToLanguageId() {
         //ignoring if already integer like value or empty
-        if((int)$this->data->language > 0) {
+        if(!isset($this->data->language) || (int)$this->data->language > 0) {
             return; 
         }
         $language = ZfExtended_Factory::get('editor_Models_Languages');
@@ -187,7 +187,8 @@ class editor_TermController extends ZfExtended_RestController {
         $this->proposal->validate();
 
         //set system fields after validation, so we don't have to provide a validator for them 
-        $this->updateUsageData($this->proposal);
+        $this->proposal->setUserGuid($sessionUser->data->userGuid);
+        $this->proposal->setUserName($sessionUser->data->userName);
         
         //we don't save the term, but we save it to a proposal: 
         $this->proposal->save();
@@ -208,13 +209,12 @@ class editor_TermController extends ZfExtended_RestController {
         $commentAttribute = ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $commentAttribute editor_Models_Term_Attribute */
         try {
-            $commentAttribute->loadByTermAndName($this->entity, 'note', $commentAttribute::ATTR_LEVEL_LANGSET);
+            $commentAttribute->loadByTermAndName($this->entity, 'note', $commentAttribute::ATTR_LEVEL_TERM);
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             $lang = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $lang editor_Models_Languages */
             $lang->loadById($this->entity->getLanguage());
-            $subLanguage = strtolower($lang->getSublanguage());
             
             $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
             /* @var $label editor_Models_TermCollection_TermAttributesLabel */
@@ -225,14 +225,15 @@ class editor_TermController extends ZfExtended_RestController {
                 'created' => NOW_ISO,
                 'internalCount' => 1,
                 'collectionId' => $this->entity->getCollectionId(),
-                //we don't set termId here, since level shall be langSet
+                'termId'=>$this->entity->getId(),
                 'termEntryId' => $this->entity->getTermEntryId(),
-                'language' => $subLanguage,
-                'attrLang' => $subLanguage,
+                'language' => strtolower($lang->getRfc5646()),
+                'attrLang' => strtolower($lang->getRfc5646()),
                 'labelId' => $label->getId(),
             ]);
         }
-        $commentAttribute->setValue(trim($this->data->term));
+        $this->decodePutData();
+        $commentAttribute->setValue(trim($this->data->comment));
         $commentAttribute->validate();
         $this->updateUsageData($commentAttribute);
         $commentAttribute->save();
