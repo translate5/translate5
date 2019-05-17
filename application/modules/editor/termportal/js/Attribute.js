@@ -18,7 +18,8 @@ const Attribute={
 	    
 	    var me=this,
 	    	html='',
-	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data">',
+            proposable = attribute.proposable ? ' proposable' : '';
+	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + '">',
 	    	headerTagClose='</h4>';
 	    
 	    switch(attribute.name) {
