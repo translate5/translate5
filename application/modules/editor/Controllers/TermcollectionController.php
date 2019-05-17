@@ -128,7 +128,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     protected function mergeProposalData($rows) {
         $mergeProposal = function($item) {
             
-            //FIXME: compute proposable also via ACLs here!
+            //FIXME: compute proposable also via ACLs here! (with Phase 3)
             $item['proposable'] = true;
             
             if(empty($item['id'])){
@@ -231,7 +231,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 }
             }
             
-//FIXME add ACL checking into the proposable calculation here 
+//FIXME add ACL checking into the proposable calculation here (with Phase 3)
             $atr['proposable'] = $attribute->isProposable($atr['name'], $atr['attrType']);
             
             array_push($map[$termKey]['attributes'],$atr);
