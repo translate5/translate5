@@ -122,21 +122,16 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Loads an attribute instance for the given term and with the given name, 
-     *   the level defines on which level the attribute should be searched for: termEntry,langSet or term 
-     * 
-     * @param editor_Models_Term $term Also a non persistend term can be given, the fields collectionId, termEntryId, language and the ID are needed depending on the search level
-     * @param string $name
-     * @param string $level termEntry,langSet or term; optional, defaults to term 
+     * Loads an attribute for the given term
      */
-    public function loadByTermAndName(editor_Models_Term $term, string $name, string $level = self::ATTR_LEVEL_TERM): void {
+    public function loadByTermAndName(editor_Models_Term $term, $name, $level = self::ATTR_LEVEL_TERM) {
         $s = $this->db->select()->where('collectionId = ?', $term->getCollectionId());
         $s->where('termEntryId = ?', $term->getTermEntryId());
         if($level == self::ATTR_LEVEL_LANGSET || $level == self::ATTR_LEVEL_TERM) {
             $lang = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $lang editor_Models_Languages */
             $lang->loadById($term->getLanguage());
-            $s->where('language = ?', $lang->getSublanguage());
+            $s->where('language = ?',strtolower($lang->getRfc5646()));
         }
         else {
             $s->where('language is null');
@@ -386,5 +381,11 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             }
         }
         return $tree;
+    }
+    
+    public function getDataObject() {
+        $result=parent::getDataObject();
+        $result->attributeOriginType='termAttribute';
+        return $result;
     }
 }
