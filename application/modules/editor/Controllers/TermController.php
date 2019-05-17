@@ -191,8 +191,9 @@ class editor_TermController extends ZfExtended_RestController {
         /* @var $attribute editor_Models_Term_Attribute */
         
         $attribute->updateModificationGroupAttributes($this->entity);
+        
         //update the view
-        $this->view->rows->proposal = $this->proposal->getDataObject()->term;
+        $this->view->rows->proposal = $this->proposal->getDataObject();
     }
     
     /**

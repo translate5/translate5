@@ -151,15 +151,24 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "filter" => $this->translate->_('Filter'),
                 "noResults" => $this->translate->_('Keine Ergebnisse für die aktuelle Suche!'),
                 "noExistingAttributes" => $this->translate->_('no existing attributes'),
+                "collection"=>$this->translate->_("Term-Collection"),
+                "client"=>$this->translate->_("Kunde"),
+                "processstatus"=>$this->translate->_("Prozessstatus"),
         );
         
         $this->view->translations=$translatedStrings;
         
         // for filtering in front-end: get the names for the available collectionIds
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
         $collections = [];
         foreach ($collectionIds as $id) {
             $collection->load($id);
-            $collections[$id] = $collection->getName();
+            $customerAssoc->loadByLanguageResourceId($id);
+            $collections[$id] = (object) [
+                                    'name' => $collection->getName(),
+                                    'clients' => $customerAssoc->loadCustomerIds($id)
+                                ];
         }
         $this->view->collections = $collections;
         
@@ -168,8 +177,10 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         /* @var $customer editor_Models_Customer */
         $clients = [];
         foreach ($customers as $id) {
-            $customer->load($id);
-            $clients[$id] = $customer->getName();
+            if (count($customerAssoc->loadByCustomerIds($id))>0) {
+                $customer->load($id);
+                $clients[$id] = $customer->getName();
+            }
         }
         $this->view->clients = $clients;
         

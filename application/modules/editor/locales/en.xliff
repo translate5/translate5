@@ -2452,6 +2452,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<source>Eigenschaften des Eintrags</source>
 	<target>Entry attributes</target>
 </trans-unit>
+<trans-unit id='UHJvemVzc3N0YXR1cw=='>
+    <source>Prozessstatus</source>
+    <target>Processstatus</target>
+</trans-unit>
 <trans-unit id='dW5wcm9jZXNzZWQ='>
     <source>unprocessed</source>
     <target>proposal</target>
@@ -2528,6 +2532,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'>
     <source>Kunde gelöscht</source>
     <target>Client deleted</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGU='>
+    <source>Kunde</source>
+    <target>Client</target>
 </trans-unit>
 
 <trans-unit id='RW5ka3VuZGU='>
