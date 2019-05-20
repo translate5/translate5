@@ -135,16 +135,16 @@ if(isset($this->error)){
     <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
     
     <div class="wrap" id="finalResultContent" style="display: none;">
-    	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
+    	<div id="resultTermEntriesHolder" class="result-holder">
           <ul>
-            <li><a href="#searchTermsHolder-1"><?php echo $this->translations["termEntries"];?></a></li>
+            <li><a href="#searchTermsHolder"><?php echo $this->translations["termEntries"];?></a></li>
           </ul>
-          <div id="searchTermsHolder-1">
+          <div id="searchTermsHolder"> 
         	<ul id="searchTermsSelect" size="10" style="display: inline-block;">
         	</ul>
           </div>
     	</div>
-    	<div id="resultTermsHolder">
+    	<div id="resultTermsHolder" class="result-holder">
           <ul>
             <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termTableTitle"];?></a></li>
             <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTableTitle"];?></a></li>
@@ -176,13 +176,13 @@ var searchFilterPlaceholderText='<?php echo $this->translations["filter"];?>'+'.
 var collectionsClients=JSON.parse('<?php echo json_encode($collectionsClients); ?>');
 
 function setSizesInFinalResultContent(){
-    var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
-    if ($('#searchTermsHolder').is(':visible')) {
+    var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #resultTermEntriesHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
+    if ($('#resultTermEntriesHolder').is(':visible')) {
         // (1) Left column: ensure that the scrollable area has always the maximal possible height that is available in the current browser window.
-        $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
+        $('#resultTermEntriesHolder').css("height", window.innerHeight - $('#resultTermEntriesHolder').position().top - 20);
         // (2) Right column: must not wrap underneath the left column until BOTH of them are wrapped to rows (is out of sight otherwise!)
         if ($('#resultTermsHolder').is(':visible')) {
-            var widthTerms = $('#searchTermsHolder').width(),
+            var widthTerms = $('#resultTermEntriesHolder').width(),
                 widthResults = $('#resultTermsHolder').width();
             if ( (widthResults - widthTerms > SCROLLBAROFFSET) &&       // = check if they have the same size (= wrapped as rows and both displayed in full width already)
                  (widthResults + widthTerms > window.innerWidth) ) {    // = together they are broader than the window and the results would be wrapped
@@ -219,8 +219,7 @@ $( function() {
             $("#languageSelector").submit();
         }
       });
-    $("#resultTermsHolder").tabs();
-    $("#searchTermsHolder").tabs();
+    $(".result-holder").tabs();
     $("#search").focus();
     $(window).resize(function() {
         setSizesInFinalResultContent();
