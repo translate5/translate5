@@ -26,7 +26,7 @@ const Term={
 		
 		initEvents:function(){
 			var me=this;
-			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) { // TODO: why does this take so long? maybe not global, but on each separately?
+			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) { // FIXME: why is this triggered twice sometimes (with attr('data-value') = "undefined" in the second)
 				me.findTermsAndAttributes($(ui.selected).attr('data-value'));
 		    });
 			me.$_termTable.on('click', ".editTerm",me.onEditTermClick);
@@ -368,7 +368,7 @@ const Term={
                 htmlProposalEditIcon,
                 htmlProposalDeleteIcon,
                 $_selector,$_selectorAdd,
-                $titleAdd, $titleDelete, $titleEdit, $titleAddition;
+                $titleAdd, $titleDelete, $titleEdit;
             // TODO: Tooltips: use translations
             htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-squaresmall-plus"></span>';
             htmlProposalDeleteIcon = '<span class="proposeTermBtn deleteTerm ui-icon ui-icon-trash-b"></span>';
@@ -415,7 +415,7 @@ const Term={
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposeTermBtn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
-                $_selectorAdd.find('.addTerm').prop('title', $titleAdd + $titleAddition);
+                $_selectorAdd.find('.addTerm').prop('title', $titleAdd);
             }
         },
 		
