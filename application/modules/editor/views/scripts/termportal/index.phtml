@@ -97,23 +97,27 @@ if(isset($this->error)){
                 <?php 
                     $collections = $this->collections;
                     $collectionsClients = [];
+                    $collectionsNames = [];
                     if (count($collections) > 1) {
                         asort($collections);
                         echo '<select class="searchFilter" name="collection" id="collection"><option value="none">'.$this->translations["collection"].':</option>';
                         foreach ($collections as $key => $value){
                             echo '<option value="'.$key.'">'.$value->name.'</option>';
                             $collectionsClients[$key] = $value->clients;
+                            $collectionsNames[$key] = $value->name;
                         }
                         echo '</select>';
                     }
                 ?>
                 <?php 
-                    $clients = $this->clients;
+                $clients = $this->clients;
+                $clientsNames = [];
                     if (count($clients) > 1) {
                         asort($clients);
                         echo '<select class="searchFilter" name="client" id="client"><option value="none">'.$this->translations["client"].':</option>';
                         foreach ($clients as $key => $value){
                             echo '<option value="'.$key.'">'.$value.'</option>';
+                            $clientsNames[$key] = $value;
                         }
                         echo '</select>';
                     }
@@ -174,6 +178,8 @@ var SESSION_LOCALE='<?php echo $session->locale; ?>';
 var noExistingAttributes='<?php echo $this->translations["noExistingAttributes"];?>';
 var searchFilterPlaceholderText='<?php echo $this->translations["filter"];?>'+'...';
 var collectionsClients=JSON.parse('<?php echo json_encode($collectionsClients); ?>');
+var collectionsNames=<?php echo json_encode($collectionsNames); ?>;
+var clientsNames=<?php echo json_encode($clientsNames); ?>;
 
 function setSizesInFinalResultContent(){
     var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #resultTermEntriesHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
