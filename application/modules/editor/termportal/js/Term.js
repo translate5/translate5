@@ -168,7 +168,7 @@ const Term={
 				var item=me.searchTermsResponse[i];
 				me.$_searchTermsSelect.append( // FIXME; this takes too long
 						$('<li>').attr('data-value', item.groupId).attr('class', 'ui-widget-content search-terms-result').append(
-								$('<div>').attr('class', 'ui-widget').append(item.term)
+								$('<div>').attr('class', 'ui-widget').append(item.label)
 						));
 			}
 			
