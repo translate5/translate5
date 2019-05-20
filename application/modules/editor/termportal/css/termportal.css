@@ -159,7 +159,7 @@ END LICENSE AND COPYRIGHT
     flex-flow: row wrap;
 }
 
-#searchTermsHolder {
+#resultTermEntriesHolder {
     flex: 0 0 20em;
     order: 1;
     margin-right: 5px;
@@ -167,15 +167,15 @@ END LICENSE AND COPYRIGHT
     overflow-x: auto;
 }
 @media (max-width: 1100px) {
-    #searchTermsHolder {
+    #resultTermEntriesHolder {
         flex: 0 0 17em;
     }
 }
 
-#searchTermsHolder > ul {
+#resultTermEntriesHolder > #searchTermsHolder {
     width: 100%
 }
-#searchTermsHolder-1 {
+#searchTermsHolder {
     padding: 1em 0em 0em;
 }
 
@@ -188,7 +188,7 @@ END LICENSE AND COPYRIGHT
 @media (max-width: 810px) {
     /* - example: 640 px for 700px in real; don't know why! */
     /* - already 870px (not 700px) can easily use row for flex */
-    #searchTermsHolder {
+    #resultTermEntriesHolder {
         flex-grow: 1;
         flex-basis: 90%;
         max-height: 200px;
@@ -224,7 +224,7 @@ h4, p {
 .proposeTermBtn.editTerm {
     float: right;
 }
-#searchTermsHolder .proposeTermBtn.addTerm,
+#resultTermEntriesHolder .proposeTermBtn.addTerm,
 #termTable > .proposeTermBtn.addTerm{
     float: right;
     color: #007fff;

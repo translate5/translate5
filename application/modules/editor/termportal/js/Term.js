@@ -1,7 +1,6 @@
 const Term={
 		
 		$_searchTermsSelect:null,
-		$_searchTermsHolderUl:null,
 		$_resultTermsHolderUl:null,
 		$_termTable:null,
 		
@@ -21,7 +20,6 @@ const Term={
 		
 		cacheDom:function(){
 			this.$_searchTermsSelect=$('#searchTermsSelect');
-	        this.$_searchTermsHolderUl=$('#searchTermsHolder > ul');
             this.$_resultTermsHolderUl = $('#resultTermsHolder > ul');
             this.$_termTable=$('#termTable');
 		},
@@ -378,7 +376,7 @@ const Term={
             switch(elements) {
                 case "term-entries":
                     $_selector = false;
-                    $_selectorAdd = me.$_searchTermsHolderUl;
+                    $_selectorAdd = $('#resultTermEntriesHolder > ul');
                     $titleAdd = 'Add Term-Entry';
                     htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-plus"></span>';
                   break;
