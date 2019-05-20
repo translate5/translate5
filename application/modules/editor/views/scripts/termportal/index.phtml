@@ -177,9 +177,9 @@ var collectionsClients=JSON.parse('<?php echo json_encode($collectionsClients); 
 
 function setSizesInFinalResultContent(){
     var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #resultTermEntriesHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
-    if ($('#resultTermEntriesHolder').is(':visible')) {
+    if ($('#searchTermsHolder').is(':visible')) {
         // (1) Left column: ensure that the scrollable area has always the maximal possible height that is available in the current browser window.
-        $('#resultTermEntriesHolder').css("height", window.innerHeight - $('#resultTermEntriesHolder').position().top - 20);
+        $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
         // (2) Right column: must not wrap underneath the left column until BOTH of them are wrapped to rows (is out of sight otherwise!)
         if ($('#resultTermsHolder').is(':visible')) {
             var widthTerms = $('#resultTermEntriesHolder').width(),
