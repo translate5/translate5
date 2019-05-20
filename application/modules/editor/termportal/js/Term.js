@@ -75,13 +75,20 @@ const Term={
 		},
         
         /**
-         * Return all the collections that are set in the tag field.
+         * Return all the Term-Collections that are set in the tag field.
          * @returns {Array}
          */
         getFilteredCollections: function() {
-            var filteredCollections = [];
-            $( '#searchFilterTags input.filter.collection' ).each(function( index, el ) {
-                filteredCollections.push(el.value);
+            var $_filteredCollections = $('#searchFilterTags input.filter.collection'),
+                filteredCollections = [];
+            if ($_filteredCollections.length === 0 && this.getFilteredClients().length > 0) {
+                // user has not selected any collections, but client(s) => use only those collections that belong to the client(s)
+                $_filteredCollections = $("#collection option:enabled");
+            }
+            $_filteredCollections.each(function( index, el ) {
+                if (el.value != 'none') {
+                    filteredCollections.push(el.value);
+                }
             });
             return filteredCollections;
         },
