@@ -263,13 +263,20 @@ const Term={
 		    $("#resultTermsHolder").show();
 		    
 		    var termAttributesHtmlContainer=[],
-		        userProposalRights=true;//TODO: get me from the backend
+                $_filteredCollections = $('#searchFilterTags input.filter.collection'),
+                $_filteredClients = $('#searchFilterTags input.filter.client'),
+                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1);
 		    
 		    $.each(termsData, function (i, term) {
 		    	var termRflLang=term.attributes[0]!=undefined ? term.attributes[0].language : '',
 		    		rfcLanguage = getLanguageFlag(termRflLang),
-		    		statusIcon=me.checkTermStatusIcon(term);//check if the term contains attribute with status icon
-	
+		    		statusIcon=me.checkTermStatusIcon(term), //check if the term contains attribute with status icon
+                    infosForSelection = '',
+                    filteredCientsNames = [],
+                    filteredCollectionsNames = [],
+                    clientId,
+                    clientName;
+                
 		    	//draw term header
 		    	termAttributesHtmlContainer.push('<h3 class="term-data" data-term-value="'+term.term+'" data-term-id="'+term.termId+'">');
 		    	
@@ -289,6 +296,29 @@ const Term={
 		    	if(statusIcon){
 		    		termAttributesHtmlContainer.push(statusIcon);
 		    	}
+                
+                //add empty space between
+                termAttributesHtmlContainer.push(' ');
+                
+                //add client- and termCollection-names like this: [CUSTOMERNAME; termCollectionNAME]
+                //(display only those that are selected for filtering)
+                if (showInfosForSelection) {
+                    infosForSelection = '';
+                    clientsForCollection = collectionsClients[term.collectionId];
+                    for (i = 0; i < clientsForCollection.length; i++) {
+                        clientId = clientsForCollection[i];
+                        clientName = clientsNames[clientId];
+                        if ($("#searchFilterTags").tagit("assignedTags").indexOf(clientName) != -1) {
+                            filteredCientsNames.push(clientName);
+                        }
+                    }
+                    infosForSelection = filteredCientsNames.join(', ');
+                    collectionName = collectionsNames[term.collectionId];
+                    if ($("#searchFilterTags").tagit("assignedTags").indexOf(collectionName) != -1) {
+                        infosForSelection += '; '+collectionName;
+                    }
+                    termAttributesHtmlContainer.push('<span class="selection-infos">['+infosForSelection+']</span>');
+                }
 		    	
 		    	termAttributesHtmlContainer.push('</h3>');
 		    	
