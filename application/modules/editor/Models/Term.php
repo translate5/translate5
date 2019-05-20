@@ -647,8 +647,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $queryString=str_replace("*","%",$queryString);
         $queryString=str_replace("?","_",$queryString);
         
-        $adapter=$this->db->getAdapter();
-        
         //when limit is provided -> autocomplete search
         if($limit){
             $queryString=$queryString.'%';

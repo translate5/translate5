@@ -116,7 +116,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         return !($name == 'date'   
             || $name=='termNote' && $type=='processStatus'
-            || $name=='transacNote' && $type=='responsiblePerson'
+            || $name=='transacNote' && ($type=='responsiblePerson' || $type=='responsibility')
             || $name=='transac' && $type=='creation'
             || $name=='transac' && $type=='modification');
     }
