@@ -446,6 +446,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                 $user->loadByLogin($triggerConfig->receiverUser);
                 $proofreaders=[(array)$user->getDataObject()];
             }else{
+                //load only users with state open
+                $tua->setState(editor_Models_Task::STATE_OPEN);
                 $proofreaders = $tua->getUsersOfRoleOfTask($notifyRole, $oneTask['taskGuid'], ['state']);
             }
             
