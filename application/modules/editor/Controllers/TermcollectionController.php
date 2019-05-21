@@ -108,7 +108,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         if(isset($params['term'])){
             $languages = $params['language'] ?? null;
             
-            if (!empty($params['collectionIds'])) {
+            if (isset($params['collectionIds'])) {
                 // use only the collectionIds that the user has selected and be sure that these are allowed
                 $collectionIds = array_intersect($params['collectionIds'],$collectionIds);
             }
