@@ -43,7 +43,6 @@ const Term={
 			var me=this,
 				lng=$('#language').val(),
 				collectionIds = me.getFilteredCollections(),
-                clientIds = me.getFilteredClients(),
                 processStats = me.getFilteredProcessStats();
 			
 			if(!lng){
@@ -60,7 +59,6 @@ const Term={
 					'term':searchString,
 					'language':lng,
 					'collectionIds':collectionIds,
-                    'clientIds':clientIds,
                     'processStats':processStats,
 					'disableLimit':me.disableLimit
 				},
