@@ -437,9 +437,9 @@ const Term={
                 case "terms-attribute":
                     $_selector = $('#termTable .attribute-data.proposable');
                     $_selectorAdd = false; // $_selectorAdd = $('#termTable .term-data').next('div');
-                    $titleAdd = 'Add Term-Attribute';
-                    $titleDelete = 'Delete Term-Attribute';
-                    $titleEdit = 'Edit Term-Attribute';
+                    $titleAdd = translations['addTermAttribute'];
+                    $titleDelete = translations['deleteTermAttribute'];
+                    $titleEdit = translations['editTermAttribute'];
                   break;
             }
             if ($_selector && $_selector.children('.proposeTermBtn').length === 0) {
