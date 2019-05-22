@@ -1488,6 +1488,18 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='dW5wcm9jZXNzZWQ='><source>unprocessed</source><target>vorgeschlagen</target></trans-unit>
 <trans-unit id='cHJvdmlzaW9uYWxseVByb2Nlc3NlZA=='><source>provisionallyProcessed</source><target>überprüft</target></trans-unit>
 <trans-unit id='ZmluYWxpemVk'><source>finalized</source><target>freigegeben</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnIGJlYXJiZWl0ZW4='><source>Term-Eintrag bearbeiten</source><target>Term-Eintrag bearbeiten</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnIGhpbnp1ZsO8Z2Vu'><source>Term-Eintrag hinzufügen</source><target>Term-Eintrag hinzufügen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnIGzDtnNjaGVu'><source>Term-Eintrag löschen</source><target>Term-Eintrag löschen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGJlYXJiZWl0ZW4='><source>Term-Eintrag-Attribut bearbeiten</source><target>Term-Eintrag-Attribut bearbeiten</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGhpbnp1ZsO8Z2Vu'><source>Term-Eintrag-Attribut hinzufügen</source><target>Term-Eintrag-Attribut hinzufügen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGzDtnNjaGVu'><source>Term-Eintrag-Attribut löschen</source><target>Term-Eintrag-Attribut löschen</target></trans-unit>
+<trans-unit id='VGVybSBiZWFyYmVpdGVu'><source>Term bearbeiten</source><target>Term bearbeiten</target></trans-unit>
+<trans-unit id='VGVybSBoaW56dWbDvGdlbg=='><source>Term hinzufügen</source><target>Term hinzufügen</target></trans-unit>
+<trans-unit id='VGVybSBsw7ZzY2hlbg=='><source>Term löschen</source><target>Term löschen</target></trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dCBiZWFyYmVpdGVu'><source>Term-Attribut bearbeiten</source><target>Term-Attribut bearbeiten</target></trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dCBoaW56dWbDvGdlbg=='><source>Term-Attribut hinzufügen</source><target>Term-Attribut hinzufügen</target></trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dCBsw7ZzY2hlbg=='><source>Term-Attribut löschen</source><target>Term-Attribut löschen</target></trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Suche</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuKQ=='><source>Serbisch (Kyrillisch) (Serbien)</source><target>Serbisch (Kyrillisch) (Serbien)</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4p'><source>Serbisch (Latein) (Serbien)</source><target>Serbisch (Latein) (Serbien)</target></trans-unit>
