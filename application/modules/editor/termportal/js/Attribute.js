@@ -13,7 +13,7 @@ const Attribute={
 	handleAttributeDrawData:function(attribute){
 	    
 	    if(!attribute.attributeId){
-	        return noExistingAttributes; // see /application/modules/editor/views/scripts/termportal/index.phtml
+	        return translations['noExistingAttributes']; // see /application/modules/editor/views/scripts/termportal/index.phtml
 	    }
 	    
 	    var me=this,

@@ -404,7 +404,6 @@ const Term={
                 htmlProposalDeleteIcon,
                 $_selector,$_selectorAdd,
                 $titleAdd, $titleDelete, $titleEdit;
-            // TODO: Tooltips: use translations
             htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-squaresmall-plus"></span>';
             htmlProposalDeleteIcon = '<span class="proposeTermBtn deleteTerm ui-icon ui-icon-trash-b"></span>';
             htmlProposalEditIcon = '<span class="proposeTermBtn editTerm ui-icon ui-icon-pencil"></span>';
@@ -412,28 +411,28 @@ const Term={
                 case "term-entries":
                     $_selector = false;
                     $_selectorAdd = $('#resultTermEntriesHolder > ul');
-                    $titleAdd = 'Add Term-Entry';
+                    $titleAdd = translations['addTermEntry'];
                     htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-plus"></span>';
                   break;
                 case "term-entry":
                     $_selector = me.$_resultTermsHolderUl;
                     $_selectorAdd = false;
-                    $titleDelete = 'Delete Term-Entry';
-                    $titleEdit = 'Edit Term-Entry';
+                    $titleDelete = translations['deleteTermEntry'];
+                    $titleEdit = translations['editTermEntry'];
                     break;
                 case "term-entry-attributes":
                     $_selector = $('#termAttributeTable .attribute-data.proposable');
                     $_selectorAdd = false; // $_selectorAdd = $('#termAttributeTable');
-                    $titleAdd = 'Add Term-Entry-Attribute';
-                    $titleDelete = 'Delete Term-Entry-Attribute';
-                    $titleEdit = 'Edit Term-Entry-Attribute';
+                    $titleAdd = translations['addTermEntryAttribute'];
+                    $titleDelete = translations['deleteTermEntryAttribute'];
+                    $titleEdit = translations['editTermEntryAttribute'];
                   break;
                 case "terms":
                     $_selector = $('#termTable .term-data');
                     $_selectorAdd = false; // $_selectorAdd = $('#termTable');
-                    $titleAdd = 'Add Term';
-                    $titleDelete = 'Delete Term';
-                    $titleEdit = 'Edit Term';
+                    $titleAdd = translations['addTerm'];
+                    $titleDelete = translations['deleteTerm'];
+                    $titleEdit = translations['editTerm'];
                     break;
                 case "terms-attribute":
                     $_selector = $('#termTable .attribute-data.proposable');
