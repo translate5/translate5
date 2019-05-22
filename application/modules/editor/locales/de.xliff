@@ -1206,7 +1206,7 @@ Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRo
 <trans-unit id='QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg=='><source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source><target>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</target></trans-unit>
 <trans-unit id='UXVlbGxzcHJhY2hlKG4p'><source>Quellsprache(n)</source><target>Quellsprache(n)</target></trans-unit>
 <trans-unit id='WmllbHNwcmFjaGUobik='><source>Zielsprache(n)</source><target>Zielsprache(n)</target></trans-unit>
-<trans-unit id='WnVnZW9yZG5ldGUgU3ByYWNoZW4='><source>Zugeordnete Sprachen</source><target>Zugeordnete Sprachen</target></trans-unit>
+<trans-unit id='QXV0b21hdGlzY2hlIFp1d2Vpc3VuZw=='><source>Automatische Zuweisung</source><target>Automatische Zuweisung</target></trans-unit>
 <trans-unit id='PGI+QXVmZ2FiZTo8L2I+IHt0YXNrLnRhc2tOYW1lfTxiciAvPgogICAgPGI+UXVlbGxzcHJhY2hlOjwvYj4ge3NvdXJjZUxhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIDxiPlppZWxzcHJhY2hlOjwvYj4ge3RhcmdldExhbmd1YWdlVHJhbnNsYXRlZH08YnIgLz4KICAgIHtyZWxhaXNMYW5ndWFnZUZyYWdtZW50fTxiPkxpZWZlcmRhdHVtOjwvYj4ge3RhcmdldERlbGl2ZXJ5RGF0ZX08YnIgLz4KICAgIDxiPldvcnRhbnphaGw6PC9iPiB7d29yZENvdW50fTxiciAvPg=='><source><b>Aufgabe:</b> {task.taskName}<br />
     <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
     <b>Zielsprache:</b> {targetLanguageTranslated}<br />
