@@ -225,40 +225,44 @@ h4, p {
 
 /* --------------- proposals --------------- */
 
-.proposeTermBtn.deleteTerm,
-.proposeTermBtn.editTerm {
-    float: right;
-}
-#resultTermEntriesHolder .proposeTermBtn.addTerm,
-#termTable > .proposeTermBtn.addTerm{
+#resultTermEntriesHolder .proposal-btn.proposal-add {   /* add TermEntry */
     float: right;
     color: #007fff;
     font-size: 25px;
     margin-top: 4px;
 }
-#termTable > div .proposeTermBtn.addTerm,
-#termAttributeTable > .proposeTermBtn.addTerm  {
+#termTable > .proposal-btn.proposal-add {               /* add Term */
+    float: left;
+    color: #007fff;
+    font-size: 60px;
+    margin-top: 4px;
+    margin-left: 0px;
+}
+#termTable > div .proposal-btn.proposal-add,            /* add TermEntry-Attribute */
+#termAttributeTable > .proposal-btn.proposal-add {      /* add Term-Attribute */
     float: left;
     color: #454545;
     font-size: 40px;
     margin-left: 0px;
 }
-html .proposeTermBtn.ui-icon.deleteTerm,
-html .proposeTermBtn.ui-icon.editTerm {
+
+html .proposal-btn.ui-icon.proposal-delete,
+html .proposal-btn.ui-icon.proposal-edit {              /* delete and edit (in general) */
+    float: right;
     margin-left: 5px;
 }
-#resultTermsHolder ul .proposeTermBtn.ui-icon {
+#resultTermsHolder ul .proposal-btn.ui-icon {           /* delete and edit Term-Entry */
     margin-top: 5px;
     font-size: 20px;
     color: #007fff;
 }
-.term-data .proposeTermBtn.ui-icon {
+.term-data .proposal-btn.ui-icon {                      /* delete and edit Term */
     font-size: 16px;
 }
-.term-data.ui-accordion-header-collapsed .proposeTermBtn.ui-icon {
+.term-data.ui-accordion-header-collapsed .proposal-btn.ui-icon {    /* delete and edit Term (inactive) */
     color: #007fff;
 }
-.term-data.ui-accordion-header-active .proposeTermBtn.ui-icon{
+.term-data.ui-accordion-header-active .proposal-btn.ui-icon {       /* delete and edit Term (active) */
     color: #fffff;
 }
 

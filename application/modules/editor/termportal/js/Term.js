@@ -1,10 +1,14 @@
 const Term={
 		
-        $_resultTermEntriesHolderUl:null,
-		$_searchTermsSelect:null,
-		$_resultTermsHolderUl:null,
+        $_searchTermsSelect:null,
 		$_termTable:null,
 		
+		// for proposal-buttons:
+		$_TermEntriesList_Header: null,
+		$_TermEntryHeader: null,
+		$_TermEntryAttributesHolder: null,
+		$_TermsHolder: null,
+        
 		searchTermsResponse:[],
 		termGroupsCache:[],
 
@@ -21,9 +25,12 @@ const Term={
 		
 		cacheDom:function(){
 			this.$_searchTermsSelect=$('#searchTermsSelect');
-            this.$_resultTermsHolderUl = $('#resultTermsHolder > ul');
-            this.$_resultTermEntriesHolderUl = $('#resultTermEntriesHolder > ul');
             this.$_termTable=$('#termTable');
+            
+            this.$_TermEntriesList_Header = $('#resultTermEntriesHolder > ul');
+            this.$_TermEntryHeader = $('#resultTermsHolder > ul');
+            this.$_TermEntryAttributesHolder = $('#termAttributeTable');
+            this.$_TermsHolder = $('#termTable');
 		},
 		
 		initEvents:function(){
@@ -31,7 +38,22 @@ const Term={
 			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) { // FIXME: why is this triggered twice sometimes (with attr('data-value') = "undefined" in the second)
 				me.findTermsAndAttributes($(ui.selected).attr('data-value'));
 		    });
-			me.$_termTable.on('click', ".editTerm",me.onEditTermClick);
+			
+            // TermEntries
+            me.$_TermEntriesList_Header.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
+            me.$_TermEntryHeader.on('click', ".proposal-delete",{scope:me},me.onDeleteTermEntryClick);
+            me.$_TermEntryHeader.on('click', ".proposal-edit",{scope:me},me.onEditTermEntryClick);
+            me.$_TermEntryAttributesHolder.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick); // step3
+            me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermEntryAttributeClick);
+            me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermEntryAttributeClick);
+            
+            // Terms
+            me.$_TermsHolder.on('click', "> .proposal-add",{scope:me},me.onAddTermClick);
+            me.$_termTable.on('click', ".term-data .proposal-delete",{scope:me},me.onDeleteTermClick);
+            me.$_termTable.on('click', ".term-data .proposal-edit",{scope:me},me.onEditTermClick);
+            me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick); // step3
+            me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermAttributeClick);
+            me.$_termTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermAttributeClick);
 		},
 		
 		/***
@@ -325,7 +347,7 @@ const Term={
 		    	termAttributesHtmlContainer.push('</h3>');
 		    	
 		    	//draw term attriubtes
-		    	termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'">');
+		    	termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" class="term-attributes">');
 		    	termAttributesHtmlContainer.push(me.drawTermAttributes(term.attributes,termRflLang));
 		    	termAttributesHtmlContainer.push('</div>');
 		    });
@@ -407,53 +429,58 @@ const Term={
                 htmlProposalEditIcon,
                 htmlProposalDeleteIcon,
                 $_selector,$_selectorAdd,
-                $titleAdd, $titleDelete, $titleEdit;
-            htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-squaresmall-plus"></span>';
-            htmlProposalDeleteIcon = '<span class="proposeTermBtn deleteTerm ui-icon ui-icon-trash-b"></span>';
-            htmlProposalEditIcon = '<span class="proposeTermBtn editTerm ui-icon ui-icon-pencil"></span>';
+                $titleAdd, $titleDelete, $titleEdit,
+                $_TermsHeaders, $_TermEntryAttributes, $_TermsAttributesHolder, $_TermsAttributesHeaders;
+            htmlProposalAddIcon = '<span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span>';
+            htmlProposalDeleteIcon = '<span class="proposal-btn proposal-delete ui-icon ui-icon-trash-b"></span>';
+            htmlProposalEditIcon = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>';
             switch(elements) {
                 case "term-entries":
                     $_selector = false;
-                    $_selectorAdd = $('#resultTermEntriesHolder > ul');
+                    $_selectorAdd = me.$_TermEntriesList_Header;
                     $titleAdd = translations['addTermEntry'];
-                    htmlProposalAddIcon = '<span class="proposeTermBtn addTerm ui-icon ui-icon-plus"></span>';
+                    htmlProposalAddIcon = '<span class="proposal-btn proposal-add ui-icon ui-icon-plus"></span>';
                   break;
                 case "term-entry":
-                    $_selector = me.$_resultTermsHolderUl;
+                    $_selector = me.$_TermEntryHeader;
                     $_selectorAdd = false;
                     $titleDelete = translations['deleteTermEntry'];
                     $titleEdit = translations['editTermEntry'];
                     break;
                 case "term-entry-attributes":
-                    $_selector = $('#termAttributeTable .attribute-data.proposable');
-                    $_selectorAdd = false; // $_selectorAdd = $('#termAttributeTable');
+                    $_TermEntryAttributes = $('#termAttributeTable .attribute-data'); // cannot use cacheCom(), rendered too late
+                    $_selector = $_TermEntryAttributes;
+                    $_selectorAdd = me.$_TermEntryAttributesHolder; // false
                     $titleAdd = translations['addTermEntryAttribute'];
                     $titleDelete = translations['deleteTermEntryAttribute'];
                     $titleEdit = translations['editTermEntryAttribute'];
                   break;
                 case "terms":
-                    $_selector = $('#termTable .term-data');
-                    $_selectorAdd = false; // $_selectorAdd = $('#termTable');
+                    $_TermsHeaders = $('#termTable .term-data'); // cannot use cacheCom(), rendered too late
+                    $_selector = $_TermsHeaders;
+                    $_selectorAdd = me.$_TermsHolder; // false;
                     $titleAdd = translations['addTerm'];
                     $titleDelete = translations['deleteTerm'];
                     $titleEdit = translations['editTerm'];
                     break;
                 case "terms-attribute":
-                    $_selector = $('#termTable .attribute-data.proposable');
-                    $_selectorAdd = false; // $_selectorAdd = $('#termTable .term-data').next('div');
+                    $_TermsAttributesHolder = $('#termTable .term-data').next('div'); // cannot use cacheCom(), rendered too late
+                    $_TermsAttributesHeaders = $('#termTable .attribute-data'); // cannot use cacheCom(), rendered too late
+                    $_selector = $_TermsAttributesHeaders;
+                    $_selectorAdd = $_TermsAttributesHolder; // false;
                     $titleAdd = translations['addTermAttribute'];
                     $titleDelete = translations['deleteTermAttribute'];
                     $titleEdit = translations['editTermAttribute'];
                   break;
             }
-            if ($_selector && $_selector.children('.proposeTermBtn').length === 0) {
+            if ($_selector && $_selector.children('.proposal-btn').length === 0) {
                 $_selector.append(htmlProposalDeleteIcon+htmlProposalEditIcon);
-                $_selector.children('.editTerm').prop('title', $titleEdit);
-                $_selector.children('.deleteTerm').prop('title', $titleDelete).click({scope:me},me.onDeleteTermClick); // FIXME: 'deleteTerm' is not Term-specific
+                $_selector.children('.proposal-edit').prop('title', $titleEdit);
+                $_selector.children('.proposal-delete').prop('title', $titleDelete);
             }
-            if ($_selectorAdd && $_selectorAdd.children('.proposeTermBtn').length === 0) {
+            if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
-                $_selectorAdd.find('.addTerm').prop('title', $titleAdd).click({scope:me},me.onAddTermEntryClick); // FIXME: 'addTerm' is not TermEntry-specific
+                $_selectorAdd.find('.proposal-add').prop('title', $titleAdd);
             }
         },
 		
@@ -538,32 +565,78 @@ const Term={
          * On add term-entry icon click handler:
          * Render "result" with empty (dummy) data and open it for editing.
          */
-        onAddTermEntryClick:function(eventData){
+        onAddTermEntryClick: function(eventData){
             var me = eventData.data.scope,
                 newTermEntryAttributes = Attribute.renderNewTermEntryAttributes(),
                 newTermAttributes = Attribute.renderNewTermAttributes(),
                 newTermData = me.renderNewTermData(newTermAttributes);
+            console.log('onAddTermEntryClick');
             TermEntry.drawTermEntryAttributes(newTermEntryAttributes);
             me.drawTermGroups(newTermData);
-            me.$_termTable.find('.editTerm')[0].click();
-            // TODO: how to choose which collectionId the new term-entry shall belong to?
+            me.$_termTable.find('.proposal-edit')[0].click();
+            // TODO: choose which collectionId the new term-entry shall belong to
         },
-		
-		/***
-		 * On edit term icon click handler
-		 */
-		onEditTermClick:function(){
-			var element=$(this),
-				parent=element.parent(),
-				search=parent.find("span[data-editable]");
-			ComponentEditor.addComponentEditor(search);
-		},
+        
+        /***
+         * On delete term-entry icon click handler
+         */
+        onDeleteTermEntryClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onDeleteTermEntryClick');
+            // TODO
+        },
+        
+        /***
+         * On edit term-entry icon click handler
+         */
+        onEditTermEntryClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onEditTermEntryClick');
+            // TODO
+        },
+
+        /***
+         * On add term-entry-attribute icon click handler
+         */
+        onAddTermEntryAttributeClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onAddTermEntryAttributeClick');
+            // TODO
+        },
+        
+        /***
+         * On delete term-entry-attribute icon click handler
+         */
+        onDeleteTermEntryAttributeClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onDeleteTermEntryAttributeClick');
+            // TODO
+        },
+        
+        /***
+         * On edit term-entry-attribute icon click handler
+         */
+        onEditTermEntryAttributeClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onEditTermEntryAttributeClick');
+            // TODO
+        },
+        
+        /***
+         * On add term icon click handler
+         */
+        onAddTermClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onAddTermClick');
+            // TODO
+        },
 		
 		/***
 		 * On remove proposal click handler
 		 */
 		onDeleteTermClick:function(eventData){
-			var $element=$(this),
+			var me = eventData.data.scope,
+                $element=$(this),
 				$parent=$element.parents('h3[data-term-id]');
 			
 			if(parent.length==0){
@@ -587,7 +660,46 @@ const Term={
 		        	
 		        }
 		    });
-		}
+		},
+        
+        /***
+         * On edit term icon click handler
+         */
+        onEditTermClick:function(eventData){
+            var me = eventData.data.scope,
+                element=$(this),
+                parent=element.parent(),
+                search=parent.find("span[data-editable]");
+            console.log('onEditTermClick');
+            ComponentEditor.addComponentEditor(search);
+        },
+
+        /***
+         * On add term-attribute icon click handler
+         */
+        onAddTermAttributeClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onAddTermAttributeClick');
+            // TODO
+        },
+        
+        /***
+         * On delete term-attribute icon click handler
+         */
+        onDeleteTermAttributeClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onDeleteTermAttributeClick');
+            // TODO
+        },
+        
+        /***
+         * On edit term-attribute icon click handler
+         */
+        onEditTermAttributeClick: function(eventData){
+            var me = eventData.data.scope;
+            console.log('onEditTermAttributeClick');
+            // TODO
+        },
 };
 
 Term.init();
