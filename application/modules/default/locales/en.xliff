@@ -82,11 +82,11 @@
 </trans-unit>
 <trans-unit id='RGVyIEJlbnV0emVybmFtZSBpc3QgenUga3VyeiE='>
     <source>Der Benutzername ist zu kurz!</source>
-    <target>The username is to short!</target>
+    <target>The username is too short!</target>
 </trans-unit>
 <trans-unit id='RGFzIFBhc3N3b3J0IGlzdCB6dSBrdXJ6IQ=='>
     <source>Das Passwort ist zu kurz!</source>
-    <target>The password is to short!</target>
+    <target>The password is too short!</target>
 </trans-unit>
 <trans-unit id='Qml0dGUgZ2ViZW4gU2llIGVpbmVuIEJlbnV0emVybmFtZW4gYW4h'>
     <source>Bitte geben Sie einen Benutzernamen an!</source>
