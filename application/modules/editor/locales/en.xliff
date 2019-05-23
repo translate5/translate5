@@ -2470,51 +2470,51 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='VGVybS1FaW50cmFnIGJlYXJiZWl0ZW4='>
     <source>Term-Eintrag bearbeiten</source>
-    <target>Edit Term-Entry</target>
+    <target>Term-Entry: Propose changes</target>
 </trans-unit>
 <trans-unit id='VGVybS1FaW50cmFnIGhpbnp1ZsO8Z2Vu'>
     <source>Term-Eintrag hinzufügen</source>
-    <target>Add Term-Entry</target>
+    <target>Propose a new Term-Entry</target>
 </trans-unit>
 <trans-unit id='VGVybS1FaW50cmFnIGzDtnNjaGVu'>
     <source>Term-Eintrag löschen</source>
-    <target>Delete Term-Entry</target>
+    <target>Term-Entry: Delete the Proposal</target>
 </trans-unit>
 <trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGJlYXJiZWl0ZW4='>
     <source>Term-Eintrag-Attribut bearbeiten</source>
-    <target>Edit Term-Entry-Attribute</target>
+    <target>Term-Entry-Attribute: Propose changes</target>
 </trans-unit>
 <trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGhpbnp1ZsO8Z2Vu'>
     <source>Term-Eintrag-Attribut hinzufügen</source>
-    <target>Add Term-Entry-Attribute</target>
+    <target>Propose a new Term-Entry-Attribute</target>
 </trans-unit>
 <trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGzDtnNjaGVu'>
     <source>Term-Eintrag-Attribut löschen</source>
-    <target>Delete Term-Entry-Attribute</target>
+    <target>Term-Entry-Attribute: Delete the Proposal</target>
 </trans-unit>
 <trans-unit id='VGVybSBiZWFyYmVpdGVu'>
     <source>Term bearbeiten</source>
-    <target>Edit Term</target>
+    <target>Term: Propose changes</target>
 </trans-unit>
 <trans-unit id='VGVybSBoaW56dWbDvGdlbg=='>
     <source>Term hinzufügen</source>
-    <target>Add Term</target>
+    <target>Propose a new Term</target>
 </trans-unit>
 <trans-unit id='VGVybSBsw7ZzY2hlbg=='>
     <source>Term löschen</source>
-    <target>Delete Term</target>
+    <target>Term: Delete the Proposal</target>
 </trans-unit>
 <trans-unit id='VGVybS1BdHRyaWJ1dCBiZWFyYmVpdGVu'>
     <source>Term-Attribut bearbeiten</source>
-    <target>Edit Term-Attribute</target>
+    <target>Term-Attribute: Propose changes</target>
 </trans-unit>
 <trans-unit id='VGVybS1BdHRyaWJ1dCBoaW56dWbDvGdlbg=='>
     <source>Term-Attribut hinzufügen</source>
-    <target>Add Term-Attribute</target>
+    <target>Propose a new Term-Attribute</target>
 </trans-unit>
 <trans-unit id='VGVybS1BdHRyaWJ1dCBsw7ZzY2hlbg=='>
     <source>Term-Attribut löschen</source>
-    <target>Delete Term-Attribute</target>
+    <target>Term-Attribute: Delete the Proposal</target>
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
     <source>Kunden</source>
