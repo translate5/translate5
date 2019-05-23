@@ -52,7 +52,7 @@ const ComponentEditor={
 	addComponentEditor:function($element){
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
-			$parent=me.$_termTable.find('[data-term-id="' + $element.data('id') + '"]'),
+			$parent=me.$_termTable.find('div[data-term-id="' + $element.data('id') + '"]'),
 			$commentPanel=$parent.find('[data-editable-comment]');
 		
 			//$input = $('<input type="text" style="min-width: 150px;" onkeyup="this.size = Math.max(this.value.length, 1)"/>').val($element.text());
