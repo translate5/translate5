@@ -135,13 +135,12 @@ if(isset($this->error)){
             </div>
     </div>
     
-    <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
-    
     <div class="wrap" id="finalResultContent" style="display: none;">
     	<div id="resultTermEntriesHolder" class="result-holder">
           <ul>
             <li><a href="#searchTermsHolder"><?php echo $this->translations["termEntries"];?></a></li>
           </ul>
+          <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
           <div id="searchTermsHolder"> 
         	<ul id="searchTermsSelect" size="10" style="display: inline-block;">
         	</ul>
