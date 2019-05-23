@@ -165,7 +165,58 @@ const Attribute={
 			data='data-editable-comment';
 		}
 		return '<span '+data+' data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
-	}
+	},
+    
+    /**
+     * Returns term entry attributes for creating a new term entry.
+     */
+    renderNewTermEntryAttributes: function() {
+        var termEntryAttributes = [];
+        // TODO: what data to use?
+        termEntryAttributes[0] = {
+                "attributeId":"1",
+                "termEntryId":"6991",
+                "language":null,
+                "name":"transacNote",
+                "attrType":"responsiblePerson",
+                "attrValue":"Username", // TODO
+                "attrCreated":null,
+                "attrUpdated":null,
+                "collectionId":null,
+                "attributeOriginType":"termEntryAttribute"
+        };
+        return termEntryAttributes;
+    },
+    
+    /**
+     * Returns term attributes for creating a new term.
+     */
+    renderNewTermAttributes: function() {
+        var termAttributes = [];
+        // TODO: what data to use?
+        termAttributes[0] = {
+                'attrCreated': null,
+                'attrDataType': null,
+                'attrId': null,
+                'attrLang': "de-de",
+                'attrTarget': null,
+                'attrType': "processStatus",
+                'attrUpdated': null,
+                'attrValue': "unprocessed",
+                'attributeId': "406",
+                'attributeOriginType': "termAttribute",
+                'children': [],
+                'headerText': null,
+                'internalCount': null,
+                'labelId': null,
+                'language': "de-DE",
+                'name': "termNote",
+                'parentId': null,
+                'proposable': false,
+                'proposal': null
+        };
+        return termAttributes;
+    }
 };
 
 Attribute.init();

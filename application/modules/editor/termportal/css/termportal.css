@@ -140,6 +140,7 @@ END LICENSE AND COPYRIGHT
 /* --------------- results --------------- */
 
 #error-no-results {
+	margin-top: 20px;
     padding: 7px;
 }
 

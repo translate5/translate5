@@ -1,5 +1,6 @@
 const Term={
 		
+        $_resultTermEntriesHolderUl:null,
 		$_searchTermsSelect:null,
 		$_resultTermsHolderUl:null,
 		$_termTable:null,
@@ -21,6 +22,7 @@ const Term={
 		cacheDom:function(){
 			this.$_searchTermsSelect=$('#searchTermsSelect');
             this.$_resultTermsHolderUl = $('#resultTermsHolder > ul');
+            this.$_resultTermEntriesHolderUl = $('#resultTermEntriesHolder > ul');
             this.$_termTable=$('#termTable');
 		},
 		
@@ -132,7 +134,9 @@ const Term={
 					me.disableLimit=false;
 				}
 				
-				$("#finalResultContent").hide();
+				$("#finalResultContent").show();
+                me.drawProposalButtons('term-entries');
+				$("#resultTermsHolder").hide();
 				return;
 			}
 			
@@ -445,11 +449,11 @@ const Term={
             if ($_selector && $_selector.children('.proposeTermBtn').length === 0) {
                 $_selector.append(htmlProposalDeleteIcon+htmlProposalEditIcon);
                 $_selector.children('.editTerm').prop('title', $titleEdit);
-                $_selector.children('.deleteTerm').prop('title', $titleDelete).click({scope:me},me.onDeleteTermClick);
+                $_selector.children('.deleteTerm').prop('title', $titleDelete).click({scope:me},me.onDeleteTermClick); // FIXME: 'deleteTerm' is not Term-specific
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposeTermBtn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
-                $_selectorAdd.find('.addTerm').prop('title', $titleAdd);
+                $_selectorAdd.find('.addTerm').prop('title', $titleAdd).click({scope:me},me.onAddTermEntryClick); // FIXME: 'addTerm' is not TermEntry-specific
             }
         },
 		
@@ -506,6 +510,44 @@ const Term={
 			htmlCollection.push('<ins>'+termData.proposal.term+'</ins>');
 			return htmlCollection.join(' ');
 		},
+        
+        /**
+         * Returns term data for creating a new term.
+         */
+        renderNewTermData: function(newTermAttributes) {
+            var newTermData = {};
+            // TODO: what data to use?
+            newTermData = {0: {
+                'attributes': newTermAttributes,
+                'collectionId': null,
+                'definition': "",
+                'desc': "",
+                'groupId': null,
+                'label': "",
+                'languageId': null, 
+                'proposal': null,
+                'term': "",
+                'termId': null,
+                'termStatus': null,
+                'value': null
+            }};
+            return newTermData;
+        },
+        
+        /***
+         * On add term-entry icon click handler:
+         * Render "result" with empty (dummy) data and open it for editing.
+         */
+        onAddTermEntryClick:function(eventData){
+            var me = eventData.data.scope,
+                newTermEntryAttributes = Attribute.renderNewTermEntryAttributes(),
+                newTermAttributes = Attribute.renderNewTermAttributes(),
+                newTermData = me.renderNewTermData(newTermAttributes);
+            TermEntry.drawTermEntryAttributes(newTermEntryAttributes);
+            me.drawTermGroups(newTermData);
+            me.$_termTable.find('.editTerm')[0].click();
+            // TODO: how to choose which collectionId the new term-entry shall belong to?
+        },
 		
 		/***
 		 * On edit term icon click handler
