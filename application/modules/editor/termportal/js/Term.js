@@ -43,7 +43,7 @@ const Term={
             me.$_TermEntriesList_Header.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
             me.$_TermEntryHeader.on('click', ".proposal-delete",{scope:me},me.onDeleteTermEntryClick);
             me.$_TermEntryHeader.on('click', ".proposal-edit",{scope:me},me.onEditTermEntryClick);
-            me.$_TermEntryAttributesHolder.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick); // step3
+            me.$_TermEntryAttributesHolder.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
             me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermEntryAttributeClick);
             me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermEntryAttributeClick);
             
@@ -51,7 +51,7 @@ const Term={
             me.$_TermsHolder.on('click', "> .proposal-add",{scope:me},me.onAddTermClick);
             me.$_termTable.on('click', ".term-data .proposal-delete",{scope:me},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data .proposal-edit",{scope:me},me.onEditTermClick);
-            me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick); // step3
+            me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
             me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermAttributeClick);
             me.$_termTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermAttributeClick);
 		},
@@ -448,9 +448,9 @@ const Term={
                     $titleEdit = translations['editTermEntry'];
                     break;
                 case "term-entry-attributes":
-                    $_TermEntryAttributes = $('#termAttributeTable .attribute-data'); // cannot use cacheCom(), rendered too late
+                    $_TermEntryAttributes = $('#termAttributeTable .attribute-data.proposable'); // cannot use cacheCom(), rendered too late
                     $_selector = $_TermEntryAttributes;
-                    $_selectorAdd = me.$_TermEntryAttributesHolder; // false
+                    $_selectorAdd = false; // me.$_TermEntryAttributesHolder;
                     $titleAdd = translations['addTermEntryAttribute'];
                     $titleDelete = translations['deleteTermEntryAttribute'];
                     $titleEdit = translations['editTermEntryAttribute'];
@@ -458,16 +458,16 @@ const Term={
                 case "terms":
                     $_TermsHeaders = $('#termTable .term-data'); // cannot use cacheCom(), rendered too late
                     $_selector = $_TermsHeaders;
-                    $_selectorAdd = me.$_TermsHolder; // false;
+                    $_selectorAdd = me.$_TermsHolder;
                     $titleAdd = translations['addTerm'];
                     $titleDelete = translations['deleteTerm'];
                     $titleEdit = translations['editTerm'];
                     break;
                 case "terms-attribute":
                     $_TermsAttributesHolder = $('#termTable .term-data').next('div'); // cannot use cacheCom(), rendered too late
-                    $_TermsAttributesHeaders = $('#termTable .attribute-data'); // cannot use cacheCom(), rendered too late
+                    $_TermsAttributesHeaders = $('#termTable .attribute-data.proposable'); // cannot use cacheCom(), rendered too late
                     $_selector = $_TermsAttributesHeaders;
-                    $_selectorAdd = $_TermsAttributesHolder; // false;
+                    $_selectorAdd = false; // $_TermsAttributesHolder;
                     $titleAdd = translations['addTermAttribute'];
                     $titleDelete = translations['deleteTermAttribute'];
                     $titleEdit = translations['editTermAttribute'];
@@ -553,7 +553,7 @@ const Term={
                 'label': "",
                 'languageId': null, 
                 'proposal': null,
-                'term': "",
+                'term': "...", // add some content, otherwise the input-field will be empty and not clickable after the user has clicked anywhere else
                 'termId': null,
                 'termStatus': null,
                 'value': null
@@ -571,7 +571,9 @@ const Term={
                 newTermAttributes = Attribute.renderNewTermAttributes(),
                 newTermData = me.renderNewTermData(newTermAttributes);
             console.log('onAddTermEntryClick');
-            TermEntry.drawTermEntryAttributes(newTermEntryAttributes);
+            $('#termAttributeTable').empty();
+            $('#termTable').empty();
+            TermEntry.drawTermEntryAttributes(newTermAttributes);
             me.drawTermGroups(newTermData);
             me.$_termTable.find('.proposal-edit')[0].click();
             // TODO: choose which collectionId the new term-entry shall belong to
