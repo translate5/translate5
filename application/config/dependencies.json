@@ -18,8 +18,8 @@
         {
             "name": "horde_text_diff",
             "label": "Horde Text Diff",
-            "url": "RELEASE:Horde_Text_Diff-2.0.1.zip",
-            "version": "2.0.1",
+            "url": "RELEASE:Horde_Text_Diff-2.2.0.zip",
+            "version": "2.2.0",
             "target": "library\/Horde_Text_Diff\/",
             "licenses": [
                 {
@@ -30,11 +30,18 @@
             ]
         },
         {
-            "name": "zend",
-            "label": "PHP Zend",
-            "url": "RELEASE:Zend-1.12-11.zip",
-            "version": "1.12-11",
-            "target": "library\/zend\/"
+            "name": "z1-php7.3",
+            "label": "PHP Zend (z1-php7.3)",
+            "url": "RELEASE:Zend-z1-php7.3-1.13.2-p1.zip",
+            "version": "1.13.2-p1",
+            "target": "library\/zend\/",
+            "licenses": [
+                {
+                    "uses": "z1-php7.3 (a fork of PHP Zend 1)",
+                    "license": "BSD-3-Clause",
+                    "relpath": "docs\/third-party-licenses\/Zend-license.txt"
+                }
+            ]
         },
         {
             "name": "querypath",
@@ -87,27 +94,13 @@
             "label": "OpenTM2",
             "url": "RELEASE:OpenTM2-Community-Edition-Setup.zip",
             "target": "OpenTM2-Installer",
-            "version": "1.5.1",
+            "version": "1.5.1.1",
             "licenses": [
                 {
                     "uses": "OpenTM2 Community Edition",
                     "license": "Eclipse Public License 1.0",
                     "relpath": "docs\/third-party-licenses\/OpenTM2-Community-Edition-license.txt",
                     "agreement": "translate5 uses {USES} (version {VERSION}).\n  Please read the following license agreement and accept it for \n  OpenTM2.\n\n    {RELPATH}\n\n  You must accept the terms of this agreement for {LABEL} by typing\n  \"y\" and <ENTER> before continuing with the installation.\n  If you type \"y\", the translate5 installer will download {LABEL} \n  for you. \n\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n    Since {LABEL} is executable only under Microsoft Windows\n    Operating Systems the installer can only download it for you.\n  !!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!!!\n\n  The Installation has to be started manually! \n\n  Please stop an already running {LABEL} instance before \n  installing \/ updating it!\n  The downloaded file will be located in the folder\n                \n    \"OpenTM2-Installer\/\"\n\n  {SUFFIX}"
-                }
-            ]
-        },
-        {
-            "name": "phpexcel",
-            "label": "PHPExcel",
-            "version": "1.8.1",
-            "url": "RELEASE:PHPExcel.zip",
-            "target": "library\/ZfExtended\/ThirdParty\/PHPExcel\/",
-            "licenses": [
-                {
-                    "uses": "PHPExcel",
-                    "license": "LGPL",
-                    "relpath": "docs\/third-party-licenses\/PHPExcel-1.8.1.license.txt"
                 }
             ]
         },
@@ -204,6 +197,60 @@
                     "uses": "PHP FIG Simple Cache PSR",
                     "license": "MIT",
                     "relpath": "docs\/third-party-licenses\/Simple-Cache-license.md"
+                }
+            ]
+        },
+        {
+            "name": "google-cloud-translate",
+            "label": "Google Cloud Translation for PHP",
+            "version": "1.2.6",
+            "url": "RELEASE:GoogleCloudTranslation-and-dependencies.zip",
+            "target": "library\/google-translate-api\/",
+            "licenses": [
+                {
+                    "uses": "Composer",
+                    "license": "Expat",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/Composer-license.txt"
+                },
+                {
+                    "uses": "Firebase",
+                    "license": "BSD-3-Clause",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/Firebase-license.txt"
+                },
+                {
+                    "uses": "Google Auth Library for PHP",
+                    "license": "Apache License 2.0",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GoogleAuth-license.txt"
+                },
+                {
+                    "uses": "Google Cloud Core for PHP",
+                    "license": "Apache License 2.0",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GoogleCloudCore-license.txt"
+                },
+                {
+                    "uses": "Google Cloud Translation for PHP",
+                    "license": "Apache License 2.0",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GoogleCloudTranslate-license.txt"
+                },
+                {
+                    "uses": "Guzzle HTTP PHP client library",
+                    "license": "MIT",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/GuzzleHttp-license.txt"
+                },
+                {
+                    "uses": "Monolog logger library",
+                    "license": "MIT",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/Monolog-license.txt"
+                },
+                {
+                    "uses": "PSR Cache, PSR HTTP Message and PSR Log library",
+                    "license": "MIT",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/PSR-libraries-license.txt"
+                },
+                {
+                    "uses": "rize PHP URI Template",
+                    "license": "MIT",
+                    "relpath": "docs\/third-party-licenses\/byGoogleTranslate\/rize-license.txt"
                 }
             ]
         },

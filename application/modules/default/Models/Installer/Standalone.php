@@ -53,7 +53,7 @@ class Models_Installer_Standalone {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 8;
+    const INSTALLER_VERSION = 9;
     
     /**
      * @var string
@@ -288,9 +288,23 @@ class Models_Installer_Standalone {
             if(empty($toDelete) || strpos($toDelete, '#') === 0){
                 continue;
             }
-            $file = new SplFileInfo($this->currentWorkingDir.$toDelete);
+            $cwd = realpath($this->currentWorkingDir);
+            $toDelete = realpath($this->currentWorkingDir.$toDelete);
+            if(!$toDelete){
+                continue;
+            }
+            //ensure that file/dir to be deleted is in the currentWorkingDir
+            if(strpos($toDelete, $cwd) !== 0 || $cwd == $toDelete) {
+                $this->log('Won\'t delete file '.$toDelete);
+                continue;
+            }
+            $file = new SplFileInfo($toDelete);
             if($file->isFile() && $file->isReadable()) {
                 unlink($file);
+            }
+            if($file->isDir() && $file->isReadable()) {
+                ZfExtended_Models_Installer_Downloader::removeRecursive($file);
+                rmdir($file);
             }
         }
     }
@@ -603,10 +617,13 @@ class Models_Installer_Standalone {
         if(!$this->isInstallation){
             $this->hostname = $config->runtimeOptions->server->name;
         }
+        $version = ZfExtended_Utils::getAppVersion();
+        $this->log('Current translate5 version '.$version);
     }
     
     protected function done() {
-        $this->log("\nTranslate5 installation / update done.\n");
+        $version = ZfExtended_Utils::getAppVersion();
+        $this->log("\nTranslate5 installation / update to version $version done.\n");
         if(!empty($this->hostname)) {
             $this->log("\nPlease visit http://".$this->hostname."/ to enjoy Translate5.\n");
             $this->log("For informations how to set up openTMSTermTagger or enable the application to send E-Mails, see http://confluence.translate5.net.\n\n");

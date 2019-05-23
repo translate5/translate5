@@ -70,8 +70,8 @@ $dep->dependencies = [[
     ],[
         "name" => "horde_text_diff",                        // see above
         "label" => "Horde Text Diff",                       // see above
-        "url" => "RELEASE:Horde_Text_Diff-2.0.1.zip",       // see above
-        "version" => "2.0.1",                               // currently not used, just for the sake of completeness
+        "url" => "RELEASE:Horde_Text_Diff-2.2.0.zip",       // see above
+        "version" => "2.2.0",                               // currently not used, just for the sake of completeness
         "target" => "library/Horde_Text_Diff/",             // unzip target, see above
         "licenses" => [[                                    // list of licenses to be confirmed for this package
             "uses" => "the Horde Text Diff library",        // is parsed into license title and agreement
@@ -83,11 +83,16 @@ $dep->dependencies = [[
             // title       optional, overwrites default title (defined in ZfExtended_Models_Installer_License)
         ]]
     ],[
-        "name" => "zend",
-        "label" => "PHP Zend",
-        "url" => "RELEASE:Zend-1.12-11.zip",
-        "version" => "1.12-11",
-        "target" => "library/zend/"
+        "name" => "z1-php7.3",
+        "label" => "PHP Zend (z1-php7.3)",
+        "url" => "RELEASE:Zend-z1-php7.3-1.13.2-p1.zip",
+        "version" => "1.13.2-p1",
+        "target" => "library/zend/",
+        "licenses" => [[
+            "uses" => "z1-php7.3 (a fork of PHP Zend 1)",
+            "license" => "BSD-3-Clause",
+            "relpath" => "docs/third-party-licenses/Zend-license.txt"
+        ]]
     ],[
         "name" => "querypath",
         "label" => "QueryPath",
@@ -141,7 +146,7 @@ $dep->dependencies = [[
         "label" => "OpenTM2",
         "url" => "RELEASE:OpenTM2-Community-Edition-Setup.zip",
         "target" => "OpenTM2-Installer",
-        "version" => "1.5.1",
+        "version" => "1.5.1.1",
         "licenses" => [[
             "uses" => "OpenTM2 Community Edition",
             "license" => "Eclipse Public License 1.0",
@@ -171,17 +176,6 @@ $dep->dependencies = [[
     "OpenTM2-Installer/"
 
   {SUFFIX}'
-        ]]
-    ],[
-        "name" => "phpexcel",
-        "label" => "PHPExcel",
-        "version" => "1.8.1",
-        "url" => "RELEASE:PHPExcel.zip",
-        "target" => "library/ZfExtended/ThirdParty/PHPExcel/",
-        "licenses" => [[
-            "uses" => "PHPExcel",
-            "license" => "LGPL",
-            "relpath" => "docs/third-party-licenses/PHPExcel-1.8.1.license.txt"
         ]]
     ],[
         "name" => "extjs-62",
@@ -258,6 +252,49 @@ $dep->dependencies = [[
             "uses" => "PHP FIG Simple Cache PSR",
             "license" => "MIT",
             "relpath" => "docs/third-party-licenses/Simple-Cache-license.md"
+        ]]
+    ],[
+        "name" => "google-cloud-translate",
+        "label" => "Google Cloud Translation for PHP",
+        "version" => "1.2.6",
+        "url" => "RELEASE:GoogleCloudTranslation-and-dependencies.zip",
+        "target" => "library/google-translate-api/",
+        "licenses" => [[
+            "uses" => "Composer",
+            "license" => "Expat",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/Composer-license.txt"
+        ],[
+            "uses" => "Firebase",
+            "license" => "BSD-3-Clause",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/Firebase-license.txt"
+        ],[
+            "uses" => "Google Auth Library for PHP",
+            "license" => "Apache License 2.0",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GoogleAuth-license.txt"
+        ],[
+            "uses" => "Google Cloud Core for PHP",
+            "license" => "Apache License 2.0",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GoogleCloudCore-license.txt"
+        ],[
+            "uses" => "Google Cloud Translation for PHP",
+            "license" => "Apache License 2.0",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GoogleCloudTranslate-license.txt"
+        ],[
+            "uses" => "Guzzle HTTP PHP client library",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/GuzzleHttp-license.txt"
+        ],[
+            "uses" => "Monolog logger library",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/Monolog-license.txt"
+        ],[
+            "uses" => "PSR Cache, PSR HTTP Message and PSR Log library",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/PSR-libraries-license.txt"
+        ],[
+            "uses" => "rize PHP URI Template",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/byGoogleTranslate/rize-license.txt"
         ]]
     ],[
         "name" => "OpenID-Connect-PHP",

@@ -65,19 +65,21 @@ class Controllers_Plugins_ViewSetup extends Zend_Controller_Plugin_Abstract
     public function dispatchLoopStartup(Zend_Controller_Request_Abstract
                                         $request)
     {
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
         $this->_session = new Zend_Session_Namespace();
-        $this->_extDir = $this->_session->runtimeOptions->extJs->basepath;
+        $this->_extDir = $config->runtimeOptions->extJs->basepath;
         $this->_viewRenderer = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper(
             'ViewRenderer'
         );
-        $this->loadCssFiles();
+        $this->loadCssFiles($config);
     }
 
     /**
      * adds the translate5 css path to the  layout
      */
-    private function loadCssFiles() {
-        $css = str_replace('//', '/', APPLICATION_RUNDIR.'/'.$this->_session->runtimeOptions->server->pathToCSS);
+    private function loadCssFiles($config) {
+        $css = str_replace('//', '/', APPLICATION_RUNDIR.'/'.$config->runtimeOptions->server->pathToCSS);
         $this->_viewRenderer->view->headLink()->appendStylesheet($css);
     }
 }

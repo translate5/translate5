@@ -230,6 +230,7 @@ Sollten Sie die Anfrage nicht selbst ausgelöst haben, bitten wir Sie uns darüb
 <trans-unit id='RGVyIFJlc2V0SGFzaCBvZGVyIGRpZSBCcm93c2Vyc2l0enVuZyBpc3QgbmljaHQgKG1laHIpIGfDvGx0aWcuIEJpdHRlIGZvcmRlcm4gU2llIMO8YmVyIGRhcyBuZWJlbnN0ZWhlbmRlIEZvcm11bGFyIGVpbmUgRS1NYWlsIG1pdCBlaW5lbSBuZXVlbiBMaW5rIGFuLg=='><source>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</source><target>Der ResetHash oder die Browsersitzung ist nicht (mehr) gültig. Bitte fordern Sie über das nebenstehende Formular eine E-Mail mit einem neuen Link an.</target></trans-unit>
 <trans-unit id='U3VwcG9ydCB0aGUgcHJvamVjdA=='><source>Support the project</source><target>Support the project</target></trans-unit>
 <trans-unit id='T3V0c3RhbmRpbmcgZmVhdHVyZXM='><source>Outstanding features</source><target>Outstanding features</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIGlzdCBrZWluZSBHVUlE'><source>'%value%' ist keine GUID</source><target>'%value%' ist keine GUID</target></trans-unit>
   </body>
  </file>
 </xliff>

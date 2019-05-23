@@ -75,8 +75,8 @@ class Models_Installer_PreconditionCheck {
      * checks the needed PHP version of translate5
      */
     protected function checkPhpVersion() {
-        if (version_compare(PHP_VERSION, '5.6.0', '<') || version_compare(PHP_VERSION, '7.0.0', '>=')) {
-            $this->errorsEnvironment[] = 'You are using PHP in version '.PHP_VERSION.', translate5 needs a PHP version >= 5.6.0 and < 7.0.0';
+        if (version_compare(PHP_VERSION, '7.3', '<')) {
+            $this->errorsEnvironment[] = 'You are using PHP in version '.PHP_VERSION.', translate5 needs a PHP version >= 7.3.0';
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $this->errorsEnvironment[] = 'Please update your xampp package manually or reinstall Translate5 with the latest windows installer from http://www.translate5.net';
                 $this->errorsEnvironment[] = 'Warning: Reinstallation can lead to data loss! Please contact support@translate5.net when you need assistance in data conversion!';
@@ -209,7 +209,6 @@ class Models_Installer_PreconditionCheck {
     }
     
     public function checkUsers() {
-        session_start();
         $config = Zend_Registry::get('config');
         $db = Zend_Db::factory($config->resources->db);
         $result = $db->query('SELECT count(*) active FROM session where modified + lifetime > unix_timestamp()');
@@ -221,27 +220,6 @@ class Models_Installer_PreconditionCheck {
         echo "Session Summary:\n";
         echo "Active Sessions:               ".$activeSessions."\n";
         echo "Active Sessions (last hour):   ".$lastHourSessions."\n";
-        
-        //$result = $db->query('SELECT session_data FROM session where modified + lifetime > unix_timestamp()');
-        $result = $db->query('SELECT * FROM session where modified + 3600 > unix_timestamp()');
-        
-        echo "Session Users (last hour):\n";
-        while($row = $result->fetchObject()) {
-            session_decode($row->session_data);
-            if(!empty($_SESSION['user']) && !empty($_SESSION['user']['data']) && !empty($_SESSION['user']['data']->login)){
-                $data = $_SESSION['user']['data'];
-                settype($data->firstName, 'string');
-                settype($data->surName, 'string');
-                settype($data->login, 'string');
-                settype($data->email, 'string');
-                $username = $data->firstName.' '.$data->surName.' ('.$data->login.': '.$data->email.')';
-                echo "                               ".$username."\n";
-            }
-            else {
-                echo "                               No User\n";
-            }
-        }
-        session_destroy();
     }
     
     public function checkWorkers() {
