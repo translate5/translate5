@@ -137,7 +137,7 @@ if(isset($this->error)){
     
     <div class="wrap" id="finalResultContent" style="display: none;">
     	<div id="resultTermEntriesHolder" class="result-holder">
-          <ul>
+          <ul id="searchTermsHolderHeader">
             <li><a href="#searchTermsHolder"><?php echo $this->translations["termEntries"];?></a></li>
           </ul>
           <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
@@ -147,7 +147,7 @@ if(isset($this->error)){
           </div>
     	</div>
     	<div id="resultTermsHolder" class="result-holder">
-          <ul>
+          <ul id="resultTermsHolderHeader">
             <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termTableTitle"];?></a></li>
             <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTableTitle"];?></a></li>
           </ul>
@@ -159,6 +159,7 @@ if(isset($this->error)){
               <div class="tabble-inner-style" id="termAttributeTable">
               </div>
           </div>
+          <div id="termCollectionSelect"></div>
         </div>
     </div>
     
