@@ -1,9 +1,15 @@
 const Term={
-		
+
+        $_searchTermsHolderHeader:null,
         $_searchTermsSelect:null,
+        
+        $_resultTermsHolder:null,
+        $_resultTermsHolderHeader: null,
 		$_termTable:null,
+        $_termEntryAttributesTable:null,
+        $_termCollectionSelect:null,
 		
-		// for proposal-buttons:
+		// for proposal-buttons: // TODO: these are the same as above => choose ONE and use those throughout
 		$_TermEntriesList_Header: null,
 		$_TermEntryHeader: null,
 		$_TermEntryAttributesHolder: null,
@@ -24,13 +30,20 @@ const Term={
 		},
 		
 		cacheDom:function(){
+            this.$_searchTermsHolderHeader = $('#searchTermsHolderHeader');
 			this.$_searchTermsSelect=$('#searchTermsSelect');
-            this.$_termTable=$('#termTable');
             
-            this.$_TermEntriesList_Header = $('#resultTermEntriesHolder > ul');
-            this.$_TermEntryHeader = $('#resultTermsHolder > ul');
-            this.$_TermEntryAttributesHolder = $('#termAttributeTable');
-            this.$_TermsHolder = $('#termTable');
+            this.$_resultTermsHolder=$('#resultTermsHolder');
+            this.$_resultTermsHolderHeader=$('#resultTermsHolderHeader');
+            this.$_termTable=$('#termTable');
+            this.$_termEntryAttributesTable = $('#termAttributeTable');
+            this.$_termCollectionSelect = $('#termCollectionSelect');
+            
+            // TODO: these are the same as above => choose ONE and use those throughout
+            this.$_TermEntriesList_Header =this.$_searchTermsHolderHeader
+            this.$_TermEntryHeader = this.$_resultTermsHolderHeader
+            this.$_TermEntryAttributesHolder = this.$_termEntryAttributesTable;
+            this.$_TermsHolder = this.$_termTable;
 		},
 		
 		initEvents:function(){
@@ -158,7 +171,7 @@ const Term={
 				
 				$("#finalResultContent").show();
                 me.drawProposalButtons('term-entries');
-				$("#resultTermsHolder").hide();
+				me.$_resultTermsHolder.hide();
 				return;
 			}
 			
@@ -191,7 +204,7 @@ const Term={
 			}
 			
 			if(me.searchTermsResponse.length > 1){
-				$("#resultTermsHolder").hide();
+			    me.$_resultTermsHolder.hide();
 			}
 			
 			//fill the term component with the search results
@@ -283,13 +296,14 @@ const Term={
 		        return;
 		    }
 		    
-		    me.$_termTable.empty();
-		    $("#resultTermsHolder").show();
+            me.emptyResultTermsHolder(true);
+            me.$_resultTermsHolder.show();
+            me.$_resultTermsHolderHeader.show();
 		    
 		    var termAttributesHtmlContainer=[],
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
                 $_filteredClients = $('#searchFilterTags input.filter.client'),
-                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1);
+                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?
 		    
 		    $.each(termsData, function (i, term) {
 		    	var termRflLang=term.attributes[0]!=undefined ? term.attributes[0].language : '',
@@ -327,7 +341,7 @@ const Term={
                 //add client- and termCollection-names like this: [CUSTOMERNAME; termCollectionNAME]
                 //(display only those that are selected for filtering)
                 if (showInfosForSelection) {
-                    infosForSelection = '';
+                    infosForSelection = [];
                     clientsForCollection = collectionsClients[term.collectionId];
                     for (i = 0; i < clientsForCollection.length; i++) {
                         clientId = clientsForCollection[i];
@@ -336,12 +350,14 @@ const Term={
                             filteredCientsNames.push(clientName);
                         }
                     }
-                    infosForSelection = filteredCientsNames.join(', ');
+                    if (filteredCientsNames.length > 0) {
+                        infosForSelection.push(filteredCientsNames.join(', '));
+                    }
                     collectionName = collectionsNames[term.collectionId];
                     if ($("#searchFilterTags").tagit("assignedTags").indexOf(collectionName) != -1) {
-                        infosForSelection += '; '+collectionName;
+                        infosForSelection.push(collectionName);
                     }
-                    termAttributesHtmlContainer.push('<span class="selection-infos">['+infosForSelection+']</span>');
+                    termAttributesHtmlContainer.push('<span class="selection-infos">['+infosForSelection.join('; ')+']</span>');
                 }
 		    	
 		    	termAttributesHtmlContainer.push('</h3>');
@@ -424,6 +440,7 @@ const Term={
          * @param elements
 		 */
         drawProposalButtons: function (elements){
+            // TODO: show either the edit OR the delete-button!
             var me = this,
                 htmlProposalAddIcon,
                 htmlProposalEditIcon,
@@ -540,13 +557,15 @@ const Term={
         
         /**
          * Returns term data for creating a new term.
+         * @params {Array} newTermAttributes
+         * @params {Integer} collectionId
          */
-        renderNewTermData: function(newTermAttributes) {
+        renderNewTermData: function(newTermAttributes, collectionId) {
             var newTermData = {};
             // TODO: what data to use?
             newTermData = {0: {
                 'attributes': newTermAttributes,
-                'collectionId': null,
+                'collectionId': collectionId,
                 'definition': "",
                 'desc': "",
                 'groupId': null,
@@ -567,16 +586,86 @@ const Term={
          */
         onAddTermEntryClick: function(eventData){
             var me = eventData.data.scope,
+                filteredCollections = me.getFilteredCollections();
+            console.log('onAddTermEntryClick');
+            if (filteredCollections.length == 1) {
+                collectionId = filteredCollections[0];
+                me.drawTermEntryProposal(collectionId);
+                return;
+            }
+            console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
+            me.drawFilteredTermCollectionSelect();
+        },
+        
+        /**
+         * Draw a select for choosing a TermCollection. The list only offers
+         * collections that are currently filtered (or all, if none is filtered).
+         */
+        drawFilteredTermCollectionSelect: function() {
+            var me = this,
+                filteredCollections = me.getFilteredCollections(),
+                filteredCollectionId,
+                collectionSelectHeader,
+                collectionSelect,
+                collectionSelectOptions = '',
+                collectionId;
+            me.emptyResultTermsHolder(false);
+            me.$_resultTermsHolderHeader.hide();
+            me.$_resultTermsHolder.show();
+            collectionSelectHeader = '<h3>Choose a collection for the new TermEntry:</h3>'; // TODO: use translation
+            if (filteredCollections.length == 0) {
+                $("#collection option").each(function() {
+                    if ($(this).val() != 'none') {
+                        filteredCollections.push($(this).val());
+                    }
+                });
+            }
+            for (i = 0; i < filteredCollections.length; i++) {
+                filteredCollectionId = filteredCollections[i];
+                collectionSelectOptions += '<option value="'+filteredCollectionId+'">'+collectionsNames[filteredCollectionId]+'</option>';
+            }
+            collectionSelect = '<select name="chooseCollection" id="chooseCollection">'+collectionSelectOptions+'</select>';
+            $('#termCollectionSelect').append(collectionSelectHeader).append(collectionSelect);
+            $('#chooseCollection').selectmenu({
+                select: function() {
+                    collectionId = $(this).val();
+                    me.drawTermEntryProposal(collectionId);
+                }
+              });
+            
+        },
+        
+        /**
+         * Draw the form for proposing a TermEntry.
+         * @params {Integer} collectionId
+         */
+        drawTermEntryProposal: function(collectionId) {
+            var me = this,
                 newTermEntryAttributes = Attribute.renderNewTermEntryAttributes(),
                 newTermAttributes = Attribute.renderNewTermAttributes(),
-                newTermData = me.renderNewTermData(newTermAttributes);
-            console.log('onAddTermEntryClick');
-            $('#termAttributeTable').empty();
-            $('#termTable').empty();
-            TermEntry.drawTermEntryAttributes(newTermAttributes);
+                newTermData = me.renderNewTermData(newTermAttributes,collectionId);
+            console.log('drawTermEntryProposal (collectionId: ' + collectionId + ')');
+            me.emptyResultTermsHolder(true);
+            me.$_resultTermsHolderHeader.show();
+            TermEntry.drawTermEntryAttributes(newTermAttributes,collectionId);
             me.drawTermGroups(newTermData);
             me.$_termTable.find('.proposal-edit')[0].click();
-            // TODO: choose which collectionId the new term-entry shall belong to
+        },
+        
+        /**
+         * Empty the resultTermsHolder.
+         * If keepAttributes is set and set to true, the attributes-Tab will not be emptied.
+         * @params {Boolean} displayHeader
+         */
+        emptyResultTermsHolder: function (keepAttributes) {
+            var me = this,
+                cssDisplayHeader;
+            me.$_termTable.empty();
+            me.$_termCollectionSelect.empty();
+            if(typeof keepAttributes !== "undefined" && keepAttributes === true) {
+                return;
+            }
+            me.$_TermEntryAttributesHolder.empty();
         },
         
         /***
