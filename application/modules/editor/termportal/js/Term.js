@@ -68,7 +68,6 @@ const Term={
             me.$_termTable.on('click', ".term-data .proposal-delete",{scope:me},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data .proposal-edit",{scope:me},me.onEditTermClick);
             me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
-            me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermAttributeClick);
             me.$_termTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermAttributeClick);
 		},
 		
@@ -793,15 +792,6 @@ const Term={
         onAddTermAttributeClick: function(eventData){
             var me = eventData.data.scope;
             console.log('onAddTermAttributeClick');
-            // TODO
-        },
-        
-        /***
-         * On delete term-attribute icon click handler
-         */
-        onDeleteTermAttributeClick: function(eventData){
-            var me = eventData.data.scope;
-            console.log('onDeleteTermAttributeClick');
             // TODO
         },
         

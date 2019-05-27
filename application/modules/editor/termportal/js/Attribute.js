@@ -1,8 +1,54 @@
 const Attribute={
+	$_termTable:null,
 	languageDefinitionContent:[],
 	
 	init:function(){
+		this.cacheDom();
+		this.initEvents();
 	},
+	
+	cacheDom:function(){
+        this.$_termTable=$('#termTable');
+	},
+	
+	initEvents:function(){
+		var me=this;
+		me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermAttributeClick);
+	},
+	
+	/***
+     * On delete term-attribute icon click handler
+     */
+    onDeleteTermAttributeClick: function(eventData){
+        var me = eventData.data.scope,
+            $element=$(this),
+			$parent=$element.parents('h4.attribute-data'),//the button parrent
+			attributeId=$parent.data('attributeId');
+		
+		if(parent.length==0){
+			return;
+		}
+		
+		//ajax call to the remove proposal action
+		var me=eventData.data.scope,
+			url=Editor.data.termportal.restPath+'termattribute/{ID}/removeproposal/operation'.replace("{ID}",attributeId);
+		$.ajax({
+	        url: url,
+	        dataType: "json",	
+	        type: "POST",
+	        success: function(result){
+	        	//the term proposal is removed, find the attribute holder and render the initial term proposable content
+	        	var attributeData=result.rows,
+	        		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
+	        		$proposalHolder=me.$_termTable.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
+	        		$ins=$proposalHolder.find('ins');
+	        		
+        		$ins.replaceWith(renderData);
+	        	$proposalHolder.find('del').remove();
+	        }
+	    });
+	
+    },
 	
 	/***
 	 * Find child's for the attribute, and build the data in needed structure
@@ -20,8 +66,11 @@ const Attribute={
 	    	html='',
             isProposal = (attribute.proposal == null) ? ' is-finalized' : ' is-proposal',
             proposable = attribute.proposable ? ' proposable' : '';
-	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '">',
-	    	headerTagClose='</h4>';
+	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '" data-attribute-id="'+attribute.attributeId+'">',
+	    	headerTagClose='</h4>',
+	    	getAttributeContainerRender=function(attribute,html){
+	    		return '<p data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
+	    	};
 	    
 	    switch(attribute.name) {
 	        case "transac":
@@ -41,10 +90,10 @@ const Attribute={
 	                    
 	                    //the data tag is displayed as first in this group
 	                    if(child.name ==="date"){
-	                        childData.unshift('<p>' + childDataText + ' ' + attVal+'</p>')
+	                        childData.unshift(getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)))
 	                        return true;
 	                    }
-	                    childData.push('<p>' + childDataText + ' ' + attVal+'</p>')
+	                    childData.push(getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
 	                });
 	                html+=childData.join('');
 	            }
@@ -67,7 +116,7 @@ const Attribute={
 	                headerText =me.handleAttributeHeaderText(attribute)+":";
 	            }
 	            
-	            html=headerTagOpen + headerText + headerTagClose + '<p>' + attVal + '</p>';
+	            html=headerTagOpen + headerText + headerTagClose +getAttributeContainerRender(attribute,attVal);
 	            
 	            //if it is definition on language level, get store the data in variable so it is displayed also on term language level
 	            if(attribute.attrType=="definition" && attribute.language){
@@ -89,7 +138,7 @@ const Attribute={
 	            
 	            var headerText = me.handleAttributeHeaderText(attribute,true);
 	            
-	            html=headerTagOpen + headerText + headerTagClose + '<p>' + attVal + '</p>';
+	            html=headerTagOpen + headerText + headerTagClose +getAttributeContainerRender(attribute,attVal);
 	            break;
 	    }
 	    return html;
@@ -140,10 +189,6 @@ const Attribute={
 	getAttributeRenderData:function(attributeData,attValue){
 		var me=this,
 			htmlCollection=[];
-		
-		if(!attributeData.proposable){
-			return attValue;
-		}
 		
 		//the proposal is allready defined, render the proposal
 		if(attributeData.proposal && attributeData.proposal!=undefined){
