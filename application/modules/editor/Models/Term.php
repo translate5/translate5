@@ -639,10 +639,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $languages
      * @param array $collectionIds
      * @param mixed $limit
+     * @param array $processStats
      * 
      * @return array
      */
-    public function searchTermByLanguage($queryString,$languages,$collectionIds,$limit=null){
+    public function searchTermByLanguage($queryString,$languages,$collectionIds,$limit=null,$processStats){
         //if wildcards are used, adopt them to the mysql needs
         $queryString=str_replace("*","%",$queryString);
         $queryString=str_replace("?","_",$queryString);
@@ -661,6 +662,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
         ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
         ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
+        ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats)
         ->order($tableTerm.'.term asc');
         if($limit){
             $s->limit($limit);

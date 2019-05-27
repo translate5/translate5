@@ -107,13 +107,19 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         
         if(isset($params['term'])){
             $languages = $params['language'] ?? null;
+            $processStats = $params['processStats'] ?? array_values($model->getAllProcessStatus());
+            
+            if (isset($params['collectionIds'])) {
+                // use only the collectionIds that the user has selected and be sure that these are allowed
+                $collectionIds = array_intersect($params['collectionIds'],$collectionIds);
+            }
             
             //if the limit is disabled, do not use it
             if(isset($params['disableLimit']) && $params['disableLimit']=="true"){
                 $termCount=null;
             }
             
-            $responseArray['term'] = $this->mergeProposalData($model->searchTermByLanguage($params['term'],$languages,$collectionIds,$termCount));
+            $responseArray['term'] = $this->mergeProposalData($model->searchTermByLanguage($params['term'],$languages,$collectionIds,$termCount,$processStats));
             
         }
         
