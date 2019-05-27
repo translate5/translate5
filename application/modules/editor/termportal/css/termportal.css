@@ -225,11 +225,16 @@ h4, p {
 
 /* --------------- proposals --------------- */
 
-#resultTermEntriesHolder .proposal-btn.proposal-add {   /* add TermEntry */
+#resultTermEntriesHolder #searchTermsHolderHeader .proposal-btn.proposal-add {   /* add TermEntry */
     float: right;
     color: #007fff;
     font-size: 25px;
     margin-top: 4px;
+}
+#resultTermEntriesHolder #error-no-results .proposal-btn.proposal-add {
+    color: #454545;
+    font-size: 40px;
+    margin: -5px -10px;
 }
 #termTable > .proposal-btn.proposal-add {               /* add Term */
     float: left;

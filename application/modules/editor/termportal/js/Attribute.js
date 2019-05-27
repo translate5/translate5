@@ -18,8 +18,9 @@ const Attribute={
 	    
 	    var me=this,
 	    	html='',
+            isProposal = (attribute.proposal == null) ? ' is-finalized' : ' is-proposal',
             proposable = attribute.proposable ? ' proposable' : '';
-	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + '">',
+	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '">',
 	    	headerTagClose='</h4>';
 	    
 	    switch(attribute.name) {

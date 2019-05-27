@@ -1,6 +1,7 @@
 const Term={
 
         $_searchTermsHolderHeader:null,
+        $_searchErrorNoResults:null,
         $_searchTermsSelect:null,
         
         $_resultTermsHolder:null,
@@ -31,6 +32,7 @@ const Term={
 		
 		cacheDom:function(){
             this.$_searchTermsHolderHeader = $('#searchTermsHolderHeader');
+            this.$_searchErrorNoResults = $('#error-no-results');
 			this.$_searchTermsSelect=$('#searchTermsSelect');
             
             this.$_resultTermsHolder=$('#resultTermsHolder');
@@ -54,6 +56,7 @@ const Term={
 			
             // TermEntries
             me.$_TermEntriesList_Header.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
+            me.$_searchErrorNoResults.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
             me.$_TermEntryHeader.on('click', ".proposal-delete",{scope:me},me.onDeleteTermEntryClick);
             me.$_TermEntryHeader.on('click', ".proposal-edit",{scope:me},me.onEditTermEntryClick);
             me.$_TermEntryAttributesHolder.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
@@ -104,7 +107,7 @@ const Term={
 					if(successCallback){
 						successCallback(result.rows[me.KEY_TERM]);
 					}
-					me.fillSearchTermSelect();
+					me.fillSearchTermSelect(searchString);
 				}
 			});
 		},
@@ -156,12 +159,12 @@ const Term={
 		 * Fill up the term option component with the search results
 		 * @returns
 		 */
-		fillSearchTermSelect:function(){
+		fillSearchTermSelect:function(searchString){
 			var me=this;
-			
 			if(!me.searchTermsResponse){
-				
-				$('#error-no-results').show();
+                
+			    me.$_searchErrorNoResults.children('.proposal-btn').prop('title', searchString + ': ' + translations['addTermEntry']);
+			    me.$_searchErrorNoResults.show();
 				
 				console.log("fillSearchTermSelect: nichts gefunden");
 				
@@ -175,7 +178,7 @@ const Term={
 				return;
 			}
 			
-			$('#error-no-results').hide();
+			me.$_searchErrorNoResults.hide();
 			me.$_searchTermsSelect.empty();
 			
 			console.log("fillSearchTermSelect: " + me.searchTermsResponse.length + " Treffer");
@@ -313,10 +316,11 @@ const Term={
                     filteredCientsNames = [],
                     filteredCollectionsNames = [],
                     clientId,
-                    clientName;
+                    clientName,
+                    isProposal = (term.proposal == null) ? ' is-finalized' : ' is-proposal';
                 
 		    	//draw term header
-		    	termAttributesHtmlContainer.push('<h3 class="term-data" data-term-value="'+term.term+'" data-term-id="'+term.termId+'">');
+		    	termAttributesHtmlContainer.push('<h3 class="term-data'+isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'">');
 		    	
 		    	
 		    	//add empty space between
@@ -440,64 +444,67 @@ const Term={
          * @param elements
 		 */
         drawProposalButtons: function (elements){
-            // TODO: show either the edit OR the delete-button!
             var me = this,
                 htmlProposalAddIcon,
                 htmlProposalEditIcon,
                 htmlProposalDeleteIcon,
-                $_selector,$_selectorAdd,
-                $titleAdd, $titleDelete, $titleEdit,
-                $_TermsHeaders, $_TermEntryAttributes, $_TermsAttributesHolder, $_TermsAttributesHeaders;
+                $_selectorAdd,$_selectorDelete,$_selectorEdit,
+                $titleAdd, $titleDelete, $titleEdit;
             htmlProposalAddIcon = '<span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span>';
             htmlProposalDeleteIcon = '<span class="proposal-btn proposal-delete ui-icon ui-icon-trash-b"></span>';
             htmlProposalEditIcon = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>';
             switch(elements) {
                 case "term-entries":
-                    $_selector = false;
                     $_selectorAdd = me.$_TermEntriesList_Header;
+                    $_selectorDelete = false;
+                    $_selectorEdit = false;
                     $titleAdd = translations['addTermEntry'];
                     htmlProposalAddIcon = '<span class="proposal-btn proposal-add ui-icon ui-icon-plus"></span>';
                   break;
                 case "term-entry":
-                    $_selector = me.$_TermEntryHeader;
                     $_selectorAdd = false;
+                    // TODO: show either the edit OR the delete-button!  (= check if TermEntry is a proposal and append proposal-buttons accordingly)
+                    $_selectorDelete = $('#resultTermsHolderHeader');
+                    $_selectorEdit =$('#resultTermsHolderHeader');
                     $titleDelete = translations['deleteTermEntry'];
                     $titleEdit = translations['editTermEntry'];
                     break;
                 case "term-entry-attributes":
-                    $_TermEntryAttributes = $('#termAttributeTable .attribute-data.proposable'); // cannot use cacheCom(), rendered too late
-                    $_selector = $_TermEntryAttributes;
                     $_selectorAdd = false; // me.$_TermEntryAttributesHolder;
+                    $_selectorDelete = $('#termAttributeTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
+                    $_selectorEdit = $('#termAttributeTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
                     $titleAdd = translations['addTermEntryAttribute'];
                     $titleDelete = translations['deleteTermEntryAttribute'];
                     $titleEdit = translations['editTermEntryAttribute'];
                   break;
                 case "terms":
-                    $_TermsHeaders = $('#termTable .term-data'); // cannot use cacheCom(), rendered too late
-                    $_selector = $_TermsHeaders;
                     $_selectorAdd = me.$_TermsHolder;
+                    $_selectorDelete = $('#termTable .term-data.is-proposal'); // cannot use cacheCom(), rendered too late
+                    $_selectorEdit = $('#termTable .term-data.is-finalized'); // cannot use cacheCom(), rendered too late
                     $titleAdd = translations['addTerm'];
                     $titleDelete = translations['deleteTerm'];
                     $titleEdit = translations['editTerm'];
                     break;
                 case "terms-attribute":
-                    $_TermsAttributesHolder = $('#termTable .term-data').next('div'); // cannot use cacheCom(), rendered too late
-                    $_TermsAttributesHeaders = $('#termTable .attribute-data.proposable'); // cannot use cacheCom(), rendered too late
-                    $_selector = $_TermsAttributesHeaders;
-                    $_selectorAdd = false; // $_TermsAttributesHolder;
+                    $_selectorAdd = false; // $('#termTable .term-data').next('div'); // cannot use cacheCom(), rendered too late
+                    $_selectorDelete = $('#termTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
+                    $_selectorEdit = $('#termTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
                     $titleAdd = translations['addTermAttribute'];
                     $titleDelete = translations['deleteTermAttribute'];
                     $titleEdit = translations['editTermAttribute'];
                   break;
             }
-            if ($_selector && $_selector.children('.proposal-btn').length === 0) {
-                $_selector.append(htmlProposalDeleteIcon+htmlProposalEditIcon);
-                $_selector.children('.proposal-edit').prop('title', $titleEdit);
-                $_selector.children('.proposal-delete').prop('title', $titleDelete);
-            }
             if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
                 $_selectorAdd.find('.proposal-add').prop('title', $titleAdd);
+            }
+            if ($_selectorEdit && $_selectorEdit.children('.proposal-btn').length === 0) {
+                $_selectorEdit.append(htmlProposalEditIcon);
+                $_selectorEdit.children('.proposal-edit').prop('title', $titleEdit);
+            }
+            if ($_selectorDelete && $_selectorDelete.children('.proposal-btn').length === 0) {
+                $_selectorDelete.append(htmlProposalDeleteIcon);
+                $_selectorDelete.children('.proposal-delete').prop('title', $titleDelete);
             }
         },
 		
@@ -559,9 +566,21 @@ const Term={
          * Returns term data for creating a new term.
          * @params {Array} newTermAttributes
          * @params {Integer} collectionId
+         * @params {String} eventDelegateTarget
          */
-        renderNewTermData: function(newTermAttributes, collectionId) {
-            var newTermData = {};
+        renderNewTermData: function(newTermAttributes, collectionId, eventDelegateTarget) {
+            console.log('eventDelegateTarget: ' + eventDelegateTarget);
+            var me = this,
+                newTermData = {},
+                languageId = null,
+                termName = null;
+            if(eventDelegateTarget === 'error-no-results') {
+                languageId = $('#language').val();
+                termName = $('#search').val();
+            }
+            if (termName === null){
+                termName = "..."; // add some default content, otherwise the input-field might be empty and not clickable after the user has clicked anywhere else
+            }
             // TODO: what data to use?
             newTermData = {0: {
                 'attributes': newTermAttributes,
@@ -570,9 +589,9 @@ const Term={
                 'desc': "",
                 'groupId': null,
                 'label': "",
-                'languageId': null, 
+                'languageId': languageId,
                 'proposal': null,
-                'term': "...", // add some content, otherwise the input-field will be empty and not clickable after the user has clicked anywhere else
+                'term': termName,
                 'termId': null,
                 'termStatus': null,
                 'value': null
@@ -586,22 +605,24 @@ const Term={
          */
         onAddTermEntryClick: function(eventData){
             var me = eventData.data.scope,
-                filteredCollections = me.getFilteredCollections();
+                filteredCollections = me.getFilteredCollections(),
+                eventDelegateTarget = eventData.delegateTarget.id;
             console.log('onAddTermEntryClick');
             if (filteredCollections.length == 1) {
                 collectionId = filteredCollections[0];
-                me.drawTermEntryProposal(collectionId);
+                me.drawTermEntryProposal(collectionId,eventDelegateTarget);
                 return;
             }
             console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
-            me.drawFilteredTermCollectionSelect();
+            me.drawFilteredTermCollectionSelect(eventDelegateTarget);
         },
         
         /**
          * Draw a select for choosing a TermCollection. The list only offers
          * collections that are currently filtered (or all, if none is filtered).
+         * @params {String} eventDelegateTarget
          */
-        drawFilteredTermCollectionSelect: function() {
+        drawFilteredTermCollectionSelect: function(eventDelegateTarget) {
             var me = this,
                 filteredCollections = me.getFilteredCollections(),
                 filteredCollectionId,
@@ -629,7 +650,7 @@ const Term={
             $('#chooseCollection').selectmenu({
                 select: function() {
                     collectionId = $(this).val();
-                    me.drawTermEntryProposal(collectionId);
+                    me.drawTermEntryProposal(collectionId,eventDelegateTarget);
                 }
               });
             
@@ -638,12 +659,13 @@ const Term={
         /**
          * Draw the form for proposing a TermEntry.
          * @params {Integer} collectionId
+         * @params {String} eventDelegateTarget
          */
-        drawTermEntryProposal: function(collectionId) {
+        drawTermEntryProposal: function(collectionId,eventDelegateTarget) {
             var me = this,
                 newTermEntryAttributes = Attribute.renderNewTermEntryAttributes(),
                 newTermAttributes = Attribute.renderNewTermAttributes(),
-                newTermData = me.renderNewTermData(newTermAttributes,collectionId);
+                newTermData = me.renderNewTermData(newTermAttributes,collectionId,eventDelegateTarget);
             console.log('drawTermEntryProposal (collectionId: ' + collectionId + ')');
             me.emptyResultTermsHolder(true);
             me.$_resultTermsHolderHeader.show();
@@ -787,9 +809,12 @@ const Term={
          * On edit term-attribute icon click handler
          */
         onEditTermAttributeClick: function(eventData){
-            var me = eventData.data.scope;
+            var me = eventData.data.scope,
+                element=$(this),
+                parent=element.parent(),
+                search=parent.next().find("span[data-editable]");
             console.log('onEditTermAttributeClick');
-            // TODO
+            search.click();
         },
 };
 

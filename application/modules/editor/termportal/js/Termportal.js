@@ -74,8 +74,8 @@ var selectItem = function (event, ui) {
     }
     
     console.log("selectItem: " + ui.item.groupId);
-    
-    Term.fillSearchTermSelect();
+
+    Term.fillSearchTermSelect(ui.item.value);
     //find the attributes for
     Term.findTermsAndAttributes(ui.item.groupId);
     //$("#search").val(ui.item.value);
