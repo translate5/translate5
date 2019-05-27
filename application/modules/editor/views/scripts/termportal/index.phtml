@@ -140,7 +140,7 @@ if(isset($this->error)){
           <ul id="searchTermsHolderHeader">
             <li><a href="#searchTermsHolder"><?php echo $this->translations["termEntries"];?></a></li>
           </ul>
-          <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
+          <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><p><?php echo $this->translations["noResults"];?></p><span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></div>
           <div id="searchTermsHolder"> 
         	<ul id="searchTermsSelect" size="10" style="display: inline-block;">
         	</ul>
