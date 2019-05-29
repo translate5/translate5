@@ -224,6 +224,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @return array|NULL
      */
     public function getAttributesForTermEntry($groupId,$collectionIds){
+        $userHasTermEntryAttributeProposalRights=true;
         $cols = array(
             'LEK_term_attributes.id AS attributeId',
             'LEK_term_attributes.labelId as labelId',
@@ -248,30 +249,55 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $s=$this->db->select()
         ->from($this->db,[])
         ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_attributes.termEntryId',$cols)
-        ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
-        ->where('LEK_term_attributes.termId is null')
+        ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText']);
+
+        //TODO: define user proposal rights
+        if($userHasTermEntryAttributeProposalRights){
+            $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = LEK_term_attributes.id',[
+                'LEK_term_attribute_proposal.value as proposalAttributeValue',
+                'LEK_term_attribute_proposal.id as proposalAttributelId',
+            ]);
+        }
+        
+        $s->where('LEK_term_attributes.termId is null')
         ->where('LEK_term_entry.groupId=?',$groupId)
         ->where('LEK_term_entry.collectionId IN(?)',$collectionIds);
         $s->setIntegrityCheck(false);
         $rows=$this->db->fetchAll($s)->toArray();
-        
-        $rows=$this->createChildTree($rows);
-        if(!empty($rows)){
-            return $rows;
+        if(empty($rows)){
+            return null;
         }
-        return null;
+        $mapProposal = function($item) {
+            $item['proposable']=$this->isProposable($item['name'],$item['attrType']);
+            if(!isset($item['proposalAttributelId'])){
+                return $item;
+            }
+            $obj=new stdClass();
+            $obj->id=$item['proposalAttributelId'];
+            $obj->value=$item['proposalAttributeValue'];
+            $item['proposal']=$obj;
+            return $item;
+        };
+        $rows=array_map($mapProposal, $rows);
+        return $this->createChildTree($rows);
     }
     
     /***
      * Update modification transac group attributes.
      * When the attribute group does not exist, transac creation and transac modification will be created.
      *
-     * @param editor_Models_Term $term
+     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
-    public function updateModificationGroupAttributes(editor_Models_Term $term){
-        $s=$this->db->select()
-        ->where('termId=?',$term->getId())
-        ->where('name="transac"')
+    public function updateModificationGroupAttributes($entity){
+        $s=$this->db->select();
+        if($entity instanceof editor_Models_Term){
+            $s->where('termId=?',$entity->getId());
+        }
+        if($entity instanceof editor_Models_TermCollection_TermEntry){
+            $s->where('termEntryId=?',$entity->getId());
+            $s->where('termId IS NULL');
+        }
+        $s->where('name="transac"')
         ->where('attrType="modification"');
         $ret=$this->db->fetchAll($s)->toArray();
         $user = new Zend_Session_Namespace('user');
@@ -284,16 +310,18 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             return;
         }
         //the transacgroups are not existing, create new
-        $this->createTransacGroup($term,'creation');
-        $this->createTransacGroup($term,'modification');
+        $this->createTransacGroup($entity,'creation');
+        $this->createTransacGroup($entity,'modification');
     }
     
     /***
      * Create transac group attributes with its values. The type can be creation or modification
-     * @param editor_Models_Term $term
+     * Depending on what kind of entity is passed, the appropriate attribute will be created(term attribute or term entry attribute)
+     * 
+     * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      * @param string $type
      */
-    protected function createTransacGroup(editor_Models_Term $term,string $type) {
+    public function createTransacGroup($entity,string $type) {
         
         $labelModel=ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
         /* @var $labelModel editor_Models_TermCollection_TermAttributesLabel */
@@ -325,38 +353,63 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         //transac
         $this->init();
         $this->setLabelId($transacLabelId);
-        $this->setCollectionId($term->getCollectionId());
-        $this->setTermId($term->getId());
-        $this->setLanguage($languagesArray[$term->getLanguage()]);
+        $this->setCollectionId($entity->getCollectionId());
+        //if the entity is term, set term attribute
+        if($entity instanceof editor_Models_Term){
+            $this->setTermId($entity->getId());
+            $this->setLanguage($languagesArray[$entity->getLanguage()]);
+            $this->setAttrLang($languagesArray[$entity->getLanguage()]);
+        }
+        //if the entity is termentry set term entry attribute
+        if($entity instanceof editor_Models_TermCollection_TermEntry){
+            $this->setTermEntryId($entity->getId());
+        }
+        
         $this->setName('transac');
         $this->setAttrType($type);
-        $this->setAttrLang($languagesArray[$term->getLanguage()]);
         $this->setValue($type);
+        //save the transac attribute
         $parentId=$this->save();
         
         //date
         $this->init();
         $this->setLabelId($dateLabelId);
-        $this->setCollectionId($term->getCollectionId());
-        $this->setTermId($term->getId());
+        $this->setCollectionId($entity->getCollectionId());
+        
+        if($entity instanceof editor_Models_Term){
+            $this->setTermId($entity->getId());
+            $this->setLanguage($languagesArray[$entity->getLanguage()]);
+            $this->setAttrLang($languagesArray[$entity->getLanguage()]);
+        }
+        
+        if($entity instanceof editor_Models_TermCollection_TermEntry){
+            $this->setTermEntryId($entity->getId());
+        }
+        
         $this->setParentId($parentId);
-        $this->setLanguage($languagesArray[$term->getLanguage()]);
         $this->setName('date');
-        $this->setAttrLang($languagesArray[$term->getLanguage()]);
         $this->setValue(time());
+        //save the date attribute
         $this->save();
         
         //responsiblePerson
         $this->init();
         $this->setLabelId($transacNoteLabelId);
-        $this->setCollectionId($term->getCollectionId());
-        $this->setTermId($term->getId());
+        $this->setCollectionId($entity->getCollectionId());
+        
+        if($entity instanceof editor_Models_Term){
+            $this->setTermId($entity->getId());
+            $this->setLanguage($languagesArray[$entity->getLanguage()]);
+            $this->setAttrLang($languagesArray[$entity->getLanguage()]);
+        }
+        if($entity instanceof editor_Models_TermCollection_TermEntry){
+            $this->setTermEntryId($entity->getId());
+        }
         $this->setParentId($parentId);
-        $this->setLanguage($languagesArray[$term->getLanguage()]);
         $this->setName('transacNote');
         $this->setAttrType('responsiblePerson');
-        $this->setAttrLang($languagesArray[$term->getLanguage()]);
         $this->setValue($fullName);
+        //save the responsible person attribute
         $this->save();
     }
     
@@ -385,7 +438,10 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     
     public function getDataObject() {
         $result=parent::getDataObject();
-        $result->attributeOriginType='termAttribute';
+        //set the attribute origin type(when no termId is provided it is termEntry attribute otherwise term attribute)
+        $result->attributeOriginType=empty($result->termId) ? 'termEntryAttribute' : 'termAttribute';
+        $result->attributeId=$result->id;
+        $result->proposable=$this->isProposable($result->name,$result->attrType);
         return $result;
     }
 }

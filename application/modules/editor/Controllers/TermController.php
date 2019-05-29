@@ -63,12 +63,21 @@ class editor_TermController extends ZfExtended_RestController {
         }
     }
     
+    public function postAction(){
+        parent::postAction();
+        //create or update or create the term transac group attributes
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        $attribute->updateModificationGroupAttributes($this->entity);
+    }
     /**
      * {@inheritDoc}
      * @see ZfExtended_RestController::decodePutData()
      */
     protected function decodePutData() {
         parent::decodePutData();
+        //remove whitespace from the beggining and the end of the string
+        $this->data->term=trim($this->data->term);
         $this->convertToLanguageId();
         if($this->_request->isPut()) {
             //the following fields may not be changed via PUT:
@@ -97,9 +106,23 @@ class editor_TermController extends ZfExtended_RestController {
      */
     protected function convertToLanguageId() {
         //ignoring if already integer like value or empty
-        if(empty($this->data->language) || (int)$this->data->language > 0) {
+        if(empty($this->data->language)) {
             return; 
         }
+        
+        $languages=explode(',',$this->data->language);
+        
+        if(empty($languages)){
+           return; 
+        }
+        
+        $language=$languages[0];
+        $this->data->language=$language;
+        
+        if((int)$this->data->language > 0) {
+            return;
+        }
+        
         $language = ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $language editor_Models_Languages */
         try {
@@ -152,6 +175,13 @@ class editor_TermController extends ZfExtended_RestController {
             $entry->setCollectionId($this->entity->getCollectionId());
             $entry->setGroupId($this->_helper->guid->create());
             $entry->save();
+            
+            //update or create the term entry creation/modification attributes
+            $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+            /* @var $attribute editor_Models_Term_Attribute */
+            $attribute->createTransacGroup($entry,'creation');
+            $attribute->createTransacGroup($entry,'modification');
+            
             $this->entity->setTermEntryId($entry->getId());
             $this->entity->setGroupId($entry->getGroupId());
         }

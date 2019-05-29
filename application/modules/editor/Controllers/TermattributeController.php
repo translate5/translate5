@@ -140,13 +140,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
             throw new ZfExtended_UnprocessableEntity('E1110');
         }
         $this->proposal->delete();
-        
-        //rename the id to attributeId
-        $entityData=$this->entity->getDataObject();
-        $entityData->attributeId=$entityData->id;
-        unset($entityData->id);
-        
-        $this->view->rows = $entityData;
+        $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
     }
 }

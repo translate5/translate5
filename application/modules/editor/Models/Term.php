@@ -850,6 +850,12 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $result;
     }
     
+    public function getDataObject() {
+        $result=parent::getDataObject();
+        $result->termId=$result->id;
+        return $result;
+    }
+    
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array
