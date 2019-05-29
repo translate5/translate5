@@ -15,7 +15,7 @@ const ComponentEditor={
 		me.initEvents();
 		
 		me.typeRouteMap['term']='term/{ID}/propose/operation';
-		me.typeRouteMap['termEntryAttribute']='';//TODO:
+		me.typeRouteMap['termEntryAttribute']='termattribute/{ID}/propose/operation';
 		me.typeRouteMap['termAttribute']='termattribute/{ID}/propose/operation';
 		
 		me.typeRequestDataKeyMap['term']='term';//TODO:
@@ -32,31 +32,52 @@ const ComponentEditor={
 	
 	initEvents:function(){
 		var me=this;
-		me.$_termTable.on('click', '[data-editable]',{scope:me},me.onEditableComponentClick);
-		me.$_termAttributeTable.on('click', '[data-editable]',{scope:me},me.onEditableComponentClick);
+		me.$_termTable.on('click', '[data-editable]',{scope:me},me.onEditableTermComponentClick);
+		me.$_termAttributeTable.on('click', '[data-editable]',{scope:me},me.onEditableAttributeComponentClick);
 		me.$_termTable.on('click', 'span[data-editable-comment]',{scope:me},me.onEditableCommentComponentClick);
 	},
 	
+	/***
+	 * Editable Comment component click handler
+	 */
 	onEditableCommentComponentClick:function(event){
 		var me=event.data.scope,
 			$el = $(this);
 		me.addCommentAttributeEditor($el);
 	},
 	
-	onEditableComponentClick:function(event){
+	/***
+	 * Editable term component click handler
+	 */
+	onEditableTermComponentClick:function(event){
 		var me=event.data.scope,
-			$el = $(this);
-		me.addComponentEditor($el);
+			$el = $(this),
+			$termAttributeHolder=me.$_termTable.find('div[data-term-id="' + $el.data('id') + '"]');
+		me.addTermComponentEditor($el,$termAttributeHolder);
 	},
 	
-	addComponentEditor:function($element){
+	/***
+	 * Editable attribute component click handler
+	 */
+	onEditableAttributeComponentClick:function(event){
+		var me=event.data.scope,
+			$el = $(this);
+		me.addAttributeComponentEditor($el);
+	},
+	
+	/***
+	 * Register term component editor for given term element
+	 */
+	addTermComponentEditor:function($element,$termAttributeHolder){
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
-			$parent=me.$_termTable.find('div[data-term-id="' + $element.data('id') + '"]'),
-			$commentPanel=$parent.find('[data-editable-comment]');
+			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		
 			//$input = $('<input type="text" style="min-width: 150px;" onkeyup="this.size = Math.max(this.value.length, 1)"/>').val($element.text());
 	  
+		//copy the collection id from the attribute holder data to the term element data
+		$element.attr("data-collection-id",$termAttributeHolder.data('collectionId'));
+		
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length==0){
 			var dummyCommentAttribute={
@@ -69,8 +90,8 @@ const ComponentEditor={
 			},
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
 			
-			$parent.prepend(drawData);
-			$commentPanel=$parent.find('[data-editable-comment]');
+			$termAttributeHolder.prepend(drawData);
+			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		}
 		
 		if($commentPanel.prop('tagName')=='SPAN'){
@@ -84,6 +105,22 @@ const ComponentEditor={
 		}).focus();
 	},
 	
+	/***
+	 * Register the component editor for given term or termentrie attribute
+	 */
+	addAttributeComponentEditor:function($element){
+		var me=this,
+			$input= $('<textarea />').val($element.text());
+		
+		$element.replaceWith($input);
+		$input.one('blur', function(){
+			me.saveComponentChange($element,$input);
+		}).focus();
+	},
+	
+	/***
+	 * Register component editor for term comment
+	 */
 	addCommentAttributeEditor:function($element){
 		var me=this,
 			$input= $('<textarea data-editable-comment />').val($element.text());
@@ -97,7 +134,7 @@ const ComponentEditor={
 	
 	saveComponentChange:function($el,$input){
 		//is the modefied text empty or the same as the initial one
-		if($input.val()=='' || $el.text()==$input.val()){
+		if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
 			
 			//get initial html for the component
 			var dummyData={
@@ -119,6 +156,17 @@ const ComponentEditor={
 		
 		requestData[dataKey]=$input.val();
 		
+		//if id is not provided, this is a proposal on empty term entry
+		if(!$el.data('id')){
+			url=Editor.data.termportal.restPath+'term',
+			requestData={};
+			//TODO: the selected collection is nota available in general(bug ?). This is small workaround
+			requestData['collectionId']=$el.data('collectionId');
+			requestData['language']=$('#language').val();
+			requestData[dataKey]=$input.val();
+		}
+		
+		
 		//send proposal request
 		 $.ajax({
 	        url: url,
@@ -135,7 +183,14 @@ const ComponentEditor={
 	
 	saveCommentChange:function($element,$input){
 		//is the modefied text empty or the same as the initial one
-		if($input.val()=='' || $element.text()==$input.val()){
+		if($input.val()=='' || $.trim($input.val())=='' || $element.text()==$input.val()){
+
+			//when the comment does not exist, clean the editor 
+			if($element.data('id')<1){
+				$input.replaceWith('');
+				return;
+			}
+
 			
 			//get initial html for the component
 			var dummyData={

@@ -1,5 +1,7 @@
 const Attribute={
 	$_termTable:null,
+	$_termEntryAttributesTable:null,
+	
 	languageDefinitionContent:[],
 	
 	init:function(){
@@ -9,18 +11,21 @@ const Attribute={
 	
 	cacheDom:function(){
         this.$_termTable=$('#termTable');
+        this.$_termEntryAttributesTable = $('#termAttributeTable');
 	},
 	
 	initEvents:function(){
 		var me=this;
-		me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermAttributeClick);
+		me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me,root:me.$_termTable},me.onDeleteAttributeClick);
+		me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
 	},
 	
 	/***
-     * On delete term-attribute icon click handler
+     * On delete term and term entry attribute icon click handler
      */
-    onDeleteTermAttributeClick: function(eventData){
-        var me = eventData.data.scope,
+    onDeleteAttributeClick: function(eventData){
+        var me=eventData.data.scope,
+        	root=eventData.data.root,
             $element=$(this),
 			$parent=$element.parents('h4.attribute-data'),//the button parrent
 			attributeId=$parent.data('attributeId');
@@ -40,7 +45,7 @@ const Attribute={
 	        	//the term proposal is removed, find the attribute holder and render the initial term proposable content
 	        	var attributeData=result.rows,
 	        		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
-	        		$proposalHolder=me.$_termTable.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
+	        		$proposalHolder=root.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
 	        		$ins=$proposalHolder.find('ins');
 	        		
         		$ins.replaceWith(renderData);
@@ -49,7 +54,7 @@ const Attribute={
 	    });
 	
     },
-	
+    
 	/***
 	 * Find child's for the attribute, and build the data in needed structure
 	 *  
@@ -65,7 +70,7 @@ const Attribute={
 	    var me=this,
 	    	html='',
             isProposal = (attribute.proposal == null) ? ' is-finalized' : ' is-proposal',
-            proposable = attribute.proposable ? ' proposable' : '';
+            proposable = attribute.proposable ? ' proposable' : '',
 	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '" data-attribute-id="'+attribute.attributeId+'">',
 	    	headerTagClose='</h4>',
 	    	getAttributeContainerRender=function(attribute,html){
@@ -189,6 +194,10 @@ const Attribute={
 	getAttributeRenderData:function(attributeData,attValue){
 		var me=this,
 			htmlCollection=[];
+		
+		if(!attributeData.proposable){
+			return attValue;
+		}
 		
 		//the proposal is allready defined, render the proposal
 		if(attributeData.proposal && attributeData.proposal!=undefined){

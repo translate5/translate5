@@ -60,7 +60,6 @@ const Term={
             me.$_TermEntryHeader.on('click', ".proposal-delete",{scope:me},me.onDeleteTermEntryClick);
             me.$_TermEntryHeader.on('click', ".proposal-edit",{scope:me},me.onEditTermEntryClick);
             me.$_TermEntryAttributesHolder.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
-            me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-delete",{scope:me},me.onDeleteTermEntryAttributeClick);
             me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermEntryAttributeClick);
             
             // Terms
@@ -366,7 +365,7 @@ const Term={
 		    	termAttributesHtmlContainer.push('</h3>');
 		    	
 		    	//draw term attriubtes
-		    	termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" class="term-attributes">');
+		    	termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
 		    	termAttributesHtmlContainer.push(me.drawTermAttributes(term.attributes,termRflLang));
 		    	termAttributesHtmlContainer.push('</div>');
 		    });
@@ -379,10 +378,19 @@ const Term={
 		    } else {
 		    	me.$_termTable.accordion({
 		            active: false,
-		            //collapsible: true,
+		            collapsible: true,
 		            heightStyle: "content"
 		        });
 		    }
+		    
+		    //FIXME: workaround, check me later
+		    $.ui.accordion.prototype._keydown = function( event ) {
+		        var keyCode = $.ui.keyCode;
+
+		        if (event.keyCode == keyCode.SPACE) {
+		            return;
+		        }
+		    };
 		    
 		    //find the selected item form the search result and expand it
 		    $.each($("#searchTermsSelect li"), function (i, item) {
@@ -542,12 +550,7 @@ const Term={
 		 */
 		getTermRenderData:function(termData){
 			var me=this,
-				htmlCollection=[],
-				userHasTermProposalRights=true;//TODO: get me from backend
-			
-			if(!userHasTermProposalRights){// || !attributeData.proposable){
-				return termData.term;
-			}
+				htmlCollection=[];
 			
 			//the proposal is not set, init the component editor
 			if(!termData.proposal){
@@ -573,12 +576,13 @@ const Term={
                 newTermData = {},
                 languageId = null,
                 termName = null;
+            
             if(eventDelegateTarget === 'error-no-results') {
-                languageId = $('#language').val();
                 termName = $('#search').val();
+	            languageId = $('#language').val();
             }
             if (termName === null){
-                termName = "..."; // add some default content, otherwise the input-field might be empty and not clickable after the user has clicked anywhere else
+                termName = " "; // add some default content, otherwise the input-field might be empty and not clickable after the user has clicked anywhere else
             }
             // TODO: what data to use?
             newTermData = {0: {
@@ -717,15 +721,6 @@ const Term={
         },
         
         /***
-         * On delete term-entry-attribute icon click handler
-         */
-        onDeleteTermEntryAttributeClick: function(eventData){
-            var me = eventData.data.scope;
-            console.log('onDeleteTermEntryAttributeClick');
-            // TODO
-        },
-        
-        /***
          * On edit term-entry-attribute icon click handler
          */
         onEditTermEntryAttributeClick: function(eventData){
@@ -781,9 +776,10 @@ const Term={
             var me = eventData.data.scope,
                 element=$(this),
                 parent=element.parent(),
-                search=parent.find("span[data-editable]");
+                search=parent.find("span[data-editable]"),
+                $termAttributeHolder=me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
             console.log('onEditTermClick');
-            ComponentEditor.addComponentEditor(search);
+            ComponentEditor.addTermComponentEditor(search,$termAttributeHolder);
         },
 
         /***
