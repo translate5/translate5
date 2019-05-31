@@ -137,7 +137,10 @@ if(isset($this->error)){
     
     <div class="wrap" id="finalResultContent" style="display: none;">
     	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
-            <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><p><?php echo $this->translations["noResults"];?></p><span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></div>
+            <div class="ui-corner-all" id="error-no-results" style="display:none;">
+                <p class="ui-state-error"><?php echo $this->translations["noResults"];?></p>
+                <p class="skeleton"></p>
+            </div>
             <ul id="searchTermsSelect" size="10" style="display: inline-block;"></ul>
     	</div>
     	<div id="resultTermsHolder" class="result-holder">
