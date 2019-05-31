@@ -153,8 +153,9 @@ const Term={
 		fillSearchTermSelect:function(searchString){
 			var me=this;
 			if(!me.searchTermsResponse){
-                
-			    me.$_searchErrorNoResults.children('.proposal-btn').prop('title', searchString + ': ' + translations['addTermEntry']);
+
+                me.$_searchErrorNoResults.find('.skeleton').html(searchString + '<span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span>');
+			    me.$_searchErrorNoResults.find('.proposal-btn').prop('title', searchString + ': ' + translations['addTermEntry']);
 			    me.$_searchErrorNoResults.show();
 				
 				console.log("fillSearchTermSelect: nichts gefunden");
@@ -301,11 +302,6 @@ const Term={
 		 * @returns
 		 */
 		drawTermGroups:function(termsData, termGroupid){
-			
-		    if(!termsData || termsData.length<1){
-		        return;
-		    }
-
             var me = this,
                 html = '',
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
@@ -531,8 +527,8 @@ const Term={
                     $_selectorDelete = $_this.filter('.is-proposal');
                     $_selectorEdit = $_this.filter('.is-finalized');
                     $_this.children('.proposal-btn').remove();
-                    $titleDelete = "Delete Proposal"; // TODO
-                    $titleEdit = "Propose changes"; // TODO
+                    $titleDelete = "Delete Proposal"; // TODO: use translations
+                    $titleEdit = "Propose changes"; // TODO: use translations
                     break;
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
@@ -613,7 +609,7 @@ const Term={
             if (me.$_searchErrorNoResults.is(":visible")) {
                 termName = $('#search').val();
 	            languageId = $('#language').val();
-	            console.log('renderNewTermData for searched item: ' + renderNewTermData);
+	            console.log('renderNewTermData for searched item: ' + termName);
             }
             
             // TODO: what data to use?
@@ -695,15 +691,13 @@ const Term={
          */
         drawTermEntryProposal: function(collectionId) {
             var me = this,
-                newTermEntryAttributes = Attribute.renderNewTermEntryAttributes(),
                 newTermAttributes = Attribute.renderNewTermAttributes(),
                 newTermData = me.renderNewTermData(newTermAttributes,collectionId);
             console.log('drawTermEntryProposal (collectionId: ' + collectionId + ')');
             me.emptyResultTermsHolder(true);
             me.$_resultTermsHolderHeader.show();
-            TermEntry.drawTermEntryAttributes(newTermAttributes,collectionId);
-            me.drawTermGroups(newTermData);
-            me.$_termTable.find('.proposal-edit')[0].click();
+            me.drawTermGroups();
+            me.$_termTable.find('.proposal-add')[0].click();
         },
         
         /**
