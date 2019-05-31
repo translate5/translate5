@@ -70,6 +70,7 @@ const ComponentEditor={
 	 */
 	addTermComponentEditor:function($element,$termAttributeHolder){
 		var me=this,
+            $elParent = $element.parent(), // $element will be not available after replaceWith, get parent NOW.
 			$input= $('<textarea />').val($element.text()),
 			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		
@@ -101,7 +102,7 @@ const ComponentEditor={
 		$element.replaceWith($input);
 	  
 		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
+			me.saveComponentChange($element,$elParent,$input);
 		}).focus();
 	},
 	
@@ -110,11 +111,12 @@ const ComponentEditor={
 	 */
 	addAttributeComponentEditor:function($element){
 		var me=this,
+		    $elParent = $element.parent(), // $element will be not available after replaceWith, get parent NOW.
 			$input= $('<textarea />').val($element.text());
 		
 		$element.replaceWith($input);
 		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
+			me.saveComponentChange($element,$elParent,$input);
 		}).focus();
 	},
 	
@@ -132,7 +134,7 @@ const ComponentEditor={
 	    });
 	},
 	
-	saveComponentChange:function($el,$input){
+	saveComponentChange:function($el,$elParent,$input){
 		//is the modefied text empty or the same as the initial one
 		if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
 			
@@ -176,7 +178,7 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-	        	me.updateComponent($el,$input,result.rows);
+	        	me.updateComponent($el,$elParent,$input,result.rows);
 	        }
 	    });
 	},
@@ -228,7 +230,7 @@ const ComponentEditor={
 	/***
 	 * Update component html with the proposed result. The editor component also will be destroyed. 
 	 */
-	updateComponent:function($el,$input,result){
+	updateComponent:function($el,$elParent,$input,result){
 		var renderData='';
 		if($el.data('type')=='term'){
 			renderData=Term.getTermRenderData(result);
@@ -236,6 +238,8 @@ const ComponentEditor={
 			renderData=Attribute.getAttributeRenderData(result,result.value);
 		}
 		$input.replaceWith(renderData);
+		$elParent.switchClass('is-finalized','is-proposal');
+        Term.drawProposalButtons($elParent);
 		//on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
 	},

@@ -484,6 +484,16 @@ const Term={
                     $titleDelete = translations['deleteTermAttribute'];
                     $titleEdit = translations['editTermAttribute'];
                   break;
+                default:
+                    // e.g. after updateComponent(): show ProposalButtons according to the new state
+                    $_this = elements;
+                    $_selectorAdd = false;
+                    $_selectorDelete = $_this.filter('.is-proposal');
+                    $_selectorEdit = $_this.filter('.is-finalized');
+                    $_this.children('.proposal-btn').remove();
+                    $titleDelete = "Delete Proposal"; // TODO
+                    $titleEdit = "Propose changes"; // TODO
+                  break;
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
@@ -721,7 +731,9 @@ const Term={
 		        		
 		        	ins.replaceWith(renderData);
 		        	$parent.find('del').empty();
-		        	
+
+		        	$parent.switchClass('is-proposal','is-finalized');
+		        	me.drawProposalButtons($parent);
 		        }
 		    });
 		},

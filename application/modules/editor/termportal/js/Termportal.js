@@ -235,6 +235,8 @@ function checkFilterDependencies() {
         selectedClients.push(el.value);
     });
     if(selectedClients.length === 0) {
+        $('#collection option:disabled').attr('disabled', false);
+        $('#collection').selectmenu("refresh");
         return;
     }
     $('#collection option' ).each(function( index, el ) {

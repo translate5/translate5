@@ -127,6 +127,9 @@ END LICENSE AND COPYRIGHT
     margin-right: 0px;
     height: 25px;
 }
+.search-filter-select .ui-state-disabled {
+   display: none;
+}
 
 @media (max-width: 600px) {
     #search,
