@@ -75,7 +75,7 @@ if(isset($this->error)){
                     $collectionsNames = [];
                     if (count($collections) > 1) {
                         asort($collections);
-                        echo '<select class="searchFilter" name="collection" id="collection"><option value="none">'.$this->translations["collection"].':</option>';
+                        echo '<select class="search-filter" name="collection" id="collection"><option value="none">'.$this->translations["collection"].':</option>';
                         foreach ($collections as $key => $value){
                             echo '<option value="'.$key.'">'.$value->name.'</option>';
                             $collectionsClients[$key] = $value->clients;
@@ -89,7 +89,7 @@ if(isset($this->error)){
                 $clientsNames = [];
                     if (count($clients) > 1) {
                         asort($clients);
-                        echo '<select class="searchFilter" name="client" id="client"><option value="none">'.$this->translations["client"].':</option>';
+                        echo '<select class="search-filter" name="client" id="client"><option value="none">'.$this->translations["client"].':</option>';
                         foreach ($clients as $key => $value){
                             echo '<option value="'.$key.'">'.$value.'</option>';
                             $clientsNames[$key] = $value;
@@ -100,7 +100,7 @@ if(isset($this->error)){
                 <?php 
                     $allProcessstatus = $this->allProcessstatus;
                     asort($allProcessstatus);
-                    echo '<select class="searchFilter" name="processStatus" id="processStatus"><option value="none">'.$this->translations["processstatus"].':</option>';
+                    echo '<select class="search-filter" name="processStatus" id="processStatus"><option value="none">'.$this->translations["processstatus"].':</option>';
                     foreach ($allProcessstatus as $key => $value){
                         echo '<option value="'.$key.'">'.$value.'</option>';
                     }
@@ -241,9 +241,12 @@ $( function() {
             return beforeFilterTagRemoved(ui.tagLabel);
         }
 	});
-    $('.searchFilter').selectmenu({
+    $('.search-filter').selectmenu({
         change: function() {
             addSearchFilter($(this).attr('id'),$(this).find(':selected').text(),$(this).val());
+        },
+        classes: {
+            "ui-selectmenu-menu": "search-filter-select"
         }
     });
     $(document).on("mousedown",function(){

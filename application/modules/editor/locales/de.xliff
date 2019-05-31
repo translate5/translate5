@@ -1482,8 +1482,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='><source>Unbekannter Term Status</source><target>Unbekannter Term Status</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
 <trans-unit id='VGVybS1FaW50csOkZ2U='><source>Term-Einträge</source><target>Term-Einträge</target></trans-unit>
-<trans-unit id='QmVuZW5udW5nIGRlcyBFaW50cmFncw=='><source>Benennung des Eintrags</source><target>Benennung des Eintrags</target></trans-unit>
-<trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='><source>Eigenschaften des Eintrags</source><target>Eigenschaften des Eintrags</target></trans-unit>
+<trans-unit id='RWludHJhZ3NiZW5lbm51bmdlbg=='><source>Eintragsbenennungen</source><target>Eintragsbenennungen</target></trans-unit>
+<trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'><source>Eintragseigenschaften</source><target>Eintragseigenschaften</target></trans-unit>
 <trans-unit id='UHJvemVzc3N0YXR1cw=='><source>Prozessstatus</source><target>Prozessstatus</target></trans-unit>
 <trans-unit id='dW5wcm9jZXNzZWQ='><source>unprocessed</source><target>vorgeschlagen</target></trans-unit>
 <trans-unit id='cHJvdmlzaW9uYWxseVByb2Nlc3NlZA=='><source>provisionallyProcessed</source><target>überprüft</target></trans-unit>

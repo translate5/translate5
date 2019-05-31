@@ -2443,14 +2443,14 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>TermEntry</target>
 </trans-unit>
 
-<trans-unit id='QmVuZW5udW5nIGRlcyBFaW50cmFncw=='>
-	<source>Benennung des Eintrags</source>
-	<target>Entry name</target>
+<trans-unit id='RWludHJhZ3NiZW5lbm51bmdlbg=='>
+	<source>Eintragsbenennungen</source>
+	<target>Term entry designations</target>
 </trans-unit>
 
-<trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='>
-	<source>Eigenschaften des Eintrags</source>
-	<target>Entry attributes</target>
+<trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'>
+	<source>Eintragseigenschaften</source>
+	<target>Term entry attributes</target>
 </trans-unit>
 <trans-unit id='UHJvemVzc3N0YXR1cw=='>
     <source>Prozessstatus</source>
