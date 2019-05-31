@@ -216,42 +216,47 @@ h4, p {
 
 /* --------------- proposals --------------- */
 
-#resultTermsHolder ul .proposal-btn.ui-icon {           /* add Term-Entry */
+#resultTermsHolder ul .proposal-btn.ui-icon {                       /* Term-Entry: add */
     float: right;
     font-size: 30px;
     color: #007fff;
 }
-#searchTermsHolder #error-no-results .proposal-btn.proposal-add { /* add TermEntry after no result */
+#searchTermsHolder #error-no-results .proposal-btn.proposal-add {   /* TermEntry: add after no result */
     color: #454545;
     font-size: 40px;
     margin: -5px -10px;
 }
-#termTable > .proposal-btn.proposal-add {               /* add Term */
-    float: left;
-    color: #007fff;
-    font-size: 60px;
-    margin-top: 4px;
-    margin-left: 0px;
-}
-#termTable > div .proposal-btn.proposal-add,            /* add TermEntry-Attribute */
-#termAttributeTable > .proposal-btn.proposal-add {      /* add Term-Attribute */
+#termTable > div .proposal-btn.proposal-add,                        /* TermEntry-Attribute: add */
+#termAttributeTable > .proposal-btn.proposal-add {                  /* Term-Attribute: add */
     float: left;
     color: #454545;
     font-size: 40px;
     margin-left: 0px;
 }
 
-#resultTermsHolder .proposal-btn.ui-icon.proposal-delete,
-#resultTermsHolder .proposal-btn.ui-icon.proposal-edit {              /* delete and edit (in general) */
+.term-data .proposal-btn.ui-icon {                                  /* Term: add, delete, edit */
     float: right;
     margin-left: 5px;
+}
+.term-data .proposal-btn.proposal-add {                             /* Term: add  */
+    font-size: 23px;
+    margin-right: -3px;
+    margin-top: -3px;
+}
+.term-data .proposal-btn.proposal-delete,
+.term-data .proposal-btn.proposal-edit {                            /* Term: delete, edit  */
     font-size: 16px;
 }
-.term-data.ui-accordion-header-collapsed .proposal-btn.ui-icon {    /* delete and edit Term (inactive) */
+.term-data.ui-accordion-header-collapsed .proposal-btn.ui-icon {    /* Term (inactive)  */
     color: #007fff;
 }
-.term-data.ui-accordion-header-active .proposal-btn.ui-icon {       /* delete and edit Term (active) */
+.term-data.ui-accordion-header-active .proposal-btn.ui-icon {       /* Term (active) */
     color: #fffff;
+}
+
+.term-data.is-new.ui-accordion-header-collapsed {
+    border: 2px dotted #c5c5c5;
+    color: #c5c5c5;
 }
 
 .ui-tooltip-content {
