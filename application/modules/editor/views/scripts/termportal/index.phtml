@@ -136,20 +136,14 @@ if(isset($this->error)){
     </div>
     
     <div class="wrap" id="finalResultContent" style="display: none;">
-    	<div id="resultTermEntriesHolder" class="result-holder">
-          <ul id="searchTermsHolderHeader">
-            <li><a href="#searchTermsHolder"><?php echo $this->translations["termEntries"];?></a></li>
-          </ul>
-          <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><p><?php echo $this->translations["noResults"];?></p><span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></div>
-          <div id="searchTermsHolder"> 
-        	<ul id="searchTermsSelect" size="10" style="display: inline-block;">
-        	</ul>
-          </div>
+    	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
+            <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><p><?php echo $this->translations["noResults"];?></p><span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></div>
+            <ul id="searchTermsSelect" size="10" style="display: inline-block;"></ul>
     	</div>
     	<div id="resultTermsHolder" class="result-holder">
           <ul id="resultTermsHolderHeader">
-            <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termTableTitle"];?></a></li>
-            <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTableTitle"];?></a></li>
+            <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termEntryNameTitle"];?></a></li>
+            <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTitle"];?></a></li>
           </ul>
           <div id="resultTermsHolder-1">
                 <div class="tabble-inner-style" id="termTable">
@@ -181,13 +175,13 @@ var translations=<?php echo json_encode($this->translations); ?>;
 var searchFilterPlaceholderText=translations['searchFilterPlaceholderText']+'...';
 
 function setSizesInFinalResultContent(){
-    var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #resultTermEntriesHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
+    var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
     if ($('#searchTermsHolder').is(':visible')) {
         // (1) Left column: ensure that the scrollable area has always the maximal possible height that is available in the current browser window.
         $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
         // (2) Right column: must not wrap underneath the left column until BOTH of them are wrapped to rows (is out of sight otherwise!)
         if ($('#resultTermsHolder').is(':visible')) {
-            var widthTerms = $('#resultTermEntriesHolder').width(),
+            var widthTerms = $('#searchTermsHolder').width(),
                 widthResults = $('#resultTermsHolder').width();
             if ( (widthResults - widthTerms > SCROLLBAROFFSET) &&       // = check if they have the same size (= wrapped as rows and both displayed in full width already)
                  (widthResults + widthTerms > window.innerWidth) ) {    // = together they are broader than the window and the results would be wrapped

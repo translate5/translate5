@@ -2443,9 +2443,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>TermEntry</target>
 </trans-unit>
 
-<trans-unit id='VGVybWU='>
-	<source>Terme</source>
-	<target>Terms</target>
+<trans-unit id='QmVuZW5udW5nIGRlcyBFaW50cmFncw=='>
+	<source>Benennung des Eintrags</source>
+	<target>Entry name</target>
 </trans-unit>
 
 <trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='>
