@@ -139,11 +139,6 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- results --------------- */
 
-#error-no-results {
-	margin-top: 20px;
-    padding: 7px;
-}
-
 @media (max-width: 400px) {
     .container-content .ui-button {
         display: block;
@@ -160,7 +155,7 @@ END LICENSE AND COPYRIGHT
     flex-flow: row wrap;
 }
 
-#resultTermEntriesHolder {
+#searchTermsHolder {
     flex: 0 0 20em;
     order: 1;
     margin-right: 5px;
@@ -168,16 +163,9 @@ END LICENSE AND COPYRIGHT
     overflow-x: auto;
 }
 @media (max-width: 1100px) {
-    #resultTermEntriesHolder {
+    #searchTermsHolder {
         flex: 0 0 17em;
     }
-}
-
-#resultTermEntriesHolder > #searchTermsHolder {
-    width: 100%
-}
-#searchTermsHolder {
-    padding: 1em 0em 0em;
 }
 
 #searchTermsSelect,
@@ -189,7 +177,7 @@ END LICENSE AND COPYRIGHT
 @media (max-width: 810px) {
     /* - example: 640 px for 700px in real; don't know why! */
     /* - already 870px (not 700px) can easily use row for flex */
-    #resultTermEntriesHolder {
+    #searchTermsHolder {
         flex-grow: 1;
         flex-basis: 90%;
         max-height: 200px;
@@ -225,13 +213,12 @@ h4, p {
 
 /* --------------- proposals --------------- */
 
-#resultTermEntriesHolder #searchTermsHolderHeader .proposal-btn.proposal-add {   /* add TermEntry */
+#resultTermsHolder ul .proposal-btn.ui-icon {           /* add Term-Entry */
     float: right;
+    font-size: 30px;
     color: #007fff;
-    font-size: 25px;
-    margin-top: 4px;
 }
-#resultTermEntriesHolder #error-no-results .proposal-btn.proposal-add {
+#searchTermsHolder #error-no-results .proposal-btn.proposal-add { /* add TermEntry after no result */
     color: #454545;
     font-size: 40px;
     margin: -5px -10px;
@@ -251,17 +238,10 @@ h4, p {
     margin-left: 0px;
 }
 
-html .proposal-btn.ui-icon.proposal-delete,
-html .proposal-btn.ui-icon.proposal-edit {              /* delete and edit (in general) */
+#resultTermsHolder .proposal-btn.ui-icon.proposal-delete,
+#resultTermsHolder .proposal-btn.ui-icon.proposal-edit {              /* delete and edit (in general) */
     float: right;
     margin-left: 5px;
-}
-#resultTermsHolder ul .proposal-btn.ui-icon {           /* delete and edit Term-Entry */
-    margin-top: 5px;
-    font-size: 20px;
-    color: #007fff;
-}
-.term-data .proposal-btn.ui-icon {                      /* delete and edit Term */
     font-size: 16px;
 }
 .term-data.ui-accordion-header-collapsed .proposal-btn.ui-icon {    /* delete and edit Term (inactive) */

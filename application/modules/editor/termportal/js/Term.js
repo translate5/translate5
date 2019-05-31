@@ -1,6 +1,5 @@
 const Term={
 
-        $_searchTermsHolderHeader:null,
         $_searchErrorNoResults:null,
         $_searchTermsSelect:null,
         
@@ -31,7 +30,6 @@ const Term={
 		},
 		
 		cacheDom:function(){
-            this.$_searchTermsHolderHeader = $('#searchTermsHolderHeader');
             this.$_searchErrorNoResults = $('#error-no-results');
 			this.$_searchTermsSelect=$('#searchTermsSelect');
             
@@ -42,7 +40,6 @@ const Term={
             this.$_termCollectionSelect = $('#termCollectionSelect');
             
             // TODO: these are the same as above => choose ONE and use those throughout
-            this.$_TermEntriesList_Header =this.$_searchTermsHolderHeader
             this.$_TermEntryHeader = this.$_resultTermsHolderHeader
             this.$_TermEntryAttributesHolder = this.$_termEntryAttributesTable;
             this.$_TermsHolder = this.$_termTable;
@@ -55,19 +52,17 @@ const Term={
 		    });
 			
             // TermEntries
-            me.$_TermEntriesList_Header.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
+			me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
             me.$_searchErrorNoResults.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
-            me.$_TermEntryHeader.on('click', ".proposal-delete",{scope:me},me.onDeleteTermEntryClick);
-            me.$_TermEntryHeader.on('click', ".proposal-edit",{scope:me},me.onEditTermEntryClick);
             me.$_TermEntryAttributesHolder.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
-            me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermEntryAttributeClick);
+            me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditAttributeClick);
             
             // Terms
             me.$_TermsHolder.on('click', "> .proposal-add",{scope:me},me.onAddTermClick);
             me.$_termTable.on('click', ".term-data .proposal-delete",{scope:me},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data .proposal-edit",{scope:me},me.onEditTermClick);
             me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
-            me.$_termTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditTermAttributeClick);
+            me.$_termTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditAttributeClick);
 		},
 		
 		/***
@@ -171,7 +166,6 @@ const Term={
 				}
 				
 				$("#finalResultContent").show();
-                me.drawProposalButtons('term-entries');
 				me.$_resultTermsHolder.hide();
 				return;
 			}
@@ -195,8 +189,6 @@ const Term={
 				if(me.searchTermsResponse.length>0){
 					showFinalResultContent();
 				}
-				
-                me.drawProposalButtons('term-entries');
 				
 			}
 			
@@ -461,21 +453,13 @@ const Term={
             htmlProposalDeleteIcon = '<span class="proposal-btn proposal-delete ui-icon ui-icon-trash-b"></span>';
             htmlProposalEditIcon = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>';
             switch(elements) {
-                case "term-entries":
-                    $_selectorAdd = me.$_TermEntriesList_Header;
+                case "term-entry":
+                    $_selectorAdd = me.$_resultTermsHolderHeader;
                     $_selectorDelete = false;
                     $_selectorEdit = false;
                     $titleAdd = translations['addTermEntry'];
                     htmlProposalAddIcon = '<span class="proposal-btn proposal-add ui-icon ui-icon-plus"></span>';
                   break;
-                case "term-entry":
-                    $_selectorAdd = false;
-                    // TODO: show either the edit OR the delete-button!  (= check if TermEntry is a proposal and append proposal-buttons accordingly)
-                    $_selectorDelete = $('#resultTermsHolderHeader');
-                    $_selectorEdit =$('#resultTermsHolderHeader');
-                    $titleDelete = translations['deleteTermEntry'];
-                    $titleEdit = translations['editTermEntry'];
-                    break;
                 case "term-entry-attributes":
                     $_selectorAdd = false; // me.$_TermEntryAttributesHolder;
                     $_selectorDelete = $('#termAttributeTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
@@ -692,24 +676,6 @@ const Term={
             }
             me.$_TermEntryAttributesHolder.empty();
         },
-        
-        /***
-         * On delete term-entry icon click handler
-         */
-        onDeleteTermEntryClick: function(eventData){
-            var me = eventData.data.scope;
-            console.log('onDeleteTermEntryClick');
-            // TODO
-        },
-        
-        /***
-         * On edit term-entry icon click handler
-         */
-        onEditTermEntryClick: function(eventData){
-            var me = eventData.data.scope;
-            console.log('onEditTermEntryClick');
-            // TODO
-        },
 
         /***
          * On add term-entry-attribute icon click handler
@@ -717,15 +683,6 @@ const Term={
         onAddTermEntryAttributeClick: function(eventData){
             var me = eventData.data.scope;
             console.log('onAddTermEntryAttributeClick');
-            // TODO
-        },
-        
-        /***
-         * On edit term-entry-attribute icon click handler
-         */
-        onEditTermEntryAttributeClick: function(eventData){
-            var me = eventData.data.scope;
-            console.log('onEditTermEntryAttributeClick');
             // TODO
         },
         
@@ -792,14 +749,15 @@ const Term={
         },
         
         /***
+         * On edit term-entry-attribute icon click handler
          * On edit term-attribute icon click handler
          */
-        onEditTermAttributeClick: function(eventData){
+        onEditAttributeClick: function(eventData){
             var me = eventData.data.scope,
                 element=$(this),
                 parent=element.parent(),
                 search=parent.next().find("span[data-editable]");
-            console.log('onEditTermAttributeClick');
+            console.log('onEditAttributeClick');
             search.click();
         },
 };
