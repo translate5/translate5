@@ -3342,6 +3342,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Diese Domain wird bereits verwendet.</source>
     <target>This domain is already in use.</target>
 </trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='>
+    <source>Vorschläge exportieren</source>
+    <target>Proposals export</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
