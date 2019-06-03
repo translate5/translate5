@@ -267,6 +267,11 @@ h4, p {
     display: none;
 }
 
+#languageSelectContainer {
+    color: #333;
+    padding:5px;
+}
+
 .ui-tooltip-content {
     font-size:10pt;
 }

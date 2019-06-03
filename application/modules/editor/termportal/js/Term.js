@@ -19,6 +19,11 @@ const Term={
 
 		disableLimit:false,
 		reloadTermEntry:false,//shoul the term entry be reloaded or fatched from the cache
+        
+		newTermAttributes: null,
+        newTermCollectionId: null,
+		newTermGroupId: null,
+        newTermLanguageId: null,
 		
 		KEY_TERM:"term",
 		KEY_TERM_ATTRIBUTES:"termAttributes",
@@ -257,6 +262,8 @@ const Term={
 		        return;
 		    }
 		    
+		    me.newTermGroupId = termGroupid;
+		    
 		    $.ajax({
 		        url: Editor.data.termportal.restPath+"termcollection/searchattribute",
 		        dataType: "json",
@@ -270,26 +277,37 @@ const Term={
 		            
 		            TermEntry.drawTermEntryAttributes(result.rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 
-		            me.drawTermGroups(result.rows[me.KEY_TERM_ATTRIBUTES], termGroupid);
+		            me.drawTermGroups(result.rows[me.KEY_TERM_ATTRIBUTES]);
 		            //reset term entry reload flag
 		            me.reloadTermEntry=false;
 		        }
 		    })
 		},
         
+        /**
+         * Draw (only) the form for proposing a Term.
+         * By this way we also create new Term-Entries (backend).
+         */
+        drawTermProposal: function() {
+            var me = this;
+            console.log('drawTermProposal...');
+            me.emptyResultTermsHolder(true);
+            me.$_resultTermsHolderHeader.show();
+            me.drawTermGroups();
+            me.$_termTable.find('.proposal-add')[0].click();
+        },
+        
         /***
          * Draw the skeleton for adding new terms.
          * @returns
          */
-        drawNewTermSkeleton:function(termGroupid){
+        drawNewTermSkeleton:function(){
             var me = this,
                 html = '',
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
                 $_filteredClients = $('#searchFilterTags input.filter.client'),
                 showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?,
-                newTermAttributes = Attribute.renderNewTermAttributes(),
-                collectionId = '123',
-                newTermData = me.renderNewTermData(newTermAttributes,collectionId,termGroupid);
+                newTermData = me.renderNewTermData();
             console.dir(newTermData[0]);
             html += me.renderTerm(newTermData[0],showInfosForSelection);
             if(html.length>0){
@@ -301,7 +319,7 @@ const Term={
 		 * Draw the term groups
 		 * @returns
 		 */
-		drawTermGroups:function(termsData, termGroupid){
+		drawTermGroups:function(termsData){
             var me = this,
                 html = '',
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
@@ -312,7 +330,7 @@ const Term={
             me.$_resultTermsHolder.show();
             me.$_resultTermsHolderHeader.show();
             
-            me.drawNewTermSkeleton(termGroupid);
+            me.drawNewTermSkeleton();
 		    
 		    $.each(termsData, function (i, term) {
 		        html += me.renderTerm(term,showInfosForSelection);
@@ -387,7 +405,7 @@ const Term={
             if (term.termId === null) {
                 isProposal = ' is-new';
                 statusIcon = '';
-                term.termId = 'new'
+                term.termId = 'new';
             }
             
             //draw term header
@@ -596,29 +614,27 @@ const Term={
         
         /**
          * Returns term data for creating a new term.
-         * @params {Array} newTermAttributes
-         * @params {Integer} collectionId
          */
-        renderNewTermData: function(newTermAttributes, collectionId, termGroupid) {
+        renderNewTermData: function() {
             console.log('renderNewTermData...');
             var me = this,
                 newTermData = {},
-                languageId = null,
+                attributes = me.newTermAttributes, // eg via Attribute.renderNewTermAttributes()
+                collectionId = me.newTermCollectionId,
+                groupId = me.newTermGroupId,
+                languageId = me.newTermLanguageId,
                 termName = "Add new term-proposal"; // TODO: use translation
-            
             if (me.$_searchErrorNoResults.is(":visible")) {
                 termName = $('#search').val();
 	            languageId = $('#language').val();
 	            console.log('renderNewTermData for searched item: ' + termName);
             }
-            
-            // TODO: what data to use?
             newTermData = {0: {
-                'attributes': newTermAttributes,
+                'attributes': attributes,
                 'collectionId': collectionId,
                 'definition': "",
                 'desc': "",
-                'groupId': termGroupid,
+                'groupId': groupId,
                 'label': "",
                 'languageId': languageId,
                 'proposal': null,
@@ -631,25 +647,76 @@ const Term={
         },
         
         /***
-         * On add term-entry icon click handler:
-         * Render "result" with empty (dummy) data and open it for editing.
+         * On add term-entry icon click handler
          */
         onAddTermEntryClick: function(eventData){
             var me = eventData.data.scope,
                 filteredCollections = me.getFilteredCollections();
             console.log('onAddTermEntryClick');
+            // "reset" data for new Term
+            me.newTermAttributes = null;
+            me.newTermCollectionId = null;
+            me.newTermGroupId = null;
+            me.newTermLanguageId = null;
             if (filteredCollections.length == 1) {
                 collectionId = filteredCollections[0];
-                me.drawTermEntryProposal(collectionId);
+                me.drawTermProposal();
                 return;
             }
-            console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
             me.drawFilteredTermCollectionSelect();
+        },
+        
+        /**
+         * Draw a select for choosing a Language for a new Term.
+         * When a Language is selected, the corresponding flag is added to the skeleton
+         * for the editable new term and it is shown again.
+         */
+        drawLanguageSelect: function() {
+            var me = this,
+                languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
+                languageSelectHeader,
+                languageSelect,
+                languageSelectOptions,
+                rfcLanguage,
+                $_termSkeleton = me.$_termTable.find('.is-new');
+            languageSelectHeader = '<p>Choose a language for the new TermEntry:</p>'; // TODO: use translation
+            $("#language option").each(function() {
+                if ($(this).val() != 'none') {
+                    languageSelectOptions += '<option value="'+$(this).val()+'">'+$(this).text()+'</option>'; // TODO: add flags
+                }
+            });
+            languageSelect = '<select name="chooseLanguage" id="chooseLanguage">'+languageSelectOptions+'</select>';
+            me.$_termTable.prepend(languageSelectContainer);
+            $('#languageSelectContainer').prepend(languageSelect).prepend(languageSelectHeader);
+            $_termSkeleton.next().hide();
+            $_termSkeleton.hide();
+            $('#chooseLanguage').selectmenu({
+                select: function() {
+                    me.newTermLanguageId = $(this).val();
+                    rfcLanguage = getLanguageFlag($( "#chooseLanguage option:selected" ).text());
+                    $('#languageSelectContainer').remove();
+                    $_termSkeleton.next().show();
+                    $_termSkeleton.show();
+                    me.drawLanguageFlagForNewTerm(rfcLanguage);
+                }
+            });
+        },
+        
+        /**
+         * 
+         */
+        drawLanguageFlagForNewTerm: function (rfcLanguage) {
+            var me = this,
+                rfcLanguage = getLanguageFlag(rfcLanguage),
+                $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache
+            $_termSkeleton.find('img').remove();
+            $_termSkeleton.children('span').first().after(rfcLanguage);
         },
         
         /**
          * Draw a select for choosing a TermCollection. The list only offers
          * collections that are currently filtered (or all, if none is filtered).
+         * When a collection is selected, the form for the editable new term is drawn.
          */
         drawFilteredTermCollectionSelect: function() {
             var me = this,
@@ -657,8 +724,13 @@ const Term={
                 filteredCollectionId,
                 collectionSelectHeader,
                 collectionSelect,
-                collectionSelectOptions = '',
-                collectionId;
+                collectionSelectOptions = '';
+            if (filteredCollections.length == 1) {
+                me.newTermCollectionId = filteredCollections[0];
+                me.drawTermProposal();
+                return;
+            }
+            console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
             me.emptyResultTermsHolder(false);
             me.$_resultTermsHolderHeader.hide();
             me.$_resultTermsHolder.show();
@@ -678,26 +750,10 @@ const Term={
             $('#termCollectionSelect').append(collectionSelectHeader).append(collectionSelect);
             $('#chooseCollection').selectmenu({
                 select: function() {
-                    collectionId = $(this).val();
-                    me.drawTermEntryProposal(collectionId);
+                    me.newTermCollectionId = $(this).val();
+                    me.drawTermProposal();
                 }
-              });
-            
-        },
-        
-        /**
-         * Draw the form for proposing a TermEntry.
-         * @params {Integer} collectionId
-         */
-        drawTermEntryProposal: function(collectionId) {
-            var me = this,
-                newTermAttributes = Attribute.renderNewTermAttributes(),
-                newTermData = me.renderNewTermData(newTermAttributes,collectionId);
-            console.log('drawTermEntryProposal (collectionId: ' + collectionId + ')');
-            me.emptyResultTermsHolder(true);
-            me.$_resultTermsHolderHeader.show();
-            me.drawTermGroups();
-            me.$_termTable.find('.proposal-add')[0].click();
+            });
         },
         
         /**
@@ -768,6 +824,13 @@ const Term={
                 search=parent.find("span[data-editable]"),
                 $termAttributeHolder=me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
             console.log('onEditTermClick');
+            if ($(eventData.target).hasClass('proposal-add')) {
+                if (me.$_searchErrorNoResults.is(":visible")) {
+                    me.drawLanguageFlagForNewTerm($( "#language option:selected" ).text());
+                } else {
+                    me.drawLanguageSelect();
+                }
+            }
             ComponentEditor.addTermComponentEditor(search,$termAttributeHolder);
         },
 
