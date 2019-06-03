@@ -40,7 +40,8 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
     id: 'Default',
 
     addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
-
+    exportTooltip:'#UT#Exportieren',
+    
     /**
      * returns the row css class for the associated service in the tm overview panel
      * @param {Editor.model.LanguageResources.LanguageResource} rec
@@ -61,6 +62,13 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      */
     getAddTooltip:function(){
         return this.addTooltip;
+    },
+    
+    /***
+     * Export button default tooltip
+     */
+    getExportTooltip:function(){
+    	return this.exportTooltip;
     }
 
 

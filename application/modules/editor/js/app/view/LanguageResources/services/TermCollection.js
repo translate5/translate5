@@ -42,7 +42,8 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     id: 'TermCollection',
 
     addTooltip: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
-
+    exportTooltip:'#UT#Vorschläge exportieren',
+    
     /**
      * returns the row css class for the associated service in the tm overview panel
      * @param {Editor.model.LanguageResources.LanguageResource} rec
@@ -60,5 +61,9 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
      */
     getAddTooltip:function(){
         return this.addTooltip;
+    },
+    
+    getExportTooltip:function(){
+    	return this.exportTooltip;
     }
 });

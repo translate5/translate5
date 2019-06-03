@@ -170,6 +170,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         isDisabled: function( view, rowIndex, colIndex, item, record ) {
                             return record.get('status') == 'novalidlicense' ? true : false;
                         }
+                    },{
+                        action: 'import',
+                        getClass:function(v,meta,record) {
+                        	if(record.get('serviceName') != 'TermCollection'){
+                        		return '';
+                        	}
+                        	meta.tdAttr = 'data-qtip="'+Editor.util.LanguageResources.getService(record.get('serviceName')).getExportTooltip()+'"';
+                        	return 'ico-tm-export';
+                        }
                     }],
                 },{
                     xtype: 'gridcolumn',
