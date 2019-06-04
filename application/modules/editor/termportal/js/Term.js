@@ -8,11 +8,6 @@ const Term={
 		$_termTable:null,
         $_termEntryAttributesTable:null,
         $_termCollectionSelect:null,
-		
-		// for proposal-buttons: // TODO: these are the same as above => choose ONE and use those throughout
-		$_TermEntriesList_Header: null,
-		$_TermEntryHeader: null,
-		$_TermEntryAttributesHolder: null,
         
 		searchTermsResponse:[],
 		termGroupsCache:[],
@@ -42,10 +37,6 @@ const Term={
             this.$_termTable=$('#termTable');
             this.$_termEntryAttributesTable = $('#termAttributeTable');
             this.$_termCollectionSelect = $('#termcollectionSelectContainer');
-            
-            // TODO: these are the same as above => choose ONE and use those throughout
-            this.$_TermEntryHeader = this.$_resultTermsHolderHeader
-            this.$_TermEntryAttributesHolder = this.$_termEntryAttributesTable;
 		},
 		
 		initEvents:function(){
@@ -57,8 +48,8 @@ const Term={
             // TermEntries
 			me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
             me.$_searchErrorNoResults.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
-            me.$_TermEntryAttributesHolder.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
-            me.$_TermEntryAttributesHolder.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditAttributeClick);
+            me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
+            me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditAttributeClick);
             
             // Terms
             me.$_termTable.on('click', ".term-data .proposal-add",{scope:me},me.onEditTermClick); // = the same procedure as editing
@@ -261,6 +252,8 @@ const Term={
 		    console.log("findTermsAndAttributes() for: " + termGroupid);
 		    Attribute.languageDefinitionContent=[];
             
+            me.$_termCollectionSelect.hide();
+            
             // data for proposing a new Term
             me.newTermGroupId = termGroupid;
             
@@ -299,7 +292,6 @@ const Term={
             var me = this;
             console.log('drawTermProposal...');
             me.emptyResultTermsHolder(true);
-            me.$_resultTermsHolderHeader.show();
             me.drawTermGroups();
             me.$_termTable.find('.proposal-add')[0].click();
         },
@@ -335,7 +327,6 @@ const Term={
 		    
             me.emptyResultTermsHolder(true);
             me.$_resultTermsHolder.show();
-            me.$_resultTermsHolderHeader.show();
             
             me.drawNewTermSkeleton();
 		    
@@ -522,7 +513,7 @@ const Term={
                     $titleAdd = translations['addTermEntry'];
                     break;
                 case "term-entry-attributes":
-                    $_selectorAdd = false; // me.$_TermEntryAttributesHolder;
+                    $_selectorAdd = false; // me.$_termEntryAttributesTable;
                     $_selectorDelete = $('#termAttributeTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
                     $_selectorEdit = $('#termAttributeTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
                     $titleAdd = translations['addTermEntryAttribute'];
@@ -741,7 +732,6 @@ const Term={
             }
             console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
             me.emptyResultTermsHolder(false);
-            me.$_resultTermsHolderHeader.show();
             me.$_resultTermsHolder.show();
             collectionSelectHeader = '<h3>Choose a collection for the new TermEntry:</h3>'; // TODO: use translation
             if (filteredCollections.length == 0) {
@@ -779,7 +769,7 @@ const Term={
             if(typeof keepAttributes !== "undefined" && keepAttributes === true) {
                 return;
             }
-            me.$_TermEntryAttributesHolder.empty();
+            me.$_termEntryAttributesTable.empty();
         },
 
         /***
