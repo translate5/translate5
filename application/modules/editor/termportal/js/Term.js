@@ -1,5 +1,6 @@
 const Term={
-
+        
+        $_searchTermsHelper:null,
         $_searchErrorNoResults:null,
         $_searchTermsSelect:null,
         
@@ -15,10 +16,11 @@ const Term={
 		disableLimit:false,
 		reloadTermEntry:false,//shoul the term entry be reloaded or fatched from the cache
         
-		newTermAttributes: null,
+		newTermAttributes: Attribute.renderNewTermAttributes(),
         newTermCollectionId: null,
 		newTermGroupId: null,
         newTermLanguageId: null,
+        newTermName: null,
 		
 		KEY_TERM:"term",
 		KEY_TERM_ATTRIBUTES:"termAttributes",
@@ -29,6 +31,7 @@ const Term={
 		},
 		
 		cacheDom:function(){
+            this.$_searchTermsHelper=$('#searchTermsHelper');
             this.$_searchErrorNoResults = $('#error-no-results');
 			this.$_searchTermsSelect=$('#searchTermsSelect');
             
@@ -47,7 +50,7 @@ const Term={
 			
             // TermEntries
 			me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
-            me.$_searchErrorNoResults.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
+            me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
             me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
             me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditAttributeClick);
             
@@ -72,11 +75,7 @@ const Term={
 				collectionIds = me.getFilteredCollections(),
                 processStats = me.getFilteredProcessStats();
 			
-			// "reset" data for proposing a new Term
-            me.newTermAttributes = Attribute.renderNewTermAttributes(); // currently just an empty Array
-            me.newTermCollectionId = null;  // will be selected by user
-            me.newTermGroupId = null;       // will be set from result's select-list
-            me.newTermLanguageId = null;    // will be selected by user
+			me.resetNewTermData();
             
 			if(!lng){
 				lng=$("input[name='language']:checked").val();
@@ -156,8 +155,8 @@ const Term={
 			var me=this;
 			if(!me.searchTermsResponse){
 
-                me.$_searchErrorNoResults.find('.skeleton').html(searchString + '<span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span>');
-			    me.$_searchErrorNoResults.find('.proposal-btn').prop('title', searchString + ': ' + translations['addTermEntry']);
+			    me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + translations['addTermEntry']);
+                me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + translations['addTermEntry']);
 			    me.$_searchErrorNoResults.show();
 				
 				console.log("fillSearchTermSelect: nichts gefunden");
@@ -166,7 +165,6 @@ const Term={
 					me.disableLimit=false;
 				}
 				
-				$("#finalResultContent").show();
 				me.$_resultTermsHolder.hide();
 				return;
 			}
@@ -255,6 +253,7 @@ const Term={
             me.$_termCollectionSelect.hide();
             
             // data for proposing a new Term
+            me.resetNewTermData();
             me.newTermGroupId = termGroupid;
             
 		    //check the cache
@@ -307,7 +306,6 @@ const Term={
                 $_filteredClients = $('#searchFilterTags input.filter.client'),
                 showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?,
                 newTermData = me.renderNewTermData();
-            console.dir(newTermData[0]);
             html += me.renderTerm(newTermData[0],showInfosForSelection);
             if(html.length>0){
                 me.$_termTable.append(html);
@@ -611,39 +609,47 @@ const Term={
 		},
         
         /**
+         * "reset" data for proposing a new Term
+         */
+        resetNewTermData: function() {
+            var me = this;
+            console.log("reset data for proposing a new Term");
+            // "default":
+            me.newTermAttributes = Attribute.renderNewTermAttributes(); // currently just an empty Array
+            me.newTermCollectionId = null;                              // will be selected by user (if not already filtered)
+            me.newTermGroupId = null;                                   // will be set from result's select-list
+            me.newTermLanguageId = null;                                // will be selected by user (or set according to search without result)
+            me.newTermName = "Add new term-proposal";                   // (or set according to search without result) // TODO: use translation 
+            // if a search has no result:
+            if (me.$_searchErrorNoResults.is(":visible")) {
+                me.newTermLanguageId = $('#language').val();
+                me.newTermName = $('#search').val();
+            }
+        },
+        
+        /**
          * Returns term data for creating a new term.
          */
         renderNewTermData: function() {
             console.log('renderNewTermData...');
             var me = this,
-                newTermData = {},
-                attributes,
-                collectionId,
-                groupId,
-                languageId,
-                termName;
-            // "default": blank term within TermEntry:
-            attributes = me.newTermAttributes;
-            collectionId = me.newTermCollectionId;
-            groupId = me.newTermGroupId;
-            languageId = me.newTermLanguageId;
-            termName = "Add new term-proposal"; // TODO: use translation
-            // if a search has no result:
-            if (me.$_searchErrorNoResults.is(":visible")) {
-	            languageId = $('#language').val();
-                termName = $('#search').val();
-                console.log('renderNewTermData for searched item: ' + termName);
-            }
+                newTermData = {};
+            console.log('renderNewTermData with: ');
+            console.log('- attributes: ' + JSON.stringify(me.newTermAttributes));
+            console.log('- collectionId: ' + me.newTermCollectionId);
+            console.log('- groupId: ' + me.newTermGroupId);
+            console.log('- languageId: ' + me.newTermLanguageId);
+            console.log('- termName: ' + me.newTermName);
             newTermData = {0: {
-                'attributes': attributes,
-                'collectionId': collectionId,
+                'attributes': me.newTermAttributes,
+                'collectionId': me.newTermCollectionId,
                 'definition': "",
                 'desc': "",
-                'groupId': groupId,
+                'groupId': me.newTermGroupId,
                 'label': "",
-                'languageId': languageId,
+                'languageId': me.newTermLanguageId,
                 'proposal': null,
-                'term': termName,
+                'term': me.newTermName,
                 'termId': null,
                 'termStatus': null,
                 'value': null
@@ -657,9 +663,10 @@ const Term={
         onAddTermEntryClick: function(eventData){
             var me = eventData.data.scope,
                 filteredCollections = me.getFilteredCollections();
-            console.log('onAddTermEntryClick');
+            me.resetNewTermData();
+            me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
             if (filteredCollections.length == 1) {
-                collectionId = filteredCollections[0];
+                me.newTermCollectionId = filteredCollections[0];
                 me.drawTermProposal();
                 return;
             }
@@ -827,7 +834,7 @@ const Term={
             if ($(eventData.target).hasClass('proposal-add')) {
                 if (me.$_searchErrorNoResults.is(":visible")) {
                     me.drawLanguageFlagForNewTerm($( "#language option:selected" ).text());
-                } else {
+                } else if (me.newTermLanguageId == null) {
                     me.drawLanguageSelect();
                 }
             }

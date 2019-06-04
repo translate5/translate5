@@ -136,7 +136,9 @@ $('#search').keyup(function (e) {
     Attribute.languageDefinitionContent=[];
     Term.termGroupsCache=[];
     
-    $('#finalResultContent').hide();
+    $('#error-no-results').hide();
+    $('#searchTermsHelper').find('.proposal-txt').text(translations['addTermEntry']);
+    $('#searchTermsHelper').find('.proposal-btn').prop('title', translations['addTermEntry']);
     $('#searchTermsSelect').empty();
     $('#termAttributeTable').empty();
     $('#termTable').empty();
@@ -148,7 +150,6 @@ $('#instantTranslateButton').on('touchstart click',function(){
 
 function startAutocomplete(){
     console.log("startAutocomplete...");
-    $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
     $('#termAttributeTable').empty();
     $('#termTable').empty();
@@ -156,7 +157,7 @@ function startAutocomplete(){
 }
 
 function showFinalResultContent() {
-    $('#finalResultContent').show();
+    $('#resultTermsHolder').show();
     setSizesInFinalResultContent();
 }
 

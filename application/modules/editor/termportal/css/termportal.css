@@ -171,6 +171,16 @@ END LICENSE AND COPYRIGHT
     }
 }
 
+#searchTermsHelper {
+    margin-left: 3px;
+    width: 100%;
+}
+#searchTermsHelper p {
+	padding-right: 9px;
+    margin: 2px 0px;
+    width: 100%;
+}
+
 #searchTermsSelect,
 #searchTermsSelect ul,
 #searchTermsSelect li  { width: 100%;}
@@ -221,7 +231,7 @@ h4, p {
     font-size: 30px;
     color: #007fff;
 }
-#searchTermsHolder #error-no-results .proposal-btn.proposal-add {   /* TermEntry: add after no result */
+#searchTermsHolder .proposal-btn.proposal-add {                     /* TermEntry: add after no result */
     float: right;
     color: #007fff;
     font-size: 40px;
@@ -260,6 +270,7 @@ h4, p {
 .term-data.is-new.ui-accordion-header-collapsed {                   /* Skeleton for new proposals */
     border: 2px dotted #c5c5c5;
     color: #c5c5c5;
+    width: 100%;
 }
 .term-data.is-new.ui-accordion-header-collapsed .proposal-add {
     display: block;
