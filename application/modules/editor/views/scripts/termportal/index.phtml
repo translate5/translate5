@@ -135,15 +135,15 @@ if(isset($this->error)){
             </div>
     </div>
     
-    <div class="wrap" id="finalResultContent" style="display: none;">
+    <div class="wrap" id="finalResultContent">
     	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
-            <div class="ui-corner-all" id="error-no-results" style="display:none;">
-                <p class="ui-state-error"><?php echo $this->translations["noResults"];?></p>
-                <p class="skeleton"></p>
+            <div id="searchTermsHelper" class="ui-corner-all">
+                <p id="error-no-results" class="ui-state-error" style="display:none;"><?php echo $this->translations["noResults"];?></p>
+                <p class="skeleton"><span class="proposal-txt"><?php echo $this->translations["addTermEntry"];?></span> <span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></p>
             </div>
             <ul id="searchTermsSelect" size="10" style="display: inline-block;"></ul>
     	</div>
-    	<div id="resultTermsHolder" class="result-holder">
+    	<div id="resultTermsHolder" class="result-holder" style="display: none;">
           <ul id="resultTermsHolderHeader">
             <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termEntryNameTitle"];?></a></li>
             <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTitle"];?></a></li>
