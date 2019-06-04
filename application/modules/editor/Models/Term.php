@@ -856,6 +856,33 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $result;
     }
     
+    /***
+     * Check if the term is proposable.
+     * It is proposable when the term status is not unproccessed and the user is allowed for term proposal operation
+     * @return boolean
+     */
+    /***
+     * 
+     * @param string $status
+     * @return boolean
+     */
+    public function isProposable(string $status=null){
+        if(empty($status)){
+            $status=$this->getStatus();
+        }
+        return $status!==self::PROCESS_STATUS_UNPROCESSED && $this->isProposableAllowed();
+    }
+    
+    /***
+     * It is proposable when the user is allowed for term proposal operation
+     * @return boolean
+     */
+    public function isProposableAllowed(){
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        return $user->isAllowed('editor_term','proposeOperation');
+    }
+    
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array

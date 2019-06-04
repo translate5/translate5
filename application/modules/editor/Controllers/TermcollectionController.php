@@ -119,7 +119,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 $termCount=null;
             }
             
-            $responseArray['term'] = $this->mergeProposalData($model->searchTermByLanguage($params['term'],$languages,$collectionIds,$termCount,$processStats));
+            $responseArray['term'] =$model->searchTermByLanguage($params['term'],$languages,$collectionIds,$termCount,$processStats);
             
         }
         
@@ -132,10 +132,20 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
      * @return array|null
      */
     protected function mergeProposalData($rows) {
-        $mergeProposal = function($item) {
+        
+        $termModel=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $termModel editor_Models_Term */
+        
+        if(!$termModel->isProposableAllowed()){
+            return $rows;
+        }
+        
+        
+        $mergeProposal = function($item) use ($termModel){
             
+            $termModel->init($item);
             //FIXME: compute proposable also via ACLs here! (with Phase 3)
-            $item['proposable'] = true;
+            $item['proposable'] =$termModel->isProposable();
             
             if(empty($item['id'])){
                 $item['proposal'] = null;
@@ -237,6 +247,14 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $groupOldKey=false;
         $termProposalData=[];
         
+        $termModel=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $termModel editor_Models_Term */
+        $isTermProposalAllowed=$termModel->isProposableAllowed();
+        
+        $attributeModel=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attributeModel editor_Models_Term_Attribute */
+        $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
+        
         foreach ($data as $tmp){
             $termKey=$tmp['termId'];
             
@@ -245,11 +263,22 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 $termKey=$tmp['termId'];
                 $map[$termKey]=[];
                 $map[$termKey]['attributes']=[];
+                
                 if(!empty($oldKey) && !empty($map[$oldKey])){
                     $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
                     $groupOldKey=true;
-                    $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
-                    $termProposalData=[];
+
+                    //collect the term proposal data if the user is allowed to
+                    if($isTermProposalAllowed){
+                        $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
+                        $map[$oldKey]['proposable']=!empty($termProposalData['term']) ? $termProposalData : null;
+                        
+                        //check if the term proposable flag is set, if calculate it
+                        if(!isset($map[$oldKey]['proposable'])){
+                            $map[$oldKey]['proposable']=$termModel->isProposable($termModel::PROCESS_STATUS_UNPROCESSED);
+                        }
+                        $termProposalData=[];
+                    }
                 }
             }
             
@@ -276,10 +305,11 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 $atr[$key]=$value;
             }
             
-//FIXME add ACL checking into the proposable calculation here (with Phase 3)
-            $atr['proposable'] = $attribute->isProposable($atr['name'], $atr['attrType']);
-            $atr['proposal']=!empty($attProposal['id']) ? $attProposal : null;
-            $attProposal=[];
+            if($isAttributeProposalAllowed){
+                $atr['proposable'] = $attribute->isProposable($atr['name'], $atr['attrType']);
+                $atr['proposal']=!empty($attProposal['id']) ? $attProposal : null;
+                $attProposal=[];
+            }
             
             array_push($map[$termKey]['attributes'],$atr);
             $oldKey = $tmp['termId'];
@@ -287,8 +317,15 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         }
         //if not grouped after foreach, group the last result
         if(!$groupOldKey){
-            $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
-            $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
+            //collect the term proposal data if the user is allowed to
+            if($isTermProposalAllowed){
+                $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
+                $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
+                //check if the term proposable flag is set, if calculate it
+                if(!isset($map[$oldKey]['proposable'])){
+                    $map[$oldKey]['proposable']=$termModel->isProposable($termModel::PROCESS_STATUS_UNPROCESSED);
+                }
+            }
         }
         
         if(empty($map)){

@@ -121,6 +121,16 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             || $name=='transac' && $type=='modification');
     }
     
+    /***
+     * It is proposable when the user is allowed for attribute proposal operation
+     * @return boolean
+     */
+    public function isProposableAllowed(){
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        return $user->isAllowed('editor_termattribute','proposeOperation');
+    }
+    
     /**
      * Loads an attribute for the given term
      */
