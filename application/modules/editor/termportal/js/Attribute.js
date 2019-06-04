@@ -221,6 +221,20 @@ const Attribute={
 		}
 		return '<span '+data+' data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
 	},
+	
+	/***
+	 * Return the jquery component of the term/termentry attribute header(h4)
+	 */
+	getTermAttributeHeader:function(attributeId,type){
+		var me=this;
+		if(type=='termEntryAttribute'){
+			return me.$_termEntryAttributesTable.find('h4[data-attribute-id="'+attributeId+'"]');
+		}
+		if(type=='termAttribute'){
+			return me.$_termTable.find('h4[data-attribute-id="'+attributeId+'"]');
+		}
+		return null;
+	},
     
     /**
      * Returns term entry attributes for creating a new term entry.

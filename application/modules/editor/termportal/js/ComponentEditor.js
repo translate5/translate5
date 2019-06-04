@@ -32,8 +32,16 @@ const ComponentEditor={
 	
 	initEvents:function(){
 		var me=this;
-		me.$_termTable.on('click', '[data-editable]',{scope:me},me.onEditableTermComponentClick);
-		me.$_termAttributeTable.on('click', '[data-editable]',{scope:me},me.onEditableAttributeComponentClick);
+		//term click
+		me.$_termTable.on('click', 'span[data-editable]',{scope:me},me.onEditableTermComponentClick);
+		
+		//term attribute click
+		me.$_termTable.on('click', '[data-editable][data-type="termAttribute"]',{scope:me},me.onEditableAttributeComponentClick);
+		
+		//term etntry attribute click
+		me.$_termAttributeTable.on('click', '[data-editable][data-type="termEntryAttribute"]',{scope:me},me.onEditableAttributeComponentClick);
+		
+		//term attribute comment click
 		me.$_termTable.on('click', 'span[data-editable-comment]',{scope:me},me.onEditableCommentComponentClick);
 	},
 	
@@ -70,7 +78,6 @@ const ComponentEditor={
 	 */
 	addTermComponentEditor:function($element,$termAttributeHolder){
 		var me=this,
-            $elParent = $element.parent(), // $element will be not available after replaceWith, get parent NOW.
 			$input= $('<textarea />').val($element.text()),
 			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		
@@ -102,21 +109,20 @@ const ComponentEditor={
 		$element.replaceWith($input);
 	  
 		$input.one('blur', function(){
-			me.saveComponentChange($element,$elParent,$input);
+			me.saveComponentChange($element,$input);
 		}).focus();
 	},
 	
 	/***
-	 * Register the component editor for given term or termentrie attribute
+	 * Register the component editor for given term or termentry attribute
 	 */
 	addAttributeComponentEditor:function($element){
 		var me=this,
-		    $elParent = $element.parent(), // $element will be not available after replaceWith, get parent NOW.
 			$input= $('<textarea />').val($element.text());
 		
 		$element.replaceWith($input);
 		$input.one('blur', function(){
-			me.saveComponentChange($element,$elParent,$input);
+			me.saveComponentChange($element,$input);
 		}).focus();
 	},
 	
@@ -134,7 +140,7 @@ const ComponentEditor={
 	    });
 	},
 	
-	saveComponentChange:function($el,$elParent,$input){
+	saveComponentChange:function($el,$input){
 		//is the modefied text empty or the same as the initial one
 		if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
 			
@@ -159,12 +165,12 @@ const ComponentEditor={
 		requestData[dataKey]=$input.val();
 		
 		//if id is not provided, this is a proposal on empty term entry
-		if(!$el.data('id')){
+		if(!$el.data('id')==undefined || $el.data('id')<1){
 			url=Editor.data.termportal.restPath+'term',
 			requestData={};
 			//TODO: the selected collection is nota available in general(bug ?). This is small workaround
-			requestData['collectionId']=$el.data('collectionId');
-			requestData['language']=$('#language').val();
+			requestData['collectionId']=Term.newTermCollectionId;
+			requestData['language']=Term.newTermLanguageId;
 			requestData[dataKey]=$input.val();
 		}
 		
@@ -178,7 +184,7 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-	        	me.updateComponent($el,$elParent,$input,result.rows);
+	        	me.updateComponent($el,$input,result.rows);
 	        }
 	    });
 	},
@@ -230,13 +236,11 @@ const ComponentEditor={
 	/***
 	 * Update component html with the proposed result. The editor component also will be destroyed. 
 	 */
-	updateComponent:function($el,$elParent,$input,result){
-		var renderData='';
-		if($el.data('type')=='term'){
-			renderData=Term.getTermRenderData(result);
-		}else{
-			renderData=Attribute.getAttributeRenderData(result,result.value);
-		}
+	updateComponent:function($element,$input,result){
+		var isTerm=$element.data('type')=='term',
+			renderData=isTerm ? Term.getTermRenderData(result) : Attribute.getAttributeRenderData(result,result.value),
+			$elParent=isTerm ?  Term.getTermHeader($element.data('id')) : Attribute.getTermAttributeHeader($element.data('id'),$element.data('type'));
+		
 		$input.replaceWith(renderData);
 		$elParent.switchClass('is-finalized','is-proposal');
         Term.drawProposalButtons($elParent);

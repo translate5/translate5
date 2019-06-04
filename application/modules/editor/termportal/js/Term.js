@@ -403,7 +403,7 @@ const Term={
             if (term.termId === null) {
                 isProposal = ' is-new';
                 statusIcon = '';
-                term.termId = 'new';
+                term.termId = -1;
             }
             
             //draw term header
@@ -855,6 +855,13 @@ const Term={
             console.log('onEditAttributeClick');
             search.click();
         },
+        
+        /***
+    	 * Return the jquery component of the term header(h3)
+    	 */
+    	getTermHeader:function(termId){
+			return this.$_termTable.find('h3[data-term-id="'+termId+'"]');
+    	},
 };
 
 Term.init();
