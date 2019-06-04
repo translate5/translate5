@@ -235,7 +235,8 @@ h4, p {
     margin-left: 0px;
 }
 
-.term-data .proposal-btn.ui-icon {                                  /* Term: add, delete, edit */
+.term-data .proposal-btn.ui-icon,                                   /* Term: add, delete, edit */
+.attribute-data .proposal-btn {                                     /* Attribute: delete, edit */
     float: right;
     margin-left: 5px;
 }
@@ -267,9 +268,14 @@ h4, p {
     display: none;
 }
 
-#languageSelectContainer {
+#languageSelectContainer,
+#termcollectionSelectContainer {
     color: #333;
     padding:5px;
+}
+
+#termcollectionSelectContainer {
+    display: none;
 }
 
 .ui-tooltip-content {
