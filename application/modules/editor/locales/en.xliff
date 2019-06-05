@@ -3346,6 +3346,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Vorschläge exportieren</source>
     <target>Proposals export</target>
 </trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRhcyBBdHRyaWJ1dCB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie das Attribut wirklich entfernen?</source><target>Do you really want to remove this attribute?</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRlciBUZXJtIHdpcmtsaWNoIGVudGZlcm5lbj8='><source>Möchten Sie der Term wirklich entfernen?</source><target>Do you really want to remove this term?</target></trans-unit>
+<trans-unit id='QXR0cmlidXQgZW50ZmVybmVu'><source>Attribut entfernen</source><target>Remove attribute</target></trans-unit>
+<trans-unit id='VGVybSBlbnRmZXJuZW4='><source>Term entfernen</source><target>Remove term</target></trans-unit>
     </body>
   </file>
 </xliff>

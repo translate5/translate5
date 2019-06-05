@@ -709,10 +709,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             'language as languageId'
         ];
         
-        //TODO: define user proposal rights
-        $userHasProposalRights=true;
-        //TODO:
-        $userHasTermAttributeProposalRights=true;
         
         $s=$this->db->select()
         ->setIntegrityCheck(false)
@@ -721,16 +717,17 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
         ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',['LEK_languages.rfc5646 AS language']);
         
-        //TODO: define user proposal rights
-        if($userHasProposalRights){
+        if($this->isProposableAllowed()){
             $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',[
                 'LEK_term_proposal.term as proposalTerm',
                 'LEK_term_proposal.id as proposalId'
             ]);
         }
         
-        //TODO: define user proposal rights
-        if($userHasTermAttributeProposalRights){
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        if($attribute->isProposableAllowed()){
             $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = LEK_term_attributes.id',[
                 'LEK_term_attribute_proposal.value as proposalAttributeValue',
                 'LEK_term_attribute_proposal.id as proposalAttributelId',

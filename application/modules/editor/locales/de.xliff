@@ -1554,6 +1554,10 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='SFRUUDogNDAx'><source>HTTP: 401</source><target>HTTP: 401</target></trans-unit>
 <trans-unit id='RGllc2UgRG9tYWluIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Domain wird bereits verwendet.</source><target>Diese Domain wird bereits verwendet.</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='><source>Vorschläge exportieren</source><target>Proposals export</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRhcyBBdHRyaWJ1dCB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie das Attribut wirklich entfernen?</source><target>Möchten Sie das Attribut wirklich entfernen?</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRlciBUZXJtIHdpcmtsaWNoIGVudGZlcm5lbj8='><source>Möchten Sie der Term wirklich entfernen?</source><target>Möchten Sie der Term wirklich entfernen?</target></trans-unit>
+<trans-unit id='QXR0cmlidXQgZW50ZmVybmVu'><source>Attribut entfernen</source><target>Attribut entfernen</target></trans-unit>
+<trans-unit id='VGVybSBlbnRmZXJuZW4='><source>Term entfernen</source><target>Term entfernen</target></trans-unit>
   </body>
  </file>
 </xliff>

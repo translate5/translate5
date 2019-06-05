@@ -165,10 +165,23 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "deleteTerm"=>$this->translate->_("Term löschen"),
                 "editTermAttribute"=>$this->translate->_("Term-Attribut bearbeiten"),
                 "addTermAttribute"=>$this->translate->_("Term-Attribut hinzufügen"),
-                "deleteTermAttribute"=>$this->translate->_("Term-Attribut löschen"),
+                "deleteTermAttribute"=>$this->translate->_("Term-Attribut löschen")
         );
         
         $this->view->translations=$translatedStrings;
+        
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        if($term->isProposableAllowed()){
+            $this->view->Php2JsVars()->set('apps.termportal.proposal.translations',[
+                "Ja"=>$this->translate->_("Ja"),
+                "Nein"=>$this->translate->_("Nein"),
+                "deleteAttributeProposalMessage"=>$this->translate->_("Möchten Sie das Attribut wirklich entfernen?"),
+                "deleteTermProposalMessage"=>$this->translate->_("Möchten Sie der Term wirklich entfernen?"),
+                "deleteAttributeProposalTitle"=>$this->translate->_("Attribut entfernen"),
+                "deleteTermProposalTitle"=>$this->translate->_("Term entfernen")
+            ]);
+        }
         
         // for filtering in front-end: get the names for the available collectionIds
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');

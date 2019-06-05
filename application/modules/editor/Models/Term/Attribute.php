@@ -114,7 +114,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $name = $this->getName();
             $type = $this->getAttrType();
         }
-        return !($name == 'date'   
+        return !($name == 'date'
             || $name=='termNote' && $type=='processStatus'
             || $name=='transacNote' && ($type=='responsiblePerson' || $type=='responsibility')
             || $name=='transac' && $type=='creation'
@@ -234,7 +234,6 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @return array|NULL
      */
     public function getAttributesForTermEntry($groupId,$collectionIds){
-        $userHasTermEntryAttributeProposalRights=true;
         $cols = array(
             'LEK_term_attributes.id AS attributeId',
             'LEK_term_attributes.labelId as labelId',
@@ -255,14 +254,12 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             new Zend_Db_Expr('"termEntryAttribute" as attributeOriginType')//this is needed as fixed value
         );
         
-//FIXME testen ob hier die korrekten Attribute geladen werden
         $s=$this->db->select()
         ->from($this->db,[])
         ->join('LEK_term_entry', 'LEK_term_entry.id = LEK_term_attributes.termEntryId',$cols)
         ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText']);
 
-        //TODO: define user proposal rights
-        if($userHasTermEntryAttributeProposalRights){
+        if($this->isProposableAllowed()){
             $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = LEK_term_attributes.id',[
                 'LEK_term_attribute_proposal.value as proposalAttributeValue',
                 'LEK_term_attribute_proposal.id as proposalAttributelId',
