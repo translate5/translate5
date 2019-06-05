@@ -52,14 +52,12 @@ const Term={
 			me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
             me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
             me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
-            me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditAttributeClick);
-            
+
             // Terms
             me.$_termTable.on('click', ".term-data .proposal-add",{scope:me},me.onEditTermClick); // = the same procedure as editing
             me.$_termTable.on('click', ".term-data .proposal-delete",{scope:me},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data .proposal-edit",{scope:me},me.onEditTermClick);
             me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
-            me.$_termTable.on('click', ".attribute-data .proposal-edit",{scope:me},me.onEditAttributeClick);
 		},
 		
 		/***
@@ -603,8 +601,8 @@ const Term={
 			}
 			
 			//the proposal is allready defined, render the proposal
-			htmlCollection.push('<del>'+termData.term+'</del>');
-			htmlCollection.push('<ins>'+termData.proposal.term+'</ins>');
+			htmlCollection.push('<del class="proposal-value-content">'+termData.term+'</del>');
+			htmlCollection.push('<ins class="proposal-value-content">'+termData.proposal.term+'</ins>');
 			return htmlCollection.join(' ');
 		},
         
@@ -800,25 +798,49 @@ const Term={
 				return;
 			}
 			
-			//ajax call to the remove proposal action
-			var me=eventData.data.scope,
-				url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id'));
-			$.ajax({
-		        url: url,
-		        dataType: "json",	
-		        type: "POST",
-		        success: function(result){
-		        	//the term proposal is removed, render the initial term proposable content
-		        	var renderData=me.getTermRenderData(result.rows),
-		        		ins=$parent.find('ins');
-		        		
-		        	ins.replaceWith(renderData);
-		        	$parent.find('del').empty();
+			var yesCallback=function(){
+				//ajax call to the remove proposal action
+				var me=eventData.data.scope,
+					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id'));
+				$.ajax({
+			        url: url,
+			        dataType: "json",	
+			        type: "POST",
+			        success: function(result){
+			        	//the term proposal is removed, render the initial term proposable content
+			        	var renderData=me.getTermRenderData(result.rows),
+			        		ins=$parent.find('ins');
+			        		
+			        	ins.replaceWith(renderData);
+			        	$parent.find('del').empty();
 
-		        	$parent.switchClass('is-proposal','is-finalized');
-		        	me.drawProposalButtons($parent);
-		        }
-		    });
+			        	$parent.switchClass('is-proposal','is-finalized');
+			        	me.drawProposalButtons($parent);
+			        }
+			    });
+			};
+			
+			var yesText=Editor.data.apps.termportal.proposal.translations['Ja'],
+				noText=Editor.data.apps.termportal.proposal.translations['Nein'],
+				buttons={
+				};
+			
+			buttons[yesText]=function(){
+	            $(this).dialog('close');
+	            yesCallback();
+			};
+			buttons[noText]=function(){
+				$(this).dialog('close');
+			};
+			// Define the Dialog and its properties.
+		    $("<div></div>").dialog({
+		        resizable: false,
+		        modal: true,
+		        title: Editor.data.apps.termportal.proposal.translations['deleteTermProposalTitle'],
+		        height: 250,
+		        width: 400,
+		        buttons:buttons
+		    }).text(Editor.data.apps.termportal.proposal.translations['deleteTermProposalMessage']);
 		},
         
         /***
@@ -848,19 +870,6 @@ const Term={
             var me = eventData.data.scope;
             console.log('onAddTermAttributeClick');
             // TODO
-        },
-        
-        /***
-         * On edit term-entry-attribute icon click handler
-         * On edit term-attribute icon click handler
-         */
-        onEditAttributeClick: function(eventData){
-            var me = eventData.data.scope,
-                element=$(this),
-                parent=element.parent(),
-                search=parent.next().find("span[data-editable]");
-            console.log('onEditAttributeClick');
-            search.click();
         },
         
         /***

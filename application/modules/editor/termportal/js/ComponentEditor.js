@@ -2,7 +2,6 @@ const ComponentEditor={
 		
 	$_termTable:null,
 	$_termAttributeTable:null,
-	$_commentEditor:null,
 	
 	typeRouteMap:[],
 	
@@ -27,7 +26,6 @@ const ComponentEditor={
 		var me=this;
 		me.$_termTable=$('#termTable');
 		me.$_termAttributeTable=$('#termAttributeTable');
-		me.$_commentEditor=$('<input />')
 	},
 	
 	initEvents:function(){
@@ -81,28 +79,10 @@ const ComponentEditor={
 			$input= $('<textarea />').val($element.text()),
 			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		
-			//$input = $('<input type="text" style="min-width: 150px;" onkeyup="this.size = Math.max(this.value.length, 1)"/>').val($element.text());
-	  
 		//copy the collection id from the attribute holder data to the term element data
 		$element.attr("data-collection-id",$termAttributeHolder.data('collectionId'));
 		
-		//the comment field does not exist for the term, create new
-		if($commentPanel.length==0){
-			var dummyCommentAttribute={
-					attributeId:-1,
-					name:'note',
-					attrValue:'',
-					attrType:null,
-					headerText:'',
-					proposable:true
-			},
-			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
-			
-			$termAttributeHolder.prepend(drawData);
-			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
-		}
-		
-		if($commentPanel.prop('tagName')=='SPAN'){
+		if($commentPanel.length>0 && $commentPanel.prop('tagName')=='SPAN'){
 			me.addCommentAttributeEditor($commentPanel);
 		}
 		
@@ -195,6 +175,10 @@ const ComponentEditor={
 
 			//when the comment does not exist, clean the editor 
 			if($element.data('id')<1){
+				//find the term holder and remove each unexisting comment attribute dom
+				$termHolder=$input.parents('div[data-term-id]');
+				$termHolder.children('p[data-id="-1"]').remove();
+				$termHolder.children('h4[data-attribute-id="-1"]').remove();
 				$input.replaceWith('');
 				return;
 			}
@@ -246,6 +230,40 @@ const ComponentEditor={
         Term.drawProposalButtons($elParent);
 		//on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
+		
+		if(!isTerm){
+			return;
+		}
+		
+		//if it is comment, and the comment panel does not exist, add the comment panel after the proposed term is saved
+		var $commentPanel=$elParent.find('[data-editable-comment]');
+		
+		//the comment field does not exist for the term, create new
+		if($commentPanel.length==0){
+			var me=this,
+				dummyCommentAttribute={
+					attributeId:-1,
+					name:'note',
+					attrValue:'',
+					attrType:null,
+					headerText:'',
+					proposable:true
+			},
+			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
+			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
+			
+			//update the term holder dom with the new temr id
+			$termAttributeHolder.attr("data-term-id",result.termId);
+			
+			//attach the comment attribute draw data to the term holder
+			$termAttributeHolder.prepend(drawData);
+
+			//find the comment panel and start the comment editor
+			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
+			if($commentPanel.length>0 && $commentPanel.prop('tagName')=='SPAN'){
+				this.addCommentAttributeEditor($commentPanel);
+			}
+		}
 	},
 	
 	/***

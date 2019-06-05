@@ -18,7 +18,52 @@ const Attribute={
 		var me=this;
 		me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me,root:me.$_termTable},me.onDeleteAttributeClick);
 		me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
+		
+		me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-edit",{
+			scope:me,
+			root:me.$_termEntryAttributesTable,
+			type:'termEntryAttribute'
+		},me.onEditAttributeClick);
+		
+        me.$_termTable.on('click', ".attribute-data .proposal-edit",{
+        	scope:me,
+        	root:me.$_termTable,
+        	type:'termAttribute'
+    	},me.onEditAttributeClick);
 	},
+	
+    /***
+     * On edit term-entry-attribute icon click handler
+     * On edit term-attribute icon click handler
+     */
+    onEditAttributeClick: function(eventData){
+    	console.log('onEditAttributeClick');
+    	var me=eventData.data.scope,
+	    	root=eventData.data.root,
+	    	type=eventData.data.type,
+	        $element=$(this),
+			$parent=$element.parents('h4.attribute-data'),//the button parrent
+			attributeId=$parent.data('attributeId'),
+			$editableComponent=me.getAttributeComponent(attributeId,type);
+			
+	
+		if($editableComponent.length==0){
+			return;
+		}
+		
+		//is attribute component
+		if(typeof $editableComponent.data('editable') !== 'undefined'){
+			ComponentEditor.addAttributeComponentEditor($editableComponent);
+			return;
+		}
+		
+		//is comment attribute component
+		if(typeof $editableComponent.data('editableComment') !== 'undefined'){
+			ComponentEditor.addCommentAttributeEditor($editableComponent);
+			return;
+		}
+    },
+    
 	
 	/***
      * On delete term and term entry attribute icon click handler
@@ -30,29 +75,54 @@ const Attribute={
 			$parent=$element.parents('h4.attribute-data'),//the button parrent
 			attributeId=$parent.data('attributeId');
 		
-		if(parent.length==0){
+		if($parent.length==0){
 			return;
 		}
+		var yesCallback=function(){
+			//ajax call to the remove proposal action
+			var me=eventData.data.scope,
+				url=Editor.data.termportal.restPath+'termattribute/{ID}/removeproposal/operation'.replace("{ID}",attributeId);
+			$.ajax({
+		        url: url,
+		        dataType: "json",	
+		        type: "POST",
+		        success: function(result){
+		        	//the term proposal is removed, find the attribute holder and render the initial term proposable content
+		        	var attributeData=result.rows,
+		        		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
+		        		$proposalHolder=root.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
+		        		$ins=$proposalHolder.find('ins');
+		        		
+	        		$ins.replaceWith(renderData);
+		        	$proposalHolder.find('del').remove();
+		        	$parent.switchClass('is-proposal','is-finalized');
+		            Term.drawProposalButtons($parent);
+		    		//on the next term click, fatch the data from the server, and update the cache
+		    		Term.reloadTermEntry=true;
+		        }
+		    });
+		};
+		var yesText=Editor.data.apps.termportal.proposal.translations['Ja'],
+			noText=Editor.data.apps.termportal.proposal.translations['Nein'],
+			buttons={
+			};
 		
-		//ajax call to the remove proposal action
-		var me=eventData.data.scope,
-			url=Editor.data.termportal.restPath+'termattribute/{ID}/removeproposal/operation'.replace("{ID}",attributeId);
-		$.ajax({
-	        url: url,
-	        dataType: "json",	
-	        type: "POST",
-	        success: function(result){
-	        	//the term proposal is removed, find the attribute holder and render the initial term proposable content
-	        	var attributeData=result.rows,
-	        		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
-	        		$proposalHolder=root.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
-	        		$ins=$proposalHolder.find('ins');
-	        		
-        		$ins.replaceWith(renderData);
-	        	$proposalHolder.find('del').remove();
-	        }
-	    });
-	
+		buttons[yesText]=function(){
+            $(this).dialog('close');
+            yesCallback();
+		};
+		buttons[noText]=function(){
+			$(this).dialog('close');
+		};
+		// Define the Dialog and its properties.
+	    $("<div></div>").dialog({
+	        resizable: false,
+	        modal: true,
+	        title: Editor.data.apps.termportal.proposal.translations['deleteAttributeProposalTitle'],
+	        height: 250,
+	        width: 400,
+	        buttons:buttons
+	    }).text(Editor.data.apps.termportal.proposal.translations['deleteAttributeProposalMessage']);
     },
     
 	/***
@@ -201,8 +271,8 @@ const Attribute={
 		
 		//the proposal is allready defined, render the proposal
 		if(attributeData.proposal && attributeData.proposal!=undefined){
-			htmlCollection.push('<del>'+attValue+'</del>');
-			htmlCollection.push('<ins>'+attributeData.proposal.value+'</ins>');
+			htmlCollection.push('<del class="proposal-value-content">'+attValue+'</del>');
+			htmlCollection.push('<ins class="proposal-value-content">'+attributeData.proposal.value+'</ins>');
 			return htmlCollection.join(' ');
 		}
 		
@@ -226,14 +296,36 @@ const Attribute={
 	 * Return the jquery component of the term/termentry attribute header(h4)
 	 */
 	getTermAttributeHeader:function(attributeId,type){
-		var me=this;
+		var me=this,
+			$selector=null;
 		if(type=='termEntryAttribute'){
-			return me.$_termEntryAttributesTable.find('h4[data-attribute-id="'+attributeId+'"]');
+			$selector=me.$_termEntryAttributesTable;
 		}
 		if(type=='termAttribute'){
-			return me.$_termTable.find('h4[data-attribute-id="'+attributeId+'"]');
+			$selector=me.$_termTable;
 		}
-		return null;
+		if(!$selector){
+			return null;
+		}
+		return $selector.find('h4[data-attribute-id="'+attributeId+'"]');
+	},
+	
+	/***
+	 * Return jquery component of the term/termenty attribute
+	 */
+	getAttributeComponent:function(attributeId,type){
+		var me=this,
+			$selector=null;
+		if(type=='termEntryAttribute'){
+			$selector=me.$_termEntryAttributesTable;
+		}
+		if(type=='termAttribute'){
+			$selector=me.$_termTable;
+		}
+		if(!$selector){
+			return null;
+		}
+		return $selector.find('span[data-id="'+attributeId+'"]');
 	},
     
     /**
