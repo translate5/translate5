@@ -139,21 +139,39 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->entity]);
         
-        //add context xliff2 as valid format
+        //add context of valid export formats:
+        // currently: xliff2, importArchive, excel
         $this->_helper
         ->getHelper('contextSwitch')
+        
         ->addContext('xliff2', [
             'headers' => [
                 'Content-Type'          => 'text/xml',
             ]
         ])
+        ->addActionContext('export', 'xliff2')
+        
         ->addContext('importArchive', [
             'headers' => [
                 'Content-Type'          => 'application/zip',
             ]
         ])
-        ->addActionContext('export', 'xliff2')
         ->addActionContext('export', 'importArchive')
+        
+        ->addContext('excel', [
+            'headers' => [
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        ])
+        ->addActionContext('export', 'excel')
+        
+        ->addContext('excelReimport', [
+            'headers' => [
+                'Content-Type'          => 'text/xml',
+            ]
+        ])
+        ->addActionContext('export', 'excelReimport')
+        
         ->initContext();
         
     }
@@ -502,6 +520,18 @@ class editor_TaskController extends ZfExtended_RestController {
     public function importAction() {
         $this->getAction();
         $this->startImportWorkers();
+    }
+    
+    /**
+     * Starts the reimport of an earlier exported excel into the task
+     */
+    public function reimportexcelAction() {
+        $this->entityLoad();
+        
+        $reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
+        /* @var $exportExcel editor_Models_Import_Excel */
+        $reimportExcel::run($this->entity);
+        // @TODO: if everything is OK, remove mark task as 'is Excel exported' and un-lock the task
     }
     
     protected function startImportWorkers() {
@@ -1178,6 +1208,21 @@ class editor_TaskController extends ZfExtended_RestController {
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         
         switch ($context) {
+            case 'excel':
+                $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel');
+                /* @var $exportExcel editor_Models_Export_Excel */
+                $exportExcel::run($this->entity);
+                
+                // @TODO: if everything is OK, mark task as 'is Excel exported' and lock the task
+                $this->entity->setForeignName(editor_Models_ExcelExImport::TASK_EXPORTED_IDENTIFIER);
+                /*
+                $this->entity->setLocked(TRUE);
+                $this->entity->setLockingUser($this->entity->getPmGuid());
+                */
+                $this->entity->save();
+                
+                return;
+            
             case 'importArchive':
                 $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
@@ -1210,7 +1255,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //      Export_ExportedWorker for ExportReq1 → works then with tempExportDir of ExportReq1 instead!
         // 
         // If we implement in future export workers which need to work on the temp export data, 
-        //  we have to ensure that each export worker get its own export directory. 
+        // we have to ensure that each export worker get its own export directory. 
         
         $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
         /* @var $worker editor_Models_Export_ExportedWorker */

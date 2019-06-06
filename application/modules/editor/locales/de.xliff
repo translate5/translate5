@@ -1295,6 +1295,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQp'><source>exportieren (Orginalformat)</source><target>exportieren (Orginalformat)</target></trans-unit>
 <trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMSk='><source>exportieren (XLIFF 2.1)</source><target>exportieren (XLIFF 2.1)</target></trans-unit>
 <trans-unit id="ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQgbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZSk="><source>exportieren (Orginalformat mit Änderungshistorie)</source><target>exportieren (Orginalformat mit Änderungshistorie)</target></trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gKEV4Y2VsKQ=='><source>exportieren (Excel)</source><target>exportieren (Excel)</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='><source>Kundenübersicht</source><target>Kundenübersicht</target></trans-unit>
 <trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>

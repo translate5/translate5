@@ -2431,6 +2431,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>exportieren (XLIFF 2.1)</source>
     <target>Export (Xliff 2.1)</target>
 </trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gKEV4Y2VsKQ=='><source>exportieren (Excel)</source><target>Export (Excel)</target></trans-unit>
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
     <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
     <target>Re-import chosen tasks into current TM</target>
