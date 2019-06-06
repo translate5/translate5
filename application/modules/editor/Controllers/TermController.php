@@ -225,6 +225,7 @@ class editor_TermController extends ZfExtended_RestController {
         
         //update the view
         $this->view->rows->proposal = $this->proposal->getDataObject();
+        $this->view->rows->proposable=false;
     }
     
     /**
@@ -286,6 +287,7 @@ class editor_TermController extends ZfExtended_RestController {
         $history->save();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
+        $this->view->rows->proposable=true;
     }
     
     /**
@@ -302,6 +304,7 @@ class editor_TermController extends ZfExtended_RestController {
         $this->proposal->delete();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
+        $this->view->rows->proposable=true;
     }
     
     /**
