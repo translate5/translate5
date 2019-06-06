@@ -226,7 +226,7 @@ const ComponentEditor={
 					proposable:true
 			},
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
-			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
+			$termAttributeHolder=$('#termTable').find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
 			
 			//update the term holder dom with the new temr id
 			$termAttributeHolder.attr("data-term-id",result.termId);
