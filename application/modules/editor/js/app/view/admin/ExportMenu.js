@@ -38,6 +38,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
       exportDiff: '#UT#exportieren (Orginalformat mit Änderungshistorie)',
       export2Def: '#UT#exportieren (XLIFF 2.1)',
       exportQmField: '#UT#Export QM-Statistik (XML) für Feld: {0}',
+      exportExcel: '#UT#exportieren (Excel)',
       downloadImportArchive: '#UT#Importarchiv herunterladen'
   },
   alias: 'widget.adminExportMenu',
@@ -55,6 +56,15 @@ Ext.define('Editor.view.admin.ExportMenu', {
         me.items = me.initExportOptions();
     }
     
+    //add download excel link if allowed @TODO: add access controll rights !!
+    if(1) {
+        me.items.push({
+            itemId: 'exportExcel',
+            hrefTarget: '_blank',
+            href: me.makePath('task/export/id/{0}?format=excel'),
+            text: me.messages.exportExcel
+        });
+    } 
     //add download archive link if allowed
     if(Editor.data.import.createArchivZip && Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
         me.items.length == 0 || me.items.push("-");
