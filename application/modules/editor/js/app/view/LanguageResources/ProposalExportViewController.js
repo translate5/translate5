@@ -27,10 +27,23 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * @class Editor.view.LanguageResources.TmWindowViewController
+ * @class Editor.view.LanguageResources.ProposalExportViewController
  * @extends Ext.app.ViewController
  */
 Ext.define('Editor.view.LanguageResources.ProposalExportViewController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.proposalexport'
+    alias: 'controller.proposalexport',
+    
+    /***
+     * Export term and term attribute proposals for the given collection id.
+     * All terms and attributes younger than the export date will be exported.
+     */
+    exportProposals:function(dateField,record){
+    	var params = {},
+	    	url = Editor.data.restpath+'languageresourceinstance/export?';
+    	dateField.up('window').destroy();
+	  	params['exportDate']=dateField.getValue();
+	  	params['collectionId']=record.get('id');
+        window.open(url+Ext.urlEncode(params));
+    }
 });

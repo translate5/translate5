@@ -37,26 +37,41 @@ Ext.define('Editor.view.LanguageResources.ProposalExport', {
     strings: {
     	
     },
-    height : 500,
-    width : 500,
-    modal : true,
-    layout:'fit',
-
-    initConfig : function(instanceConfig) {
-        var me = this,
-            config = {},
-            defaults = {
-                labelWidth: 160,
-                anchor: '100%'
-            },
-        config = {
-            title: me.strings.title,
-            items : [{}],
-            dockedItems : [{}]
-        };
-        if (instanceConfig) {
-            me.self.getConfigurator().merge(me, config, instanceConfig);
-        }
-        return me.callParent([config]);
-    }
+    modal:true,
+	width:500,
+	autoScroll:true,
+    autoHeight:true,
+	layout:'auto',
+	title:'Proposal Export',
+	border:false,
+	bodyPadding: 10,
+	items:[{
+		xtype: 'datefield',
+		flex:1,
+		fieldLabel:'Export Date',
+		value:new Date(),
+		name:'exportDate'
+	}],
+	dockedItems: [{
+        xtype: 'toolbar',
+        dock: 'bottom',
+        items: [{
+        	xtype:'button',
+        	itemId:'exportButton',
+        	text:'Export',
+        	handler:function(){
+        		var tmpWin=this.up('window'),
+        			dateField=tmpWin.down('datefield');
+        		tmpWin.getController().exportProposals(dateField,tmpWin.record);
+        	}
+        
+        },{
+        	xtype:'button',
+        	text:'Abbrechen',
+        	handler:function(){
+        		this.up('window').destroy();
+        	}
+        }]
+    }]
+    
 });

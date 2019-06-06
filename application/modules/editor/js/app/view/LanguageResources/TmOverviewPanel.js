@@ -171,7 +171,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                             return record.get('status') == 'novalidlicense' ? true : false;
                         }
                     },{
-                        action: 'import',
+                        action: 'export',
                         getClass:function(v,meta,record) {
                         	if(record.get('serviceName') != 'TermCollection'){
                         		return '';
