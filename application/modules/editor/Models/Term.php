@@ -704,6 +704,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             'id as value',
             'term as desc',
             'status as termStatus',
+            'processStatus as processStatus',
             'id as termId',
             'collectionId',
             'language as languageId'
@@ -850,16 +851,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     public function getDataObject() {
         $result=parent::getDataObject();
         $result->termId=$result->id;
+        $result->proposable=$this->isProposableAllowed();
         return $result;
     }
     
     /***
      * Check if the term is proposable.
      * It is proposable when the term status is not unproccessed and the user is allowed for term proposal operation
-     * @return boolean
-     */
-    /***
-     * 
      * @param string $status
      * @return boolean
      */

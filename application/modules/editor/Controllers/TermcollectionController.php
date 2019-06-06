@@ -211,6 +211,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             'value',
             'desc',
             'termStatus',
+            'processStatus',
             'termId',
             'collectionId',
             'languageId',
@@ -268,15 +269,11 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                     $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
                     $groupOldKey=true;
 
+                    $map[$oldKey]['proposable']=$isTermProposalAllowed;
                     //collect the term proposal data if the user is allowed to
                     if($isTermProposalAllowed){
                         $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
-                        $map[$oldKey]['proposable']=!empty($termProposalData['term']) ? $termProposalData : null;
-                        
                         //check if the term proposable flag is set, if calculate it
-                        if(!isset($map[$oldKey]['proposable'])){
-                            $map[$oldKey]['proposable']=$termModel->isProposable($termModel::PROCESS_STATUS_UNPROCESSED);
-                        }
                         $termProposalData=[];
                     }
                 }
@@ -317,14 +314,12 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         }
         //if not grouped after foreach, group the last result
         if(!$groupOldKey){
+            $map[$oldKey]['proposable']=$isTermProposalAllowed;
             //collect the term proposal data if the user is allowed to
             if($isTermProposalAllowed){
                 $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
                 $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
                 //check if the term proposable flag is set, if calculate it
-                if(!isset($map[$oldKey]['proposable'])){
-                    $map[$oldKey]['proposable']=$termModel->isProposable($termModel::PROCESS_STATUS_UNPROCESSED);
-                }
             }
         }
         
