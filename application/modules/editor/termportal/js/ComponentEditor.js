@@ -82,7 +82,24 @@ const ComponentEditor={
 		//copy the collection id from the attribute holder data to the term element data
 		$element.attr("data-collection-id",$termAttributeHolder.data('collectionId'));
 		
-		if($commentPanel.length>0 && $commentPanel.prop('tagName')=='SPAN'){
+		
+		//the comment field does not exist for the term, create new
+		if($commentPanel.length==0 && $element.data('id')>0){
+			var dummyCommentAttribute={
+					attributeId:-1,
+					name:'note',
+					attrValue:'',
+					attrType:null,
+					headerText:'',
+					proposable:true
+			},
+			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
+			
+			$termAttributeHolder.prepend(drawData);
+			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
+		}
+		
+		if($commentPanel.prop('tagName')=='SPAN'){
 			me.addCommentAttributeEditor($commentPanel);
 		}
 		
