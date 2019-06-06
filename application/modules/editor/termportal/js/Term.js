@@ -38,7 +38,7 @@ const Term={
             this.$_resultTermsHolder=$('#resultTermsHolder');
             this.$_resultTermsHolderHeader=$('#resultTermsHolderHeader');
             this.$_termTable=$('#termTable');
-            this.$_termEntryAttributesTable = $('#termAttributeTable');
+            this.$_termEntryAttributesTable = $('#termEntryAttributeTable');
             this.$_termCollectionSelect = $('#termcollectionSelectContainer');
 		},
 		
@@ -48,16 +48,24 @@ const Term={
 				me.findTermsAndAttributes($(ui.selected).attr('data-value'));
 		    });
 			
-            // TermEntries
-			me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
-            me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
-            me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
+			// Term-Entries
+	        me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
+	        me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
 
             // Terms
-            me.$_termTable.on('click', ".term-data .proposal-add",{scope:me},me.onEditTermClick); // = the same procedure as editing
-            me.$_termTable.on('click', ".term-data .proposal-delete",{scope:me},me.onDeleteTermClick);
-            me.$_termTable.on('click', ".term-data .proposal-edit",{scope:me},me.onEditTermClick);
-            me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
+	        // - Headline
+	        me.$_termTable.on('click', '.term-data.proposable',{
+	            scope:me,
+	            reference: 'headline'
+	        },me.onEditTermClick);
+            // - Icons
+            me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me, reference:'icon'},me.onEditTermClick); // = the same procedure as editing
+            me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me, reference:'icon'},me.onDeleteTermClick);
+            me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
+            // - Content
+            me.$_termTable.on('click', '.term-data.proposable [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
+            
+            // Terms-Attributes: see Attribute.js
 		},
 		
 		/***
@@ -70,8 +78,8 @@ const Term={
 		searchTerm:function(searchString,successCallback){
 			var me=this,
 				lng=$('#language').val(),
-				collectionIds = me.getFilteredCollections(),
-                processStats = me.getFilteredProcessStats();
+				collectionIds = getFilteredCollections(),
+                processStats = getFilteredProcessStats();
 			
 			me.resetNewTermData();
             
@@ -101,49 +109,6 @@ const Term={
 				}
 			});
 		},
-        
-        /**
-         * Return all the Term-Collections that are set in the tag field.
-         * @returns {Array}
-         */
-        getFilteredCollections: function() {
-            var $_filteredCollections = $('#searchFilterTags input.filter.collection'),
-                filteredCollections = [];
-            if ($_filteredCollections.length === 0 && this.getFilteredClients().length > 0) {
-                // user has not selected any collections, but client(s) => use only those collections that belong to the client(s)
-                $_filteredCollections = $("#collection option:enabled");
-            }
-            $_filteredCollections.each(function( index, el ) {
-                if (el.value != 'none') {
-                    filteredCollections.push(el.value);
-                }
-            });
-            return filteredCollections;
-        },
-        
-        /**
-         * Return all the clients that are set in the tag field.
-         * @returns {Array}
-         */
-        getFilteredClients: function() {
-            var filteredClients = [];
-            $( '#searchFilterTags input.filter.client' ).each(function( index, el ) {
-                filteredClients.push(el.value);
-            });
-            return filteredClients;
-        },
-        
-        /**
-         * Return all the prcoessStats that are set in the tag field.
-         * @returns {Array}
-         */
-        getFilteredProcessStats: function() {
-            var filteredProcessStats = [];
-            $( '#searchFilterTags input.filter.processStatus' ).each(function( index, el ) {
-                filteredProcessStats.push(el.value);
-            });
-            return filteredProcessStats;
-        },
 		
 		/***
 		 * Fill up the term option component with the search results
@@ -394,7 +359,9 @@ const Term={
                 filteredCollectionsNames = [],
                 clientId,
                 clientName,
-                isProposal = (term.proposal == null) ? ' is-finalized' : ' is-proposal';
+                // TODO!!!! check processStatus!!! ************************++
+                isProposal = (term.proposal == null) ? ' is-finalized' : ' is-proposal', // ("is-proposal" can be a proposal for a term that already existed or a proposal for a new term) 
+                proposable = (term.proposable !== false) ? ' proposable' : ''; // = user has the rights to handle proposals
                 
             if (term.termId === null) {
                 isProposal = ' is-new';
@@ -403,7 +370,7 @@ const Term={
             }
             
             //draw term header
-            termAttributesHtmlContainer.push('<h3 class="term-data'+isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'">');
+            termAttributesHtmlContainer.push('<h3 class="term-data'+proposable + isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'">');
             
             
             //add empty space between
@@ -451,39 +418,10 @@ const Term={
             
             //draw term attriubtes
             termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
-            termAttributesHtmlContainer.push(me.renderTermAttributes(term.attributes,termRflLang));
+            termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term.attributes,termRflLang));
             termAttributesHtmlContainer.push('</div>');
             
             return termAttributesHtmlContainer.join('');
-		},
-		
-		/***
-		 * Render term attributes by given term
-		 * 
-		 * @param attributes
-		 * @param termLang
-		 * @returns {String}
-		 */
-		renderTermAttributes:function(attributes,termLang){
-		    var me=this,
-		        html = [],
-		        commentAttribute=[];
-		    
-		    if(Attribute.languageDefinitionContent[termLang]){
-		    	html.push(Attribute.languageDefinitionContent[termLang]);
-		    }
-		    
-		    for(var i=0;i<attributes.length;i++){
-		    	//comment attribute should always appear as first
-		    	if(attributes[i].name=='note'){
-		    		commentAttribute.push(Attribute.handleAttributeDrawData(attributes[i]));
-		    		continue;
-		    	}
-		    	html.push(Attribute.handleAttributeDrawData(attributes[i]));
-		    }
-		    html=commentAttribute.concat(html);
-		    
-		    return html.join('');
 		},
         
 		/**
@@ -510,16 +448,16 @@ const Term={
                     break;
                 case "term-entry-attributes":
                     $_selectorAdd = false; // me.$_termEntryAttributesTable;
-                    $_selectorDelete = $('#termAttributeTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
-                    $_selectorEdit = $('#termAttributeTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
+                    $_selectorDelete = $('#termEntryAttributesTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
+                    $_selectorEdit = $('#termEntryAttributesTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
                     $titleAdd = translations['addTermEntryAttribute'];
                     $titleDelete = translations['deleteTermEntryAttribute'];
                     $titleEdit = translations['editTermEntryAttribute'];
                     break;
                 case "terms":
                     $_selectorAdd = $('#termTable .term-data.is-new'); // cannot use cacheCom(), rendered too late
-                    $_selectorDelete = $('#termTable .term-data.is-proposal'); // cannot use cacheCom(), rendered too late
-                    $_selectorEdit = $('#termTable .term-data.is-finalized'); // cannot use cacheCom(), rendered too late
+                    $_selectorDelete = $('#termTable .term-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
+                    $_selectorEdit = $('#termTable .term-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
                     $titleAdd = translations['addTerm'];
                     $titleDelete = translations['deleteTerm'];
                     $titleEdit = translations['editTerm'];
@@ -656,11 +594,13 @@ const Term={
         },
         
         /***
-         * On add term-entry icon click handler
+         * On add term-entry icon click handler.
+         * (Adding a term-entry is done via creating a new term-proposal.)
          */
-        onAddTermEntryClick: function(eventData){
-            var me = eventData.data.scope,
-                filteredCollections = me.getFilteredCollections();
+        onAddTermEntryClick: function(event){
+            console.log('onAddTermEntryClick');
+            var me = event.data.scope,
+                filteredCollections = getFilteredCollections();
             me.resetNewTermData();
             me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
             if (filteredCollections.length == 1) {
@@ -676,7 +616,8 @@ const Term={
          * When a Language is selected, the corresponding flag is added to the skeleton
          * for the editable new term and it is shown again.
          */
-        drawLanguageSelect: function() {
+        drawLanguageSelectForTerm: function() {
+            console.log('drawLanguageSelectForTerm');
             var me = this,
                 languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
                 languageSelectHeader,
@@ -711,6 +652,7 @@ const Term={
          * 
          */
         drawLanguageFlagForNewTerm: function (rfcLanguage) {
+            console.log('drawLanguageFlagForNewTerm');
             var me = this,
                 rfcLanguage = getLanguageFlag(rfcLanguage),
                 $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache
@@ -724,8 +666,9 @@ const Term={
          * When a collection is selected, the form for the editable new term is drawn.
          */
         drawFilteredTermCollectionSelect: function() {
+            console.log('drawFilteredTermCollectionSelect');
             var me = this,
-                filteredCollections = me.getFilteredCollections(),
+                filteredCollections = getFilteredCollections(),
                 filteredCollectionId,
                 collectionSelectHeader,
                 collectionSelect,
@@ -778,19 +721,10 @@ const Term={
         },
 
         /***
-         * On add term-entry-attribute icon click handler
-         */
-        onAddTermEntryAttributeClick: function(eventData){
-            var me = eventData.data.scope;
-            console.log('onAddTermEntryAttributeClick');
-            // TODO
-        },
-        
-        /***
 		 * On remove proposal click handler
 		 */
-		onDeleteTermClick:function(eventData){
-			var me = eventData.data.scope,
+		onDeleteTermClick:function(event){
+			var me = event.data.scope,
                 $element=$(this),
 				$parent=$element.parents('h3[data-term-id]');
 			
@@ -800,7 +734,7 @@ const Term={
 			
 			var yesCallback=function(){
 				//ajax call to the remove proposal action
-				var me=eventData.data.scope,
+				var me=event.data.scope,
 					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id'));
 				$.ajax({
 			        url: url,
@@ -844,32 +778,39 @@ const Term={
 		},
         
         /***
-         * On edit term icon click handler
+         * On edit term click handler
          */
-        onEditTermClick:function(eventData){
-            var me = eventData.data.scope,
-                element=$(this),
-                parent=element.parent(),
-                search=parent.find("span[data-editable]"),
-                $termAttributeHolder=me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
-            console.log('onEditTermClick');
-            if ($(eventData.target).hasClass('proposal-add')) {
-                if (me.$_searchErrorNoResults.is(":visible")) {
-                    me.drawLanguageFlagForNewTerm($( "#language option:selected" ).text());
-                } else if (me.newTermLanguageId == null) {
-                    me.drawLanguageSelect();
-                }
+        onEditTermClick:function(event){
+            var me = event.data.scope,
+                reference = event.data.reference,
+                $element=$(this),
+                search,
+                $termAttributeHolder;
+            console.log('onEditTermClick ('+reference+')');
+            
+            event.stopPropagation();
+            
+            if (me.$_searchErrorNoResults.is(":visible")) {
+                me.drawLanguageFlagForNewTerm($( "#language option:selected" ).text());
             }
+            if (me.newTermLanguageId == null) {
+                me.drawLanguageSelectForTerm();
+            }
+            
+            switch(reference) {
+                case "content":
+                    search = $element;
+                    break;
+                case "headline":
+                    search=$element.find("span[data-editable]");
+                    break;
+                case "icon":
+                    search=$element.parent().find("span[data-editable]");
+                    break;
+            }
+            
+            $termAttributeHolder = me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
             ComponentEditor.addTermComponentEditor(search,$termAttributeHolder);
-        },
-
-        /***
-         * On add term-attribute icon click handler
-         */
-        onAddTermAttributeClick: function(eventData){
-            var me = eventData.data.scope;
-            console.log('onAddTermAttributeClick');
-            // TODO
         },
         
         /***

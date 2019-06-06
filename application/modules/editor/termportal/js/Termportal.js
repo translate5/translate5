@@ -140,7 +140,7 @@ $('#search').keyup(function (e) {
     $('#searchTermsHelper').find('.proposal-txt').text(translations['addTermEntry']);
     $('#searchTermsHelper').find('.proposal-btn').prop('title', translations['addTermEntry']);
     $('#searchTermsSelect').empty();
-    $('#termAttributeTable').empty();
+    $('#termEntryAttributesTable').empty();
     $('#termTable').empty();
 });
 
@@ -151,7 +151,7 @@ $('#instantTranslateButton').on('touchstart click',function(){
 function startAutocomplete(){
     console.log("startAutocomplete...");
     $('#searchTermsSelect').empty();
-    $('#termAttributeTable').empty();
+    $('#termEntryAttributesTable').empty();
     $('#termTable').empty();
     $("#search").autocomplete( "search", $("#search").val());
 }
@@ -276,4 +276,47 @@ function handlePlaceholder() {
     } else {
         $_searchFilterTags.data("ui-tagit").tagInput.attr("placeholder", searchFilterPlaceholderText);
     }
+}
+
+/**
+ * Return all the Term-Collections that are set in the tag field.
+ * @returns {Array}
+ */
+function getFilteredCollections() {
+    var $_filteredCollections = $('#searchFilterTags input.filter.collection'),
+        filteredCollections = [];
+    if ($_filteredCollections.length === 0 && this.getFilteredClients().length > 0) {
+        // user has not selected any collections, but client(s) => use only those collections that belong to the client(s)
+        $_filteredCollections = $("#collection option:enabled");
+    }
+    $_filteredCollections.each(function( index, el ) {
+        if (el.value != 'none') {
+            filteredCollections.push(el.value);
+        }
+    });
+    return filteredCollections;
+}
+
+/**
+ * Return all the clients that are set in the tag field.
+ * @returns {Array}
+ */
+function getFilteredClients() {
+    var filteredClients = [];
+    $( '#searchFilterTags input.filter.client' ).each(function( index, el ) {
+        filteredClients.push(el.value);
+    });
+    return filteredClients;
+}
+
+/**
+ * Return all the prcoessStats that are set in the tag field.
+ * @returns {Array}
+ */
+function getFilteredProcessStats() {
+    var filteredProcessStats = [];
+    $( '#searchFilterTags input.filter.processStatus' ).each(function( index, el ) {
+        filteredProcessStats.push(el.value);
+    });
+    return filteredProcessStats;
 }

@@ -207,7 +207,7 @@ END LICENSE AND COPYRIGHT
 }
 
 #termTable,
-#termAttributeTable {
+#termEntryAttributesTable {
     width: 100%;
 }
 
@@ -238,7 +238,7 @@ h4, p {
     margin: -10px;
 }
 #termTable > div .proposal-btn.proposal-add,                        /* TermEntry-Attribute: add */
-#termAttributeTable > .proposal-btn.proposal-add {                  /* Term-Attribute: add */
+#termEntryAttributesTable > .proposal-btn.proposal-add {                  /* Term-Attribute: add */
     float: left;
     color: #454545;
     font-size: 40px;

@@ -1,7 +1,4 @@
 const ComponentEditor={
-		
-	$_termTable:null,
-	$_termAttributeTable:null,
 	
 	typeRouteMap:[],
 	
@@ -9,9 +6,6 @@ const ComponentEditor={
 	
 	init:function(){
 		var me=this;
-		
-		me.cacheDom();
-		me.initEvents();
 		
 		me.typeRouteMap['term']='term/{ID}/propose/operation';
 		me.typeRouteMap['termEntryAttribute']='termattribute/{ID}/propose/operation';
@@ -22,50 +16,11 @@ const ComponentEditor={
 		me.typeRequestDataKeyMap['termAttribute']='value';//TODO:
 	},
 	
-	cacheDom:function(){
-		var me=this;
-		me.$_termTable=$('#termTable');
-		me.$_termAttributeTable=$('#termAttributeTable');
-	},
-	
-	initEvents:function(){
-		var me=this;
-		//term click
-		me.$_termTable.on('click', 'span[data-editable]',{scope:me},me.onEditableTermComponentClick);
-		
-		//term attribute click
-		me.$_termTable.on('click', '[data-editable][data-type="termAttribute"]',{scope:me},me.onEditableAttributeComponentClick);
-		
-		//term etntry attribute click
-		me.$_termAttributeTable.on('click', '[data-editable][data-type="termEntryAttribute"]',{scope:me},me.onEditableAttributeComponentClick);
-		
-		//term attribute comment click
-		me.$_termTable.on('click', 'span[data-editable-comment]',{scope:me},me.onEditableCommentComponentClick);
-	},
-	
-	/***
-	 * Editable Comment component click handler
-	 */
-	onEditableCommentComponentClick:function(event){
-		var me=event.data.scope,
-			$el = $(this);
-		me.addCommentAttributeEditor($el);
-	},
-	
-	/***
-	 * Editable term component click handler
-	 */
-	onEditableTermComponentClick:function(event){
-		var me=event.data.scope,
-			$el = $(this),
-			$termAttributeHolder=me.$_termTable.find('div[data-term-id="' + $el.data('id') + '"]');
-		me.addTermComponentEditor($el,$termAttributeHolder);
-	},
-	
 	/***
 	 * Editable attribute component click handler
 	 */
 	onEditableAttributeComponentClick:function(event){
+        console.log('onEditableAttributeComponentClick');
 		var me=event.data.scope,
 			$el = $(this);
 		me.addAttributeComponentEditor($el);
@@ -75,6 +30,7 @@ const ComponentEditor={
 	 * Register term component editor for given term element
 	 */
 	addTermComponentEditor:function($element,$termAttributeHolder){
+        console.log('addTermComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
 			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
@@ -114,6 +70,7 @@ const ComponentEditor={
 	 * Register the component editor for given term or termentry attribute
 	 */
 	addAttributeComponentEditor:function($element){
+        console.log('addAttributeComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text());
 		
@@ -127,6 +84,7 @@ const ComponentEditor={
 	 * Register component editor for term comment
 	 */
 	addCommentAttributeEditor:function($element){
+        console.log('addCommentAttributeEditor');
 		var me=this,
 			$input= $('<textarea data-editable-comment />').val($element.text());
 		
@@ -138,6 +96,7 @@ const ComponentEditor={
 	},
 	
 	saveComponentChange:function($el,$input){
+        console.log('saveComponentChange');
 		//is the modefied text empty or the same as the initial one
 		if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
 			
