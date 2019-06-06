@@ -508,6 +508,25 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->success = $this->validateUpload();
     }
     
+    public function exportAction() {
+        $proposals=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $proposals editor_Models_Term */
+        $rows = $proposals->loadProposalExportData($this->getParam('exportDate'),$this->getParam('collectionId'));
+        
+        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+        
+        // set property for export-filename
+        $excel->setProperty('filename', 'Term and term attributes proposals');
+        
+        // sample label-translations
+        //$excel->setLabel('id', 'Nummer');
+        //$excel->setLabel('term', 'Term');
+        //$excel->setLabel('processStatus', 'processStatus');
+        
+        $excel->simpleArrayToExcel($rows);
+    }
+    
     /**
      * Loads all task information entities for the given languageResource
      * The returned data is no real task entity, although the task model is used in the frontend!

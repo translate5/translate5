@@ -549,6 +549,41 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Load term and attribute proposals yunger as $youngerAs date within the given collection
+     * @param string $youngerAs
+     * @param int $collectionId
+     */
+    public function loadProposalExportData(string $youngerAs,int $collectionId){
+        $sql="SELECT 
+            	t.termEntryId as 'term-termEntryId',
+                t.id as 'term-Id',
+                t.term as 'term-term',
+                t.updated as 'term-updated',
+                tp.id as 'termproposal-id',
+                tp.term as 'termproposal-term',
+                tp.created as 'termproposal-created',
+                ta.id as 'attribute-id',
+                ta.value as 'attribute-value',
+                tap.id as 'attributeproposal-id',
+                tap.value as 'attributeproposal-value',
+                tap.created as 'attributeproposal-created'
+            FROM
+            	LEK_terms t
+            	INNER JOIN LEK_term_entry te ON te.id=t.termEntryId
+                    LEFT OUTER JOIN
+                LEK_term_proposal tp ON t.id = tp.termId
+                    LEFT OUTER JOIN
+                LEK_term_attributes ta ON t.id = ta.termId
+            		LEFT OUTER JOIN
+                LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                where (tp.term is not null or tap.value is not null)
+                and t.created < ? and t.collectionId=?
+                order by t.groupId,t.term";
+        $resultArray=$this->db->getAdapter()->query($sql,[$youngerAs,$collectionId])->fetchAll();
+        return $resultArray;
+    }
+    
+    /***
      * Load terms in given collection and languages. The returned data will be sorted by groupId,language and id
      * 
      * @param array $collectionIds
