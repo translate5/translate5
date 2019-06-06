@@ -11,41 +11,135 @@ const Attribute={
 	
 	cacheDom:function(){
         this.$_termTable=$('#termTable');
-        this.$_termEntryAttributesTable = $('#termAttributeTable');
+        this.$_termEntryAttributesTable = $('#termEntryAttributesTable');
 	},
 	
 	initEvents:function(){
 		var me=this;
-		me.$_termTable.on('click', ".attribute-data .proposal-delete",{scope:me,root:me.$_termTable},me.onDeleteAttributeClick);
-		me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
-		
-		me.$_termEntryAttributesTable.on('click', ".attribute-data .proposal-edit",{
-			scope:me,
-			root:me.$_termEntryAttributesTable,
-			type:'termEntryAttribute'
-		},me.onEditAttributeClick);
-		
-        me.$_termTable.on('click', ".attribute-data .proposal-edit",{
+        
+        // ------------- TermEntries-Attributes -------------
+        // - Headline
+        me.$_termEntryAttributesTable.on('click', '.attribute-data.proposable',{
+            scope:me,
+            type:'termEntryAttribute',
+            reference: 'headline'
+        },me.onEditAttributeClick);
+        // - Icons
+        me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
+        me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
+        me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-edit",{
+            scope:me,
+            type:'termEntryAttribute',
+            reference: 'icon'
+        },me.onEditAttributeClick);
+        // - Content
+        me.$_termEntryAttributesTable.on('click', '.attribute-data.proposable ~ [data-type="termEntryAttribute"] [data-editable][data-type="termEntryAttribute"]',{
+            scope:me,
+            type:'termEntryAttribute',
+            reference: 'content'
+        },me.onEditAttributeClick);
+        
+        // ------------- Terms-Attributes -------------
+        // - Headline
+        me.$_termTable.on('click', '.attribute-data.proposable',{
+            scope:me,
+            type:'termAttribute',
+            reference: 'headline'
+        },me.onEditAttributeClick);
+        // - Icons
+        me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
+        me.$_termTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termTable},me.onDeleteAttributeClick);
+        me.$_termTable.on('click', ".attribute-data.proposable .proposal-edit",{
         	scope:me,
         	root:me.$_termTable,
-        	type:'termAttribute'
+        	type:'termAttribute',
+            reference: 'icon'
     	},me.onEditAttributeClick);
+        // - Content
+        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable][data-type="termAttribute"]',{
+            scope:me,
+            type:'termAttribute',
+            reference: 'content'
+        },me.onEditAttributeClick);
+        // - Attribute comment
+        // TODO me.$_termTable.on('click', '.attribute-data.proposable span[data-editable-comment]',{scope:ComponentEditor},ComponentEditor.onEditableCommentComponentClick);
 	},
+    
+    /***
+     * Render term attributes by given term
+     * 
+     * @param attributes
+     * @param termLang
+     * @returns {String}
+     */
+    renderTermAttributes:function(attributes,termLang){
+        var me=this,
+            html = [],
+            commentAttribute=[];
+        
+        if(Attribute.languageDefinitionContent[termLang]){
+            html.push(Attribute.languageDefinitionContent[termLang]);
+        }
+        
+        for(var i=0;i<attributes.length;i++){
+            //comment attribute should always appear as first
+            if(attributes[i].name=='note'){
+                commentAttribute.push(Attribute.handleAttributeDrawData(attributes[i]));
+                continue;
+            }
+            html.push(Attribute.handleAttributeDrawData(attributes[i]));
+        }
+        html=commentAttribute.concat(html);
+        
+        return html.join('');
+    },
+
+    /***
+     * On add term-entry-attribute icon click handler
+     */
+    onAddTermEntryAttributeClick: function(event){
+        var me = event.data.scope;
+        console.log('onAddTermEntryAttributeClick');
+        // TODO
+    },
+
+    /***
+     * On add term-attribute icon click handler
+     */
+    onAddTermAttributeClick: function(event){
+        var me = event.data.scope;
+        console.log('onAddTermAttributeClick');
+        // TODO
+    },
 	
     /***
-     * On edit term-entry-attribute icon click handler
-     * On edit term-attribute icon click handler
+     * On edit term-entry-attribute click handler
+     * On edit term-attribute click handler
      */
-    onEditAttributeClick: function(eventData){
-    	console.log('onEditAttributeClick');
-    	var me=eventData.data.scope,
-	    	root=eventData.data.root,
-	    	type=eventData.data.type,
+    onEditAttributeClick: function(event){
+    	var me=event.data.scope,
+	    	type=event.data.type,
+            reference = event.data.reference,
 	        $element=$(this),
-			$parent=$element.parents('h4.attribute-data'),//the button parrent
-			attributeId=$parent.data('attributeId'),
-			$editableComponent=me.getAttributeComponent(attributeId,type);
-			
+			attributeId,
+            $editableComponent;
+        console.log('onEditAttributeClick ('+reference+')');
+        
+        event.stopPropagation();
+        
+        switch(reference) {
+            case "content":
+                $editableComponent = $element;
+                break;
+            case "headline":
+                attributeId = $element.data('attributeId');
+                $editableComponent = me.getAttributeComponent(attributeId,type);
+                break;
+            case "icon":
+                attributeId = $element.parents('h4.attribute-data').data('attributeId');
+                $editableComponent = me.getAttributeComponent(attributeId,type);
+                break;
+    	}
 	
 		if($editableComponent.length==0){
 			return;
@@ -68,9 +162,9 @@ const Attribute={
 	/***
      * On delete term and term entry attribute icon click handler
      */
-    onDeleteAttributeClick: function(eventData){
-        var me=eventData.data.scope,
-        	root=eventData.data.root,
+    onDeleteAttributeClick: function(event){
+        var me=event.data.scope,
+        	root=event.data.root,
             $element=$(this),
 			$parent=$element.parents('h4.attribute-data'),//the button parrent
 			attributeId=$parent.data('attributeId');
@@ -80,7 +174,7 @@ const Attribute={
 		}
 		var yesCallback=function(){
 			//ajax call to the remove proposal action
-			var me=eventData.data.scope,
+			var me=event.data.scope,
 				url=Editor.data.termportal.restPath+'termattribute/{ID}/removeproposal/operation'.replace("{ID}",attributeId);
 			$.ajax({
 		        url: url,

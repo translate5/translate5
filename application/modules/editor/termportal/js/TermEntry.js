@@ -1,7 +1,8 @@
 const TermEntry={
-		
-	$_termAttributeTable:null,
+
 	$_resultTermsHolder:null,
+    $_termEntryAttributesTable:null,
+    
 	KEY_TERM_ENTRY_ATTRIBUTES:"termEntryAttributes",
 	
 	init:function(){
@@ -9,9 +10,17 @@ const TermEntry={
 	},
 	
 	cacheDom:function(){
-		this.$_termAttributeTable=$('#termAttributeTable');
 		this.$_resultTermsHolder=$('#resultTermsHolder');
+        this.$_termEntryAttributesTable=$('#termEntryAttributesTable');
 	},
+    
+    initEvents:function(){
+        // TermEntries:
+        // - adding, deleting and editing term-entries is done by editing it's term(s)
+        
+        // TermEntries-Attributes: 
+        // - see Attribute.js
+    },
 	
 	/***
 	 * Draw the term entry groups
@@ -24,7 +33,7 @@ const TermEntry={
 	    }
 	    var me=this;
 	    
-	    me.$_termAttributeTable.empty();
+	    me.$_termEntryAttributesTable.empty();
 	    me.$_resultTermsHolder.show();
 	    
 	    var drawDataContainer=[],
@@ -41,7 +50,7 @@ const TermEntry={
 	    //merge the comments and the other attributes
 	    drawDataContainer=commentAttribute.concat(drawDataContainer);
 	    
-	    me.$_termAttributeTable.append(drawDataContainer.join(''));
+	    me.$_termEntryAttributesTable.append(drawDataContainer.join(''));
 
         Term.drawProposalButtons('term-entry');
         Term.drawProposalButtons('term-entry-attributes');
