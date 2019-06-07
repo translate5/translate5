@@ -302,7 +302,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 $atr[$key]=$value;
             }
             
-            $atr['proposable'] =$isAttributeProposalAllowed;
+            //is attribute proposable (is user attribute proposal allowed and the attribute is proposal whitelisted)
+            $atr['proposable'] =$isAttributeProposalAllowed && $attribute->isProposable($atr['name'],$atr['attrType']);
             if($isAttributeProposalAllowed){
                 $atr['proposal']=!empty($attProposal['id']) ? $attProposal : null;
                 $attProposal=[];

@@ -448,7 +448,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         //set the attribute origin type(when no termId is provided it is termEntry attribute otherwise term attribute)
         $result->attributeOriginType=empty($result->termId) ? 'termEntryAttribute' : 'termAttribute';
         $result->attributeId=$result->id;
-        $result->proposable=$this->isProposable($result->name,$result->attrType);
+        $result->proposable=$this->isProposableAllowed() && $this->isProposable($result->name,$result->attrType);
         return $result;
     }
 }
