@@ -1488,18 +1488,18 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='dW5wcm9jZXNzZWQ='><source>unprocessed</source><target>vorgeschlagen</target></trans-unit>
 <trans-unit id='cHJvdmlzaW9uYWxseVByb2Nlc3NlZA=='><source>provisionallyProcessed</source><target>überprüft</target></trans-unit>
 <trans-unit id='ZmluYWxpemVk'><source>finalized</source><target>freigegeben</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnIGJlYXJiZWl0ZW4='><source>Term-Eintrag bearbeiten</source><target>Term-Eintrag: Änderung vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnIGhpbnp1ZsO8Z2Vu'><source>Term-Eintrag hinzufügen</source><target>Neuen Term-Eintrag vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnIGzDtnNjaGVu'><source>Term-Eintrag löschen</source><target>Term-Eintrag: Vorschlag löschen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGJlYXJiZWl0ZW4='><source>Term-Eintrag-Attribut bearbeiten</source><target>Term-Eintrag-Attribut: Änderung vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGhpbnp1ZsO8Z2Vu'><source>Term-Eintrag-Attribut hinzufügen</source><target>Neues Term-Eintrag-Attribut vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0IGzDtnNjaGVu'><source>Term-Eintrag-Attribut löschen</source><target>Term-Eintrag-Attribut: Vorschlag löschen</target></trans-unit>
-<trans-unit id='VGVybSBiZWFyYmVpdGVu'><source>Term bearbeiten</source><target>Term: Änderung vorschlagen</target></trans-unit>
-<trans-unit id='VGVybSBoaW56dWbDvGdlbg=='><source>Term hinzufügen</source><target>Neuen Term vorschlagen</target></trans-unit>
-<trans-unit id='VGVybSBsw7ZzY2hlbg=='><source>Term löschen</source><target>Term: Vorschlag löschen</target></trans-unit>
-<trans-unit id='VGVybS1BdHRyaWJ1dCBiZWFyYmVpdGVu'><source>Term-Attribut bearbeiten</source><target>Term-Attribut: Änderung vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1BdHRyaWJ1dCBoaW56dWbDvGdlbg=='><source>Term-Attribut hinzufügen</source><target>Neues Term-Attribut vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1BdHRyaWJ1dCBsw7ZzY2hlbg=='><source>Term-Attribut löschen</source><target>Term-Attribut: Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnOiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='><source>Term-Eintrag: Änderung vorschlagen</source><target>Term-Eintrag: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZW4gVGVybS1FaW50cmFnIHZvcnNjaGxhZ2Vu'><source>Neuen Term-Eintrag vorschlagen</source><target>Neuen Term-Eintrag vorschlagen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnOiBWb3JzY2hsYWcgbMO2c2NoZW4='><source>Term-Eintrag: Vorschlag löschen</source><target>Term-Eintrag: Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='><source>Term-Eintrag-Attribut: Änderung vorschlagen</source><target>Term-Eintrag-Attribut: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZXMgVGVybS1FaW50cmFnLUF0dHJpYnV0IHZvcnNjaGxhZ2Vu'><source>Neues Term-Eintrag-Attribut vorschlagen</source><target>Neues Term-Eintrag-Attribut vorschlagen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiBWb3JzY2hsYWcgbMO2c2NoZW4='><source>Term-Eintrag-Attribut: Vorschlag löschen</source><target>Term-Eintrag-Attribut: Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybTogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Term: Änderung vorschlagen</source><target>Term: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZW4gVGVybSB2b3JzY2hsYWdlbg=='><source>Neuen Term vorschlagen</source><target>Neuen Term vorschlagen</target></trans-unit>
+<trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dDogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Term-Attribut: Änderung vorschlagen</source><target>Term-Attribut: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZXMgVGVybS1BdHRyaWJ1dCB2b3JzY2hsYWdlbg=='><source>Neues Term-Attribut vorschlagen</source><target>Neues Term-Attribut vorschlagen</target></trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dDogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term-Attribut: Vorschlag löschen</source><target>Term-Attribut: Vorschlag löschen</target></trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Suche</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuKQ=='><source>Serbisch (Kyrillisch) (Serbien)</source><target>Serbisch (Kyrillisch) (Serbien)</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4p'><source>Serbisch (Latein) (Serbien)</source><target>Serbisch (Latein) (Serbien)</target></trans-unit>
@@ -1554,10 +1554,13 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='SFRUUDogNDAx'><source>HTTP: 401</source><target>HTTP: 401</target></trans-unit>
 <trans-unit id='RGllc2UgRG9tYWluIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Domain wird bereits verwendet.</source><target>Diese Domain wird bereits verwendet.</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='><source>Vorschläge exportieren</source><target>Proposals export</target></trans-unit>
-<trans-unit id='TcO2Y2h0ZW4gU2llIGRhcyBBdHRyaWJ1dCB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie das Attribut wirklich entfernen?</source><target>Möchten Sie das Attribut wirklich entfernen?</target></trans-unit>
-<trans-unit id='TcO2Y2h0ZW4gU2llIGRlciBUZXJtIHdpcmtsaWNoIGVudGZlcm5lbj8='><source>Möchten Sie der Term wirklich entfernen?</source><target>Möchten Sie der Term wirklich entfernen?</target></trans-unit>
-<trans-unit id='QXR0cmlidXQgZW50ZmVybmVu'><source>Attribut entfernen</source><target>Attribut entfernen</target></trans-unit>
-<trans-unit id='VGVybSBlbnRmZXJuZW4='><source>Term entfernen</source><target>Term entfernen</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBBdHRyaWJ1dHMtVm9yc2NobGFnIHdpcmtsaWNoIGVudGZlcm5lbj8='><source>Möchten Sie den Attributs-Vorschlag wirklich entfernen?</source><target>Möchten Sie den Attributs-Vorschlag wirklich entfernen?</target></trans-unit>
+<trans-unit id='RGFzIEF0dHJpYnV0IHdpcmQgZGFubiBhdWYgZGVuIGFsdGVuIFN0YW5kIHp1csO8Y2tnZXNldHp0Lg=='><source>Das Attribut wird dann auf den alten Stand zurückgesetzt.</source><target>Das Attribut wird dann auf den alten Stand zurückgesetzt.</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBUZXJtLVZvcnNjaGxhZyB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie den Term-Vorschlag wirklich entfernen?</source><target>Möchten Sie den Term-Vorschlag wirklich entfernen?</target></trans-unit>
+<trans-unit id='RGVyIFRlcm0gd2lyZCBkYW5uIGF1ZiBkZW4gYWx0ZW4gU3RhbmQgenVyw7xja2dlc2V0enQgKGJ6dy4gZ2Vsw7ZzY2h0LCB3ZW5uIGVzIGlobiB2b3JoZXIgbmljaHQgZ2FiKS4='><source>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</source><target>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attributs-Vorschlag löschen</source><target>Attributs-Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
+<trans-unit id='T3BlbklkIElzc3Vlcg=='><source>OpenId Issuer</source><target>OpenId Issuer</target></trans-unit>
   </body>
  </file>
 </xliff>

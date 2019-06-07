@@ -153,19 +153,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "noExistingAttributes" => $this->translate->_('no existing attributes'),
                 "collection"=>$this->translate->_("Term-Collection"),
                 "client"=>$this->translate->_("Kunde"),
-                "processstatus"=>$this->translate->_("Prozessstatus"),
-                "editTermEntry"=>$this->translate->_("Term-Eintrag bearbeiten"),
-                "addTermEntry"=>$this->translate->_("Term-Eintrag hinzufügen"),
-                "deleteTermEntry"=>$this->translate->_("Term-Eintrag löschen"),
-                "editTermEntryAttribute"=>$this->translate->_("Term-Eintrag-Attribut bearbeiten"),
-                "addTermEntryAttribute"=>$this->translate->_("Term-Eintrag-Attribut hinzufügen"),
-                "deleteTermEntryAttribute"=>$this->translate->_("Term-Eintrag-Attribut löschen"),
-                "editTerm"=>$this->translate->_("Term bearbeiten"),
-                "addTerm"=>$this->translate->_("Term hinzufügen"),
-                "deleteTerm"=>$this->translate->_("Term löschen"),
-                "editTermAttribute"=>$this->translate->_("Term-Attribut bearbeiten"),
-                "addTermAttribute"=>$this->translate->_("Term-Attribut hinzufügen"),
-                "deleteTermAttribute"=>$this->translate->_("Term-Attribut löschen")
+                "processstatus"=>$this->translate->_("Prozessstatus")
         );
         
         $this->view->translations=$translatedStrings;
@@ -176,10 +164,21 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $this->view->Php2JsVars()->set('apps.termportal.proposal.translations',[
                 "Ja"=>$this->translate->_("Ja"),
                 "Nein"=>$this->translate->_("Nein"),
-                "deleteAttributeProposalMessage"=>$this->translate->_("Möchten Sie das Attribut wirklich entfernen?"),
-                "deleteTermProposalMessage"=>$this->translate->_("Möchten Sie der Term wirklich entfernen?"),
-                "deleteAttributeProposalTitle"=>$this->translate->_("Attribut entfernen"),
-                "deleteTermProposalTitle"=>$this->translate->_("Term entfernen")
+                "deleteAttributeProposalMessage"=>$this->translate->_("Möchten Sie den Attributs-Vorschlag wirklich entfernen?"),
+                "deleteTermProposalMessage"=>$this->translate->_("Möchten Sie den Term-Vorschlag wirklich entfernen?"),
+                "deleteAttributeProposalTitle"=>$this->translate->_("Attributs-Vorschlag löschen"),
+                "editTermEntry"=>$this->translate->_("Term-Eintrag: Änderung vorschlagen"),
+                "addTermEntry"=>$this->translate->_("Neuen Term-Eintrag vorschlagen"),
+                "deleteTermEntry"=>$this->translate->_("Term-Eintrag: Vorschlag löschen"),
+                "editTermEntryAttribute"=>$this->translate->_("Term-Eintrag-Attribut: Änderung vorschlagen"),
+                "addTermEntryAttribute"=>$this->translate->_("Neues Term-Eintrag-Attribut vorschlagen"),
+                "deleteTermEntryAttribute"=>$this->translate->_("Term-Eintrag-Attribut: Vorschlag löschen"),
+                "editTerm"=>$this->translate->_("Term: Änderung vorschlagen"),
+                "addTerm"=>$this->translate->_("Neuen Term vorschlagen"),
+                "deleteTerm"=>$this->translate->_("Term: Vorschlag löschen"),
+                "editTermAttribute"=>$this->translate->_("Term-Attribut: Änderung vorschlagen"),
+                "addTermAttribute"=>$this->translate->_("Neues Term-Attribut vorschlagen"),
+                "deleteTermAttribute"=>$this->translate->_("Term-Attribut: Vorschlag löschen")
             ]);
         }
         
