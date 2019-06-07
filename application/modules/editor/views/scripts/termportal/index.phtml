@@ -139,7 +139,7 @@ if(isset($this->error)){
     	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
             <div id="searchTermsHelper" class="ui-corner-all">
                 <p id="error-no-results" class="ui-state-error" style="display:none;"><?php echo $this->translations["noResults"];?></p>
-                <p class="skeleton"><span class="proposal-txt"><?php echo $this->translations["addTermEntry"];?></span> <span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></p>
+                <p class="skeleton"><span class="proposal-txt"></span> <span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></p>
             </div>
             <ul id="searchTermsSelect" size="10" style="display: inline-block;"></ul>
     	</div>
@@ -175,8 +175,8 @@ var collectionsClients=JSON.parse('<?php echo json_encode($collectionsClients); 
 var collectionsNames=<?php echo json_encode($collectionsNames); ?>;
 var clientsNames=<?php echo json_encode($clientsNames); ?>;
 var translations=<?php echo json_encode($this->translations); ?>;
+var proposalTranslations = Editor.data.apps.termportal.proposal.translations;
 var searchFilterPlaceholderText=translations['searchFilterPlaceholderText']+'...';
-
 function setSizesInFinalResultContent(){
     var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
     if ($('#searchTermsHolder').is(':visible')) {
@@ -225,7 +225,8 @@ $( function() {
     $("#search").focus();
     $(window).resize(function() {
         setSizesInFinalResultContent();
-    });  
+    });
+    $('#searchTermsHelper').find('.proposal-txt').text(proposalTranslations['addTermEntryProposal']);
     $( document ).tooltip({
         position: { my: "left center", at: "right center" }
     });
