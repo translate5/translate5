@@ -703,7 +703,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
         $s = $this->db->select()
         ->setIntegrityCheck(false)
-        ->from($tableTerm, array('definition','groupId', 'term as label','id as value','term as desc'))
+        ->from($tableTerm, array('definition','groupId', 'term as label','id as value','term as desc', 'collectionId', 'termEntryId'))
         ->joinLeft($tableProposal, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['term', 'id', 'created'])
         ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
         ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
