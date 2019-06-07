@@ -100,9 +100,18 @@ class editor_TermattributeController extends ZfExtended_RestController {
         //we don't save the term, but we save it to a proposal:
         $this->proposal->save();
         
+        //in the term attributes the termEntryId is not set
+        $entryId=$this->entity->getTermEntryId();
+        if($entryId==null){
+            $term=ZfExtended_Factory::get('editor_Models_Term');
+            /* @var $term editor_Models_Term */
+            $term->load($this->entity->getTermId());
+            $entryId=$term->getTermEntryId();
+        }
+        
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->load($this->entity->getTermEntryId());
+        $termEntry->load($entryId);
         
         //update the term entry create/modefy dates
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
@@ -150,9 +159,19 @@ class editor_TermattributeController extends ZfExtended_RestController {
         }
         $this->proposal->delete();
         
+
+        //in the term attributes the termEntryId is not set
+        $entryId=$this->entity->getTermEntryId();
+        if($entryId==null){
+            $term=ZfExtended_Factory::get('editor_Models_Term');
+            /* @var $term editor_Models_Term */
+            $term->load($this->entity->getTermId());
+            $entryId=$term->getTermEntryId();
+        }
+        
         $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
-        $termEntry->load($this->entity->getTermEntryId());
+        $termEntry->load($entryId);
         
         //update the term entry create/modefy dates
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
