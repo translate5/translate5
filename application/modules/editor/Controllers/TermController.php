@@ -184,6 +184,14 @@ class editor_TermController extends ZfExtended_RestController {
             
             $this->entity->setTermEntryId($entry->getId());
             $this->entity->setGroupId($entry->getGroupId());
+        }else{
+            
+            //when the term entry is provided, load the term entry and set the term groupId
+            //this is the case when new term is proposed in the allready exisitn termEntry
+            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+            /* @var $entry editor_Models_TermCollection_TermEntry */
+            $entry->load($this->data->termEntryId);
+            $this->entity->setGroupId($entry->getGroupId());
         }
     }
     
