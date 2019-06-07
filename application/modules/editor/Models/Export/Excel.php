@@ -36,7 +36,14 @@ class editor_Models_Export_Excel {
      */
     protected static $excel;
     
+    /**
+     * export xls from $task.
+     * @param editor_Models_Task $task
+     */
     public static function run(editor_Models_Task $task) : void {
+        // task data must be aktualiced
+        $task->createMaterializedView();
+        
         // create a new empty excel
         $tempExcelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
         /* @var $tempExcelExImport editor_Models_ExcelExImport */
@@ -53,20 +60,19 @@ class editor_Models_Export_Excel {
         /* @var $segments editor_Models_Segment_Iterator */
         
         foreach($segments as $segment) {
-            $source = $segmentTagger->toXliff($segment->getSource());
-            $target = $segmentTagger->toXliff($segment->getTargetEdit());
+            $source = $segmentTagger->toExcel($segment->getSource(), $tempMap);
+            $target = $segmentTagger->toExcel($segment->getTargetEdit());
             self::$excel->addSegment($segment->getSegmentNrInTask(), $source, $target);
         }
         
         // output: first send headers
-        //header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); // !!! this is already send by TaskController.php::init()
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('.xlsx').'"');
         header('Cache-Control: max-age=0');
         
         // .. then send the excel
         $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx(self::$excel->getExcel());
         $writer->save('php://output');
-        
-        return;
+        exit;
     }
 }

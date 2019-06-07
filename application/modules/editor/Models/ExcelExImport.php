@@ -62,10 +62,10 @@ class editor_Models_ExcelExImport {
     
     
     /**
-     * Identifier for task-field 'foreignName' to mark task as 'is Excel exported'
+     * task-state to identify a task as "excel exported"
      * @var string
      */
-    const TASK_EXPORTED_IDENTIFIER = 'ExcelExImport';
+    const TASK_STATE_ISEXCELEXPORTED = 'ExcelExported';
     
     /**
      * Container to hold the excel-object aka PhpOffice\PhpSpreadsheet\Spreadsheet
@@ -338,6 +338,40 @@ class editor_Models_ExcelExImport {
         $sheet->setCellValue('B6', $this->taskGuid);
     }
     
+    
+    /**
+     * lock the task for editing and set the tasks state to "isExcelExported"
+     * @param editor_Models_Task $task
+     * @return bool
+     */
+    public static function taskLock(editor_Models_Task $task) : bool {
+        return TRUE;
+        if(!$task->lock(NOW_ISO)) {
+            $this->log->logError('The following task is in use and cannot be exported: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
+            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task lock failed');
+            return FALSE;
+        }
+        
+        $task->setState(self::TASK_STATE_ISEXCELEXPORTED);
+        $task->save();
+        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task lock OK');
+        return TRUE;
+    }
+    /**
+     * lock the task for editing and set the tasks state to "isExcelExported"
+     * @param editor_Models_Task $task
+     * @return bool
+     */
+    public static function taskUnlock(editor_Models_Task $task) : bool {
+        if (!$task->unlock()) {
+            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task unlock failed');
+            return FALSE;
+        }
+        $task->setState(editor_Models_Task::STATE_OPEN);
+        $task->save();
+        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task unlock OK');
+        return TRUE;
+    }
 }
 
 /**

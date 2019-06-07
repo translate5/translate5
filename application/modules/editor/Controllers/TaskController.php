@@ -529,9 +529,19 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entityLoad();
         
         $reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
-        /* @var $exportExcel editor_Models_Import_Excel */
-        $reimportExcel::run($this->entity);
-        // @TODO: if everything is OK, remove mark task as 'is Excel exported' and un-lock the task
+        /* @var $reimportExcel editor_Models_Import_Excel */
+        if ($reimportExcel::run($this->entity)) {
+            // if everything is OK
+            // unlock task and set state to 'open'
+            $excelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
+            /* @var $excelExImport editor_Models_ExcelExImport */
+            $excelExImport::taskUnlock($this->entity);
+            
+            // @TODO: if there where error in segments, show them as hint in frontend.
+            if ($segmentError = $reimportExcel::getSegmentError()) {
+                error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Error on reimport in the following segments. Please check this segments.'."\n".$segmentError);
+            }
+        }
     }
     
     protected function startImportWorkers() {
@@ -1209,17 +1219,15 @@ class editor_TaskController extends ZfExtended_RestController {
         
         switch ($context) {
             case 'excel':
+                // lock task and set state to 'ExcelExported'
+                $excelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
+                /* @var $excelExImport editor_Models_ExcelExImport */
+                $excelExImport::taskLock($this->entity);
+                
+                // run excel export
                 $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel');
                 /* @var $exportExcel editor_Models_Export_Excel */
                 $exportExcel::run($this->entity);
-                
-                // @TODO: if everything is OK, mark task as 'is Excel exported' and lock the task
-                $this->entity->setForeignName(editor_Models_ExcelExImport::TASK_EXPORTED_IDENTIFIER);
-                /*
-                $this->entity->setLocked(TRUE);
-                $this->entity->setLockingUser($this->entity->getPmGuid());
-                */
-                $this->entity->save();
                 
                 return;
             

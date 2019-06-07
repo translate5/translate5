@@ -180,6 +180,71 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
     
     /**
+     * converts the given string (mainly the internal tags in the string) into excel tag-placeholder.
+     * Sample:
+     * <img class=".. open .." .. /> => <1>
+     * <img class=".. close .." .. /> => </1>
+     * <img class=".. single .." .. /> => <1 />
+     * because <123> are no real tags, the function uses an "internal tag" <excel 123>. So first all tags are converted to <excel 123> tags.
+     * this "real" tags can be used to exclude them from beeing removed by function strip_tags if $removeOther is true.
+     * After this a simple str_replace is used to convert the internal <excel 123> to the wanted <123> tags
+     * 
+     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
+     * and the replaced original tags. Warning: it is no usual key => value map, to be compatible with toXliffPaired (details see there)
+     *  
+     * @param string $segment
+     * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
+     * @return string segment with excel pseudo tags
+     */
+    public function toExcel(string $segment, &$replaceMap = null) {
+        //if not external map given, we init it internally, although we don't need it
+        if(is_null($replaceMap)) {
+            $replaceMap = [];
+        }
+        
+        // remove TrackChanges Tags
+        $taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $taghelperTrackChanges editor_Models_Segment_TrackChangeTag */
+        $segment = $taghelperTrackChanges->removeTrackChanges($segment);
+        
+        $result = $this->replace($segment, function($match) use (&$replaceMap) {
+            //original id coming from import format
+            $id = $match[3];
+            $type = $match[1];
+            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x'];
+            
+            switch($type) {
+                case 'single':
+                    $result = sprintf('<excel %s />', $id);
+                    $resultId = sprintf('<%s />', $id);
+                    break;
+                
+                case 'open':
+                    $result = sprintf('<excel %s>', $id);
+                    $resultId = sprintf('<%s>', $id);
+                    break;
+                
+                case 'close':
+                    $result = sprintf('<excel /%s>', $id);
+                    $resultId = sprintf('</%s>', $id);
+                break;
+            }
+            
+            $replaceMap[$resultId] = [$resultId, $match[0]];
+            return $result;
+        });
+        
+        // prevent internal excel tags from beeing removed
+        $result = strip_tags($result, '<excel>');
+        
+        // convert the internal excel tags to the wanted form
+        $result = str_replace('<excel ', '<', $result);
+        
+        
+        return $result;
+    }
+    
+    /**
      * Converts internal tags to xliff2 format
      * @see editor_Models_Segment_InternalTag::toXliff for details see toXliff
      * @param string $segment

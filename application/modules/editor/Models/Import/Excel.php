@@ -36,7 +36,24 @@ class editor_Models_Import_Excel {
      */
     protected static $excel;
     
-    public static function run(editor_Models_Task $task) : void {
+    /**
+     * A list of segment-numbers (@TODO: ?and error description) with invalid tag-strucrue.
+     * So this list is shown after reimport to the user with hint thet the user has to check the here notet segments.
+     * 
+     * @var array
+     */
+    protected static $segmentError = [];
+    
+    /**
+     * reimport xls into $task.
+     * returns TRUE if everything is OK, FALSE on (fatal) error
+     * @param editor_Models_Task $task
+     * @return bool
+     */
+    public static function run(editor_Models_Task $task) : bool {
+        // task data must be aktualized
+        $task->createMaterializedView();
+        
         // load the excel
         $tempExcelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
         /* @var $tempExcelExImport editor_Models_ExcelExImport */
@@ -49,7 +66,7 @@ class editor_Models_Import_Excel {
         if (!self::formalCheck($task)) {
             // @TODO: where/how store errors/exceptions !?!
             error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Excel reimport is not possible because of formal errors');
-            return;
+            return FALSE;
         }
         
         // load segment tagger to extract pure text from t5Segment
@@ -61,29 +78,47 @@ class editor_Models_Import_Excel {
         /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
         
         foreach (self::$excel->getSegments() as $segment) {
-            $tempReplacement = [];
+            // detect tag-map and org. segment content from org t5 segment
+            $tempMap = [];
             $t5Segment->loadBySegmentNrInTask($segment->nr, $task->getTaskGuid());
-            $orgSegmentTarget = $segmentTagger->toXliff($t5Segment->getTargetEdit(), NULL, $tempReplacement);
+            $orgSegmentAsExcel = $segmentTagger->toExcel($t5Segment->getTargetEdit(), $tempMap);
+            
+            // remove TrackChanges Tags
+            $taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+            /* @var $taghelperTrackChanges editor_Models_Segment_TrackChangeTag */
+            $orgSegmentTrackChangesDeleted = $taghelperTrackChanges->removeTrackChanges($t5Segment->getTargetEdit());
+            
+            // new segement is the one from excel
             $newSegmentTarget = $segment->target;
             
+            // add TrackChanges informations comparing the new segmenet from excel with the org segment converted to excel tagging
+            //$newSegmentTarget = $diffTagger->diffSegment($orgSegmentAsExcel, $newSegmentTarget, NULL, NULL);
             // restore org tags
-            $newSegmentTarget = $segmentTagger->reapply2dMap($newSegmentTarget, $tempReplacement);
+            //$newSegmentTarget = $segmentTagger->reapply2dMap($newSegmentTarget, $tempMap);
             
-            // @TODO: add TermTagger Informations !?!
+            // restore org tags
+            $newSegmentTarget = $segmentTagger->reapply2dMap($newSegmentTarget, $tempMap);
+            // add TrackChanges informations comparing the new segmenet from excel with the org segment
+            $newSegmentTarget = $diffTagger->diffSegment($orgSegmentTrackChangesDeleted, $newSegmentTarget, NULL, NULL);
             
-            // finally add TrackChanges
-            $newSegmentTarget = $diffTagger->diffSegment($orgSegmentTarget, $newSegmentTarget, NULL, NULL);
-            
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__."\n"
-                    .'alt (org):'.$t5Segment->getTargetEdit()
-                    ."\nneu:".$newSegmentTarget
-                    //."\nTrackChanges: ".print_r($diffTagger->diffSegment($orgSegmentTarget, $newSegmentTarget, NULL, NULL), TRUE)
-                    //."\ntagDiffs: ".print_r($segmentTagger->diff($orgSegmentTarget, $newSegmentTarget), TRUE)
-                    );
-            continue;
             // @TODO: Terminology markup is readded by sending the segment again to the termTagger.
-            // ?? is it always neded???
+            // ?? is it always neded??? or only if TermTagger Plugin is active.. what about the workflow..
             
+            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__
+                    ."\norg:\n".$t5Segment->getTargetEdit()
+                    ."\norg->woChanges:\n".$orgSegmentTrackChangesDeleted
+                    //."\norg->toExcel:\n".$orgSegmentAsExcel
+                    //."\nneu\n".$segment->target
+                    ."\nneu (TrackChanges)\n".$newSegmentTarget
+                    //."\nmap:".print_r($tempMap, true)
+                    );
+            
+            continue;
+            
+            // @TODO: add segment error if an error ist detected. what is an error?
+            if ($orgSegmentAsExcel != $segment->target) {
+                self::addSegmentError($segment->nr, 'segment content changed.');
+            }
             
             // save edited segment target
             $t5Segment->setTargetEdit(date('Y-m-d H:i:s').' reimported :: '.$newSegmentTarget);
@@ -95,11 +130,11 @@ class editor_Models_Import_Excel {
             }
         }
         
-        return;
+        return TRUE;
     }
     
     /**
-     * Add a comment to a segment.
+     * Add a comment to a segment in t5.
      * @param string $comment
      * @param int $segmentId
      * @param editor_Models_Task $task
@@ -170,5 +205,32 @@ class editor_Models_Import_Excel {
         }
         
         return TRUE;
+    }
+    
+    /**
+     * add an segment error to the internal segment-error-list.
+     * @param int $segmentNr
+     * @param string $hint
+     */
+    protected static function addSegmentError(int $segmentNr, string $hint = '') : void {
+        $tempError = '#'.$segmentNr;
+        if (!empty($hint)) {
+            $tempError .= ': '.$hint;
+        }
+        
+        self::$segmentError[] = $tempError;
+    }
+    
+    /**
+     * get the list of internal segment errors (as formatet string).
+     * if there where no error FALSE will be returned
+     * @return string|false
+     */
+    public static function getSegmentError() : string {
+        if (empty(self::$segmentError)) {
+            return FALSE;
+        }
+        
+        return implode("\n", self::$segmentError);
     }
 }
