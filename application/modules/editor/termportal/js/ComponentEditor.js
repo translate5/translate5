@@ -93,7 +93,7 @@ const ComponentEditor={
             url,
             requestData={};
         
-        // if id is not provided, this is a proposal on empty term entry
+        // if id is not provided, this is a proposal on empty term entry // TODO: is this comment correct? We can also create a new Term WITHIN an existing TermEntry!
         isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
         
         // if not new: 
@@ -123,11 +123,12 @@ const ComponentEditor={
 		if(isNew){
 			url=Editor.data.termportal.restPath+'term',
 			requestData={};
-			requestData['collectionId']=Term.newTermCollectionId;
-			requestData['language']=Term.newTermLanguageId;
+			requestData['collectionId']  =Term.newTermCollectionId;
+			requestData['language']      =Term.newTermLanguageId;
+            requestData['termEntryId']   =Term.newTermTermEntryId;
 			requestData[dataKey]=$input.val();
 			
-	        console.log('saveComponentChange for proposal on empty term entry:');
+	        console.log('saveComponentChange (isNew):');
 	        console.log('- requestData: ' + JSON.stringify(requestData));
 		}
 		

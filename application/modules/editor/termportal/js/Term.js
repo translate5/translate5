@@ -21,6 +21,7 @@ const Term={
 		newTermGroupId: null,
         newTermLanguageId: null,
         newTermName: null,
+        newTermTermEntryId: null,
 		
 		KEY_TERM:"term",
 		KEY_TERM_ATTRIBUTES:"termAttributes",
@@ -44,9 +45,10 @@ const Term={
 		
 		initEvents:function(){
 			var me=this;
-			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) { // FIXME: why is this triggered twice sometimes (with attr('data-value') = "undefined" in the second)
-				me.findTermsAndAttributes($(ui.selected).attr('data-value'));
-		    });
+			
+            // Search Results
+			me.$_searchTermsSelect.on( "selectableselected",{scope:me},me.onSelectSearchTerm);
+		    // FIXME: why is this triggered twice sometimes (with attr('data-value') = "undefined" in the second)
 			
 			// Term-Entries
 	        me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
@@ -58,9 +60,24 @@ const Term={
             me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me, reference:'icon'},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
             // - Content
+            me.$_termTable.on('click', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
             
             // Terms-Attributes: see Attribute.js
+		},
+        
+        /***
+         * On searchTermsSelect selectableselected handler
+         */
+        onSelectSearchTerm(event, ui) {
+            var me = event.data.scope,
+                $_selected = $(ui.selected);
+            // data for proposing a new Term
+            me.resetNewTermData();
+            me.newTermCollectionId = $_selected.attr('data-collectionid');
+            me.newTermTermEntryId = $_selected.attr('data-termentryid');
+            // show Terms and Attributes
+            me.findTermsAndAttributes($_selected.attr('data-value'));
 		},
 		
 		/***
@@ -132,21 +149,16 @@ const Term={
 			
 			console.log("fillSearchTermSelect: " + me.searchTermsResponse.length + " Treffer");
 			
-			if(me.disableLimit){
-				console.log("fillSearchTermSelect: me.disableLimit");
+			console.log("fillSearchTermSelect: me.disableLimit"); // FIXME: do we need this here?
 				
-				me.disableLimit=false;
-				
-				//if only one record, find the attributes and display them
-				if(me.searchTermsResponse.length===1){
-					console.log("fillSearchTermSelect: only one record => find the attributes and display them");
-					me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
-				}
-				
-				if(me.searchTermsResponse.length>0){
-					showFinalResultContent();
-				}
-				
+			//if only one record, find the attributes and display them
+			if(me.searchTermsResponse.length===1){
+				console.log("fillSearchTermSelect: only one record => find the attributes and display them");
+				me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
+			}
+			
+			if(me.searchTermsResponse.length>0){
+				showFinalResultContent();
 			}
 			
 			if(!me.$_searchTermsSelect.is(":visible")){
@@ -161,7 +173,10 @@ const Term={
 			for(var i=0;i<me.searchTermsResponse.length;i++){
 				var item=me.searchTermsResponse[i];
 				me.$_searchTermsSelect.append( // FIXME; this takes too long
-						$('<li>').attr('data-value', item.groupId).attr('class', 'ui-widget-content search-terms-result').append(
+						$('<li>').attr('data-value', item.groupId)
+						         .attr('data-collectionid', item.collectionId)
+                                 .attr('data-termentryid', item.termEntryId)
+						         .attr('class', 'ui-widget-content search-terms-result').append(
 								$('<div>').attr('class', 'ui-widget').append(item.label)
 						));
 			}
@@ -209,10 +224,6 @@ const Term={
 		    Attribute.languageDefinitionContent=[];
             
             me.$_termCollectionSelect.hide();
-            
-            // data for proposing a new Term
-            me.resetNewTermData();
-            me.newTermGroupId = termGroupid;
             
 		    //check the cache
 		    if(!me.reloadTermEntry && me.termGroupsCache[termGroupid]){
@@ -371,9 +382,8 @@ const Term={
                 clientId,
                 clientName,
                 isProposal,
-                proposable = (term.proposable !== false) ? ' proposable' : ''; // = does the user have the rights to handle proposals at all?
+                proposable = (term.proposable !== false) ? ' proposable' : ''; // = does the user have the rights to handle proposals for this term?
             
-            // TODO: calculate this in backend
             // "is-proposal" can be ... 
             // ... a proposal for a term that already existed (term.proposal = "xyz")
             // ... or a proposal for a new term (term.proposal = null, but processStatus is "unprocessed")
@@ -576,6 +586,7 @@ const Term={
             me.newTermGroupId = null;                                           // will be set from result's select-list
             me.newTermLanguageId = null;                                        // will be selected by user (or set according to search without result)
             me.newTermName = proposalTranslations['addTermProposal'] + '...';   // (or set according to search without result)
+            me.newTermTermEntryId = null;                                       // will be set by selecting a search-result (if not given => new TermEntry will be created)
             // if a search has no result:
             if (me.$_searchErrorNoResults.is(":visible")) {
                 me.newTermLanguageId = $('#language').val();
@@ -590,12 +601,13 @@ const Term={
             console.log('renderNewTermData...');
             var me = this,
                 newTermData = {};
-            console.log('renderNewTermData with: ');
+            console.log('renderNewTermData; currently known: ');
             console.log('- attributes: ' + JSON.stringify(me.newTermAttributes));
             console.log('- collectionId: ' + me.newTermCollectionId);
             console.log('- groupId: ' + me.newTermGroupId);
             console.log('- languageId: ' + me.newTermLanguageId);
             console.log('- termName: ' + me.newTermName);
+            console.log('- termTermEntryId: ' + me.newTermTermEntryId);
             newTermData = {0: {
                 'attributes': me.newTermAttributes,
                 'collectionId': me.newTermCollectionId,

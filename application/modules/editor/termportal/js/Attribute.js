@@ -225,19 +225,18 @@ const Attribute={
 	    var me=this,
 	    	html='',
             isProposal,
-            proposable = attribute.proposable ? ' proposable' : '',
+            proposable = attribute.proposable ? ' proposable' : '', // = the user can handle proposals for this attribute: (1) suer has the rights (2) attribute is editable
 	    	headerTagOpen,
 	    	headerTagClose,
 	    	getAttributeContainerRender=function(attribute,html){
 	    		return '<p data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
 	    	};
-
-        // TODO: calculate this in backend
+            
     	// "is-proposal" can be ... 
-        // ... a proposal for a term that already existed (term.proposal = "xyz")
-        // ... or a proposal for a new term (term.proposal = null, but processStatus is "unprocessed")
+        // ... a proposal for a term that already existed (attribute.proposal = "xyz")
+        // ... or a proposal for a new term (attribute.proposal = null, but attrProcessStatus is "unprocessed")
         isProposal = ' is-finalized'; 
-        if (attribute.proposal !== null || attribute.processStatus === "unprocessed") {
+        if (attribute.proposal !== null || attribute.attrProcessStatus === "unprocessed") {
             isProposal = ' is-proposal';
         }
         
