@@ -53,13 +53,8 @@ const Term={
 	        me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
 
             // Terms
-	        // - Headline
-	        me.$_termTable.on('click', '.term-data.proposable',{
-	            scope:me,
-	            reference: 'headline'
-	        },me.onEditTermClick);
             // - Icons
-            me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me, reference:'icon'},me.onEditTermClick); // = the same procedure as editing
+            me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me, reference:'icon'},me.onAddTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me, reference:'icon'},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
             // - Content
@@ -116,7 +111,7 @@ const Term={
 		 */
 		fillSearchTermSelect:function(searchString){
 			var me=this;
-			if(!me.searchTermsResponse){
+			if(!me.searchTermsResponse || me.searchTermsResponse.length === 0){
 
 			    me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + translations['addTermEntry']);
                 me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + translations['addTermEntry']);
@@ -284,7 +279,9 @@ const Term={
                 html = '',
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
                 $_filteredClients = $('#searchFilterTags input.filter.client'),
-                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?
+                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1), // TODO: show collection also when adding a TermEntry?
+                currentItem,
+                currentItemNr;
 		    
             me.emptyResultTermsHolder(true);
             me.$_resultTermsHolder.show();
@@ -304,7 +301,21 @@ const Term={
 		    	me.$_termTable.accordion({
 		            active: false,
 		            collapsible: true,
-		            heightStyle: "content"
+		            heightStyle: "content",
+		            beforeActivate: function( event, ui ) {
+		                if (ui.newHeader.length === 0 && ui.oldHeader.has("textarea").length > 0) {
+		                    // Term in header is opened for editing; don't close the panel.
+		                    event.preventDefault();
+		                }
+		            },
+                    activate: function( event, ui ) {
+                        if (ui.newHeader.length === 0 && ui.oldHeader.has("textarea").length > 0) {
+                            // Panel is already opened, don't close it after click on Term in header for editing.
+                            currentItem = ui.oldHeader[0];
+                            currentItemNr = me.$_termTable.children('h3').index(currentItem);
+                            me.$_termTable.accordion('option', 'active', currentItemNr);
+                        }
+                    }
 		        });
 		    }
 		    
@@ -359,10 +370,18 @@ const Term={
                 filteredCollectionsNames = [],
                 clientId,
                 clientName,
-                // TODO!!!! check processStatus!!! ************************++
-                isProposal = (term.proposal == null) ? ' is-finalized' : ' is-proposal', // ("is-proposal" can be a proposal for a term that already existed or a proposal for a new term) 
-                proposable = (term.proposable !== false) ? ' proposable' : ''; // = user has the rights to handle proposals
-                
+                isProposal,
+                proposable = (term.proposable !== false) ? ' proposable' : ''; // = does the user have the rights to handle proposals at all?
+            
+            // "is-proposal" can be ... 
+            // ... a proposal for a term that already existed (term.proposal = "xyz")
+            // ... or a proposal for a new term (term.proposal = null, but processStatus is "unprocessed")
+            isProposal = ' is-finalized'; 
+            if (term.proposal !== null || term.processStatus === "unprocessed") {
+                isProposal = ' is-proposal';
+            }
+            
+            // for new-term-skeleton
             if (term.termId === null) {
                 isProposal = ' is-new';
                 statusIcon = '';
@@ -593,24 +612,6 @@ const Term={
             return newTermData;
         },
         
-        /***
-         * On add term-entry icon click handler.
-         * (Adding a term-entry is done via creating a new term-proposal.)
-         */
-        onAddTermEntryClick: function(event){
-            console.log('onAddTermEntryClick');
-            var me = event.data.scope,
-                filteredCollections = getFilteredCollections();
-            me.resetNewTermData();
-            me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
-            if (filteredCollections.length == 1) {
-                me.newTermCollectionId = filteredCollections[0];
-                me.drawTermProposal();
-                return;
-            }
-            me.drawFilteredTermCollectionSelect();
-        },
-        
         /**
          * Draw a select for choosing a Language for a new Term.
          * When a Language is selected, the corresponding flag is added to the skeleton
@@ -707,7 +708,7 @@ const Term={
         /**
          * Empty the resultTermsHolder.
          * If keepAttributes is set and set to true, the attributes-Tab will not be emptied.
-         * @params {Boolean} displayHeader
+         * @params {Boolean} keepAttributes
          */
         emptyResultTermsHolder: function (keepAttributes) {
             var me = this,
@@ -778,6 +779,42 @@ const Term={
 		},
         
         /***
+         * On add term-entry icon click handler.
+         * (Adding a term-entry is done via creating a new term-proposal.)
+         */
+        onAddTermEntryClick: function(event){
+            console.log('onAddTermEntryClick');
+            var me = event.data.scope,
+                filteredCollections = getFilteredCollections();
+            me.resetNewTermData();
+            me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
+            if (filteredCollections.length == 1) {
+                me.newTermCollectionId = filteredCollections[0];
+                me.drawTermProposal();
+                return;
+            }
+            me.drawFilteredTermCollectionSelect();
+        },
+        
+        /***
+         * On add term click handler
+         */
+        onAddTermClick:function(event){
+            console.log('onAddTermClick');
+            var me = event.data.scope;
+            
+            if (me.$_searchErrorNoResults.is(":visible")) {
+                me.drawLanguageFlagForNewTerm($( "#language option:selected" ).text());
+                return;
+            }
+            
+            if (me.newTermLanguageId == null) {
+                me.drawLanguageSelectForTerm();
+                return;
+            }
+        },
+        
+        /***
          * On edit term click handler
          */
         onEditTermClick:function(event){
@@ -790,19 +827,9 @@ const Term={
             
             event.stopPropagation();
             
-            if (me.$_searchErrorNoResults.is(":visible")) {
-                me.drawLanguageFlagForNewTerm($( "#language option:selected" ).text());
-            }
-            if (me.newTermLanguageId == null) {
-                me.drawLanguageSelectForTerm();
-            }
-            
             switch(reference) {
                 case "content":
                     search = $element;
-                    break;
-                case "headline":
-                    search=$element.find("span[data-editable]");
                     break;
                 case "icon":
                     search=$element.parent().find("span[data-editable]");

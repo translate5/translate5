@@ -18,12 +18,6 @@ const Attribute={
 		var me=this;
         
         // ------------- TermEntries-Attributes -------------
-        // - Headline
-        me.$_termEntryAttributesTable.on('click', '.attribute-data.proposable',{
-            scope:me,
-            type:'termEntryAttribute',
-            reference: 'headline'
-        },me.onEditAttributeClick);
         // - Icons
         me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
         me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
@@ -40,12 +34,6 @@ const Attribute={
         },me.onEditAttributeClick);
         
         // ------------- Terms-Attributes -------------
-        // - Headline
-        me.$_termTable.on('click', '.attribute-data.proposable',{
-            scope:me,
-            type:'termAttribute',
-            reference: 'headline'
-        },me.onEditAttributeClick);
         // - Icons
         me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
         me.$_termTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termTable},me.onDeleteAttributeClick);
@@ -91,6 +79,10 @@ const Attribute={
         }
         html=commentAttribute.concat(html);
         
+        if (attributes.length === 0) {
+            html.push('(wird erst nach erstem Term-save angezeigt...)'); // TODO: text, translations and style
+        }
+        
         return html.join('');
     },
 
@@ -130,10 +122,6 @@ const Attribute={
         switch(reference) {
             case "content":
                 $editableComponent = $element;
-                break;
-            case "headline":
-                attributeId = $element.data('attributeId');
-                $editableComponent = me.getAttributeComponent(attributeId,type);
                 break;
             case "icon":
                 attributeId = $element.parents('h4.attribute-data').data('attributeId');
