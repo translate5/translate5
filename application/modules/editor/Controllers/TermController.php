@@ -76,8 +76,17 @@ class editor_TermController extends ZfExtended_RestController {
      */
     protected function decodePutData() {
         parent::decodePutData();
-        //remove whitespace from the beggining and the end of the string
-        $this->data->term=trim($this->data->term);
+
+        if(isset($this->data->term)){
+            //remove whitespace from the beggining and the end of the string
+            $this->data->term=trim($this->data->term);
+        }
+        
+        if(isset($this->data->comment)){
+            //remove whitespace from the beggining and the end of the string
+            $this->data->comment=trim($this->data->comment);
+        }
+        
         $this->convertToLanguageId();
         if($this->_request->isPut()) {
             //the following fields may not be changed via PUT:

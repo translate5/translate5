@@ -157,7 +157,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         
         $row = $this->db->fetchRow($s);
         if (!$row) {
-            $this->notFound(__CLASS__ . '#termAndName', $term->getId.'; '.$name);
+            $this->notFound(__CLASS__ . '#termAndName', $term->getId().'; '.$name);
         }
         //load implies loading one Row, so use only the first row
         $this->row = $row;
