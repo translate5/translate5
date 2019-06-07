@@ -556,17 +556,25 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     public function loadProposalExportData(string $youngerAs,int $collectionId){
         $sql="SELECT 
             	t.termEntryId as 'term-termEntryId',
+                t.definition as 'term-definition',
+                t.language as 'term-language',
                 t.id as 'term-Id',
                 t.term as 'term-term',
-                t.updated as 'term-updated',
+                t.processStatus as 'term-processStatus',
+                t.userName as 'term-lastEditor',
+                t.updated as 'term-lastEditorDate',
                 tp.id as 'termproposal-id',
                 tp.term as 'termproposal-term',
-                tp.created as 'termproposal-created',
+                tp.created as 'termproposal-lastEditorDate',
+                tp.userName as 'termproposal-lastEditor',
                 ta.id as 'attribute-id',
                 ta.value as 'attribute-value',
+                ta.updated as 'attribute-lastEditorDate',
+                ta.userName as 'attribute-lastEditor',
                 tap.id as 'attributeproposal-id',
                 tap.value as 'attributeproposal-value',
-                tap.created as 'attributeproposal-created'
+                tap.created as 'attributeproposal-lastEditorDate',
+                tap.userName as 'attributeproposal-lastEditor'
             FROM
             	LEK_terms t
             	INNER JOIN LEK_term_entry te ON te.id=t.termEntryId
@@ -580,7 +588,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 and t.created < ? and t.collectionId=?
                 order by t.groupId,t.term";
         $resultArray=$this->db->getAdapter()->query($sql,[$youngerAs,$collectionId])->fetchAll();
-        return $resultArray;
+        if(empty($resultArray)){
+            return [];
+        }
+        return $this->groupProposalExportData($resultArray);
     }
     
     /***
@@ -728,6 +739,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 'LEK_term_attributes.created AS attrCreated',
                 'LEK_term_attributes.updated AS attrUpdated',
                 'LEK_term_attributes.attrDataType AS attrDataType',
+                'LEK_term_attributes.processStatus AS attrProcessStatus',
                 new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
         );
         
@@ -911,6 +923,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $user=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         return $user->isAllowed('editor_term','proposeOperation');
+    }
+    
+    /***
+     * Group the term and attribute proposal data for the export
+     * @param array $data
+     * @return array
+     */
+    protected function groupProposalExportData(array $data){
+        return $data;
     }
     
     /**

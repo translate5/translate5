@@ -302,8 +302,8 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                 $atr[$key]=$value;
             }
             
+            $atr['proposable'] =$isAttributeProposalAllowed;
             if($isAttributeProposalAllowed){
-                $atr['proposable'] = $attribute->isProposable($atr['name'], $atr['attrType']);
                 $atr['proposal']=!empty($attProposal['id']) ? $attProposal : null;
                 $attProposal=[];
             }
