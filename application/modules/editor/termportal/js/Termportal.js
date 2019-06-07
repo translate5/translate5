@@ -137,8 +137,8 @@ $('#search').keyup(function (e) {
     Term.termGroupsCache=[];
     
     $('#error-no-results').hide();
-    $('#searchTermsHelper').find('.proposal-txt').text(translations['addTermEntry']);
-    $('#searchTermsHelper').find('.proposal-btn').prop('title', translations['addTermEntry']);
+    $('#searchTermsHelper').find('.proposal-txt').text(proposalTranslations['addTermEntryProposal']);
+    $('#searchTermsHelper').find('.proposal-btn').prop('title', proposalTranslations['addTermEntryProposal']);
     $('#searchTermsSelect').empty();
     $('#termEntryAttributesTable').empty();
     $('#termTable').empty();

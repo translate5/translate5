@@ -17,16 +17,6 @@ const ComponentEditor={
 	},
 	
 	/***
-	 * Editable attribute component click handler
-	 */
-	onEditableAttributeComponentClick:function(event){
-        console.log('onEditableAttributeComponentClick');
-		var me=event.data.scope,
-			$el = $(this);
-		me.addAttributeComponentEditor($el);
-	},
-	
-	/***
 	 * Register term component editor for given term element
 	 */
 	addTermComponentEditor:function($element,$termAttributeHolder){
@@ -97,37 +87,48 @@ const ComponentEditor={
 	
 	saveComponentChange:function($el,$input){
         console.log('saveComponentChange');
-		//is the modefied text empty or the same as the initial one
-		if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
-			
-			//get initial html for the component
-			var dummyData={
-					'attributeOriginType':$el.data('type'),
-					'attributeId':$el.data('id'),
-					'proposable':true
-			},
-			componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
+        var me=this,
+            route,
+            dataKey,
+            url,
+            requestData={};
+        
+        // if id is not provided, this is a proposal on empty term entry
+        isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
+        
+        // if not new: 
+        if (!isNew) {
+            // is the modified text empty or the same as the initial one?
+            if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
+                
+                //get initial html for the component
+                var dummyData={
+                        'attributeOriginType':$el.data('type'),
+                        'attributeId':$el.data('id'),
+                        'proposable':true
+                },
+                componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
 
-			$input.replaceWith(componentRenderData);
-			return;
-		}
+                $input.replaceWith(componentRenderData);
+                return;
+            }
+        }
 		
-		var me=this,
-			route=me.typeRouteMap[$el.data('type')],
-			dataKey=me.typeRequestDataKeyMap[$el.data('type')],
-			url=Editor.data.termportal.restPath+route.replace("{ID}",$el.data('id')),
-			requestData={};
+		route=me.typeRouteMap[$el.data('type')];
+		dataKey=me.typeRequestDataKeyMap[$el.data('type')];
+		url=Editor.data.termportal.restPath+route.replace("{ID}",$el.data('id'));
 		
 		requestData[dataKey]=$input.val();
 		
-		//if id is not provided, this is a proposal on empty term entry
-		if(!$el.data('id')==undefined || $el.data('id')<1){
+		if(isNew){
 			url=Editor.data.termportal.restPath+'term',
 			requestData={};
-			//TODO: the selected collection is nota available in general(bug ?). This is small workaround
 			requestData['collectionId']=Term.newTermCollectionId;
 			requestData['language']=Term.newTermLanguageId;
 			requestData[dataKey]=$input.val();
+			
+	        console.log('saveComponentChange for proposal on empty term entry:');
+	        console.log('- requestData: ' + JSON.stringify(requestData));
 		}
 		
 		

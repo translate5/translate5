@@ -49,8 +49,12 @@ const Attribute={
             type:'termAttribute',
             reference: 'content'
         },me.onEditAttributeClick);
-        // - Attribute comment
-        // TODO me.$_termTable.on('click', '.attribute-data.proposable span[data-editable-comment]',{scope:ComponentEditor},ComponentEditor.onEditableCommentComponentClick);
+        // - Comment
+        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable-comment][data-type="termAttribute"]',{
+            scope:me,
+            type:'termAttribute',
+            reference: 'comment'
+        },me.onEditAttributeClick);
 	},
     
     /***
@@ -120,6 +124,9 @@ const Attribute={
         event.stopPropagation();
         
         switch(reference) {
+            case "comment":
+                $editableComponent = $element;
+                break;
             case "content":
                 $editableComponent = $element;
                 break;
@@ -184,8 +191,8 @@ const Attribute={
 		        }
 		    });
 		};
-		var yesText=Editor.data.apps.termportal.proposal.translations['Ja'],
-			noText=Editor.data.apps.termportal.proposal.translations['Nein'],
+		var yesText=proposalTranslations['Ja'],
+			noText=proposalTranslations['Nein'],
 			buttons={
 			};
 		
@@ -200,11 +207,11 @@ const Attribute={
 	    $("<div></div>").dialog({
 	        resizable: false,
 	        modal: true,
-	        title: Editor.data.apps.termportal.proposal.translations['deleteAttributeProposalTitle'],
+	        title: proposalTranslations['deleteAttributeProposal'],
 	        height: 250,
 	        width: 400,
 	        buttons:buttons
-	    }).text(Editor.data.apps.termportal.proposal.translations['deleteAttributeProposalMessage']);
+	    }).text(proposalTranslations['deleteAttributeProposalMessage']);
     },
     
 	/***
@@ -221,14 +228,26 @@ const Attribute={
 	    
 	    var me=this,
 	    	html='',
-            isProposal = (attribute.proposal == null) ? ' is-finalized' : ' is-proposal',
+            isProposal,
             proposable = attribute.proposable ? ' proposable' : '',
-	    	headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '" data-attribute-id="'+attribute.attributeId+'">',
-	    	headerTagClose='</h4>',
+	    	headerTagOpen,
+	    	headerTagClose,
 	    	getAttributeContainerRender=function(attribute,html){
 	    		return '<p data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
 	    	};
-	    
+
+        // TODO: calculate this in backend
+    	// "is-proposal" can be ... 
+        // ... a proposal for a term that already existed (term.proposal = "xyz")
+        // ... or a proposal for a new term (term.proposal = null, but processStatus is "unprocessed")
+        isProposal = ' is-finalized'; 
+        if (attribute.proposal !== null || attribute.processStatus === "unprocessed") {
+            isProposal = ' is-proposal';
+        }
+        
+        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '" data-attribute-id="'+attribute.attributeId+'">';
+        headerTagClose='</h4>';
+        
 	    switch(attribute.name) {
 	        case "transac":
 	            

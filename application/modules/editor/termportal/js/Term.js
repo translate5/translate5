@@ -113,8 +113,8 @@ const Term={
 			var me=this;
 			if(!me.searchTermsResponse || me.searchTermsResponse.length === 0){
 
-			    me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + translations['addTermEntry']);
-                me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + translations['addTermEntry']);
+			    me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + proposalTranslations['addTermEntryProposal']);
+                me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + proposalTranslations['addTermEntryProposal']);
 			    me.$_searchErrorNoResults.show();
 				
 				console.log("fillSearchTermSelect: nichts gefunden");
@@ -373,6 +373,7 @@ const Term={
                 isProposal,
                 proposable = (term.proposable !== false) ? ' proposable' : ''; // = does the user have the rights to handle proposals at all?
             
+            // TODO: calculate this in backend
             // "is-proposal" can be ... 
             // ... a proposal for a term that already existed (term.proposal = "xyz")
             // ... or a proposal for a new term (term.proposal = null, but processStatus is "unprocessed")
@@ -463,31 +464,31 @@ const Term={
                     $_selectorAdd = me.$_resultTermsHolderHeader;
                     $_selectorDelete = false;
                     $_selectorEdit = false;
-                    $titleAdd = translations['addTermEntry'];
+                    $titleAdd = proposalTranslations['addTermEntryProposal'];
                     break;
                 case "term-entry-attributes":
                     $_selectorAdd = false; // me.$_termEntryAttributesTable;
                     $_selectorDelete = $('#termEntryAttributesTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
                     $_selectorEdit = $('#termEntryAttributesTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
-                    $titleAdd = translations['addTermEntryAttribute'];
-                    $titleDelete = translations['deleteTermEntryAttribute'];
-                    $titleEdit = translations['editTermEntryAttribute'];
+                    $titleAdd = proposalTranslations['addTermEntryAttributeProposal'];
+                    $titleDelete = proposalTranslations['deleteTermEntryAttributeProposal'];
+                    $titleEdit = proposalTranslations['editTermEntryAttributeProposal'];
                     break;
                 case "terms":
                     $_selectorAdd = $('#termTable .term-data.is-new'); // cannot use cacheCom(), rendered too late
                     $_selectorDelete = $('#termTable .term-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
                     $_selectorEdit = $('#termTable .term-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
-                    $titleAdd = translations['addTerm'];
-                    $titleDelete = translations['deleteTerm'];
-                    $titleEdit = translations['editTerm'];
+                    $titleAdd = proposalTranslations['addTermProposal'];
+                    $titleDelete = proposalTranslations['deleteTermProposal'];
+                    $titleEdit = proposalTranslations['editTermProposal'];
                     break;
                 case "terms-attribute":
                     $_selectorAdd = false; // $('#termTable .term-data').next('div'); // cannot use cacheCom(), rendered too late
                     $_selectorDelete = $('#termTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
                     $_selectorEdit = $('#termTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
-                    $titleAdd = translations['addTermAttribute'];
-                    $titleDelete = translations['deleteTermAttribute'];
-                    $titleEdit = translations['editTermAttribute'];
+                    $titleAdd = proposalTranslations['addTermAttributeProposal'];
+                    $titleDelete = proposalTranslations['deleteTermAttributeProposal'];
+                    $titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 default:
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
@@ -496,8 +497,8 @@ const Term={
                     $_selectorDelete = $_this.filter('.is-proposal');
                     $_selectorEdit = $_this.filter('.is-finalized');
                     $_this.children('.proposal-btn').remove();
-                    $titleDelete = "Delete Proposal"; // TODO: use translations
-                    $titleEdit = "Propose changes"; // TODO: use translations
+                    $titleDelete = proposalTranslations['deleteProposal'];
+                    $titleEdit = proposalTranslations['addProposal'];
                     break;
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
@@ -570,11 +571,11 @@ const Term={
             var me = this;
             console.log("reset data for proposing a new Term");
             // "default":
-            me.newTermAttributes = Attribute.renderNewTermAttributes(); // currently just an empty Array
-            me.newTermCollectionId = null;                              // will be selected by user (if not already filtered)
-            me.newTermGroupId = null;                                   // will be set from result's select-list
-            me.newTermLanguageId = null;                                // will be selected by user (or set according to search without result)
-            me.newTermName = "Add new term-proposal";                   // (or set according to search without result) // TODO: use translation 
+            me.newTermAttributes = Attribute.renderNewTermAttributes();         // currently just an empty Array
+            me.newTermCollectionId = null;                                      // will be selected by user (if not already filtered)
+            me.newTermGroupId = null;                                           // will be set from result's select-list
+            me.newTermLanguageId = null;                                        // will be selected by user (or set according to search without result)
+            me.newTermName = proposalTranslations['addTermProposal'] + '...';   // (or set according to search without result)
             // if a search has no result:
             if (me.$_searchErrorNoResults.is(":visible")) {
                 me.newTermLanguageId = $('#language').val();
@@ -626,7 +627,7 @@ const Term={
                 languageSelectOptions,
                 rfcLanguage,
                 $_termSkeleton = me.$_termTable.find('.is-new');
-            languageSelectHeader = '<p>Choose a language for the new TermEntry:</p>'; // TODO: use translation
+            languageSelectHeader = '<p>'+proposalTranslations['chooseLanguageForTermEntry']+':</p>';
             $("#language option").each(function() {
                 if ($(this).val() != 'none') {
                     languageSelectOptions += '<option value="'+$(this).val()+'">'+$(this).text()+'</option>'; // TODO: add flags
@@ -645,6 +646,8 @@ const Term={
                     $_termSkeleton.next().show();
                     $_termSkeleton.show();
                     me.drawLanguageFlagForNewTerm(rfcLanguage);
+                    $_termSkeleton.find('[data-editable]').click();
+                    $_termSkeleton.find('.proposal-add').click();
                 }
             });
         },
@@ -682,7 +685,7 @@ const Term={
             console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
             me.emptyResultTermsHolder(false);
             me.$_resultTermsHolder.show();
-            collectionSelectHeader = '<h3>Choose a collection for the new TermEntry:</h3>'; // TODO: use translation
+            collectionSelectHeader = '<h3>'+proposalTranslations['chooseTermcollectionForTermEntry']+':</h3>'; // TODO: use translation
             if (filteredCollections.length == 0) {
                 $("#collection option").each(function() {
                     if ($(this).val() != 'none') {
@@ -755,8 +758,8 @@ const Term={
 			    });
 			};
 			
-			var yesText=Editor.data.apps.termportal.proposal.translations['Ja'],
-				noText=Editor.data.apps.termportal.proposal.translations['Nein'],
+			var yesText=proposalTranslations['Ja'],
+				noText=proposalTranslations['Nein'],
 				buttons={
 				};
 			
@@ -771,11 +774,11 @@ const Term={
 		    $("<div></div>").dialog({
 		        resizable: false,
 		        modal: true,
-		        title: Editor.data.apps.termportal.proposal.translations['deleteTermProposalTitle'],
+		        title: proposalTranslations['deleteTermProposal'],
 		        height: 250,
 		        width: 400,
 		        buttons:buttons
-		    }).text(Editor.data.apps.termportal.proposal.translations['deleteTermProposalMessage']);
+		    }).text(proposalTranslations['deleteTermProposalMessage']);
 		},
         
         /***
@@ -801,10 +804,14 @@ const Term={
          */
         onAddTermClick:function(event){
             console.log('onAddTermClick');
-            var me = event.data.scope;
+            var me = event.data.scope,
+                $_termSkeleton;
             
             if (me.$_searchErrorNoResults.is(":visible")) {
-                me.drawLanguageFlagForNewTerm($( "#language option:selected" ).text());
+                me.newTermLanguageId = $("#language").val();
+                me.drawLanguageFlagForNewTerm($("#language option:selected").text());
+                $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache
+                $_termSkeleton.find('[data-editable]').click();
                 return;
             }
             
