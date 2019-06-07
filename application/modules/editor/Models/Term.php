@@ -931,6 +931,23 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     protected function groupProposalExportData(array $data){
+        $returnResult=[];
+        $tmpRow=[];
+        $termId=null;
+        $tmpTerm=[];
+        $tmpAttr=[];
+        foreach ($data as $row) {
+            if(empty($termId)){
+                $termId=$row['termId'];
+            }
+            $tmpRow['termEntryId']=$row['term-termEntryId'];
+            $tmpRow['definition']=$row['term-definition'];
+            $tmpRow['language']=$row['term-language'];
+            $tmpRow['termId']=$row['term-termId'];
+            if(!empty($row['termproposal-term'])){
+                $tmpRow['term']=$row['termproposal-term'];
+            }
+        }
         return $data;
     }
     
