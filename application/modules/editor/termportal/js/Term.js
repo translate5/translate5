@@ -624,13 +624,15 @@ const Term={
                 languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
                 languageSelectHeader,
                 languageSelect,
-                languageSelectOptions,
+                languageSelectOptions = '',
                 rfcLanguage,
+                flag,
                 $_termSkeleton = me.$_termTable.find('.is-new');
             languageSelectHeader = '<p>'+proposalTranslations['chooseLanguageForTermEntry']+':</p>';
             $("#language option").each(function() {
                 if ($(this).val() != 'none') {
-                    languageSelectOptions += '<option value="'+$(this).val()+'">'+$(this).text()+'</option>'; // TODO: add flags
+                    flag = getLanguageFlag($(this).text());
+                    languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
                 }
             });
             languageSelect = '<select name="chooseLanguage" id="chooseLanguage">'+languageSelectOptions+'</select>';
@@ -638,18 +640,38 @@ const Term={
             $('#languageSelectContainer').prepend(languageSelect).prepend(languageSelectHeader);
             $_termSkeleton.next().hide();
             $_termSkeleton.hide();
-            $('#chooseLanguage').selectmenu({
-                select: function() {
-                    me.newTermLanguageId = $(this).val();
-                    rfcLanguage = getLanguageFlag($( "#chooseLanguage option:selected" ).text());
-                    $('#languageSelectContainer').remove();
-                    $_termSkeleton.next().show();
-                    $_termSkeleton.show();
-                    me.drawLanguageFlagForNewTerm(rfcLanguage);
-                    $_termSkeleton.find('[data-editable]').click();
-                    $_termSkeleton.find('.proposal-add').click();
+            
+            // https://jqueryui.com/resources/demos/selectmenu/custom_render.html
+            $.widget( "custom.iconselectmenu", $.ui.selectmenu, {
+                _renderItem: function( ul, item ) {
+                    var li = $( "<li>" ),
+                        wrapper = $( "<div>", { text: item.label } );
+                    if ( item.disabled ) {
+                        li.addClass( "ui-state-disabled" );
+                    }
+                    $( "<span>", {
+                        style: item.element.attr( "data-style" ),
+                        "class": "ui-icon " + item.element.attr( "data-class" )
+                    })
+                        .appendTo( wrapper );
+                    return li.append( wrapper ).appendTo( ul );
                 }
             });
+            $( "#chooseLanguage" )
+                .iconselectmenu({
+                    select: function() {
+                        me.newTermLanguageId = $(this).val();
+                        rfcLanguage = getLanguageFlag($( "#chooseLanguage option:selected" ).text());
+                        $('#languageSelectContainer').remove();
+                        $_termSkeleton.next().show();
+                        $_termSkeleton.show();
+                        me.drawLanguageFlagForNewTerm(rfcLanguage);
+                        $_termSkeleton.find('[data-editable]').click();
+                        $_termSkeleton.find('.proposal-add').click();
+                    }
+                })
+                .iconselectmenu( "menuWidget")
+                .addClass( "ui-menu-icons flag" );
         },
         
         /**
@@ -685,7 +707,7 @@ const Term={
             console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
             me.emptyResultTermsHolder(false);
             me.$_resultTermsHolder.show();
-            collectionSelectHeader = '<h3>'+proposalTranslations['chooseTermcollectionForTermEntry']+':</h3>'; // TODO: use translation
+            collectionSelectHeader = '<h3>'+proposalTranslations['chooseTermcollectionForTermEntry']+':</h3>';
             if (filteredCollections.length == 0) {
                 $("#collection option").each(function() {
                     if ($(this).val() != 'none') {

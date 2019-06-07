@@ -285,6 +285,16 @@ h4, p {
     padding:5px;
 }
 
+#languageSelectContainer option.flag {
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+.ui-menu .ui-icon.flag {
+    background-position: left top;
+    top: 0.4em;
+    left: 0.5em;
+}
+
 #termcollectionSelectContainer {
     display: none;
 }

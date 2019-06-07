@@ -83,10 +83,6 @@ const Attribute={
         }
         html=commentAttribute.concat(html);
         
-        if (attributes.length === 0) {
-            html.push('(wird erst nach erstem Term-save angezeigt...)'); // TODO: text, translations and style
-        }
-        
         return html.join('');
     },
 
