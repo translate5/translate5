@@ -151,6 +151,9 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      * Logs the missing relais files.
      */
     protected function logMissingFile() {
+        if(empty($this->collectedMissingFiles)) {
+            return;
+        }
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->getTaskGuid());
