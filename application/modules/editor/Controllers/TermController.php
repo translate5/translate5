@@ -95,6 +95,45 @@ class editor_TermController extends ZfExtended_RestController {
             unset($this->data->mid);
             unset($this->data->groupId);
         }
+        
+        //ignore all non post request
+        if(!$this->_request->isPost()){
+            return;
+        }
+        
+        if(!empty($this->data->groupId)) {
+            throw ZfExtended_UnprocessableEntity::createResponse('E1114', ['groupId' => 'Die GroupId kann nicht direkt gesetzt werden, nur indirekt über eine gegebene TermEntryId.']);
+        }
+        
+        if(!empty($this->data->termEntryId)){
+            //when the term entry is provided, load the term entry and set the term groupId
+            //this is the case when new term is proposed in the allready exisitn termEntry
+            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+            /* @var $entry editor_Models_TermCollection_TermEntry */
+            $entry->load($this->data->termEntryId);
+            $this->entity->setGroupId($entry->getGroupId());
+            $this->entity->setTermEntryId($entry->getId());
+            return;
+        }
+        
+        if(empty($this->data->termEntryId) && $this->entity->getTermEntryId()==null) {
+            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+            /* @var $entry editor_Models_TermCollection_TermEntry */
+            $entry->setCollectionId($this->data->collectionId);
+            $entry->setGroupId($this->_helper->guid->create());
+            $entry->save();
+            
+            //update or create the term entry creation/modification attributes
+            $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+            /* @var $attribute editor_Models_Term_Attribute */
+            $attribute->createTransacGroup($entry,'creation');
+            $attribute->createTransacGroup($entry,'modification');
+            
+            $this->entity->setTermEntryId($entry->getId());
+            $this->entity->setGroupId($entry->getGroupId());
+            $this->data->termEntryId=$entry->getId();
+            $this->data->groupId=$entry->getGroupId();
+        }
     }
     
     /**
@@ -165,9 +204,6 @@ class editor_TermController extends ZfExtended_RestController {
         if(empty($this->data->language)) {
             throw ZfExtended_UnprocessableEntity::createResponse('E1113', ['language' => 'Bitte wählen Sie die Sprache des Terms aus.']);
         }
-        if(!empty($this->data->groupId)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1114', ['groupId' => 'Die GroupId kann nicht direkt gesetzt werden, nur indirekt über eine gegebene TermEntryId.']);
-        }
         if(empty($this->data->processStatus)) {
             //TODO: this initial value will depend on the ACL with Phase 3 implementation of termportal
             $this->entity->setProcessStatus(editor_Models_Term::PROCESS_STATUS_UNPROCESSED);
@@ -181,7 +217,7 @@ class editor_TermController extends ZfExtended_RestController {
         if(empty($this->data->termEntryId)) {
             $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
             /* @var $entry editor_Models_TermCollection_TermEntry */
-            $entry->setCollectionId($this->entity->getCollectionId());
+            $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
             $entry->save();
             
