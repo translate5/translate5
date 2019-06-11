@@ -36,6 +36,11 @@ div.x-container.x-container-default {position: initial;}
   white-space: normal;
 }
 
+.editorAdminTaskLogGrid .x-property-grid .x-grid-row td.x-grid-cell-last .x-grid-cell-inner {
+	font-family: monospace;
+    white-space: pre;
+}
+
 /* this default width is needed, see TRANSLATE-563 */
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 #segment-grid .x-grid-row .segment-tag-column .x-grid-cell-inner {
