@@ -117,13 +117,18 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             'yaml' => ['application/octet-stream'], 
     );
     
-    /***
+    /**
      * The okapi config file-types
      * @var array
      */
     private $okapiBconf= array(
             'bconf'
     );
+    
+    /**
+     * @var editor_Models_Task
+     */
+    protected $task;
     
     public function init() {
         if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
@@ -140,6 +145,12 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     protected function initEvents() {
         //checks if import contains files for okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', array($this, 'handleAfterDirectoryParsing'));
+        
+        //invokes in the handleFile method of the relais filename match check. 
+        // Needed since relais files are bilingual (ending on .xlf) and the 
+        // imported files for Okapi are in the source format and do not end on .xlf. 
+        // Therefore the filenames do not match, this is corrected here.
+        $this->eventManager->attach('editor_Models_RelaisFoldertree', 'customHandleFile', array($this, 'handleCustomHandleFileForRelais'));
         
         //Archives the temporary data folder again after converting the files with okapi:
         $this->eventManager->attach('editor_Models_Import_Worker_Import', 'importCleanup', array($this, 'handleAfterImport'));
@@ -163,6 +174,40 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
                 continue;
             }
             $this->queueWorker($fileId, $fileInfo, $params);
+        }
+    }
+    
+    /**
+     * Needed since relais files are bilingual (ending on .xlf) and the 
+     * imported files for Okapi are in the source format (example docx) and do not end on .xlf. 
+     * Therefore the filenames do not match to the relais files, this is corrected here.
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleCustomHandleFileForRelais(Zend_EventManager_Event $event) {
+        $suffix = '.xlf'; //TODO should come from the worker. there the suffix is determined from the okapi output 
+        $child = $event->getParam('fileChild'); //children stdClass, containing several information about the file to be parsed
+        $fullpath = $event->getParam('fullPath'); //absolute path to the relais file to be parsed
+        
+        if(empty($this->task)) {
+            $this->task = ZfExtended_Factory::get('editor_Models_Task');
+            $this->task->loadByTaskGuid($event->getParam('taskGuid'));
+        }
+        
+        if($child->relaisFileStatus == editor_Models_RelaisFoldertree::RELAIS_NOT_FOUND) {
+            $config = Zend_Registry::get('config');
+            $proofRead = '/'.trim($config->runtimeOptions->import->proofReadDirectory,'/').'/';
+            $relaisDirectory = '/'.trim($config->runtimeOptions->import->relaisDirectory,'/').'/';
+            $fullpath = $fullpath.$suffix;
+            $bilingualSourceFile = str_replace($relaisDirectory, $proofRead, $fullpath);
+            
+            //check for manifest file, to ensure that the file was processed via Okapi:
+            $path = $this->task->getAbsoluteTaskDataPath().'/'.editor_Plugins_Okapi_Worker::OKAPI_REL_DATA_DIR.'/';
+            $okapiManifestFile = new SplFileInfo($path.sprintf(editor_Plugins_Okapi_Worker::MANIFEST_FILE, $child->id));
+            
+            if(file_exists($fullpath) && file_exists($bilingualSourceFile) && $okapiManifestFile->isReadable()) {
+                $child->filename .= $suffix;
+                $child->relaisFileStatus = editor_Models_RelaisFoldertree::RELAIS_NOT_IMPORTED;
+            }
         }
     }
     
@@ -227,7 +272,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         }
             
         $isXml = $extension == 'xml';
-        if($extension && editor_Models_Import_FileParser_Xml::isParsable(file_get_contents($fileinfo))) {
+        if($isXml && editor_Models_Import_FileParser_Xml::isParsable(file_get_contents($fileinfo))) {
             //Okapi supports XML, but if it is XLIFF in the XML file we don't need Okapi:
             return false;
         }

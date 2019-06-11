@@ -62,7 +62,13 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      * Wenn true werden fehlende Relais Datein als Fehler geloggt
      * @var boolean
      */
-    protected $logMissingFiles = null;
+    protected $enableLogMissingFiles = null;
+    
+    /**
+     * Collected files which have no corresponding relais file
+     * @var array
+     */
+    protected $collectedMissingFiles = [];
 
     /**
      * @var ZfExtended_Controller_Helper_LocalEncoded
@@ -72,7 +78,7 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
     public function __construct(){
         parent::__construct();
         $config = Zend_Registry::get('config');
-        $this->logMissingFiles = $config->runtimeOptions->import->reportOnNoRelaisFile;
+        $this->enableLogMissingFiles = $config->runtimeOptions->import->reportOnNoRelaisFile;
         $this->localEncoded = ZfExtended_Zendoverwrites_Controller_Action_HelperBroker::getStaticHelper('LocalEncoded');
         
         $this->setPathPrefix($config->runtimeOptions->import->relaisDirectory);
@@ -88,6 +94,7 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
         $this->checkCall = true;
         $this->relaisRootPath = $importFolder.DIRECTORY_SEPARATOR.$this->_pathPrefix;
     	$this->getFilePathsNodeVisitor($this->objectTree);
+    	$this->logMissingFile();
         $this->checkCall = false;
         return array_filter($this->_paths, function($path) {
             return $this->isFileToImport($path);
@@ -100,16 +107,29 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      * @param string $path
      */
     protected function handleFile(stdClass $child, $path) {
-    	parent::handleFile($child, $path);
     	if(! $this->checkCall){
+        	parent::handleFile($child, $path);
     	    return;
     	}
     	$filepath = $path.$child->filename;
-        $fullpath = $this->relaisRootPath.DIRECTORY_SEPARATOR.$this->localEncoded->encode($filepath);
+    	$fullpath = $this->relaisRootPath.DIRECTORY_SEPARATOR.ZfExtended_Utils::filesystemEncode($filepath);
         if(empty($child->relaisFileStatus)){
             $child->relaisFileStatus = file_exists($fullpath) ? self::RELAIS_NOT_IMPORTED : self::RELAIS_NOT_FOUND;
         }
-        $this->logMissingFile($path, $child);
+
+        //here can invoke import filters to manipulate the file information, needed for example if the filename changes and therefore the filename based relais file matching would fail. 
+        $this->events->trigger("customHandleFile", $this, array(
+            'path' => $path,
+            'fileChild' => $child,
+            'fullPath' => $fullpath,
+            'filePath' => $filepath,
+            'taskGuid' => $this->getTaskGuid(),
+        ));
+        $filepath = $path.$child->filename;
+        
+        //stores the handled file in the internal path array (which is returned filtered later)
+        parent::handleFile($child, $path);
+        $this->collectMissingFile($path, $child);
         $this->relaisFilesStati[$this->_pathPrefix.DIRECTORY_SEPARATOR.$filepath] = $child->relaisFileStatus;
     }
     
@@ -118,18 +138,31 @@ class editor_Models_RelaisFoldertree extends editor_Models_Foldertree {
      * @param string $path
      * @param stdClass $child
      */
-    protected function logMissingFile($path, stdClass $child) {
+    protected function collectMissingFile($path, stdClass $child) {
         if($child->relaisFileStatus !== self::RELAIS_NOT_FOUND 
-             || !$this->logMissingFiles 
+             || !$this->enableLogMissingFiles 
              || empty($child->isFile)){
             return;
         }
-        
-        $msg = 'Missing Relais File: "'.$path.$child->filename.'". Task: '.$this->getTaskGuid();
-        /* @var $log ZfExtended_Log */
-        $log = ZfExtended_Factory::get('ZfExtended_Log');
-        $log->logError($msg);
+        $this->collectedMissingFiles[$child->id] = $path.$child->filename;
     }
+    
+    /**
+     * Logs the missing relais files.
+     */
+    protected function logMissingFile() {
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->getTaskGuid());
+        
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.import.relais');
+        /* @var $logger ZfExtended_Logger */
+        $logger->warn('E1112', 'Task was configured with relais language, but some relais file were not found. See Details.',[
+            'filesWithoutRelais' => join("\n", $this->collectedMissingFiles),
+            'task' => $task,
+        ]);
+    }
+    
     
     /**
      * @param string $path
