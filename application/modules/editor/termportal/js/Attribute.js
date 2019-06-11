@@ -69,17 +69,17 @@ const Attribute={
             html = [],
             commentAttribute=[];
         
-        if(Attribute.languageDefinitionContent[termLang]){
-            html.push(Attribute.languageDefinitionContent[termLang]);
+        if(me.languageDefinitionContent[termLang]){
+            html.push(me.languageDefinitionContent[termLang]);
         }
         
         for(var i=0;i<attributes.length;i++){
             //comment attribute should always appear as first
             if(attributes[i].name=='note'){
-                commentAttribute.push(Attribute.handleAttributeDrawData(attributes[i]));
+                commentAttribute.push(me.handleAttributeDrawData(attributes[i]));
                 continue;
             }
-            html.push(Attribute.handleAttributeDrawData(attributes[i]));
+            html.push(me.handleAttributeDrawData(attributes[i]));
         }
         html=commentAttribute.concat(html);
         
