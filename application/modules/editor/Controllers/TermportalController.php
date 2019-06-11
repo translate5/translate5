@@ -141,6 +141,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             'unknown' => $this->translate->_('Unbekannter Term Status'),
         ]);
         $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$config->runtimeOptions->loginUrl);
+        $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
         
         //translated strings for some of the result tables
         $translatedStrings=array(
@@ -153,7 +154,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "noExistingAttributes" => $this->translate->_('no existing attributes'),
                 "collection"=>$this->translate->_("Term-Collection"),
                 "client"=>$this->translate->_("Kunde"),
-                "processstatus"=>$this->translate->_("Prozessstatus")
+                "processstatus"=>$this->translate->_("Prozessstatus"),
+                "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach")
         );
         
         $this->view->translations=$translatedStrings;
