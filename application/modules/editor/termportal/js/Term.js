@@ -845,7 +845,9 @@ const Term={
                 me.newTermLanguageId = $("#language").val();
                 me.drawLanguageFlagForNewTerm($("#language option:selected").text());
                 $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache
-                $_termSkeleton.find('[data-editable]').click();
+                var $termEditorSpan=$_termSkeleton.find('[data-editable]'),
+                	$termEditorHolder=me.$_termTable.find('div[data-term-id="-1"]');
+                ComponentEditor.addTermComponentEditor($termEditorSpan,$termEditorHolder);
                 return;
             }
             
