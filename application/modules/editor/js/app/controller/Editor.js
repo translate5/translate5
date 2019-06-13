@@ -1251,26 +1251,24 @@ Ext.define('Editor.controller.Editor', {
             plug = this.getEditPlugin(),
             editor = plug.editor.mainEditor,
             imgInTarget = editor.getDoc().getElementsByTagName("img"),
-            nrTagsInSrc,
-            nrTagsInTarget,
-            nrTagsInSegment;
+            collectedIds = ['0'];
         // source
-        if(!me.sourceTags){
-            nrTagsInSrc = 0;
-        } else {
-            nrTagsInSrc = me.sourceTags.length;
+        if(me.sourceTags){
+            me.sourceTags.map(function(item){
+                collectedIds = collectedIds.concat(Ext.Object.getKeys(item));
+            });
         }
         // target
-        nrTagsInTarget = 0;
         Ext.Object.each(imgInTarget, function(key, imgNode){
             var imgClassList = imgNode.classList;
             if (imgClassList.contains('single') || imgClassList.contains('open')) {
-                nrTagsInTarget++;
+                collectedIds.push(imgNode.id);
             }
         });
         // use the highest
-        nrTagsInSegment = (nrTagsInSrc >= nrTagsInTarget) ? nrTagsInSrc : nrTagsInTarget;
-        return nrTagsInSegment + 1;
+        return Math.max.apply(null, collectedIds.map(function(val){
+            return parseInt(val.replace(/[^0-9]*/,''));
+        })) + 1;
     },
 
         handleInsertTagShift: function(key, e) {
