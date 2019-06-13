@@ -42,8 +42,8 @@ Ext.define('Editor.view.LanguageResources.ProposalExportViewController', {
     	var params = {},
 	    	url = Editor.data.restpath+'languageresourceinstance/export?';
     	dateField.up('window').destroy();
-	  	params['exportDate']=dateField.getValue();
+	  	params['exportDate']=Ext.util.Format.date(dateField.getValue(),'Y-m-d H:i:s');
 	  	params['collectionId']=record.get('id');
-        window.open(url+Ext.urlEncode(params));
+	  	window.open(url+Ext.urlEncode(params)); 
     }
 });

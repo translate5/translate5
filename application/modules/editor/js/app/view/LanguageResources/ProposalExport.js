@@ -35,43 +35,53 @@ Ext.define('Editor.view.LanguageResources.ProposalExport', {
     alias: 'widget.proposalexport',
     itemId: 'proposalExport',
     strings: {
-    	
+    	dateFieldLabel:'#UT#Jünger als',
+    	exportButtonText:'#UT#Exportieren',
+    	cancelButtonText:'#UT#Abbrechen',
+    	title:'#UT#Vorschläge exportieren',
     },
     modal:true,
 	width:500,
 	autoScroll:true,
     autoHeight:true,
 	layout:'auto',
-	title:'Proposal Export',
 	border:false,
 	bodyPadding: 10,
-	items:[{
-		xtype: 'datefield',
-		flex:1,
-		fieldLabel:'Export Date',
-		value:new Date(),
-		name:'exportDate'
-	}],
-	dockedItems: [{
-        xtype: 'toolbar',
-        dock: 'bottom',
-        items: [{
-        	xtype:'button',
-        	itemId:'exportButton',
-        	text:'Export',
-        	handler:function(){
-        		var tmpWin=this.up('window'),
-        			dateField=tmpWin.down('datefield');
-        		tmpWin.getController().exportProposals(dateField,tmpWin.record);
-        	}
-        
-        },{
-        	xtype:'button',
-        	text:'Abbrechen',
-        	handler:function(){
-        		this.up('window').destroy();
-        	}
-        }]
-    }]
-    
+	initConfig: function(instanceConfig) {
+        var me = this,
+        config = {
+    		title:me.strings.title,
+            items:[{
+        		xtype: 'datefield',
+        		flex:1,
+        		fieldLabel:me.strings.dateFieldLabel,
+        		value:new Date(),
+        		name:'exportDate'
+        	}],
+        	dockedItems: [{
+                xtype: 'toolbar',
+                dock: 'bottom',
+                items: [{
+                	xtype:'button',
+                	itemId:'exportButton',
+                	text:me.strings.exportButtonText,
+                	handler:function(){
+                		var dateField=me.down('datefield');
+                		me.getController().exportProposals(dateField,me.record);
+                	}
+                
+                },{
+                	xtype:'button',
+                	text:me.strings.cancelButtonText,
+                	handler:function(){
+                		this.up('window').destroy();
+                	}
+                }]
+            }]
+        };
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    }
 });
