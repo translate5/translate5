@@ -462,6 +462,69 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         }
     }
     
+    /***
+     * Notify the configured user with the daily term and term attribute proposals.
+     * The attached export data in the mail will be in excel format.
+     */
+    public function notifyTermProposals(){
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+        if(!isset($triggerConfig->receiverUser) || empty($triggerConfig->receiverUser)){
+            return;
+        }
+        
+        $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        $lr=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $lr editor_Models_LanguageResources_LanguageResource */
+        
+        //load all existing term collections
+        $collections=$lr->loadByResourceId($service->getServiceNamespace());
+        
+        if(empty($collections)){
+            return;
+        }
+        
+        
+        
+        $exportDate=date('Y-m-d');//TODO: when do we set the trigger date ? date('Y-m-d',strtotime("-1 days"));
+        $collections=array_column($collections,'id');
+        $proposals=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $proposals editor_Models_Term */
+        
+        //load the term and term entry proposals data for all term collections and younger as $exportDate
+        $rows = $proposals->loadProposalExportData($exportDate,$collections);
+        if(empty($rows)){
+            return;
+        }
+        
+        $file=APPLICATION_PATH.'/../data/tmp/tmp_proposal_export.xlsx';
+        //create tmp file in the tmp directory of translate5
+        $proposals->exportProposals($rows,$file);
+        
+        //create the notification with the xlsx file
+        $attachment = array(
+            'body' => file_get_contents($file),
+            'mimeType' => Zend_Mime::TYPE_OCTETSTREAM,
+            'disposition' => Zend_Mime::DISPOSITION_ATTACHMENT,
+            'encoding' => Zend_Mime::ENCODING_BASE64,
+            'filename' => 'Proposals.xlsx',
+        );
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $user->loadByLogin($triggerConfig->receiverUser);
+        
+        $this->createNotification('visitor', __FUNCTION__, [
+            'exportDate'=>$exportDate
+        ]);
+        $this->mailer->setAttachment([$attachment]);
+        $this->notify([(array)$user->getDataObject()]);
+        
+        //remove the tmp file from the disc
+        unlink($file);
+    }
+    
+    
+    
     /**
      * attaches the segmentList as attachment to the internal mailer object
      * @param string $segmentHash

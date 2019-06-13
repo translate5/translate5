@@ -549,6 +549,86 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Export term and term attribute proposals in excel file.
+     * When no path is provided, redirect the output to a client's web browser (Excel)
+     * 
+     * @param array $rows
+     * @param string $path: the path where the excel document will be saved
+     */
+    public function exportProposals(array $rows,string $path=null){
+        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+        
+        // set property for export-filename
+        $excel->setProperty('filename', 'Term and term attributes proposals');
+        
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+        
+        // sample label-translations
+        $excel->setLabel('termEntryId', $t->_('Term-Eintrag'));
+        $excel->setLabel('definition', $t->_('Definition'));
+        $excel->setLabel('language', $t->_('Sprache'));
+        $excel->setLabel('termId', $t->_('Term-Id'));
+        $excel->setLabel('term', $t->_('Term'));
+        $excel->setLabel('termProposal', $t->_('Term-Vorschlag'));
+        $excel->setLabel('attribute', $t->_('Attribut'));
+        $excel->setLabel('attributeProposal', $t->_('Attribut-Vorschlag'));
+        $excel->setLabel('processStatus', $t->_('Processstatus'));
+        $excel->setLabel('lastEditor', $t->_('Letzter Bearbeiter'));
+        $excel->setLabel('lastEditedDate', $t->_('Bearbeitungsdatum'));
+        
+        
+        $autosizeCells=function($phpExcel) use ($excel){
+            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
+                
+                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
+                
+                $sheet = $phpExcel->getActiveSheet();
+                
+                //the highes column based on the current row columns
+                $highestColumn='L';
+                foreach(range('A',$highestColumn) as $column) {
+                    $sheet->getColumnDimension($column)->setAutoSize(true);
+                }
+                
+                
+                $highestColumnIndex = $excel->columnIndexFromString($highestColumn);
+                
+                // expects same number of row records for all columns
+                $highestRow = $worksheet->getHighestRow();
+                
+                for($col = 0; $col < $highestColumnIndex; $col++)
+                {
+                    // if you do not expect same number of row records for all columns
+                    // get highest row index for each column
+                    // $highestRow = $worksheet->getHighestRow();
+                    
+                    for ($row = 1; $row <= $highestRow; $row++)
+                    {
+                        $cell = $worksheet->getCellByColumnAndRow($col, $row);
+                        if(strpos($cell->getValue(), '<changemycolortag>') !== false){
+                            $cell->setValue(str_replace('<changemycolortag>','',$cell->getValue()));
+                            $sheet->getStyle($cell->getCoordinate())->getFill()->setFillType('solid')->getStartColor()->setRGB('f9f25c');
+                        }
+                    }
+                }
+            }
+        };
+        
+        //if the path is provided, save the excel into the given path location
+        if(!empty($path)){
+            $excel->loadArrayData($rows);
+            $autosizeCells($excel->getSpreadsheet());
+            $excel->saveToDisc($path);
+            return;
+        }
+        
+        //send the excel to browser download
+        $excel->simpleArrayToExcel($rows,$autosizeCells);
+    }
+    
+    /***
      * Load term and attribute proposals yunger as $youngerAs date within the given collection
      * @param string $youngerAs
      * @param array $collectionId
