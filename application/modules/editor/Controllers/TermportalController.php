@@ -42,10 +42,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $this->view->Php2JsVars()->set('term', $this->getRequest()->getParam('term'));
         }
         
+        
+        $userSession = new Zend_Session_Namespace('user');
+        $this->view->Php2JsVars()->set('app.user.isInstantTranslateAllowed', in_array('instantTranslate', $userSession->data->roles)); // see FIXME for isInstantTranslateAllowed()? ("use the rights not the roles here!!!!")
+        
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();
-
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         if(empty($customers)){
@@ -60,6 +63,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $model=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
+        
+        $this->view->Php2JsVars()->set('availableLanguages', $model->getAvailableLanguages());
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
