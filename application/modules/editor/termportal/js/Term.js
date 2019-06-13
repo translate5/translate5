@@ -69,7 +69,7 @@ const Term={
         /***
          * On searchTermsSelect selectableselected handler
          */
-        onSelectSearchTerm(event, ui) {
+        onSelectSearchTerm: function(event, ui) {
             var me = event.data.scope,
                 $_selected = $(ui.selected);
             // data for proposing a new Term
@@ -361,6 +361,37 @@ const Term={
             me.drawProposalButtons('terms');
 		    
 		    setSizesInFinalResultContent();
+
+            $( ".instanttranslate-integration .chooseLanguage" )
+                .iconselectmenu({
+                    select: function() {
+                        me.openInstantTranslate($(this));
+                    }
+                })
+                .iconselectmenu( "menuWidget")
+                .addClass( "ui-menu-icons flag" );
+        },
+        
+        /**
+         * Opens InstantTranslate for the term and languages.
+         */
+        openInstantTranslate: function($_elSelect) {
+            var $_termAttributes = $_elSelect.closest('.term-attributes'),
+                $_termData = $_termAttributes.prev('.term-data'),
+                $_form = $_termAttributes.children('form'),
+                text = $_termData.attr('data-term-value'),
+                source = $_termData.children('img').attr('title'),
+                target = $_elSelect.find("option:selected").text(),
+                instanttranslateUrl = Editor.data.restpath+'apps';
+            // use proposal if exists
+            if ($_termData.children('ins.proposal-value-content').length === 1) {
+                text = $_termData.children('ins.proposal-value-content')[0].innerText;
+            }
+            $_form.attr("target","instanttranslate");
+            $_form.attr("action",instanttranslateUrl);
+            console.log('openInstantTranslate with text="'+text+'", source="'+source+'", target="'+target+'", instanttranslateUrl: ' + instanttranslateUrl);
+            // TODO: use instanttranslate with params (text, source, target)
+            //$_form.submit();
 		},
 		
 		/**
@@ -446,13 +477,41 @@ const Term={
             
             termAttributesHtmlContainer.push('</h3>');
             
-            //draw term attriubtes
+            //draw term attributes
             termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
+            if (term.termId != -1) {
+                termAttributesHtmlContainer.push(me.renderInstantTranslateIntegrationForTerm());
+            }
             termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term.attributes,termRflLang));
             termAttributesHtmlContainer.push('</div>');
             
             return termAttributesHtmlContainer.join('');
 		},
+        
+        /**
+         * Return HTML for "InstantTranslate into"-LanguageDropDown.
+         * @returns {String}
+         * 
+         */
+        renderInstantTranslateIntegrationForTerm: function() {
+            if (!Editor.data.app.user.isInstantTranslateAllowed) {
+                console.log('do NOT renderInstantTranslateIntegrationForTerm');
+                return '';
+            }
+            console.log('renderInstantTranslateIntegrationForTerm');
+            var me = this,
+                html = '';
+            html += '<form>';
+            html += '<input type="hidden" name="name" value="instanttranslate">';
+            html += '<input type="hidden" name="apiUrl" value="'+Editor.data.restpath+'instanttranslate">';
+            html += '<input type="hidden" name="hiddenTest" value="hiddenBsp">'; // TODO (just an example for testing params into instanttranslate5)
+            html += '</form>';
+            html += '<div class="instanttranslate-integration">';
+            html += '<span>'+translations['instantTranslateInto']+' </span>';
+            html += me.renderLanguageSelect('instanttranslateTarget');
+            html += '</div>';
+            return html;
+        },
         
 		/**
 		 * Append the buttons for proposals in the DOM.
@@ -636,44 +695,20 @@ const Term={
                 languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
                 languageSelectHeader,
                 languageSelect,
-                languageSelectOptions = '',
                 rfcLanguage,
-                flag,
                 $_termSkeleton = me.$_termTable.find('.is-new');
             languageSelectHeader = '<p>'+proposalTranslations['chooseLanguageForTermEntry']+':</p>';
-            $("#language option").each(function() {
-                if ($(this).val() != 'none') {
-                    flag = getLanguageFlag($(this).text());
-                    languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
-                }
-            });
-            languageSelect = '<select name="chooseLanguage" id="chooseLanguage">'+languageSelectOptions+'</select>';
+            languageSelect = me.renderLanguageSelect('translate5');
             me.$_termTable.prepend(languageSelectContainer);
             $('#languageSelectContainer').prepend(languageSelect).prepend(languageSelectHeader);
             $_termSkeleton.next().hide();
             $_termSkeleton.hide();
             
-            // https://jqueryui.com/resources/demos/selectmenu/custom_render.html
-            $.widget( "custom.iconselectmenu", $.ui.selectmenu, {
-                _renderItem: function( ul, item ) {
-                    var li = $( "<li>" ),
-                        wrapper = $( "<div>", { text: item.label } );
-                    if ( item.disabled ) {
-                        li.addClass( "ui-state-disabled" );
-                    }
-                    $( "<span>", {
-                        style: item.element.attr( "data-style" ),
-                        "class": "ui-icon " + item.element.attr( "data-class" )
-                    })
-                        .appendTo( wrapper );
-                    return li.append( wrapper ).appendTo( ul );
-                }
-            });
-            $( "#chooseLanguage" )
+            $( "#languageSelectContainer .chooseLanguage" )
                 .iconselectmenu({
                     select: function() {
                         me.newTermLanguageId = $(this).val();
-                        rfcLanguage = getLanguageFlag($( "#chooseLanguage option:selected" ).text());
+                        rfcLanguage = getLanguageFlag($( "#languageSelectContainer .chooseLanguage option:selected" ).text());
                         $('#languageSelectContainer').remove();
                         $_termSkeleton.next().show();
                         $_termSkeleton.show();
@@ -684,6 +719,49 @@ const Term={
                 })
                 .iconselectmenu( "menuWidget")
                 .addClass( "ui-menu-icons flag" );
+        },
+        
+        /**
+         * Returns the HTML for a language-select with flags.
+         * @param {String} 
+         * @returns {String}
+         */
+        renderLanguageSelect: function(languagesFrom) { // TODO render this once at the beginning
+            var languageSelect,
+                languageSelectOptions = '',
+                flag;
+            
+            switch(languagesFrom) {
+                case "instanttranslateTarget":
+                    // TODO: Auswahl für Sofort-Übersetzung nur wie in instanstTranslate erhältlich für den Term und seine source
+                    $("#language option").each(function() {
+                        if ($(this).val() != 'none') {
+                            flag = getLanguageFlag($(this).text());
+                            languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
+                        }
+                    });
+                    break;
+                case "translate5":
+                    // TODO: ALLE erhältlichen translat5-Sprachen
+                    var test = Editor.data.availableLanguages; console.dir(test);
+                    $("#language option").each(function() {
+                        if ($(this).val() != 'none') {
+                            flag = getLanguageFlag($(this).text());
+                            languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
+                        }
+                    });
+                    break;
+            }
+            
+            languageSelect = '<select class="chooseLanguage">'+languageSelectOptions+'</select>';
+            return languageSelect;
+        },
+        
+        /**
+         * "Activate" the Language-Selectlist.
+         */
+        activateLanguageSelectForTerm: function(selectId) {
+            
         },
         
         /**
