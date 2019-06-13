@@ -315,6 +315,21 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
+     * Get the available collections for the currently logged user
+     *
+     * @return array
+     */
+    public function getCollectionForLogedUser(){
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
+        if(empty($customers)){
+            return [];
+        }
+        return $this->getCollectionsIdsForCustomer($customers);
+    }
+    
+    /***
      * Remove term collection from the disk
      * @param int $collectionId
      */

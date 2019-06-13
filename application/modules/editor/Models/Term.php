@@ -551,43 +551,59 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /***
      * Load term and attribute proposals yunger as $youngerAs date within the given collection
      * @param string $youngerAs
-     * @param int $collectionId
+     * @param array $collectionId
      */
-    public function loadProposalExportData(string $youngerAs,int $collectionId){
-        $sql="SELECT 
-            	t.termEntryId as 'term-termEntryId',
+    public function loadProposalExportData(string $youngerAs,array $collectionIds){
+        //if no date is set, se to current
+        if(empty($youngerAs)){
+            $youngerAs=date('Y-m-d H:i:s');
+        }
+        if(empty($collectionIds)){
+            $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            /* @var $termCollection editor_Models_TermCollection_TermCollection */
+            $collectionIds=$termCollection->getCollectionForLogedUser();
+        }
+        $sql="SELECT
+                t.termEntryId as 'term-termEntryId',
                 t.definition as 'term-definition',
-                t.language as 'term-language',
+                l.langName as 'term-language',
                 t.id as 'term-Id',
                 t.term as 'term-term',
                 t.processStatus as 'term-processStatus',
                 t.userName as 'term-lastEditor',
-                t.updated as 'term-lastEditorDate',
+                t.updated as 'term-lastEditedDate',
                 tp.id as 'termproposal-id',
                 tp.term as 'termproposal-term',
-                tp.created as 'termproposal-lastEditorDate',
+                tp.created as 'termproposal-lastEditedDate',
                 tp.userName as 'termproposal-lastEditor',
                 ta.id as 'attribute-id',
                 ta.value as 'attribute-value',
-                ta.updated as 'attribute-lastEditorDate',
+                ta.updated as 'attribute-lastEditedDate',
                 ta.userName as 'attribute-lastEditor',
                 tap.id as 'attributeproposal-id',
                 tap.value as 'attributeproposal-value',
-                tap.created as 'attributeproposal-lastEditorDate',
+                tap.created as 'attributeproposal-lastEditedDate',
                 tap.userName as 'attributeproposal-lastEditor'
-            FROM
-            	LEK_terms t
-            	INNER JOIN LEK_term_entry te ON te.id=t.termEntryId
+                    FROM
+                    LEK_terms t
+					LEFT OUTER JOIN
+                    LEK_term_proposal tp ON tp.termId = t.id
+                    INNER JOIN LEK_languages l ON t.language=l.id 
                     LEFT OUTER JOIN
-                LEK_term_proposal tp ON t.id = tp.termId
+                    LEK_term_attributes ta ON ta.termId=t.id AND ta.id IN (
+							select attributeId from LEK_term_attribute_proposal
+							inner join LEK_term_attributes on LEK_term_attributes.id=LEK_term_attribute_proposal.attributeId
+							where LEK_term_attribute_proposal.value is not null or LEK_term_attribute_proposal.value!=''
+                            and LEK_term_attributes.termId=t.id
+                    )
                     LEFT OUTER JOIN
-                LEK_term_attributes ta ON t.id = ta.termId
-            		LEFT OUTER JOIN
-                LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
-                where (tp.term is not null or tap.value is not null)
-                and t.created < ? and t.collectionId=?
-                order by t.groupId,t.term";
-        $resultArray=$this->db->getAdapter()->query($sql,[$youngerAs,$collectionId])->fetchAll();
+                    LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                where 
+                t.created > DATE_SUB(?, INTERVAL 5 MINUTE) 
+                and t.collectionId IN(?)
+                and (tp.term is not null or tap.value is not null)
+				order by t.groupId,t.term";
+        $resultArray=$this->db->getAdapter()->query($sql,[$youngerAs,implode(',', $collectionIds)])->fetchAll();
         if(empty($resultArray)){
             return [];
         }
@@ -932,23 +948,55 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      */
     protected function groupProposalExportData(array $data){
         $returnResult=[];
-        $tmpRow=[];
         $termId=null;
         $tmpTerm=[];
-        $tmpAttr=[];
+        $newTermInsert=true;
+        //clange cell color by value on the excel export callback
+        $changeMyCollorTag='<changemycolortag>';
         foreach ($data as $row) {
-            if(empty($termId)){
-                $termId=$row['termId'];
-            }
-            $tmpRow['termEntryId']=$row['term-termEntryId'];
-            $tmpRow['definition']=$row['term-definition'];
-            $tmpRow['language']=$row['term-language'];
-            $tmpRow['termId']=$row['term-termId'];
+            
+            $newTermInsert=$termId != $row['term-Id'] && !empty($row['termproposal-term']);
+            
+            $tmpTerm['termEntryId']=$row['term-termEntryId'];
+            $tmpTerm['definition']=$row['term-definition'];
+            $tmpTerm['language']=$row['term-language'];
+            $tmpTerm['termId']=$row['term-Id'];
+            $tmpTerm['term']=$row['term-term'];
+            $tmpTerm['termProposal']='';
+            $tmpTerm['processStatus']=$row['term-processStatus'];
+            $tmpTerm['attribute']=$row['attribute-value'];
+            $tmpTerm['attributeProposal']='';
+            $tmpTerm['lastEditor']=$changeMyCollorTag.$row['term-lastEditor'];
+            $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['term-lastEditedDate'];
+            
+            //if the proposal exist, set the change color and last editor for the proposal
             if(!empty($row['termproposal-term'])){
-                $tmpRow['term']=$row['termproposal-term'];
+                $tmpTerm['termProposal']=$changeMyCollorTag.$row['termproposal-term'];
+                $tmpTerm['lastEditor']=$changeMyCollorTag.$row['termproposal-lastEditor'];
+                $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['termproposal-lastEditedDate'];
             }
+            
+            //if the attribute proposal is set, set the change color and last editor for the attribute proposal
+            if(!empty($row['attributeproposal-value'])){
+                //if also the term proposal exist for new term row, insert the term proposal with change color value and last editor
+                if($newTermInsert){
+                    $tmpTerm['attribute']='';
+                    $tmpTerm['attributeProposal']='';
+                    $returnResult[]=$tmpTerm;
+                    $newTermInsert=false;
+                }
+                $tmpTerm['termProposal']=str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+                $tmpTerm['attribute']=$row['attribute-value'];
+                $tmpTerm['attributeProposal']=$changeMyCollorTag.$row['attributeproposal-value'];
+                $tmpTerm['lastEditor']=$changeMyCollorTag.$row['attributeproposal-lastEditor'];
+                $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['attributeproposal-lastEditedDate'];
+            }
+            $returnResult[]=$tmpTerm;
+            $tmpTerm=[];
+            
+            $termId=$row['term-Id'];
         }
-        return $data;
+        return $returnResult;
     }
     
     /**

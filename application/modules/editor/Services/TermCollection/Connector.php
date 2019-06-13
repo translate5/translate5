@@ -67,9 +67,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         if(isset($params['deleteEntriesModifiedOlderThan']) && !empty($params['deleteEntriesModifiedOlderThan'])){
             
             $validator = new Zend_Validate_Date();
-            $validator->setFormat(NOW_ISO);
+            $validator->setFormat('Y-m-d H:i:s');
             if(!$validator->isValid($params['deleteEntriesModifiedOlderThan'])){
-                $params['deleteEntriesModifiedOlderThan'] = date(NOW_ISO, strtotime($params['deleteEntriesModifiedOlderThan']));
+                $params['deleteEntriesModifiedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteEntriesModifiedOlderThan']));
             }
             
             $termModel=ZfExtended_Factory::get('editor_Models_Term');

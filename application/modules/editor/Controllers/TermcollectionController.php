@@ -92,7 +92,9 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
-        $collectionIds=$this->getCollectionForLogedUser();
+        $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        $collectionIds=$termCollection->getCollectionForLogedUser();
         
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;
@@ -175,7 +177,9 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
-        $collectionIds=$this->getCollectionForLogedUser();
+        $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        $collectionIds=$termCollection->getCollectionForLogedUser();
         
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;
@@ -364,28 +368,6 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             $filePath[]=$info['tmp_name'];
         }
         return $filePath;
-    }
-    
-    /***
-     * Get the available collections for the currently logged user
-     * 
-     * @return array
-     */
-    private function getCollectionForLogedUser(){
-        
-        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $userModel ZfExtended_Models_User */
-        $customers=$userModel->getUserCustomersFromSession();
-
-        if(empty($customers)){
-            return array();
-        }
-        
-        $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $collection editor_Models_TermCollection_TermCollection */
-        $collectionIds=$collection->getCollectionsIdsForCustomer($customers);
-        
-        return $collectionIds;
     }
     
     /**

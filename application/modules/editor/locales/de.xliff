@@ -1553,7 +1553,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RGllIFJlc3NvdXJjZSBpc3QgZ2VuZXJlbGwgdmVyZsO8Z2Jhciwgc3RlbGx0IGFiZXIga2VpbmUgSW5mb3JtYXRpb25lbiDDvGJlciBkYXMgYW5nZWZyYWd0ZSBUTSBiZXJlaXQsIGRhIGRpZXMgbmljaHQgZ2VsYWRlbiBpc3Qu'><source>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</source><target>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</target></trans-unit>
 <trans-unit id='SFRUUDogNDAx'><source>HTTP: 401</source><target>HTTP: 401</target></trans-unit>
 <trans-unit id='RGllc2UgRG9tYWluIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Domain wird bereits verwendet.</source><target>Diese Domain wird bereits verwendet.</target></trans-unit>
-<trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='><source>Vorschläge exportieren</source><target>Proposals export</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='><source>Vorschläge exportieren</source><target>Vorschläge exportieren</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBBdHRyaWJ1dHMtVm9yc2NobGFnIHdpcmtsaWNoIGVudGZlcm5lbj8='><source>Möchten Sie den Attributs-Vorschlag wirklich entfernen?</source><target>Möchten Sie den Attributs-Vorschlag wirklich entfernen?</target></trans-unit>
 <trans-unit id='RGFzIEF0dHJpYnV0IHdpcmQgZGFubiBhdWYgZGVuIGFsdGVuIFN0YW5kIHp1csO8Y2tnZXNldHp0Lg=='><source>Das Attribut wird dann auf den alten Stand zurückgesetzt.</source><target>Das Attribut wird dann auf den alten Stand zurückgesetzt.</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBUZXJtLVZvcnNjaGxhZyB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie den Term-Vorschlag wirklich entfernen?</source><target>Möchten Sie den Term-Vorschlag wirklich entfernen?</target></trans-unit>
@@ -1565,6 +1565,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='Qml0dGUgVGVybS1Db2xsZWN0aW9uIGbDvHIgZGVuIG5ldWVuIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Bitte Term-Collection für den neuen Term-Vorschlag wählen</source><target>Bitte Term-Collection für den neuen Term-Vorschlag wählen</target></trans-unit>
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
 <trans-unit id='T3BlbklkIElzc3Vlcg=='><source>OpenId Issuer</source><target>OpenId Issuer</target></trans-unit>
+<trans-unit id='SsO8bmdlciBhbHM='><source>Jünger als</source><target>Jünger als</target></trans-unit>
   </body>
  </file>
 </xliff>

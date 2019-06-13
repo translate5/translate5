@@ -1121,6 +1121,16 @@ Ext.define('Editor.controller.Localizer', {
             singleSearch:'<?php echo $this->translate->_('Suche in {0}');?>'
         }
     });
+    
+    Ext.define("Editor.locale.view.LanguageResources.ProposalExport", {
+        override: "Editor.view.LanguageResources.ProposalExport",
+        strings: {
+            dateFieldLabel: '<?php echo $this->translate->_('Jünger als');?>',
+            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
+            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
+            title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
+        }
+    });
 <?php 
     }; //END if($hasFrontendController('Editor.controller.LanguageResources')){
     if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
