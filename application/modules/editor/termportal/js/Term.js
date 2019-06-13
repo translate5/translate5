@@ -365,21 +365,33 @@ const Term={
             $( ".instanttranslate-integration .chooseLanguage" )
                 .iconselectmenu({
                     select: function() {
-                            var $_termAttributes = $(this).closest('.term-attributes'),
-                                $_termData = $_termAttributes.prev('.term-data'),
-                                $_form = $_termAttributes.children('form'),
-                                text = $_termData.attr('data-term-value'), // TODO: use proposal if exists!
-                                source = $_termData.children('img').attr('title'),
-                                target = $(this).find("option:selected").text(),
-                                instanttranslateUrl = Editor.data.restpath+'apps';
-                            $_form.attr("target","instanttranslate");
-                            $_form.attr("action",instanttranslateUrl);
-                            console.log('instanttranslateUrl: ' + instanttranslateUrl); // TODO: use instanttranslate with params (text, source, target)
-                            $_form.submit();
+                        me.openInstantTranslate($(this));
                     }
                 })
                 .iconselectmenu( "menuWidget")
                 .addClass( "ui-menu-icons flag" );
+        },
+        
+        /**
+         * Opens InstantTranslate for the term and languages.
+         */
+        openInstantTranslate: function($_elSelect) {
+            var $_termAttributes = $_elSelect.closest('.term-attributes'),
+                $_termData = $_termAttributes.prev('.term-data'),
+                $_form = $_termAttributes.children('form'),
+                text = $_termData.attr('data-term-value'),
+                source = $_termData.children('img').attr('title'),
+                target = $_elSelect.find("option:selected").text(),
+                instanttranslateUrl = Editor.data.restpath+'apps';
+            // use proposal if exists
+            if ($_termData.children('ins.proposal-value-content').length === 1) {
+                text = $_termData.children('ins.proposal-value-content')[0].innerText;
+            }
+            $_form.attr("target","instanttranslate");
+            $_form.attr("action",instanttranslateUrl);
+            console.log('openInstantTranslate with text="'+text+'", source="'+source+'", target="'+target+'", instanttranslateUrl: ' + instanttranslateUrl);
+            // TODO: use instanttranslate with params (text, source, target)
+            //$_form.submit();
 		},
 		
 		/**
@@ -482,10 +494,13 @@ const Term={
          * 
          */
         renderInstantTranslateIntegrationForTerm: function() {
+            if (!Editor.data.app.user.isInstantTranslateAllowed) {
+                console.log('do NOT renderInstantTranslateIntegrationForTerm');
+                return '';
+            }
             console.log('renderInstantTranslateIntegrationForTerm');
             var me = this,
                 html = '';
-            // TODO if isInstantTranslateAllowed() ...
             html += '<form>';
             html += '<input type="hidden" name="name" value="instanttranslate">';
             html += '<input type="hidden" name="apiUrl" value="'+Editor.data.restpath+'instanttranslate">';
@@ -711,7 +726,7 @@ const Term={
          * @param {String} 
          * @returns {String}
          */
-        renderLanguageSelect: function(languagesFrom) {
+        renderLanguageSelect: function(languagesFrom) { // TODO render this once at the beginning
             var languageSelect,
                 languageSelectOptions = '',
                 flag;
@@ -728,6 +743,7 @@ const Term={
                     break;
                 case "translate5":
                     // TODO: ALLE erhältlichen translat5-Sprachen
+                    var test = Editor.data.availableLanguages; console.dir(test);
                     $("#language option").each(function() {
                         if ($(this).val() != 'none') {
                             flag = getLanguageFlag($(this).text());
