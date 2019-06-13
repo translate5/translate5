@@ -42,10 +42,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $this->view->Php2JsVars()->set('term', $this->getRequest()->getParam('term'));
         }
         
+        
+        $userSession = new Zend_Session_Namespace('user');
+        $this->view->Php2JsVars()->set('app.user.isInstantTranslateAllowed', in_array('instantTranslate', $userSession->data->roles)); // see FIXME for isInstantTranslateAllowed()? ("use the rights not the roles here!!!!")
+        
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();
-
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         if(empty($customers)){
@@ -60,6 +63,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $model=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
+        
+        $this->view->Php2JsVars()->set('availableLanguages', $model->getAvailableLanguages());
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
@@ -141,6 +146,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             'unknown' => $this->translate->_('Unbekannter Term Status'),
         ]);
         $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$config->runtimeOptions->loginUrl);
+        $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
         
         //translated strings for some of the result tables
         $translatedStrings=array(
@@ -153,7 +159,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "noExistingAttributes" => $this->translate->_('no existing attributes'),
                 "collection"=>$this->translate->_("Term-Collection"),
                 "client"=>$this->translate->_("Kunde"),
-                "processstatus"=>$this->translate->_("Prozessstatus")
+                "processstatus"=>$this->translate->_("Prozessstatus"),
+                "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach")
         );
         
         $this->view->translations=$translatedStrings;

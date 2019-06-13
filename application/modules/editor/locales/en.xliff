@@ -3357,6 +3357,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='Qml0dGUgVGVybS1Db2xsZWN0aW9uIGbDvHIgZGVuIG5ldWVuIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Bitte Term-Collection für den neuen Term-Vorschlag wählen</source><target>Please choose a Term-Collection for the new TermEntry</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHM='><source>Jünger als</source><target>Younger than</target></trans-unit>
 <trans-unit id='RXhwb3J0aWVyZW4='><source>Exportieren</source><target>Export</target></trans-unit>
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>InstantTranslate into</target></trans-unit>
     </body>
   </file>
 </xliff>
