@@ -136,6 +136,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
     /*
      Idee war die Anzahl der Tags des Targets auch in den Hash des sources mit aufzunehmen,
         so dass keine WDHs gefunden werden wenn die Tag Anzahl unterschiedlich ist.
+        NEU hier: Whitespace Tags gehören nicht zur Anzahl dazu!
         
         Logisch bedeutet das für Source Wiederholungen: 
             Eine Wiederholung ist eine Wiederholung wenn, 
@@ -279,13 +280,13 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
     }
     
     /**
-     * See TRANSLATE-1442
+     * See TRANSLATE-1442 and TRANSLATE-680 and TRANSLATE-1669
      */
     public function testTagOnlyReplacement() {
         $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
-        $segToTest = $segments[12];
+        $segToTest = $segments[12]; //segmentNrInTask 13
         $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToTest->targetEdit.'Test', $segToTest->id);
-        $segment = $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
         
         //fetch alikes and assert correct segments found by segmentNrInTask
         $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
@@ -293,7 +294,7 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         $alikeNrs = array_map(function($item){
             return $item->segmentNrInTask;
         },$alikes);
-        $this->assertEquals([14,15,16], $alikeNrs, 'The found repetitions are not as expected!');
+        $this->assertEquals([15], $alikeNrs, 'The found repetitions are not as expected!');
         
         //save repetitions
         $alikeIds = array_map(function($item){
@@ -307,10 +308,22 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
         $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
             
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
-        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segments);
+        $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segmentsAfterChange);
         //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/ChangeAlikeTranslate680Test/expectedSegments-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now. 
         $this->assertEquals(self::$api->getFileContent('expectedSegments.json'), $data, 'Imported segments are not as expected!');
+        
+        //seg 14 has seg 16 as alike, although the target tag count differs. 
+        // But thats ok since target of 16 is empty, and will be filled with one tag from the source on editing. 
+        // So after editing, tags are equal again. 
+        $segToTest = $segments[13]; //segmentNrInTask 14
+        //fetch alikes and assert correct segments found by segmentNrInTask
+        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        $alikeNrs = array_map(function($item){
+            return $item->segmentNrInTask;
+        },$alikes);
+        $this->assertEquals([16], $alikeNrs, 'The found repetitions are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
