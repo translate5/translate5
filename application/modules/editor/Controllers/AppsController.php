@@ -40,6 +40,7 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
         $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
         $this->view->Php2JsVars()->set('apps.appName',$this->getRequest()->getParam('name'));
         $this->view->Php2JsVars()->set('apps.apiUrl',$this->getRequest()->getParam('apiUrl'));
+        $this->view->Php2JsVars()->set('apps.params',$this->getRequest()->getParam('params'));
         
         $this->view->Php2JsVars()->set('apps.title',$translate->_('translate5-apps'));
         $this->view->Php2JsVars()->set('apps.instanttranslate.title',$translate->_('translate5-instanttranslate'));

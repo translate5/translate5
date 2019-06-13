@@ -511,20 +511,77 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     public function exportAction() {
         $proposals=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $proposals editor_Models_Term */
-        $rows = $proposals->loadProposalExportData($this->getParam('exportDate'),$this->getParam('collectionId'));
         
+        $collectionIds=$this->getParam('collectionId');
+        if(is_string($collectionIds)){
+            $collectionIds=explode(',', $collectionIds);
+        }
+        $rows = $proposals->loadProposalExportData($this->getParam('exportDate'),$collectionIds);
+        if(empty($rows)){
+            $this->view->message='No results where found.';
+            return;
+        }
         $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
         /* @var $excel ZfExtended_Models_Entity_ExcelExport */
         
         // set property for export-filename
         $excel->setProperty('filename', 'Term and term attributes proposals');
         
-        // sample label-translations
-        //$excel->setLabel('id', 'Nummer');
-        //$excel->setLabel('term', 'Term');
-        //$excel->setLabel('processStatus', 'processStatus');
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
         
-        $excel->simpleArrayToExcel($rows);
+        // sample label-translations
+        $excel->setLabel('termEntryId', $t->_('Term-Eintrag'));
+        $excel->setLabel('definition', $t->_('Definition'));
+        $excel->setLabel('language', $t->_('Sprache'));
+        $excel->setLabel('termId', $t->_('Term-Id'));
+        $excel->setLabel('term', $t->_('Term'));
+        $excel->setLabel('termProposal', $t->_('Term-Vorschlag'));
+        $excel->setLabel('attribute', $t->_('Attribut'));
+        $excel->setLabel('attributeProposal', $t->_('Attribut-Vorschlag'));
+        $excel->setLabel('processStatus', $t->_('Processstatus'));
+        $excel->setLabel('lastEditor', $t->_('Letzter Bearbeiter'));
+        $excel->setLabel('lastEditedDate', $t->_('Bearbeitungsdatum'));
+        
+        
+        
+        //set the cell autosize
+        $excel->simpleArrayToExcel($rows,function($phpExcel) use ($excel){
+            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
+                
+                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
+                
+                $sheet = $phpExcel->getActiveSheet();
+                
+                //the highes column based on the current row columns
+                $highestColumn='L';
+                foreach(range('A',$highestColumn) as $column) {
+                    $sheet->getColumnDimension($column)->setAutoSize(true);
+                }
+                
+                
+                $highestColumnIndex = $excel->columnIndexFromString($highestColumn);
+                
+                // expects same number of row records for all columns
+                $highestRow = $worksheet->getHighestRow();
+                
+                for($col = 0; $col < $highestColumnIndex; $col++)
+                {
+                    // if you do not expect same number of row records for all columns
+                    // get highest row index for each column
+                    // $highestRow = $worksheet->getHighestRow();
+                    
+                    for ($row = 1; $row <= $highestRow; $row++)
+                    {
+                        $cell = $worksheet->getCellByColumnAndRow($col, $row);
+                        if(strpos($cell->getValue(), '<changemycolortag>') !== false){
+                            $cell->setValue(str_replace('<changemycolortag>','',$cell->getValue()));
+                            $sheet->getStyle($cell->getCoordinate())->getFill()->setFillType('solid')->getStartColor()->setRGB('f9f25c');
+                        }
+                    }
+                }
+            }
+        });
     }
     
     /**
