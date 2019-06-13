@@ -107,8 +107,12 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
         ['<br>','<br>'],
         ["\r",''],
         ['<hr>',''],
-        ['<br>','<br><br>'], // no repetition of above sources with a single tag
-        //testing the correct replacement of the tags
+        ['<br>','<br><br>'], // no repetition of above sources with a single tag and testing the correct replacement of the tags
+        //test deleting and adding whitespace tags via repetition should not influence other tags
+        ['<p>Test wort</p>','<p>Test word</p>'],
+        ['<b>Test wort</b>','<b>Test word</b>'],
+        ['<p>Test wort2</p>','<p>Test word2</p>'],
+        ['<b>Test wort2</b>','<b>Test word2</b>'],
     );
     
     /**
@@ -324,6 +328,65 @@ class ChangeAlikeTranslate680Test extends \ZfExtended_Test_ApiTestcase {
             return $item->segmentNrInTask;
         },$alikes);
         $this->assertEquals([16], $alikeNrs, 'The found repetitions are not as expected!');
+    }
+    
+    /**
+     * See TRANSLATE-1669
+     * @depends testTagOnlyReplacement
+     */
+    public function testWhitespaceTagManipulation() {
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        
+        /*
+         * segmentNrInTask 18 - remove whitespace tag the other tags must remain in the alikes
+         */
+        $segToTest = $segments[17]; 
+        $newTarget = preg_replace('/Test<.*>word/', 'Test Word', $segToTest->targetEdit);
+        
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $newTarget, $segToTest->id);
+        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
+        //fetch alikes and assert correct segments found by segmentNrInTask
+        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        
+        $alikeNrs = array_column($alikes, 'segmentNrInTask');
+        $this->assertEquals([19], $alikeNrs, 'The found repetitions are not as expected!');
+        $alikeIds = array_column($alikes, 'id');
+                
+        $alikePutData = [
+            'duration' => 777, //faked duration value
+            'alikes' => json_encode($alikeIds)
+        ];
+        //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
+        $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
+        
+        /*
+         * segmentNrInTask 20 - add whitespace tag the other tags must remain in the alikes
+         */
+        $segToTest = $segments[19];
+        $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segments[17]->target, $segToTest->id);
+        $this->api()->requestJson('editor/segment/'.$segToTest->id, 'PUT', $segmentData);
+        
+        //fetch alikes and assert correct segments found by segmentNrInTask
+        $alikes = $this->api()->requestJson('editor/alikesegment/'.$segToTest->id, 'GET');
+        
+        $alikeNrs = array_column($alikes, 'segmentNrInTask');
+        $this->assertEquals([21], $alikeNrs, 'The found repetitions are not as expected!');
+        $alikeIds = array_column($alikes, 'id');
+        
+        $alikePutData = [
+            'duration' => 777, //faked duration value
+            'alikes' => json_encode($alikeIds)
+        ];
+        
+        //Alike Data is sent as plain HTTP request parameters not as JSON in data parameter!
+        $this->api()->request('editor/alikesegment/'.$segToTest->id, 'PUT', $alikePutData);
+                
+        $segmentsAfterChange = $this->api()->requestJson('editor/segment?page=1&start=0&limit=200');
+        $data = array_map([self::$api,'removeUntestableSegmentContent'], $segmentsAfterChange);
+        //file_put_contents("/home/tlauria/www/translate5-master/application/modules/editor/testcases/editorAPI/ChangeAlikeTranslate680Test/expectedSegmentsEditedWhitespace-new.json", json_encode($data,JSON_PRETTY_PRINT));
+        //In Segment 15 the macReturn is changed correctly to a softReturn, since the whitespace tags belong to the content right now.
+        $this->assertEquals(self::$api->getFileContent('expectedSegmentsEditedWhitespace.json'), $data, 'Imported segments are not as expected!');
     }
     
     public static function tearDownAfterClass(): void {
