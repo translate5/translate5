@@ -378,23 +378,31 @@ const Term={
         openInstantTranslate: function($_elSelect) {
             var $_termAttributes = $_elSelect.closest('.term-attributes'),
                 $_termData = $_termAttributes.prev('.term-data'),
-                $_form = $_termAttributes.children('form'),
                 text = $_termData.attr('data-term-value'),
                 source = $_termData.children('img').attr('title'),
                 target = $_elSelect.find("option:selected").text(),
-                instanttranslateUrl = Editor.data.restpath+'apps';
+                name = 'instanttranslate',
+                apiUrl = Editor.data.restpath+'instanttranslate',
+                params,
+                newTab,
+                newTabHref;
             // use proposal if exists
             if ($_termData.children('ins.proposal-value-content').length === 1) {
                 text = $_termData.children('ins.proposal-value-content')[0].innerText;
             }
-            $_form.attr("target","instanttranslate");
-            $_form.attr("action",instanttranslateUrl);
-            console.log('openInstantTranslate with text="'+text+'", source="'+source+'", target="'+target+'", instanttranslateUrl: ' + instanttranslateUrl);
-            // TODO: use instanttranslate with params (text, source, target)
-            //$_form.submit();
-		},
-		
-		/**
+            // open InstantTranslate with params
+            params = '{"text" : "'+text+'", "source" : "'+source+'", "target" : "'+target+'"}',
+            newTabHref = Editor.data.restpath+'apps?name='+name+'&apiUrl='+apiUrl+'&params='+params;
+            console.log('openInstantTranslate: ' + newTabHref);
+            newTab = window.open("about:blank", "instanttranslate");
+            if(newTab == null) { // window.open does not work in Chrome
+                window.location.href = newTabHref;
+            } else {
+                newTab.location = newTabHref;
+            };
+        },
+        
+        /**
          * Render html for term data by given term.
          * 
          * @param {Object} term
@@ -413,7 +421,8 @@ const Term={
                 clientId,
                 clientName,
                 isProposal,
-                proposable = (term.proposable !== false) ? ' proposable' : ''; // = does the user have the rights to handle proposals for this term?
+                proposable = (term.proposable !== false) ? ' proposable' : '', // = does the user have the rights to handle proposals for this term?,
+                instantTranslateIntegrationForTerm;
             
             // "is-proposal" can be ... 
             // ... a proposal for a term that already existed (term.proposal = "xyz")
@@ -479,7 +488,8 @@ const Term={
             
             //draw term attributes
             termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
-            if (term.termId != -1 && instantTranslateIntegrationForTerm != '') {
+            if (term.termId != -1) {
+                instantTranslateIntegrationForTerm = me.renderInstantTranslateIntegrationForTerm(termRflLang);
                 termAttributesHtmlContainer.push(instantTranslateIntegrationForTerm);
             }
             termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term.attributes,termRflLang));
@@ -487,6 +497,77 @@ const Term={
             
             return termAttributesHtmlContainer.join('');
 		},
+
+        /**
+         * Returns the HTML for a language-select with flags.
+         * @param {String} languagesFor
+         * @param {String} source
+         * @returns {String}
+         */
+        renderLanguageSelect: function (languagesFor, source=null) {
+            var languageSelect,
+                languageSelectOptions = '',
+                flag,
+                lang,
+                targetsForSources,
+                targets,
+                availableLanguages;
+            
+            switch(languagesFor) {
+                case "instanttranslate":
+                    // offer target-Languages as available in InstantTranslate for the term's source
+                    targetsForSources = Editor.data.instanttranslate.targetsForSources;
+                    targets = targetsForSources[source];
+                    for (var i=0; i < targets.length; i++) {
+                        target = targets[i];
+                        flag = getLanguageFlag(target);
+                        languageSelectOptions += '<option value="'+target+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+target+'</option>';
+                    }
+                    break;
+                case "term":
+                    // list the languages of the TermPortal first...
+                    languageSelectOptions += '<option value="none" disabled>-- '+translations['TermPortalLanguages']+': --</option>';
+                    $("#language option").each(function() {
+                        if ($(this).val() != 'none') {
+                            flag = getLanguageFlag($(this).text());
+                            languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
+                        }
+                    });
+                    // ... and then list ALL languages that are available in translate5
+                    languageSelectOptions += '<option value="none" disabled>-- '+translations['AllLanguagesAvailable']+': --</option>';
+                    availableLanguages = Editor.data.availableLanguages;
+                    console.dir(availableLanguages);
+                    for (var i=0; i < availableLanguages.length; i++) {
+                        lang = availableLanguages[i];
+                        flag = getLanguageFlag(lang.value);
+                        languageSelectOptions += '<option value="'+lang.id+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+lang.text+'</option>';
+                    }
+                    break;
+            }
+            
+            languageSelect = '<select class="chooseLanguage">'+languageSelectOptions+'</select>';
+            return languageSelect;
+        },
+
+        /**
+         * Return HTML for "InstantTranslate into"-LanguageDropDown.
+         * @returns {String}
+         * 
+         */
+        renderInstantTranslateIntegrationForTerm: function(source) {
+            if (!Editor.data.app.user.isInstantTranslateAllowed) {
+                console.log('do NOT renderInstantTranslateIntegrationForTerm');
+                return '';
+            }
+            console.log('renderInstantTranslateIntegrationForTerm');
+            var me = this,
+                html = '';
+            html += '<div class="instanttranslate-integration">';
+            html += '<span>'+translations['instantTranslateInto']+' </span>';
+            html += me.renderLanguageSelect('instanttranslate',source);
+            html += '</div>';
+            return html;
+        },
         
 		/**
 		 * Append the buttons for proposals in the DOM.
