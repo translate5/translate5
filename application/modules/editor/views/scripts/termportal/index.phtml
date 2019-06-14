@@ -281,9 +281,6 @@ $( function() {
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Term.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <script type="text/javascript">
-    var languageSelectForInstanttranslate = renderLanguageSelect('instanttranslate');
-    var languageSelectForNewTerm = renderLanguageSelect('term');
-    var instantTranslateIntegrationForTerm = renderInstantTranslateIntegrationForTerm();
-
+    var languageSelectForNewTerm = Term.renderLanguageSelect('term');
     checkDirectSearch();
 </script>
