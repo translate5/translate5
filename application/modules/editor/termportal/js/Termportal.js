@@ -161,6 +161,80 @@ function showFinalResultContent() {
     setSizesInFinalResultContent();
 }
 
+
+
+/**
+ * Returns the HTML for a language-select with flags.
+ * @param {String} 
+ * @returns {String}
+ */
+function renderLanguageSelect (languagesFor) {
+    var languageSelect,
+        languageSelectOptions = '',
+        flag,
+        lang,
+        availableLanguages;
+    
+    switch(languagesFor) {
+        case "instanttranslate":
+            // TODO: Auswahl für Sofort-Übersetzung nur wie in instanstTranslate erhältlich für den Term und seine source
+            $("#language option").each(function() {
+                if ($(this).val() != 'none') {
+                    flag = getLanguageFlag($(this).text());
+                    languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
+                }
+            });
+            break;
+        case "term":
+            // list the languages of the TermPortal first...
+            languageSelectOptions += '<option value="none" disabled>-- '+translations['TermPortalLanguages']+': --</option>';
+            $("#language option").each(function() {
+                if ($(this).val() != 'none') {
+                    flag = getLanguageFlag($(this).text());
+                    languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
+                }
+            });
+            // ... and then list ALL languages that are available in translate5
+            languageSelectOptions += '<option value="none" disabled>-- '+translations['AllLanguagesAvailable']+': --</option>';
+            availableLanguages = Editor.data.availableLanguages;
+            console.dir(availableLanguages);
+            for (var i=0; i < availableLanguages.length; i++) {
+                lang = availableLanguages[i];
+                flag = getLanguageFlag(lang.value);
+                languageSelectOptions += '<option value="'+lang.id+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+lang.text+'</option>';
+            }
+            break;
+    }
+    
+    languageSelect = '<select class="chooseLanguage">'+languageSelectOptions+'</select>';
+    return languageSelect;
+}
+
+/**
+ * Return HTML for "InstantTranslate into"-LanguageDropDown.
+ * @returns {String}
+ * 
+ */
+function renderInstantTranslateIntegrationForTerm() {
+    if (!Editor.data.app.user.isInstantTranslateAllowed) {
+        console.log('do NOT renderInstantTranslateIntegrationForTerm');
+        return '';
+    }
+    console.log('renderInstantTranslateIntegrationForTerm');
+    var me = this,
+        html = '';
+    html += '<form>';
+    html += '<input type="hidden" name="name" value="instanttranslate">';
+    html += '<input type="hidden" name="apiUrl" value="'+Editor.data.restpath+'instanttranslate">';
+    html += '<input type="hidden" name="hiddenTest" value="hiddenBsp">'; // TODO (just an example for testing params into instanttranslate5)
+    html += '</form>';
+    html += '<div class="instanttranslate-integration">';
+    html += '<span>'+translations['instantTranslateInto']+' </span>';
+    html += languageSelectForInstanttranslate;
+    html += '</div>';
+    return html;
+}
+
 /* ---------------------------------------------------------------------
 // ------------------- handle tag fields and filters -------------------
 //----------------------------------------------------------------------

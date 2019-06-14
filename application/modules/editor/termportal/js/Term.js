@@ -479,39 +479,14 @@ const Term={
             
             //draw term attributes
             termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
-            if (term.termId != -1) {
-                termAttributesHtmlContainer.push(me.renderInstantTranslateIntegrationForTerm());
+            if (term.termId != -1 && instantTranslateIntegrationForTerm != '') {
+                termAttributesHtmlContainer.push(instantTranslateIntegrationForTerm);
             }
             termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term.attributes,termRflLang));
             termAttributesHtmlContainer.push('</div>');
             
             return termAttributesHtmlContainer.join('');
 		},
-        
-        /**
-         * Return HTML for "InstantTranslate into"-LanguageDropDown.
-         * @returns {String}
-         * 
-         */
-        renderInstantTranslateIntegrationForTerm: function() {
-            if (!Editor.data.app.user.isInstantTranslateAllowed) {
-                console.log('do NOT renderInstantTranslateIntegrationForTerm');
-                return '';
-            }
-            console.log('renderInstantTranslateIntegrationForTerm');
-            var me = this,
-                html = '';
-            html += '<form>';
-            html += '<input type="hidden" name="name" value="instanttranslate">';
-            html += '<input type="hidden" name="apiUrl" value="'+Editor.data.restpath+'instanttranslate">';
-            html += '<input type="hidden" name="hiddenTest" value="hiddenBsp">'; // TODO (just an example for testing params into instanttranslate5)
-            html += '</form>';
-            html += '<div class="instanttranslate-integration">';
-            html += '<span>'+translations['instantTranslateInto']+' </span>';
-            html += me.renderLanguageSelect('instanttranslateTarget');
-            html += '</div>';
-            return html;
-        },
         
 		/**
 		 * Append the buttons for proposals in the DOM.
@@ -694,16 +669,14 @@ const Term={
             var me = this,
                 languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
                 languageSelectHeader,
-                languageSelect,
                 rfcLanguage,
                 $_termSkeleton = me.$_termTable.find('.is-new');
             languageSelectHeader = '<p>'+proposalTranslations['chooseLanguageForTermEntry']+':</p>';
-            languageSelect = me.renderLanguageSelect('translate5');
             me.$_termTable.prepend(languageSelectContainer);
-            $('#languageSelectContainer').prepend(languageSelect).prepend(languageSelectHeader);
+            $('#languageSelectContainer').prepend(languageSelectForNewTerm).prepend(languageSelectHeader);
             $_termSkeleton.next().hide();
             $_termSkeleton.hide();
-            
+            // TODO: first mouseover causes "jquery.js:6718 GET http://translate5.local/editor/undefined 404 (Not Found)"
             $( "#languageSelectContainer .chooseLanguage" )
                 .iconselectmenu({
                     select: function() {
@@ -719,49 +692,6 @@ const Term={
                 })
                 .iconselectmenu( "menuWidget")
                 .addClass( "ui-menu-icons flag" );
-        },
-        
-        /**
-         * Returns the HTML for a language-select with flags.
-         * @param {String} 
-         * @returns {String}
-         */
-        renderLanguageSelect: function(languagesFrom) { // TODO render this once at the beginning
-            var languageSelect,
-                languageSelectOptions = '',
-                flag;
-            
-            switch(languagesFrom) {
-                case "instanttranslateTarget":
-                    // TODO: Auswahl für Sofort-Übersetzung nur wie in instanstTranslate erhältlich für den Term und seine source
-                    $("#language option").each(function() {
-                        if ($(this).val() != 'none') {
-                            flag = getLanguageFlag($(this).text());
-                            languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
-                        }
-                    });
-                    break;
-                case "translate5":
-                    // TODO: ALLE erhältlichen translat5-Sprachen
-                    var test = Editor.data.availableLanguages; console.dir(test);
-                    $("#language option").each(function() {
-                        if ($(this).val() != 'none') {
-                            flag = getLanguageFlag($(this).text());
-                            languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
-                        }
-                    });
-                    break;
-            }
-            
-            languageSelect = '<select class="chooseLanguage">'+languageSelectOptions+'</select>';
-            return languageSelect;
-        },
-        
-        /**
-         * "Activate" the Language-Selectlist.
-         */
-        activateLanguageSelectForTerm: function(selectId) {
-            
         },
         
         /**

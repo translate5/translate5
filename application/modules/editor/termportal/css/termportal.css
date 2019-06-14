@@ -30,6 +30,10 @@ END LICENSE AND COPYRIGHT
     margin: 10px;
 }
 
+.ui-selectmenu-menu ul {
+    max-height: 19em;
+}
+
 .wrap {
     margin-bottom: 1em;
 }
