@@ -59,6 +59,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $config = Zend_Registry::get('config');
         $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
         
+        $this->view->Php2JsVars()->set('instanttranslate.showSublanguages', $config->runtimeOptions->InstantTranslate->showSubLanguages);
+        
         $langsArray = array();
         
         $model=ZfExtended_Factory::get('editor_Models_Languages');

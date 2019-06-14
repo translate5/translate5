@@ -172,7 +172,6 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
      * @return object
      */
     public function getLanguageCombinationsForLoggedUser() {
-        // TODO: how to handle 'de-DE' vs. 'de' etc?
         // TODO: use this instaed of getLocalesAccordingToReference() in Instanttranslate.js
         $targetsForSources = [];
         $sourcesForTargets = [];
@@ -200,6 +199,15 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
                 }
             }
         };
+        // how to handle 'de-DE' vs. 'de'
+        $config = Zend_Registry::get('config');
+        $showSublanguages = $config->runtimeOptions->InstantTranslate->showSubLanguages;
+        $checkSubLanguage = function(&$locale) use ($showSublanguages) {
+            if (!$showSublanguages) {
+                $localeParts = explode('-',$locale);
+                $locale = $localeParts[0];
+            }
+        };
         
         $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
@@ -208,6 +216,10 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
         foreach ($allAvailableLanguageResources as $languageResource){
             $sources = $languageResource['source'];
             $targets = $languageResource['target'];
+            array_walk($sources, $checkSubLanguage);
+            array_walk($targets, $checkSubLanguage);
+            array_unique($sources);
+            array_unique($targets);
             $addTargetsToSources($sources,$targets);
             $addSourcesToTargets($sources,$targets);
         }
