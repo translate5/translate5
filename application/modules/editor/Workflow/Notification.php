@@ -484,9 +484,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return;
         }
         
-        
-        
-        $exportDate=date('Y-m-d');//TODO: when do we set the trigger date ? date('Y-m-d',strtotime("-1 days"));
+        //export yunger as one day before now
+        $exportDate=date('Y-m-d',strtotime("-1 days"));
         $collections=array_column($collections,'id');
         $proposals=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $proposals editor_Models_Term */
