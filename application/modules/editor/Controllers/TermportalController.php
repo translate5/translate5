@@ -160,7 +160,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "collection"=>$this->translate->_("Term-Collection"),
                 "client"=>$this->translate->_("Kunde"),
                 "processstatus"=>$this->translate->_("Prozessstatus"),
-                "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach")
+                "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach"),
+                "TermPortalLanguages"=>$this->translate->_("Terminologieportal-Sprachen"),
+                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen")
         );
         
         $this->view->translations=$translatedStrings;
