@@ -128,6 +128,11 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         //all languages in the available term collections for the user
         $this->view->languages=$langsArray;
         
+        // all language-combinations that are available in InstantTranslate
+        $languageResourcesLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languageResourcesLanguages editor_Models_LanguageResources_Languages */
+        $languageCombinations = $languageResourcesLanguages->getLanguageCombinationsForLoggedUser();
+        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageCombinations->targetsForSources);
         
         //rfc language code to language flag mapping
         $this->view->rfcFlags=$rfcFlags;
@@ -160,7 +165,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "collection"=>$this->translate->_("Term-Collection"),
                 "client"=>$this->translate->_("Kunde"),
                 "processstatus"=>$this->translate->_("Prozessstatus"),
-                "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach")
+                "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach"),
+                "TermPortalLanguages"=>$this->translate->_("Terminologieportal-Sprachen"),
+                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen")
         );
         
         $this->view->translations=$translatedStrings;
