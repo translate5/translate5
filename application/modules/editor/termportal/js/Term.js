@@ -386,11 +386,14 @@ const Term={
                 params,
                 newTab,
                 newTabHref;
+            
             // use proposal if exists
             if ($_termData.children('ins.proposal-value-content').length === 1) {
                 text = $_termData.children('ins.proposal-value-content')[0].innerText;
             }
-            // open InstantTranslate with params
+            
+            source = checkSubLanguage(source);
+            target = checkSubLanguage(target);
             params = '{"text" : "'+text+'", "source" : "'+source+'", "target" : "'+target+'"}',
             newTabHref = Editor.data.restpath+'apps?name='+name+'&apiUrl='+apiUrl+'&params='+params;
             console.log('openInstantTranslate: ' + newTabHref);
@@ -505,7 +508,7 @@ const Term={
          * @returns {String}
          */
         renderLanguageSelect: function (languagesFor, source=null) {
-            var languageSelect,
+            var languageSelect = '',
                 languageSelectOptions = '',
                 flag,
                 lang,
@@ -516,12 +519,15 @@ const Term={
             switch(languagesFor) {
                 case "instanttranslate":
                     // offer target-Languages as available in InstantTranslate for the term's source
+                    source = checkSubLanguage(source);
                     targetsForSources = Editor.data.instanttranslate.targetsForSources;
-                    targets = targetsForSources[source];
-                    for (var i=0; i < targets.length; i++) {
-                        target = targets[i];
-                        flag = getLanguageFlag(target);
-                        languageSelectOptions += '<option value="'+target+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+target+'</option>';
+                    if (source in targetsForSources){
+                        targets = targetsForSources[source];
+                        for (var i=0; i < targets.length; i++) {
+                            target = targets[i];
+                            flag = getLanguageFlag(target);
+                            languageSelectOptions += '<option value="'+target+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+target+'</option>';
+                        }
                     }
                     break;
                 case "term":
@@ -545,7 +551,9 @@ const Term={
                     break;
             }
             
-            languageSelect = '<select class="chooseLanguage">'+languageSelectOptions+'</select>';
+            if (languageSelectOptions != '') {
+                languageSelect = '<select class="chooseLanguage">'+languageSelectOptions+'</select>';
+            }
             return languageSelect;
         },
 
@@ -555,13 +563,18 @@ const Term={
          * 
          */
         renderInstantTranslateIntegrationForTerm: function(source) {
+            console.log('renderInstantTranslateIntegrationForTerm');
+            var me = this,
+                languageSelect,
+                html = '';
             if (!Editor.data.app.user.isInstantTranslateAllowed) {
                 console.log('do NOT renderInstantTranslateIntegrationForTerm');
                 return '';
             }
-            console.log('renderInstantTranslateIntegrationForTerm');
-            var me = this,
-                html = '';
+            languageSelect = me.renderLanguageSelect('instanttranslate',source);
+            if (languageSelect == '') {
+                return '';
+            }
             html += '<div class="instanttranslate-integration">';
             html += '<span>'+translations['instantTranslateInto']+' </span>';
             html += me.renderLanguageSelect('instanttranslate',source);

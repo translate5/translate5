@@ -105,6 +105,7 @@ $("#search").autocomplete({
 function getLanguageFlag(rfcLanguage) {
     rfcLanguage = rfcLanguage.toLowerCase();
     if (rfcLanguage in rfcLanguageFlags) {
+        // TODO: img-html could be reused if already created before
         return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcLanguage] + '.png" alt="' + rfcLanguage + '" title="' + rfcLanguage + '">';
     } else {
         return rfcLanguage;
@@ -159,6 +160,20 @@ function startAutocomplete(){
 function showFinalResultContent() {
     $('#resultTermsHolder').show();
     setSizesInFinalResultContent();
+}
+
+/**
+ * Handle 'de-DE' vs. 'de' according to showSublanguages-config.
+ * @param {String} locale
+ * @returns {String}
+ */
+function checkSubLanguage(locale) {
+    var localeParts;
+    if (!Editor.data.instanttranslate.showSublanguages) {
+        localeParts = locale.split("-");
+        locale = localeParts[0];
+    }
+    return locale;
 }
 
 /* ---------------------------------------------------------------------
