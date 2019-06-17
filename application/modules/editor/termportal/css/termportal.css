@@ -184,6 +184,9 @@ END LICENSE AND COPYRIGHT
     margin: 2px 0px;
     width: 100%;
 }
+#searchTermsHelper .proposal-txt {
+    margin-right: 30px;
+}
 
 #searchTermsSelect,
 #searchTermsSelect ul,

@@ -60,7 +60,7 @@ const Term={
             me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me, reference:'icon'},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
             // - Content
-            me.$_termTable.on('click', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
+            me.$_termTable.on('click', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
             
             // Terms-Attributes: see Attribute.js
@@ -130,6 +130,7 @@ const Term={
 			var me=this;
 			if(!me.searchTermsResponse || me.searchTermsResponse.length === 0){
 
+                me.$_searchTermsSelect.empty();
 			    me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + proposalTranslations['addTermEntryProposal']);
                 me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + proposalTranslations['addTermEntryProposal']);
 			    me.$_searchErrorNoResults.show();
