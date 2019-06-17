@@ -537,6 +537,9 @@ function fillTranslation() {
     }
     $('#translations').html(translationHtml);
     showTranslations();
+
+    // open TermPortal for proposing new term?
+    drawTermPortalIntegration();
 }
 
 function renderTranslationContainer(resultData) {
@@ -825,17 +828,64 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 });
 
 /* --------------- open TermPortal ------------------------------------------ */
+
+/**
+ * If the user has the right to propose terms in the TermPortal,
+ * we draw the link here.
+ */
+function drawTermPortalIntegration() {
+    var html = '';
+    if(!Editor.data.app.user.isUserTermproposer) { // see TRANSLATE-1371
+        return;
+    }
+    if($('#translations h4').length > 3) { // see TRANSLATE-1371
+        return;
+    }
+    if (false) { // see TRANSLATE-1371
+        // TODO: If exactly the same term as translated by machine translation already exists 
+        // as term for the exact same language, the button "Propose as new term" is not shown.
+        return;
+    }
+    html += '<input id="proposeTermSubmit" name="proposeTermSubmit" value="Propose as new term" type="submit" class="ui-corner-all ui-button ui-widget"/>';
+    $('#translations').append(html);
+    $('#proposeTermSubmit').button();
+}
+
+/**
+ * events
+ */
+$(document).on('click', '#proposeTermSubmit' , function() {
+    var text = $('#sourceText').val(),
+        lang = $("#targetLocale").val(),
+        showTermProposal = 'true';
+        params="text="+text+"&lang="+lang+"&showTermProposal="+showTermProposal;
+    openTermPortal(params);
+});
+
 $('#translations').on('touchstart click','.term-info',function(){
-    var url=Editor.data.restpath+"termportal",
-    	termLanguage=$(this).attr("data-languageRfc"),
-        params="term="+$(this).attr('id')+"&lang="+termLanguage;
-    
-    window.parent.loadIframe('termportal',url,params);
+    var text = $(this).attr('id'),
+        lang = $(this).attr("data-languageRfc"),
+        params="text="+text+"&lang="+lang;
+    openTermPortal(params);
 });
 
 $('#termPortalButton').on('touchstart click',function(){
-    window.parent.loadIframe('termportal',Editor.data.restpath+'termportal');
+    openTermPortal();
 });
+
+/**
+ * Open TermPortal with given params (optional).
+ * @param {String} params
+ */
+function openTermPortal (params) {
+    console.log('openTermPortal ' + params);
+    var url = Editor.data.restpath+"termportal";
+    if (params) {
+        window.parent.loadIframe('termportal',url,params);
+    } else {
+        window.parent.loadIframe('termportal',url);
+    }
+}
 
 /* --------------- show/hide: helpers --------------------------------------- */
 function showSource() {

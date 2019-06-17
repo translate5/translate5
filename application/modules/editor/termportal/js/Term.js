@@ -141,7 +141,15 @@ const Term={
 					me.disableLimit=false;
 				}
 				
-				me.$_resultTermsHolder.hide();
+                
+                // show form for adding proposal right away?
+                if(showTermProposal === 'true') {
+                    $("#searchTermsHelper .proposal-add").click();
+                    showTermProposal = 'false'; // "reset", is valid only one (when coming from TermPortal)
+                } else {
+                    me.$_resultTermsHolder.hide();
+                }
+                
 				return;
 			}
 			
@@ -394,10 +402,6 @@ const Term={
             source = checkSubLanguage(source);
             target = checkSubLanguage(target);
             params = "text="+text+"&source="+source+"&target="+target;
-            
-            // clear current view
-            me.$_searchTermsSelect.empty();
-            me.$_resultTermsHolder.empty();
             
             console.log('(openInstantTranslate:) url: ' + url +'; params: ' + params);
             window.parent.loadIframe('instanttranslate',url,params);
