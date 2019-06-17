@@ -508,6 +508,7 @@ function fillTranslation() {
                         }
                     }
                     resultData = {'languageResourceId': result['languageResourceid'],
+                                  'languageResourceType': result['languageResourceType'],
                                   'fuzzyMatch': fuzzyMatch,
                                   'infoText': infoText.join('<br/>'),
                                   'resourceName': resourceName,
@@ -558,7 +559,7 @@ function renderTranslationContainer(resultData) {
     }
     
     translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'">'+resultData.translationText+'</div>';
+    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'" data-languageresource-type="'+resultData.languageResourceType+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     
     if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
@@ -834,18 +835,27 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
  * we draw the link here.
  */
 function drawTermPortalIntegration() {
-    var html = '';
-    if(!Editor.data.app.user.isUserTermproposer) { // see TRANSLATE-1371
+    var html = '',
+        termToCheck,
+        termExists = false;
+    // check user rights
+    if(!Editor.data.app.user.isUserTermproposer) {
         return;
     }
-    if($('#translations h4').length > 3) { // see TRANSLATE-1371
+    // check number of results
+    if($('#translations h4').length > 3) {
         return;
     }
-    if (false) { // see TRANSLATE-1371
-        // TODO: If exactly the same term as translated by machine translation already exists 
-        // as term for the exact same language, the button "Propose as new term" is not shown.
+    // check if any of the machine-translation-results already exists as term
+    $('#translations [data-languageresource-type="mt"]').each(function() {
+        termToCheck = $(this).text();
+        console.log('AT WORK: check "' + termToCheck + '"');
+        // TODO ...
+    });
+    if (termExists) {
         return;
     }
+    // append "Propose as new term"-button
     html += '<input id="proposeTermSubmit" name="proposeTermSubmit" value="Propose as new term" type="submit" class="ui-corner-all ui-button ui-widget"/>';
     $('#translations').append(html);
     $('#proposeTermSubmit').button();
