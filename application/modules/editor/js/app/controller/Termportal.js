@@ -101,7 +101,7 @@ Ext.define('Editor.controller.Termportal', {
             var apiUrl=Editor.data.restpath+'termportal',
                 appName='termportal',
                 url=Editor.data.restpath+'apps?name='+appName+'&apiUrl='+apiUrl;
-            window.open(url, 'termportal');
+            window.open(url, 'termportalandinstanttranslate');
         }  
     },
     

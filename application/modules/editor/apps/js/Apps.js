@@ -32,7 +32,7 @@ var activeIframe=[];
  */
 function loadIframe(appName,url,params){
     var iframeId=appName+'Iframe',
-    	url = url+(params ? ("?params="+params) : ""),
+    	url = url+(params ? ("?"+params) : ""),
     	title=Editor.data.apps[appName].title;
 
     document.title=title;

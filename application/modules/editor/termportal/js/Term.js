@@ -377,16 +377,14 @@ const Term={
          * Opens InstantTranslate for the term and languages.
          */
         openInstantTranslate: function($_elSelect) {
-            var $_termAttributes = $_elSelect.closest('.term-attributes'),
+            var me = this,
+                $_termAttributes = $_elSelect.closest('.term-attributes'),
                 $_termData = $_termAttributes.prev('.term-data'),
                 text = $_termData.attr('data-term-value'),
                 source = $_termData.children('img').attr('title'),
                 target = $_elSelect.find("option:selected").text(),
-                name = 'instanttranslate',
-                apiUrl = Editor.data.restpath+'instanttranslate',
-                params,
-                newTab,
-                newTabHref;
+                url = Editor.data.restpath+'instanttranslate',
+                params;
             
             // use proposal if exists
             if ($_termData.children('ins.proposal-value-content').length === 1) {
@@ -395,15 +393,14 @@ const Term={
             
             source = checkSubLanguage(source);
             target = checkSubLanguage(target);
-            params = '{"text" : "'+text+'", "source" : "'+source+'", "target" : "'+target+'"}',
-            newTabHref = Editor.data.restpath+'apps?name='+name+'&apiUrl='+apiUrl+'&params='+params;
-            console.log('openInstantTranslate: ' + newTabHref);
-            newTab = window.open("about:blank", "instanttranslate");
-            if(newTab == null) { // window.open does not work in Chrome
-                window.location.href = newTabHref;
-            } else {
-                newTab.location = newTabHref;
-            };
+            params = "text="+text+"&source="+source+"&target="+target;
+            
+            // clear current view
+            me.$_searchTermsSelect.empty();
+            me.$_resultTermsHolder.empty();
+            
+            console.log('(openInstantTranslate:) url: ' + url +'; params: ' + params);
+            window.parent.loadIframe('instanttranslate',url,params);
         },
         
         /**
@@ -543,7 +540,6 @@ const Term={
                     // ... and then list ALL languages that are available in translate5
                     languageSelectOptions += '<option value="none" disabled>-- '+translations['AllLanguagesAvailable']+': --</option>';
                     availableLanguages = Editor.data.availableLanguages;
-                    console.dir(availableLanguages);
                     for (var i=0; i < availableLanguages.length; i++) {
                         lang = availableLanguages[i];
                         flag = getLanguageFlag(lang.value);
