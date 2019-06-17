@@ -129,9 +129,15 @@
         <form id="sourceLanguageAndContent">
             <select id="sourceLocale" name="sourceLocale">
                 <?php
+                    $sourceLangSelected = false;
+                    if (isset($_GET['source'])) {
+                        $sourceLangSelected = $_GET['source'];
+                    } else if (!empty($this->sourceSearchLanguagePreselectionLocale)) {
+                        $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
+                    }
                     $optionValues=[];
                     foreach ($allSourceLanguageLocales as $sourceLangLocale) {
-                        $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $selected = ($sourceLangSelected != false && $sourceLangSelected == $sourceLangLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
                     echo implode(' ', $optionValues);
@@ -141,7 +147,7 @@
             <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"></div>
             <div id="sourceContent" class="clearable">
             	<?php 
-                	$text = $this->text ?? '';
+                    $text = $_GET['text'] ?? '';
             	?>
                 <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"><?php echo $text; ?></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
                 <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
@@ -155,9 +161,15 @@
         <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
                 <?php
+                    $targetLangSelected = false;
+                    if (isset($_GET['target'])) {
+                        $targetLangSelected = $_GET['target'];
+                    } else if (!empty($this->targetSearchLanguagePreselectionLocale)) {
+                        $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
+                    }
                     $optionValues=[];
                     foreach ($allTargetLanguageLocales as $targetLangLocale) {
-                        $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $selected = ($targetLangSelected != false && $targetLangSelected == $targetLangLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
                     echo implode(' ', $optionValues);
