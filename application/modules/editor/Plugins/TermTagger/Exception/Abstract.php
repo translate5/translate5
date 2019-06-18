@@ -31,5 +31,20 @@ END LICENSE AND COPYRIGHT
  * 
  *
  */
-abstract class editor_Plugins_TermTagger_Exception_Abstract extends ZfExtended_Exception {
+abstract class editor_Plugins_TermTagger_Exception_Abstract extends ZfExtended_ErrorCodeException {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.terminology';
+    
+    protected static $localErrorCodes = [
+        'E1116' => 'Could not load TBX into TermTagger: TBX hash is empty.',
+        'E1117' => 'Could not load TBX into TermTagger: TermTagger HTTP result was not successful!',
+        'E1118' => 'Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!',
+        'E1119' => 'TermTagger communication Error',
+        'E1130' => 'TermTagger communication Error, probably crashing the TermTagger instance.',
+        'E1120' => 'TermTagger returns an error on tagging segments.',
+        'E1121' => 'TermTagger result could not be decoded.',
+        'E1129' => 'TermTagger DOWN: The configured TermTagger "{termTaggerUrl}" is not reachable and is deactivated in translate5 temporary.',
+    ];
 }

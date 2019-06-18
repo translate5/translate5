@@ -56,6 +56,11 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
      */
     private $keepTargetOriginal = false;
     
+    public function __construct() {
+        parent::__construct();
+        $this->logger = Zend_Registry::get('logger')->cloneMe('editor.terminology.import');
+    }
+    
     /**
      * Special Paramters:
      * 
@@ -133,23 +138,43 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
+        $slot = $this->workerModel->getSlot();
+        if(empty($slot)) {
+            return false;
+        }
         try {
-            $this->checkTermTaggerTbx($this->workerModel->getSlot(), $serverCommunication->tbxFile);
-            $result = $termTagger->tagterms($this->workerModel->getSlot(), $serverCommunication);
+            $this->checkTermTaggerTbx($slot, $serverCommunication->tbxFile);
+            $result = $termTagger->tagterms($slot, $serverCommunication);
             $this->saveSegments($this->markTransFound($result->segments));
         }
-        catch(editor_Plugins_TermTagger_Exception_Malfunction $e) {
+        //Malfunction means the termtagger is up, but the send data produces an error in the tagger. 
+        // 1. we set the segment satus to retag, so each segment is tagged again, segment by segment, not in a bulk manner
+        // 2. we log all the data producing the error
+        catch(editor_Plugins_TermTagger_Exception_Malfunction $exception) {
             if (empty($state)) {
                 $state = self::SEGMENT_STATE_RETAG;
             }
             $this->setTermtagState($segmentIds, $state);
+            $exception->addExtraData([
+                'task' => $this->task
+            ]);
+            $this->logger->exception($exception, [
+                'level' => ZfExtended_Logger::LEVEL_WARN,
+                'domain' => 'editor.terminology.import'
+            ]);
         }
         catch(editor_Plugins_TermTagger_Exception_Abstract $exception) {
+            if($exception instanceof editor_Plugins_TermTagger_Exception_Down) {
+                $this->disableSlot($slot);
+            }
             $this->setTermtagState($segmentIds, self::SEGMENT_STATE_UNTAGGED);
-            $url = $this->workerModel->getSlot();
-            $exception->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.') could not tag segments on import! Reason: '."\n".$exception->getMessage(), false);
-            $this->log->logException($exception);
-            sleep(60);
+            $exception->addExtraData([
+                'task' => $this->task
+            ]);
+            $this->logger->exception($exception, [
+                'level' => ZfExtended_Logger::LEVEL_WARN,
+                'domain' => 'editor.terminology.import'
+            ]);
         }
         
         // initialize an new worker-queue-entry to continue 'chained'-import-process
@@ -162,8 +187,10 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTaggerImport */
         
         if (!$worker->init($taskGuid, $this->workerModel->getParameters())) {
-            $this->log->logError('TermTaggerImport-Error on new worker init()'
-                                , __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            $this->logger->error('E1122', 'TermTaggerImport Worker can not be initialized!', [
+                'taskGuid' => $taskGuid,
+                'parameters' => $this->workerModel->getParameters(),
+            ]);
             return false;
         }
         $worker->queue($this->workerModel->getParentId());
@@ -388,8 +415,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             return;
         }
         
-        $msg = 'While importing Task "'.$this->task->getTaskName().'" with $taskGuid: '.$taskGuid
-                .' the following Segments where marked as defect:'."\n";
+        $segmentsToLog = [];
         //$msg .= '  $defectSegments: '.print_r($defectSegments, true);
         foreach ($defectSegments as $defectsegment) {
             $segment = ZfExtended_Factory::get('editor_Models_Segment');
@@ -402,10 +428,12 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
             $segmentFields = $fieldManager->getFieldList();
             $sourceFieldName = $fieldManager->getFirstSourceName();
             
-            $msg .= '- # '.$segment->getSegmentNrInTask().'; Source-Text: '.strip_tags($segment->get($sourceFieldName))."\n";
+            $segmentsToLog[] = $segment->getSegmentNrInTask().'; Source-Text: '.strip_tags($segment->get($sourceFieldName));
         }
-                
         
-        $this->log->logError('TermTagger-Import defect Segments ', __CLASS__.' -> '.__FUNCTION__."\n". $msg);
+        $this->logger->warn('E1123', 'Some segments could not be tagged by the TermTagger.', [
+            'task' => $this->task,
+            'untaggableSegments' => $segmentsToLog,
+        ]);
     }
 }

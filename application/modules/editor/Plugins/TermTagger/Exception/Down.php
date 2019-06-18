@@ -30,6 +30,6 @@ END LICENSE AND COPYRIGHT
  * Exception Class to get detailed information on TermTagger-Error.
  *
  */
-class editor_Plugins_TermTagger_Exception_Open extends editor_Plugins_TermTagger_Exception_Abstract {
+class editor_Plugins_TermTagger_Exception_Down extends editor_Plugins_TermTagger_Exception_Abstract {
     //localErrorCodes see parent abstract
 }
