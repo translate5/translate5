@@ -99,6 +99,7 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
      */
     protected function triggerBefore(editor_Models_Import_Configuration $importConfig) {
         $this->events->trigger("beforeDirectoryParsing", $this, [
+                'importConfig' => $importConfig,
                 'importFolder' => $importConfig->importFolder,
                 'task' => $this->task,
                 'workerParentId' => $this->workerModel->getParentId(),
@@ -112,6 +113,7 @@ class editor_Models_Import_Worker_FileTree extends editor_Models_Import_Worker_A
      */
     protected function triggerAfter(editor_Models_Import_Configuration $importConfig, array $filelist) {
         $this->events->trigger("afterDirectoryParsing", $this, [
+                'importConfig' => $importConfig,
                 'task' => $this->task,
                 'importFolder' => $importConfig->importFolder,
                 'filelist' => $filelist,

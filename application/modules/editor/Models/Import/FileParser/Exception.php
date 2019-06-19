@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  *
  */
-class editor_Models_Import_FileParser_Exception extends ZfExtended_ErrorCodeException {
+class editor_Models_Import_FileParser_Exception extends editor_Models_Import_Exception {
     /**
      * @var string
      */

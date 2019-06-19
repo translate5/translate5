@@ -61,10 +61,13 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
   
   static protected $filesFound = false;
   
-  public function __construct() {
+  public function __construct(bool $checkFileTypes) {
       $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
       /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
-      $this->_importExtensionList = array_keys($supportedFiles->getSupportedTypes());
+      if($checkFileTypes) {
+          //if _importExtensionList is not set, all files are imported
+          $this->_importExtensionList = array_keys($supportedFiles->getSupportedTypes());
+      }
   }
   
   /**

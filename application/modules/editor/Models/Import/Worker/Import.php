@@ -143,6 +143,9 @@ class editor_Models_Import_Worker_Import {
             $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
             $params = $this->getFileparserParams($path, $fileId);
             $parser = $this->getFileParser($params[0], $params);
+            if(!$parser) {
+                continue;
+            }
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
@@ -225,10 +228,11 @@ class editor_Models_Import_Worker_Import {
         $ext = strtolower(preg_replace('".*\.([^.]*)$"i', '\\1', $path));
         try {
             $parserClass = $this->supportedFiles->getParser($ext);
-        } catch(editor_Models_Import_Exception $e) {
+        } catch(editor_Models_Import_FileParser_NoParserException $e) {
             //in supportedFiles the task is missing, so we have to add it here to the exception
             $e->addExtraData(['task' => $this->task]);
-            throw $e;
+            Zend_Registry::get('logger')->exception($e);
+            return false;
         }
         $parser = ZfExtended_Factory::get($parserClass,$params)->getChainedParser();
         /* var $parser editor_Models_Import_FileParser */
@@ -254,6 +258,9 @@ class editor_Models_Import_Worker_Import {
         foreach ($relayFiles as $fileId => $path) {
             $params = $this->getFileparserParams($path, $fileId);
             $parser = $this->getFileParser($path, $params);
+            if(!$parser) {
+                continue;
+            }
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]);  //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);

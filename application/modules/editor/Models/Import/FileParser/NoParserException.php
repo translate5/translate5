@@ -26,19 +26,21 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
+/**
  *
  */
+class editor_Models_Import_FileParser_NoParserException extends editor_Models_Import_Exception {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.import.fileparser';
 
-class editor_Models_Import_Exception extends ZfExtended_ErrorCodeException {
-        /**
-         * @var string
-         */
-        protected $domain = 'editor.import';
-        
-        static protected $localErrorCodes = [
-        ];
+    /**
+     * @var integer
+     */
+    protected $level = ZfExtended_Logger::LEVEL_WARN;
+    
+    static protected $localErrorCodes = [
+        'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.'
+    ];
 }

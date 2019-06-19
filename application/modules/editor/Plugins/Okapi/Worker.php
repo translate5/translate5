@@ -88,7 +88,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
             /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
-            $api->uploadOkapiConfig($params['bconfFilePath']);
+            $api->uploadOkapiConfig($params['bconfFilePaths']);
             $api->uploadInputFile($fileName, $file);
             $api->executeTask($sourceLang, $targetLang);
             $convertedFile = $api->downloadFile($fileName, $manifestFile, $okapiDataDir);
@@ -114,7 +114,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     }
     
     protected function handleException(Exception $e, SplFileInfo $file, $fileId) {
-        $logger = Zend_Registry::get('logger');
+        $logger = Zend_Registry::get('logger')->cloneMe('plugin.okapi');
         /* @var $logger ZfExtended_Logger */
         $logger->exception($e, [
             'extra' => ['task' => $this->task],

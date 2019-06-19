@@ -95,6 +95,12 @@ class editor_Models_Import_Configuration {
     public $workerId; 
     
     /**
+     * if true, the uploaded files are only processed if the file extension is supported. Conversion plug-ins may disable that.
+     * @var boolean
+     */
+    public $checkFileType = true;
+    
+    /**
      * needed internally for de/serialization 
      * @var string
      */

@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  */
 class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
-    /***
+    /**
      * Name of the default okapi config file
      *
      * @var string
@@ -37,7 +37,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     const OKAPI_BCONF_DEFAULT_NAME='okapi_default_import.bconf';
     const OKAPI_BCONF_EXPORT_NAME='okapi_default_export.bconf';
     
-    /***
+    /**
      * Supported file-types by okapi
      *
      * @var array
@@ -126,24 +126,42 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     );
     
     /**
+     * Internal flag if custom bconf files were provided or not. In the latter case the internal default bconf is used.
+     * @var string
+     */
+    private $useCustomBconf = true;
+    
+    /**
+     * Container for the found bconf files in the import package
+     * @var array
+     */
+    private $bconfFilePaths = [];
+    
+    /**
      * @var editor_Models_Task
      */
     protected $task;
+    
+    /**
+     * @var editor_Models_Import_SupportedFileTypes
+     */
+    protected $fileTypes;
     
     public function init() {
         if(ZfExtended_Debug::hasLevel('plugin', 'Okapi')) {
             ZfExtended_Factory::addOverwrite('Zend_Http_Client', 'ZfExtended_Zendoverwrites_Http_DebugClient');
         }
-        $fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
+        $this->fileTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $fileTypes editor_Models_Import_SupportedFileTypes */
         foreach ($this->okapiFileTypes as $ext => $mimes) {
-            $fileTypes->register($ext, $mimes);
+            $this->fileTypes->register($ext, $mimes);
         }
         $this->initEvents();
     }
     
     protected function initEvents() {
         //checks if import contains files for okapi:
+        $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'beforeDirectoryParsing', array($this, 'handleBeforeDirectoryParsing'));
         $this->eventManager->attach('editor_Models_Import_Worker_FileTree', 'afterDirectoryParsing', array($this, 'handleAfterDirectoryParsing'));
         
         //invokes in the handleFile method of the relais filename match check. 
@@ -159,7 +177,19 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
     }
     
-    /***
+    /**
+     * Hook on the before import event and check the import files
+     *
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleBeforeDirectoryParsing(Zend_EventManager_Event $event) {
+        $config = $event->getParam('importConfig');
+        /* @var $config editor_Models_Import_Configuration */
+        $this->findBconfFiles($event->getParam('importFolder'));
+        $config->checkFileType = !$this->useCustomBconf;
+    }
+    
+    /**
      * Hook on the before import event and check the import files
      *
      * @param Zend_EventManager_Event $event
@@ -168,6 +198,7 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
         $params = $event->getParams();
         $filelist = $params['filelist'];
         $importFolder = $params['importFolder'];
+        
         foreach($filelist as $fileId => $filePath) {
             $fileInfo = new SplFileInfo($importFolder.'/'.ZfExtended_Utils::filesystemEncode($filePath));
             if(!$this->isProcessable($fileInfo)) {
@@ -241,23 +272,23 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
     /**
      * looks for bconf files in the import root folder and returns them
      * @param string $importFolder
-     * @return string[]
      */
-    protected function getBconfFiles($importFolder) {
-        $bconfFilePath=[];
+    protected function findBconfFiles($importFolder) {
+        $this->bconfFilePaths = [];
+        $this->useCustomBconf = true;
         $directory = new DirectoryIterator($importFolder);
         
         foreach ($directory as $fileinfo) {
             if (in_array(strtolower($fileinfo->getExtension()),$this->okapiBconf)) {
-                $bconfFilePath[]=$fileinfo->getPathname();
+                $this->bconfFilePaths[]=$fileinfo->getPathname();
                 continue;
             }
         }
         
-        if(empty($bconfFilePath)){
-            $bconfFilePath[]=$this->getDefaultBconf();
+        if(empty($this->bconfFilePaths)){
+            $this->useCustomBconf = false;
+            $this->bconfFilePaths[]=$this->getDefaultBconf();
         }
-        return $bconfFilePath;
     }
     
     /**
@@ -276,6 +307,14 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
             //Okapi supports XML, but if it is XLIFF in the XML file we don't need Okapi:
             return false;
         }
+        
+        //if there is a custom bconf, this bconf can contain "new" allowed file types.
+        // Since we currently can not get the information from the bconf which additional types are allowed, 
+        // we just pass all filetypes (expect the ones with a native fileparser) to be parsed via Okapi
+        // If the user uploads invalid files, they are ignored and listed in the event log
+        if($this->useCustomBconf && !$this->fileTypes->hasParser($extension)) {
+            return true;
+        }
             
         return in_array($extension,array_keys($this->okapiFileTypes));
     }
@@ -290,21 +329,19 @@ class editor_Plugins_Okapi_Init extends ZfExtended_Plugin_Abstract {
      * @return boolean
      */
     protected function queueWorker($fileId, SplFileInfo $file, array $params){
-        $filelist = $params['filelist'];
         $importFolder = $params['importFolder'];
         $task = $params['task'];
-        $bconfFilePath = $this->getBconfFiles($importFolder);
         $workerParentId = $params['workerParentId'];
         
         $worker = ZfExtended_Factory::get('editor_Plugins_Okapi_Worker');
         /* @var $worker editor_Plugins_Okapi_Worker */
         
         $params=[
-                'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
-                'fileId' => $fileId,
-                'file' => (string) $file,
-                'bconfFilePath' => $bconfFilePath,
-                'importFolder' => $importFolder,
+            'type' => editor_Plugins_Okapi_Worker::TYPE_IMPORT,
+            'fileId' => $fileId,
+            'file' => (string) $file,
+            'importFolder' => $importFolder,
+            'bconfFilePaths' => $this->bconfFilePaths,
         ];
         
         // init worker and queue it
