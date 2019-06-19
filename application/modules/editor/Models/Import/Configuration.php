@@ -77,11 +77,6 @@ class editor_Models_Import_Configuration {
     public $importFolder;
     
     /**
-     * @var boolean
-     */
-    public $isCheckRun = false;
-
-    /**
      * initial userguid of the segments
      * @var string
      */
