@@ -98,7 +98,7 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
             return false;
         }
         
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         $result = '';

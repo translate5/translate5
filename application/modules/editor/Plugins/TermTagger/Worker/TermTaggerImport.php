@@ -135,7 +135,7 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
         $serverCommunication = $this->fillServerCommunication($segmentIds);
         /* @var $serverCommunication editor_Plugins_TermTagger_Service_ServerCommunication */
         
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         $slot = $this->workerModel->getSlot();

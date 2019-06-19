@@ -313,7 +313,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * @param string $tbxHash unique id of the tbx-file
      */
     protected function checkTermTaggerTbx($url, &$tbxHash) {
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         // test if tbx-file is already loaded
@@ -336,7 +336,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
         }
         
         $tbxHash = $this->task->meta()->getTbxHash();
-        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
         /* @var $service editor_Plugins_TermTagger_Service */
         
         try {

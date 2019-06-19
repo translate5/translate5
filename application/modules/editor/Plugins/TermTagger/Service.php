@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_TermTagger_Service {
     
     /**
-     * @var ZfExtended_Log
+     * @var ZfExtended_Logger
      */
     protected $log;
     
@@ -90,8 +90,8 @@ class editor_Plugins_TermTagger_Service {
     
     
     
-    public function __construct() {
-        $this->log = ZfExtended_Factory::get('ZfExtended_Log');
+    public function __construct($logDomain) {
+        $this->log = Zend_Registry::get('logger')->cloneMe($logDomain);
         $config = Zend_Registry::get('config');
         $this->config = $config->runtimeOptions->termTagger;
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
@@ -258,7 +258,6 @@ class editor_Plugins_TermTagger_Service {
                 $ecode = 'E1130';
             }
             
-//FIXME und dann auch noch: runtimeOptions.termTagger.timeOut.segmentTagging auf einen niedereren Wert setzen. Ebenso der importTimeout. 1000 Sekunden machen bei beidem keinen Sinn!
             throw new editor_Plugins_TermTagger_Exception_Request($ecode, $extraData, $httpException);
         }
     }
@@ -399,16 +398,14 @@ class editor_Plugins_TermTagger_Service {
         libxml_use_internal_errors($oldFlagValue);
         $textNotEqual = strip_tags($text) !== strip_tags($segment->$field);
         if($invalidXml || $textNotEqual) {
-            $msg = 'Problem in merging terminology and track changes: '."\n\n";
-            $msg .= "Problem(s):   ".($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':'')." \n";
-            $msg .= "task guid:    ".$request->task->getTaskGuid()." \n";
-            $msg .= "task name:    ".$request->task->getTaskName()." \n";
-            $msg .= "task nr:      ".$request->task->getTaskNr()." \n";
-            $msg .= "segment id:   ".$segment->id." \n";
-            $msg .= "\nInput from browser: \n".$trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges)."\n";
-            $msg .= "\nResult termtagger: \n".$segment->$field."\n";
-            $msg .= "\nmerged result: \n".$text."\n";
-            $this->log->log('conflict in merging terminology and track changes', $msg);
+            $this->log->warn('E1132', 'Conflict in merging terminology and track changes: "{type}".', [
+                'type' => ($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':''),
+                'task' => $request->task,
+                'segmentId' => $segment->id,
+                'inputFromBrowser' => $trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges),
+                'termTaggerResult' => $segment->$field,
+                'mergedResult' => $text,
+            ]);
         }
         //error_log($text);
         $text = $trackChangeTag->unprotect($text);
@@ -437,13 +434,16 @@ class editor_Plugins_TermTagger_Service {
         $data = json_decode($result->getBody());
         if(!empty($data)) {
             if(!empty($data->error)) {
-                $this->log->logError(__CLASS__.' decoded TermTagger Result but with following Error from TermTagger: ', print_r($data,1));
+                $this->log->error('E1133', 'TermTagger reports error "{error}".', [
+                    'error' => print_r($data,1),
+                ]);
             }
             return $data;
         }
-        $msg = "Original TermTagger Result was: \n".$result->getBody()."\n JSON decode error was: ";
-        $msg .= json_last_error_msg();
-        $this->log->logError(__CLASS__.' cannot json_decode TermTagger Result!', $msg);
+        $this->log->error('E1134', 'TermTagger produces invalid JSON: "{jsonError}".', [
+            'jsonError' => json_last_error_msg(),
+            'jsonBody' => $result->getBody(),
+        ]);
         return null;
     }
     
