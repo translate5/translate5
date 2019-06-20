@@ -629,8 +629,6 @@ const Term={
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
-                console.log(htmlProposalAddIcon);
-                console.dir($_selectorAdd);
                 $_selectorAdd.find('.proposal-add').prop('title', $titleAdd);
             }
             if ($_selectorEdit && $_selectorEdit.children('.proposal-btn').length === 0) {
@@ -931,22 +929,21 @@ const Term={
         onAddTermClick:function(event){
             console.log('onAddTermClick');
             var me = event.data.scope,
-                $_termSkeleton;
+                $_termSkeleton = me.$_termTable.find('.is-new'), // TODO: use DOM-cache
+                $termEditorSpan = $_termSkeleton.find('[data-editable]'),
+                $termEditorHolder = me.$_termTable.find('div[data-term-id="-1"]');
+            
+            if (me.newTermLanguageId == null && me.$_termTable.find('#languageSelectContainer').length == 0) {
+                me.drawLanguageSelectForTerm();
+                return;
+            }
             
             if (me.$_searchErrorNoResults.is(":visible")) {
                 me.newTermLanguageId = $("#language").val();
                 me.drawLanguageFlagForNewTerm($("#language option:selected").text());
-                $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache
-                var $termEditorSpan=$_termSkeleton.find('[data-editable]'),
-                	$termEditorHolder=me.$_termTable.find('div[data-term-id="-1"]');
-                ComponentEditor.addTermComponentEditor($termEditorSpan,$termEditorHolder);
-                return;
             }
             
-            if (me.newTermLanguageId == null) {
-                me.drawLanguageSelectForTerm();
-                return;
-            }
+            ComponentEditor.addTermComponentEditor($termEditorSpan,$termEditorHolder);
         },
         
         /***
