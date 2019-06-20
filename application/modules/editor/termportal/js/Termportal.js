@@ -202,15 +202,15 @@ function renderTagLabel(text) {
  * @param {String} text
  * @param {String} value
  */
-function addSearchFilter(dropdownId, text, value) {
+function addSearchFilter(dropdownId, text, value, index) {
     var tagLabel = this.renderTagLabel(text),
         $_searchFilterTags = $("#searchFilterTags");
-    // synchronize dropdown
+    // reset dropdown
     $('#'+dropdownId).val('none');
     $('#'+dropdownId).selectmenu("refresh");
     // add hidden input
     if ($_searchFilterTags.children('input[name="'+tagLabel+'"][value="'+value+'"].filter.'+dropdownId).length === 0) {
-        $_searchFilterTags.append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'">');
+        $_searchFilterTags.append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'" data-index="'+index+'">');
     }
     // add tag field
     $_searchFilterTags.tagit("createTag", tagLabel);
@@ -229,6 +229,29 @@ function beforeFilterTagRemoved(tagLabel) {
         }
     });
     // remove tag field: will be handled by tag-it
+}
+
+/**
+ * Don't show filtered items in the dropdown.
+ */
+function removeFilteredItemsFromDropdowns(dropdownId) {
+    $( '#searchFilterTags input.filter.'+dropdownId).each(function( index, el ) {
+        $('#'+dropdownId+'-menu li:eq('+$(el).attr('data-index')+')').addClass('isfiltered');
+    });
+}
+/**
+ * When a filtered item is removed from the tag-field, it must be re-added to the dropdown.
+ */
+function addFilteredItemToDropdown(tagLabel) {
+    var $el,
+        dropdownId;
+    $('input.filter[name="'+tagLabel+'"]').each(function( index, el ) {
+        $el = $(el);
+        $el.removeClass('filter');
+        dropdownId = $el.attr('class');
+        $el.addClass('filter');
+        $('#'+dropdownId+'-menu li:eq('+$el.attr('data-index')+')').removeClass('isfiltered');
+    });
 }
 
 /**

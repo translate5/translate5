@@ -131,7 +131,8 @@ END LICENSE AND COPYRIGHT
     margin-right: 0px;
     height: 25px;
 }
-.search-filter-select .ui-state-disabled {
+.search-filter-select .ui-state-disabled,               /* = option is not available due to filtered dependencies*/
+.search-filter-select li.ui-menu-item.isfiltered {      /* = option is not available because it's filtered already*/
    display: none;
 }
 
