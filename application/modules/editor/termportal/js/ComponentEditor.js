@@ -1,4 +1,6 @@
 const ComponentEditor={
+    
+    $_resultTermsHolder:null,
 	
 	typeRouteMap:[],
 	
@@ -14,7 +16,27 @@ const ComponentEditor={
 		me.typeRequestDataKeyMap['term']='term';//TODO:
 		me.typeRequestDataKeyMap['termEntryAttribute']='value';//TODO:
 		me.typeRequestDataKeyMap['termAttribute']='value';//TODO:
+        
+        this.cacheDom();
+        this.initEvents();
 	},
+    
+    cacheDom:function(){
+        this.$_resultTermsHolder=$('#resultTermsHolder');
+    },
+    
+    initEvents:function(){
+        var me = this;
+        me.$_resultTermsHolder.on('focus', ".term-data.proposable.is-new textarea",{scope:me},me.onAddNewTermFocus);
+    },
+    
+    onAddNewTermFocus: function(event) {
+        var me = event.data.scope,
+            $element = $(this);
+        if ($(this).val().indexOf(proposalTranslations['addTermProposal']) != -1) {
+            $(this).val('');
+        }
+    },
 	
 	/***
 	 * Register term component editor for given term element

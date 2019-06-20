@@ -39,7 +39,7 @@ const Term={
             this.$_resultTermsHolder=$('#resultTermsHolder');
             this.$_resultTermsHolderHeader=$('#resultTermsHolderHeader');
             this.$_termTable=$('#termTable');
-            this.$_termEntryAttributesTable = $('#termEntryAttributeTable');
+            this.$_termEntryAttributesTable = $('#termEntryAttributesTable');
             this.$_termCollectionSelect = $('#termcollectionSelectContainer');
 		},
 		
@@ -61,6 +61,7 @@ const Term={
             me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
             // - Content
             me.$_termTable.on('click', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
+            me.$_termTable.on('click', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
             
             // Terms-Attributes: see Attribute.js
@@ -599,20 +600,6 @@ const Term={
             htmlProposalDeleteIcon = '<span class="proposal-btn proposal-delete ui-icon ui-icon-trash-b"></span>';
             htmlProposalEditIcon = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>';
             switch(elements) {
-                case "term-entry":
-                    $_selectorAdd = me.$_resultTermsHolderHeader;
-                    $_selectorDelete = false;
-                    $_selectorEdit = false;
-                    $titleAdd = proposalTranslations['addTermEntryProposal'];
-                    break;
-                case "term-entry-attributes":
-                    $_selectorAdd = false; // me.$_termEntryAttributesTable;
-                    $_selectorDelete = $('#termEntryAttributesTable .attribute-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
-                    $_selectorEdit = $('#termEntryAttributesTable .attribute-data.proposable.is-finalized'); // cannot use cacheCom(), rendered too late
-                    $titleAdd = proposalTranslations['addTermEntryAttributeProposal'];
-                    $titleDelete = proposalTranslations['deleteTermEntryAttributeProposal'];
-                    $titleEdit = proposalTranslations['editTermEntryAttributeProposal'];
-                    break;
                 case "terms":
                     $_selectorAdd = $('#termTable .term-data.is-new'); // cannot use cacheCom(), rendered too late
                     $_selectorDelete = $('#termTable .term-data.proposable.is-proposal'); // cannot use cacheCom(), rendered too late
@@ -642,6 +629,8 @@ const Term={
             }
             if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
+                console.log(htmlProposalAddIcon);
+                console.dir($_selectorAdd);
                 $_selectorAdd.find('.proposal-add').prop('title', $titleAdd);
             }
             if ($_selectorEdit && $_selectorEdit.children('.proposal-btn').length === 0) {
@@ -781,8 +770,8 @@ const Term={
                         $_termSkeleton.next().show();
                         $_termSkeleton.show();
                         me.drawLanguageFlagForNewTerm(rfcLanguage);
-                        $_termSkeleton.find('[data-editable]').click();
                         $_termSkeleton.find('.proposal-add').click();
+                        $_termSkeleton.find('textarea').focus();
                     }
                 })
                 .iconselectmenu( "menuWidget")
