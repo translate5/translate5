@@ -70,6 +70,19 @@ if(isset($this->error)){
     <div class="wrap">
             <div id="searchFilterForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
                 <?php 
+                $clients = $this->clients;
+                $clientsNames = [];
+                    if (count($clients) > 1) {
+                        asort($clients);
+                        echo '<select class="search-filter" name="client" id="client"><option value="none">'.$this->translations["client"].':</option>';
+                        foreach ($clients as $key => $value){
+                            echo '<option value="'.$key.'">'.$value.'</option>';
+                            $clientsNames[$key] = $value;
+                        }
+                        echo '</select>';
+                    }
+                ?>
+                <?php 
                     $collections = $this->collections;
                     $collectionsClients = [];
                     $collectionsNames = [];
@@ -80,19 +93,6 @@ if(isset($this->error)){
                             echo '<option value="'.$key.'">'.$value->name.'</option>';
                             $collectionsClients[$key] = $value->clients;
                             $collectionsNames[$key] = $value->name;
-                        }
-                        echo '</select>';
-                    }
-                ?>
-                <?php 
-                $clients = $this->clients;
-                $clientsNames = [];
-                    if (count($clients) > 1) {
-                        asort($clients);
-                        echo '<select class="search-filter" name="client" id="client"><option value="none">'.$this->translations["client"].':</option>';
-                        foreach ($clients as $key => $value){
-                            echo '<option value="'.$key.'">'.$value.'</option>';
-                            $clientsNames[$key] = $value;
                         }
                         echo '</select>';
                     }

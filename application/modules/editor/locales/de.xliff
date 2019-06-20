@@ -1561,9 +1561,9 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QXR0cmlidXRzLVZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attributs-Vorschlag löschen</source><target>Attributs-Vorschlag löschen</target></trans-unit>
 <trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Vorschlag löschen</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Änderung vorschlagen</target></trans-unit>
-<trans-unit id='Qml0dGUgU3ByYWNoZSBmw7xyIGRlbiBuZXVlbiBUZXJtLVZvcnNjaGxhZyB3w6RobGVu'><source>Bitte Sprache für den neuen Term-Vorschlag wählen</source><target>Bitte Sprache für den neuen Term-Vorschlag wählen</target></trans-unit>
+<trans-unit id='Qml0dGUgU3ByYWNoZSBmw7xyIGRlbiBuZXVlbiBUZXJtLVZvcnNjaGxhZyB3w6RobGVu'><source>Bitte Sprache für den neuen Term-Vorschlag wählen</source><target>... Sprache auswählen</target></trans-unit>
 <trans-unit id='Qml0dGUgVGVybS1Db2xsZWN0aW9uIGbDvHIgZGVuIG5ldWVuIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Bitte Term-Collection für den neuen Term-Vorschlag wählen</source><target>Bitte Term-Collection für den neuen Term-Vorschlag wählen</target></trans-unit>
-<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>Sofortübersetzung nach</target></trans-unit>
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>... Sprache auswählen</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>Terminologieportal-Sprachen</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>
 <trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
