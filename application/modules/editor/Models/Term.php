@@ -730,6 +730,21 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Check if any of the given terms exists in any collection
+     * @param array $terms
+     * @return boolean
+     */
+    public function isAnyTermInAnyCollection($searchTerms){
+        $s = $this->db->select();
+        foreach ($searchTerms as $term) {
+            $s->orWhere('term = ?', trim($term));
+        }
+        $terms = $this->db->fetchAll($s);
+        $test = $terms->count();
+        return $terms->count()>0;
+    }
+    
+    /***
      * Check if the given term entry exist in the collection
      * @param mixed $termEntry
      * @param int $collectionId
