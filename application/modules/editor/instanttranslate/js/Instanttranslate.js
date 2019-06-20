@@ -540,7 +540,7 @@ function fillTranslation() {
     showTranslations();
 
     // open TermPortal for proposing new term?
-    drawTermPortalIntegration();
+    checkTermPortalIntegration();
 }
 
 function renderTranslationContainer(resultData) {
@@ -834,10 +834,9 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
  * If the user has the right to propose terms in the TermPortal,
  * we draw the link here.
  */
-function drawTermPortalIntegration() {
+function checkTermPortalIntegration() {
     var html = '',
-        termToCheck,
-        termExists = false;
+        searchTerms = [];
     // check user rights
     if(!Editor.data.app.user.isUserTermproposer) {
         return;
@@ -848,15 +847,32 @@ function drawTermPortalIntegration() {
     }
     // check if any of the machine-translation-results already exists as term
     $('#translations [data-languageresource-type="mt"]').each(function() {
-        termToCheck = $(this).text();
-        console.log('AT WORK: check "' + termToCheck + '"');
-        // TODO ...
+        searchTerms.push($(this).text());
     });
-    if (termExists) {
+    if(searchTerms.length == 0) {
         return;
     }
-    // append "Propose as new term"-button
-    html += '<input id="proposeTermSubmit" name="proposeTermSubmit" value="Propose as new term" type="submit" class="ui-corner-all ui-button ui-widget"/>';
+    $.ajax({
+        url: Editor.data.restpath+"termcollection/searchtermexists",
+        dataType: "json",
+        type: "POST",
+        data: {
+            'searchTerms':JSON.stringify(searchTerms),
+        },
+        success: function(result){
+            if (result.rows === false) {
+                // if none of the results exists as term: draw propose-Button
+                drawTermPortalIntegration();
+            }
+        }
+    });
+}
+
+/**
+ * Draw button for proposing terms in the TermPortal.
+ */
+function drawTermPortalIntegration() {
+    var html = '<input id="proposeTermSubmit" name="proposeTermSubmit" value="Propose as new term" type="submit" class="ui-corner-all ui-button ui-widget"/>';
     $('#translations').append(html);
     $('#proposeTermSubmit').button();
 }
