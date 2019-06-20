@@ -247,15 +247,22 @@ $( function() {
             handlePlaceholder();
         },
         beforeTagRemoved: function (event, ui) {
+            addFilteredItemToDropdown(ui.tagLabel);
             return beforeFilterTagRemoved(ui.tagLabel);
         }
 	});
     $('.search-filter').selectmenu({
         change: function() {
-            addSearchFilter($(this).attr('id'),$(this).find(':selected').text(),$(this).val());
+            var index = $(this).find(':selected').index();
+            if (index != 0) {
+                addSearchFilter($(this).attr('id'),$(this).find(':selected').text(),$(this).val(),index);
+            }
         },
         classes: {
             "ui-selectmenu-menu": "search-filter-select"
+        },
+        open: function() {
+            removeFilteredItemsFromDropdowns($(this).attr('id'));
         }
     });
     $(document).on("mousedown",function(){
