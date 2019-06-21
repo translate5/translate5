@@ -208,7 +208,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $searchTerms = json_decode($params['searchTerms']);
         $model = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $model editor_Models_Term */
-        $this->view->rows = $model->isAnyTermInAnyCollection(array_unique($searchTerms));
+        $this->view->rows = $model->getNonExistingTermsInAnyCollection($searchTerms);
     }
     
     /***
