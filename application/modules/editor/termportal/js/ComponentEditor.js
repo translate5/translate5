@@ -222,7 +222,7 @@ const ComponentEditor={
 	 */
 	updateComponent:function($element,$input,result){
 		var isTerm=$element.data('type')=='term',
-			renderData=isTerm ? Term.getTermRenderData(result) : Attribute.getAttributeRenderData(result,result.value),
+			renderData=isTerm ? Term.renderTermData(result) : Attribute.getAttributeRenderData(result,result.value),
 			$elParent=isTerm ?  Term.getTermHeader($element.data('id')) : Attribute.getTermAttributeHeader($element.data('id'),$element.data('type'));
 		
 		$input.replaceWith(renderData);

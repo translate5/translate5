@@ -20,6 +20,7 @@ const Term={
         newTermCollectionId: null,
 		newTermGroupId: null,
         newTermLanguageId: null,
+        newTermRfcLanguage: null,
         newTermName: null,
         newTermTermEntryId: null,
 		
@@ -144,9 +145,9 @@ const Term={
 				
                 
                 // show form for adding proposal right away?
-                if(showTermProposal === 'true') {
+                if(isTermProposalFromInstantTranslate === 'true') {
                     $("#searchTermsHelper .proposal-add").click();
-                    showTermProposal = 'false'; // "reset", is valid only one (when coming from TermPortal)
+                    isTermProposalFromInstantTranslate = 'false'; // "reset", is valid only once (when coming from TermPortal)
                 } else {
                     me.$_resultTermsHolder.hide();
                 }
@@ -238,7 +239,7 @@ const Term={
 		    //check the cache
 		    if(!me.reloadTermEntry && me.termGroupsCache[termGroupid]){
 		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termGroupid].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
-		        me.drawTermGroups(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
+		        me.drawTermTable(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
 		        return;
 		    }
 		    
@@ -255,47 +256,23 @@ const Term={
 		            
 		            TermEntry.drawTermEntryAttributes(result.rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 
-		            me.drawTermGroups(result.rows[me.KEY_TERM_ATTRIBUTES]);
+		            me.drawTermTable(result.rows[me.KEY_TERM_ATTRIBUTES]);
 		            //reset term entry reload flag
 		            me.reloadTermEntry=false;
 		        }
 		    })
 		},
-        
-        /**
-         * Draw (only) the form for proposing a Term.
-         * By this way we also create new Term-Entries (backend).
-         */
-        drawTermProposal: function() {
-            var me = this;
-            console.log('drawTermProposal...');
-            me.emptyResultTermsHolder(true);
-            me.drawTermGroups();
-            me.$_termTable.find('.proposal-add')[0].click();
-        },
-        
-        /***
-         * Draw the skeleton for adding new terms.
-         * @returns
-         */
-        drawNewTermSkeleton:function(){
-            var me = this,
-                html = '',
-                $_filteredCollections = $('#searchFilterTags input.filter.collection'),
-                $_filteredClients = $('#searchFilterTags input.filter.client'),
-                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?,
-                newTermData = me.renderNewTermData();
-            html += me.renderTerm(newTermData[0],showInfosForSelection);
-            if(html.length>0){
-                me.$_termTable.append(html);
-            }
-        },
 		
 		/***
-		 * Draw the term groups
+         * Draw the term-table:
+         * - render skeleton for new proposals
+         * - render data for existing terms (if exist)
+         * - handle accordion
+         * - add proposal-buttons
 		 * @returns
 		 */
-		drawTermGroups:function(termsData){
+		drawTermTable:function(termsData){
+		    console.log('drawTermTable...');
             var me = this,
                 html = '',
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
@@ -303,19 +280,24 @@ const Term={
                 showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1), // TODO: show collection also when adding a TermEntry?
                 currentItem,
                 currentItemNr;
-		    
+            
+            // ------- "reset" term-table -------
             me.emptyResultTermsHolder(true);
             me.$_resultTermsHolder.show();
             
-            me.drawNewTermSkeleton();
-		    
+            // -------render skeleton for new terms -------
+            html += me.renderNewTermSkeleton();
+            
+            // -------render term-data -------
 		    $.each(termsData, function (i, term) {
 		        html += me.renderTerm(term,showInfosForSelection);
 		    });
+            
 		    if(html.length>0){
 		    	me.$_termTable.append(html);
 		    }
-		    
+            
+            // -------handle accordion etc -------
 		    if (me.$_termTable.hasClass('ui-accordion')) {
 		    	me.$_termTable.accordion('refresh');
 		    } else {
@@ -366,10 +348,7 @@ const Term={
 		            
 		        }
 		    });
-
-            me.drawProposalButtons('terms-attribute');
-            me.drawProposalButtons('terms');
-		    
+            
 		    setSizesInFinalResultContent();
 
             $( ".instanttranslate-integration .chooseLanguage" )
@@ -380,36 +359,29 @@ const Term={
                 })
                 .iconselectmenu( "menuWidget")
                 .addClass( "ui-menu-icons flag" );
+            
+            // -------proposal-buttons -------
+            me.drawProposalButtons('terms-attribute');
+            me.drawProposalButtons('terms');
         },
         
-        /**
-         * Opens InstantTranslate for the term and languages.
+        /***
+         * Render html for adding new terms (= visible as "skeleton").
+         * @returns
          */
-        openInstantTranslate: function($_elSelect) {
+        renderNewTermSkeleton:function(){
             var me = this,
-                $_termAttributes = $_elSelect.closest('.term-attributes'),
-                $_termData = $_termAttributes.prev('.term-data'),
-                text = $_termData.attr('data-term-value'),
-                source = $_termData.children('img').attr('title'),
-                target = $_elSelect.find("option:selected").text(),
-                url = Editor.data.restpath+'instanttranslate',
-                params;
-            
-            // use proposal if exists
-            if ($_termData.children('ins.proposal-value-content').length === 1) {
-                text = $_termData.children('ins.proposal-value-content')[0].innerText;
-            }
-            
-            source = checkSubLanguage(source);
-            target = checkSubLanguage(target);
-            params = "text="+text+"&source="+source+"&target="+target;
-            
-            console.log('(openInstantTranslate:) url: ' + url +'; params: ' + params);
-            window.parent.loadIframe('instanttranslate',url,params);
+                html = '',
+                $_filteredCollections = $('#searchFilterTags input.filter.collection'),
+                $_filteredClients = $('#searchFilterTags input.filter.client'),
+                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?,
+                newTermData = me.getNewTermData();
+            html += me.renderTerm(newTermData[0],showInfosForSelection);
+            return html;
         },
         
         /**
-         * Render html for term data by given term.
+         * Render html for term by given term.
          * 
          * @param {Object} term
          * @param {Boolean} showInfosForSelection
@@ -459,7 +431,7 @@ const Term={
             termAttributesHtmlContainer.push(' ');
             
             //get term render data
-            termAttributesHtmlContainer.push(me.getTermRenderData(term));
+            termAttributesHtmlContainer.push(me.renderTermData(term));
 
             if(statusIcon){
                 termAttributesHtmlContainer.push(statusIcon);
@@ -503,6 +475,33 @@ const Term={
             
             return termAttributesHtmlContainer.join('');
 		},
+        
+        /***
+         * Return the jquery component of the term header(h3)
+         */
+        getTermHeader:function(termId){
+            return this.$_termTable.find('h3[data-term-id="'+termId+'"]');
+        },
+        
+        
+        /***
+         * Render html for the term data. If the user has proposal tights, the term proposal render data will be set.
+         */
+        renderTermData:function(termData){
+            var me=this,
+                htmlCollection=[];
+            
+            //the proposal is not set, init the component editor
+            if(!termData.proposal){
+                //the user has proposal rights -> init term proposal span
+                return Attribute.getProposalDefaultHtml('term',termData.termId,termData.term,termData);
+            }
+            
+            //the proposal is allready defined, render the proposal
+            htmlCollection.push('<del class="proposal-value-content">'+termData.term+'</del>');
+            htmlCollection.push('<ins class="proposal-value-content">'+termData.proposal.term+'</ins>');
+            return htmlCollection.join(' ');
+        },
 
         /**
          * Returns the HTML for a language-select with flags.
@@ -582,6 +581,32 @@ const Term={
             html += me.renderLanguageSelect('instanttranslate',source);
             html += '</div>';
             return html;
+        },
+        
+        /**
+         * Opens InstantTranslate for the term and languages.
+         */
+        openInstantTranslate: function($_elSelect) {
+            var me = this,
+                $_termAttributes = $_elSelect.closest('.term-attributes'),
+                $_termData = $_termAttributes.prev('.term-data'),
+                text = $_termData.attr('data-term-value'),
+                source = $_termData.children('img').attr('title'),
+                target = $_elSelect.find("option:selected").text(),
+                url = Editor.data.restpath+'instanttranslate',
+                params;
+            
+            // use proposal if exists
+            if ($_termData.children('ins.proposal-value-content').length === 1) {
+                text = $_termData.children('ins.proposal-value-content')[0].innerText;
+            }
+            
+            source = checkSubLanguage(source);
+            target = checkSubLanguage(target);
+            params = "text="+text+"&source="+source+"&target="+target;
+            
+            console.log('(openInstantTranslate:) url: ' + url +'; params: ' + params);
+            window.parent.loadIframe('instanttranslate',url,params);
         },
         
 		/**
@@ -669,26 +694,6 @@ const Term={
 		    retVal += ' <img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'">';
 		    return retVal;
 		},
-		
-		
-		/***
-		 * Get the term render data. If the user has proposal tights, the term proposal render data will be set.
-		 */
-		getTermRenderData:function(termData){
-			var me=this,
-				htmlCollection=[];
-			
-			//the proposal is not set, init the component editor
-			if(!termData.proposal){
-				//the user has proposal rights -> init term proposal span
-				return Attribute.getProposalDefaultHtml('term',termData.termId,termData.term,termData);
-			}
-			
-			//the proposal is allready defined, render the proposal
-			htmlCollection.push('<del class="proposal-value-content">'+termData.term+'</del>');
-			htmlCollection.push('<ins class="proposal-value-content">'+termData.proposal.term+'</ins>');
-			return htmlCollection.join(' ');
-		},
         
         /**
          * "reset" data for proposing a new Term
@@ -701,23 +706,30 @@ const Term={
             me.newTermCollectionId = null;                                      // will be selected by user (if not already filtered)
             me.newTermGroupId = null;                                           // will be set from result's select-list
             me.newTermLanguageId = null;                                        // will be selected by user (or set according to search without result)
+            me.newTermRfcLanguage = null;                                       // (set always with newTermLanguageId!) 
             me.newTermName = proposalTranslations['addTermProposal'] + '...';   // (or set according to search without result)
             me.newTermTermEntryId = null;                                       // will be set by selecting a search-result (if not given => new TermEntry will be created)
             // if a search has no result:
-            if (me.$_searchErrorNoResults.is(":visible")) {
+            if (!isTermProposalFromInstantTranslate && me.$_searchErrorNoResults.is(":visible")) {
                 me.newTermLanguageId = $('#language').val();
+                me.newTermRfcLanguage = getLanguageFlag($( "#languageSelectContainer .chooseLanguage option:selected" ).text());
                 me.newTermName = $('#search').val();
+            }
+            // if proposal from InstantTranslate:
+            if (isTermProposalFromInstantTranslate) {
+                me.newTermLanguageId = langProposal;
+                me.newTermRfcLanguage = langProposal; // TODO: langProposal is languageId!
+                me.newTermName = textProposal+'xxx';
             }
         },
         
         /**
          * Returns term data for creating a new term.
          */
-        renderNewTermData: function() {
-            console.log('renderNewTermData...');
+        getNewTermData: function() {
             var me = this,
                 newTermData = {};
-            console.log('renderNewTermData; currently known: ');
+            console.log('getNewTermData; currently known: ');
             console.log('- attributes: ' + JSON.stringify(me.newTermAttributes));
             console.log('- collectionId: ' + me.newTermCollectionId);
             console.log('- groupId: ' + me.newTermGroupId);
@@ -746,8 +758,8 @@ const Term={
          * When a Language is selected, the corresponding flag is added to the skeleton
          * for the editable new term and it is shown again.
          */
-        drawLanguageSelectForTerm: function() {
-            console.log('drawLanguageSelectForTerm');
+        drawLanguageSelectForNewTerm: function() {
+            console.log('drawLanguageSelectForNewTerm');
             var me = this,
                 languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
                 languageSelectHeader,
@@ -763,11 +775,11 @@ const Term={
                 .iconselectmenu({
                     select: function() {
                         me.newTermLanguageId = $(this).val();
-                        rfcLanguage = getLanguageFlag($( "#languageSelectContainer .chooseLanguage option:selected" ).text());
+                        me.newTermRfcLanguage = $( "#languageSelectContainer .chooseLanguage option:selected" ).text();
                         $('#languageSelectContainer').remove();
                         $_termSkeleton.next().show();
                         $_termSkeleton.show();
-                        me.drawLanguageFlagForNewTerm(rfcLanguage);
+                        me.drawLanguageFlagForNewTerm();
                         $_termSkeleton.find('.proposal-add').click();
                         $_termSkeleton.find('textarea').focus();
                     }
@@ -779,13 +791,13 @@ const Term={
         /**
          * 
          */
-        drawLanguageFlagForNewTerm: function (rfcLanguage) {
-            console.log('drawLanguageFlagForNewTerm');
+        drawLanguageFlagForNewTerm: function () {
             var me = this,
-                rfcLanguage = getLanguageFlag(rfcLanguage),
+                flag = getLanguageFlag(me.newTermRfcLanguage),
                 $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache
+            console.log('drawLanguageFlagForNewTerm ('+me.newTermLanguageId+' / '+me.newTermRfcLanguage+')');
             $_termSkeleton.find('img').remove();
-            $_termSkeleton.children('span').first().after(rfcLanguage);
+            $_termSkeleton.children('span').first().after(flag);
         },
         
         /**
@@ -803,7 +815,8 @@ const Term={
                 collectionSelectOptions = '';
             if (filteredCollections.length == 1) {
                 me.newTermCollectionId = filteredCollections[0];
-                me.drawTermProposal();
+                me.drawTermTable();
+                me.$_termTable.find('.proposal-add')[0].click();
                 return;
             }
             console.log('choose collection (filteredCollections: ' + filteredCollections.length + ')');
@@ -827,7 +840,8 @@ const Term={
                 select: function() {
                     me.newTermCollectionId = $(this).val();
                     me.$_termCollectionSelect.empty().hide();
-                    me.drawTermProposal();
+                    me.drawTermTable();
+                    me.$_termTable.find('.proposal-add')[0].click();
                 }
             });
         },
@@ -870,7 +884,7 @@ const Term={
 			        type: "POST",
 			        success: function(result){
 			        	//the term proposal is removed, render the initial term proposable content
-			        	var renderData=me.getTermRenderData(result.rows),
+			        	var renderData=me.renderTermData(result.rows),
 			        		ins=$parent.find('ins');
 			        		
 			        	ins.replaceWith(renderData);
@@ -915,11 +929,14 @@ const Term={
                 filteredCollections = getFilteredCollections();
             me.resetNewTermData();
             me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
+            // If the collection is known, we can start right away...
             if (filteredCollections.length == 1) {
                 me.newTermCollectionId = filteredCollections[0];
-                me.drawTermProposal();
+                me.drawTermTable();
+                me.$_termTable.find('.proposal-add')[0].click();
                 return;
             }
+            // ... otherwise the user must select a collection first:
             me.drawFilteredTermCollectionSelect();
         },
         
@@ -927,22 +944,32 @@ const Term={
          * On add term click handler
          */
         onAddTermClick:function(event){
+            // TODO: is called twice after coming from InstantTranslate-Term-Proposal (goes to Component Editor and comes back again)
             console.log('onAddTermClick');
             var me = event.data.scope,
                 $_termSkeleton = me.$_termTable.find('.is-new'), // TODO: use DOM-cache
                 $termEditorSpan = $_termSkeleton.find('[data-editable]'),
                 $termEditorHolder = me.$_termTable.find('div[data-term-id="-1"]');
             
+            // can the language be set according to currently known information?
+            if (me.$_searchErrorNoResults.is(":visible")) {
+                if (isTermProposalFromInstantTranslate) { // 
+                    me.newTermLanguageId = langProposal;
+                    me.newTermRfcLanguage = langProposal; // TODO: langProposal is not the same as languageId; check input from TermPortal!!
+                } else {
+                    me.newTermLanguageId = $("#language").val();
+                    me.newTermRfcLanguage = $("#language option:selected").text();
+                }
+            }
+            
+            // if language is not set yet, draw language-select first...
             if (me.newTermLanguageId == null && me.$_termTable.find('#languageSelectContainer').length == 0) {
-                me.drawLanguageSelectForTerm();
+                me.drawLanguageSelectForNewTerm();
                 return;
             }
             
-            if (me.$_searchErrorNoResults.is(":visible")) {
-                me.newTermLanguageId = $("#language").val();
-                me.drawLanguageFlagForNewTerm($("#language option:selected").text());
-            }
-            
+            // ... otherwise draw language-flag and open form for editing:
+            me.drawLanguageFlagForNewTerm();
             ComponentEditor.addTermComponentEditor($termEditorSpan,$termEditorHolder);
         },
         
@@ -970,14 +997,7 @@ const Term={
             
             $termAttributeHolder = me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
             ComponentEditor.addTermComponentEditor(search,$termAttributeHolder);
-        },
-        
-        /***
-    	 * Return the jquery component of the term header(h3)
-    	 */
-    	getTermHeader:function(termId){
-			return this.$_termTable.find('h3[data-term-id="'+termId+'"]');
-    	},
+        }
 };
 
 Term.init();
