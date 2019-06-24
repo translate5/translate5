@@ -182,7 +182,10 @@ var proposalTranslations = Editor.data.apps.termportal.proposal.translations;
 var searchFilterPlaceholderText=translations['searchFilterPlaceholderText']+'...';
 
 // termProposal from InstantTranslate
-var isTermProposalFromInstantTranslate = '<?php echo $_GET['isTermProposalFromInstantTranslate'] ?? 'false'; ?>';
+var isTermProposalFromInstantTranslate = '<?php echo $_GET['isTermProposalFromInstantTranslate'] ?? false; ?>';
+if (isTermProposalFromInstantTranslate == 'true') {
+    isTermProposalFromInstantTranslate = true;
+}
 var textProposal = '<?php echo $_GET['textProposal'] ?? ''; ?>';
 var langProposal = '<?php echo $_GET['langProposal'] ?? ''; ?>';
 

@@ -185,6 +185,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "deleteAttributeProposal"=>$this->translate->_("Attributs-Vorschlag löschen"),
                 "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
                 "addProposal"=>$this->translate->_("Änderung vorschlagen"),
+                "saveProposal"=>$this->translate->_("Änderung sichern"),
                 "editTermEntryProposal"=>$this->translate->_("Term-Eintrag: Änderung vorschlagen"),
                 "addTermEntryProposal"=>$this->translate->_("Neuen Term-Eintrag vorschlagen"),
                 "deleteTermEntryProposal"=>$this->translate->_("Term-Eintrag: Vorschlag löschen"),
@@ -198,7 +199,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "addTermAttributeProposal"=>$this->translate->_("Neues Term-Attribut vorschlagen"),
                 "deleteTermAttributeProposal"=>$this->translate->_("Term-Attribut: Vorschlag löschen"),
                 "chooseLanguageForTermEntry"=>$this->translate->_("Bitte Sprache für den neuen Term-Vorschlag wählen"),
-                "chooseTermcollectionForTermEntry"=>$this->translate->_("Bitte Term-Collection für den neuen Term-Vorschlag wählen")
+                "chooseTermcollectionForTermEntry"=>$this->translate->_("Bitte Term-Collection für den neuen Term-Vorschlag wählen"),
+                "selectLanguage"=>$this->translate->_("... Sprache auswählen")
             ]);
         }
         
