@@ -384,7 +384,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this,
             conf = [],
             overwrite = overwrite || {};
-        
+            
         /*
         * event beforeKeyMapUsage parameters:
         * @param {Editor.controller.Editor} 
@@ -392,12 +392,19 @@ Ext.define('Editor.controller.Editor', {
         * @param {Object} overwrite, the object with overwrite definitions 
         */
         me.fireEvent('beforeKeyMapUsage', this, area, overwrite);
-        
+
+        //we may not use me.keyMapConfig to add the overwriten values, since it must remain unchanged, 
+        // so we do it the other way round and copy all values to the overwrite object:
         Ext.Object.each(me.keyMapConfig, function(key, item){
-            //applies if available the overwritten config instead the default one
-            if(overwrite && overwrite[key]) {
-                item = overwrite[key];
+            //copy the config to the overwrite object, only if it does not exist already!
+            if(overwrite[key]) {
+                return;
             }
+            overwrite[key] = item;
+        });
+        
+        //no we process the merged configs:
+        Ext.Object.each(overwrite, function(key, item){
             if(!item) {
                 return;
             }
@@ -432,14 +439,14 @@ Ext.define('Editor.controller.Editor', {
             me.editorKeyMap.destroy();
         }
         
-        // insert whitespace
-        me.keyMapConfig['ctrl-shift-space'] = [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true];
-        me.keyMapConfig['shift-enter'] = [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true];
-        me.keyMapConfig['tab'] = [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true];
-        
         editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: docEl,
-            binding: me.getKeyMapConfig()
+            binding: me.getKeyMapConfig('editor', {
+                // insert whitespace key events
+                'ctrl-shift-space': [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true],
+                'shift-enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true],
+                'tab': [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true]
+            })
         });
         editor.DEC_DIGITS = me.DEC_DIGITS;
 
