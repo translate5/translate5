@@ -320,3 +320,7 @@ h4, p {
 	color:#584311;
 }
 
+.in-editing + .term-attributes .proposal-btn {
+    color: #aaa;
+}
+

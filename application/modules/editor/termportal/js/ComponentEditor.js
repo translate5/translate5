@@ -72,6 +72,8 @@ const ComponentEditor={
 		}
 		
 		$element.replaceWith($input);
+        
+        Term.drawProposalButtons('componentEditorOpened');
 	  
 		$input.one('blur', function(){
 			me.saveComponentChange($element,$input);
@@ -87,6 +89,9 @@ const ComponentEditor={
 			$input= $('<textarea />').val($element.text());
 		
 		$element.replaceWith($input);
+        
+		Term.drawProposalButtons('attributeComponentEditorOpened');
+        
 		$input.one('blur', function(){
 			me.saveComponentChange($element,$input);
 		}).focus();
@@ -101,10 +106,12 @@ const ComponentEditor={
 			$input= $('<textarea data-editable-comment />').val($element.text());
 		
 		$element.replaceWith($input);
-		
+        
+        Term.drawProposalButtons('commentAttributeEditorOpened');
+        
 		$input.focusout(function() {
 			me.saveCommentChange($element,$input);
-	    });
+	    }).focus();
 	},
 	
 	saveComponentChange:function($el,$input){
@@ -115,25 +122,24 @@ const ComponentEditor={
             url,
             requestData={};
         
+        Term.drawProposalButtons('componentEditorClosed');
+        
         // if id is not provided, this is a proposal on empty term entry // TODO: is this comment correct? We can also create a new Term WITHIN an existing TermEntry!
         isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
         
-        // if not new: 
-        if (!isNew) {
-            // is the modified text empty or the same as the initial one?
-            if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
-                
-                //get initial html for the component
-                var dummyData={
-                        'attributeOriginType':$el.data('type'),
-                        'attributeId':$el.data('id'),
-                        'proposable':true
-                },
-                componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
+        // is the modified text empty or the same as the initial one?
+        if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
+            
+            //get initial html for the component
+            var dummyData={
+                    'attributeOriginType':$el.data('type'),
+                    'attributeId':$el.data('id'),
+                    'proposable':true
+            },
+            componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
 
-                $input.replaceWith(componentRenderData);
-                return;
-            }
+            $input.replaceWith(componentRenderData);
+            return;
         }
 		
 		route=me.typeRouteMap[$el.data('type')];
@@ -170,6 +176,9 @@ const ComponentEditor={
 	},
 	
 	saveCommentChange:function($element,$input){
+        
+        Term.drawProposalButtons('commentAttributeEditorClosed');
+        
 		//is the modefied text empty or the same as the initial one
 		if($input.val()=='' || $.trim($input.val())=='' || $element.text()==$input.val()){
 
