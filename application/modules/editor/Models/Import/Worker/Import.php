@@ -230,8 +230,11 @@ class editor_Models_Import_Worker_Import {
             $parserClass = $this->supportedFiles->getParser($ext);
         } catch(editor_Models_Import_FileParser_NoParserException $e) {
             //in supportedFiles the task is missing, so we have to add it here to the exception
-            $e->addExtraData(['task' => $this->task]);
-            Zend_Registry::get('logger')->exception($e);
+            $e->addExtraData([
+                'file' => $path,
+                'task' => $this->task,
+            ]);
+            Zend_Registry::get('logger')->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
             return false;
         }
         $parser = ZfExtended_Factory::get($parserClass,$params)->getChainedParser();

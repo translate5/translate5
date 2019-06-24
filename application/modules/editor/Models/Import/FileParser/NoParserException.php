@@ -35,12 +35,8 @@ class editor_Models_Import_FileParser_NoParserException extends editor_Models_Im
      */
     protected $domain = 'editor.import.fileparser';
 
-    /**
-     * @var integer
-     */
-    protected $level = ZfExtended_Logger::LEVEL_WARN;
-    
     static protected $localErrorCodes = [
-        'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.'
+        'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.',
+        'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
     ];
 }

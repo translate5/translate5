@@ -118,6 +118,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
         /* @var $logger ZfExtended_Logger */
         $logger->exception($e, [
             'extra' => ['task' => $this->task],
+            'level' => ZfExtended_Logger::LEVEL_DEBUG,
         ]);
         
         $absFile = $file->__toString();
