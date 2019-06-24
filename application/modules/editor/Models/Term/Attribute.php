@@ -428,6 +428,9 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function createChildTree(array $list, $parentId = 0){
+        if(count($list)==1){
+            return $list;
+        }
         $tree = array();
         foreach ($list as $element) {
             if ($element['parentId'] == $parentId) {

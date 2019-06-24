@@ -91,7 +91,7 @@ class editor_Models_LanguageResources_SdlResources {
         $getDomainCode=function($specificData){
             try {
                 $specificData=json_decode($specificData);
-                return $specificData->domainCode;
+                return $specificData->domainCode ?? null;
             } catch (Exception $e) {
                 return null;
             }
