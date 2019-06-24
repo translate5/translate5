@@ -95,6 +95,10 @@ const Term={
 				collectionIds = getFilteredCollections(),
                 processStats = getFilteredProcessStats();
 			
+            if (searchString == '') {
+                return;
+            }
+            
 			me.resetNewTermData();
             
 			if(!lng){
@@ -230,6 +234,9 @@ const Term={
 		 * @returns
 		 */
 		findTermsAndAttributes:function(termGroupid){
+		    if (termGroupid === undefined) {
+		        return; // TODO (quick & dirty - the REAL problem is: this should not happen at all!!)
+		    }
 			var me=this;
 		    console.log("findTermsAndAttributes() for: " + termGroupid);
 		    Attribute.languageDefinitionContent=[];
@@ -237,7 +244,11 @@ const Term={
             me.$_termCollectionSelect.hide();
             
 		    //check the cache
-		    if(!me.reloadTermEntry && me.termGroupsCache[termGroupid]){
+            if (me.reloadTermEntry) {
+                me.termGroupsCache = []; // FIXME: better remove only the groupId's items from the cache instead of setting reloadTermEntry to true!
+                me.reloadTermEntry=false; //reset term entry reload flag
+            }
+		    if(me.termGroupsCache[termGroupid]){
 		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termGroupid].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 		        me.drawTermTable(me.termGroupsCache[termGroupid].rows[me.KEY_TERM_ATTRIBUTES]);
 		        return;
@@ -257,8 +268,6 @@ const Term={
 		            TermEntry.drawTermEntryAttributes(result.rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 
 		            me.drawTermTable(result.rows[me.KEY_TERM_ATTRIBUTES]);
-		            //reset term entry reload flag
-		            me.reloadTermEntry=false;
 		        }
 		    })
 		},
@@ -493,6 +502,12 @@ const Term={
         renderTermData:function(termData){
             var me=this,
                 htmlCollection=[];
+            
+            // DB: new term-proposals are stored as unprocessed term, not as proposal... *sigh*
+            if (termData.processStatus === "unprocessed" && typeof termData.proposal === 'undefined' ) {
+                htmlCollection.push('<ins class="proposal-value-content">'+termData.term+'</ins>');
+                return htmlCollection.join(' ');
+            }
             
             //the proposal is not set, init the component editor
             if(!termData.proposal){
