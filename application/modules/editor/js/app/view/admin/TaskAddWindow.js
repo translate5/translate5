@@ -177,7 +177,8 @@ Ext.define('Editor.view.admin.TaskAddWindow', {
                                 padding: '0 10 0 0',
                                 defaults: {
                                     labelWidth: 200,
-                                    anchor: '100%'
+                                    anchor: '100%',
+                                    msgTarget: 'under'
                                 },
                                 items: [{
                                     xtype: 'textfield',
