@@ -1,6 +1,7 @@
 const ComponentEditor={
     
     $_resultTermsHolder:null,
+    $_termTable:null,
 	
 	typeRouteMap:[],
 	
@@ -23,6 +24,7 @@ const ComponentEditor={
     
     cacheDom:function(){
         this.$_resultTermsHolder=$('#resultTermsHolder');
+        this.$_termTable=$('#termTable');
     },
     
     initEvents:function(){
@@ -230,9 +232,12 @@ const ComponentEditor={
 	 * Update component html with the proposed result. The editor component also will be destroyed. 
 	 */
 	updateComponent:function($element,$input,result){
-		var isTerm=$element.data('type')=='term',
+		var me = this,
+		    isTerm=$element.data('type')=='term',
 			renderData=isTerm ? Term.renderTermData(result) : Attribute.getAttributeRenderData(result,result.value),
-			$elParent=isTerm ?  Term.getTermHeader($element.data('id')) : Attribute.getTermAttributeHeader($element.data('id'),$element.data('type'));
+			$elParent=isTerm ?  Term.getTermHeader($element.data('id')) : Attribute.getTermAttributeHeader($element.data('id'),$element.data('type')),
+            $commentPanel,
+            dummyCommentAttribute;
 		
 		$input.replaceWith(renderData);
 		$elParent.switchClass('is-finalized','is-proposal');
@@ -243,14 +248,19 @@ const ComponentEditor={
 		if(!isTerm){
 			return;
 		}
-		
+        
+        // update term-data
+        $elParent.attr('data-term-value', result.term);
+        $elParent.attr('data-term-id', result.termId);
+        $elParent.removeClass('is-new').addClass('is-proposal');
+        $elParent.removeClass('in-editing');
+        
 		//if it is comment, and the comment panel does not exist, add the comment panel after the proposed term is saved
-		var $commentPanel=$elParent.find('[data-editable-comment]');
+		$commentPanel=$elParent.find('[data-editable-comment]');
 		
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length==0){
-			var me=this,
-				dummyCommentAttribute={
+			dummyCommentAttribute={
 					attributeId:-1,
 					name:'note',
 					attrValue:'',
@@ -259,7 +269,7 @@ const ComponentEditor={
 					proposable:true
 			},
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
-			$termAttributeHolder=$('#termTable').find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
+			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
 			
 			//update the term holder dom with the new temr id
 			$termAttributeHolder.attr("data-term-id",result.termId);
@@ -273,7 +283,13 @@ const ComponentEditor={
 				this.addCommentAttributeEditor($commentPanel);
 			}
 		}
-	},
+        
+        // add new skeleton for creating new-term-proposal
+        if (me.$_termTable.find('h3.term-data.is-proposable.is-new').length === 0) {
+            me.$_termTable.prepend(Term.renderNewTermSkeleton());
+            me.$_termTable.accordion('refresh');
+        }
+    },
 	
 	/***
 	 * Update comment component in the table results
