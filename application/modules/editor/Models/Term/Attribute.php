@@ -169,12 +169,16 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @return mixed|array
      */
     public function saveOrUpdate(){
-        $s = $this->db->select();
+        $s = $this->db->select()
+        ->from(['a'=>'LEK_term_attributes']);
         $toSave=$this->row->toArray();
         $notCheckField=array(
             'id',
             'created',
-            'updated'
+            'updated',
+            'userGuid',
+            'userName',
+            'processStatus'
         );
         
         //check if the field is unupdatable
@@ -193,11 +197,11 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             
             //if the value is null
             if($value==null){
-                $s->where($key.' IS NULL');
+                $s->where('`a`.'.$key.' IS NULL');
                 continue;
             }
             
-            $s->where($key.'=?',$value);
+            $s->where('`a`.'.$key.'=?',$value);
         }
         
         //check if the field exist
@@ -207,6 +211,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             //the field does not exist
             return $this->save();
         }
+        
         //the field exist, set the id it is needed for parentId
         $this->setId($checkRow['id']);
         if($isUnupdatable){
@@ -217,6 +222,12 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             $this->load($checkRow['id']);
             $this->setUpdated(date("Y-m-d H:i:s"));
             return $this->save();
+        }
+        
+        $proposal=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
+        /* @var $proposal editor_Models_Term_AttributeProposal */
+        if($proposal->isProposal($checkRow['id'], $toSave['value'])){
+            $proposal->removeAttributeProposal($checkRow['id'], $toSave['value']);
         }
         
         //new value is found, update the attribute
@@ -428,6 +439,9 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function createChildTree(array $list, $parentId = 0){
+        if(count($list)==1){
+            return $list;
+        }
         $tree = array();
         foreach ($list as $element) {
             if ($element['parentId'] == $parentId) {

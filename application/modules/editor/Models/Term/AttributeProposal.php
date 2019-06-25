@@ -54,4 +54,34 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
     public function loadByAttributeId(int $attributeId): Zend_Db_Table_Row_Abstract {
         return $this->loadRow('attributeId = ?', $attributeId);
     }
+    
+    
+    /***
+     * Check if the given attribute value is proposal for the given attributeId
+     *
+     * @param int $attributeId
+     * @param string $value
+     * @return boolean
+     */
+    public function isProposal(int $attributeId,string $value){
+        $s=$this->db->select()
+        ->where('attributeId=?',$attributeId)
+        ->where('value=?',$value);
+        $result=$this->db->fetchRow($s)->toArray();
+        return !empty($result);
+    }
+    
+    /***
+     * Remove attribute proposal by attributeId and proposal value
+     *
+     * @param int $attributeId
+     * @param string $value
+     * @return boolean
+     */
+    public function removeAttributeProposal(int $attributeId,string $value){
+        return $this->db->delete([
+            'attributeId=?' => $attributeId,
+            'value=?' => $value,
+        ])>0;
+    }
 }

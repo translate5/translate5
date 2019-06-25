@@ -1029,6 +1029,21 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $cleanValue= $now->format('U');
         }
         $attribute->setValue($cleanValue);
+        
+        //$sessionUser = new Zend_Session_Namespace('user');
+        //$attribute->setUserGuid($sessionUser->data->userGuid);
+        //$attribute->setUserName($sessionUser->data->userName);
+        
+        
+        //find the default status from the config
+        $config = Zend_Registry::get('config');
+        $attributeStatus=$config->runtimeOptions->tbx->defaultTermAttributeStatus;
+        if(empty($config->runtimeOptions->tbx->defaultTermAttributeStatus)){
+            $attributeStatus=editor_Models_Term::PROCESS_STATUS_FINALIZED;
+        }
+        //Set the attribute status to finalized since the systems where the imported terms/attributes come from 
+        //are considered as leading system
+        $attribute->setProcessStatus($attributeStatus);
         return $attribute;
     }
     
@@ -1179,6 +1194,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $terms=$term->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollectionId);
+        
+        $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+        /* @var $proposal editor_Models_Term_Proposal */
+        
         //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
             foreach ($terms as $t){
@@ -1192,13 +1211,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $termModel->setUpdated(date("Y-m-d H:i:s"));
                 $termModel->save();
                 $this->actualTermIdDb=$termModel->getId();
+                
+                //remove the proposal if exist
+                $proposal->removeTermProposal($t->id, $this->xml->readInnerXml());
                 return;
             }
         }
         //check if the term with the same termEntry,collection but different termId exist
-        
         $tmpTermValue=$term->getRestTermsOfGroup($this->actualTermEntry, $this->actualTermIdTbx, $this->termCollectionId);
-
+        
         $addNewTerm=$tmpTermValue->count()>0;
         if($addNewTerm){
 
@@ -1206,35 +1227,54 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             foreach ($tmpTermValue as $t){
                 $t = (object) $t;
                 $checkCase=$t->language==$this->actualLangId;
-                $checkCase=$checkCase && ($t->term==$this->xml->readInnerXml());
+                $checkCase=$checkCase && ($t->term==$this->xml->readInnerXml());//Desktop
+                $isProposal=$proposal->isTermProposal($t->id,$this->xml->readInnerXml());//Desktop
                 //the groupId is already the same
                 //$checkCase=$checkCase && ($t->groupId==$this->actualTermIdTbx);
                 
-                if($checkCase){
-                    //update the term, so the timestamp is update, and the term entry attributes are updated to
-                    $termModel=ZfExtended_Factory::get('editor_Models_Term');
-                    /* @var $termModel editor_Models_Term */
-                    $termModel->load($t->id);
-                    $termModel->setDefinition($this->actualDefinition);
-                    $termModel->setUpdated(date("Y-m-d H:i:s"));
-                    $termModel->save();
-                    $this->actualTermIdDb=$t->id;
-                    $addNewTerm=false;
-                    break;
+                if(!$checkCase && !$isProposal){
+                    continue;
                 }
-            }
-            if(!$addNewTerm){
+                
+                //if it is proposal, remove it
+                if($isProposal){
+                    $proposal->removeTermProposal($t->id,$this->xml->readInnerXml());
+                }
+                
+                //update the term, so the timestamp is update, and the term entry attributes are updated to
+                $termModel=ZfExtended_Factory::get('editor_Models_Term');
+                /* @var $termModel editor_Models_Term */
+                $termModel->load($t->id);
+                $termModel->setTerm($this->xml->readInnerXml());
+                $termModel->setDefinition($this->actualDefinition);
+                $termModel->setUpdated(date("Y-m-d H:i:s"));
+                $termModel->save();
+                $this->actualTermIdDb=$t->id;
                 return;
             }
-            
         }
         
+        //check if the current tbx term is existing term proposal for the language in the term collection
+        $proposalInCollection=$proposal->findProposalInCollection($this->xml->readInnerXml(),$this->actualLangId,$this->termCollectionId);
+        
         if($this->mergeTerms){
-            
             //check if the term text exist in the term collection within the language
             $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollectionId);
             
+            //if the term can not be found, check if it is proposal
+            if(!$tmpTermValue || $tmpTermValue->count()<1){
+                
+                //if it is proposal, remove the proposal and update the original value
+                if($proposalInCollection && $proposalInCollection->count()>0){
+                    $proposalTerm=$proposalInCollection->toArray();
+                    $proposalTerm=$proposalTerm[0];
+                    $proposal->removeTermProposal($proposalTerm['id'], $this->xml->readInnerXml());
+                    $tmpTermValue=$proposalInCollection;
+                }
+            }
+            
             if($tmpTermValue && $tmpTermValue->count()>0){
+                
                 //the first term thus found is updated by the values ​​in the TBX file. 
                 //The term-ID and termEntry-ID remain the same as they already existed in translate5.
                 $tmpTermValue=$tmpTermValue->toArray();
@@ -1245,9 +1285,15 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 /* @var $term editor_Models_Term */
                 
                 $termModel->load($tmpTermValue['id']);
+                
+                //check if the current select is proposal, if yes update the original term value with the term proposal value
+                if(isset($tmpTermValue['termProposalValue']) && !empty($tmpTermValue['termProposalValue'])){
+                    $termModel->setTerm($tmpTermValue['termProposalValue']);
+                }
+                
                 $termModel->setUpdated(date("Y-m-d H:i:s"));
-                $termModel->save();
                 $termModel->setDefinition($this->actualDefinition);
+                $termModel->save();
                 $this->actualTermIdDb=$tmpTermValue['id'];
                 
                 if(!$this->lastMergeTermEntryId){
@@ -1282,8 +1328,27 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $this->termsContainer[$this->actualTermIdTbx]=$term;
             return;
         }
-        //add new
-        $this->saveTerm();
+        
+        //if the current tbx term is not valid proposal save it as a new term
+        if(!$proposalInCollection || $proposalInCollection->count()<1){
+            $this->saveTerm();
+            return;
+        }
+        
+        //it is proposal, remove the proposal and update the original value
+        $proposalTerm=$proposalInCollection->toArray();
+        $proposalTerm=$proposalTerm[0];
+        $proposal->removeTermProposal($proposalTerm['id'], $this->xml->readInnerXml());
+        
+        //update the term, so the timestamp is update, and the term entry attributes are updated to
+        $termModel=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $termModel editor_Models_Term */
+        $termModel->load($proposalTerm['id']);
+        $termModel->setTerm($this->xml->readInnerXml());
+        $termModel->setDefinition($this->actualDefinition);
+        $termModel->setUpdated(date("Y-m-d H:i:s"));
+        $termModel->save();
+        $this->actualTermIdDb=$proposalTerm['id'];
     }
     
     /***

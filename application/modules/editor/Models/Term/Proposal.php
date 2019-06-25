@@ -59,4 +59,65 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
     public function loadByTermId(int $termId): Zend_Db_Table_Row_Abstract {
         return $this->loadRow('termId = ?', $termId);
     }
+    
+    /**
+     * Find term proposal in collection by given language and term value
+     * 
+     * @param string $termText
+     * @param integer $languageId
+     * @param integer $termCollection
+     * @return Zend_Db_Table_Rowset_Abstract
+     */
+    public function findProposalInCollection(string $termText, int $languageId, int $termCollection){
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['p'=>'LEK_term_proposal'],['p.term as termProposalValue'])
+        ->join(['t'=>'LEK_terms'],'t.id=p.termId')
+        ->where('p.term = ?', $termText)
+        ->where('t.language = ?', $languageId)
+        ->where('t.collectionId = ?',$termCollection);
+        return $this->db->fetchAll($s);
+    }
+    
+    /***
+     * Check if the given term value is proposal for the given termId
+     * 
+     * @param int $termId
+     * @param string $term
+     * @return boolean
+     */
+    public function isTermProposal(int $termId,string $term){
+        $s=$this->db->select()
+        ->where('termId=?',$termId)
+        ->where('term=?',$term);
+        return !empty($this->db->fetchRow($s));
+    }
+    
+    /***
+     * Remove term proposal by termId and proposal value
+     * 
+     * @param int $termId
+     * @param string $term
+     * @return boolean
+     */
+    public function removeTermProposal(int $termId,string $term){
+        return $this->db->delete([
+            'termId=?' => $termId,
+            'term=?' => $term,
+        ])>0;
+    }
+    
+    /***
+     * Remove old term proposals by given date.
+     *
+     * @param array $collectionIds
+     * @param string $olderThan
+     * @return boolean
+     */
+    public function removeOlderThan(array $collectionIds,string $olderThan){
+        return $this->db->delete([
+            'created < ?' => $olderThan,
+            'collectionId in (?)' => $collectionIds,
+        ])>0;
+    }
 }
