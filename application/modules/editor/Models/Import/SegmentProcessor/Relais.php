@@ -70,6 +70,11 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
     protected $errors = [];
     
     /**
+     * @var int
+     */
+    protected $segmentNrInTask = 0;
+    
+    /**
      * Definitions of the different relais compare mode flags
      * @var integer
      */
@@ -107,19 +112,34 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
         $source = $this->sfm->getFirstSourceName();
         $target = $this->sfm->getFirstTargetName();
         $mid = $parser->getMid();
+        $loadBySegmentNr = false;
+        
+        $this->segmentNrInTask++;
         
         try {
+            //try loading via fileId and Mid
             $this->segment->loadByFileidMid($this->fileId, $mid);
         } catch(ZfExtended_Models_Entity_NotFoundException $e) {
-            $this->errors['source-not-found'][] = $parser->getMid();
-            return false;
+            //if above was not successful, load via segmentNrInTask
+            $loadBySegmentNr = $this->loadSegmentByNrInTask($parser->getMid());
+            if(!$loadBySegmentNr) {
+                //if no segment was found via segmentNr, we ignore it
+                return false;
+            }
         }
-        $sourceContent = $this->normalizeSegmentData($this->segment->getFieldOriginal($source));
-        $relaisContent = $this->normalizeSegmentData($data[$source]["original"]);
+        $contentIsEqual = $this->isContentEqual($this->segment->getFieldOriginal($source), $data[$source]["original"]);
         
-        //equal means here, that also the tags must be equal in content and position
-        if($sourceContent !== $relaisContent){
-            $this->errors['source-different'][] = 'mid: '.$parser->getMid().' / Source content of translated file: '.$sourceContent.' / Source content of relais file: '.$data[$source]["original"];
+        //if content is not equal, but was loaded with mid, try to load with segment nr and compare again
+        if(!$contentIsEqual && !$loadBySegmentNr){
+            if(!$this->loadSegmentByNrInTask($parser->getMid())) {
+                return false;
+            }
+            $contentIsEqual = $this->isContentEqual($this->segment->getFieldOriginal($source), $data[$source]["original"]);
+        }
+        
+        //if source and relais content is finally not equal, we log that and ignore the segment 
+        if(!$contentIsEqual){
+            $this->errors['source-different'][] = 'mid: '.$parser->getMid().' / Source content of translated file: '.$this->segment->getFieldOriginal($source).' / Source content of relais file: '.$data[$source]["original"];
             return false;
         }
         
@@ -130,6 +150,35 @@ class editor_Models_Import_SegmentProcessor_Relais extends editor_Models_Import_
             $this->errors['source-missing'][] = $e->getMessage();
         }
         return false;
+    }
+    
+    /**
+     * returns true if content is equal
+     * equal means here, that also the tags must be equal in content and position
+     * @param string $source
+     * @param string $relais
+     * @return boolean
+     */
+    protected function isContentEqual(string $source, string $relais) : bool {
+        $source = $this->normalizeSegmentData($source);
+        $relais = $this->normalizeSegmentData($relais);
+        return $source === $relais;
+    }
+    
+    /**
+     * Tries to load the segment to current relais content via segmentNrInTask
+     * returns true if found a segment, false if not. If false this is logged.
+     * @param string $mid
+     * @return boolean
+     */
+    protected function loadSegmentByNrInTask(string $mid): bool {
+        try {
+            $this->segment->loadBySegmentNrInTask($this->segmentNrInTask, $this->taskGuid);
+            return true;
+        } catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->errors['source-not-found'][] = $mid;
+            return false;
+        }
     }
 
     /**
