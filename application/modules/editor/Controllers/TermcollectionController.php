@@ -128,48 +128,6 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $this->view->rows=$responseArray;
     }
     
-    /**
-     * Merge / convert the proposal information in the result data 
-     * @param array $rows
-     * @return array|null
-     */
-    protected function mergeProposalData($rows) {
-        
-        $termModel=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $termModel editor_Models_Term */
-        
-        if(!$termModel->isProposableAllowed()){
-            return $rows;
-        }
-        
-        
-        $mergeProposal = function($item) use ($termModel){
-            
-            $termModel->init($item);
-            //FIXME: compute proposable also via ACLs here! (with Phase 3)
-            $item['proposable'] =$termModel->isProposable();
-            
-            if(empty($item['id'])){
-                $item['proposal'] = null;
-            }
-            else {
-                $item['proposal'] = [
-                    'id' => $item['id'],
-                    'term' => $item['term'],
-                    'created' => $item['created'],
-                ];
-            }
-            unset($item['id']);
-            unset($item['term']);
-            unset($item['created']);
-            return $item;
-        };
-        if(empty($rows)){
-            return null;
-        }
-        return array_map($mergeProposal, $rows);
-    }
-    
     /***
      * Search term entry and term attributes in group
      */
@@ -271,12 +229,22 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         /* @var $attributeModel editor_Models_Term_Attribute */
         $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
         
+        //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
+        $keyMap=[];
+        $indexKeyMap=function($termId) use (&$keyMap){
+            if(!isset($keyMap[$termId])){
+                $keyMap[$termId]=count($keyMap);
+                return $keyMap[$termId];
+            }
+            return $keyMap[$termId];
+        };
+        
         foreach ($data as $tmp){
-            $termKey=$tmp['termId'];
+            $termKey=$indexKeyMap($tmp['termId']);
             
             
             if(!isset($map[$termKey])){
-                $termKey=$tmp['termId'];
+                $termKey=$indexKeyMap($tmp['termId']);
                 $map[$termKey]=[];
                 $map[$termKey]['attributes']=[];
                 
@@ -325,7 +293,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             }
             
             array_push($map[$termKey]['attributes'],$atr);
-            $oldKey = $tmp['termId'];
+            $oldKey = $indexKeyMap($tmp['termId']);
             $groupOldKey=false;
         }
         //if not grouped after foreach, group the last result
