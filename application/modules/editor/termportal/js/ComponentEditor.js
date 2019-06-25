@@ -55,14 +55,7 @@ const ComponentEditor={
 		
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length==0 && $element.data('id')>0){
-			var dummyCommentAttribute={
-					attributeId:-1,
-					name:'note',
-					attrValue:'',
-					attrType:null,
-					headerText:'',
-					proposable:true
-			},
+			var dummyCommentAttribute=Attribute.renderNewCommentAttributes(),
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
 			
 			$termAttributeHolder.prepend(drawData);
@@ -129,9 +122,8 @@ const ComponentEditor={
         // if id is not provided, this is a proposal on empty term entry // TODO: is this comment correct? We can also create a new Term WITHIN an existing TermEntry!
         isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
         
-        // is the modified text empty or the same as the initial one?
-        if($input.val()=='' || $.trim($input.val())=='' || $el.text()==$input.val()){
-            
+        // don't send the request? then reset component only.
+        if (me.stopRequest($el,$input)){
             //get initial html for the component
             var dummyData={
                     'attributeOriginType':$el.data('type'),
@@ -180,9 +172,9 @@ const ComponentEditor={
 	saveCommentChange:function($element,$input){
         
         Term.drawProposalButtons('commentAttributeEditorClosed');
-        
-		//is the modefied text empty or the same as the initial one
-		if($input.val()=='' || $.trim($input.val())=='' || $element.text()==$input.val()){
+
+        // don't send the request? then reset component only.
+        if (me.stopRequest($el,$input)){
 
 			//when the comment does not exist, clean the editor 
 			if($element.data('id')<1){
@@ -238,36 +230,28 @@ const ComponentEditor={
 			$elParent=isTerm ?  Term.getTermHeader($element.data('id')) : Attribute.getTermAttributeHeader($element.data('id'),$element.data('type')),
             $commentPanel,
             dummyCommentAttribute;
-		
-		$input.replaceWith(renderData);
-		$elParent.switchClass('is-finalized','is-proposal');
+            
+        // update term-data
+        $elParent.attr('data-term-value', result.term);
+        $elParent.attr('data-term-id', result.termId);
+        $elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
+        $elParent.removeClass('in-editing');
+        $input.replaceWith(renderData);
         Term.drawProposalButtons($elParent);
-		//on the next term click, fatch the data from the server, and update the cache
+        
+        //on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
 		
 		if(!isTerm){
 			return;
 		}
         
-        // update term-data
-        $elParent.attr('data-term-value', result.term);
-        $elParent.attr('data-term-id', result.termId);
-        $elParent.removeClass('is-new').addClass('is-proposal');
-        $elParent.removeClass('in-editing');
-        
 		//if it is comment, and the comment panel does not exist, add the comment panel after the proposed term is saved
 		$commentPanel=$elParent.find('[data-editable-comment]');
 		
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length==0){
-			dummyCommentAttribute={
-					attributeId:-1,
-					name:'note',
-					attrValue:'',
-					attrType:null,
-					headerText:'',
-					proposable:true
-			},
+			dummyCommentAttribute=Attribute.renderNewCommentAttributes(),
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
 			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
 			
@@ -284,8 +268,10 @@ const ComponentEditor={
 			}
 		}
         
-        // add new skeleton for creating new-term-proposal
+        // add new skeleton for creating another new-term-proposal for the current collection
         if (me.$_termTable.find('h3.term-data.is-proposable.is-new').length === 0) {
+            Term.resetNewTermData();
+            Term.newTermCollectionId = result.collectionId;
             me.$_termTable.prepend(Term.renderNewTermSkeleton());
             me.$_termTable.accordion('refresh');
         }
@@ -298,7 +284,27 @@ const ComponentEditor={
 		$input.replaceWith(Attribute.getProposalDefaultHtml(result.attributeOriginType,result.id,result.value,result));
 		//on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
-	}
+	},
+    
+    /**
+     * Is the request to be send?
+     * Don't send the request if the modified text is
+     * - empty 
+     * or 
+     * - the same as the initial one (= does not apply to proposals that use a prefilled term-string, e.g. from InstantTranslate or after empty search)
+     * @returns {Boolean}
+     */
+    stopRequest: function($el,$input) {
+        if($input.val()=='' || $.trim($input.val())=='') {
+            return true;
+        }
+        if ($el.text()==$input.val()) {
+            if (!isTermProposalFromInstantTranslate && $('#error-no-results').is(":hidden")) {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 ComponentEditor.init();
