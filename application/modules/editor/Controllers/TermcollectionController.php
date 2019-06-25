@@ -201,6 +201,17 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     }
     
     /***
+     * Check if any of the given terms exist in any collection
+     */
+    public function searchtermexistsAction(){
+        $params = $this->getRequest()->getParams();
+        $searchTerms = json_decode($params['searchTerms']);
+        $model = ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $model editor_Models_Term */
+        $this->view->rows = $model->getNonExistingTermsInAnyCollection($searchTerms);
+    }
+    
+    /***
      * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
      * The term attributes itself will be grouped in parent-child structure
      * @param array $data

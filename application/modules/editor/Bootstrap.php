@@ -320,6 +320,15 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 ));
         $this->front->getRouter()->addRoute('searchattributetermcollection', $searchAttributeTermCollection);
         
+        $searchTermExists = new ZfExtended_Controller_RestLikeRoute(
+            'editor/termcollection/searchtermexists/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'termcollection',
+                'action' => 'searchtermexists'
+            ));
+        $this->front->getRouter()->addRoute('searchtermexists', $searchTermExists);
+        
         # Language resources rutes start
         //WARNING: Order of the route definition is important!
         // the catchall like download route must be defined before the more specific query/search routes!

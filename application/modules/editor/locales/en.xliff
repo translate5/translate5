@@ -2496,6 +2496,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Term: Änderung vorschlagen</source>
     <target>Term: Propose changes</target>
 </trans-unit>
+<trans-unit id='w4RuZGVydW5nIHNpY2hlcm4='><source>Änderung sichern</source><target>Save proposal</target></trans-unit>
 <trans-unit id='TmV1ZW4gVGVybSB2b3JzY2hsYWdlbg=='>
     <source>Neuen Term vorschlagen</source>
     <target>Propose a new Term</target>
@@ -3353,7 +3354,8 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='QXR0cmlidXRzLVZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attributs-Vorschlag löschen</source><target>Remove proposal for attribute</target></trans-unit>
 <trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Remove the proposal</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Propose changes</target></trans-unit>
-<trans-unit id='Qml0dGUgU3ByYWNoZSBmw7xyIGRlbiBuZXVlbiBUZXJtLVZvcnNjaGxhZyB3w6RobGVu'><source>Bitte Sprache für den neuen Term-Vorschlag wählen</source><target>Please choose a language for the new TermEntry</target></trans-unit>
+<trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... select language</target></trans-unit>
+<trans-unit id='Qml0dGUgU3ByYWNoZSBmw7xyIGRlbiBuZXVlbiBUZXJtLVZvcnNjaGxhZyB3w6RobGVu'><source>Bitte Sprache für den neuen Term-Vorschlag wählen</source><target>Bitte Sprache für den neuen Term-Vorschlag wählen</target></trans-unit>
 <trans-unit id='Qml0dGUgVGVybS1Db2xsZWN0aW9uIGbDvHIgZGVuIG5ldWVuIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Bitte Term-Collection für den neuen Term-Vorschlag wählen</source><target>Please choose a Term-Collection for the new TermEntry</target></trans-unit>
 <trans-unit id='SsO8bmdlciBhbHM='><source>Jünger als</source><target>Younger than</target></trans-unit>
 <trans-unit id='RXhwb3J0aWVyZW4='><source>Exportieren</source><target>Export</target></trans-unit>

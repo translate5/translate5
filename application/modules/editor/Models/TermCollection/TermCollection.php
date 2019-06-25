@@ -174,16 +174,20 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
-     * Get all collections ids assigned to the given customers.
+     * Get all TermCollections ids assigned to the given customers.
      * 
      * @param array $customerIds
      */
     public function getCollectionsIdsForCustomer($customerIds){
+        $service = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        $serviceType = $service->getServiceNamespace(); 
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from(array('lr'=>'LEK_languageresources'))
         ->join(array('ca'=>'LEK_languageresources_customerassoc'), 'ca.languageResourceId=lr.id',array('ca.customerId as customerId'))
-        ->where('ca.customerId IN(?)',$customerIds);
+        ->where('ca.customerId IN(?)',$customerIds)
+        ->where('lr.serviceType = ?',$serviceType);
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
             $ids = array_column($rows, 'id');
