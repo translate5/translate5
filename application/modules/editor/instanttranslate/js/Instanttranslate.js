@@ -540,7 +540,7 @@ function fillTranslation() {
     showTranslations();
 
     // open TermPortal for proposing new term?
-    drawTermPortalIntegration();
+    checkTermPortalIntegration();
 }
 
 function renderTranslationContainer(resultData) {
@@ -832,43 +832,63 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 
 /**
  * If the user has the right to propose terms in the TermPortal,
- * we draw the link here.
+ * we initiate drawing the links here.
  */
-function drawTermPortalIntegration() {
+function checkTermPortalIntegration() {
     var html = '',
-        termToCheck,
-        termExists = false;
+        searchTerms = [],
+        nonExistingTerms = [];
     // check user rights
     if(!Editor.data.app.user.isUserTermproposer) {
         return;
     }
     // check number of results
-    if($('#translations h4').length > 3) {
-        return;
+    if($('#translations .translation-result').length > 3) {
+        //return;
     }
-    // check if any of the machine-translation-results already exists as term
+    // check if the terms already exist in any TermCollection
     $('#translations [data-languageresource-type="mt"]').each(function() {
-        termToCheck = $(this).text();
-        console.log('AT WORK: check "' + termToCheck + '"');
-        // TODO ...
+        searchTerms.push({'text' : $(this).text(), 'id' : $(this).attr('id')});
     });
-    if (termExists) {
+    if(searchTerms.length == 0) {
         return;
     }
-    // append "Propose as new term"-button
-    html += '<input id="proposeTermSubmit" name="proposeTermSubmit" value="Propose as new term" type="submit" class="ui-corner-all ui-button ui-widget"/>';
-    $('#translations').append(html);
-    $('#proposeTermSubmit').button();
+    $.ajax({
+        url: Editor.data.restpath+"termcollection/searchtermexists",
+        dataType: "json",
+        type: "POST",
+        data: {
+            'searchTerms':JSON.stringify(searchTerms),
+        },
+        success: function(result){
+            nonExistingTerms = result.rows;
+            nonExistingTerms.forEach(function(termToPropose) {
+                // for all translation-results that don't exist already exists as term: draw propose-Button
+                drawTermPortalIntegration(termToPropose);
+              });
+        }
+    });
+}
+
+/**
+ * Draw button for proposing term in the TermPortal.
+ * @params {Object}
+ */
+function drawTermPortalIntegration(termToPropose) {
+    var html = '<span class="term-proposal" title="Propose as new term in terminology portal" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><span class="ui-icon ui-icon-circle-plus"></span></span>';
+    $('#'+termToPropose.id+'.translation-result').next('.copyable-copy').append(html);
 }
 
 /**
  * events
  */
-$(document).on('click', '#proposeTermSubmit' , function() {
+$(document).on('click', '.term-proposal' , function() {
     var text = $('#sourceText').val(),
-        lang = $("#targetLocale").val(),
-        showTermProposal = 'true';
-        params="text="+text+"&lang="+lang+"&showTermProposal="+showTermProposal;
+        lang = $("#sourceLocale").val(),
+        textProposal = $(this).attr('data-term'),
+        langProposal = $("#targetLocale").val(),
+        isTermProposalFromInstantTranslate = 'true';
+        params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
     openTermPortal(params);
 });
 

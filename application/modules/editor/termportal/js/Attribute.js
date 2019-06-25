@@ -438,6 +438,21 @@ const Attribute={
      */
     renderNewTermAttributes: function() {
         return [];
+    },
+    
+    /**
+     * Returns comment "dummy" attributes for creating a new comment.
+     * @returns {Array}
+     */
+    renderNewCommentAttributes: function() {
+        return {
+            attributeId:-1,
+            name:'note',
+            attrValue:'',
+            attrType:null,
+            headerText:'',
+            proposable:true
+        };
     }
 };
 
