@@ -1036,7 +1036,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     public function isProposableAllowed(){
         $user=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
-        return $user->isAllowed('editor_term','proposeOperation');
+        return $user->hasRole('termProposer');
     }
     
     /***

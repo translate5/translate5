@@ -178,7 +178,7 @@ var collectionsClients=JSON.parse('<?php echo json_encode($collectionsClients); 
 var collectionsNames=<?php echo json_encode($collectionsNames); ?>;
 var clientsNames=<?php echo json_encode($clientsNames); ?>;
 var translations=<?php echo json_encode($this->translations); ?>;
-var proposalTranslations = Editor.data.apps.termportal.proposal.translations;
+var proposalTranslations = Editor.data.apps ? Editor.data.apps.termportal.proposal.translations : [];
 var searchFilterPlaceholderText=translations['searchFilterPlaceholderText']+'...';
 
 // termProposal from InstantTranslate

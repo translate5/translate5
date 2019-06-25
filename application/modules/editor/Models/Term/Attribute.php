@@ -122,13 +122,14 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * It is proposable when the user is allowed for attribute proposal operation
+     * Is the user allowed for attribute proposal
+     * 
      * @return boolean
      */
     public function isProposableAllowed(){
         $user=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
-        return $user->isAllowed('editor_termattribute','proposeOperation');
+        return $user->hasRole('termProposer');
     }
     
     /**
