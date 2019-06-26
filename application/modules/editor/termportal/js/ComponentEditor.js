@@ -235,6 +235,8 @@ const ComponentEditor={
         // update term-data
         $elParent.attr('data-term-value', result.term);
         $elParent.attr('data-term-id', result.termId);
+        $elParent.attr('data-groupid', result.groupId);
+        
         $elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
         $elParent.removeClass('in-editing');
         $input.replaceWith(renderData);
@@ -258,6 +260,7 @@ const ComponentEditor={
 			
 			//update the term holder dom with the new temr id
 			$termAttributeHolder.attr("data-term-id",result.termId);
+			$termAttributeHolder.attr("data-groupid",result.groupId);
 			
 			//attach the comment attribute draw data to the term holder
 			$termAttributeHolder.prepend(drawData);

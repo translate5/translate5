@@ -430,7 +430,7 @@ const Term={
             }
             
             //draw term header
-            termAttributesHtmlContainer.push('<h3 class="term-data'+proposable + isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'">');
+            termAttributesHtmlContainer.push('<h3 class="term-data'+proposable + isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'" data-groupid="'+term.groupId+'">');
             
             
             //add empty space between
@@ -944,12 +944,22 @@ const Term={
 			var yesCallback=function(){
 				//ajax call to the remove proposal action
 				var me=event.data.scope,
-					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id'));
+					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id')),
+					groupId=$parent.data('groupid');
+
 				$.ajax({
 			        url: url,
 			        dataType: "json",	
 			        type: "POST",
 			        success: function(result){
+			        	
+			        	//reload the termEntry when the term is removed
+			        	if(!result.rows || result.rows.length==0){
+			        		me.reloadTermEntry=true;
+			        		me.findTermsAndAttributes(groupId);
+			        		return;
+			        	}
+			        	
 			        	//the term proposal is removed, render the initial term proposable content
 			        	var renderData=me.renderTermData(result.rows),
 			        		ins=$parent.find('ins');
