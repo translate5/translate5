@@ -227,6 +227,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                ) sub
             WHERE targetEditToSort  REGEXP '[0-9]';
          */
+        $this->addWatchlistJoin($select);
         $result = $this->loadFilterdCustom($select);
         
         return $result;
