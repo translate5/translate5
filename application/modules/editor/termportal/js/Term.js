@@ -518,6 +518,9 @@ const Term={
             //the proposal is allready defined, render the proposal
             htmlCollection.push('<del class="proposal-value-content">'+termData.term+'</del>');
             htmlCollection.push('<ins class="proposal-value-content">'+termData.proposal.term+'</ins>');
+            // TODO: clicking on ins or pencil for editing...
+            // -  ... does not open the component (selector "[data-editable]" is missing from now on!), or
+            // -  ... opens a component for del and ins each
             return htmlCollection.join(' ');
         },
 
@@ -689,7 +692,7 @@ const Term={
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
                     $_this = elements;
                     $_selectorDelete = $_this.filter('.is-proposal');
-                    $_selectorEdit = $_this.filter('.is-finalized');
+                    $_selectorEdit = $_this.filter('.proposable');
                     $_this.children('.proposal-btn').remove();
                     titleDelete = proposalTranslations['deleteProposal'];
                     titleEdit = proposalTranslations['editProposal'];
