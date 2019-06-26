@@ -63,7 +63,7 @@ const Term={
             // - Content
             me.$_termTable.on('click', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
-            me.$_termTable.on('click', '.term-data.proposable [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
+            me.$_termTable.on('click', '.term-data.proposable.is-finalized [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
             
             // Terms-Attributes: see Attribute.js
 		},
@@ -645,9 +645,8 @@ const Term={
             switch(elements) {
                 case "commentAttributeEditorClosed":
                     $_selectorRemove = $('#termTable .proposal-save').closest('h4');
-                    $_selectorDelete = $_selectorRemove;
+                    // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
-                    titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "attributeComponentEditorOpened":
@@ -659,9 +658,8 @@ const Term={
                 case "componentEditorClosed":
                 // case "attributeComponentEditorClosed" (= is handled via saveComponentChange(), too)
                     $_selectorRemove = $('#termTable .proposal-save').parent();
-                    $_selectorDelete = $_selectorRemove;
+                    // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
-                    titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "componentEditorOpened":
@@ -672,7 +670,7 @@ const Term={
                 case "terms":
                     $_selectorAdd = $('#termTable .term-data.is-new');
                     $_selectorDelete = $('#termTable .term-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .term-data.proposable');
+                    $_selectorEdit = $('#termTable .term-data.proposable.is-finalized');
                     titleAdd = proposalTranslations['addTermProposal'];
                     titleDelete = proposalTranslations['deleteTermProposal'];
                     titleEdit = proposalTranslations['editTermProposal'];
@@ -680,7 +678,7 @@ const Term={
                 case "terms-attribute":
                     //$_selectorAdd = $('#termTable .term-data').next('div');
                     $_selectorDelete = $('#termTable .attribute-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .attribute-data.proposable');
+                    $_selectorEdit = $('#termTable .attribute-data.proposable.is-finalized');
                     titleAdd = proposalTranslations['addTermAttributeProposal'];
                     titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
@@ -689,7 +687,7 @@ const Term={
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
                     $_this = elements;
                     $_selectorDelete = $_this.filter('.is-proposal');
-                    $_selectorEdit = $_this.filter('.is-finalized');
+                    $_selectorEdit = $_this.filter('.proposable');
                     $_this.children('.proposal-btn').remove();
                     titleDelete = proposalTranslations['deleteProposal'];
                     titleEdit = proposalTranslations['editProposal'];
