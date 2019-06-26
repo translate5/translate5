@@ -200,7 +200,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "deleteTermAttributeProposal"=>$this->translate->_("Term-Attribut: Vorschlag löschen"),
                 "chooseLanguageForTermEntry"=>$this->translate->_("Bitte Sprache für den neuen Term-Vorschlag wählen"),
                 "chooseTermcollectionForTermEntry"=>$this->translate->_("Bitte Term-Collection für den neuen Term-Vorschlag wählen"),
-                "selectLanguage"=>$this->translate->_("... Sprache auswählen")
+                "selectLanguage"=>$this->translate->_("... Sprache auswählen"),
+                "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für")
             ]);
         }
         

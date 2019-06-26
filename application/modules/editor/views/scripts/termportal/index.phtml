@@ -142,6 +142,7 @@ if(isset($this->error)){
     	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
             <div id="searchTermsHelper" class="ui-corner-all">
                 <p id="error-no-results" class="ui-state-error" style="display:none;"><?php echo $this->translations["noResults"];?></p>
+                <p id="warning-new-source" class="ui-state-error" style="display:none;"></p>
                 <p class="skeleton"><span class="proposal-txt"></span> <span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></p>
             </div>
             <ul id="searchTermsSelect" size="10" style="display: inline-block;"></ul>
@@ -185,9 +186,13 @@ var searchFilterPlaceholderText=translations['searchFilterPlaceholderText']+'...
 var isTermProposalFromInstantTranslate = '<?php echo $_GET['isTermProposalFromInstantTranslate'] ?? false; ?>';
 if (isTermProposalFromInstantTranslate == 'true') {
     isTermProposalFromInstantTranslate = true;
+    var instanttranslate = {};
+    instanttranslate.textSource = '<?php echo $_GET['text'] ?? ''; ?>';
+    instanttranslate.langSource = '<?php echo $_GET['lang'] ?? ''; ?>';
+    instanttranslate.textProposal = '<?php echo $_GET['textProposal'] ?? ''; ?>';
+    instanttranslate.langProposal = '<?php echo $_GET['langProposal'] ?? ''; ?>';
+    console.dir(instanttranslate);
 }
-var textProposal = '<?php echo $_GET['textProposal'] ?? ''; ?>';
-var langProposal = '<?php echo $_GET['langProposal'] ?? ''; ?>';
 
 function setSizesInFinalResultContent(){
     var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
@@ -301,5 +306,6 @@ $( function() {
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <script type="text/javascript">
     var languageSelectForNewTerm = Term.renderLanguageSelect('term');
+    clearResults();
     checkDirectSearch();
 </script>
