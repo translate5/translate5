@@ -505,7 +505,7 @@ const Term={
                 htmlCollection=[];
             
             // DB: new term-proposals are stored as unprocessed term, not as proposal... *sigh*
-            if (termData.processStatus === "unprocessed" && typeof termData.proposal === 'undefined' ) {
+            if (termData.processStatus === "unprocessed" && !termData.proposal) {
                 htmlCollection.push('<ins class="proposal-value-content">'+termData.term+'</ins>');
                 return htmlCollection.join(' ');
             }

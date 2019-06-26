@@ -132,7 +132,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     text: me.strings.name
                 },{
                     xtype: 'actioncolumn',
-                    width: 98,
+                    width: 110,
                     items: [{
                         tooltip: me.strings.edit,
                         action: 'edit',
