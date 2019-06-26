@@ -184,7 +184,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "deleteTermProposalMessage"=>$this->translate->_("Möchten Sie den Term-Vorschlag wirklich entfernen?"),
                 "deleteAttributeProposal"=>$this->translate->_("Attributs-Vorschlag löschen"),
                 "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
-                "addProposal"=>$this->translate->_("Änderung vorschlagen"),
+                "editProposal"=>$this->translate->_("Änderung vorschlagen"),
                 "saveProposal"=>$this->translate->_("Änderung sichern"),
                 "editTermEntryProposal"=>$this->translate->_("Term-Eintrag: Änderung vorschlagen"),
                 "addTermEntryProposal"=>$this->translate->_("Neuen Term-Eintrag vorschlagen"),
