@@ -242,13 +242,12 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         foreach ($data as $tmp){
             $termKey=$indexKeyMap($tmp['termId']);
             
-            
             if(!isset($map[$termKey])){
                 $termKey=$indexKeyMap($tmp['termId']);
                 $map[$termKey]=[];
                 $map[$termKey]['attributes']=[];
                 
-                if(!empty($oldKey) && !empty($map[$oldKey])){
+                if(isset($oldKey) && isset($map[$oldKey])){
                     $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
                     $groupOldKey=true;
 
