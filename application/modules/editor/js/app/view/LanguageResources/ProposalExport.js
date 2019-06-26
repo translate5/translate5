@@ -35,7 +35,7 @@ Ext.define('Editor.view.LanguageResources.ProposalExport', {
     alias: 'widget.proposalexport',
     itemId: 'proposalExport',
     strings: {
-    	dateFieldLabel:'#UT#Jünger als',
+    	dateFieldLabel:'#UT#Jünger als oder gleich',
     	exportButtonText:'#UT#Exportieren',
     	cancelButtonText:'#UT#Abbrechen',
     	title:'#UT#Vorschläge exportieren',
