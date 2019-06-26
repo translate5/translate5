@@ -143,10 +143,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
         }
 
         if($workerCountToStart == 0) {
-            $this->logger->warn('E1131', 'No TermTaggers available, task imported without terms tagged.',[
+            //E1131No TermTaggers available, please enable term taggers to import this task.
+            throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
                 'task' => $this->task
             ]);
-            return $parentId;
         }
         
         for($i=0;$i<$workerCountToStart;$i++){

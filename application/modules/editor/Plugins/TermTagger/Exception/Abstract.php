@@ -46,5 +46,6 @@ abstract class editor_Plugins_TermTagger_Exception_Abstract extends ZfExtended_E
         'E1120' => 'TermTagger returns an error on tagging segments.',
         'E1121' => 'TermTagger result could not be decoded.',
         'E1129' => 'TermTagger DOWN: The configured TermTagger "{termTaggerUrl}" is not reachable and is deactivated in translate5 temporary.',
+        'E1131' => 'TermTagger DOWN: No TermTagger instances are available, please enable them and reimport this task.',
     ];
 }
