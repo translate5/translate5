@@ -679,7 +679,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                     LEFT OUTER JOIN
                     LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
                 where 
-                t.created > DATE_SUB(?, INTERVAL 5 MINUTE) 
+                t.created >= DATE_SUB(?, INTERVAL 5 MINUTE) 
                 and t.collectionId IN(?)
                 and (tp.term is not null or tap.value is not null or t.processStatus='unprocessed')
 				order by t.groupId,t.term";
