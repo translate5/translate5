@@ -346,6 +346,13 @@ class editor_TermController extends ZfExtended_RestController {
      * @throws ZfExtended_UnprocessableEntity
      */
     public function removeproposalOperation() {
+        //the removed request is for term with process status unprocessed
+        if($this->view->rows->processStatus==$this->entity::PROCESS_STATUS_UNPROCESSED){
+            $this->entity->delete();
+            $this->view->rows = [];
+            return;
+        }
+        
         if(empty($this->view->rows->proposal)) {
             ZfExtended_UnprocessableEntity::addCodes([
                 'E1109' => 'There is no proposal which can be deleted.'

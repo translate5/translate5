@@ -176,6 +176,9 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
      * @return array
      */
     protected function groupTermsAndAttributes(array $data){
+        if(empty($data)){
+            return $data;
+        }
         $map=[];
         $termColumns=[
             'definition',

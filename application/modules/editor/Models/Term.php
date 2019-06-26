@@ -681,7 +681,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 where 
                 t.created > DATE_SUB(?, INTERVAL 5 MINUTE) 
                 and t.collectionId IN(?)
-                and (tp.term is not null or tap.value is not null)
+                and (tp.term is not null or tap.value is not null or t.processStatus='unprocessed')
 				order by t.groupId,t.term";
         $resultArray=$this->db->getAdapter()->query($sql,[$youngerAs,implode(',', $collectionIds)])->fetchAll();
         if(empty($resultArray)){
