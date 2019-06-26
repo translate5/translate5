@@ -149,11 +149,14 @@ const ComponentEditor={
 			requestData['language']      =Term.newTermLanguageId;
             requestData['termEntryId']   =Term.newTermTermEntryId;
 			requestData[dataKey]=$input.val();
-			
-	        console.log('saveComponentChange (isNew):');
-	        console.log('- requestData: ' + JSON.stringify(requestData));
 		}
-		
+        
+        if (Term.$_searchWarningNewSource.is(":visible")) {
+            requestData['termSource']  = instanttranslate.textSource;
+            requestData['termSourceLanguage']  = instanttranslate.langSource;
+        }
+        
+        console.log('saveComponentChange :' + JSON.stringify(requestData));
 		
 		//send proposal request
 		 $.ajax({
@@ -164,6 +167,16 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
+                
+	            // TODO: 
+                // reload the termEntry when source term from InstantTranslate did not exist before,
+	            // but how do we access the note-editor then
+                if(false && Term.$_searchWarningNewSource.is(":visible")){
+                    Term.reloadTermEntry=true;
+                    Term.findTermsAndAttributes(result.groupId);
+                    return;
+                }
+                
 	        	me.updateComponent($el,$input,result.rows);
 	        }
 	    });
@@ -303,7 +316,7 @@ const ComponentEditor={
             return true;
         }
         if ($el.text()==$input.val()) {
-            if (!isTermProposalFromInstantTranslate && $('#error-no-results').is(":hidden")) {
+            if (Term.$_searchWarningNewSource.is(":hidden") && Term.$_searchErrorNoResults.is(":hidden")) {
                 return true;
             }
         }

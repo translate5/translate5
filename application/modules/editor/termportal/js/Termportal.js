@@ -36,6 +36,13 @@ function checkDirectSearch() {
     }
 }
 
+function clearResults () {
+    $('#searchTermsSelect').empty();
+    $('#searchErrorNoResults').hide();
+    $('#searchWarningNewSource').hide();
+    $('#searchTermsHelper .skeleton').show();
+}
+
 /***
  * On dropdown select function handler
  */
