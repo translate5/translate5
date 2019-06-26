@@ -120,8 +120,9 @@ const Term={
 				},
 				success: function(result){
 					me.searchTermsResponse=result.rows[me.KEY_TERM];
-					if(successCallback){
+					if(successCallback && me.searchTermsResponse.length>1){
 						successCallback(result.rows[me.KEY_TERM]);
+						return;
 					}
 					me.fillSearchTermSelect(searchString);
 				}
