@@ -63,7 +63,7 @@ const Term={
             // - Content
             me.$_termTable.on('click', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
-            me.$_termTable.on('click', '.term-data.proposable [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
+            me.$_termTable.on('click', '.term-data.proposable.is-finalized [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
             
             // Terms-Attributes: see Attribute.js
 		},
@@ -518,9 +518,6 @@ const Term={
             //the proposal is allready defined, render the proposal
             htmlCollection.push('<del class="proposal-value-content">'+termData.term+'</del>');
             htmlCollection.push('<ins class="proposal-value-content">'+termData.proposal.term+'</ins>');
-            // TODO: clicking on ins or pencil for editing...
-            // -  ... does not open the component (selector "[data-editable]" is missing from now on!), or
-            // -  ... opens a component for del and ins each
             return htmlCollection.join(' ');
         },
 
@@ -648,9 +645,8 @@ const Term={
             switch(elements) {
                 case "commentAttributeEditorClosed":
                     $_selectorRemove = $('#termTable .proposal-save').closest('h4');
-                    $_selectorDelete = $_selectorRemove;
+                    // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
-                    titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "attributeComponentEditorOpened":
@@ -662,9 +658,8 @@ const Term={
                 case "componentEditorClosed":
                 // case "attributeComponentEditorClosed" (= is handled via saveComponentChange(), too)
                     $_selectorRemove = $('#termTable .proposal-save').parent();
-                    $_selectorDelete = $_selectorRemove;
+                    // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
-                    titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "componentEditorOpened":
@@ -675,7 +670,7 @@ const Term={
                 case "terms":
                     $_selectorAdd = $('#termTable .term-data.is-new');
                     $_selectorDelete = $('#termTable .term-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .term-data.proposable');
+                    $_selectorEdit = $('#termTable .term-data.proposable.is-finalized');
                     titleAdd = proposalTranslations['addTermProposal'];
                     titleDelete = proposalTranslations['deleteTermProposal'];
                     titleEdit = proposalTranslations['editTermProposal'];
@@ -683,7 +678,7 @@ const Term={
                 case "terms-attribute":
                     //$_selectorAdd = $('#termTable .term-data').next('div');
                     $_selectorDelete = $('#termTable .attribute-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .attribute-data.proposable');
+                    $_selectorEdit = $('#termTable .attribute-data.proposable.is-finalized');
                     titleAdd = proposalTranslations['addTermAttributeProposal'];
                     titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
