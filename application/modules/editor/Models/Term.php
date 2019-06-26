@@ -678,12 +678,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                     )
                     LEFT OUTER JOIN
                     LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
-                where 
-                t.created >= DATE_SUB(?, INTERVAL 5 MINUTE) 
-                and t.collectionId IN(?)
+                where t.collectionId IN(?)
+                and (t.created >= ? || tp.created >= ? || tap.created >=?) 
                 and (tp.term is not null or tap.value is not null or t.processStatus='unprocessed')
 				order by t.groupId,t.term";
-        $resultArray=$this->db->getAdapter()->query($sql,[$youngerAs,implode(',', $collectionIds)])->fetchAll();
+        $resultArray=$this->db->getAdapter()->query($sql,[implode(',', $collectionIds),$youngerAs,$youngerAs,$youngerAs])->fetchAll();
         if(empty($resultArray)){
             return [];
         }

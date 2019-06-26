@@ -69,6 +69,10 @@ class editor_TermController extends ZfExtended_RestController {
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
         $attribute->updateModificationGroupAttributes($this->entity);
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        $attribute->checkOrCreateProcessStatus($this->entity->getId());
     }
     /**
      * {@inheritDoc}
@@ -308,6 +312,7 @@ class editor_TermController extends ZfExtended_RestController {
                 'language' => strtolower($lang->getRfc5646()),
                 'attrLang' => strtolower($lang->getRfc5646()),
                 'labelId' => $label->getId(),
+                'processStatus'=>editor_Models_Term::PROCESS_STATUS_UNPROCESSED
             ]);
         }
         $this->decodePutData();

@@ -458,6 +458,53 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         return $tree;
     }
     
+    /***
+     * Check if for the current term there is a processStatus attribute. When there is no one, create it.
+     * @param int $termId
+     */
+    public function checkOrCreateProcessStatus(int $termId) {
+        $s=$this->db->select()
+        ->where('termId=?',$termId)
+        ->where('name="termNote"')
+        ->where('attrType="processStatus"');
+        
+        $result=$this->db->fetchAll($s)->toArray();
+        if(count($result)>0){
+            return;
+        }
+        
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $term->load($termId);
+        
+        $language=ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        
+        $language->loadById($term->getLanguage());
+        
+        
+        $this->setCollectionId($term->getCollectionId());
+        $this->setTermId($term->getId());
+        
+        $this->setLanguage($language->getRfc5646());
+        
+        $this->setName('termNote');
+        $this->setAttrType('processStatus');
+            
+        $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+        $label->loadOrCreate('termNote', 'processStatus');
+        $this->setLabelId($label->getId());
+        
+        $this->setAttrLang($language->getRfc5646());
+        
+        $this->setUserGuid($term->getUserGuid());
+        $this->setUserName($term->getUserName());
+        $this->setProcessStatus($term->getProcessStatus());
+        $this->setValue($term->getProcessStatus());
+        $this->save();
+    }
+    
     public function getDataObject() {
         $result=parent::getDataObject();
         //set the attribute origin type(when no termId is provided it is termEntry attribute otherwise term attribute)

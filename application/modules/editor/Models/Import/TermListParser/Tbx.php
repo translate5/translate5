@@ -559,6 +559,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $deleteParams['termEntryId = ?']=$this->actualTermEntryIdDb;
         $deleteParams['termId is null'] = '';
         
+        //TODO: add additional flag (from zf config) if this should be triggered or not
         if(!empty($this->termEntryAttributeContainer)){
             $deleteParams['id NOT IN (?)']=$this->termEntryAttributeContainer;
         }
@@ -817,6 +818,9 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             }
             
             $termAttributes->delete($deleteParams);
+            
+            //check the processStatus attribute for the term. If not process status attribute for the term exist, new one will be created.
+            $this->handleTermProcessStatus();
         }else{
             $this->counterTigInLangSet++;
         }
@@ -925,6 +929,18 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             }
         }
         
+    }
+    
+    /***
+     * Check if the current term has attribute with processStatus. If not create a default processStatus attribute
+     */
+    protected function handleTermProcessStatus(){
+        if(empty($this->actualTermIdDb)){
+            return;
+        }
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        $attribute->checkOrCreateProcessStatus($this->actualTermIdDb);
     }
     
     /***
