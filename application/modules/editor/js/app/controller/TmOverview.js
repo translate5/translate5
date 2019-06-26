@@ -418,6 +418,7 @@ Ext.define('Editor.controller.TmOverview', {
                 break;
             case 'delete':
                 me.handleDeleteTm(view,cell,col,record);
+                break;
             case 'export':
                 me.handleExportProposalClick(view,cell,col,record);
                 break;
