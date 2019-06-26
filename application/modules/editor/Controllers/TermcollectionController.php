@@ -301,9 +301,10 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         //if not grouped after foreach, group the last result
         if(!$groupOldKey){
             $map[$oldKey]['proposable']=$isTermProposalAllowed;
+            $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
+
             //collect the term proposal data if the user is allowed to
             if($isTermProposalAllowed){
-                $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
                 $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
                 //check if the term proposable flag is set, if calculate it
             }

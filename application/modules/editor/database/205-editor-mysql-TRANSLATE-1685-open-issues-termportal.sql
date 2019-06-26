@@ -25,24 +25,5 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
-('editor', 'termProposer', 'termCustomerSearch', 'all'),
-('editor', 'termProposer', 'editor_termportal', 'all'),
-('editor', 'termProposer', 'editor_apps', 'all'),
-('editor', 'termCustomerSearch', 'editor_term', 'get'),
-('editor', 'termProposer', 'editor_term', 'post'),
-('editor', 'termProposer', 'editor_term', 'proposeOperation'),
-('editor', 'termProposer', 'editor_term', 'removeproposalOperation'),
-('editor', 'termCustomerSearch', 'editor_termattribute', 'get'),
-('editor', 'termProposer', 'editor_termattribute', 'post'),
-('editor', 'termProposer', 'editor_termattribute', 'proposeOperation'),
-('editor', 'termProposer', 'editor_termattribute', 'removeproposalOperation');
-
--- insert other rules for already existing operations.
-INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
-('editor', 'pm', 'editor_task', 'analysisOperation'),
-('editor', 'pm', 'editor_task', 'pretranslationOperation'),
-('editor', 'pm', 'setaclrole', 'termProposer'),
-('editor', 'admin', 'setaclrole', 'termProposer'),
-('editor', 'admin', 'setaclrole', 'instantTranslate'),
-('editor', 'admin', 'setaclrole', 'termCustomerSearch');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('default', 'termProposer', 'initial_page', 'termPortal');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES ('editor', 'termProposer', 'editor_termcollection', 'all');
