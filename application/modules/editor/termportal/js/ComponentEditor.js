@@ -170,11 +170,12 @@ const ComponentEditor={
 	},
 	
 	saveCommentChange:function($element,$input){
+	    var me = this;
         
         Term.drawProposalButtons('commentAttributeEditorClosed');
 
         // don't send the request? then reset component only.
-        if (me.stopRequest($el,$input)){
+        if (me.stopRequest($element,$input)){
 
 			//when the comment does not exist, clean the editor 
 			if($element.data('id')<1){

@@ -63,7 +63,7 @@ const Term={
             // - Content
             me.$_termTable.on('click', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
-            me.$_termTable.on('click', '.term-data.proposable.is-finalized [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
+            me.$_termTable.on('click', '.term-data.proposable [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
             
             // Terms-Attributes: see Attribute.js
 		},
@@ -645,8 +645,9 @@ const Term={
             switch(elements) {
                 case "commentAttributeEditorClosed":
                     $_selectorRemove = $('#termTable .proposal-save').closest('h4');
-                    // only editable items can be edited; we can simply switch back to edit-icon
+                    $_selectorDelete = $_selectorRemove;
                     $_selectorEdit = $_selectorRemove;
+                    titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "attributeComponentEditorOpened":
@@ -658,8 +659,9 @@ const Term={
                 case "componentEditorClosed":
                 // case "attributeComponentEditorClosed" (= is handled via saveComponentChange(), too)
                     $_selectorRemove = $('#termTable .proposal-save').parent();
-                    // only editable items can be edited; we can simply switch back to edit-icon
+                    $_selectorDelete = $_selectorRemove;
                     $_selectorEdit = $_selectorRemove;
+                    titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "componentEditorOpened":
@@ -670,7 +672,7 @@ const Term={
                 case "terms":
                     $_selectorAdd = $('#termTable .term-data.is-new');
                     $_selectorDelete = $('#termTable .term-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .term-data.proposable.is-finalized');
+                    $_selectorEdit = $('#termTable .term-data.proposable');
                     titleAdd = proposalTranslations['addTermProposal'];
                     titleDelete = proposalTranslations['deleteTermProposal'];
                     titleEdit = proposalTranslations['editTermProposal'];
@@ -678,7 +680,7 @@ const Term={
                 case "terms-attribute":
                     //$_selectorAdd = $('#termTable .term-data').next('div');
                     $_selectorDelete = $('#termTable .attribute-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .attribute-data.proposable.is-finalized');
+                    $_selectorEdit = $('#termTable .attribute-data.proposable');
                     titleAdd = proposalTranslations['addTermAttributeProposal'];
                     titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
@@ -690,22 +692,22 @@ const Term={
                     $_selectorEdit = $_this.filter('.is-finalized');
                     $_this.children('.proposal-btn').remove();
                     titleDelete = proposalTranslations['deleteProposal'];
-                    titleEdit = proposalTranslations['addProposal'];
+                    titleEdit = proposalTranslations['editProposal'];
                     break;
             }
             if($_selectorRemove) {
                 $_selectorRemove.removeClass('in-editing');
                 $_selectorRemove.children('.proposal-btn').remove();
             }
-            if ($_selectorAdd && $_selectorAdd.children('.proposal-btn').length === 0) {
+            if ($_selectorAdd && $_selectorAdd.children('.proposal-btn.proposal-add').length === 0) {
                 $_selectorAdd.append(htmlProposalAddIcon);
                 $_selectorAdd.find('.proposal-add').prop('title', titleAdd);
             }
-            if ($_selectorEdit && $_selectorEdit.children('.proposal-btn').length === 0) {
+            if ($_selectorEdit && $_selectorEdit.children('.proposal-btn.proposal-edit').length === 0) {
                 $_selectorEdit.append(htmlProposalEditIcon);
                 $_selectorEdit.children('.proposal-edit').prop('title', titleEdit);
             }
-            if ($_selectorDelete && $_selectorDelete.children('.proposal-btn').length === 0) {
+            if ($_selectorDelete && $_selectorDelete.children('.proposal-btn.proposal-delete').length === 0) {
                 $_selectorDelete.append(htmlProposalDeleteIcon);
                 $_selectorDelete.children('.proposal-delete').prop('title', titleDelete);
             }
