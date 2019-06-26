@@ -2,6 +2,7 @@ const Term={
         
         $_searchTermsHelper:null,
         $_searchErrorNoResults:null,
+        $_searchWarningNewSource:null,
         $_searchTermsSelect:null,
         
         $_resultTermsHolder:null,
@@ -35,6 +36,7 @@ const Term={
 		cacheDom:function(){
             this.$_searchTermsHelper=$('#searchTermsHelper');
             this.$_searchErrorNoResults = $('#error-no-results');
+            this.$_searchWarningNewSource = $('#warning-new-source');
 			this.$_searchTermsSelect=$('#searchTermsSelect');
             
             this.$_resultTermsHolder=$('#resultTermsHolder');
@@ -99,6 +101,7 @@ const Term={
                 return;
             }
             
+            clearResults();
 			me.resetNewTermData();
             
 			if(!lng){
@@ -135,14 +138,22 @@ const Term={
 		 */
 		fillSearchTermSelect:function(searchString){
 			var me=this;
+            clearResults();
 			if(!me.searchTermsResponse || me.searchTermsResponse.length === 0){
-
-                me.$_searchTermsSelect.empty();
-			    me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + proposalTranslations['addTermEntryProposal']);
-                me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + proposalTranslations['addTermEntryProposal']);
-			    me.$_searchErrorNoResults.show();
-				
-				console.log("fillSearchTermSelect: nichts gefunden");
+                
+                console.log("fillSearchTermSelect: nichts gefunden");
+                
+                // show/hide helper: errors, warning, skeleton...
+                if (isTermProposalFromInstantTranslate) {
+                    me.$_searchWarningNewSource.text(proposalTranslations['newSourceForSaving'] + ': ' + instanttranslate.textSource);
+                    me.$_searchWarningNewSource.show();
+                    me.$_searchTermsHelper.find('.skeleton').hide();
+                } else {
+                    me.$_searchErrorNoResults.show();
+                    me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + proposalTranslations['addTermEntryProposal']);
+                    me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + proposalTranslations['addTermEntryProposal']);
+                    me.$_searchTermsHelper.find('.skeleton').show();
+                }
 				
 				if(me.disableLimit){
 					me.disableLimit=false;
@@ -152,16 +163,18 @@ const Term={
                 // show form for adding proposal right away?
                 if(isTermProposalFromInstantTranslate) {
                     $("#searchTermsHelper .proposal-add").click();
-                    isTermProposalFromInstantTranslate = false; // "reset", is valid only once (when coming from TermPortal)
                 } else {
                     me.$_resultTermsHolder.hide();
                 }
                 
+                // "reset", is valid only once (= when coming from TermPortal)
+                if(isTermProposalFromInstantTranslate) {
+                    isTermProposalFromInstantTranslate = false;
+                }
+                
 				return;
 			}
-			
-			me.$_searchErrorNoResults.hide();
-			me.$_searchTermsSelect.empty();
+            
 			
 			console.log("fillSearchTermSelect: " + me.searchTermsResponse.length + " Treffer");
 			
@@ -767,9 +780,9 @@ const Term={
             }
             // if proposal from InstantTranslate:
             if (isTermProposalFromInstantTranslate) {
-                me.newTermLanguageId = langProposal;
-                me.newTermRfcLanguage = langProposal; // TODO: langProposal is not the same as languageId; check input from TermPortal!!
-                me.newTermName = textProposal+'xxx';
+                me.newTermLanguageId = instanttranslate.langProposal;
+                me.newTermRfcLanguage = instanttranslate.langProposal; // TODO: langProposal is not the same as languageId; check input from TermPortal!!
+                me.newTermName = instanttranslate.textProposal;
             }
             
             console.log("reset data for proposing a new Term; currently:");
