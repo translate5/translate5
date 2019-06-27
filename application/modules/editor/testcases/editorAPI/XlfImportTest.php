@@ -174,6 +174,16 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '04-segmentation.xlf', 'export-segmentation.xlf');
     }
+
+    /**
+     * check if the whitespace between mrk tags on the import are also exported again
+     * @depends testSegmentEditing
+     */
+    public function testAcrossXlf() {
+        $task = $this->api()->getTask();
+        //start task export
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '03-across.xlf', 'export-across.xlf');
+    }
     
     /**
      * check if the whitespace between mrk tags on the import are also exported again

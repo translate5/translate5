@@ -82,8 +82,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         try {
             $this->config->workflow->doWithTask($oldTask, $task);
         }
-        catch (ZfExtended_Models_Entity_Conflict $e) {
-            //ignore entity conflict here
+        catch (ZfExtended_Models_Entity_NoAccessException $e) {
+            //ignore no access here. Access may by declined by the called workflow. But this may not block the end via workflow action.
         }
         
         if($oldTask->getState() != $task->getState()) {

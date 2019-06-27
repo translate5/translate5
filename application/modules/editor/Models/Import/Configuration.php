@@ -77,11 +77,6 @@ class editor_Models_Import_Configuration {
     public $importFolder;
     
     /**
-     * @var boolean
-     */
-    public $isCheckRun = false;
-
-    /**
      * initial userguid of the segments
      * @var string
      */
@@ -98,6 +93,12 @@ class editor_Models_Import_Configuration {
      * @var integer
      */
     public $workerId; 
+    
+    /**
+     * if true, the uploaded files are only processed if the file extension is supported. Conversion plug-ins may disable that.
+     * @var boolean
+     */
+    public $checkFileType = true;
     
     /**
      * needed internally for de/serialization 

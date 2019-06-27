@@ -62,7 +62,9 @@ class editor_Models_Segment_RepetitionHash {
      * @return string
      */
     public function hashSource($source, $target) {
-        return $this->generateHash($source, $this->tagHelper->count($target));
+        //only the real tag count goes into the hash (whitespace tags are ignored, since they are editable)
+        $stat = $this->tagHelper->statistic($target);
+        return $this->generateHash($source, $stat['tag']);
     }
     
     /**
@@ -91,7 +93,15 @@ class editor_Models_Segment_RepetitionHash {
      * @return string
      */
     protected function generateHash($value, $additionalValue) {
-        $value = $this->tagHelper->replace($value, '<internal-tag>');
+        $value = $this->tagHelper->replace($value, function($match) {
+            //whitespace tags and real tags can not replaced by each other, so they must be different in the hash,
+            // so: "Das<x>Haus" may not be a repetition anymore of "DasTABHaus", even TAB and <x> are both replaced with an internal tag  
+            if(in_array($match[3], editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
+                return '<internal-ws-tag>';
+            }
+            return '<internal-tag>';
+        });
+        
         if(!empty($additionalValue)) {
             $value .= '#'.$additionalValue;
         }
@@ -111,6 +121,8 @@ class editor_Models_Segment_RepetitionHash {
         if(!$this->isSourceEditing || empty($targetValue)) {
             return '';
         }
-        return $this->tagHelper->count($segmentValue);
+        //only the real tag count goes into the hash (whitespace tags are ignored, since they are editable)
+        $stat = $this->tagHelper->statistic($segmentValue);
+        return $stat['tag'];
     }
 }

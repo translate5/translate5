@@ -97,11 +97,20 @@ class editor_Models_Import_SupportedFileTypes {
     public function getParser($ext) {
         if(empty(self::$extensionParserMap[$ext])) {
             //'For the given fileextension no parser is registered.'
-            throw new editor_Models_Import_Exception('E1060', [
+            throw new editor_Models_Import_FileParser_NoParserException('E1060', [
                 'extension' => $ext,
                 'availableParsers' => print_r(self::$extensionParserMap,1),
             ]);
         }
         return self::$extensionParserMap[$ext];
+    }
+    
+    /**
+     * returns true if file extension is supported natively by a fileparser (no pre conversion like Okapi is needed for that file).
+     * @param string $ext
+     * @return bool
+     */
+    public function hasParser(string $ext) : bool {
+        return !empty(self::$extensionParserMap[$ext]);
     }
 }
