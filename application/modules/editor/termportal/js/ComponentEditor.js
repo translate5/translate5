@@ -72,7 +72,7 @@ const ComponentEditor={
 	  
 		$input.one('blur', function(){
 			me.saveComponentChange($element,$input);
-		}).focus();
+		});
 	},
 	
 	/***
@@ -89,7 +89,7 @@ const ComponentEditor={
         
 		$input.one('blur', function(){
 			me.saveComponentChange($element,$input);
-		}).focus();
+		});
 	},
 	
 	/***
@@ -106,7 +106,7 @@ const ComponentEditor={
         
 		$input.focusout(function() {
 			me.saveCommentChange($element,$input);
-	    }).focus();
+	    });
 	},
 	
 	saveComponentChange:function($el,$input){
