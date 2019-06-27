@@ -39,6 +39,10 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.editortaskExcelReimportWindowController',
+    strings: {
+        loadingWindowMessage: '#UT# Datei wird hochgeladen',
+    },
+
     listen: {
         component: {
             '#uploadBtn': {
@@ -51,9 +55,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
     },
     
     upload: function() {
-        alert('.. @TODO: upload');
         this.saveTask();
-        this.getView().close();
     },
     
     close: function() {
@@ -65,12 +67,15 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
      * 
      */
     saveTask:function(){
-        alert('.. @TODO: in function upload');
-        return;
-        
         var me = this,
             win = me.getView(),
-            form = win.down('form');
+            form = win.down('form'),
+            task = win.task;
+        
+        //alert('URL: '+Editor.data.restpath+'task/'+task.get('id')+'/excelreimport');
+        if (!form.isValid()) {
+            return;
+        }
         
         win.setLoading(me.strings.loadingWindowMessage);
         
@@ -78,41 +83,20 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
             //Accept Header of submitted file uploads could not be changed:
             //http://stackoverflow.com/questions/13344082/fileupload-accept-header
             //so use format parameter jsontext here, for jsontext see REST_Controller_Action_Helper_ContextSwitch
-            
             params: {
                 format: 'jsontext',
                 autoStartImport: 0
             },
             timeout: 3600,
-            url: Editor.data.restpath+'task',
+            url: Editor.data.restpath+'task/'+task.get('id')+'/excelreimport',
             scope: this,
             success: function(form, submit) {
-                var task = me.getModel('admin.Task').create(submit.result.rows);
-                me.fireEvent('taskCreated', task);
-                win.setLoading(false);
-                me.getAdminTasksStore().load();
-                
-                //set the store reference to the model(it is missing), it is used later when the task is deleted
-                task.store=me.getAdminTasksStore();
-                
-                me.setCardsTask(task);
+                alert('.. upload success :-)');
+                win.close();
             },
             failure: function(form, submit) {
-                var card, errorHandler = Editor.app.getController('ServerException');
                 win.setLoading(false);
-                if(submit.failureType == 'server' && submit.result && !submit.result.success){
-                    if(submit.result.httpStatus == "422") {
-                        win.getLayout().setActiveItem('taskMainCard');
-                        form.markInvalid(submit.result.errorsTranslated);
-                    }
-                    else {
-                        card = win.down('#taskUploadCard');
-                        if(card.isVisible()){
-                            card.update(errorHandler.renderHtmlMessage(me.strings.taskError, submit.result));
-                        }
-                        errorHandler.handleException(submit.response);
-                    }
-                }
+                alert('.. upload failed :-(');
             }
         });
     },

@@ -729,7 +729,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       if(!this.isAllowed('editorExcelreimportTask')){
           return;
       }
-      Ext.widget('adminTaskExcelReimportWindow').show();
+      var tempWidget = Ext.widget('adminTaskExcelReimportWindow').show();
+      tempWidget.setTask(task);
   },
   
   /**
