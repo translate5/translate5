@@ -683,6 +683,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                     ta.updated as 'attribute-lastEditedDate',
                     ta.userName as 'attribute-lastEditor',
                     ta.processStatus as 'attribute-processStatus',
+                    l.langName as 'term-language',
                     tap.id as 'attributeproposal-id',
                     tap.value as 'attributeproposal-value',
                     tap.created as 'attributeproposal-lastEditedDate',
@@ -704,6 +705,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 		LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
+                        INNER JOIN LEK_languages l ON t.language=l.id 
                 	where ta.collectionId IN(?)
                 	and (ta.created >=? || tap.created >=?) 
                 	and (tap.value is not null or ta.processStatus='unprocessed')
@@ -1114,7 +1116,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['termproposal-lastEditedDate'];
             }
             
-            if($row['attribute-processStatus']==self::PROCESS_STATUS_UNPROCESSED){
+            if(isset($row['attribute-processStatus']) && $row['attribute-processStatus']==self::PROCESS_STATUS_UNPROCESSED){
                 $tmpTerm['attribute']=$changeMyCollorTag.$row['attribute-value'];
                 $tmpTerm['lastEditor']=$changeMyCollorTag.$row['attributeproposal-lastEditor'];
                 $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['attributeproposal-lastEditedDate'];
