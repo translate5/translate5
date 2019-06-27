@@ -3,6 +3,41 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+For special notices see:
+TRANSLATE-1654: TermTagger stops working on import of certain task - improved error management and logging
+TRANSLATE-1695: VisualReview: segmentmap generation has a bad performance on task load
+ 
+## [3.2.2] - 2019-06-27
+###Added
+TRANSLATE-1676: Disable file extension check if a custom bconf is provided
+
+###Changed
+TRANSLATE-1665: Change font colour to black
+
+###Bugfixes
+TRANSLATE-1701: Searching in bookmarked segments leads to SQL error (missing column)
+TRANSLATE-1660: Remove message for unsupported browser for MS Edge
+TRANSLATE-1620: Relais (pivot) import does not work, if Trados alters mid
+TRANSLATE-1181: Workflow Cron Daily actions are called multiple times
+TRANSLATE-1695: VisualReview: segmentmap generation has a bad performance on task load
+				** one of the two improvements is not applied automatically to the task **
+				** if you still experience loading timeouts in the GUI on opening a task **
+				** go to task administration, end the task, and reopen it again, this is decribed in: **
+				** https://jira.translate5.net/browse/TRANSLATE-1695?focusedCommentId=20594&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-20594 **
+TRANSLATE-1694: Allow SDLXLIFF tags with dashes in the ID
+TRANSLATE-1691: Search and Replace does not escape entities in the replaced text properly
+TRANSLATE-1684: Uneditable segments with tags only can lose content on export
+TRANSLATE-1669: repetition editor deletes wrong tags
+TRANSLATE-1693: Search and Replace does not open segment on small tasks
+TRANSLATE-1666: Improve error communication when uploading a import package without proofRead folder
+TRANSLATE-1689: Pressing "tab" in search and replace produces a JS error
+TRANSLATE-1683: Inserting white-space tags in the editor can overwrite other tags in the target
+TRANSLATE-1659: Change of description for auto-assignment area in user management
+TRANSLATE-1654: TermTagger stops working on import of certain task - improved error management and logging
+				** if a termtagger is not reachable anymore (due crash or not started) it will be deactivated in translate5 **
+				** for reactivation of such deactivated termtaggers see the instructions to E1129 **
+				** in https://confluence.translate5.net/display/TAD/EventCodes#EventCodes-E1129 **
+
 ## [3.2.1] - 2019-05-10
 ###Added
 TRANSLATE-1403: Anonymize users in the workflow
