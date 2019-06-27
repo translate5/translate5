@@ -109,6 +109,7 @@ class editor_Models_Segment_MaterializedView {
      */
     protected function createMutexed() {
         $createSql = 'CREATE TABLE `'.$this->viewName.'` LIKE `LEK_segments`; ALTER TABLE `'.$this->viewName.'` ENGINE=MyISAM;';
+        $createSql .= 'ALTER TABLE `'.$this->viewName.'` ADD KEY (`segmentNrInTask`);';
         $db = Zend_Db_Table::getDefaultAdapter();
         try {
             $db->query($createSql);

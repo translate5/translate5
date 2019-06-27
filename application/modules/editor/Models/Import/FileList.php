@@ -69,9 +69,17 @@ class editor_Models_Import_FileList {
      * @param string $proofreadDir
      */
     public function processProofreadFiles() {
-        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
+        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles', [$this->importConfig->checkFileType]);
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
-        $tree = $parser->parse($this->importConfig->getProofReadDir());
+        $tree = $parser->parse($this->importConfig->getProofReadDir(), $this->task);
+        $ignoredFiles = $parser->getIgnoredFiles();
+        if(!empty($ignoredFiles)) {
+            $logger = Zend_Registry::get('logger');
+            /* @var $logger ZfExtended_Logger */
+            $logger->warn('E1136', 'Some files could not be imported, since there is no parser available. For affected files see log details.', [
+                'files' => $ignoredFiles,
+            ]);
+        }
         
         $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
@@ -89,7 +97,6 @@ class editor_Models_Import_FileList {
         if(!$this->hasReferenceFiles()){
             return;
         }
-        $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles');
         $this->treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         $this->treeDb->loadByTaskGuid($this->task->getTaskGuid());
         $this->treeDb->setReferenceFileTree($this->getReferenceFileTree());
@@ -122,7 +129,7 @@ class editor_Models_Import_FileList {
     
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_ReferenceFiles');
         /* @var $parser editor_Models_Import_DirectoryParser_ReferenceFiles */
-        return $parser->parse($refTarget);
+        return $parser->parse($refTarget, $this->task);
     }
     
     /**

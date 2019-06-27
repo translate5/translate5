@@ -48,7 +48,7 @@
       <trans-unit id="53" maxwidth="450" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
         <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext one<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph></source>
         <seg-source><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext eins</mrk> <mrk mtype="seg" mid="2">Testtext zwei</mrk> <mrk mtype="seg" mid="3">Testtext 3</mrk> </seg-source>
-        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>testtext one</mrk> <mrk mtype="seg" mid="2">text text two</mrk> <mrk mtype="seg" mid="3">texttext three</mrk> </target>
+        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>testtext one</mrk> <mrk mtype="seg" mid="2">text text two</mrk> <mrk mtype="seg" mid="3">texttext three</mrk></target>
         <alt-trans mid="1" match-quality="80%">
           <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext 1</source>
           <target><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext 1</target>

@@ -938,7 +938,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //if target was given and source contains tags only or is empty, then it will be ignored
             if(!$isSourceMrkMissing && !empty($this->segmentData[$targetName]['original']) && !$this->hasText($this->segmentData[$sourceName]['original'])) {
-                $placeHolders[$mid] = $this->xmlparser->join($targetChunksOriginal);
+                $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($targetChunksOriginal).$trailingTags;
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();

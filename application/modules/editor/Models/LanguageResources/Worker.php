@@ -55,7 +55,7 @@ class editor_Models_LanguageResources_Worker extends editor_Models_Import_Worker
         $task = $this->task;
         if(!$task->lock(NOW_ISO, true)) {
             $this->log->logError('The following task is in use and cannot be reimported: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
-            continue;
+            return false;
         }
         $oldState = $task->getState();
         $task->setState('reimporttm');

@@ -27,9 +27,16 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * Exception Class to get detailed information on TermTagger-Error.
  *
  */
-class editor_Plugins_TermTagger_Exception_Open extends editor_Plugins_TermTagger_Exception_Abstract {
-    //localErrorCodes see parent abstract
+class editor_Models_Import_FileParser_NoParserException extends editor_Models_Import_Exception {
+    /**
+     * @var string
+     */
+    protected $domain = 'editor.import.fileparser';
+
+    static protected $localErrorCodes = [
+        'E1060' => 'For the fileextension "{extension}" no parser is registered. For available parsers see log details.',
+        'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
+    ];
 }

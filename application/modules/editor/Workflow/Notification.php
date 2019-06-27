@@ -443,7 +443,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             
             //if the receiverUser user is configured, send mail only to receiverUser
             if(isset($triggerConfig->receiverUser)){
-                $user->loadByLogin($triggerConfig->receiverUser);
                 $proofreaders=[(array)$user->getDataObject()];
             }else{
                 //load only users with state open

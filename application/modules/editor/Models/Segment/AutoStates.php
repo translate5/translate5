@@ -314,6 +314,8 @@ class editor_Models_Segment_AutoStates {
         
         $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
+        //NOTE: no record in segment data history is inserted because
+        //there is no related data change for this table
         $history->createHistoryByAutoState($taskGuid,[self::REVIEWED_UNTOUCHED]);
         
         $segment->updateLastAuthorFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);

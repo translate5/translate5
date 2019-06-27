@@ -27,26 +27,9 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * generall interface for Terminology exporters 
+ * Exception Class to get detailed information on TermTagger-Error.
+ *
  */
-interface editor_Models_Export_Terminology_Interface {
-    /**
-     * Sets the Terminology data to be processed
-     * Data must already be sorted by: groupId, language, id
-     * @param Iterator $data
-     */
-    public function setData(Iterator $data);
-    
-    /**
-     * sets the target where the data should be exported to
-     * can be a file name or directory. This depends on the exporteur.
-     * @param string $target
-     */
-    public function setTarget($target);
-    
-    /**
-     * exports the internally stored data
-     * @return string the generated data
-     */
-    public function export();
+class editor_Plugins_TermTagger_Exception_Down extends editor_Plugins_TermTagger_Exception_Abstract {
+    //localErrorCodes see parent abstract
 }

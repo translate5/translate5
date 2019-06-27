@@ -28,9 +28,8 @@ END LICENSE AND COPYRIGHT
 
 /**
  * exports term data stored in translate5 to valid TBX files
- * implements editor_Models_Export_Terminology_Interface
  */
-class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Terminology_Interface {
+class editor_Models_Export_Terminology_Tbx {
     /**
      * @var Iterator
      */
@@ -71,17 +70,18 @@ class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Termi
     }
     
     /**
-     * (non-PHPdoc)
-     * @see editor_Models_Export_Terminology_Interface::setData()
+     * Sets the Terminology data to be processed
+     * Data must already be sorted by: groupId, language, id
+     * @param Iterator $data
      */
     public function setData(Iterator $data) {
         $this->data = $data;
     }
     
     /**
+     * sets the target where the data should be exported to
      * expects a TBX filename 
-     * (non-PHPdoc)
-     * @see editor_Models_Export_Terminology_Interface::setTarget()
+     * @param string $target
      */
     public function setTarget($target) {
         $this->target = $target;
@@ -106,8 +106,8 @@ class editor_Models_Export_Terminology_Tbx implements editor_Models_Export_Termi
     
     /**
      * TODO: add the term attributes and term entry attributes 
-     * (non-PHPdoc)
-     * @see editor_Models_Export_Terminology_Interface::export()
+     * exports the internally stored data
+     * @return string the generated data
      */
     public function export() {
         $body = $this->createTbx();

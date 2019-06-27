@@ -103,7 +103,11 @@ class editor_Models_Import_Worker_Import {
         $this->segmentFieldManager->initFields($this->task->getTaskGuid());
 
         //call import Methods:
-        $this->importWithCollectableErrors();
+        $this->importFiles();
+        $this->syncFileOrder();
+        $this->importRelaisFiles();
+        $this->task->createMaterializedView();
+        $this->calculateEmptyTargets();
         
         //saving task twice is the simplest way to do this. has meta data is only available after import.
         $this->task->save();
@@ -116,32 +120,6 @@ class editor_Models_Import_Worker_Import {
         $workflowManager->initDefaultUserPrefs($this->task);
         
         $this->events->trigger('importCleanup', $this, array('task' => $task, 'importConfig' => $importConfig));
-    }
-    
-    /**
-     * The errors of the import methods called in here, will be collected in check mode
-     */
-    protected function importWithCollectableErrors() {
-        //should errors stop the import, or should they be logged:
-        Zend_Registry::set('errorCollect', $this->importConfig->isCheckRun);
-        
-        $this->importFiles();
-        $this->syncFileOrder();
-        $this->importRelaisFiles();
-        $this->updateSegmentFieldViews();
-        $this->calculateEmptyTargets();
-        
-        //disable errorCollecting for post processing
-        Zend_Registry::set('errorCollect', false);
-    }
-    
-    /**
-     * refreshes / creates the database views for this task
-     */
-    protected function updateSegmentFieldViews() {
-        if(! $this->importConfig->isCheckRun) {
-            $this->task->createMaterializedView();
-        }
     }
     
     /**
@@ -165,6 +143,9 @@ class editor_Models_Import_Worker_Import {
             $path = $fileFilter->applyImportFilters($path, $fileId, $filelist);
             $params = $this->getFileparserParams($path, $fileId);
             $parser = $this->getFileParser($params[0], $params);
+            if(!$parser) {
+                continue;
+            }
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]); //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
@@ -247,10 +228,14 @@ class editor_Models_Import_Worker_Import {
         $ext = strtolower(preg_replace('".*\.([^.]*)$"i', '\\1', $path));
         try {
             $parserClass = $this->supportedFiles->getParser($ext);
-        } catch(editor_Models_Import_Exception $e) {
+        } catch(editor_Models_Import_FileParser_NoParserException $e) {
             //in supportedFiles the task is missing, so we have to add it here to the exception
-            $e->addExtraData(['task' => $this->task]);
-            throw $e;
+            $e->addExtraData([
+                'file' => $path,
+                'task' => $this->task,
+            ]);
+            Zend_Registry::get('logger')->exception($e, ['level' => ZfExtended_Logger::LEVEL_WARN]);
+            return false;
         }
         $parser = ZfExtended_Factory::get($parserClass,$params)->getChainedParser();
         /* var $parser editor_Models_Import_FileParser */
@@ -274,11 +259,11 @@ class editor_Models_Import_Worker_Import {
         $segProc = ZfExtended_Factory::get('editor_Models_Import_SegmentProcessor_Relais', array($this->task, $this->segmentFieldManager));
         /* @var $segProc editor_Models_Import_SegmentProcessor_Relais */
         foreach ($relayFiles as $fileId => $path) {
-            if($this->importConfig->isCheckRun){
-                    trigger_error('Check of Relais File: '.$this->importConfig->importFolder.DIRECTORY_SEPARATOR.$path);
-            }
             $params = $this->getFileparserParams($path, $fileId);
             $parser = $this->getFileParser($path, $params);
+            if(!$parser) {
+                continue;
+            }
             /* @var $parser editor_Models_Import_FileParser */
             $segProc->setSegmentFile($fileId, $params[1]);  //$params[1] => filename
             $parser->addSegmentProcessor($mqmProc);
