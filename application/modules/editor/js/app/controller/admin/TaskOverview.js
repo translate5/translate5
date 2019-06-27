@@ -36,7 +36,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   requires: ['Editor.view.admin.ExportMenu'],
   models: ['admin.Task', 'admin.task.Log'],
   stores: ['admin.Users', 'admin.Tasks','admin.Languages', 'admin.task.Logs', 'admin.TaskUserTrackings'],
-  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow'],
+  views: ['admin.TaskGrid', 'admin.TaskAddWindow', 'admin.task.LogWindow', 'admin.task.ExcelReimportWindow'],
   refs : [{
       ref: 'headToolBar',
       selector: 'headPanel toolbar#top-menu'
@@ -718,6 +718,18 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       menu.down('#exportItem') && menu.down('#exportItem').setVisible(exportAllowed);
       menu.down('#exportDiffItem') && menu.down('#exportDiffItem').setVisible(exportAllowed);
       menu.showAt(event.getXY());
+  },
+  
+  /**
+   * displays the excel re-import fileupload dialog
+   * @param {Editor.model.admin.Task} task
+   * @param {Ext.EventObjectImpl} event
+   */
+  handleTaskExcelreimport: function(task, event) {
+      if(!this.isAllowed('editorExcelreimportTask')){
+          return;
+      }
+      Ext.widget('adminTaskExcelReimportWindow').show();
   },
   
   /**

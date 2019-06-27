@@ -56,13 +56,17 @@ Ext.define('Editor.view.admin.ExportMenu', {
         me.items = me.initExportOptions();
     }
     
-    //add download excel link if allowed @TODO: add access controll rights !!
+    // add download excel link if allowed @TODO: add access controll rights !!
+    // analog zu Editor.app.authenticatedUser.isAllowed('excelExport', this.initialConfig.task)
     if(1) {
         me.items.push({
             itemId: 'exportExcel',
             hrefTarget: '_blank',
-            href: me.makePath('task/export/id/{0}?format=excel'),
-            text: me.messages.exportExcel
+            href: me.makePath('task/{0}/excelexport/'),
+            text: me.messages.exportExcel,
+            handler:function(){
+                console.log(arguments);
+            }
         });
     } 
     //add download archive link if allowed

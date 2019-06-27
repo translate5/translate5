@@ -1,0 +1,121 @@
+
+/*
+START LICENSE AND COPYRIGHT
+
+ This file is part of translate5
+ 
+ Copyright (c) 2013 - 2017 Marc Mittag; MittagQI - Quality Informatics;  All rights reserved.
+
+ Contact:  http://www.MittagQI.com/  /  service (ATT) MittagQI.com
+
+ This file may be used under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE version 3
+ as published by the Free Software Foundation and appearing in the file agpl3-license.txt 
+ included in the packaging of this file.  Please review the following information 
+ to ensure the GNU AFFERO GENERAL PUBLIC LICENSE version 3 requirements will be met:
+ http://www.gnu.org/licenses/agpl.html
+  
+ There is a plugin exception available for use with this release of translate5 for
+ translate5: Please see http://www.translate5.net/plugin-exception.txt or 
+ plugin-exception.txt in the root folder of translate5.
+  
+ @copyright  Marc Mittag, MittagQI - Quality Informatics
+ @author     MittagQI - Quality Informatics
+ @license    GNU AFFERO GENERAL PUBLIC LICENSE version 3 with plugin-execption
+			 http://www.gnu.org/licenses/agpl.html http://www.translate5.net/plugin-exception.txt
+
+END LICENSE AND COPYRIGHT
+*/
+
+Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
+    extend: 'Ext.window.Window',
+    alias: 'widget.adminTaskExcelReimportWindow',
+    itemId: 'adminTaskExcelReimportWindow',
+    
+    title: '#UT#Excel reimportieren',
+    strings: {
+        info: '#UT# Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in den Task ein.',
+        reimportUploadType: '#UT# Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .',
+        uploadBtn: '#UT# Excel hochladen',
+        cancelBtn: '#UT# Abbrechen',
+    },
+    modal : true,
+    layout: 'anchor',
+    autoScroll: true,
+    
+    requires: ['Editor.view.admin.task.ExcelReimportWindowController'],
+    controller: 'editortaskExcelReimportWindowController',
+
+    closeAction: 'destroy',
+    layout: 'fit',
+    modal: true,
+    
+    initConfig: function(instanceConfig) {
+        var me = this,
+            config;
+        config = {
+            height: Math.min(400, parseInt(Ext.getBody().getViewSize().height * 0.8)),
+            width: 500,
+            
+            items:[
+                {
+                    xtype: 'form',
+                    padding: 10,
+                    ui: 'default-frame',
+                    //layout: 'hbox',
+                    layoutConfig : {
+                        //align : 'stretch',
+                    },
+                    //anchor: '100%',
+                    items: [
+                        {
+                            xtype: 'filefield',
+                            name: 'excelreimportUpload',
+                            regex: new RegExp('\.xlsx$', 'i'),
+                            regexText: me.strings.reimportUploadType,
+                            allowBlank: false,
+                            toolTip: me.strings.info,
+                            fieldLabel: me.strings.uploadBtn
+                        },
+                        {
+                            xtype: 'container',
+                            html: me.strings.info
+                        },
+                    ],
+                },
+            ],
+            
+            dockedItems: [{
+                xtype: 'toolbar',
+                itemId: 'mainToolbar',
+                dock: 'bottom',
+                ui: 'footer',
+                items: [
+                    {
+                        xtype: 'tbfill'
+                    },
+                    {
+                        xtype: 'button',
+                        itemId: 'uploadBtn',
+                        iconCls : 'ico-task-excelreimport',
+                        text: me.strings.uploadBtn
+                    },
+                    {
+                        xtype: 'button',
+                        itemId: 'cancelBtn',
+                        iconCls : 'ico-cancel',
+                        text: me.strings.cancelBtn
+                    },
+                ]
+            }],
+        };
+        
+        config.items = Ext.Array.merge(config.items, instanceConfig.items);
+        delete instanceConfig.items;
+        
+        if (instanceConfig) {
+            me.self.getConfigurator().merge(me, config, instanceConfig);
+        }
+        return me.callParent([config]);
+    },
+
+});
