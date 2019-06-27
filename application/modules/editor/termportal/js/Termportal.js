@@ -38,8 +38,8 @@ function checkDirectSearch() {
 
 function clearResults () {
     $('#searchTermsSelect').empty();
-    $('#searchErrorNoResults').hide();
-    $('#searchWarningNewSource').hide();
+    $('#error-no-results').hide();
+    $('#warning-new-source').hide();
     $('#searchTermsHelper .skeleton').show();
 }
 

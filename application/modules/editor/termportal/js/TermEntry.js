@@ -59,6 +59,7 @@ const TermEntry={
      */
     reloadTermEntry: function(groupId) {
         Term.reloadTermEntry = true;
+        clearResults();
         Term.findTermsAndAttributes(groupId);
     }
 };

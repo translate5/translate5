@@ -378,6 +378,9 @@ const Term={
 		            
 		        }
 		    });
+            if ($("#searchTermsSelect li").length === 0) {
+                me.$_termTable.accordion({ active: false, collapsible: true });
+            }
             
 		    setSizesInFinalResultContent();
 
