@@ -182,6 +182,9 @@ const Term={
 				
 			//if only one record, find the attributes and display them
 			if(me.searchTermsResponse.length===1){
+	            me.newTermCollectionId = me.searchTermsResponse[0].collectionId;
+                me.newTermGroupId = me.searchTermsResponse[0].groupId;
+	            me.newTermTermEntryId = me.searchTermsResponse[0].termEntryId;
 				console.log("fillSearchTermSelect: only one record => find the attributes and display them");
 				me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
 			}
@@ -329,10 +332,14 @@ const Term={
 		            collapsible: true,
 		            heightStyle: "content",
 		            beforeActivate: function( event, ui ) {
+                        if ($(event.toElement).hasClass('proposal-delete')) {
+                            // Clicking the delete-icon itself does not need to open the Term.
+                            event.preventDefault();
+                        }
 		                if (ui.newHeader.length === 0 && ui.oldHeader.has("textarea").length > 0) {
-		                    // Term in header is opened for editing; don't close the panel.
-		                    event.preventDefault();
-		                }
+                            // Term in header is opened for editing; don't close the panel.
+                            event.preventDefault();
+                        }
 		            },
                     activate: function( event, ui ) {
                         if (ui.newHeader.length === 0 && ui.oldHeader.has("textarea").length > 0) {
@@ -785,7 +792,7 @@ const Term={
                 me.newTermName = instanttranslate.textProposal;
             }
             
-            console.log("reset data for proposing a new Term; currently:");
+            console.log("After reset data for proposing a new Term:");
             console.log('- attributes: ' + JSON.stringify(me.newTermAttributes));
             console.log('- collectionId: ' + me.newTermCollectionId);
             console.log('- groupId: ' + me.newTermGroupId);
@@ -801,6 +808,9 @@ const Term={
         getNewTermData: function() {
             var me = this,
                 newTermData = {};
+            if(me.newTermCollectionId == undefined) {
+                debugger;
+            }
             console.log('getNewTermData; currently known: ');
             console.log('- attributes: ' + JSON.stringify(me.newTermAttributes));
             console.log('- collectionId: ' + me.newTermCollectionId);

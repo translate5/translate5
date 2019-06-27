@@ -51,7 +51,16 @@ const TermEntry={
 	    drawDataContainer=commentAttribute.concat(drawDataContainer);
 	    
 	    me.$_termEntryAttributesTable.append(drawDataContainer.join(''));
-	}
+	},
+
+    
+    /***
+     * Update front-end for given groupId.
+     */
+    reloadTermEntry: function(groupId) {
+        Term.reloadTermEntry = true;
+        Term.findTermsAndAttributes(groupId);
+    }
 };
 
 TermEntry.init();

@@ -133,6 +133,7 @@ const ComponentEditor={
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
 
             $input.replaceWith(componentRenderData);
+            me.$_termTable.accordion({ active: false, collapsible: true });
             return;
         }
 		
@@ -167,50 +168,22 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-                
-	            // TODO: 
-                // reload the termEntry when source term from InstantTranslate did not exist before,
-	            // but how do we access the note-editor then
-                if(false && Term.$_searchWarningNewSource.is(":visible")){
-                    Term.reloadTermEntry=true;
-                    Term.findTermsAndAttributes(result.groupId);
-                    return;
-                }
-                
 	        	me.updateComponent($el,$input,result.rows);
 	        }
 	    });
 	},
 	
 	saveCommentChange:function($element,$input){
-	    var me = this;
+	    var me = this,
+            groupId = $input.closest('.term-attributes').prev('.term-data').data('groupid');;
         
         Term.drawProposalButtons('commentAttributeEditorClosed');
 
-        // don't send the request? then reset component only.
+        // don't send the request? then update front-end only.
         if (me.stopRequest($element,$input)){
-
-			//when the comment does not exist, clean the editor 
-			if($element.data('id')<1){
-				//find the term holder and remove each unexisting comment attribute dom
-				$termHolder=$input.parents('div[data-term-id]');
-				$termHolder.children('p[data-id="-1"]').remove();
-				$termHolder.children('h4[data-attribute-id="-1"]').remove();
-				$input.replaceWith('');
-				return;
-			}
-
-			
-			//get initial html for the component
-			var dummyData={
-					'attributeOriginType':$element.data('type'),
-					'attributeId':$element.data('id'),
-					'name':'note',
-					'proposable':true
-			},
-			componentRenderData=Attribute.getAttributeRenderData(dummyData,$element.text());
-
-			$input.replaceWith(componentRenderData);
+            // We completely render the front-end new to have a clear reset.
+            // Otherwise things get buggy; too much work.
+            TermEntry.reloadTermEntry(groupId);
 			return;
 		}
 
@@ -229,7 +202,9 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-	        	me.updateComponentComment($element,$input,result.rows);
+	            // We render the front-end new to have a clear reset.
+	            // Otherwise things get buggy; too much work.
+	            TermEntry.reloadTermEntry(groupId);
 	        }
 	    });
 	},
@@ -259,6 +234,7 @@ const ComponentEditor={
 		Term.reloadTermEntry=true;
 		
 		if(!isTerm){
+		    debugger; // TODO when do we get here???
 			return;
 		}
         
@@ -284,18 +260,11 @@ const ComponentEditor={
 				this.addCommentAttributeEditor($commentPanel);
 			}
 		}
-        
-        // add new skeleton for creating another new-term-proposal for the current collection
-        if (me.$_termTable.find('h3.term-data.is-proposable.is-new').length === 0) {
-            Term.resetNewTermData();
-            Term.newTermCollectionId = result.collectionId;
-            me.$_termTable.prepend(Term.renderNewTermSkeleton());
-            me.$_termTable.accordion('refresh');
-        }
     },
 	
 	/***
-	 * Update comment component in the table results
+	 * Update comment component in the table results.
+	 * (Currently not in use; front-end gets too buggy. Instead we reload the TermEntry completely.)
 	 */
 	updateComponentComment:function($el,$input,result){
 		$input.replaceWith(Attribute.getProposalDefaultHtml(result.attributeOriginType,result.id,result.value,result));
