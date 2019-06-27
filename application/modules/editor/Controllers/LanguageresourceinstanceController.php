@@ -749,9 +749,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
         
+        
+        $userSession = new Zend_Session_Namespace('user');
+        
         $params['languageResourceId']=$this->entity->getId();
         $params['fileinfo']=!empty($importInfo[self::FILE_UPLOAD_NAME])? $importInfo[self::FILE_UPLOAD_NAME]:[];
         $params['addnew']=$addnew;
+        $params['userGuid']=$userSession->data->userGuid;
         
         if (!$worker->init(null, $params)) {
             $this->uploadErrors[] = 'File import in language resources Error on worker init()';

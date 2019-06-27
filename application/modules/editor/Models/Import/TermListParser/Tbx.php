@@ -262,6 +262,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     public $importSource="";
     
+    /***
+     * 
+     * @var ZfExtended_Models_User
+     */
+    protected $user;
     
     public function __construct() {
         if(!defined('LIBXML_VERSION') || LIBXML_VERSION < '20620') {
@@ -539,6 +544,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $singleTerm->setGroupId($isMerged ? $this->lastMergeTermEntryId : $this->actualTermEntry);
                 //set the termEntryId -> if from database
                 $singleTerm->setTermEntryId($isMerged ? $this->lastMergeTermEntryIdDb : $this->actualTermEntryIdDb);
+                
                 $singleTerm->save();
             }
             
@@ -710,6 +716,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $term->load($this->actualTermIdDb);
             $term->setStatus($actualTermNoteStatus);
             $term->setUpdated(date("Y-m-d H:i:s"));
+            $term->setUserGuid($this->user->getUserGuid());
+            $term->setUserName($this->user->getUserName());
             $term->save();
             return;
         } catch (ZfExtended_Models_Entity_NotFoundException $e) {
@@ -718,6 +726,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $term=$this->termsContainer[$this->actualTermIdTbx];
                 $term->setStatus($actualTermNoteStatus);
                 $term->setUpdated(date("Y-m-d H:i:s"));
+                $term->setUserGuid($this->user->getUserGuid());
+                $term->setUserName($this->user->getUserName());
                 $term->save();
             }
         }
@@ -1047,9 +1057,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $attribute->setValue($cleanValue);
         
         //$sessionUser = new Zend_Session_Namespace('user');
-        //$attribute->setUserGuid($sessionUser->data->userGuid);
-        //$attribute->setUserName($sessionUser->data->userName);
-        
+        $attribute->setUserGuid($this->user->getUserGuid());
+        $attribute->setUserName($this->user->getUserName());
         
         //find the default status from the config
         $config = Zend_Registry::get('config');
@@ -1225,6 +1234,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $termModel->load($t->id);
                 $termModel->setTerm($this->xml->readInnerXml());
                 $termModel->setUpdated(date("Y-m-d H:i:s"));
+                $termModel->setUserGuid($this->user->getUserGuid());
+                $termModel->setUserName($this->user->getUserName());
                 $termModel->save();
                 $this->actualTermIdDb=$termModel->getId();
                 
@@ -1264,6 +1275,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $termModel->setTerm($this->xml->readInnerXml());
                 $termModel->setDefinition($this->actualDefinition);
                 $termModel->setUpdated(date("Y-m-d H:i:s"));
+                $termModel->setUserGuid($this->user->getUserGuid());
+                $termModel->setUserName($this->user->getUserName());
                 $termModel->save();
                 $this->actualTermIdDb=$t->id;
                 return;
@@ -1309,6 +1322,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 
                 $termModel->setUpdated(date("Y-m-d H:i:s"));
                 $termModel->setDefinition($this->actualDefinition);
+                $termModel->setUserGuid($this->user->getUserGuid());
+                $termModel->setUserName($this->user->getUserName());
                 $termModel->save();
                 $this->actualTermIdDb=$tmpTermValue['id'];
                 
@@ -1337,7 +1352,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $term->setLanguage((int)$this->actualLangId);
             $term->setCollectionId($this->termCollectionId);
             $term->setUpdated(date("Y-m-d H:i:s"));
-            
+            $term->setUserGuid($this->user->getUserGuid());
+            $term->setUserName($this->user->getUserName());
             $this->actualTermIdDb=$term->save();
             
             //collect the term so later can be updated
@@ -1363,6 +1379,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $termModel->setTerm($this->xml->readInnerXml());
         $termModel->setDefinition($this->actualDefinition);
         $termModel->setUpdated(date("Y-m-d H:i:s"));
+        $termModel->setUserGuid($this->user->getUserGuid());
+        $termModel->setUserName($this->user->getUserName());
         $termModel->save();
         $this->actualTermIdDb=$proposalTerm['id'];
     }
@@ -1425,6 +1443,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $term->setCollectionId($this->termCollectionId);
         $term->setTermEntryId($this->actualTermEntryIdDb);
         $term->setUpdated(date("Y-m-d H:i:s"));
+        $term->setUserGuid($this->user->getUserGuid());
+        $term->setUserName($this->user->getUserName());
         $this->actualTermIdDb=$term->save();
     }
     
@@ -1510,6 +1530,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             return $text;
         };
         return $replaceSpecialChars($value, $tempFunnyChars);
+    }
+    
+    public function loadUser(string $userGuid) {
+        if(isset($userGuid) && !empty($userGuid)){
+            $this->user=ZfExtended_Factory::get('ZfExtended_Models_User');
+            $this->user->loadByGuid($userGuid);
+        }
     }
     
     /***

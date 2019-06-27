@@ -57,6 +57,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $import->mergeTerms=isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
         
+        $import->loadUser($params['userGuid']);
+        
         //import the term collection
         if(!$import->parseTbxFile([$fileinfo],$this->languageResource->getId())){
             $this->handleError("LanguageResources - Error on termcollection import \n");

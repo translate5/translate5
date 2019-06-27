@@ -67,7 +67,7 @@ class editor_Models_Term_AttributeProposal extends ZfExtended_Models_Entity_Abst
         $s=$this->db->select()
         ->where('attributeId=?',$attributeId)
         ->where('value=?',$value);
-        $result=$this->db->fetchRow($s)->toArray();
+        $result=$this->db->fetchAll($s)->toArray();
         return !empty($result);
     }
     
