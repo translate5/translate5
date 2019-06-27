@@ -859,6 +859,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
               if(submit.failureType == 'server' && submit.result && !submit.result.success){
                   if(submit.result.httpStatus == "422") {
                       win.getLayout().setActiveItem('taskMainCard');
+                      win.getViewModel().set('activeItem',win.down('#taskMainCard'));
                       form.markInvalid(submit.result.errorsTranslated);
                   }
                   else {

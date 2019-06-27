@@ -400,7 +400,7 @@ Ext.application({
           return;
       }
       Ext.Object.each(Editor.data.supportedBrowsers, function(idx, version) {
-          if(Ext[idx] >= version) {
+          if(Ext.browser.name == idx && Ext.browser.version.major >= version) {
               supportedBrowser = true;
               return false;
           }

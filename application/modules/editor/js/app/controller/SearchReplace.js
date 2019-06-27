@@ -1388,7 +1388,7 @@ Ext.define('Editor.controller.SearchReplace', {
         
         grid.scrollTo(goToIndex, {
             callback: callback,
-            callback: callback
+            notScrollCallback: callback
         });
     },
     
