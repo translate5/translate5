@@ -636,7 +636,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @return boolean
      */
     public function isExclusiveState() {
-        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED);
+        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED, editor_Models_Excel_ExImport::TASK_STATE_ISEXCELEXPORTED);
         return !in_array($this->getState(), $nonExclusiveStates);
     }
     

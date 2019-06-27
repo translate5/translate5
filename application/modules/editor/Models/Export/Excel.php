@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Export_Excel {
     /**
-     * @var editor_Models_ExcelExImport
+     * @var editor_Models_Excel_ExImport
      */
     protected static $excel;
     
@@ -41,38 +41,48 @@ class editor_Models_Export_Excel {
      * @param editor_Models_Task $task
      */
     public static function run(editor_Models_Task $task) : void {
-        // task data must be aktualiced
-        $task->createMaterializedView();
-        
-        // create a new empty excel
-        $tempExcelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
-        /* @var $tempExcelExImport editor_Models_ExcelExImport */
-        self::$excel = $tempExcelExImport::createNewExcel($task);
-        
-        
-        // write the segments into the excel
-        // load segment tagger to extract pure text from segment
-        $segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $segmentTagger editor_Models_Segment_InternalTag */
-        
-        // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
-        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
-        /* @var $segments editor_Models_Segment_Iterator */
-        
-        foreach($segments as $segment) {
-            $source = $segmentTagger->toExcel($segment->getSource(), $tempMap);
-            $target = $segmentTagger->toExcel($segment->getTargetEdit());
-            self::$excel->addSegment($segment->getSegmentNrInTask(), $source, $target);
+        try {
+            // task data must be aktualiced
+            $task->createMaterializedView();
+            
+            // create a new empty excel
+            $tempExcelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+            /* @var $tempExcelExImport editor_Models_Excel_ExImport */
+            self::$excel = $tempExcelExImport::createNewExcel($task);
+            
+            
+            // load segment tagger to extract pure text from segments
+            $segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+            /* @var $segmentTagger editor_Models_Segment_InternalTag */
+            
+            // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
+            $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$task->getTaskGuid()]);
+            /* @var $segments editor_Models_Segment_Iterator */
+            
+            // write the segments into the excel
+            foreach($segments as $segment) {
+                $source = $segmentTagger->toExcel($segment->getSource(), $tempMap);
+                $target = $segmentTagger->toExcel($segment->getTargetEdit());
+                self::$excel->addSegment($segment->getSegmentNrInTask(), $source, $target);
+            }
+            
+            // output: first send headers
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('.xlsx').'"');
+            header('Cache-Control: max-age=0');
+            
+            // .. then send the excel
+            $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx(self::$excel->getExcel());
+            $writer->save('php://output');
+            exit;
         }
-        
-        // output: first send headers
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="'.$task->getTasknameForDownload('.xlsx').'"');
-        header('Cache-Control: max-age=0');
-        
-        // .. then send the excel
-        $writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx(self::$excel->getExcel());
-        $writer->save('php://output');
-        exit;
+        catch (Exception $e) {
+            $logger = Zend_Registry::get('logger');
+            /* @var $logger ZfExtended_Logger */
+            throw new editor_Models_Excel_ExImportException('E_ExIm_1',[
+                'task' => $task,
+                'previousMessage' => $logger->formatMessage($e->getMessage()),
+            ], $e);
+        }
     }
 }

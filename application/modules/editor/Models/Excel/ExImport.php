@@ -40,7 +40,7 @@ END LICENSE AND COPYRIGHT
 require_once APPLICATION_PATH.'/../library/PhpSpreadsheet/vendor/autoload.php';
 
 
-class editor_Models_ExcelExImport {
+class editor_Models_Excel_ExImport {
     
     /**
      * the taskGuid the excel belongs to
@@ -93,7 +93,7 @@ class editor_Models_ExcelExImport {
     protected $segmentRow = 2;
     
     /**
-     * Class should not be used with new editor_Models_ExcelExImport()
+     * Class should not be used with new editor_Models_Excel_ExImport()
      * You should use
      * ::createNewExcel($task) or
      * ::loadFromExcel($file)
@@ -104,11 +104,11 @@ class editor_Models_ExcelExImport {
     /**
      * Create a new, empty excel
      * @param editor_Models_Task $task
-     * @return editor_Models_ExcelExImport
+     * @return editor_Models_Excel_ExImport
      */
-    public static function createNewExcel(editor_Models_Task $task) : editor_Models_ExcelExImport {
-        $tempExImExcel = ZfExtended_Factory::get('editor_Models_ExcelExImport');
-        /* @var editor_Models_ExcelExImport $tempExImExcel */
+    public static function createNewExcel(editor_Models_Task $task) : editor_Models_Excel_ExImport {
+        $tempExImExcel = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+        /* @var editor_Models_Excel_ExImport $tempExImExcel */
         
         // init class properties
         $tempExImExcel->taskGuid = $task->getTaskGuid();
@@ -134,7 +134,7 @@ class editor_Models_ExcelExImport {
         $tempExImExcel->initSheetMeta();
         
         
-        // return the editor_Models_ExcelExImport object
+        // return the editor_Models_Excel_ExImport object
         return $tempExImExcel;
     }
     
@@ -176,11 +176,11 @@ class editor_Models_ExcelExImport {
      * @TODO
      * 
      * @param string $filename
-     * @return editor_Models_ExcelExImport
+     * @return editor_Models_Excel_ExImport
      */
-    public static function loadFromExcel(string $filename) : editor_Models_ExcelExImport {
-        $tempExImExcel = ZfExtended_Factory::get('editor_Models_ExcelExImport');
-        /* @var editor_Models_ExcelExImport $tempExImExcel */
+    public static function loadFromExcel(string $filename) : editor_Models_Excel_ExImport {
+        $tempExImExcel = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+        /* @var editor_Models_Excel_ExImport $tempExImExcel */
         
         // load excel
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
@@ -192,7 +192,7 @@ class editor_Models_ExcelExImport {
         $tempExImExcel->taskName = $sheet->getCell('B5')->getValue();
         $tempExImExcel->taskMailPm = $sheet->getCell('B1')->getValue();
         
-        // return the editor_Models_ExcelExImport object
+        // return the editor_Models_Excel_ExImport object
         return $tempExImExcel;
     }
     
@@ -336,6 +336,10 @@ class editor_Models_ExcelExImport {
         $sheet->setCellValue('B5', $this->taskName);
         $sheet->setCellValue('A6', 'Task-Guid:');
         $sheet->setCellValue('B6', $this->taskGuid);
+        
+        // @TODO: deaktivate writing for CELL B6 (taskGuid). Only enabled for development
+        $sheet->getStyle('B6')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+        
     }
     
     
@@ -345,8 +349,10 @@ class editor_Models_ExcelExImport {
      * @return bool
      */
     public static function taskLock(editor_Models_Task $task) : bool {
-        return TRUE;
-        if(!$task->lock(NOW_ISO)) {
+        // @TODO: disabled at the moment. Don't know if this is the right way to lock the task....
+        //return TRUE;
+        
+        if(!$task->lock(NOW_ISO, TRUE)) {
             $this->log->logError('The following task is in use and cannot be exported: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
             error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task lock failed');
             return FALSE;
@@ -354,7 +360,7 @@ class editor_Models_ExcelExImport {
         
         $task->setState(self::TASK_STATE_ISEXCELEXPORTED);
         $task->save();
-        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task lock OK');
+        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task is locked');
         return TRUE;
     }
     /**
@@ -369,7 +375,7 @@ class editor_Models_ExcelExImport {
         }
         $task->setState(editor_Models_Task::STATE_OPEN);
         $task->save();
-        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task unlock OK');
+        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task is unlocked');
         return TRUE;
     }
 }

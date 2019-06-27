@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Models_Import_Excel {
     /**
-     * @var editor_Models_ExcelExImport
+     * @var editor_Models_Excel_ExImport
      */
     protected static $excel;
     
@@ -51,84 +51,110 @@ class editor_Models_Import_Excel {
      * @return bool
      */
     public static function run(editor_Models_Task $task) : bool {
-        // task data must be aktualized
+        // task data must be actualized
         $task->createMaterializedView();
         
         // load the excel
-        $tempExcelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
-        /* @var $tempExcelExImport editor_Models_ExcelExImport */
+        $tempExcelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+        /* @var $tempExcelExImport editor_Models_Excel_ExImport */
         self::$excel = $tempExcelExImport::loadFromExcel(APPLICATION_PATH.'/Test.xlsx');
         
-        // load the model that handles the t5 segments
-        $t5Segment = ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $t5Segment editor_Models_Segment */
-        
+        // do formal checkings of the loaded excel data aginst the task
         if (!self::formalCheck($task)) {
             // @TODO: where/how store errors/exceptions !?!
             error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Excel reimport is not possible because of formal errors');
             return FALSE;
         }
         
-        // load segment tagger to extract pure text from t5Segment
+        // load required ressources:
+        // - load the model that handles the t5 segments
+        $t5Segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $t5Segment editor_Models_Segment */
+        
+        // - load segment tagger to extract pure text from t5Segment
         $segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $segmentTagger editor_Models_Segment_InternalTag */
         
-        // load diffTagger (CSV-Diff-Tagger as sample)
+        // - load diffTagger (CSV-Diff-Tagger works fine here)
         $diffTagger = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
         /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
         
+        // - load tag structure checker
+        $tagStructureChecker = ZfExtended_Factory::get('editor_Models_Excel_TagStructureChecker');
+        /* @var $tagStructureChecker editor_Models_Excel_TagStructureChecker */
+        
+        
+        // now handle each segment from the excel
         foreach (self::$excel->getSegments() as $segment) {
-            // detect tag-map and org. segment content from org t5 segment
+            // detect tag-map and org. segment content from org. t5 segment
             $tempMap = [];
             $t5Segment->loadBySegmentNrInTask($segment->nr, $task->getTaskGuid());
             $orgSegmentAsExcel = $segmentTagger->toExcel($t5Segment->getTargetEdit(), $tempMap);
             
-            // remove TrackChanges Tags
-            $taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-            /* @var $taghelperTrackChanges editor_Models_Segment_TrackChangeTag */
-            $orgSegmentTrackChangesDeleted = $taghelperTrackChanges->removeTrackChanges($t5Segment->getTargetEdit());
-            
             // new segement is the one from excel
-            $newSegmentTarget = $segment->target;
+            $newSegment = $segment->target;
             
-            // add TrackChanges informations comparing the new segmenet from excel with the org segment converted to excel tagging
-            //$newSegmentTarget = $diffTagger->diffSegment($orgSegmentAsExcel, $newSegmentTarget, NULL, NULL);
-            // restore org tags
-            //$newSegmentTarget = $segmentTagger->reapply2dMap($newSegmentTarget, $tempMap);
-            
-            // restore org tags
-            $newSegmentTarget = $segmentTagger->reapply2dMap($newSegmentTarget, $tempMap);
-            // add TrackChanges informations comparing the new segmenet from excel with the org segment
-            $newSegmentTarget = $diffTagger->diffSegment($orgSegmentTrackChangesDeleted, $newSegmentTarget, NULL, NULL);
-            
-            // @TODO: Terminology markup is readded by sending the segment again to the termTagger.
-            // ?? is it always neded??? or only if TermTagger Plugin is active.. what about the workflow..
-            
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__
-                    ."\norg:\n".$t5Segment->getTargetEdit()
-                    ."\norg->woChanges:\n".$orgSegmentTrackChangesDeleted
-                    //."\norg->toExcel:\n".$orgSegmentAsExcel
-                    //."\nneu\n".$segment->target
-                    ."\nneu (TrackChanges)\n".$newSegmentTarget
-                    //."\nmap:".print_r($tempMap, true)
-                    );
-            
-            continue;
-            
-            // @TODO: add segment error if an error ist detected. what is an error?
-            if ($orgSegmentAsExcel != $segment->target) {
-                self::addSegmentError($segment->nr, 'segment content changed.');
+            // do nothing if segment has not changed
+            if ($newSegment == $orgSegmentAsExcel) {
+                if (!empty($segment->comment)) {
+                    self::addComment($segment->comment, $t5Segment->getId(), $task);
+                }
+                continue;
             }
             
+            // check segments structure of the segment from excel
+            if (!$tagStructureChecker->check($newSegment)) {
+                self::addSegmentError($segment->nr, 'tags in segment are not well-structured. '.$tagStructureChecker->getError());
+            }
+            $countNewSegmentTags = $tagStructureChecker->getCount();
+            
+            // check count tags of segment from excel against the org. segement from t5
+            $tagStructureChecker->check($orgSegmentAsExcel);
+            if ($tagStructureChecker->getCount() != $countNewSegmentTags) {
+                self::addSegmentError($segment->nr, 'count of tags in segment changed in excel');
+            }
+            
+            // add TrackChanges informations comparing the new segmnet from excel with the org. segment converted to excel tagging
+            // but only if task is not in workflowStep 'translation'
+            if ($task->getWorkflowStepName() !== editor_Workflow_Abstract::STEP_TRANSLATION) {
+                $newSegment = $diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date('Y-m-d H:i:s'), $task->getPmName());
+            }
+            
+            // restore org. tags
+            $newSegment = $segmentTagger->reapply2dMap($newSegment, $tempMap);
+            
+            // @TODO: terminology markup is readded by sending the segment again to the termTagger.
+            // ?? is it always neded??? or only if TermTagger Plugin is active.. what about the workflow..
+            // maybe its better to do it for the complete task, so not every single segment must be tagged.
+            // must be somehow like on task creation
+            
+            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__
+                    //."\norg:\n".$t5Segment->getTargetEdit()
+                    //."\norg->woChanges:\n".$orgSegmentTrackChangesDeleted
+                    //."\norg->toExcel:\n".$orgSegmentAsExcel
+                    //."\nneu\n".$segment->target
+                    ."\nneu (TrackChanges)\n".$newSegment
+                    );
+            
+            // currently all writing is disabled...
+            //continue;
+            
             // save edited segment target
-            $t5Segment->setTargetEdit(date('Y-m-d H:i:s').' reimported :: '.$newSegmentTarget);
+            $t5Segment->setTargetEdit($newSegment);
             $t5Segment->save();
             
+            
+            // on every changed segment, add a comment that it was edited
+            self::addComment("Changed in external Excel editing.", $t5Segment->getId(), $task, TRUE);
             // save (new) comment for the segment (if not empty in excel)
             if (!empty($segment->comment)) {
                 self::addComment($segment->comment, $t5Segment->getId(), $task);
             }
         }
+        
+        // task data must be actualized
+        $task->createMaterializedView();
+        
         
         return TRUE;
     }
@@ -138,8 +164,9 @@ class editor_Models_Import_Excel {
      * @param string $comment
      * @param int $segmentId
      * @param editor_Models_Task $task
+     * @param bool $noIntro
      */
-    protected static function addComment(string $commentText, int $segmentId, editor_Models_Task$task) : void {
+    protected static function addComment(string $commentText, int $segmentId, editor_Models_Task$task, $noIntro = FALSE) : void {
         try {
             $comment = ZfExtended_Factory::get('editor_Models_Comment');
             /* @var $comment editor_Models_Comment */
@@ -155,10 +182,13 @@ class editor_Models_Import_Excel {
             $comment->setUserGuid($task->getPmGuid());
             $comment->setUserName($task->getPmName());
             
-            $comment->setComment('Comment from external editing in Excel:'."\n".$commentText);
+            $tempComment = ($noIntro) ? $commentText : 'Comment from external editing in Excel:'."\n".$commentText;
+            $comment->setComment($tempComment);
             
             $comment->validate();
             $comment->save();
+            
+            $comment->updateSegment($segmentId, $task->getTaskGuid());
         }
         catch (ZfExtended_UnprocessableEntity | Zend_Db_Statement_Exception $e) {
             // @TODO what to do if en error occures on validating/saving the comment
@@ -166,10 +196,10 @@ class editor_Models_Import_Excel {
     }
     
     /**
-     * Do some formal checks, by comparing the informations in the excel with the informations of the task
-     * - compare the task-guid
-     * - compare the number of segments
-     * - compare all segments if a not-empty segment in task is empty in excel
+     * Do some formal checks, by comparing the informations in the excel with the informations of the task<br/>
+     * - compare the task-guid<br/>
+     * - compare the number of segments<br/>
+     * - compare all segments if an empty segment in excel was not-empty in task<br/>
      * 
      * @param editor_Models_Task $task
      * @return bool
@@ -197,11 +227,15 @@ class editor_Models_Import_Excel {
         }
         
         // compare all segments if an empty segment in excel is not-empty in task
-        foreach ($tempExcelSegments as $segment) {
-            if (empty($segment->target)) {
-                $t5Segment->loadBySegmentNrInTask($segment->nr, $task->getTaskGuid());
+        foreach ($tempExcelSegments as $excelSegment) {
+            if (empty($excelSegment->target)) {
+                $t5Segment->loadBySegmentNrInTask($excelSegment->nr, $task->getTaskGuid());
+                if (!empty($t5Segment->getTargetEdit())) {
+                    // @TODO: where/how store errors/exceptions !?!
+                    error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; segment #'.$excelSegment->nr.' is empty in excel while there was content in the the original task.');
+                    return FALSE;
+                }
             }
-            
         }
         
         return TRUE;

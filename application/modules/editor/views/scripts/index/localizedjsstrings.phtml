@@ -601,7 +601,8 @@ Ext.define('Editor.controller.Localizer', {
             assocUser: '<?php echo $this->translate->_('Benutzer der Aufgabe zuweisen');?>', //FIXME remove me!
             taskPrefs: '<?php echo $this->translate->_('Aufgabenspezifische Einstellungen');?>',
             actionReOpen: '<?php echo $this->translate->_('beendete Aufgabe wieder öffnen');?>',
-            exp: '<?php echo $this->translate->_('Exportoptionen');?>'
+            exp: '<?php echo $this->translate->_('Exportoptionen');?>',
+            actionExcelReimport: '<?php echo $this->translate->_('Excel Re-Importieren');?>'
         }
     });
     
@@ -614,6 +615,17 @@ Ext.define('Editor.controller.Localizer', {
             exportQmField: '<?php echo $this->translate->_('Export QM-Statistik (XML) für Feld: {0}');?>',
             exportExcel: '<?php echo $this->translate->_('exportieren (Excel)');?>',
             downloadImportArchive: '<?php echo $this->translate->_('Importarchiv herunterladen');?>'
+        }
+    });
+    
+    Ext.define("Editor.locale.de.view.admin.task.ExcelReimportWindow", {
+        override: "Editor.view.admin.task.ExcelReimportWindow",
+        title: '<?php echo $this->translate->_('Excel reimportieren');?>',
+        messages: {
+            info: '<?php echo $this->translate->_('Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in den Task ein.');?>',
+            reimportUploadType: '<?php echo $this->translate->_('Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .');?>',
+            uploadBtn: '<?php echo $this->translate->_('Excel hochladen');?>',
+            cancelBtn: '<?php echo $this->translate->_('Abbrechen');?>',
         }
     });
     

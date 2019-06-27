@@ -158,6 +158,7 @@ class editor_TaskController extends ZfExtended_RestController {
         ])
         ->addActionContext('export', 'importArchive')
         
+        /*
         ->addContext('excel', [
             'headers' => [
                 'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -171,9 +172,9 @@ class editor_TaskController extends ZfExtended_RestController {
             ]
         ])
         ->addActionContext('export', 'excelReimport')
+        */
         
         ->initContext();
-        
     }
     
     /**
@@ -522,26 +523,42 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->startImportWorkers();
     }
     
+    
+    /**
+     * Starts the export of a task into an excel file
+     */
+    public function excelexportAction() {
+        $this->entityLoad();
+        
+        // lock task and set state to 'ExcelExported'
+        $excelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+        /* @var $excelExImport editor_Models_Excel_ExImport */
+        $excelExImport::taskLock($this->entity);
+        
+        // run excel export
+        $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel');
+        /* @var $exportExcel editor_Models_Export_Excel */
+        try {
+            $exportExcel::run($this->entity);
+        }
+        // if export is not possible, unlock task
+        catch (editor_Models_Excel_ExImportException $e) {
+            $excelExImport::taskUnlock($this->entity);
+        }
+    }
+    
     /**
      * Starts the reimport of an earlier exported excel into the task
      */
-    public function reimportexcelAction() {
+    public function excelreimportAction() {
         $this->entityLoad();
         
-        $reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
-        /* @var $reimportExcel editor_Models_Import_Excel */
-        if ($reimportExcel::run($this->entity)) {
-            // if everything is OK
-            // unlock task and set state to 'open'
-            $excelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
-            /* @var $excelExImport editor_Models_ExcelExImport */
-            $excelExImport::taskUnlock($this->entity);
-            
-            // @TODO: if there where error in segments, show them as hint in frontend.
-            if ($segmentError = $reimportExcel::getSegmentError()) {
-                error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Error on reimport in the following segments. Please check this segments.'."\n".$segmentError);
-            }
-        }
+        $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
+        /* @var $worker editor_Models_Excel_Worker */
+        $worker->init($this->entity->getTaskGuid());
+        $worker->queue();
+        //$worker->runQueued();
+        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; worker started editor_Models_Excel_Worker');
     }
     
     protected function startImportWorkers() {
@@ -1211,26 +1228,10 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function exportAction() {
         parent::getAction();
-        
-        
         $diff = (boolean)$this->getRequest()->getParam('diff');
-        
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         
         switch ($context) {
-            case 'excel':
-                // lock task and set state to 'ExcelExported'
-                $excelExImport = ZfExtended_Factory::get('editor_Models_ExcelExImport');
-                /* @var $excelExImport editor_Models_ExcelExImport */
-                $excelExImport::taskLock($this->entity);
-                
-                // run excel export
-                $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel');
-                /* @var $exportExcel editor_Models_Export_Excel */
-                $exportExcel::run($this->entity);
-                
-                return;
-            
             case 'importArchive':
                 $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
