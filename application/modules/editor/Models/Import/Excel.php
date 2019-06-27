@@ -45,19 +45,22 @@ class editor_Models_Import_Excel {
     protected static $segmentError = [];
     
     /**
-     * reimport xls into $task.
+     * reimport $filename xls into $task.
+     * the fiel $filename is located inside the /data/importedTasks/<taskGuid>/excelReimport/ folder
      * returns TRUE if everything is OK, FALSE on (fatal) error
      * @param editor_Models_Task $task
+     * @param string $filename
      * @return bool
      */
-    public static function run(editor_Models_Task $task) : bool {
+    public static function run(editor_Models_Task $task, $filename) : bool {
         // task data must be actualized
         $task->createMaterializedView();
         
         // load the excel
+        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Excel reimport file '.$task->getAbsoluteTaskDataPath().'/excelReimport/'.$filename);
         $tempExcelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
         /* @var $tempExcelExImport editor_Models_Excel_ExImport */
-        self::$excel = $tempExcelExImport::loadFromExcel(APPLICATION_PATH.'/Test.xlsx');
+        self::$excel = $tempExcelExImport::loadFromExcel($task->getAbsoluteTaskDataPath().'/excelReimport/'.$filename);
         
         // do formal checkings of the loaded excel data aginst the task
         if (!self::formalCheck($task)) {

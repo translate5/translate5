@@ -540,11 +540,13 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $exportExcel editor_Models_Export_Excel */
         try {
             $exportExcel::run($this->entity);
+            return TRUE;
         }
         // if export is not possible, unlock task
         catch (editor_Models_Excel_ExImportException $e) {
             $excelExImport::taskUnlock($this->entity);
         }
+        return FALSE;
     }
     
     /**
@@ -553,9 +555,24 @@ class editor_TaskController extends ZfExtended_RestController {
     public function excelreimportAction() {
         $this->entityLoad();
         
+        $tempFilename = date('Y-m-d__H_i_s').'__'.rand().'.xslx';
+        $uploadTarget = $this->entity->getAbsoluteTaskDataPath().'/excelReimport/';
+        
+        // create upload target directory /data/importedTasks/<taskGuid>/excelReimport/ (if not exist already)
+        if (!is_dir($uploadTarget)) {
+            mkdir($uploadTarget, 0755);
+        }
+        
+        // move uploaded excel into upload target
+        if (!move_uploaded_file($_FILES['excelreimportUpload']['tmp_name'], $uploadTarget.$tempFilename)) {
+            // @TODO: add Exception here
+            // return something invalid (e.g. http status 4xx)
+            return FALSE;
+        }
+        
         $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
         /* @var $worker editor_Models_Excel_Worker */
-        $worker->init($this->entity->getTaskGuid());
+        $worker->init($this->entity->getTaskGuid(), ['filename' => $tempFilename]);
         $worker->queue();
         //$worker->runQueued();
         error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; worker started editor_Models_Excel_Worker');

@@ -53,9 +53,13 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
             return false;
         }
         
+        // detect the filename from the workers parameter
+        $tempParameter = $this->getModel()->getParameters();
+        $filename = $tempParameter['filename'];
+        
         $reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
         /* @var $reimportExcel editor_Models_Import_Excel */
-        if ($reimportExcel::run($task)) {
+        if ($reimportExcel::run($task, $filename)) {
             // if everything is OK
             // unlock task and set state to 'open'
             $excelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
