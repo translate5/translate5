@@ -159,8 +159,8 @@ const ComponentEditor={
 		}
         
         if (Term.$_searchWarningNewSource.is(":visible")) {
-            requestData['termSource']  = instanttranslate.textSource;
-            requestData['termSourceLanguage']  = instanttranslate.langSource;
+            requestData['termSource']=instanttranslate.textSource;
+            requestData['termSourceLanguage']=instanttranslate.langSource;
         }
         
         console.log('saveComponentChange :' + JSON.stringify(requestData));
