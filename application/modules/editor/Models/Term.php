@@ -1118,8 +1118,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             
             if(isset($row['attribute-processStatus']) && $row['attribute-processStatus']==self::PROCESS_STATUS_UNPROCESSED){
                 $tmpTerm['attribute']=$changeMyCollorTag.$row['attribute-value'];
-                $tmpTerm['lastEditor']=$changeMyCollorTag.$row['attributeproposal-lastEditor'];
-                $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['attributeproposal-lastEditedDate'];
+                $tmpTerm['lastEditor']=$changeMyCollorTag.$row['attribute-lastEditor'];
+                $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['attribute-lastEditedDate'];
                 $tmpTerm['term']=str_replace($changeMyCollorTag,'',$row['term-term']);
                 $tmpTerm['termProposal']=str_replace($changeMyCollorTag,'',$row['termproposal-term']);
             }
