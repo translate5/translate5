@@ -254,7 +254,6 @@ const ComponentEditor={
         $elParent.attr('data-term-id', result.termId);
         $elParent.attr('data-groupid', result.groupId);
         
-        debugger;
         if(!isTerm){
         	$elParent.attr('data-attribute-id', result.attributeId);
         }
