@@ -57,7 +57,6 @@ class editor_Models_Import_Excel {
         $task->createMaterializedView();
         
         // load the excel
-        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Excel reimport file '.$task->getAbsoluteTaskDataPath().'/excelReimport/'.$filename);
         $tempExcelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
         /* @var $tempExcelExImport editor_Models_Excel_ExImport */
         self::$excel = $tempExcelExImport::loadFromExcel($task->getAbsoluteTaskDataPath().'/excelReimport/'.$filename);
@@ -78,9 +77,9 @@ class editor_Models_Import_Excel {
         $segmentTagger = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         /* @var $segmentTagger editor_Models_Segment_InternalTag */
         
-        // - load diffTagger (CSV-Diff-Tagger works fine here)
-        $diffTagger = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_Csv');
-        /* @var $diffTagger editor_Models_Export_DiffTagger_Csv */
+        // - load diffTagger for markup changes with TrackChanges Markup
+        $diffTagger = ZfExtended_Factory::get('editor_Models_Export_DiffTagger_TrackChanges', [$task]);
+        /* @var $diffTagger editor_Models_Export_DiffTagger_TrackChanges */
         
         // - load tag structure checker
         $tagStructureChecker = ZfExtended_Factory::get('editor_Models_Excel_TagStructureChecker');
@@ -119,6 +118,7 @@ class editor_Models_Import_Excel {
             
             // add TrackChanges informations comparing the new segmnet from excel with the org. segment converted to excel tagging
             // but only if task is not in workflowStep 'translation'
+            // @TODO: ADD check Plugin.TrackChanges active, or soemthing similar.
             if ($task->getWorkflowStepName() !== editor_Workflow_Abstract::STEP_TRANSLATION) {
                 $newSegment = $diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date('Y-m-d H:i:s'), $task->getPmName());
             }
