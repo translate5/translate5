@@ -65,6 +65,10 @@ class editor_TermController extends ZfExtended_RestController {
     
     public function postAction(){
         parent::postAction();
+        
+        //handle additional source term
+        $this->handleSourceTerm();
+        
         //create or update or create the term transac group attributes
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
@@ -367,6 +371,64 @@ class editor_TermController extends ZfExtended_RestController {
         $this->proposal->delete();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
+    }
+    
+    /***
+     * Handle the additional term if exist
+     */
+    protected function handleSourceTerm(){
+        if($this->entity->getId()<1){
+            return;
+        }
+        
+        if(!isset($this->data->termSource) || !isset($this->data->termSourceLanguage)){
+            return;
+        }
+
+        if(empty($this->data->termSource) || empty($this->data->termSourceLanguage)){
+            return;
+        }
+        
+        $language = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $language editor_Models_Languages */
+        try {
+            $matches = null;
+            if(preg_match('/^lcid-([0-9]+)$/i', $this->data->termSourceLanguage, $matches)) {
+                $language->loadByLcid($matches[1]);
+            }else {
+                $language->loadByRfc5646($this->data->termSourceLanguage);
+            }
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            $this->data->termSourceLanguage = 0;
+            return;
+        }
+        $this->data->termSourceLanguage = $language->getId();
+        
+        //remove whitespace from the beggining and the end of the string
+        $this->data->termSource=trim($this->data->termSource);
+        
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        
+        $term->setTerm($this->data->termSource);
+        $term->setLanguage($this->data->termSourceLanguage);
+        $term->setMid($this->entity->getMid());
+        $term->setStatus($this->entity->getStatus());
+        $term->setProcessStatus($this->entity->getProcessStatus());
+        $term->setDefinition($this->entity->getDefinition());
+        $term->setGroupId($this->entity->getGroupId());
+        $term->setCollectionId($this->entity->getCollectionId());
+        $term->setTermEntryId($this->entity->getTermEntryId());
+        $term->setUserGuid($this->entity->getUserGuid());
+        $term->setUserName($this->entity->getUserName());
+        $term->setCreated(null);
+        $term->setUpdated(null);
+        $termId=$term->save();
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        $attribute->checkOrCreateProcessStatus($termId);
     }
     
     /**
