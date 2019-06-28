@@ -128,7 +128,7 @@ const ComponentEditor={
         me.isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
         
         // don't send the request? then reset component only.
-        if (me.stopRequest($el,$input)){
+        if (!me.isNew && me.stopRequest($el,$input)){
             //get initial html for the component
             var dummyData={
                     'attributeOriginType':$el.data('type'),
