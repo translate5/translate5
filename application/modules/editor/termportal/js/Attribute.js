@@ -14,8 +14,14 @@ const Attribute={
         this.$_termEntryAttributesTable = $('#termEntryAttributesTable');
 	},
 	
+	onAttributeEditingOpened: function() {
+        Term.drawProposalButtons('attributeEditingOpened');
+	},
+	
 	initEvents:function(){
 		var me=this;
+
+        me.$_termTable.on('focus input', ".term-attributes textarea",me.onAttributeEditingOpened);
         
         // ------------- TermEntries-Attributes -------------
         // - Icons
@@ -109,12 +115,14 @@ const Attribute={
      * On edit term-attribute click handler
      */
     onEditAttributeClick: function(event){
+        console.log('onEditAttributeClick');
     	var me=event.data.scope,
 	    	type=event.data.type,
             reference = event.data.reference,
 	        $element=$(this),
 			attributeId,
-            $editableComponent;
+            $editableComponent,
+            $input;
         console.log('onEditAttributeClick ('+reference+')');
         
         event.stopPropagation();
@@ -136,16 +144,25 @@ const Attribute={
 			return;
 		}
 		
+		// if the textarea exists already
+		if ($editableComponent.children('textarea').length === 1) {
+	        $input = $editableComponent.children('textarea');
+	        $input.focus();
+	        return;
+		}
+		
 		//is attribute component
 		if(typeof $editableComponent.data('editable') !== 'undefined'){
-			ComponentEditor.addAttributeComponentEditor($editableComponent);
-			return;
+		    $input = ComponentEditor.addAttributeComponentEditor($editableComponent);
+            $input.focus();
+            return;
 		}
 		
 		//is comment attribute component
 		if(typeof $editableComponent.data('editableComment') !== 'undefined'){
-			ComponentEditor.addCommentAttributeEditor($editableComponent);
-			return;
+		    $input = ComponentEditor.addCommentAttributeEditor($editableComponent);
+            $input.focus();
+            return;
 		}
     },
     
@@ -411,7 +428,8 @@ const Attribute={
 	 */
 	getAttributeComponent:function(attributeId,type){
 		var me=this,
-			$selector=null;
+			$selector=null,
+			$el;
 		if(type=='termEntryAttribute'){
 			$selector=me.$_termEntryAttributesTable;
 		}
@@ -421,7 +439,12 @@ const Attribute={
 		if(!$selector){
 			return null;
 		}
-		return $selector.find('span[data-id="'+attributeId+'"]');
+		// sometimes the attribute is still in span, sometimes in p > textarea already
+		$el = $selector.find('span[data-id="'+attributeId+'"]');
+		if ($el.length === 0) {
+		    $el = $selector.find('p[data-id="'+attributeId+'"]');
+		}
+		return $el;
 	},
     
     /**

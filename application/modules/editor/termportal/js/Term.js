@@ -79,6 +79,7 @@ const Term={
             // data for proposing a new Term
             me.resetNewTermData();
             me.newTermCollectionId = $_selected.attr('data-collectionid');
+            console.log('onSelectSearchTerm => newTermCollectionId: ' + me.newTermCollectionId);
             me.newTermTermEntryId = $_selected.attr('data-termentryid');
             // show Terms and Attributes
             me.findTermsAndAttributes($_selected.attr('data-value'));
@@ -100,9 +101,11 @@ const Term={
             if (searchString == '') {
                 return;
             }
-            
+
+            console.log('searchTerm');
             clearResults();
-			me.resetNewTermData();
+            console.log('106 searchTerm => resetNewTermData');
+            me.resetNewTermData();
             
 			if(!lng){
 				lng=$("input[name='language']:checked").val();
@@ -138,7 +141,6 @@ const Term={
 		 */
 		fillSearchTermSelect:function(searchString){
 			var me=this;
-            clearResults();
 			if(!me.searchTermsResponse || me.searchTermsResponse.length === 0){
                 
                 console.log("fillSearchTermSelect: nichts gefunden");
@@ -183,6 +185,7 @@ const Term={
 			//if only one record, find the attributes and display them
 			if(me.searchTermsResponse.length===1){
 	            me.newTermCollectionId = me.searchTermsResponse[0].collectionId;
+	            console.log('fillSearchTermSelect => newTermCollectionId: ' + me.newTermCollectionId);
                 me.newTermGroupId = me.searchTermsResponse[0].groupId;
 	            me.newTermTermEntryId = me.searchTermsResponse[0].termEntryId;
 				console.log("fillSearchTermSelect: only one record => find the attributes and display them");
@@ -378,7 +381,9 @@ const Term={
 		            
 		        }
 		    });
-            if ($("#searchTermsSelect li").length === 0) {
+		    // We must avoid that the first item is activated (= this is the skeleton and must never be active until clicked);
+		    // better collapse all if nothing is (selected) in the left column.
+            if ($("#searchTermsSelect li").length === 0 || $("#searchTermsSelect li.ui-state-active").length === 0) {
                 me.$_termTable.accordion({ active: false, collapsible: true });
             }
             
@@ -658,6 +663,7 @@ const Term={
          * @param elements
 		 */
         drawProposalButtons: function (elements){
+            console.log('drawProposalButtons: ' + elements);
             var me = this,
                 $_selectorRemove = false,
                 htmlProposalAddIcon     = '<span class="proposal-btn proposal-add ui-icon ui-icon-plus"></span>',
@@ -673,21 +679,19 @@ const Term={
                     $_selectorEdit = $_selectorRemove;
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
-                case "attributeComponentEditorOpened":
-                case "commentAttributeEditorOpened":
-                    $_selectorRemove = $('#termTable textarea').closest('p').prev('h4');
+                case "attributeEditingOpened":
+                    $_selectorRemove = $('#termTable textarea:focus').closest('p').prev('h4');
                     $_selectorSave = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
                     break;
                 case "componentEditorClosed":
-                // case "attributeComponentEditorClosed" (= is handled via saveComponentChange(), too)
                     $_selectorRemove = $('#termTable .proposal-save').parent();
                     // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "componentEditorOpened":
-                    $_selectorRemove = $('#termTable textarea').closest('h3');
+                    $_selectorRemove = $('#termTable textarea:focus').closest('h3');
                     $_selectorSave = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
                     break;
@@ -711,7 +715,7 @@ const Term={
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
                     $_this = elements;
                     $_selectorDelete = $_this.filter('.is-proposal');
-                    $_selectorEdit = $_this.filter('.proposable');
+                    $_selectorEdit = $_this.filter('.proposable.is-finalized');
                     $_this.children('.proposal-btn').remove();
                     titleDelete = proposalTranslations['deleteProposal'];
                     titleEdit = proposalTranslations['editProposal'];
@@ -777,6 +781,7 @@ const Term={
             // "default":
             me.newTermAttributes = Attribute.renderNewTermAttributes();         // currently just an empty Array
             me.newTermCollectionId = null;                                      // will be selected by user (if not already filtered)
+            console.log('resetNewTermData => newTermCollectionId: ' + me.newTermCollectionId);
             me.newTermGroupId = null;                                           // will be set from result's select-list
             me.newTermLanguageId = null;                                        // will be selected by user (or set according to search without result)
             me.newTermRfcLanguage = null;                                       // (set always with newTermLanguageId!) 
@@ -907,6 +912,7 @@ const Term={
                 collectionSelectOptions = '';
             if (filteredCollections.length == 1) {
                 me.newTermCollectionId = filteredCollections[0];
+                console.log('drawFilteredTermCollectionSelect => newTermCollectionId: ' + me.newTermCollectionId);
                 me.drawTermTable();
                 me.$_termTable.find('.proposal-add')[0].click();
                 return;
@@ -931,6 +937,7 @@ const Term={
             $('#chooseCollection').selectmenu({
                 select: function() {
                     me.newTermCollectionId = $(this).val();
+                    console.log('chooseCollection selectmenu => newTermCollectionId: ' + me.newTermCollectionId);
                     me.$_termCollectionSelect.empty().hide();
                     me.drawTermTable();
                     me.$_termTable.find('.proposal-add')[0].click();
@@ -1029,11 +1036,13 @@ const Term={
             console.log('onAddTermEntryClick');
             var me = event.data.scope,
                 filteredCollections = getFilteredCollections();
+            console.log('1034 onAddTermEntryClick => resetNewTermData');
             me.resetNewTermData();
             me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
             // If the collection is known, we can start right away...
             if (filteredCollections.length == 1) {
                 me.newTermCollectionId = filteredCollections[0];
+                console.log('onAddTermEntryClick => newTermCollectionId: ' + me.newTermCollectionId);
                 me.drawTermTable();
                 me.$_termTable.find('.proposal-add')[0].click();
                 return;

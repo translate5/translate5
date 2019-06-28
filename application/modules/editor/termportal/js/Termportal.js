@@ -37,6 +37,7 @@ function checkDirectSearch() {
 }
 
 function clearResults () {
+    console.log('clearResults');
     $('#searchTermsSelect').empty();
     $('#error-no-results').hide();
     $('#warning-new-source').hide();

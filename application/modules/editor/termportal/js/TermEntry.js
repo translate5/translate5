@@ -58,8 +58,8 @@ const TermEntry={
      * Update front-end for given groupId.
      */
     reloadTermEntry: function(groupId) {
+        console.log('reloadTermEntry');
         Term.reloadTermEntry = true;
-        clearResults();
         Term.findTermsAndAttributes(groupId);
     }
 };

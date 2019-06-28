@@ -7,6 +7,8 @@ const ComponentEditor={
 	
 	typeRequestDataKeyMap:[],
 	
+	isNew: false,
+	
 	init:function(){
 		var me=this;
 		
@@ -72,11 +74,13 @@ const ComponentEditor={
 	  
 		$input.one('blur', function(){
 			me.saveComponentChange($element,$input);
-		});
+		}).focus();
 	},
 	
 	/***
 	 * Register the component editor for given term or termentry attribute
+	 * and return the component.
+	 * @returns {Object}
 	 */
 	addAttributeComponentEditor:function($element){
         console.log('addAttributeComponentEditor');
@@ -85,15 +89,17 @@ const ComponentEditor={
 		
 		$element.replaceWith($input);
         
-		Term.drawProposalButtons('attributeComponentEditorOpened');
-        
 		$input.one('blur', function(){
 			me.saveComponentChange($element,$input);
 		});
+        
+        return $input;
 	},
 	
 	/***
 	 * Register component editor for term comment
+     * and return the component.
+     * @returns {Object}
 	 */
 	addCommentAttributeEditor:function($element){
         console.log('addCommentAttributeEditor');
@@ -102,11 +108,11 @@ const ComponentEditor={
 		
 		$element.replaceWith($input);
         
-        Term.drawProposalButtons('commentAttributeEditorOpened');
-        
 		$input.focusout(function() {
 			me.saveCommentChange($element,$input);
 	    });
+		
+		return $input;
 	},
 	
 	saveComponentChange:function($el,$input){
@@ -120,7 +126,7 @@ const ComponentEditor={
         Term.drawProposalButtons('componentEditorClosed');
         
         // if id is not provided, this is a proposal on empty term entry // TODO: is this comment correct? We can also create a new Term WITHIN an existing TermEntry!
-        isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
+        me.isNew = (!$el.data('id') == undefined || $el.data('id') < 1); 
         
         // don't send the request? then reset component only.
         if (me.stopRequest($el,$input)){
@@ -133,7 +139,6 @@ const ComponentEditor={
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
 
             $input.replaceWith(componentRenderData);
-            me.$_termTable.accordion({ active: false, collapsible: true });
             return;
         }
 		
@@ -143,10 +148,11 @@ const ComponentEditor={
 		
 		requestData[dataKey]=$input.val();
 		
-		if(isNew){
+		if(me.isNew){
 			url=Editor.data.termportal.restPath+'term',
 			requestData={};
 			requestData['collectionId']  =Term.newTermCollectionId;
+			console.log('saveComponentChange => newTermCollectionId: ' + me.newTermCollectionId);
 			requestData['language']      =Term.newTermLanguageId;
             requestData['termEntryId']   =Term.newTermTermEntryId;
 			requestData[dataKey]=$input.val();
@@ -175,16 +181,42 @@ const ComponentEditor={
 	
 	saveCommentChange:function($element,$input){
 	    var me = this,
-            groupId = $input.closest('.term-attributes').prev('.term-data').data('groupid');;
-        
-        Term.drawProposalButtons('commentAttributeEditorClosed');
+            groupId;
 
         // don't send the request? then update front-end only.
         if (me.stopRequest($element,$input)){
-            // We completely render the front-end new to have a clear reset.
-            // Otherwise things get buggy; too much work.
-            TermEntry.reloadTermEntry(groupId);
-			return;
+            
+            Term.drawProposalButtons('commentAttributeEditorClosed');
+            
+            if (me.isNew) {
+                // We completely render the front-end new to have a clear reset.
+                // Otherwise things get buggy; too much work.
+                groupId = $input.closest('.term-attributes').prev('.term-data').data('groupid');
+                TermEntry.reloadTermEntry(groupId);
+                return;
+            }
+
+            //when the comment does not exist, clean the editor 
+            if($element.data('id')<1){
+                //find the term holder and remove each unexisting comment attribute dom
+                $termHolder=$input.parents('div[data-term-id]');
+                $termHolder.children('p[data-id="-1"]').remove();
+                $termHolder.children('h4[data-attribute-id="-1"]').remove();
+                $input.replaceWith('');
+                return;
+            }
+
+            
+            //get initial html for the component
+            var dummyData={
+                    'attributeOriginType':$element.data('type'),
+                    'attributeId':$element.data('id'),
+                    'name':'note',
+                    'proposable':true
+            },
+            componentRenderData=Attribute.getAttributeRenderData(dummyData,$element.text());
+
+            $input.replaceWith(componentRenderData);
 		}
 
 		var me=this,
@@ -202,9 +234,7 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-	            // We render the front-end new to have a clear reset.
-	            // Otherwise things get buggy; too much work.
-	            TermEntry.reloadTermEntry(groupId);
+	            me.updateComponentComment($element,$input,result.rows);
 	        }
 	    });
 	},
@@ -234,7 +264,7 @@ const ComponentEditor={
 		Term.reloadTermEntry=true;
 		
 		if(!isTerm){
-		    debugger; // TODO when do we get here???
+		    // (= we come from editing an attribute, not a term)
 			return;
 		}
         
@@ -254,19 +284,34 @@ const ComponentEditor={
 			//attach the comment attribute draw data to the term holder
 			$termAttributeHolder.prepend(drawData);
 
-			//find the comment panel and start the comment editor
-			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
-			if($commentPanel.length>0 && $commentPanel.prop('tagName')=='SPAN'){
-				this.addCommentAttributeEditor($commentPanel);
+            //find the comment panel and start the comment editor
+            // (for existing terms, the comment editor is started by clicking it)
+			if (me.isNew) {
+	            $commentPanel=$termAttributeHolder.find('[data-editable-comment]');
+	            if($commentPanel.length>0 && $commentPanel.prop('tagName')=='SPAN'){
+	                this.addCommentAttributeEditor($commentPanel);
+	            }
 			}
 		}
     },
 	
 	/***
 	 * Update comment component in the table results.
-	 * (Currently not in use; front-end gets too buggy. Instead we reload the TermEntry completely.)
 	 */
 	updateComponentComment:function($el,$input,result){
+	    var me = this,
+	        groupId;
+	    
+        console.log('updateComponentComment for isNew='+me.isNew);
+        
+        if (me.isNew) {
+            // We render the front-end new to have a clear reset.
+            // Otherwise things get buggy; too much work.
+            groupId = $input.closest('.term-attributes').prev('.term-data').data('groupid');
+            TermEntry.reloadTermEntry(groupId);
+            return;
+        }
+        
 		$input.replaceWith(Attribute.getProposalDefaultHtml(result.attributeOriginType,result.id,result.value,result));
 		//on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
