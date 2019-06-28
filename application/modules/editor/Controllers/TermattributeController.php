@@ -151,6 +151,14 @@ class editor_TermattributeController extends ZfExtended_RestController {
      * @throws ZfExtended_UnprocessableEntity
      */
     public function removeproposalOperation() {
+        
+        //the removed request is for attribute with process status unprocessed
+        if($this->view->rows->processStatus==editor_Models_Term::PROCESS_STATUS_UNPROCESSED){
+            $this->entity->delete();
+            $this->view->rows = [];
+            return;
+        }
+        
         if(empty($this->view->rows->proposal)) {
             ZfExtended_UnprocessableEntity::addCodes([
                 'E1110' => 'There is no attribute proposal which can be deleted.'

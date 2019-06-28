@@ -511,6 +511,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $result->attributeOriginType=empty($result->termId) ? 'termEntryAttribute' : 'termAttribute';
         $result->attributeId=$result->id;
         $result->proposable=$this->isProposableAllowed() && $this->isProposable($result->name,$result->attrType);
+        $result->attrProcessStatus=$result->processStatus;//used by termporatl
+        $result->attrValue=$result->value;//used by termporatl
         return $result;
     }
 }

@@ -318,13 +318,56 @@ class editor_TermController extends ZfExtended_RestController {
                 'labelId' => $label->getId(),
                 'processStatus'=>editor_Models_Term::PROCESS_STATUS_UNPROCESSED
             ]);
+            $this->decodePutData();
+            $commentAttribute->setValue(trim($this->data->comment));
+            $commentAttribute->validate();
+            $this->updateUsageData($commentAttribute);
+            $commentAttribute->save();
+            $this->view->rows = $commentAttribute->getDataObject();
+            return;
         }
+        
+        //the comment is proposed
+        $sessionUser = new Zend_Session_Namespace('user');
+        
         $this->decodePutData();
-        $commentAttribute->setValue(trim($this->data->comment));
-        $commentAttribute->validate();
-        $this->updateUsageData($commentAttribute);
-        $commentAttribute->save();
+        
+        $proposal=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
+        /* @var $proposal editor_Models_Term_AttributeProposal */
+        
+        $proposal->setAttributeId($commentAttribute->getId());
+        $proposal->setCollectionId($commentAttribute->getCollectionId());
+        $proposal->setValue(trim($this->data->comment));
+        $proposal->validate();
+        
+        //set system fields after validation, so we don't have to provide a validator for them
+        $proposal->setUserGuid($sessionUser->data->userGuid);
+        $proposal->setUserName($sessionUser->data->userName);
+        $proposal->setCreated(NOW_ISO);
+        
+        $proposal->save();
+        
+        //in the term attributes the termEntryId is not set
+        $entryId=$commentAttribute->getTermEntryId();
+        if($entryId==null){
+            $term=ZfExtended_Factory::get('editor_Models_Term');
+            /* @var $term editor_Models_Term */
+            $term->load($commentAttribute->getTermId());
+            $entryId=$term->getTermEntryId();
+        }
+        
+        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntry->load($entryId);
+        
+        //update the term entry create/modefy dates
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        $attribute->updateModificationGroupAttributes($termEntry);
+        
+        //update the view
         $this->view->rows = $commentAttribute->getDataObject();
+        $this->view->rows->proposal = $proposal->getDataObject();
     }
     
     /**
