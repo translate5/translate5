@@ -156,29 +156,51 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                     },{
                         action: 'import',
-                        iconCls: 'ico-tm-import',
-                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') == 'novalidlicense' ? true : false;
+	                    getClass:function(v,meta,record) {
+                        	if(record.get('status') == 'novalidlicense' || !me.showImportAndDownload(record)){
+                        		return '';
+                        	}
+                        	return 'ico-tm-import';
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    	if(r.get('status') == 'novalidlicense' || !me.showImportAndDownload(r)){
+                        		return false;
+                        	}
                             return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip();
 	                    }
+                        
                     },{
-                        tooltip: me.strings.download,
                         action: 'download',
-                        iconCls: 'ico-tm-download',
-                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') == 'novalidlicense' ? true : false;
-                        }
+                        getClass:function(v,meta,record) {
+                        	if(record.get('status') == 'novalidlicense' || !me.showImportAndDownload(record)){
+                        		return '';
+                        	}
+                        	return 'ico-tm-download';
+                        },
+	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    	if(r.get('status') == 'novalidlicense' || !me.showImportAndDownload(r)){
+                        		return false;
+                        	}
+	                    	//FIXME: change me via function
+	                    	if(r.get('serviceName')=='TermCollection'){
+	                    		return false;
+	                    	}
+                            return me.strings.download;
+	                    }
                     },{
                         action: 'export',
                         getClass:function(v,meta,record) {
-                        	if(record.get('serviceName') != 'TermCollection'){
-                        		return '';
+                        	if(record.get('serviceName') == 'TermCollection'){
+                        		return 'ico-tm-export';
                         	}
-                        	meta.tdAttr = 'data-qtip="'+Editor.util.LanguageResources.getService(record.get('serviceName')).getExportTooltip()+'"';
-                        	return 'ico-tm-export';
-                        }
+                        	return '';
+                        },
+	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    	if(r.get('serviceName') == 'TermCollection'){
+	                    		return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
+                        	}
+	                    	return false;
+	                    }
                     }],
                 },{
                     xtype: 'gridcolumn',
@@ -386,5 +408,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         }
         record.set('status',record.STATUS_LOADING);
         record.load();
+    },
+
+    /***
+     * Show import and download icon only for importable and downloadable resources
+     */
+    showImportAndDownload:function(record){
+    	return Ext.Array.contains(['OpenTM2','TermCollection'],record.get('serviceName'));
     }
+    
 });
