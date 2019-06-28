@@ -54,10 +54,9 @@ const ComponentEditor={
 		//copy the collection id from the attribute holder data to the term element data
 		$element.attr("data-collection-id",$termAttributeHolder.data('collectionId'));
 		
-		
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length==0 && $element.data('id')>0){
-			var dummyCommentAttribute=Attribute.renderNewCommentAttributes(),
+			var dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute'),
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
 			
 			$termAttributeHolder.prepend(drawData);
@@ -234,7 +233,7 @@ const ComponentEditor={
 	    		'data':JSON.stringify(requestData)
 	    	},
 	        success: function(result){
-	            me.updateComponentComment($element,$input,result.rows);
+	            me.updateComponent($element,$input,result.rows);
 	        }
 	    });
 	},
@@ -255,6 +254,11 @@ const ComponentEditor={
         $elParent.attr('data-term-id', result.termId);
         $elParent.attr('data-groupid', result.groupId);
         
+        debugger;
+        if(!isTerm){
+        	$elParent.attr('data-attribute-id', result.attributeId);
+        }
+        
         $elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
         $elParent.removeClass('in-editing');
         $input.replaceWith(renderData);
@@ -273,7 +277,7 @@ const ComponentEditor={
 		
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length==0){
-			dummyCommentAttribute=Attribute.renderNewCommentAttributes(),
+			dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute'),
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
 			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
 			

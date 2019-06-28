@@ -81,6 +81,7 @@ const Term={
             me.newTermCollectionId = $_selected.attr('data-collectionid');
             console.log('onSelectSearchTerm => newTermCollectionId: ' + me.newTermCollectionId);
             me.newTermTermEntryId = $_selected.attr('data-termentryid');
+            me.newTermGroupId=$_selected.attr('data-value');
             // show Terms and Attributes
             me.findTermsAndAttributes($_selected.attr('data-value'));
 		},
@@ -977,7 +978,7 @@ const Term={
 				//ajax call to the remove proposal action
 				var me=event.data.scope,
 					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id')),
-					groupId=$parent.data('groupid');
+					groupId=$parent.data('groupid') || me.newTermGroupId;
 
 				$.ajax({
 			        url: url,

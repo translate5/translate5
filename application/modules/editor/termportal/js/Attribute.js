@@ -184,11 +184,19 @@ const Attribute={
 			//ajax call to the remove proposal action
 			var me=event.data.scope,
 				url=Editor.data.termportal.restPath+'termattribute/{ID}/removeproposal/operation'.replace("{ID}",attributeId);
+				
 			$.ajax({
 		        url: url,
 		        dataType: "json",	
 		        type: "POST",
 		        success: function(result){
+		        	//reload the termEntry when the attribute is deleted (not proposal)
+		        	if(!result.rows || result.rows.length==0){
+		        		Term.reloadTermEntry=true;
+		        		Term.findTermsAndAttributes(Term.newTermGroupId);
+		        		return;
+		        	}
+		        	
 		        	//the term proposal is removed, find the attribute holder and render the initial term proposable content
 		        	var attributeData=result.rows,
 		        		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
@@ -378,9 +386,15 @@ const Attribute={
 		var me=this,
 			htmlCollection=[];
 		
+		if (attributeData.attrProcessStatus === "unprocessed" && !attributeData.proposal) {
+			htmlCollection.push('<ins class="proposal-value-content">'+attributeData.attrValue+'</ins>');
+			return htmlCollection.join(' ');
+		}
+		
 		if(!attributeData.proposable){
 			return attValue;
 		}
+		
 		
 		//the proposal is allready defined, render the proposal
 		if(attributeData.proposal && attributeData.proposal!=undefined){
@@ -465,16 +479,18 @@ const Attribute={
     
     /**
      * Returns comment "dummy" attributes for creating a new comment.
+     * @param: attributeOriginType origin type of the attribute
      * @returns {Array}
      */
-    renderNewCommentAttributes: function() {
+    renderNewCommentAttributes: function(attributeOriginType) {
         return {
             attributeId:-1,
             name:'note',
             attrValue:'',
             attrType:null,
             headerText:'',
-            proposable:true
+            proposable:true,
+            attributeOriginType:attributeOriginType
         };
     }
 };
