@@ -1049,6 +1049,10 @@ const Term={
             console.log('1034 onAddTermEntryClick => resetNewTermData');
             me.resetNewTermData();
             me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
+            
+            //focus on the term tab
+            $('a[href="#resultTermsHolder-1"]').click();
+            
             // If the collection is known, we can start right away...
             if (filteredCollections.length == 1) {
                 me.newTermCollectionId = filteredCollections[0];
