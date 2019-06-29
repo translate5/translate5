@@ -1563,8 +1563,8 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Änderung vorschlagen</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHNpY2hlcm4='><source>Änderung sichern</source><target>Änderung sichern</target></trans-unit>
 <trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... Sprache auswählen</target></trans-unit>
-<trans-unit id='Qml0dGUgU3ByYWNoZSBmw7xyIGRlbiBuZXVlbiBUZXJtLVZvcnNjaGxhZyB3w6RobGVu'><source>Bitte Sprache für den neuen Term-Vorschlag wählen</source><target>Bitte Sprache für den neuen Term-Vorschlag wählen</target></trans-unit>
-<trans-unit id='Qml0dGUgVGVybS1Db2xsZWN0aW9uIGbDvHIgZGVuIG5ldWVuIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Bitte Term-Collection für den neuen Term-Vorschlag wählen</source><target>Bitte Term-Collection für den neuen Term-Vorschlag wählen</target></trans-unit>
+<trans-unit id='U3ByYWNoZSBmw7xyIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Sprache für Term-Vorschlag wählen</source><target>Sprache für Term-Vorschlag wählen</target></trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Term-Collection für Term-Vorschlag wählen</target></trans-unit>
 <trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>Sofortübersetzung nach</target></trans-unit>
 <trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>Terminologieportal-Sprachen</target></trans-unit>
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>

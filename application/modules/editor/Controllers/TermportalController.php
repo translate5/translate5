@@ -198,8 +198,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                 "editTermAttributeProposal"=>$this->translate->_("Term-Attribut: Änderung vorschlagen"),
                 "addTermAttributeProposal"=>$this->translate->_("Neues Term-Attribut vorschlagen"),
                 "deleteTermAttributeProposal"=>$this->translate->_("Term-Attribut: Vorschlag löschen"),
-                "chooseLanguageForTermEntry"=>$this->translate->_("Bitte Sprache für den neuen Term-Vorschlag wählen"),
-                "chooseTermcollectionForTermEntry"=>$this->translate->_("Bitte Term-Collection für den neuen Term-Vorschlag wählen"),
+                "chooseLanguageForTermEntry"=>$this->translate->_("Sprache für Term-Vorschlag wählen"),
+                "chooseTermcollectionForTermEntry"=>$this->translate->_("Term-Collection für Term-Vorschlag wählen"),
                 "selectLanguage"=>$this->translate->_("... Sprache auswählen"),
                 "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für")
             ]);
