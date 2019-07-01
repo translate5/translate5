@@ -128,11 +128,18 @@ Ext.define('Editor.util.TaskActions', {
         }
         Ext.Msg.confirm(me.strings.confirmFinish, me.strings.confirmFinishMsg, function(btn){
             if(btn == 'yes') {
-                me.modifyTask(callback, {
-                    userState: 'finished'
-                }, me.strings.taskFinishing);
+                me._doFinish(callback);
             }
         });
+    },
+    /**
+     * reusable function which performs the real finish call (without confirmation)
+     */
+    _doFinish: function(callback) {
+        var me = this;
+        me.modifyTask(callback, {
+            userState: 'finished'
+        }, me.strings.taskFinishing);        
     },
     /**
      * confirms the current task

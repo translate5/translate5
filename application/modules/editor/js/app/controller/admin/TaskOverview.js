@@ -111,7 +111,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   },
   init : function() {
       var me = this;
-      
       //@todo on updating ExtJS to >4.2 use Event Domains and this.listen for the following controller / store event bindings
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
@@ -561,6 +560,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           return;
       }
 
+      if(!this.fireEvent('beforeTaskActionConfirm', action, task, function(){
+          me[action](task, ev);
+      })) {
+          return;
+      }
+      
       //if NO confirmation string exists, we call the action unconfirmed. 
       if(! me.confirmStrings[actionIdx]) {
           me[action](task, ev);
