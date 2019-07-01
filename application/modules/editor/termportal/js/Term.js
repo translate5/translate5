@@ -289,7 +289,8 @@ const Term={
 		        dataType: "json",
 		        type: "POST",
 		        data: {
-		            'groupId':termGroupid
+		            'groupId':termGroupid,
+		            'collectionId':getFilteredCollections()
 		        },
 		        success: function(result){
 		            //store the results to the cache
