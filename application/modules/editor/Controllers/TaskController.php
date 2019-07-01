@@ -565,18 +565,17 @@ class editor_TaskController extends ZfExtended_RestController {
         
         // move uploaded excel into upload target
         if (!move_uploaded_file($_FILES['excelreimportUpload']['tmp_name'], $uploadTarget.$tempFilename)) {
-            // @TODO: add Exception here
-            // return something invalid (e.g. http status 4xx)
-            return FALSE;
+            // @TODO: return something invalid (e.g. http status 4xx)
+            // throw exception 'E1141' => 'Excel Reimport: upload failed.'
+            throw new editor_Models_Excel_ExImportException('E1141',['task' => $task], $e);
         }
         
         $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
         /* @var $worker editor_Models_Excel_Worker */
         $worker->init($this->entity->getTaskGuid(), ['filename' => $tempFilename]);
         $worker->queue();
-        //$worker->runQueued();
-        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; worker started editor_Models_Excel_Worker');
     }
+    
     
     protected function startImportWorkers() {
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');

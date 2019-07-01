@@ -77,12 +77,8 @@ class editor_Models_Export_Excel {
             exit;
         }
         catch (Exception $e) {
-            $logger = Zend_Registry::get('logger');
-            /* @var $logger ZfExtended_Logger */
-            throw new editor_Models_Excel_ExImportException('E_ExIm_1',[
-                'task' => $task,
-                'previousMessage' => $logger->formatMessage($e->getMessage()),
-            ], $e);
+            // throw exception 'E1137' => 'Task can not be exported as Excel-file.',
+            throw new editor_Models_Excel_ExImportException('E1137',['task' => $task], $e);
         }
     }
 }

@@ -59,18 +59,23 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         
         $reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
         /* @var $reimportExcel editor_Models_Import_Excel */
-        if ($reimportExcel::run($task, $filename)) {
-            // if everything is OK
-            // unlock task and set state to 'open'
-            $excelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
-            /* @var $excelExImport editor_Models_Excel_ExImport */
-            $excelExImport::taskUnlock($task);
+        
+        // on error an editor_Models_Excel_ExImportException is thrown
+        $reimportExcel::run($task, $filename);
+        
+        // unlock task and set state to 'open'
+        $excelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+        /* @var $excelExImport editor_Models_Excel_ExImport */
+        $excelExImport::taskUnlock($task);
+        
+        // @TODO: if there where error in segments, show them as hint in frontend.
+        if ($segmentError = $reimportExcel::getSegmentError()) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+            /* @var $logger ZfExtended_Logger */
             
-            // @TODO: if there where error in segments, show them as hint in frontend.
-            if ($segmentError = $reimportExcel::getSegmentError()) {
-                error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Error on reimport in the following segments. Please check the following segment(s):.'."\n".$segmentError);
-            }
+            $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):.'."\n".$segmentError;
+            // log warnging 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
+            $logger->warn('E1141', $msg, ['task' => $this->task]);
         }
-        return TRUE;
    }
 }
