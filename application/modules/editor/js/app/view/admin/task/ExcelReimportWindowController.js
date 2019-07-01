@@ -39,10 +39,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.editortaskExcelReimportWindowController',
-    strings: {
-        loadingWindowMessage: '#UT# Datei wird hochgeladen',
-    },
-
     listen: {
         component: {
             '#uploadBtn': {
@@ -77,7 +73,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
             return;
         }
         
-        win.setLoading(me.strings.loadingWindowMessage);
+        win.setLoading(win.strings.loadingWindowMessage);
         
         form.submit({
             //Accept Header of submitted file uploads could not be changed:
@@ -91,12 +87,11 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
             url: Editor.data.restpath+'task/'+task.get('id')+'/excelreimport',
             scope: this,
             success: function(form, submit) {
-                alert('.. upload success :-)');
                 win.close();
             },
             failure: function(form, submit) {
                 win.setLoading(false);
-                alert('.. upload failed :-(');
+                Editor.app.getController('ServerException').handleException(submit.response);
             }
         });
     },

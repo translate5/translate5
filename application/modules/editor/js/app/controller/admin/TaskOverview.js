@@ -68,11 +68,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   isImportStarted:false,
 
-  /***
-   * Task state check function pull. Each item/function in this pull will be included in the task state check loop.see:checkImportState
-   */
-  taskStateCheckPull:[],
-  
   /**
    * Anonymizing workflow-users will need the taskUserTracking-data
    */
@@ -115,9 +110,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Editor.app.on('adminViewportClosed', me.clearTasks, me);
       Editor.app.on('editorViewportOpened', me.handleInitEditor, me);
       
-      //add default task state checker function
-      me.taskStateCheckPull.push(me.isImportingCheck);
-
       me.getAdminTasksStore().on('load', me.startCheckImportStates, me);
       
       me.control({
@@ -269,7 +261,8 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       Ext.TaskManager.start(this.checkImportStateTask);
   },
   /**
-   * Checks if all actually loaded tasks are imported completly
+   * Checks if all currently loaded tasks are imported or available completly. 
+   * If there are locked tasks with a state which needs periodical reload, reload them
    */
   checkImportState: function() {
       var me = this, 
@@ -280,12 +273,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
                   Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskError, rec.get('taskName')));
                   return;
               }
-              if(!me.checkTaskStateCheckPull(rec)) {
+              if(!me.isImportingCheck(rec)) {
                   Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskImported, rec.get('taskName')));
               }
           };
       tasks.each(function(task){
-          if(!me.checkTaskStateCheckPull(task) || task.dropped){
+          if(!me.isImportingCheck(task) || task.dropped){
               return;
           }
           task.load({
@@ -301,7 +294,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
       });
       if(foundImporting == 0) {
           Ext.TaskManager.stop(this.checkImportStateTask);
-          me.cleanTaskStateCheckPull();
       }
   },
   handleChangeImportFile: function(field, val){
@@ -927,39 +919,15 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Is the given task importing
    */
   isImportingCheck:function(task){
-    return task.isImporting();
-  },
 
-  /***
-   * Call each function checker applied to the taskStateCheckPull
-   */
-  checkTaskStateCheckPull:function(task){
-      var me=this,
-          retval=false;
-
-        for(var i=0;i<me.taskStateCheckPull.length;i++){
-            var fn=me.taskStateCheckPull[i];
-            retval=retval || fn(task);
-        }
-    return retval;
-  },
-
-  /***
-   * Add new task state checker function to the task state check pull
-   */
-  addTaskStateCheckPull:function(item){
-      this.taskStateCheckPull.push(item);
-  },
-
-  /***
-   * Clean/reinitialize the taskStateCheckPull with the default/initial importState check.
-   * This will remove all checker functions added by other classes or plugins
-   */
-  cleanTaskStateCheckPull:function(){
-      var me=this;
-      me.taskStateCheckPull=[];
-      me.addTaskStateCheckPull(me.isImportingCheck);
-      me.fireEvent('taskStateCheckPullCleaned',[]);
-  }
-  
+      if(task.isImporting() || task.get('state') == 'ExcelExported') {
+          return true;
+      }
+      if(task.isCustomState()) {
+          //if one of the triggered handler return false, the fireEvent returns false,
+          // so we have to flip logic here: if one of the events should trigger the reload they have to return false 
+          return !this.fireEvent('periodicalTaskReloadIgnore', task);
+      }          
+      return false;
+  }  
 });

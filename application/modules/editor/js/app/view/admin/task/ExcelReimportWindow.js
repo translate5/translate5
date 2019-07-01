@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
         reimportUploadType: '#UT# Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .',
         uploadBtn: '#UT# Excel hochladen',
         cancelBtn: '#UT# Abbrechen',
+        loadingWindowMessage: '#UT# Datei wird hochgeladen',
     },
     modal : true,
     layout: 'anchor',
@@ -59,19 +60,16 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
         config = {
             height: Math.min(400, parseInt(Ext.getBody().getViewSize().height * 0.8)),
             width: 500,
-            
+            title: me.title, //see EXT6UPD-9
             items:[
                 {
                     xtype: 'form',
                     padding: 10,
                     ui: 'default-frame',
-                    //layout: 'hbox',
-                    layoutConfig : {
-                        //align : 'stretch',
-                    },
-                    //anchor: '100%',
+                    layout: 'anchor',
                     items: [
                         {
+                            anchor: '100%',
                             xtype: 'filefield',
                             name: 'excelreimportUpload',
                             regex: new RegExp('\.xlsx$', 'i'),
@@ -81,6 +79,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
                             fieldLabel: me.strings.uploadBtn
                         },
                         {
+                            anchor: '100%',
                             xtype: 'container',
                             html: me.strings.info
                         },
