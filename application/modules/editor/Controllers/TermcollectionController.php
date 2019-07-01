@@ -137,10 +137,18 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         
         $collectionIds=$params['collectionId'];
         
+        //if not collections are provided, fiter by all for customers of the user
+        if(empty($collectionIds)){
+            $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            /* @var $termCollection editor_Models_TermCollection_TermCollection */
+            $collectionIds=$termCollection->getCollectionForLogedUser();
+        }
+        
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;
             return;
         }
+        
         
         $model=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $model editor_Models_Term */
