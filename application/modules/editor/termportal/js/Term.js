@@ -10,6 +10,7 @@ const Term={
 		$_termTable:null,
         $_termEntryAttributesTable:null,
         $_termCollectionSelect:null,
+        $_resultTermsHolder:null,
         
 		searchTermsResponse:[],
 		termGroupsCache:[],
@@ -44,6 +45,7 @@ const Term={
             this.$_termTable=$('#termTable');
             this.$_termEntryAttributesTable = $('#termEntryAttributesTable');
             this.$_termCollectionSelect = $('#termcollectionSelectContainer');
+            this.$_resultTermsHolder=$('#resultTermsHolder');
 		},
 		
 		initEvents:function(){
@@ -68,6 +70,7 @@ const Term={
             me.$_termTable.on('click', '.term-data.proposable.is-finalized [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
             
             // Terms-Attributes: see Attribute.js
+            me.$_resultTermsHolder.on('tabsactivate',{scope:me},me.onResultTabActivate);
 		},
         
         /***
@@ -84,6 +87,12 @@ const Term={
             me.newTermGroupId=$_selected.attr('data-value');
             // show Terms and Attributes
             me.findTermsAndAttributes($_selected.attr('data-value'));
+		},
+		
+		onResultTabActivate:function(event, ui){
+			var me = event.data.scope;
+            me.drawProposalButtons('attribute');
+            me.drawProposalButtons('terms');
 		},
 		
 		/***
@@ -413,7 +422,7 @@ const Term={
                 .addClass( "ui-menu-icons flag" );
             
             // -------proposal-buttons -------
-            me.drawProposalButtons('terms-attribute');
+            me.drawProposalButtons('attribute');
             me.drawProposalButtons('terms');
         },
         
@@ -682,42 +691,44 @@ const Term={
                 htmlProposalEditIcon    = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>',
                 htmlProposalSaveIcon    = '<span class="proposal-btn proposal-save ui-icon ui-icon-check"></span>',
                 $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit = false, $_selectorSave = false,
-                titleAdd, titleDelete, titleEdit, titleSave;
+                titleAdd, titleDelete, titleEdit, titleSave,
+        		selectedArea='#'+$("#resultTermsHolder ul>.ui-tabs-active").attr('aria-controls');
+            
             switch(elements) {
                 case "commentAttributeEditorClosed":
-                    $_selectorRemove = $('#termTable .proposal-save').closest('h4');
+                    $_selectorRemove = $(selectedArea+' .proposal-save').closest('h4');
                     // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "attributeEditingOpened":
-                    $_selectorRemove = $('#termTable textarea:focus').closest('p').prev('h4');
+                    $_selectorRemove = $(selectedArea+' textarea:focus').closest('p').prev('h4');
                     $_selectorSave = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
                     break;
                 case "componentEditorClosed":
-                    $_selectorRemove = $('#termTable .proposal-save').parent();
+                    $_selectorRemove = $(selectedArea+' .proposal-save').parent();
                     // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "componentEditorOpened":
-                    $_selectorRemove = $('#termTable textarea:focus').closest('h3');
+                    $_selectorRemove = $(selectedArea+' textarea:focus').closest('h3');
                     $_selectorSave = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
                     break;
                 case "terms":
-                    $_selectorAdd = $('#termTable .term-data.is-new');
-                    $_selectorDelete = $('#termTable .term-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .term-data.proposable.is-finalized');
+                    $_selectorAdd = $(selectedArea+' .term-data.is-new');
+                    $_selectorDelete = $(selectedArea+' .term-data.proposable.is-proposal');
+                    $_selectorEdit = $(selectedArea+' .term-data.proposable.is-finalized');
                     titleAdd = proposalTranslations['addTermProposal'];
                     titleDelete = proposalTranslations['deleteTermProposal'];
                     titleEdit = proposalTranslations['editTermProposal'];
                     break;
-                case "terms-attribute":
-                    //$_selectorAdd = $('#termTable .term-data').next('div');
-                    $_selectorDelete = $('#termTable .attribute-data.proposable.is-proposal');
-                    $_selectorEdit = $('#termTable .attribute-data.proposable.is-finalized');
+                case "attribute":
+                    //$_selectorAdd = $(selectedArea+' .term-data').next('div');
+                    $_selectorDelete = $(selectedArea+' .attribute-data.proposable.is-proposal');
+                    $_selectorEdit = $(selectedArea+' .attribute-data.proposable.is-finalized');
                     titleAdd = proposalTranslations['addTermAttributeProposal'];
                     titleDelete = proposalTranslations['deleteTermAttributeProposal'];
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
@@ -1051,8 +1062,9 @@ const Term={
             me.resetNewTermData();
             me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
             
+            
             //focus on the term tab
-            $('a[href="#resultTermsHolder-1"]').click();
+            $("#resultTermsHolder" ).tabs({active:0});
             
             // If the collection is known, we can start right away...
             if (filteredCollections.length == 1) {

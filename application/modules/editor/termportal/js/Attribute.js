@@ -22,6 +22,7 @@ const Attribute={
 		var me=this;
 
         me.$_termTable.on('focus input', ".term-attributes textarea",me.onAttributeEditingOpened);
+        me.$_termEntryAttributesTable.on('focus input', "textarea",me.onAttributeEditingOpened);
         
         // ------------- TermEntries-Attributes -------------
         // - Icons
@@ -197,9 +198,18 @@ const Attribute={
 		        		return;
 		        	}
 		        	
+		        	
+		        	var attributeData=result.rows;
+		        	
+		        	//the term attribute is definition, remove and update the content for the term and term entry attribute definition dom
+		    		if(attributeData.attrType=='definition'){
+		    			me.checkAndUpdateDeffinition(attributeData,'termEntryAttribute')
+		    			me.checkAndUpdateDeffinition(attributeData,'termAttribute')
+		    			return;
+		    		}
+		    		
 		        	//the term proposal is removed, find the attribute holder and render the initial term proposable content
-		        	var attributeData=result.rows,
-		        		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
+		        	var renderData=me.getAttributeRenderData(attributeData,attributeData.value),
 		        		$proposalHolder=root.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
 		        		$ins=$proposalHolder.find('ins');
 		        		
@@ -252,10 +262,7 @@ const Attribute={
             isProposal,
             proposable = attribute.proposable ? ' proposable' : '', // = the user can handle proposals for this attribute: (1) suer has the rights (2) attribute is editable
 	    	headerTagOpen,
-	    	headerTagClose,
-	    	getAttributeContainerRender=function(attribute,html){
-	    		return '<p data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
-	    	};
+	    	headerTagClose;
             
     	// "is-proposal" can be ... 
         // ... a proposal for a term that already existed (attribute.proposal = "xyz")
@@ -286,10 +293,10 @@ const Attribute={
 	                    
 	                    //the data tag is displayed as first in this group
 	                    if(child.name ==="date"){
-	                        childData.unshift(getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)))
+	                        childData.unshift(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)))
 	                        return true;
 	                    }
-	                    childData.push(getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
+	                    childData.push(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
 	                });
 	                html+=childData.join('');
 	            }
@@ -312,7 +319,7 @@ const Attribute={
 	                headerText =me.handleAttributeHeaderText(attribute)+":";
 	            }
 	            
-	            html=headerTagOpen + headerText + headerTagClose +getAttributeContainerRender(attribute,attVal);
+	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
 	            
 	            //if it is definition on language level, get store the data in variable so it is displayed also on term language level
 	            if(attribute.attrType=="definition" && attribute.language){
@@ -334,10 +341,46 @@ const Attribute={
 	            
 	            var headerText = me.handleAttributeHeaderText(attribute,true);
 	            
-	            html=headerTagOpen + headerText + headerTagClose +getAttributeContainerRender(attribute,attVal);
+	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
 	            break;
 	    }
 	    return html;
+	},
+	
+	/***
+	 * Check if the attribute is of type deffinition. When it is deffinition, update the definitiona attribute 
+	 * in the term or termentry area deppending on attrType param
+	 */
+	checkAndUpdateDeffinition:function(attribute,attrType){
+		
+		if(attribute.attrType!='definition'){
+			return false;
+		}
+		
+		
+		var me = this,
+			renderData=me.getAttributeRenderData(attribute,attribute.value),
+			$elParent=me.getTermAttributeHeader(attribute.attributeId,attrType),
+			$input=me.getAttributeComponent(attribute.attributeId,attrType);
+	        
+		
+		//check for proposal and update the classes
+		if(!attribute.proposal){
+			$elParent.switchClass('is-proposal','is-finalized');
+		}else{
+			// update term-data
+			$elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
+			$elParent.removeClass('in-editing');
+		}
+	    
+		if($input.children('ins').length==1){
+			renderData=me.getAttributeContainerRender(attribute,renderData);
+		}
+		
+	    $input.replaceWith(renderData);
+	    
+	    Term.drawProposalButtons($elParent);
+	    return true;
 	},
 	
 	/***
@@ -417,6 +460,13 @@ const Attribute={
 			data='data-editable-comment';
 		}
 		return '<span '+data+' data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
+	},
+	
+	/***
+	 * The attribute container holder. All attributes and attribute proposals must be surrounded with this container.
+	 */
+	getAttributeContainerRender:function(attribute,html){
+		return '<p data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
 	},
 	
 	/***

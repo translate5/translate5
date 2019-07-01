@@ -16,9 +16,9 @@ const ComponentEditor={
 		me.typeRouteMap['termEntryAttribute']='termattribute/{ID}/propose/operation';
 		me.typeRouteMap['termAttribute']='termattribute/{ID}/propose/operation';
 		
-		me.typeRequestDataKeyMap['term']='term';//TODO:
-		me.typeRequestDataKeyMap['termEntryAttribute']='value';//TODO:
-		me.typeRequestDataKeyMap['termAttribute']='value';//TODO:
+		me.typeRequestDataKeyMap['term']='term';
+		me.typeRequestDataKeyMap['termEntryAttribute']='value';
+		me.typeRequestDataKeyMap['termAttribute']='value';
         
         this.cacheDom();
         this.initEvents();
@@ -86,6 +86,15 @@ const ComponentEditor={
 		var me=this,
 			$input= $('<textarea />').val($element.text());
 		
+		
+		$input.on('change keyup keydown paste cut', function () {
+			//resite the input when there is more than 50 characters in it
+			if($(this).val().length>50){
+				$(this).height(150);
+				$(this).width(350);
+			}
+	    }).change();
+		
 		$element.replaceWith($input);
         
 		$input.one('blur', function(){
@@ -104,6 +113,15 @@ const ComponentEditor={
         console.log('addCommentAttributeEditor');
 		var me=this,
 			$input= $('<textarea data-editable-comment />').val($element.text());
+		
+		
+		$input.on('change keyup keydown paste cut', function () {
+			//resite the input when there is more than 50 characters in it
+			if($(this).val().length>50){
+				$(this).height(150);
+				$(this).width(350);
+			}
+	    }).change();
 		
 		$element.replaceWith($input);
         
@@ -216,6 +234,8 @@ const ComponentEditor={
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$element.text());
 
             $input.replaceWith(componentRenderData);
+            
+            return;
 		}
 
 		var me=this,
@@ -243,11 +263,30 @@ const ComponentEditor={
 	 */
 	updateComponent:function($element,$input,result){
 		var me = this,
-		    isTerm=$element.data('type')=='term',
-			renderData=isTerm ? Term.renderTermData(result) : Attribute.getAttributeRenderData(result,result.value),
-			$elParent=isTerm ?  Term.getTermHeader($element.data('id')) : Attribute.getTermAttributeHeader($element.data('id'),$element.data('type')),
+			attrType=$element.data('type'),
+		    isTerm=attrType=='term',
+		    renderData=null,
+		    $elParent=null,
             $commentPanel,
             dummyCommentAttribute;
+			
+		if(isTerm){
+			renderData=Term.renderTermData(result);
+			$elParent= Term.getTermHeader($element.data('id'));
+		}else{
+			renderData=Attribute.getAttributeRenderData(result,result.value);
+			
+			//if the type is definition, update the definition attribute in the current selected tab
+			if(result.attrType=='definition'){
+                var activeTabSelector=$("#resultTermsHolder ul>.ui-tabs-active").attr('aria-controls'),
+        			activeTab= $('#'+activeTabSelector);
+
+    			//the selected tab is the term tab
+            	attrType=activeTab.data('type');
+        		
+			}
+			$elParent=Attribute.getTermAttributeHeader($element.data('id'),attrType);
+		}
             
         // update term-data
         $elParent.attr('data-term-value', result.term);
@@ -268,6 +307,12 @@ const ComponentEditor={
 		
 		if(!isTerm){
 		    // (= we come from editing an attribute, not a term)
+
+			//invert the attribute type, with this the other deffinition is updated to
+			attrType=attrType=='termEntryAttribute' ? 'termAttribute' : 'termEntryAttribute';
+			
+			//check and update if the attribute is deffinition
+			Attribute.checkAndUpdateDeffinition(result,attrType);
 			return;
 		}
         
@@ -298,28 +343,6 @@ const ComponentEditor={
 		}
     },
 	
-	/***
-	 * Update comment component in the table results.
-	 */
-	updateComponentComment:function($el,$input,result){
-	    var me = this,
-	        groupId;
-	    
-        console.log('updateComponentComment for isNew='+me.isNew);
-        
-        if (me.isNew) {
-            // We render the front-end new to have a clear reset.
-            // Otherwise things get buggy; too much work.
-            groupId = $input.closest('.term-attributes').prev('.term-data').data('groupid');
-            TermEntry.reloadTermEntry(groupId);
-            return;
-        }
-        
-		$input.replaceWith(Attribute.getProposalDefaultHtml(result.attributeOriginType,result.id,result.value,result));
-		//on the next term click, fatch the data from the server, and update the cache
-		Term.reloadTermEntry=true;
-	},
-    
     /**
      * Is the request to be send?
      * Don't send the request if the modified text is
