@@ -702,7 +702,7 @@ const Term={
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "attributeEditingOpened":
-                    $_selectorRemove = $(selectedArea+' textarea:focus').closest('p').prev('h4');
+                    $_selectorRemove = $(selectedArea+' textarea').closest('p').prev('h4');
                     $_selectorSave = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
                     break;
@@ -713,7 +713,7 @@ const Term={
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
                 case "componentEditorOpened":
-                    $_selectorRemove = $(selectedArea+' textarea:focus').closest('h3');
+                    $_selectorRemove = $(selectedArea+' textarea').closest('h3');
                     $_selectorSave = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
                     break;
