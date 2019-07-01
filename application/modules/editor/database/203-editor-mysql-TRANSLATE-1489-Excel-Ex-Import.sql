@@ -45,6 +45,10 @@ INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES
 ('editor', 'admin', 'frontend', 'editorExcelreimportTask'),
 ('editor', 'pm', 'frontend', 'editorExcelreimportTask');
 
+# Export rights in JS-world for admin, pm
+INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'admin', 'frontend', 'editorExcelreexportTask'),
+('editor', 'pm', 'frontend', 'editorExcelreexportTask');
 
 # worker config for reimport worker
 INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 

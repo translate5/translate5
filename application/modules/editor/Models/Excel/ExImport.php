@@ -348,7 +348,7 @@ class editor_Models_Excel_ExImport {
      * @param editor_Models_Task $task
      * @return bool
      */
-    public static function taskLock(editor_Models_Task $task) : bool {
+    public function taskLock(editor_Models_Task $task) : bool {
         // @TODO: disabled at the moment. Don't know if this is the right way to lock the task....
         //return TRUE;
         
@@ -368,7 +368,7 @@ class editor_Models_Excel_ExImport {
      * @param editor_Models_Task $task
      * @return bool
      */
-    public static function taskUnlock(editor_Models_Task $task) : bool {
+    public function taskUnlock(editor_Models_Task $task) : bool {
         if (!$task->unlock()) {
             error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task unlock failed');
             return FALSE;
