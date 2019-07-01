@@ -135,9 +135,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
-        $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $collectionIds=$termCollection->getCollectionForLogedUser();
+        $collectionIds=$params['collectionId'];
         
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;
