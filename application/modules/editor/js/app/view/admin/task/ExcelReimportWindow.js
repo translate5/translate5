@@ -30,7 +30,6 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.adminTaskExcelReimportWindow',
     itemId: 'adminTaskExcelReimportWindow',
-    
     title: '#UT#Excel reimportieren',
     strings: {
         info: '#UT# Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in den Task ein.',
@@ -48,6 +47,11 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
     closeAction: 'destroy',
     layout: 'fit',
     modal: true,
+    
+    task: null,
+    setTask: function(task) {
+        this.task = task;
+    },
     
     initConfig: function(instanceConfig) {
         var me = this,
