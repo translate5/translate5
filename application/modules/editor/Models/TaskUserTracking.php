@@ -72,7 +72,7 @@ class editor_Models_TaskUserTracking extends ZfExtended_Models_Entity_Abstract {
      * - if a user is assigned to a task, but has never opened the task so far
      * @return boolean
      */
-    public function hasEntry() {
+    public function hasEntry(): bool {
         return (!is_null($this->row));
     }
     

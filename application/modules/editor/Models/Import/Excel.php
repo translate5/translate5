@@ -196,11 +196,11 @@ class editor_Models_Import_Excel {
      * @param editor_Models_Task $task
      * @throws editor_Models_Excel_ExImportException
      */
-    protected static function formalCheck(editor_Models_Task $task) : bool {
+    protected static function formalCheck(editor_Models_Task $task) {
         // compare task-guid
         if ($task->getTaskGuid() != self::$excel->getTaskGuid()) {
             // throw exception 'E1138' => 'Excel Reimport: Formal check failed: task-guid differs in task compared to the excel.'
-            throw new editor_Models_Excel_ExImportException('E1138',['task' => $task], $e);
+            throw new editor_Models_Excel_ExImportException('E1138',['task' => $task]);
         }
         
         // compare number of segments.
@@ -209,11 +209,9 @@ class editor_Models_Import_Excel {
         $tempCountTaskSegments = $t5Segment->count($task->getTaskGuid());
         
         $tempExcelSegments = self::$excel->getSegments();
-        $tempCountExcelSegments = count($tempExcelSegments);
-        
-        if ($tempCountTaskSegments != $tempCountTaskSegments) {
+        if ($tempCountTaskSegments != count($tempExcelSegments)) {
             // throw exception 'E1139' => 'Excel Reimport: Formal check failed: number of segments differ in task compared to the excel.'
-            throw new editor_Models_Excel_ExImportException('E1139',['task' => $task], $e);
+            throw new editor_Models_Excel_ExImportException('E1139',['task' => $task]);
         }
         
         // compare all segments if an empty segment in excel is not-empty in task
@@ -222,7 +220,7 @@ class editor_Models_Import_Excel {
                 $t5Segment->loadBySegmentNrInTask($excelSegment->nr, $task->getTaskGuid());
                 if (!empty($t5Segment->getTargetEdit())) {
                     // throw exception 'E1140' => 'Excel Reimport: Formal check failed: segment #{segmentNr} is empty in excel while there was content in the the original task.'
-                    throw new editor_Models_Excel_ExImportException('E1140',['task' => $task, 'segmentNr' => $excelSegment->nr], $e);
+                    throw new editor_Models_Excel_ExImportException('E1140',['task' => $task, 'segmentNr' => $excelSegment->nr]);
                 }
             }
         }

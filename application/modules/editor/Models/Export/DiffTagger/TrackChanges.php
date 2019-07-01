@@ -67,9 +67,9 @@ class editor_Models_Export_DiffTagger_TrackChanges extends editor_Models_Export_
         $tempTaskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
         /* @var $tempTaskUserTracking editor_Models_TaskUserTracking */
         $tempTaskUserTracking->loadEntry($task->getTaskGuid(), $task->getPmGuid());
-        if ($tempTaskUserTracking->hasEntry() == NULL) {
-            // @TODO: remove 3. parameter "role"
-            $tempTaskUserTracking->insertTaskUserTrackingEntry($task->getTaskGuid(), $task->getPmGuid(), 'lector');
+        if (! $tempTaskUserTracking->hasEntry()) {
+            $tempTaskUserTracking->insertTaskUserTrackingEntry($task->getTaskGuid(), $task->getPmGuid(), '');
+            $tempTaskUserTracking->loadEntry($task->getTaskGuid(), $task->getPmGuid());
         }
         
         $this->tagger->userTrackingId = $tempTaskUserTracking->getId();

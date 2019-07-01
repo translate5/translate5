@@ -263,24 +263,25 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         
         $result = $this->replace($segment, function($match) use (&$replaceMap) {
             //original id coming from import format
-            $id = $match[3];
             $type = $match[1];
-            $tag = ['open' => 'bx', 'close' => 'ex', 'single' => 'x'];
-            
+            $innerMatch = [];
             switch($type) {
                 case 'single':
-                    $result = sprintf('<excel %s />', $id);
-                    $resultId = sprintf('<%s />', $id);
+                    preg_match(self::REGEX_SINGLETAG, $match[0], $innerMatch);
+                    $result = sprintf('<excel %s />', $innerMatch[1]);
+                    $resultId = sprintf('<%s />', $innerMatch[1]);
                     break;
                 
                 case 'open':
-                    $result = sprintf('<excel %s>', $id);
-                    $resultId = sprintf('<%s>', $id);
+                    preg_match(self::REGEX_STARTTAG, $match[0], $innerMatch);
+                    $result = sprintf('<excel %s>', $innerMatch[1]);
+                    $resultId = sprintf('<%s>', $innerMatch[1]);
                     break;
                 
                 case 'close':
-                    $result = sprintf('<excel /%s>', $id);
-                    $resultId = sprintf('</%s>', $id);
+                    preg_match(self::REGEX_ENDTAG, $match[0], $innerMatch);
+                    $result = sprintf('<excel /%s>', $innerMatch[1]);
+                    $resultId = sprintf('</%s>', $innerMatch[1]);
                 break;
             }
             
