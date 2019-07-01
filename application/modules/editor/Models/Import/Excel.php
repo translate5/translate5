@@ -88,13 +88,13 @@ class editor_Models_Import_Excel {
         
         // now handle each segment from the excel
         foreach (self::$excel->getSegments() as $segment) {
-            // detect tag-map and org. segment content from org. t5 segment
-            $tempMap = [];
-            $t5Segment->loadBySegmentNrInTask($segment->nr, $task->getTaskGuid());
-            $orgSegmentAsExcel = $segmentTagger->toExcel($t5Segment->getTargetEdit(), $tempMap);
-            
             // new segement is the one from excel
             $newSegment = $segment->target;
+            
+            // detect $orgSegmentAsExcel as content of the t5 target segment
+            $t5Segment->loadBySegmentNrInTask($segment->nr, $task->getTaskGuid());
+            $orgSegmentAsExcel = $segmentTagger->toExcel($t5Segment->getTargetEdit());
+            
             
             // do nothing if segment has not changed
             if ($newSegment == $orgSegmentAsExcel) {
@@ -104,32 +104,35 @@ class editor_Models_Import_Excel {
                 continue;
             }
             
-            // check segments structure of the segment from excel
+            // check structure of the new segment (from excel)
             if (!$tagStructureChecker->check($newSegment)) {
                 self::addSegmentError($segment->nr, 'tags in segment are not well-structured. '.$tagStructureChecker->getError());
             }
             $countNewSegmentTags = $tagStructureChecker->getCount();
             
-            // check count tags of segment from excel against the org. segement from t5
+            // check count tags of the new segment (from excel) against the org. segement from t5
             $tagStructureChecker->check($orgSegmentAsExcel);
             if ($tagStructureChecker->getCount() != $countNewSegmentTags) {
                 self::addSegmentError($segment->nr, 'count of tags in segment changed in excel');
             }
             
-            // add TrackChanges informations comparing the new segmnet from excel with the org. segment converted to excel tagging
+            // add TrackChanges informations comparing the new segment (from excel) with the t5 segment (converted to excel tagging)
             // but only if task is not in workflowStep 'translation'
-            // @TODO: ADD check Plugin.TrackChanges active, or soemthing similar.
+            // @TODO: ADD check Plugin.TrackChanges active, or something similar.
             if ($task->getWorkflowStepName() !== editor_Workflow_Abstract::STEP_TRANSLATION) {
                 $newSegment = $diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date('Y-m-d H:i:s'), $task->getPmName());
             }
             
-            // restore org. tags
+            // restore org. tags; detect tag-map from t5 SOURCE segment. Only there all original tags are present.
+            $tempMap = [];
+            $segmentTagger->toExcel($t5Segment->getSource(), $tempMap);
             $newSegment = $segmentTagger->reapply2dMap($newSegment, $tempMap);
             
             // @TODO: terminology markup is readded by sending the segment again to the termTagger.
             // ?? is it always neded??? or only if TermTagger Plugin is active.. what about the workflow..
             // maybe its better to do it for the complete task, so not every single segment must be tagged.
             // must be somehow like on task creation
+            // or maybe this is automaticaly done by $t5Segment->save(); a bit later on this function.
             
             error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__
                     //."\norg:\n".$t5Segment->getTargetEdit()
@@ -139,7 +142,7 @@ class editor_Models_Import_Excel {
                     ."\nneu (TrackChanges)\n".$newSegment
                     );
             
-            // currently all writing is disabled...
+            // @TODO: remove temporarily disable all writing for DEV
             //continue;
             
             // save edited segment target

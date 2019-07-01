@@ -66,19 +66,14 @@ class editor_Models_Export_DiffTagger_TrackChanges extends editor_Models_Export_
         // to set TrackChanges userTrackingID and userColorNr, we need the TaskUserTracking
         $tempTaskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
         /* @var $tempTaskUserTracking editor_Models_TaskUserTracking */
-        /*
-        $tempTaskUserTracking->loadEntry($task->getId(), $task->getPmGuid());
+        $tempTaskUserTracking->loadEntry($task->getTaskGuid(), $task->getPmGuid());
         if ($tempTaskUserTracking->hasEntry() == NULL) {
             // @TODO: remove 3. parameter "role"
-            $tempTaskUserTracking->insertTaskUserTrackingEntry($task->getId(), $task->getPmGuid(), 'lector');
+            $tempTaskUserTracking->insertTaskUserTrackingEntry($task->getTaskGuid(), $task->getPmGuid(), 'lector');
         }
         
         $this->tagger->userTrackingId = $tempTaskUserTracking->getId();
         $this->tagger->userColorNr = $tempTaskUserTracking->getTaskOpenerNumberForUser();
-        */
-        // @TODO: da obiges Konstrukt nicht funktioniert, werden hier mal probeweise die Werte fix gesetzt.
-        $this->tagger->userTrackingId = 1;
-        $this->tagger->userColorNr = 1;
         
         parent::__construct();
     }
