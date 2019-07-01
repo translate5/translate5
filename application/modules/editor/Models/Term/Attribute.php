@@ -288,7 +288,12 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         }
         $mapProposal = function($item) {
             $item['proposable']=$this->isProposable($item['name'],$item['attrType']);
+            $item['proposal']=null;
             if(!isset($item['proposalAttributelId'])){
+                unset($item['proposalAttributelId']);
+                if(!isset($item['proposalAttributeValue'])){
+                    unset($item['proposalAttributeValue']);
+                }
                 return $item;
             }
             $obj=new stdClass();
