@@ -37,8 +37,8 @@ class editor_Models_Import_Excel {
     protected static $excel;
     
     /**
-     * A list of segment-numbers (@TODO: ?and error description) with invalid tag-strucrue.
-     * So this list is shown after reimport to the user with hint thet the user has to check the here notet segments.
+     * A list of segment-numbers and notices about the segment (e.g. invalid tag-structure in segment).
+     * This list is shown after the reimport with the hint that the user has to check the here notet segments.
      * 
      * @var array
      */
@@ -62,11 +62,8 @@ class editor_Models_Import_Excel {
         self::$excel = $tempExcelExImport::loadFromExcel($task->getAbsoluteTaskDataPath().'/excelReimport/'.$filename);
         
         // do formal checkings of the loaded excel data aginst the task
-        if (!self::formalCheck($task)) {
-            // @TODO: where/how store errors/exceptions !?!
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; Excel reimport is not possible because of formal errors');
-            return FALSE;
-        }
+        // on error an editor_Models_Excel_ExImportException is thrown
+        self::formalCheck($task);
         
         // load required ressources:
         // - load the model that handles the t5 segments
@@ -134,17 +131,6 @@ class editor_Models_Import_Excel {
             // must be somehow like on task creation
             // or maybe this is automaticaly done by $t5Segment->save(); a bit later on this function.
             
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__
-                    //."\norg:\n".$t5Segment->getTargetEdit()
-                    //."\norg->woChanges:\n".$orgSegmentTrackChangesDeleted
-                    //."\norg->toExcel:\n".$orgSegmentAsExcel
-                    //."\nneu\n".$segment->target
-                    ."\nneu (TrackChanges)\n".$newSegment
-                    );
-            
-            // @TODO: remove temporarily disable all writing for DEV
-            //continue;
-            
             // save edited segment target
             $t5Segment->setTargetEdit($newSegment);
             $t5Segment->save();
@@ -208,14 +194,13 @@ class editor_Models_Import_Excel {
      * - compare all segments if an empty segment in excel was not-empty in task<br/>
      * 
      * @param editor_Models_Task $task
-     * @return bool
+     * @throws editor_Models_Excel_ExImportException
      */
     protected static function formalCheck(editor_Models_Task $task) : bool {
         // compare task-guid
         if ($task->getTaskGuid() != self::$excel->getTaskGuid()) {
-            // @TODO: where/how store errors/exceptions !?!
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task-guid differs in task compared to the excel; Task: '.$task->getTaskGuid().' vs. Excel: '.self::$excel->getTaskGuid());
-            return FALSE;
+            // throw exception 'E1138' => 'Excel Reimport: Formal check failed: task-guid differs in task compared to the excel.'
+            throw new editor_Models_Excel_ExImportException('E1138',['task' => $task], $e);
         }
         
         // compare number of segments.
@@ -227,9 +212,8 @@ class editor_Models_Import_Excel {
         $tempCountExcelSegments = count($tempExcelSegments);
         
         if ($tempCountTaskSegments != $tempCountTaskSegments) {
-            // @TODO: where/how store errors/exceptions !?!
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; number of segments differ in task compared to the excel; Task: '.$tempCountTaskSegments.' vs. Excel: '.$tempCountExcelSegments);
-            return FALSE;
+            // throw exception 'E1139' => 'Excel Reimport: Formal check failed: number of segments differ in task compared to the excel.'
+            throw new editor_Models_Excel_ExImportException('E1139',['task' => $task], $e);
         }
         
         // compare all segments if an empty segment in excel is not-empty in task
@@ -237,14 +221,11 @@ class editor_Models_Import_Excel {
             if (empty($excelSegment->target)) {
                 $t5Segment->loadBySegmentNrInTask($excelSegment->nr, $task->getTaskGuid());
                 if (!empty($t5Segment->getTargetEdit())) {
-                    // @TODO: where/how store errors/exceptions !?!
-                    error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; segment #'.$excelSegment->nr.' is empty in excel while there was content in the the original task.');
-                    return FALSE;
+                    // throw exception 'E1140' => 'Excel Reimport: Formal check failed: segment #{segmentNr} is empty in excel while there was content in the the original task.'
+                    throw new editor_Models_Excel_ExImportException('E1140',['task' => $task, 'segmentNr' => $excelSegment->nr], $e);
                 }
             }
         }
-        
-        return TRUE;
     }
     
     /**
