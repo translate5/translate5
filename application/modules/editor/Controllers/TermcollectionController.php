@@ -135,7 +135,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $params=$this->getRequest()->getParams();
         $responseArray=array();
         
-        $collectionIds=$params['collectionId'];
+        $collectionIds=isset($params['collectionId']) ? $params['collectionId'] : [];
         
         //if not collections are provided, fiter by all for customers of the user
         if(empty($collectionIds)){
