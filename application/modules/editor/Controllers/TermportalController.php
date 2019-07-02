@@ -180,9 +180,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $this->view->Php2JsVars()->set('apps.termportal.proposal.translations',[
                 "Ja"=>$this->translate->_("Ja"),
                 "Nein"=>$this->translate->_("Nein"),
-                "deleteAttributeProposalMessage"=>$this->translate->_("Möchten Sie den Attributs-Vorschlag wirklich entfernen?"),
-                "deleteTermProposalMessage"=>$this->translate->_("Möchten Sie den Term-Vorschlag wirklich entfernen?"),
-                "deleteAttributeProposal"=>$this->translate->_("Attributs-Vorschlag löschen"),
+                "deleteAttributeProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
+                "deleteTermProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
+                "deleteAttributeProposal"=>$this->translate->_("Attribut: Vorschlag löschen"),
                 "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
                 "editProposal"=>$this->translate->_("Änderung vorschlagen"),
                 "saveProposal"=>$this->translate->_("Änderung sichern"),

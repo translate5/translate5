@@ -1554,11 +1554,11 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='SFRUUDogNDAx'><source>HTTP: 401</source><target>HTTP: 401</target></trans-unit>
 <trans-unit id='RGllc2UgRG9tYWluIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Domain wird bereits verwendet.</source><target>Diese Domain wird bereits verwendet.</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='><source>Vorschläge exportieren</source><target>Vorschläge exportieren</target></trans-unit>
-<trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBBdHRyaWJ1dHMtVm9yc2NobGFnIHdpcmtsaWNoIGVudGZlcm5lbj8='><source>Möchten Sie den Attributs-Vorschlag wirklich entfernen?</source><target>Möchten Sie den Attributs-Vorschlag wirklich entfernen?</target></trans-unit>
+<trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVuPw=='><source>Vorschlag löschen?</source><target>Vorschlag löschen?</target></trans-unit>
 <trans-unit id='RGFzIEF0dHJpYnV0IHdpcmQgZGFubiBhdWYgZGVuIGFsdGVuIFN0YW5kIHp1csO8Y2tnZXNldHp0Lg=='><source>Das Attribut wird dann auf den alten Stand zurückgesetzt.</source><target>Das Attribut wird dann auf den alten Stand zurückgesetzt.</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBUZXJtLVZvcnNjaGxhZyB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie den Term-Vorschlag wirklich entfernen?</source><target>Möchten Sie den Term-Vorschlag wirklich entfernen?</target></trans-unit>
 <trans-unit id='RGVyIFRlcm0gd2lyZCBkYW5uIGF1ZiBkZW4gYWx0ZW4gU3RhbmQgenVyw7xja2dlc2V0enQgKGJ6dy4gZ2Vsw7ZzY2h0LCB3ZW5uIGVzIGlobiB2b3JoZXIgbmljaHQgZ2FiKS4='><source>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</source><target>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</target></trans-unit>
-<trans-unit id='QXR0cmlidXRzLVZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attributs-Vorschlag löschen</source><target>Attributs-Vorschlag löschen</target></trans-unit>
+<trans-unit id='QXR0cmlidXQ6IFZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attribut: Vorschlag löschen</source><target>Attribut: Vorschlag löschen</target></trans-unit>
 <trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Vorschlag löschen</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Änderung vorschlagen</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHNpY2hlcm4='><source>Änderung sichern</source><target>Änderung sichern</target></trans-unit>

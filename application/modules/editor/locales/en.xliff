@@ -3347,11 +3347,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Vorschläge exportieren</source>
     <target>Proposals export</target>
 </trans-unit>
-<trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBBdHRyaWJ1dHMtVm9yc2NobGFnIHdpcmtsaWNoIGVudGZlcm5lbj8='><source>Möchten Sie den Attributs-Vorschlag wirklich entfernen?</source><target>Do you really want to remove the proposal for this attribute?</target></trans-unit>
+<trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVuPw=='><source>Vorschlag löschen?</source><target>Delete the proposal?</target></trans-unit>
 <trans-unit id='RGFzIEF0dHJpYnV0IHdpcmQgZGFubiBhdWYgZGVuIGFsdGVuIFN0YW5kIHp1csO8Y2tnZXNldHp0Lg=='><source>Das Attribut wird dann auf den alten Stand zurückgesetzt.</source><target>The attribute will be reset to its former content.</target></trans-unit>
 <trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBUZXJtLVZvcnNjaGxhZyB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie den Term-Vorschlag wirklich entfernen?</source><target>Do you really want to remove the proposal this term?</target></trans-unit>
 <trans-unit id='RGVyIFRlcm0gd2lyZCBkYW5uIGF1ZiBkZW4gYWx0ZW4gU3RhbmQgenVyw7xja2dlc2V0enQgKGJ6dy4gZ2Vsw7ZzY2h0LCB3ZW5uIGVzIGlobiB2b3JoZXIgbmljaHQgZ2FiKS4='><source>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</source><target>The term will be reset to its former content (or deleted if it didn't exist before).</target></trans-unit>
-<trans-unit id='QXR0cmlidXRzLVZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attributs-Vorschlag löschen</source><target>Remove proposal for attribute</target></trans-unit>
+<trans-unit id='QXR0cmlidXQ6IFZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attribut: Vorschlag löschen</source><target>Attribute: Delete proposal</target></trans-unit>
 <trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Remove the proposal</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Propose changes</target></trans-unit>
 <trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... select language</target></trans-unit>
@@ -3364,6 +3364,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>All languages available</target></trans-unit>
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Delete proposals older than</target></trans-unit>
+<trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Delete proposal</target></trans-unit>
     </body>
   </file>
 </xliff>
