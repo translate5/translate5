@@ -2503,7 +2503,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='VGVybS1BdHRyaWJ1dDogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'>
     <source>Term-Attribut: Änderung vorschlagen</source>
-    <target>Term: Delete the Proposal</target>
+    <target>Term-Attribute: Propose changes</target>
 </trans-unit>
 <trans-unit id='VGVybS1BdHRyaWJ1dCBiZWFyYmVpdGVu'>
     <source>Term-Attribut bearbeiten</source>
