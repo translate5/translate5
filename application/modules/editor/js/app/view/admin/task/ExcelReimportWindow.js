@@ -32,7 +32,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
     itemId: 'adminTaskExcelReimportWindow',
     title: '#UT#Excel reimportieren',
     strings: {
-        info: '#UT# Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in den Task ein.',
+        info: '#UT# Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.',
         reimportUploadType: '#UT# Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .',
         uploadBtn: '#UT# Excel hochladen',
         cancelBtn: '#UT# Abbrechen',
