@@ -371,7 +371,7 @@ class editor_TermController extends ZfExtended_RestController {
         $this->view->rows = $commentAttribute->getDataObject();
         $this->view->rows->proposal = $proposal->getDataObject();
         //set the groupid, it is used by the attribute proposal component
-        $this->view->rows->groupId=$entryId->$termEntry->getGroupId();
+        $this->view->rows->groupId=$termEntry->getGroupId();
     }
     
     /**
