@@ -229,6 +229,7 @@ const Term={
 						$('<li>').attr('data-value', item.groupId)
 						         .attr('data-collectionid', item.collectionId)
                                  .attr('data-termentryid', item.termEntryId)
+                                 .attr('data-language', item.language)
 						         .attr('class', 'ui-widget-content search-terms-result').append(
 								$('<div>').attr('class', 'ui-widget').append(item.label)
 						));
@@ -391,10 +392,12 @@ const Term={
 		            });
 		            
 		            $.each($("#termTable h3"), function (i, termitem) {
-		                if(termitem.dataset.termValue === item.textContent){
+		            	//expand the selected term (check for language, since there can be terms with same name in same term entry)
+		                if((termitem.dataset.termValue === item.textContent) && (termitem.dataset.language==item.dataset.language)){
 		                	me.$_termTable.accordion({
 		                        active:i
 		                    });
+		                	return false;
 		                }
 		            });
 		            
@@ -478,7 +481,7 @@ const Term={
             }
             
             //draw term header
-            termAttributesHtmlContainer.push('<h3 class="term-data'+proposable + isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'" data-groupid="'+term.groupId+'">');
+            termAttributesHtmlContainer.push('<h3 class="term-data'+proposable + isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'" data-groupid="'+term.groupId+'" data-language="'+term.languageId+'">');
             
             
             //add empty space between
