@@ -41,5 +41,6 @@ class editor_Models_Export_Exception extends ZfExtended_ErrorCodeException {
         static protected $localErrorCodes = [
             'E1145' => 'Could not create export-zip.',
             'E1146' => 'The task export folder does not exist, no export ZIP file can be created.',
+            'E1147' => 'The task export folder does not exist or is not writeable, no export ZIP file can be created.',
         ];
 }
