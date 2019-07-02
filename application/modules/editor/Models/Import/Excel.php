@@ -115,7 +115,7 @@ class editor_Models_Import_Excel {
             
             // add TrackChanges informations comparing the new segment (from excel) with the t5 segment (converted to excel tagging)
             // but only if task is not in workflowStep 'translation'
-            // @TODO: ADD check Plugin.TrackChanges active, or something similar.
+            // @FIXME: ADD check Plugin.TrackChanges active, or something similar.
             if ($task->getWorkflowStepName() !== editor_Workflow_Abstract::STEP_TRANSLATION) {
                 $newSegment = $diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date('Y-m-d H:i:s'), $task->getPmName());
             }
@@ -125,7 +125,7 @@ class editor_Models_Import_Excel {
             $segmentTagger->toExcel($t5Segment->getSource(), $tempMap);
             $newSegment = $segmentTagger->reapply2dMap($newSegment, $tempMap);
             
-            // @TODO: terminology markup is readded by sending the segment again to the termTagger.
+            // @FIXME: terminology markup is readded by sending the segment again to the termTagger.
             // ?? is it always neded??? or only if TermTagger Plugin is active.. what about the workflow..
             // maybe its better to do it for the complete task, so not every single segment must be tagged.
             // must be somehow like on task creation

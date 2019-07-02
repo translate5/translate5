@@ -155,7 +155,6 @@ class editor_Models_Excel_ExImport {
         $sheet->getStyle('C'.$this->segmentRow)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
         $sheet->getStyle('D'.$this->segmentRow)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
         
-        
         $this->segmentRow++;
     }
     
@@ -297,6 +296,13 @@ class editor_Models_Excel_ExImport {
         $sheet = $this->getSheetJob();
         // setting write protection for the whole sheet
         $sheet->getProtection()->setSheet(true);
+        
+        // set font-size to "14" for the whole sheet
+        $sheet->getParent()->getDefaultStyle()->applyFromArray([
+                        'font' => [
+                                        'size' => '14',
+                        ],
+        ]);
         
         // set column width
         $sheet->getColumnDimension('A')->setWidth(5);
