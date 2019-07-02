@@ -313,6 +313,11 @@ const ComponentEditor={
 			
 			//check and update if the attribute is deffinition
 			Attribute.checkAndUpdateDeffinition(result,attrType);
+			
+			//if it is new term entry, reload after save
+			if (me.isNew) {
+				TermEntry.reloadTermEntry(result.groupId);
+			}
 			return;
 		}
         
