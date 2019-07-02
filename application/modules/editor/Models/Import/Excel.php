@@ -30,11 +30,11 @@ END LICENSE AND COPYRIGHT
 /**
  * Import the whole task from an earlier exported Excel-file
  */
-class editor_Models_Import_Excel {
+class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
     /**
      * @var editor_Models_Excel_ExImport
      */
-    protected static $excel;
+    protected $excel;
     
     /**
      * A list of segment-numbers and notices about the segment (e.g. invalid tag-structure in segment).
@@ -42,7 +42,7 @@ class editor_Models_Import_Excel {
      * 
      * @var array
      */
-    protected static $segmentError = [];
+    protected $segmentError = [];
     
     /**
      * reimport $filename xls into $task.
@@ -52,18 +52,16 @@ class editor_Models_Import_Excel {
      * @param string $filename
      * @return bool
      */
-    public static function run(editor_Models_Task $task, $filename) : bool {
+    public function run(editor_Models_Task $task, $filename) : bool {
         // task data must be actualized
         $task->createMaterializedView();
         
         // load the excel
-        $tempExcelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
-        /* @var $tempExcelExImport editor_Models_Excel_ExImport */
-        self::$excel = $tempExcelExImport::loadFromExcel($task->getAbsoluteTaskDataPath().'/excelReimport/'.$filename);
+        $this->excel = editor_Models_Excel_ExImport::loadFromExcel($task->getAbsoluteTaskDataPath().'/excelReimport/'.$filename);
         
         // do formal checkings of the loaded excel data aginst the task
         // on error an editor_Models_Excel_ExImportException is thrown
-        self::formalCheck($task);
+        $this->formalCheck($task);
         
         // load required ressources:
         // - load the model that handles the t5 segments
@@ -84,7 +82,7 @@ class editor_Models_Import_Excel {
         
         
         // now handle each segment from the excel
-        foreach (self::$excel->getSegments() as $segment) {
+        foreach ($this->excel->getSegments() as $segment) {
             // new segement is the one from excel
             $newSegment = $segment->target;
             
@@ -96,21 +94,21 @@ class editor_Models_Import_Excel {
             // do nothing if segment has not changed
             if ($newSegment == $orgSegmentAsExcel) {
                 if (!empty($segment->comment)) {
-                    self::addComment($segment->comment, $t5Segment->getId(), $task);
+                    $this->addComment($segment->comment, $t5Segment->getId(), $task);
                 }
                 continue;
             }
             
             // check structure of the new segment (from excel)
             if (!$tagStructureChecker->check($newSegment)) {
-                self::addSegmentError($segment->nr, 'tags in segment are not well-structured. '.$tagStructureChecker->getError());
+                $this->addSegmentError($segment->nr, 'tags in segment are not well-structured. '.$tagStructureChecker->getError());
             }
             $countNewSegmentTags = $tagStructureChecker->getCount();
             
             // check count tags of the new segment (from excel) against the org. segement from t5
             $tagStructureChecker->check($orgSegmentAsExcel);
             if ($tagStructureChecker->getCount() != $countNewSegmentTags) {
-                self::addSegmentError($segment->nr, 'count of tags in segment changed in excel');
+                $this->addSegmentError($segment->nr, 'count of tags in segment changed in excel');
             }
             
             // add TrackChanges informations comparing the new segment (from excel) with the t5 segment (converted to excel tagging)
@@ -137,10 +135,10 @@ class editor_Models_Import_Excel {
             
             
             // on every changed segment, add a comment that it was edited
-            self::addComment("Changed in external Excel editing.", $t5Segment->getId(), $task, TRUE);
+            $this->addComment("Changed in external Excel editing.", $t5Segment->getId(), $task, TRUE);
             // save (new) comment for the segment (if not empty in excel)
             if (!empty($segment->comment)) {
-                self::addComment($segment->comment, $t5Segment->getId(), $task);
+                $this->addComment($segment->comment, $t5Segment->getId(), $task);
             }
         }
         
@@ -158,7 +156,7 @@ class editor_Models_Import_Excel {
      * @param editor_Models_Task $task
      * @param bool $noIntro
      */
-    protected static function addComment(string $commentText, int $segmentId, editor_Models_Task$task, $noIntro = FALSE) : void {
+    protected function addComment(string $commentText, int $segmentId, editor_Models_Task$task, $noIntro = FALSE) : void {
         try {
             $comment = ZfExtended_Factory::get('editor_Models_Comment');
             /* @var $comment editor_Models_Comment */
@@ -196,9 +194,9 @@ class editor_Models_Import_Excel {
      * @param editor_Models_Task $task
      * @throws editor_Models_Excel_ExImportException
      */
-    protected static function formalCheck(editor_Models_Task $task) {
+    protected function formalCheck(editor_Models_Task $task) {
         // compare task-guid
-        if ($task->getTaskGuid() != self::$excel->getTaskGuid()) {
+        if ($task->getTaskGuid() != $this->excel->getTaskGuid()) {
             // throw exception 'E1138' => 'Excel Reimport: Formal check failed: task-guid differs in task compared to the excel.'
             throw new editor_Models_Excel_ExImportException('E1138',['task' => $task]);
         }
@@ -208,7 +206,7 @@ class editor_Models_Import_Excel {
         /* @var $segment editor_Models_Segment */
         $tempCountTaskSegments = $t5Segment->count($task->getTaskGuid());
         
-        $tempExcelSegments = self::$excel->getSegments();
+        $tempExcelSegments = $this->excel->getSegments();
         if ($tempCountTaskSegments != count($tempExcelSegments)) {
             // throw exception 'E1139' => 'Excel Reimport: Formal check failed: number of segments differ in task compared to the excel.'
             throw new editor_Models_Excel_ExImportException('E1139',['task' => $task]);
@@ -231,13 +229,13 @@ class editor_Models_Import_Excel {
      * @param int $segmentNr
      * @param string $hint
      */
-    protected static function addSegmentError(int $segmentNr, string $hint = '') : void {
+    protected function addSegmentError(int $segmentNr, string $hint = '') : void {
         $tempError = '#'.$segmentNr;
         if (!empty($hint)) {
             $tempError .= ': '.$hint;
         }
         
-        self::$segmentError[] = $tempError;
+        $this->segmentError[] = $tempError;
     }
     
     /**
@@ -245,11 +243,11 @@ class editor_Models_Import_Excel {
      * if there where no error FALSE will be returned
      * @return string|false
      */
-    public static function getSegmentError() : string {
-        if (empty(self::$segmentError)) {
+    public function getSegmentError() : string {
+        if (empty($this->segmentError)) {
             return FALSE;
         }
         
-        return implode("\n", self::$segmentError);
+        return implode("\n", $this->segmentError);
     }
 }

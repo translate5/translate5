@@ -560,7 +560,9 @@ class editor_TaskController extends ZfExtended_RestController {
         $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
         /* @var $worker editor_Models_Excel_Worker */
         $worker->init($this->entity->getTaskGuid(), ['filename' => $tempFilename]);
-        $worker->queue();
+        //TODO running import as direct run / synchronous process. 
+        // Reason is just the feedback for the user, which the user should get directly in the browser
+        $worker->run(); 
         $this->view->success = true;
     }
     
@@ -759,7 +761,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->load($this->_getParam('id'));
         
         //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
-        $this->entity->checkStateAllowsActions([editor_Models_Excel_ExImport::TASK_STATE_ISEXCELEXPORTED]);
+        $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
         
         $taskguid = $this->entity->getTaskGuid();
         $this->log->request();

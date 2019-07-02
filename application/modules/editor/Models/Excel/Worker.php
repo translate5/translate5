@@ -40,6 +40,15 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
     }
     
     /**
+     * enable direct runs
+     * {@inheritDoc}
+     * @see ZfExtended_Worker_Abstract::run()
+     */
+    public function run() {
+        return parent::run();
+    }
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::work()
      */
@@ -49,7 +58,7 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         $task->loadByTaskGuid($this->taskGuid);
         
         // do nothing if task is not in state "is Excel exported"
-        if ($task->getState() != editor_Models_Excel_ExImport::TASK_STATE_ISEXCELEXPORTED) {
+        if ($task->getState() != editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED) {
             return false;
         }
         
@@ -61,15 +70,13 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         /* @var $reimportExcel editor_Models_Import_Excel */
         
         // on error an editor_Models_Excel_ExImportException is thrown
-        $reimportExcel::run($task, $filename);
+        $reimportExcel->run($task, $filename);
         
         // unlock task and set state to 'open'
-        $excelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
-        /* @var $excelExImport editor_Models_Excel_ExImport */
-        $excelExImport->taskUnlock($task);
+        $reimportExcel->taskUnlock($task);
         
         // @TODO: if there where error in segments, show them as hint in frontend.
-        if ($segmentError = $reimportExcel::getSegmentError()) {
+        if ($segmentError = $reimportExcel->getSegmentError()) {
             $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
             /* @var $logger ZfExtended_Logger */
             

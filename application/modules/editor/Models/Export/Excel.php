@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Export the whole task as an Excel-file
  */
-class editor_Models_Export_Excel {
+class editor_Models_Export_Excel extends editor_Models_Excel_AbstractExImport {
     /**
      * @var editor_Models_Excel_ExImport
      */
@@ -43,6 +43,7 @@ class editor_Models_Export_Excel {
     
     public function __construct(editor_Models_Task $task) {
         $this->task = $task;
+        parent::__construct();
     }
     
     /**
@@ -55,7 +56,7 @@ class editor_Models_Export_Excel {
             $this->export($fileName, $taskLock);
         }
         catch (Exception $e) {
-            $this->excel->taskUnlock($this->task);
+            $this->taskUnlock($this->task);
             // throw exception 'E1137' => 'Task can not be exported as Excel-file',
             throw new editor_Models_Excel_ExImportException('E1137',['task' => $this->task], $e);
         }
@@ -86,7 +87,7 @@ class editor_Models_Export_Excel {
         $this->task->createMaterializedView();
         
         if($taskLock) {
-            $this->excel->taskLock($this->task);
+            $this->taskLock($this->task);
         }
         
         // load segment tagger to extract pure text from segments

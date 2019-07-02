@@ -60,13 +60,6 @@ class editor_Models_Excel_ExImport {
      */
     protected $taskMailPm = NULL;
     
-    
-    /**
-     * task-state to identify a task as "excel exported"
-     * @var string
-     */
-    const TASK_STATE_ISEXCELEXPORTED = 'ExcelExported';
-    
     /**
      * Container to hold the excel-object aka PhpOffice\PhpSpreadsheet\Spreadsheet
      * @var \PhpOffice\PhpSpreadsheet\Spreadsheet
@@ -104,7 +97,9 @@ class editor_Models_Excel_ExImport {
      * ::loadFromExcel($file)
      * to get an instance of the class
      */
-    //protected function __construct() {} // :-( this does not work, because the class-factory needs a public constructor...
+    protected function __construct() {
+        $this->log = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+    }
     
     /**
      * Create a new, empty excel
@@ -112,9 +107,9 @@ class editor_Models_Excel_ExImport {
      * @return editor_Models_Excel_ExImport
      */
     public static function createNewExcel(editor_Models_Task $task) : editor_Models_Excel_ExImport {
-        $tempExImExcel = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+        $tempExImExcel = ZfExtended_Factory::get('editor_Models_Excel_ExImport',[],false);
         /* @var editor_Models_Excel_ExImport $tempExImExcel */
-        $tempExImExcel->log = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+        $tempExImExcel->__construct();
         
         // init class properties
         $tempExImExcel->taskGuid = $task->getTaskGuid();
@@ -184,8 +179,9 @@ class editor_Models_Excel_ExImport {
      * @return editor_Models_Excel_ExImport
      */
     public static function loadFromExcel(string $filename) : editor_Models_Excel_ExImport {
-        $tempExImExcel = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
+        $tempExImExcel = ZfExtended_Factory::get('editor_Models_Excel_ExImport', [], false);
         /* @var editor_Models_Excel_ExImport $tempExImExcel */
+        $tempExImExcel->__construct();
         
         // load excel
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
@@ -352,39 +348,6 @@ class editor_Models_Excel_ExImport {
         // @TODO: deaktivate writing for CELL B6 (taskGuid). Only enabled for development
         $sheet->getStyle('B6')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
         
-    }
-    
-    
-    /**
-     * lock the task for editing and set the tasks state to "isExcelExported"
-     * @param editor_Models_Task $task
-     * @return bool
-     */
-    public function taskLock(editor_Models_Task $task) : bool {
-        if(!$task->lock(NOW_ISO, true)) {
-            $this->log->debug('E0000', 'Excel Export: task lock failed');
-            return FALSE;
-        }
-        
-        $task->setState(self::TASK_STATE_ISEXCELEXPORTED);
-        $task->save();
-        $this->log->debug('E0000', 'Excel Export: task lock success');
-        return TRUE;
-    }
-    /**
-     * lock the task for editing and set the tasks state to "isExcelExported"
-     * @param editor_Models_Task $task
-     * @return bool
-     */
-    public function taskUnlock(editor_Models_Task $task) : bool {
-        if (!$task->unlock()) {
-            $this->log->debug('E0000', 'Excel Export: task unlock failed');
-            return FALSE;
-        }
-        $task->setState(editor_Models_Task::STATE_OPEN);
-        $task->save();
-        $this->log->debug('E0000', 'Excel Export: task unlock success');
-        return TRUE;
     }
 }
 
