@@ -20,8 +20,8 @@ const ComponentEditor={
 		me.typeRequestDataKeyMap['termEntryAttribute']='value';
 		me.typeRequestDataKeyMap['termAttribute']='value';
         
-        this.cacheDom();
-        this.initEvents();
+		me.cacheDom();
+		me.initEvents();
 	},
     
     cacheDom:function(){

@@ -56,6 +56,14 @@ const Attribute={
             type:'termAttribute',
             reference: 'content'
         },me.onEditAttributeClick);
+        
+        //handle the definition to (the termentryattibute-deffinition is also visible in the term table)
+        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termEntryAttribute"] [data-editable][data-type="termEntryAttribute"]',{
+            scope:me,
+            type:'termEntryAttribute',
+            reference: 'content'
+        },me.onEditAttributeClick);
+        
         // - Comment
         me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable-comment][data-type="termAttribute"]',{
             scope:me,
