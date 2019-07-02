@@ -324,6 +324,8 @@ class editor_TermController extends ZfExtended_RestController {
             $this->updateUsageData($commentAttribute);
             $commentAttribute->save();
             $this->view->rows = $commentAttribute->getDataObject();
+            //set the groupid, it is used by the attribute proposal component
+            $this->view->rows->groupId=$this->entity->getGroupId();
             return;
         }
         
@@ -368,6 +370,8 @@ class editor_TermController extends ZfExtended_RestController {
         //update the view
         $this->view->rows = $commentAttribute->getDataObject();
         $this->view->rows->proposal = $proposal->getDataObject();
+        //set the groupid, it is used by the attribute proposal component
+        $this->view->rows->groupId=$entryId->$termEntry->getGroupId();
     }
     
     /**
