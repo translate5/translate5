@@ -3282,6 +3282,30 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Diese Domain wird bereits verwendet.</source>
     <target>This domain is already in use.</target>
 </trans-unit>
+<trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='>
+    <source>Excel Re-Importieren</source>
+    <target>Excel Re-Import</target>
+</trans-unit>
+<trans-unit id='RXhjZWwgcmVpbXBvcnRpZXJlbg=='>
+    <source>Excel reimportieren</source>
+    <target>re-import excel file</target>
+</trans-unit>
+<trans-unit id='U3BpZWxlbiBTaWUgaGllciBkaWUgdm9yaGVyIGhlcnVudGVyZ2VsYWRlbmUgRXhjZWwtRGF0ZWkgd2llZGVyIGluIGRpZSBBdWZnYWJlIGVpbi4='>
+    <source>Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.</source>
+    <target>Re-import the previously downloaded excel-file back into the task.</target>
+</trans-unit>
+<trans-unit id='RXJsYXVidCBpc3QgaGllciBudXIgZGFzIEhvY2hsYWRlbiB2b24gKi54bHN4LURhdGVpZW4gLg=='>
+    <source>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</source>
+    <target>Only *.xlsx files are allowed.</target>
+</trans-unit>
+<trans-unit id='RGF0ZWkgd2lyZCBob2NoZ2VsYWRlbg=='>
+    <source>Datei wird hochgeladen</source>
+    <target>uploading file</target>
+</trans-unit>
+<trans-unit id='RXhjZWwgaG9jaGxhZGVu'>
+    <source>Excel hochladen</source>
+    <target>upload excel</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
