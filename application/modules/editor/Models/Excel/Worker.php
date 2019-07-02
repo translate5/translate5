@@ -75,7 +75,7 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
             
             $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):.'."\n".$segmentError;
             // log warnging 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
-            $logger->warn('E1142', $msg, ['task' => $this->task]);
+            $logger->warn('E1142', $msg, ['task' => $task]);
         }
    }
 }
