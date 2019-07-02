@@ -199,17 +199,7 @@ const Term={
 			console.log("fillSearchTermSelect: " + me.searchTermsResponse.length + " Treffer");
 			
 			console.log("fillSearchTermSelect: me.disableLimit"); // FIXME: do we need this here?
-				
-			//if only one record, find the attributes and display them
-			if(me.searchTermsResponse.length===1){
-	            me.newTermCollectionId = me.searchTermsResponse[0].collectionId;
-	            console.log('fillSearchTermSelect => newTermCollectionId: ' + me.newTermCollectionId);
-                me.newTermGroupId = me.searchTermsResponse[0].groupId;
-	            me.newTermTermEntryId = me.searchTermsResponse[0].termEntryId;
-				console.log("fillSearchTermSelect: only one record => find the attributes and display them");
-				me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
-			}
-			
+
 			if(me.searchTermsResponse.length>0){
 				showFinalResultContent();
 			}
@@ -218,9 +208,6 @@ const Term={
 				return;
 			}
 			
-			if(me.searchTermsResponse.length > 1){
-			    me.$_resultTermsHolder.hide();
-			}
 			
 			//fill the term component with the search results
 			for(var i=0;i<me.searchTermsResponse.length;i++){
@@ -265,6 +252,23 @@ const Term={
 			
 			// "reset" search form
 			$("#search").autocomplete( "search", $("#search").val('') );
+			
+			//if only one record, find the attributes and display them
+			if(me.searchTermsResponse.length===1){
+	            me.newTermCollectionId = me.searchTermsResponse[0].collectionId;
+	            console.log('fillSearchTermSelect => newTermCollectionId: ' + me.newTermCollectionId);
+                me.newTermGroupId = me.searchTermsResponse[0].groupId;
+	            me.newTermTermEntryId = me.searchTermsResponse[0].termEntryId;
+				console.log("fillSearchTermSelect: only one record => find the attributes and display them");
+				me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
+				return;
+			}
+			
+			
+			if(me.searchTermsResponse.length > 1){
+			    me.$_resultTermsHolder.hide();
+			}
+			
 		},
 		
 		/***
@@ -286,6 +290,10 @@ const Term={
             if (me.reloadTermEntry) {
                 me.termGroupsCache = []; // FIXME: better remove only the groupId's items from the cache instead of setting reloadTermEntry to true!
                 me.reloadTermEntry=false; //reset term entry reload flag
+                
+                //hide the no result error if the term is created via no found search
+                me.$_searchErrorNoResults.hide();
+                me.resetNewTermData();
             }
 		    if(me.termGroupsCache[termGroupid]){
 		    	TermEntry.drawTermEntryAttributes(me.termGroupsCache[termGroupid].rows[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
@@ -335,7 +343,7 @@ const Term={
             me.$_resultTermsHolder.show();
             
             // -------render skeleton for new terms -------
-            html += me.renderNewTermSkeleton();
+            html += me.renderNewTermSkeleton(termsData);
             
             // -------render term-data -------
 		    $.each(termsData, function (i, term) {
@@ -430,15 +438,16 @@ const Term={
         
         /***
          * Render html for adding new terms (= visible as "skeleton").
+         * @param {Object} termsData
          * @returns
          */
-        renderNewTermSkeleton:function(){
+        renderNewTermSkeleton:function(termsData){
             var me = this,
                 html = '',
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
                 $_filteredClients = $('#searchFilterTags input.filter.client'),
                 showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?,
-                newTermData = me.getNewTermData();
+                newTermData = me.getNewTermData(termsData);
             html += me.renderTerm(newTermData[0],showInfosForSelection);
             return html;
         },
@@ -836,12 +845,16 @@ const Term={
         
         /**
          * Returns term data for creating a new term.
+         * @param {Object} termsData
          */
-        getNewTermData: function() {
+        getNewTermData: function(termsData) {
             var me = this,
                 newTermData = {};
-            if(me.newTermCollectionId == undefined) {
-                debugger;
+            //if the collection id is not set, set it from the terms data
+            if(me.newTermCollectionId == undefined && termsData) {
+                me.newTermCollectionId = termsData[0].collectionId;
+                me.newTermTermEntryId = termsData[0].termEntryId;
+                me.newTermGroupId=termsData[0].groupId;
             }
             console.log('getNewTermData; currently known: ');
             console.log('- attributes: ' + JSON.stringify(me.newTermAttributes));
