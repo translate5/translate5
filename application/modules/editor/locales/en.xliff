@@ -3304,7 +3304,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RXhjZWwgaG9jaGxhZGVu'>
     <source>Excel hochladen</source>
-    <target>upload excel</target>
+    <target>Upload excel</target>
 </trans-unit>
     </body>
   </file>
