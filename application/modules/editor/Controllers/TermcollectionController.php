@@ -195,6 +195,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             'termStatus',
             'processStatus',
             'termId',
+            'termEntryId',
             'collectionId',
             'languageId',
             'term'

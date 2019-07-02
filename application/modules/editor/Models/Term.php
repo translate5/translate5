@@ -901,6 +901,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             'status as termStatus',
             'processStatus as processStatus',
             'id as termId',
+            'termEntryId',
             'collectionId',
             'language as languageId'
         ];
