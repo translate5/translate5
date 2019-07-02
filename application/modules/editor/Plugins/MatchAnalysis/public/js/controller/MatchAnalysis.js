@@ -105,7 +105,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
                 taskUnhandledAction: 'onTaskActionColumnNoHandler',
-                taskStateCheckPullCleaned:'onTaskStateCheckPullCleaned'
+                periodicalTaskReloadIgnore: 'ignoreTaskForReload'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -367,9 +367,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
             },
             scope: this,
-            timeout:600000,
             success: function(response){
-                me.checkTaskState(taskId);
+                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
+                //start task state checker loop
+                controller.startCheckImportStates();
             }, 
             failure: function(response){
                 me.removeLoadingMask();
@@ -422,31 +423,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         return component.checked ? 1 : 0;
     },
 
-    /***
-     * Add tast state check conditional function, so the task reload condition depends also from the matchanalysis state
+    /**
+     * if task must be reloaded periodically we have to return false here
      */
-    checkTaskState:function(taskId){
-        //the task needs to be updated, so the last state is fetched from the db
-        var task = Ext.StoreManager.get('admin.Tasks').getById(taskId);
-        if(!task) {
-            return;
-        }
-        task.load({
-            success:function(){
-                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
-                //add match analysis state checker function to the task state checker loop
-                controller.addTaskStateCheckPull(function(rec){
-                    return rec.get('state')=='matchanalysis';
-                });
-                controller.startCheckImportStates();
-            }
-        });
+    ignoreTaskForReload: function(task) {
+        return task.get('state') !== 'matchanalysis';
     },
 
     /***
      * Tash state check cleand event handler. This event is fired from Task overview controller.
      */
     onTaskStateCheckPullCleaned:function(){
+        //FIXME wann muss ich das machen? Eigentlich lösgelöst von der TaskOverview!
         this.removeLoadingMask(true);
     },
 
