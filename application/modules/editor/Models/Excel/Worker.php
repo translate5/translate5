@@ -35,7 +35,7 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        // @TODO: what needs to be check here?
+        // @TODO: what needs to be check here? TL: the filename for example!
         return true;
     }
     
@@ -66,7 +66,7 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         // unlock task and set state to 'open'
         $excelExImport = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
         /* @var $excelExImport editor_Models_Excel_ExImport */
-        $excelExImport::taskUnlock($task);
+        $excelExImport->taskUnlock($task);
         
         // @TODO: if there where error in segments, show them as hint in frontend.
         if ($segmentError = $reimportExcel::getSegmentError()) {

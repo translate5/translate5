@@ -93,6 +93,11 @@ class editor_Models_Excel_ExImport {
     protected $segmentRow = 2;
     
     /**
+     * @var ZfExtended_Logger
+     */
+    protected $log;
+    
+    /**
      * Class should not be used with new editor_Models_Excel_ExImport()
      * You should use
      * ::createNewExcel($task) or
@@ -109,6 +114,7 @@ class editor_Models_Excel_ExImport {
     public static function createNewExcel(editor_Models_Task $task) : editor_Models_Excel_ExImport {
         $tempExImExcel = ZfExtended_Factory::get('editor_Models_Excel_ExImport');
         /* @var editor_Models_Excel_ExImport $tempExImExcel */
+        $tempExImExcel->log = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
         
         // init class properties
         $tempExImExcel->taskGuid = $task->getTaskGuid();
@@ -355,18 +361,14 @@ class editor_Models_Excel_ExImport {
      * @return bool
      */
     public function taskLock(editor_Models_Task $task) : bool {
-        // @TODO: disabled at the moment. Don't know if this is the right way to lock the task....
-        //return TRUE;
-        
-        if(!$task->lock(NOW_ISO, TRUE)) {
-            $this->log->logError('The following task is in use and cannot be exported: '.$task->getTaskName().' ('.$task->getTaskGuid().')');
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task lock failed');
+        if(!$task->lock(NOW_ISO, true)) {
+            $this->log->debug('E0000', 'Excel Export: task lock failed');
             return FALSE;
         }
         
         $task->setState(self::TASK_STATE_ISEXCELEXPORTED);
         $task->save();
-        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task is locked');
+        $this->log->debug('E0000', 'Excel Export: task lock success');
         return TRUE;
     }
     /**
@@ -376,12 +378,12 @@ class editor_Models_Excel_ExImport {
      */
     public function taskUnlock(editor_Models_Task $task) : bool {
         if (!$task->unlock()) {
-            error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task unlock failed');
+            $this->log->debug('E0000', 'Excel Export: task unlock failed');
             return FALSE;
         }
         $task->setState(editor_Models_Task::STATE_OPEN);
         $task->save();
-        error_log(__FILE__.'::'.__LINE__.'; '.__CLASS__.' -> '.__FUNCTION__.'; task is unlocked');
+        $this->log->debug('E0000', 'Excel Export: task unlock success');
         return TRUE;
     }
 }
