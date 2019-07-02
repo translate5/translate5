@@ -758,7 +758,8 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
-        $this->entity->checkStateAllowsActions();
+        //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
+        $this->entity->checkStateAllowsActions([editor_Models_Excel_ExImport::TASK_STATE_ISEXCELEXPORTED]);
         
         $taskguid = $this->entity->getTaskGuid();
         $this->log->request();
