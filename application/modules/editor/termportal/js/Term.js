@@ -851,7 +851,7 @@ const Term={
             var me = this,
                 newTermData = {};
             //if the collection id is not set, set it from the terms data
-            if(me.newTermCollectionId == undefined && termsData) {
+            if(me.newTermCollectionId == undefined && (termsData && termsData.length>0)) {
                 me.newTermCollectionId = termsData[0].collectionId;
                 me.newTermTermEntryId = termsData[0].termEntryId;
                 me.newTermGroupId=termsData[0].groupId;
