@@ -345,9 +345,8 @@ class editor_Models_Excel_ExImport {
         $sheet->setCellValue('A6', 'Task-Guid:');
         $sheet->setCellValue('B6', $this->taskGuid);
         
-        // @TODO: deaktivate writing for CELL B6 (taskGuid). Only enabled for development
-        $sheet->getStyle('B6')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
-        
+        //deactivate writing for CELL B6 (taskGuid). Only enabled for development
+        //$sheet->getStyle('B6')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
     }
 }
 

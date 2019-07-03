@@ -30,6 +30,12 @@ END LICENSE AND COPYRIGHT
  * Contains the Excel Reimport Worker
  */
 class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
+    
+    /**
+     * @var editor_Models_Import_Excel
+     */
+    protected $reimportExcel;
+    
     /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
@@ -37,6 +43,30 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
     protected function validateParameters($parameters = array()) {
         // @TODO: what needs to be check here? TL: the filename for example!
         return true;
+    }
+    
+    /**
+     * prepares the excel import
+     * @param editor_Models_Task $task
+     * @throws editor_Models_Excel_ExImportException
+     * @return string
+     */
+    public function prepareImportFile(editor_Models_Task $task): string {
+        $tempFilename = date('Y-m-d__H_i_s').'__'.rand().'.xslx';
+        $uploadTarget = $task->getAbsoluteTaskDataPath().'/excelReimport/';
+        
+        // create upload target directory /data/importedTasks/<taskGuid>/excelReimport/ (if not exist already)
+        if (!is_dir($uploadTarget)) {
+            mkdir($uploadTarget, 0755);
+        }
+        
+        // move uploaded excel into upload target
+        if (!move_uploaded_file($_FILES['excelreimportUpload']['tmp_name'], $uploadTarget.$tempFilename)) {
+            // @FIXME: return something invalid (e.g. http status 4xx)
+            // throw exception 'E1141' => 'Excel Reimport: upload failed.'
+            throw new editor_Models_Excel_ExImportException('E1141',['task' => $task]);
+        }
+        return $tempFilename;
     }
     
     /**
@@ -66,23 +96,22 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         $tempParameter = $this->getModel()->getParameters();
         $filename = $tempParameter['filename'];
         
-        $reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
+        $this->reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
         /* @var $reimportExcel editor_Models_Import_Excel */
         
         // on error an editor_Models_Excel_ExImportException is thrown
-        $reimportExcel->run($task, $filename);
+        $this->reimportExcel->run($task, $filename);
         
         // unlock task and set state to 'open'
         $reimportExcel->taskUnlock($task);
-        
-        // @TODO: if there where error in segments, show them as hint in frontend.
-        if ($segmentError = $reimportExcel->getSegmentError()) {
-            $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
-            /* @var $logger ZfExtended_Logger */
-            
-            $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):.'."\n".$segmentError;
-            // log warnging 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
-            $logger->warn('E1142', $msg, ['task' => $task]);
-        }
-   }
+        return true;
+    }
+    
+    /**
+     * Returns the segment errors of the reimport, empty array if none
+     * @return array
+     */
+    public function getSegmentErrors(): array {
+        return $this->reimportExcel->getSegmentErrors();
+    }
 }

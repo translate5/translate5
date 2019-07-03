@@ -213,14 +213,18 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
         }
         
         // compare all segments if an empty segment in excel is not-empty in task
+        $emptySegments = [];
         foreach ($tempExcelSegments as $excelSegment) {
             if (empty($excelSegment->target)) {
                 $t5Segment->loadBySegmentNrInTask($excelSegment->nr, $task->getTaskGuid());
                 if (!empty($t5Segment->getTargetEdit())) {
-                    // throw exception 'E1140' => 'Excel Reimport: Formal check failed: segment #{segmentNr} is empty in excel while there was content in the the original task.'
-                    throw new editor_Models_Excel_ExImportException('E1140',['task' => $task, 'segmentNr' => $excelSegment->nr]);
+                    $emptySegments[] = $excelSegment->nr;
                 }
             }
+        }
+        if(!empty($emptySegments)) {
+            // throw exception 'E1140' => 'Excel Reimport: Formal check failed: segment #{segmentNr} is empty in excel while there was content in the the original task.'
+            throw new editor_Models_Excel_ExImportException('E1140',['task' => $task, 'segmentNr' => join(',', $emptySegments)]);
         }
     }
     
@@ -229,25 +233,20 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
      * @param int $segmentNr
      * @param string $hint
      */
-    protected function addSegmentError(int $segmentNr, string $hint = '') : void {
-        $tempError = '#'.$segmentNr;
-        if (!empty($hint)) {
-            $tempError .= ': '.$hint;
-        }
-        
-        $this->segmentError[] = $tempError;
+    protected function addSegmentError(int $segmentNr, string $hint) : void {
+        //we abuse the segment container for transporting the error messages
+        $error = new excelExImportSegmentContainer();
+        $error->nr = $segmentNr;
+        $error->comment = $hint;
+        $this->segmentError[] = $error;
     }
     
     /**
      * get the list of internal segment errors (as formatet string).
      * if there where no error FALSE will be returned
-     * @return string|false
+     * @return excelExImportSegmentContainer[]
      */
-    public function getSegmentError() : string {
-        if (empty($this->segmentError)) {
-            return FALSE;
-        }
-        
-        return implode("\n", $this->segmentError);
+    public function getSegmentErrors() : array {
+        return $this->segmentError;
     }
 }

@@ -84,7 +84,6 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
      * @see ZfExtended_Worker_Abstract::run()
      */
     public function run() {
-        $this->isWorkerThread = false;
         return parent::run();
     }
 

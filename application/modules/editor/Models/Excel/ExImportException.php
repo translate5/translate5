@@ -39,19 +39,14 @@ class editor_Models_Excel_ExImportException extends ZfExtended_ErrorCodeExceptio
          */
         protected $domain = 'editor.task.exceleximport';
         
-        // @TODO: match E-numbers
         static protected $localErrorCodes = [
-                        // Export:
-                        'E1137' => 'Task can not be exported as Excel-file.',
-                        
-                        // Reimport:
-                        'E1141' => 'Excel Reimport: upload failed.',
-                        
-                        'E1138' => 'Excel Reimport: Formal check failed: task-guid differs in task compared to the excel.',
-                        'E1139' => 'Excel Reimport: Formal check failed: number of segments differ in task compared to the excel.',
-                        'E1140' => 'Excel Reimport: Formal check failed: segment #{segmentNr} is empty in excel while there was content in the the original task.',
-                        
-                        'E1142' => 'Excel Reimport: at least one segment needs to be controlled.',
-                        
+            // Export:
+            'E1137' => 'Task can not be exported as Excel-file.',
+            
+            // Reimport:
+            'E1138' => 'Excel Reimport: Formal check failed: task-guid differs in task compared to the excel.',
+            'E1139' => 'Excel Reimport: Formal check failed: number of segments differ in task compared to the excel.',
+            'E1140' => 'Excel Reimport: Formal check failed: segment #{segmentNr} is empty in excel while there was content in the the original task.',
+            'E1141' => 'Excel Reimport: upload failed.',
         ];
 }

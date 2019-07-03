@@ -542,27 +542,56 @@ class editor_TaskController extends ZfExtended_RestController {
     public function excelreimportAction() {
         $this->getAction();
         
-        $tempFilename = date('Y-m-d__H_i_s').'__'.rand().'.xslx';
-        $uploadTarget = $this->entity->getAbsoluteTaskDataPath().'/excelReimport/';
-        
-        // create upload target directory /data/importedTasks/<taskGuid>/excelReimport/ (if not exist already)
-        if (!is_dir($uploadTarget)) {
-            mkdir($uploadTarget, 0755);
-        }
-        
-        // move uploaded excel into upload target
-        if (!move_uploaded_file($_FILES['excelreimportUpload']['tmp_name'], $uploadTarget.$tempFilename)) {
-            // @FIXME: return something invalid (e.g. http status 4xx)
-            // throw exception 'E1141' => 'Excel Reimport: upload failed.'
-            throw new editor_Models_Excel_ExImportException('E1141',['task' => $this->entity]);
-        }
-        
         $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
         /* @var $worker editor_Models_Excel_Worker */
-        $worker->init($this->entity->getTaskGuid(), ['filename' => $tempFilename]);
-        //TODO running import as direct run / synchronous process. 
-        // Reason is just the feedback for the user, which the user should get directly in the browser
-        $worker->run(); 
+        
+        try {
+            $tempFilename = $worker->prepareImportFile($this->entity);
+            
+            $worker->init($this->entity->getTaskGuid(), ['filename' => $tempFilename]);
+            //TODO running import as direct run / synchronous process. 
+            // Reason is just the feedback for the user, which the user should get directly in the browser
+            $worker->run();
+        }
+        catch(editor_Models_Excel_ExImportException $e) {
+            $codeToFieldAndMessage = [
+                'E1138' => ['excelreimportUpload', 'Die Excel Datei gehört nicht zu dieser Aufgabe.'],
+                'E1139' => ['excelreimportUpload', 'Die Anzahl der Segmente in der Excel-Datei und in der Aufgabe sind unterschiedlich!'],
+                'E1140' => ['excelreimportUpload', 'Ein oder mehrere Segmente sind in der Excel-Datei leer, obwohl in der Orginalaufgabe Inhalt vorhanden war.'],
+                'E1141' => ['excelreimportUpload', 'Dateiupload fehlgeschlagen. Bitte versuchen Sie es erneut.'],
+            ];
+            $code = $e->getErrorCode();
+            if(empty($codeToFieldAndMessage[$code])) {
+                throw $e;
+            }
+            // the Import exceptions causing unprossable entity exceptions are logged on level info
+            $this->log->exception($e, [
+                'level' => ZfExtended_Logger::LEVEL_INFO
+            ]);
+            
+            throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
+                //fieldName => error message to field
+                $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+            ]);
+        }
+        
+        if ($segmentErrors = $worker->getSegmentErrors()) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+            /* @var $logger ZfExtended_Logger */
+            
+            $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):';
+            // log warning 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
+            $logger->warn('E1142', $msg."\n{segments}", [
+                'task' => $this->entity,
+                'segments' => join("\n", array_map(function(excelExImportSegmentContainer $item) {
+                    return '#'.$item->nr.': '.$item->comment;
+                }, $segmentErrors)),
+            ]);
+            $msg = $this->translate->_('Die Excel-Datei konnte reimportiert werden, die nachfolgenden Segmente beinhalten aber Fehler und müssen korrigiert werden:');
+            $this->restMessages->addWarning($msg, $logger->getDomain(), null, array_map(function(excelExImportSegmentContainer $item) {
+                return ['type' => $item->nr, 'error' => $item->comment];
+            }, $segmentErrors));
+        }
         $this->view->success = true;
     }
     
