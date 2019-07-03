@@ -102,9 +102,9 @@ Ext.define('Editor.MessageBox',{
             return '';
         }
         var tpl = new Ext.XTemplate([
-            '<table>',
+            '<table class="message-box-data">',
             '<tpl for=".">',
-            '<tr><td>{type}: </td><td>{error}</td></tr>',
+            '<tr><td class="type">{type}: </td><td class="msg">{error}</td></tr>',
             '</tpl>',
             '</table>'
         ]);

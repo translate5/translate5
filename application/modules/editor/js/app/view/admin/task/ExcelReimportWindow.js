@@ -83,6 +83,27 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
                             xtype: 'container',
                             html: me.strings.info
                         },
+                        {
+                            xtype: 'container',
+                            itemId: 'feedback',
+                            height:'70%',
+                            style: {
+                                userSelect: 'auto'
+                            },
+                            layout: 'fit',
+                            scrollable: 'y',
+                            margin: '10 0 0 0',
+                            tpl: ['<tpl for=".">',
+                                    '<tpl if="type == \'error\'">',
+                                        '<div class="x-message-box-error x-message-box-icon" style="float:left;"></div><h3>{msg}</h3>',
+                                    '<tpl else>',
+                                        '<div class="x-message-box-warning x-message-box-icon" style="float:left;"></div><h3>{msg}</h3>',
+                                    '</tpl>',
+                                    '<tpl if="data">',
+                                        '{[Editor.MessageBox.dataTable(values.data)]}',
+                                    '</tpl>',
+                                  '</tpl>']
+                        }
                     ],
                 },
             ],

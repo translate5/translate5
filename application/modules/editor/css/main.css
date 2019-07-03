@@ -292,6 +292,8 @@ background-color: #EAF1FB;
 .app-msg .icon-status-warning {background-image: url("../images/error.png");}
 .app-msg .icon-status-notice {background-image: url("../images/information.png");}
 .app-msg .icon-status-ok {background-image: url("../images/tick.png");}
+table.message-box-data .type {vertical-align: top;} 
+table.message-box-data .error {} 
 
 .taskUploadCard h1 {
 	background:url("../images/exclamation.png") no-repeat left center; padding-left: 20px;

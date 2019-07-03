@@ -47,6 +47,9 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
             '#cancelBtn': {
                 click: 'close'
             },
+            'filefield': {
+                change: 'filechange'
+            }
         }
     },
     
@@ -58,7 +61,11 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
         this.getView().close();
     },
     
-    /***
+    filechange: function() {
+        this.getView().down('#feedback').update('');
+    },
+    
+    /**
      * starts the upload / form submit
      * 
      */
@@ -74,7 +81,6 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
         }
         
         win.setLoading(win.strings.loadingWindowMessage);
-        
         form.submit({
             //Accept Header of submitted file uploads could not be changed:
             //http://stackoverflow.com/questions/13344082/fileupload-accept-header
@@ -87,11 +93,28 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
             url: Editor.data.restpath+'task/'+task.get('id')+'/excelreimport',
             scope: this,
             success: function(form, submit) {
-                win.close();
+                if(submit.result.errors) {
+                    win.down('#feedback').update(submit.result.errors);
+                    win.down('#uploadBtn').hide();
+                    win.setLoading(false);
+                }
+                else {
+                    win.close();
+                }
             },
             failure: function(form, submit) {
+                var errors;
                 win.setLoading(false);
-                Editor.app.getController('ServerException').handleException(submit.response);
+                if(submit.result.httpStatus == "422") {
+                    errors = submit.result.errorsTranslated;
+                    form.markInvalid(errors);
+                    if(errors.excelreimportUpload) {
+                        win.down('#feedback').update({msg: errors.excelreimportUpload.join('<br>'), type: 'error'});
+                    }
+                }
+                else {
+                    Editor.app.getController('ServerException').handleException(submit.response, true);
+                }
             }
         });
     },
