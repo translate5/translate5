@@ -400,6 +400,13 @@ const Term={
 		            });
 		            
 		            $.each($("#termTable h3"), function (i, termitem) {
+		            	//check it is request from instanttranslate for translated term
+		            	if(isTermProposalFromInstantTranslate && termitem.dataset.termId==-1){
+		            		//this will triger the "new translated" term editor
+		            		$(termitem).click();
+		            		isTermProposalFromInstantTranslate=false;
+		            		return false;
+		            	}
 		            	//expand the selected term (check for language, since there can be terms with same name in same term entry)
 		                if((termitem.dataset.termValue === item.textContent) && (termitem.dataset.language==item.dataset.language)){
 		                	me.$_termTable.accordion({
