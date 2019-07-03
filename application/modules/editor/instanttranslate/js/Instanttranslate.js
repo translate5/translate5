@@ -875,7 +875,7 @@ function checkTermPortalIntegration() {
  * @params {Object}
  */
 function drawTermPortalIntegration(termToPropose) {
-    var html = '<span class="term-proposal" title="Propose as new term in terminology portal" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><span class="ui-icon ui-icon-circle-plus"></span></span>';
+    var html = '<span class="term-proposal" title="'+Editor.data.languageresource.translatedStrings['termProposalIconTooltip']+'" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><span class="ui-icon ui-icon-circle-plus"></span></span>';
     $('#'+termToPropose.id+'.translation-result').next('.copyable-copy').append(html);
 }
 
