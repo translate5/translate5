@@ -954,6 +954,13 @@ const Term={
                 collectionSelectHeader,
                 collectionSelect,
                 collectionSelectOptions = '';
+            
+            //filtered collection is empty it can means that there is only one collection available and the select is not visible
+            if(filteredCollections.length == 0){
+            	//collectionIds is global variable for all available collections to the current user
+            	filteredCollections=collectionIds;
+            }
+            
             if (filteredCollections.length == 1) {
                 me.newTermCollectionId = filteredCollections[0];
                 console.log('drawFilteredTermCollectionSelect => newTermCollectionId: ' + me.newTermCollectionId);
@@ -1080,6 +1087,13 @@ const Term={
             console.log('onAddTermEntryClick');
             var me = event.data.scope,
                 filteredCollections = getFilteredCollections();
+            
+            //filtered collection is empty it can means that there is only one collection available and the select is not visible
+            if(filteredCollections.length == 0){
+            	//collectionIds is global variable for all available collections to the current user
+            	filteredCollections=collectionIds;
+            }
+            
             console.log('1034 onAddTermEntryClick => resetNewTermData');
             me.resetNewTermData();
             me.$_searchTermsSelect.find('.ui-state-active').removeClass('ui-state-active');
