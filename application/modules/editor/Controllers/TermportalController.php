@@ -44,7 +44,11 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         
         $userSession = new Zend_Session_Namespace('user');
-        $this->view->Php2JsVars()->set('app.user.isInstantTranslateAllowed', in_array('instantTranslate', $userSession->data->roles)); // see FIXME for isInstantTranslateAllowed()? ("use the rights not the roles here!!!!")
+        $this->view->Php2JsVars()->set('app.user.isInstantTranslateAllowed', in_array('instantTranslate', $userSession->data->roles));
+        
+        $isTermProposalAllowed= in_array('termProposer', $userSession->data->roles);
+        $this->view->Php2JsVars()->set('app.user.isTermProposalAllowed',$isTermProposalAllowed);
+        $this->view->isTermProposalAllowed=$isTermProposalAllowed;
         
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
