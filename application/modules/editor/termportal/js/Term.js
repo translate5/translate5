@@ -55,6 +55,10 @@ const Term={
 			me.$_searchTermsSelect.on( "selectableselected",{scope:me},me.onSelectSearchTerm);
 		    // FIXME: why is this triggered twice sometimes (with attr('data-value') = "undefined" in the second)
 			
+			if(!Editor.data.app.user.isTermProposalAllowed){
+				return;
+			}
+			
 			// Term-Entries
 	        me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
 	        me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
@@ -449,6 +453,11 @@ const Term={
          * @returns
          */
         renderNewTermSkeleton:function(termsData){
+        	
+			if(!Editor.data.app.user.isTermProposalAllowed){
+				return '';
+			}
+			
             var me = this,
                 html = '',
                 $_filteredCollections = $('#searchFilterTags input.filter.collection'),
@@ -701,6 +710,9 @@ const Term={
          * @param elements
 		 */
         drawProposalButtons: function (elements){
+        	if(!Editor.data.app.user.isTermProposalAllowed){
+				return;
+			}
             console.log('drawProposalButtons: ' + elements);
             var me = this,
                 $_selectorRemove = false,
@@ -894,6 +906,9 @@ const Term={
          * for the editable new term and it is shown again.
          */
         drawLanguageSelectForNewTerm: function() {
+        	if(!Editor.data.app.user.isTermProposalAllowed){
+				return;
+			}
             console.log('drawLanguageSelectForNewTerm');
             var me = this,
                 languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
@@ -933,6 +948,9 @@ const Term={
          * 
          */
         drawLanguageFlagForNewTerm: function () {
+        	if(!Editor.data.app.user.isTermProposalAllowed){
+				return;
+			}
             var me = this,
                 flag = getLanguageFlag(me.newTermRfcLanguage),
                 $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache

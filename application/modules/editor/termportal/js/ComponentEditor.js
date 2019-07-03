@@ -21,6 +21,10 @@ const ComponentEditor={
 		me.typeRequestDataKeyMap['termAttribute']='value';
         
 		me.cacheDom();
+		
+		if(!Editor.data.app.user.isTermProposalAllowed){
+			return;
+		}
 		me.initEvents();
 	},
     
@@ -46,6 +50,9 @@ const ComponentEditor={
 	 * Register term component editor for given term element
 	 */
 	addTermComponentEditor:function($element,$termAttributeHolder){
+		if(!Editor.data.app.user.isTermProposalAllowed){
+			return;
+		}
         console.log('addTermComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
@@ -82,6 +89,9 @@ const ComponentEditor={
 	 * @returns {Object}
 	 */
 	addAttributeComponentEditor:function($element){
+		if(!Editor.data.app.user.isTermProposalAllowed){
+			return;
+		}
         console.log('addAttributeComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text());
@@ -110,6 +120,9 @@ const ComponentEditor={
      * @returns {Object}
 	 */
 	addCommentAttributeEditor:function($element){
+		if(!Editor.data.app.user.isTermProposalAllowed){
+			return;
+		}
         console.log('addCommentAttributeEditor');
 		var me=this,
 			$input= $('<textarea data-editable-comment />').val($element.text());

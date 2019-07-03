@@ -6,6 +6,9 @@ const Attribute={
 	
 	init:function(){
 		this.cacheDom();
+		if(!Editor.data.app.user.isTermProposalAllowed){
+			return;
+		}
 		this.initEvents();
 	},
 	
@@ -361,10 +364,9 @@ const Attribute={
 	 */
 	checkAndUpdateDeffinition:function(attribute,attrType){
 		
-		if(attribute.attrType!='definition'){
+		if(attribute.attrType!='definition' || !Editor.data.app.user.isTermProposalAllowed){
 			return false;
 		}
-		
 		
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
