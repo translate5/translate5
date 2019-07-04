@@ -204,8 +204,17 @@ const Attribute={
 		        success: function(result){
 		        	//reload the termEntry when the attribute is deleted (not proposal)
 		        	if(!result.rows || result.rows.length==0){
-		        		Term.reloadTermEntry=true;
-		        		Term.findTermsAndAttributes(Term.newTermGroupId);
+		        		//TODO: if needed add also for termentry attributes
+		        		$attribute=me.getAttributeComponent($parent.data('attributeId'),'termAttribute');
+		        		//if no regular comment holder is found, check for the newly created
+		        		if(!$attribute || $attribute.length==0){
+		        			$attribute=me.$_termTable.find('p[data-id~="-1"][data-type~="termAttribute"]');
+		        		}
+		        		if(!$attribute || $attribute.length<1){
+		        			return;
+		        		}
+		        		$($attribute).remove()
+		        		$($parent).remove()
 		        		return;
 		        	}
 		        	
@@ -476,7 +485,11 @@ const Attribute={
 	 * The attribute container holder. All attributes and attribute proposals must be surrounded with this container.
 	 */
 	getAttributeContainerRender:function(attribute,html){
-		return '<p data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
+		var isComment='';
+		if(attribute && attribute.name=='note'){
+			isComment='class="isAttributeComment"';
+		}
+		return '<p '+isComment+' data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
 	},
 	
 	/***

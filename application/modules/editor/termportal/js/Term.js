@@ -138,21 +138,12 @@ const Term={
 					'disableLimit':me.disableLimit
 				},
 				success: function(result){
-					//INFO:this is disabled because TRANSLATE-1685: if there is only one result in the live-search, the search is immediately automatically sent. This irritates the user and should not be done. The live search should act, as it does when it has more than one result.
 					me.searchTermsResponse=result.rows[me.KEY_TERM];
 					if(successCallback){
 						successCallback(result.rows[me.KEY_TERM]);
 						return;
 					}
-					
 					me.fillSearchTermSelect(searchString);
-					
-					//me.searchTermsResponse=result.rows[me.KEY_TERM];
-					//if(successCallback && me.searchTermsResponse.length>1){
-					//	successCallback(result.rows[me.KEY_TERM]);
-					//	return;
-					//}
-					//me.fillSearchTermSelect(searchString);
 				}
 			});
 		},

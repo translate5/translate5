@@ -58,6 +58,11 @@ const ComponentEditor={
 			$input= $('<textarea />').val($element.text()),
 			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		
+		//check if it is new comment attribute
+		if($commentPanel.length==0 && $element.data('id')>0){
+			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
+		}
+		
 		//copy the collection id from the attribute holder data to the term element data
 		$element.attr("data-collection-id",$termAttributeHolder.data('collectionId'));
 		
@@ -218,16 +223,7 @@ const ComponentEditor={
             
             Term.drawProposalButtons('commentAttributeEditorClosed');
             
-            if (me.isNew) {
-                // We completely render the front-end new to have a clear reset.
-                // Otherwise things get buggy; too much work.
-                groupId = $input.closest('.term-attributes').prev('.term-data').data('groupid');
-                TermEntry.reloadTermEntry(groupId);
-                return;
-            }
-
-            //when the comment does not exist, clean the editor 
-            if($element.data('id')<1){
+            if (me.isNew || $element.data('id')<1) {
                 //find the term holder and remove each unexisting comment attribute dom
                 $termHolder=$input.parents('div[data-term-id]');
                 $termHolder.children('p[data-id="-1"]').remove();
@@ -236,7 +232,6 @@ const ComponentEditor={
                 return;
             }
 
-            
             //get initial html for the component
             var dummyData={
                     'attributeOriginType':$element.data('type'),
@@ -326,11 +321,6 @@ const ComponentEditor={
 			
 			//check and update if the attribute is deffinition
 			Attribute.checkAndUpdateDeffinition(result,attrType);
-			
-			//if it is new term entry, reload after save
-			if (me.isNew) {
-				TermEntry.reloadTermEntry(result.groupId);
-			}
 			return;
 		}
         
