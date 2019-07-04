@@ -69,9 +69,16 @@ const ComponentEditor={
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length==0 && $element.data('id')>0){
 			var dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute'),
-			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
+				drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
+				$instantTranslateComponent=$termAttributeHolder.find('div.instanttranslate-integration')
 			
-			$termAttributeHolder.prepend(drawData);
+			//if the instant translate component exist, add the comment editor always after it
+			if($instantTranslateComponent.length>0){
+				$instantTranslateComponent.after(drawData);
+			}else{
+				$termAttributeHolder.prepend(drawData);
+			}
+			
 			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		}
 		
