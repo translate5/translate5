@@ -185,7 +185,7 @@ const ComponentEditor={
         }
         
         //check if the new term request should be canceled (empty value)
-        if(me.stopRequest($el,$input)){
+        if($input.val()=='' || $.trim($input.val())==''){
     		Term.findTermsAndAttributes(Term.newTermGroupId);
     		return;
         }
