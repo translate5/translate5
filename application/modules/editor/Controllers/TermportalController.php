@@ -180,7 +180,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
-        if($term->isProposableAllowed()){
+        $isProposableAllowed=$term->isProposableAllowed();
+        if($isProposableAllowed){
             $this->view->Php2JsVars()->set('apps.termportal.proposal.translations',[
                 "Ja"=>$this->translate->_("Ja"),
                 "Nein"=>$this->translate->_("Nein"),
@@ -240,6 +241,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         /* @var $term editor_Models_Term */
         $allProcessStatus = [];
         foreach ($term->getAllProcessStatus() as $processstatus) {
+            if(!$isProposableAllowed && $processstatus==$term::PROCESS_STATUS_UNPROCESSED){
+                continue;
+            }
             $allProcessStatus[$processstatus] = $this->translate->_($processstatus);
         }
         $this->view->allProcessstatus = $allProcessStatus;

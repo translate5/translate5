@@ -850,22 +850,47 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $queryString=$queryString.'%';
         }
         
+        $isProposableAllowed=$this->isProposableAllowed();
+        
+        //remove the unprocessed status if the user is not allowed for proposals
+        if(!$isProposableAllowed){
+            $processStats = array_diff($processStats,[self::PROCESS_STATUS_UNPROCESSED]);
+        }
+        
         $tableTerm = $this->db->info($this->db::NAME);
         $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
         $s = $this->db->select()
         ->setIntegrityCheck(false)
-        ->from($tableTerm, array('definition','groupId', 'term as label','id as value','term as desc', 'collectionId', 'termEntryId','language'))
-        ->joinLeft($tableProposal, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['term', 'id', 'created'])
+        ->from($tableTerm, ['term as label','id as value','term as desc','definition','groupId','collectionId','termEntryId','language'])
         ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
+        ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
+        ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
+        ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats);
+        $s->order($tableTerm.'.term asc');
+        if($limit){
+            $s->limit($limit);
+        }
+        
+        if(!$isProposableAllowed){
+            return $this->db->fetchAll($s)->toArray();
+        }
+        
+        //if proposal is allowed, search also in the proposal table for results
+        $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
+        $sp = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from($tableProposal, ['term as label','termId as value','term as desc'])
+        ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['definition','groupId','collectionId', 'termEntryId','language'])
+        ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
         ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
         ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
         ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats)
         ->order($tableTerm.'.term asc');
         if($limit){
-            $s->limit($limit);
+            $sp->limit($limit);
         }
-        
-        return $this->db->fetchAll($s)->toArray();
+        $sql='('.$s->assemble().') UNION ('.$sp->assemble().')';
+        return $this->db->getAdapter()->query($sql)->fetchAll();
     }
     
     /***

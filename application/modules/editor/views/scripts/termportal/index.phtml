@@ -81,6 +81,11 @@ if(isset($this->error)){
                         }
                         echo '</select>';
                     }
+                    if(count($clients)==1){
+                        foreach ($clients as $key => $value){
+                            $clientsNames[$key] = $value;
+                        }
+                    }
                 ?>
                 <?php 
                     $collections = $this->collections;
@@ -95,6 +100,13 @@ if(isset($this->error)){
                             $collectionsNames[$key] = $value->name;
                         }
                         echo '</select>';
+                    }
+                    
+                    if(count($collections)==1){
+                        foreach ($collections as $key => $value){
+                            $collectionsClients[$key] = $value->clients;
+                            $collectionsNames[$key] = $value->name;
+                        }
                     }
                 ?>
                 <?php 
