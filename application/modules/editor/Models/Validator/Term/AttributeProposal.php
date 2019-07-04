@@ -32,7 +32,7 @@ class editor_Models_Validator_Term_AttributeProposal extends ZfExtended_Models_V
    */
   protected function defineValidators() {
     $this->addValidator('id', 'int');
-    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 255)); //TODO why the restriction to 255 in editor_Models_Validator_Term_Attribute?
+    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 65535));
     $this->addDontValidateField('collectionId');
     $this->addDontValidateField('attributeId');
   }

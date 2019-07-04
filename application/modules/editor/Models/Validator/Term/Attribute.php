@@ -44,6 +44,6 @@ class editor_Models_Validator_Term_Attribute extends ZfExtended_Models_Validator
     $this->addValidator('attrTarget', 'stringLength', array('min' => 0, 'max' => 100));
     $this->addValidator('attrId', 'stringLength', array('min' => 0, 'max' => 100));
     $this->addValidator('attrLang', 'stringLength', array('min' => 0, 'max' => 45));
-    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 255)); //FIXME value is a text field!
+    $this->addValidator('value', 'stringLength', array('min' => 0, 'max' => 65535));
   }
 }
