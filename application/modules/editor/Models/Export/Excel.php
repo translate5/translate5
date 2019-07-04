@@ -47,13 +47,20 @@ class editor_Models_Export_Excel extends editor_Models_Excel_AbstractExImport {
     }
     
     /**
-     * export xls from stored task.
+     * export xls from stored task, returns true if file was created
      * @param string $fileName where the XLS should go to
-     * @param boolean $taskLock if true lock task, defaults to true
+     * @return bool
      */
-    public function exportAsFile(string $fileName, bool $taskLock = true): void {
+    public function exportAsFile(string $fileName): bool {
         try {
-            $this->export($fileName, $taskLock);
+            $this->export($fileName);
+            return true;
+        }
+        catch (editor_Models_Excel_LockFailedException $e) {
+            $this->log->exception($e, [
+                'level' => ZfExtended_Logger::LEVEL_INFO
+            ]);
+            return false;
         }
         catch (Exception $e) {
             $this->taskUnlock($this->task);
@@ -64,30 +71,32 @@ class editor_Models_Export_Excel extends editor_Models_Excel_AbstractExImport {
     
     /**
      * provides the excel as download to the browser
-     * @param boolean $taskLock
      */
-    public function exportAsDownload(bool $taskLock = true): void {
+    public function exportAsDownload(): void {
         // output: first send headers
+        if(!$this->exportAsFile('php://output')) {
+            throw new ZfExtended_NoAccessException('Task is in use by another user!');
+        }
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="'.$this->task->getTasknameForDownload('.xlsx').'"');
         header('Cache-Control: max-age=0');
-        $this->exportAsFile('php://output', $taskLock);
         exit;
     }
     
     /**
      * does the export
      * @param string $fileName where the XLS should go to
-     * @param boolean $taskLock
      */
-    protected function export(string $fileName, bool $taskLock = true): void {
+    protected function export(string $fileName): void {
         $this->excel = editor_Models_Excel_ExImport::createNewExcel($this->task);
         
         // task data must be aktualiced
         $this->task->createMaterializedView();
-        
-        if($taskLock) {
-            $this->taskLock($this->task);
+        if(!$this->taskLock($this->task)) {
+            //Task can not be locked for excel export, no excel export could be created
+            throw new editor_Models_Excel_LockFailedException('E1148', [
+                'task' => $this->task,
+            ]);
         }
         
         // load segment tagger to extract pure text from segments
