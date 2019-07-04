@@ -81,6 +81,25 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
         ])>0;
     }
     
+    /***
+     * Remove empty term entry from the database. Empty term entry is term entry without terms in it.
+     * @param int $termEntryId
+     */
+    public function deleteEmptyTermEntry(int $termEntryId) {
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['te'=>'LEK_term_entry'])
+        ->join(['t'=>'LEK_terms'],'t.termEntryId=te.id')
+        ->where('te.id = ?',$termEntryId);
+        $result=$this->db->fetchAll($s)->toArray();
+        
+        if(!empty($result)){
+            return;
+        }
+        $this->db->delete([
+            'id IN (?)'=>$termEntryId
+        ]);
+    }
     
     /**
      * Remove term entry older than $olderThan date from a specific term collection

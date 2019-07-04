@@ -402,10 +402,14 @@ class editor_TermController extends ZfExtended_RestController {
      * @throws ZfExtended_UnprocessableEntity
      */
     public function removeproposalOperation() {
+        $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+        /* @var $termEntry editor_Models_TermCollection_TermEntry */
+        $termEntryId=$this->entity->getTermEntryId();
         //the removed request is for term with process status unprocessed
         if($this->view->rows->processStatus==$this->entity::PROCESS_STATUS_UNPROCESSED){
             $this->entity->delete();
             $this->view->rows = [];
+            $termEntry->deleteEmptyTermEntry($termEntryId);
             return;
         }
         
@@ -416,6 +420,7 @@ class editor_TermController extends ZfExtended_RestController {
             throw new ZfExtended_UnprocessableEntity('E1109');
         }
         $this->proposal->delete();
+        $termEntry->deleteEmptyTermEntry($termEntryId);
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;
     }
