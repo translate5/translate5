@@ -3365,6 +3365,14 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Delete proposals older than</target></trans-unit>
 <trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Delete proposal</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Change to existing term</target></trans-unit>
+<trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess status</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVNjaGzDvHNzZWw='><source>Attributs-Schlüssel</source><target>Attribute key</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVdlcnQ='><source>Attributs-Wert</source><target>Attribute value</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Change to existing attribute</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term entry</target></trans-unit>
+<trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Last editor</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Edit date</target></trans-unit>
     </body>
   </file>
 </xliff>

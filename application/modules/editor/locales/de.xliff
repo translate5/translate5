@@ -1574,6 +1574,15 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
 <trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Vorschläge löschen älter als</target></trans-unit>
 <trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IGFwcGVhciB0byBiZSBhbiBpbnRlZ2Vy'><source>'%value%' does not appear to be an integer</source><target>'%value%' does not appear to be an integer</target></trans-unit>
+
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Änderung zu bestehendem Term</target></trans-unit>
+<trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess-Status</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVNjaGzDvHNzZWw='><source>Attributs-Schlüssel</source><target>Attributs-Schlüssel</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVdlcnQ='><source>Attributs-Wert</source><target>Attributs-Wert</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Änderung zu bestehendem Attributs-Wert</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term-Eintrag</target></trans-unit>
+<trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Letzter Bearbeiter</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Bearbeitungsdatum</target></trans-unit>
   </body>
  </file>
 </xliff>

@@ -571,10 +571,11 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $excel->setLabel('language', $t->_('Sprache'));
         $excel->setLabel('termId', $t->_('Term-Id'));
         $excel->setLabel('term', $t->_('Term'));
-        $excel->setLabel('termProposal', $t->_('Term-Vorschlag'));
-        $excel->setLabel('attribute', $t->_('Attribut'));
-        $excel->setLabel('attributeProposal', $t->_('Attribut-Vorschlag'));
-        $excel->setLabel('processStatus', $t->_('Processstatus'));
+        $excel->setLabel('termProposal', $t->_('Änderung zu bestehendem Term'));
+        $excel->setLabel('processStatus', $t->_('Prozess-Status'));
+        $excel->setLabel('attributeName', $t->_('Attributs-Schlüssel'));
+        $excel->setLabel('attribute', $t->_('Attributs-Wert'));
+        $excel->setLabel('attributeProposal', $t->_('Änderung zu bestehendem Attributs-Wert'));
         $excel->setLabel('lastEditor', $t->_('Letzter Bearbeiter'));
         $excel->setLabel('lastEditedDate', $t->_('Bearbeitungsdatum'));
         
@@ -587,7 +588,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 $sheet = $phpExcel->getActiveSheet();
                 
                 //the highes column based on the current row columns
-                $highestColumn='L';
+                $highestColumn='M';
                 foreach(range('A',$highestColumn) as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
@@ -651,12 +652,13 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             		t.term as 'term-term',
             		t.processStatus as 'term-processStatus',
             		t.userName as 'term-lastEditor',
-            		t.updated as 'term-lastEditedDate',
-            		tp.id as 'termproposal-id',
-            		tp.term as 'termproposal-term',
+                    t.updated as 'term-lastEditedDate',
+                    tp.id as 'termproposal-id',
+                    tp.term as 'termproposal-term',
             		tp.created as 'termproposal-lastEditedDate',
             		tp.userName as 'termproposal-lastEditor',
                     null as 'attribute-id',
+                    null as 'attribute-name',
                     null as 'attribute-value',
                     null as 'attribute-lastEditedDate',
                     null as 'attribute-lastEditor',
@@ -679,6 +681,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $attributeSql="SELECT
                     ta.id as 'attribute-id',
                     ta.termId as 'term-Id',
+                    ta.name as 'attribute-name',
                     ta.value as 'attribute-value',
                     ta.updated as 'attribute-lastEditedDate',
                     ta.userName as 'attribute-lastEditor',
@@ -1104,6 +1107,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $tmpTerm['term']=$changeMyCollorTag.$row['term-term'];
             $tmpTerm['termProposal']='';
             $tmpTerm['processStatus']=$row['term-processStatus'];
+            $tmpTerm['attributeName']=$row['attribute-name'];
             $tmpTerm['attribute']=$row['attribute-value'];
             $tmpTerm['attributeProposal']='';
             $tmpTerm['lastEditor']=$changeMyCollorTag.$row['term-lastEditor'];
