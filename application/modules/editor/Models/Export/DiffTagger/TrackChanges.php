@@ -61,7 +61,7 @@ class editor_Models_Export_DiffTagger_TrackChanges extends editor_Models_Export_
         
         // initialize TrackChanges tagger
         $this->tagger = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        $this->tagger->attributeWorkflowstep = $task->getWorkflowStepName();
+        $this->tagger->attributeWorkflowstep = $task->getWorkflowStepName().$task->getWorkflowStep();
         
         // to set TrackChanges userTrackingID and userColorNr, we need the TaskUserTracking
         $tempTaskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');

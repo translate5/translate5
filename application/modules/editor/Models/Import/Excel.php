@@ -152,7 +152,7 @@ class editor_Models_Import_Excel extends editor_Models_Excel_AbstractExImport {
             // but only if task is not in workflowStep 'translation'
             // @FIXME: ADD check Plugin.TrackChanges active, or something similar.
             if ($this->task->getWorkflowStepName() !== editor_Workflow_Abstract::STEP_TRANSLATION) {
-                $newSegment = $this->diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date('Y-m-d H:i:s'), $this->task->getPmName());
+                $newSegment = $this->diffTagger->diffSegment($orgSegmentAsExcel, $newSegment, date(NOW_ISO), $this->user->getUserName());
             }
             
             // restore org. tags; detect tag-map from t5 SOURCE segment. Only there all original tags are present.

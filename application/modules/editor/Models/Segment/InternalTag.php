@@ -295,8 +295,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         // convert the internal excel tags to the wanted form
         $result = str_replace('<excel ', '<', $result);
         
-        
-        return $result;
+        return html_entity_decode($result, ENT_XML1);
     }
     
     /**
