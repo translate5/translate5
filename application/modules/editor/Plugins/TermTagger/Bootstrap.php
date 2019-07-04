@@ -64,7 +64,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $this->eventManager->attach('editor_Models_Import_MetaData', 'importMetaData', array($this, 'handleImportMeta'));
         $this->eventManager->attach('Editor_IndexController', 'afterIndexAction', array($this, 'handleAfterIndex'));
         $this->eventManager->attach('editor_Workflow_Default', array('doView', 'doEdit'), array($this, 'handleAfterTaskOpen'));
-        $this->eventManager->attach('Editor_SegmentController', 'beforePutSave', array($this, 'handleBeforePutSave'));
+        $this->eventManager->attach('editor_Models_Segment_Updater', 'beforeSegmentUpdate', array($this, 'handleBeforeSegmentUpdate'));
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'termtaggerStateHandler'));
         $this->eventManager->attach('Editor_AlikesegmentController', 'beforeSaveAlike', array($this, 'handleBeforeSaveAlike'));
         
@@ -202,7 +202,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
      * Re-TermTag the (modified) segment-text.
      */
-    public function handleBeforePutSave(Zend_EventManager_Event $event) {
+    public function handleBeforeSegmentUpdate(Zend_EventManager_Event $event) {
         $config = Zend_Registry::get('config');
         $c = $config->runtimeOptions->termTagger->switchOn->GUI;
         if((boolean)$c === false) {

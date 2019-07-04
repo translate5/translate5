@@ -55,7 +55,7 @@ class editor_Models_Export_DiffTagger_TrackChanges extends editor_Models_Export_
      * 
      * @param editor_Models_Task $task
      */
-    public function __construct(editor_Models_Task $task) {
+    public function __construct(editor_Models_Task $task, ZfExtended_Models_User $user) {
         $this->_changeTimestamp = date('Y-m-d H:i:s');
         $this->task = $task;
         
@@ -66,10 +66,10 @@ class editor_Models_Export_DiffTagger_TrackChanges extends editor_Models_Export_
         // to set TrackChanges userTrackingID and userColorNr, we need the TaskUserTracking
         $tempTaskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
         /* @var $tempTaskUserTracking editor_Models_TaskUserTracking */
-        $tempTaskUserTracking->loadEntry($task->getTaskGuid(), $task->getPmGuid());
+        $tempTaskUserTracking->loadEntry($task->getTaskGuid(), $user->getUserGuid());
         if (! $tempTaskUserTracking->hasEntry()) {
-            $tempTaskUserTracking->insertTaskUserTrackingEntry($task->getTaskGuid(), $task->getPmGuid(), '');
-            $tempTaskUserTracking->loadEntry($task->getTaskGuid(), $task->getPmGuid());
+            $tempTaskUserTracking->insertTaskUserTrackingEntry($task->getTaskGuid(), $user->getUserGuid(), '');
+            $tempTaskUserTracking->loadEntry($task->getTaskGuid(), $user->getUserGuid());
         }
         
         $this->tagger->userTrackingId = $tempTaskUserTracking->getId();

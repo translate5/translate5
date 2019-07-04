@@ -548,7 +548,10 @@ class editor_TaskController extends ZfExtended_RestController {
         try {
             $tempFilename = $worker->prepareImportFile($this->entity);
             
-            $worker->init($this->entity->getTaskGuid(), ['filename' => $tempFilename]);
+            $worker->init($this->entity->getTaskGuid(), [
+                'filename' => $tempFilename,
+                'currentUserGuid' => $this->user->data->userGuid,
+            ]);
             //TODO running import as direct run / synchronous process. 
             // Reason is just the feedback for the user, which the user should get directly in the browser
             $worker->run();

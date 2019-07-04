@@ -706,46 +706,49 @@ abstract class editor_Workflow_Abstract {
     /**
      * manipulates the segment as needed by workflow after updated by user
      * @param editor_Models_Segment $segmentToSave
+     * @param editor_Models_Task $task
      */
-    public function beforeSegmentSave(editor_Models_Segment $segmentToSave) {
+    public function beforeSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
         $updateAutoStates = function($autostates, $segment, $tua) {
             //sets the calculated autoStateId
             $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
         };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates);
+        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
     }
     
     /**
      * manipulates the segment as needed by workflow after user has add or edit a comment of the segment
+     * @param editor_Models_Segment $segmentToSave
+     * @param editor_Models_Task $task
      */
-    public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave) {
+    public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
         $updateAutoStates = function($autostates, $segment, $tua) {
             $autostates->updateAfterCommented($segment, $tua);
         };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates);
+        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
     }
     
     /**
      * internal used method containing all common logic happend on a segment before saving it
      * @param editor_Models_Segment $segmentToSave
      * @param Closure $updateStates
+     * @param editor_Models_Task $task
      */
-    protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates) {
-        $session = new Zend_Session_Namespace();
+    protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
         $sessionUser = new Zend_Session_Namespace('user');
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua->loadByParams($sessionUser->data->userGuid,$session->taskGuid);
+        $tua->loadByParams($sessionUser->data->userGuid, $task->getTaskGuid());
         if($tua->getIsPmOverride() == 1){
-            $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr); //set also the number to identify in which phase the changes were done
+            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
         }
         else {
             //sets the actual workflow step
-            $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr);
+            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep());
             
             //sets the actual workflow step name, does currently depend only on the userTaskRole!
             $step = $this->getStepOfRole($tua->getRole());

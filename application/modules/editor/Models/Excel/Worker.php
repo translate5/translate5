@@ -41,7 +41,7 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        // @TODO: what needs to be check here? TL: the filename for example!
+        // @TODO: what needs to be check here? TL: the filename and currentUserGuid for example!
         return true;
     }
     
@@ -62,7 +62,6 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         
         // move uploaded excel into upload target
         if (!move_uploaded_file($_FILES['excelreimportUpload']['tmp_name'], $uploadTarget.$tempFilename)) {
-            // @FIXME: return something invalid (e.g. http status 4xx)
             // throw exception 'E1141' => 'Excel Reimport: upload failed.'
             throw new editor_Models_Excel_ExImportException('E1141',['task' => $task]);
         }
@@ -93,17 +92,16 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
         }
         
         // detect the filename from the workers parameter
-        $tempParameter = $this->getModel()->getParameters();
-        $filename = $tempParameter['filename'];
+        $params = $this->getModel()->getParameters();
         
-        $this->reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel');
+        $this->reimportExcel = ZfExtended_Factory::get('editor_Models_Import_Excel', [$task, $params['filename'], $params['currentUserGuid']]);
         /* @var $reimportExcel editor_Models_Import_Excel */
         
         // on error an editor_Models_Excel_ExImportException is thrown
-        $this->reimportExcel->run($task, $filename);
+        $this->reimportExcel->run();
         
         // unlock task and set state to 'open'
-        $reimportExcel->taskUnlock($task);
+        $this->reimportExcel->taskUnlock($task);
         return true;
     }
     

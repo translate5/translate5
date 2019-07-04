@@ -232,7 +232,7 @@ class editor_Models_Import_UploadProcessor {
      * throws upload errors if some occured 
      * @throws ZfExtended_FileUploadException
      */
-    protected function throwOnUploadError(array $extraData) {
+    protected function throwOnUploadError(array $extraData = []) {
         if(empty($this->uploadErrors)) {
             return;
         }
