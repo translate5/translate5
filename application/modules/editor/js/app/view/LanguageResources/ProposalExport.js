@@ -55,7 +55,7 @@ Ext.define('Editor.view.LanguageResources.ProposalExport', {
         		xtype: 'datefield',
         		flex:1,
         		fieldLabel:me.strings.dateFieldLabel,
-        		value:new Date(),
+        		value:Ext.util.Format.date(new Date()),
         		name:'exportDate'
         	}],
         	dockedItems: [{
