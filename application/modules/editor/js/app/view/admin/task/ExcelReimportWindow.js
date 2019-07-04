@@ -36,6 +36,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindow', {
         reimportUploadType: '#UT# Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .',
         uploadBtn: '#UT# Excel hochladen',
         cancelBtn: '#UT# Abbrechen',
+        closeBtn: '#UT# Schließen',
         loadingWindowMessage: '#UT# Datei wird hochgeladen',
     },
     modal : true,

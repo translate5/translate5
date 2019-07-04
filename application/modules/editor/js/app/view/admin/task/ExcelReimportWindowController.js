@@ -63,6 +63,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
     
     filechange: function() {
         this.getView().down('#feedback').update('');
+        this.getView().down('#cancelBtn').setText(this.getView().strings.cancelBtn);
     },
     
     /**
@@ -81,6 +82,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
         }
         
         win.setLoading(win.strings.loadingWindowMessage);
+        win.down('#cancelBtn').setText(win.strings.closeBtn);
         form.submit({
             //Accept Header of submitted file uploads could not be changed:
             //http://stackoverflow.com/questions/13344082/fileupload-accept-header
@@ -108,7 +110,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
                 if(submit.result.httpStatus == "422") {
                     errors = submit.result.errorsTranslated;
                     form.markInvalid(errors);
-                    if(errors.excelreimportUpload) {
+                    if(errors && errors.excelreimportUpload) {
                         win.down('#feedback').update({msg: errors.excelreimportUpload.join('<br>'), type: 'error'});
                     }
                 }
