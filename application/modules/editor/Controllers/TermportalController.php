@@ -181,34 +181,32 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $isProposableAllowed=$term->isProposableAllowed();
-        if($isProposableAllowed){
-            $this->view->Php2JsVars()->set('apps.termportal.proposal.translations',[
-                "Ja"=>$this->translate->_("Ja"),
-                "Nein"=>$this->translate->_("Nein"),
-                "deleteAttributeProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
-                "deleteTermProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
-                "deleteAttributeProposal"=>$this->translate->_("Attribut: Vorschlag löschen"),
-                "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
-                "editProposal"=>$this->translate->_("Änderung vorschlagen"),
-                "saveProposal"=>$this->translate->_("Änderung sichern"),
-                "editTermEntryProposal"=>$this->translate->_("Term-Eintrag: Änderung vorschlagen"),
-                "addTermEntryProposal"=>$this->translate->_("Neuen Term-Eintrag vorschlagen"),
-                "deleteTermEntryProposal"=>$this->translate->_("Term-Eintrag: Vorschlag löschen"),
-                "editTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Änderung vorschlagen"),
-                "addTermEntryAttributeProposal"=>$this->translate->_("Neues Term-Eintrag-Attribut vorschlagen"),
-                "deleteTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Vorschlag löschen"),
-                "editTermProposal"=>$this->translate->_("Term: Änderung vorschlagen"),
-                "addTermProposal"=>$this->translate->_("Neuen Term vorschlagen"),
-                "deleteTermProposal"=>$this->translate->_("Term: Vorschlag löschen"),
-                "editTermAttributeProposal"=>$this->translate->_("Term-Attribut: Änderung vorschlagen"),
-                "addTermAttributeProposal"=>$this->translate->_("Neues Term-Attribut vorschlagen"),
-                "deleteTermAttributeProposal"=>$this->translate->_("Term-Attribut: Vorschlag löschen"),
-                "chooseLanguageForTermEntry"=>$this->translate->_("Sprache für Term-Vorschlag wählen"),
-                "chooseTermcollectionForTermEntry"=>$this->translate->_("Term-Collection für Term-Vorschlag wählen"),
-                "selectLanguage"=>$this->translate->_("... Sprache auswählen"),
-                "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für")
-            ]);
-        }
+        $this->view->Php2JsVars()->set('apps.termportal.proposal.translations',[
+            "Ja"=>$this->translate->_("Ja"),
+            "Nein"=>$this->translate->_("Nein"),
+            "deleteAttributeProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
+            "deleteTermProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
+            "deleteAttributeProposal"=>$this->translate->_("Attribut: Vorschlag löschen"),
+            "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
+            "editProposal"=>$this->translate->_("Änderung vorschlagen"),
+            "saveProposal"=>$this->translate->_("Änderung sichern"),
+            "editTermEntryProposal"=>$this->translate->_("Term-Eintrag: Änderung vorschlagen"),
+            "addTermEntryProposal"=>$this->translate->_("Neuen Term-Eintrag vorschlagen"),
+            "deleteTermEntryProposal"=>$this->translate->_("Term-Eintrag: Vorschlag löschen"),
+            "editTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Änderung vorschlagen"),
+            "addTermEntryAttributeProposal"=>$this->translate->_("Neues Term-Eintrag-Attribut vorschlagen"),
+            "deleteTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Vorschlag löschen"),
+            "editTermProposal"=>$this->translate->_("Term: Änderung vorschlagen"),
+            "addTermProposal"=>$this->translate->_("Neuen Term vorschlagen"),
+            "deleteTermProposal"=>$this->translate->_("Term: Vorschlag löschen"),
+            "editTermAttributeProposal"=>$this->translate->_("Term-Attribut: Änderung vorschlagen"),
+            "addTermAttributeProposal"=>$this->translate->_("Neues Term-Attribut vorschlagen"),
+            "deleteTermAttributeProposal"=>$this->translate->_("Term-Attribut: Vorschlag löschen"),
+            "chooseLanguageForTermEntry"=>$this->translate->_("Sprache für Term-Vorschlag wählen"),
+            "chooseTermcollectionForTermEntry"=>$this->translate->_("Term-Collection für Term-Vorschlag wählen"),
+            "selectLanguage"=>$this->translate->_("... Sprache auswählen"),
+            "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für")
+        ]);
         
         // for filtering in front-end: get the names for the available collectionIds
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
