@@ -173,6 +173,7 @@ const Term={
                     me.$_searchWarningNewSource.show();
                     me.$_searchTermsHelper.find('.skeleton').hide();
                 } else {
+                	$('#searchTermsHolder').show();
                     me.$_searchErrorNoResults.show();
                     me.$_searchTermsHelper.find('.proposal-txt').text(searchString + ': ' + proposalTranslations['addTermEntryProposal']);
                     me.$_searchTermsHelper.find('.proposal-btn').prop('title', searchString + ': ' + proposalTranslations['addTermEntryProposal']);
@@ -336,9 +337,6 @@ const Term={
 		    console.log('drawTermTable...');
             var me = this,
                 html = '',
-                $_filteredCollections = $('#searchFilterTags input.filter.collection'),
-                $_filteredClients = $('#searchFilterTags input.filter.client'),
-                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1), // TODO: show collection also when adding a TermEntry?
                 currentItem,
                 currentItemNr;
             
@@ -351,7 +349,7 @@ const Term={
             
             // -------render term-data -------
 		    $.each(termsData, function (i, term) {
-		        html += me.renderTerm(term,showInfosForSelection);
+		        html += me.renderTerm(term);
 		    });
             
 		    if(html.length>0){
@@ -412,7 +410,7 @@ const Term={
 		            		return false;
 		            	}
 		            	//expand the selected term (check for language, since there can be terms with same name in same term entry)
-		                if((termitem.dataset.termValue === item.textContent) && (termitem.dataset.language==item.dataset.language)){
+		                if((termitem.dataset.termValue === item.textContent || termitem.dataset.proposal=== item.textContent) && (termitem.dataset.language==item.dataset.language)){
 		                	me.$_termTable.accordion({
 		                        active:i
 		                    });
@@ -460,11 +458,8 @@ const Term={
 			
             var me = this,
                 html = '',
-                $_filteredCollections = $('#searchFilterTags input.filter.collection'),
-                $_filteredClients = $('#searchFilterTags input.filter.client'),
-                showInfosForSelection = ($_filteredCollections.length > 1 || $_filteredClients.length > 1); // TODO: show collection also when adding a TermEntry?,
                 newTermData = me.getNewTermData(termsData);
-            html += me.renderTerm(newTermData[0],showInfosForSelection);
+            html += me.renderTerm(newTermData[0]);
             return html;
         },
         
@@ -472,10 +467,9 @@ const Term={
          * Render html for term by given term.
          * 
          * @param {Object} term
-         * @param {Boolean} showInfosForSelection
          * @returns {String}
 		 */
-		renderTerm: function (term, showInfosForSelection) {
+		renderTerm: function (term) {
             var me = this,
                 termAttributesHtmlContainer = [],
                 termRflLang=term.attributes[0]!=undefined ? term.attributes[0].language : '',
@@ -488,7 +482,8 @@ const Term={
                 clientName,
                 isProposal,
                 proposable = (term.proposable !== false) ? ' proposable' : '', // = does the user have the rights to handle proposals for this term?,
-                instantTranslateIntegrationForTerm;
+                instantTranslateIntegrationForTerm,
+                termHeader=[];
             
             // "is-proposal" can be ... 
             // ... a proposal for a term that already existed (term.proposal = "xyz")
@@ -506,7 +501,18 @@ const Term={
             }
             
             //draw term header
-            termAttributesHtmlContainer.push('<h3 class="term-data'+proposable + isProposal+'" data-term-value="'+term.term+'" data-term-id="'+term.termId+'" data-groupid="'+term.groupId+'" data-language="'+term.languageId+'">');
+            termHeader.push('<h3');
+            termHeader.push('class="term-data'+proposable + isProposal+'"');
+            termHeader.push('data-term-value="'+term.term+'"');
+            termHeader.push('data-term-id="'+term.termId+'"');
+            termHeader.push('data-groupid="'+term.groupId+'"');
+            termHeader.push('data-language="'+term.languageId+'"');
+            if (term.proposal && term.proposal!=undefined) {
+            	termHeader.push('data-proposal="'+term.proposal.term+'"');
+            }
+            termHeader.push('>');
+            
+            termAttributesHtmlContainer.push(termHeader.join(' '));
             
             
             //add empty space between
@@ -529,26 +535,20 @@ const Term={
             termAttributesHtmlContainer.push(' ');
             
             //add client- and termCollection-names like this: [CUSTOMERNAME; termCollectionNAME]
-            //(display only those that are selected for filtering)
-            if (showInfosForSelection) {
-                infosForSelection = [];
-                clientsForCollection = collectionsClients[term.collectionId];
-                for (i = 0; i < clientsForCollection.length; i++) {
-                    clientId = clientsForCollection[i];
-                    clientName = clientsNames[clientId];
-                    if ($("#searchFilterTags").tagit("assignedTags").indexOf(clientName) != -1) {
-                        filteredCientsNames.push(clientName);
-                    }
+            infosForSelection = [];
+            clientsForCollection = collectionsClients[term.collectionId];
+            if(clientsForCollection.length>1){
+            	for (i = 0; i < clientsForCollection.length; i++) {
+            		if(clientsNames[clientsForCollection[i]]!=undefined){
+            			filteredCientsNames.push(clientsNames[clientsForCollection[i]]);
+            		}
                 }
-                if (filteredCientsNames.length > 0) {
-                    infosForSelection.push(filteredCientsNames.join(', '));
-                }
-                collectionName = collectionsNames[term.collectionId];
-                if ($("#searchFilterTags").tagit("assignedTags").indexOf(collectionName) != -1) {
-                    infosForSelection.push(collectionName);
-                }
-                termAttributesHtmlContainer.push('<span class="selection-infos">['+infosForSelection.join('; ')+']</span>');
             }
+            if (filteredCientsNames.length >1) {
+                infosForSelection.push(filteredCientsNames.join(', '));
+            }
+            infosForSelection.push(collectionsNames[term.collectionId]);
+            termAttributesHtmlContainer.push('<span class="selection-infos">['+infosForSelection.join('; ')+']</span>');
             
             termAttributesHtmlContainer.push('</h3>');
             
