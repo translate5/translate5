@@ -306,6 +306,13 @@ const Term={
 		            'collectionId':getFilteredCollections()
 		        },
 		        success: function(result){
+		        	
+		        	if(!result.rows[me.KEY_TERM_ATTRIBUTES] || result.rows[me.KEY_TERM_ATTRIBUTES].length==0){
+		        		//there are no resulsts, and do not render nothing 
+		        		me.emptyResultTermsHolder();
+		        		return;
+		        	}
+		        	
 		            //store the results to the cache
 		            me.termGroupsCache[termGroupid]=result;
 		            

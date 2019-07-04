@@ -183,6 +183,12 @@ const ComponentEditor={
             $input.replaceWith(componentRenderData);
             return;
         }
+        
+        //check if the new term request should be canceled (empty value)
+        if(me.stopRequest($el,$input)){
+    		Term.findTermsAndAttributes(Term.newTermGroupId);
+    		return;
+        }
 		
 		route=me.typeRouteMap[$el.data('type')];
 		dataKey=me.typeRequestDataKeyMap[$el.data('type')];
