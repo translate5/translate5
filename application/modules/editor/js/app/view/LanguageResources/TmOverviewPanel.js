@@ -157,13 +157,13 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },{
                         action: 'import',
 	                    getClass:function(v,meta,record) {
-                        	if(record.get('status') == 'novalidlicense' || !me.showImportAndDownload(record)){
-                        		return '';
+                        	if(record.get('status') == 'novalidlicense' || !me.showImport(record)){
+                        		return 'x-hidden-display';
                         	}
                         	return 'ico-tm-import';
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-	                    	if(r.get('status') == 'novalidlicense' || !me.showImportAndDownload(r)){
+	                    	if(r.get('status') == 'novalidlicense' || !me.showImport(r)){
                         		return false;
                         	}
                             return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip();
@@ -172,19 +172,15 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },{
                         action: 'download',
                         getClass:function(v,meta,record) {
-                        	if(record.get('status') == 'novalidlicense' || !me.showImportAndDownload(record)){
-                        		return '';
+                        	if(record.get('status') == 'novalidlicense' || !me.showDownload(record)){
+                        		return 'x-hidden-display';
                         	}
                         	return 'ico-tm-download';
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-	                    	if(r.get('status') == 'novalidlicense' || !me.showImportAndDownload(r)){
+	                    	if(r.get('status') == 'novalidlicense' || !me.showDownload(r)){
                         		return false;
                         	}
-	                    	//FIXME: change me via function
-	                    	if(r.get('serviceName')=='TermCollection'){
-	                    		return false;
-	                    	}
                             return me.strings.download;
 	                    }
                     },{
@@ -193,7 +189,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         	if(record.get('serviceName') == 'TermCollection'){
                         		return 'ico-tm-export';
                         	}
-                        	return '';
+                        	return 'x-hidden-display';
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
 	                    	if(r.get('serviceName') == 'TermCollection'){
@@ -411,10 +407,18 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
     },
 
     /***
-     * Show import and download icon only for importable and downloadable resources
+     * Show import icon only for importable resources
      */
-    showImportAndDownload:function(record){
+    showImport:function(record){
     	return Ext.Array.contains(['OpenTM2','TermCollection'],record.get('serviceName'));
+    },
+    
+    /***
+     * Show download icon only for downloadable resources
+     */
+    showDownload:function(record){
+    	return Ext.Array.contains(['OpenTM2'],record.get('serviceName'));
     }
+    
     
 });
