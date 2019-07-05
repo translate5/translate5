@@ -379,6 +379,9 @@ var Term={
                             currentItemNr = me.$_termTable.children('h3').index(currentItem);
                             me.$_termTable.accordion('option', 'active', currentItemNr);
                         }
+                        if(!$.isEmptyObject(ui.newHeader.offset())) {
+                            $('html:not(:animated), body:not(:animated)').animate({ scrollTop: ui.newHeader.offset().top }, 'slow');
+                        }
                     }
 		        });
 		    }
@@ -1051,10 +1054,9 @@ var Term={
 			        dataType: "json",	
 			        type: "POST",
 			        success: function(result){
-			        	
+			        	me.reloadTermEntry=true;
 			        	//reload the termEntry when the term is removed
 			        	if(!result.rows || result.rows.length==0){
-			        		me.reloadTermEntry=true;
 			        		me.findTermsAndAttributes(groupId);
 			        		return;
 			        	}
