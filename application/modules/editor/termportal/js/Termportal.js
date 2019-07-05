@@ -106,11 +106,13 @@ $("#search").autocomplete({
 function getLanguageFlag(rfcLanguage) {
     rfcLanguage = rfcLanguage.toLowerCase();
     if (rfcLanguage in rfcLanguageFlags) {
+    	if(rfcLanguageFlags[rfcLanguage]==''){
+    		return rfcLanguage;
+    	}
         // TODO: img-html could be reused if already created before
         return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcLanguage] + '.png" alt="' + rfcLanguage + '" title="' + rfcLanguage + '">';
-    } else {
-        return rfcLanguage;
     }
+    return rfcLanguage;
 }
 
 $("#searchButton" ).button({

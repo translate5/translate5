@@ -42,9 +42,9 @@ var editIdleTimer = null,
  * Store allowed file-types for all available languageResources.
  */
 function setFileTypesAllowedAndAvailable() {
-    for (languageResourceId in allLanguageResources) {
-        if(allLanguageResources.hasOwnProperty(languageResourceId)){
-            addFileTypesAllowedAndAvailable(allLanguageResources[languageResourceId]);
+    for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
+        if(Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)){
+            addFileTypesAllowedAndAvailable(Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId]);
         }
     }
 }
@@ -265,9 +265,9 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
         languageResourceToCheckAllTargets,
         languageResourceLocaleSet,
         languageResourceAllLocalesToAdd;
-    for (languageResourceId in allLanguageResources) {
-        if (allLanguageResources.hasOwnProperty(languageResourceId)) {
-            languageResourceToCheck = allLanguageResources[languageResourceId];
+    for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
+        if (Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)) {
+            languageResourceToCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
             languageResourceToCheckAllSources = languageResourceToCheck.source;
             languageResourceToCheckAllTargets = languageResourceToCheck.target;
             languageResourceLocaleSet = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllSources : languageResourceToCheckAllTargets;

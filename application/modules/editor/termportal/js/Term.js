@@ -674,7 +674,7 @@ var Term={
             }
             html += '<div class="instanttranslate-integration">';
             html += '<span>'+translations['instantTranslateInto']+' </span>';
-            html += me.renderLanguageSelect('instanttranslate',source);
+            html += languageSelect;
             html += '</div>';
             return html;
         },
