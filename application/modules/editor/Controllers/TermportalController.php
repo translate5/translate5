@@ -106,7 +106,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $frontendLocaleNormalized=$this->normalizeLanguage($this->_session->locale);
         $preselectedLang=null;
         
-        $rfcFlags=[];
         foreach ($langsArray as &$lng){
 
             //set preselected term-search language based on user locale language
@@ -116,8 +115,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                     $preselectedLang=$lng['rfc5646'];
                 }
             }
-            
-            $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['iso3166Part1alpha2']);
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
             
@@ -141,7 +138,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageCombinations->targetsForSources);
         
         //rfc language code to language flag mapping
-        $this->view->rfcFlags=$rfcFlags;
+        $this->view->rfcFlags=$languagesModel->loadAllKeyValueCustom('rfc5646', 'iso3166Part1alpha2',true);
+        
         $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         
         $this->view->labels=$labels;
