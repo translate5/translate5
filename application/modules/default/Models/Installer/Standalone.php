@@ -547,7 +547,8 @@ class Models_Installer_Standalone {
         }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
-        $admins = $user->loadAllByRole('admin');
+        $rolesToLoad = array('admin');
+        $admins = $user->loadAllByRole($rolesToLoad);
         //Zend_Registry::set('Zend_Locale', 'en');
         $mail = ZfExtended_Factory::get('Zend_Mail', ['utf8']);
         /* @var $mail Zend_Mail */
