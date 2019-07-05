@@ -255,7 +255,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                                 cls: 'x-check-group-alt',
                                 fieldLabel: me.strings.rolesLabel + ' &#8505;',
                                 items: roles,
-                                columns: 3,
+                                columns: 2,
                                 autoEl: {
                                     tag: 'div',
                                     'data-qtip': Ext.String.htmlEncode(me.strings.bottomRoleInfo)
