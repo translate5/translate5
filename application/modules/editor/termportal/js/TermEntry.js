@@ -1,4 +1,4 @@
-const TermEntry={
+var TermEntry={
 
 	$_resultTermsHolder:null,
     $_termEntryAttributesTable:null,

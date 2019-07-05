@@ -1,4 +1,4 @@
-const Term={
+var Term={
         
         $_searchTermsHelper:null,
         $_searchErrorNoResults:null,

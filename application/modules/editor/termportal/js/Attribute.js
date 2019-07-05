@@ -1,4 +1,4 @@
-const Attribute={
+var Attribute={
 	$_termTable:null,
 	$_termEntryAttributesTable:null,
 	

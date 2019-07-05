@@ -1,4 +1,4 @@
-const ComponentEditor={
+var ComponentEditor={
     
     $_resultTermsHolder:null,
     $_termTable:null,
