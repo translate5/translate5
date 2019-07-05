@@ -957,6 +957,7 @@ var Term={
                 $_termSkeleton = me.$_termTable.find('.is-new'); // TODO: use DOM-cache
             console.log('drawLanguageFlagForNewTerm ('+me.newTermLanguageId+' / '+me.newTermRfcLanguage+')');
             $_termSkeleton.find('img').remove();
+            $_termSkeleton.find('span.noFlagLanguage').remove();
             $_termSkeleton.children('span').first().after(flag);
         },
         

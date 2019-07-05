@@ -107,12 +107,12 @@ function getLanguageFlag(rfcLanguage) {
     rfcLanguage = rfcLanguage.toLowerCase();
     if (rfcLanguage in rfcLanguageFlags) {
     	if(rfcLanguageFlags[rfcLanguage]==''){
-    		return rfcLanguage;
+    		return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     	}
         // TODO: img-html could be reused if already created before
         return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcLanguage] + '.png" alt="' + rfcLanguage + '" title="' + rfcLanguage + '">';
     }
-    return rfcLanguage;
+    return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
 }
 
 $("#searchButton" ).button({
