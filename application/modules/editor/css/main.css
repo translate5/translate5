@@ -33,7 +33,13 @@ div.x-container.x-container-default {position: initial;}
 #changealike-grid .x-grid-row .segment-tag-column .x-grid-cell-inner,
 .editorAdminTaskLogGrid .x-grid-row .x-grid-cell .x-grid-cell-inner,
 #segment-grid .x-grid-row .x-grid-cell .x-grid-cell-inner {
-  white-space: normal;
+	color:#000000;
+  	white-space: normal;
+}
+
+.editorAdminTaskLogGrid .x-property-grid .x-grid-row td.x-grid-cell-last .x-grid-cell-inner {
+	font-family: monospace;
+    white-space: pre;
 }
 
 /* this default width is needed, see TRANSLATE-563 */
@@ -137,6 +143,7 @@ div.single + div {
     cursor: move;
 }
 #segment-grid .x-grid-row-editor .segment-content .x-form-display-field {
+	color:#000000;
     cursor: text;
 }
 

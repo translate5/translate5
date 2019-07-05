@@ -63,7 +63,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
         addBtn: '#UT#Benutzer hinzufügen',
         saveBtn: '#UT#Benutzer speichern',
         cancelBtn: '#UT#Abbrechen',
-        languagesLabel:'#UT#Zugeordnete Sprachen',
+        languagesLabel:'#UT#Automatische Zuweisung',
         sourceLangageLabel:'#UT#Quellsprache(n)',
         sourceLangageTip:'#UT#Quellsprache(n)',
         targetLangageLabel:'#UT#Zielsprache(n)',
