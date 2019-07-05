@@ -370,15 +370,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                     'tagname' => $name,
                 ]);
             }
-            
-            if (strpos($id, '-')!== false) {
-                //the tag id contains a dash - which is not allowed since this may interfere with the GUI 
-                throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1008', [
-                    'task' => $this->task,
-                    'filename' => $this->_fileName,
-                    'tagId' => $id,
-                ]);
-            }
         }
     }
     

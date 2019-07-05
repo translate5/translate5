@@ -428,6 +428,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         //check if the required search parametars are in the request
         $this->checkRequiredSearchParameters($parametars);
+        $parametars['searchField'] =  htmlentities($parametars['searchField'], ENT_XML1);
         
         //check character number limit
         if(!$this->checkSearchStringLength($parametars['searchField'])){
@@ -460,6 +461,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         //check if the required search parametars are in the request
         $this->checkRequiredSearchParameters($parameters);
+        $parameters['searchField'] =  htmlentities($parameters['searchField'], ENT_XML1);
+        $parameters['replaceField'] =  htmlentities($parameters['replaceField'], ENT_XML1);
         
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm

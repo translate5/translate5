@@ -844,14 +844,21 @@ abstract class editor_Workflow_Abstract {
      */
     protected function callActions($trigger, $step = null, $role = null, $state = null) {
         $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
+        /* @var $actions editor_Models_Workflow_Action */
         $debugData = [
             'trigger' => $trigger,
             'step' => $step, 
             'role' => $role,
             'state' => $state,
         ];
-        /* @var $actions editor_Models_Workflow_Action */
-        $workflows = $this->getIdList();
+        if($this->isCron) {
+            //in cron calls we loop over each workflow, so we may not iterate here over the whole inheritance tree. 
+            // This would duplicate action calls.
+            $workflows = [static::WORKFLOW_ID];
+        }
+        else {
+            $workflows = $this->getIdList();
+        }
         $actions = $actions->loadByTrigger($workflows, $trigger, $step, $role, $state);
         $this->actionDebugMessage($workflows, $debugData);
         $instances = [];

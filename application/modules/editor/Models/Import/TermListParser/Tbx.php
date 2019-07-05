@@ -381,14 +381,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         
-        $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
-        /* @var $export editor_Models_Export_Terminology_Tbx */
-        
-        $tbxData = $term->export($task, $export);
-        
-        if(empty($tbxData)){
-            return $tbxData;
-        }
+        $tbxData = $term->exportForTagging($task);
         
         $meta = $task->meta();
         //ensure existence of the tbxHash field
@@ -639,7 +632,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     protected function isLanguageToProcess() {
         $langToImport = $this->normalizeLanguage($this->actualLang);
-        $lastLangId;
+        $lastLangId = '';
         $this->actualLangId = 0;
         $matched = false;
         foreach($this->languages as $langString => $langAllowed) {

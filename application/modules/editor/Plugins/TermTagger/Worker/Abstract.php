@@ -28,6 +28,8 @@ END LICENSE AND COPYRIGHT
 
 abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_Import_Worker_Abstract {
     
+    const TERMTAGGER_DOWN_CACHE_KEY = 'TermTaggerDownList';
+    
     /**
      * overwrites $this->workerModel->maxLifetime
      */
@@ -87,6 +89,16 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      */
     protected $markTransFound;
     
+    /**
+     * @var ZfExtended_Logger
+     */
+    protected $logger;
+    
+    /**
+     * @var Zend_Cache_Core
+     */
+    protected $memCache;
+    
     public function init($taskGuid = NULL, $parameters = array()) {
         $return = parent::init($taskGuid, $parameters);
         
@@ -95,6 +107,8 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
         /* @var $task editor_Models_Task */
         $this->task->loadByTaskGuid($taskGuid);
         $this->markTransFound = ZfExtended_Factory::get('editor_Plugins_TermTagger_RecalcTransFound', array($this->task));
+        $this->memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
+        
         return $return;
     }
     
@@ -128,6 +142,13 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
             $workerCountToStart = count($this->getAvailableSlots($this->resourcePool));
         }
 
+        if($workerCountToStart == 0) {
+            //E1131No TermTaggers available, please enable term taggers to import this task.
+            throw new editor_Plugins_TermTagger_Exception_Down('E1131', [
+                'task' => $this->task
+            ]);
+        }
+        
         for($i=0;$i<$workerCountToStart;$i++){
             $this->init($this->workerModel->getTaskGuid(), $this->workerModel->getParameters());
             parent::queue($parentId, $state);
@@ -189,6 +210,10 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
         
         $usedSlots = $this->workerModel->getListSlotsCount(self::$resourceName, $availableSlots);
         
+        if(empty($availableSlots)) {
+            return ['resource' => self::$resourceName, 'slot' => null];
+        }
+        
         // all slotes in use
         if (count($usedSlots) == count($availableSlots)) {
             // take first slot in list of usedSlots which is the one with the min. number of counts
@@ -242,19 +267,35 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
                 break;
         }
         
+        
+        //remove not available termtaggers from configured list
+        $downList = $this->memCache->load(self::TERMTAGGER_DOWN_CACHE_KEY);
+        
+        if(!empty($downList) && is_array($downList)) {
+            $return = array_diff($return, $downList);
+        }
+        
         // no slots for this resourcePool defined
         if (empty($return) && $resourcePool != 'default') {
             // calculate slot from default resourcePool
             return $this->getAvailableSlots();
         }
         
-        if(empty($return)) {
-            trigger_error(__CLASS__.'->'.__FUNCTION__.'; There have to be available slots!');
-        }
-        
         return $return;
     }
     
+    /**
+     * disables the given slot (URL) via memcache.
+     * @param string $url
+     */
+    protected function disableSlot(string $url) : void {
+        $list = $this->memCache->load(self::TERMTAGGER_DOWN_CACHE_KEY);
+        if(!$list || !is_array($list)) {
+            $list = [];
+        }
+        $list[] = $url;
+        $this->memCache->save($list, self::TERMTAGGER_DOWN_CACHE_KEY);
+    }
     
     /**
      * @return SplFileInfo
@@ -272,7 +313,7 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
      * @param string $tbxHash unique id of the tbx-file
      */
     protected function checkTermTaggerTbx($url, &$tbxHash) {
-        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        $termTagger = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
         /* @var $termTagger editor_Plugins_TermTagger_Service */
         
         // test if tbx-file is already loaded
@@ -284,23 +325,28 @@ abstract class editor_Plugins_TermTagger_Worker_Abstract extends editor_Models_I
         $tbxPath = $this->getTbxFilename($this->task);
         $tbxParser = ZfExtended_Factory::get('editor_Models_Import_TermListParser_Tbx');
         /* @var $tbxParser editor_Models_Import_TermListParser_Tbx */
-        $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
-        
-        if(empty($tbxData)){
-            throw new editor_Plugins_TermTagger_Exception_Open("Unable to create the tbx data on the disk. taskGuid:".$this->task->getTaskGuid());
+        try {
+            $tbxData = $tbxParser->assertTbxExists($this->task, new SplFileInfo($tbxPath));
+        }
+        catch (editor_Models_Term_TbxCreationException $e) {
+            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
+                'task' => $this->task,
+                'termTaggerUrl' => $url,
+            ], $e);
         }
         
         $tbxHash = $this->task->meta()->getTbxHash();
-        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        $service = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', [$this->logger->getDomain()]);
         /* @var $service editor_Plugins_TermTagger_Service */
         
         try {
             $service->open($url, $tbxHash, $tbxData);
         }
         catch (editor_Plugins_TermTagger_Exception_Abstract $e) {
-            $e->setMessage('TermTagger '.$url.' (task '.$this->taskGuid.' could not load TBX! Reason: '."\n".$e->getMessage(), false);
+            $e->addExtraData([
+                'task' => $this->task
+            ]);
             throw $e;
         }
     }
-    
 }

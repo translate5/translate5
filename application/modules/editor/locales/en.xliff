@@ -6,34 +6,34 @@
     <body>
       <trans-unit id="w5xiZXJzZXR6dA==">
         <source>&#xDC;bersetzt</source>
-        <target>translated</target>
+        <target>Translated</target>
       </trans-unit>
       <trans-unit id="TmljaHQgw7xiZXJzZXR6dA==">
         <source>Nicht &#xFC;bersetzt</source>
-        <target>untranslated</target>
+        <target>Not translated</target>
       </trans-unit>
-      <trans-unit id="QXV0b2xla3RvcmllcnQ=">
-        <source>Autolektoriert</source>
-        <target>auto-reviewed</target>
+      <trans-unit id="TGVrdG9yaWVydCwgYXV0bw==">
+        <source>Lektoriert, auto</source>
+        <target>Reviewed, auto-set</target>
       </trans-unit>
-      <trans-unit id="TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0">
-        <source>Lektoriert, unber&#xFC;hrt, auto-gesetzt</source>
-        <target>reviewed, untouched, auto-set</target>
+      <trans-unit id="TGVrdG9yaWVydCwgdW5iZXLDvGhydCwgYXV0by1nZXNldHp0IGJlaW0gQXVmZ2FiZW5hYnNjaGx1c3M=">
+        <source>Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss</source>
+        <target>Reviewed, untouched, auto-set at finish of workflow step</target>
       </trans-unit>
       <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0">
-        <source>Lektoriert, unver&#xE4;ndert</source>
-        <target>reviewed, untouched</target>
+        <source>Lektoriert, unverändert</source>
+        <target>Reviewed, untouched</target>
       </trans-unit>
-      <trans-unit id="QXV0b2xla3RvcmllcnQsIHVudmVyw6RuZGVydA==">
-        <source>Autolektoriert, unver&#xE4;ndert</source>
-        <target>auto-reviewed, untouched</target>
+      <trans-unit id="TGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv">
+        <source>Lektoriert, unverändert, auto</source>
+        <target>Reviewed, untouched, auto-set</target>
       </trans-unit>
-      <trans-unit id="w5xiZXJzZXR6ZXIgZ2VwcsO8ZnQ=">
-        <source>&#xDC;bersetzer gepr&#xFC;ft</source>
-        <target>translator reviewed</target>
+      <trans-unit id="TGVrdG9yYXQgZHVyY2ggw5xiZXJzZXR6ZXIgZ2VwcsO8ZnQ=">
+        <source>Lektorat durch Übersetzer geprüft</source>
+        <target>Review checked by translator</target>
       </trans-unit>
-      <trans-unit id="w5xiZXJzZXR6ZXIgYXV0b2dlcHLDvGZ0">
-        <source>&#xDC;bersetzer autogepr&#xFC;ft</source>
+      <trans-unit id="TGVrdG9yYXQgZHVyY2ggw5xiZXJzZXR6ZXIgZ2VwcsO8ZnQsIGF1dG8=">
+        <source>Lektorat durch Übersetzer geprüft, auto</source>
         <target>translator autoreviewed</target>
       </trans-unit>
       <trans-unit id="d2lyZCBlcm1pdHRlbHQuLi4=">
@@ -46,8 +46,24 @@
       </trans-unit>
       <trans-unit id="QmxvY2tlZA==">
         <source>Blocked</source>
-        <target>blocked</target>
+        <target>Blocked</target>
       </trans-unit>
+      <trans-unit id="TmljaHQgbGVrdG9yaWVydA==">
+		<source>Nicht lektoriert</source>
+		<target>Not edited</target>
+	</trans-unit>
+	<trans-unit id="TGVrdG9yaWVydA==">
+		<source>Lektoriert</source>
+		<target>Reviewed</target>
+	</trans-unit>
+	<trans-unit id="QXV0by1MZWt0b3JpZXJ0">
+		<source>Auto-Lektoriert</source>
+		<target>Auto-edited</target>
+	</trans-unit>
+	<trans-unit id="R2VzcGVycnQ=">
+		<source>Gesperrt</source>
+		<target>Blocked</target>
+	</trans-unit>
       <trans-unit id="QmVzdWNoZXI=">
         <source>Besucher</source>
         <target>visitor</target>
@@ -388,21 +404,21 @@
         <source>Benutzer speichern</source>
         <target>save user</target>
       </trans-unit>
-      <trans-unit id='UE0gZ2VwcsO8ZnQ='>
-        <source>PM geprüft</source>
+      <trans-unit id='UE0gbGVrdG9yaWVydA=='>
+        <source>PM lektoriert</source>
 	<target>PM reviewed</target>
       </trans-unit>
-      <trans-unit id='UE0gQXV0b2dlcHLDvGZ0'>
-        <source>PM Autogeprüft</source>
-	<target>PM auto-reviewed</target>
+      <trans-unit id='UE0gbGVrdG9yaWVydCwgYXV0bw=='>
+        <source>PM lektoriert, auto</source>
+	<target>PM reviewed, auto-set</target>
       </trans-unit>
-      <trans-unit id='UE0gZ2VwcsO8ZnQsIHVudmVyw6RuZGVydA=='>
-        <source>PM geprüft, unverändert</source>
+      <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0'>
+        <source>PM lektoriert, unverändert</source>
 	<target>PM reviewed, unchanged</target>
       </trans-unit>
-      <trans-unit id='UE0gQXV0b2dlcHLDvGZ0LCB1bnZlcsOkbmRlcnQ='>
-        <source>PM Autogeprüft, unverändert</source>
-	<target>PM auto-reviewed, unchanged</target>
+      <trans-unit id='UE0gbGVrdG9yaWVydCwgdW52ZXLDpG5kZXJ0LCBhdXRv='>
+        <source>PM lektoriert, unverändert, auto</source>
+	<target>PM reviewed, unchanged, auto-set</target>
       </trans-unit>
       <trans-unit id='UE0gUHLDvGZ1bmc='>
         <source>PM Prüfung</source>
@@ -1339,9 +1355,9 @@
   <source>Das Segment kann nicht bearbeitet werden, da die Aufgabe im "nur Lese"- bzw. Ansichtsmodus ist.</source>
   <target>The segment cannot be edited, because the task is read-only / in view mode.</target>
 </trans-unit>
-<trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgICBEaWUgQW53ZW5kdW5nIHd1cmRlIGhpbnNpY2h0bGljaCBGdW5rdGlvbmFsaXTDpHQgdW5kIFBlcmZvcm1hbmNlIGluIGRlbiBmb2xnZW5kZW4gQnJvd3NlciBvZmZpemllbGwgZ2V0ZXN0ZXQ6ICAgIDx1bD4gICAgICAgIDxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPiAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBhYiBWZXJzaW9uIDQ0PC9saT4gICAgICAgIDxsaT5BcHBsZSBTYWZhcmkgYWIgVmVyc2lvbiA5PC9saT4gICAgICAgIDxsaT5NaWNyb3NvZnQgSW50ZXJuZXQgRXhwbG9yZXIgVmVyc2lvbiA5IC0gMTE8L2xpPiAgICA8L3VsPiAgICBQcmluemlwaWVsbCBrYW5uICUxJHMgYXVjaCBtaXQgYW5kZXJlbiBCcm93c2VybiBiencuIMOkbHRlcmVuIFZlcnNpb25lbiBmdW5rdGlvbmllcmVuLiAgICAgSGllciBrYW5uIGVzIGFiZXIgenUgdW52b3JoZXJnZXNlaGVuZW4gRmVobGVybiBrb21tZW4uICAgICBQb3RlbnRpZWxsIGvDtm5uZW4gYXVjaCBtYW5jaGUgRmVhdHVyZXMga29tcGxldHQgbmljaHQgZnVua3Rpb25pZXJlbi4='>
-  <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Internet Explorer Version 9 - 11</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.</source>
-  <target>Your browser or your browser-version is not officially supported by %1$s.<br />The application was officially tested in the following browsers regarding functionality and performance:<ul>        <li>Google Chrome from version 48</li>        <li>Mozilla Firefox from version 44</li>        <li>Apple Safari from version 9</li>        <li>Microsoft Internet Explorer version 9 - 11</li>    </ul>    In general %1$s should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won't work at all.</target>
+<trans-unit id='SWhyIEJyb3dzZXIgb2RlciBJaHJlIEJyb3dzZXItVmVyc2lvbiB3aXJkIHZvbiAlMSRzIG5pY2h0IG9mZml6aWVsbCB1bnRlcnN0w7x0enQuPGJyIC8+ICAgICBEaWUgQW53ZW5kdW5nIHd1cmRlIGhpbnNpY2h0bGljaCBGdW5rdGlvbmFsaXTDpHQgdW5kIFBlcmZvcm1hbmNlIGluIGRlbiBmb2xnZW5kZW4gQnJvd3NlciBvZmZpemllbGwgZ2V0ZXN0ZXQ6ICAgIDx1bD4gICAgICAgIDxsaT5Hb29nbGUgQ2hyb21lIGFiIFZlcnNpb24gNDg8L2xpPiAgICAgICAgPGxpPk1vemlsbGEgRmlyZWZveCBhYiBWZXJzaW9uIDQ0PC9saT4gICAgICAgIDxsaT5BcHBsZSBTYWZhcmkgYWIgVmVyc2lvbiA5PC9saT4gICAgICAgIDxsaT5NaWNyb3NvZnQgSW50ZXJuZXQgRXhwbG9yZXIgVmVyc2lvbiAxMTwvbGk+ICAgICAgICA8bGk+TWljcm9zb2Z0IEVkZ2U8L2xpPiAgICA8L3VsPiAgICBQcmluemlwaWVsbCBrYW5uICUxJHMgYXVjaCBtaXQgYW5kZXJlbiBCcm93c2VybiBiencuIMOkbHRlcmVuIFZlcnNpb25lbiBmdW5rdGlvbmllcmVuLiAgICAgSGllciBrYW5uIGVzIGFiZXIgenUgdW52b3JoZXJnZXNlaGVuZW4gRmVobGVybiBrb21tZW4uICAgICBQb3RlbnRpZWxsIGvDtm5uZW4gYXVjaCBtYW5jaGUgRmVhdHVyZXMga29tcGxldHQgbmljaHQgZnVua3Rpb25pZXJlbi4='>
+  <source>Ihr Browser oder Ihre Browser-Version wird von %1$s nicht offiziell unterstützt.<br />     Die Anwendung wurde hinsichtlich Funktionalität und Performance in den folgenden Browser offiziell getestet:    <ul>        <li>Google Chrome ab Version 48</li>        <li>Mozilla Firefox ab Version 44</li>        <li>Apple Safari ab Version 9</li>        <li>Microsoft Internet Explorer Version 11</li>        <li>Microsoft Edge</li>    </ul>    Prinzipiell kann %1$s auch mit anderen Browsern bzw. älteren Versionen funktionieren.     Hier kann es aber zu unvorhergesehenen Fehlern kommen.     Potentiell können auch manche Features komplett nicht funktionieren.</source>
+  <target>Your browser or your browser-version is not officially supported by %1$s.<br />The application was officially tested in the following browsers regarding functionality and performance:<ul>        <li>Google Chrome from version 48</li>        <li>Mozilla Firefox from version 44</li>        <li>Apple Safari from version 9</li>        <li>Microsoft Internet Explorer version 11</li>        <li>Microsoft Edge</li>    </ul>    In general %1$s should be able to work with other browsers and older versions. Unforeseen errors are possible then. It is possible that some features won't work at all.</target>
 </trans-unit>
 <trans-unit id='TmljaHQgdW50ZXJzdMO8dHp0ZSBCcm93c2VyLVZlcnNpb24='>
   <source>Nicht unterstützte Browser-Version</source>
@@ -1727,9 +1743,9 @@
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgenVnZXdpZXNlbg=='><source>Translate5 - Aufgabe zugewiesen</source><target>Translate5 - task associated</target></trans-unit>
 
 <trans-unit id='RGVyIFdvcmtmbG93IFNjaHJpdHQgZGVyIEF1ZmdhYmUgd3VyZGUgenUgInswfSIgZ2XDpG5kZXJ0IQ=='><source>Der Workflow Schritt der Aufgabe wurde zu "{0}" geändert!</source><target>The workflow step of the task was changed to "{0}"!</target></trans-unit>
-      <trans-unit id='WnVnZW9yZG5ldGUgU3ByYWNoZW4='>
-        <source>Zugeordnete Sprachen</source>
-        <target>Associated languages</target>
+      <trans-unit id='QXV0b21hdGlzY2hlIFp1d2Vpc3VuZw=='>
+        <source>Automatische Zuweisung</source>
+        <target>Auto-Assignment</target>
       </trans-unit>
       <trans-unit id='UXVlbGxzcHJhY2hlKG4p'>
         <source>Quellsprache(n)</source>
@@ -3177,9 +3193,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Creation date</target>
 </trans-unit>
 
-<trans-unit id='QXV0b8O8YmVyc2V0enQ='>
-  <source>Autoübersetzt</source>
-  <target>Auto-translated</target>
+<trans-unit id='w5xiZXJzZXR6dCwgYXV0bw=='>
+  <source>Übersetzt, auto</source>
+  <target>Translated, auto-set</target>
 </trans-unit>
 
 <trans-unit id='dHJhbnNsYXRlNS1hcHBz'>

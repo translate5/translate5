@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     /**
-     * @var ZfExtended_Log
+     * @var ZfExtended_Logger
      */
     protected $log;
     
@@ -53,7 +53,7 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     private $markTransFound = null;
     
     public function init() {
-        $this->log = ZfExtended_Factory::get('ZfExtended_Log', array(false));
+        $this->log = Zend_Registry::get('logger')->cloneMe('editor.terminology');
 
         if(!$this->assertConfig()) {
             return false;
@@ -73,6 +73,9 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         //trigger the check also if the default customer is assigned in the task post action
         $this->eventManager->attach('editor_TaskController', 'afterPostAction', array($this, 'handleAfterTermCollectionAssocChange'));
+        
+        //checks if the term taggers are available.
+        $this->eventManager->attach('ZfExtended_Resource_GarbageCollector', 'cleanUp', array($this, 'handleTermTaggerCheck'));
     }
     
     /**
@@ -127,17 +130,14 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
     protected function assertConfig() {
         $config = Zend_Registry::get('config');
         $c = $config->runtimeOptions->termTagger->url;
-
         if (!isset($c->default) || !isset($c->import) || !isset($c->gui)) {
-            $this->log->logError('Plugin TermTagger URL config default, import or gui not defined',
-                                 'One of the required config-settings default, import or gui under runtimeOptions.termTagger.url is not defined in configuration.');
+            $this->log->error('E1126', 'Plugin TermTagger URL config default, import or gui not defined (check config runtimeOptions.termTagger.url)');
             return false;
         }
         
         $defaultUrl = $c->default->toArray();
         if (empty($defaultUrl)) {
-            $this->log->logError('Plugin TermTagger config not set',
-                                 'The required config-setting runtimeOptions.termTagger.url.default is not set in configuration. Value is empty');
+            $this->log->error('E1127', 'Plugin TermTagger default server not configured: configuration is empty.');
             return false;
         }
         return true;
@@ -163,8 +163,11 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         $meta->addMeta('termtagState', $meta::META_TYPE_STRING, $worker::SEGMENT_STATE_UNTAGGED, 'Contains the TermTagger-state for this segment while importing', 36);
         
         // init worker and queue it
-        if (!$worker->init($task->getTaskGuid(), array('resourcePool' => 'import'))) {
-            $this->log->logError('TermTaggerImport-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+        $params = ['resourcePool' => 'import'];
+        if (!$worker->init($task->getTaskGuid(), $params)) {
+            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
+                'parameters' => $params,
+            ]);
             return false;
         }
         $worker->queue($event->getParam('parentWorkerId'));
@@ -224,8 +227,11 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         
         $worker = ZfExtended_Factory::get('editor_Plugins_TermTagger_Worker_TermTagger');
         /* @var $worker editor_Plugins_TermTagger_Worker_TermTagger */
-        if (!$worker->init($taskGuid, array('serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'))) {
-            $this->log->logError('TermTagger-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+        $params = ['serverCommunication' => $serverCommunication, 'resourcePool' => 'gui'];
+        if (!$worker->init($taskGuid, $params)) {
+            $this->log->error('E1128', 'TermTaggerImport Worker can not be initialized!', [
+                'parameters' => $params,
+            ]);
             return false;
         }
         
@@ -302,14 +308,43 @@ class editor_Plugins_TermTagger_Bootstrap extends ZfExtended_Plugin_Abstract {
         return $serverCommunication;
     }
     
+    /**
+     * is called periodically to check the term tagger instances
+     */
+    public function handleTermTaggerCheck() {
+        $memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend(), ['automatic_serialization' => true]);
+        
+        $status = $this->termtaggerState();
+        $serverList = [];
+        $offline = [];
+        foreach($status->running as $url => $stat) {
+            $serverList[] = "\n".$url . ': '. ($stat ? 'ONLINE': 'OFFLINE!');
+            if(!$stat) {
+                $offline[] = $url;
+            }
+        }
+        //update the block list of not available term taggers
+        $memCache->save($offline, editor_Plugins_TermTagger_Worker_Abstract::TERMTAGGER_DOWN_CACHE_KEY);
+        if(!$status->runningAll) {
+            $this->log->error('E1125', 'TermTagger DOWN: one or more configured TermTagger instances are not available: {serverList}', [
+                'serverList' => join('; ', $serverList),
+                'serverStatus' => $status,
+            ]);
+        }
+    }
+    
     public function termtaggerStateHandler(Zend_EventManager_Event $event) {
         $applicationState = $event->getParam('applicationState');
         $applicationState->termtagger = $this->termtaggerState();
     }
     
+    /**
+     * Checks if the configured termtaggers are available and returns the result as stdClass
+     * @return stdClass
+     */
     public function termtaggerState() {
         $termtagger = new stdClass();
-        $ttService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service');
+        $ttService = ZfExtended_Factory::get('editor_Plugins_TermTagger_Service', ['editor.terminology']);
         /* @var $ttService editor_Plugins_TermTagger_Service */
         $termtagger->configured = $ttService->getConfiguredUrls();
         $allUrls = array_unique(call_user_func_array('array_merge', (array)$termtagger->configured));

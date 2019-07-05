@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * TO BE COMPLETED: There are several more places in translate5 which can make use of this class
  * 
  */
-class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstract{
+class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstract {
     
     /**
      * match 0: as usual the whole string
@@ -67,8 +67,23 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @return array
      */
     public function get(string $segment) {
+        $matches = null;
         preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches);
         return $matches[0];
+    }
+    
+    /**
+     * Get all real (non whitespace) tags
+     * @param string $segment
+     */
+    public function getRealTags(string $segment) {
+        $matches = null;
+        preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches);
+        $realTags = array_filter($matches[3], function($value){
+            return !in_array($value, editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        });
+        //return the real tags (with cleaned index) from matches[0] by the keys from the found real tags above
+        return array_values(array_intersect_key($matches[0], $realTags));
     }
     
     /**
@@ -90,6 +105,45 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      */
     public function count(string $segment) {
         return preg_match_all(self::REGEX_INTERNAL_TAGS, $segment);
+    }
+    
+    /**
+     * returns an array with several different tag counts to the given segment content
+     * Example result:
+     * (
+     *     [open] => 0          → the content contains no open tags
+     *     [close] => 0         → the content contains no close tags
+     *     [single] => 3        → the content contains 3 single tags
+     *     [whitespace] => 1    → the content contains 1 whitespace tag
+     *     [tag] => 2           → the content contains 2 normal tags
+     *     [all] => 3           → the content contains 3 internal tags at all (equals to count method)
+     * )
+     * 
+     * @param string $segment
+     * @return array
+     */
+    public function statistic(string $segment) {
+        $result = [
+            'open' => 0,
+            'close' => 0,
+            'single' => 0,
+            'whitespace' => 0,
+            'tag' => 0,
+            'all' => 0,
+        ];
+        $matches = null;
+        $result['all'] = preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches);
+        if(!$result['all']) {
+            return $result;
+        }
+        //count whitespace and "normal" tags
+        $result['whitespace'] = count(array_filter($matches[3], function($id){
+            return in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        }));
+        $result['tag'] = $result['all'] - $result['whitespace'];
+        
+        //count single|open|close types:
+        return array_merge($result, array_count_values($matches[1]));
     }
     
     /**

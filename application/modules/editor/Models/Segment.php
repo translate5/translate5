@@ -227,6 +227,7 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
                ) sub
             WHERE targetEditToSort  REGEXP '[0-9]';
          */
+        $this->addWatchlistJoin($select);
         $result = $this->loadFilterdCustom($select);
         
         return $result;
@@ -691,36 +692,45 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * loads segment entity
+     * loads segment entity by file id and mid, taskGuid must be set via setTaskGuid before
      * @param int $fileId
      * @param string $mid
      */
     public function loadByFileidMid(int $fileId, $mid) {
         $taskGuid = $this->getTaskGuid();
-        $s = $this->db->select()->from($this->tableName, array('id'));
-        $segmentId = new Zend_Db_Expr('('.$s
-                            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
-                            ->where($this->tableName.'.fileId = ?', $fileId)
-                            ->where($this->tableName.'.mid = ?', $mid).')');
-        $this->load($segmentId);
+        $s = $this->db->select()
+            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
+            ->where($this->tableName.'.fileId = ?', $fileId)
+            ->where($this->tableName.'.mid = ?', $mid);
+        $this->row = $this->db->fetchRow($s);
+        if(empty($this->row)){
+            $this->notFound('#loadByFileidMid ', $fileId.'#'.$mid);
+        }
+        $this->segmentFieldManager->initFields($this->getTaskGuid());
+        $this->initData($this->getId());
     }
     
     /**
-     * loads segment entity
+     * loads segment entity by segmentNrInTask
      * @param int $segmentNrInTask
      * @param string $taskGuid
      */
     public function loadBySegmentNrInTask($segmentNrInTask, $taskGuid) {
-        $s = $this->db->select()->from($this->tableName, array('id'));
-        $segmentId = new Zend_Db_Expr('('.$s
-                            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
-                            ->where($this->tableName.'.segmentNrInTask = ?', $segmentNrInTask).')');
-        $this->load($segmentId);
+        $s = $this->db->select()
+            ->where($this->tableName.'.taskGuid = ?', $taskGuid)
+            ->where($this->tableName.'.segmentNrInTask = ?', $segmentNrInTask);
+        $this->row = $this->db->fetchRow($s);
+        if(empty($this->row)){
+            $this->notFound('#loadBySegmentNrInTask ', $segmentNrInTask.'#'.$taskGuid);
+        }
+        $this->segmentFieldManager->initFields($this->getTaskGuid());
+        $this->initData($this->getId());
     }
     
     /**
      * adds one single field content ([original => TEXT, originalMd5 => HASH]) to a given segment, 
      * identified by MID and fileId. taskGuid MUST be given by setTaskGuid before!
+     * due the internal implementation this method works only correctly before the materialized view is created!
      * 
      * @param Zend_Db_Table_Row_Abstract $field
      * @param int $fileId
@@ -734,10 +744,6 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
 
         $taskGuid = $this->getTaskGuid();
         $segmentId = $this->getId();
-        if(is_null($segmentId)){
-            $this->loadByFileidMid($fileId, $mid);
-            $segmentId = $this->getId();
-        }
         
         $data = array(
             'taskGuid' => $taskGuid,

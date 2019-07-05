@@ -185,6 +185,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     /**
      * returns a list with users to the actually loaded taskGuid and role
      * loads only assocs where isPmOverride not set
+     * If the state is set, it will load all assoc users with the given state.
      * @param array $assocFields optional, if given add that assoc fields to the join
      * @return array
      */
@@ -192,6 +193,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
         $role = $this->getRole();
+        $state=$this->getState();
         $s = $user->db->select()
         ->setIntegrityCheck(false)
         ->from(array('u' => $user->db->info($db::NAME)))
@@ -200,6 +202,9 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         ->where('tua.taskGuid = ?', $this->getTaskGuid());
         if(!empty($role)) {
             $s->where('tua.role = ?', $role);
+        }
+        if(!empty($state)){
+            $s->where('tua.state = ?', $state);
         }
         return $user->db->fetchAll($s)->toArray();
     }

@@ -33,7 +33,12 @@ class editor_Plugins_TermTagger_Service_ServerCommunication {
     
     // REQUIRED FIELDS:
     // *****************************************************
+    /**
+     * TBX file / hash
+     * @var string
+     */
     public $tbxFile = NULL;
+    
     public $sourceLang = NULL;
     public $targetLang = NULL;
     public $segments = NULL;
