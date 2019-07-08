@@ -44,10 +44,6 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         if(!isset($parameters['diff']) || !is_bool($parameters['diff'])) {
             return false;
         }
-        if(isset($parameters['exportToFolder']) && (!is_dir($parameters['exportToFolder']) || !is_writable($parameters['exportToFolder']))){
-            $this->log->logError('Export folder not found or not write able: '.$parameters['exportToFolder']);
-            return false;
-        }
         return true;
     }
     
@@ -98,6 +94,14 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
+        
+        if(!is_dir($parameters['exportToFolder']) || !is_writable($parameters['exportToFolder'])){
+            //The task export folder does not exist or is not writeable, no export ZIP file can be created.
+            throw new editor_Models_Export_Exception('E1147', [
+                'task' => $task,
+                'exportFolder' => $parameters['exportToFolder'],
+            ]);
+        }
         
         $exportClass = 'editor_Models_Export';
         $export = ZfExtended_Factory::get($exportClass);

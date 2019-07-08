@@ -633,11 +633,12 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns true if current task is in an exclusive state (like import)
+     * @param array $additionalNonExclusive additional states to be handled non exclusive
      * @return boolean
      */
-    public function isExclusiveState() {
-        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED);
-        return !in_array($this->getState(), $nonExclusiveStates);
+    public function isExclusiveState(array $additionalNonExclusive = []) {
+        $nonExclusiveStates = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
+        return !in_array($this->getState(), array_merge($nonExclusiveStates, $additionalNonExclusive));
     }
     
     /**
@@ -711,11 +712,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Check if the current task status allows this action
-     * 
+     * @param array $allow additional states to be handled non exclusive
      * @throws ZfExtended_Models_Entity_Conflict
      */
-    public function checkStateAllowsActions() {
-        if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
+    public function checkStateAllowsActions(array $allow = []) {
+        if($this->isErroneous() || $this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid())) {
             ZfExtended_Models_Entity_Conflict::addCodes([
                 'E1046' => 'The current task status does not allow that action.',
             ]);

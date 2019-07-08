@@ -80,20 +80,16 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   
   /**
    * updates the segments comments field by merging all comments to the segment, and apply HTML markup to each comment
-   * @param int $segmentId
+   * @param editor_Models_Segment $segment
    * @param string $taskGuid
    */
-  public function updateSegment(int $segmentId, string $taskGuid) {
-      $comments = $this->loadBySegmentId($segmentId, $taskGuid);
+  public function updateSegment(editor_Models_Segment $segment, string $taskGuid) {
+      $comments = $this->loadBySegmentId($segment->getId(), $taskGuid);
       $commentsMarkup = array();
       $view = clone Zend_Layout::getMvcInstance()->getView();
       foreach($comments as $comment) {
           $commentsMarkup[] = $this->getMarkedUp($view, $comment);
       }
-      $segment = ZfExtended_Factory::get('editor_Models_Segment');
-      /* @var $segment editor_Models_Segment */
-      $segment->load($segmentId);
-      
       if($taskGuid === $segment->get('taskGuid')) {
           $segment->set('comments', join("\n", $commentsMarkup));
           $segment->save();

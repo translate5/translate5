@@ -2431,6 +2431,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>exportieren (XLIFF 2.1)</source>
     <target>Export (Xliff 2.1)</target>
 </trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gKEV4Y2VsKQ=='><source>exportieren (Excel)</source><target>Export (Excel)</target></trans-unit>
 <trans-unit id='QXVzZ2V3w6RobHRlIEF1ZmdhYmVuIGVybmV1dCBpbnMgYWt0dWVsbGUgVE0gaW1wb3J0aWVyZW4='>
     <source>Ausgewählte Aufgaben erneut ins aktuelle TM importieren</source>
     <target>Re-import chosen tasks into current TM</target>
@@ -3389,6 +3390,30 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term entry</target></trans-unit>
 <trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Last editor</target></trans-unit>
 <trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Edit date</target></trans-unit>
+<trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='>
+    <source>Excel Re-Importieren</source>
+    <target>Excel Re-Import</target>
+</trans-unit>
+<trans-unit id='RXhjZWwgcmVpbXBvcnRpZXJlbg=='>
+    <source>Excel reimportieren</source>
+    <target>re-import excel file</target>
+</trans-unit>
+<trans-unit id='U3BpZWxlbiBTaWUgaGllciBkaWUgdm9yaGVyIGhlcnVudGVyZ2VsYWRlbmUgRXhjZWwtRGF0ZWkgd2llZGVyIGluIGRpZSBBdWZnYWJlIGVpbi4='>
+    <source>Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.</source>
+    <target>Re-import the previously downloaded excel-file back into the task.</target>
+</trans-unit>
+<trans-unit id='RXJsYXVidCBpc3QgaGllciBudXIgZGFzIEhvY2hsYWRlbiB2b24gKi54bHN4LURhdGVpZW4gLg=='>
+    <source>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</source>
+    <target>Only *.xlsx files are allowed.</target>
+</trans-unit>
+<trans-unit id='RGF0ZWkgd2lyZCBob2NoZ2VsYWRlbg=='>
+    <source>Datei wird hochgeladen</source>
+    <target>uploading file</target>
+</trans-unit>
+<trans-unit id='RXhjZWwgaG9jaGxhZGVu'>
+    <source>Excel hochladen</source>
+    <target>Upload excel</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

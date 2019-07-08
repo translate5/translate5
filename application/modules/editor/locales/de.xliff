@@ -1295,6 +1295,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQp'><source>exportieren (Orginalformat)</source><target>exportieren (Orginalformat)</target></trans-unit>
 <trans-unit id='ZXhwb3J0aWVyZW4gKFhMSUZGIDIuMSk='><source>exportieren (XLIFF 2.1)</source><target>exportieren (XLIFF 2.1)</target></trans-unit>
 <trans-unit id="ZXhwb3J0aWVyZW4gKE9yZ2luYWxmb3JtYXQgbWl0IMOEbmRlcnVuZ3NoaXN0b3JpZSk="><source>exportieren (Orginalformat mit Änderungshistorie)</source><target>exportieren (Orginalformat mit Änderungshistorie)</target></trans-unit>
+<trans-unit id='ZXhwb3J0aWVyZW4gKEV4Y2VsKQ=='><source>exportieren (Excel)</source><target>exportieren (Excel)</target></trans-unit>
 <trans-unit id='S3VuZGVu'><source>Kunden</source><target>Kunden</target></trans-unit>
 <trans-unit id='S3VuZGVuw7xiZXJzaWNodA=='><source>Kundenübersicht</source><target>Kundenübersicht</target></trans-unit>
 <trans-unit id="QWxsZSBLdW5kZW4="><source>Alle Kunden</source><target>Alle Kunden</target></trans-unit>
@@ -1583,6 +1584,12 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term-Eintrag</target></trans-unit>
 <trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Letzter Bearbeiter</target></trans-unit>
 <trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Bearbeitungsdatum</target></trans-unit>
+<trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='><source>Excel Re-Importieren</source><target>Excel Re-Importieren</target></trans-unit>
+<trans-unit id='RXhjZWwgcmVpbXBvcnRpZXJlbg=='><source>Excel reimportieren</source><target>Excel reimportieren</target></trans-unit>
+<trans-unit id='U3BpZWxlbiBTaWUgaGllciBkaWUgdm9yaGVyIGhlcnVudGVyZ2VsYWRlbmUgRXhjZWwtRGF0ZWkgd2llZGVyIGluIGRpZSBBdWZnYWJlIGVpbi4='><source>Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.</source><target>Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.</target></trans-unit>
+<trans-unit id='RXJsYXVidCBpc3QgaGllciBudXIgZGFzIEhvY2hsYWRlbiB2b24gKi54bHN4LURhdGVpZW4gLg=='><source>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</source><target>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</target></trans-unit>
+<trans-unit id='RGF0ZWkgd2lyZCBob2NoZ2VsYWRlbg=='><source>Datei wird hochgeladen</source><target>Datei wird hochgeladen</target></trans-unit>
+<trans-unit id='RXhjZWwgaG9jaGxhZGVu'><source>Excel hochladen</source><target>Excel hochladen</target></trans-unit>
   </body>
  </file>
 </xliff>

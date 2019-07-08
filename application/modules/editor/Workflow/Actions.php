@@ -108,7 +108,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $pmId = $user->getId();
         $aclInstance = ZfExtended_Acl::getInstance();
         $roles = $user->getRoles();
-        $pmSeeAll = !empty($roles) && $aclInstance->isInAllowedRoles(explode(',', $roles), 'backend', 'seeAllUsers');
+        $pmSeeAll = !empty($roles) && $aclInstance->isInAllowedRoles($roles, 'backend', 'seeAllUsers');
         
         $sourceLang = $task->getSourceLang();
         $targetLang = $task->getTargetLang();

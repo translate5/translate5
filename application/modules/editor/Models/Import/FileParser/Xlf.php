@@ -1115,7 +1115,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         //if there was at least one processed comment, we have to sync the comment contents to the segment
         if(!empty($comment)){
-            $comment->updateSegment($segmentId, $this->task->getTaskGuid());
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($segmentId);
+            $comment->updateSegment($segment, $this->task->getTaskGuid());
         }
     }
     

@@ -182,6 +182,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             )
         ));
         
+        // Excel Ex- + Reimport
+        $this->front->getRouter()->addRoute('editorTaskExcelExport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/excelexport',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'excelexport'
+            )
+        ));
+        $this->front->getRouter()->addRoute('editorTaskExcelReimport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/excelreimport',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'excelreimport'
+            )
+        ));
+        
         //FIXME convert me to RestLikeRoute (see filemap)
         $filemapRoute = new ZfExtended_Controller_RestFakeRoute(
             'editor/segment/nextsegments/*',

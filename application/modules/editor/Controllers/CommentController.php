@@ -46,8 +46,11 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
             $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
             /* @var $wfm editor_Workflow_Manager */
             $workflow = $wfm->getActive($segment->getTaskGuid());
+            $task = ZfExtended_Factory::get('editor_Models_Task');
+            /* @var $task editor_Models_Task */
+            $task->loadByTaskGuid($segment->getTaskGuid());
             //@todo do this with events
-            $workflow->beforeCommentedSegmentSave($segment);
+            $workflow->beforeCommentedSegmentSave($segment, $task);
         });
     }
     
@@ -91,7 +94,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->isEditable = true; //a edited comment is editable again
-        $this->entity->updateSegment((int)$this->entity->getSegmentId(), $this->session->taskGuid);
+        $this->updateSegment((int)$this->entity->getSegmentId(), $this->session->taskGuid);
     }
 
     public function deleteAction() {
@@ -104,7 +107,7 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $this->entity->getUserGuid());
         $id = (int)$this->entity->getSegmentId();
         $this->entity->delete();
-        $this->entity->updateSegment($id, $this->session->taskGuid);
+        $this->updateSegment($id, $this->session->taskGuid);
     }
 
     public function postAction() {
@@ -129,7 +132,19 @@ class Editor_CommentController extends editor_Controllers_EditorrestController {
         $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->isEditable = true; //a newly added comment is editable by the user
-        $this->entity->updateSegment((int)$this->entity->getSegmentId(), $taskGuid);
+        $this->updateSegment((int)$this->entity->getSegmentId(), $taskGuid);
+    }
+    
+    /**
+     * Wrapper function to load segment before updating the comments in it
+     * @param int $segmentId
+     * @param string $taskGuid
+     */
+    protected function updateSegment(int $segmentId, string $taskGuid): void {
+        $segment = ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segment editor_Models_Segment */
+        $segment->load($segmentId);
+        $this->entity->updateSegment($segment, $taskGuid);
     }
     
     /**

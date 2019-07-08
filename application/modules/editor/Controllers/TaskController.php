@@ -139,23 +139,42 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->entity]);
         
-        //add context xliff2 as valid format
+        //add context of valid export formats:
+        // currently: xliff2, importArchive, excel
         $this->_helper
         ->getHelper('contextSwitch')
+        
         ->addContext('xliff2', [
             'headers' => [
                 'Content-Type'          => 'text/xml',
             ]
         ])
+        ->addActionContext('export', 'xliff2')
+        
         ->addContext('importArchive', [
             'headers' => [
                 'Content-Type'          => 'application/zip',
             ]
         ])
-        ->addActionContext('export', 'xliff2')
         ->addActionContext('export', 'importArchive')
-        ->initContext();
         
+        /*
+        ->addContext('excel', [
+            'headers' => [
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        ])
+        ->addActionContext('export', 'excel')
+        
+        ->addContext('excelReimport', [
+            'headers' => [
+                'Content-Type'          => 'text/xml',
+            ]
+        ])
+        ->addActionContext('export', 'excelReimport')
+        */
+        
+        ->initContext();
     }
     
     /**
@@ -504,6 +523,81 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->startImportWorkers();
     }
     
+    
+    /**
+     * Starts the export of a task into an excel file
+     */
+    public function excelexportAction() {
+        $this->entityLoad();
+        
+        // run excel export
+        $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel', [$this->entity]);
+        /* @var $exportExcel editor_Models_Export_Excel */
+        $exportExcel->exportAsDownload();
+    }
+    
+    /**
+     * Starts the reimport of an earlier exported excel into the task
+     */
+    public function excelreimportAction() {
+        $this->getAction();
+        
+        $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
+        /* @var $worker editor_Models_Excel_Worker */
+        
+        try {
+            $tempFilename = $worker->prepareImportFile($this->entity);
+            
+            $worker->init($this->entity->getTaskGuid(), [
+                'filename' => $tempFilename,
+                'currentUserGuid' => $this->user->data->userGuid,
+            ]);
+            //TODO running import as direct run / synchronous process. 
+            // Reason is just the feedback for the user, which the user should get directly in the browser
+            $worker->run();
+        }
+        catch(editor_Models_Excel_ExImportException $e) {
+            $codeToFieldAndMessage = [
+                'E1138' => ['excelreimportUpload', 'Die Excel Datei gehört nicht zu dieser Aufgabe.'],
+                'E1139' => ['excelreimportUpload', 'Die Anzahl der Segmente in der Excel-Datei und in der Aufgabe sind unterschiedlich!'],
+                'E1140' => ['excelreimportUpload', 'Ein oder mehrere Segmente sind in der Excel-Datei leer, obwohl in der Orginalaufgabe Inhalt vorhanden war.'],
+                'E1141' => ['excelreimportUpload', 'Dateiupload fehlgeschlagen. Bitte versuchen Sie es erneut.'],
+            ];
+            $code = $e->getErrorCode();
+            if(empty($codeToFieldAndMessage[$code])) {
+                throw $e;
+            }
+            // the Import exceptions causing unprossable entity exceptions are logged on level info
+            $this->log->exception($e, [
+                'level' => ZfExtended_Logger::LEVEL_INFO
+            ]);
+            
+            throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
+                //fieldName => error message to field
+                $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+            ]);
+        }
+        
+        if ($segmentErrors = $worker->getSegmentErrors()) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+            /* @var $logger ZfExtended_Logger */
+            
+            $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):';
+            // log warning 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
+            $logger->warn('E1142', $msg."\n{segments}", [
+                'task' => $this->entity,
+                'segments' => join("\n", array_map(function(excelExImportSegmentContainer $item) {
+                    return '#'.$item->nr.': '.$item->comment;
+                }, $segmentErrors)),
+            ]);
+            $msg = $this->translate->_('Die Excel-Datei konnte reimportiert werden, die nachfolgenden Segmente beinhalten aber Fehler und müssen korrigiert werden:');
+            $this->restMessages->addWarning($msg, $logger->getDomain(), null, array_map(function(excelExImportSegmentContainer $item) {
+                return ['type' => $item->nr, 'error' => $item->comment];
+            }, $segmentErrors));
+        }
+        $this->view->success = true;
+    }
+    
     protected function startImportWorkers() {
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $workerModel ZfExtended_Models_Worker */
@@ -698,7 +792,8 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
-        $this->entity->checkStateAllowsActions();
+        //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
+        $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
         
         $taskguid = $this->entity->getTaskGuid();
         $this->log->request();
@@ -1171,10 +1266,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function exportAction() {
         parent::getAction();
-        
-        
         $diff = (boolean)$this->getRequest()->getParam('diff');
-        
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
         
         switch ($context) {
@@ -1210,7 +1302,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //      Export_ExportedWorker for ExportReq1 → works then with tempExportDir of ExportReq1 instead!
         // 
         // If we implement in future export workers which need to work on the temp export data, 
-        //  we have to ensure that each export worker get its own export directory. 
+        // we have to ensure that each export worker get its own export directory. 
         
         $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
         /* @var $worker editor_Models_Export_ExportedWorker */
