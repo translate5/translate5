@@ -69,11 +69,12 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
     }
     
     /**
-     * enable direct runs
+     * enable direct runs by inheriting public
      * {@inheritDoc}
      * @see ZfExtended_Worker_Abstract::run()
      */
     public function run() {
+        //needed since parent is protected by design
         return parent::run();
     }
     
