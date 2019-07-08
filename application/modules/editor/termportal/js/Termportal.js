@@ -104,15 +104,15 @@ $("#search").autocomplete({
 });
 
 function getLanguageFlag(rfcLanguage) {
-    rfcLanguage = rfcLanguage.toLowerCase();
-    if (rfcLanguage in rfcLanguageFlags) {
-    	if(rfcLanguageFlags[rfcLanguage]==''){
+	var rfcValue=rfcLanguage.toLowerCase()
+    if (rfcValue in rfcLanguageFlags) {
+    	if(rfcLanguageFlags[rfcValue]==''){
     		return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     	}
         // TODO: img-html could be reused if already created before
-        return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcLanguage] + '.png" alt="' + rfcLanguage + '" title="' + rfcLanguage + '">';
+        return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcValue] + '.png" alt="' + rfcValue + '" title="' + rfcValue + '">';
     }
-    return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
+    return '<span class="noFlagLanguage">'+capitalizeFirstLetter(rfcLanguage)+'</span>';
 }
 
 $("#searchButton" ).button({

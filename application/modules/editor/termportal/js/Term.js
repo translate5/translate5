@@ -925,24 +925,22 @@ var Term={
             $_termSkeleton.next().hide();
             $_termSkeleton.hide();
             // TODO: first mouseover causes "jquery.js:6718 GET http://translate5.local/editor/undefined 404 (Not Found)"
-            $( "#languageSelectContainer .chooseLanguage" )
-                .iconselectmenu({
-                    select: function() {
-                        if ($(this).val() == 'none') {
-                            return false;
-                        }
-                        me.newTermLanguageId = $(this).val();
-                        me.newTermRfcLanguage = $( "#languageSelectContainer .chooseLanguage option:selected" ).text();
-                        $('#languageSelectContainer').remove();
-                        $_termSkeleton.next().show();
-                        $_termSkeleton.show();
-                        me.drawLanguageFlagForNewTerm();
-                        $_termSkeleton.find('.proposal-add').click();
-                        $_termSkeleton.find('textarea').focus();
+            $( "#languageSelectContainer .chooseLanguage" ).iconselectmenu({
+                select: function() {
+                	
+                    if ($(this).val() == 'none') {
+                        return false;
                     }
-                })
-                .iconselectmenu( "menuWidget")
-                .addClass( "ui-menu-icons flag" );
+                    me.newTermLanguageId = $(this).val();
+                    me.newTermRfcLanguage = $("#languageSelectContainer .chooseLanguage option:selected").text();
+                    $('#languageSelectContainer').remove();
+                    $_termSkeleton.next().show();
+                    $_termSkeleton.show();
+                    me.drawLanguageFlagForNewTerm();
+                    $_termSkeleton.find('.proposal-add').click();
+                    $_termSkeleton.find('textarea').focus();
+                }
+            }).iconselectmenu("menuWidget").addClass("ui-menu-icons flag");
         },
         
         /**
