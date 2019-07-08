@@ -570,6 +570,7 @@ tr.customState td div {font-style: italic;}
 .adminTaskGrid tr.editorReopenTask .ico-task-reopen {display:inline-block;}
 .adminTaskGrid tr.editorDeleteTask.error .ico-task-delete,
 .adminTaskGrid tr.editorDeleteTask .ico-task-delete {display:inline-block;}
+.adminTaskGrid tr.editorLogTask.customState.state-ExcelExported .ico-task-log,
 .adminTaskGrid tr.editorLogTask.error .ico-task-log {;display:inline-block;}
 .adminTaskGrid tr.editorCloneTask.error .ico-task-clone,
 .adminTaskGrid tr.editorCloneTask .ico-task-clone {display:inline-block;}
