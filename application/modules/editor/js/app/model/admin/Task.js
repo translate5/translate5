@@ -265,7 +265,7 @@ Ext.define('Editor.model.admin.Task', {
       if(step && useFilter) {
           //preset grid filtering:
           if(!data.initialGridFilters) {
-              filter = data.initialGridFilters = {};
+              data.initialGridFilters = {};
           }
           filter = data.initialGridFilters; //use filter as reference 
           //reset workflowstep filters of formerly opened tasks, since initialGridFilters is persistent between tasks!
