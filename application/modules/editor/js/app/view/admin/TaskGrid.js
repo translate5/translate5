@@ -122,6 +122,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           }
           if(task.isCustomState()) {
               res.push('customState');
+              res.push('state-'+task.get('state'));
           }
           if(task.isUnconfirmed()) {
               res.push('unconfirmed');
