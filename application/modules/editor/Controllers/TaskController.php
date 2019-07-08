@@ -532,6 +532,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         // run excel export
         $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel', [$this->entity]);
+        $this->log->info('E1011', 'Task exported as excel file and locked for further processing.');
         /* @var $exportExcel editor_Models_Export_Excel */
         $exportExcel->exportAsDownload();
     }
@@ -552,30 +553,14 @@ class editor_TaskController extends ZfExtended_RestController {
                 'filename' => $tempFilename,
                 'currentUserGuid' => $this->user->data->userGuid,
             ]);
-            //TODO running import as direct run / synchronous process. 
+            //TODO should be an synchronous process (queue instead run) 
+            // currently running import as direct run / synchronous process. 
             // Reason is just the feedback for the user, which the user should get directly in the browser
             $worker->run();
+            $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
         }
         catch(editor_Models_Excel_ExImportException $e) {
-            $codeToFieldAndMessage = [
-                'E1138' => ['excelreimportUpload', 'Die Excel Datei gehört nicht zu dieser Aufgabe.'],
-                'E1139' => ['excelreimportUpload', 'Die Anzahl der Segmente in der Excel-Datei und in der Aufgabe sind unterschiedlich!'],
-                'E1140' => ['excelreimportUpload', 'Ein oder mehrere Segmente sind in der Excel-Datei leer, obwohl in der Orginalaufgabe Inhalt vorhanden war.'],
-                'E1141' => ['excelreimportUpload', 'Dateiupload fehlgeschlagen. Bitte versuchen Sie es erneut.'],
-            ];
-            $code = $e->getErrorCode();
-            if(empty($codeToFieldAndMessage[$code])) {
-                throw $e;
-            }
-            // the Import exceptions causing unprossable entity exceptions are logged on level info
-            $this->log->exception($e, [
-                'level' => ZfExtended_Logger::LEVEL_INFO
-            ]);
-            
-            throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
-                //fieldName => error message to field
-                $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
-            ]);
+            $this->handleException($e);
         }
         
         if ($segmentErrors = $worker->getSegmentErrors()) {
@@ -596,6 +581,33 @@ class editor_TaskController extends ZfExtended_RestController {
             }, $segmentErrors));
         }
         $this->view->success = true;
+    }
+    
+    /**
+     * Handles the exceptions happened on excel reimport
+     * @param ZfExtended_ErrorCodeException $e
+     * @throws ZfExtended_ErrorCodeException
+     */
+    protected function handleException(ZfExtended_ErrorCodeException $e) {
+        $codeToFieldAndMessage = [
+            'E1138' => ['excelreimportUpload', 'Die Excel Datei gehört nicht zu dieser Aufgabe.'],
+            'E1139' => ['excelreimportUpload', 'Die Anzahl der Segmente in der Excel-Datei und in der Aufgabe sind unterschiedlich!'],
+            'E1140' => ['excelreimportUpload', 'Ein oder mehrere Segmente sind in der Excel-Datei leer, obwohl in der Orginalaufgabe Inhalt vorhanden war.'],
+            'E1141' => ['excelreimportUpload', 'Dateiupload fehlgeschlagen. Bitte versuchen Sie es erneut.'],
+        ];
+        $code = $e->getErrorCode();
+        if(empty($codeToFieldAndMessage[$code])) {
+            throw $e;
+        }
+        // the Import exceptions causing unprossable entity exceptions are logged on level info
+        $this->log->exception($e, [
+            'level' => ZfExtended_Logger::LEVEL_INFO
+        ]);
+        
+        throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
+            //fieldName => error message to field
+            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+        ]);
     }
     
     protected function startImportWorkers() {
