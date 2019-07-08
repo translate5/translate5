@@ -103,6 +103,7 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
                 else {
                     win.close();
                 }
+                task.store && task.load();
             },
             failure: function(form, submit) {
                 var errors;
