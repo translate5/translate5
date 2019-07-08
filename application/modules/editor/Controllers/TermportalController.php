@@ -137,8 +137,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $languageCombinations = $languageResourcesLanguages->getLanguageCombinationsForLoggedUser();
         $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageCombinations->targetsForSources);
         
+        
         //rfc language code to language flag mapping
-        $this->view->rfcFlags=$languagesModel->loadAllKeyValueCustom('rfc5646', 'iso3166Part1alpha2',true);
+        $this->view->Php2JsVars()->set('apps.termportal.rfcFlags',$languagesModel->loadAllKeyValueCustom('rfc5646', 'iso3166Part1alpha2',true));
+        //id language to rfc code mapping
+        $this->view->Php2JsVars()->set('apps.termportal.idToRfcLanguageMap',$languagesModel->loadAllKeyValueCustom('id', 'rfc5646'));
+        //rfc to languagename map
+        $this->view->Php2JsVars()->set('apps.termportal.rfcToLanguageNameMap',$languagesModel->loadAllKeyValueCustom('rfc5646', 'langName'));
         
         $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         

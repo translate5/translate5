@@ -224,6 +224,20 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
             $addSourcesToTargets($sources,$targets);
         }
         
+        //sort alphabetically
+        if(!empty($targetsForSources)){
+            ksort($targetsForSources);
+            foreach ($targetsForSources as &$single){
+                sort($single);
+            }
+        }
+        //sort alphabetically
+        if(!empty($sourcesForTargets)){
+            ksort($sourcesForTargets);
+            foreach ($sourcesForTargets as &$single){
+                sort($single);
+            }
+        }
         return (object) [
             'targetsForSources' => $targetsForSources,
             'sourcesForTargets' => $sourcesForTargets,

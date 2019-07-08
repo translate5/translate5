@@ -188,7 +188,6 @@ if(isset($this->error)){
 var attributeLabels='<?php echo json_encode($this->labels);?>';
 attributeLabels = JSON.parse(attributeLabels);
 var collectionIds=<?php echo json_encode($this->collectionIds);?>;
-var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
 var SESSION_LOCALE='<?php echo $session->locale; ?>';
 var collectionsClients=JSON.parse('<?php echo json_encode($collectionsClients); ?>');
