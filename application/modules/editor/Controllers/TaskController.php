@@ -560,7 +560,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
         }
         catch(editor_Models_Excel_ExImportException $e) {
-            $this->handleException($e);
+            $this->handleExcelreimportException($e);
         }
         
         if ($segmentErrors = $worker->getSegmentErrors()) {
@@ -588,7 +588,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * @param ZfExtended_ErrorCodeException $e
      * @throws ZfExtended_ErrorCodeException
      */
-    protected function handleException(ZfExtended_ErrorCodeException $e) {
+    protected function handleExcelreimportException(ZfExtended_ErrorCodeException $e) {
         $codeToFieldAndMessage = [
             'E1138' => ['excelreimportUpload', 'Die Excel Datei gehört nicht zu dieser Aufgabe.'],
             'E1139' => ['excelreimportUpload', 'Die Anzahl der Segmente in der Excel-Datei und in der Aufgabe sind unterschiedlich!'],
@@ -979,7 +979,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $row['notEditContent'] = (bool)$row['userPrefs'][0]->notEditContent;
         
         //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
-        foreach($row['segmentFields'] as $key => &$field) {
+        foreach($row['segmentFields'] as &$field) {
             //TRANSLATE-318: replacing of a subpart of the column name is a client specific feature
             $needle = $this->config->runtimeOptions->segments->fieldMetaIdentifier;
             if(!empty($needle)) {
@@ -1056,7 +1056,6 @@ class editor_TaskController extends ZfExtended_RestController {
      * stores the task as active task if its an opening or an editing request
      */
     protected function openAndLock() {
-        $session = new Zend_Session_Namespace();
         $task = $this->entity;
         if($this->isOpenTaskRequest(true)){
             $workflow = $this->workflow;
@@ -1334,7 +1333,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         if($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+            /* @var $translate ZfExtended_Zendoverwrites_Translate */
             $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
         }
         else {
