@@ -548,8 +548,14 @@ var Term={
             if (filteredCientsNames.length >1) {
                 infosForSelection.push(filteredCientsNames.join(', '));
             }
-            infosForSelection.push(collectionsNames[term.collectionId]);
-            termAttributesHtmlContainer.push('<span class="selection-infos">['+infosForSelection.join('; ')+']</span>');
+            
+            if(Object.keys(collectionsNames).length>1){
+            	infosForSelection.push(collectionsNames[term.collectionId]);
+            }
+            
+            if(infosForSelection.length>0){
+            	termAttributesHtmlContainer.push('<span class="selection-infos">['+infosForSelection.join('; ')+']</span>');
+            }
             
             termAttributesHtmlContainer.push('</h3>');
             
