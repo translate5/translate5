@@ -429,17 +429,7 @@ var Term={
             
 		    setSizesInFinalResultContent();
 
-            $( ".instanttranslate-integration .chooseLanguage" )
-                .iconselectmenu({
-                    select: function() {
-                        if ($(this).val() == 'none') {
-                            return false;
-                        }
-                        me.openInstantTranslate($(this));
-                    }
-                })
-                .iconselectmenu( "menuWidget")
-                .addClass( "ui-menu-icons flag" );
+	    	me.initInstantTranslateSelect()
             
             // -------proposal-buttons -------
             me.drawProposalButtons('attribute');
@@ -618,7 +608,9 @@ var Term={
                 lang,
                 targetsForSources,
                 targets,
-                availableLanguages;
+                availableLanguages,
+                languageName='';
+            
             
             switch(languagesFor) {
                 case "instanttranslate":
@@ -629,8 +621,9 @@ var Term={
                         targets = targetsForSources[source];
                         for (var i=0; i < targets.length; i++) {
                             target = targets[i];
+                            languageName=Editor.data.apps.termportal.rfcToLanguageNameMap[target] ? Editor.data.apps.termportal.rfcToLanguageNameMap[target] : target;
                             flag = getLanguageFlag(target);
-                            languageSelectOptions += '<option value="'+target+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+target+'</option>';
+                            languageSelectOptions += '<option value="'+target+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+languageName+'</option>';
                         }
                     }
                     break;
@@ -640,7 +633,8 @@ var Term={
                     $("#language option").each(function() {
                         if ($(this).val() != 'none') {
                             flag = getLanguageFlag($(this).text());
-                            languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+$(this).text()+'</option>';
+                            languageName=Editor.data.apps.termportal.rfcToLanguageNameMap[$(this).text()] ? Editor.data.apps.termportal.rfcToLanguageNameMap[$(this).text()] : $(this).text();
+                            languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+languageName+'</option>';
                         }
                     });
                     // ... and then list ALL languages that are available in translate5
@@ -649,6 +643,7 @@ var Term={
                     for (var i=0; i < availableLanguages.length; i++) {
                         lang = availableLanguages[i];
                         flag = getLanguageFlag(lang.value);
+                        languageName=Editor.data.apps.termportal.rfcToLanguageNameMap[lang.text] ? Editor.data.apps.termportal.rfcToLanguageNameMap[lang.text] : lang.text;
                         languageSelectOptions += '<option value="'+lang.id+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+lang.text+'</option>';
                     }
                     break;
@@ -674,6 +669,10 @@ var Term={
                 console.log('do NOT renderInstantTranslateIntegrationForTerm');
                 return '';
             }
+            //if the value is number, find the rfc value of it
+            if($.isNumeric(source)){
+            	source=Editor.data.apps.termportal.idToRfcLanguageMap[source];
+            }
             languageSelect = me.renderLanguageSelect('instanttranslate',source);
             if (languageSelect == '') {
                 return '';
@@ -694,7 +693,7 @@ var Term={
                 $_termData = $_termAttributes.prev('.term-data'),
                 text = $_termData.attr('data-term-value'),
                 source = $_termData.children('img').attr('title'),
-                target = $_elSelect.find("option:selected").text(),
+                target = $_elSelect.find("option:selected").val(),
                 url = Editor.data.restpath+'instanttranslate',
                 params;
             
@@ -933,12 +932,11 @@ var Term={
             // TODO: first mouseover causes "jquery.js:6718 GET http://translate5.local/editor/undefined 404 (Not Found)"
             $( "#languageSelectContainer .chooseLanguage" ).iconselectmenu({
                 select: function() {
-                	
                     if ($(this).val() == 'none') {
                         return false;
                     }
                     me.newTermLanguageId = $(this).val();
-                    me.newTermRfcLanguage = $("#languageSelectContainer .chooseLanguage option:selected").text();
+                    me.newTermRfcLanguage = $("#languageSelectContainer .chooseLanguage option:selected").val();
                     $('#languageSelectContainer').remove();
                     $_termSkeleton.next().show();
                     $_termSkeleton.show();
@@ -1034,6 +1032,23 @@ var Term={
                 return;
             }
             me.$_termEntryAttributesTable.empty();
+        },
+        
+        /***
+         * Init the instant translate select html to jquery component
+         * This will also register the onselect handler
+         */
+        initInstantTranslateSelect:function(){
+        	var me=this;
+            $( ".instanttranslate-integration .chooseLanguage" )
+            .iconselectmenu({
+                select: function() {
+                    if ($(this).val() == 'none') {
+                        return false;
+                    }
+                    me.openInstantTranslate($(this));
+                }
+            }).iconselectmenu( "menuWidget").addClass( "ui-menu-icons flag" );
         },
 
         /***

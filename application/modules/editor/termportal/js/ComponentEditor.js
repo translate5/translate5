@@ -345,17 +345,41 @@ var ComponentEditor={
 			dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute'),
 			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute),
 			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
+			instantTranslateInto=Term.renderInstantTranslateIntegrationForTerm(result.language);
 			
 			//update the term holder dom with the new temr id
 			$termAttributeHolder.attr("data-term-id",result.termId);
 			$termAttributeHolder.attr("data-groupid",result.groupId);
 			
+			
 			//attach the comment attribute draw data to the term holder
 			$termAttributeHolder.prepend(drawData);
 
-            //find the comment panel and start the comment editor
+			//render the instant translate into select
+			if(instantTranslateInto){
+				$termAttributeHolder.prepend(instantTranslateInto);
+				Term.initInstantTranslateSelect();
+			}
+			
+			//find the comment panel and start the comment editor
             // (for existing terms, the comment editor is started by clicking it)
 			if (me.isNew) {
+				//reset the data for the propose term component
+				//only the term specific data is reset, the other data is loaded from the newly saved term
+				Term.newTermName=proposalTranslations['addTermProposal'] + '...';
+				Term.newTermRfcLanguage=null;
+				Term.newTermLanguageId=null;
+				Term.newTermAttributes=[];
+				Term.newTermCollectionId=result.collectionId;
+				Term.newTermGroupId=result.groupId;
+				Term.newTermTermEntryId=result.termEntryId;
+				
+				me.$_termTable.prepend(Term.renderNewTermSkeleton(result));
+				me.$_termTable.accordion('refresh');
+				
+				Term.drawProposalButtons('attribute');
+				Term.drawProposalButtons('terms');
+            
 	            $commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 	            if($commentPanel.length>0 && $commentPanel.prop('tagName')=='SPAN'){
 	                this.addCommentAttributeEditor($commentPanel);

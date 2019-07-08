@@ -104,14 +104,30 @@ $("#search").autocomplete({
 });
 
 function getLanguageFlag(rfcLanguage) {
-	var rfcValue=rfcLanguage.toLowerCase()
-    if (rfcValue in rfcLanguageFlags) {
-    	if(rfcLanguageFlags[rfcValue]==''){
+	var rfcValue=rfcLanguage.toLowerCase();
+    if (rfcValue in Editor.data.apps.termportal.rfcFlags) {
+    	if(Editor.data.apps.termportal.rfcFlags[rfcValue]==''){
     		return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     	}
         // TODO: img-html could be reused if already created before
-        return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcValue] + '.png" alt="' + rfcValue + '" title="' + rfcValue + '">';
+        return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[rfcValue] + '.png" alt="' + rfcValue + '" title="' + rfcValue + '">';
     }
+    if(!rfcValue || rfcValue==''){
+    	return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
+    }
+    //check if it is comma separated ids
+    rfcValue=rfcValue.split(',');
+    if(!rfcValue || rfcValue.length==0){
+    	return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
+    }
+    rfcValue=rfcValue[0];
+    //it is comma separated, try to find it
+    if (rfcValue in Editor.data.apps.termportal.idToRfcLanguageMap) {
+    	var flagRfc=Editor.data.apps.termportal.idToRfcLanguageMap[rfcValue];
+    	flagRfc=flagRfc.toLowerCase()
+        return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[flagRfc] + '.png" alt="' + flagRfc + '" title="' + flagRfc + '">';
+    }
+    
     return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
 }
 
