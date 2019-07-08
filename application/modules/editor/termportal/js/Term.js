@@ -665,7 +665,7 @@ var Term={
             var me = this,
                 languageSelect,
                 html = '';
-            if (!Editor.data.app.user.isTermProposalAllowed || !Editor.data.app.user.isInstantTranslateAllowed) {
+            if (!Editor.data.app.user.isInstantTranslateAllowed) {
                 console.log('do NOT renderInstantTranslateIntegrationForTerm');
                 return '';
             }
