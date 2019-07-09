@@ -31,7 +31,8 @@ var activeIframe=[];
  * Load translate5 app as iframe.
  */
 function loadIframe(appName,url,params){
-    var iframeId=appName+'Iframe',
+    var me=this,
+    	iframeId=appName+'Iframe',
     	url = url+(params ? ("?"+params) : ""),
     	title=Editor.data.apps[appName].title;
 
@@ -46,6 +47,7 @@ function loadIframe(appName,url,params){
                 $(frameId).attr("src", url);
             }
             $(frameId).toggle();
+            me.saveUserApp(appName);
         }
     });
 
@@ -54,6 +56,8 @@ function loadIframe(appName,url,params){
         return;
     }
 
+    me.saveUserApp(appName);
+    
     //the app does not exist, save the appId and create an iframe
     activeIframe.push(iframeId);
 
@@ -64,4 +68,26 @@ function loadIframe(appName,url,params){
         frameborder: 0,
         scrolling: 'yes'
     }).appendTo('#appContainer');
+}
+
+/***
+ * Update the last used app for the user
+ * 
+ * @param appName
+ * @returns
+ */
+function saveUserApp(appName){
+	if(!appName || appName==''){
+		return;
+	}
+	$.ajax({
+        url: Editor.data.restpath+'apps/lastusedapp',
+        dataType: "json",	
+        type: "POST",
+    	data:{
+    		'appName':appName
+    	},
+        success: function(result){
+        }
+    });
 }
