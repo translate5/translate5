@@ -315,10 +315,9 @@ class editor_Models_Excel_ExImport {
         // write fieldnames in header
         $sheet->setCellValue('A1', 'ID');
         $sheet->setCellValue('B1', 'Source');
-        $sheet->setCellValue('C1', 'Target');
+        $sheet->setCellValue('C1', 'Target (Please enter your changes in this column)');
         $sheet->setCellValue('D1', 'Comment');
         $sheet->getStyle('A1:D1')->getFont()->setBold(TRUE);
-        
     }
     
     /**
