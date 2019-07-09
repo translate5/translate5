@@ -250,6 +250,7 @@ var ComponentEditor={
                     'attributeOriginType':$element.data('type'),
                     'attributeId':$element.data('id'),
                     'name':'note',
+                    'headerText:':Attribute.findTranslatedAttributeLabel('note',null),
                     'proposable':true
             },
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$element.text());

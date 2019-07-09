@@ -559,12 +559,28 @@ var Attribute={
         return {
             attributeId:-1,
             name:'note',
+            headerText:this.findTranslatedAttributeLabel('note',null),
             attrValue:'',
             attrType:null,
-            headerText:'',
             proposable:true,
             attributeOriginType:attributeOriginType
         };
+    },
+    
+
+    /***
+     * Find the label translation
+     * @param labelName
+     * @param labelType
+     * @returns
+     */
+    findTranslatedAttributeLabel:function(labelName,labelType){
+    	for(var i=0;i<attributeLabels.length;i++){
+    		if(attributeLabels[i].label==labelName && attributeLabels[i].type==labelType){
+    			return attributeLabels[i].labelText;
+    		}
+    	}
+    	return labelName+' '+labelType;
     }
 };
 
