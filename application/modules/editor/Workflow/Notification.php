@@ -103,7 +103,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         /* @var $user ZfExtended_Models_User */
         $user->init($userData);
         $this->mailer->sendToUser($user);
-        return;
     }
     
     /**
@@ -199,8 +198,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
         
-        $users = $this->tua->getUsersOfRoleOfTask($nextRole,$task->getTaskGuid());
-        $previousUsers = $this->tua->getUsersOfRoleOfTask($triggeringRole,$task->getTaskGuid());
+        
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $users = $tua->getUsersOfRoleOfTask($nextRole,$task->getTaskGuid());
+        $previousUsers = $tua->getUsersOfRoleOfTask($triggeringRole,$task->getTaskGuid());
         $params = array(
             'triggeringRole' => $triggeringRole,
             'nextRole' => $nextRole,
