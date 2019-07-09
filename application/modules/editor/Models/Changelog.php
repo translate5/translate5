@@ -109,11 +109,10 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
      * @return integer the id on which was updated
      */
     public function updateChangelogUserInfo(stdClass $userData){
-        $userGroup = $this->getUsergroup($userData);
-        $changelogId = $this->maxChangeLogId($userGroup);
+        $changelogId = $this->maxChangeLogId($this->getUsergroup($userData));
         $db = $this->db->getAdapter();
-        $sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId,userGroup) VALUES(?,?,?)';
-        $db->query($sql, [$userData->id, $changelogId,$userGroup]);
+        $sql = 'REPLACE INTO LEK_user_changelog_info (userId,changelogId) VALUES(?,?)';
+        $db->query($sql, [$userData->id, $changelogId]);
         return $changelogId;
     }
     
