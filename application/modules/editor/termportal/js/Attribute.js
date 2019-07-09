@@ -399,6 +399,7 @@ var Attribute={
 	    $input.replaceWith(renderData);
 	    
 	    Term.drawProposalButtons($elParent);
+	    Term.reloadTermEntry=true;
 	    return true;
 	},
 	
