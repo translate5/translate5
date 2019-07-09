@@ -980,7 +980,7 @@ var Term={
             //filtered collection is empty it can means that there is only one collection available and the select is not visible
             if(filteredCollections.length == 0){
             	//collectionIds is global variable for all available collections to the current user
-            	filteredCollections=collectionIds;
+            	filteredCollections=Editor.data.apps.termportal.collectionIds;
             }
             
             if (filteredCollections.length == 1) {
@@ -1129,7 +1129,7 @@ var Term={
             //filtered collection is empty it can means that there is only one collection available and the select is not visible
             if(filteredCollections.length == 0){
             	//collectionIds is global variable for all available collections to the current user
-            	filteredCollections=collectionIds;
+            	filteredCollections=Editor.data.apps.termportal.collectionIds;
             }
             
             console.log('1034 onAddTermEntryClick => resetNewTermData');
