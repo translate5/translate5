@@ -956,7 +956,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             'language as languageId'
         ];
         
-        
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from($this->db,$cols)
