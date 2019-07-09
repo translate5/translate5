@@ -55,23 +55,9 @@ Ext.define('Editor.view.admin.ExportMenu', {
     }
     else {
         me.items = me.initExportOptions();
+        me.addExcelExport(task);
     }
     
-    if(Editor.app.authenticatedUser.isAllowed('editorExcelreexportTask', task)) {
-        me.items.push({
-            itemId: 'exportExcel',
-            hrefTarget: '_blank',
-            href: me.makePath('task/{0}/excelexport/'),
-            text: me.messages.exportExcel,
-            handler: function() {
-                task.set('state', 'ExcelExported');
-                var controller = Editor.app.getController('Editor.controller.admin.TaskOverview');
-                controller.startCheckImportStates();
-                // executes after 5 seconds:
-                Ext.defer(controller.startCheckImportStates, 5000, controller);
-            }
-        });
-    } 
     //add download archive link if allowed
     if(Editor.data.import.createArchivZip && Editor.app.authenticatedUser.isAllowed('downloadImportArchive', this.initialConfig.task)) {
         me.items.length == 0 || me.items.push("-");
@@ -86,11 +72,33 @@ Ext.define('Editor.view.admin.ExportMenu', {
     me.callParent(arguments);
   },
   /**
+   * Adds the Excel Export option if allowed
+   */
+  addExcelExport(task) {
+      var me = this;
+      if(!Editor.app.authenticatedUser.isAllowed('editorExcelreexportTask', task)) {
+          return;
+      }
+      me.items.push({
+          itemId: 'exportExcel',
+          hrefTarget: '_blank',
+          href: me.makePath('task/{0}/excelexport/'),
+          text: me.messages.exportExcel,
+          handler: function() {
+              task.set('state', 'ExcelExported');
+              var controller = Editor.app.getController('Editor.controller.admin.TaskOverview');
+              controller.startCheckImportStates();
+              // executes after 5 seconds:
+              Ext.defer(controller.startCheckImportStates, 5000, controller);
+          }
+      });
+  },
+  /**
    * Add export Links to item list
    */
   initExportOptions: function() {
       var me = this,
-          fields = this.initialConfig.fields;
+          fields = this.initialConfig.fields,
           result = [{
               itemId: 'exportItem',
               hrefTarget: '_blank',

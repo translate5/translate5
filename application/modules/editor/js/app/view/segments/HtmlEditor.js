@@ -146,7 +146,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    * @returns string
    */
   getDocMarkup: function() {
-      //FIXME die app version an htmleditor.css hängen!
     var me = this,
         version = Editor.data.app.version,
         dir = (me.isRtl ? 'rtl' : 'ltr'),
