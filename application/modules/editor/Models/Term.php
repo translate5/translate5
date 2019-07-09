@@ -893,7 +893,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $s->limit($limit);
         }
         
-        if(!$isProposableAllowed){
+        if(!$isProposableAllowed || !in_array(self::PROCESS_STATUS_UNPROCESSED, $processStats)){
             return $this->db->fetchAll($s)->toArray();
         }
         
