@@ -818,7 +818,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess($session->taskGuid,$languageResourceId, $segment);
+        $this->entity->checkTaskAndLanguageResourceAccess((string) $session->taskGuid,$languageResourceId, $segment);
         
         $this->entity->load($languageResourceId);
 
