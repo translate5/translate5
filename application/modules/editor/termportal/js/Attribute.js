@@ -221,6 +221,9 @@ var Attribute={
 		        	
 		        	var attributeData=result.rows;
 		        	
+		        	//on the next term click, fatch the data from the server, and update the cache
+		    		Term.reloadTermEntry=true;
+		    		
 		        	//the term attribute is definition, remove and update the content for the term and term entry attribute definition dom
 		    		if(attributeData.attrType=='definition'){
 		    			me.checkAndUpdateDeffinition(attributeData,'termEntryAttribute')
@@ -237,8 +240,6 @@ var Attribute={
 		        	$proposalHolder.find('del').remove();
 		        	$parent.switchClass('is-proposal','is-finalized');
 		            Term.drawProposalButtons($parent);
-		    		//on the next term click, fatch the data from the server, and update the cache
-		    		Term.reloadTermEntry=true;
 		        }
 		    });
 		};
