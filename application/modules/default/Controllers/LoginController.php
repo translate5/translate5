@@ -83,34 +83,49 @@ class LoginController extends ZfExtended_Controllers_Login {
         $acl = ZfExtended_Acl::getInstance();
         /* @var $acl ZfExtended_Acl */
         $roles=$sessionUser->data->roles;
+        
+        
         if($acl->isInAllowedRoles($roles, 'initial_page','editor')) {
             header ('HTTP/1.1 302 Moved Temporarily');
             header ('Location: '.APPLICATION_RUNDIR.'/editor');
+            exit;
         }
-        //check if the user contains the termportal right
-        elseif($acl->isInAllowedRoles($roles, 'initial_page', 'termPortal')) {
-            header ('HTTP/1.1 302 Moved Temporarily');
-            
-            //redirect the term portal via apps route
-            $apiUrl=APPLICATION_RUNDIR.'/editor/termportal';
-            $appName='termportal';
-            $url=APPLICATION_RUNDIR.'/editor/apps?name='.$appName.'&apiUrl='.$apiUrl;
-            
-            //same check for new term search page
-            header ('Location: '.$url);
-        }//check if the user contains the instanttranslate right
-        elseif($acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal')) {
-            header ('HTTP/1.1 302 Moved Temporarily');
-            
-            //redirect the instanttranslate portal via apps route
-            $apiUrl=APPLICATION_RUNDIR.'/editor/instanttranslate';
-            $appName='instanttranslate';
-            $url=APPLICATION_RUNDIR.'/editor/apps?name='.$appName.'&apiUrl='.$apiUrl;
-            
-            header ('Location: '.$url);
-        }else {
-            throw new ZfExtended_NoAccessException("No initial_page resource is found.");
+        
+        $isTermPortalAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'termPortal');
+        $isInstantTranslateAllowed=$acl->isInAllowedRoles($roles, 'initial_page', 'instantTranslatePortal');
+        
+        //the user has termportal and instantranslate roles
+        if($isTermPortalAllowed && $isInstantTranslateAllowed){
+            //find the last used app, if none use the instantranslate as default
+            $meta=ZfExtended_Factory::get('editor_Models_UserMeta');
+            /* @var $meta editor_Models_UserMeta */
+            $meta->loadByUser($sessionUser->data->id);
+            $rdr='instanttranslate';
+            if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
+                $rdr=$meta->getLastUsedApp();
+            }
+            $this->applicationRedirect($rdr);
         }
+        
+        //is instanttranslate allowed
+        if($isInstantTranslateAllowed){
+            $this->applicationRedirect('instanttranslate');
+        }
+        
+        //is termportal allowed
+        if($isTermPortalAllowed){
+            $this->applicationRedirect('termportal');
+        }
+        
+        throw new ZfExtended_NoAccessException("No initial_page resource is found.");
+        exit;
+    }
+    
+    protected function applicationRedirect(string $applicationName){
+        header ('HTTP/1.1 302 Moved Temporarily');
+        $apiUrl=APPLICATION_RUNDIR.'/editor/'.$applicationName;
+        $url=APPLICATION_RUNDIR.'/editor/apps?name='.$applicationName.'&apiUrl='.$apiUrl;
+        header ('Location: '.$url);
         exit;
     }
     
