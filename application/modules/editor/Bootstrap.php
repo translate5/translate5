@@ -347,6 +347,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('searchtermexists', $searchTermExists);
         
+        
+        $lastusedapp = new ZfExtended_Controller_RestLikeRoute(
+            'editor/apps/lastusedapp/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'apps',
+                'action' => 'lastusedapp'
+            ));
+        $this->front->getRouter()->addRoute('lastusedapp', $lastusedapp);
+        
         # Language resources rutes start
         //WARNING: Order of the route definition is important!
         // the catchall like download route must be defined before the more specific query/search routes!

@@ -36,10 +36,36 @@ END LICENSE AND COPYRIGHT
  * @method void setSourceLangDefault() setSourceLangDefault(int $sourceLangDefault)
  * @method integer getTargetLangDefault() getTargetLangDefault()
  * @method void setTargetLangDefault() setTargetLangDefault(int $targetLangDefault)
+ * @method string getLastUsedApp() getLastUsedApp()
+ * @method void setLastUsedApp() setLastUsedApp(string $lastUsedApp)
  */
+
 class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_UserMeta';
     protected $validatorInstanceClass = 'editor_Models_Validator_UserMeta';
+    
+    
+    
+    /***
+     * Load or init user meta model
+     * @param int $userId
+     */
+    public  function loadOrSet(int $userId){
+        try {
+            $this->loadByUser($userId);
+        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            parent::init();
+            $this->setUserId($userId);
+        }
+    }
+    
+    /***
+     * Load model for the given user
+     * @param int $userId
+     */
+    public function loadByUser($userId){
+        $this->loadRow('userId=?',$userId);
+    }
     
     
     /***
@@ -52,23 +78,22 @@ class editor_Models_UserMeta extends ZfExtended_Models_Entity_Abstract {
      * @return mixed|array
      */
     public function saveDefaultLanguages($userId,$source,$target){
-        try {
-            $this->loadByUser($userId);
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            parent::init();
-            $this->setUserId($userId);
-        }
+        $this->loadOrSet($userId);
         $this->setSourceLangDefault($source);
         $this->setTargetLangDefault($target);
         return $this->save();
     }
     
     /***
-     * Load model for the given user
+     * Save last used app for the given user
      * @param int $userId
+     * @param string $appName
+     * @return mixed|array
      */
-    public function loadByUser($userId){
-        $this->loadRow('userId=?',$userId);
+    public function saveLastUsedApp(int $userId,string $appName){
+        $this->loadOrSet($userId);
+        $this->setLastUsedApp($appName);
+        return $this->save();
     }
     
 }
