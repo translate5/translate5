@@ -906,7 +906,6 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
         ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
         ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
-        ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats)
         ->order($tableTerm.'.term asc');
         if($limit){
             $sp->limit($limit);
