@@ -148,7 +148,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         
         $this->view->labels=$labels;
-        $this->view->collectionIds=array_unique($collectionIds);
+        
+        $this->view->Php2JsVars()->set('apps.termportal.collectionIds',array_unique($collectionIds));
         
         $this->view->preselectedLang=$preselectedLang;
         
