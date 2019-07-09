@@ -978,6 +978,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 'LEK_term_attribute_proposal.value as proposalAttributeValue',
                 'LEK_term_attribute_proposal.id as proposalAttributelId',
             ]);
+        }else{
+            //exclude the proposals
+            $s->where('LEK_terms.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED)
+            ->where('LEK_term_attributes.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED);
         }
         
         $s->where('groupId=?',$groupId)
