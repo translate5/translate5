@@ -196,6 +196,12 @@ var translations=<?php echo json_encode($this->translations); ?>;
 var proposalTranslations = Editor.data.apps ? Editor.data.apps.termportal.proposal.translations : [];
 var searchFilterPlaceholderText=translations['searchFilterPlaceholderText']+'...';
 
+//if the frontend var is object, convert it to array
+if(Editor.data.apps.termportal.collectionIds instanceof Object){
+	Editor.data.apps.termportal.collectionIds = $.map(Editor.data.apps.termportal.collectionIds, function(value, index) {
+	    return [value];
+	});
+}
 // termProposal from InstantTranslate
 var isTermProposalFromInstantTranslate = '<?php echo $_GET['isTermProposalFromInstantTranslate'] ?? false; ?>';
 if (isTermProposalFromInstantTranslate == 'true') {
