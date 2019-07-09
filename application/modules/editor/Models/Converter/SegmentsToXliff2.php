@@ -856,7 +856,7 @@ Please note:
 - "untouched, auto-set" are status flags, that are changed automatically when a user finishes its job, because the finish means approval of everything, he did not touch manually.
 
 translate5 autostatus			->	xliff 2.x substate	->	mapped xliff status
---------------------------------------------------------------------------------
+===============================================================================
 
 //before translate5 workflow starts
 not translated		 			->	not_translated				->	initial
