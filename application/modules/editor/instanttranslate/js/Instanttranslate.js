@@ -425,6 +425,7 @@ function translateText(textToTranslate,translationInProgressID){
         },
         url: Editor.data.restpath+"instanttranslateapi/translate",
         dataType: "json",
+        type: "POST",
         data: {
             'source':$("#sourceLocale").val(),
             'target':$("#targetLocale").val(),
