@@ -789,15 +789,18 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Returns all terms of the given $searchTerms that don't exist in any collection
+     * Returns all terms of the given $searchTerms that don't exist in 
+     * any of the given collections.
      * @param array $searchTerms with objects {'text':'abc', 'id':123}
+     * @param array $collectionIds
      * @return array $nonExistingTerms with objects {'text':'abc', 'id':123}
      */
-    public function getNonExistingTermsInAnyCollection($searchTerms){
+    public function getNonExistingTermsInAnyCollection($searchTerms, $collectionIds){
         $nonExistingTerms = [];
         foreach ($searchTerms as $term) {
             $s = $this->db->select()
-            ->where('term = ?', $term->text);
+            ->where('term = ?', $term->text)
+            ->where('collectionId IN(?)', $collectionIds);
             $terms = $this->db->fetchAll($s);
             if ($terms->count() == 0) {
                 $nonExistingTerms[] = $term;

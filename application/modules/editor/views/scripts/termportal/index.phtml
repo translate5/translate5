@@ -122,10 +122,7 @@ if(isset($this->error)){
                 </ul>
             </div>
             <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
-                <?php
-                    $text = $_GET['text'] ?? '';
-                ?>
-                <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" value="<?php echo $text; ?>" placeholder="<?php echo $this->translations["search"].'...'; ?>" name="search" id="search">
+                <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" value="<?php echo htmlspecialchars($this->text); ?>" placeholder="<?php echo $this->translations["search"].'...'; ?>" name="search" id="search">
                 <button id="searchButton"></button>
                 <?php
                     $languages = $this->languages;
@@ -133,9 +130,10 @@ if(isset($this->error)){
                         return strcmp($a['rfc5646'], $b['rfc5646']);
                     });
                     $preselectedLang = false;
-                    if (isset($_GET['lang'])) {
-                        // if param 'lang' is given, select it
-                        $preselectedLang = $_GET['lang'];
+                    $getParamLang = $this->lang;
+                    if ($getParamLang != '') {
+                        // if param 'lang' is set, select it
+                        $preselectedLang = $getParamLang;
                     } else if (!empty($this->preselectedLang)) {
                         // if the preselectedLang exist, select it
                         $preselectedLang = $this->preselectedLang;
@@ -203,14 +201,14 @@ if(Editor.data.apps.termportal.collectionIds instanceof Object){
 	});
 }
 // termProposal from InstantTranslate
-var isTermProposalFromInstantTranslate = '<?php echo $_GET['isTermProposalFromInstantTranslate'] ?? false; ?>';
-if (isTermProposalFromInstantTranslate == 'true') {
+var isTermProposalFromInstantTranslate = <?php echo json_encode($this->isTermProposalFromInstantTranslate); ?>;
+if (isTermProposalFromInstantTranslate === 'true') {
     isTermProposalFromInstantTranslate = true;
     var instanttranslate = {};
-    instanttranslate.textSource = '<?php echo $_GET['text'] ?? ''; ?>';
-    instanttranslate.langSource = '<?php echo $_GET['lang'] ?? ''; ?>';
-    instanttranslate.textProposal = '<?php echo $_GET['textProposal'] ?? ''; ?>';
-    instanttranslate.langProposal = '<?php echo $_GET['langProposal'] ?? ''; ?>';
+    instanttranslate.textSource = <?php echo json_encode($this->text); ?>;
+    instanttranslate.langSource = <?php echo json_encode($this->lang); ?>;
+    instanttranslate.textProposal = <?php echo json_encode($this->textProposal); ?>;
+    instanttranslate.langProposal = <?php echo json_encode($this->langProposal); ?>;
     console.dir(instanttranslate);
 }
 
