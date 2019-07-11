@@ -306,7 +306,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Search segment action.
      */
     public function searchAction(){
-        
         $parametars=$this->getAllParams();
         
         //check if the required search parametars are in the request
@@ -652,7 +651,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @throws ZfExtended_ValidateException
      */
     private function checkRequiredSearchParameters(array $parameters){
-        if(!isset($parameters['searchInField']) || !isset($parameters['searchField']) || !isset($parameters['searchType'])){
+        if(empty($parameters['searchInField']) || empty($parameters['searchField']) || empty($parameters['searchType'])){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */;
             $e = new ZfExtended_ValidateException();

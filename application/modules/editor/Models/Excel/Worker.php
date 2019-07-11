@@ -37,6 +37,11 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
     protected $reimportExcel;
     
     /**
+     * @var editor_Models_Task
+     */
+    protected $task;
+    
+    /**
      * (non-PHPdoc)
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
@@ -83,8 +88,8 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $ class */
+        $this->task = $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
         
         // do nothing if task is not in state "is Excel exported"
@@ -111,6 +116,20 @@ class editor_Models_Excel_Worker extends ZfExtended_Worker_Abstract {
      * @return array
      */
     public function getSegmentErrors(): array {
-        return $this->reimportExcel->getSegmentErrors();
+        return empty($this->reimportExcel) ? [] : $this->reimportExcel->getSegmentErrors();
+    }
+    
+    /**
+     * send an email to the upload with the segment errors
+     * @param ZfExtended_Models_User $user
+     */
+    public function mailSegmentErrors(ZfExtended_Models_User $user) {
+        $mailer = ZfExtended_Factory::get('ZfExtended_Mail');
+        $mailer->setParameters([
+            'segmentErrors' => $this->getSegmentErrors(),
+            'task' => $this->task,
+        ]);
+        $mailer->setTemplate('workflow/pm/notifyExcelReimportErrors.phtml');
+        $mailer->sendToUser($user);
     }
 }

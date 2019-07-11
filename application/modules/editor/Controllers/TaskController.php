@@ -579,6 +579,10 @@ class editor_TaskController extends ZfExtended_RestController {
             $this->restMessages->addWarning($msg, $logger->getDomain(), null, array_map(function(excelExImportSegmentContainer $item) {
                 return ['type' => $item->nr, 'error' => $item->comment];
             }, $segmentErrors));
+            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $user ZfExtended_Models_User */
+            $user->init((array) $this->user->data);
+            $worker->mailSegmentErrors($user);
         }
         $this->view->success = true;
     }
