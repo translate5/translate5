@@ -165,14 +165,18 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
     }
     
     /***
-     * Check if any of the given terms exist in any collection
+     * Check if any of the given terms exist in any allowed collection
+     * for the logged user.
      */
     public function searchtermexistsAction(){
         $params = $this->getRequest()->getParams();
         $searchTerms = json_decode($params['searchTerms']);
-        $model = ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $model editor_Models_Term */
-        $this->view->rows = $model->getNonExistingTermsInAnyCollection($searchTerms);
+        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        $collectionIds = $termCollection->getCollectionForLogedUser();
+        $term = ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $this->view->rows = $term->getNonExistingTermsInAnyCollection($searchTerms, $collectionIds);
     }
     
     /***
