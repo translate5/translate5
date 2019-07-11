@@ -209,13 +209,13 @@ class editor_Models_Segment_Updater {
         // we convert it to usual whitespaces. If there are multiple ones, they are reduced to one then.
         // This is so far the desired behavior. No characters escaped as tag by the import should be addable through the editor.
         // Empty spaces at the very beginning/end are only allowed during editing and now removed for saving.
-        $oldContent = $content = trim(str_replace($nbsp, ' ', $content));
+        $content = trim(str_replace($nbsp, ' ', $content));
+        
+        //if there are tags to be ignored, we remove them here
+        $oldContent = $content = $this->internalTag->removeIgnoredTags($content);
         
         //since our internal tags are a div span construct with plain content in between, we have to replace them first
         $content = $this->internalTag->protect($content);
-        
-        //FIXME beim TM usage werden tags angelegt, die nicht benutzt werden sollen, diese müssen hier rausfliegen:
-        // siehe replaceAdditionalTags methode.
         
         //the following call splits the content at tag boundaries, and sanitizes the textNodes only
         // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed

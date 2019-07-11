@@ -99,7 +99,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $results=$segmentModel->getRepetitions($this->task->getTaskGuid());
         
         $repetitionsDb=array();
-        foreach($results as $key=>$value){
+        foreach($results as $value){
             $repetitionsDb[$value['id']] = $value;
         }
         unset($results);

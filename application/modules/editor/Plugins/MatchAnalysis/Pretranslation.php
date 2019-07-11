@@ -90,6 +90,10 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $usePretranslateMT=false;
     
+    /**
+     * @var editor_Models_Segment_InternalTag
+     */
+    protected $internalTag;
     
     /***
      * Pretranslation mt connectors(the mt resources associated to a task)
@@ -99,6 +103,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     public function __construct(){
         $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
+        $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
     }
     
     /***
@@ -153,9 +158,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         if($this->isTermCollection($languageResourceid)){
             $targetResult=ZfExtended_Utils::mb_ucfirst($targetResult);
         }
-        
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
+        $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
         
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
         $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here

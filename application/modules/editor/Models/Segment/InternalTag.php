@@ -56,6 +56,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     const PLACEHOLDER_TEMPLATE='<translate5:escaped id="%s" />';
     const PLACEHOLDER_TAG='<translate5:escaped>';
     
+    const IGNORE_CLASS = 'ignoreInEditor';
+    const IGNORE_ID_PREFIX = 'toignore-';
+    
     public function __construct(){
         $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
         $this->placeholderTemplate=self::PLACEHOLDER_TEMPLATE;
@@ -147,6 +150,29 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
     
     /**
+     * removes the tags to be ignored from the segment
+     * @param string $segment
+     * @return string
+     */
+    public function removeIgnoredTags(string $segment) {
+        return $this->replace($segment, function($match) {
+            if($this->matchIsIgnoredTag($match)) {
+                return '';
+            }
+            return $match[0];
+        });
+    }
+    
+    /**
+     * returns true if the given preg_match match array belongs to an ignored tag
+     * @param array $match
+     * @return boolean
+     */
+    protected function matchIsIgnoredTag(array $match) {
+        return strpos($match[3], self::IGNORE_ID_PREFIX) === 0 && strpos($match[0], self::IGNORE_CLASS) !== false;
+    }
+    
+    /**
      * restores the original escaped tag
      * @param string $segment
      * @param bool $whitespaceOnly optional, if true restore whitespace tags only 
@@ -156,6 +182,11 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         //TODO extend $whitespaceOnly filter so that we can filter for one ore more of the CSS classes (nbsp, newline, tab, space) 
         return $this->replace($segment, function($match) use ($whitespaceOnly) {
             $id = $match[3];
+            
+            //if the tag is tag to be ignored, we just remove it
+            if($this->matchIsIgnoredTag($match)) {
+                return '';
+            }
             
             if($whitespaceOnly && !in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS)) {
                 return $match[0];
@@ -469,4 +500,23 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
         return $result;
     }
     
+    /**
+     * When using TMs it can happen, that the TM result contains more tags as we can use in the segment.
+     * For visual reasons in the GUI we have to add them as "additional tags", but such tags may not be saved to the DB then.
+     * @param int $shortTag
+     * @return string the generated tag as string
+     */
+    public function makeAdditionalHtmlTag(int $shortTag) {
+        if(empty($this->singleTag)) {
+            //lazy and anonymous instantiation, since only needed here 
+            $this->singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
+        }
+        /* @var $this->singleTag editor_ImageTag_Single */
+        return $this->singleTag->getHtmlTag([
+            'class' => self::IGNORE_CLASS,
+            'text' => '&lt;AdditionalTagFromTM/&gt;',
+            'id' => self::IGNORE_ID_PREFIX.$shortTag,
+            'shortTag' => $shortTag
+        ]);
+    }
 }
