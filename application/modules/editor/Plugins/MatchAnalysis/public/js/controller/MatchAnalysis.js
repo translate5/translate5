@@ -441,8 +441,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Import state check state finished event handler. This event is fired from Task overview controller.
      */
     onImportStateCheckFinished:function(taskOverview,record){
-    	var me=this;
-    	if(record.get('taskGuid')==me.getAdminTaskPreferencesWindow().actualTask.get('taskGuid')){
+    	var me=this,
+    		taskWindow=me.getAdminTaskPreferencesWindow();
+    	if(!taskWindow){
+    		return;
+    	}
+    	if(record.get('taskGuid')==taskWindow.actualTask.get('taskGuid')){
     		me.removeLoadingMask(true);
     	}
     },
