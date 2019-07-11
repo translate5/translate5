@@ -137,12 +137,17 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         
         $collectionIds=isset($params['collectionId']) ? $params['collectionId'] : [];
         
-        //if not collections are provided, fiter by all for customers of the user
-        if(empty($collectionIds)){
-            $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-            /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        
+        if(!empty($collectionIds)){
+            // use only the collectionIds that the user has selected and be sure that these are allowed
+            $collectionIds = array_intersect($collectionIds,$termCollection->getCollectionForLogedUser());
+        }else{
             $collectionIds=$termCollection->getCollectionForLogedUser();
         }
+
+        
         
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;

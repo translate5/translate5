@@ -187,11 +187,11 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->from(array('lr'=>'LEK_languageresources'))
         ->join(array('ca'=>'LEK_languageresources_customerassoc'), 'ca.languageResourceId=lr.id',array('ca.customerId as customerId'))
         ->where('ca.customerId IN(?)',$customerIds)
-        ->where('lr.serviceType = ?',$serviceType);
+        ->where('lr.serviceType = ?',$serviceType)
+        ->group('lr.id');
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
-            $ids = array_column($rows, 'id');
-            return $ids;
+            return array_column($rows, 'id');
         }
         return [];
     }
