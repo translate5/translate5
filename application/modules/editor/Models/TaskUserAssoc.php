@@ -73,13 +73,12 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
-        $role = $this->getRole();
         $s = $user->db->select()
         ->setIntegrityCheck(false)
         ->from(array('u' => $user->db->info($db::NAME)))
         ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
         ->where('tua.isPmOverride = 0')
-        ->where('tua.taskGuid = ?', $this->getTaskGuid());
+        ->where('tua.taskGuid = ?', $taskGuid);
         if(!empty($role)) {
             $s->where('tua.role = ?', $role);
         }
@@ -152,14 +151,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @param string $state | null
      * @return array
      */
-    public function loadByParams(string $userGuid, $taskGuid = null,
-            $role = null,$state = null) {
+    public function loadByParams(string $userGuid, $taskGuid = null, $role = null, $state = null) {
         try {
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid);
-            if(!is_null($taskGuid)) $s->where('taskGuid = ?', $taskGuid);
-            if(!is_null($role)) $s->where('role= ?', $role);
-            if(!is_null($state)) $s->where('state= ?', $state);
+            if(!is_null($taskGuid)) {
+                $s->where('taskGuid = ?', $taskGuid);
+            }
+            if(!is_null($role)) {
+                $s->where('role= ?', $role);
+            }
+            if(!is_null($state)) {
+                $s->where('state= ?', $state);
+            }
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
