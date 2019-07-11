@@ -459,12 +459,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
             matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
         
-        if(assocPanel && assocPanel.getEl()){
-            assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        if(assocPanel){
+        	assocPanel.setLoading(true);
         }
 
-        if(matchAnalysisPanel && matchAnalysisPanel.getEl()){
-            matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        if(matchAnalysisPanel){
+        	matchAnalysisPanel.setLoading(true);
         }
     },
 
@@ -482,9 +482,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             return;
         }
 
-        if(assocPanel.getEl() && assocPanel.getEl().unmask){
-        	assocPanel.getEl().unmask();	
-        }
+        assocPanel.setLoading(false);
 
         if(!matchAnalysisPanel){
             return;
@@ -494,9 +492,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             matchAnalysisGrid.getStore().reload();
         }
         
-        if(matchAnalysisPanel.getEl() && matchAnalysisPanel.getEl().unmask){
-        	matchAnalysisPanel.getEl().unmask(me.strings.analysisLoadingMsg);
-        }
+        matchAnalysisPanel.setLoading(false);
     }
 
 });
