@@ -69,6 +69,13 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      */
     getExportTooltip:function(){
     	return this.exportTooltip;
+    },
+    
+    /***
+     * Get export language reources action icon class
+     */
+    getExportIconClass:function(){
+    	return 'x-hidden-display';
     }
 
 

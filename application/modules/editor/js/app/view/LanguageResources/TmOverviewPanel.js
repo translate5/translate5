@@ -186,16 +186,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },{
                         action: 'export',
                         getClass:function(v,meta,record) {
-                        	if(record.get('serviceName') == 'TermCollection'){
-                        		return 'ico-tm-export';
-                        	}
-                        	return 'x-hidden-display';
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getExportIconClass();
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-	                    	if(r.get('serviceName') == 'TermCollection'){
-	                    		return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
-                        	}
-	                    	return false;
+	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
 	                    }
                     }],
                 },{

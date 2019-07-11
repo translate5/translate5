@@ -86,8 +86,6 @@ function saveUserApp(appName){
         type: "POST",
     	data:{
     		'appName':appName
-    	},
-        success: function(result){
-        }
+    	}
     });
 }

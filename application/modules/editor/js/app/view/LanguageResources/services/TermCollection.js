@@ -63,7 +63,17 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
         return this.addTooltip;
     },
     
+    /***
+     * Get export language resources tooltip
+     */
     getExportTooltip:function(){
     	return this.exportTooltip;
+    },
+    
+    /***
+     * Get export language reources action icon class
+     */
+    getExportIconClass:function(){
+    	return 'ico-tm-export';
     }
 });
