@@ -555,9 +555,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
             ];
-            $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $currentStep]);
-            /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
-            return $xliffConverter;
+            return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $currentStep]);
         }
         
         $xliffConf = [
@@ -566,10 +564,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                 editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
                 editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
         ];
-        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
-        /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
-        
-        return $xliffConverter;
+        return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
     }
     
     public function testNotifications() {
