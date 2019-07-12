@@ -69,8 +69,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         customers:'#UT#Kunden',
         useAsDefault:'#UT#Standardmässig aktiv für',
         taskassocgridcell:'#UT#Zugewiesene Aufgaben',
-        groupHeader: '#UT#Ressource: {name}',
-        log:'#UT#Log'
+        groupHeader: '#UT#Ressource: {name}'
     },
     cls:'tmOverviewPanel',
     height: '100%',
@@ -183,10 +182,10 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         tooltip: me.strings.log,
                         action: 'log',
                         getTip:function(view,metadata,record,rowIndex,colIndex,store){
-                            return record.get('eventsCount') > 0 ? me.strings.log : '';
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogTooltip(record);
 	                    },
 	                    getClass:function(view,metadata,record,rowIndex,colIndex,store){
-	                    	return record.get('eventsCount') > 0 ? 'ico-tm-log' : '';
+	                    	return Editor.util.LanguageResources.getService(record.get('serviceName')).getLogIconClass(record);
 	                    }
                     }],
                 },{
