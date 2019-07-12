@@ -376,7 +376,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             }
         }catch (Exception $e){
             $this->logger->exception($e,[
-                'level'=>ZfExtended_Logger::LEVEL_WARN
+                'level'=>ZfExtended_Logger::LEVEL_ERROR,
+                'extra'=>[
+                    'languageResource'=>$this->termCollection
+                ]
             ]);
             return false;
         }
@@ -1294,7 +1297,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         }
         
         //check if the current tbx term is existing term proposal for the language in the term collection
-        $proposalInCollection=$proposal->findProposalInCollection($this->xml->readInnerXml(),$this->actualLangId,$this->termCollectionId);
+        $proposalInCollection=$proposal->findProposalInCollection($this->xml->readInnerXml(),$this->actualLangId,$this->termCollection->getId());
         
         if($this->mergeTerms){
             //check if the term text exist in the term collection within the language
