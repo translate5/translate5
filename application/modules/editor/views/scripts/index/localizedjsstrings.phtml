@@ -1280,8 +1280,7 @@ Ext.define('Editor.controller.Localizer', {
             customers: '<?php echo $this->translate->_('Kunden');?>',
         	defaultCustomer: '<?php echo $this->translate->_('Standardkunde');?>',
         	useAsDefault: '<?php echo $this->translate->_('Standardmässig aktiv für');?>',
-            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>',
-            log: '<?php echo $this->translate->_('log');?>'
+            groupHeader: '<?php echo $this->translate->_('Ressource: {name}');?>'
         }
     });
 
@@ -1293,7 +1292,8 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.view.LanguageResources.services.Default", {
         override: "Editor.view.LanguageResources.services.Default",
-        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>'
+        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>',
+        log: '<?php echo $this->translate->_('Log');?>'
     });
     
     Ext.define("Editor.locale.view.LanguageResources.services.OpenTM2", {

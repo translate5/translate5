@@ -1590,6 +1590,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RXJsYXVidCBpc3QgaGllciBudXIgZGFzIEhvY2hsYWRlbiB2b24gKi54bHN4LURhdGVpZW4gLg=='><source>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</source><target>Erlaubt ist hier nur das Hochladen von *.xlsx-Dateien .</target></trans-unit>
 <trans-unit id='RGF0ZWkgd2lyZCBob2NoZ2VsYWRlbg=='><source>Datei wird hochgeladen</source><target>Datei wird hochgeladen</target></trans-unit>
 <trans-unit id='RXhjZWwgaG9jaGxhZGVu'><source>Excel hochladen</source><target>Excel hochladen</target></trans-unit>
+<trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
   </body>
  </file>
 </xliff>
