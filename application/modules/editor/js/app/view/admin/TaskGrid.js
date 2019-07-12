@@ -122,6 +122,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
           }
           if(task.isCustomState()) {
               res.push('customState');
+              res.push('state-'+task.get('state'));
           }
           if(task.isUnconfirmed()) {
               res.push('unconfirmed');
@@ -265,7 +266,11 @@ Ext.define('Editor.view.admin.TaskGrid', {
                   title: me.title, //see EXT6UPD-9
           languageStore: Ext.StoreMgr.get('admin.Languages'),
           customerStore: Ext.StoreManager.get('customersStore'),
-          columns: [{
+          columns: {
+              defaults: {
+                  menuDisabled: ! Editor.app.authenticatedUser.isAllowed('editorTaskOverviewColumnMenu')
+              },
+          items:[{
               text: me.text_cols.taskActions,
               menuDisabled: true,//must be disabled, because of disappearing filter menu entry on missing filter
               xtype: 'taskActionColumn',
@@ -289,7 +294,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
 
                   if(rec.isImporting() || rec.isErroneous()) {
                       addQtip(meta, me.errorTipTpl.apply(rec.get('lastErrors')));
-                      return rec.get('state'); //FIXME better output here with fixing worker error handling
+                      return rec.get('state');
                   }
                   if(rec.isLocked() && rec.isCustomState()) {
                       addQtip(meta, Ext.String.format(me.strings.lockedSystem, rec.get('state')));
@@ -467,9 +472,15 @@ Ext.define('Editor.view.admin.TaskGrid', {
               filter: {
                   type: 'string'
               },
-              renderer: function(v, meta) {
-                  meta.tdAttr = 'data-qtip="' + v + '"';
-                  return v;
+              renderer: function(v, meta,rec) {
+            	  var tooltip=v,
+            	  	  ret=v;
+            	  if(Editor.data.frontend.tasklist.pmMailTo){
+            		  tooltip=rec.get('pmMail');
+            		  ret='<a alt="'+tooltip+'" href="mailto:'+tooltip+'">'+v+'</a>';
+            		  meta.tdAttr = 'data-qtip="'+tooltip+'"';
+            	  }
+                  return ret;
               },
               text: me.text_cols.pmGuid
           },{
@@ -548,7 +559,8 @@ Ext.define('Editor.view.admin.TaskGrid', {
               },
               tooltip: me.text_cols.enableSourceEditing,
               text: me.text_cols.enableSourceEditing
-          }],
+          }]
+          },
           dockedItems: [{
               xtype: 'toolbar',
               dock: 'top',
@@ -576,7 +588,7 @@ Ext.define('Editor.view.admin.TaskGrid', {
         };
         
         if(Editor.data.debug && Editor.data.debug.showTaskGuid) {
-            config.columns.unshift({
+            config.columns.items.unshift({
                 xtype: 'gridcolumn',
                 width: 60,
                 dataIndex: 'id',

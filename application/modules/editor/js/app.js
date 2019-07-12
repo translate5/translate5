@@ -106,6 +106,7 @@ Ext.application({
       
       this.applyDefaultState();
       this.callParent(arguments);
+      this.logoutOnWindowClose();
   },
   launch : function() {
       var me = this,
@@ -135,6 +136,31 @@ Ext.application({
     });
   },
   /**
+   * If configured the user is logged out on window close
+   */
+  logoutOnWindowClose: function() {
+      if(!Editor.data.logoutOnWindowClose) {
+          return;
+      }      
+      var notRun = true,
+          logout = function() {
+              notRun = false;
+              //use the hardcoded URL since we don't want to redirect to a custom logout page, 
+              //but we just want to foirce a session destroy
+              Ext.Ajax.request({
+                  url: Editor.data.pathToRunDir+'/login/logout',
+                  method: 'get',
+                  async: false
+              });
+          };
+      Ext.EventManager.on(window, 'beforeunload', function() {
+          Editor.data.logoutOnWindowClose && notRun && logout();
+      });
+      Ext.EventManager.on(window, 'unload', function() {
+          Editor.data.logoutOnWindowClose && notRun && logout();
+      });
+  },
+  /**
    * opens the editor with the given Task
    * firing the adminViewportClosed event
    * @param {Editor.model.admin.Task} task
@@ -142,6 +168,7 @@ Ext.application({
   openEditor: function(task) {
       var me = this,
           languages = Ext.getStore('admin.Languages'),
+          taskUserTrackingsStore,
           closeEvent;
       
       if(! (task instanceof Editor.model.admin.Task)) {
@@ -151,6 +178,8 @@ Ext.application({
       Editor.data.task = task;
       Editor.model.Segment.redefine(task.segmentFields());
       
+      Editor.data.taskUserTracking = Ext.create('Editor.store.admin.TaskUserTrackings').load();
+
       Editor.data.taskLanguages = {
           source: languages.getById(task.get('sourceLang')),
           relais: languages.getById(task.get('relaisLang')),
@@ -352,6 +381,7 @@ Ext.application({
           // Create the form
           form = Ext.DomHelper.append(Ext.getBody(), formSpec);
 
+      Editor.data.logoutOnWindowClose = false;
       form.submit();
   },
   browserAdvice: function() {
@@ -370,7 +400,7 @@ Ext.application({
           return;
       }
       Ext.Object.each(Editor.data.supportedBrowsers, function(idx, version) {
-          if(Ext[idx] >= version) {
+          if(Ext.browser.name == idx && Ext.browser.version.major >= version) {
               supportedBrowser = true;
               return false;
           }

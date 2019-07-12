@@ -44,8 +44,9 @@ Ext.define('Editor.controller.Editor', {
         'Editor.controller.editor.PrevNextSegment',
         'Editor.view.task.ConfirmationWindow'
     ],
-    mixins: ['Editor.util.Range'
-        ],
+    mixins: ['Editor.util.Event',
+        	 'Editor.util.Range'
+    ],
     messages: {
         segmentReset: '#UT#Das Segment wurde auf den ursprünglichen Zustand nach dem Import zurückgesetzt.',
         segmentNotBuffered: '#UT#Das nächste / vorherige Segment wird noch geladen, bitte versuchen Sie es erneut.',
@@ -87,6 +88,9 @@ Ext.define('Editor.controller.Editor', {
             '#Editor.$application': {
                 editorViewportClosed: 'onCloseEditorViewport',
                 editorViewportOpened: 'onOpenEditorViewport'
+            },
+            '#QmSubSegments': {
+            	afterInsertMqmTag: 'handleAfterContentChange'
             }
         },
         component: {
@@ -95,7 +99,9 @@ Ext.define('Editor.controller.Editor', {
             },
             'segmentsHtmleditor': {
                 initialize: 'initEditor',
-                contentErrors: 'handleSaveWithErrors'
+                contentErrors: 'handleSaveWithErrors',
+                afterInsertMarkup: 'handleAfterContentChange',
+                afterSetValueAndMarkup: 'handleAfterContentChange'
             },
             'roweditor': {
                 destroy: 'handleDestroyRoweditor'
@@ -137,10 +143,13 @@ Ext.define('Editor.controller.Editor', {
         
         //set the default config
         //'xyz': [key(s), {ctrl, alt, shift}, fn, defaultEventAction==stopEvent]
+        // **** CAUTION: with any changes, please check if they affect Editor.util.Event ****
         me.keyMapConfig = {
             'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
             'ctrl-g':         ["G",{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-z':         ["Z",{ctrl: true, alt: false}, me.undo],
+            'ctrl-y':         ["Y",{ctrl: true, alt: false}, me.redo],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -162,7 +171,7 @@ Ext.define('Editor.controller.Editor', {
             // DEC_DIGITS:
             // (If you change the setting for a defaultEventAction for DEC_DIGITS,
             // please check if eventIsTranslate5() still works as expected 
-            // in Editor.plugins.TrackChanges.controller.UtilEvent).
+            // in Editor.util.Event).
             'alt-DIGIT':      [me.DEC_DIGITS,{ctrl: false, alt: true}, me.handleAssignMQMTag, true],
             'DIGIT':          [me.DEC_DIGITS,{ctrl: false, alt: false}, me.handleDigit],
             'ctrl-zoomIn':    [[187, Ext.EventObjectImpl.NUM_PLUS],{ctrl: true, alt: false, shift: false}, me.handleZoomIn, true],
@@ -375,7 +384,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this,
             conf = [],
             overwrite = overwrite || {};
-        
+            
         /*
         * event beforeKeyMapUsage parameters:
         * @param {Editor.controller.Editor} 
@@ -383,12 +392,19 @@ Ext.define('Editor.controller.Editor', {
         * @param {Object} overwrite, the object with overwrite definitions 
         */
         me.fireEvent('beforeKeyMapUsage', this, area, overwrite);
-        
+
+        //we may not use me.keyMapConfig to add the overwriten values, since it must remain unchanged, 
+        // so we do it the other way round and copy all values to the overwrite object:
         Ext.Object.each(me.keyMapConfig, function(key, item){
-            //applies if available the overwritten config instead the default one
-            if(overwrite && overwrite[key]) {
-                item = overwrite[key];
+            //copy the config to the overwrite object, only if it does not exist already!
+            if(overwrite[key]) {
+                return;
             }
+            overwrite[key] = item;
+        });
+        
+        //no we process the merged configs:
+        Ext.Object.each(overwrite, function(key, item){
             if(!item) {
                 return;
             }
@@ -423,16 +439,24 @@ Ext.define('Editor.controller.Editor', {
             me.editorKeyMap.destroy();
         }
         
-        // insert whitespace
-        me.keyMapConfig['ctrl-shift-space'] = [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true];
-        me.keyMapConfig['shift-enter'] = [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true];
-        me.keyMapConfig['tab'] = [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true];
-        
         editor.editorKeyMap = me.editorKeyMap = new Editor.view.segments.EditorKeyMap({
             target: docEl,
-            binding: me.getKeyMapConfig()
+            binding: me.getKeyMapConfig('editor', {
+                // insert whitespace key events
+                'ctrl-shift-space': [Ext.EventObjectImpl.SPACE,{ctrl: true, alt: false, shift: true}, me.insertWhitespaceNbsp, true],
+                'shift-enter': [Ext.EventObjectImpl.ENTER,{ctrl: false, alt: false, shift: true}, me.insertWhitespaceNewline, true],
+                'tab': [Ext.EventObjectImpl.TAB,{ctrl: false, alt: false}, me.insertWhitespaceTab, true]
+            })
         });
         editor.DEC_DIGITS = me.DEC_DIGITS;
+
+        docEl.on('keyup', me.handleKeyUp, me, {priority: 9999, delegated: false});
+        docEl.on('mouseup', me.handleMouseUp, me, {priority: 9999, delegated: false});
+        docEl.on('singletap', me.handleMouseUp, me, {priority: 9999, delegated: false});
+        
+        // Paste does not reach the browser's clipboard-functionality,
+        // so we need our own SnapshotHistory for handling CTRL+Z and CTRL+Y.
+        me.fireEvent('activateSnapshotHistory');
         docEl.on('paste', function(e){
             e.stopPropagation();
             e.preventDefault();
@@ -458,14 +482,20 @@ Ext.define('Editor.controller.Editor', {
                         && me.lastClipboardData != ''
                         && clipboardData != me.lastClipboardData) {
                     data = clipboardData;
+                    me.copiedContentFromSource = null;
+                    me.lastCopiedFromSourceData = '';
+                } else {
+                    me.lastCopiedFromSourceData = me.copiedContentFromSource.selDataHtml;
                 }
-                me.lastCopiedFromSourceData = me.copiedContentFromSource.selDataHtml;
-                editor.insertMarkup(data);
+                editor.insertMarkup(data); 
+                // handleAfterContentChange() is triggered from THERE
             } else {
                 editor.insertAtCursor(clipboardData);
+                me.handleAfterContentChange();
             }
             me.lastClipboardData = clipboardData;
         }, me, {delegated: false});
+        
         if(me.editorTooltip){
             me.editorTooltip.setTarget(editor.getEditorBody());
             me.editorTooltip.targetIframe = editor.iframeEl;
@@ -537,6 +567,59 @@ Ext.define('Editor.controller.Editor', {
             me.fireEvent('prepareTrackChangesForSaving');
             me.fireEvent('saveSegment');
         }
+    },
+    /**
+     * Handler for CTRL+X
+     */
+    undo: function() {
+        this.fireEvent('undo'); // see SnapshotHistory
+    },
+    /**
+     * Handler for CTRL+Y
+     */
+    redo: function() {
+        this.fireEvent('redo'); // see SnapshotHistory
+    },
+    /**
+     * handleAfterContentChange: save snapshot.
+     */
+    handleAfterContentChange: function() {
+    	this.fireEvent('saveSnapshot'); // see SnapshotHistory
+    },
+    /**
+     * handleAfterCursorMove: save new position of cursor if necessary.
+     */
+    handleAfterCursorMove: function() {
+    	this.fireEvent('updateSnapshotBookmark'); // see SnapshotHistory
+    },
+    /**
+     * After keyboard-event: handle changes if event is not to be ignored.
+     * ('change'-event from segmentsHtmleditor does not work; is not really envoked when we need it!)
+     * @param event
+     */
+    handleKeyUp: function(event) {
+        var me = this
+        	me.event = event; // Editor.util.Event
+	    // New content? 
+        // Ignore 
+        // - keys that don't produce content (strg,alt,shift itself, arrows etc)
+        // - keys that must not change the content in the Editor (e.g. strg-z will not always do what the user expects)
+	    if (!me.eventIsCtrlZ() && !me.eventIsCtrlY() && !me.eventHasToBeIgnored() && !me.eventHasToBeIgnoredAndStopped()) {
+	    	me.handleAfterContentChange();
+	    	return;
+	    }
+	    // New position of cursor?
+	    if (me.eventIsArrowKey()) {
+	    	me.handleAfterCursorMove();
+	    	return;
+	    }
+    },
+    /**
+     * After mouse-click.
+     */
+    handleMouseUp: function() {
+        var me = this;
+        me.handleAfterCursorMove();
     },
     /**
      * Special Universal preparation Handler for pressing DIGIT keys
@@ -1036,6 +1119,7 @@ Ext.define('Editor.controller.Editor', {
             selInternalTags,
             selDataText,
             activeElement,
+            position,
             isElementWithInternalTags = function(el){
                 var classNames = el.className.split(' ');
                 if (classNames.indexOf('segment-tag-container')>=0
@@ -1052,6 +1136,14 @@ Ext.define('Editor.controller.Editor', {
                     return true;
                 }
                 return isElementInMatchGrid(el.parentNode, cls);
+            },
+            isElementSourceSegment = function(el){
+                var classNames = el.className.split(' ');
+                if (classNames.indexOf('segment-tag-container')>=0
+                    || classNames.indexOf('type-source')>=0) {
+                    return true;
+                }
+                return false;
             };
             
         //do only something when editing targets:
@@ -1075,14 +1167,26 @@ Ext.define('Editor.controller.Editor', {
         htmlEditor = plug.editor.mainEditor;
         segmentId = plug.context.record.get('id');
         sel = rangy.getSelection();
-
-        // language resource concordance panel: copy content of selected cell
-        if (isElementInMatchGrid(activeElement,'language-resource-result-panel')) {
-            rangeForCell = rangy.createRange();
-            rangeForCell.selectNodeContents(activeElement.firstChild);
-            sel.setSingleRange(rangeForCell);
-        }
-
+        
+        // selections that need extra handling:
+        switch(true) {
+            case isElementSourceSegment(activeElement):
+                // whole source segment selected? Then select the content within only.
+                // (= without the surrounding "<div (...) class="segment-tag-container (...) type-source">(...)</div>"
+                selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
+                position = me.getPositionInfoForRange(selRange,activeElement);
+                if(position.atStart && position.atEnd){
+                    sel.selectAllChildren(activeElement);
+                }
+                break;
+            case isElementInMatchGrid(activeElement,'language-resource-result-panel'):
+                // language resource concordance panel: copy content of selected cell
+                rangeForCell = rangy.createRange();
+                rangeForCell.selectNodeContents(activeElement.firstChild);
+                sel.setSingleRange(rangeForCell);
+                break;
+        } 
+        
         selRange = sel.rangeCount ? sel.getRangeAt(0) : null;
         selRange = me.getRangeWithFullInternalTags(selRange);
         
@@ -1154,26 +1258,24 @@ Ext.define('Editor.controller.Editor', {
             plug = this.getEditPlugin(),
             editor = plug.editor.mainEditor,
             imgInTarget = editor.getDoc().getElementsByTagName("img"),
-            nrTagsInSrc,
-            nrTagsInTarget,
-            nrTagsInSegment;
+            collectedIds = ['0'];
         // source
-        if(!me.sourceTags){
-            nrTagsInSrc = 0;
-        } else {
-            nrTagsInSrc = me.sourceTags.length;
+        if(me.sourceTags){
+            me.sourceTags.map(function(item){
+                collectedIds = collectedIds.concat(Ext.Object.getKeys(item));
+            });
         }
         // target
-        nrTagsInTarget = 0;
         Ext.Object.each(imgInTarget, function(key, imgNode){
             var imgClassList = imgNode.classList;
             if (imgClassList.contains('single') || imgClassList.contains('open')) {
-                nrTagsInTarget++;
+                collectedIds.push(imgNode.id);
             }
         });
         // use the highest
-        nrTagsInSegment = (nrTagsInSrc >= nrTagsInTarget) ? nrTagsInSrc : nrTagsInTarget;
-        return nrTagsInSegment + 1;
+        return Math.max.apply(null, collectedIds.map(function(val){
+            return parseInt(val.replace(/[^0-9]*/,''));
+        })) + 1;
     },
 
         handleInsertTagShift: function(key, e) {

@@ -151,27 +151,28 @@ Ext.define('Editor.view.ToolTip', {
     getTrackChangesData: function(node) {
         var me = this,
             trackChanges,
+            attrnameUserTrackingId,
             attrnameUsername,
             attrnameTimestamp,
             attrnameHistorylist,
-            attrnameHistoryActionPrefix,
-            attrnameHistoryUsernamePrefix,
             attrUserName,
             attrTimestamp,
             nodeAction = '',
             nodeUser = '',
             nodeDate = '',
-            nodeHistory = '';
+            nodeHistory = '',
+            userTrackingId,
+            taskUserTrackingsStore;
         // TrackChanges-Plugin activated?
         if (!Editor.plugins.TrackChanges) {
             return me.messages.notrackchangesplugin;
         }
-        trackChanges = Editor.plugins.TrackChanges.controller.Editor,
+        trackChanges = Editor.plugins.TrackChanges.controller.Editor;
+        taskUserTrackingsStore = Ext.getStore('admin.TaskUserTrackings');
+        attrnameUserTrackingId = trackChanges.ATTRIBUTE_USERTRACKINGID;
         attrnameUsername = trackChanges.ATTRIBUTE_USERNAME;
         attrnameTimestamp = trackChanges.ATTRIBUTE_TIMESTAMP;
         attrnameHistorylist = trackChanges.ATTRIBUTE_HISTORYLIST;
-        attrnameHistoryActionPrefix = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX;
-        attrnameHistoryUsernamePrefix = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX;
         // What has been done (INS/DEL)?
         if (node.nodeName.toLowerCase() == trackChanges.NODE_NAME_INS) {
             nodeAction = me.messages.insertedby;
@@ -181,10 +182,14 @@ Ext.define('Editor.view.ToolTip', {
             return;
         }
         // Who has done it?
-        if (node.hasAttribute(attrnameUsername)) {
+        if (node.hasAttribute(attrnameUserTrackingId)) {
+            userTrackingId = node.getAttribute(attrnameUserTrackingId);
+            attrUserName = taskUserTrackingsStore.getUserName(userTrackingId); // returns username under consideration of anonymization
+        } else if (node.hasAttribute(attrnameUsername)) {
+            // (fallback for tasks before anonymizing was implemented)
             attrUserName = node.getAttribute(attrnameUsername);
-            nodeUser = attrUserName; // can be used just as it is
         }
+        nodeUser = attrUserName; // can be used just as it is
         // When?
         if (node.hasAttribute(attrnameTimestamp)) {
             attrTimestamp = node.getAttribute(attrnameTimestamp);
@@ -199,10 +204,14 @@ Ext.define('Editor.view.ToolTip', {
             nodeHistory += '<hr><b>'+me.messages.history+':</b><hr>';
             var historyItems = node.getAttribute(attrnameHistorylist).split(",");
             for(var i=0, len=historyItems.length; i < len; i++){
-                var historyItemTimestamp = historyItems[i],
+                var attrnameHistoryAction,
+                    attrnameHistoryUsername,
+                    historyItemTimestamp = historyItems[i],
                     historyItemAction,
                     historyItemUser,
-                    historyItemDate;
+                    historyItemDate,
+                    historyUserTrackingId;
+                // history-item: date
                 if (Number(parseInt(historyItemTimestamp)) == historyItemTimestamp) { // TRANSLATE-1202: some older dates might be stored in millisecond-timestamp, others now in ISO
                     historyItemDate = Ext.Date.format(new Date(parseInt(historyItemTimestamp)),'Y-m-d H:i');
                 } else {
@@ -211,13 +220,25 @@ Ext.define('Editor.view.ToolTip', {
                 if (Number(parseInt(historyItemTimestamp)) != historyItemTimestamp) { 
                     historyItemTimestamp = Ext.Date.format(new Date(historyItemTimestamp), 'time'); // TRANSLATE-1202, but attribute-name would be invalid using ISO => still uses millisecond-timestamp
                 }
-                historyItemAction = node.getAttribute(attrnameHistoryActionPrefix + historyItemTimestamp);
-                historyItemUser = node.getAttribute(attrnameHistoryUsernamePrefix + historyItemTimestamp);
+                // history-item: user
+                attrnameHistoryUsername = trackChanges.ATTRIBUTE_USERTRACKINGID + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
+                if (node.hasAttribute(attrnameHistoryUsername)) {
+                    historyUserTrackingId = node.getAttribute(attrnameHistoryUsername);
+                    historyItemUser = taskUserTrackingsStore.getUserName(historyUserTrackingId); // returns username under consideration of anonymization
+                } else if (node.hasAttribute(attrnameUsername)) {
+                    // (fallback for tasks before anonymizing was implemented)
+                    attrnameHistoryUsername = trackChanges.ATTRIBUTE_USERNAME + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
+                    historyItemUser = node.getAttribute(attrnameHistoryUsername);
+                }
+                // history-item: action
+                attrnameHistoryAction = trackChanges.ATTRIBUTE_ACTION + trackChanges.ATTRIBUTE_HISTORY_SUFFIX + historyItemTimestamp;
+                historyItemAction = node.getAttribute(attrnameHistoryAction);
                 if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_INS) {
                     historyItemAction = me.messages.insertedby;
                 } else if (historyItemAction.toLowerCase() == trackChanges.NODE_NAME_DEL) {
                     historyItemAction = me.messages.deletedby;
                 }
+                // => history-item:
                 nodeHistory += '<b>'+historyItemAction+'</b><br>'+historyItemUser+'<br>'+historyItemDate+'<hr>';
             }
         }

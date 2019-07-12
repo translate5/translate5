@@ -151,7 +151,7 @@ Ext.define('Editor.controller.ServerException', {
         }
             
         //it can happen on submit requests, that we receive the content in XML instead JSON:
-        if(response.responseText.length == 0 && Ext.DomQuery.isXml(response.responseXML)) {
+        if((!response.responseText || response.responseText.length == 0) && Ext.DomQuery.isXml(response.responseXML)) {
             json.httpStatus = status = Ext.DomQuery.selectNumber('httpStatus', response.responseXML);
             _status = Ext.DomQuery.selectValue('httpStatus', response.responseXML);
             json.message = statusText = Ext.DomQuery.selectValue('errorMessage', response.responseXML);
@@ -169,9 +169,10 @@ Ext.define('Editor.controller.ServerException', {
         }
             
         //form submits have here always a status of 200, so we have to get the real status from JSON
-        if(json && status != json.httpStatus) {
+        if(json && json.httpStatus && status != json.httpStatus) {
             status = json.httpStatus;
             statusText = json.message;
+            _status = status.toString();
         }
         switch(status) {
             case -1:
@@ -223,6 +224,24 @@ Ext.define('Editor.controller.ServerException', {
             case 409: //Conflict: show message from server
                 Editor.MessageBox.addError(appendServerMsg(str["409"]));
                 return;
+            //422 unprocessable entity: normally the errors are shown via form.markInvalid. 
+            // If not, we add up the error message with info from the payload
+            case 422: 
+                if(json.errorMessage && json.errorsTranslated) {
+                    Ext.Object.each(json.errorsTranslated, function(field, errors) {
+                        Ext.Array.each(errors, function(error) {
+                            json.errorMessage = json.errorMessage+'<br>'+error;
+                        });
+                    });
+                }
+                if(json.errorMessage && json.errors) {
+                    Ext.Object.each(json.errors, function(field, errors) {
+                        Ext.Object.each(errors, function(key, error) {
+                            json.errorMessage = json.errorMessage+'<br>'+error;
+                        });
+                    });
+                }
+                break;
             case 406: //Not Acceptable: show message from server
                 Editor.MessageBox.addError(getServerMsg());
             case 502: //Bad Gateway → the real error is coming from a requested third party system
@@ -243,11 +262,11 @@ Ext.define('Editor.controller.ServerException', {
                 return;
         }
         if(json && json.errorMessage) {
-            statusText += ': '+json.errorMessage;
+            statusText += ': <br>'+json.errorMessage;
         }
-        Ext.Msg.alert(str.title, text+tpl.apply([_status, statusText]));
+        Editor.MessageBox.addError(text+tpl.apply([_status, statusText]));
     },
-    renderHtmlMessage(title, response){
+    renderHtmlMessage: function(title, response){
         var me = this,
             str = me.strings,
             tpl = new Ext.Template(str.serverMsg),

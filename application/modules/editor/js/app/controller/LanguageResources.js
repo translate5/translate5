@@ -112,13 +112,13 @@ Ext.define('Editor.controller.LanguageResources', {
   },
   startEditing: function(plugin,context) {
       var me=this;
-      if(me.getAssocStoreCount() > 0){
+      if(!me.isLanguageResourcesDisabled()){
           me.getMatchgrid().controller.startEditing(context);//(context.record.get('taskGuid'),context.value);
       }
   },
   endEditing: function(plugin,context) {
       var me=this;
-      if(me.getAssocStoreCount() > 0){
+      if(!me.isLanguageResourcesDisabled()){
           me.getMatchgrid().controller.endEditing();//(context.record.get('taskGuid'),context.value);
       }
   },
@@ -132,6 +132,10 @@ Ext.define('Editor.controller.LanguageResources', {
   },
   handleEditorKeyMapUsage: function(cont, area, mapOverwrite) {
       var me = this;
+      
+      if(me.isLanguageResourcesDisabled()){
+    	  return;
+      }
       
       cont.keyMapConfig['ctrl-DIGIT'] = [cont.DEC_DIGITS,{ctrl: true, alt: false},function(key) {
           if(!me.getMatchgrid() || !me.getMatchgrid().isVisible()) {
@@ -189,6 +193,10 @@ Ext.define('Editor.controller.LanguageResources', {
           return;
       }
 
+      if(me.isLanguageResourcesDisabled()){
+    	  return;
+      }
+      
       if(vm.get('editorIsReadonly')) {
           me.getEditorPanel().collapse();
       }
@@ -213,7 +221,7 @@ Ext.define('Editor.controller.LanguageResources', {
   },
   addEditorPanelToViewPort: function() {
       var me = this;
-      if(me.getAssocStoreCount() <= 0){
+      if(me.isLanguageResourcesDisabled()){
           return;
       }
       me.getEditorViewport().add({
@@ -242,5 +250,27 @@ Ext.define('Editor.controller.LanguageResources', {
   getAssocStoreCount: function(){
       var store = this.assocStore;
       return store ? store.getTotalCount() : 0;
+  },
+  
+  /***
+   * Check if the language resources match grid should be/is disabled
+   */
+  isLanguageResourcesDisabled:function(){
+	  var me=this,
+	  	  disableIfTermCollectionOnly=Editor.data.editor.LanguageResources.disableIfOnlyTermCollection,
+	  	  assocCount=me.getAssocStoreCount(),
+	  	  termCollectionCount=0;
+	  //no results in the assoc store -> disabled
+	  if(assocCount <=0){
+		  return true;
+	  }
+	  //foreach rec in the assoc store get the termcollection count
+	  me.assocStore.each(function(record){
+		  if(record.get('resourceType')==Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
+			  termCollectionCount++;
+		  }
+	  });
+	  //disabled if only term collections and it is configuret do disable the panel
+	  return termCollectionCount==assocCount && disableIfTermCollectionOnly;
   }
 });

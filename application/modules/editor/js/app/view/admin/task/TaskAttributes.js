@@ -283,7 +283,7 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             return val;
         }
         var customersStore = Ext.StoreManager.get('customersStore'),
-            customer = customersStore.getById(val);
+            customer = customersStore && customersStore.getById(val);
         return customer ? customer.get('name') : '';
     }
   });

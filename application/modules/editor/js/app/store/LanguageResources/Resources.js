@@ -33,5 +33,6 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.store.LanguageResources.Resources', {
 	  extend : 'Ext.data.Store',
 	  model: 'Editor.model.LanguageResources.Resource',
-	  autoLoad: true
+	  autoLoad: true,
+	  pageSize: 0
 });

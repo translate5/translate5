@@ -50,11 +50,21 @@ Ext.define('Editor.view.admin.log.GridViewController', {
         }
     },
     handleGridClick: function(table, td, idx, rec, tr) {
+        var extra = {};
         if(! Ext.fly(td).hasCls('message') || !rec.get('extra')) {
             return;
         }
+        Ext.Object.each(rec.get('extra'), function(k, v){
+            if(Ext.isObject(v)) {
+                v = JSON.stringify(v, null, 2);
+            }
+            else if(Ext.isArray(v)) {
+                v = v.join("\n");
+            }
+            extra[k] = v;
+        });
         this.getView().down('gridpanel').hide();
-        this.getView().down('#detailview propertygrid').setSource(rec.get('extra'));
+        this.getView().down('#detailview propertygrid').setSource(extra);
         this.getView().down('#eventdata').update('<table>'+tr.outerHTML+'</table>');
         this.getView().down('#detailview').show();
     },

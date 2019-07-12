@@ -457,32 +457,20 @@ Ext.define('Editor.util.Range', {
     },
     /**
      * Returns true if all the relevant content in the editor is selected.
-     * (CAUTION: CTRL+A does NOT select everything in this sense.)
      * @returns {Boolean} 
      */
     isSelectedAllRelevantNodesInEditor: function() {
         var me = this,
             selectionInEditor = rangy.getSelection(me.getEditorBody()),
             rangeForSelection = selectionInEditor.rangeCount ? selectionInEditor.getRangeAt(0) : null,
-            selectedNodes,
-            nodesInEditor,
-            notSelectedNodesFound = false;
+            selectedText,
+            textInEditor;
         if (rangeForSelection == null || rangeForSelection.collapsed){
             return false; // might be true, but we couldn't check with the current code.
         }
-        selectedNodes = rangeForSelection.cloneContents().childNodes;
-        if (selectedNodes.length > 0) {
-            nodesInEditor = me.getEditorBody().childNodes;
-            Ext.Array.each(nodesInEditor, function(node, index) {
-                if (!me.isContainerToIgnore(node)) {
-                    if (!node.isEqualNode(selectedNodes[index])) {
-                        notSelectedNodesFound = true;
-                        return false;
-                    }
-                }
-            });
-        }
-        return !notSelectedNodesFound;
+        selectedText = rangeForSelection.toString();
+        textInEditor = me.getEditorBody().textContent;
+        return selectedText === textInEditor;
     },
     
     /**

@@ -77,6 +77,7 @@ Ext.define('Editor.model.admin.Task', {
     {name: 'qmSubEnabled', type: 'boolean'},
     {name: 'qmSubFlags', type: 'auto'},
     {name: 'qmSubSeverities', type: 'auto'},
+    {name: 'lastErrors', type: 'auto'},
     {name: 'emptyTargets', type: 'boolean', persist: false},
     {name: 'userState', type: 'string', isEqual: function() {
       return false;
@@ -264,7 +265,7 @@ Ext.define('Editor.model.admin.Task', {
       if(step && useFilter) {
           //preset grid filtering:
           if(!data.initialGridFilters) {
-              filter = data.initialGridFilters = {};
+              data.initialGridFilters = {};
           }
           filter = data.initialGridFilters; //use filter as reference 
           //reset workflowstep filters of formerly opened tasks, since initialGridFilters is persistent between tasks!

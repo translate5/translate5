@@ -67,14 +67,16 @@ Ext.define('Editor.view.admin.customer.Panel', {
         customerDeleteTitle:'#UT#Kunden löschen',
         customerDeletedMsg:'#UT#Kunde gelöscht',
         export:'#UT#Exportieren',
-        domain:'#UT#Domain',
-        openIdServer:'#UT#OpenID server',
-        openIdAuth2Url:'#UT#OpenID OAuth url',
+        domain:'#UT#translate5 Domain',
+        openIdServer:'#UT#OpenId server',
+        openIdIssuer:'#UT#OpenId Issuer',
+        openIdClientId:'#UT#OpenId Benutzername',
+        openIdClientSecret:'#UT#OpenId Passwort',
+        openIdAuth2Url:'#UT#OpenId OAuth URL',
         rolesLabel: '#UT#Systemrollen',
-        openIdClientId:'#UT#OpenID Benutzername',
-        openIdClientSecret:'#UT#OpenID Passwort',
-        openIdRedirectLabel:'#UT#Label-Text umleiten',
-        openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn das checkbox nicht aktiviert ist, wird dem Benutzer eine verknüpfte Nachricht "Anmelden mit xxx" über dem Anmeldeformular angezeigt.'
+        openIdRedirectLabel:'#UT#Verlinkter Text Loginseite',
+        openIdRedirectCheckbox:'#UT#Anmeldeseite nicht anzeigen: Automatisch zum OpenID Connect-Server umleiten, wenn keine Benutzersitzung in translate5 vorhanden ist. Wenn diese Checkbox nicht aktiviert ist, wird der im untenstehenden Textfeld definierte Text auf der Loginseite von translate5 mit dem OpenID Connect Server verlinkt.',
+        anonymizeUsers:'#UT#User anonymisieren?'
     },
     shrinkWrap: 0,
     layout: 'border',
@@ -132,6 +134,15 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                 filter: {
                                     type: 'string'
                                 }
+                            },
+                            {
+                                xtype: 'owncheckcolumn',
+                                dataIndex: 'anonymizeUsers',
+                                text: me.strings.anonymizeUsers,
+                                filter: {
+                                    type: 'boolean'
+                                },
+                                width: 70
                             }
                             /*{
                                 xtype: 'actioncolumn',
@@ -172,13 +183,22 @@ Ext.define('Editor.view.admin.customer.Panel', {
                         split: true,
                         reference: 'display',
                         width: 150,
-                        layout: 'card',
                         bodyBorder: true,
+                        scrollable:true,
                         items: [
                             {
                                 xtype: 'form',
                                 reference: 'form',
                                 bodyPadding: 10,
+                            	tools:[{
+                            		itemId: 'home',
+                            		type: 'home',
+                            		cls:'tools-help-icon',
+                            		qtip: 'OpenID connect',
+                            	    handler: function(panel, tool, event) {
+                            	    	window.open('https://confluence.translate5.net/display/BUS/OpenID+connect+in+translate5', '_blank');
+                            	    }
+                            	}],
                                 fieldDefaults: {
                                     anchor: '1'
                                 },
@@ -202,15 +222,31 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                         name: 'number',
                                         allowBlank: false,
                                         maxLength: 255
+                                    },
+                                    {
+                                        xtype: 'checkbox',
+                                        fieldLabel: me.strings.anonymizeUsers,
+                                        name: 'anonymizeUsers',
+                                        inputValue:1,
+                                        uncheckedValue:0,
+                                        checked:1
+                                    },{
+                                        xtype:'textfield',
+                                        fieldLabel:me.strings.domain,
+                                        name:'domain',
+                                        itemId:'openIdDomain'
                                     },{
                                     	xtype:'fieldset',
-                                    	title:'OpenId',
+                                    	itemId:'openIdFieldset',
+                                    	collapsible: true,
+                                    	collapsed: true,
+                                    	title:'OpenId Connect',
                                     	items:[
                                     		{
                                             	xtype:'textfield',
-                                            	fieldLabel:me.strings.domain,
+                                            	fieldLabel:me.strings.openIdServer,
                                             	vtype: 'url',
-                                            	name:'domain',
+                                            	name:'openIdServer',
                                             	setAllowBlank:me.setFieldAllowBlank,
                                             	listeners: {
                                                     change: {
@@ -221,11 +257,12 @@ Ext.define('Editor.view.admin.customer.Panel', {
                                             	bind:{
                                             		allowBlank:'{!isOpenIdRequired}'
                                             	}
-                                            },{
+                                            },
+                                            {
                                             	xtype:'textfield',
-                                            	fieldLabel:me.strings.openIdServer,
+                                            	fieldLabel:me.strings.openIdIssuer,
                                             	vtype: 'url',
-                                            	name:'openIdServer',
+                                            	name:'openIdIssuer',
                                             	setAllowBlank:me.setFieldAllowBlank,
                                             	listeners: {
                                                     change: {
@@ -291,41 +328,25 @@ Ext.define('Editor.view.admin.customer.Panel', {
         	                                    cls: 'x-check-group-alt',
         	                                    fieldLabel: me.strings.rolesLabel,
         	                                    items: roles,
-        	                                    columns: 3,
-        	                                    bind:{
-                                            		visible:'{isOpenIdRequired}'
-                                            	}
+        	                                    columns: 3
                                             },{
                                             	xtype:'textfield',
                                             	fieldLabel:me.strings.openIdRedirectLabel,
                                             	name:'openIdRedirectLabel',
-                                            	setAllowBlank:me.setFieldAllowBlank,
-                                            	listeners: {
-                                                    change: {
-                                                        fn: 'onOpenIdRedirectLabelChange',
-                                                        scope: 'controller'
-                                                    }
-                                                },
-                                            	bind:{
-                                            		visible:'{isOpenIdRequired}',
-                                            		allowBlank:'{isOpenIdRedirectLabelRequired}'
-                                            	}
+                                            	setAllowBlank:me.setFieldAllowBlank
                                             },{
                                             	xtype:'checkbox',
                                                 boxLabel:me.strings.openIdRedirectCheckbox,
                                                 name:'openIdRedirectCheckbox',
-                                                setAllowBlank:me.setFieldAllowBlank,
                                                 inputValue:1,
                                                 uncheckedValue:0,
+                                                checked:1,
                                                 listeners: {
                                                     change: {
-                                                        fn: 'onOpenIdRedirectLabelChange',
+                                                        fn: 'onOpenIdRedirectCheckboxChange',
                                                         scope: 'controller'
                                                     }
-                                                },
-                                                bind:{
-                                            		visible:'{isOpenIdRequired}'
-                                            	}
+                                                }
                                             }
                                     	]
                                     },{
@@ -431,7 +452,7 @@ Ext.define('Editor.view.admin.customer.Panel', {
     },
     
     setFieldAllowBlank:function(value){
-    	this.allowBlank=value;
+    	this.allowBlank=value || this.isDisabled();
     	this.up('form').isValid();
     },
     

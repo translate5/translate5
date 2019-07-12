@@ -48,7 +48,8 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
       actionDelete: '#UT#Aufgabe komplett löschen',
       actionLog: '#UT# Aufgabe Fehlerhistorie',
       taskPrefs: '#UT# Aufgabenspezifische Einstellungen',
-      exp: '#UT# Aufgabe exportieren'
+      exp: '#UT# Aufgabe exportieren',
+      actionExcelReimport: '#UT# Excel Re-Importieren'
   },
   
   /**
@@ -118,15 +119,21 @@ Ext.define('Editor.view.admin.TaskActionColumn', {
                 iconCls: 'ico-task-showexportmenu',
                 sortIndex:10,
             },{
+                // - Excel Reimport Icon, bei Klick darauf öffnet sich der Datei-Upload-Dialog zum Reimport der Excel-Datei
+                tooltip: me.messages.actionExcelReimport,
+                isAllowedFor: 'editorExcelreimportTask',
+                iconCls: 'ico-task-excelreimport',
+                sortIndex:11,
+            },{
                 tooltip: me.messages.actionDelete,
                 isAllowedFor: 'editorDeleteTask',
                 iconCls: 'ico-task-delete',
-                sortIndex:11,
+                sortIndex:12,
             },{
                 tooltip: me.messages.actionLog,
                 isAllowedFor: 'editorLogTask',
                 iconCls: 'ico-task-log',
-                sortIndex:12,
+                sortIndex:13,
             }]
     };
 

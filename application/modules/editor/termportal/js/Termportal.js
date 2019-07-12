@@ -134,6 +134,7 @@ function findTermsAndAttributes(termGroupid){
     $.ajax({
         url: Editor.data.termportal.restPath+"termcollection/searchattribute",
         dataType: "json",
+        type: "POST",
         data: {
             'groupId':termGroupid
         },
@@ -164,6 +165,7 @@ function searchTerm(searchString,successCallback){
     $.ajax({
         url: Editor.data.termportal.restPath+"termcollection/search",
         dataType: "json",
+        type: "POST",
         data: {
             'term':searchString,
             'language':lng,

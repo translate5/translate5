@@ -279,7 +279,7 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           me.getUserAssoc().excludeLogins = store.collect('login');
       }
       //disable the button if there is no record in the store
-      assocNotifyBtn.setDisabled(store.getCount()< 1)
+      assocNotifyBtn && assocNotifyBtn.setDisabled(store.getCount()< 1)
   },
   /**
    * sets the initial state value dependent on the role
@@ -297,9 +297,15 @@ Ext.define('Editor.controller.admin.TaskUserAssoc', {
           isChanged = stateCombo.getValue() != rec.get('state'),
           meta = task.getWorkflowMetaData(),
           initialStates = meta.initialStates[task.get('workflowStepName')];
+      stateCombo.store.clearFilter();
       if(!rec.phantom || isChanged) {
           return;
       }
+      //on new job entries only non finished states are allowed. 
+      // Everything else would make no sense and bypass workflow
+      stateCombo.store.addFilter(function(item){
+          return item.get('id') != Editor.model.admin.Task.prototype.USER_STATE_FINISH;
+      });
       if(initialStates && initialStates[newValue]) {
           newState = initialStates[newValue];
       }

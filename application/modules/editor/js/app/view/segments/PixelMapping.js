@@ -77,7 +77,7 @@ Ext.define('Editor.view.segments.PixelMapping', {
          * @return {Integer}
          */
         getPixelLengthFromTag: function (tagNode, segmentMeta) {
-            if(!Editor.data.task.get('pixelMapping') || segmentMeta.sizeUnit != this.SIZE_UNIT_FOR_PIXELMAPPING) {
+            if(!Editor.data.task.get('pixelMapping') || (segmentMeta &&  segmentMeta.sizeUnit != this.SIZE_UNIT_FOR_PIXELMAPPING)) {
                 return 0;
             }
             

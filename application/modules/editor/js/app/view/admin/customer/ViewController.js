@@ -38,7 +38,8 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         var me=this,
         	formPanel = me.getReferences().form,
             removeButton = me.getReferences().removeButton,
-            vm = me.getViewModel();
+            vm = me.getViewModel(),
+            isOpenIdHidden=record.get('number')==Editor.model.admin.Customer.DEFAULTCUSTOMER_NUMBER && !Editor.data.customers.openid.showOpenIdDefaultCustomerData;
 
         vm.set('record', record);
         vm.set('title', me.getView().strings.editCustomerTitle);
@@ -52,6 +53,10 @@ Ext.define('Editor.view.admin.customer.ViewController', {
         });
         
         removeButton.setDisabled(false);
+        
+        //hide the openid data for the default customer if it is configured so
+    	formPanel.down('#openIdDomain').setVisible(!isOpenIdHidden);
+    	formPanel.down('#openIdFieldset').setVisible(!isOpenIdHidden);
     },
 
     /**
@@ -237,18 +242,17 @@ Ext.define('Editor.view.admin.customer.ViewController', {
     	var me=this,
     		form=me.getView().down('form').getForm(),
     		vm=me.getViewModel(),
-    		fields=['domain','openIdServer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
+    		fields=['openIdServer','openIdIssuer','openIdAuth2Url','openIdClientId','openIdClientSecret'];
     	
     	vm.set('isOpenIdRequired',me.handleRequiredFields(form,fields));
     },
     
-    onOpenIdRedirectLabelChange:function(field,newValue,oldValue,eOpts){
+    onOpenIdRedirectCheckboxChange:function(field){
     	var me=this,
 			form=me.getView().down('form').getForm(),
-			fields=['openIdRedirectLabel','openIdRedirectCheckbox'],
-			vm=me.getViewModel();
-    	
-    	vm.set('isOpenIdRedirectLabelRequired',me.handleRequiredFields(form,fields));
+			openIdRedirectLabel=form.findField('openIdRedirectLabel');
+
+		openIdRedirectLabel.setAllowBlank(field.checked);
     }
 
 });

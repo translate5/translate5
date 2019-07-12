@@ -53,6 +53,7 @@ Ext.define('Editor.util.SegmentEditor', {
     getEditorBody:function(){
         var me = this;
         if(!me.editor){
+        	me.consoleLog('ERROR: getEditorBody cannot find me.editor!');
             return false;
         }
         if(me.editor.editorBody){
@@ -75,6 +76,7 @@ Ext.define('Editor.util.SegmentEditor', {
     getEditorDoc:function(){
         var me = this;
         if(!me.editor){
+        	me.consoleLog('ERROR: getEditorDoc cannot find me.editor!');
             return false;
         }
         return me.editor.getDoc();
@@ -442,5 +444,88 @@ Ext.define('Editor.util.SegmentEditor', {
                 trackChangeNode.parentNode.removeChild(trackChangeNode);
             }
         });
+    },
+    
+    // =========================================================================
+    // Helpers: Clipboard
+    // =========================================================================
+    
+    /**
+     * Copy what's selected in the Editor into the browser's clipboard.
+     * (https://stackoverflow.com/a/33928558)
+     * 
+     * Due to using the browser's execCommand("copy"),this cannot be called to replace the copy-function
+     * (= we would run into the copy again).
+     */
+    copyToClipboard: function () {
+        var me = this,
+        	docSel,
+        	docSelBookmark,
+        	docSelRange,
+            textToCopy,
+            domFrag,    // for HTMLDivElement
+            domFragEl,  // for Ext.dom.Element
+            allImgNodes,
+            imgPartnerNode,
+            imgPartnerNodeForClipboard;
+        
+        if (!me.getEditorDoc()) {
+        	me.consoleLog('ERROR: copyToClipboard cannot find editor!');
+        	return;
+        }
+
+        docSel = rangy.getSelection(me.getEditorBody());
+        docSelBookmark = docSel.getBookmark();
+        docSelRange = docSel.rangeCount ? docSel.getRangeAt(0) : null;
+        textToCopy = docSelRange.toHtml();
+        
+        // (see TRANSLATE-1213:)
+        // If we cut & paste an image that has a partner-tag, the CTRL+X will delete the partner-tag, too, so
+        // we will need to paste the partner-tag as well here (if it's not already part of the selection).
+        if (/img/.test(textToCopy)) {
+            domFrag = Ext.DomHelper.createDom({tag: 'div'});
+            Ext.DomHelper.insertHtml('afterBegin',domFrag,textToCopy);
+            domFragEl = Ext.get(domFrag);
+            allImgNodes = domFragEl.query('img');
+            Ext.Array.each(allImgNodes, function(imgNode, index, allImgNodes) {
+                imgPartnerNode = me.getPartnerTag(imgNode);
+                if (imgPartnerNode) {
+                    if (textToCopy.indexOf(imgPartnerNode.outerHTML) === -1) { // check via string = avoid yet another DOM-El....
+                        imgPartnerNodeForClipboard = imgPartnerNode.cloneNode();
+                        if(/open/.test(imgNode.className)) {
+                            Ext.get(imgNode).insertSibling(imgPartnerNodeForClipboard,'after');
+                        } else {
+                            Ext.get(imgNode).insertSibling(imgPartnerNodeForClipboard,'before');
+                        }
+                    };
+                }
+            });
+            textToCopy = domFragEl.getHtml();
+        }
+        
+        me.consoleLog("copyToClipboard: " + textToCopy);
+        
+        if (window.clipboardData && window.clipboardData.setData) {
+            // IE specific code path to prevent textarea being shown while dialog is visible.
+            return clipboardData.setData("Text", textToCopy);
+        } else if (me.getEditorDoc().queryCommandSupported && me.getEditorDoc().queryCommandSupported("copy")) {
+            var textarea = me.getEditorDoc().createElement("textarea");
+            textarea.textContent = textToCopy;
+            textarea.style.position = "fixed";  // Prevent scrolling to bottom of page in MS Edge.
+            me.getEditorBody().appendChild(textarea);
+            textarea.select();
+            try {
+                me.getEditorDoc().execCommand("copy");  // Security exception may be thrown by some browsers.
+            } catch (ex) {
+                Editor.MessageBox.addError(me.messages.NoImageTagsForClipboard);
+            } finally {
+                me.getEditorBody().removeChild(textarea);
+            }
+        } else {
+            if (me.USE_CONSOLE) {
+                debugger;
+            }
+        }
+        docSel.moveToBookmark(docSelBookmark);
     }
 });

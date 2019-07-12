@@ -51,8 +51,6 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       'Editor.view.segments.PixelMapping',
       'Editor.view.segments.StatusStrip'
   ],
-  mixins: ['Editor.util.SegmentEditorSnapshots'
-  ],
   componentLayout: 'htmleditorlayout',
   cls: 'x-selectable', //TRANSLATE-1021
   
@@ -149,10 +147,11 @@ Ext.define('Editor.view.segments.HtmlEditor', {
    */
   getDocMarkup: function() {
     var me = this,
+        version = Editor.data.app.version,
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
         body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;" class="{3}"></body></html>',
-        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v=16" />'; //disable Img resizing
+        additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v='+version+'" />'; //disable Img resizing
     return Ext.String.format(body, me.iframePad, additionalCss, dir, me.currentSegmentSize);
   },
   /**
@@ -199,6 +198,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
       me.statusStrip.updateSegment(segment, fieldName);
+      me.fireEvent('afterSetValueAndMarkup');
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -306,7 +306,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         	range.setStartAfter(lastNode);
         	range.setEndAfter(lastNode);
         }
-        this.saveSnapshot(); // Keep a snapshot from the new content
+        this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
         this.fireEvent('afterInsertMarkup', rangeForNode);
       }
   },
@@ -1125,7 +1125,7 @@ Ext.define('Editor.view.segments.HtmlEditor', {
           length;
       text = div.textContent || div.innerText || "";
       //remove characters with 0 length:
-      text = text.replace(/\u200B/g, '');
+      text = text.replace(/\u200B|\uFEFF/g, '');
       if (isPixel) {
           // ----------- pixel-based -------------
           length = pixelMapping.getPixelLength(text, meta);
