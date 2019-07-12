@@ -32,52 +32,22 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  *
  */
-/**
- * @class Editor.plugins.pluginFeasibilityTest.view.EditorPanel
- * @extends Ext.panel.Panel
- */
-Ext.define('Editor.view.LanguageResources.services.TermCollection', {
+Ext.define('Editor.view.LanguageResources.services.OpenTM2', {
     requires: ['Editor.view.LanguageResources.services.Default'],
     extend: 'Editor.view.LanguageResources.services.Default',
-    id: 'TermCollection',
-
-    addTooltip: '#UT#Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen',
-    exportTooltip:'#UT#Vorschläge exportieren',
+    id: 'OpenTM2',
     
-    /**
-     * returns the row css class for the associated service in the tm overview panel
-     * @param {Editor.model.LanguageResources.LanguageResource} rec
-     * @return {Array}
-     */
-    getTmOverviewRowCls: function(record) {
-        var result = [];
-        result.push('language-ressource-import');
-        result.push('languageResource-status-'+record.get('status'));
-        return result;
-    },
-
+    addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
+    download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',
+    
     /***
-     * Term collection tooltip for add/import term collection button. This is rendered in the language resources grid.
+     * Add/import new resoucres button default tooltip. This is rendered in the language resources grid.
      */
     getAddTooltip:function(record){
     	if(record.get('status') == 'novalidlicense'){
     		return false;
     	}
         return this.addTooltip;
-    },
-    
-    /***
-     * Get export language resources tooltip
-     */
-    getExportTooltip:function(){
-    	return this.exportTooltip;
-    },
-    
-    /***
-     * Get export language reources action icon class
-     */
-    getExportIconClass:function(){
-    	return 'ico-tm-export';
     },
     
     /***
@@ -88,6 +58,25 @@ Ext.define('Editor.view.LanguageResources.services.TermCollection', {
     		return 'x-hidden-display';
     	}
     	return 'ico-tm-import';
-    }
+    },
     
+    /***
+     * Get download language reources action icon class
+     */
+    getDownloadIconClass:function(record){
+    	if(record.get('status') == 'novalidlicense'){
+    		return 'x-hidden-display';
+    	}
+    	return 'ico-tm-download';
+    },
+    
+    /***
+     * Get download language reources action icon tooltip
+     */
+    getDownloadTooltip:function(record){
+    	if(record.get('status') == 'novalidlicense'){
+    		return false;
+    	}
+    	return this.download;
+    }
 });

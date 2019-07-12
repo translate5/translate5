@@ -47,7 +47,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         edit: '#UT#Bearbeiten',
         erase: '#UT#Löschen',
         tasks: '#UT#Zugewiesene Aufgaben',
-        download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',
         resource: '#UT#Ressource',
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
@@ -157,31 +156,19 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                     },{
                         action: 'import',
 	                    getClass:function(v,meta,record) {
-                        	if(record.get('status') == 'novalidlicense' || !me.showImport(record)){
-                        		return 'x-hidden-display';
-                        	}
-                        	return 'ico-tm-import';
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getImportIconClass(record);
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-	                    	if(r.get('status') == 'novalidlicense' || !me.showImport(r)){
-                        		return false;
-                        	}
-                            return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip();
+                            return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip(r);
 	                    }
                         
                     },{
                         action: 'download',
                         getClass:function(v,meta,record) {
-                        	if(record.get('status') == 'novalidlicense' || !me.showDownload(record)){
-                        		return 'x-hidden-display';
-                        	}
-                        	return 'ico-tm-download';
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getDownloadIconClass(record);
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-	                    	if(r.get('status') == 'novalidlicense' || !me.showDownload(r)){
-                        		return false;
-                        	}
-                            return me.strings.download;
+	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getDownloadTooltip(r);
 	                    }
                     },{
                         action: 'export',
