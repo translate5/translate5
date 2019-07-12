@@ -43,9 +43,4 @@ class editor_Logger_LanguageResourcesWriter extends ZfExtended_Logger_Writer_Abs
         }
         return parent::isAccepted($event);
     }
-    
-    public function validateOptions(array $options) {
-        //additional options????
-    }
-    
 }
