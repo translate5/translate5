@@ -93,7 +93,7 @@ var Attribute={
         
         for(var i=0;i<attributes.length;i++){
             //comment attribute should always appear as first
-            if(attributes[i].name=='note'){
+            if(attributes[i].name === 'note'){
                 commentAttribute.push(me.handleAttributeDrawData(attributes[i]));
                 continue;
             }
@@ -107,8 +107,7 @@ var Attribute={
     /***
      * On add term-entry-attribute icon click handler
      */
-    onAddTermEntryAttributeClick: function(event){
-        var me = event.data.scope;
+    onAddTermEntryAttributeClick: function(){
         console.log('onAddTermEntryAttributeClick');
         // TODO
     },
@@ -116,8 +115,7 @@ var Attribute={
     /***
      * On add term-attribute icon click handler
      */
-    onAddTermAttributeClick: function(event){
-        var me = event.data.scope;
+    onAddTermAttributeClick: function(){
         console.log('onAddTermAttributeClick');
         // TODO
     },
@@ -152,7 +150,7 @@ var Attribute={
                 break;
     	}
 	
-		if($editableComponent.length==0){
+		if($editableComponent === null || $editableComponent === undefined || $editableComponent.length === 0){
 			return;
 		}
 		
@@ -186,16 +184,23 @@ var Attribute={
         var me=event.data.scope,
         	root=event.data.root,
             $element=$(this),
-			$parent=$element.parents('h4.attribute-data'),//the button parrent
-			attributeId=$parent.data('attributeId');
-		
-		if($parent.length==0){
+            $parent,
+            attributeId,
+            url,
+            $attribute,
+            yesCallback,
+            yesText;
+        
+        $parent=$element.parents('h4.attribute-data');//the button parrent
+		if($parent.length === 0){
 			return;
 		}
-		var yesCallback=function(){
+		
+        attributeId=$parent.data('attributeId');
+        
+		yesCallback=function(){
 			//ajax call to the remove proposal action
-			var me=event.data.scope,
-				url=Editor.data.termportal.restPath+'termattribute/{ID}/removeproposal/operation'.replace("{ID}",attributeId);
+			url=Editor.data.termportal.restPath+'termattribute/{ID}/removeproposal/operation'.replace("{ID}",attributeId);
 				
 			$.ajax({
 		        url: url,
@@ -203,18 +208,18 @@ var Attribute={
 		        type: "POST",
 		        success: function(result){
 		        	//reload the termEntry when the attribute is deleted (not proposal)
-		        	if(!result.rows || result.rows.length==0){
+		        	if(!result.rows || result.rows.length === 0){
 		        		//TODO: if needed add also for termentry attributes
 		        		$attribute=me.getAttributeComponent($parent.data('attributeId'),'termAttribute');
 		        		//if no regular comment holder is found, check for the newly created
-		        		if(!$attribute || $attribute.length==0){
+		        		if(!$attribute || $attribute.length === 0){
 		        			$attribute=me.$_termTable.find('p[data-id~="-1"][data-type~="termAttribute"]');
 		        		}
 		        		if(!$attribute || $attribute.length<1){
 		        			return;
 		        		}
-		        		$($attribute).remove()
-		        		$($parent).remove()
+		        		$($attribute).remove();
+		        		$($parent).remove();
 		        		return;
 		        	}
 		        	
@@ -225,9 +230,9 @@ var Attribute={
 		    		Term.reloadTermEntry=true;
 		    		
 		        	//the term attribute is definition, remove and update the content for the term and term entry attribute definition dom
-		    		if(attributeData.attrType=='definition'){
-		    			me.checkAndUpdateDeffinition(attributeData,'termEntryAttribute')
-		    			me.checkAndUpdateDeffinition(attributeData,'termAttribute')
+		    		if(attributeData.attrType === 'definition'){
+		    			me.checkAndUpdateDeffinition(attributeData,'termEntryAttribute');
+		    			me.checkAndUpdateDeffinition(attributeData,'termAttribute');
 		    			return;
 		    		}
 		    		
@@ -243,7 +248,8 @@ var Attribute={
 		        }
 		    });
 		};
-		var yesText=proposalTranslations['Ja'],
+		
+		yesText=proposalTranslations['Ja'],
 			noText=proposalTranslations['Nein'],
 			buttons={
 			};
@@ -282,8 +288,14 @@ var Attribute={
 	    	html='',
             isProposal,
             proposable = attribute.proposable ? ' proposable' : '', // = the user can handle proposals for this attribute: (1) suer has the rights (2) attribute is editable
-	    	headerTagOpen,
-	    	headerTagClose;
+            header,
+            headerTagOpen,
+            headerTagClose,
+            headerText = '',
+            attVal,
+            flagContent = '',
+            childData=[],
+            childDataText;
             
     	// "is-proposal" can be ... 
         // ... a proposal for a term that already existed (attribute.proposal = "xyz")
@@ -299,22 +311,20 @@ var Attribute={
 	    switch(attribute.name) {
 	        case "transac":
 	            
-	            
-	            var header=me.handleAttributeHeaderText(attribute,true);
+	            header=me.handleAttributeHeaderText(attribute,true);
 	            
 	            html += headerTagOpen + header + headerTagClose;
 	            
 	            if(attribute.children && attribute.children.length>0){
-	                var childData=[];
 	                attribute.children.forEach(function(child) {
 	                    //get the header text
 	                    childDataText=me.handleAttributeHeaderText(child,true);
 	                    
-	                    var attVal=me.getAttributeValue(child);
+	                    attVal=me.getAttributeValue(child);
 	                    
 	                    //the data tag is displayed as first in this group
-	                    if(child.name ==="date"){
-	                        childData.unshift(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)))
+	                    if(child.name === "date"){
+	                        childData.unshift(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
 	                        return true;
 	                    }
 	                    childData.push(me.getAttributeContainerRender(attribute,(childDataText + ' ' + attVal)));
@@ -324,15 +334,12 @@ var Attribute={
 	            break;
 	        case "descrip":
 	            
-	            var attVal=me.getAttributeValue(attribute);
-	
-	            var flagContent="";
+	            attVal=me.getAttributeValue(attribute);
+	            
 	            //add the flag for the definition in the term entry attributes
-	            if(attribute.attrType=="definition" && attribute.language){
+	            if(attribute.attrType === "definition" && attribute.language){
 	                flagContent=" "+getLanguageFlag(attribute.language);
 	            }
-	
-	            var headerText="";
 	            
 	            if(flagContent && flagContent!=""){
 	                headerText =me.handleAttributeHeaderText(attribute,false)+flagContent;
@@ -343,7 +350,7 @@ var Attribute={
 	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
 	            
 	            //if it is definition on language level, get store the data in variable so it is displayed also on term language level
-	            if(attribute.attrType=="definition" && attribute.language){
+	            if(attribute.attrType === "definition" && attribute.language){
 	                me.languageDefinitionContent[attribute.language]="";
 	                if(attribute.children && attribute.children.length>0){
 	                    attribute.children.forEach(function(child) {
@@ -358,9 +365,9 @@ var Attribute={
 	            break;
 	        default:
 	            
-	            var attVal=me.getAttributeValue(attribute);
+	            attVal=me.getAttributeValue(attribute);
 	            
-	            var headerText = me.handleAttributeHeaderText(attribute,true);
+	            headerText = me.handleAttributeHeaderText(attribute,true);
 	            
 	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
 	            break;
@@ -374,7 +381,7 @@ var Attribute={
 	 */
 	checkAndUpdateDeffinition:function(attribute,attrType){
 		
-		if(attribute.attrType!='definition' || !Editor.data.app.user.isTermProposalAllowed){
+		if(attribute.attrType !== 'definition' || !Editor.data.app.user.isTermProposalAllowed){
 			return false;
 		}
 		
@@ -393,7 +400,7 @@ var Attribute={
 			$elParent.removeClass('in-editing');
 		}
 	    
-		if($input.children('ins').length==1){
+		if($input.children('ins').length === 1){
 			renderData=me.getAttributeContainerRender(attribute,renderData);
 		}
 		
@@ -411,8 +418,7 @@ var Attribute={
 	 * @returns
 	 */
 	handleAttributeHeaderText:function(attribute,addColon){
-	    var me=this,
-	    	noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : ""),
+	    var noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : ""),
 	    	headerText=attribute.headerText ? attribute.headerText :  noHeaderName;//if no headerText use attribute name + if exist attribute type
 	    
 	    return headerText+ (addColon ? ":" : "");
@@ -428,16 +434,16 @@ var Attribute={
 	    	attVal=attribute.attrValue ? attribute.attrValue : "";
 	    
 	    //if it is a date attribute, handle the date format
-	    if(attribute.name=="date"){
+	    if(attribute.name === "date"){
 	        var dateFormat='dd.mm.yy';
-	        if(SESSION_LOCALE=="en"){
+	        if(SESSION_LOCALE === "en"){
 	            dateFormat='mm/dd/yy';
 	        }
 	        attVal=$.datepicker.formatDate(dateFormat, new Date(attVal*1000));
 	    }
-	    if (attribute.attrType == "processStatus" && attVal == "finalized") {
+	    if (attribute.attrType === "processStatus" && attVal === "finalized") {
 	    	attVal='<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
-	    }else if(attribute.attrType == "processStatus" && attVal == "provisionallyProcessed"){
+	    }else if(attribute.attrType === "processStatus" && attVal === "provisionallyProcessed"){
 	    	attVal="-";
 	    } else {
 	    	attVal=attVal.replace(/$/mg,'<br>');
@@ -461,7 +467,7 @@ var Attribute={
 		
 		
 		//the proposal is allready defined, render the proposal
-		if(attributeData.proposal && attributeData.proposal!=undefined){
+		if(attributeData.proposal && attributeData.proposal !== undefined){
 			htmlCollection.push('<del class="proposal-value-content">'+attValue+'</del>');
 			htmlCollection.push('<ins class="proposal-value-content">'+attributeData.proposal.value+'</ins>');
 			return htmlCollection.join(' ');
@@ -477,7 +483,7 @@ var Attribute={
 	 */
 	getProposalDefaultHtml:function(type,id,value,attributeData){
 		var data='data-editable';
-		if(attributeData && attributeData.name=='note'){
+		if(attributeData && attributeData.name === 'note'){
 			data='data-editable-comment';
 		}
 		return '<span '+data+' data-type="'+type+'" data-id="'+id+'">'+value+'</span>';
@@ -488,7 +494,7 @@ var Attribute={
 	 */
 	getAttributeContainerRender:function(attribute,html){
 		var isComment='';
-		if(attribute && attribute.name=='note'){
+		if(attribute && attribute.name === 'note'){
 			isComment='class="isAttributeComment"';
 		}
 		return '<p '+isComment+' data-type="'+attribute.attributeOriginType+'" data-id="'+attribute.attributeId+'">'+html+'</p>';
@@ -500,10 +506,10 @@ var Attribute={
 	getTermAttributeHeader:function(attributeId,type){
 		var me=this,
 			$selector=null;
-		if(type=='termEntryAttribute'){
+		if(type === 'termEntryAttribute'){
 			$selector=me.$_termEntryAttributesTable;
 		}
-		if(type=='termAttribute'){
+		if(type === 'termAttribute'){
 			$selector=me.$_termTable;
 		}
 		if(!$selector){
@@ -519,10 +525,10 @@ var Attribute={
 		var me=this,
 			$selector=null,
 			$el;
-		if(type=='termEntryAttribute'){
+		if(type === 'termEntryAttribute'){
 			$selector=me.$_termEntryAttributesTable;
 		}
-		if(type=='termAttribute'){
+		if(type === 'termAttribute'){
 			$selector=me.$_termTable;
 		}
 		if(!$selector){
@@ -578,7 +584,7 @@ var Attribute={
      */
     findTranslatedAttributeLabel:function(labelName,labelType){
     	for(var i=0;i<attributeLabels.length;i++){
-    		if(attributeLabels[i].label==labelName && attributeLabels[i].type==labelType){
+    		if(attributeLabels[i].label === labelName && attributeLabels[i].type === labelType){
     			return attributeLabels[i].labelText;
     		}
     	}
