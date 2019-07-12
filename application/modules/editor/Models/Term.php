@@ -664,7 +664,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if(empty($collectionIds)){
             $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
             /* @var $termCollection editor_Models_TermCollection_TermCollection */
-            $collectionIds=$termCollection->getCollectionForLogedUser();
+            $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
         }
         $termSql="SELECT
             		t.termEntryId as 'term-termEntryId',

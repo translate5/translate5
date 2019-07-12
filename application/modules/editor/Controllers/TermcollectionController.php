@@ -94,7 +94,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         
         $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $collectionIds=$termCollection->getCollectionForLogedUser();
+        $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
         
         if(empty($collectionIds)){
             $this->view->rows=$responseArray;
@@ -142,9 +142,9 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         
         if(!empty($collectionIds)){
             // use only the collectionIds that the user has selected and be sure that these are allowed
-            $collectionIds = array_intersect($collectionIds,$termCollection->getCollectionForLogedUser());
+            $collectionIds = array_intersect($collectionIds,$termCollection->getCollectionForAuthenticatedUser());
         }else{
-            $collectionIds=$termCollection->getCollectionForLogedUser();
+            $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
         }
 
         
@@ -178,7 +178,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $searchTerms = json_decode($params['searchTerms']);
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        $collectionIds = $termCollection->getCollectionForLogedUser();
+        $collectionIds = $termCollection->getCollectionForAuthenticatedUser();
         $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $this->view->rows = $term->getNonExistingTermsInAnyCollection($searchTerms, $collectionIds);

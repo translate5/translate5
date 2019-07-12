@@ -323,7 +323,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      *
      * @return array
      */
-    public function getCollectionForLogedUser(){
+    public function getCollectionForAuthenticatedUser(){
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();
