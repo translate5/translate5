@@ -57,6 +57,8 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $import->mergeTerms=isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
         
+        $import->loadUser($params['userGuid']);
+        
         //import the term collection
         if(!$import->parseTbxFile([$fileinfo],$this->languageResource->getId())){
             $this->handleError("LanguageResources - Error on termcollection import \n");
@@ -67,9 +69,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         if(isset($params['deleteEntriesModifiedOlderThan']) && !empty($params['deleteEntriesModifiedOlderThan'])){
             
             $validator = new Zend_Validate_Date();
-            $validator->setFormat(NOW_ISO);
+            $validator->setFormat('Y-m-d H:i:s');
             if(!$validator->isValid($params['deleteEntriesModifiedOlderThan'])){
-                $params['deleteEntriesModifiedOlderThan'] = date(NOW_ISO, strtotime($params['deleteEntriesModifiedOlderThan']));
+                $params['deleteEntriesModifiedOlderThan'] = date('Y-m-d H:i:s', strtotime($params['deleteEntriesModifiedOlderThan']));
             }
             
             $termModel=ZfExtended_Factory::get('editor_Models_Term');
@@ -84,11 +86,19 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
             $termEntry->removeEmptyFromCollection([$this->languageResource->getId()]);
         }
         
+        $deleteOlderThanCurrentImport=isset($params['deleteEntriesOlderThanCurrentImport']) && filter_var($params['deleteEntriesOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN);
         //delete termcollection entries older then current import date
-        if(isset($params['deleteEntriesOlderThanCurrentImport']) && filter_var($params['deleteEntriesOlderThanCurrentImport'], FILTER_VALIDATE_BOOLEAN)){
+        if($deleteOlderThanCurrentImport){
             $termEntry=ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
             /* @var $termEntry editor_Models_TermCollection_TermEntry */
             $termEntry->removeOlderThan($this->languageResource->getId(), NOW_ISO);
+        }
+        //delete term proposals 
+        if(isset($params['deletProposalsOlderThan']) && filter_var($params['deletProposalsOlderThan'], FILTER_VALIDATE_BOOLEAN)){
+            $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+            /* @var $proposal editor_Models_Term_Proposal */
+            $theDate=!$deleteOlderThanCurrentImport && !empty($params['deleteEntriesModifiedOlderThan']) ? $params['deleteEntriesModifiedOlderThan'] :  NOW_ISO;
+            $proposals->removeOlderThan([$this->languageResource->getId()],$theDate);
         }
         
         return true;

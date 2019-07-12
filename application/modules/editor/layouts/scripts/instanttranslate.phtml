@@ -44,8 +44,10 @@ $config = Zend_Registry::get('config');
 $version = '?v='.$this->appVersion;
 echo $this->doctype();
 $jqueryPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-1.12.1';
+$jqueryIconFontPath = APPLICATION_RUNDIR.'/js/jquery-ui/jquery-ui-iconfont-2.3.2';
 $this->headLink()->prependStylesheet(APPLICATION_RUNDIR.'/modules/editor/instanttranslate/css/instanttranslate.css'.$version);
 $this->headLink()->prependStylesheet($jqueryPath.'/jquery-ui.min.css');
+$this->headLink()->prependStylesheet($jqueryIconFontPath.'/jquery-ui-1.12.icon-font.min.css');
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>

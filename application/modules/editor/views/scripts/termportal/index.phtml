@@ -28,7 +28,7 @@
 ?>
 
 
-<div id="container-header" class="container">
+<div id="containerHeader" class="container">
     <div id="logo"></div>
 <?php 
     // see View_Helper_LanguageSelector
@@ -67,10 +67,62 @@ if(isset($this->error)){
 }    
 ?>
 <div id="container-content" class="container">
-    
     <div class="wrap">
+            <div id="searchFilterForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
+                <?php 
+                $clients = $this->clients;
+                $clientsNames = [];
+                    if (count($clients) > 1) {
+                        asort($clients);
+                        echo '<select class="search-filter" name="client" id="client"><option value="none">'.$this->translations["client"].':</option>';
+                        foreach ($clients as $key => $value){
+                            echo '<option value="'.$key.'">'.$value.'</option>';
+                            $clientsNames[$key] = $value;
+                        }
+                        echo '</select>';
+                    }
+                    if(count($clients)==1){
+                        foreach ($clients as $key => $value){
+                            $clientsNames[$key] = $value;
+                        }
+                    }
+                ?>
+                <?php 
+                    $collections = $this->collections;
+                    $collectionsClients = [];
+                    $collectionsNames = [];
+                    if (count($collections) > 1) {
+                        asort($collections);
+                        echo '<select class="search-filter" name="collection" id="collection"><option value="none">'.$this->translations["collection"].':</option>';
+                        foreach ($collections as $key => $value){
+                            echo '<option value="'.$key.'">'.$value->name.'</option>';
+                            $collectionsClients[$key] = $value->clients;
+                            $collectionsNames[$key] = $value->name;
+                        }
+                        echo '</select>';
+                    }
+                    
+                    if(count($collections)==1){
+                        foreach ($collections as $key => $value){
+                            $collectionsClients[$key] = $value->clients;
+                            $collectionsNames[$key] = $value->name;
+                        }
+                    }
+                ?>
+                <?php 
+                    $allProcessstatus = $this->allProcessstatus;
+                    asort($allProcessstatus);
+                    echo '<select class="search-filter" name="processStatus" id="processStatus"><option value="none">'.$this->translations["processstatus"].':</option>';
+                    foreach ($allProcessstatus as $key => $value){
+                        echo '<option value="'.$key.'">'.$value.'</option>';
+                    }
+                    echo '</select>';
+                ?>
+                <ul id="searchFilterTags">
+                </ul>
+            </div>
             <div id="searchForm" class="ui-toolbar ui-widget-header ui-helper-clearfix">
-                <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" placeholder="<?php echo $this->translations["search"];?>..." name="search" id="search">
+                <input class="serchField ui-widget ui-widget-content ui-corner-all" type="text" value="<?php echo htmlspecialchars($this->text); ?>" placeholder="<?php echo $this->translations["search"].'...'; ?>" name="search" id="search">
                 <button id="searchButton"></button>
                 <?php
                     $languages = $this->languages;
@@ -78,14 +130,15 @@ if(isset($this->error)){
                         return strcmp($a['rfc5646'], $b['rfc5646']);
                     });
                     $preselectedLang = false;
-                    if (isset($_GET['lang'])) {
-                        // if param 'lang' is given, select it
-                        $preselectedLang = $_GET['lang'];
+                    $getParamLang = $this->lang;
+                    if ($getParamLang != '') {
+                        // if param 'lang' is set, select it
+                        $preselectedLang = $getParamLang;
                     } else if (!empty($this->preselectedLang)) {
                         // if the preselectedLang exist, select it
                         $preselectedLang = $this->preselectedLang;
                     }
-                    echo '<select name="languages" id="languages">';
+                    echo '<select name="language" id="language">';
                     foreach ($languages as $lang){
                         $isSelected=($preselectedLang !== false) && ($preselectedLang == $lang["rfc5646"]);
                         echo '<option '.($isSelected ? 'selected="selected"' : '').' value="'.implode(",", $lang['languageGroup']).'">'.$lang["rfc5646"].'</option>';
@@ -95,24 +148,31 @@ if(isset($this->error)){
             </div>
     </div>
     
-    <div class="ui-state-error ui-corner-all" id="error-no-results" style="display:none;"><?php echo $this->translations["noResults"];?></div>
-    
-    <div class="wrap" id="finalResultContent" style="display: none;">
-    	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
-        	<ul id="searchTermsSelect" size="10" style="display: inline-block;">
-        	</ul>
+    <div class="wrap" id="finalResultContent">
+    	<div id="searchTermsHolder" class="ui-tabs ui-corner-all ui-widget ui-widget-content" style="display: none;">
+            <div id="searchTermsHelper" class="ui-corner-all">
+                <p id="error-no-results" class="ui-state-error" style="display:none;"><?php echo $this->translations["noResults"];?></p>
+                <p id="warning-new-source" class="ui-state-error" style="display:none;"></p>
+                <?php
+                    if($this->isTermProposalAllowed){
+                        echo '<p class="skeleton proposal-add"><span class="proposal-txt"></span> <span class="proposal-btn proposal-add ui-icon ui-icon-squaresmall-plus"></span></p>';
+                    }
+                ?>
+            </div>
+            <ul id="searchTermsSelect" size="10" style="display: inline-block;"></ul>
     	</div>
-    	<div id="resultTermsHolder">
-          <ul>
-            <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termTableTitle"];?></a></li>
-            <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTableTitle"];?></a></li>
+    	<div id="resultTermsHolder" class="result-holder" style="display: none;">
+          <ul id="resultTermsHolderHeader">
+            <li><a href="#resultTermsHolder-1"><?php echo $this->translations["termEntryNameTitle"];?></a></li>
+            <li><a href="#resultTermsHolder-2"><?php echo $this->translations["termEntryAttributeTitle"];?></a></li>
           </ul>
-          <div id="resultTermsHolder-1">
+          <div id="resultTermsHolder-1" data-type="termAttribute">
+          		<div id="termcollectionSelectContainer" class="skeleton"></div>
                 <div class="tabble-inner-style" id="termTable">
                 </div>
           </div>
-          <div id="resultTermsHolder-2">
-              <div class="tabble-inner-style" id="termAttributeTable">
+          <div id="resultTermsHolder-2" data-type="termEntryAttribute">
+              <div class="tabble-inner-style" id="termEntryAttributesTable">
               </div>
           </div>
         </div>
@@ -125,25 +185,49 @@ if(isset($this->error)){
 //FIXME: Refactor the Variable stuff to php2js stuff
 var attributeLabels='<?php echo json_encode($this->labels);?>';
 attributeLabels = JSON.parse(attributeLabels);
-var collectionIds=<?php echo json_encode($this->collectionIds);?>;
-var rfcLanguageFlags=<?php echo json_encode($this->rfcFlags);?>;
 var moduleFolder = '<?php echo $this->moduleFolder; ?>';
 var SESSION_LOCALE='<?php echo $session->locale; ?>';
-var noExistingAttributes='<?php echo $this->translations["noExistingAttributes"];?>';
+var collectionsClients=JSON.parse('<?php echo json_encode($collectionsClients); ?>');
+var collectionsNames=<?php echo json_encode($collectionsNames); ?>;
+var clientsNames=<?php echo json_encode($clientsNames); ?>;
+var translations=<?php echo json_encode($this->translations); ?>;
+var proposalTranslations = Editor.data.apps ? Editor.data.apps.termportal.proposal.translations : [];
+var searchFilterPlaceholderText=translations['searchFilterPlaceholderText']+'...';
+
+//if the frontend var is object, convert it to array
+if(Editor.data.apps.termportal.collectionIds instanceof Object){
+	Editor.data.apps.termportal.collectionIds = $.map(Editor.data.apps.termportal.collectionIds, function(value, index) {
+	    return [value];
+	});
+}
+// termProposal from InstantTranslate
+var isTermProposalFromInstantTranslate = <?php echo json_encode($this->isTermProposalFromInstantTranslate); ?>;
+if (isTermProposalFromInstantTranslate === 'true') {
+    isTermProposalFromInstantTranslate = true;
+    var instanttranslate = {};
+    instanttranslate.textSource = <?php echo json_encode($this->text); ?>;
+    instanttranslate.langSource = <?php echo json_encode($this->lang); ?>;
+    instanttranslate.textProposal = <?php echo json_encode($this->textProposal); ?>;
+    instanttranslate.langProposal = <?php echo json_encode($this->langProposal); ?>;
+    console.dir(instanttranslate);
+}
 
 function setSizesInFinalResultContent(){
     var SCROLLBAROFFSET = 30; // Due to the scrollbar etc, #searchTermsHolder and #resultTermsHolder have different content-width (Chrome and Firefox: 26.600000000000023)
-    if ($('#searchTermsHolder').is(':visible')) {
-        // (1) Left column: ensure that the scrollable area has always the maximal possible height that is available in the current browser window.
-        $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
-        // (2) Right column: must not wrap underneath the left column until BOTH of them are wrapped to rows (is out of sight otherwise!)
-        if ($('#resultTermsHolder').is(':visible')) {
-            var widthTerms = $('#searchTermsHolder').width(),
-                widthResults = $('#resultTermsHolder').width();
-            if ( (widthResults - widthTerms > SCROLLBAROFFSET) &&       // = check if they have the same size (= wrapped as rows and both displayed in full width already)
-                 (widthResults + widthTerms > window.innerWidth) ) {    // = together they are broader than the window and the results would be wrapped
-                $('#resultTermsHolder').css("width", window.innerWidth - widthTerms - 100); // 100 is just to get small enough to not be wrapped; flex ("auto") will adjust the width by itself then
-            }
+
+    if(!$('#searchTermsHolder').is(':visible')) {
+    	$('#searchTermsHolder').show();
+    }
+
+    // (1) Left column: ensure that the scrollable area has always the maximal possible height that is available in the current browser window.
+    $('#searchTermsHolder').css("height", window.innerHeight - $('#searchTermsHolder').position().top - 20);
+    // (2) Right column: must not wrap underneath the left column until BOTH of them are wrapped to rows (is out of sight otherwise!)
+    if ($('#resultTermsHolder').is(':visible')) {
+        var widthTerms = $('#searchTermsHolder').width(),
+            widthResults = $('#resultTermsHolder').width();
+        if ( (widthResults - widthTerms > SCROLLBAROFFSET) &&       // = check if they have the same size (= wrapped as rows and both displayed in full width already)
+             (widthResults + widthTerms > window.innerWidth) ) {    // = together they are broader than the window and the results would be wrapped
+            $('#resultTermsHolder').css("width", window.innerWidth - widthTerms - 100); // 100 is just to get small enough to not be wrapped; flex ("auto") will adjust the width by itself then
         }
     }
 }
@@ -163,7 +247,7 @@ $( function() {
         	window.parent.location = Editor.data.loginUrl;
         }
     });
-    $('#languages').selectmenu({
+    $('#language').selectmenu({
         change: function( event, ui ) {
             startAutocomplete();
         }
@@ -175,18 +259,74 @@ $( function() {
             $("#languageSelector").submit();
         }
       });
-    $("#searchTermsSelect").on( "selectableselected", function( event, ui ) {
-        findTermsAndAttributes($(ui.selected).attr('data-value'));
-    });
-    $("#resultTermsHolder").tabs();
+    $(".result-holder").tabs();
     $("#search").focus();
     $(window).resize(function() {
         setSizesInFinalResultContent();
     });
+    $('#searchTermsHelper').find('.proposal-txt').text(proposalTranslations['addTermEntryProposal']);
+    $( document ).tooltip({
+        position: { my: "left center", at: "right center" }
+    });
+    // filter & tag-fields
+    $("#searchFilterTags").tagit({
+        placeholderText: searchFilterPlaceholderText,
+        afterTagAdded: function() {
+            checkFilterDependencies();
+            handlePlaceholder();
+        },
+        afterTagRemoved: function() {
+            checkFilterDependencies();
+            handlePlaceholder();
+        },
+        beforeTagRemoved: function (event, ui) {
+            addFilteredItemToDropdown(ui.tagLabel);
+            return beforeFilterTagRemoved(ui.tagLabel);
+        }
+	});
+    $('.search-filter').selectmenu({
+        change: function() {
+            var index = $(this).find(':selected').index();
+            if (index != 0) {
+                addSearchFilter($(this).attr('id'),$(this).find(':selected').text(),$(this).val(),index);
+            }
+        },
+        classes: {
+            "ui-selectmenu-menu": "search-filter-select"
+        },
+        open: function() {
+            removeFilteredItemsFromDropdowns($(this).attr('id'));
+        }
+    });
+    $(document).on("mousedown",function(){
+        $('#error-filter-tags').hide();
+    });
+    // https://jqueryui.com/resources/demos/selectmenu/custom_render.html
+    $.widget( "custom.iconselectmenu", $.ui.selectmenu, {
+        _renderItem: function( ul, item ) {
+            var li = $( "<li>" ),
+                wrapper = $( "<div>", { text: item.label } );
+            if ( item.disabled ) {
+                li.addClass( "ui-state-disabled" );
+            }
+            $( "<span>", {
+                style: item.element.attr( "data-style" ),
+                "class": "ui-icon " + item.element.attr( "data-class" )
+            })
+                .appendTo( wrapper );
+            return li.append( wrapper ).appendTo( ul );
+        }
+    });
 } );
 
 </script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/ComponentEditor.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Attribute.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/TermEntry.js"></script>
+<script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Term.js"></script>
 <script src="<?php echo APPLICATION_RUNDIR; ?>/modules/editor/termportal/js/Termportal.js"></script>
 <script type="text/javascript">
+    var languageSelectForNewTerm = Term.renderLanguageSelect('term');
+    clearResults();
     checkDirectSearch();
 </script>

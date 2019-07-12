@@ -1144,6 +1144,16 @@ Ext.define('Editor.controller.Localizer', {
             singleSearch:'<?php echo $this->translate->_('Suche in {0}');?>'
         }
     });
+    
+    Ext.define("Editor.locale.view.LanguageResources.ProposalExport", {
+        override: "Editor.view.LanguageResources.ProposalExport",
+        strings: {
+            dateFieldLabel: '<?php echo $this->translate->_('Jünger als oder gleich');?>',
+            exportButtonText: '<?php echo $this->translate->_('Exportieren');?>',
+            cancelButtonText: '<?php echo $this->translate->_('Abbrechen');?>',
+            title: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
+        }
+    });
 <?php 
     }; //END if($hasFrontendController('Editor.controller.LanguageResources')){
     if($hasFrontendController('Editor.controller.LanguageResourcesTaskassoc')){
@@ -1245,7 +1255,6 @@ Ext.define('Editor.controller.Localizer', {
             edit: '<?php echo $this->translate->_('Bearbeiten');?>',
             tasks: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             erase: '<?php echo $this->translate->_('Löschen');?>',
-            download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
             refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
@@ -1279,11 +1288,18 @@ Ext.define('Editor.controller.Localizer', {
     Ext.define("Editor.locale.view.LanguageResources.services.TermCollection", {
         override: "Editor.view.LanguageResources.services.TermCollection",
         addTooltip: '<?php echo $this->translate->_('Weitere Term-Collection Daten in Form einer TBX Datei importieren und dem Term-Collection hinzufügen');?>',
+        exportTooltip: '<?php echo $this->translate->_('Vorschläge exportieren');?>'
     });
 
     Ext.define("Editor.locale.view.LanguageResources.services.Default", {
         override: "Editor.view.LanguageResources.services.Default",
+        exportTooltip: '<?php echo $this->translate->_('Exportieren');?>'
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.services.OpenTM2", {
+        override: "Editor.view.LanguageResources.services.OpenTM2",
         addTooltip: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+        download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>'
     });
 
     
@@ -1314,7 +1330,8 @@ Ext.define('Editor.controller.Localizer', {
             mergeTerms:'<?php echo $this->translate->_('Termeinträge verschmelzen');?>',
             deleteTermEntriesDate:'<?php echo $this->translate->_('Termeinträge löschen älter als');?>',
             deleteTermEitriesImport:'<?php echo $this->translate->_('Termeinträge löschen älter als aktueller Import');?>',
-            helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>'
+            helpButtonTooltip:'<?php echo $this->translate->_('Info zum Term-Collection');?>',
+            deleteTermProposals:'<?php echo $this->translate->_('Vorschläge löschen älter als');?>'
         }
     });
     

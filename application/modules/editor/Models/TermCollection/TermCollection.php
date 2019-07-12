@@ -174,20 +174,24 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
-     * Get all collections ids assigned to the given customers.
+     * Get all TermCollections ids assigned to the given customers.
      * 
      * @param array $customerIds
      */
     public function getCollectionsIdsForCustomer($customerIds){
+        $service = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        $serviceType = $service->getServiceNamespace(); 
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from(array('lr'=>'LEK_languageresources'))
         ->join(array('ca'=>'LEK_languageresources_customerassoc'), 'ca.languageResourceId=lr.id',array('ca.customerId as customerId'))
-        ->where('ca.customerId IN(?)',$customerIds);
+        ->where('ca.customerId IN(?)',$customerIds)
+        ->where('lr.serviceType = ?',$serviceType)
+        ->group('lr.id');
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
-            $ids = array_column($rows, 'id');
-            return $ids;
+            return array_column($rows, 'id');
         }
         return [];
     }
@@ -209,8 +213,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->setIntegrityCheck(false)
         ->from(array('tc' => 'LEK_languageresources'), array('id'))
         ->join(array('t' => 'LEK_terms'),'tc.id=t.collectionId', array('count(DISTINCT t.id) as termsCount'))
-        ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId', array('count(DISTINCT ta.id) as termsAtributeCount'))
-        ->join(array('tea' => 'LEK_term_entry_attributes'),'tc.id=tea.collectionId', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
+        ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId AND not ta.termId is null', array('count(DISTINCT ta.id) as termsAtributeCount'))
+        ->join(array('tea' => 'LEK_term_attributes'),'tc.id=tea.collectionId AND tea.termId is null', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
         ->where('tc.id =?',$collectionId);
         return $this->db->fetchRow($s)->toArray();
     }
@@ -312,6 +316,21 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         if(!$lngAssoc->isInCollection($language, 'targetLang', $collectionId)){
             $lngAssoc->saveLanguages(null, $language, $collectionId);
         }
+    }
+    
+    /***
+     * Get the available collections for the currently logged user
+     *
+     * @return array
+     */
+    public function getCollectionForAuthenticatedUser(){
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
+        if(empty($customers)){
+            return [];
+        }
+        return $this->getCollectionsIdsForCustomer($customers);
     }
     
     /***

@@ -26,6 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method string getGroupId() getGroupId()
+ * @method void setGroupId() setGroupId(string $groupId)
+ * @method integer getCollectionId() getCollectionId()
+ * @method void setCollectionId() setCollectionId(integer $id)
+ */
 class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermEntry';
     protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermEntry';
@@ -73,6 +81,25 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
         ])>0;
     }
     
+    /***
+     * Remove empty term entry from the database. Empty term entry is term entry without terms in it.
+     * @param int $termEntryId
+     */
+    public function deleteEmptyTermEntry(int $termEntryId) {
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from(['te'=>'LEK_term_entry'])
+        ->join(['t'=>'LEK_terms'],'t.termEntryId=te.id')
+        ->where('te.id = ?',$termEntryId);
+        $result=$this->db->fetchAll($s)->toArray();
+        
+        if(!empty($result)){
+            return;
+        }
+        $this->db->delete([
+            'id IN (?)'=>$termEntryId
+        ]);
+    }
     
     /**
      * Remove term entry older than $olderThan date from a specific term collection
@@ -86,11 +113,12 @@ class editor_Models_TermCollection_TermEntry extends ZfExtended_Models_Entity_Ab
         //find all modefied entries older than $olderThan date
         //the query will find the lates modefied term entry attribute, if the term entry attribute update date is older than $olderThan, remove the termEntry
         $collectionId = (int) $collectionId;
+    //FIXME testen ob die methode das macht was sie soll
         return $this->db->delete(['id IN (SELECT t.termEntryId
-            	FROM LEK_term_entry_attributes t
-            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_entry_attributes WHERE collectionId = '.$collectionId.' GROUP BY termEntryId)
+            	FROM LEK_term_attributes t
+            	INNER JOIN (SELECT termEntryId, MAX(updated) as MaxDate FROM LEK_term_attributes WHERE termId is null AND collectionId = '.$collectionId.' GROUP BY termEntryId)
             	tm ON t.termEntryId = tm.termEntryId AND t.updated = tm.MaxDate
-            	WHERE t.collectionId = '.$collectionId.' AND t.updated < ?
+            	WHERE t.termId is null AND t.collectionId = '.$collectionId.' AND t.updated < ?
             	GROUP BY t.termEntryId)'=>$olderThan])>0;
     }
 }

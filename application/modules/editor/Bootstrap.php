@@ -106,10 +106,11 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
     {
         
         $restRoute = new Zend_Rest_Route($this->front, array(), array(
-            'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
+            'editor' => ['file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','apps','taskusertracking'),
+                                'languageresourceinstance','apps','taskusertracking', 'term', 'termattribute'
+            ],
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -337,6 +338,25 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 ));
         $this->front->getRouter()->addRoute('searchattributetermcollection', $searchAttributeTermCollection);
         
+        $searchTermExists = new ZfExtended_Controller_RestLikeRoute(
+            'editor/termcollection/searchtermexists/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'termcollection',
+                'action' => 'searchtermexists'
+            ));
+        $this->front->getRouter()->addRoute('searchtermexists', $searchTermExists);
+        
+        
+        $lastusedapp = new ZfExtended_Controller_RestLikeRoute(
+            'editor/apps/lastusedapp/*',
+            array(
+                'module' => 'editor',
+                'controller' => 'apps',
+                'action' => 'lastusedapp'
+            ));
+        $this->front->getRouter()->addRoute('lastusedapp', $lastusedapp);
+        
         # Language resources rutes start
         //WARNING: Order of the route definition is important!
         // the catchall like download route must be defined before the more specific query/search routes!
@@ -385,7 +405,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_tasks', $queryRoute);
         
-        
+
         $this->front->getRouter()->addRoute('editorLanguageResourcesEvents', new ZfExtended_Controller_RestLikeRoute(
             'editor/languageresourceinstance/:id/events',
             array(
@@ -394,7 +414,16 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'events'
             )
         ));
-        
+
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/export',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'export'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_export', $queryRoute);
+
         #Language resource rutes end
     }
     

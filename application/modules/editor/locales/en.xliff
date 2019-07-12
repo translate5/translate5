@@ -2441,7 +2441,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Terminology portal</target>
 </trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Search</target></trans-unit>
-
+<trans-unit id='RmlsdGVy'>
+    <source>Filter</source>
+    <target>Filter</target>
+</trans-unit>
 <trans-unit id='SWhuZW4gc2luZCBkZXJ6ZWl0IGtlaW5lIEt1bmRlbnZlcmtuw7xwZnVuZ2VuIHVuZCBkYW1pdCBhdWNoIGtlaW5lIFRlcm1Db2xsZWN0aW9ucyB6dWdlb3JkbmV0LiBEYWhlciBpc3QgYXVjaCBrZWluZSBUZXJtc3VjaGUgbcO2Z2xpY2gu'>
 	<source>Ihnen sind derzeit keine Kundenverknüpfungen und damit auch keine TermCollections zugeordnet. Daher ist auch keine Termsuche möglich.</source>
 	<target>There are currently no clients connected to your account and therefore no TermCollections assigned. Therefore no term search is possible.</target>
@@ -2452,14 +2455,84 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<target>No available term collections were found for the clients that are associated to you.</target>
 </trans-unit>
 
-<trans-unit id='VGVybWU='>
-	<source>Terme</source>
-	<target>Terms</target>
+<trans-unit id='VGVybS1FaW50csOkZ2U='>
+    <source>Term-Einträge</source>
+    <target>TermEntry</target>
 </trans-unit>
 
-<trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='>
-	<source>Eigenschaften des Eintrags</source>
-	<target>Entry attributes</target>
+<trans-unit id='RWludHJhZ3NiZW5lbm51bmdlbg=='>
+	<source>Eintragsbenennungen</source>
+	<target>Term entry designations</target>
+</trans-unit>
+
+<trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'>
+	<source>Eintragseigenschaften</source>
+	<target>Term entry attributes</target>
+</trans-unit>
+<trans-unit id='UHJvemVzc3N0YXR1cw=='>
+    <source>Prozessstatus</source>
+    <target>Processstatus</target>
+</trans-unit>
+<trans-unit id='dW5wcm9jZXNzZWQ='>
+    <source>unprocessed</source>
+    <target>proposal</target>
+</trans-unit>
+<trans-unit id='cHJvdmlzaW9uYWxseVByb2Nlc3NlZA=='>
+    <source>provisionallyProcessed</source>
+    <target>reviewed</target>
+</trans-unit>
+<trans-unit id='ZmluYWxpemVk'>
+    <source>finalized</source>
+    <target>approved</target>
+</trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnOiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='>
+    <source>Term-Eintrag: Änderung vorschlagen</source>
+    <target>Term-Entry: Propose changes</target>
+</trans-unit>
+<trans-unit id='TmV1ZW4gVGVybS1FaW50cmFnIHZvcnNjaGxhZ2Vu'>
+    <source>Neuen Term-Eintrag vorschlagen</source>
+    <target>Propose a new Term-Entry</target>
+</trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnOiBWb3JzY2hsYWcgbMO2c2NoZW4='>
+    <source>Term-Eintrag: Vorschlag löschen</source>
+    <target>Term-Entry: Delete the Proposal</target>
+</trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='>
+    <source>Term-Eintrag-Attribut: Änderung vorschlagen</source>
+    <target>Term-Entry-Attribute: Propose changes</target>
+</trans-unit>
+<trans-unit id='TmV1ZXMgVGVybS1FaW50cmFnLUF0dHJpYnV0IHZvcnNjaGxhZ2Vu'>
+    <source>Neues Term-Eintrag-Attribut vorschlagen</source>
+    <target>Propose a new Term-Entry-Attribute</target>
+</trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiBWb3JzY2hsYWcgbMO2c2NoZW4='>
+    <source>Term-Eintrag-Attribut: Vorschlag löschen</source>
+    <target>Term-Entry-Attribute: Delete the Proposal</target>
+</trans-unit>
+<trans-unit id='VGVybTogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'>
+    <source>Term: Änderung vorschlagen</source>
+    <target>Term: Propose changes</target>
+</trans-unit>
+<trans-unit id='w4RuZGVydW5nIHNpY2hlcm4='><source>Änderung sichern</source><target>Save proposal</target></trans-unit>
+<trans-unit id='TmV1ZW4gVGVybSB2b3JzY2hsYWdlbg=='>
+    <source>Neuen Term vorschlagen</source>
+    <target>Propose a new Term</target>
+</trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dDogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'>
+    <source>Term-Attribut: Änderung vorschlagen</source>
+    <target>Term-Attribute: Propose changes</target>
+</trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dCBiZWFyYmVpdGVu'>
+    <source>Term-Attribut bearbeiten</source>
+    <target>Term-Attribute: Propose changes</target>
+</trans-unit>
+<trans-unit id='TmV1ZXMgVGVybS1BdHRyaWJ1dCB2b3JzY2hsYWdlbg=='>
+    <source>Neues Term-Attribut vorschlagen</source>
+    <target>Propose a new Term-Attribute</target>
+</trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dDogVm9yc2NobGFnIGzDtnNjaGVu'>
+    <source>Term-Attribut: Vorschlag löschen</source>
+    <target>Term-Attribute: Delete the Proposal</target>
 </trans-unit>
 <trans-unit id='S3VuZGVu'>
     <source>Kunden</source>
@@ -2525,6 +2598,11 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='S3VuZGUgZ2Vsw7ZzY2h0'>
     <source>Kunde gelöscht</source>
     <target>Client deleted</target>
+</trans-unit>
+
+<trans-unit id='S3VuZGU='>
+    <source>Kunde</source>
+    <target>Client</target>
 </trans-unit>
 
 <trans-unit id='RW5ka3VuZGU='>
@@ -3282,6 +3360,36 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Diese Domain wird bereits verwendet.</source>
     <target>This domain is already in use.</target>
 </trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='>
+    <source>Vorschläge exportieren</source>
+    <target>Proposals export</target>
+</trans-unit>
+<trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVuPw=='><source>Vorschlag löschen?</source><target>Delete the proposal?</target></trans-unit>
+<trans-unit id='RGFzIEF0dHJpYnV0IHdpcmQgZGFubiBhdWYgZGVuIGFsdGVuIFN0YW5kIHp1csO8Y2tnZXNldHp0Lg=='><source>Das Attribut wird dann auf den alten Stand zurückgesetzt.</source><target>The attribute will be reset to its former content.</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBUZXJtLVZvcnNjaGxhZyB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie den Term-Vorschlag wirklich entfernen?</source><target>Do you really want to remove the proposal this term?</target></trans-unit>
+<trans-unit id='RGVyIFRlcm0gd2lyZCBkYW5uIGF1ZiBkZW4gYWx0ZW4gU3RhbmQgenVyw7xja2dlc2V0enQgKGJ6dy4gZ2Vsw7ZzY2h0LCB3ZW5uIGVzIGlobiB2b3JoZXIgbmljaHQgZ2FiKS4='><source>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</source><target>The term will be reset to its former content (or deleted if it didn't exist before).</target></trans-unit>
+<trans-unit id='QXR0cmlidXQ6IFZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attribut: Vorschlag löschen</source><target>Attribute: Delete proposal</target></trans-unit>
+<trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Remove the proposal</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Propose changes</target></trans-unit>
+<trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... select language</target></trans-unit>
+<trans-unit id='U3ByYWNoZSBmw7xyIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Sprache für Term-Vorschlag wählen</source><target>Select language for term proposal</target></trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Select Term-Collection for term proposal</target></trans-unit>
+<trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Younger than or equal</target></trans-unit>
+<trans-unit id='RXhwb3J0aWVyZW4='><source>Exportieren</source><target>Export</target></trans-unit>
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>InstantTranslate into</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>TermPortal-languages</target></trans-unit>
+<trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>All languages available</target></trans-unit>
+<trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Saving the term will also create a new entry for</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Delete proposals older than</target></trans-unit>
+<trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Delete proposal</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Change to existing term</target></trans-unit>
+<trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess status</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVNjaGzDvHNzZWw='><source>Attributs-Schlüssel</source><target>Attribute key</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVdlcnQ='><source>Attributs-Wert</source><target>Attribute value</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Change to existing attribute</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term entry</target></trans-unit>
+<trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Last editor</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Edit date</target></trans-unit>
 <trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='>
     <source>Excel Re-Importieren</source>
     <target>Excel Re-Import</target>

@@ -1482,8 +1482,25 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>Ansichtsmodus</target></trans-unit>
 <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='><source>Unbekannter Term Status</source><target>Unbekannter Term Status</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
-<trans-unit id='VGVybWU='><source>Terme</source><target>Terme</target></trans-unit>
-<trans-unit id='RWlnZW5zY2hhZnRlbiBkZXMgRWludHJhZ3M='><source>Eigenschaften des Eintrags</source><target>Eigenschaften des Eintrags</target></trans-unit>
+<trans-unit id='VGVybS1FaW50csOkZ2U='><source>Term-Einträge</source><target>Term-Einträge</target></trans-unit>
+<trans-unit id='RWludHJhZ3NiZW5lbm51bmdlbg=='><source>Eintragsbenennungen</source><target>Eintragsbenennungen</target></trans-unit>
+<trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'><source>Eintragseigenschaften</source><target>Eintragseigenschaften</target></trans-unit>
+<trans-unit id='UHJvemVzc3N0YXR1cw=='><source>Prozessstatus</source><target>Prozessstatus</target></trans-unit>
+<trans-unit id='dW5wcm9jZXNzZWQ='><source>unprocessed</source><target>vorgeschlagen</target></trans-unit>
+<trans-unit id='cHJvdmlzaW9uYWxseVByb2Nlc3NlZA=='><source>provisionallyProcessed</source><target>überprüft</target></trans-unit>
+<trans-unit id='ZmluYWxpemVk'><source>finalized</source><target>freigegeben</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnOiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='><source>Term-Eintrag: Änderung vorschlagen</source><target>Term-Eintrag: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZW4gVGVybS1FaW50cmFnIHZvcnNjaGxhZ2Vu'><source>Neuen Term-Eintrag vorschlagen</source><target>Neuen Term-Eintrag vorschlagen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnOiBWb3JzY2hsYWcgbMO2c2NoZW4='><source>Term-Eintrag: Vorschlag löschen</source><target>Term-Eintrag: Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='><source>Term-Eintrag-Attribut: Änderung vorschlagen</source><target>Term-Eintrag-Attribut: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZXMgVGVybS1FaW50cmFnLUF0dHJpYnV0IHZvcnNjaGxhZ2Vu'><source>Neues Term-Eintrag-Attribut vorschlagen</source><target>Neues Term-Eintrag-Attribut vorschlagen</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiBWb3JzY2hsYWcgbMO2c2NoZW4='><source>Term-Eintrag-Attribut: Vorschlag löschen</source><target>Term-Eintrag-Attribut: Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybTogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Term: Änderung vorschlagen</source><target>Term: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZW4gVGVybSB2b3JzY2hsYWdlbg=='><source>Neuen Term vorschlagen</source><target>Neuen Term vorschlagen</target></trans-unit>
+<trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Vorschlag löschen</target></trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dDogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Term-Attribut: Änderung vorschlagen</source><target>Term-Attribut: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZXMgVGVybS1BdHRyaWJ1dCB2b3JzY2hsYWdlbg=='><source>Neues Term-Attribut vorschlagen</source><target>Neues Term-Attribut vorschlagen</target></trans-unit>
+<trans-unit id='VGVybS1BdHRyaWJ1dDogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term-Attribut: Vorschlag löschen</source><target>Term-Attribut: Vorschlag löschen</target></trans-unit>
 <trans-unit id='U3VjaGU='><source>Suche</source><target>Suche</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKEt5cmlsbGlzY2gpIChTZXJiaWVuKQ=='><source>Serbisch (Kyrillisch) (Serbien)</source><target>Serbisch (Kyrillisch) (Serbien)</target></trans-unit>
 <trans-unit id='U2VyYmlzY2ggKExhdGVpbikgKFNlcmJpZW4p'><source>Serbisch (Latein) (Serbien)</source><target>Serbisch (Latein) (Serbien)</target></trans-unit>
@@ -1537,6 +1554,36 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='RGllIFJlc3NvdXJjZSBpc3QgZ2VuZXJlbGwgdmVyZsO8Z2Jhciwgc3RlbGx0IGFiZXIga2VpbmUgSW5mb3JtYXRpb25lbiDDvGJlciBkYXMgYW5nZWZyYWd0ZSBUTSBiZXJlaXQsIGRhIGRpZXMgbmljaHQgZ2VsYWRlbiBpc3Qu'><source>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</source><target>Die Ressource ist generell verfügbar, stellt aber keine Informationen über das angefragte TM bereit, da dies nicht geladen ist.</target></trans-unit>
 <trans-unit id='SFRUUDogNDAx'><source>HTTP: 401</source><target>HTTP: 401</target></trans-unit>
 <trans-unit id='RGllc2UgRG9tYWluIHdpcmQgYmVyZWl0cyB2ZXJ3ZW5kZXQu'><source>Diese Domain wird bereits verwendet.</source><target>Diese Domain wird bereits verwendet.</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgZXhwb3J0aWVyZW4='><source>Vorschläge exportieren</source><target>Vorschläge exportieren</target></trans-unit>
+<trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVuPw=='><source>Vorschlag löschen?</source><target>Vorschlag löschen?</target></trans-unit>
+<trans-unit id='RGFzIEF0dHJpYnV0IHdpcmQgZGFubiBhdWYgZGVuIGFsdGVuIFN0YW5kIHp1csO8Y2tnZXNldHp0Lg=='><source>Das Attribut wird dann auf den alten Stand zurückgesetzt.</source><target>Das Attribut wird dann auf den alten Stand zurückgesetzt.</target></trans-unit>
+<trans-unit id='TcO2Y2h0ZW4gU2llIGRlbiBUZXJtLVZvcnNjaGxhZyB3aXJrbGljaCBlbnRmZXJuZW4/'><source>Möchten Sie den Term-Vorschlag wirklich entfernen?</source><target>Möchten Sie den Term-Vorschlag wirklich entfernen?</target></trans-unit>
+<trans-unit id='RGVyIFRlcm0gd2lyZCBkYW5uIGF1ZiBkZW4gYWx0ZW4gU3RhbmQgenVyw7xja2dlc2V0enQgKGJ6dy4gZ2Vsw7ZzY2h0LCB3ZW5uIGVzIGlobiB2b3JoZXIgbmljaHQgZ2FiKS4='><source>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</source><target>Der Term wird dann auf den alten Stand zurückgesetzt (bzw. gelöscht, wenn es ihn vorher nicht gab).</target></trans-unit>
+<trans-unit id='QXR0cmlidXQ6IFZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attribut: Vorschlag löschen</source><target>Attribut: Vorschlag löschen</target></trans-unit>
+<trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Vorschlag löschen</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Änderung vorschlagen</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHNpY2hlcm4='><source>Änderung sichern</source><target>Änderung sichern</target></trans-unit>
+<trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... Sprache auswählen</target></trans-unit>
+<trans-unit id='U3ByYWNoZSBmw7xyIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Sprache für Term-Vorschlag wählen</source><target>Sprache für Term-Vorschlag wählen</target></trans-unit>
+<trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Term-Collection für Term-Vorschlag wählen</target></trans-unit>
+<trans-unit id='U29mb3J0w7xiZXJzZXR6dW5nIG5hY2g='><source>Sofortübersetzung nach</source><target>Sofortübersetzung nach</target></trans-unit>
+<trans-unit id='VGVybWlub2xvZ2llcG9ydGFsLVNwcmFjaGVu'><source>Terminologieportal-Sprachen</source><target>Terminologieportal-Sprachen</target></trans-unit>
+<trans-unit id='QWxsZSB2ZXJmw7xnYmFyZW4gU3ByYWNoZW4='><source>Alle verfügbaren Sprachen</source><target>Alle verfügbaren Sprachen</target></trans-unit>
+<trans-unit id='U3BlaWNoZXJuIGRlcyBuZXVlbiBUZXJtcyBlcnpldWd0IGF1dG9tYXRpc2NoIGVpbmVuIG5ldWVuIEVpbnRyYWcgZsO8cg=='><source>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</source><target>Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für</target></trans-unit>
+<trans-unit id='VGVybVByb3Bvc2Vy'><source>TermProposer</source><target>TermProposer</target></trans-unit>
+<trans-unit id='T3BlbklkIElzc3Vlcg=='><source>OpenId Issuer</source><target>OpenId Issuer</target></trans-unit>
+<trans-unit id='SsO8bmdlciBhbHMgb2RlciBnbGVpY2g='><source>Jünger als oder gleich</source><target>Jünger als oder gleich</target></trans-unit>
+<trans-unit id='Vm9yc2NobMOkZ2UgbMO2c2NoZW4gw6RsdGVyIGFscw=='><source>Vorschläge löschen älter als</source><target>Vorschläge löschen älter als</target></trans-unit>
+<trans-unit id='JyV2YWx1ZSUnIGRvZXMgbm90IGFwcGVhciB0byBiZSBhbiBpbnRlZ2Vy'><source>'%value%' does not appear to be an integer</source><target>'%value%' does not appear to be an integer</target></trans-unit>
+
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIFRlcm0='><source>Änderung zu bestehendem Term</source><target>Änderung zu bestehendem Term</target></trans-unit>
+<trans-unit id='UHJvemVzcy1TdGF0dXM='><source>Prozess-Status</source><target>Prozess-Status</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVNjaGzDvHNzZWw='><source>Attributs-Schlüssel</source><target>Attributs-Schlüssel</target></trans-unit>
+<trans-unit id='QXR0cmlidXRzLVdlcnQ='><source>Attributs-Wert</source><target>Attributs-Wert</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Änderung zu bestehendem Attributs-Wert</target></trans-unit>
+<trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term-Eintrag</target></trans-unit>
+<trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Letzter Bearbeiter</target></trans-unit>
+<trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Bearbeitungsdatum</target></trans-unit>
 <trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='><source>Excel Re-Importieren</source><target>Excel Re-Importieren</target></trans-unit>
 <trans-unit id='RXhjZWwgcmVpbXBvcnRpZXJlbg=='><source>Excel reimportieren</source><target>Excel reimportieren</target></trans-unit>
 <trans-unit id='U3BpZWxlbiBTaWUgaGllciBkaWUgdm9yaGVyIGhlcnVudGVyZ2VsYWRlbmUgRXhjZWwtRGF0ZWkgd2llZGVyIGluIGRpZSBBdWZnYWJlIGVpbi4='><source>Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.</source><target>Spielen Sie hier die vorher heruntergeladene Excel-Datei wieder in die Aufgabe ein.</target></trans-unit>

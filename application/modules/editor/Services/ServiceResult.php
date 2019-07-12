@@ -119,6 +119,7 @@ class editor_Services_ServiceResult {
         $result->matchrate = (int) $matchrate;
         $result->source = $this->defaultSource;
         $result->languageResourceid = $this->languageResource->getId();
+        $result->languageResourceType = $this->languageResource->getResourceType();
         
         $result->state = self::STATUS_LOADED;
         

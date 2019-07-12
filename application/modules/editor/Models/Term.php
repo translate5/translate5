@@ -32,12 +32,43 @@ END LICENSE AND COPYRIGHT
  * @version 1.0
  */
 /**
- * Term Instanz
- * 
+ * Term Instance
  * TODO refactor this class, so that code to deal with the term mark up will be moved in editor_Models_Segment_TermTag
  * 
+ * @method integer getId() getId()
+ * @method void setId() setId(integer $id)
+ * @method string getTerm() getTerm()
+ * @method void setTerm() setTerm(string $term)
+ * @method string getMid() getMid()
+ * @method void setMid() setMid(string $mid)
+ * @method string getStatus() getStatus()
+ * @method void setStatus() setStatus(string $status)
+ * @method string getProcessStatus() getProcessStatus()
+ * @method void setProcessStatus() setProcessStatus(string $processStatus)
+ * @method string getDefinition() getDefinition()
+ * @method void setDefinition() setDefinition(string $definition)
+ * @method string getGroupId() getGroupId()
+ * @method void setGroupId() setGroupId(string $groupId)
+ * @method integer getLanguage() getLanguage()
+ * @method void setLanguage() setLanguage(integer $languageId)
+ * @method integer getCollectionId() getCollectionId()
+ * @method void setCollectionId() setCollectionId(integer $id)
+ * @method integer getTermEntryId() getTermEntryId()
+ * @method void setTermEntryId() setTermEntryId(integer $id)
+ * @method string getCreated() getCreated()
+ * @method void setCreated() setCreated(string $created)
+ * @method string getUpdated() getUpdated()
+ * @method void setUpdated() setUpdated(string $updated)
+ * @method string getUserGuid() getUserGuid()
+ * @method void setUserGuid() setUserGuid(string $userGuid)
+ * @method string getUserName() getUserName()
+ * @method void setUserName() setUserName(string $userName)
  */
 class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
+    const PROCESS_STATUS_UNPROCESSED = 'unprocessed';
+    const PROCESS_STATUS_PROV_PROCESSED = 'provisionallyProcessed';
+    const PROCESS_STATUS_FINALIZED = 'finalized';
+    
     const STAT_PREFERRED = 'preferredTerm';
     const STAT_ADMITTED = 'admittedTerm';
     const STAT_LEGAL = 'legalTerm';
@@ -58,6 +89,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @var array
      */
     protected static $statusCache = [];
+    
+    protected $validatorInstanceClass = 'editor_Models_Validator_Term_Term';
     
     protected $statOrder = array(
         self::STAT_PREFERRED => 1,
@@ -82,6 +115,23 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     public function __construct() {
         parent::__construct();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
+    }
+    
+    /**
+     * creates a new, unsaved term history entity
+     * @return editor_Models_Term_History
+     */
+    public function getNewHistoryEntity() {
+        $history = ZfExtended_Factory::get('editor_Models_Term_History');
+        /* @var $history editor_Models_Term_History */
+        $history->setTermId($this->getId());
+        $history->setHistoryCreated(NOW_ISO);
+        
+        $fields = $history->getFieldsToUpdate();
+        foreach ($fields as $field) {
+            $history->__call('set' . ucfirst($field), array($this->get($field)));
+        }
+        return $history;
     }
     
     /**
@@ -521,6 +571,185 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Export term and term attribute proposals in excel file.
+     * When no path is provided, redirect the output to a client's web browser (Excel)
+     * 
+     * @param array $rows
+     * @param string $path: the path where the excel document will be saved
+     */
+    public function exportProposals(array $rows,string $path=null){
+        $excel = ZfExtended_Factory::get('ZfExtended_Models_Entity_ExcelExport');
+        /* @var $excel ZfExtended_Models_Entity_ExcelExport */
+        
+        // set property for export-filename
+        $excel->setProperty('filename', 'Term and term attributes proposals');
+        
+        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
+        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+        
+        // sample label-translations
+        $excel->setLabel('termEntryId', $t->_('Term-Eintrag'));
+        $excel->setLabel('definition', $t->_('Definition'));
+        $excel->setLabel('language', $t->_('Sprache'));
+        $excel->setLabel('termId', $t->_('Term-Id'));
+        $excel->setLabel('term', $t->_('Term'));
+        $excel->setLabel('termProposal', $t->_('Änderung zu bestehendem Term'));
+        $excel->setLabel('processStatus', $t->_('Prozess-Status'));
+        $excel->setLabel('attributeName', $t->_('Attributs-Schlüssel'));
+        $excel->setLabel('attribute', $t->_('Attributs-Wert'));
+        $excel->setLabel('attributeProposal', $t->_('Änderung zu bestehendem Attributs-Wert'));
+        $excel->setLabel('lastEditor', $t->_('Letzter Bearbeiter'));
+        $excel->setLabel('lastEditedDate', $t->_('Bearbeitungsdatum'));
+        
+        
+        $autosizeCells=function($phpExcel) use ($excel){
+            foreach ($phpExcel->getWorksheetIterator() as $worksheet) {
+                
+                $phpExcel->setActiveSheetIndex($phpExcel->getIndex($worksheet));
+                
+                $sheet = $phpExcel->getActiveSheet();
+                
+                //the highes column based on the current row columns
+                $highestColumn='M';
+                foreach(range('A',$highestColumn) as $column) {
+                    $sheet->getColumnDimension($column)->setAutoSize(true);
+                }
+                
+                
+                $highestColumnIndex = $excel->columnIndexFromString($highestColumn);
+                
+                // expects same number of row records for all columns
+                $highestRow = $worksheet->getHighestRow();
+                
+                for($col = 0; $col < $highestColumnIndex; $col++)
+                {
+                    // if you do not expect same number of row records for all columns
+                    // get highest row index for each column
+                    // $highestRow = $worksheet->getHighestRow();
+                    
+                    for ($row = 1; $row <= $highestRow; $row++)
+                    {
+                        $cell = $worksheet->getCellByColumnAndRow($col, $row);
+                        if(strpos($cell->getValue(), '<changemycolortag>') !== false){
+                            $cell->setValue(str_replace('<changemycolortag>','',$cell->getValue()));
+                            $sheet->getStyle($cell->getCoordinate())->getFill()->setFillType('solid')->getStartColor()->setRGB('f9f25c');
+                        }
+                    }
+                }
+            }
+        };
+        
+        //if the path is provided, save the excel into the given path location
+        if(!empty($path)){
+            $excel->loadArrayData($rows);
+            $autosizeCells($excel->getSpreadsheet());
+            $excel->saveToDisc($path);
+            return;
+        }
+        
+        //send the excel to browser download
+        $excel->simpleArrayToExcel($rows,$autosizeCells);
+    }
+    
+    /***
+     * Load term and attribute proposals yunger as $youngerAs date within the given collection
+     * @param string $youngerAs
+     * @param array $collectionId
+     */
+    public function loadProposalExportData(string $youngerAs,array $collectionIds){
+        //if no date is set, se to current
+        if(empty($youngerAs)){
+            $youngerAs=date('Y-m-d H:i:s');
+        }
+        if(empty($collectionIds)){
+            $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+            /* @var $termCollection editor_Models_TermCollection_TermCollection */
+            $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
+        }
+        $termSql="SELECT
+            		t.termEntryId as 'term-termEntryId',
+            		t.definition as 'term-definition',
+            		l.langName as 'term-language',
+            		t.id as 'term-Id',
+            		t.term as 'term-term',
+            		t.processStatus as 'term-processStatus',
+            		t.userName as 'term-lastEditor',
+                    t.updated as 'term-lastEditedDate',
+                    tp.id as 'termproposal-id',
+                    tp.term as 'termproposal-term',
+            		tp.created as 'termproposal-lastEditedDate',
+            		tp.userName as 'termproposal-lastEditor',
+                    null as 'attribute-id',
+                    null as 'attribute-name',
+                    null as 'attribute-value',
+                    null as 'attribute-lastEditedDate',
+                    null as 'attribute-lastEditor',
+                    null as 'attributeproposal-id',
+                    null as 'attributeproposal-value',
+                    null as 'attributeproposal-lastEditedDate',
+                    null as 'attributeproposal-lastEditor'
+        			FROM
+        			LEK_terms t
+        			LEFT OUTER JOIN
+        			LEK_term_proposal tp ON tp.termId = t.id
+        			INNER JOIN LEK_languages l ON t.language=l.id 
+                    		where t.collectionId IN(?)
+        		and (t.created >=? || tp.created >= ?) 
+        		and (tp.term is not null or t.processStatus='unprocessed')
+        		order by t.groupId,t.term";
+        
+        $termResult=$this->db->getAdapter()->query($termSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
+        
+        $attributeSql="SELECT
+                    ta.id as 'attribute-id',
+                    ta.termId as 'term-Id',
+                    ta.name as 'attribute-name',
+                    ta.value as 'attribute-value',
+                    ta.updated as 'attribute-lastEditedDate',
+                    ta.userName as 'attribute-lastEditor',
+                    ta.processStatus as 'attribute-processStatus',
+                    l.langName as 'term-language',
+                    tap.id as 'attributeproposal-id',
+                    tap.value as 'attributeproposal-value',
+                    tap.created as 'attributeproposal-lastEditedDate',
+                    tap.userName as 'attributeproposal-lastEditor',
+                    t.termEntryId as 'term-termEntryId',
+                    t.definition as 'term-definition',
+                    t.id as 'term-Id',
+                    t.term as 'term-term',
+                    t.processStatus as 'term-processStatus',
+                    t.userName as 'term-lastEditor',
+                    t.updated as 'term-lastEditedDate',
+                    tp.id as 'termproposal-id',
+                    tp.term as 'termproposal-term',
+                    tp.created as 'termproposal-lastEditedDate',
+                    tp.userName as 'termproposal-lastEditor'
+                		FROM
+                		LEK_term_attributes ta
+                		LEFT OUTER JOIN
+                		LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                        LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
+                        LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
+                        INNER JOIN LEK_languages l ON t.language=l.id 
+                	where ta.collectionId IN(?)
+                	and (ta.created >=? || tap.created >=?) 
+                	and (tap.value is not null or ta.processStatus='unprocessed')
+                	order by ta.termId";
+        
+        $attributeResult=$this->db->getAdapter()->query($attributeSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
+        
+        $resultArray=array_merge($termResult,$attributeResult);
+        
+        //load term and proposals
+        //load attributes and proposals
+        if(empty($resultArray)){
+            return [];
+        }
+        
+        return $this->groupProposalExportData($resultArray);
+    }
+    
+    /***
      * Load terms in given collection and languages. The returned data will be sorted by groupId,language and id
      * 
      * @param array $collectionIds
@@ -560,6 +789,27 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Returns all terms of the given $searchTerms that don't exist in 
+     * any of the given collections.
+     * @param array $searchTerms with objects {'text':'abc', 'id':123}
+     * @param array $collectionIds
+     * @return array $nonExistingTerms with objects {'text':'abc', 'id':123}
+     */
+    public function getNonExistingTermsInAnyCollection($searchTerms, $collectionIds){
+        $nonExistingTerms = [];
+        foreach ($searchTerms as $term) {
+            $s = $this->db->select()
+            ->where('term = ?', $term->text)
+            ->where('collectionId IN(?)', $collectionIds);
+            $terms = $this->db->fetchAll($s);
+            if ($terms->count() == 0) {
+                $nonExistingTerms[] = $term;
+            }
+        }
+        return $nonExistingTerms;
+    }
+    
+    /***
      * Check if the given term entry exist in the collection
      * @param mixed $termEntry
      * @param int $collectionId
@@ -589,14 +839,18 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         return $this->db->fetchAll($s);
     }
     
-    /***
+    /**
      * Find term in collection by given language and term value
+     * @param string $termText
+     * @param integer $languageId optional, if omitted use internal value
+     * @param integer $termCollection optional, if omitted use internal value
+     * @return Zend_Db_Table_Rowset_Abstract
      */
-    public function findTermInCollection($termText,$languageId,$termCollection){
+    public function findTermInCollection(string $termText, int $languageId = null, int $termCollection = null){
         $s = $this->db->select()
-        ->where('language = ?', $languageId)
         ->where('term = ?', $termText)
-        ->where('collectionId = ?',$termCollection);
+        ->where('language = ?', $languageId ?? $this->getLanguage())
+        ->where('collectionId = ?',$termCollection ?? $this->getCollectionId());
         return $this->db->fetchAll($s);
     }
     
@@ -607,36 +861,60 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param array $languages
      * @param array $collectionIds
      * @param mixed $limit
+     * @param array $processStats
      * 
-     * @return array|NULL
+     * @return array
      */
-    public function searchTermByLanguage($queryString,$languages,$collectionIds,$limit=null){
-        
+    public function searchTermByLanguage($queryString,$languages,$collectionIds,$limit=null,$processStats){
         //if wildcards are used, adopt them to the mysql needs
         $queryString=str_replace("*","%",$queryString);
         $queryString=str_replace("?","_",$queryString);
-        
-        $adapter=$this->db->getAdapter();
         
         //when limit is provided -> autocomplete search
         if($limit){
             $queryString=$queryString.'%';
         }
         
-        $s=$this->db->select()
-        ->from($this->db, array('definition','groupId', 'term as label','id as value','term as desc'))
-        ->where('lower(term) like lower(?) COLLATE utf8_bin',$queryString)
-        ->where('language IN(?)',explode(',', $languages))
-        ->where('collectionId IN(?)',$collectionIds)
-        ->order('term asc');
+        $isProposableAllowed=$this->isProposableAllowed();
+        
+        //remove the unprocessed status if the user is not allowed for proposals
+        if(!$isProposableAllowed){
+            $processStats = array_diff($processStats,[self::PROCESS_STATUS_UNPROCESSED]);
+        }
+        
+        $tableTerm = $this->db->info($this->db::NAME);
+        $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
+        $s = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from($tableTerm, ['term as label','id as value','term as desc','definition','groupId','collectionId','termEntryId','language'])
+        ->where('lower(`'.$tableTerm.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
+        ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
+        ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
+        ->where('`'.$tableTerm.'`.processStatus IN(?)',$processStats);
+        $s->order($tableTerm.'.term asc');
         if($limit){
             $s->limit($limit);
         }
-        $rows=$this->db->fetchAll($s)->toArray();
-        if(!empty($rows)){
-            return $rows;
+        
+        if(!$isProposableAllowed || !in_array(self::PROCESS_STATUS_UNPROCESSED, $processStats)){
+            return $this->db->fetchAll($s)->toArray();
         }
-        return null;
+        
+        //if proposal is allowed, search also in the proposal table for results
+        $tableProposal = (new editor_Models_Db_Term_Proposal())->info($this->db::NAME);
+        $sp = $this->db->select()
+        ->setIntegrityCheck(false)
+        ->from($tableProposal, ['term as label','termId as value','term as desc'])
+        ->joinInner($tableTerm, '`'.$tableTerm.'`.`id` = `'.$tableProposal.'`.`termId`', ['definition','groupId','collectionId', 'termEntryId','language'])
+        ->where('lower(`'.$tableProposal.'`.term) like lower(?) COLLATE utf8_bin',$queryString)
+        ->where('`'.$tableTerm.'`.language IN(?)',explode(',', $languages))
+        ->where('`'.$tableTerm.'`.collectionId IN(?)',$collectionIds)
+        ->order($tableTerm.'.term asc');
+        if($limit){
+            $sp->limit($limit);
+        }
+        $sql='('.$s->assemble().') UNION ('.$sp->assemble().')';
+        return $this->db->getAdapter()->query($sql)->fetchAll();
     }
     
     /***
@@ -644,7 +922,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * 
      * @param string $groupId
      * @param array $collectionIds
-     * @return array|NULL
+     * @return array
      */
     public function searchTermAttributesInTermentry($groupId,$collectionIds){
         $attCols=array(
@@ -661,53 +939,58 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                 'LEK_term_attributes.created AS attrCreated',
                 'LEK_term_attributes.updated AS attrUpdated',
                 'LEK_term_attributes.attrDataType AS attrDataType',
+                'LEK_term_attributes.processStatus AS attrProcessStatus',
+                new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
         );
         
-        $cols=array(
-                'definition',
-                'groupId', 
-                'term as label',
-                'id as value',
-                'term as desc',
-                'status as termStatus',
-                'id as termId',
-                'collectionId',
-                'language as languageId'
-        );
+        $cols=[
+            'definition',
+            'groupId',
+            'term as label',
+            'term as term',//for consistency
+            'id as value',
+            'term as desc',
+            'status as termStatus',
+            'processStatus as processStatus',
+            'id as termId',
+            'termEntryId',
+            'collectionId',
+            'language as languageId'
+        ];
         
         $s=$this->db->select()
+        ->setIntegrityCheck(false)
         ->from($this->db,$cols)
         ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
-        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',array('LEK_languages.rfc5646 AS language'))
-        ->where('groupId=?',$groupId)
+        ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
+        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',['LEK_languages.rfc5646 AS language']);
+        
+        if($this->isProposableAllowed()){
+            $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',[
+                'LEK_term_proposal.term as proposalTerm',
+                'LEK_term_proposal.id as proposalId'
+            ]);
+        }
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        if($attribute->isProposableAllowed()){
+            $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = LEK_term_attributes.id',[
+                'LEK_term_attribute_proposal.value as proposalAttributeValue',
+                'LEK_term_attribute_proposal.id as proposalAttributelId',
+            ]);
+        }else{
+            //exclude the proposals
+            $s->where('LEK_terms.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED)
+            ->where('LEK_term_attributes.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED);
+        }
+        
+        $s->where('groupId=?',$groupId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
-        ->order('label');
-        $s->setIntegrityCheck(false);
-        $rows=$this->db->fetchAll($s)->toArray();
-        if(!empty($rows)){
-            return $rows;
-        }
-        return null;
-    }
-    
-    /***
-     * Find term entry attributes in the given term entry (lek_terms groupId)
-     * 
-     * @param string $groupId
-     * @return array|NULL
-     */
-    public function searchTermEntryAttributesInTermentry($groupId){
-        $s=$this->db->select()
-        ->from($this->db, array('definition','groupId', 'term','id as termId'))
-        ->join('LEK_term_entry_attributes', 'LEK_term_entry_attributes.termEntryId = LEK_terms.termEntryId')
-        ->where('LEK_terms.groupId=?',$groupId)
-        ->group('LEK_terms.groupId');
-        $s->setIntegrityCheck(false);
-        $rows=$this->db->fetchAll($s)->toArray();
-        if(!empty($rows)){
-            return $rows;
-        }
-        return null;
+        ->order('LEK_languages.rfc5646')
+        ->order('LEK_terms.term');
+        return $this->db->fetchAll($s)->toArray();
     }
     
     /***
@@ -816,7 +1099,103 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         
         return $result;
     }
-
+    
+    public function getDataObject() {
+        $result=parent::getDataObject();
+        $result->termId=$result->id;
+        $result->proposable=$this->isProposableAllowed();
+        return $result;
+    }
+    
+    /***
+     * Check if the term is proposable.
+     * It is proposable when the term status is not unproccessed and the user is allowed for term proposal operation
+     * @param string $status
+     * @return boolean
+     */
+    public function isProposable(string $status=null){
+        if(empty($status)){
+            $status=$this->getStatus();
+        }
+        return $status!==self::PROCESS_STATUS_UNPROCESSED && $this->isProposableAllowed();
+    }
+    
+    /***
+     * It is proposable when the user is allowed for term proposal operation
+     * @return boolean
+     */
+    public function isProposableAllowed(){
+        $user=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        return $user->hasRole('termProposer');
+    }
+    
+    /***
+     * Group the term and attribute proposal data for the export
+     * @param array $data
+     * @return array
+     */
+    protected function groupProposalExportData(array $data){
+        
+        usort($data, function($a, $b) {
+            $retval = $a['term-Id'] <=> $b['term-Id'];
+            if ($retval == 0) {
+                $retval = $b['term-term'] <=> $a['term-term'];
+            }
+            return $retval;
+        });
+        
+        $returnResult=[];
+        $tmpTerm=[];
+        
+        //clange cell color by value on the excel export callback
+        $changeMyCollorTag='<changemycolortag>';
+        foreach ($data as $row) {
+            
+            $tmpTerm['termEntryId']=$row['term-termEntryId'];
+            $tmpTerm['definition']=$row['term-definition'];
+            $tmpTerm['language']=$row['term-language'];
+            $tmpTerm['termId']=$row['term-Id'];
+            $tmpTerm['term']=$changeMyCollorTag.$row['term-term'];
+            $tmpTerm['termProposal']='';
+            $tmpTerm['processStatus']=$row['term-processStatus'];
+            $tmpTerm['attributeName']=$row['attribute-name'];
+            $tmpTerm['attribute']=$row['attribute-value'];
+            $tmpTerm['attributeProposal']='';
+            $tmpTerm['lastEditor']=$changeMyCollorTag.$row['term-lastEditor'];
+            $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['term-lastEditedDate'];
+            
+            //if the proposal exist, set the change color and last editor for the proposal
+            if(!empty($row['termproposal-term'])){
+                $tmpTerm['term']=str_replace($changeMyCollorTag,'',$row['term-term']);
+                $tmpTerm['termProposal']=$changeMyCollorTag.$row['termproposal-term'];
+                $tmpTerm['lastEditor']=$changeMyCollorTag.$row['termproposal-lastEditor'];
+                $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['termproposal-lastEditedDate'];
+            }
+            
+            if(isset($row['attribute-processStatus']) && $row['attribute-processStatus']==self::PROCESS_STATUS_UNPROCESSED){
+                $tmpTerm['attribute']=$changeMyCollorTag.$row['attribute-value'];
+                $tmpTerm['lastEditor']=$changeMyCollorTag.$row['attribute-lastEditor'];
+                $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['attribute-lastEditedDate'];
+                $tmpTerm['term']=str_replace($changeMyCollorTag,'',$row['term-term']);
+                $tmpTerm['termProposal']=str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+            }
+            
+            //if the attribute proposal is set, set the change color and last editor for the attribute proposal
+            if(!empty($row['attributeproposal-value'])){
+                $tmpTerm['term']=str_replace($changeMyCollorTag,'',$row['term-term']);
+                $tmpTerm['termProposal']=str_replace($changeMyCollorTag,'',$row['termproposal-term']);
+                $tmpTerm['attribute']=$row['attribute-value'];
+                $tmpTerm['attributeProposal']=$changeMyCollorTag.$row['attributeproposal-value'];
+                $tmpTerm['lastEditor']=$changeMyCollorTag.$row['attributeproposal-lastEditor'];
+                $tmpTerm['lastEditedDate']=$changeMyCollorTag.$row['attributeproposal-lastEditedDate'];
+            }
+            $returnResult[]=$tmpTerm;
+            $tmpTerm=[];
+        }
+        return $returnResult;
+    }
+    
     /**
      * returns a map CONSTNAME => value of all term status
      * @return array
@@ -824,6 +1203,15 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     static public function getAllStatus() {
         self::initConstStatus();
         return self::$statusCache['status'];
+    }
+    
+    /**
+     * returns a map CONSTNAME => value of all term process-status
+     * @return array
+     */
+    static public function getAllProcessStatus() {
+        self::initConstStatus();
+        return self::$statusCache['processStatus'];
     }
     
     /**
@@ -845,6 +1233,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         self::$statusCache = [
             'status' => [],
             'translation' => [],
+            'processStatus' => [],
         ];
         $refl = new ReflectionClass(__CLASS__);
         $constants = $refl->getConstants();
@@ -854,6 +1243,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             }
             if(strpos($key, 'TRANSSTAT_') === 0) {
                 self::$statusCache['translation'][$key] = $val;
+            }
+            if(strpos($key, 'PROCESS_STATUS_') === 0) {
+                self::$statusCache['processStatus'][$key] = $val;
             }
         }
     }

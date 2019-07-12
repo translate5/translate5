@@ -166,5 +166,82 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
     public function removeByResourceId($languageResourceIds){
         $this->db->delete(array('languageResourceId IN(?)' => $languageResourceIds));
     }
+    
+    /**
+     * Which combinations of sources and targets are available for all languageResources the current user can use?
+     * @return object
+     */
+    public function getLanguageCombinationsForLoggedUser() {
+        // TODO: use this instaed of getLocalesAccordingToReference() in Instanttranslate.js
+        $targetsForSources = [];
+        $sourcesForTargets = [];
+        $addTargetsToSources = function($sources,$targets) use (&$targetsForSources) {
+            foreach ($sources as $source){
+                if(!array_key_exists($source, $targetsForSources)) {
+                    $targetsForSources[$source] = [];
+                }
+                foreach ($targets as $target){
+                    if (!in_array($target, $targetsForSources[$source]) && $target != $source) {
+                        array_push($targetsForSources[$source], $target);
+                    }
+                }
+            }
+        };
+        $addSourcesToTargets = function($sources,$targets) use (&$sourcesForTargets) {
+            foreach ($targets as $target){
+                if(!array_key_exists($target, $sourcesForTargets)) {
+                    $sourcesForTargets[$target] = [];
+                }
+                foreach ($sources as $source){
+                    if (!in_array($source, $sourcesForTargets[$target]) && $source != $target) {
+                        array_push($sourcesForTargets[$target], $source);
+                    }
+                }
+            }
+        };
+        // how to handle 'de-DE' vs. 'de'
+        $config = Zend_Registry::get('config');
+        $showSublanguages = $config->runtimeOptions->InstantTranslate->showSubLanguages;
+        $checkSubLanguage = function(&$locale) use ($showSublanguages) {
+            if (!$showSublanguages) {
+                $localeParts = explode('-',$locale);
+                $locale = $localeParts[0];
+            }
+        };
+        
+        $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
+        $allAvailableLanguageResources = $languageResources->getEnginesByAssoc();
+        
+        foreach ($allAvailableLanguageResources as $languageResource){
+            $sources = $languageResource['source'];
+            $targets = $languageResource['target'];
+            array_walk($sources, $checkSubLanguage);
+            array_walk($targets, $checkSubLanguage);
+            array_unique($sources);
+            array_unique($targets);
+            $addTargetsToSources($sources,$targets);
+            $addSourcesToTargets($sources,$targets);
+        }
+        
+        //sort alphabetically
+        if(!empty($targetsForSources)){
+            ksort($targetsForSources);
+            foreach ($targetsForSources as &$single){
+                sort($single);
+            }
+        }
+        //sort alphabetically
+        if(!empty($sourcesForTargets)){
+            ksort($sourcesForTargets);
+            foreach ($sourcesForTargets as &$single){
+                sort($single);
+            }
+        }
+        return (object) [
+            'targetsForSources' => $targetsForSources,
+            'sourcesForTargets' => $sourcesForTargets,
+        ];
+    }
 }
 

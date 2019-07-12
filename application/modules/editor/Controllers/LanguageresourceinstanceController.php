@@ -542,6 +542,22 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->success = $this->validateUpload();
     }
     
+    public function exportAction() {
+        $proposals=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $proposals editor_Models_Term */
+        
+        $collectionIds=$this->getParam('collectionId');
+        if(is_string($collectionIds)){
+            $collectionIds=explode(',', $collectionIds);
+        }
+        $rows = $proposals->loadProposalExportData($this->getParam('exportDate'),$collectionIds);
+        if(empty($rows)){
+            $this->view->message='No results where found.';
+            return;
+        }
+        $proposals->exportProposals($rows);
+    }
+    
     /**
      * Loads all task information entities for the given languageResource
      * The returned data is no real task entity, although the task model is used in the frontend!
@@ -767,9 +783,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
         
+        
+        $userSession = new Zend_Session_Namespace('user');
+        
         $params['languageResourceId']=$this->entity->getId();
         $params['fileinfo']=!empty($importInfo[self::FILE_UPLOAD_NAME])? $importInfo[self::FILE_UPLOAD_NAME]:[];
         $params['addnew']=$addnew;
+        $params['userGuid']=$userSession->data->userGuid;
         
         if (!$worker->init(null, $params)) {
             $this->uploadErrors[] = 'File import in language resources Error on worker init()';
@@ -793,7 +813,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return;
         }
         //create unique temp file name
-        $newFileLocation=tempnam('', $fileinfo['name']);
+        $newFileLocation=tempnam(sys_get_temp_dir(), $fileinfo['name']);
         if (!is_dir(dirname($newFileLocation))) {
             mkdir(dirname($newFileLocation), 0777, true);
         }

@@ -50,7 +50,7 @@ class View_Helper_WorkflowNotifyMail extends Zend_View_Helper_Abstract {
         $task = $this->view->task;
         /* @var $task editor_Models_Task */
         $taskGuid = $task->getTaskGuid();
-        if ($task->anonymizeUsers(false)) {
+        if ($task->anonymizeUsers(false)) { 
             // = anonymize $users for task without taking the addressed user into account
             // (the receiver of the mail might not be the currently authenticated user)
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
