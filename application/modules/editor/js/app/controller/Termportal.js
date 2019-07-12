@@ -113,7 +113,7 @@ Ext.define('Editor.controller.Termportal', {
     /***
      * Fires when the components in this container are arranged by the associated layout manager.
      */
-    onCentarPanelComponentAfterLayout:function(component){
+    onCentarPanelComponentAfterLayout:function(){
         if(!this.isTermportalAllowed()){
             return;
         }
