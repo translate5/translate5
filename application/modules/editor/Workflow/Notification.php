@@ -490,7 +490,8 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             return;
         }
         
-        $file=APPLICATION_PATH.'/../data/tmp/tmp_proposal_export.xlsx';
+        $file=tempnam(APPLICATION_PATH.'/../data/tmp/','').'xlsx';
+
         //create tmp file in the tmp directory of translate5
         $proposals->exportProposals($rows,$file);
         
