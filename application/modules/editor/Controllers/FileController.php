@@ -64,7 +64,7 @@ class Editor_FileController extends editor_Controllers_EditorrestController {
   
   /**
    * syncronize the Segment FileOrder Values to the corresponding Values in LEK_Files
-   * @param guid $taskGuid
+   * @param string $taskGuid
    */
   protected function syncSegmentFileOrder($taskGuid) {
     /* @var $segment editor_Models_Segment */

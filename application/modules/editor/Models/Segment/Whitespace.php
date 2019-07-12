@@ -71,6 +71,7 @@ class editor_Models_Segment_Whitespace {
         '/\x{205F}/u', //Hex UTF-8 bytes or codepoint of middle mathematical space
         '/\x{3000}/u', //Hex UTF-8 bytes or codepoint of ideographic space
         '/\x{200B}/u', //Hex UTF-8 bytes or codepoint of zero width space
+        '/\x{FEFF}/u', //Hex UTF-8 bytes or codepoint of ZERO WIDTH NO-BREAK SPACE / unicode BOM
         '/[\x{2000}-\x{200A}]/u', //Hex UTF-8 bytes or codepoint of eleven different small spaces, Haarspatium and em space
     ]; //Hex UTF-8 bytes 	E2 80 9C//von mssql nicht vertragen
     
@@ -121,6 +122,8 @@ class editor_Models_Segment_Whitespace {
             '<hardReturn />',
             '<softReturn />',
             '<macReturn />',
+            //the string "EFBBBF" "ZERO WIDTH NO-BREAK SPACE" BOM can be savly removed, since it was inserted by the frontend as internal marker which was not removed properly 
+            chr(0xEF).chr(0xBB).chr(0xBF),
         );
         $replace = array(
             "\r\n",
@@ -129,6 +132,7 @@ class editor_Models_Segment_Whitespace {
             "\r\n",
             "\n",
             "\r",
+            '',
         );
         $content = str_replace($search, $replace, $content);
         return preg_replace_callback('#<(space|char|tab) ts="([A-Fa-f0-9]*)"( length="[0-9]+")?/>#', function ($match) {
@@ -139,7 +143,7 @@ class editor_Models_Segment_Whitespace {
     /**
      * Does the entity encoding, see inline comments
      * @param string $textNode
-     * @param boolean $xmlBased
+     * @param bool $xmlBased
      * @return string
      */
     public function entityCleanup($textNode, $xmlBased = true) {
@@ -168,7 +172,7 @@ class editor_Models_Segment_Whitespace {
      * Creates the internal Space/Tab/SpecialChar tags
      * @param string $type
      * @param string $toBeProtected
-     * @param integer $length
+     * @param int $length
      * @return string
      */
     protected function maskSpecialContent($type, $toBeProtected, $length) {

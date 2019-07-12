@@ -135,7 +135,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param int $segmentId
      * @return array
      */
-    public function getByTaskGuidAndSegment(string $taskGuid, integer $segmentId) {
+    public function getByTaskGuidAndSegment(string $taskGuid, int $segmentId) {
         if(empty($taskGuid) || empty($segmentId)) {
             return array();
         }
@@ -465,11 +465,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
+     * exports all terms of all termCollections associated to the task in the task's languages.  
      * @param editor_Models_Task $task
-    //FIXME editor_Models_Export_Tbx durch entsprechendes Interface ersetzen
-     * @param editor_Models_Export_Tbx $exporteur
      */
-    public function export(editor_Models_Task $task, editor_Models_Export_Terminology_Tbx $exporteur) {
+    public function exportForTagging(editor_Models_Task $task) {
         $languageModel=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $languageModel editor_Models_Languages */
         
@@ -477,8 +476,12 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         /* @var $assoc editor_Models_TermCollection_TermCollection */
         $collectionIds=$assoc->getCollectionsForTask($task->getTaskGuid());
         
-        if(empty($collectionIds)){
-            return null;
+        if(empty($collectionIds)) {
+            //No term collection assigned to task although tasks terminology flag is true. 
+            // This is normally not possible, since the terminology flag in the task is maintained on TC task assoc changes via API 
+            throw new editor_Models_Term_TbxCreationException('E1113', [
+                'task' => $task
+            ]);
         }
         
         //get source and target language fuzzies
@@ -492,9 +495,28 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         
         $data=$this->loadSortedByCollectionAndLanguages($collectionIds, $langs);
         if(!$data) {
-            return null;
+            //The associated collections don't contain terms in the languages of the task.
+            // Should not be, should be checked already on assignment of collection to task. 
+            // Colud happen when all terms of a language are removed from a TermCollection via term import after associating that term collection to a task.
+            throw new editor_Models_Term_TbxCreationException('E1114', [
+                'task' => $task,
+                'collectionIds' => $collectionIds,
+                'languageIds' => $langs,
+            ]);
         }
+        
+        $exporteur = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
+        /* @var $exporteur editor_Models_Export_Terminology_Tbx */
         $exporteur->setData($data);
+        $result = $exporteur->export();
+        if(empty($result)) {
+            //collected terms could not be converted to XML.
+            throw new editor_Models_Term_TbxCreationException('E1115', [
+                'task' => $task,
+                'collectionIds' => $collectionIds,
+                'languageIds' => $langs,
+            ]);
+        }
         return $exporteur->export();
     }
     
@@ -540,7 +562,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     /***
      * Check if the given term entry exist in the collection
      * @param mixed $termEntry
-     * @param integer $collectionId
+     * @param int $collectionId
      * @return boolean
      */
     public function isTermEntryInCollection($termEntry,$collectionId){

@@ -32,10 +32,16 @@ class editor_Models_Import_FileParser_Csv_Exception extends editor_Models_Import
     /**
      * @var string
      */
-    protected $origin = 'import.fileparser.csv';
+    protected $domain = 'editor.import.fileparser.csv';
     
     static protected $localErrorCodes = [
         'E1017' => 'The regex {regex} matches the placeholderCSV string {placeholder} that is used in the editor_Models_Import_FileParser_Csv class to manage the protection loop. This is not allowed. Please find another solution to protect what you need to protect in your CSV via Regular Expression.',
         'E1018' => 'The string $this->placeholderCSV ({placeholder}) had been present in the segment before parsing it. This is not allowed.',
+        'E1075' => 'Error on parsing a line of CSV. Current line is: "{line}". Error could also be in previous line!',
+        'E1076' => 'In the line "{line}" there is no third column.',
+        'E1077' => 'No linebreak found in CSV: "{file}"',
+        'E1078' => 'No header column found in CSV: "{file}"',
+        'E1079' => 'In application.ini configured column-header(s) "{headers}" not found in CSV: "{file}"',
+        'E1080' => 'Source and mid given but no more data columns found in CSV: "{file}"',
     ];
 }

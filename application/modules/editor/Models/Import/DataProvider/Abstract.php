@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  */
 abstract class editor_Models_Import_DataProvider_Abstract {
     const TASK_ARCHIV_ZIP_NAME = 'ImportArchiv.zip';
+    const TASK_TEMP_IMPORT = '_tempImport';
+    
     protected $task;
     protected $taskPath;
     protected $importFolder;
@@ -48,7 +50,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
 
     /**
      * DataProvider specific method to create the import archive
-     * @param $filename optional, provide a different archive file name
+     * @param string $filename optional, provide a different archive file name
      */
     abstract public function archiveImportedData($filename = null);
     
@@ -65,7 +67,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
      * @throws Zend_Exception
      */
     protected function checkAndMakeTempImportFolder() {
-        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.'_tempImport';
+        $this->importFolder = $this->taskPath.DIRECTORY_SEPARATOR.self::TASK_TEMP_IMPORT;
         if(is_dir($this->importFolder)) {
             throw new Zend_Exception('Temporary directory for Task GUID ' . $this->task->getTaskGuid() . ' already exists!');
         }
@@ -112,7 +114,7 @@ abstract class editor_Models_Import_DataProvider_Abstract {
     
     /**
      * returns the fix defined (=> final) archiveZipPath
-     * @param $filename optional, provide a different filename as the default
+     * @param string $filename optional, provide a different filename as the default
      * @return string
      */
     protected final function getZipArchivePath($filename = null) {

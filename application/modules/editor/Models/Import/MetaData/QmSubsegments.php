@@ -97,7 +97,7 @@ END LICENSE AND COPYRIGHT
 
     /**
      * iterates over and manipulates the QM Sub Segments to prepare them for storage in DB
-     * @param unknown_type $parent
+     * @param stdClass $parent
      * @param SimpleXMLIterator $nodeList
      * @throws Zend_Exception
      */

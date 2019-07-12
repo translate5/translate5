@@ -133,20 +133,20 @@ class editor_Models_Segment_AutoStates {
     
     protected $states = array(
         self::TRANSLATED => 'Übersetzt',
-        self::TRANSLATED_AUTO => 'Autoübersetzt',
+        self::TRANSLATED_AUTO => 'Übersetzt, auto',
         self::NOT_TRANSLATED => 'Nicht übersetzt',
         self::REVIEWED => 'Lektoriert',
-        self::REVIEWED_AUTO => 'Autolektoriert',
+        self::REVIEWED_AUTO => 'Lektoriert, auto',
         self::BLOCKED => 'Gesperrt',
-        self::REVIEWED_UNTOUCHED => 'Lektoriert, unberührt, auto-gesetzt',
+        self::REVIEWED_UNTOUCHED => 'Lektoriert, unberührt, auto-gesetzt beim Aufgabenabschluss',
         self::REVIEWED_UNCHANGED => 'Lektoriert, unverändert',
-        self::REVIEWED_UNCHANGED_AUTO => 'Autolektoriert, unverändert',
-        self::REVIEWED_TRANSLATOR => 'Übersetzer geprüft',
-        self::REVIEWED_TRANSLATOR_AUTO => 'Übersetzer autogeprüft',
-        self::REVIEWED_PM => 'PM geprüft',
-        self::REVIEWED_PM_AUTO => 'PM Autogeprüft',
-        self::REVIEWED_PM_UNCHANGED => 'PM geprüft, unverändert',
-        self::REVIEWED_PM_UNCHANGED_AUTO => 'PM Autogeprüft, unverändert',
+        self::REVIEWED_UNCHANGED_AUTO => 'Lektoriert, unverändert, auto',
+        self::REVIEWED_TRANSLATOR => 'Lektorat durch Übersetzer geprüft',
+        self::REVIEWED_TRANSLATOR_AUTO => 'Lektorat durch Übersetzer geprüft, auto',
+        self::REVIEWED_PM => 'PM lektoriert',
+        self::REVIEWED_PM_AUTO => 'PM lektoriert, auto',
+        self::REVIEWED_PM_UNCHANGED => 'PM lektoriert, unverändert',
+        self::REVIEWED_PM_UNCHANGED_AUTO => 'PM lektoriert, unverändert, auto',
     );
     
     /**
@@ -231,8 +231,8 @@ class editor_Models_Segment_AutoStates {
     
     /**
      * calculates the initial autoStateId of an segment in the import process
-     * @param boolean $isEditable
-     * @param boolean $isTranslated
+     * @param bool $isEditable
+     * @param bool $isTranslated
      * @return integer
      */
     public function calculateImportState($isEditable, $isTranslated) {
@@ -314,6 +314,8 @@ class editor_Models_Segment_AutoStates {
         
         $history  = ZfExtended_Factory::get('editor_Models_SegmentHistory');
         /* @var $history editor_Models_SegmentHistory */
+        //NOTE: no record in segment data history is inserted because
+        //there is no related data change for this table
         $history->createHistoryByAutoState($taskGuid,[self::REVIEWED_UNTOUCHED]);
         
         $segment->updateLastAuthorFromHistory($taskGuid, self::REVIEWED_UNTOUCHED);
@@ -323,21 +325,22 @@ class editor_Models_Segment_AutoStates {
     }
     
     /**
-     * changes the state after add / edit a comment of this task
+     * changes the state after add / edit only a comment of this segment (no segment change)
      * @param editor_Models_Segment $segment
      */
     public function updateAfterCommented(editor_Models_Segment $segment, editor_Models_TaskUserAssoc $tua) {
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($segment->getTaskGuid());
-        $isTranslator = $tua->getRole() == $workflow::ROLE_TRANSLATOR;
-        $autoState = $segment->getAutoStateId();
-        if(!$isTranslator && ($autoState == self::TRANSLATED || $autoState == self::NOT_TRANSLATED)) {
-            if($this->isEditWithoutAssoc($tua)) {
-                $stateToSet = self::REVIEWED_PM_UNCHANGED;
-            }
-            else {
-                $stateToSet = self::REVIEWED_UNCHANGED;
-            }
-            $segment->setAutoStateId($stateToSet);
+        if($tua->getRole() == $workflow::ROLE_TRANSLATORCHECK) {
+            $segment->setAutoStateId(self::REVIEWED_TRANSLATOR); //TODO if we have TRANSLATE-1704 then this must be changed too
+            return;
+        }
+        if($tua->getRole() == $workflow::ROLE_LECTOR) {
+            $segment->setAutoStateId(self::REVIEWED_UNCHANGED);
+            return;
+        }
+        if($this->isEditWithoutAssoc($tua)){
+            $segment->setAutoStateId(self::REVIEWED_PM_UNCHANGED);
+            return;
         }
     }
     

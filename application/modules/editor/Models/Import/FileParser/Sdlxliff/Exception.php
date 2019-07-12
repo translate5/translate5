@@ -31,7 +31,7 @@ class editor_Models_Import_FileParser_Sdlxliff_Exception extends editor_Models_I
     /**
      * @var string
      */
-    protected $origin = 'import.fileparser.sdlxliff';
+    protected $domain = 'editor.import.fileparser.sdlxliff';
     
     static protected $localErrorCodes = [
         'E1000' => 'The file "{filename}" contains SDL comments which are currently not supported!',
@@ -42,7 +42,6 @@ class editor_Models_Import_FileParser_Sdlxliff_Exception extends editor_Models_I
         'E1005' => '<sdl:seg-defs was not found in the current transunit: "{transunit}"',
         'E1006' => 'Loading the tag information from the SDLXLIFF header has failed!',
         'E1007' => 'The tag "{tagname}" is not defined in the "_tagDefMapping" list.',
-        'E1008' => 'The tag ID "{tagId}" contains a dash "-" which is not allowed!',
         'E1009' => 'The source and target segment count does not match in transunit: "{transunit}".', 
         'E1010' => 'The tag "{tagname}" was used in the segment but is not defined in the "_tagDefMapping" list!',
     ];

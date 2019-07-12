@@ -109,7 +109,7 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
             'editor' => array(  'file', 'segment', 'alikesegment', 'customer', 'referencefile', 'qmstatistics', 'comment',
                                 'task', 'user', 'taskuserassoc', 'segmentfield', 'workflowuserpref', 'worker','taskmeta',
                                 'config', 'segmentuserassoc', 'session', 'language','termcollection','languageresourceresource','languageresourcetaskassoc',
-                                'languageresourceinstance','apps'),
+                                'languageresourceinstance','apps','taskusertracking'),
         ));
         $this->front->getRouter()->addRoute('editorRestDefault', $restRoute);
 
@@ -178,6 +178,24 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'module' => 'editor',
                 'controller' => 'task',
                 'action' => 'import'
+            )
+        ));
+        
+        // Excel Ex- + Reimport
+        $this->front->getRouter()->addRoute('editorTaskExcelExport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/excelexport',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'excelexport'
+            )
+        ));
+        $this->front->getRouter()->addRoute('editorTaskExcelReimport', new ZfExtended_Controller_RestLikeRoute(
+            'editor/task/:id/excelreimport',
+            array(
+                'module' => 'editor',
+                'controller' => 'task',
+                'action' => 'excelreimport'
             )
         ));
         

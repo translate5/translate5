@@ -41,6 +41,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     const PREFIX_SUB = 'sub-';
     const MISSING_MRK = 'missing-mrk';
     
+    /**
+     * defines if the content parser should reparse the chunks
+     * false default, better performance
+     * true used in subclasses, sometimes thats needed because of changes done in the XML structure
+     * @var boolean
+     */
+    const XML_REPARSE_CONTENT = false;
+    
     private $wordCount = 0;
     private $segmentCount = 1;
     
@@ -191,7 +199,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * Init tagmapping
      */
-    public function __construct(string $path, string $fileName, integer $fileId, editor_Models_Task $task) {
+    public function __construct(string $path, string $fileName, int $fileId, editor_Models_Task $task) {
         parent::__construct($path, $fileName, $fileId, $task);
         $this->initNamespaces();
         $this->contentConverter = ZfExtended_Factory::get('editor_Models_Import_FileParser_Xlf_ContentConverter', [$this->namespaces, $this->task, $fileName]);
@@ -374,8 +382,8 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *    This will change with implementing merging and splitting.
      *    
      * @param editor_Models_Import_FileParser_SegmentAttributes $attributes
-     * @param boolean $useSourceOtherContent
-     * @param boolean $preserveWhitespace
+     * @param bool $useSourceOtherContent
+     * @param bool $preserveWhitespace
      */
     protected function saveTargetOtherContentLength(editor_Models_Import_FileParser_SegmentAttributes $attributes, $useSourceOtherContent, $preserveWhitespace) {
         $otherContent = $useSourceOtherContent ? $this->otherContentSource : $this->otherContentTarget;
@@ -447,7 +455,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      *   <seg-source>                   tag, plain content or
      *   <seg-source> <mrk mtype="seg">  content of the mrk type=seg tags inside the seg-source
      * @param string $tag
-     * @param integer $key
+     * @param int $key
      * @param array $opener
      */
     protected function handleSourceTag($tag, $key, $opener) {
@@ -477,7 +485,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * calculates the MID for mapping source to target fragment (is NOT related to the segments MID)
      * @param array $opener
-     * @param boolean $source defines for which column the content is calculated: true if source, false if target  
+     * @param bool $source defines for which column the content is calculated: true if source, false if target  
      * @return string
      */
     protected function calculateMid(array $opener, $source) {
@@ -496,15 +504,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                     return $prefix.$parent['tag'].'-'.$parent['attributes']['id'];
                 }
             }
-            $msg  = 'SUB tag of '.($source ? 'source' : 'target').' is not unique due missing ID in the parent node and is ignored as separate segment therefore.'."\n";
-            $this->throwSegmentationException($msg);
+            $this->throwSegmentationException('E1070', ['field' => ($source ? 'source' : 'target')]);
             return '';
         }
         if($opener['tag'] == 'mrk') {
             $prefix = self::PREFIX_MRK;
             if($this->xmlparser->getAttribute($opener['attributes'], 'mid') === false) {
-                $msg  = 'MRK tag of '.($source ? 'source' : 'target').' has no MID attribute.';
-                $this->throwSegmentationException($msg);
+                $this->throwSegmentationException('E1071', ['field' => ($source ? 'source' : 'target')]);
             }
         }
         if(!($opener['tag'] == 'mrk' && $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid'))) {
@@ -524,15 +530,17 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     }
     
     /**
-     * @param string $msg
+     * Throws Xlf Exception
+     * @param string $errorCode
+     * @param string $data
      * @throws ZfExtended_Exception
      */
-    protected function throwSegmentationException($msg, $transUnitId = false) {
-        if($transUnitId === false) {
-            $transUnitId = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
+    protected function throwSegmentationException($errorCode, array $data) {
+        if(!array_key_exists('transUnitId', $data)) {
+            $data['transUnitId'] = $this->xmlparser->getParent('trans-unit')['attributes']['id'];
         }
-        $msg .= "\n".'Transunit mid: '.$transUnitId.' and TaskGuid: '.$this->task->getTaskGuid();
-        throw new ZfExtended_Exception($msg);
+        $data['task'] = $this->task;
+        throw new editor_Models_Import_FileParser_Xlf_Exception($errorCode, $data);
     }
     
     /**
@@ -634,7 +642,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * Checks if the given xliff is in the correct (supported) version
      * @param string $xliffTag
-     * @param integer $key
+     * @param int $key
      * @throws ZfExtended_Exception
      */
     protected function checkXliffVersion($attributes, $key) {
@@ -666,7 +674,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * parses the TransUnit attributes
      * @param array $attributes transUnit attributes
-     * @param integer $mid MRK tag mid or 0 if no mrk mtype seg used
+     * @param int $mid MRK tag mid or 0 if no mrk mtype seg used
      * @return editor_Models_Import_FileParser_SegmentAttributes
      */
     protected function parseSegmentAttributes($attributes, $mid) {
@@ -821,7 +829,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             else {
                 //parse the source chunks
-                $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1);
+                $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1, static::XML_REPARSE_CONTENT);
                 $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
                 
@@ -833,9 +841,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             }
             
             if($sourceEdit && $isSourceMrkMissing || $hasTargets && empty($this->currentTarget[$mid])){
-                $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-                $msg  = 'MRK/SUB tag of source not found in target with Mid: '.$mid."\n";
-                $this->throwSegmentationException($msg, $transUnitMid);
+                $this->throwSegmentationException('E1067', [
+                    'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
+                    'mid' => $mid,
+                ]);
             }
             if(empty($this->currentTarget) || empty($this->currentTarget[$mid])){
                 $targetChunksOriginal = $targetChunks = [];
@@ -853,9 +862,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 }
                 else {
                     //parse the target chunks, store the real chunks from the XLF separatly 
-                    $targetChunksOriginal = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
+                    $targetChunksOriginal = $targetChunks = $this->xmlparser->getRange($currentTarget['opener']+1, $currentTarget['closer']-1);
+                    
+                    //if reparse content is enabled, we convert the chunks to a string, so reparsing is triggerd
+                    if(static::XML_REPARSE_CONTENT) {
+                        $targetChunks = $this->xmlparser->join($targetChunks);
+                    }
                     //in targetChunks the content is converted (tags, whitespace etc)
-                    $targetChunks = $this->contentConverter->convert($targetChunksOriginal, false, $currentTarget['openerMeta']['preserveWhitespace']);
+                    $targetChunks = $this->contentConverter->convert($targetChunks, false, $currentTarget['openerMeta']['preserveWhitespace']);
                     unset($this->currentTarget[$mid]);
                 }
             }
@@ -924,13 +938,13 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             
             //if target was given and source contains tags only or is empty, then it will be ignored
             if(!$isSourceMrkMissing && !empty($this->segmentData[$targetName]['original']) && !$this->hasText($this->segmentData[$sourceName]['original'])) {
-                $placeHolders[$mid] = $this->xmlparser->join($targetChunksOriginal);
+                $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($targetChunksOriginal).$trailingTags;
                 continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
             //only with a segmentId (in case of ProofProcessor) we can save comments
             if($segmentId !== false && is_numeric($segmentId)) {
-                $this->importComments((integer) $segmentId);
+                $this->importComments((int) $segmentId);
             }
             if($currentTarget !== self::MISSING_MRK) {
                 //we add a placeholder if it is a real segment, not just a placeholder for a missing mrk
@@ -939,9 +953,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         
         if(!empty($this->currentTarget)){
-            $transUnitMid = $this->xmlparser->getAttribute($transUnit, 'id', '-na-');
-            $msg  = 'MRK/SUB tag of target not found in source with Mid(s): '.join(', ', array_keys($this->currentTarget))."\n";
-            $this->throwSegmentationException($msg, $transUnitMid);
+            $this->throwSegmentationException('E1068', [
+                'transUnitId' => $this->xmlparser->getAttribute($transUnit, 'id', '-na-'),
+                'mids' => join(', ', array_keys($this->currentTarget)),
+            ]);
         }
         
         //if we dont find any usable segment, we dont have to place the placeholder
@@ -1017,7 +1032,9 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         $otherContent = join(array_merge($otherContentSource, $otherContentTarget));
         if(!empty($otherContent) && preg_match('/[^\s]+/', $this->contentConverter->removeXlfTags($otherContent),$matches)) {
             $data = array_merge($otherContentSource, $otherContentTarget);
-            $this->throwSegmentationException('There is other content as whitespace outside of the mrk tags. Found content: '.print_r($data,1));
+            $this->throwSegmentationException('E1069', [
+                'content' => print_r($data,1),
+            ]);
         }
         
         $otherContent = $useSourceContent ? $otherContentSource : $otherContentTarget;
@@ -1083,7 +1100,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     
     /**
      * Imports the comments of last processed segment
-     * @param integer $segmentId
+     * @param int $segmentId
      */
     protected function importComments($segmentId) {
         $comments = $this->namespaces->getComments();
@@ -1098,7 +1115,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
         }
         //if there was at least one processed comment, we have to sync the comment contents to the segment
         if(!empty($comment)){
-            $comment->updateSegment($segmentId, $this->task->getTaskGuid());
+            $segment = ZfExtended_Factory::get('editor_Models_Segment');
+            /* @var $segment editor_Models_Segment */
+            $segment->load($segmentId);
+            $comment->updateSegment($segment, $this->task->getTaskGuid());
         }
     }
     
@@ -1204,10 +1224,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * Checks recursivly if target and source starts/ends with the same chunks, 
      *   if there are some tags in the start/end chunks it checks if they are paired tags. 
      *   if source and target start and ends just with that paired tags (no other content expect whitespace) then the tags are ignored in import 
-     * @param boolean $preserveWhitespace 
+     * @param bool $preserveWhitespace 
      * @param array $source
      * @param array $target
-     * @param boolean $foundTag used for recursive call
+     * @param bool $foundTag used for recursive call
      * @return boolean returns false if there are no matching leading/trailing tags at all 
      */
     protected function hasSameStartAndEndTags($preserveWhitespace, array $source, array $target, $foundTag = false) {
@@ -1316,7 +1336,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
     /**
      * returns true if target is a single tag (<target/>) or is empty <target></target>, where whitespace between the both targets matters for emptiness depending on preserveWhitespace
      * @param array $openerMeta
-     * @param integer $closerKey
+     * @param int $closerKey
      * @return boolean
      */
     protected function isEmptyTarget(array $openerMeta, $closerKey) {

@@ -128,6 +128,17 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleFirstFinishOfARole()
      */
     protected function handleFirstFinishOfARole(array $finishStat){
+        $role = $this->newTaskUserAssoc->getRole();
+        $taskState = $this->newTask->getState();
+        if($role == self::ROLE_LECTOR && $taskState == editor_Models_Task::STATE_UNCONFIRMED) {
+            //we have to confirm the task and retrigger task workflow triggers 
+            // if task was unconfirmed but a lektor is set to finish, this implies confirming 
+            $oldTask = clone $this->newTask;
+            $this->newTask->setState(editor_Models_Task::STATE_OPEN);
+            $this->doWithTask($oldTask, $this->newTask);
+            $this->newTask->save();
+            $this->newTask->setState(editor_Models_Task::STATE_OPEN);
+        }
         $this->doDebug(__FUNCTION__);
     }
     

@@ -72,12 +72,8 @@
     <div id="logo"></div>
 <?php 
 
-    $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
-    /* @var $userModel ZfExtended_Models_User */
-    $isUserAllowed=$userModel->isAllowed("editor_termportal","all");
-    
     //check if the user is allowed to acces the term portal
-    if($isUserAllowed){
+    if($this->isUserTermportalAllowed){
         echo '<div id="termPortalButtonContainer"><a id="termPortalButton" class="ui-button ui-widget ui-corner-all">'.$translate->_("Terminologieportal").'</a></div>';
     }else{
         echo '<div id="termPortalButtonContainer"></div>';
@@ -109,7 +105,8 @@
         "attentionFuzzyMatch"       => $translate->_("Achtung! FuzzyMatch ({0})"),
         "differenceIsHighlighted"   => $translate->_("Quellsegment zum TM-Match: Unterschied zu Ihrer Texteingabe hervorgehoben"),
         "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung."),
-        "noLanguageResource"        => $translate->_("Für diese Sprachkombination steht keine SprachResource zur Verfügung.")
+        "noLanguageResource"        => $translate->_("Für diese Sprachkombination steht keine SprachResource zur Verfügung."),
+        "translationsForLabel"      => $translate->_("Übersetzungen für"),
     );
     $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
     
@@ -194,7 +191,12 @@ $( function() {
             $(this).addClass("ui-state-active");
         });
     $('#logout').on("click",function(){
-        window.location = Editor.data.loginUrl;
+    	//check if it is used from iframe
+        if(window.parent!=undefined){
+            window.parent.location = Editor.data.loginUrl;
+        }else{
+        	window.parent.location = Editor.data.loginUrl;
+        }
     });
     $('#locale').selectmenu({
         change: function() {

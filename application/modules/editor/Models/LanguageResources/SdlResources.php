@@ -58,7 +58,7 @@ class editor_Models_LanguageResources_SdlResources {
     /***
      * Merge engine data required for the frontend layout
      * @param array $engines
-     * @param boolean $addArrayId : if true(default true), the array key will be the language resource id
+     * @param bool $addArrayId : if true(default true), the array key will be the language resource id
      * @return array[]
      */
     public function mergeEngineData($engines,$addArrayId=true) {
@@ -100,7 +100,7 @@ class editor_Models_LanguageResources_SdlResources {
         $getIsoLangs=function($languages) use($lngs){
           $ret=[];
           foreach ($languages as $l){
-              $ret[]=isset($lngs[$l]) ? $lngs[$l] : null;
+              $ret[] = $lngs[$l] ?? null;
           }
           return $ret;
         };
@@ -135,7 +135,7 @@ class editor_Models_LanguageResources_SdlResources {
         foreach($engines as $engine){
             $id=is_array($engine) ? $engine['id'] :'mt'.$engineCounter;
             //get character limit per engine (if configured)
-            $engineLimit=isset($engineCharacterLimit[$id]) ? $engineCharacterLimit[$id] : PHP_INT_MAX;
+            $engineLimit = $engineCharacterLimit[$id] ?? PHP_INT_MAX;
             
             //check if the engine support file uploads
             $fileUpload=$isFileUpload($engine);

@@ -49,8 +49,7 @@ abstract class editor_Models_Segment_TagAbstract {
     
     /***
      * The replacer regex used in the replace function
-     *
-     * @var regexp
+     * @var string
      */
     protected $replacerRegex;
     
@@ -81,8 +80,8 @@ abstract class editor_Models_Segment_TagAbstract {
     
     /**
      * replaces tags with either the callback or the given scalar
-     * @see preg_replace
-     * @see preg_replace_callback
+     * see preg_replace
+     * see preg_replace_callback
      * @param string $segment
      * @param Closure|string $replacer
      * @param int $limit optional
@@ -99,7 +98,7 @@ abstract class editor_Models_Segment_TagAbstract {
     /***
      * Return the placeholder template with id
      *
-     * @param integer $id
+     * @param int $id
      * @return string
      */
     protected function getPlaceholderTemplate($id){
@@ -112,8 +111,7 @@ abstract class editor_Models_Segment_TagAbstract {
     
     /***
      * Get the replace regex used in the replace function
-     *
-     * @return regexp
+     * @return string
      */
     protected function getReplacerRegex(){
         //if it is not set, set the default regex

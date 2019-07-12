@@ -49,15 +49,6 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     public $fileNameCache=array();
     
     
-    /***
-     * Unsupported unicode characters by opentm2 and their replace mapping
-     * @var array
-     */
-    protected $replaceMap=array(
-        '&#x1E;'=>'___tag___INFORMATION SEPARATOR TWO___tag___',
-        '&#x8;'=>'___tag___backspace___tag___',
-    );
-    
     /**
      * @var editor_Models_Import_FileParser_XmlParser
      */
@@ -110,9 +101,13 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $this->languageResource->addSpecificData('fileName',$name);
         
+        // If we are adding a TMX file as LanguageResource, we must create an empty memory first.
+        $validFileTypes = $this->getValidFiletypes();
+        if(empty($validFileTypes['TMX'])){
+            throw new ZfExtended_NotFoundException('OpenTM2: Cannot addTm for TMX-file; valid file types are missing.');
+        }
         $noFile = empty($fileinfo);
-        $tmxUpload = !$noFile && $fileinfo['type'] == 'application/xml' && preg_match('/\.tmx$/', $fileinfo['name']);
-        
+        $tmxUpload = !$noFile && in_array($fileinfo['type'], $validFileTypes['TMX']) && preg_match('/\.tmx$/', $fileinfo['name']);
         if($noFile || $tmxUpload) {
             if($this->api->createEmptyMemory($name, $sourceLang)){
                 $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
@@ -127,12 +122,8 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             return false;
         }
         
-        //replace the unsupported unicodes
-        $data=file_get_contents($fileinfo['tmp_name']);
-        $data=$this->replaceUnicodes($data);
-        
         //initial upload is a TM file
-        if($this->api->createMemory($name, $sourceLang, $data)){
+        if($this->api->createMemory($name, $sourceLang, file_get_contents($fileinfo['tmp_name']))){
             $this->languageResource->addSpecificData('fileName',$this->api->getResult()->name);
             return true;
         }
@@ -147,9 +138,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     public function addAdditionalTm(array $fileinfo = null,array $params=null){
         //FIXME refactor to streaming (for huge files) if possible by underlying HTTP client
-        $data=file_get_contents($fileinfo['tmp_name']);
-        $data=$this->replaceUnicodes($data);
-        if($this->api->importMemory($data)) {
+        if($this->api->importMemory(file_get_contents($fileinfo['tmp_name']))) {
             return true;
         }
         $this->handleOpenTm2Error('LanguageResources - could not add TMX data to OpenTM2'." LanguageResource: \n");
@@ -161,6 +150,17 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypes()
      */
     public function getValidFiletypes() {
+        return [
+            'TM' => ['application/zip'],
+            'TMX' => ['application/xml','text/xml'],
+        ];
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see editor_Services_Connector_FilebasedAbstract::getValidFiletypeForExport()
+     */
+    public function getValidExportTypes() {
         return [
             'TM' => 'application/zip',
             'TMX' => 'application/xml',
@@ -261,6 +261,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         
         $this->shortTagIdent = $mapCount + 1;
         $xmlParser->registerOther(function($textNode, $key) use ($xmlParser){
+            //for communication with OpenTM2 we assume that the segment content is XML/XLIFF therefore we assume xmlBased here 
             $textNode = $this->whitespaceHelper->protectWhitespace($textNode, true); 
             $textNode = $this->whitespaceTagReplacer($textNode);
             $xmlParser->replaceChunk($key, $textNode);
@@ -318,7 +319,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /**
      * replace additional tags from the TM to internal tags which are ignored in the frontend then
      * @param string $segment
-     * @param integer $mapCount used as start number for the short tag numbering
+     * @param int $mapCount used as start number for the short tag numbering
      * @return string
      */
     protected function replaceAdditionalTags($segment, $mapCount) {
@@ -505,7 +506,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      */
     protected function throwBadGateway() {
         $e = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz meldete folgenden Fehler:');
-        $e->setOrigin('LanguageResources');
+        $e->setDomain('LanguageResources');
         $e->setErrors($this->api->getErrors());
         throw $e;
     }
@@ -604,7 +605,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * Calculate the new matchrate value.
      * Check if the current match is of type context-match or exact-exact match
      * 
-     * @param integer $matchRate
+     * @param int $matchRate
      * @param array $metaData
      * @param editor_Models_Segment $segment
      * @param string $filename
@@ -646,7 +647,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
     /***
      * Download and save the existing tm with "fuzzy" name. The new fuzzy connector will be freturned.
      * The fuzzy languageResource name format is: oldname+Fuzzy-Analysis
-     * @param integer $analysisId
+     * @param int $analysisId
      * @throws ZfExtended_NotFoundException
      * @return editor_Services_Connector_Abstract
      */
@@ -654,7 +655,7 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         $suffix = '-fuzzy-'.$analysisId;
         $mime="TM";
         $this->isInternalFuzzy = true;
-        $validExportTypes = $this->getValidFiletypes();
+        $validExportTypes = $this->getValidExportTypes();
         
         if(empty($validExportTypes[$mime])){
             throw new ZfExtended_NotFoundException('Can not download in format '.$mime);
@@ -780,15 +781,5 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
         }
         
         return $matchrate;
-    }
-    
-    /***
-     * Replace unsupported unicodes in the given text with there defined replacement
-     * @param string $data: tbx file content
-     * @return string
-     */
-    protected function replaceUnicodes($data){
-        return strtr($data,$this->replaceMap);
-        
     }
 }

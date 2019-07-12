@@ -32,7 +32,7 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_TermTagger_Service {
     
     /**
-     * @var ZfExtended_Log
+     * @var ZfExtended_Logger
      */
     protected $log;
     
@@ -90,8 +90,8 @@ class editor_Plugins_TermTagger_Service {
     
     
     
-    public function __construct() {
-        $this->log = ZfExtended_Factory::get('ZfExtended_Log');
+    public function __construct($logDomain) {
+        $this->log = Zend_Registry::get('logger')->cloneMe($logDomain);
         $config = Zend_Registry::get('config');
         $this->config = $config->runtimeOptions->termTagger;
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
@@ -127,9 +127,7 @@ class editor_Plugins_TermTagger_Service {
     
     /**
      * Checks if there is a TermTagger-server behind $url.
-     * 
-     * @param url $url url of the TermTagger-Server
-     * 
+     * @param string $url url of the TermTagger-Server
      * @return boolean true if there is a TermTagger-Server behind $url 
      */
     public function testServerUrl(string $url, &$version = null) {
@@ -137,6 +135,9 @@ class editor_Plugins_TermTagger_Service {
         $httpClient->setHeaders('accept', 'text/html');
         try {
             $response = $this->sendRequest($httpClient, $httpClient::GET);
+        }
+        catch(editor_Plugins_TermTagger_Exception_Down $e) {
+            return false;
         }
         catch(editor_Plugins_TermTagger_Exception_Request $e) {
             return false;
@@ -164,7 +165,7 @@ class editor_Plugins_TermTagger_Service {
     
     
     /**
-     * Load a tbx-file $tbxFilePath to the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
+     * Load a tbx-file $tbxFilePath into the TermTagger-server behind $url where $tbxHash is a unic id for this tbx-file
      *  
      * @param string $url url of the TermTagger-Server
      * @param string $tbxHash TBX hash
@@ -175,29 +176,15 @@ class editor_Plugins_TermTagger_Service {
      */
     public function open(string $url, string $tbxHash, string $tbxData) {
         if(empty($tbxHash)) {
-            throw new editor_Plugins_TermTagger_Exception_Open('TBX hash is empty!');
+            //Could not load TBX into TermTagger: TBX hash is empty.
+            throw new editor_Plugins_TermTagger_Exception_Open('E1116', [
+                'termTaggerUrl' => $url,
+            ]);
         }
         
-        return $this->_open($url, $tbxHash, $tbxData);
-    }
-    
-    /**
-     * sends an open request to the termtagger
-     * @param string $url
-     * @param string $tbxHash
-     * @param string $tbxData
-     * @param array $moreParams
-     * @throws editor_Plugins_TermTagger_Exception_Open
-     * @throws editor_Plugins_TermTagger_Exception_Request
-     * @return Zend_Http_Response
-     */
-    private function _open($url, $tbxHash, $tbxData, $moreParams = array()) {
         // get default- and additional- (if any) -options for server-communication
         $serverCommunication = new stdClass();
         $serverCommunication->tbxFile = $tbxHash;
-        foreach ($moreParams as $key => $value) {
-            $serverCommunication->$key = $value;
-        }
         $serverCommunication->tbxdata = $tbxData;
         
         // send request to TermTagger-server
@@ -205,27 +192,20 @@ class editor_Plugins_TermTagger_Service {
         $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->tbxParsing));
         $httpClient->setRawData(json_encode($serverCommunication), 'application/json');
         $response = $this->sendRequest($httpClient, $httpClient::POST);
-        if(!$this->wasSuccessfull()) {
-            $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
-            $msg .= "\n URL: ".$httpClient->getUri(true);
-            $this->log->logError('INFO: Opening a TBX in termtagger '.$url.' was NOT successfull!', $msg."\n\nMore details in error log!\n\n");
-            $msg .= "\n\nPlain Server Response: ".print_r($response,true);
-            $msg .= "\n\nRequested Data: ".print_r($serverCommunication,true);
-            error_log($msg);
-            throw new editor_Plugins_TermTagger_Exception_Open('TermTagger HTTP Result was not successfull!');
+        $success = $this->wasSuccessfull();
+        if($success && $response = $this->decodeServiceResult($response)) {
+            return $response;
         }
-        
-        $response = $this->decodeServiceResult($response);
-        if (!$response) {
-            $msg = 'Could not decode TermTagger result!';
-            $msg .= "\n URL: ".$httpClient->getUri(true);
-            $this->log->logError('INFO: Opening a TBX in termtagger '.$url.' has PERHAPS failed!', $msg."\n\nMore details in error log!\n\n");
-            $msg .= "\n\nPlain Server Response: ".print_r($response,true);
-            $msg .= "\n\nRequested Data: ".print_r($serverCommunication,true);
-            error_log($msg);
-            throw new editor_Plugins_TermTagger_Exception_Open('TermTagger HTTP Result could not be decoded!');
-        }
-        return $response;
+        $data = [
+            'httpStatus' => $this->getLastStatus(),
+            'termTaggerUrl' => $httpClient->getUri(true),
+            'plainServerResponse' => print_r($response, true),
+            'requestedData' => $serverCommunication,
+        ];
+        $errorCode = $success ? 'E1118' : 'E1117';
+        //E1117: Could not load TBX into TermTagger: TermTagger HTTP result was not successful!
+        //E1118: Could not load TBX into TermTagger: TermTagger HTTP result could not be decoded!'
+        throw new editor_Plugins_TermTagger_Exception_Open($errorCode, $data);
     }
     
     /**
@@ -247,9 +227,38 @@ class editor_Plugins_TermTagger_Service {
             $this->lastStatus = $result->getStatus();
             return $result;
         } catch(Exception $httpException) {
-            //logging the send data is irrelevant here, since we are logging communication errors, not termtagger server errors!
-            $msg = 'Method: '.$method.'; URL was: '.$client->getUri(true).'; Message was: '.$httpException->getMessage();
-            throw new editor_Plugins_TermTagger_Exception_Request($msg);
+            $isInAdapter = $httpException instanceof Zend_Http_Client_Adapter_Exception;
+            $msg = $httpException->getMessage();
+            $extraData = [
+                'httpMethod' => $method,
+                'termTaggerUrl' => $client->getUri(true),
+            ];
+            
+            //currently we add all of the requested data to the log. Perhaps we get the problem which crashes the tagger
+            // on TBX upload we don't put the request to save memory
+            if(strpos($extraData['termTaggerUrl'], '/termTagger/tbxFile/') === false) {
+                $extraData['termTaggerRequest'] = print_r($client->getLastRequest(),1);
+                $extraData['termTaggerAnswer'] = print_r(!empty($result) && $result->getRawBody(),1);
+            }
+            
+            //if the error is one of the following, we have a connection problem
+            //TODO add other similar checks here too
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://localhost:8080. Error #111: Connection refused
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Read timed out after 10 seconds
+            //ERROR Zend_Http_Client_Adapter_Exception: E9999 - Unable to Connect to tcp://michgibtesdefinitivnichtalsdomain.com:8080. Error #0: php_network_getaddresses: getaddrinfo failed: Name or service not known
+            if($isInAdapter && (strpos($msg, 'Read timed out after') === 0 || strpos($msg, 'Unable to Connect to') === 0)) {
+                throw new editor_Plugins_TermTagger_Exception_Down('E1129', $extraData, $httpException);
+            }
+            
+            //Error in communication with TermTagger
+            $ecode = 'E1119';
+            //This error points to an crash of the termtagger, so we can log additional data here
+            // Zend_Http_Client_Exception('Unable to read response, or response is empty');
+            if($httpException instanceof Zend_Http_Client_Exception && strpos($msg, 'Unable to read response, or response is empty') === 0) {
+                $ecode = 'E1130';
+            }
+            
+            throw new editor_Plugins_TermTagger_Exception_Request($ecode, $extraData, $httpException);
         }
     }
     
@@ -267,32 +276,42 @@ class editor_Plugins_TermTagger_Service {
     /**
      * TermTaggs segment-text(s) in $data on TermTagger-server $url 
      * 
-     * @param unknown $url
+     * @param string $url
      * @param editor_Plugins_TermTagger_Service_ServerCommunication $data
      * 
      * @return Zend_Http_Response or null on error
      */
     public function tagterms($url, editor_Plugins_TermTagger_Service_ServerCommunication $data) {
-        
         $data = $this->encodeSegments($data);
         
+        //test term tagger errors, start a dummy netcat server in the commandline: nc -l -p 8080
+        // if the request was received in the commandline, just kill nc to simulate a termtagger crash.
+        //$url = 'http://michgibtesdefinitivnichtalsdomain.com:8080'; // this is the nc dummy URL then.
+        //$url = 'http://localhost:8080'; // this is the nc dummy URL then.
         $httpClient = $this->getHttpClient($url.'/termTagger/termTag/');
+        
         $httpClient->setRawData(json_encode($data), 'application/json');
         $httpClient->setConfig(array('timeout' => (integer)$this->config->timeOut->segmentTagging));
         $response = $this->sendRequest($httpClient, $httpClient::POST);
         
         if(!$this->wasSuccessfull()) {
-            $msg = 'TermTagger HTTP Status was: '.$this->getLastStatus();
-            $msg .= "\n URL: ".$httpClient->getUri(true)."\n\nRequested Data: ";
-            $msg .= print_r($data,true)."\n\nPlain Server Response: ";
-            $msg .= print_r($response,true);
-            throw new editor_Plugins_TermTagger_Exception_Malfunction($msg);
+            //TermTagger returns an error on tagging segments.
+            throw new editor_Plugins_TermTagger_Exception_Malfunction('E1120', [
+                'httpStatus' => $this->getLastStatus(),
+                'termTaggerUrl' => $httpClient->getUri(true),
+                'plainServerResponse' => print_r($response->getBody(), true),
+                'requestedData' => $data,
+            ]);
         }
-        
         $response = $this->decodeServiceResult($response);
         if (!$response) {
-            //processing tagterms 
-            throw new editor_Plugins_TermTagger_Exception_Request('TermTagger : Error on decodeServiceResult');
+            //processing tagterms TermTagger result could not be decoded.
+            throw new editor_Plugins_TermTagger_Exception_Request('E1121', [
+                'httpStatus' => $this->getLastStatus(),
+                'termTaggerUrl' => $httpClient->getUri(true),
+                'plainServerResponse' => print_r($response->getBody(), true),
+                'requestedData' => $data,
+            ]);
         }
         
         $response = $this->decodeSegments($response, $data);
@@ -379,16 +398,14 @@ class editor_Plugins_TermTagger_Service {
         libxml_use_internal_errors($oldFlagValue);
         $textNotEqual = strip_tags($text) !== strip_tags($segment->$field);
         if($invalidXml || $textNotEqual) {
-            $msg = 'Problem in merging terminology and track changes: '."\n\n";
-            $msg .= "Problem(s):   ".($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':'')." \n";
-            $msg .= "task guid:    ".$request->task->getTaskGuid()." \n";
-            $msg .= "task name:    ".$request->task->getTaskName()." \n";
-            $msg .= "task nr:      ".$request->task->getTaskNr()." \n";
-            $msg .= "segment id:   ".$segment->id." \n";
-            $msg .= "\nInput from browser: \n".$trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges)."\n";
-            $msg .= "\nResult termtagger: \n".$segment->$field."\n";
-            $msg .= "\nmerged result: \n".$text."\n";
-            $this->log->log('conflict in merging terminology and track changes', $msg);
+            $this->log->warn('E1132', 'Conflict in merging terminology and track changes: "{type}".', [
+                'type' => ($invalidXml?'Invalid XML,':'').($textNotEqual?' text changed by merge':''),
+                'task' => $request->task,
+                'segmentId' => $segment->id,
+                'inputFromBrowser' => $trackChangeTag->unprotect($trackChangeTag->textWithTrackChanges),
+                'termTaggerResult' => $segment->$field,
+                'mergedResult' => $text,
+            ]);
         }
         //error_log($text);
         $text = $trackChangeTag->unprotect($text);
@@ -417,26 +434,16 @@ class editor_Plugins_TermTagger_Service {
         $data = json_decode($result->getBody());
         if(!empty($data)) {
             if(!empty($data->error)) {
-                $this->log->logError(__CLASS__.' decoded TermTagger Result but with following Error from TermTagger: ', print_r($data,1));
+                $this->log->error('E1133', 'TermTagger reports error "{error}".', [
+                    'error' => print_r($data,1),
+                ]);
             }
             return $data;
         }
-        $msg = "Original TermTagger Result was: \n".$result->getBody()."\n JSON decode error was: ";
-        if (function_exists('json_last_error_msg')) {
-            $msg .= json_last_error_msg();
-        } else {
-            static $errors = array(
-                            JSON_ERROR_NONE             => null,
-                            JSON_ERROR_DEPTH            => 'Maximum stack depth exceeded',
-                            JSON_ERROR_STATE_MISMATCH   => 'Underflow or the modes mismatch',
-                            JSON_ERROR_CTRL_CHAR        => 'Unexpected control character found',
-                            JSON_ERROR_SYNTAX           => 'Syntax error, malformed JSON',
-                            JSON_ERROR_UTF8             => 'Malformed UTF-8 characters, possibly incorrectly encoded'
-            );
-            $error = json_last_error();
-            $msg .=  array_key_exists($error, $errors) ? $errors[$error] : "Unknown error ({$error})";
-        }
-        $this->log->logError(__CLASS__.' cannot json_decode TermTagger Result!', $msg);
+        $this->log->error('E1134', 'TermTagger produces invalid JSON: "{jsonError}".', [
+            'jsonError' => json_last_error_msg(),
+            'jsonBody' => $result->getBody(),
+        ]);
         return null;
     }
     

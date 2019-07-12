@@ -101,7 +101,7 @@ class editor_Plugins_XlfExportTranslateByAutostate_Init extends ZfExtended_Plugi
             if(empty($commentsRendered)) {
                 continue;
             }
-            $comments = $comment->loadBySegmentAndTaskPlain((integer) $segment->getId(), $segment->getTaskGuid());
+            $comments = $comment->loadBySegmentAndTaskPlain((int) $segment->getId(), $segment->getTaskGuid());
             //filter out the imported comments and consider only newly written comments
             $comments = array_filter($comments, $nonImportedComments);
             if(!empty($comments)) {

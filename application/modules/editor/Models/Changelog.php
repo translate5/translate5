@@ -51,7 +51,7 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
 
     /**
      * Load all changelog entries for a specific user group
-     * @param integer $userGroupId
+     * @param int $userGroupId
      * @return array
      */
     public function loadAllForUser($userGroupId) {
@@ -63,7 +63,7 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Get total count of changelog entries for a specific user group
-     * @param integer $userGroupId
+     * @param int $userGroupId
      * @return integer
      */
     public function getTotalCount($userGroupId){
@@ -74,8 +74,8 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Load all changelogs of a specific  
-     * @param integer $lastSeen
-     * @param integer $userGroupId
+     * @param int $lastSeen
+     * @param int $userGroupId
      */
     public function moreChangeLogs($lastSeen, $userGroupId){
         $s = $this->db->select()
@@ -86,7 +86,7 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns the highest changelog ID, optionally filtered by usergroup
-     * @param integer $userGroup optional
+     * @param int $userGroup optional
      * @return integer
      */
     protected function maxChangeLogId($userGroup = null) {
@@ -106,7 +106,7 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
      * Saves to one user which changelog id he has seen last, the saved id is returned
      * @param int $userId
      * @param int $changelogId
-     * @return the id on which was updated
+     * @return integer the id on which was updated
      */
     public function updateChangelogUserInfo(stdClass $userData){
         $changelogId = $this->maxChangeLogId($this->getUsergroup($userData));
@@ -133,7 +133,7 @@ class editor_Models_Changelog extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns the changelog id which the user has seen the last time, -1 if he never have seen any changelogs before
-     * @param integer $userId
+     * @param int $userId
      * @return integer
      */
     public function getLastChangelogForUserId($userId){

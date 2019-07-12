@@ -51,7 +51,7 @@ class editor_TaskController extends ZfExtended_RestController {
     protected $entity;
     
     /**
-     * Cached map of userGuids to userNames
+     * Cached map of userGuids and taskGuid to userNames
      * @var array
      */
     protected $cachedUserInfo = array();
@@ -118,6 +118,10 @@ class editor_TaskController extends ZfExtended_RestController {
         //set same join for sorting!
         $this->_sortColMap['customerId'] = $this->_filterTypeMap['customerId']['string'];
         
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1064' => 'The referenced customer does not exist (anymore).'
+        ], 'editor.task');
+        
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $this->user = new Zend_Session_Namespace('user');
@@ -135,23 +139,42 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->log = ZfExtended_Factory::get('editor_Logger_Workflow', [$this->entity]);
         
-        //add context xliff2 as valid format
+        //add context of valid export formats:
+        // currently: xliff2, importArchive, excel
         $this->_helper
         ->getHelper('contextSwitch')
+        
         ->addContext('xliff2', [
             'headers' => [
                 'Content-Type'          => 'text/xml',
             ]
         ])
+        ->addActionContext('export', 'xliff2')
+        
         ->addContext('importArchive', [
             'headers' => [
                 'Content-Type'          => 'application/zip',
             ]
         ])
-        ->addActionContext('export', 'xliff2')
         ->addActionContext('export', 'importArchive')
-        ->initContext();
         
+        /*
+        ->addContext('excel', [
+            'headers' => [
+                'Content-Type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        ])
+        ->addActionContext('export', 'excel')
+        
+        ->addContext('excelReimport', [
+            'headers' => [
+                'Content-Type'          => 'text/xml',
+            ]
+        ])
+        ->addActionContext('export', 'excelReimport')
+        */
+        
+        ->initContext();
     }
     
     /**
@@ -230,7 +253,14 @@ class editor_TaskController extends ZfExtended_RestController {
             array_push($taskassocs[$res['taskGuid']], $res);
         }
         
+        //if the config for mailto link in task grid pm user column is configured
+        $isMailTo=$this->config->runtimeOptions->frontend->tasklist->pmMailTo;
+        
         $customerData = $this->getCustomersForRendering($rows);
+
+        if($isMailTo){
+            $userData=$this->getUsersForRendering($rows);
+        }
         
         foreach ($rows as &$row) {
             $row['lastErrors'] = $this->getLastErrorMessage($row['taskGuid'], $row['state']);
@@ -251,6 +281,10 @@ class editor_TaskController extends ZfExtended_RestController {
             //add task assoc if exist
             if(isset($taskassocs[$row['taskGuid']])){
                 $row['taskassocs'] = $taskassocs[$row['taskGuid']];
+            }
+            
+            if($isMailTo) {
+                $row['pmMail'] = empty($userData[$row['pmGuid']]) ? '' : $userData[$row['pmGuid']];
             }
         }
         return $rows;
@@ -274,7 +308,7 @@ class editor_TaskController extends ZfExtended_RestController {
             if($userGuid == $assoc['userGuid']) {
                 $userAssocInfos[$assoc['taskGuid']] = $assoc;
             }
-            $userInfo = $this->getUserinfo($assoc['userGuid']);
+            $userInfo = $this->getUserinfo($assoc['userGuid'], $assoc['taskGuid']);
             $assoc['userName'] = $userInfo['surName'].', '.$userInfo['firstName'];
             $assoc['login'] = $userInfo['login'];
             //set only not pmOverrides
@@ -299,16 +333,19 @@ class editor_TaskController extends ZfExtended_RestController {
     }
 
     /**
-     * replaces the userGuid with the username
+     * returns the username for the given userGuid.
      * Doing this on client side would be possible, but then it must be ensured that UsersStore is always available and loaded before TaskStore. 
      * @param string $userGuid
+     * @param string $taskGuid
+     * @return array
      */
-    protected function getUserinfo($userGuid) {
+    protected function getUserinfo($userGuid, $taskGuid) {
         $notfound = array(); //should not be, but can occur after migration of old data!
         if(empty($userGuid)) {
             return $notfound;
         }
         if(isset($this->cachedUserInfo[$userGuid])) {
+            // cache for user
             return $this->cachedUserInfo[$userGuid];
         }
         if(empty($this->tmpUserDb)) {
@@ -320,8 +357,10 @@ class editor_TaskController extends ZfExtended_RestController {
         if(!$row) {
             return $notfound; 
         }
-        $this->cachedUserInfo[$userGuid] = $row->toArray();
-        return $row->toArray(); 
+        $userInfo = $row->toArray();
+        
+        $this->cachedUserInfo[$userGuid] = $userInfo;
+        return $userInfo; 
     }
     
     /**
@@ -330,7 +369,7 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function getUsername(array $userinfo) {
         if(empty($userinfo)) {
-            return '- not found -'; //should not be, but can occur after migration of old data!
+            return '- not found -'; //should not be, but can occur e.g. after migration of old data or for lockingUsername
         }
         return $userinfo['firstName'].' '.$userinfo['surName'].' ('.$userinfo['login'].')';
     }
@@ -350,13 +389,37 @@ class editor_TaskController extends ZfExtended_RestController {
         },$rows);
 
         if(empty($customerIds)){
-            throw new ZfExtended_Exception('No customers were found in the provided task list. The task list was:'.error_log(print_r($rows,1)));
+            return [];
         }
         
         $customer = ZfExtended_Factory::get('editor_Models_Customer');
         /* @var $customer editor_Models_Customer */
         $customerData = $customer->loadByIds($customerIds);
         return array_combine(array_column($customerData, 'id'), array_column($customerData, 'name'));
+    }
+    
+    /***
+     * Return a mapping of user guid and user email
+     * @param array $rows
+     * @return array|array
+     */
+    protected function getUsersForRendering(array $rows) {
+        if(empty($rows)){
+            return [];
+        }
+        
+        $userGuids = array_map(function($item){
+            return $item['pmGuid'];
+        },$rows);
+            
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        $userData = $user->loadByGuids($userGuids);
+        $ret=[];
+        foreach ($userData as $data){
+            $ret[$data['userGuid']]=$data['email'];
+        }
+        return $ret;
     }
     
     /**
@@ -380,10 +443,16 @@ class editor_TaskController extends ZfExtended_RestController {
             //if not explicitly disabled the import starts always automatically to be compatible with legacy API users
             $this->data['autoStartImport'] = true;
         }
-        $this->data['pmGuid'] = $this->user->data->userGuid;
         $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $pm ZfExtended_Models_User */
-        $pm->init((array)$this->user->data);
+        if(empty($this->data['pmGuid']) || !$this->isAllowed('frontend','editorEditTaskPm')) {
+            $this->data['pmGuid'] = $this->user->data->userGuid;
+            $pm->init((array)$this->user->data);
+        }
+        else {
+            //TODO test what happens with new error logging if PM does not exist? 
+            $pm->loadByGuid($this->data['pmGuid']);
+        }
         $this->data['pmName'] = $pm->getUsernameLong();
         $this->processClientReferenceVersion();
         $this->convertToLanguageIds();
@@ -454,6 +523,97 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->startImportWorkers();
     }
     
+    
+    /**
+     * Starts the export of a task into an excel file
+     */
+    public function excelexportAction() {
+        $this->entityLoad();
+        
+        // run excel export
+        $exportExcel = ZfExtended_Factory::get('editor_Models_Export_Excel', [$this->entity]);
+        $this->log->info('E1011', 'Task exported as excel file and locked for further processing.');
+        /* @var $exportExcel editor_Models_Export_Excel */
+        $exportExcel->exportAsDownload();
+    }
+    
+    /**
+     * Starts the reimport of an earlier exported excel into the task
+     */
+    public function excelreimportAction() {
+        $this->getAction();
+        
+        $worker = ZfExtended_Factory::get('editor_Models_Excel_Worker');
+        /* @var $worker editor_Models_Excel_Worker */
+        
+        try {
+            $tempFilename = $worker->prepareImportFile($this->entity);
+            
+            $worker->init($this->entity->getTaskGuid(), [
+                'filename' => $tempFilename,
+                'currentUserGuid' => $this->user->data->userGuid,
+            ]);
+            //TODO should be an synchronous process (queue instead run) 
+            // currently running import as direct run / synchronous process. 
+            // Reason is just the feedback for the user, which the user should get directly in the browser
+            $worker->run();
+            $this->log->info('E1011', 'Task re-imported from excel file and unlocked for further processing.');
+        }
+        catch(editor_Models_Excel_ExImportException $e) {
+            $this->handleExcelreimportException($e);
+        }
+        
+        if ($segmentErrors = $worker->getSegmentErrors()) {
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.task.exceleximport');
+            /* @var $logger ZfExtended_Logger */
+            
+            $msg = 'Error on excel reimport in the following segments. Please check the following segment(s):';
+            // log warning 'E1141' => 'Excel Reimport: at least one segment needs to be controlled.',
+            $logger->warn('E1142', $msg."\n{segments}", [
+                'task' => $this->entity,
+                'segments' => join("\n", array_map(function(excelExImportSegmentContainer $item) {
+                    return '#'.$item->nr.': '.$item->comment;
+                }, $segmentErrors)),
+            ]);
+            $msg = $this->translate->_('Die Excel-Datei konnte reimportiert werden, die nachfolgenden Segmente beinhalten aber Fehler und müssen korrigiert werden:');
+            $this->restMessages->addWarning($msg, $logger->getDomain(), null, array_map(function(excelExImportSegmentContainer $item) {
+                return ['type' => $item->nr, 'error' => $item->comment];
+            }, $segmentErrors));
+            $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+            /* @var $user ZfExtended_Models_User */
+            $user->init((array) $this->user->data);
+            $worker->mailSegmentErrors($user);
+        }
+        $this->view->success = true;
+    }
+    
+    /**
+     * Handles the exceptions happened on excel reimport
+     * @param ZfExtended_ErrorCodeException $e
+     * @throws ZfExtended_ErrorCodeException
+     */
+    protected function handleExcelreimportException(ZfExtended_ErrorCodeException $e) {
+        $codeToFieldAndMessage = [
+            'E1138' => ['excelreimportUpload', 'Die Excel Datei gehört nicht zu dieser Aufgabe.'],
+            'E1139' => ['excelreimportUpload', 'Die Anzahl der Segmente in der Excel-Datei und in der Aufgabe sind unterschiedlich!'],
+            'E1140' => ['excelreimportUpload', 'Ein oder mehrere Segmente sind in der Excel-Datei leer, obwohl in der Orginalaufgabe Inhalt vorhanden war.'],
+            'E1141' => ['excelreimportUpload', 'Dateiupload fehlgeschlagen. Bitte versuchen Sie es erneut.'],
+        ];
+        $code = $e->getErrorCode();
+        if(empty($codeToFieldAndMessage[$code])) {
+            throw $e;
+        }
+        // the Import exceptions causing unprossable entity exceptions are logged on level info
+        $this->log->exception($e, [
+            'level' => ZfExtended_Logger::LEVEL_INFO
+        ]);
+        
+        throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
+            //fieldName => error message to field
+            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+        ]);
+    }
+    
     protected function startImportWorkers() {
         $workerModel = ZfExtended_Factory::get('ZfExtended_Models_Worker');
         /* @var $workerModel ZfExtended_Models_Worker */
@@ -479,7 +639,60 @@ class editor_TaskController extends ZfExtended_RestController {
         $import->setTask($this->entity);
         $dp = $this->upload->getDataProvider();
         
-        $import->import($dp);
+        try {
+            $import->import($dp);
+        }
+        catch(editor_Models_Import_ConfigurationException $e) {
+            $this->handleConfigurationException($e);
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            $this->handleIntegrityConstraint($e);
+        }
+    }
+    
+    /**
+     * Converts the ConfigurationException caused by wrong user input to ZfExtended_UnprocessableEntity exceptions
+     * @param editor_Models_Import_ConfigurationException $e
+     * @throws editor_Models_Import_ConfigurationException
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    protected function handleConfigurationException(editor_Models_Import_ConfigurationException $e) {
+        $codeToFieldAndMessage = [
+            'E1032' => ['sourceLang', 'Die übergebene Quellsprache "{language}" ist ungültig!'],
+            'E1033' => ['targetLang', 'Die übergebene Zielsprache "{language}" ist ungültig!'],
+            'E1034' => ['relaisLang', 'Es wurde eine Relaissprache gesetzt, aber im Importpaket befinden sich keine Relaisdaten.'],
+            'E1039' => ['importUpload', 'Das importierte Paket beinhaltet kein gültiges "{proofRead}" Verzeichnis.'],
+            'E1040' => ['importUpload', 'Das importierte Paket beinhaltet keine Dateien im "{proofRead}" Verzeichnis.'],
+        ];
+        $code = $e->getErrorCode();
+        if(empty($codeToFieldAndMessage[$code])) {
+            throw $e;
+        }
+        // the config exceptions causing unprossable entity exceptions are logged on level info
+        $this->log->exception($e, [
+            'level' => ZfExtended_Logger::LEVEL_INFO
+        ]);
+        
+        throw ZfExtended_UnprocessableEntity::createResponseFromOtherException($e, [
+            //fieldName => error message to field
+            $codeToFieldAndMessage[$code][0] => $codeToFieldAndMessage[$code][1]
+        ]);
+    }
+    
+    /**
+     * Converts the IntegrityConstraint Exceptions caused by wrong user input to ZfExtended_UnprocessableEntity exceptions
+     * @param ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e
+     * @throws ZfExtended_Models_Entity_Exceptions_IntegrityConstraint
+     * @throws ZfExtended_UnprocessableEntity
+     */
+    protected function handleIntegrityConstraint(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+        //check if the error comes from the customer assoc or not
+        if(! $e->isInMessage('REFERENCES `LEK_customer`')) {
+            throw $e;
+        }
+        throw ZfExtended_UnprocessableEntity::createResponse('E1064', [
+            'customerId' => 'Der referenzierte Kunde existiert nicht (mehr)'
+        ], [], $e);
     }
     
     /**
@@ -529,6 +742,7 @@ class editor_TaskController extends ZfExtended_RestController {
         copy($oldTaskPath, $copy);
         
         $data = (array) $this->entity->getDataObject();
+        $oldTaskGuid=$data['taskGuid'];
         unset($data['id']);
         unset($data['taskGuid']);
         unset($data['state']);
@@ -540,11 +754,12 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         $copy = new SplFileInfo($copy);
-        ZfExtended_Utils::cleanZipPaths($copy, '_tempImport');
+        ZfExtended_Utils::cleanZipPaths($copy, editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT);
         $this->upload->initByGivenZip($copy);
         
         if($this->validate()) {
             $this->processUploadedFile();
+            $this->cloneLanguageResources($oldTaskGuid,$this->entity->getTaskGuid());
             $this->startImportWorkers();
             //reload because entityVersion could be changed somewhere
             $this->entity->load($this->entity->getId());
@@ -593,7 +808,8 @@ class editor_TaskController extends ZfExtended_RestController {
     public function putAction() {
         $this->entity->load($this->_getParam('id'));
         
-        $this->entity->checkStateAllowsActions();
+        //task manipulation is allowed additionally on excel export (for opening read only, changing user states etc)
+        $this->entity->checkStateAllowsActions([editor_Models_Excel_AbstractExImport::TASK_STATE_ISEXCELEXPORTED]);
         
         $taskguid = $this->entity->getTaskGuid();
         $this->log->request();
@@ -657,6 +873,8 @@ class editor_TaskController extends ZfExtended_RestController {
         $userAssocInfos = array();
         $allAssocInfos = $this->getUserAssocInfos(array($taskguid), $userAssocInfos);
         
+        $this->invokeTaskUserTracking($taskguid, $userAssocInfos);
+        
         //because we are mixing objects (getDataObject) and arrays (loadAll) as entity container we have to cast here
         $row = (array) $obj; 
         $this->addUserInfos($row, $taskguid, $userAssocInfos, $allAssocInfos);
@@ -702,7 +920,8 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
-     * Adds additional user based infos to the given array
+     * Adds additional user based infos to the given array.
+     * If the given taskguid is assigned to a client for anonymizing data, the added user-data is anonymized already.
      * @param array $row gets the row to modify as reference
      * @param string $taskguid
      * @param array $userAssocInfos
@@ -729,7 +948,11 @@ class editor_TaskController extends ZfExtended_RestController {
             $row['users'] = $allAssocInfos[$taskguid];
         }
         
-        $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser']));
+        $row['lockingUsername'] = null;
+        
+        if(!empty($row['lockingUser'])){
+            $row['lockingUsername'] = $this->getUsername($this->getUserinfo($row['lockingUser'],$taskguid));
+        }
         
         $fields = ZfExtended_Factory::get('editor_Models_SegmentField');
         /* @var $fields editor_Models_SegmentField */
@@ -760,7 +983,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $row['notEditContent'] = (bool)$row['userPrefs'][0]->notEditContent;
         
         //$row['segmentFields'] = $fields->loadByCurrentUser($taskguid);
-        foreach($row['segmentFields'] as $key => &$field) {
+        foreach($row['segmentFields'] as &$field) {
             //TRANSLATE-318: replacing of a subpart of the column name is a client specific feature
             $needle = $this->config->runtimeOptions->segments->fieldMetaIdentifier;
             if(!empty($needle)) {
@@ -775,14 +998,31 @@ class editor_TaskController extends ZfExtended_RestController {
         $row['defaultSegmentLayout'] = $this->segmentFieldManager->isDefaultLayout(array_map(function($field){
             return $field['name'];
         }, $row['segmentFields']));
+        
+        // anonymize userinfo?
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskguid);
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            if(!empty($row['lockingUser'])) {
+                $row = $workflowAnonymize->anonymizeUserdata($taskguid, $row['lockingUser'], $row);
+            }
+            if(!empty($row['users'])) {
+                foreach ($row['users'] as &$rowUser) {
+                    $rowUser = $workflowAnonymize->anonymizeUserdata($taskguid, $rowUser['userGuid'], $rowUser);
+                }
+            }
+        }
     }
     
     /**
      * returns true if PUT Requests opens a task for editing or readonly
      * 
      * - its not allowed to set both parameters to true
-     * @param boolean $editOnly if set to true returns true only if its a real editing (not readonly) request
-     * @param boolean $viewOnly if set to true returns true only if its a readonly request
+     * @param bool $editOnly if set to true returns true only if its a real editing (not readonly) request
+     * @param bool $viewOnly if set to true returns true only if its a readonly request
      * 
      * @return boolean
      */
@@ -801,11 +1041,25 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
+     * invokes taskUserTracking if its an opening or an editing request
+     * (no matter if the workflow-users of the task are to be anonymized or not)
+     * param string $taskguid
+     * @param array $userAssocInfos
+     */
+    protected function invokeTaskUserTracking($taskguid, $userAssocInfos) {
+        if(!$this->isOpenTaskRequest()){
+            return;
+        }
+        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $taskUserTracking editor_Models_TaskUserTracking */
+        $taskUserTracking->insertTaskUserTrackingEntry($taskguid, $this->user->data->userGuid, $userAssocInfos[$taskguid]['role']);
+    }
+    
+    /**
      * locks the current task if its an editing request
      * stores the task as active task if its an opening or an editing request
      */
     protected function openAndLock() {
-        $session = new Zend_Session_Namespace();
         $task = $this->entity;
         if($this->isOpenTaskRequest(true)){
             $workflow = $this->workflow;
@@ -877,7 +1131,7 @@ class editor_TaskController extends ZfExtended_RestController {
      * Updates the transferred User Assoc State to the given userGuid (normally the current user)
      * Per Default all state changes trigger something in the workflow. In some circumstances this should be disabled.
      * @param string $userGuid
-     * @param boolean $disableWorkflowEvents optional, defaults to false
+     * @param bool $disableWorkflowEvents optional, defaults to false
      */
     protected function updateUserState(string $userGuid, $disableWorkflowEvents = false) {
         if(empty($this->data->userState)) {
@@ -1027,13 +1281,12 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     public function exportAction() {
         parent::getAction();
-        
-        
         $diff = (boolean)$this->getRequest()->getParam('diff');
-        
         $context = $this->_helper->getHelper('contextSwitch')->getCurrentContext();
+        
         switch ($context) {
             case 'importArchive':
+                $this->logInfo('Task import archive downloaded');
                 $this->downloadImportArchive();
                 return;
                 
@@ -1064,7 +1317,7 @@ class editor_TaskController extends ZfExtended_RestController {
         //      Export_ExportedWorker for ExportReq1 → works then with tempExportDir of ExportReq1 instead!
         // 
         // If we implement in future export workers which need to work on the temp export data, 
-        //  we have to ensure that each export worker get its own export directory. 
+        // we have to ensure that each export worker get its own export directory. 
         
         $worker = ZfExtended_Factory::get('editor_Models_Export_ExportedWorker');
         /* @var $worker editor_Models_Export_ExportedWorker */
@@ -1084,13 +1337,14 @@ class editor_TaskController extends ZfExtended_RestController {
         
         if($diff) {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+            /* @var $translate ZfExtended_Zendoverwrites_Translate */
             $suffix = $translate->_(' - mit Aenderungen nachverfolgen.zip');
         }
         else {
             $suffix = '.zip';
         }
         
+        $this->logInfo('Task exported', ['context' => $context, 'diff' => $diff]);
         $this->provideZipDownload($zipFile, $suffix);
         
         //rename file after usage to export.zip to keep backwards compatibility
@@ -1189,6 +1443,29 @@ class editor_TaskController extends ZfExtended_RestController {
         $e->setErrors($errors);
         $this->view->validTrigger = $this->workflow->getDirectTrigger();
         $this->handleValidateException($e);
+    }
+
+    /***
+     * Clone existing language resources from oldTaskGuid for newTaskGuid.
+     */
+    protected function cloneLanguageResources(string $oldTaskGuid,string $newTaskGuid){
+        try{
+
+            $model=ZfExtended_Factory::get('editor_Models_LanguageResources_Taskassoc');
+            /* @var $model editor_Models_LanguageResources_Taskassoc */
+            $assocs=$model->loadByTaskGuids([$oldTaskGuid]);
+            if(empty($assocs)){
+                return;
+            }
+            foreach($assocs as $assoc){
+                unset($assoc['id']);
+                $assoc['taskGuid']=$newTaskGuid;
+                $model->init($assoc);
+                $model->save();
+            }
+        }catch(ZfExtended_Models_Entity_NotFoundException $e){
+            return;
+        }
     }
     
     /**

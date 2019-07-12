@@ -88,7 +88,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $api = ZfExtended_Factory::get('editor_Plugins_Okapi_Connector');
             /* @var $api editor_Plugins_Okapi_Connector */
             $api->createProject();
-            $api->uploadOkapiConfig($params['bconfFilePath']);
+            $api->uploadOkapiConfig($params['bconfFilePaths']);
             $api->uploadInputFile($fileName, $file);
             $api->executeTask($sourceLang, $targetLang);
             $convertedFile = $api->downloadFile($fileName, $manifestFile, $okapiDataDir);
@@ -106,16 +106,33 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
             $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
         }catch (Exception $e){
-            // in case of an exception we just ignore that file, log it, and proceed with the import
-            $debug = [
-                'fileId' => $fileId,
-                'file' => $file->__toString(),
-            ];
-            $this->log->logError('Okapi Error: Error on converting a file. Task: '.$this->taskGuid.'; File: '.print_r($debug, 1).'; Error was: '.$e);
-        }finally {
+            $this->handleException($e, $file, $fileId);
+        } finally {
             $api->removeProject();
         }
         return true;
+    }
+    
+    protected function handleException(Exception $e, SplFileInfo $file, $fileId) {
+        $logger = Zend_Registry::get('logger')->cloneMe('plugin.okapi');
+        /* @var $logger ZfExtended_Logger */
+        $logger->exception($e, [
+            'extra' => ['task' => $this->task],
+            'level' => ZfExtended_Logger::LEVEL_DEBUG,
+        ]);
+        
+        $absFile = $file->__toString();
+        $tmpImport = editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT;
+        $relFile = mb_strpos($absFile, $tmpImport);
+        $relFile = mb_substr($absFile, $relFile + strlen($tmpImport));
+        // in case of an exception we just ignore that file, log it, and proceed with the import
+        $logger->warn('E1058', 'Okapi Plug-In: Error in converting file {file}. See log details for more information.', [
+            'task' => $this->task,
+            'message' => get_class($e).': '.$e->getMessage(),
+            'fileId' => $fileId,
+            'file' => $relFile,
+            'filePath' => $absFile,
+        ]);
     }
     
     /**
@@ -174,7 +191,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     
     /**
      * returns the manifest.rkm file for a stored file
-     * @param integer $fileId
+     * @param int $fileId
      * @return string
      */
     protected function getManifestFile($fileId) {
@@ -183,7 +200,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
     
     /**
      * returns the original file for a stored file (stored in the okapi data dir)
-     * @param integer $fileId
+     * @param int $fileId
      * @return string
      */
     protected function findOriginalFile($fileId) {
@@ -231,7 +248,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             mkdir((string) $okapiDataDir, 0777, true);
         }
         if(!$okapiDataDir->isWritable()) {
-            throw new editor_Plugins_Okapi_Exception("Okapi Data dir not writeable: ".$okapiDataDir);
+            //Okapi Plug-In: Data dir not writeable
+            throw new editor_Plugins_Okapi_Exception('E1057', ['okapiDataDir' => $okapiDataDir]);
         }
         return $okapiDataDir;
     }
@@ -242,7 +260,8 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      */
     protected function doTikalFallback(SplFileInfo $workfile) {
         if(strtolower($workfile->getExtension()) !== 'xlf') {
-            throw new editor_Plugins_Okapi_Exception('Okapi tikal fallback can not be used, workfile does not contain the XLF suffix: '.$workfile);
+            // Okapi Plug-In: tikal fallback can not be used, workfile does not contain the XLF suffix',
+            throw new editor_Plugins_Okapi_Exception('E1056', ['workfile' => $workfile]);
         }
         $tikal = ZfExtended_Factory::get('editor_Plugins_Okapi_Tikal_Connector', [$this->task]);
         /* @var $tikal editor_Plugins_Okapi_Tikal_Connector */
@@ -261,6 +280,6 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             return true;
         }
         $attach = $config->fileconverters->attachOriginalFileAsReference->toArray();
-        return isset($attach['okapi']) ? $attach['okapi'] : false;
+        return $attach['okapi'] ?? false;
     }
 }

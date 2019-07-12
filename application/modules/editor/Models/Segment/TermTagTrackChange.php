@@ -245,7 +245,7 @@ class editor_Models_Segment_TermTagTrackChange {
      * Handler for XML structure Errors
      * @param array $opener
      * @param string $tag
-     * @param integer $key
+     * @param int $key
      * @throws editor_Models_Segment_TermTagTrackChangeStopException
      * @throws ZfExtended_Exception
      * @return string|boolean

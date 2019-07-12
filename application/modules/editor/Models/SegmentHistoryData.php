@@ -36,7 +36,7 @@ class editor_Models_SegmentHistoryData  extends ZfExtended_Models_Entity_Abstrac
      * loads the history data entries to one segment, DESC sorted by id (creation)
      *  can be limited with $limit parameter
      *  can be filtered to one datafield with optional parameter $field 
-     * @param integer $id
+     * @param int $id
      * @param string $field optional, defaults to null which means all fields
      * @param number $limit optional, defaults to 0 which means no limit
      * @return array

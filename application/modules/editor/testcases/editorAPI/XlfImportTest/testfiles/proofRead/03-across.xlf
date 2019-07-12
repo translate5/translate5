@@ -137,6 +137,20 @@
       <trans-unit id="92" translate="no" ax:state-name="KeepSource" ax:state-id="1" ax:state-flags="1024">
         <source>ohne match</source>
         <target>without match</target>
+        <ax:named-properties>
+          <ax:named-property name="Comment">
+            <ax:named-value ax:name="Annotates">Target</ax:named-value>
+            <ax:named-value ax:name="Author">tester</ax:named-value>
+            <ax:named-value ax:name="Text">Imported Comment Text</ax:named-value>
+            <ax:named-value ax:name="Created">02/20/2019 12:55:20</ax:named-value>
+            <ax:named-value ax:name="Title">Imported Comment Title</ax:named-value>
+          </ax:named-property>
+        </ax:named-properties>
+      </trans-unit>
+      <!-- next segment test TRANSLATE-1684 -->
+      <trans-unit id="93" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="8388608">
+        <source><bpt id="1" rid="1" ax:s-id="2" ax:s-is-base-style="True" ax:s-font-name="Arial" ax:s-font-size="7.0" /><bpt id="3" rid="2" ax:s-id="6" ax:s-font-name="Wingdings 2" /><ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="2" ax:s-is-base-style="True" ax:s-font-name="Arial" ax:s-font-size="7.0" /><bpt id="3" rid="2" ax:s-id="6" ax:s-font-name="Wingdings 2" /><ept id="4" rid="2" /><ept id="2" rid="1" /></target>
       </trans-unit>
     </body>
   </file>

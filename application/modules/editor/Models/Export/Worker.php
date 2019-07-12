@@ -35,6 +35,7 @@ END LICENSE AND COPYRIGHT
  *  "exportToFolder" string valid writable path to the export folder, only needed for method "exportToFolder"
  */
 class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
+    CONST PARAM_EXPORT_FOLDER = 'exportToFolder';
     
     /**
      * (non-PHPdoc)
@@ -42,10 +43,6 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
      */
     protected function validateParameters($parameters = array()) {
         if(!isset($parameters['diff']) || !is_bool($parameters['diff'])) {
-            return false;
-        }
-        if(isset($parameters['exportToFolder']) && (!is_dir($parameters['exportToFolder']) || !is_writable($parameters['exportToFolder']))){
-            $this->log->logError('Export folder not found or not write able: '.$parameters['exportToFolder']);
             return false;
         }
         return true;
@@ -73,8 +70,8 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
      */
     public function initFolderExport(editor_Models_Task $task, bool $diff, string $exportFolder) {
         $parameter = [
-                'diff' => $diff,
-                'exportToFolder' => $exportFolder
+            'diff' => $diff,
+            self::PARAM_EXPORT_FOLDER => $exportFolder
         ];
         $this->init($task->getTaskGuid(), $parameter);
         return $exportFolder;
@@ -99,11 +96,19 @@ class editor_Models_Export_Worker extends ZfExtended_Worker_Abstract {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($this->taskGuid);
         
+        if(!is_dir($parameters[self::PARAM_EXPORT_FOLDER]) || !is_writable($parameters[self::PARAM_EXPORT_FOLDER])){
+            //The task export folder does not exist or is not writeable, no export ZIP file can be created.
+            throw new editor_Models_Export_Exception('E1147', [
+                'task' => $task,
+                'exportFolder' => $parameters[self::PARAM_EXPORT_FOLDER],
+            ]);
+        }
+        
         $exportClass = 'editor_Models_Export';
         $export = ZfExtended_Factory::get($exportClass);
         /* @var $export editor_Models_Export */
         $export->setTaskToExport($task, $parameters['diff']);
-        $export->export($parameters['exportToFolder'], $this->workerModel->getId());
+        $export->export($parameters[self::PARAM_EXPORT_FOLDER], $this->workerModel->getId());
         
         //we should use __CLASS__ here, if not we loose bound handlers to base class in using subclasses
         $eventManager = ZfExtended_Factory::get('ZfExtended_EventManager', array($exportClass));

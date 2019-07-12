@@ -117,18 +117,20 @@ class editor_Models_Import_UploadProcessor {
             return $ext;
         }
         
-        if(empty($importInfo['importUpload']['size'])) {
-            $this->addUploadError('emptyUploadFile', $importInfo['importUpload']['name']);
+        $data = [
+            'ext' => $ext,
+            'filename' => $importInfo['importUpload']['name'],
+        ];
+        if($isEmptySize) {
+            $this->addUploadError('emptyUploadFile');
         }
         else {
-            $log = ZfExtended_Factory::get('ZfExtended_Log');
-            /* @var $log ZfExtended_Log */
-            $log->logError('Unknown extension "'.$ext.'" discovered',
-                            'Someone tried the file extension "'.$ext.'" which is not registered');
-            $this->addUploadError('noValidUploadFile', $importInfo['importUpload']['name']);
+            $log = Zend_Registry::get('logger');
+            /* @var $log ZfExtended_Logger */
+            $log->info('E1031', 'A file "{filename}" with an unknown file extension "{ext}" was tried to be imported.', $data);
+            $this->addUploadError('noValidUploadFile');
         }
-        
-        $this->throwOnUploadError();
+        $this->throwOnUploadError($data);
     }
     
     /**
@@ -209,36 +211,28 @@ class editor_Models_Import_UploadProcessor {
      * @param string $errorType
      */
     protected function addUploadError($errorType) {
-        $msgs = array(
-            'noValidUploadFile' => 'Bitte eine ZIP, SDLXLIFF, XLIFF oder CSV Datei auswählen.',
-            'emptyUploadFile' => 'Die ausgewählte Datei war leer!',
-        );
-        $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
-        if(empty($msgs[$errorType])) {
-            $msg = $translate->_('Unbekannter Fehler beim Dateiupload.');
+        switch ($errorType) {
+            case 'noValidUploadFile':
+                $this->uploadErrors[$errorType] = 'Der Dateityp "{ext}" der ausgewählten Datei "{filename}" wird nicht unterstützt.';
+                return;
+            case 'emptyUploadFile':
+                $this->uploadErrors[$errorType] = 'Die ausgewählte Datei war leer!';
+                return;
+            default:
+                $this->uploadErrors[$errorType] = 'Unbekannter Fehler beim Dateiupload.';
+                return;
         }
-        else {
-            $msg = $translate->_($msgs[$errorType]);
-        }
-        $args = func_get_args();
-        array_shift($args); //remove type
-        array_unshift($args, $msg); //add formatted string as first parameter
-        $this->uploadErrors[$errorType] = call_user_func_array('sprintf', $args);
     }
 
     /**
      * throws upload errors if some occured 
      * @throws ZfExtended_ValidateException
      */
-    protected function throwOnUploadError() {
+    protected function throwOnUploadError(array $extraData = []) {
         if(empty($this->uploadErrors)) {
             return;
         }
-        $errors = array('importUpload' => $this->uploadErrors);
-        $e = new ZfExtended_ValidateException(print_r($errors, 1));
-        $e->setErrors($errors);
-        throw $e;
+        throw ZfExtended_FileUploadException::createResponse('E1026', ['importUpload' => $this->uploadErrors], $extraData);
     }
     
 }

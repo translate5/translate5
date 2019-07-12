@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
     
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -95,7 +95,8 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
             '19' => 'Here the alignment is OK again 3.',
                 
             '19' => 'Here the alignment is OK again 3.',
-            '20' => 'Diese Datei ist Teil der php-online-Dokumentation. Ihre Übersetzung ist durch eine Vorübersetzung entstanden, die auf einem sehr schnell durchgeführten winalign-Project basiert und in keiner Art und Weise dem State of the Art eines Übersetzungsprojekts entspricht. Sein einziger Zweck ist die Erzeugung von Demo-Daten für translate5. ',
+            // the next segment has a different MID to test the segmentNrInTask based algorithm
+            '20' => 'Dieses Segment testet mit einer abweichenden MID als im orginal SDLXLIFF den segmentNrInTask basierten Match Algorithmus.',
             '21' => 'Apache 2.0 auf Unixsystemen - Manual',
             '22' => 'PHP Manual',
             '23' => 'Installation und Konfiguration',
@@ -115,7 +116,7 @@ class RelaisImportTest extends \ZfExtended_Test_ApiTestcase {
         $this->assertEquals($targetEdit, $segments[24]['targetEdit'], 'Imported Target is not as expected!');
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testmanager');

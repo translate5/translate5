@@ -30,31 +30,31 @@ END LICENSE AND COPYRIGHT
  * MatchAnalysis Entity Object
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * 
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * 
  * @method integer getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(integer $segmentId)
+ * @method void setSegmentId() setSegmentId(int $segmentId)
  * 
  * @method integer getSegmentNrInTask() getSegmentNrInTask()
- * @method void setSegmentNrInTask() setSegmentNrInTask(integer $segmentNrInTask)
+ * @method void setSegmentNrInTask() setSegmentNrInTask(int $segmentNrInTask)
  * 
  * @method integer getLanguageResourceid() getLanguageResourceid()
- * @method void setLanguageResourceid() setLanguageResourceid(integer $languageResourceid)
+ * @method void setLanguageResourceid() setLanguageResourceid(int $languageResourceid)
  * 
  * @method integer getMatchRate() getMatchRate()
- * @method void setMatchRate() setMatchRate(integer $matchrate)
+ * @method void setMatchRate() setMatchRate(int $matchrate)
  * 
  * @method integer getWordCount() getWordCount()
- * @method void setWordCount() setWordCount(integer $wordCount)
+ * @method void setWordCount() setWordCount(int $wordCount)
  * 
  * @method integer getAnalysisId() getAnalysisId()
- * @method void setAnalysisId() setAnalysisId(integer $analysisId)
+ * @method void setAnalysisId() setAnalysisId(int $analysisId)
  * 
  * @method integer getInternalFuzzy() getInternalFuzzy()
- * @method void setInternalFuzzy() setInternalFuzzy(integer $internalFuzzy)
+ * @method void setInternalFuzzy() setInternalFuzzy(int $internalFuzzy)
  * 
  */
 class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Models_Entity_Abstract {
@@ -76,7 +76,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
      * Ex: group index 99 is every matchrate between 90 and 99 
      * 
      * @param string $taskGuid
-     * @param boolean $isExport: is the data requested for export
+     * @param bool $isExport: is the data requested for export
      * @return array
      */
     public function loadByBestMatchRate($taskGuid,$isExport=false){
@@ -187,7 +187,7 @@ class editor_Plugins_MatchAnalysis_Models_MatchAnalysis extends ZfExtended_Model
     /***
      * Init match analysis result array. Fore each assoc language resource one row will be created.
      * @param string $taskGuid
-     * @param boolean $internalFuzzy
+     * @param bool $internalFuzzy
      * @return array|number
      */
     protected function initResultArray($taskGuid,$internalFuzzy){

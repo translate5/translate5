@@ -28,17 +28,17 @@ END LICENSE AND COPYRIGHT
 
 /**
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
- * @method string getSourceLang() getSourceLang()
- * @method void setSourceLang() setSourceLang(integer $id)
+ * @method void setId() setId(int $id)
+ * @method integer getSourceLang() getSourceLang()
+ * @method void setSourceLang() setSourceLang(int $id)
  * @method string getSourceLangRfc5646() getSourceLangRfc5646()
  * @method void setSourceLangRfc5646() setSourceLangRfc5646(string $lang)
- * @method string getTargetLang() getTargetLang()
- * @method void setTargetLang() setTargetLang(integer $id)
+ * @method integer getTargetLang() getTargetLang()
+ * @method void setTargetLang() setTargetLang(int $id)
  * @method string getTargetLangRfc5646() getTargetLangRfc5646()
  * @method void setTargetLangRfc5646() setTargetLangRfc5646(string $lang)
  * @method integer getLanguageResourceId getLanguageResourceId()
- * @method void setLanguageResourceId() setLanguageResourceId(integer $languageResourceId)
+ * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
  * 
  */
 class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity_Abstract {
@@ -81,7 +81,7 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
     }
     
     /***
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @return array
      */
     public function loadByLanguageResourceId($languageResourceId=null){

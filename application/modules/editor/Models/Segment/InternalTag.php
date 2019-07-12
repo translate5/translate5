@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  * TO BE COMPLETED: There are several more places in translate5 which can make use of this class
  * 
  */
-class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstract{
+class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstract {
     
     /**
      * match 0: as usual the whole string
@@ -54,6 +54,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @var string
      */
     const PLACEHOLDER_TEMPLATE='<translate5:escaped id="%s" />';
+    const PLACEHOLDER_TAG='<translate5:escaped>';
     
     public function __construct(){
         $this->replacerRegex=self::REGEX_INTERNAL_TAGS;
@@ -66,8 +67,23 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      * @return array
      */
     public function get(string $segment) {
+        $matches = null;
         preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches);
         return $matches[0];
+    }
+    
+    /**
+     * Get all real (non whitespace) tags
+     * @param string $segment
+     */
+    public function getRealTags(string $segment) {
+        $matches = null;
+        preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches);
+        $realTags = array_filter($matches[3], function($value){
+            return !in_array($value, editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        });
+        //return the real tags (with cleaned index) from matches[0] by the keys from the found real tags above
+        return array_values(array_intersect_key($matches[0], $realTags));
     }
     
     /**
@@ -92,9 +108,48 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
     
     /**
+     * returns an array with several different tag counts to the given segment content
+     * Example result:
+     * (
+     *     [open] => 0          → the content contains no open tags
+     *     [close] => 0         → the content contains no close tags
+     *     [single] => 3        → the content contains 3 single tags
+     *     [whitespace] => 1    → the content contains 1 whitespace tag
+     *     [tag] => 2           → the content contains 2 normal tags
+     *     [all] => 3           → the content contains 3 internal tags at all (equals to count method)
+     * )
+     * 
+     * @param string $segment
+     * @return array
+     */
+    public function statistic(string $segment) {
+        $result = [
+            'open' => 0,
+            'close' => 0,
+            'single' => 0,
+            'whitespace' => 0,
+            'tag' => 0,
+            'all' => 0,
+        ];
+        $matches = null;
+        $result['all'] = preg_match_all(self::REGEX_INTERNAL_TAGS, $segment, $matches);
+        if(!$result['all']) {
+            return $result;
+        }
+        //count whitespace and "normal" tags
+        $result['whitespace'] = count(array_filter($matches[3], function($id){
+            return in_array($id, editor_Models_Segment_Whitespace::WHITESPACE_TAGS);
+        }));
+        $result['tag'] = $result['all'] - $result['whitespace'];
+        
+        //count single|open|close types:
+        return array_merge($result, array_count_values($matches[1]));
+    }
+    
+    /**
      * restores the original escaped tag
      * @param string $segment
-     * @param boolean $whitespaceOnly optional, if true restore whitespace tags only 
+     * @param bool $whitespaceOnly optional, if true restore whitespace tags only 
      * @return mixed
      */
     public function restore(string $segment, $whitespaceOnly = false) {
@@ -132,9 +187,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      *  and the replaced original tags. Warning: it is no usual key => value map, to be compatible with toXliffPaired (details see there)
      *  
      * @param string $segment
-     * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
+     * @param bool $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
-     * @param integer &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
+     * @param int &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
      * @return string segment with xliff tags
      */
     public function toXliff(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
@@ -179,10 +234,75 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     }
     
     /**
+     * converts the given string (mainly the internal tags in the string) into excel tag-placeholder.
+     * Sample:
+     * <img class=".. open .." .. /> => <1>
+     * <img class=".. close .." .. /> => </1>
+     * <img class=".. single .." .. /> => <1 />
+     * because <123> are no real tags, the function uses an "internal tag" <excel 123>. So first all tags are converted to <excel 123> tags.
+     * this "real" tags can be used to exclude them from beeing removed by function strip_tags if $removeOther is true.
+     * After this a simple str_replace is used to convert the internal <excel 123> to the wanted <123> tags
+     * 
+     * The third parameter $replaceMap can be used to return a mapping between the inserted xliff tags 
+     * and the replaced original tags. Warning: it is no usual key => value map, to be compatible with toXliffPaired (details see there)
+     *  
+     * @param string $segment
+     * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
+     * @return string segment with excel pseudo tags
+     */
+    public function toExcel(string $segment, &$replaceMap = null) {
+        //if not external map given, we init it internally, although we don't need it
+        if(is_null($replaceMap)) {
+            $replaceMap = [];
+        }
+        
+        // remove TrackChanges Tags
+        $taghelperTrackChanges = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
+        /* @var $taghelperTrackChanges editor_Models_Segment_TrackChangeTag */
+        $segment = $taghelperTrackChanges->removeTrackChanges($segment);
+        
+        $result = $this->replace($segment, function($match) use (&$replaceMap) {
+            //original id coming from import format
+            $type = $match[1];
+            $innerMatch = [];
+            switch($type) {
+                case 'single':
+                    preg_match(self::REGEX_SINGLETAG, $match[0], $innerMatch);
+                    $result = sprintf('<excel %s />', $innerMatch[1]);
+                    $resultId = sprintf('<%s />', $innerMatch[1]);
+                    break;
+                
+                case 'open':
+                    preg_match(self::REGEX_STARTTAG, $match[0], $innerMatch);
+                    $result = sprintf('<excel %s>', $innerMatch[1]);
+                    $resultId = sprintf('<%s>', $innerMatch[1]);
+                    break;
+                
+                case 'close':
+                    preg_match(self::REGEX_ENDTAG, $match[0], $innerMatch);
+                    $result = sprintf('<excel /%s>', $innerMatch[1]);
+                    $resultId = sprintf('</%s>', $innerMatch[1]);
+                break;
+            }
+            
+            $replaceMap[$resultId] = [$resultId, $match[0]];
+            return $result;
+        });
+        
+        // prevent internal excel tags from beeing removed
+        $result = strip_tags($result, '<excel>');
+        
+        // convert the internal excel tags to the wanted form
+        $result = str_replace('<excel ', '<', $result);
+        
+        return html_entity_decode($result, ENT_XML1);
+    }
+    
+    /**
      * Converts internal tags to xliff2 format
      * @see editor_Models_Segment_InternalTag::toXliff for details see toXliff
      * @param string $segment
-     * @param boolean $removeOther
+     * @param bool $removeOther
      * @param array $replaceMap
      * @param number $newid
      * @return string|mixed
@@ -254,9 +374,9 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
      *  There fore the map is a 2d array: [[</g>, replacement 1],[</g>, replacement 2]] 
      *  
      * @param string $segment
-     * @param boolean $removeOther optional, removes per default all other tags (mqm, terms, etc)
+     * @param bool $removeOther optional, removes per default all other tags (mqm, terms, etc)
      * @param array &$replaceMap optional, returns by reference a mapping between the inserted xliff tags and the replaced original
-     * @param integer &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
+     * @param int &$newid defaults to 1, is given as reference to provide a different startid of the internal tags
      * @return string segment with xliff tags
      */
     public function toXliffPaired(string $segment, $removeOther = true, &$replaceMap = null, &$newid = 1) {
@@ -270,7 +390,7 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     /**
      * @see self::toXliffPaired
      * @param string $segment
-     * @param boolean $removeOther
+     * @param bool $removeOther
      * @param array &$replaceMap
      * @param number &$newid
      * @return string segment with xliff2 tags

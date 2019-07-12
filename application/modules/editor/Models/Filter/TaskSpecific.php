@@ -44,7 +44,7 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6 
     
     /**
      * refactor the state filter given by client, separates task and user states
-     * @param boolean $loadAllAllowed optional, if true current user is allowed to see all tasks
+     * @param bool $loadAllAllowed optional, if true current user is allowed to see all tasks
      */
     public function convertStates($loadAllAllowed = false) {
         //get affected filters: field = state
@@ -184,7 +184,7 @@ class editor_Models_Filter_TaskSpecific extends ZfExtended_Models_Filter_ExtJs6 
     
     /**
      * set the isUserAssocNeeded state
-     * @param boolean $isNeeded
+     * @param bool $isNeeded
      */
     public function setUserAssocNeeded($isNeeded = true) {
         self::$isUserAssocNeeded = $isNeeded;

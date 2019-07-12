@@ -38,14 +38,10 @@ abstract class editor_Test_Testcase extends \ZfExtended_Test_Testcase {
      * @var array
      */
     public static $messages = array();
+    
     /**
-     * 
-     * @param type $name
-     * @param array $data
-     * @param type $dataName
      */
-
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$testTask = ZfExtended_Factory::get('editor_Models_Task');
         parent::setUpBeforeClass();
     }

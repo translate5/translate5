@@ -26,6 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
+/**
+ * Language Resource Connector class
+ * - provides a connection to a concrete language resource, via the internal adapter (which contains the concrete connector instance)
+ * - intercepts some calls to the adapter to provide unified logging etc per each call
+ * - all non intercepted methods are passed directly to the underlying adapter
+ * 
+ * FIXME add __called function names from underlying adapter (ABstractConnector)
+ */
 class editor_Services_Connector {
     
     /***
@@ -79,6 +87,17 @@ class editor_Services_Connector {
         $this->targetLang=$targetLang;
     }
     
+    /**
+     * Init connector for fuzzy usage
+     * @param integer  $analysisId
+     * @return editor_Services_Connector
+     */
+    public function initForFuzzyAnalysis(int $analysisId): editor_Services_Connector {
+        $fuzzyConnector = clone $this;
+        /* @var $fuzzyConnector editor_Services_Connector */
+        $fuzzyConnector->adapter = $fuzzyConnector->adapter->initForFuzzyAnalysis($analysisId);
+        return $fuzzyConnector;
+    }
     
     /***
      * Invoke the query resource action so the MT logger can be used
@@ -98,7 +117,7 @@ class editor_Services_Connector {
      * Invoke search resource action so the MT logger can be used
      * @param string $searchString
      * @param string $field
-     * @param unknown $offset
+     * @param integer $offset
      * @return editor_Services_ServiceResult
      */
     public function search(string $searchString, $field = 'source', $offset = null) {

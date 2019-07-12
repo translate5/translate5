@@ -89,8 +89,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * Attributes for the trackchange-Node 
      * @var string
      */
-    const ATTRIBUTE_USERGUID='data-userguid';
-    const ATTRIBUTE_USERNAME='data-username';
+    const ATTRIBUTE_USERTRACKINGID='data-usertrackingid';
     const ATTRIBUTE_USERCSSNR='data-usercssnr';
     const ATTRIBUTE_WORKFLOWSTEP='data-workflowstep';
     const ATTRIBUTE_TIMESTAMP='data-timestamp';
@@ -100,14 +99,18 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
     const ATTRIBUTE_USERCSSNR_VALUE_PREFIX='usernr';
     
     /**
-     * Array of JSON with the userColorMap from DB's task_meta-Info
+     * the id of the user in the taskUserTracking-table
+     */
+    public $userTrackingId;
+    
+    /**
+     * number for usercss-color (= taskOpenerNumber from taskUserTracking)
      */
     public $userColorNr;
     
     /***
      * Trackchanges workflow step attribute
-     *
-     * @var unknown
+     * @var string
      */
     public $attributeWorkflowstep;
     
@@ -130,13 +133,10 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         
         $node=[];
         $node[]='<'.$nodeName;
-        $node[]='class="'.$this->getTrachChangesCss($nodeName).'"';
+        $node[]='class="'.$this->getTrackChangesCss($nodeName).'"';
         
         // id to identify the user who did the editing (also used for verifying checks)
-        $node[]=self::ATTRIBUTE_USERGUID.'="'.$sessionUser->data->userGuid.'"';
-        
-        // name of the user who did the editing
-        $node[]=self::ATTRIBUTE_USERNAME.'="'.$sessionUser->data->userName.'"';
+        $node[]=self::ATTRIBUTE_USERTRACKINGID.'="'.$this->userTrackingId.'"';
         
         // css-selector with specific number for this user
         $node[]=self::ATTRIBUTE_USERCSSNR.'="'.self::ATTRIBUTE_USERCSSNR_VALUE_PREFIX.$this->userColorNr.'"';
@@ -159,7 +159,7 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
      * @param string $nodeName
      * @return string
      */
-    public function getTrachChangesCss($nodeName){
+    public function getTrackChangesCss($nodeName){
         switch(strtolower($nodeName)) {
             case self::NODE_NAME_DEL:
                 return self::CSS_CLASSNAME_DEL;
@@ -181,5 +181,4 @@ class editor_Models_Segment_TrackChangeTag extends editor_Models_Segment_TagAbst
         $segment= preg_replace('/<'.self::PLACEHOLDER_TAG_DEL.'[^>]+>/', '', $segment);
         return $segment;
     }
-
 }

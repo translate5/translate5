@@ -62,7 +62,7 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     
     /**
      * loads the history entries to one segment, DESC sorted by id (creation), can be limited with $limit parameter 
-     * @param integer $id
+     * @param int $id
      * @param number $limit
      * @return array
      */
@@ -188,8 +188,8 @@ class editor_Models_SegmentHistory extends ZfExtended_Models_Entity_Abstract
     }
     
     /***
-     * Insert record(s) in segment history table for 
-     * autostates and taskguid as condition 
+     * Insert record(s) in segment history table for autostates and taskguid as condition
+     * Attention: no record in segment data history is inserted, because usage is where no related data was changed for the data table 
      * @param string $taskGuid
      * @param array $autoStates
      */

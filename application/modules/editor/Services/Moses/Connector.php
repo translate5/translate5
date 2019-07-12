@@ -96,7 +96,7 @@ class editor_Services_Moses_Connector extends editor_Services_Connector_Abstract
     /***
      * Query the Moses resource with the given search string
      * @param string $searchString
-     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
     protected function queryMosesApi($searchString, $reimportWhitespace = false){

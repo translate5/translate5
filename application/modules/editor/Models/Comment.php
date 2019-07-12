@@ -35,11 +35,11 @@ END LICENSE AND COPYRIGHT
 /**
  * Comment Entity Object
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method integer getSegmentId() getSegmentId()
- * @method void setSegmentId() setSegmentId(integer $segmentId)
+ * @method void setSegmentId() setSegmentId(int $segmentId)
  * @method string getUserGuid() getUserGuid()
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method string getUserName() getUserName()
@@ -67,21 +67,29 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   }
   
   /**
+   * anonymizes a comment that has been markedUp using comment.phtml 
+   * (= replace author given in <span class="author">xyz</span>)
+   * @param string $text
+   */
+  public function renderAnonymizedComment (string $text) {
+      // Details regarding the author ("User1", "User2", ...) are available in the segment's context-column,
+      // hence here we skip turning the given data to "User1" etc.
+      $text = preg_replace('/<span class="author">.*?<\/span>/', '<span class="author"></span>', $text);
+      return $text;
+  }
+  
+  /**
    * updates the segments comments field by merging all comments to the segment, and apply HTML markup to each comment
-   * @param integer $segmentId
+   * @param editor_Models_Segment $segment
    * @param string $taskGuid
    */
-  public function updateSegment(integer $segmentId, string $taskGuid) {
-      $comments = $this->loadBySegmentId($segmentId, $taskGuid);
+  public function updateSegment(editor_Models_Segment $segment, string $taskGuid) {
+      $comments = $this->loadBySegmentId($segment->getId(), $taskGuid);
       $commentsMarkup = array();
       $view = clone Zend_Layout::getMvcInstance()->getView();
       foreach($comments as $comment) {
           $commentsMarkup[] = $this->getMarkedUp($view, $comment);
       }
-      $segment = ZfExtended_Factory::get('editor_Models_Segment');
-      /* @var $segment editor_Models_Segment */
-      $segment->load($segmentId);
-      
       if($taskGuid === $segment->get('taskGuid')) {
           $segment->set('comments', join("\n", $commentsMarkup));
           $segment->save();
@@ -91,13 +99,13 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
   /**
    * loads all comments to the given segmentId, filter also only the session loaded taskguid
    * sorts from newest to oldest comment, does compute the isEditable flag
-   * @param integer $segmentId
+   * @param int $segmentId
    * @param string $taskGuid
    * @return array
    */
-  public function loadBySegmentId(integer $segmentId, string $taskGuid) {
+  public function loadBySegmentId(int $segmentId, string $taskGuid) {
       $sessionUser = new Zend_Session_Namespace('user');
-      $userGuid = isset($sessionUser->data->userGuid) ? $sessionUser->data->userGuid : null;
+      $userGuid = $sessionUser->data->userGuid ?? null;
       $comments = $this->loadBySegmentAndTaskPlain($segmentId, $taskGuid);
       $editable = true;
       //comment is editable until an other user has edited it. 
@@ -113,7 +121,7 @@ class editor_Models_Comment extends ZfExtended_Models_Entity_Abstract {
    * Loads all comments of a segment by segmentid and taskguid, orders by creation order
    * does not provide isEditable info
    */
-  public function loadBySegmentAndTaskPlain(integer $segmentId, string $taskGuid) {
+  public function loadBySegmentAndTaskPlain(int $segmentId, string $taskGuid) {
       $s = $this->db->select()
       ->where('taskGuid = ?', $taskGuid)
       ->where('segmentId = ?', $segmentId)

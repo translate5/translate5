@@ -106,7 +106,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $termCount=$config->runtimeOptions->termportal->searchTermsCount;
         
         if(isset($params['term'])){
-            $languages=isset($params['language']) ? $params['language'] : null;
+            $languages = $params['language'] ?? null;
             
             //if the limit is disabled, do not use it
             if(isset($params['disableLimit']) && $params['disableLimit']=="true"){

@@ -51,8 +51,8 @@ class Editor_CustomerController extends ZfExtended_RestController {
         if(!$this->isAllowed("backend","customerAdministration")){
             throw new ZfExtended_NoAccessException();
         }
-        
-        return parent::indexAction();
+        parent::indexAction();
+        $this->cleanUpOpenIdForDefault();
     }
     
     public function postAction() {
@@ -63,8 +63,8 @@ class Editor_CustomerController extends ZfExtended_RestController {
         try {
             return parent::postAction();
         }
-        catch(Zend_Db_Statement_Exception $e) {
-            $this->handleDuplicateNumber($e);
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            $this->handleDuplicate($e);
         }
     }
     
@@ -76,8 +76,8 @@ class Editor_CustomerController extends ZfExtended_RestController {
         try {
             return parent::putAction();
         }
-        catch(Zend_Db_Statement_Exception $e) {
-            $this->handleDuplicateNumber($e);
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+            $this->handleDuplicate($e);
         }
     }
     
@@ -85,12 +85,11 @@ class Editor_CustomerController extends ZfExtended_RestController {
         try {
             parent::deleteAction();
         }
-        catch(Zend_Db_Statement_Exception $e) {
-            $m = $e->getMessage();
-            if(stripos($m, 'Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails') !== false) {
-                 throw new ZfExtended_Models_Entity_Conflict('A client cannot be deleted as long as tasks are assigned to this client.', 0, $e);
-            }
-            throw $e;
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1047' => 'A client cannot be deleted as long as tasks are assigned to this client.'
+            ], 'editor.customer');
+            throw new ZfExtended_Models_Entity_Conflict('E1047');
         }
     }
     
@@ -136,6 +135,63 @@ class Editor_CustomerController extends ZfExtended_RestController {
         });
     }
     
+    protected function decodePutData(){
+        parent::decodePutData();
+        $this->handleDomainField();
+    }
+    
+    /***
+     * Handle the domain field from the post/put request data.
+     */
+    protected function handleDomainField(){
+        if(!isset($this->data->domain)){
+            return;
+        }
+        //because it is uniqe key, do not allow empty value
+        if(empty($this->data->domain)){
+            $this->data->domain=null;
+            return;
+        }
+        //add always / at the end of the url
+        if(substr($this->data->domain,-1)!=='/'){
+            $this->data->domain.='/';
+        }
+        
+        //remove always the protocol if it is provided by the api or frontend
+        $disallowed = array('http://', 'https://');
+        foreach($disallowed as $d) {
+            if(strpos($this->data->domain, $d) === 0) {
+                $this->data->domain=str_replace($d, '', $this->data->domain);
+            }
+        }
+    }
+    
+    /***
+     * Remove the openid data for the default customer if it is configured so
+     */
+    protected function cleanUpOpenIdForDefault(){
+        $config = Zend_Registry::get('config');
+        $showOpenIdForDefault=(boolean)$config->runtimeOptions->customers->openid->showOpenIdDefaultCustomerData;
+        if($showOpenIdForDefault){
+            return;
+        }
+        
+        foreach ($this->view->rows as &$row){
+            if($row['number']!=editor_Models_Customer::DEFAULTCUSTOMER_NUMBER){
+                continue;
+            }
+            $row['domain']=null;
+            $row['openIdServer']=null;
+            $row['openIdIssuer']=null;
+            $row['openIdAuth2Url']=null;
+            $row['openIdServerRoles']=null;
+            $row['openIdClientId']=null;
+            $row['openIdClientSecret']=null;
+            $row['openIdRedirectLabel']=null;
+            $row['openIdRedirectCheckbox']=null;
+        }
+    }
+    
     /**
      * Protect the default customer from being edited or deleted.
      */
@@ -152,18 +208,21 @@ class Editor_CustomerController extends ZfExtended_RestController {
      * @param Zend_Db_Statement_Exception $e
      * @throws Zend_Db_Statement_Exception
      */
-    protected function handleDuplicateNumber(Zend_Db_Statement_Exception $e) {
-        $msg = $e->getMessage();
-        if(stripos($msg, 'Duplicate entry') === false || stripos($msg, "for key ") === false) {
-            throw $e; //otherwise throw this again
+    protected function handleDuplicate(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+        if($e->isInMessage('domain_UNIQUE')){
+            ZfExtended_UnprocessableEntity::addCodes([
+                'E1104' => 'This domain is already in use.'
+            ], 'editor.customer');
+            throw ZfExtended_UnprocessableEntity::createResponse('E1104', [
+                'domain' => ['duplicateDomain' => 'Diese Domain wird bereits verwendet.']
+            ]);
         }
-    
-        $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
-    
-        $errors = array('number' => $t->_('Diese Kundennummer wird bereits verwendet.'));
-        $e = new ZfExtended_ValidateException();
-        $e->setErrors($errors);
-        $this->handleValidateException($e);
+        
+        ZfExtended_UnprocessableEntity::addCodes([
+            'E1063' => 'The given client-number is already in use.'
+        ], 'editor.customer');
+        throw ZfExtended_UnprocessableEntity::createResponse('E1063', [
+            'number' => ['duplicateClientNumber' => 'Diese Kundennummer wird bereits verwendet.']
+        ]);
     }
 }

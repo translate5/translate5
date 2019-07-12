@@ -29,7 +29,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Entity Model for segment fields
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method string getName() getName()
@@ -40,10 +40,10 @@ END LICENSE AND COPYRIGHT
  * @method void setLabel() setLabel(string $label)
  * @method string getWidth() getWidth()
  * @method void setWidth() setWidth(string $width)
- * @method string getRankable() getRankable()
- * @method void setRankable() setRankable(boolean $rankable)
- * @method string getEditable() getEditable()
- * @method void setEditable() setEditable(boolean $editable)
+ * @method boolean getRankable() getRankable()
+ * @method void setRankable() setRankable(bool $rankable)
+ * @method boolean getEditable() getEditable()
+ * @method void setEditable() setEditable(bool $editable)
  */
 class editor_Models_SegmentField extends ZfExtended_Models_Entity_Abstract {
     //consts also defined in GUI Model Editor.model.segment.Field 

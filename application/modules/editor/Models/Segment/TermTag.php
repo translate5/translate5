@@ -69,8 +69,8 @@ class editor_Models_Segment_TermTag {
     
     /**
      * replaces term tags with either the callback or the given scalar
-     * @see preg_replace
-     * @see preg_replace_callback
+     * see preg_replace
+     * see preg_replace_callback
      * @param string $segment
      * @param string|Callable $startTagReplacer If callable, parameters: $wholeMatch, $tbxId, array $cssClasses, $wholeSegment
      * @param string $endTagReplacer scalar only, since str_replace is used insted of preg_replace
@@ -105,7 +105,7 @@ class editor_Models_Segment_TermTag {
     /**
      * Removes term tags. Warning: if unsure if your content contains internal tags set parameter preserveInternal to true!
      * @param string $segment the segment content
-     * @param boolean $preserveInternal if true, internal tags are masked before removing term tags.
+     * @param bool $preserveInternal if true, internal tags are masked before removing term tags.
      */
     public function remove(string $segment, $preserveInternal = false) {
         

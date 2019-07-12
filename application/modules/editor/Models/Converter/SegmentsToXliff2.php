@@ -104,27 +104,42 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected $workflowStep = null;
     
     /***
-      Mapping of translate5 autostates to xliff 2.x default segment state is as follows:
-			translate5 autostatus			->	mapped xliff status
-			--------------------------------------------------------
-			untranslated		 			-> initial
-			blocked							-> initial
+      Mapping of translate5 autostates to xliff 2.x substate to xliff 2.x default segment state is as follows.
+      
+			Please note: 
+			- "auto-set" are status flags, that are set by the "translate5 repetition editor" (auto-propagate)
+			- "untouched, auto-set" are status flags, that are changed automatically when a user finishes its job, because the finish means approval of everything, he did not touch manually.
 			
-			translated						-> translated
-			auto-translated					-> translated
+			translate5 autostatus			->	xliff 2.x substate	->	mapped xliff status
+			--------------------------------------------------------------------------------
+
+		//before translate5 workflow starts
+			not translated		 			->	not_translated				->	initial
+			blocked							->	blocked						->	initial
+		
+		//1st default translate5 workflow step: set in translation step or initial status before review only workflow
+			translated						->	translated					->	translated
+			translated, auto-set			->	translated_auto				->	translated
 			
-			reviewed					    -> reviewed
-			auto-reviewed					-> reviewed
-			reviewed, untouched, auto-set	-> reviewed
-			reviewed, untouched				-> reviewed
-			auto-reviewed, untouched		-> reviewed
+		//2nd default translate5 workflow step: set in review workflow step
+			reviewed					    ->	reviewed					->	reviewed
+			reviewed, auto-set				->	reviewed_auto				->	reviewed
+			reviewed, untouched, auto-set
+				at finish of workflow step	->	reviewed_untouched			->	reviewed 
+			reviewed, unchanged				->	reviewed_unchanged			->	reviewed
+			reviewed, unchanged, auto-set	->	reviewed_unchanged_auto		->	reviewed
+		
+		//3rd default translate5 workflow step: set during check of the review by the translator
+			Review checked by translator	->	reviewed_translator			->	final
+			Review checked by translator, 
+				auto-set					->	reviewed_translator_auto	->	final
 			
-			translator reviewed				-> final
-			translator autoreviewed			-> final
-			PM reviewed						-> final
-			PM auto-reviewed				-> final
-			PM reviewed, unchanged			-> final
-			PM auto-reviewed, unchanged 	-> final
+		//Not part of the translate5 workflow - done by the PM at any time of the workflow
+			PM reviewed						->	reviewed_pm					->	final
+			PM reviewed, auto-set			->	reviewed_pm_auto			->	final
+			PM reviewed, unchanged			->	reviewed_pm_unchanged		->	final
+			PM reviewed, unchanged, auto-set->	reviewed_pm_unchanged_auto	->	final
+			
        @var array
      */
     protected $segmentStateMap=[
@@ -165,6 +180,12 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      */
     private $xliffCommentsApplied=[
     ];
+    
+    /**
+     * Array with taskUserTracking-data of our task
+     * @var array
+     */
+    protected $trackingData = [];
     
     /***
      * Segment id xliff prefix
@@ -265,6 +286,13 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
             
         },$allUsers);
         
+        // prepare tracking-data of this task
+        $taskUserTracking = ZfExtended_Factory::get('editor_Models_TaskUserTracking');
+        /* @var $taskUserTracking editor_Models_TaskUserTracking */
+        $taskUserTrackingData = $taskUserTracking->getByTaskGuid($this->task->getTaskGuid());
+        foreach ($taskUserTrackingData as $value) {
+            $this->trackingData[$value['id']] = (object)['userGuid' => $value['userGuid'],'userName' => $value['userName']];
+        }
         
         //init the manual status
         $this->config = Zend_Registry::get('config');
@@ -414,7 +442,7 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
      * @param array $segment
      */
     protected function processComment(array $segment) {
-        $comments = $this->comment->loadBySegmentAndTaskPlain((integer)$segment['id'], $this->task->getTaskGuid());
+        $comments = $this->comment->loadBySegmentAndTaskPlain((int)$segment['id'], $this->task->getTaskGuid());
         
         
         //add the comment only once
@@ -685,12 +713,13 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
     protected function trackChangesAsMrk($text){
         $insOpenTag='/<ins[^>]*>/i';
         $delOpenTag='/<del[^>]*>/i';
-        $attributesRegex='/(data-userguid|data-username|data-timestamp)=("[^"]*")/i';
+        $attributesRegex='/(data-userguid|data-username|data-usertrackingid|data-timestamp)=("[^"]*")/i';
         //parametar map between ins/del tags and the new mrk ins/del tags
         $paramMap=[
-                'data-userguid'=>'translate5:userGuid',
-                'data-username'=>'translate5:username',
-                'data-timestamp'=>'translate5:date'
+            'data-userguid'=>'translate5:userGuid', // keep userGuid and username for tasks with TrackChange-Tags before anonymizing was implemented
+            'data-username'=>'translate5:username',
+            'data-usertrackingid'=>'translate5:username', // NOT userName, must be the same as before from data-username
+            'data-timestamp'=>'translate5:date'
         ];
         
         //find the ins or delete tags
@@ -717,6 +746,17 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
                             
                         }
                         $argValue='"'.$argValue.'"';
+                    }
+                    
+                    //convert the username and userGuid from data-usertrackingid ...
+                    if($argName==='translate5:username'){
+                        $userTrackingId = str_replace('"','', $argValue);
+                        // ... but only when from data-usertrackingid (= e.g "90"), not from data-username (= e.g. "Project Manager")
+                        // (in other words: if a taskUserTracking-entry exists; the data-username might be "1001" and thus numeric, too)
+                        if(array_key_exists($userTrackingId, $this->trackingData)) {
+                            $tracked = $this->trackingData[$userTrackingId];
+                            $argValue='"'.$tracked->userName.'" translate5:userGuid="'.$tracked->userGuid.'"';
+                        }
                     }
                     
                     $buildTag[$argName]=$argValue;
@@ -789,70 +829,88 @@ class editor_Models_Converter_SegmentsToXliff2 extends editor_Models_Converter_S
         switch ($commentType){
             case 'unitComment':
                 $unitComment[]='<!-- unit id is the segmentNrInTask of LEK_segment in translate5 with the prefix "unit"; Since we only use on segment per unit in translate5 changes xliff, the segment id is the same, but with the prefix "seg";
-                    	its:person is the translator name, if assigned in translate5; if no translator is assigned, it is the user of the translator-check;
-                    	translate5:personGuid is the corresponding userGuid of the person-attribute
-                    	its:revPerson is the proofreader, if assigned in translate5;
-                    	translate5:revPersonGuid is the userGuid of the proofreader;
-                    	- if more than one proofreader or translator is assigned, the above attributes refer to the translator or proofreader
-                    	  that edited the segment the last time / set the autostatus flag the last time;
-                    	- if the last editor is no person, that is assigned to the task, it may be the project manager. If it is the project manager,
-                    	  the project manager of the task is used in the following way: If the workflow step that is currently finishd is translation
-                    	  or translator-check, the PM is used for its:person. If the current workflow step is proofreading,
-                    	  than the project manager is used for its:revPerson
-                    	- if the last editor of a segment is no assigned user and not the PM, but we have more than one user assigned for a
-                    	  role, than we use the value "undefined".
-                    	- if no user is assigned for a role, we omit the attribute (be it its:person or its:revPerson).
-                    	translate5:manualStatus is omitted, if empty
-                    	 -->';
+its:person is the translator name, if assigned in translate5; if no translator is assigned, it is the user of the translator-check;
+translate5:personGuid is the corresponding userGuid of the person-attribute
+its:revPerson is the proofreader, if assigned in translate5;
+translate5:revPersonGuid is the userGuid of the proofreader;
+- if more than one proofreader or translator is assigned, the above attributes refer to the translator or proofreader
+  that edited the segment the last time / set the autostatus flag the last time;
+- if the last editor is no person, that is assigned to the task, it may be the project manager. If it is the project manager,
+  the project manager of the task is used in the following way: If the workflow step that is currently finishd is translation
+  or translator-check, the PM is used for its:person. If the current workflow step is proofreading,
+  than the project manager is used for its:revPerson
+- if the last editor of a segment is no assigned user and not the PM, but we have more than one user assigned for a
+  role, than we use the value "undefined".
+- if no user is assigned for a role, we omit the attribute (be it its:person or its:revPerson).
+translate5:manualStatus is omitted, if empty
+-->';
                 break;
             case 'autostateMapComment':
                 $unitComment[]='<!--
-                              translate5 autostates show the segment state more in detail, than xliff 2 is able to. To reflect the Autostates the substate attribute of xliff 2 is used. Autostates are mapped to xliff 2 segment state as best as possible
-                    
-                              mapping of translate5 autostates to xliff 2.x default segment state is as follows:
-                            		translate5 autostatus (substate)->	mapped xliff status
-                            		untranslated		 			-> initial
-                            		blocked							-> initial
-                            		translated						-> translated
-                            		auto-translated					-> translated
-                            		reviewed						-> reviewed
-                            		auto-reviewed					-> reviewed
-                            		reviewed, untouched, auto-set	-> reviewed
-                            		reviewed, untouched				-> reviewed
-                            		auto-reviewed, untouched		-> reviewed
-                            		translator reviewed				-> final
-                            		translator autoreviewed			-> final
-                            		PM reviewed						-> final
-                            		PM auto-reviewed				-> final
-                            		PM reviewed, unchanged			-> final
-                            		PM auto-reviewed, unchanged 	-> final
-                    
-                            		-->';
+translate5 autostates show the segment state more in detail, than xliff 2 is able to. To reflect the Autostates the substate attribute of xliff 2 is used. Autostates are mapped to xliff 2 segment state as best as possible
+
+Mapping of translate5 autostates to xliff 2.x substate to xliff 2.x default segment state is as follows.
+
+Please note: 
+- "auto-set" are status flags, that are set by the "translate5 repetition editor" (auto-propagate)
+- "untouched, auto-set" are status flags, that are changed automatically when a user finishes its job, because the finish means approval of everything, he did not touch manually.
+
+translate5 autostatus			->	xliff 2.x substate	->	mapped xliff status
+===============================================================================
+
+//before translate5 workflow starts
+not translated		 			->	not_translated				->	initial
+blocked							->	blocked						->	initial
+
+//1st default translate5 workflow step: set in translation step or initial status before review only workflow
+translated						->	translated					->	translated
+translated, auto-set			->	translated_auto				->	translated
+
+//2nd default translate5 workflow step: set in review workflow step
+reviewed					    ->	reviewed					->	reviewed
+reviewed, auto-set				->	reviewed_auto				->	reviewed
+reviewed, untouched, auto-set
+	at finish of workflow step	->	reviewed_untouched			->	reviewed 
+reviewed, unchanged				->	reviewed_unchanged			->	reviewed
+reviewed, unchanged, auto-set	->	reviewed_unchanged_auto		->	reviewed
+
+//3rd default translate5 workflow step: set during check of the review by the translator
+Review checked by translator	->	reviewed_translator			->	final
+Review checked by translator, 
+	auto-set					->	reviewed_translator_auto	->	final
+
+//Not part of the translate5 workflow - done by the PM at any time of the workflow
+PM reviewed						->	reviewed_pm					->	final
+PM reviewed, auto-set			->	reviewed_pm_auto			->	final
+PM reviewed, unchanged			->	reviewed_pm_unchanged		->	final
+PM reviewed, unchanged, auto-set->	reviewed_pm_unchanged_auto	->	final
+		
+-->';
                 break;
             case 'mrkTagComment':
                 $unitComment[]='<!-- The translate5:translated attribut on mrk-tags of type="term" shows, if the marked term has been found as translated in the corresponding target segment or not.
-    		     The allowed values are "found", "notfound" and "undefined". Undefined usually means, that no term has been defined in the target language of the terminology.
-    		     The translate5:translated attribute can only occur inside of the source-tag.
-                    
-    		     The translate5:status  attribut on mrk-tags of type="term" shows the term classification of the term in the terminology.
-    		     Its values can be one of the following: preferredTerm, admittedTerm, legalTerm, regulatedTerm, standardizedTerm, deprecatedTerm, supersededTerm.
-    		     translate5:status can occur in mrk tags inside of source AND target tags.
-    	           -->';
+ The allowed values are "found", "notfound" and "undefined". Undefined usually means, that no term has been defined in the target language of the terminology.
+ The translate5:translated attribute can only occur inside of the source-tag.
+	
+ The translate5:status  attribut on mrk-tags of type="term" shows the term classification of the term in the terminology.
+ Its values can be one of the following: preferredTerm, admittedTerm, legalTerm, regulatedTerm, standardizedTerm, deprecatedTerm, supersededTerm.
+ translate5:status can occur in mrk tags inside of source AND target tags.
+   -->';
                 break;
             case 'qmAndTrachChangesComment':
                 $unitComment[]='<!--
-            			If there is a QM flag on the entire segment in translate5, an mrk-tag surrounding the entire segment content with the attribute its:locQualityIssuesRef is used.
-            			The value of the its:locQualityIssuesRef attribute contains the translate5-specific ids of all qm flags, that are added to the entire segment.
-            			The ids are separated by underscore (this means the id e. g. looks like "1_3_5", if three QM flags have been selected for the segment and they have the ids 1, 3 and 5 in translate5).
-            			The actual values of the qm-flags are listed in the its:locQualityIssues tag above.
-                    -->
-                            
-                    <!--
-            			mrk-tags with the translate5:trackChanges attribute show, where changes have been made inside of the segment.
-            			translate5:trackChanges="ins" reflect inserted strings and translate5:trackChanges="del" show deleted strings.
-            			The other attributes of these mrk tags are self-explaining. The value of the id is random, since inside of translate5 there is no id for these tags.
-            			The value of translate5:date is in the format  "2017-12-06 13:12:34"
-            		-->';
+If there is a QM flag on the entire segment in translate5, an mrk-tag surrounding the entire segment content with the attribute its:locQualityIssuesRef is used.
+The value of the its:locQualityIssuesRef attribute contains the translate5-specific ids of all qm flags, that are added to the entire segment.
+The ids are separated by underscore (this means the id e. g. looks like "1_3_5", if three QM flags have been selected for the segment and they have the ids 1, 3 and 5 in translate5).
+The actual values of the qm-flags are listed in the its:locQualityIssues tag above.
+-->
+	
+<!--
+mrk-tags with the translate5:trackChanges attribute show, where changes have been made inside of the segment.
+translate5:trackChanges="ins" reflect inserted strings and translate5:trackChanges="del" show deleted strings.
+The other attributes of these mrk tags are self-explaining. The value of the id is random, since inside of translate5 there is no id for these tags.
+The value of translate5:date is in the format  "2017-12-06 13:12:34"
+-->';
                 break;
             case 'commentsComment':
                 $unitComment[]='<!-- the note id reflects the id in LEK_comments table of translate5 -->';

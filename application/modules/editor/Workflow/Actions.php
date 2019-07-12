@@ -82,8 +82,8 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         try {
             $this->config->workflow->doWithTask($oldTask, $task);
         }
-        catch (ZfExtended_Models_Entity_Conflict $e) {
-            //ignore entity conflict here
+        catch (ZfExtended_Models_Entity_NoAccessException $e) {
+            //ignore no access here. Access may by declined by the called workflow. But this may not block the end via workflow action.
         }
         
         if($oldTask->getState() != $task->getState()) {
@@ -108,7 +108,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         $pmId = $user->getId();
         $aclInstance = ZfExtended_Acl::getInstance();
         $roles = $user->getRoles();
-        $pmSeeAll = !empty($roles) && $aclInstance->isInAllowedRoles(explode(',', $roles), 'backend', 'seeAllUsers');
+        $pmSeeAll = !empty($roles) && $aclInstance->isInAllowedRoles($roles, 'backend', 'seeAllUsers');
         
         $sourceLang = $task->getSourceLang();
         $targetLang = $task->getTargetLang();
@@ -147,7 +147,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     
     /**
      * Associates automatically a different PM (The one who starts the import is the default) to the task by the PMs languages
-     * @return the new PM user, false if no one found
+     * @return ZfExtended_Models_User|false the new PM user, false if no one found
      */
     public function autoAssociateTaskPm() {
         $task = $this->config->task;

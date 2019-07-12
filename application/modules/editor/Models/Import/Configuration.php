@@ -77,11 +77,6 @@ class editor_Models_Import_Configuration {
     public $importFolder;
     
     /**
-     * @var boolean
-     */
-    public $isCheckRun = false;
-
-    /**
      * initial userguid of the segments
      * @var string
      */
@@ -98,6 +93,12 @@ class editor_Models_Import_Configuration {
      * @var integer
      */
     public $workerId; 
+    
+    /**
+     * if true, the uploaded files are only processed if the file extension is supported. Conversion plug-ins may disable that.
+     * @var boolean
+     */
+    public $checkFileType = true;
     
     /**
      * needed internally for de/serialization 
@@ -179,7 +180,7 @@ class editor_Models_Import_Configuration {
     
     /**
      * validiert / filtert die Get-Werte
-     * @throws Zend_Exception
+     * @throws editor_Models_Import_ConfigurationException
      */
     protected function validateParams($taskGuid){
         
@@ -190,57 +191,52 @@ class editor_Models_Import_Configuration {
             $this->relaisLang = null;
         }
         
-        $_langErrors = array(
-            'source' => 'The passed source language %s is not valid.',
-            'target' => 'The passed target language  %s is not valid.',
-            'relais' => 'The import did not contain files for the relais language %s.',
-        );
-        
         $guidValidator = new ZfExtended_Validate_Guid();
         $validateUsername = new Zend_Validate_Regex('"[A-Za-z0-9 \-]+"');
         if(!$guidValidator->isValid($taskGuid)){
-            throw new Zend_Exception('Die übergebene taskGuid '.$taskGuid.' ist keine valide GUID.');
+            //The given taskGuid was not valid GUID.
+            throw new editor_Models_Import_ConfigurationException('E1035',['taskGuid' => $taskGuid]);
         }
         if(!$guidValidator->isValid($this->userGuid)){
-            throw new Zend_Exception('Die übergebene userGuid '.$this->userGuid.' ist keine valide GUID.');
+            //The given userGuid was not valid GUID.
+            throw new editor_Models_Import_ConfigurationException('E1036',['userGuid' => $this->userGuid]);
         }
         if(!$validateUsername->isValid($this->userName)){
-            throw new Zend_Exception('Der übergebene _userName '.$this->userName.' ist kein valider Username.');
+            //The given userName was not valid user name.
+            throw new editor_Models_Import_ConfigurationException('E1037',['userName' => $this->userName]);
         }
         if(is_null($this->sourceLang)){
-            throw new Zend_Exception(sprintf($_langErrors['source'], $this->sourceLangValue));
+            //The passed source language is not valid.
+            throw new editor_Models_Import_ConfigurationException('E1032',['language' => $this->sourceLangValue]);
         }
         if(is_null($this->targetLang)){
-            throw new Zend_Exception(sprintf($_langErrors['target'], $this->targetLangValue));
+            //The passed target language is not valid.
+            throw new editor_Models_Import_ConfigurationException('E1033',['language' => $this->targetLangValue]);
         }
         if(!empty($this->relaisLangValue) && is_null($this->relaisLang)){
-            throw new Zend_Exception(sprintf($_langErrors['relais'], $this->relaisLangValue));
+            //The import did not contain relais files but a relais language was given
+            throw new editor_Models_Import_ConfigurationException('E1034',['language' => $this->relaisLangValue]);
         }
     }
     
     /**
      * validiert die nötigen Import Verzeichnisse
-     * @throws Zend_Exception
+     * @throws editor_Models_Import_ConfigurationException
      */
     protected function validateImportFolders(){
-        $error = '';
         if(!is_dir($this->importFolder)){
-            $error .= 'Der übergebene importRootFolder '.$this->importFolder.' existiert nicht.';
+            //The import root folder does not exist.
+            throw new editor_Models_Import_ConfigurationException('E1038', ['folder' => $this->importFolder]);
         }
-        if(!is_dir($this->getProofReadDir()) || empty(glob($this->getProofReadDir().'/*'))){
-            $error .= 'Der übergebene ProofReadFolder '.$this->getProofReadDir().' existiert nicht oder ist leer.';
+        $data = ['proofRead' => basename($this->getProofReadDir())];
+        if(!is_dir($this->getProofReadDir())){
+            //The imported package did not contain a valid proofRead folder.
+            throw new editor_Models_Import_ConfigurationException('E1039', $data);
         }
-        
-        if (empty($error)) {
-            return;
+        if(empty(glob($this->getProofReadDir().'/*'))){
+            //The imported package did not contain any files in the proofRead folder.
+            throw new editor_Models_Import_ConfigurationException('E1040', $data);
         }
-        
-        if(Zend_Registry::isRegistered('rest_messages')) {
-            $messages = Zend_Registry::get('rest_messages');
-            /* @var $messages ZfExtended_Models_Messages */
-            $messages->addError($error);
-        }
-        throw new Zend_Exception($error);
     }
     
     /**

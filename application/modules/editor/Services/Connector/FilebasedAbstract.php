@@ -94,11 +94,22 @@ abstract class editor_Services_Connector_FilebasedAbstract extends editor_Servic
     abstract public function getTm($mime);
     
     /**
-     * Returns an associative array of filetypes which can be uploaded to the underlying system
-     *  key: file extension
-     *  value: mimetype
+     * Returns an associative array of filetypes which can be uploaded to the underlying system.
+     * 'Accept' in the header can take multiple types; to provide this we use an array with strings for the values.
+     *  key: (string) file extension
+     *  value: (string[]) mimetype(s)
+     * @return array
      */
     abstract public function getValidFiletypes();
+    
+    /**
+     * Returns an associative array of filetypes which can be exported by the underlying system.
+     * 'Content-Type' in the header takes a single media-type only => value MUST BE A SINGLE STRING; not an array with strings.
+     *  key: (string) file extension
+     *  value: (string) mimetype
+     * @return array
+     */
+    abstract public function getValidExportTypes();
 
     /**
      * Deletes the connected TM on the configured Resource

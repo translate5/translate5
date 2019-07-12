@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:ax="AcrossXliff" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd" ax:time-stamp="06/27/2017 17:23:18">
+  <file source-language="de-DE" ax:src-lang="959c4834-a4db-44c7-8d09-011abaa866a3" target-language="en-EN" ax:trg-lang="7ea90d97-dcfc-4341-a1ca-2d55c1d593eb" original="test.docx" datatype="x-across-translation" category="General" ax:start-date="07/07/2017 19:00:00" ax:due-date="07/17/2017 19:00:00">
+    <header>
+      <tool tool-id="Across.XLIFF" tool-name="Across.XLIFF" tool-version="1.1" tool-company="Across Systems GmbH" />
+      <ax:project>
+        <ax:name>Across Match Rate Import Test</ax:name>
+      </ax:project>
+      <ax:properties>
+        <ax:property name="subjects">
+          <ax:value>General</ax:value>
+        </ax:property>
+      </ax:properties>
+    </header>
+    <body>
+       <trans-unit id="14" maxwidth="75" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testwort<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph></source>
+        <target><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testword<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph></target>
+        <alt-trans match-quality="100%">
+          <source>Testwort</source>
+          <target>Testword</target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Thomas</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>12/13/2018 13:07:04</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Someone</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>11/10/2019 15:38:29</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+            <ax:property name="Fachgebiete">
+              <ax:value>Translate5</ax:value>
+              <ax:value>Tests</ax:value>
+            </ax:property>
+            <ax:property name="Relationen">
+              <ax:value>MittagQI</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="53" maxwidth="450" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
+        <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext one<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph></source>
+        <seg-source><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext eins</mrk> <mrk mtype="seg" mid="2">Testtext zwei</mrk> <mrk mtype="seg" mid="3">Testtext 3</mrk> </seg-source>
+        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>testtext one</mrk> <mrk mtype="seg" mid="2">text text two</mrk> <mrk mtype="seg" mid="3">texttext three</mrk></target>
+        <alt-trans mid="1" match-quality="80%">
+          <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext 1</source>
+          <target><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>Testtext 1</target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Thomas</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>12/13/2018 13:07:04</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Someone</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>11/10/2019 15:38:29</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+            <ax:property name="Fachgebiete">
+              <ax:value>Translate5</ax:value>
+              <ax:value>Tests</ax:value>
+            </ax:property>
+            <ax:property name="Relationen">
+              <ax:value>MittagQI</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+        <alt-trans mid="2" match-quality="77%">
+          <source>Testtext 2</source>
+          <target>testtext 2</target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Thomas</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>12/13/2018 13:07:04</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Someone</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>11/10/2019 15:38:29</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+            <ax:property name="Fachgebiete">
+              <ax:value>Translate5</ax:value>
+              <ax:value>Tests</ax:value>
+            </ax:property>
+            <ax:property name="Relationen">
+              <ax:value>MittagQI</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+        <alt-trans mid="3" match-quality="94%">
+          <source>Testtext 3</source>
+          <target>testtext 3</target>
+          <ax:properties>
+            <ax:property name="CreatedBy">
+              <ax:value>Thomas</ax:value>
+            </ax:property>
+            <ax:property name="Created">
+              <ax:value>12/13/2018 13:07:04</ax:value>
+            </ax:property>
+            <ax:property name="ModifiedBy">
+              <ax:value>Someone</ax:value>
+            </ax:property>
+            <ax:property name="Modified">
+              <ax:value>11/10/2019 15:38:29</ax:value>
+            </ax:property>
+            <ax:property name="State">
+              <ax:value>SmartInserted</ax:value>
+            </ax:property>
+            <ax:property name="Fachgebiete">
+              <ax:value>Translate5</ax:value>
+              <ax:value>Tests</ax:value>
+            </ax:property>
+            <ax:property name="Relationen">
+              <ax:value>MittagQI</ax:value>
+            </ax:property>
+          </ax:properties>
+        </alt-trans>
+      </trans-unit>
+      <trans-unit id="92" translate="no" ax:state-name="KeepSource" ax:state-id="1" ax:state-flags="1024">
+        <source>ohne match</source>
+        <target>without match</target>
+        <ax:named-properties>
+          <ax:named-property name="Comment">
+            <ax:named-value ax:name="Annotates">Target</ax:named-value>
+            <ax:named-value ax:name="Author">tester</ax:named-value>
+            <ax:named-value ax:name="Text">Imported Comment Text</ax:named-value>
+            <ax:named-value ax:name="Created">02/20/2019 12:55:20</ax:named-value>
+            <ax:named-value ax:name="Title">Imported Comment Title</ax:named-value>
+          </ax:named-property>
+        </ax:named-properties>
+      </trans-unit>
+      <!-- next segment test TRANSLATE-1684 -->
+      <trans-unit id="93" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="8388608">
+        <source><bpt id="1" rid="1" ax:s-id="2" ax:s-is-base-style="True" ax:s-font-name="Arial" ax:s-font-size="7.0" /><bpt id="3" rid="2" ax:s-id="6" ax:s-font-name="Wingdings 2" /><ept id="4" rid="2" /><ept id="2" rid="1" /></source>
+        <target><bpt id="1" rid="1" ax:s-id="2" ax:s-is-base-style="True" ax:s-font-name="Arial" ax:s-font-size="7.0" /><bpt id="3" rid="2" ax:s-id="6" ax:s-font-name="Wingdings 2" /><ept id="4" rid="2" /><ept id="2" rid="1" /></target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

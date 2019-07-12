@@ -107,7 +107,7 @@ class editor_Models_SegmentFieldManager {
     /**
      * initiates the task specific segment fields
      * @param string $taskGuid
-     * @param boolean $reload optional, if true overwrite the internal stored fields for the task (if they were already loaded)
+     * @param bool $reload optional, if true overwrite the internal stored fields for the task (if they were already loaded)
      */
     public function initFields($taskGuid, $reload = false) {
         if($this->taskGuid == $taskGuid && !$reload) {
@@ -219,7 +219,7 @@ class editor_Models_SegmentFieldManager {
      * Add the given segment field (for the internally stored taskGuid)
      * @param string $label string any string as label
      * @param string $type one of the editor_Models_SegmentField::TYPE_... consts
-     * @param boolean $editable optional, default null means that editable is calculated. if boolean use the given value for editable
+     * @param bool $editable optional, default null means that editable is calculated. if bool use the given value for editable
      * @return string returns the fieldname to be used by the segment data instances for this field
      */
     public function addField($label, $type, $editable = null) {
@@ -313,7 +313,7 @@ class editor_Models_SegmentFieldManager {
     
     /**
      * returns a list of all or editable field dataindizes, depending on param
-     * @param boolean $editableOnly if true return editable field data indizes only
+     * @param bool $editableOnly if true return editable field data indizes only
      * @return array
      */
     protected function _getDataIndexList($editableOnly) {

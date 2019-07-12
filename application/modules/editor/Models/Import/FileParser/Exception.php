@@ -29,12 +29,14 @@ END LICENSE AND COPYRIGHT
 /**
  *
  */
-class editor_Models_Import_FileParser_Exception extends ZfExtended_ErrorCodeException {
+class editor_Models_Import_FileParser_Exception extends editor_Models_Import_Exception {
     /**
      * @var string
      */
-    protected $origin = 'import.fileparser';
+    protected $domain = 'editor.import.fileparser';
     
     static protected $localErrorCodes = [
+        'E1083' => 'The encoding of the file "{fileName}" is none of the encodings utf-8, iso-8859-1 and win-1252.',
+        'E1084' => 'Given MID was to long (max 1000 chars), MID: "{mid}".',
     ];
 }

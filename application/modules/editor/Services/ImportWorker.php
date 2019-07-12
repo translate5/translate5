@@ -41,7 +41,7 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::validateParameters()
      */
     protected function validateParameters($parameters = array()) {
-        if(empty($parameters['fileinfo']) || empty($parameters['languageResourceId'])){
+        if(empty($parameters['languageResourceId'])){
             return false;
         }
         return true;
@@ -76,8 +76,10 @@ class editor_Services_ImportWorker extends ZfExtended_Worker_Abstract {
         
         $this->updateLanguageResourceStatus($connector);
         
-        //remove the file from the temp dir
-        unlink($params['fileinfo']['tmp_name']);
+        if(isset($params['fileinfo']['tmp_name']) && !empty($params['fileinfo']['tmp_name'])){
+            //remove the file from the temp dir
+            unlink($params['fileinfo']['tmp_name']);
+        }
         
         return $return;
     }

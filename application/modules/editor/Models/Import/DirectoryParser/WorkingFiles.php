@@ -57,27 +57,41 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    */
   protected $rootNode;
   
+  /**
+   * collection of ignored files
+   * @var array
+   */
+  protected $ignoredFiles = [];
+  
   protected $exceptionOnNoFilesFound = true;
   
   static protected $filesFound = false;
   
-  public function __construct() {
+  public function __construct(bool $checkFileTypes) {
       $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
       /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
-      $this->_importExtensionList = array_keys($supportedFiles->getSupportedTypes());
+      if($checkFileTypes) {
+          //if _importExtensionList is not set, all files are imported
+          $this->_importExtensionList = array_keys($supportedFiles->getSupportedTypes());
+      }
   }
   
   /**
    * parses the given directory and returns a Object tree ready for output as JSON
    * @param string $directoryPath
+   * @param editor_Models_Task $task
    * @return object Directory Object Tree
    */
-  public function parse($directoryPath){
+  public function parse($directoryPath, editor_Models_Task $task){
+      $this->ignoredFiles = [];
       $rootNode = $this->getInitialRootNode();
       self::$filesFound = false;
       $this->iterateThrough($rootNode, $directoryPath);
       if($this->exceptionOnNoFilesFound && !self::$filesFound) {
-          throw new ZfExtended_Exception("There are no importable files in the Task. The following file extensions can be imported: .".join(', .', $this->_importExtensionList));
+          throw new editor_Models_Import_FileParser_NoParserException('E1135', [
+              'extensions' => join(', .', $this->_importExtensionList),
+              'task' => $task,
+          ]);
       }
       return $rootNode->children;
   }
@@ -159,6 +173,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
               return false;
           }
       }
+      $this->ignoredFiles[] = $file->getFilename();
       return true;
   }
   
@@ -198,7 +213,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    */
   protected function getDirectoryNodeAndIterate($directory, $path) {
     $node = $this->getDirectoryNode($directory);
-    $iteration = new static;
+    $iteration = new static(!empty($this->_importExtensionList));
     $iteration->iterateThrough($node, $path);
     return $node;
   }
@@ -215,5 +230,13 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
     $node->cls = 'folder';
 	$node->children = array();
     return $node;
+  }
+  
+  /**
+   * returns the files which were ignored
+   * @return array
+   */
+  public function getIgnoredFiles() {
+      return $this->ignoredFiles;
   }
 }

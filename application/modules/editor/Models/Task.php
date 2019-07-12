@@ -35,7 +35,7 @@ END LICENSE AND COPYRIGHT
 /**
  * Task Object Instance as needed in the application
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * @method string getTaskGuid() getTaskGuid()
  * @method void setTaskGuid() setTaskGuid(string $guid)
  * @method string getTaskNr() getTaskNr()
@@ -47,11 +47,11 @@ END LICENSE AND COPYRIGHT
  * @method string getForeignName() getForeignName()
  * @method void setForeignName() setForeignName(string $name)
  * @method integer getSourceLang() getSourceLang()
- * @method void setSourceLang() setSourceLang(integer $id)
+ * @method void setSourceLang() setSourceLang(int $id)
  * @method integer getTargetLang() getTargetLang()
- * @method void setTargetLang() setTargetLang(integer $id)
+ * @method void setTargetLang() setTargetLang(int $id)
  * @method integer getRelaisLang() getRelaisLang()
- * @method void setRelaisLang() setRelaisLang(integer $id)
+ * @method void setRelaisLang() setRelaisLang(int $id)
  * @method string getLockedInternalSessionUniqId() getLockedInternalSessionUniqId()
  * @method void setLockedInternalSessionUniqId() setLockedInternalSessionUniqId(string $id)
  * @method string getLocked() getLocked()
@@ -66,11 +66,11 @@ END LICENSE AND COPYRIGHT
  * @method string getWorkflow() getWorkflow()
  * @method void setWorkflow() setWorkflow(string $workflow)
  * @method integer getWorkflowStep() getWorkflowStep()
- * @method void setWorkflowStep() setWorkflowStep(integer $stepNr)
+ * @method void setWorkflowStep() setWorkflowStep(int $stepNr)
  * @method string getWorkflowStepName() getWorkflowStepName()
  * @method void setWorkflowStepName() setWorkflowStepName(string $stepName)
  * @method integer getWordCount() getWordCount()
- * @method void setWordCount() setWordCount(integer $wordcount)
+ * @method void setWordCount() setWordCount(int $wordcount)
  * @method string getTargetDeliveryDate() getTargetDeliveryDate()
  * @method void setTargetDeliveryDate() setTargetDeliveryDate(string $datetime)
  * @method string getRealDeliveryDate() getRealDeliveryDate()
@@ -78,24 +78,24 @@ END LICENSE AND COPYRIGHT
  * @method string getOrderdate() getOrderdate()
  * @method void setOrderdate() setOrderdate(string $datetime)
  * @method boolean getReferenceFiles() getReferenceFiles()
- * @method void setReferenceFiles() setReferenceFiles(boolean $flag)
+ * @method void setReferenceFiles() setReferenceFiles(bool $flag)
  * @method boolean getTerminologie() getTerminologie()
- * @method void setTerminologie() setTerminologie(boolean $flag)
+ * @method void setTerminologie() setTerminologie(bool $flag)
  * @method boolean getEnableSourceEditing() getEnableSourceEditing()
- * @method void setEnableSourceEditing() setEnableSourceEditing(boolean $flag)
+ * @method void setEnableSourceEditing() setEnableSourceEditing(bool $flag)
  * @method boolean getEdit100PercentMatch() getEdit100PercentMatch()
- * @method void setEdit100PercentMatch() setEdit100PercentMatch(boolean $flag)
+ * @method void setEdit100PercentMatch() setEdit100PercentMatch(bool $flag)
  * @method boolean getLockLocked() getLockLocked()
- * @method void setLockLocked() setLockLocked(boolean $flag)
+ * @method void setLockLocked() setLockLocked(bool $flag)
  * @method string getQmSubsegmentFlags() getQmSubsegmentFlags() get Original Flags from DB
  * @method void setQmSubsegmentFlags() setQmSubsegmentFlags(string $flags) set Original Flags in DB
  * @method void delete() delete() see editor_Models_Task_Remover for complete task removal
  * @method boolean getEmptyTargets() getEmptyTargets()
- * @method void setEmptyTargets() setEmptyTargets(boolean $emptyTargets)
+ * @method void setEmptyTargets() setEmptyTargets(bool $emptyTargets)
  * @method string getImportAppVersion() getImportAppVersion()
  * @method void setImportAppVersion() setImportAppVersion(string $version)
  * @method integer getCustomerId() getCustomerId()
- * @method void setCustomerId() setCustomerId(integer $customerId)
+ * @method void setCustomerId() setCustomerId(int $customerId)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -127,10 +127,40 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * @var string
      */
     protected $taskDataPath;
+    
+    /**
+     * Returns a Zend_Config Object; if task specific settings exist, they are set now.
+     * @return Zend_Config
+     */
+    protected function getConfig() {
+        // This is a temporary preparation for implementing TRANSLATE-471.
+        
+        $config = new Zend_Config([], true);
+        
+        // Step 1: start with systemwide config
+        $origConfig = Zend_Registry::get('config');
+        /* @var $origConfig Zend_Config */
+        $config->merge($origConfig);
+        
+        // Step 2: anything customer-specific for this task?
+        if (!empty($this->getCustomerId())) {
+            $customer = ZfExtended_Factory::get('editor_Models_Customer');
+            /* @var $customer editor_Models_Customer */
+            $customer->load($this->getCustomerId());
+            $customerConfig = $customer->getConfig();
+            $config->merge($customerConfig);
+        }
+        
+        // Step 3: anything task-specific for this task?
+        // TODO...
+        
+        $config->setReadOnly();
+        return $config;
+    }
 
     /**
      * loads the task to the given guid
-     * @param guid $taskGuid
+     * @param string $taskGuid
      */
     public function loadByTaskGuid(string $taskGuid){
         try {
@@ -160,7 +190,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $loadAll optional, per default false 
+     * @param bool $loadAll optional, per default false 
      * @return array
      */
     public function loadListByUserAssoc(string $userGuid, $loadAll = false) {
@@ -183,7 +213,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * if $loadAll is true, load all tasks, user infos joined only where possible,
      *   if false only the associated tasks
      * @param string $userGuid
-     * @param boolean $loadAll
+     * @param bool $loadAll
      * @return number
      */
     public function getTotalCountByUserAssoc(string $userGuid, $loadAll = false) {
@@ -200,7 +230,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      *   if false only the associated tasks to the user
      * @param string $userGuid
      * @param string $cols column definition
-     * @param boolean $loadAll 
+     * @param bool $loadAll 
      * @return Zend_Db_Table_Select
      */
     protected function getSelectByUserAssocSql(string $userGuid, $cols = '*', $loadAll = false) {
@@ -233,7 +263,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * @param boolean $asJson if true, json is returned, otherwhise assoc-array
+     * @param bool $asJson if true, json is returned, otherwhise assoc-array
      * @return mixed depending on $asJson
      */
     public function getQmSubsegmentIssuesTranslated($asJson = true){
@@ -305,7 +335,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      *   id: 'sev2',
      *   text: 'Severity 2'
      * }]
-     * @param boolean $asJson
+     * @param bool $asJson
      * @param Zend_Db_Table_Row_Abstract $row | null - if null, $this->row is used
      * @return string|array depends on $asJson
      */
@@ -407,7 +437,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     /**
      * update the workflowStep of a specific task 
      * @param string $stepName
-     * @param boolean $increaseStep optional, by default true, increases then the workflow step nr
+     * @param bool $increaseStep optional, by default true, increases then the workflow step nr
      */
     public function updateWorkflowStep(string $stepName, $increaseStep = true) {
         $data = [
@@ -491,7 +521,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      * sets a locked-timestamp in LEK_task for the task, if locked column is null
      * 
      * @param string $datetime
-     * @param boolean $sessionIndependant optional, default false. If true the lock is session independant, and must therefore revoked manually! 
+     * @param bool $sessionIndependant optional, default false. If true the lock is session independant, and must therefore revoked manually! 
      * @return boolean
      * @throws Zend_Exception if something went wrong
      */
@@ -603,15 +633,17 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns true if current task is in an exclusive state (like import)
+     * @param array $additionalNonExclusive additional states to be handled non exclusive
      * @return boolean
      */
-    public function isExclusiveState() {
-        $nonExclusiveStates = array(self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED);
-        return !in_array($this->getState(), $nonExclusiveStates);
+    public function isExclusiveState(array $additionalNonExclusive = []) {
+        $nonExclusiveStates = [self::STATE_OPEN, self::STATE_END, self::STATE_UNCONFIRMED];
+        return !in_array($this->getState(), array_merge($nonExclusiveStates, $additionalNonExclusive));
     }
     
     /**
      * returns a Zend_Config Object with task specific settings
+     * @deprecated must be changed with TRANSLATE-471
      * @return Zend_Config
      */
     public function getAsConfig() {
@@ -680,20 +712,22 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * Check if the current task status allows this action
-     * 
+     * @param array $allow additional states to be handled non exclusive
      * @throws ZfExtended_Models_Entity_Conflict
      */
-    public function checkStateAllowsActions() {
-        if($this->isErroneous() || $this->isExclusiveState() && $this->isLocked($this->getTaskGuid())) {
-            $e = new ZfExtended_Models_Entity_Conflict('Der aktuelle Status der Aufgabe verbietet diese Aktion!');
-            $e->setErrors([
-                    'task' => $this->getTaskGuid(),
-                    'taskState' => $this->getState(),
-                    'isLocked' => $this->isLocked($this->getTaskGuid()),
-                    'isErroneous' => $this->isErroneous(),
-                    'isExclusiveState' => $this->isExclusiveState(),
+    public function checkStateAllowsActions(array $allow = []) {
+        if($this->isErroneous() || $this->isExclusiveState($allow) && $this->isLocked($this->getTaskGuid())) {
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1046' => 'The current task status does not allow that action.',
             ]);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1046', [
+                'Der aktuelle Status der Aufgabe verbietet diese Aktion!'
+            ], [
+                'task' => $this,
+                'isLocked' => $this->isLocked($this->getTaskGuid()),
+                'isErroneous' => $this->isErroneous(),
+                'isExclusiveState' => $this->isExclusiveState(),
+            ]);
         }
     }
     
@@ -706,7 +740,7 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         $taskLifetimeDays= $config->runtimeOptions->taskLifetimeDays;
 
         
-        $daysOffset=isset($taskLifetimeDays) ? $taskLifetimeDays : 100;
+        $daysOffset = $taskLifetimeDays ?? 100;
         
         if(!$daysOffset){
             throw new Zend_Exception('No task taskLifetimeDays configuration defined.');
@@ -821,5 +855,28 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
                  [fontSize] => 14
          )
          */
+    }
+    
+    /**
+     * Are the usernames for the task to be anonymized?
+     * No personal information about other workflow users is visible in the workflow,
+     * (1) if anonymizeUsers is checked (set to true)
+     * (2) if the currently logged in user does not have the role admin, PM or api.
+     * If the $checkUser-param is set to "false", the user-check is omitted (= only the
+     * task's anonymizeUsers-config is taken into account).
+     * @param string|false $checkUser (optional)
+     * @return boolean
+     */
+    public function anonymizeUsers($checkUser = true) {
+        $config = $this->getConfig();
+        if(!$config->runtimeOptions->customers->anonymizeUsers) {
+            return false;
+        }
+        if($checkUser === false) {
+            return $config->runtimeOptions->customers->anonymizeUsers; // = true if we get here
+        }
+        $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        return !($userModel->readAnonymizedUsers());
     }
 }

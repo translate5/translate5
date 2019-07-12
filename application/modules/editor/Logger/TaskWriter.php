@@ -56,9 +56,4 @@ class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
         }
         return parent::isAccepted($event);
     }
-    
-    public function validateOptions(array $options) {
-        //additional options????
-    }
-    
 }

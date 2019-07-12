@@ -96,7 +96,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
     /***
      * Query the google cloud api for the search string
      * @param string $searchString
-     * @param boolean $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
      * @return editor_Services_ServiceResult
      */
     protected function queryGoogleApi($searchString, $reimportWhitespace = false){
@@ -114,7 +114,7 @@ class editor_Services_Google_Connector extends editor_Services_Connector_Abstrac
             $result=$this->api->getResult();
         }
         
-        $translation = isset($result['text']) ? $result['text'] : "";
+        $translation = $result['text'] ?? "";
         if($reimportWhitespace) {
             $translation = $this->importWhitespaceFromTagLessQuery($translation);
         }

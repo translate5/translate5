@@ -188,7 +188,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         }
         $result[] = $th.$t->_('Status').'</th>';
         $result[] = $th.$t->_('QM').'</th>';
-        $result[] = $th.$t->_('AutoStatus').'</th>';
+        $result[] = $th.$t->_('Bearbeitungsstatus').'</th>';
         $result[] = $th.$t->_('Matchrate').'</th>';
         $result[] = $th.$t->_('Kommentare').'</th>';
         $result[] = '</tr>';
@@ -198,7 +198,7 @@ class View_Helper_WorkflowNotifyHtmlMailSegmentList extends Zend_View_Helper_Abs
         };
         
         foreach($this->segments as $segment) {
-            $state = isset($stateMap[$segment['autoStateId']]) ? $stateMap[$segment['autoStateId']] : '- not found -'; //else tree should not be so untranslated
+            $state = $stateMap[$segment['autoStateId']] ?? '- not found -'; //else tree should not be so untranslated
             $result[] = "\n".'<tr>';
             $result[] = '<td valign="top">'.$segment['segmentNrInTask'].'</td>';
             foreach($fieldsToShow as $fieldName => $field) {

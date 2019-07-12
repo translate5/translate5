@@ -41,15 +41,15 @@ END LICENSE AND COPYRIGHT
  * @method string getRole() getRole()
  * @method string getUsedState() getUsedState()
  * @method string getUsedInternalSessionUniqId() getUsedInternalSessionUniqId()
- * @method string getIsPmOverride() getIsPmOverride()
- * @method void setId() setId(integer $id)
+ * @method boolean getIsPmOverride() getIsPmOverride()
+ * @method void setId() setId(int $id)
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method void setUserGuid() setUserGuid(string $userGuid)
  * @method void setState() setState(string $state)
  * @method void setRole() setRole(string $role)
  * @method void setUsedState() setUsedState(string $state)
  * @method void setUsedInternalSessionUniqId() setUsedInternalSessionUniqId(string $sessionId)
- * @method void setIsPmOverride() setIsPmOverride(boolean $isPmOverride)
+ * @method void setIsPmOverride() setIsPmOverride(bool $isPmOverride)
  * @method string getStaticAuthHash() getStaticAuthHash()
  * @method void setStaticAuthHash() setStaticAuthHash(string $hash)
  * 
@@ -61,24 +61,36 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * returns all users to the taskGuid and role of the given TaskUserAssoc
-     * @param mixed $role string or null as a value
      * @param string $taskGuid
+     * @param string $role string or null, if empty returns no users, since needed as filter
      * @param array $assocFields optional, column names of the assoc table to be added in the result set
+     * @param string $state string or null, additional filter for state of the job
      * @return [array] list with user arrays
      */
-    public function getUsersOfRoleOfTask($role,$taskGuid, $assocFields = []){
+    public function loadUsersOfTaskWithRole(string $taskGuid, $role, array $assocFields = [], $state = null){
         if (empty($role)) {
             return [];
         }
-        /* @var $tua editor_Models_TaskUserAssoc */
-        $this->setRole($role);
-        $this->setTaskGuid($taskGuid);
-        return $this->loadAllUsers($assocFields);
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        $db = $this->db;
+        $s = $user->db->select()
+        ->setIntegrityCheck(false)
+        ->from(array('u' => $user->db->info($db::NAME)))
+        ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
+        ->where('tua.isPmOverride = 0')
+        ->where('tua.taskGuid = ?', $taskGuid);
+        if(!empty($role)) {
+            $s->where('tua.role = ?', $role);
+        }
+        if(!empty($state)){
+            $s->where('tua.state = ?', $state);
+        }
+        return $user->db->fetchAll($s)->toArray();
     }
     
     /**
      * loads all tasks to the given user guid
-     * @param guid $userGuid
+     * @param string $userGuid
      * @return array|null
      */
     public function loadByUserGuid(string $userGuid){
@@ -139,14 +151,19 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @param string $state | null
      * @return array
      */
-    public function loadByParams(string $userGuid, $taskGuid = null,
-            $role = null,$state = null) {
+    public function loadByParams(string $userGuid, $taskGuid = null, $role = null, $state = null) {
         try {
             $s = $this->db->select()
                 ->where('userGuid = ?', $userGuid);
-            if(!is_null($taskGuid)) $s->where('taskGuid = ?', $taskGuid);
-            if(!is_null($role)) $s->where('role= ?', $role);
-            if(!is_null($state)) $s->where('state= ?', $state);
+            if(!is_null($taskGuid)) {
+                $s->where('taskGuid = ?', $taskGuid);
+            }
+            if(!is_null($role)) {
+                $s->where('role= ?', $role);
+            }
+            if(!is_null($state)) {
+                $s->where('state= ?', $state);
+            }
             $row = $this->db->fetchRow($s);
         } catch (Exception $e) {
             $this->notFound('NotFound after other Error', $e);
@@ -180,28 +197,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $sql = 'select state, role, count(userGuid) cnt from LEK_taskUserAssoc where taskGuid = ? and isPmOverride = 0 group by state, role;';
         $res = $this->db->getAdapter()->query($sql, array($this->getTaskGuid()));
         return $res->fetchAll();
-    }
-    
-    /**
-     * returns a list with users to the actually loaded taskGuid and role
-     * loads only assocs where isPmOverride not set
-     * @param array $assocFields optional, if given add that assoc fields to the join
-     * @return array
-     */
-    public function loadAllUsers($assocFields = []) {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        $db = $this->db;
-        $role = $this->getRole();
-        $s = $user->db->select()
-        ->setIntegrityCheck(false)
-        ->from(array('u' => $user->db->info($db::NAME)))
-        ->join(array('tua' => $db->info($db::NAME)), 'tua.userGuid = u.userGuid', $assocFields)
-        ->where('tua.isPmOverride = 0')
-        ->where('tua.taskGuid = ?', $this->getTaskGuid());
-        if(!empty($role)) {
-            $s->where('tua.role = ?', $role);
-        }
-        return $user->db->fetchAll($s)->toArray();
     }
     
     /**
@@ -248,20 +243,24 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         $taskGuid = $this->get('taskGuid');
         $task = ZfExtended_Factory::get('editor_Models_Task');
 
-        $e = new ZfExtended_BadMethodCallException();
-        $e->setLogging(false);
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1061' => 'The job can not be removed, since the user is using the task.',
+            'E1062' => 'The job can not be removed, since the task is locked by the user.',
+        ]);
         
         if($this->isUsed()) {
-            $e->setMessage("Die Aufgabe wird von einem Benutzer benutzt", true);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1061', [
+                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da der Benutzer diese aktuell benutzt.'
+            ], ['job' => $this]);
         }
         
         /* @var $task editor_Models_Task */
         if($task->isLocked($taskGuid, $this->getUserGuid())) {
-            $e->setMessage("Die Aufgabe ist durch einen Benutzer gesperrt", true);
-            throw $e;
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1062', [
+                'Die Zuweisung zwischen Aufgabe und Benutzer kann nicht gelöscht werden, da die Aufgabe durch den Benutzer gesperrt ist.'
+            ], ['job' => $this]);
         }
-
+        
         $result = parent::delete();
         $this->updateTask($taskGuid);
         return $result;

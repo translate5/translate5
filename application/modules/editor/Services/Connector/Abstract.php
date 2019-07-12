@@ -130,8 +130,8 @@ abstract class editor_Services_Connector_Abstract {
     /**
      * Link this Connector Instance to the given LanguageResource and its resource, in the given language combination
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param integer $sourceLang language id 
-     * @param integer $targetLang language id 
+     * @param int $sourceLang language id 
+     * @param int $targetLang language id 
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         $this->sourceLang = $sourceLang;
@@ -255,7 +255,7 @@ abstract class editor_Services_Connector_Abstract {
     abstract public function search(string $searchString, $field = 'source', $offset = null);
     
     /**
-     * @return the status of the connected resource and additional information if there is some
+     * @return editor_Services_ServiceResult the status of the connected resource and additional information if there is some
      */
     abstract public function getStatus(& $moreInfo);
     
@@ -287,7 +287,7 @@ abstract class editor_Services_Connector_Abstract {
     
     /***
      * Initialize fuzzy connectors. Returns the current instance if not supported.
-     * @param integer $analysisId
+     * @param int $analysisId
      * @return editor_Services_Connector_Abstract
      */
     public function initForFuzzyAnalysis($analysisId) {

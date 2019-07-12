@@ -105,7 +105,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
                 taskUnhandledAction: 'onTaskActionColumnNoHandler',
-                taskStateCheckPullCleaned:'onTaskStateCheckPullCleaned'
+                periodicalTaskReloadIgnore: 'ignoreTaskForReload',
+                importStateCheckFinished:'onImportStateCheckFinished'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -352,7 +353,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startAnalysis:function(taskId,operation){
     	//'editor/:entity/:id/operation/:operation',
-        var me=this;
+        var me=this,
+        	store=Ext.StoreManager.get('admin.Tasks'),
+        	record=store ? store.getById(taskId) : null;
+        
+        if(record){
+        	record.set('state','matchanalysis');
+        }
         
         me.addLoadingMask();
         Ext.Ajax.request({
@@ -367,9 +374,10 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
                 isTaskImport:me.getComponentByItemId('adminTaskAddWindow') ? 1 : 0
             },
             scope: this,
-            timeout:600000,
             success: function(response){
-                me.checkTaskState(taskId);
+                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
+                //start task state checker loop
+                controller.startCheckImportStates();
             }, 
             failure: function(response){
                 me.removeLoadingMask();
@@ -422,32 +430,25 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         return component.checked ? 1 : 0;
     },
 
-    /***
-     * Add tast state check conditional function, so the task reload condition depends also from the matchanalysis state
+    /**
+     * if task must be reloaded periodically we have to return false here
      */
-    checkTaskState:function(taskId){
-        //the task needs to be updated, so the last state is fetched from the db
-        var task = Ext.StoreManager.get('admin.Tasks').getById(taskId);
-        if(!task) {
-            return;
-        }
-        task.load({
-            success:function(){
-                var controller=Editor.app.getController('Editor.controller.admin.TaskOverview');
-                //add match analysis state checker function to the task state checker loop
-                controller.addTaskStateCheckPull(function(rec){
-                    return rec.get('state')=='matchanalysis';
-                });
-                controller.startCheckImportStates();
-            }
-        });
+    ignoreTaskForReload: function(task) {
+        return task.get('state') !== 'matchanalysis';
     },
 
     /***
-     * Tash state check cleand event handler. This event is fired from Task overview controller.
+     * Import state check state finished event handler. This event is fired from Task overview controller.
      */
-    onTaskStateCheckPullCleaned:function(){
-        this.removeLoadingMask(true);
+    onImportStateCheckFinished:function(taskOverview,record){
+    	var me=this,
+    		taskWindow=me.getAdminTaskPreferencesWindow();
+    	if(!taskWindow){
+    		return;
+    	}
+    	if(record.get('taskGuid')==taskWindow.actualTask.get('taskGuid')){
+    		me.removeLoadingMask(true);
+    	}
     },
 
     /***
@@ -458,12 +459,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
             matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
         
-        if(assocPanel && assocPanel.getEl()){
-            assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        if(assocPanel){
+        	assocPanel.setLoading(true);
         }
 
-        if(matchAnalysisPanel && matchAnalysisPanel.getEl()){
-            matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        if(matchAnalysisPanel){
+        	matchAnalysisPanel.setLoading(true);
         }
     },
 
@@ -480,15 +481,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         if(!assocPanel){
             return;
         }
-        assocPanel.unmask();;
+
+        assocPanel.setLoading(false);
 
         if(!matchAnalysisPanel){
             return;
         }
+        
         if(reloadStore){
             matchAnalysisGrid.getStore().reload();
         }
-        matchAnalysisPanel.getEl().unmask(me.strings.analysisLoadingMsg);
+        
+        matchAnalysisPanel.setLoading(false);
     }
 
 });

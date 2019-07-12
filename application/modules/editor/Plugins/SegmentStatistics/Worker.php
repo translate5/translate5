@@ -279,7 +279,7 @@ class editor_Plugins_SegmentStatistics_Worker extends editor_Models_Import_Worke
     /**
      * Method to write statistics to task data directory
      * parameter decides if configured filter should be used or not
-     * @param boolean $filtered
+     * @param bool $filtered
      */
     protected function writeToDisk($filtered = false) {
         $task = ZfExtended_Factory::get('editor_Models_Task');

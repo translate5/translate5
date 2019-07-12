@@ -135,11 +135,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
         $userGuid = (new Zend_Session_Namespace('user'))->data->userGuid;
         $tua->loadByParams($userGuid, $session->taskGuid);
         
-        $tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $tagHelper editor_Models_Segment_InternalTag */
-        
-        $trackChangesTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TrackChangeTag');
-        /* @var $trackChangesTagHelper editor_Models_Segment_TrackChangeTag */
+        $repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [
+            $this->entity,
+            $qmSubsegmentAlikes
+        ]);
+        /* @var $repetitionUpdater editor_Models_Segment_RepetitionUpdater */
         
         $alikeCount = count($ids);
         foreach($ids as $id) {
@@ -163,46 +163,11 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                     continue;
                 }
 
+                $repetitionUpdater->setRepetition($entity);
                 //if source editing = true, then fieldLoop loops also over the source field
-                $fieldLoopResult = $this->fieldLoop(function($field, $editField, $getter, $setter) use ($id, $entity, $config, $qmSubsegmentAlikes, $tagHelper, $trackChangesTagHelper){
-                    $getOriginal = 'get'.ucfirst($field);
-                    //Entity befüllen:
-                    if($config->runtimeOptions->editor->enableQmSubSegments) {
-                        $segmentContent = $qmSubsegmentAlikes[$field]->cloneAndUpdate($id, $field);
-                    }
-                    else {
-                        $segmentContent = $this->entity->{$getter}();
-                    }
                     //replace the masters tags with the original repetition ones
-                    $originalContent = $entity->{$getOriginal}();
-                    $useSourceTags = empty($originalContent);
-                    if($useSourceTags) {
-                        //if the original had no content, we have to load the source tags. 
-                        $originalContent = $entity->getSource();
-                    }
-                    $originalTags = $tagHelper->get($originalContent);
-                    if(empty($originalTags)) {
-                        //if there are no original tags we have to init $i with the realTagCount in the targetEdit for below check
-                        $i = $tagHelper->count($trackChangesTagHelper->protect($segmentContent));
-                    }
-                    else {
-                        $i = 0;
-                        $segmentContent = $trackChangesTagHelper->protect($segmentContent);
-                        $segmentContent = $tagHelper->replace($segmentContent, function($foo) use (&$i, $originalTags){
-                            return $originalTags[$i++];
-                        });
-                        //if we use the source tags, the count of tags in source and target content to be used must be equal! 
-                        // If this is not the case, the segment can not be processed as repetition! 
-                        $segmentContent = $trackChangesTagHelper->unprotect($segmentContent);
-                    }
-                    //if we use the tags from the source, and their count is different to the tag count in the targetEdit to be used, 
-                      // then return false to prevent the saving of that repetition to prevent wrong tags to be used 
-                    if($useSourceTags && count($originalTags) !== $i) {
-                        return false;
-                    }
-                    $entity->{$setter}($segmentContent);
-                    $entity->updateToSort($editField);
-                });
+                    //if there was an error in taking over the segment content into the repetition, we return false, so the segment is inored later on
+                $fieldLoopResult = $this->fieldLoop([$repetitionUpdater, 'updateSegmentContent']);
                 if($fieldLoopResult['target'] === false || $this->isSourceEditable && $fieldLoopResult['source'] === false ) {
                     //the segment has to be ignored!
                     continue;
@@ -245,7 +210,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
                 $this->updateTargetHashAndOriginal($entity, $hasher);
                 
                 $history->save();
-                $entity->setTimestamp(null); //see TRANSLATE-922
+                $entity->setTimestamp(NOW_ISO); //see TRANSLATE-922
                 $entity->save();
             }
             catch (Exception $e) {
@@ -303,7 +268,7 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * See TRANSLATE-885 for details!
      * 
      * @param editor_Models_Segment $entity
-     * @param integer $editedSegmentId
+     * @param int $editedSegmentId
      * @param editor_Models_Segment_RepetitionHash $hasher
      * @return boolean
      */
@@ -337,10 +302,10 @@ class Editor_AlikesegmentController extends editor_Controllers_EditorrestControl
      * (currently only source and target! Since ChangeAlikes are deactivated for alternatives)
      * Closure Parameters: $field, $editField, $getter, $setter → 'target', 'targetEdit', 'getTargetEdit', 'setTargetEdit'
      * 
-     * @param Closure $callback
+     * @param Callable $callback
      * @return array
      */
-    protected function fieldLoop(Closure $callback) {
+    protected function fieldLoop(Callable $callback) {
         $result = array();
         if($this->isSourceEditable) {
             $result['source'] = $callback('source', 'sourceEdit', 'getSourceEdit', 'setSourceEdit');

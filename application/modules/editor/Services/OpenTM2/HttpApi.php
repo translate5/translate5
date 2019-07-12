@@ -147,9 +147,13 @@ class editor_Services_OpenTM2_HttpApi {
     
     /**
      * retrieves the TM as TM file
+     * @param string|array $mime
      * @return boolean
      */
     public function get($mime) {
+        if(is_array($mime)) {
+            $mime = implode(',', $mime);
+        }
         $http = $this->getHttpWithMemory('GET');
         $http->setConfig(['timeout' => 1200]);
         $http->setHeaders('Accept', $mime);
@@ -332,7 +336,7 @@ class editor_Services_OpenTM2_HttpApi {
     
     protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
         $badGateway = new ZfExtended_BadGateway('Die angefragte OpenTM2 Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setOrigin('LanguageResources');
+        $badGateway->setDomain('LanguageResources');
         
         $error = new stdClass();
         $error->type = 'HTTP';
@@ -365,7 +369,9 @@ class editor_Services_OpenTM2_HttpApi {
             $error->method = $this->httpMethod;
             $this->error[] = $error;
         }
-        $result = json_decode(trim($response->getBody()));
+        
+        $responseBody = trim($response->getBody());
+        $result = (empty($responseBody)) ? '' : json_decode($responseBody);
         
         //check for JSON errors
         if(json_last_error() > 0){

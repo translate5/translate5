@@ -30,6 +30,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Plugins_MatchAnalysis_Pretranslation{
     use editor_Models_Import_FileParser_TagTrait;
+    use ZfExtended_Logger_DebugTrait;
     
     /***
      * 
@@ -96,6 +97,9 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $mtConnectors=array();
     
+    public function __construct(){
+        $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
+    }
     
     /***
      * Use the given TM analyse (or MT if analyse was empty) result to update the segment
@@ -281,7 +285,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Check if the given language resource id is a valid termcollection resource
-     * @param integer $languageResourceId
+     * @param int $languageResourceId
      * @return boolean
      */
     protected function isTermCollection($languageResourceId){
@@ -312,7 +316,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segment->setTimeTrackData($duration);
         
         $history->save();
-        $segment->setTimestamp(null);
+        $segment->setTimestamp(NOW_ISO);
         $segment->save();
     }
     
@@ -330,7 +334,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Set pretranslate from Mt priority flag
-     * @param boolean $usePretranslateMT
+     * @param bool $usePretranslateMT
      */
     public function setPretranslateMt($usePretranslateMT) {
         $this->usePretranslateMT=$usePretranslateMT;
@@ -338,7 +342,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     
     /***
      * Set the pretranslate from the Tm and termcollection priority flag. This flag also will run the pretranslations
-     * @param boolean $usePretranslateTMAndTerm
+     * @param bool $usePretranslateTMAndTerm
      */
     public function setPretranslateTmAndTerm($usePretranslateTMAndTerm) {
         $this->usePretranslateTMAndTerm=$usePretranslateTMAndTerm;

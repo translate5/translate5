@@ -596,7 +596,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * checks if the given TaskUserAssoc Instance allows reading of the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
      * @return boolean
      */
     public function isReadable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
@@ -606,7 +606,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * checks if the given TaskUserAssoc Instance allows writing to the task according to the Workflow Definitions
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param boolean $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
+     * @param bool $useUsedState optional, per default false means using TaskUserAssoc field state, otherwise TaskUserAssoc field usedState
      * @return boolean
      */
     public function isWriteable(editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
@@ -632,7 +632,7 @@ abstract class editor_Workflow_Abstract {
      * @param array $roles
      * @param array $states
      * @param editor_Models_TaskUserAssoc $tua (default null is only to allow null as value)
-     * @param boolean $useUsedState
+     * @param bool $useUsedState
      * @return boolean
      */
     protected function isTuaAllowed(array $roles, array $states, editor_Models_TaskUserAssoc $tua = null, $useUsedState = false) {
@@ -673,7 +673,7 @@ abstract class editor_Workflow_Abstract {
      * debugging workflow 
      * @param string $msg
      * @param array $data optional debuggin data
-     * @param boolean $levelInfo optional, if true log in level info instead debug
+     * @param bool $levelInfo optional, if true log in level info instead debug
      */
     protected function doDebug($msg, array $data = [], $levelInfo = false) {
         if(empty($this->newTask)) {
@@ -706,46 +706,49 @@ abstract class editor_Workflow_Abstract {
     /**
      * manipulates the segment as needed by workflow after updated by user
      * @param editor_Models_Segment $segmentToSave
+     * @param editor_Models_Task $task
      */
-    public function beforeSegmentSave(editor_Models_Segment $segmentToSave) {
+    public function beforeSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
         $updateAutoStates = function($autostates, $segment, $tua) {
             //sets the calculated autoStateId
             $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
         };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates);
+        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
     }
     
     /**
      * manipulates the segment as needed by workflow after user has add or edit a comment of the segment
+     * @param editor_Models_Segment $segmentToSave
+     * @param editor_Models_Task $task
      */
-    public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave) {
+    public function beforeCommentedSegmentSave(editor_Models_Segment $segmentToSave, editor_Models_Task $task) {
         $updateAutoStates = function($autostates, $segment, $tua) {
             $autostates->updateAfterCommented($segment, $tua);
         };
-        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates);
+        $this->commonBeforeSegmentSave($segmentToSave, $updateAutoStates, $task);
     }
     
     /**
      * internal used method containing all common logic happend on a segment before saving it
      * @param editor_Models_Segment $segmentToSave
      * @param Closure $updateStates
+     * @param editor_Models_Task $task
      */
-    protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates) {
-        $session = new Zend_Session_Namespace();
+    protected function commonBeforeSegmentSave(editor_Models_Segment $segmentToSave, Closure $updateStates, editor_Models_Task $task) {
         $sessionUser = new Zend_Session_Namespace('user');
         
         $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
         /* @var $tua editor_Models_TaskUserAssoc */
         
         //we assume that on editing a segment, every user (also not associated pms) have a assoc, so no notFound must be handled
-        $tua->loadByParams($sessionUser->data->userGuid,$session->taskGuid);
+        $tua->loadByParams($sessionUser->data->userGuid, $task->getTaskGuid());
         if($tua->getIsPmOverride() == 1){
-            $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr); //set also the number to identify in which phase the changes were done
+            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep()); //set also the number to identify in which phase the changes were done
             $segmentToSave->setWorkflowStep(self::STEP_PM_CHECK);
         }
         else {
             //sets the actual workflow step
-            $segmentToSave->setWorkflowStepNr($session->taskWorkflowStepNr);
+            $segmentToSave->setWorkflowStepNr($task->getWorkflowStep());
             
             //sets the actual workflow step name, does currently depend only on the userTaskRole!
             $step = $this->getStepOfRole($tua->getRole());
@@ -830,7 +833,7 @@ abstract class editor_Workflow_Abstract {
             if(method_exists($this, $state)) {
                 $this->{$state}();
             } 
-            $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua));
+            $this->events->trigger($state, __CLASS__, array('oldTua' => $oldTua, 'newTua' => $newTua, 'task' => $task));
         }
         $this->recalculateWorkflowStep($newTua);
     }
@@ -844,14 +847,21 @@ abstract class editor_Workflow_Abstract {
      */
     protected function callActions($trigger, $step = null, $role = null, $state = null) {
         $actions = ZfExtended_Factory::get('editor_Models_Workflow_Action');
+        /* @var $actions editor_Models_Workflow_Action */
         $debugData = [
             'trigger' => $trigger,
             'step' => $step, 
             'role' => $role,
             'state' => $state,
         ];
-        /* @var $actions editor_Models_Workflow_Action */
-        $workflows = $this->getIdList();
+        if($this->isCron) {
+            //in cron calls we loop over each workflow, so we may not iterate here over the whole inheritance tree. 
+            // This would duplicate action calls.
+            $workflows = [static::WORKFLOW_ID];
+        }
+        else {
+            $workflows = $this->getIdList();
+        }
         $actions = $actions->loadByTrigger($workflows, $trigger, $step, $role, $state);
         $this->actionDebugMessage($workflows, $debugData);
         $instances = [];
@@ -1000,7 +1010,7 @@ abstract class editor_Workflow_Abstract {
      * 
      * @param editor_Models_TaskUserAssoc $oldTua
      * @param editor_Models_TaskUserAssoc $newTua
-     * @param $prefix optional, defaults to "do"
+     * @param string $prefix optional, defaults to "do"
      * @return string
      */
     public function getTriggeredState(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, $prefix = 'do') {
@@ -1117,7 +1127,7 @@ abstract class editor_Workflow_Abstract {
     /**
      * can be triggered via API, valid triggers are currently
      * @param editor_Models_Task $task
-     * @param unknown $trigger
+     * @param string $trigger
      */
     public function doDirectTrigger(editor_Models_Task $task, $trigger) {
         if(!in_array($trigger, $this->validDirectTrigger)) {

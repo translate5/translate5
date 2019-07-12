@@ -146,7 +146,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrieves specific language from the given language container
      * @param array $data
      * @param string $index the datafield to get
-     * @param integer $id the language resource id 
+     * @param int $id the language resource id 
      * @return array
      */
     protected function getLanguage(array $languages, $index, $id) {
@@ -160,7 +160,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrieves specific data from the given data container
      * @param array $data
      * @param string $index the datafield to get
-     * @param integer $id the language resource id 
+     * @param int $id the language resource id 
      * @return array
      */
     protected function getCustassoc(array $data, $index, $id) {
@@ -175,7 +175,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Retrives the useAsDefault customers for the given language resource
      * @param array $data
      * @param string $index the datafield to get
-     * @param integer $id the language resource id 
+     * @param int $id the language resource id 
      * @return array
      */
     protected function getCustassocDefault(array $data, $index, $id){
@@ -429,7 +429,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * This method is very opentm2 specific. If we want more generalization: 
      *  - JS needs to know about the valid export types of the requested TM system
      *  - The Connector must be able to decide if a given type can be exported or not
-     *    (like for uploads the getValidFiletypes, just for exports there should be a getValidExportTypes)
      */
     public function downloadAction() {
         //call GET to load entity internally
@@ -452,8 +451,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $connector = $serviceManager->getConnector($this->entity);
         /* @var $connector editor_Services_Connector */
         
-        //just reuse importvalidtypes here, nothing other implemented yet 
-        $validExportTypes = $connector->getValidFiletypes();
+        $validExportTypes = $connector->getValidExportTypes();
         
         if(empty($validExportTypes[$type])){
             throw new ZfExtended_Models_Entity_NotFoundException('Can not download in format '.$type);
@@ -683,10 +681,51 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //check if connector / resource can deal with the uploaded file type
         $validTypes = $connector->getValidFiletypes();
+        $validMimeType = array_values($validTypes);
+        $validExtension = array_keys($validTypes);
+        
+        // =============== workaround (start) ==========================================
+        // with array_values($validTypes), $validMimeType currently is (example):
+        /*
+        Array
+        (
+            [0] => Array
+                (
+                    [0] => application/zip
+                )
+        
+            [1] => Array
+                (
+                    [0] => application/xml
+                    [1] => text/xml
+                )
+        
+        )
+
+        */
+        // but Zend_Validate_File_MimeType needs (example):
+        /*
+        Array
+        (
+            [0] => application/zip
+            [1] => application/xml
+            [2] => text/xml
+        )
+
+        */
+        $allValidMimeTypes = [];
+        foreach ($validMimeType as $key1 => $value1) {
+            foreach ($value1 as $key2 => $value2) {
+                $allValidMimeTypes[] = $value2;
+            }
+        }
+        // =============== workaround (end) ============================================
         $upload->addValidators([
-            new Zend_Validate_File_MimeType(array_values($validTypes)),
-            new Zend_Validate_File_Extension(array_keys($validTypes)),
+            new Zend_Validate_File_MimeType($allValidMimeTypes),
+            new Zend_Validate_File_Extension($validExtension),
         ]);
+        // CAUTON: The validators don't know which extensions are allowed for which extension.
+        // The only know ALL extensions that are allowed and all MimeTypes that are allowed.
         
         //init validations
         $upload->isValid(self::FILE_UPLOAD_NAME);
@@ -729,7 +768,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
         
         $params['languageResourceId']=$this->entity->getId();
-        $params['fileinfo']=$importInfo[self::FILE_UPLOAD_NAME];
+        $params['fileinfo']=!empty($importInfo[self::FILE_UPLOAD_NAME])? $importInfo[self::FILE_UPLOAD_NAME]:[];
         $params['addnew']=$addnew;
         
         if (!$worker->init(null, $params)) {
@@ -750,6 +789,9 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param array $fileinfo
      */
     protected function handleUploadLanguageResourcesFile(&$fileinfo){
+        if(!$fileinfo){
+            return;
+        }
         //create unique temp file name
         $newFileLocation=tempnam('LanguageResources', $fileinfo['name']);
         if (!is_dir(dirname($newFileLocation))) {
@@ -810,7 +852,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         //check taskGuid of segment against loaded taskguid for security reasons
         //checks if the current task is associated to the languageResource
-        $this->entity->checkTaskAndLanguageResourceAccess($session->taskGuid,$languageResourceId, $segment);
+        $this->entity->checkTaskAndLanguageResourceAccess((string) $session->taskGuid,$languageResourceId, $segment);
         
         $this->entity->load($languageResourceId);
 

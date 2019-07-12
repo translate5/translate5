@@ -347,8 +347,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
                 $this->termCollection->load($termCollectionId);
                 
-                $tmpName=isset($path['tmp_name']) ? $path['tmp_name'] : $path;
-                $fileName=isset($path['name']) ? $path['name'] : null;;
+                $tmpName = $path['tmp_name'] ?? $path;
+                $fileName = $path['name'] ?? null;
                 
                 $this->xml = new XmlReader();
                 //$this->xml->open(self::getTbxPath($task));
@@ -388,14 +388,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         
-        $export = ZfExtended_Factory::get('editor_Models_Export_Terminology_Tbx');
-        /* @var $export editor_Models_Export_Terminology_Tbx */
-        
-        $tbxData = $term->export($task, $export);
-        
-        if(empty($tbxData)){
-            return $tbxData;
-        }
+        $tbxData = $term->exportForTagging($task);
         
         $meta = $task->meta();
         //ensure existence of the tbxHash field
@@ -643,7 +636,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     protected function isLanguageToProcess() {
         $langToImport = $this->normalizeLanguage($this->actualLang);
-        $lastLangId;
+        $lastLangId = '';
         $this->actualLangId = 0;
         $matched = false;
         foreach($this->languages as $langString => $langAllowed) {
@@ -941,7 +934,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Save term entry attribute in the database.
      * 
-     * @param integer $parentId
+     * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
      * @return boolean|editor_Models_TermCollection_TermEntryAttributes
@@ -963,7 +956,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Save term attribute in the database
      * 
-     * @param integer $parentId
+     * @param int $parentId
      * @param int $internalCount: the current tag count of the same type in one group
      * 
      * @return void|editor_Models_TermCollection_TermEntryAttributes
@@ -985,7 +978,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     /***
      * Get the term attribute or term entry attribute model
      * 
-     * @param boolean $isTermAttribute
+     * @param bool $isTermAttribute
      * @param mixed $parentId
      * 
      * @return editor_Models_TermCollection_TermEntryAttributes

@@ -34,6 +34,7 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * LanguageResource Service Manager
+ * TODO all services classes should be located somewhere under language resources
  * Not needed to be instanced as singleton since registered connectors were stored internally in a static member variable
  */
 class editor_Services_Manager {
@@ -50,7 +51,8 @@ class editor_Services_Manager {
         'editor_Services_LucyLT',
         'editor_Services_TermCollection',
         'editor_Services_SDLLanguageCloud',
-        'editor_Services_Google'
+        'editor_Services_Google',
+        'editor_Services_Microsoft'
         //'editor_Services_DummyFileTm',
     );
 
@@ -97,8 +99,8 @@ class editor_Services_Manager {
      * returns the desired connector, connection to the given resource
      * 
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
-     * @param integer $sourceLang
-     * @param integer $targetLang
+     * @param int $sourceLang
+     * @param int $targetLang
      * @return editor_Services_Connector
      */
     public function getConnector(editor_Models_LanguageResources_LanguageResource $languageResource,$sourceLang=null,$targetLang=null) {
@@ -117,7 +119,10 @@ class editor_Services_Manager {
      */
     protected function checkService(string $serviceType) {
         if(!$this->hasService($serviceType)) {
-            throw new ZfExtended_Exception("Given Service ".$serviceType." is not registered in the LanguageResource Service Manager!");
+            //Given Language-Resource-Service "{serviceType}." is not registered in the Language-Resource-Service-Manager!
+            throw new editor_Services_NoServiceException('E1106', [
+                'serviceType' => $serviceType,
+            ]);
         }
     }
     
@@ -176,6 +181,18 @@ class editor_Services_Manager {
                 $connector = $this->getConnector($languageResource);
                 /* @var $connector editor_Services_Connector */
                 $todo($connector, $languageResource, $one);
+            }
+            catch(editor_Services_NoServiceException $e) {
+                $logger = Zend_Registry::get('logger')->cloneMe('editor.languageresource.service');
+                /* @var $logger ZfExtended_Logger */
+                $task = ZfExtended_Factory::get('editor_Models_Task');
+                /* @var $task editor_Models_Task */
+                $task->loadByTaskGuid($taskGuid);
+                $e->addExtraData(['task' => $task]);
+                $logger->exception($e,[
+                    'level' => $logger::LEVEL_WARN
+                ]);
+                continue;
             }
             catch(ZfExtended_BadGateway $e) {
                 continue;

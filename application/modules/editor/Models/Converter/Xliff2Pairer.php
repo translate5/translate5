@@ -49,7 +49,7 @@ class editor_Models_Converter_Xliff2Pairer extends editor_Models_Converter_XmlPa
     
     /**
      * creates a XmlPairerNode by the given nod
-     * @param integer $idx
+     * @param int $idx
      * @param string $node
      * @return boolean|editor_Models_Converter_XmlPairerNode
      */

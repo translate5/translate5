@@ -26,7 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-$portal = $this->config->runtimeOptions->server->protocol.$this->config->runtimeOptions->server->name.APPLICATION_RUNDIR;
+
+//used to calculate the base url from the request
+$http=ZfExtended_Factory::get('Zend_Controller_Request_Http');
+/* @var $http Zend_Controller_Request_Http */
+
+$portal =(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] .$http->getBaseUrl().'/';
 
 //fill data with generally needed variables
 $data = [
@@ -50,6 +55,15 @@ if(!empty($this->task)) {
     $taskData['targetDeliveryDate'] = $this->workflowNotifyMail()->dateFormat($this->task->getTargetDeliveryDate());
     $taskData['wordCount'] = $this->task->getWordCount() > 0 ? $this->task->getWordCount() : '-';
     
+    $customer=ZfExtended_Factory::get('editor_Models_Customer');
+    /* @var $customer editor_Models_Customer */
+    $customer->load($this->task->getCustomerId());
+    //if the customer domain is set, use this domain as portal url and link
+    if(!empty($customer->getDomain())){
+        $data['portalUrl']=$customer->getDomain();
+        $data['portalLink']='<a href="'.$customer->getDomain().'">'.$customer->getDomain().'</a>';
+    }
+    
     $data['taskFragment'] = $this->templateApply('<b>Aufgabe:</b> {task.taskName}<br />
     <b>Quellsprache:</b> {sourceLanguageTranslated}<br />
     <b>Zielsprache:</b> {targetLanguageTranslated}<br />
@@ -68,3 +82,7 @@ $this->footer = $this->templateApply('<br/>
 <br/>{companyName}
 <br/>
 <br/>Diese Email wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail!', $data);
+
+//set the variables so they can be used when this template is rendered in other views
+$this->data=$data;
+$this->taskData=isset($taskData) ? $taskData : null;

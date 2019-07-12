@@ -38,7 +38,7 @@
  * Customer Entity Objekt
  * 
  * @method integer getId() getId()
- * @method void setId() setId(integer $id)
+ * @method void setId() setId(int $id)
  * 
  * @method string getName() getName()
  * @method void setName() setName(string $name)
@@ -47,13 +47,16 @@
  * @method void setNumber() setNumber(string $number)
  * 
  * @method integer getSearchCharacterLimit() getSearchCharacterLimit()
- * @method void setSearchCharacterLimit() setSearchCharacterLimit(integer $searchCharacterLimit)
+ * @method void setSearchCharacterLimit() setSearchCharacterLimit(int $searchCharacterLimit)
  * 
  * @method string getDomain() getDomain()
  * @method void setDomain() setDomain(string $domain)
  * 
  * @method string getOpenIdServer() getOpenIdServer()
  * @method void setOpenIdServer() setOpenIdServer(string $openIdServer)
+ * 
+ * @method string getOpenIdIssuer() getOpenIdIssuer()
+ * @method void setOpenIdIssuer() setOpenIdIssuer(string $openIdIssuer)
  * 
  * @method string getOpenIdAuth2Url() getOpenIdAuth2Url()
  * @method void setOpenIdAuth2Url() setOpenIdAuth2Url(string $openIdAuth2Url)
@@ -73,12 +76,41 @@
  * @method integer getOpenIdRedirectCheckbox() getOpenIdRedirectCheckbox()
  * @method void setOpenIdRedirectCheckbox() setOpenIdRedirectCheckbox(integer $openIdRedirectCheckbox)
  * 
+ * @method boolean getAnonymizeUsers() getAnonymizeUsers()
+ * @method void setAnonymizeUsers() getAnonymizeUsers(boolean $anonymizeUsers)
+ * 
+ * 
 */
 class editor_Models_Customer extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Customer';
     protected $validatorInstanceClass   = 'editor_Models_Validator_Customer';
     
     CONST DEFAULTCUSTOMER_NUMBER = 'default for legacy data';
+    
+    /**
+     * Returns a Zend_Config Object; if customer specific settings exist, they are set now.
+     * @return Zend_Config
+     */
+    public function getConfig() {
+        // This is a temporary preparation for implementing TRANSLATE-471.
+        
+        $config = new Zend_Config([], true);
+        
+        // Step 1: start with systemwide config
+        $origConfig = Zend_Registry::get('config');
+        /* @var $origConfig Zend_Config */
+        $config->merge($origConfig);
+        
+        // Step 2: anything customer-specific?
+        if (!empty($this->getId())) {
+            // TODO: get and merge Zend_Config for customerId,
+            //       this is just a quick & dirty workaround for anonymizeUsers
+            $config->runtimeOptions->customers->anonymizeUsers = $this->getAnonymizeUsers();
+        }
+        
+        $config->setReadOnly();
+        return $config;
+    }
     
     /**
      * Loads customers by a given list of ids

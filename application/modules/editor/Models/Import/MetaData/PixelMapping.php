@@ -42,6 +42,12 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
     const PIXEL_MAPPING_XLSX = 'pixel-mapping.xlsx';
     
     /**
+     * Highest column to get content from, see default XLSX Layout
+     * @var integer
+     */
+    const PIXEL_MAPPING_MAXCOL = 5;
+    
+    /**
      * @var string
      */
     protected $importPath;
@@ -62,6 +68,8 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      */
     protected $ignoredLines = [];
     
+    protected $lastCustomerId;
+    
     /**
      * (non-PHPdoc)
      * @see editor_Models_Import_MetaData_IMetaDataImporter::import()
@@ -77,9 +85,23 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
      * if exist update table LEK_pixel_mapping
      */
     public function importFromSpreadsheet() {
-        $this->loadSpreadsheet();
-        $this->updateDb();
-        $this->logIgnoredLines();
+        try {
+            $e = null;
+            $this->loadSpreadsheet();
+            $this->updateDb();
+            $this->logIgnoredLines();
+            return;
+        }
+        catch(ZfExtended_Models_Entity_NotFoundException $e) {
+            //no customer to the number found, proceed with the below Exception
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            //no customer to the number found, proceed with the below Exception
+        }
+        throw new editor_Models_Import_MetaData_Exception('E1053',[
+            'task' => $this->task,
+            'lastClientNr' => $this->lastCustomerId
+        ], $e);
     }
     
     /**
@@ -106,14 +128,12 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
         if ($highestRow == 1) {
             return; // first row: headlines only
         }
-        $highestColumn = $worksheet->getHighestColumn();
-        $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
         $pixelMappingModel = ZfExtended_Factory::get('editor_Models_PixelMapping');
         /* @var $pixelMappingModel editor_Models_PixelMapping */
         for ($row = 2; $row <= $highestRow; ++$row) { // first row: headlines only
             $values = [];
             $oneColWasEmpty = false;
-            for ($col = 1; $col <= $highestColumnIndex; ++$col) {
+            for ($col = 1; $col <= self::PIXEL_MAPPING_MAXCOL; ++$col) {
                 $values[] = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
                 $oneColWasEmpty = $oneColWasEmpty || (strlen(end($values)) == 0);
             }
@@ -122,6 +142,7 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
                 $this->ignoredLines[] = join(', ', $values);
                 continue;
             }
+            $this->lastCustomerId = $values[0];
             $pixelMappingModel->insertPixelMappingRow($values);
         }
     }
@@ -133,9 +154,12 @@ class editor_Models_Import_MetaData_PixelMapping implements editor_Models_Import
         if(empty($this->ignoredLines)) {
             return;
         }
-        $msg = 'Task Meta Data Import PixelMapping: ignored one ore more lines of the excel due one or more empty columns'."\n";
-        $msg .= 'Task: '.$this->task->getTaskName().' ('.$this->task->getTaskNr()."\n";
-        $msg .= 'PixelMapping Excel Line(s): '."\n".join("\n", $this->ignoredLines);
-        error_log($msg);
+        $logger = Zend_Registry::get('logger')->cloneMe('editor.import.metadata.pixelmapping');
+        /* @var $logger ZfExtended_Logger */
+        $msg = 'Pixel-Mapping: ignored one ore more lines of the excel due one or more empty columns.';
+        $logger->warn('E1096', $msg, [
+            'task' => $this->task,
+            'ignoredLines' => "\n".join("\n", $this->ignoredLines),
+        ]);
     }
 }

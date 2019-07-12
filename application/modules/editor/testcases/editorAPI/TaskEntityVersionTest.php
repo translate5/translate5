@@ -30,7 +30,7 @@ END LICENSE AND COPYRIGHT
  * TaskEntityWorkflowTest is currently incomplete, just created as a stub to be implemented
  */
 class TaskEntityWorkflowTest extends \ZfExtended_Test_ApiTestcase {
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -55,7 +55,7 @@ class TaskEntityWorkflowTest extends \ZfExtended_Test_ApiTestcase {
         $this->api()->addUser('testtranslator');
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->requestJson('editor/task/'.$task->id, 'DELETE');

@@ -27,8 +27,6 @@ END LICENSE AND COPYRIGHT
 */
 
 class Editor_SegmentController extends editor_Controllers_EditorrestController {
-    use editor_Models_Import_FileParser_TagTrait;
-
     protected $entityClass = 'editor_Models_Segment';
 
     /**
@@ -52,34 +50,12 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         'qmId' => ['list' => 'listAsString']
     ];
     
-    /**
-     * @var ZfExtended_EventManager
-     */
-    protected $events = false;
-    
-    
     /***
      * Number to divide the segment duration
      * 
      * @var integer
      */
     protected $durationsDivisor=1;
-    
-    /**
-     * Initialize event-trigger.
-     * 
-     * For more Information see definition of parent-class
-     * 
-     * @param Zend_Controller_Request_Abstract $request
-     * @param Zend_Controller_Response_Abstract $response
-     * @param array $invokeArgs
-     */
-    public function __construct(Zend_Controller_Request_Abstract $request, Zend_Controller_Response_Abstract $response, array $invokeArgs = array())
-    {
-        parent::__construct($request, $response);
-        $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
-        $this->initHelper();
-    }
     
     public function preDispatch() {
         parent::preDispatch();
@@ -105,12 +81,26 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     public function indexAction() {
         $taskGuid = $this->session->taskGuid;
-        $this->view->rows = $this->entity->loadByTaskGuid($taskGuid);
+        
+        $rows = $this->entity->loadByTaskGuid($taskGuid);
+        $this->view->rows = $rows;
         $this->view->total = $this->entity->totalCountByTaskGuid($taskGuid);
         
         $this->addIsWatchedFlag();
         $this->addFirstEditable();
         $this->addIsFirstFileInfo($taskGuid);
+        
+        // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($taskGuid);
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            foreach ($this->view->rows as &$row) {
+                $row = $workflowAnonymize->anonymizeUserdata($taskGuid, $row['userGuid'], $row);
+            }
+        }
     }
     
     public function nextsegmentsAction() {
@@ -265,12 +255,20 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $sessionUser = new Zend_Session_Namespace('user');
         $this->entity->load((int) $this->_getParam('id'));
 
+        //check if update is allowed
         $this->checkTaskGuidAndEditable();
         $task = $this->checkTaskState();
+        $wfh = $this->_helper->workflow;
+        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
+        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid);
 
+        //the history entry must be created before the original entity is modified
         $history = $this->entity->getNewHistoryEntity();
+        //update the segment
+        $updater = ZfExtended_Factory::get('editor_Models_Segment_Updater', [$task]);
 
         $this->decodePutData();
+        
         //set the editing durations for time tracking into the segment object
         settype($this->data->durations, 'object');
         $this->entity->setTimeTrackData($this->data->durations,$this->durationsDivisor);
@@ -279,118 +277,28 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $allowedToChange = array('qmId', 'stateId', 'autoStateId', 'matchRate', 'matchRateType');
         
         $allowedAlternatesToChange = $this->entity->getEditableDataIndexList();
-        $updateSearchAndSort = array_intersect(array_keys((array)$this->data), $allowedAlternatesToChange);
-        $this->checkPlausibilityOfPut($allowedAlternatesToChange);
-        $this->sanitizeEditedContent($allowedAlternatesToChange);
-        $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
-        foreach($updateSearchAndSort as $field) {
-            $this->entity->updateToSort($field);
-        }
 
+        $this->checkPlausibilityOfPut($allowedAlternatesToChange);
+        $this->sanitizeEditedContent($updater, $allowedAlternatesToChange);
+
+        $this->setDataInEntity(array_merge($allowedToChange, $allowedAlternatesToChange), self::SET_DATA_WHITELIST);
         $this->entity->setUserGuid($sessionUser->data->userGuid);
         $this->entity->setUserName($sessionUser->data->userName);
-        $this->entity->restoreNotModfied();
         
-        //@todo do this with events
-        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-        /* @var $wfm editor_Workflow_Manager */
-        $wfm->getActive($this->entity->getTaskGuid())->beforeSegmentSave($this->entity); 
+        /* @var $updater editor_Models_Segment_Updater */
+        $updater->update($this->entity, $history);
         
-        $wfh = $this->_helper->workflow;
-        /* @var $wfh ZfExtended_Controller_Helper_Workflow */
-        $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid);
-        
-        $this->entity->validate();
-        
-        //FIXME: Introduced with TRANSLATE-885, but is more a hack as a solution. See Issue comments for more information!
-        $this->updateTargetHashAndOriginal($task);
-
-        foreach($allowedAlternatesToChange as $field) {
-            if($this->entity->isModified($field)) {
-                $this->entity->updateQmSubSegments($field);
-            }
-        }
-        //FIXME check who use this event so we klnow do we trigger this on replace all or not
-        $this->events->trigger("beforePutSave", $this, array(
-                'entity' => $this->entity,
-                'model' => $this->entity, //FIXME model usage is deprecated and should be removed in future (today 2016-08-10) 
-                'history' => $history
-        ));
-        
-        //call before segment put
-        $this->handleBeforePutSave();
-        
-        //saving history directly before normal saving, 
-        // so no exception between can lead to history entries without changing the master segment
-        $history->save();
-        $this->entity->setTimestamp(null); //see TRANSLATE-922
-        $this->entity->save();
         $this->view->rows = $this->entity->getDataObject();
         
-        //call after segment put handler
-        $this->handleAfterSegmentPut();
-    }
-    
-    /**
-     * Before a segment is saved, the matchrate type has to be fixed to valid value
-     */
-    protected function handleBeforePutSave() {
-        $segment =$this->entity;
-        /* @var $segment editor_Models_Segment */
-        $givenType = $segment->getMatchRateType();
-        
-        //if it was a normal segment edit, without overtaking the match we have to do nothing here
-        if(!$segment->isModified('matchRateType') || strpos($givenType, editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED) !== 0) {
-            return;
-        }
-        
-        $matchrateType = ZfExtended_Factory::get('editor_Models_Segment_MatchRateType');
-        /* @var $matchrateType editor_Models_Segment_MatchRateType */
-        
-        $unknown = function() use ($matchrateType, $givenType, $segment){
-            $matchrateType->initEdited($matchrateType::TYPE_UNKNOWN, $givenType);
-            $segment->setMatchRateType((string) $matchrateType);
-        };
-        
-        //if it was an invalid type set it to unknown
-        if(! preg_match('/'.editor_Models_LanguageResources_LanguageResource::MATCH_RATE_TYPE_EDITED.';languageResourceid=([0-9]+)/', $givenType, $matches)) {
-            $unknown();
-            return;
-        }
-        
-        //load the used languageResource to get more information about it (TM or MT)
-        $languageResourceid = $matches[1];
-        $languageresource = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
-        /* @var $languageresource editor_Models_LanguageResources_LanguageResource */
-        try {
-            $languageresource->load($languageResourceid);
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            $unknown();
-            return;
-        }
-        
-        //just to display the TM name too, we add it here to the type
-        $type = $languageresource->getServiceName().' - '.$languageresource->getName();
-        
-        //set the type
-        $matchrateType->initEdited($languageresource->getResource()->getType(),$type);
-        
-        //REMINDER: this would be possible if we would know if the user edited the segment after using the TM
-        //$matchrateType->add($matchrateType::TYPE_INTERACTIVE);
-        
-        //save the type
-        $segment->setMatchRateType((string) $matchrateType);
-    }
-    
-    /**
-     * After a segment is changed we inform the services about that. What they do with this information is the service's problem.
-     */
-    protected function handleAfterSegmentPut() {
-        /* @var $segment editor_Models_Segment */
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        if(editor_Models_Segment_MatchRateType::isUpdateable($this->entity->getMatchRateType())) {
-            $manager->updateSegment($this->entity);
+        // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        $task->loadByTaskGuid($this->entity->getTaskGuid());
+        if ($task->anonymizeUsers()) {
+            $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
+            /* @var $workflowAnonymize editor_Workflow_Anonymize */
+            $row = json_decode(json_encode($this->view->rows), true); // = for anonymizeUserdata(): argument 3 must be of the type array
+            $this->view->rows = $workflowAnonymize->anonymizeUserdata($this->entity->getTaskGuid(), $row['userGuid'], $row);
         }
     }
     
@@ -398,11 +306,11 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Search segment action.
      */
     public function searchAction(){
-        
         $parametars=$this->getAllParams();
         
         //check if the required search parametars are in the request
         $this->checkRequiredSearchParameters($parametars);
+        $parametars['searchField'] =  htmlentities($parametars['searchField'], ENT_XML1);
         
         //check character number limit
         if(!$this->checkSearchStringLength($parametars['searchField'])){
@@ -435,6 +343,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         
         //check if the required search parametars are in the request
         $this->checkRequiredSearchParameters($parameters);
+        $parameters['searchField'] =  htmlentities($parameters['searchField'], ENT_XML1);
+        $parameters['replaceField'] =  htmlentities($parameters['replaceField'], ENT_XML1);
         
         //check if the task has mqm tags
         //replace all is not supported for tasks with mqm
@@ -453,8 +363,8 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $results=$this->entity->search($parameters);
         
         $searchInField=$parameters['searchInField'];
-        $searchType=isset($parameters['searchType']) ? $parameters['searchType'] : null;
-        $matchCase=isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true'): false;
+        $searchType = $parameters['searchType'] ?? null;
+        $matchCase = isset($parameters['matchCase']) ? (strtolower($parameters['matchCase'])=='true') : false;
         
         if(!$results || empty($results)){
             $this->view->message= $t->_('Keine Ergebnisse für die aktuelle Suche!');
@@ -473,6 +383,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
             if(isset($parameters['isActiveTrackChanges']) && $parameters['isActiveTrackChanges']){
                 $replace->trackChangeTag->attributeWorkflowstep=$parameters['attributeWorkflowstep'];
                 $replace->trackChangeTag->userColorNr=$parameters['userColorNr'];
+                $replace->trackChangeTag->userTrackingId=$parameters['userTrackingId'];
                 $replace->isActiveTrackChanges=$parameters['isActiveTrackChanges'];
             }
             
@@ -532,25 +443,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     }
     
     /**
-     * Updates the target original and targetMd5 hash for repetition calculation
-     * Can be done only in Workflow Step 1 and if all targets were empty on import
-     * This is more a hack as a right solution. See TRANSLATE-885 comments for more information!
-     * See also in AlikesegmenController!
-     * @param editor_Models_Task $task
-     */
-    protected function updateTargetHashAndOriginal(editor_Models_Task $task) {
-        //TODO: also a check is missing, if task has alternate targets or not.
-        // With alternates no recalc is needed at all, since no repetition editor can be used
-        
-        if($task->getWorkflowStep() == 1 && (bool) $task->getEmptyTargets()){
-            $hasher = ZfExtended_Factory::get('editor_Models_Segment_RepetitionHash', [$task]);
-            /* @var $hasher editor_Models_Segment_RepetitionHash */
-            $this->entity->setTargetMd5($hasher->hashTarget($this->entity->getTargetEdit(), $this->entity->getSource()));
-            $this->entity->setTarget($this->entity->getTargetEdit());
-        }
-    }
-    
-    /**
      * checks if current put makes sense to save
      * @param array $fieldnames allowed fieldnames to be saved
      * @return boolean
@@ -601,39 +493,18 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * Applies the import whitespace replacing to the edited user by the content
      * @param array $fieldnames
      */
-    protected function sanitizeEditedContent(array $fieldnames) {
-        $nbsp = json_decode('"\u00a0"');
-        $internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
-        /* @var $internalTag editor_Models_Segment_InternalTag */
+    protected function sanitizeEditedContent(editor_Models_Segment_Updater $updater, array $fieldnames): void {
+        $sanitized = false;
         foreach($this->data as $key => $data) {
             //consider only changeable datafields:
             if(! in_array($key, $fieldnames)) {
                 continue;
             }
-            
-            //some browsers create nbsp instead of normal whitespaces, since nbsp are removed by the protectWhitespace code below
-            // we convert it to usual whitespaces. If there are multiple ones, they are reduced to one then.
-            // This is so far the desired behavior. No characters escaped as tag by the import should be addable through the editor.
-            // Empty spaces at the very beginning/end are only allowed during editing and now removed for saving.
-            $this->data->{$key} = $data = trim(str_replace($nbsp, ' ', $this->data->{$key}));
-            
-            //since our internal tags are a div span construct with plain content in between, we have to replace them first
-            $data = $internalTag->protect($data);
-
-            //the following call splits the content at tag boundaries, and sanitizes the textNodes only
-            // In the textnode additional / new protected characters (whitespace) is converted to internal tags and then removed
-            // This is because the user is not allowed to add new internal tags by adding plain special characters directly (only via adding it as tag in the frontend)
-            $data = $this->parseSegmentProtectWhitespace($data, 'strip_tags');
-
-            //revoke the internaltag replacement
-            $data = $internalTag->unprotect($data);
-            
-            //if nothing was changed, everything was OK already
-            if($this->whitespaceHelper->entityCleanup($data) === $this->whitespaceHelper->entityCleanup($this->data->{$key})) {
-                return;
-            }
-            $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
+            $sanitized = $updater->sanitizeEditedContent($data) || $sanitized;
             $this->data->{$key} = $data;
+        }
+        if($sanitized) {
+            $this->restMessages->addWarning('Aus dem Segment wurden nicht darstellbare Zeichen entfernt (mehrere Leerzeichen, Tabulatoren, Zeilenumbrüche etc.)!');
         }
     }
     
@@ -780,7 +651,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
      * @throws ZfExtended_ValidateException
      */
     private function checkRequiredSearchParameters(array $parameters){
-        if(!isset($parameters['searchInField']) || !isset($parameters['searchField']) || !isset($parameters['searchType'])){
+        if(empty($parameters['searchInField']) || empty($parameters['searchField']) || empty($parameters['searchType'])){
             $t = ZfExtended_Zendoverwrites_Translate::getInstance();
             /* @var $t ZfExtended_Zendoverwrites_Translate */;
             $e = new ZfExtended_ValidateException();
@@ -791,7 +662,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
     
     /***
      * Check if the task contains mqm tags for some of the segments
-     * @param taskGuid $taskGuid
+     * @param string $taskGuid
      * @return boolean
      */
     private function isMqmTask($taskGuid){

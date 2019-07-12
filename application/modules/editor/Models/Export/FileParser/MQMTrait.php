@@ -189,7 +189,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
      * @param string $type
      * @param string $content
      * @param string $input
-     * @param boolean $valueMustExist
+     * @param bool $valueMustExist
      */
     protected function _checkImageTag($type, $content, $tag, $valueMustExist = true) {
     	if($valueMustExist && $content == ''){
@@ -205,8 +205,8 @@ trait editor_Models_Export_FileParser_MQMTrait {
      * 
      * @param string $tag
      * @param string $type
-     * @param boolean $numeric
-     * @param boolean $valueMustExist
+     * @param bool $numeric
+     * @param bool $valueMustExist
      */
     protected function _getImgTagAttr($tag, $type, $numeric = false, $valueMustExist = true) {
     	$a = '[^\"]*';
@@ -285,7 +285,7 @@ trait editor_Models_Export_FileParser_MQMTrait {
     /**
      * 
      * @param array $array
-     * @param type $indexToPointTo
+     * @param mixed $indexToPointTo
      * @return boolean if successful or not
      */
     protected function setArrayPointer(array &$array, $indexToPointTo) {

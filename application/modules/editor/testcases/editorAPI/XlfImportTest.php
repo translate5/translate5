@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  * edits segments and checks then the edited ones again on correct content
  */
 class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
         
         $task = array(
@@ -174,6 +174,16 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         //start task export 
         $this->checkExport($task, 'editor/task/export/id/'.$task->id, '04-segmentation.xlf', 'export-segmentation.xlf');
     }
+
+    /**
+     * check if the whitespace between mrk tags on the import are also exported again
+     * @depends testSegmentEditing
+     */
+    public function testAcrossXlf() {
+        $task = $this->api()->getTask();
+        //start task export
+        $this->checkExport($task, 'editor/task/export/id/'.$task->id, '03-across.xlf', 'export-across.xlf');
+    }
     
     /**
      * check if the whitespace between mrk tags on the import are also exported again
@@ -217,7 +227,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         $this->markTestIncomplete('Could not be tested due missing task template functionality to set the preserve config to true.');
     }
     
-    public static function tearDownAfterClass() {
+    public static function tearDownAfterClass(): void {
         $task = self::$api->getTask();
         //open task for whole testcase
         self::$api->login('testlector');

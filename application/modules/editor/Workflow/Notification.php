@@ -103,7 +103,6 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         /* @var $user ZfExtended_Models_User */
         $user->init($userData);
         $this->mailer->sendToUser($user);
-        return;
     }
     
     /**
@@ -123,7 +122,17 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             foreach($receiverRoleMap as $recRole => $roles) {
                 if($recRole == '*' || $recRole == $receiverRole) {
                     foreach($roles as $role) {
-                        $users = $tua->getUsersOfRoleOfTask($role, $task->getTaskGuid());
+                        $users = array_merge($users,$tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $role));
+                    }
+                }
+                if($recRole == 'byUserLogin') {
+                    $userModel = ZfExtended_Factory::get('ZfExtended_Models_User');
+                    /* @var $userModel ZfExtended_Models_User */
+                    foreach($roles as $singleUser) {
+                        $return=$userModel->loadByLogin($singleUser);
+                        if(isset($return)){
+                            $users[] = $return->toArray();
+                        }
                     }
                 }
             }
@@ -170,7 +179,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific Notification after all users of a role have finished a task
      * @param string $triggeringRole
-     * @param boolean $isCron
+     * @param bool $isCron
      */
     public function notifyAllFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
@@ -189,8 +198,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         
         $nextRole = $workflow->getRoleOfStep((string)$workflow->getNextStep($currentStep));
         
-        $users = $this->tua->getUsersOfRoleOfTask($nextRole,$task->getTaskGuid());
-        $previousUsers = $this->tua->getUsersOfRoleOfTask($triggeringRole,$task->getTaskGuid());
+        
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $users = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $nextRole);
+        $previousUsers = $tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole);
         $params = array(
             'triggeringRole' => $triggeringRole,
             'nextRole' => $nextRole,
@@ -228,7 +240,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
      * Workflow specific PM Notification after one users of a role have finished a task
      * @param string $triggeringRole
-     * @param boolean $isCron
+     * @param bool $isCron
      */
     public function notifyOneFinishOfARole() {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
@@ -246,7 +258,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
             error_log("No workflow step to Role ".$triggeringRole." found! This is actually a workflow config error!");
         }
         
-        $currentUsers = $this->tua->getUsersOfRoleOfTask($triggeringRole, $task->getTaskGuid(), ['state']);
+        $currentUsers = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), $triggeringRole, ['state']);
         $params = array(
             'triggeringRole' => $triggeringRole,
             'currentUsers' => $currentUsers,
@@ -307,19 +319,11 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $triggerConfig = $this->initTriggerConfig(func_get_args());
         $task = $this->config->task;
         $this->tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
-        $this->tua->setTaskGuid($task->getTaskGuid());
-        
-        //FIXME Hack:
-        // for the current release we need only proofreaders, 
-        // in future this should be done differntly as described in TRANSLATE-1094
-        // so load now only proofreaders: 
-        $this->tua->setRole(editor_Workflow_Abstract::ROLE_LECTOR);
-        //END Hack
         
         $workflow = $this->config->workflow;
         $labels = $workflow->getLabels(false);
         
-        $tuas = $this->tua->loadAllUsers(['state','role']);
+        $tuas = $this->tua->loadUsersOfTaskWithRole($task->getTaskGuid(), editor_Workflow_Abstract::ROLE_LECTOR, ['state','role']);
         $roles = array_column($tuas, 'role');
         array_multisort($roles, SORT_ASC, SORT_STRING, $tuas);
         
@@ -380,6 +384,76 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
         $this->createNotification(ACL_ROLE_PM, __FUNCTION__, $params);
         $this->addCopyReceivers($triggerConfig, ACL_ROLE_PM);
         $this->notify((array) $user->getDataObject());
+    }
+    
+    
+    /***
+     * Notify the lectors when the delivery date is over the defined days in the config
+     */
+    public function notifyOverdueTasks(){
+        $triggerConfig = $this->initTriggerConfig(func_get_args());
+        $daysOffset=isset($triggerConfig->daysOffset) ? $triggerConfig->daysOffset : 1;
+        
+        $task = ZfExtended_Factory::get('editor_Models_Task');
+        /* @var $task editor_Models_Task */
+        
+        //load all tasks where the delivery date overdue the current date - days offset
+        $db = Zend_Registry::get('db');
+        /* @var $db Zend_Db_Table */
+        $s = $db->select()
+        ->from(array('tua' => 'LEK_taskUserAssoc'), ['taskGuid'])
+        ->distinct()
+        ->join(array('t' => 'LEK_task'), 'tua.taskGuid = t.taskGuid', array())
+        ->where('tua.role = ?', editor_Workflow_Abstract::ROLE_LECTOR)
+        ->where('tua.state != ?', editor_Workflow_Abstract::STATE_FINISH)
+        ->where('t.state = ?', $task::STATE_OPEN)
+        ->where('targetDeliveryDate = CURRENT_DATE - INTERVAL ? DAY', $daysOffset);
+        $tasks = $db->fetchAll($s);
+        
+        $this->tua = $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        
+        $wf = $this->config->workflow;
+        
+        $notifyRole=$wf::ROLE_LECTOR;
+        if(isset($triggerConfig->receiverRole)){
+            $notifyRole=$triggerConfig->receiverRole;
+        }
+        $template=__FUNCTION__;
+        if(isset($triggerConfig->template)){
+            $template=$triggerConfig->template;
+        }
+        
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        if(isset($triggerConfig->receiverUser)){
+            $user->loadByLogin($triggerConfig->receiverUser);
+        }
+        
+        foreach($tasks as $oneTask) {
+            $task->loadByTaskGuid($oneTask['taskGuid']);
+            $this->config->task = clone $task;
+            
+            //if the receiverUser user is configured, send mail only to receiverUser
+            if(isset($triggerConfig->receiverUser)){
+                $proofreaders=[(array)$user->getDataObject()];
+            }else{
+                //load only users with state open
+                $proofreaders = $tua->loadUsersOfTaskWithRole($oneTask['taskGuid'], $notifyRole, ['state'], editor_Models_Task::STATE_OPEN);
+            }
+            
+            $params = [
+                'task' => $this->config->task,
+                'proofreaders' => $proofreaders,
+            ];
+            
+            foreach($proofreaders as $proofreader) {
+                $this->createNotification($notifyRole, $template, $params);
+                $this->addCopyReceivers($triggerConfig, $notifyRole);
+                $this->notify($proofreader);
+            }
+        }
     }
     
     /**
@@ -481,9 +555,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_INCLUDE_DIFF=>false,
                     editor_Models_Converter_SegmentsToXliff2::CONFIG_ADD_QM=>true,
             ];
-            $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $currentStep]);
-            /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff2 */
-            return $xliffConverter;
+            return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff2', [$xliffConf, $currentStep]);
         }
         
         $xliffConf = [
@@ -492,10 +564,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
                 editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_ALTERNATIVES => true,
                 editor_Models_Converter_SegmentsToXliff::CONFIG_ADD_TERMINOLOGY => true,
         ];
-        $xliffConverter = ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
-        /* @var $xliffConverter editor_Models_Converter_SegmentsToXliff */
-        
-        return $xliffConverter;
+        return ZfExtended_Factory::get('editor_Models_Converter_SegmentsToXliff', [$xliffConf]);
     }
     
     public function testNotifications() {

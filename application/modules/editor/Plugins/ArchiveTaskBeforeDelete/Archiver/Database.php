@@ -86,9 +86,9 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
 
     /**
      * adds an update statement to the LEK_task table to fix the task state
-     * @param unknown $taskGuid
-     * @param unknown $table
-     * @param unknown $file
+     * @param string $taskGuid
+     * @param string $table
+     * @param string $file
      */
     protected function fixTaskState($taskGuid, $table, $file) {
         if($table !== 'LEK_task') {
@@ -144,7 +144,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_Archiver_Database implements editor
     /**
      * creates the SQL command ready for exec
      * @param Zend_Config $credentials
-     * @param boolean $dataOnly → true to dump data only, false to dump structure only
+     * @param bool $dataOnly → true to dump data only, false to dump structure only
      */
     protected function makeSqlCmd(Zend_Config $credentials, $dataOnly = true) {
         $mysqlExecutable = $this->getMysqlDumpExec();

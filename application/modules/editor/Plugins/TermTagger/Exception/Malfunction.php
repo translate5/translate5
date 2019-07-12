@@ -31,4 +31,5 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Plugins_TermTagger_Exception_Malfunction extends editor_Plugins_TermTagger_Exception_Abstract {
+    //localErrorCodes see parent abstract
 }

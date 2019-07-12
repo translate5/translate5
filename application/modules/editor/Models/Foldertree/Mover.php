@@ -61,7 +61,7 @@ class editor_Models_Foldertree_Mover {
   
   /**
    * needs the actual Foldertree to move the Files in
-   * @param Models_Foldertree $actualTree
+   * @param editor_Models_Foldertree $actualTree
    */
   public function __construct(editor_Models_Foldertree $actualTree){
     $this->actualTree = $actualTree;
@@ -92,7 +92,7 @@ class editor_Models_Foldertree_Mover {
   
   /**
    * returns the File Node with the given ID
-   * @param integer $id
+   * @param int $id
    * @return stdClass
    */
   public function getById($id) {
@@ -101,9 +101,9 @@ class editor_Models_Foldertree_Mover {
   
   /**
    * moves the File/Directory with the given id to the given parentid and index
-   * @param integer $id
-   * @param integer $parentId
-   * @param integer $index
+   * @param int $id
+   * @param int $parentId
+   * @param int $index
    */
   public function moveNode($id, $parentId, $index) {
     $this->removeFromOldParent($id);
