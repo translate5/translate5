@@ -42,9 +42,9 @@ var editIdleTimer = null,
  * Store allowed file-types for all available languageResources.
  */
 function setFileTypesAllowedAndAvailable() {
-    for (languageResourceId in allLanguageResources) {
-        if(allLanguageResources.hasOwnProperty(languageResourceId)){
-            addFileTypesAllowedAndAvailable(allLanguageResources[languageResourceId]);
+    for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
+        if(Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)){
+            addFileTypesAllowedAndAvailable(Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId]);
         }
     }
 }
@@ -265,9 +265,9 @@ function getLocalesAccordingToReference (accordingTo, selectedLocale) {
         languageResourceToCheckAllTargets,
         languageResourceLocaleSet,
         languageResourceAllLocalesToAdd;
-    for (languageResourceId in allLanguageResources) {
-        if (allLanguageResources.hasOwnProperty(languageResourceId)) {
-            languageResourceToCheck = allLanguageResources[languageResourceId];
+    for (languageResourceId in Editor.data.apps.instanttranslate.allLanguageResources) {
+        if (Editor.data.apps.instanttranslate.allLanguageResources.hasOwnProperty(languageResourceId)) {
+            languageResourceToCheck = Editor.data.apps.instanttranslate.allLanguageResources[languageResourceId];
             languageResourceToCheckAllSources = languageResourceToCheck.source;
             languageResourceToCheckAllTargets = languageResourceToCheck.target;
             languageResourceLocaleSet = (accordingTo === 'accordingToSourceLocale') ? languageResourceToCheckAllSources : languageResourceToCheckAllTargets;
@@ -425,6 +425,7 @@ function translateText(textToTranslate,translationInProgressID){
         },
         url: Editor.data.restpath+"instanttranslateapi/translate",
         dataType: "json",
+        type: "POST",
         data: {
             'source':$("#sourceLocale").val(),
             'target':$("#targetLocale").val(),
@@ -508,6 +509,7 @@ function fillTranslation() {
                         }
                     }
                     resultData = {'languageResourceId': result['languageResourceid'],
+                                  'languageResourceType': result['languageResourceType'],
                                   'fuzzyMatch': fuzzyMatch,
                                   'infoText': infoText.join('<br/>'),
                                   'resourceName': resourceName,
@@ -537,6 +539,9 @@ function fillTranslation() {
     }
     $('#translations').html(translationHtml);
     showTranslations();
+
+    // open TermPortal for proposing new term?
+    checkTermPortalIntegration();
 }
 
 function renderTranslationContainer(resultData) {
@@ -555,7 +560,7 @@ function renderTranslationContainer(resultData) {
     }
     
     translationsContainer += '<div class="copyable">';
-    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'">'+resultData.translationText+'</div>';
+    translationsContainer += '<div class="translation-result" id="'+resultData.languageResourceId+'" data-languageresource-type="'+resultData.languageResourceType+'">'+resultData.translationText+'</div>';
     translationsContainer += '<span class="copyable-copy" title="'+Editor.data.languageresource.translatedStrings['copy']+'"><span class="ui-icon ui-icon-copy"></span></span>';
     
     if(resultData.processStatusAttributeValue && resultData.processStatusAttributeValue === 'finalized') {
@@ -825,17 +830,93 @@ $('#translations').on('touchstart click','.copyable-copy',function(){
 });
 
 /* --------------- open TermPortal ------------------------------------------ */
+
+/**
+ * If the user has the right to propose terms in the TermPortal,
+ * we initiate drawing the links here.
+ */
+function checkTermPortalIntegration() {
+    var html = '',
+        searchTerms = [],
+        nonExistingTerms = [];
+    // check user rights
+    if(!Editor.data.app.user.isUserTermproposer) {
+        return;
+    }
+    // check number of results
+    if($('#translations .translation-result').length > 3) {
+        //return;
+    }
+    // check if the terms already exist in any TermCollection
+    $('#translations [data-languageresource-type="mt"]').each(function() {
+        searchTerms.push({'text' : $(this).text(), 'id' : $(this).attr('id')});
+    });
+    if(searchTerms.length == 0) {
+        return;
+    }
+    $.ajax({
+        url: Editor.data.restpath+"termcollection/searchtermexists",
+        dataType: "json",
+        type: "POST",
+        data: {
+            'searchTerms':JSON.stringify(searchTerms),
+        },
+        success: function(result){
+            nonExistingTerms = result.rows;
+            nonExistingTerms.forEach(function(termToPropose) {
+                // for all translation-results that don't exist already exists as term: draw propose-Button
+                drawTermPortalIntegration(termToPropose);
+              });
+        }
+    });
+}
+
+/**
+ * Draw button for proposing term in the TermPortal.
+ * @params {Object}
+ */
+function drawTermPortalIntegration(termToPropose) {
+    var html = '<span class="term-proposal" title="'+Editor.data.languageresource.translatedStrings['termProposalIconTooltip']+'" data-id="'+termToPropose.id+'" data-term="'+termToPropose.text+'"><span class="ui-icon ui-icon-circle-plus"></span></span>';
+    $('#'+termToPropose.id+'.translation-result').next('.copyable-copy').append(html);
+}
+
+/**
+ * events
+ */
+$(document).on('click', '.term-proposal' , function() {
+    var text = $('#sourceText').val(),
+        lang = $("#sourceLocale").val(),
+        textProposal = $(this).attr('data-term'),
+        langProposal = $("#targetLocale").val(),
+        isTermProposalFromInstantTranslate = 'true';
+        params = "text="+text+"&lang="+lang+"&textProposal="+textProposal+"&langProposal="+langProposal+"&isTermProposalFromInstantTranslate="+isTermProposalFromInstantTranslate;
+    openTermPortal(params);
+});
+
 $('#translations').on('touchstart click','.term-info',function(){
-    var url=Editor.data.restpath+"termportal",
-    	termLanguage=$(this).attr("data-languageRfc"),
-        params="term="+$(this).attr('id')+"&lang="+termLanguage;
-    
-    window.parent.loadIframe('termportal',url,params);
+    var text = $(this).attr('id'),
+        lang = $(this).attr("data-languageRfc"),
+        params="text="+text+"&lang="+lang;
+    openTermPortal(params);
 });
 
 $('#termPortalButton').on('touchstart click',function(){
-    window.parent.loadIframe('termportal',Editor.data.restpath+'termportal');
+    openTermPortal();
 });
+
+/**
+ * Open TermPortal with given params (optional).
+ * @param {String} params
+ */
+function openTermPortal (params) {
+    console.log('openTermPortal ' + params);
+    var url = Editor.data.restpath+"termportal";
+    if (params) {
+        window.parent.loadIframe('termportal',url,params);
+    } else {
+        window.parent.loadIframe('termportal',url);
+    }
+}
 
 /* --------------- show/hide: helpers --------------------------------------- */
 function showSource() {

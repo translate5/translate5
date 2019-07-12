@@ -46,7 +46,8 @@ Ext.define('Editor.controller.TmOverview', {
         'Editor.view.LanguageResources.EditTmWindow',
         'Editor.view.LanguageResources.TaskGridWindow',
         'Editor.view.LanguageResources.ImportCollectionWindow',
-        'Editor.view.LanguageResources.log.LogWindow'
+        'Editor.view.LanguageResources.log.LogWindow',
+        'Editor.view.LanguageResources.ProposalExport'
     ],
     models: ['Editor.model.admin.Task', 'Editor.model.LanguageResources.Resource','Editor.model.LanguageResources.LanguageResource'],
     stores:[
@@ -427,6 +428,9 @@ Ext.define('Editor.controller.TmOverview', {
             case 'delete':
                 me.handleDeleteTm(view,cell,col,record);
                 break;
+            case 'export':
+                me.handleExportProposalClick(view,cell,col,record);
+                break;
             case 'log':
                 me.handleLogTm(view,cell,col,record);
                 break;
@@ -615,5 +619,15 @@ Ext.define('Editor.controller.TmOverview', {
             labels.push(lngStore.getById(id).get('label'));
         });
         return labels.join(',');
+    },
+    
+    /***
+     * Export proposals action button click handler
+     */
+    handleExportProposalClick:function(view, cell, cellIdx, rec){
+    	var proposalWindow=Ext.create('Editor.view.LanguageResources.ProposalExport',{
+    		record:rec
+    	});
+    	proposalWindow.show();
     }
 });

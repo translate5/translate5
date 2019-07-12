@@ -39,8 +39,8 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.LanguageResources.services.Default', {
     id: 'Default',
 
-    addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
-
+    exportTooltip:'#UT#Exportieren',
+    
     /**
      * returns the row css class for the associated service in the tm overview panel
      * @param {Editor.model.LanguageResources.LanguageResource} rec
@@ -60,7 +60,42 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      * Add/import new resoucres button default tooltip. This is rendered in the language resources grid.
      */
     getAddTooltip:function(){
-        return this.addTooltip;
+        return false;
+    },
+    
+    /***
+     * Export button default tooltip
+     */
+    getExportTooltip:function(){
+    	return this.exportTooltip;
+    },
+    
+    /***
+     * Get export language reources action icon class
+     */
+    getExportIconClass:function(){
+    	return 'x-hidden-display';
+    },
+    
+    /***
+     * Get import language reources action icon class
+     */
+    getImportIconClass:function(){
+    	return 'x-hidden-display';
+    },
+    
+    /***
+     * Get download language reources action icon class
+     */
+    getDownloadIconClass:function(){
+    	return 'x-hidden-display';
+    },
+    
+    /***
+     * Get download language reources action icon tooltip
+     */
+    getDownloadTooltip:function(){
+    	return false;
     }
 
 

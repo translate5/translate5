@@ -720,6 +720,7 @@ a.x-btn span.task-confirmation {
 .ico-tm-tasks {background-image: url(../images/tasks_assoc.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-delete {background-image: url(../images/book_delete.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-add {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}
+.ico-tm-export {background-image: url(../images/database_go.png);background-repeat:no-repeat;background-position:center;}
 .ico-tm-information {background-image: url(../images/information.png); background-repeat:no-repeat; background-position:50% 50%;}
 .ico-tm-show-more {background-image: url(../images/show_more.png); background-repeat:no-repeat; background-position:50% 50%;}
 .language-ressource-import .ico-tm-import {background-image: url(../images/book_add.png);background-repeat:no-repeat;background-position:center;}

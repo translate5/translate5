@@ -47,7 +47,6 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         edit: '#UT#Bearbeiten',
         erase: '#UT#Löschen',
         tasks: '#UT#Zugewiesene Aufgaben',
-        download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',
         resource: '#UT#Ressource',
         color: '#UT#Farbe',
         refresh: '#UT#Aktualisieren',
@@ -157,20 +156,29 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                         }
                     },{
                         action: 'import',
-                        iconCls: 'ico-tm-import',
-                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') == 'novalidlicense' ? true : false;
+	                    getClass:function(v,meta,record) {
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getImportIconClass(record);
                         },
 	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
-                            return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip();
+                            return Editor.util.LanguageResources.getService(r.get('serviceName')).getAddTooltip(r);
+	                    }
+                        
+                    },{
+                        action: 'download',
+                        getClass:function(v,meta,record) {
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getDownloadIconClass(record);
+                        },
+	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getDownloadTooltip(r);
 	                    }
                     },{
-                        tooltip: me.strings.download,
-                        action: 'download',
-                        iconCls: 'ico-tm-download',
-                        isDisabled: function( view, rowIndex, colIndex, item, record ) {
-                            return record.get('status') == 'novalidlicense' ? true : false;
-                        }
+                        action: 'export',
+                        getClass:function(v,meta,record) {
+                        	return Editor.util.LanguageResources.getService(record.get('serviceName')).getExportIconClass();
+                        },
+	                    getTip:function(view,metadata,r,rowIndex,colIndex,store){
+	                    	return Editor.util.LanguageResources.getService(r.get('serviceName')).getExportTooltip();
+	                    }
                     },{
                         tooltip: me.strings.log,
                         action: 'log',
@@ -387,5 +395,21 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
         }
         record.set('status',record.STATUS_LOADING);
         record.load();
+    },
+
+    /***
+     * Show import icon only for importable resources
+     */
+    showImport:function(record){
+    	return Ext.Array.contains(['OpenTM2','TermCollection'],record.get('serviceName'));
+    },
+    
+    /***
+     * Show download icon only for downloadable resources
+     */
+    showDownload:function(record){
+    	return Ext.Array.contains(['OpenTM2'],record.get('serviceName'));
     }
+    
+    
 });

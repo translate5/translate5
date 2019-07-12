@@ -40,7 +40,8 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         mergeTerms:'#UT#Termeinträge verschmelzen',
         deleteTermEntriesDate:'#UT#Termeinträge löschen älter als',
         deleteTermEitriesImport:'#UT#Termeinträge löschen älter als aktueller Import',
-        helpButtonTooltip:'#UT#Info zum Term-Collection'
+        helpButtonTooltip:'#UT#Info zum Term-Collection',
+        deleteTermProposals:'#UT#Vorschläge löschen älter als'
     },
     tools:[{
         type:'help',
@@ -76,11 +77,36 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
             fieldLabel: me.strings.deleteTermEntriesDate,
             itemId:'deleteEntriesModifiedOlderThan',
             name:'deleteEntriesModifiedOlderThan',
+            listeners:{
+            	change:function(datefield,newValue){
+            		var form=me.down('form').getForm(),
+            			proposalsCb=form.findField('deletProposalsOlderThan'),
+            			currentImportCb=form.findField('deleteEntriesOlderThanCurrentImport');
+            		proposalsCb.setDisabled(!newValue && !currentImportCb.checked);
+            	}
+            },
         },{
             xtype:'checkbox',
             fieldLabel: me.strings.deleteTermEitriesImport,
             itemId:'deleteEntriesOlderThanCurrentImport',
             name:'deleteEntriesOlderThanCurrentImport',
+            value:false,
+            listeners:{
+            	change:function(checkbox,newValue){
+            		var form=me.down('form').getForm(),
+            			proposalsCb=form.findField('deletProposalsOlderThan'),
+            			deletedateField=form.findField('deleteEntriesModifiedOlderThan');
+            		
+            		proposalsCb.setDisabled(!newValue && deletedateField.getValue()==null);
+            	}
+            }
+        },{
+            xtype:'checkbox',
+            fieldLabel: me.strings.deleteTermProposals,
+            itemId:'deletProposalsOlderThan',
+            name:'deletProposalsOlderThan',
+            disabled:true,
+            inputValue:true,
             value:false
         });
         me.down('filefield[name="tmUpload"]').regex=/\.tbx$/i;
