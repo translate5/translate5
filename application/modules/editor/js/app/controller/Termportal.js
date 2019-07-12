@@ -101,7 +101,12 @@ Ext.define('Editor.controller.Termportal', {
             var apiUrl=Editor.data.restpath+'termportal',
                 appName='termportal',
                 url=Editor.data.restpath+'apps?name='+appName+'&apiUrl='+apiUrl;
-            window.open(url, 'termportalandinstanttranslate');
+            window.open(url, 'termportalandinstanttranslate').focus();
+            // Yet, this still does not always re-focus an already existing Termportal-Tab:
+            // - "Firefox (51.) gets the handle but cannot run any Element.focus() " 
+            //   (https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Note_on_use_of_window_open)
+            // - "It may fail due to user settings and the window isn't guaranteed to be frontmost before this method returns." 
+            //   (https://developer.mozilla.org/en-US/docs/Web/API/Window/focus)
         }  
     },
     

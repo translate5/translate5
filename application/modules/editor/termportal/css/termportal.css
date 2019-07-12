@@ -40,7 +40,7 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- header --------------- */
 
-#container-header {
+#containerHeader {
     display: flex;
     flex-flow: row wrap;
     border-bottom: 1px solid #00adef;
@@ -81,15 +81,21 @@ END LICENSE AND COPYRIGHT
     color: #454545;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 690px) {
     #logo {
         flex: 0 1 100%;
         text-align:left;
         margin-right: 0px;
     }
-    #logo { order: 1; }
-    #languageSelector { order: 2; text-align: left; margin-top: 5px;}
-    #logoutContainer { order: 3; margin-top: 5px;}
+    #languageSelector {text-align: left; margin-top: 5px;}
+    #logoutContainer {margin-top: 5px;}
+    #instantTranslateButtonContainer {margin-top: 5px;}
+}
+
+@media (max-width: 600px) {
+    #containerHeader {
+        font-size: 90%;
+    }
 }
 
 /* --------------- search --------------- */
