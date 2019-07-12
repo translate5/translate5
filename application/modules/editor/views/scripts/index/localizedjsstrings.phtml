@@ -1249,7 +1249,6 @@ Ext.define('Editor.controller.Localizer', {
             edit: '<?php echo $this->translate->_('Bearbeiten');?>',
             tasks: '<?php echo $this->translate->_('Zugewiesene Aufgaben');?>',
             erase: '<?php echo $this->translate->_('Löschen');?>',
-            download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>',
             resource: '<?php echo $this->translate->_('Ressource');?>',
             refresh: '<?php echo $this->translate->_('Aktualisieren');?>',
             color: '<?php echo $this->translate->_('Farbe');?>',
@@ -1287,8 +1286,13 @@ Ext.define('Editor.controller.Localizer', {
 
     Ext.define("Editor.locale.view.LanguageResources.services.Default", {
         override: "Editor.view.LanguageResources.services.Default",
-        addTooltip: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
         exportTooltip: '<?php echo $this->translate->_('Exportieren');?>'
+    });
+    
+    Ext.define("Editor.locale.view.LanguageResources.services.OpenTM2", {
+        override: "Editor.view.LanguageResources.services.OpenTM2",
+        addTooltip: '<?php echo $this->translate->_('Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen');?>',
+        download: '<?php echo $this->translate->_('Dateibasiertes TM herunterladen und lokal speichern');?>'
     });
 
     
