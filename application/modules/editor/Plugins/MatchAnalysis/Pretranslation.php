@@ -117,7 +117,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         //if the segment target is not empty or best match rate is not found do not pretranslate
         //pretranslation only for editable segments
-        if(($segment->getAutoStateId()!=editor_Models_Segment_AutoStates::NOT_TRANSLATED)){
+        if($segment->getAutoStateId() != editor_Models_Segment_AutoStates::NOT_TRANSLATED){
             return;
         }
         //if($result->matchrate==editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE){
