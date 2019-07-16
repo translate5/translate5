@@ -349,6 +349,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 
                 $this->termCollectionId=$termCollectionId;
                 
+                if(!isset($this->user)){
+                    $sessionUser = new Zend_Session_Namespace('user');
+                    $this->loadUser($sessionUser->data->userGuid);
+                }
+                
                 //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
                 while($this->fastForwardTo('termEntry')) {
                     $this->setActualLevel();

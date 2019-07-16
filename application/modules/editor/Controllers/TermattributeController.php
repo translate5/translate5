@@ -80,6 +80,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
     }
     
     /**
+     * TODO: Tests
      * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
      */
     public function proposeOperation() {
@@ -126,6 +127,8 @@ class editor_TermattributeController extends ZfExtended_RestController {
     }
     
     /**
+     * TODO: Tests, later in the development
+     * 
      * confirm the proposal and saves the proposed data into the term
      * @throws ZfExtended_UnprocessableEntity
      */
@@ -150,6 +153,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
     }
     
     /**
+     * TODO: Tests
      * removes a proposal
      * @throws ZfExtended_UnprocessableEntity
      */

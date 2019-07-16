@@ -508,6 +508,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->success = $this->validateUpload();
     }
     
+    //TODO: Tests
     public function exportAction() {
         $proposals=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $proposals editor_Models_Term */
