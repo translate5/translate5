@@ -597,6 +597,7 @@ class editor_Models_Import_FileParser_XmlParser {
      * @return boolean
      */
     public function isStringValidXml($string){
+        libxml_clear_errors();
         libxml_use_internal_errors(true);
         
         //surround with dummy tags so the string validation can be done with domdocument
@@ -612,11 +613,7 @@ class editor_Models_Import_FileParser_XmlParser {
             return true;
         }
         
-        $error = $errors[0];
-        if($error->level < 3){
-            return true;
-        }
-        return false;
+        return $errors[0]->level < 3;
     }
     
     /**
