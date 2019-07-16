@@ -40,6 +40,6 @@ CREATE TABLE `LEK_request_log` (
   PRIMARY KEY (`id`),
   KEY `taskGuid` (`taskGuid`),
   CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `LEK_task_log` ADD COLUMN `message` varchar(512) NOT NULL;
