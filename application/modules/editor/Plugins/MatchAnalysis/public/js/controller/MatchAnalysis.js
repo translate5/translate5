@@ -105,7 +105,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
                 taskUnhandledAction: 'onTaskActionColumnNoHandler',
-                periodicalTaskReloadIgnore: 'ignoreTaskForReload'
+                periodicalTaskReloadIgnore: 'ignoreTaskForReload',
+                importStateCheckFinished:'onImportStateCheckFinished'
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -352,7 +353,13 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     startAnalysis:function(taskId,operation){
     	//'editor/:entity/:id/operation/:operation',
-        var me=this;
+        var me=this,
+        	store=Ext.StoreManager.get('admin.Tasks'),
+        	record=store ? store.getById(taskId) : null;
+        
+        if(record){
+        	record.set('state','matchanalysis');
+        }
         
         me.addLoadingMask();
         Ext.Ajax.request({
@@ -431,11 +438,17 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
     },
 
     /***
-     * Tash state check cleand event handler. This event is fired from Task overview controller.
+     * Import state check state finished event handler. This event is fired from Task overview controller.
      */
-    onTaskStateCheckPullCleaned:function(){
-        //FIXME wann muss ich das machen? Eigentlich lösgelöst von der TaskOverview!
-        this.removeLoadingMask(true);
+    onImportStateCheckFinished:function(taskOverview,record){
+    	var me=this,
+    		taskWindow=me.getAdminTaskPreferencesWindow();
+    	if(!taskWindow){
+    		return;
+    	}
+    	if(record.get('taskGuid')==taskWindow.actualTask.get('taskGuid')){
+    		me.removeLoadingMask(true);
+    	}
     },
 
     /***
@@ -446,12 +459,12 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
             assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
             matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
         
-        if(assocPanel && assocPanel.getEl()){
-            assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        if(assocPanel){
+        	assocPanel.setLoading(true);
         }
 
-        if(matchAnalysisPanel && matchAnalysisPanel.getEl()){
-            matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        if(matchAnalysisPanel){
+        	matchAnalysisPanel.setLoading(true);
         }
     },
 
@@ -468,15 +481,18 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         if(!assocPanel){
             return;
         }
-        assocPanel.unmask();
+
+        assocPanel.setLoading(false);
 
         if(!matchAnalysisPanel){
             return;
         }
+        
         if(reloadStore){
             matchAnalysisGrid.getStore().reload();
         }
-        matchAnalysisPanel.getEl().unmask(me.strings.analysisLoadingMsg);
+        
+        matchAnalysisPanel.setLoading(false);
     }
 
 });
