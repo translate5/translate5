@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         ref: 'taskAssocGrid',
         selector: '#languageResourcesTaskAssocGrid'
     }],
-        
+    TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
@@ -105,7 +105,8 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         	'#admin.TaskOverview':{
         		taskCreated:'onTaskCreated',
                 taskUnhandledAction: 'onTaskActionColumnNoHandler',
-                periodicalTaskReloadIgnore: 'ignoreTaskForReload'
+                periodicalTaskReloadIgnore: 'ignoreTaskForReload',
+                taskStateCheckReloaded: 'onTaskStateCheckPullCleaned' 
             },
             '#LanguageResourcesTaskassoc':{
                 taskAssocSavingFinished:'onTaskAssocSavingFinished'
@@ -151,8 +152,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * On task preferences window tabpanel render
      */
     onTaskPreferencesWindowPanelRender:function(panel){
-        var me=this,
-            prefWindow=panel.up('window');
+        var prefWindow = panel.up('window');
         
         //add the matchanalysis panel in the tabpanel
         panel.insert(2,{
@@ -383,8 +383,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Language resource to task assoc after save event handler
      */
     onTaskAssocSavingFinished:function(record,store){
-        var me=this;
-        me.updateTaskAssocPanelViewModel(store);
+        this.updateTaskAssocPanelViewModel(store);
     },
 
     /***
@@ -427,15 +426,25 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * if task must be reloaded periodically we have to return false here
      */
     ignoreTaskForReload: function(task) {
-        return task.get('state') !== 'matchanalysis';
+        return task.get('state') !== this.TASK_STATE_ANALYSIS;
     },
 
     /***
-     * Tash state check cleand event handler. This event is fired from Task overview controller.
+     * Task state check cleand event handler. This event is fired from Task overview controller.
      */
-    onTaskStateCheckPullCleaned:function(){
-        //FIXME wann muss ich das machen? Eigentlich lösgelöst von der TaskOverview!
-        this.removeLoadingMask(true);
+    onTaskStateCheckPullCleaned:function(task){
+        var me = this, 
+            win = me.getAdminTaskPreferencesWindow(),
+            loadedTask;
+        
+        if(!win) {
+            return;
+        }
+        loadedTask = win.lookupViewModel().get('currentTask');
+        if(task.get('id') !== loadedTask.get('id') || !me.ignoreTaskForReload(task)) {
+            return;
+        }
+        me.removeLoadingMask(true);
     },
 
     /***
@@ -443,15 +452,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     addLoadingMask:function(){
         var me=this,
-            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
-            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
+            loadedTask,
+            assocPanel = me.getLanguageResourceTaskAssocPanel(),
+            matchAnalysisPanel = me.getMatchAnalysisPanel();
         
-        if(assocPanel && assocPanel.getEl()){
-            assocPanel.getEl().mask(me.strings.analysisLoadingMsg);
-        }
-
-        if(matchAnalysisPanel && matchAnalysisPanel.getEl()){
-            matchAnalysisPanel.getEl().mask(me.strings.analysisLoadingMsg);
+        assocPanel && assocPanel.setLoading(me.strings.analysisLoadingMsg);
+        
+        if(matchAnalysisPanel){
+            loadedTask = matchAnalysisPanel.lookupViewModel().get('currentTask');
+            loadedTask.set('state', me.TASK_STATE_ANALYSIS);
+            matchAnalysisPanel.setLoading(me.strings.analysisLoadingMsg);
         }
     },
 
@@ -461,22 +471,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     removeLoadingMask:function(reloadStore){
         var me=this,
-            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel'),
-            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel'),
-            matchAnalysisGrid=me.getComponentByItemId('matchAnalysisGrid');
+            assocPanel = me.getLanguageResourceTaskAssocPanel(),
+            matchAnalysisPanel = me.getMatchAnalysisPanel(),
+            matchAnalysisGrid = me.getComponentByItemId('matchAnalysisGrid'),
+            store = matchAnalysisGrid && matchAnalysisGrid.getStore();
         
-        if(!assocPanel){
-            return;
+        assocPanel && assocPanel.setLoading(false);
+        matchAnalysisPanel && matchAnalysisPanel.setLoading(false);
+        if(matchAnalysisGrid && reloadStore && store.isLoaded()){
+            store.reload();
         }
-        assocPanel.unmask();
-
-        if(!matchAnalysisPanel){
-            return;
-        }
-        if(reloadStore){
-            matchAnalysisGrid.getStore().reload();
-        }
-        matchAnalysisPanel.getEl().unmask(me.strings.analysisLoadingMsg);
     }
 
 });
