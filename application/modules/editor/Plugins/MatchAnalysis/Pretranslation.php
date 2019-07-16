@@ -101,6 +101,12 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $mtConnectors=array();
     
+    /**
+     * contains the real state of the task. $this->task->state will contain matchanalysis
+     * @var string
+     */
+    protected $taskState;
+    
     public function __construct(){
         $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -176,7 +182,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $segment->setMatchRate($result->matchrate);
         
         //if the task is in state import calculate the autostate
-        if($this->task->getState()==editor_Models_Task::STATE_IMPORT){
+        if($this->taskState == editor_Models_Task::STATE_IMPORT){
             $autoStates=ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
             /* @var $autoStates editor_Models_Segment_AutoStates */
             
@@ -187,7 +193,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             /* @var $wfm editor_Workflow_Manager */
             $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
             
-            $updateAutoStates = function($autostates, $segment, $tua) {
+            $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, $segment, $tua) {
                 //sets the calculated autoStateId
                 $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
             };
