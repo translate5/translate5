@@ -270,10 +270,12 @@ Ext.define('Editor.controller.admin.TaskOverview', {
           taskReloaded = function(rec) {
               if(rec.isErroneous()) {
                   Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskError, rec.get('taskName')));
+                  me.fireEvent('importStateCheckFinished',me,rec);
                   return;
               }
               if(!me.isImportingCheck(rec)) {
                   Editor.MessageBox.addSuccess(Ext.String.format(me.strings.taskImported, rec.get('taskName')));
+                  me.fireEvent('importStateCheckFinished',me,rec);
               }
           };
       tasks.each(function(task){
