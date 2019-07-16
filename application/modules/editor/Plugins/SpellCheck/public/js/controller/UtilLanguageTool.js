@@ -79,12 +79,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
      */
     setIsSupportedLanguage: function (resultLT) {
         var me = this;
-        if (resultLT.rows == false) {
+        if (resultLT.rows === false) {
             me.isSupportedLanguage = false;
             me.languageToCheckLongCode = null;
         } else {
             me.isSupportedLanguage = true;
             me.languageToCheckLongCode = resultLT.rows.longCode;
+            me.initEditor();
         }
         me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
     },
@@ -169,9 +170,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
      * @returns {Array}
      */
     getReplacementsForMatchFromTool: function (match) {
-        var me = this,
-            replacements = [];
-        Ext.Array.each(match.replacements, function(replacement, index) {
+        var replacements = [];
+        Ext.Array.each(match.replacements, function(replacement) {
             Ext.Array.push(replacements, replacement.value );
         });
         return replacements;
@@ -182,9 +182,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
      * @returns {Array}
      */
     getInfoURLsForMatchFromTool: function (match) {
-        var me = this,
-            infoURLs = [];
-        Ext.Array.each(match.rule.urls, function(url, index) {
+        var infoURLs = [];
+        Ext.Array.each(match.rule.urls, function(url) {
             Ext.Array.push(infoURLs, url.value );
         });
         return infoURLs;
