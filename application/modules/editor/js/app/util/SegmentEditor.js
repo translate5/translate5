@@ -83,6 +83,19 @@ Ext.define('Editor.util.SegmentEditor', {
     },
     
     // =========================================================================
+    // Helpers regarding the Segment-Editor
+    // =========================================================================
+    
+    /***
+     * Enable/disable the Segment-Editor.
+     * @param {Boolean} disabled
+     */
+    setEditorDisabled:function(disabled){
+        var me = this;
+        me.editor.setDisabled(disabled);
+    },
+    
+    // =========================================================================
     // Helpers regarding the (content in the) Segment-Editor
     // =========================================================================
     

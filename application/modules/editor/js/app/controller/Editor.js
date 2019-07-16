@@ -140,10 +140,17 @@ Ext.define('Editor.controller.Editor', {
         Ext.override("Ext.util.KeyMap",{
             handleTargetEvent: Editor.view.segments.EditorKeyMap.handleTargetEvent
         });
-        
-        //set the default config
-        //'xyz': [key(s), {ctrl, alt, shift}, fn, defaultEventAction==stopEvent]
+
+        // -------------------------------------------------------------------------------------
+        // set the default config
+        // -------------------------------------------------------------------------------------
+        // 'xyz': [key(s), {ctrl, alt, shift}, fn, defaultEventAction==stopEvent, (optional:) scope]
+        // -------------------------------------------------------------------------------------
         // **** CAUTION: with any changes, please check if they affect Editor.util.Event ****
+        // -------------------------------------------------------------------------------------
+        // For a complete overview of all keyboard-shortcuts (including those from plugins) see:
+        // https://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts
+        // -------------------------------------------------------------------------------------
         me.keyMapConfig = {
             'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
             'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
@@ -209,7 +216,7 @@ Ext.define('Editor.controller.Editor', {
         plug.on('beforestartedit', me.handleBeforeStartEdit, me);
         plug.on('beforeedit', me.handleStartEdit, me);
         plug.on('canceledit', disableEditing);
-        plug.on('edit', disableEditing)
+        plug.on('edit', disableEditing);
         
         Ext.getDoc().on('copy', me.copySelectionWithInternalTags, me, {priority: 9999, delegated: false});
         
@@ -241,7 +248,6 @@ Ext.define('Editor.controller.Editor', {
             'alt-c':[
                 "C",{ctrl: false, alt: true}, 
                 function(key, e){
-                    var me = this;
                     e.stopEvent();
                     Ext.fireEvent('editorOpenComments');
                     return false;
@@ -324,7 +330,7 @@ Ext.define('Editor.controller.Editor', {
             var me = this,
                 plug = me.getEditPlugin(),
                 source = context.record.get('source'),
-                tempNode, parse, walkNodes;
+                tempNode, walkNodes;
 
             me.sourceTags = [];
             //do nothing when editing the source field
@@ -337,10 +343,10 @@ Ext.define('Editor.controller.Editor', {
 
             walkNodes = function(rootNode) {
                 Ext.each(rootNode.childNodes, function(item){
-                    if(Ext.isTextNode(item) || item.tagName != 'DIV'){
+                    if(Ext.isTextNode(item) || item.tagName !== 'DIV'){
                         return;
                     }
-                    if(item.tagName == 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
+                    if(item.tagName === 'DIV' && /(^|[\s])term([\s]|$)/.test(item.className)){
                         walkNodes(item);
                         return;
                     }
@@ -375,6 +381,7 @@ Ext.define('Editor.controller.Editor', {
      * 1: special key config
      * 2: function to be called
      * 3: boolean, if true prepend event propagation stopper
+     * 4: scope (optional)
      *
      * @param {String} area, a speakable name where the config is used. 
      *    Just passed to the keyMapConfig event to determine there if the event should be processed or not
@@ -412,7 +419,7 @@ Ext.define('Editor.controller.Editor', {
             //applies the keys config and scope to a fresh conf object
             var confObj = Ext.applyIf({
                 key: item[0],
-                scope: me
+                scope: item[4] || me
             }, item[1]);
             if(item[3]) {
                 confObj.defaultEventAction = 'stopEvent';
@@ -422,7 +429,7 @@ Ext.define('Editor.controller.Editor', {
                 item[2].apply(confObj.scope, arguments);
                 //FIXME Ausnahme für digitHandler definieren, wenn nicht im isDigitPreparation Modus!
                 return false; //stop further key binding processing
-            }
+            };
             conf.push(confObj);
         });
         return conf;
@@ -433,8 +440,7 @@ Ext.define('Editor.controller.Editor', {
      */
     initEditor: function(editor){
         var me = this,
-            docEl = Ext.get(editor.getDoc()),
-            offset = editor.iframeEl.getXY();
+            docEl = Ext.get(editor.getDoc());
         if(me.editorKeyMap) {
             me.editorKeyMap.destroy();
         }
@@ -461,13 +467,12 @@ Ext.define('Editor.controller.Editor', {
             e.stopPropagation();
             e.preventDefault();
             var plug = me.getEditPlugin(),
-                htmlEditor = plug.editor.mainEditor,
                 segmentId = plug.context.record.get('id'),
                 data,
                 clipboardData = (e.browserEvent.clipboardData || window.clipboardData).getData('Text');
-            if (me.copiedContentFromSource != null ) {
+            if (me.copiedContentFromSource !== null ) {
                 // Segment A must not copy internal tags into Segment B
-                if (segmentId != me.copiedContentFromSource.selSegmentId) {
+                if (segmentId !== me.copiedContentFromSource.selSegmentId) {
                     data = me.copiedContentFromSource.selDataText;
                 } else {
                     data = me.copiedContentFromSource.selDataHtml;
@@ -477,10 +482,10 @@ Ext.define('Editor.controller.Editor', {
                 // if the clipboard-data isn't the same as before copying from the source,
                 // we use the new clipboard-data.
                 // But only if what has been copied from the source has not changed meanwhile.
-                if (me.lastCopiedFromSourceData == me.copiedContentFromSource.selDataHtml
-                        && clipboardData != ''
-                        && me.lastClipboardData != ''
-                        && clipboardData != me.lastClipboardData) {
+                if (me.lastCopiedFromSourceData === me.copiedContentFromSource.selDataHtml
+                        && clipboardData !== ''
+                        && me.lastClipboardData !== ''
+                        && clipboardData !== me.lastClipboardData) {
                     data = clipboardData;
                     me.copiedContentFromSource = null;
                     me.lastCopiedFromSourceData = '';
@@ -598,8 +603,8 @@ Ext.define('Editor.controller.Editor', {
      * @param event
      */
     handleKeyUp: function(event) {
-        var me = this
-        	me.event = event; // Editor.util.Event
+        var me = this;
+        me.event = event; // Editor.util.Event
 	    // New content? 
         // Ignore 
         // - keys that don't produce content (strg,alt,shift itself, arrows etc)
@@ -667,7 +672,7 @@ Ext.define('Editor.controller.Editor', {
      */
     goToLowerNoSave: function() {
         var me = this;
-        me.prevNextSegment.calcNext()
+        me.prevNextSegment.calcNext();
         me.moveToAdjacentRow();
     },
     /**
@@ -676,7 +681,7 @@ Ext.define('Editor.controller.Editor', {
      */
     goToUpperNoSave: function() {
         var me = this;
-        me.prevNextSegment.calcPrev()
+        me.prevNextSegment.calcPrev();
         me.moveToAdjacentRow();
     },
     /**
@@ -687,7 +692,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this;
         e.preventDefault();
         e.stopEvent();
-        me.prevNextSegment.calcNext(true)
+        me.prevNextSegment.calcNext(true);
         me.moveToAdjacentRow();
     },
     /**
@@ -698,7 +703,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this;
         e.preventDefault();
         e.stopEvent();
-        me.prevNextSegment.calcPrev(true)
+        me.prevNextSegment.calcPrev(true);
         me.moveToAdjacentRow();
     },
     /**
@@ -721,7 +726,7 @@ Ext.define('Editor.controller.Editor', {
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     saveNext: function() {
-        this.prevNextSegment.calcNext()
+        this.prevNextSegment.calcNext();
         this.saveOtherRow();
     },
     /**
@@ -729,7 +734,7 @@ Ext.define('Editor.controller.Editor', {
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     savePrevious: function() {
-        this.prevNextSegment.calcPrev()
+        this.prevNextSegment.calcPrev();
         this.saveOtherRow();
     },
     /**
@@ -737,7 +742,7 @@ Ext.define('Editor.controller.Editor', {
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     saveNextByWorkflow: function() {
-        this.prevNextSegment.calcNext(true)
+        this.prevNextSegment.calcNext(true);
         this.saveOtherRow();
     },
     /**
@@ -745,17 +750,14 @@ Ext.define('Editor.controller.Editor', {
      * @return {Boolean} true if there is a next segment, false otherwise
      */
     savePreviousByWorkflow: function() {
-        this.prevNextSegment.calcPrev(true)
+        this.prevNextSegment.calcPrev(true);
         this.saveOtherRow();
     },
     /**
      * save and go to other row
      */
     saveOtherRow: function() {
-        var me = this,
-            grid = me.getSegmentGrid(),
-            selModel = grid.getSelectionModel(),
-            ed = me.getEditPlugin();
+        var me = this;
         
         me.fireEvent('saveUnsavedComments');
         if(!me.isEditing) {
@@ -772,14 +774,15 @@ Ext.define('Editor.controller.Editor', {
     },
     /**
      * Opens a next row, if any
-     * @param {Object} data from getPrevNextRow
      */
     openNextRow: function() {
         var me = this,
             grid = me.getSegmentGrid(),
             selModel = grid.getSelectionModel(),
-            ed = me.getEditPlugin()
-            rowMeta = me.prevNextSegment.getCalculated();
+            ed = me.getEditPlugin(),
+            rowMeta = me.prevNextSegment.getCalculated(),
+            callback,
+            sel;
         
         //if we have a nextSegment and it is rendered, bring into the view and open it
         if (rowMeta.rec && grid.getView().getNode(rowMeta.rec)) {
@@ -837,7 +840,7 @@ Ext.define('Editor.controller.Editor', {
         });
         if(Editor.data.segments.userCanIgnoreTagValidation) {
             msgBox.confirm(me.messages.errorTitle, msg, function(btn) {
-                if(btn == 'no') {
+                if(btn === 'no') {
                     me.saveAndIgnoreContentErrors();
                 }
             },me);
@@ -881,7 +884,7 @@ Ext.define('Editor.controller.Editor', {
     /**
      * Handles pressing the comment keyboard shortcut
      */
-    handleOpenComments: function(key) {
+    handleOpenComments: function() {
         Ext.fireEvent('editorOpenComments');
     },
     /**
@@ -895,7 +898,7 @@ Ext.define('Editor.controller.Editor', {
         e.preventDefault();
         e.stopEvent();
         var param = Number(key) - 48;
-        if (param == 0) {
+        if (param === 0) {
             param = 10;
         }
         if(e.shiftKey) {
@@ -955,13 +958,13 @@ Ext.define('Editor.controller.Editor', {
     /**
      * Move the editor about one editable field
      */
-    goAlternateRight: function(btn, ev) {
+    goAlternateRight: function() {
         this.goToCustom(1, true);
     },
     /**
      * Move the editor about one editable field
      */
-    goAlternateLeft: function(btn, ev) {
+    goAlternateLeft: function() {
         this.goToCustom(-1, true);
     },
     /**
@@ -1006,7 +1009,7 @@ Ext.define('Editor.controller.Editor', {
         }
         
         Ext.Array.each(columns, function(col, idx) {
-        if(col.dataIndex == current) {
+        if(col.dataIndex === current) {
             foundIdx = idx;
         }
         });
@@ -1064,7 +1067,6 @@ Ext.define('Editor.controller.Editor', {
             selModel = grid.getSelectionModel(),
             ed = me.getEditPlugin(),
             cols = grid.query('contentEditableColumn:not([hidden])'),
-            view = grid.getView(),
             sel = [],
             firstEditableRow = grid.store.getFirsteditableRow(),
             callback;
@@ -1110,7 +1112,6 @@ Ext.define('Editor.controller.Editor', {
         // CTRL+C gets the selected text (including internal tags)
         var me = this,
             plug = me.getEditPlugin(),
-            htmlEditor,
             segmentId,
             rangeForCell,
             sel,
@@ -1164,7 +1165,6 @@ Ext.define('Editor.controller.Editor', {
             return;
         }
 
-        htmlEditor = plug.editor.mainEditor;
         segmentId = plug.context.record.get('id');
         sel = rangy.getSelection();
         
@@ -1209,7 +1209,7 @@ Ext.define('Editor.controller.Editor', {
                 'selDataHtml': selDataHtml, // = selected content WITH internal tags
                 'selDataText': selDataText, // = selected content WITHOUT internal tags
                 'selSegmentId': segmentId
-        }
+        };
         
         event.preventDefault();
     },
@@ -1244,7 +1244,7 @@ Ext.define('Editor.controller.Editor', {
         plug = me.getEditPlugin();
         editor = plug.editor.mainEditor;
         editor.insertWhitespaceInEditor(whitespaceType, tagNr);
-        if (e.delegatedTarget.nodeName.toLowerCase() == 'a') {
+        if (e.delegatedTarget.nodeName.toLowerCase() === 'a') {
             editor.focus();
         }
         e.stopEvent();
@@ -1286,9 +1286,7 @@ Ext.define('Editor.controller.Editor', {
             var me = this,
                 plug = this.getEditPlugin(),
                 editor = plug.editor.mainEditor,
-                source = plug.context.record.get('source'),
-                tagIdx = Number(key) - 49, //49 shifts tag nr down to 0 for tag 1
-                tempNode, parse;
+                tagIdx = Number(key) - 49; //49 shifts tag nr down to 0 for tag 1
 
             //key 0 equals to tadIdx -1 and equals to tag nr 10 (which equals to tagIdx 9)
             if(tagIdx < 0) {
@@ -1349,7 +1347,7 @@ Ext.define('Editor.controller.Editor', {
                 record.set('segmentUserAssocId', isWatched ? null : rec.data['id']);
                 but.setTooltip(isWatched ? startText : stopText);
                 but.toggle(!isWatched, true);
-                if(op.action == 'create') {
+                if(op.action === 'create') {
                     me.fireEvent('watchlistAdded', record, me, rec);
                 }
                 else {
@@ -1358,25 +1356,22 @@ Ext.define('Editor.controller.Editor', {
                 //update autostate displayfield, since the displayfields are getting the rendered content, we have to fetch it here from rendered HTML too
                 autoStateCell && displayfield.setValue(autoStateCell.getHtml());
             },
-            failure = function(rec, op) {
+            failure = function() {
                 but.setTooltip(isWatched ? stopText : startText);
                 but.toggle(isWatched, true);
             };
         
-        if (isWatched)
-        {
+        if (isWatched) {
             config = {
                 id: segmentUserAssocId
-            }
+            };
             model = Ext.create('Editor.model.SegmentUserAssoc', config);
             model.getProxy().setAppendId(true);
             model.erase({
                 success: success,
                 failure: failure
             });
-        }
-        else
-        {
+        } else {
             model = Ext.create('Editor.model.SegmentUserAssoc', {'segmentId': segmentId});
             model.save({
                 success: success,
