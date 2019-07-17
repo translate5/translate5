@@ -1337,7 +1337,7 @@
         "stateId": "0",
         "autoStateId": "3",
         "fileOrder": "2",
-        "comments": "<div class=\"comment\">\n    <span class=\"content\">Title: Imported Comment Title<br \/>\nImported Comment Text<\/span>\n    <span class=\"author\">tester<\/span>\n    <span class=\"modified\">2019-02-20 12:55:20<\/span>\n<\/div>",
+        "comments": "<div class=\"comment\">\n    <span class=\"content\">Title: Imported Comment Title<br \/>\nImported Comment Text<\/span>\n    <span class=\"author\">tester<\/span>\n    <span class=\"modified\">NOT_TESTABLE<\/span>\n<\/div>",
         "workflowStepNr": "0",
         "workflowStep": null,
         "source": "ohne match",
