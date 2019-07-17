@@ -147,9 +147,6 @@ div.single + div {
 	color:#000000;
     cursor: text;
 }
-#segment-grid .x-grid-row-editor .segment-content.x-form-readonly .x-form-display-field {
-    display: none;
-}
 
 #segment-grid .x-grid-row-editor .autoState .x-form-display-field {
     white-space: nowrap
