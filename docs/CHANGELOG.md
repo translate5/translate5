@@ -6,7 +6,23 @@ Missing Versions are merged into in the next upper versions, so no extra section
 For special notices see:
 TRANSLATE-1654: TermTagger stops working on import of certain task - improved error management and logging
 TRANSLATE-1695: VisualReview: segmentmap generation has a bad performance on task load
- 
+
+## [3.2.3] - 2019-07-17
+###Added
+TRANSLATE-1489: Export task as excel and be able to reimport it
+
+###Bugfixes
+TRANSLATE-1464: SpellCheck for Japanese and other languages using the Microsoft Input Method Editor
+TRANSLATE-1715: XLF Import: Segments with tags only should be ignored and pretranslated automatically on translation tasks
+TRANSLATE-1705: Pre-translation does not remove "AdditionalTag"-Tag from OpenTM2
+TRANSLATE-1637: MatchAnalysis: Errors in Frontend when analysing multiple tasks
+TRANSLATE-1658: Notify assoc users with state open in notifyOverdueTasks
+TRANSLATE-1709: Missing translator checkers in email when all proofreaders are finished
+TRANSLATE-1708: Possible server error on segment search
+TRANSLATE-1707: XLIFF 2.1 Export creates invalid XML
+TRANSLATE-1702: Multiple parallel export of the same task from the same session leads to errors
+TRANSLATE-1706: Improve TrackChanges markup for internal tags in Editor
+
 ## [3.2.2] - 2019-06-27
 ###Added
 TRANSLATE-1676: Disable file extension check if a custom bconf is provided
