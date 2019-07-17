@@ -763,9 +763,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * @param {Ext.container.Container} statusStrip
      */
     setDisableSpellCheckByIdle: function (statusStrip) {
-        var me = this;
+        var me = this,
+            targetLangSplit = me.targetLangCode.split('-'),
+            mainLang = targetLangSplit[0];
         // is the target-language one of those that cause problems?
-        me.disableSpellCheckByIdle = (me.languagesToStopIdle.indexOf(me.targetLangCode) !== -1);
+        me.disableSpellCheckByIdle = (me.languagesToStopIdle.indexOf(mainLang) !== -1);
         // if yes, add button in statusStrip:
         if (me.disableSpellCheckByIdle) {
             me.addSpellCheckButton(statusStrip);
