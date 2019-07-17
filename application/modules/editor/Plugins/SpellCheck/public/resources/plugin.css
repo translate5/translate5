@@ -50,3 +50,7 @@ Images to the plugins image path are adressed relativly
     border-bottom:  0px !important;
     border-left:  0px !important;
 }
+
+#segment-grid .x-grid-row-editor .segment-content.x-form-readonly div.x-form-display-field.type-target {
+    display: none;
+}
