@@ -95,6 +95,11 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
      */
     protected $internalTag;
     
+    /**
+     * @var editor_Models_Segment_AutoStates
+     */
+    protected $autoStates;
+    
     /***
      * Pretranslation mt connectors(the mt resources associated to a task)
      * @var array
@@ -110,6 +115,7 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
     public function __construct(){
         $this->initLogger('E1100', 'plugin.matchanalysis', '', 'Plug-In MatchAnalysis: ');
         $this->internalTag = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
+        $this->autoStates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
     }
     
     /***
@@ -160,11 +166,25 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
             return;
         }
         
-        //if the result language resource is termcollection, set the target result first character to uppercase
-        if($this->isTermCollection($languageResourceid)){
-            $targetResult=ZfExtended_Utils::mb_ucfirst($targetResult);
+        $hasText = $this->internalTag->hasText($segment->getSource());
+        if($hasText) {
+            //if the result language resource is termcollection, set the target result first character to uppercase
+            if($this->isTermCollection($languageResourceid)){
+                $targetResult=ZfExtended_Utils::mb_ucfirst($targetResult);
+            }
+            $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
+            $segment->setMatchRate($result->matchrate);
+            $matchrateType->initPretranslated($languageResource->getResourceType(), $type);
         }
-        $targetResult = $this->internalTag->removeIgnoredTags($targetResult);
+        //if the source contains no text but tags only, we set the target to the source directly
+        else {
+            $targetResult = $segment->getSource();
+            $segment->setMatchRate(editor_Services_Connector_FilebasedAbstract::CONTEXT_MATCH_VALUE);
+            $matchrateType->initPretranslated($matchrateType::TYPE_SOURCE);
+            $segment->setEditable(false);
+        }
+        $segment->setMatchRateType((string) $matchrateType);
+        
         
         $segment->set($segmentField,$targetResult); //use sfm->getFirstTargetName here
         $segment->set($segmentFieldEdit,$targetResult); //use sfm->getFirstTargetName here
@@ -174,53 +194,8 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         
         $segment->setUserGuid($this->userGuid);//to the authenticated userGuid
         $segment->setUserName($this->userName);//to the authenticated userName
-        
-        $matchrateType->initPretranslated($languageResource->getResourceType(), $type);
-        
-        $segment->setMatchRateType((string) $matchrateType);
-        
-        $segment->setMatchRate($result->matchrate);
-        
-        //if the task is in state import calculate the autostate
-        if($this->taskState == editor_Models_Task::STATE_IMPORT){
-            $autoStates=ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-            /* @var $autoStates editor_Models_Segment_AutoStates */
-            
-            $segment->setAutoStateId($autoStates->calculateImportState($segment->isEditable(), true));
-            
-        }else{
-            $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
-            /* @var $wfm editor_Workflow_Manager */
-            $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
-            
-            $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, $segment, $tua) {
-                //sets the calculated autoStateId
-                $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
-            };
-            
-            //init the task user association
-            $this->initUsertTaskAssoc();
-            
-            if($this->userTaskAssoc->getIsPmOverride() == 1){
-                
-                $segment->setWorkflowStep(editor_Workflow_Abstract::STEP_PM_CHECK);
-            }
-            else {
-                //sets the actual workflow step
-                $segment->setWorkflowStepNr($this->task->getWorkflowStep());
-                
-                //sets the actual workflow step name, does currently depend only on the userTaskRole!
-                $step = $activeWorkflow->getStepOfRole($this->userTaskAssoc->getRole());
-                $step && $segment->setWorkflowStep($step);
-            }
-            
-            $autostates = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
-            
-            //set the autostate as defined in the given Closure
-            /* @var $autostates editor_Models_Segment_AutoStates */
-            $updateAutoStates($autostates, $segment, $this->userTaskAssoc);
-        }
-        
+
+        $this->calculateSegmentAutoState($segment, $hasText);
         
         //NOTE: remove me if to many problems
         //$segment->validate();
@@ -242,6 +217,51 @@ class editor_Plugins_MatchAnalysis_Pretranslation{
         $this->saveSegmentAndHistory($segment,$history);
     }
     
+    /**
+     * calculates the autostate in the given segment
+     * @param editor_Models_Segment $segment
+     * @param bool $hasText
+     */
+    protected function calculateSegmentAutoState(editor_Models_Segment $segment, bool $hasText): void {
+        if(!$hasText) {
+            $segment->setAutoStateId($this->autoStates->calculateImportState(false, true));
+            return;
+        }
+        
+        //if the task is in state import calculate the autostate
+        if($this->taskState == editor_Models_Task::STATE_IMPORT){
+            $segment->setAutoStateId($this->autoStates->calculateImportState($segment->isEditable(), true));
+            return;
+        }
+        
+        //if a user pretranslates an already imported task, we set the autostate and workflow step to values fitting to the user 
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $activeWorkflow=$wfm->getActive($this->task->getTaskGuid());
+        
+        $updateAutoStates = function(editor_Models_Segment_AutoStates $autostates, $segment, $tua) {
+            //sets the calculated autoStateId
+            $segment->setAutoStateId($autostates->calculateSegmentState($segment, $tua));
+        };
+        
+        //init the task user association
+        $this->initUsertTaskAssoc();
+        
+        if($this->userTaskAssoc->getIsPmOverride() == 1){
+            $segment->setWorkflowStep(editor_Workflow_Abstract::STEP_PM_CHECK);
+        }
+        else {
+            //sets the actual workflow step
+            $segment->setWorkflowStepNr($this->task->getWorkflowStep());
+            
+            //sets the actual workflow step name, does currently depend only on the userTaskRole!
+            $step = $activeWorkflow->getStepOfRole($this->userTaskAssoc->getRole());
+            $step && $segment->setWorkflowStep($step);
+        }
+        
+        //set the autostate as defined in the given Closure
+        $updateAutoStates($this->autoStates, $segment, $this->userTaskAssoc);
+    }
     
     /***
      * Init the task user assocition if exist. If not a default record will be initialized

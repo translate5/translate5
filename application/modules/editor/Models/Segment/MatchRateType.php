@@ -138,7 +138,7 @@ class editor_Models_Segment_MatchRateType {
      * All match rate types which are requiring an icon
      * @var array
      */
-    const TYPES_WITH_ICONS=array(self::TYPE_TM,self::TYPE_MT,self::TYPE_TERM_COLLECTION,self::TYPE_INTERNAL_FUZZY_AVAILABLE);
+    const TYPES_WITH_ICONS=array(self::TYPE_TM,self::TYPE_MT,self::TYPE_TERM_COLLECTION,self::TYPE_INTERNAL_FUZZY_AVAILABLE,self::TYPE_SOURCE);
     
     /**
      * internal map for import conversion 

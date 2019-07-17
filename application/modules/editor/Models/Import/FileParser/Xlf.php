@@ -1101,9 +1101,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @return boolean
      */
     protected function hasText($segmentContent) {
-        $segmentContent = $this->internalTag->replace($segmentContent, '');
-        $segmentContent = trim(strip_tags($segmentContent));
-        return !empty($segmentContent);
+        return $this->internalTag->hasText($segmentContent);
     }
     
     /**
