@@ -508,7 +508,6 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->success = $this->validateUpload();
     }
     
-    //TODO: Tests
     public function exportAction() {
         $proposals=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $proposals editor_Models_Term */
@@ -524,6 +523,17 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         }
         $proposals->exportProposals($rows);
     }
+
+    /***
+     * This is used for the tests. It will return the proposals for the current date and for the 
+     * assigned collections of the customers of the authenticated user
+     */
+    public function testexportAction() {
+        $proposals=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $proposals editor_Models_Term */
+        $this->view->rows=$proposals->loadProposalExportData();
+    }
+    
     
     /**
      * Loads all task information entities for the given languageResource

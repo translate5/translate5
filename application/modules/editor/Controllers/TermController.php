@@ -249,7 +249,6 @@ class editor_TermController extends ZfExtended_RestController {
     }
     
     /**
-     * TODO: Tests
      * propose a new term, this function has the same signature as the putAction, expect that it creates a new propose instead of editing the term directly
      */
     public function proposeOperation() {

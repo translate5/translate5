@@ -45,6 +45,19 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
      */
     protected $uploadErrors = array();
 
+    public function postAction(){
+        $this->entity->init();
+        $this->decodePutData();
+        $this->processClientReferenceVersion();
+        $this->setDataInEntity($this->postBlacklist);
+        if($this->validate()){
+            $customerIds=explode(',', $this->data->customerIds);
+            $collectionId=$this->entity->create($this->data->name,$customerIds,0);
+            $this->entity->setId($collectionId);
+            $this->view->rows = $this->entity->getDataObject();
+        }
+    }
+    
     /***
      * Info: function incomplete! 
      * Only used in a test at the moment! 
@@ -377,7 +390,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             return true;
         }
         $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $translate ZfExtended_Zendoverwrites_Translate */;
+        /* @var $translate ZfExtended_Zendoverwrites_Translate */
         $errors = array(self::FILE_UPLOAD_NAME => array());
         
         foreach($this->uploadErrors as $error) {

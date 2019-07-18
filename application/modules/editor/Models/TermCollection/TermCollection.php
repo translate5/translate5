@@ -52,10 +52,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * The autoCreatedOnImport flag is set to true.
      * @param string $name
      * @param array $customers
+     * @param int $autoCreatedOnImport
+     * 
      * @return int
      */
-    public function create($name,$customers){
-        $this->setAutoCreatedOnImport(1);
+    public function create(string $name,array $customers,int $autoCreatedOnImport=1){
+        $this->setAutoCreatedOnImport($autoCreatedOnImport);
         $this->setName($name);
         
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
@@ -71,7 +73,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $this->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
         $resourceId=$this->save();
         
-        if($customers){
+        if(!empty($customers)){
             $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
             $customerAssoc->addAssocs($customers, $resourceId);
