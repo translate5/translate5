@@ -816,6 +816,11 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $oldTask = clone $this->entity;
         $this->decodePutData();
+        
+        if(isset($this->data->edit100PercentMatch)){
+            settype($this->data->edit100PercentMatch, 'integer');
+        }
+        
         $this->checkTaskAttributeField();
         //was formerly in JS: if a userState is transfered, then entityVersion has to be ignored!
         if(!empty($this->data->userState)) {
@@ -866,6 +871,11 @@ class editor_TaskController extends ZfExtended_RestController {
         
         //closing a task must be done after all workflow "do" calls which triggers some events
         $this->closeAndUnlock();
+        
+        //if the edit100PercentMatch is changed, update the value for all segments in the task
+        if(isset($this->data->edit100PercentMatch)){
+            $this->entity->updateSegmentsEdit100PercentMatch($this->entity->getTaskGuid(), (boolean)$this->data->edit100PercentMatch);
+        }
         
         $this->entity->save();
         $obj = $this->entity->getDataObject();
