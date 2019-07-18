@@ -71,6 +71,30 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     protected $connectorErrorCount = [];
     
     /**
+     * Contains an array of segment IDs which have at least one repetition
+     * @var array
+     */
+    protected $segmentIdsWithRepetitions = [];
+    
+    /**
+     * Contains the bestMatchResult to a segment source hash
+     * @var array
+     */
+    protected $repetitionByHash = [];
+    
+    /**
+     * Contains the master segment to a segment source hash
+     * @var array
+     */
+    protected $repetitionMasterSegments = [];
+    
+    /**
+     * Holds the repetition updater
+     * @var editor_Models_Segment_RepetitionUpdater
+     */
+    protected $repetitionUpdater;
+    
+    /**
      * @param editor_Models_Task $task
      * @param integer $analysisId
      * @param string $taskState the real state of the task, the state in the Task Model will be matchanalysis
@@ -98,19 +122,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         if(empty($this->connectors)){
             return false;
         }
+        $this->initRepetitions();
         
-        $segmentModel=ZfExtended_Factory::get('editor_Models_Segment');
-        /* @var $segmentModel editor_Models_Segment */
-        $results=$segmentModel->getRepetitions($this->task->getTaskGuid());
-        
-        $repetitionsDb=array();
-        foreach($results as $value){
-            $repetitionsDb[$value['id']] = $value;
-        }
-        unset($results);
-
-        $repetitionByHash=array();
-
         $taskTotalWords=0;
         //init the word count calculator
         $this->initWordCount();
@@ -122,32 +135,8 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
             //collect the total words in the task
             $taskTotalWords+=$this->wordCount->getSourceCount();
             
-            //calculate and set segment hash
-            $segmentHash = $segment->getSourceMd5();
-            
-            //check if the segment source hash exist in the repetition array
-            //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 languageResource
-            //segment does not exist in repetition array -> query the tm save the best match rate per tm
-            $isRepetition = isset($repetitionsDb[$segment->getId()]) && array_key_exists($segmentHash,$repetitionByHash);
-            if($isRepetition){
-                $repetitionRate = editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE;
-                //get the best match rate for the repetition segment, 
-                // it can be context match (103%) which is better as the 102% repetition one
-                // or the one stored for the repetition could be from a MT. So recalc here always.
-                $bestMatchRateResult = $this->getBestMatchrate($segment,false);
-                $foundRate = empty($bestMatchRateResult) ? 0 : $bestMatchRateResult->matchrate;
-                //save the repetition analysis with either 102% or 103% matchrate
-                $this->saveAnalysis($segment, max($repetitionRate, $foundRate), 0);
-                
-                //the returning result must be the one from the first of the repetition group.
-                // that ensures that the repeated segments are pre-translated the same way as the first found one 
-                $bestMatchRateResult = $repetitionByHash[$segmentHash];
-            }
-            else {
-                $bestMatchRateResult = $this->getBestMatchrate($segment,true);
-                //store the found match for repetition reusage
-                $repetitionByHash[$segmentHash] = $bestMatchRateResult;
-            }
+            //get the best match rate, respecting repetitions
+            $bestMatchRateResult = $this->handleRepetition($segment);
             
             if(!$this->pretranslate){
                 continue;
@@ -163,8 +152,12 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 $bestMatchRateResult = $this->getMtResult($segment);
 
                 if(!empty($bestMatchRateResult)){
-                    //store the result for the repetitions too
-                    $repetitionByHash[$segmentHash] = $bestMatchRateResult;
+                    //store the result for the repetitions, but only if there is not already a repeated result
+                    if(empty($this->repetitionByHash[$segment->getSourceMd5()])) {
+                        $this->repetitionByHash[$segment->getSourceMd5()] = $bestMatchRateResult;
+                        $segment->setTargetEdit($bestMatchRateResult->target);
+                        $this->repetitionMasterSegments[$segment->getSourceMd5()] = $segment;
+                    }
                 }else{
                     $bestMatchRateResult=null;
                 }
@@ -191,14 +184,71 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     }
     
     /**
-     * Get best match rate result for the segment. If $saveAnalysis is provided, for each best match rate for the tm,
+     * Checks for segment repetititons and handles them if needed 
+     * @param editor_Models_Segment $segment
+     * @return stdClass
+     */
+    protected function handleRepetition(editor_Models_Segment $segment) {
+        //calculate and set segment hash
+        $segmentHash = $segment->getSourceMd5();
+
+        //lazy init, we need only instance, the here given $segment will be overwritten wuth the updateRepetition call
+        if(empty($this->repetitionUpdater)) {
+            $this->repetitionUpdater = ZfExtended_Factory::get('editor_Models_Segment_RepetitionUpdater', [$segment]);
+        }
+        
+        //check if the segment source hash exist in the repetition array
+        //segment exist in the repetition array -> it is repetition, save it as 102 (repetition) and 0 languageResource
+        //segment does not exist in repetition array -> query the tm save the best match rate per tm
+        $hasRepetitions = in_array($segment->getId(), $this->segmentIdsWithRepetitions);
+        $isRepetition = $hasRepetitions && array_key_exists($segmentHash, $this->repetitionMasterSegments);
+        if(! $isRepetition) {
+            $bestResult = $this->getBestResult($segment,true);
+            if(!$hasRepetitions) {
+                // if the segment has no repetitions at all we just return the found result
+                return $bestResult;
+            }
+            //the first segment of multiple repetitions is always stored as master
+            $this->repetitionMasterSegments[$segmentHash] = $segment;
+            //store the found match for repetition reusage
+            return $this->repetitionByHash[$segmentHash] = $bestResult; 
+        }
+        $masterHasResult = !empty($this->repetitionByHash[$segmentHash]);
+        if($masterHasResult && !$this->repetitionUpdater->updateRepetition($this->repetitionMasterSegments[$segmentHash], $segment)) {
+            //if repetition could not be updated, handle segment as it is a segment without repetitions, 
+            // we may not update the repetitionHash, this would interfer with the other repetitions
+            return $this->getBestResult($segment,true);
+        }
+        $repetitionRate = editor_Services_Connector_FilebasedAbstract::REPETITION_MATCH_VALUE;
+        //get the best match rate for the repetition segment,
+        // it can be context match (103%) which is better as the 102% repetition one
+        // or the one stored for the repetition could be from a MT. So recalc here always.
+        $bestResult = $this->getBestResult($segment,false);
+        //save the repetition analysis with either 102% or 103% matchrate
+        $this->saveAnalysis($segment, max($repetitionRate, $bestResult->matchrate ?? 0), 0);
+        
+        //if there is no match we can not update the target below
+        if(!$masterHasResult) {
+            //this means returning null:
+            return $this->repetitionByHash[$segmentHash];
+        }
+        
+        //the returning result must be the one from the first of the repetition group.
+        // to get the correct content for the repetition we get the value from $segment, which was updated by the repetition updater
+        $bestRepeatedResult = clone $this->repetitionByHash[$segmentHash];
+        $bestRepeatedResult->target = $segment->getTargetEdit();
+        return $bestRepeatedResult;
+    }
+    
+    /**
+     * Get best result (best matchrate) for the segment. If $saveAnalysis is provided, for each best match rate for the tm,
      * one analysis will be saved
      * 
      * @param editor_Models_Segment $segment
      * @param bool $saveAnalysis
      * @return NULL|stdClass
      */
-    protected function getBestMatchrate(editor_Models_Segment $segment,$saveAnalysis=true){
+    protected function getBestResult(editor_Models_Segment $segment,$saveAnalysis=true){
         $bestMatchRateResult=null;
         $bestMatchRate=null;
         
@@ -363,6 +413,17 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
         $matchAnalysis->save();
     }
     
+    /**
+     * Inits data for repetition handling
+     */
+    protected function initRepetitions(){
+        $segmentModel=ZfExtended_Factory::get('editor_Models_Segment');
+        /* @var $segmentModel editor_Models_Segment */
+        $results=$segmentModel->getRepetitions($this->task->getTaskGuid());
+        $this->segmentIdsWithRepetitions = array_column($results, 'id');
+        $this->repetitionByHash = [];
+        $this->repetitionMasterSegments= [];
+    }
     
     /***
      * Init the languageResource connectiors

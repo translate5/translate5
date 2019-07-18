@@ -1647,14 +1647,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Get all segment repetitions from the task view.
+     * Get all segment IDs of segments which have a repetition
      * Segment repetitions are segments with the same sourceMd5 hash value.
      * If the segment does not have repetition, it will not be returned by this function.
      * The returned segments are ordered by segment id
      * 
      * @param string $taskGuid
+     * @return array
      */
-    public function getRepetitions($taskGuid){
+    public function getRepetitions(string $taskGuid){
         $adapter=$this->db->getAdapter();
         $mv=ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView  */
