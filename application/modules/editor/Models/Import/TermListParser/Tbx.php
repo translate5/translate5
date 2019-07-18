@@ -273,6 +273,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             //Mindestversion siehe http://www.php.net/manual/de/xmlreader.readstring.php
             throw new Zend_Exception('LIBXML_VERSION must be at least 2.6.20 (or as integer 20620).');
         }
+        $this->user=ZfExtended_Factory::get('ZfExtended_Models_User');
     }
 
     /**
@@ -293,6 +294,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         if(empty($this->customerIds)){
             $this->customerIds=[$this->task->getCustomerId()];
         }
+        
+        $this->loadUser($task->getPmGuid());
         
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
@@ -348,11 +351,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->xml->open($tmpName, null, LIBXML_PARSEHUGE);
                 
                 $this->termCollectionId=$termCollectionId;
-                
-                if(!isset($this->user)){
-                    $sessionUser = new Zend_Session_Namespace('user');
-                    $this->loadUser($sessionUser->data->userGuid);
-                }
                 
                 //Bis zum ersten TermEntry springen und alle TermEntries verarbeiten.
                 while($this->fastForwardTo('termEntry')) {
@@ -1531,10 +1529,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
     
     public function loadUser(string $userGuid) {
-        if(isset($userGuid) && !empty($userGuid)){
-            $this->user=ZfExtended_Factory::get('ZfExtended_Models_User');
-            $this->user->loadByGuid($userGuid);
-        }
+        $this->user->loadByGuid($userGuid);
+    }
+    
+    public function getUser() {
+        return $this->user;
     }
     
     /***

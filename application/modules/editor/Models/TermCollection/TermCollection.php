@@ -44,6 +44,11 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $import->importSource = $params['importSource'] ?? "";
         
         $import->customerIds=$params['customerIds'];
+
+        $sessionUser = new Zend_Session_Namespace('user');
+        $userGuid=$params['userGuid'] ?? $sessionUser->data->userGuid;
+        $import->loadUser($userGuid);
+        
         return $import->parseTbxFile($filePath,$params['collectionId']);
     }
     
