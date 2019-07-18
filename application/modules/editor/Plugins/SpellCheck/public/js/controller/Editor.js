@@ -430,6 +430,15 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             me.setEditorDisabled(true);
         }
         
+        editorContentAsText = me.getEditorContentAsText(false);
+        
+        if (editorContentAsText === '') {
+            me.consoleLog('startSpellCheck stopped because editorContentAsText = ""');
+            me.terminateSpellCheck();
+            return;
+        }
+        me.consoleLog('startSpellCheck for editorContentAsText: ' + editorContentAsText);
+        
         me.consoleLog('(0.3 => startSpellCheck (' + Ext.Date.format(new Date(), 'c') + ').)');
         spellCheckProcessID = Ext.Date.format(new Date(), 'time');
         me.spellCheckInProgressID = spellCheckProcessID;
@@ -446,9 +455,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         me.allMatches = null;
         me.allMatchesRanges = null;
-        
-        editorContentAsText = me.getEditorContentAsText(false);
-        me.consoleLog('editorContentAsText: ' + editorContentAsText);
         me.runSpellCheck(editorContentAsText, spellCheckProcessID);
         // => runSpellCheck with the tool calls applySpellCheck() when the results arrive.
     },
