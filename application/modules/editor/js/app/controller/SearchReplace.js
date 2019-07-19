@@ -228,7 +228,7 @@ Ext.define('Editor.controller.SearchReplace', {
     },
     
     constructor:function(){
-        this.callParent(arguments);;
+        this.callParent(arguments);
     },
     
     initConfig:function(){
@@ -464,14 +464,14 @@ Ext.define('Editor.controller.SearchReplace', {
      */
     addSearchReplaceMenu:function(gridMenu){
         // add menu item  into the menu and store its reference
-        var me=this,
-            menuItem = gridMenu.add({
-                itemId:'searchReplaceMenu',
-                text: me.strings.searchAndReplaceMenuItem,
-                iconCls:'x-fa fa-search',
-                scope:me,
-                handler:me.showSearchAndReplaceWindow
-            });
+        var me=this;
+        gridMenu.add({
+            itemId:'searchReplaceMenu',
+            text: me.strings.searchAndReplaceMenuItem,
+            iconCls:'x-fa fa-search',
+            scope:me,
+            handler:me.showSearchAndReplaceWindow
+        });
     },
     
     /***
@@ -666,7 +666,8 @@ Ext.define('Editor.controller.SearchReplace', {
         //if onyl ctrl+f or ctrl+h is pressed and there 
         
         var searchReplaceWindow=Ext.widget('searchreplacewindow'),
-            plug = Editor.app.getController('Editor').getEditPlugin();
+            plug = Editor.app.getController('Editor').getEditPlugin(),
+            focusTab=null;
             //rec = plug.editing && plug.context.record,
             //grid = me.getSegmentGrid(),
             //selModel = grid.getSelectionModel();
@@ -717,9 +718,7 @@ Ext.define('Editor.controller.SearchReplace', {
      * Show the search/replace window
      */
     handleSerchReplaceMenu:function(){
-        var me=this,
-            searchReplaceWindow=Ext.widget('searchreplacewindow');
-        searchReplaceWindow.show();
+        Ext.widget('searchreplacewindow').show();
     },
     
     /***
@@ -843,19 +842,12 @@ Ext.define('Editor.controller.SearchReplace', {
     pureReplace:function(bookmarkRangeForDel,replaceText,isTextOnly){
         var me=this,
             allImagesInNode=[],
-            collectedNodesForDel,
-            iframeDocument = me.getSegmentIframeDocument(),
             range = rangy.createRange();
         
-        if (isTextOnly) {
-            range = me.moveRangeToBookmarkInTranslate5(range,bookmarkRangeForDel,true);
-        } else {
-            //range.moveToBookmark(bookmarkRangeForDel);
-            range = me.moveRangeToBookmarkInTranslate5(range,bookmarkRangeForDel,true);
-        }
+        range = me.moveRangeToBookmarkInTranslate5(range,bookmarkRangeForDel,true);
         
         //collect all images in the range
-        collectedNodesForDel = range.getNodes([1,3], function(node) {
+        range.getNodes([1,3], function(node) {
             if(node.nodeType == 1 && node.nodeName.toLowerCase() == 'img') {
                 allImagesInNode.push(node.cloneNode());
             }
@@ -966,10 +958,7 @@ Ext.define('Editor.controller.SearchReplace', {
     handleRowSelection:function(){
         var me=this,
             plug = Editor.app.getController('Editor'),
-            editor = plug.getEditPlugin().editor,
-            grid = plug.getSegmentGrid(),
-            selModel = grid.getSelectionModel(),
-            ed = plug.getEditPlugin();
+            grid = plug.getSegmentGrid();
         
         if(me.activeSegment.matchIndex >= me.activeSegment.matchCount-1) {
             me.activeSegment.matchIndex=0;
@@ -1011,7 +1000,6 @@ Ext.define('Editor.controller.SearchReplace', {
             activeTab=tabPanel.getActiveTab(),
             searchField=activeTab.down('#searchField'),
             searchTerm=searchField.getRawValue(),
-            replaceField=activeTab.down('#replaceField'),
             searchType=activeTab.down('radiofield').getGroupValue(),
             matchCase=activeTab.down('#matchCase').checked;
         
@@ -1194,8 +1182,8 @@ Ext.define('Editor.controller.SearchReplace', {
                 var divNodesToHide=Ext.get(contentDiv).query('div'),
                 arrLength=divNodesToHide.length;
                 
-                for (i = 0; i < arrLength; i++){
-                    node = divNodesToHide[i];
+                for (var i = 0; i < arrLength; i++){
+                    var node = divNodesToHide[i];
                     node.classList.add(me.CSS_CLASSNAME_HIDE_ELEMENT);
                 }
             }
@@ -1240,7 +1228,6 @@ Ext.define('Editor.controller.SearchReplace', {
             results=activeTabViewModel.get('result'),
             saveCurrentOpen=activeTab.down('#saveCurrentOpen').checked,
             searchTopChekbox=activeTab.down('#searchTopChekbox').checked,
-            gridView=grid.getView(),
             indexBoundaries=me.getVisibleRowIndexBoundaries(grid),
             goToIndex=null,
             goToIndexEdited=null,
@@ -1256,7 +1243,7 @@ Ext.define('Editor.controller.SearchReplace', {
         me.isActiveTrackChanges();
 
         //check if all search segment parametars are 0(this is the initial state of the search)
-        isSearchStart=function(){
+        var isSearchStart=function(){
             return me.activeSegment.matchIndex===0 &&
             me.activeSegment.nextSegmentIndex===0 &&
             me.activeSegment.currentSegmentIndex===0 &&
@@ -1298,7 +1285,7 @@ Ext.define('Editor.controller.SearchReplace', {
         }
         
         //go to segment and open it for editing
-        callback=function(indexToGo){
+        var callback=function(indexToGo){
             me.removeReplaceClass();
             me.goToSegment(indexToGo,plug,saveCurrentOpen,activeTabViewModel);
             me.activeSegment.currentSegmentIndex=me.activeSegment.nextSegmentIndex;
@@ -1343,7 +1330,7 @@ Ext.define('Editor.controller.SearchReplace', {
 
         callback = function() {
             grid.selectOrFocus(goToIndex);
-            sel = selModel.getSelection();
+            var sel = selModel.getSelection();
 
             if(saveCurrentOpen===false && ed.editing){
                 ed.cancelEdit();
@@ -1414,8 +1401,7 @@ Ext.define('Editor.controller.SearchReplace', {
                 if(!responseData){
                     return;
                 }
-                var segmentIndex =responseData.index,
-                    segmentNrInTask = responseData.segmentNrInTask;
+                var segmentIndex =responseData.index;
                 //if no index is found, display info message
                 if(!segmentIndex || segmentIndex<0){
                     Editor.MessageBox.addInfo(me.strings.noIndexFound);
@@ -1683,8 +1669,6 @@ Ext.define('Editor.controller.SearchReplace', {
      * Return the search term for given type
      */
     handleSearchType:function(searchTerm,searchType,matchCase){
-        var me=this;
-        
         if (searchType==="regularExpressionSearch" ) {
             searchTerm = new RegExp(searchTerm,"g"+(!matchCase ? 'i':''));   
         }
