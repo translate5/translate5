@@ -141,7 +141,7 @@ Ext.define('Editor.controller.Editor', {
     init : function() {
         var me = this;
         
-        Ext.override("Ext.util.KeyMap",{
+        Ext.override('Ext.util.KeyMap',{
             handleTargetEvent: Editor.view.segments.EditorKeyMap.handleTargetEvent
         });
 
@@ -156,11 +156,11 @@ Ext.define('Editor.controller.Editor', {
         // https://confluence.translate5.net/display/BUS/Editor+keyboard+shortcuts
         // -------------------------------------------------------------------------------------
         me.keyMapConfig = {
-            'ctrl-d':         ["D",{ctrl: true, alt: false}, me.watchSegment, true],
-            'ctrl-s':         ["S",{ctrl: true, alt: false}, me.save, true],
-            'ctrl-g':         ["G",{ctrl: true, alt: false}, me.scrollToSegment, true],
-            'ctrl-z':         ["Z",{ctrl: true, alt: false}, me.undo],
-            'ctrl-y':         ["Y",{ctrl: true, alt: false}, me.redo],
+            'ctrl-d':         ['D',{ctrl: true, alt: false}, me.watchSegment, true],
+            'ctrl-s':         ['S',{ctrl: true, alt: false}, me.save, true],
+            'ctrl-g':         ['G',{ctrl: true, alt: false}, me.scrollToSegment, true],
+            'ctrl-z':         ['Z',{ctrl: true, alt: false}, me.undo],
+            'ctrl-y':         ['Y',{ctrl: true, alt: false}, me.redo],
             'ctrl-enter':     [[10,13],{ctrl: true, alt: false}, me.saveNextByWorkflow],
             'ctrl-alt-enter': [[10,13],{ctrl: true, alt: true, shift: false}, me.saveNext],
             'ctrl-alt-shift-enter': [[10,13],{ctrl: true, alt: true, shift: true}, me.savePrevious],
@@ -172,8 +172,8 @@ Ext.define('Editor.controller.Editor', {
             'alt-del':        [Ext.EventObjectImpl.DELETE,{ctrl: false, alt: true}, me.resetSegment],
             'ctrl-alt-up':    [Ext.EventObjectImpl.UP,{ctrl: true, alt: true}, me.goToUpperNoSave, true],
             'ctrl-alt-down':  [Ext.EventObjectImpl.DOWN,{ctrl: true, alt: true}, me.goToLowerNoSave, true],
-            'alt-c':          ["C",{ctrl: false, alt: true}, me.handleOpenComments, true],
-            'alt-s':          ["S",{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
+            'alt-c':          ['C',{ctrl: false, alt: true}, me.handleOpenComments, true],
+            'alt-s':          ['S',{ctrl: false, alt: true}, me.handleDigitPreparation(me.handleChangeState), true],
             'ctrl-comma':     [188,{ctrl: true, alt: false, shift: false}, me.handleDigitPreparation(me.handleInsertTag), true],
             'ctrl-shift-comma': [188,{ctrl: true, alt: false, shift: true}, me.handleDigitPreparation(me.handleInsertTagShift), true],
             'F2':             [Ext.EventObjectImpl.F2,{ctrl: false, alt: false}, me.handleF2KeyPress, true],
@@ -250,7 +250,7 @@ Ext.define('Editor.controller.Editor', {
         
         me.generalKeyMap = new Ext.util.KeyMap(Ext.getDoc(), me.getKeyMapConfig('application', {
             'alt-c':[
-                "C",{ctrl: false, alt: true}, 
+                'C',{ctrl: false, alt: true}, 
                 function(key, e){
                     e.stopEvent();
                     Ext.fireEvent('editorOpenComments');
@@ -837,8 +837,8 @@ Ext.define('Editor.controller.Editor', {
         
         msgBox = Ext.create('Ext.window.MessageBox', {
             buttonText:{
-                ok: "OK",
-                yes: "OK",
+                ok: 'OK',
+                yes: 'OK',
                 no: me.messages.saveAnyway
             }
         });
@@ -1267,7 +1267,7 @@ Ext.define('Editor.controller.Editor', {
         var me = this,
             plug = this.getEditPlugin(),
             editor = plug.editor.mainEditor,
-            imgInTarget = editor.getDoc().getElementsByTagName("img"),
+            imgInTarget = editor.getDoc().getElementsByTagName('img'),
             collectedIds = ['0'];
         // source
         if(me.sourceTags){
@@ -1314,7 +1314,7 @@ Ext.define('Editor.controller.Editor', {
 
             Ext.Object.each(me.sourceTags[tagIdx], function(id, tag){
                 var tagInTarget = editor.getDoc().getElementById(id);
-                if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase()!=="del"){
+                if(tagInTarget && tagInTarget.parentNode.nodeName.toLowerCase() !== 'del'){
                     return;
                 }
                 editor.insertMarkup(tag);

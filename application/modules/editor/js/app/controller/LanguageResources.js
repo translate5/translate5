@@ -155,10 +155,9 @@ Ext.define('Editor.controller.LanguageResources', {
           editor = plug.editor,
           task = Editor.data.task,
           rec = plug.context.record,
-          contentTags,
           matchrate = matchRecord.get('matchrate');
 
-      if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
+      if(matchRecord.get('state') !== me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
       }
       
@@ -205,7 +204,7 @@ Ext.define('Editor.controller.LanguageResources', {
       }
   },
   loadAssocStore: function(){
-      var me = this
+      var me = this,
           taskGuid = Editor.data.task.get('taskGuid'),
           prm = {
                 params: {
@@ -216,7 +215,7 @@ Ext.define('Editor.controller.LanguageResources', {
           };
       me.assocStore = Ext.create('Ext.data.Store', {
           model: 'Editor.model.LanguageResources.TaskAssoc'
-      }),
+      });
       me.assocStore.load(prm);
   },
   addEditorPanelToViewPort: function() {
@@ -266,11 +265,11 @@ Ext.define('Editor.controller.LanguageResources', {
 	  }
 	  //foreach rec in the assoc store get the termcollection count
 	  me.assocStore.each(function(record){
-		  if(record.get('resourceType')==Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
+		  if(record.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
 			  termCollectionCount++;
 		  }
 	  });
 	  //disabled if only term collections and it is configuret do disable the panel
-	  return termCollectionCount==assocCount && disableIfTermCollectionOnly;
+	  return termCollectionCount === assocCount && disableIfTermCollectionOnly;
   }
 });
