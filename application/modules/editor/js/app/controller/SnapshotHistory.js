@@ -73,7 +73,8 @@ Ext.define('Editor.controller.SnapshotHistory', {
         },
         component:{
             'segmentsHtmleditor': {
-                initialize: 'init'
+                initialize: 'init',
+                saveSnapshot: 'saveSnapshot'
             },
             '#segmentgrid': {
                 beforeedit: 'initSnapshotHistory' // start new everytime we open a segment
