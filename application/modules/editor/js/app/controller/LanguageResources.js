@@ -86,7 +86,7 @@ Ext.define('Editor.controller.LanguageResources', {
               viewModeChanged:'viewModeChangeEvent'
           },
           '#Editor.plugins.TrackChanges.controller.Editor':{
-              setLanguageResourceValueForEditor:'setLanguageResourceValueForEditor'
+              setValueForEditor:'setValueForEditor'
           }
       }
   },
@@ -169,8 +169,8 @@ Ext.define('Editor.controller.LanguageResources', {
       }
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
-          me.setLanguageResourceValueForEditor(matchRecord.get('target'));
-          me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added first and then setLanguageResourceValueForEditor is applied from there (= again, but so what)
+          me.setValueForEditor(matchRecord.get('target'));
+          me.fireEvent('prepareCompleteReplace',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
           editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
@@ -181,7 +181,7 @@ Ext.define('Editor.controller.LanguageResources', {
           }
       }
   },
-  setLanguageResourceValueForEditor: function(value) {
+  setValueForEditor: function(value) {
       var me = this;
       me.languageResourceValueForEditor = value;
   },

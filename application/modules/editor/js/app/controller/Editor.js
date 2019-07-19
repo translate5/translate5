@@ -83,6 +83,7 @@ Ext.define('Editor.controller.Editor', {
     lastClipboardData: '',
     lastCopiedFromSourceData: '',
     copiedContentFromSource: null,
+    resetSegmentValueForEditor: null,
     listen: {
         controller: {
             '#Editor.$application': {
@@ -91,6 +92,9 @@ Ext.define('Editor.controller.Editor', {
             },
             '#QmSubSegments': {
             	afterInsertMqmTag: 'handleAfterContentChange'
+            },
+            '#Editor.plugins.TrackChanges.controller.Editor':{
+                setValueForEditor: 'setValueForEditor'
             }
         },
         component: {
@@ -1056,7 +1060,13 @@ Ext.define('Editor.controller.Editor', {
             rec = plug.context.record,
             columnToRead = editor.columnToEdit.replace(/Edit$/, '');
         Editor.MessageBox.addInfo(me.messages.segmentReset);
-        editor.mainEditor.setValueAndMarkup(rec.get(columnToRead), rec, editor.columnToEdit);
+        me.setValueForEditor(rec.get(columnToRead));
+        me.fireEvent('prepareCompleteReplace',rec.get(columnToRead)); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
+        editor.mainEditor.setValueAndMarkup(me.resetSegmentValueForEditor, rec, editor.columnToEdit);
+    },
+    setValueForEditor: function(value) {
+        var me = this;
+        me.resetSegmentValueForEditor = value;
     },
     /**
      * handler for the F2 key
