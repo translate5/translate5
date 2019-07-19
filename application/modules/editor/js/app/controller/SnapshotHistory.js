@@ -174,19 +174,19 @@ Ext.define('Editor.controller.SnapshotHistory', {
             me.initSnapshotHistory();
         }
         if (me.editorBodyExtDomElement == null) {
-            me.consoleLog("saveSnapshot: no snapshop saved because editor-body was not found (maybe the editor is closed already)."); 
+            me.consoleLog('saveSnapshot: no snapshop saved because editor-body was not found (maybe the editor is closed already).'); 
             return;
         }
         contentForSnaphot = me.editorBodyExtDomElement.getHtml();
         if (contentForSnaphot === me.getContentOfNewestSnapshot()) {
-            me.consoleLog("saveSnapshot: no snapshop saved because the content is not new."); 
+            me.consoleLog('saveSnapshot: no snapshop saved because the content is not new.'); 
             return;
         }
         bookmarkForSnapshot = me.getCurrentBookmark();
         me.removeNewerSnapshots(); // delete newer items if there are any.
         me.editorSnapshotHistory.push({content: contentForSnaphot, bookmark: bookmarkForSnapshot});
         me.editorSnapshotReference = me.editorSnapshotHistory.length - 1;
-    	me.consoleLog("~~~~~~~~ SNAPSHOTHISTORY: snapshot saved (me.editorSnapshotReference: " + me.editorSnapshotReference + ')');
+    	me.consoleLog('~~~~~~~~ SNAPSHOTHISTORY: snapshot saved (me.editorSnapshotReference: ' + me.editorSnapshotReference + ')');
     	me.consoleLog(me.editorSnapshotHistory);
     },
     /**
@@ -245,7 +245,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
     getContentOfNewestSnapshot: function() {
         var me = this,
             newestSnapshot;
-        if (me.editorSnapshotHistory.length == 0) {
+        if (me.editorSnapshotHistory.length === 0) {
         	return null;
         }
         newestSnapshot = me.editorSnapshotHistory[me.editorSnapshotHistory.length - 1];
@@ -274,7 +274,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
         if(newReference >= 0) {
             me.editorSnapshotReference = newReference;
         } else {
-            me.consoleLog("Rewinding the snapshot-history is not possible; end of history is reached already (newReference: " + newReference + ").");
+            me.consoleLog('Rewinding the snapshot-history is not possible; end of history is reached already (newReference: ' + newReference + ').');
         }
     },
     /**
@@ -291,7 +291,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
         if(newReference < me.editorSnapshotHistory.length) {
             me.editorSnapshotReference = newReference;
         } else {
-            me.consoleLog("Fastforwarding the snapshot-history is not possible; end of history is reached already (newReference: " + newReference + ").");
+            me.consoleLog('Fastforwarding the snapshot-history is not possible; end of history is reached already (newReference: ' + newReference + ').');
         }
     },
     /**
@@ -300,12 +300,12 @@ Ext.define('Editor.controller.SnapshotHistory', {
     restoreSnapshotInEditor: function() {
         var me = this,
             currentSnapshot = me.editorSnapshotHistory[me.editorSnapshotReference];
-        if (currentSnapshot != undefined) {
-        	me.consoleLog("restore snapshot (content)...");
+        if (currentSnapshot !== undefined) {
+        	me.consoleLog('restore snapshot (content)...');
             me.editorBodyExtDomElement.setHtml(currentSnapshot.content);
             me.restorePositionOfCaret(currentSnapshot.bookmark);
         } else {
-            me.consoleLog("currentSnapshot does not exist for editorSnapshotReference = " + me.editorSnapshotReference);
+            me.consoleLog('currentSnapshot does not exist for editorSnapshotReference = ' + me.editorSnapshotReference);
         }
     },
     /**
@@ -316,7 +316,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
         	editorBody = me.getEditorBody(),
         	selectionForSnapshot = rangy.getSelection(editorBody),
             rangeForCaret;
-    	me.consoleLog("restore snapshot (caret)...");
+    	me.consoleLog('restore snapshot (caret)...');
         if (bookmark.rangeBookmarks.length === 0) {
         	// The first snapshot after opening a segment does not always recognize a position of the cursor in the Editor.
         	// Workaround: If no bookmark is given, we place the cursor at the beginning of the editor (= this is where the cursor is after opening a segment).
@@ -337,8 +337,8 @@ Ext.define('Editor.controller.SnapshotHistory', {
             indexRemoveTo,
             howmany;
         if (me.editorSnapshotReference < me.editorSnapshotHistory.length) {
-            indexRemoveFrom = me.editorSnapshotReference + 1,       // keep the currently indexed item, start removing with the next item
-            indexRemoveTo = (me.editorSnapshotHistory.length) - 1,  // the length is not the index...
+            indexRemoveFrom = me.editorSnapshotReference + 1;       // keep the currently indexed item, start removing with the next item
+            indexRemoveTo = (me.editorSnapshotHistory.length) - 1;  // the length is not the index...
             howmany = 1 + (indexRemoveTo - indexRemoveFrom);        // howmany starts with 1 (= to remove the indexed item itself), additional items for removal are ADDED UP
             me.editorSnapshotHistory.splice(indexRemoveFrom,  1 + howmany);
             // me.editorSnapshotReference is a different topic; don't change it here automatically!
@@ -353,7 +353,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
             arrLength = me.editorSnapshotHistory.length;
         for (i = arrLength; i--; ) {
             if (i > 1) {
-                if (me.editorSnapshotHistory[i].content == me.editorSnapshotHistory[i-1].content ) {
+                if (me.editorSnapshotHistory[i].content === me.editorSnapshotHistory[i-1].content ) {
                     me.editorSnapshotHistory.splice(i, 1);
                     if (me.editorSnapshotReference >= i) {
                         me.editorSnapshotReference = me.editorSnapshotReference - 1;
