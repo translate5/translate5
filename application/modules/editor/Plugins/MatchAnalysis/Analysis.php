@@ -209,7 +209,7 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
                 return $bestResult;
             }
             //the first segment of multiple repetitions is always stored as master
-            $this->repetitionMasterSegments[$segmentHash] = $segment;
+            $this->repetitionMasterSegments[$segmentHash] = clone $segment;
             //store the found match for repetition reusage
             return $this->repetitionByHash[$segmentHash] = $bestResult; 
         }
