@@ -70,10 +70,15 @@ class editor_Plugins_MatchAnalysis_Analysis extends editor_Plugins_MatchAnalysis
     
     protected $connectorErrorCount = [];
     
-    
-    public function __construct(editor_Models_Task $task,$analysisId){
-        $this->task=$task;
+    /**
+     * @param editor_Models_Task $task
+     * @param integer $analysisId
+     * @param string $taskState the real state of the task, the state in the Task Model will be matchanalysis
+     */
+    public function __construct(editor_Models_Task $task, $analysisId, string $taskState){
+        $this->task = $task;
         $this->analysisId=$analysisId;
+        $this->taskState = $taskState;
         $this->sfm = editor_Models_SegmentFieldManager::getForTaskGuid($task->getTaskGuid());
         $this->initHelper();
         parent::__construct();
