@@ -40,6 +40,11 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      * @var string
      */
     const ORIGINAL_FILE = 'original-%s.%s';
+    
+    /**
+     * @var ZfExtended_Logger
+     */
+    protected $logger;
 
     /**
      * (non-PHPdoc)
@@ -58,6 +63,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
      * @see ZfExtended_Worker_Abstract::work()
      */
     public function work() {
+        $this->logger = Zend_Registry::get('logger')->cloneMe('plugin.okapi');
         $params = $this->workerModel->getParameters();
         if($params['type'] == self::TYPE_IMPORT) {
             return $this->doImport();
@@ -106,33 +112,11 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $fileFilter->addFilter($fileFilter::TYPE_IMPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
             $fileFilter->addFilter($fileFilter::TYPE_EXPORT, $this->taskGuid, $fileId, 'editor_Plugins_Okapi_FileFilter');
         }catch (Exception $e){
-            $this->handleException($e, $file, $fileId);
+            $this->handleException($e, $file, $fileId, true);
         } finally {
             $api->removeProject();
         }
         return true;
-    }
-    
-    protected function handleException(Exception $e, SplFileInfo $file, $fileId) {
-        $logger = Zend_Registry::get('logger')->cloneMe('plugin.okapi');
-        /* @var $logger ZfExtended_Logger */
-        $logger->exception($e, [
-            'extra' => ['task' => $this->task],
-            'level' => ZfExtended_Logger::LEVEL_DEBUG,
-        ]);
-        
-        $absFile = $file->__toString();
-        $tmpImport = editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT;
-        $relFile = mb_strpos($absFile, $tmpImport);
-        $relFile = mb_substr($absFile, $relFile + strlen($tmpImport));
-        // in case of an exception we just ignore that file, log it, and proceed with the import
-        $logger->warn('E1058', 'Okapi Plug-In: Error in converting file {file}. See log details for more information.', [
-            'task' => $this->task,
-            'message' => get_class($e).': '.$e->getMessage(),
-            'fileId' => $fileId,
-            'file' => $relFile,
-            'filePath' => $absFile,
-        ]);
     }
     
     /**
@@ -171,6 +155,7 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $api->uploadInputFile('manifest.rkm', $manifestFile);
             $originalFile = $this->findOriginalFile($fileId);
             $api->uploadOriginalFile($originalFile, new SplFileInfo($this->getDataDir().'/'.$originalFile));
+            $this->xliffExportPreValidation($workFile, $fileId);
             $api->uploadWorkFile($originalFile.$api::OUTPUT_FILE_EXTENSION, $workFile);
             $api->executeTask($sourceLang, $targetLang);
             //the exported work file (containing xlf) must be renamed so that 
@@ -179,15 +164,68 @@ class editor_Plugins_Okapi_Worker extends editor_Models_Import_Worker_Abstract {
             $api->downloadMergedFile($originalFile, $workFile);
             $result = true;
         } catch (Exception $e){
-            $debug = [
-                'fileId' => $fileId,
-                'file' => $workFile,
-            ];
-            $this->log->logError('Okapi Error: Error on converting a file. Task: '.$this->taskGuid.'; File: '.print_r($debug, 1).'; Error was: '.$e);
+            $this->handleException($e, $workFile, $fileId, false);
+        } finally {
+            $api->removeProject();
         }
-        $api->removeProject();
+        
         return $result; 
     }
+    
+    /**
+     * Logs the occured exception
+     * @param Exception $e
+     * @param SplFileInfo $file
+     * @param integer $fileId
+     * @param boolean $import true on import, false on export
+     */
+    protected function handleException(Exception $e, SplFileInfo $file, $fileId, bool $import) {
+        $this->logger->exception($e, [
+            'extra' => ['task' => $this->task],
+            'level' => ZfExtended_Logger::LEVEL_DEBUG,
+        ]);
+        
+        $absFile = $file->__toString();
+        if($import) {
+            $tmpImport = editor_Models_Import_DataProvider_Abstract::TASK_TEMP_IMPORT;
+            $relFile = mb_strpos($absFile, $tmpImport);
+            $relFile = mb_substr($absFile, $relFile + strlen($tmpImport));
+            $code = 'E1058';
+            $msg = 'Okapi Plug-In: Error in converting file {file} on import. See log details for more information.';
+        }
+        else {
+            $relFile = mb_strpos($absFile, $this->task->getTaskGuid());
+            $relFile = mb_substr($absFile, $relFile + strlen($this->task->getTaskGuid()));
+            $code = 'E1151';
+            $msg = 'Okapi Plug-In: Error in converting file {file} on export. See log details for more information.';
+        }
+        
+        // in case of an exception we just ignore that file, log it, and proceed with the import/export
+        $this->logger->warn($code, $msg, [
+            'task' => $this->task,
+            'message' => get_class($e).': '.$e->getMessage(),
+            'fileId' => $fileId,
+            'file' => $relFile,
+            'filePath' => $absFile,
+        ]);
+    }
+
+    /**
+     * Does some validation of the XLIFF file to improve debugging
+     */
+    protected function xliffExportPreValidation(SplFileInfo $workFile, $fileId) {
+        $content = file_get_contents($workFile);
+        
+        if(preg_match('#<target[^>]*/>#', $content)) {
+            // in case of an exception we just ignore that file, log it, and proceed with the import/export
+            $this->logger->warn('E1150', 'Okapi Plug-In: The exported XLIFF {file} contains empty targets, the Okapi process will probably fail then.', [
+                'task' => $this->task,
+                'fileId' => $fileId,
+                'file' => basename($workFile),
+            ]);
+        }
+    }
+    
     
     /**
      * returns the manifest.rkm file for a stored file

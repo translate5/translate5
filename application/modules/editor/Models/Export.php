@@ -121,7 +121,6 @@ class editor_Models_Export {
         }
         $log = Zend_Registry::get('logger')->cloneMe('editor.export');
         $log->warn('E1149', 'Export: Some segments contains tag errors.', [
-            'segments' => $this->segmentsWithTagErrors,
             'task' => $this->task,
             'segments' => $segmentErrors,
         ]);
