@@ -74,8 +74,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
-                push: 'handleAfterContentUpdate',
-                afterInsertMarkup: 'handleAfterContentUpdate'
+                push: 'handleAfterContentUpdate'
             },
             '#segmentStatusStrip': {
                 afterRender: 'initSpellCheckPlugin'
@@ -188,8 +187,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.injectCSSForEditor();
         // SpellCheck-specific for Editor:
         me.initTooltips();
-        me.initKeyboardEvents();
-        me.initMouseEvents();
+        me.initEvents();
         me.setBrowserSpellcheck();
         me.setSnapshotHistory();
     },
@@ -211,10 +209,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         });
     },
     /**
-     * Init Events
-     */
-    /**
-     * Init the event and "Reset" everything for the new keydown-Event
+     * Init (+ "Reset") everything for the new keydown-Event
      */
     initKeyDownEvent: function(event) {
         var me = this;
@@ -223,17 +218,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.ignoreEvent = false;
         me.stopEvent = false;
     },
-    initKeyboardEvents: function() {
-        var me = this;
-        me.consoleLog('SpellCheck: initKeyboardEvents...');
-        if (!me.disableSpellCheckByIdle) {
-            Ext.get(me.editor.getDoc()).on('keydown', me.handleKeyDown, me, {priority: 9980, delegated: false});
-        }
-    },
-    initMouseEvents: function() {
+    /**
+     * Init Events
+     */
+    initEvents: function() {
         var me = this,
             editorDoc = Ext.get(me.editor.getDoc()),
             tooltipBody = Ext.getBody();
+        me.consoleLog('SpellCheck: initEvents...');
+        
+        if (!me.disableSpellCheckByIdle) {
+            editorDoc.on('keydown', me.handleKeyDown, me, {priority: 9980, delegated: false});
+        }
         
         editorDoc.on({
             click:{
@@ -241,6 +237,18 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
                 fn: me.handleClickInEditor,
                 scope: this,
                 preventDefault: true
+            }
+        });
+        
+        me.editor.on({
+            afterInsertMarkup:{
+                delegated: false,
+                fn: me.handleAfterContentUpdate,
+                scope: this,
+                preventDefault: true,
+                options: {priority: -800}   // for fireEvent('afterInsertMarkup'): SpellCheck must run after(!!!) TrackChanges: 
+                                            // 1. TrackChanges needs the given range before SpellCheck changes it
+                                            // 2. SpellCheck will start an Ajax-call
             }
         });
         
