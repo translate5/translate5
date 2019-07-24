@@ -159,7 +159,7 @@ class editor_Models_Import_FileParser_XmlParser {
             $matches[1] = array_map('strtolower', $matches[1]);
             return array_combine($matches[1], $matches[2]);
         }
-        return $matches; //since $matches is empty we can return it here as empty array
+        return []; //$matches contains empty arrays, so it is not empty, we have to return a new empty array here
     }
     
     /**
