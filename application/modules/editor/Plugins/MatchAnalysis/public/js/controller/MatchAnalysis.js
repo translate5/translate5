@@ -63,7 +63,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
         ref: 'taskAssocGrid',
         selector: '#languageResourcesTaskAssocGrid'
     }],
-        
+    TASK_STATE_ANALYSIS: 'matchanalysis',
     strings:{
         taskGridIconTooltip:'#UT#Match-Analyse',
         finishTask:'#UT#Beenden',
@@ -152,8 +152,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * On task preferences window tabpanel render
      */
     onTaskPreferencesWindowPanelRender:function(panel){
-        var me=this,
-            prefWindow=panel.up('window');
+        var prefWindow = panel.up('window');
         
         //add the matchanalysis panel in the tabpanel
         panel.insert(2,{
@@ -390,8 +389,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * Language resource to task assoc after save event handler
      */
     onTaskAssocSavingFinished:function(record,store){
-        var me=this;
-        me.updateTaskAssocPanelViewModel(store);
+        this.updateTaskAssocPanelViewModel(store);
     },
 
     /***
@@ -434,7 +432,7 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      * if task must be reloaded periodically we have to return false here
      */
     ignoreTaskForReload: function(task) {
-        return task.get('state') !== 'matchanalysis';
+        return task.get('state') !== this.TASK_STATE_ANALYSIS;
     },
 
     /***
@@ -456,15 +454,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     addLoadingMask:function(){
         var me=this,
-            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel');
-            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel');
+            loadedTask,
+            assocPanel = me.getLanguageResourceTaskAssocPanel(),
+            matchAnalysisPanel = me.getMatchAnalysisPanel();
         
-        if(assocPanel){
-        	assocPanel.setLoading(true);
-        }
-
+        assocPanel && assocPanel.setLoading(me.strings.analysisLoadingMsg);
+        
         if(matchAnalysisPanel){
-        	matchAnalysisPanel.setLoading(true);
+            loadedTask = matchAnalysisPanel.lookupViewModel().get('currentTask');
+            loadedTask.set('state', me.TASK_STATE_ANALYSIS);
+            matchAnalysisPanel.setLoading(me.strings.analysisLoadingMsg);
         }
     },
 
@@ -474,25 +473,16 @@ Ext.define('Editor.plugins.MatchAnalysis.controller.MatchAnalysis', {
      */
     removeLoadingMask:function(reloadStore){
         var me=this,
-            assocPanel=me.getComponentByItemId('languageResourceTaskAssocPanel'),
-            matchAnalysisPanel=me.getComponentByItemId('matchAnalysisPanel'),
-            matchAnalysisGrid=me.getComponentByItemId('matchAnalysisGrid');
+            assocPanel = me.getLanguageResourceTaskAssocPanel(),
+            matchAnalysisPanel = me.getMatchAnalysisPanel(),
+            matchAnalysisGrid = me.getComponentByItemId('matchAnalysisGrid'),
+            store = matchAnalysisGrid && matchAnalysisGrid.getStore();
         
-        if(!assocPanel){
-            return;
+        assocPanel && assocPanel.setLoading(false);
+        matchAnalysisPanel && matchAnalysisPanel.setLoading(false);
+        if(matchAnalysisGrid && reloadStore && store.isLoaded()){
+            store.reload();
         }
-
-        assocPanel.setLoading(false);
-
-        if(!matchAnalysisPanel){
-            return;
-        }
-        
-        if(reloadStore){
-            matchAnalysisGrid.getStore().reload();
-        }
-        
-        matchAnalysisPanel.setLoading(false);
     }
 
 });

@@ -140,6 +140,17 @@ abstract class editor_Models_Export_FileParser {
     protected $lastSegmentLength = 0;
     
     /**
+     * collected segmentNrs with tag missing or to much tags compared to the source
+     * @var array
+     */
+    protected $segmentsWithTagErrors = [];
+    
+    /**
+     * @var ZfExtended_Logger
+     */
+    protected $log;
+    
+    /**
      * 
      * @param int $fileId
      * @param bool $diff
@@ -161,6 +172,7 @@ abstract class editor_Models_Export_FileParser {
         $this->_taskGuid = $task->getTaskGuid();
         $this->path = $path;
         $this->config = Zend_Registry::get('config');
+        $this->log = Zend_Registry::get('logger')->cloneMe('editor.export.fileparser');
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
@@ -188,6 +200,15 @@ abstract class editor_Models_Export_FileParser {
     public function saveFile() {
         file_put_contents($this->path, $this->getFile());
     }
+    
+    /**
+     * returns the collected segments with tag errors
+     * @return array
+     */
+    public function getSegmentTagErrors() {
+        return $this->segmentsWithTagErrors;
+    }
+    
     /**
      * übernimmt das eigentliche FileParsing
      *
@@ -200,6 +221,7 @@ abstract class editor_Models_Export_FileParser {
         $count = count($file) - 1;
         for ($i = 1; $i < $count;) {
             $file[$i] = $this->preProcessReplacement($file[$i]);
+            $matches = [];
             if (!preg_match('#^\s*id="([^"]+)"\s*(field="([^"]+)"\s*)?$#', $file[$i], $matches)) {
                 //Error in Export-Fileparsing. instead of a id="INT" and a optional field="STRING" attribute the following content was extracted: "{content}"
                 throw new editor_Models_Export_FileParser_Exception('E1086', [
@@ -316,10 +338,10 @@ abstract class editor_Models_Export_FileParser {
         
         $edited= $trackChange->removeTrackChanges($edited);
         
-        $before = $edited;
         $edited = $this->tagHelper->protect($edited);
         $edited = $this->removeTermTags($edited);
         $edited = $this->tagHelper->unprotect($edited);
+        $this->compareTags($segment, $segment->getSource(), $edited);
         
         //count length after removing removeTrackChanges and removeTermTags 
         // so that the same remove must not be done again inside of textLength
@@ -350,6 +372,29 @@ abstract class editor_Models_Export_FileParser {
         }
         // unprotectWhitespace must be done after diffing!
         return $this->whitespaceHelper->unprotectWhitespace($diffed);
+    }
+    
+    /**
+     * Compares the real tags (ignores whitespace tags) of a source and target string, track the differences between the both along the segmentNrInTask
+     * @param editor_Models_Segment $segment
+     * @param string $source
+     * @param string $target
+     */
+    protected function compareTags(editor_Models_Segment $segment, $source, $target) {
+        $sourceTags = $this->tagHelper->getRealTags($source);
+        $targetTags = $this->tagHelper->getRealTags($target);
+        $notInTarget = $this->tagHelper->diffArray($sourceTags, $targetTags);
+        $notInSource = $this->tagHelper->diffArray($targetTags, $sourceTags);
+        if(empty($notInSource) && empty($notInTarget)) {
+            return;
+        }
+        $this->segmentsWithTagErrors[] = [
+            'id' => $segment->getId(),
+            'fileId' => $segment->getFileId(),
+            'segmentNrInTask' => $segment->getSegmentNrInTask(),
+            'additionalInTarget' => $notInSource,
+            'missingInTarget' => $notInTarget,
+        ];
     }
     
     /**
@@ -416,7 +461,9 @@ abstract class editor_Models_Export_FileParser {
      */
     protected function convertEncoding(editor_Models_File $file){
         $enc = $file->getEncoding();
-        if(is_null($enc) || $enc === '' || strtolower($enc) === 'utf-8')return;
+        if(is_null($enc) || $enc === '' || strtolower($enc) === 'utf-8'){
+            return;
+        }
         $this->_exportFile = iconv('utf-8', $enc, $this->_exportFile);
     }
     

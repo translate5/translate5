@@ -790,7 +790,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             return;
         }
         //create unique temp file name
-        $newFileLocation=tempnam(sys_get_temp_dir(), $fileinfo['name']);
+        $newFileLocation=tempnam(sys_get_temp_dir(), 'LanguageResources'.$fileinfo['name']);
         if (!is_dir(dirname($newFileLocation))) {
             mkdir(dirname($newFileLocation), 0777, true);
         }
