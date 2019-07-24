@@ -187,8 +187,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   initMainMenu: function() {
       var toolbar = this.getHeadToolBar(),
           insertIdx = 1,
-          logout = this.getLogoutButton(),
-          grid = this.getTaskGrid();
+          logout = this.getLogoutButton()
       if(logout) {
           insertIdx = toolbar.items.indexOf(logout) + 1;
       }
@@ -401,7 +400,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
   handleTaskAdd: function(button) {
       var me=this,
           win=me.getTaskAddWindow(),
-          vm=win.getViewModel();
+          vm=win.getViewModel(),
           winLayout=win.getLayout(),
           nextStep=win.down('#taskUploadCard');
       
@@ -763,7 +762,6 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    */
   onAdminTaskAddWindowClose:function(win){
       var me = this,
-	      win = me.getTaskAddWindow(),
 	      winLayout=win.getLayout(),
           activeItem=winLayout.getActiveItem(),
           task=activeItem.task;
@@ -797,8 +795,7 @@ Ext.define('Editor.controller.admin.TaskOverview', {
    * Set the default values for the add task window fields. The values are configured zf config
    */
   setTaskAddFieldDefaults:function(win){
-    var me=this,
-        fieldDefaults=[];
+    var key, fieldDefaults=[];
 
     if(Editor.data.frontend.importTask && Editor.data.frontend.importTask.fieldsDefaultValue){
         fieldDefaults=Editor.data.frontend.importTask.fieldsDefaultValue;

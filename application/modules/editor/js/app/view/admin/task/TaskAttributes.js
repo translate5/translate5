@@ -45,6 +45,9 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         btnCancel:'#UT#Abbrechen',
         btnReload: '#UT#Aktualisieren',
         loadingMask:'#UT#Aktualisieren',
+        fullMatchLabel: '#UT#100% Matches sind editierbar',
+        editTrue:'#UT#Ja',
+        editFalse:'#UT#Nein'
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
@@ -276,6 +279,30 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
             });
         }
 
+        //is the user allowed to edit the Edit100PercentMatch
+        if(auth.isAllowed('editorEditTaskEdit100PercentMatch')) {
+	        items.push({
+	            xtype: 'checkbox',
+	            fieldLabel:me.strings.fullMatchLabel,
+	            dataIndex:'edit100PercentMatch',
+	            itemId:'edit100PercentMatch',
+	            bind:{
+	                value:'{currentTask.edit100PercentMatch}'
+	            }
+	        });
+        }else{
+            items.push({
+                xtype: 'displayfield',
+                fieldLabel: me.strings.fullMatchLabel,
+                renderer: function(value, displayField) {
+            		return value ? me.strings.editTrue : me.strings.editFalse;
+                },
+                bind:{
+                    value:'{currentTask.edit100PercentMatch}'
+                }
+            });
+        }
+        
         return items;
     },
     customerRenderer : function(val) {
