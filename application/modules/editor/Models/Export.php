@@ -82,7 +82,6 @@ class editor_Models_Export {
             throw new Zend_Exception(sprintf('Temporary Export Folder could not be created! Task: %s Path: %s', $this->taskGuid, $exportRootFolder));
         }
         
-        $session = new Zend_Session_Namespace();
         $treeDb = ZfExtended_Factory::get('editor_Models_Foldertree');
         /* @var $treeDb editor_Models_Foldertree */
         $treeDb->setPathPrefix('');
@@ -102,15 +101,30 @@ class editor_Models_Export {
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
             mkdir($path);
         }
-        foreach ($filePaths as $fileId => $path) {
-            $path = $localEncoded->encode($path);
+        $segmentErrors = [];
+        foreach ($filePaths as $fileId => $relPath) {
+            $path = $localEncoded->encode($relPath);
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
             $parser = $this->getFileParser((int)$fileId, $path);
             /* @var $parser editor_Models_Export_FileParser */
             $parser->saveFile();
+            $errors = $parser->getSegmentTagErrors();
+            if(!empty($errors)) {
+                $segmentErrors[$fileId.' # '.$relPath] = $errors;
+            }
             
             $fileFilter->applyExportFilters($path, $fileId);
         }
+        
+        if(empty($segmentErrors)) {
+            return;
+        }
+        $log = Zend_Registry::get('logger')->cloneMe('editor.export');
+        $log->warn('E1149', 'Export: Some segments contains tag errors.', [
+            'segments' => $this->segmentsWithTagErrors,
+            'task' => $this->task,
+            'segments' => $segmentErrors,
+        ]);
     }
     
     /**

@@ -24,22 +24,5 @@
 -- 
 -- END LICENSE AND COPYRIGHT
 -- */
-
-INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) VALUES ('runtimeOptions.requestLogging', '1', 'editor', 'editor', '0', '0', '', 'boolean', 'log some important requests for workflow handling');
-
-CREATE TABLE `LEK_request_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `taskGuid` varchar(38) NOT NULL,
-  `method` varchar(60) NOT NULL,
-  `requestUri` varchar(512) DEFAULT NULL,
-  `parameters` longtext DEFAULT NULL,
-  `authUserGuid` varchar(38) NOT NULL,
-  `authUserLogin` varchar(255) NOT NULL,
-  `authUserName` varchar(512) NOT NULL,
-  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `taskGuid` (`taskGuid`),
-  CONSTRAINT FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE `LEK_task_log` ADD COLUMN `message` varchar(512) NOT NULL;
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'pm', 'frontend', 'editorEditTaskEdit100PercentMatch');

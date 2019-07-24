@@ -326,17 +326,9 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
      * @return string
      */
     protected function replaceAdditionalTags($segment, $mapCount) {
-        $singleTag = ZfExtended_Factory::get('editor_ImageTag_Single');
-        /* @var $singleTag editor_ImageTag_Single */
         $shortTagNr = $mapCount;
-        return preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr, $singleTag) {
-            $shortTag = $shortTagNr++;
-            return $singleTag->getHtmlTag([
-                'class' => 'ignoreInEditor',
-                'text' => '&lt;AdditionalTagFromTM/&gt;',
-                'id' => 'toignore-'.$shortTag,
-                'shortTag' => $shortTag
-            ]);
+        return preg_replace_callback('#<(x|ex|bx|g|/g)[^>]*>#', function() use (&$shortTagNr) {
+            return $this->internalTag->makeAdditionalHtmlTag($shortTagNr++);
         }, $segment);
     }
 

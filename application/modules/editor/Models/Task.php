@@ -879,4 +879,24 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
         /* @var $userModel ZfExtended_Models_User */
         return !($userModel->readAnonymizedUsers());
     }
+    
+    /***
+     * Update the $edit100PercentMatch flag for all segments in the task.
+     * TODO:(TRANSLATE-1671) 
+     * INFO:the editable calculation is not the same as when the task is imported. Solve this after it is decided what we should do
+     * @param string $taskGuid
+     * @param bool $edit100PercentMatch
+     */
+     public function updateSegmentsEdit100PercentMatch(string $taskGuid,bool $edit100PercentMatch){
+        // create a segment-iterator to get all segments of this task as a list of editor_Models_Segment objects
+        $segments = ZfExtended_Factory::get('editor_Models_Segment_Iterator', [$taskGuid]);
+        /* @var $segments editor_Models_Segment_Iterator */
+        foreach ($segments as $segment){
+            if($segment->getEditable() == $edit100PercentMatch || $segment->getMatchRate()<100){
+                continue;
+            }
+            $segment->setEditable($edit100PercentMatch);
+            $segment->save();
+        }
+    }
 }
