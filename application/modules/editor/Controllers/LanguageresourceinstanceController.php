@@ -427,16 +427,16 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     
     public function postAction(){
         $this->entity->init();
-        $this->data = $this->getAllParams();
+        $this->data = $this->getAllParams(); //since its a fileupload, this is a normal POST
         $this->setDataInEntity($this->postBlacklist);
         
         $manager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $manager editor_Services_Manager */
         $resource = $manager->getResourceById($this->entity->getServiceType(), $this->entity->getResourceId());
         
-        //validateLanguages prefills also the lang rfc values! So it must be called before the fileupload, 
-        // since there will be communication with the underlying resource which needs the RFC values
-        $validLanguages = $this->validateLanguages($resource);
+        $sourceLangId = $this->getParam('sourceLang');
+        $targetLangId = $this->getParam('targetLang');
+        $validLanguages = $this->validateLanguages($resource, $sourceLangId, $targetLangId);
         
         if(!$validLanguages || !$this->validate()){
             return;
@@ -461,7 +461,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         //save the resource languages to
         $resourceLanguages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $resourceLanguages editor_Models_LanguageResources_Languages */
-        $resourceLanguages->saveLanguages($this->getRequest()->getParam('sourceLang'), $this->getRequest()->getParam('targetLang'), $this->data['id']);
+        $resourceLanguages->saveLanguages($sourceLangId, $targetLangId, $this->data['id']);
         
         if($resource->getFilebased()) {
             $this->handleInitialFileUpload($manager);
@@ -544,29 +544,18 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * Validates if choosen languages can be used by the choosen resource
      * Validates also the existence of the languages in the Lang DB 
      * @param editor_Models_LanguageResources_Resource $resource
+     * @param mixed $sourceLang
+     * @param mixed $targetLang
      * @return boolean
      */
-    protected function validateLanguages(editor_Models_LanguageResources_Resource $resource) {
-        
+    protected function validateLanguages(editor_Models_LanguageResources_Resource $resource, &$sourceLang, &$targetLang): bool {
         //when termcollection is a resource, the languages are handled by the tbx import
         if($resource instanceof editor_Services_TermCollection_Resource){
             return true;
         }
         
-        $sourceLang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $sourceLang editor_Models_Languages */
-        $sourceLang->load($this->getRequest()->getParam('sourceLang'));
-        
-        $targetLang = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $targetLang editor_Models_Languages */
-        $targetLang->load($this->getRequest()->getParam('targetLang'));
-        
-        $hasSourceLang = $resource->hasSourceLang($sourceLang);
-        $hasTargetLang = $resource->hasTargetLang($targetLang);
-        
-        //cache the RF5646 language key in the languageResource since this value is used more often as our internal ID
-        //$this->entity->setSourceLangRfc5646($sourceLang->getRfc5646());
-        //$this->entity->setTargetLangRfc5646($targetLang->getRfc5646());
+        $hasSourceLang = $resource->hasSourceLang($this->_helper->Api->convertLanguageParameters($sourceLang));
+        $hasTargetLang = $resource->hasTargetLang($this->_helper->Api->convertLanguageParameters($targetLang));
         
         //both languages can be dealed by the resource, all OK
         if($hasSourceLang && $hasTargetLang) {
