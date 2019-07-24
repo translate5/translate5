@@ -306,8 +306,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         	range.setStartAfter(lastNode);
         	range.setEndAfter(lastNode);
         }
-        this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
         this.fireEvent('afterInsertMarkup', rangeForNode);
+        this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
       }
   },
   setSegmentSize: function(controller, size, oldSize) {
