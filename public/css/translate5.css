@@ -123,5 +123,9 @@ margin-bottom: 5px;
 #content .sidebar img.supporters {
     width: 91px;
     margin-right: 9px;
-  }
+}
+/* set the filtered column as active */
+div.x-grid-filters-filtered-column{
+	border-style: inset;
+}
   
