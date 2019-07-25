@@ -108,18 +108,20 @@ Ext.define('Editor.view.LanguageResources.SearchGrid', {
         config = {
                 columns: [{
                     xtype: 'gridcolumn',
+                    enableTextSelection: true,
                     hideable: false,
                     sortable: false,
                     flex: 2,
                     dataIndex: 'source',
-                    tdCls: 'segment-tag-column source'+segField.getDirectionCls('source'),
+                    tdCls: 'x-selectable segment-tag-column source'+segField.getDirectionCls('source'),
                     cellWrap: true,
                     text: me.strings.source
                 },{
                     xtype: 'gridcolumn',
+                    enableTextSelection: true,
                     flex: 2,
                     dataIndex: 'target',
-                    tdCls: 'segment-tag-column target'+segField.getDirectionCls('target'),
+                    tdCls: 'x-selectable segment-tag-column target'+segField.getDirectionCls('target'),
                     hideable: false,
                     sortable: false,
                     cellWrap: true,
