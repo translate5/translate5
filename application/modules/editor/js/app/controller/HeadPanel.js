@@ -111,6 +111,10 @@ Ext.define('Editor.controller.HeadPanel', {
   //End Events
   //***********************************************************************************
   headPanelToggle: function(tool) {
+      //head panel may be disabled in editor view
+      if(!this.getHeadPanel()) {
+          return;
+      }
       this.getHeadPanel().setVisible(tool.type == 'down');
       if(tool.itemId == 'headPanelUp') {
           tool.ownerCt.down('#headPanelDown').show();
