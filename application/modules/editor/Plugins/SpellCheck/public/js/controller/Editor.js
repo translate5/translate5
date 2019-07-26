@@ -521,7 +521,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             return;
         }
         
-        if (!me.allMatchesOfTool.length > 0) {
+        if (me.allMatchesOfTool === null || me.allMatchesOfTool.length === 0) {
             me.consoleLog('allMatchesOfTool: no errors.');
             me.cleanSpellCheckMarkupInEditor(); // in case there have been errors marked before
             me.bookmarkForCaret = null;
