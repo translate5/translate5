@@ -844,23 +844,36 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     handleSpellCheckTooltip: function() {
         var me = this,
-            oldMenuItems;
+            oldMenuItems,
+            spellCheckData;
         // remove formerly added menu-items
         oldMenuItems = me.spellCheckTooltip.items.items;
         Ext.Array.each(oldMenuItems, function(itemToRemove) {
             me.spellCheckTooltip.remove(itemToRemove);
         },me, true);
         // update Tooltip
-        me.spellCheckTooltip.add(me.getSpellCheckData());
+        spellCheckData = me.getSpellCheckData();
+        if (spellCheckData !== false) {
+            me.spellCheckTooltip.add(spellCheckData);
+        }
     },
     getSpellCheckData: function() {
         var me = this,
-            activeMatchIndex = me.activeMatchNode.getAttribute(me.self.ATTRIBUTE_ACTIVEMATCHINDEX),
-            activeMatch = me.allMatches[activeMatchIndex],
-            message      = activeMatch.message,
-            replacements = activeMatch.replacements,
-            infoURLs     = activeMatch.infoURLs,
-            items = [];
+            activeMatchIndex,
+            activeMatch,
+            message,
+            replacements,
+            infoURLs,
+            items;
+        if (me.allMatches === null || me.allMatches.length < 1) {
+            return false;
+        }
+        activeMatchIndex = me.activeMatchNode.getAttribute(me.self.ATTRIBUTE_ACTIVEMATCHINDEX);
+        activeMatch = me.allMatches[activeMatchIndex];
+        message      = activeMatch.message;
+        replacements = activeMatch.replacements;
+        infoURLs     = activeMatch.infoURLs;
+        items = [];
         // message
         items.push({text: '<b>'+message+'</b>',
                     cls: me.self.CSS_CLASSNAME_TOOLTIP_HEADER });
