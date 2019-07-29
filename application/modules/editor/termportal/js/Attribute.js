@@ -36,13 +36,15 @@ var Attribute={
             type:'termEntryAttribute',
             reference: 'icon'
         },me.onEditAttributeClick);
+        
+        /*
         // - Content
         me.$_termEntryAttributesTable.on('click', '.attribute-data.proposable ~ [data-type="termEntryAttribute"] [data-editable][data-type="termEntryAttribute"]',{
             scope:me,
             type:'termEntryAttribute',
             reference: 'content'
         },me.onEditAttributeClick);
-        
+        */
         // ------------- Terms-Attributes -------------
         // - Icons
         me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
@@ -53,6 +55,8 @@ var Attribute={
         	type:'termAttribute',
             reference: 'icon'
     	},me.onEditAttributeClick);
+        
+        /*
         // - Content
         me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable][data-type="termAttribute"]',{
             scope:me,
@@ -73,6 +77,7 @@ var Attribute={
             type:'termAttribute',
             reference: 'comment'
         },me.onEditAttributeClick);
+        */
 	},
     
     /***

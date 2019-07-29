@@ -149,7 +149,6 @@ $('#search').keyup(function (e) {
     }
     console.log("keyup");
     Term.termAttributeContainer=[];
-    termEntryAttributeContainer=[];
     Term.searchTermsResponse=[];
     Term.disableLimit=false;
 

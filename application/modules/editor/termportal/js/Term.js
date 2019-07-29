@@ -10,7 +10,6 @@ var Term={
 		$_termTable:null,
         $_termEntryAttributesTable:null,
         $_termCollectionSelect:null,
-        $_resultTermsHolder:null,
         
 		searchTermsResponse:[],
 		termGroupsCache:[],
@@ -68,11 +67,12 @@ var Term={
             me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me, reference:'icon'},me.onAddTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me, reference:'icon'},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
+            /*
             // - Content
-            me.$_termTable.on('click', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
-            me.$_termTable.on('click', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
-            me.$_termTable.on('click', '.term-data.proposable.is-finalized [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
-            
+            me.$_termTable.on('dblclick', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
+            me.$_termTable.on('dblclick', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
+            me.$_termTable.on('dblclick', '.term-data.proposable.is-finalized [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
+            */
             me.$_resultTermsHolder.on('tabsactivate',{scope:me},me.onResultTabActivate);
 		},
         
