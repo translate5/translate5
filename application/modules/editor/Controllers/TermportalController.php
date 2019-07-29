@@ -42,10 +42,17 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             $this->view->Php2JsVars()->set('term', $this->getRequest()->getParam('term'));
         }
         
+        
+        $userSession = new Zend_Session_Namespace('user');
+        $this->view->Php2JsVars()->set('app.user.isInstantTranslateAllowed', in_array('instantTranslate', $userSession->data->roles));
+        
+        $isTermProposalAllowed= in_array('termProposer', $userSession->data->roles);
+        $this->view->Php2JsVars()->set('app.user.isTermProposalAllowed',$isTermProposalAllowed);
+        $this->view->isTermProposalAllowed=$isTermProposalAllowed;
+        
         $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $userModel ZfExtended_Models_User */
         $customers=$userModel->getUserCustomersFromSession();
-
         $this->translate = ZfExtended_Zendoverwrites_Translate::getInstance();
         
         if(empty($customers)){
@@ -56,10 +63,14 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $config = Zend_Registry::get('config');
         $defaultLangs=$config->runtimeOptions->termportal->defaultlanguages->toArray();
         
+        $this->view->Php2JsVars()->set('instanttranslate.showSublanguages', $config->runtimeOptions->InstantTranslate->showSubLanguages);
+        
         $langsArray = array();
         
         $model=ZfExtended_Factory::get('editor_Models_Languages');
         /* @var $model editor_Models_Languages */
+        
+        $this->view->Php2JsVars()->set('availableLanguages', $model->getAvailableLanguages());
         
         $collection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $collection editor_Models_TermCollection_TermCollection */
@@ -95,7 +106,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $frontendLocaleNormalized=$this->normalizeLanguage($this->_session->locale);
         $preselectedLang=null;
         
-        $rfcFlags=[];
         foreach ($langsArray as &$lng){
 
             //set preselected term-search language based on user locale language
@@ -105,8 +115,6 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
                     $preselectedLang=$lng['rfc5646'];
                 }
             }
-            
-            $rfcFlags[strtolower($lng['rfc5646'])]=strtolower($lng['iso3166Part1alpha2']);
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
             
@@ -123,15 +131,34 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         //all languages in the available term collections for the user
         $this->view->languages=$langsArray;
         
+        // all language-combinations that are available in InstantTranslate
+        $languageResourcesLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
+        /* @var $languageResourcesLanguages editor_Models_LanguageResources_Languages */
+        $languageCombinations = $languageResourcesLanguages->getLanguageCombinationsForLoggedUser();
+        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageCombinations->targetsForSources);
+        
         
         //rfc language code to language flag mapping
-        $this->view->rfcFlags=$rfcFlags;
+        $this->view->Php2JsVars()->set('apps.termportal.rfcFlags',$languagesModel->loadAllKeyValueCustom('rfc5646', 'iso3166Part1alpha2',true));
+        //id language to rfc code mapping
+        $this->view->Php2JsVars()->set('apps.termportal.idToRfcLanguageMap',$languagesModel->loadAllKeyValueCustom('id', 'rfc5646'));
+        //rfc to languagename map
+        $this->view->Php2JsVars()->set('apps.termportal.rfcToLanguageNameMap',$languagesModel->loadAllKeyValueCustom('rfc5646', 'langName'));
+        
         $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         
         $this->view->labels=$labels;
-        $this->view->collectionIds=$collectionIds;
+        
+        $this->view->Php2JsVars()->set('apps.termportal.collectionIds',array_unique($collectionIds));
         
         $this->view->preselectedLang=$preselectedLang;
+        
+        // GET-params
+        $this->view->text = $this->_getParam('text', '');
+        $this->view->lang = $this->_getParam('lang', '');
+        $this->view->textProposal = $this->_getParam('textProposal', '');
+        $this->view->langProposal = $this->_getParam('langProposal', '');
+        $this->view->isTermProposalFromInstantTranslate = $this->_getParam('isTermProposalFromInstantTranslate', false);
         
         $this->view->Php2JsVars()->set('termStatusMap', $config->runtimeOptions->tbx->termLabelMap->toArray());
         $this->view->Php2JsVars()->set('termStatusLabel', [
@@ -141,17 +168,94 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             'unknown' => $this->translate->_('Unbekannter Term Status'),
         ]);
         $this->view->Php2JsVars()->set('loginUrl', APPLICATION_RUNDIR.$config->runtimeOptions->loginUrl);
+        $this->view->Php2JsVars()->set('restpath',APPLICATION_RUNDIR.'/'.Zend_Registry::get('module').'/');
         
         //translated strings for some of the result tables
         $translatedStrings=array(
-                "termTableTitle"=>$this->translate->_("Terme"),
-                "termEntryAttributeTableTitle"=>$this->translate->_("Eigenschaften des Eintrags"),
+                "termEntries"=>$this->translate->_("Term-Einträge"),
+                "termEntryNameTitle"=>$this->translate->_("Eintragsbenennungen"),
+                "termEntryAttributeTitle"=>$this->translate->_("Eintragseigenschaften"),
                 "search" => $this->translate->_('Suche'),
+                "searchFilterPlaceholderText" => $this->translate->_('Filter'),
                 "noResults" => $this->translate->_('Keine Ergebnisse für die aktuelle Suche!'),
                 "noExistingAttributes" => $this->translate->_('no existing attributes'),
+                "collection"=>$this->translate->_("Term-Collection"),
+                "client"=>$this->translate->_("Kunde"),
+                "processstatus"=>$this->translate->_("Prozessstatus"),
+                "instantTranslateInto"=>$this->translate->_("Sofortübersetzung nach"),
+                "TermPortalLanguages"=>$this->translate->_("Terminologieportal-Sprachen"),
+                "AllLanguagesAvailable"=>$this->translate->_("Alle verfügbaren Sprachen")
         );
         
         $this->view->translations=$translatedStrings;
+        
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $isProposableAllowed=$term->isProposableAllowed();
+        $this->view->Php2JsVars()->set('apps.termportal.proposal.translations',[
+            "Ja"=>$this->translate->_("Ja"),
+            "Nein"=>$this->translate->_("Nein"),
+            "deleteAttributeProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
+            "deleteTermProposalMessage"=>$this->translate->_("Vorschlag löschen?"),
+            "deleteAttributeProposal"=>$this->translate->_("Attribut: Vorschlag löschen"),
+            "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
+            "editProposal"=>$this->translate->_("Änderung vorschlagen"),
+            "saveProposal"=>$this->translate->_("Änderung sichern"),
+            "editTermEntryProposal"=>$this->translate->_("Term-Eintrag: Änderung vorschlagen"),
+            "addTermEntryProposal"=>$this->translate->_("Neuen Term-Eintrag vorschlagen"),
+            "deleteTermEntryProposal"=>$this->translate->_("Term-Eintrag: Vorschlag löschen"),
+            "editTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Änderung vorschlagen"),
+            "addTermEntryAttributeProposal"=>$this->translate->_("Neues Term-Eintrag-Attribut vorschlagen"),
+            "deleteTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Vorschlag löschen"),
+            "editTermProposal"=>$this->translate->_("Term: Änderung vorschlagen"),
+            "addTermProposal"=>$this->translate->_("Neuen Term vorschlagen"),
+            "deleteTermProposal"=>$this->translate->_("Term: Vorschlag löschen"),
+            "editTermAttributeProposal"=>$this->translate->_("Term-Attribut: Änderung vorschlagen"),
+            "addTermAttributeProposal"=>$this->translate->_("Neues Term-Attribut vorschlagen"),
+            "deleteTermAttributeProposal"=>$this->translate->_("Term-Attribut: Vorschlag löschen"),
+            "chooseLanguageForTermEntry"=>$this->translate->_("Sprache für Term-Vorschlag wählen"),
+            "chooseTermcollectionForTermEntry"=>$this->translate->_("Term-Collection für Term-Vorschlag wählen"),
+            "selectLanguage"=>$this->translate->_("... Sprache auswählen"),
+            "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für")
+        ]);
+        
+        // for filtering in front-end: get the names for the available collectionIds
+        $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
+        /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
+        $collections = [];
+        foreach ($collectionIds as $id) {
+            $collection->load($id);
+            $customerAssoc->loadByLanguageResourceId($id);
+            $collections[$id] = (object) [
+                                    'name' => $collection->getName(),
+                                    'clients' => $customerAssoc->loadCustomerIds($id)
+                                ];
+        }
+        $this->view->collections = $collections;
+        
+        // for filtering in front-end: get the names for the available clients
+        $customer=ZfExtended_Factory::get('editor_Models_Customer');
+        /* @var $customer editor_Models_Customer */
+        $clients = [];
+        foreach ($customers as $id) {
+            if (count($customerAssoc->loadByCustomerIds($id))>0) {
+                $customer->load($id);
+                $clients[$id] = $customer->getName();
+            }
+        }
+        $this->view->clients = $clients;
+        
+        // for filtering in front-end: get processtats
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $allProcessStatus = [];
+        foreach ($term->getAllProcessStatus() as $processstatus) {
+            if(!$isProposableAllowed && $processstatus==$term::PROCESS_STATUS_UNPROCESSED){
+                continue;
+            }
+            $allProcessStatus[$processstatus] = $this->translate->_($processstatus);
+        }
+        $this->view->allProcessstatus = $allProcessStatus;
     }
     
     /**

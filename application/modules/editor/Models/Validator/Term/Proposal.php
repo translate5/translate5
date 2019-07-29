@@ -26,7 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Db_TermCollection_TermAttributes extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_term_attributes';
-    public $_primary = 'id';
+class editor_Models_Validator_Term_Proposal extends ZfExtended_Models_Validator_Abstract {
+  /**
+   * Validators for Terms
+   */
+  protected function defineValidators() {
+    $this->addValidator('id', 'int');
+    $this->addValidator('term', 'stringLength', array('min' => 0, 'max' => 19000));
+    $this->addDontValidateField('collectionId');
+    $this->addDontValidateField('termId');
+  }
 }

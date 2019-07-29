@@ -107,6 +107,7 @@
         "selectLanguages"           => $translate->_("Bitte wählen Sie eine Sprachkombination für die Übersetzung."),
         "noLanguageResource"        => $translate->_("Für diese Sprachkombination steht keine SprachResource zur Verfügung."),
         "translationsForLabel"      => $translate->_("Übersetzungen für"),
+        "termProposalIconTooltip"   => $translate->_("Als neuen Term im TermPortal vorschlagen"),
     );
     $this->Php2JsVars()->set('languageresource.translatedStrings',$this->translations);
     
@@ -129,9 +130,16 @@
         <form id="sourceLanguageAndContent">
             <select id="sourceLocale" name="sourceLocale">
                 <?php
+                    $sourceLangSelected = false;
+                    $getParamSource = $this->source;
+                    if (!is_null($getParamSource)) {
+                        $sourceLangSelected = $getParamSource;
+                    } else if (!empty($this->sourceSearchLanguagePreselectionLocale)) {
+                        $sourceLangSelected = $this->sourceSearchLanguagePreselectionLocale;
+                    }
                     $optionValues=[];
                     foreach ($allSourceLanguageLocales as $sourceLangLocale) {
-                        $selected = ($sourceLangLocale== $this->sourceSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $selected = ($sourceLangSelected != false && $sourceLangSelected == $sourceLangLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$sourceLangLocale.'"'.$selected.'>'.$sourceLangLocale.'</option>';
                     }
                     echo implode(' ', $optionValues);
@@ -140,7 +148,7 @@
             <div id="sourceIsText" class="source-toggle show-if-source-is-text infotext"></div>
             <div id="sourceIsFile" class="source-toggle show-if-source-is-file infotext"></div>
             <div id="sourceContent" class="clearable">
-                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
+                <textarea id="sourceText" name="sourceText" wrap="SOFT" class="show-if-source-is-text"><?php echo htmlspecialchars($this->text); ?></textarea> <!-- TODO: what to do with a lot of text (and after clearing)? Scrollbars? Resize?-->
                 <span class="clearable-clear show-if-source-is-text" title="<?php echo $this->translations["clearText"];?>">&times;</span> <!-- TODO: (1) reposition after resizing the textarea by the user (2) interferes with scrollbars-->
                 <span id="countedCharacters" class="show-if-source-is-text">0</span>
                 <input id="sourceFile" name="sourceFile" type="file" class="show-if-source-is-file"/>
@@ -152,9 +160,16 @@
         <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
                 <?php
+                    $targetLangSelected = false;
+                    $getParamTarget = $this->target;
+                    if (!is_null($getParamTarget)) {
+                        $targetLangSelected = $getParamTarget;
+                    } else if (!empty($this->targetSearchLanguagePreselectionLocale)) {
+                        $targetLangSelected = $this->targetSearchLanguagePreselectionLocale;
+                    }
                     $optionValues=[];
                     foreach ($allTargetLanguageLocales as $targetLangLocale) {
-                        $selected = ($targetLangLocale== $this->targetSearchLanguagePreselectionLocale) ? ' selected="selected"' : '';
+                        $selected = ($targetLangSelected != false && $targetLangSelected == $targetLangLocale) ? ' selected="selected"' : '';
                         $optionValues[]='<option value="'.$targetLangLocale.'"'.$selected.'>'.$targetLangLocale.'</option>';
                     }
                     echo implode(' ', $optionValues);
@@ -173,13 +188,8 @@
 </div>
 
 <script type="text/javascript">
-    var allSourceLanguageLocales = '<?php echo json_encode($allSourceLanguageLocales);?>';
-    allSourceLanguageLocales = JSON.parse(allSourceLanguageLocales);
-    var allTargetLanguageLocales = '<?php echo json_encode($allTargetLanguageLocales);?>';
-    allTargetLanguageLocales = JSON.parse(allTargetLanguageLocales);
-    var allLanguageResources = '<?php echo json_encode($this->machineTranslationEngines);?>';
-    allLanguageResources = JSON.parse(allLanguageResources);
     var characterLimit = '<?php echo $characterLimit;?>';
+    
 </script>
 
 <script type="text/javascript">

@@ -45,4 +45,27 @@ class Editor_AppsController extends ZfExtended_Controllers_Action {
         $this->view->Php2JsVars()->set('apps.instanttranslate.title',$translate->_('translate5-instanttranslate'));
         $this->view->Php2JsVars()->set('apps.termportal.title',$translate->_('translate5-termportal'));
     }
+    
+    /***
+     * Update the last used app for the current user
+     */
+    public function lastusedappAction() {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->_helper->layout->disableLayout();
+        $appName=$this->getRequest()->getParam('appName');
+        if(empty($appName)){
+            return;
+        }
+        
+        //TODO: when more apps, create service classes
+        $validApps=['instanttranslate','termportal'];
+        if(!in_array($appName, $validApps)){
+            return;
+        }
+        
+        $userId = (new Zend_Session_Namespace('user'))->data->id;
+        $meta=ZfExtended_Factory::get('editor_Models_UserMeta');
+        /* @var $meta editor_Models_UserMeta */
+        $meta->saveLastUsedApp($userId, $appName);
+    }
 }

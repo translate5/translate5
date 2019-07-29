@@ -26,7 +26,7 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_TermCollection_TermAttributes extends editor_Models_TermCollection_Attributes{
-    protected $dbInstanceClass = 'editor_Models_Db_TermCollection_TermAttributes';
-    protected $validatorInstanceClass   = 'editor_Models_Validator_TermCollection_TermAttributes';
+class editor_Models_Db_Term_Proposal extends Zend_Db_Table_Abstract {
+    protected $_name    = 'LEK_term_proposal';
+    public $_primary = 'id';
 }

@@ -25,12 +25,19 @@
 -- END LICENSE AND COPYRIGHT
 -- */
 
-INSERT INTO `Zf_users` (`userGuid` , `firstName` , `surName` , `gender` , `login` , `email` , `roles` , `passwd`, `editable`, `locale`)
-VALUES
-('{00000000-0000-0000-C100-CCDDEE000001}', 'manager', 'test', 'm', 'testmanager', 'support@translate5.net', 'pm,editor,admin', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000002}', 'lector', 'test', 'm', 'testlector', 'support@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000003}', 'translator', 'test', 'm', 'testtranslator', 'support@translate5.net', 'editor', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000004}', 'api', 'test', 'm', 'testapiuser', 'support@translate5.net', 'pm,editor,admin,api', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en'),
-('{00000000-0000-0000-C100-CCDDEE000005}', 'termproposer', 'test', 'm', 'testtermproposer', 'support@translate5.net', 'pm,editor,api,termProposer', '6a204bd89f3c8348afd5c77c717a097a', 0, 'en');
+INSERT INTO `Zf_acl_rules` (`module`, `role`, `resource`, `right`) VALUES
+('editor', 'pm', 'editor_term', 'all');
 
-    
+CREATE TABLE `LEK_term_proposal` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `term` varchar(19000) NOT NULL DEFAULT '' COMMENT 'the proposed term',
+  `collectionId` int(11) NOT NULL COMMENT 'links to the collection',
+  `termId` int(11) DEFAULT NULL COMMENT 'links to the term',
+  `created` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  CONSTRAINT FOREIGN KEY (`termId`) REFERENCES `LEK_terms` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FOREIGN KEY (`collectionId`) REFERENCES `LEK_languageresources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+ALTER TABLE `LEK_terms` 
+ADD COLUMN `processStatus` VARCHAR(128) DEFAULT 'finalized' AFTER status;

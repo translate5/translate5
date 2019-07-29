@@ -44,6 +44,11 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $import->importSource = $params['importSource'] ?? "";
         
         $import->customerIds=$params['customerIds'];
+
+        $sessionUser = new Zend_Session_Namespace('user');
+        $userGuid=$params['userGuid'] ?? $sessionUser->data->userGuid;
+        $import->loadUser($userGuid);
+        
         return $import->parseTbxFile($filePath,$params['collectionId']);
     }
     
@@ -52,10 +57,12 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * The autoCreatedOnImport flag is set to true.
      * @param string $name
      * @param array $customers
+     * @param int $autoCreatedOnImport
+     * 
      * @return int
      */
-    public function create($name,$customers){
-        $this->setAutoCreatedOnImport(1);
+    public function create(string $name,array $customers,int $autoCreatedOnImport=1){
+        $this->setAutoCreatedOnImport($autoCreatedOnImport);
         $this->setName($name);
         
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
@@ -71,7 +78,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $this->setResourceType(editor_Models_Segment_MatchRateType::TYPE_TERM_COLLECTION);
         $resourceId=$this->save();
         
-        if($customers){
+        if(!empty($customers)){
             $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
             /* @var $customerAssoc editor_Models_LanguageResources_CustomerAssoc */
             $customerAssoc->addAssocs($customers, $resourceId);
@@ -174,20 +181,24 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
-     * Get all collections ids assigned to the given customers.
+     * Get all TermCollections ids assigned to the given customers.
      * 
      * @param array $customerIds
      */
     public function getCollectionsIdsForCustomer($customerIds){
+        $service = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        $serviceType = $service->getServiceNamespace(); 
         $s=$this->db->select()
         ->setIntegrityCheck(false)
         ->from(array('lr'=>'LEK_languageresources'))
         ->join(array('ca'=>'LEK_languageresources_customerassoc'), 'ca.languageResourceId=lr.id',array('ca.customerId as customerId'))
-        ->where('ca.customerId IN(?)',$customerIds);
+        ->where('ca.customerId IN(?)',$customerIds)
+        ->where('lr.serviceType = ?',$serviceType)
+        ->group('lr.id');
         $rows=$this->db->fetchAll($s)->toArray();
         if(!empty($rows)){
-            $ids = array_column($rows, 'id');
-            return $ids;
+            return array_column($rows, 'id');
         }
         return [];
     }
@@ -209,8 +220,8 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         ->setIntegrityCheck(false)
         ->from(array('tc' => 'LEK_languageresources'), array('id'))
         ->join(array('t' => 'LEK_terms'),'tc.id=t.collectionId', array('count(DISTINCT t.id) as termsCount'))
-        ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId', array('count(DISTINCT ta.id) as termsAtributeCount'))
-        ->join(array('tea' => 'LEK_term_entry_attributes'),'tc.id=tea.collectionId', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
+        ->join(array('ta' => 'LEK_term_attributes'),'tc.id=ta.collectionId AND not ta.termId is null', array('count(DISTINCT ta.id) as termsAtributeCount'))
+        ->join(array('tea' => 'LEK_term_attributes'),'tc.id=tea.collectionId AND tea.termId is null', array('count(DISTINCT tea.id) as termsEntryAtributeCount'))
         ->where('tc.id =?',$collectionId);
         return $this->db->fetchRow($s)->toArray();
     }
@@ -312,6 +323,21 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         if(!$lngAssoc->isInCollection($language, 'targetLang', $collectionId)){
             $lngAssoc->saveLanguages(null, $language, $collectionId);
         }
+    }
+    
+    /***
+     * Get the available collections for the currently logged user
+     *
+     * @return array
+     */
+    public function getCollectionForAuthenticatedUser(){
+        $userModel=ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $userModel ZfExtended_Models_User */
+        $customers=$userModel->getUserCustomersFromSession();
+        if(empty($customers)){
+            return [];
+        }
+        return $this->getCollectionsIdsForCustomer($customers);
     }
     
     /***

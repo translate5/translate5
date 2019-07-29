@@ -508,6 +508,33 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->success = $this->validateUpload();
     }
     
+    public function exportAction() {
+        $proposals=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $proposals editor_Models_Term */
+        
+        $collectionIds=$this->getParam('collectionId');
+        if(is_string($collectionIds)){
+            $collectionIds=explode(',', $collectionIds);
+        }
+        $rows = $proposals->loadProposalExportData($this->getParam('exportDate'),$collectionIds);
+        if(empty($rows)){
+            $this->view->message='No results where found.';
+            return;
+        }
+        $proposals->exportProposals($rows);
+    }
+
+    /***
+     * This is used for the tests. It will return the proposals for the current date and for the 
+     * assigned collections of the customers of the authenticated user
+     */
+    public function testexportAction() {
+        $proposals=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $proposals editor_Models_Term */
+        $this->view->rows=$proposals->loadProposalExportData();
+    }
+    
+    
     /**
      * Loads all task information entities for the given languageResource
      * The returned data is no real task entity, although the task model is used in the frontend!
@@ -722,9 +749,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         
         $this->handleUploadLanguageResourcesFile($importInfo[self::FILE_UPLOAD_NAME]);
         
+        
+        $userSession = new Zend_Session_Namespace('user');
+        
         $params['languageResourceId']=$this->entity->getId();
         $params['fileinfo']=!empty($importInfo[self::FILE_UPLOAD_NAME])? $importInfo[self::FILE_UPLOAD_NAME]:[];
         $params['addnew']=$addnew;
+        $params['userGuid']=$userSession->data->userGuid;
         
         if (!$worker->init(null, $params)) {
             $this->uploadErrors[] = 'File import in language resources Error on worker init()';
