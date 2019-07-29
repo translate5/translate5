@@ -1238,8 +1238,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function hasSameStartAndEndTags($preserveWhitespace, array $source, array $target, $foundTag = false) {
         //source and target must have at least a start tag, text content, and an end tag, that means at least 3 chunks:
-        if(count($source) < 4 || count($target) < 4){
+        // if the feature is disabled no framing tags are ignored
+        if(!$this->config->runtimeOptions->import->xlf->ignoreFramingTags || count($source) < 4 || count($target) < 4){
             return $foundTag;
+        }
+        
+        //if target is empty, we assume the target = source so that the feature can be used at all, since it checks for same tags in source and target 
+        if(empty($target)) {
+            $target = $source;
         }
         
         //init variables:
