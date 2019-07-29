@@ -33,6 +33,14 @@ END LICENSE AND COPYRIGHT
     flex-wrap: wrap;
 }
 
+.ui-selectmenu-menu ul {
+    max-height: 19em;
+}
+
+.wrap {
+    margin-bottom: 1em;
+}
+
 #source,
 #target {
     flex: 1 300px;
@@ -148,15 +156,21 @@ h4, p {
     color: #454545;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 690px) {
     #logo {
         flex: 0 1 100%;
         text-align:left;
         margin-right: 0px;
     }
-    #logo { order: 1; }
-    #languageSelector { order: 2; text-align: left; margin-top: 5px;}
-    #logoutContainer { order: 3; margin-top: 5px;}
+    #languageSelector {text-align: left; margin-top: 5px;}
+    #logoutContainer {margin-top: 5px;}
+    #termPortalButtonContainer {margin-top: 5px;}
+}
+
+@media (max-width: 600px) {
+    #containerHeader {
+        font-size: 90%;
+    }
 }
 
 /* --------------- spinner --------------- */

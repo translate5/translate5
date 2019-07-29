@@ -27,35 +27,22 @@ END LICENSE AND COPYRIGHT
 */
 
 /***
- * Helper variables
- */
-var termAttributeContainer=[],
-    termEntryAttributeContainer=[],
-    searchTermsResponse=[],
-    requestFromSearchButton=false,
-    languageDefinitionContent=[],//it is used to store the description definition for language
-    KEY_TERM="term",
-    KEY_TERM_ATTRIBUTES="termAttributes",
-    KEY_TERM_ENTRY_ATTRIBUTES="termEntryAttributes",
-    termGroupsCache=[];//cache the groups results
-
-/***
- * If the parameter 'term' is given in the URL, we start a search directly.
+ * If a text is already given, we start a search directly.
  */
 function checkDirectSearch() {
-    var givenTerm = getUrlParamValue('term');
-    if (givenTerm != '') {
-        $('#search').val(givenTerm);
+    var givenText = $('#search').val();
+    if (givenText != '') {
         $('#searchButton').click();
     }
 }
-function getUrlParamValue(paramName) {
-    // https://davidwalsh.name/query-string-javascript
-    paramName = paramName.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + paramName + '=([^&#]*)');
-    var results = regex.exec(window.location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-};
+
+function clearResults () {
+    console.log('clearResults');
+    $('#searchTermsSelect').empty();
+    $('#error-no-results').hide();
+    $('#warning-new-source').hide();
+    $('#searchTermsHelper .skeleton').show();
+}
 
 /***
  * On dropdown select function handler
@@ -70,8 +57,8 @@ var selectItem = function (event, ui) {
     if (origEvent.type == 'click'){
         event.preventDefault();
         console.log("clicked item: " + ui.item.groupId);
-        searchTerm(ui.item.label);
-        requestFromSearchButton=true;
+        Term.searchTerm(ui.item.label);
+        Term.disableLimit=true;
         return;
     }
 
@@ -81,23 +68,24 @@ var selectItem = function (event, ui) {
     $('#searchTermsSelect').empty();
 
     //if there are results, show them
-    if(searchTermsResponse.length>0){
+    if(Term.searchTermsResponse.length>0){
         $('#searchTermsSelect').show();
         showFinalResultContent();
     }
     
     console.log("selectItem: " + ui.item.groupId);
+
+    Term.fillSearchTermSelect(ui.item.label);
     
-    fillSearchTermSelect();
     //find the attributes for
-    findTermsAndAttributes(ui.item.groupId);
+    Term.findTermsAndAttributes(ui.item.groupId);
     //$("#search").val(ui.item.value);
     return false;
 }
  
 $("#search").autocomplete({
     source: function(request, response) {
-        searchTerm(request.term,function(data){
+        Term.searchTerm(request.term,function(data){
             response(data);
         })
     },
@@ -115,511 +103,64 @@ $("#search").autocomplete({
     }
 });
 
-/***
- * Find all terms and terms attributes for the given term entry id (groupId)
- * @param termGroupid
- * @returns
- */
-function findTermsAndAttributes(termGroupid){
-    console.log("findTermsAndAttributes() for: " + termGroupid);
-    languageDefinitionContent=[];
-    
-    //check the cache
-    if(termGroupsCache[termGroupid]){
-        drawTermEntryAttributes(termGroupsCache[termGroupid].rows[KEY_TERM_ENTRY_ATTRIBUTES]);
-        groupTermAttributeData(termGroupsCache[termGroupid].rows[KEY_TERM_ATTRIBUTES]);
-        return;
-    }
-    
-    $.ajax({
-        url: Editor.data.termportal.restPath+"termcollection/searchattribute",
-        dataType: "json",
-        type: "POST",
-        data: {
-            'groupId':termGroupid
-        },
-        success: function(result){
-            //store the results to the cache
-            termGroupsCache[termGroupid]=result;
-            
-            drawTermEntryAttributes(result.rows[KEY_TERM_ENTRY_ATTRIBUTES]);
-            groupTermAttributeData(result.rows[KEY_TERM_ATTRIBUTES]);
-        }
-    })
-}
-
-/***
- * Search the term in the language and term collection
- * @param searchString
- * @param successCallback
- * @returns
- */
-function searchTerm(searchString,successCallback){
-    var lng=$('#languages').val();
-    if(!lng){
-        lng=$("input[name='languages']:checked").val();
-    }
-    console.log("searchTerm() for: " + searchString);
-    console.log("searchTerm() for language: " + lng);
-    searchTermsResponse=[];  
-    $.ajax({
-        url: Editor.data.termportal.restPath+"termcollection/search",
-        dataType: "json",
-        type: "POST",
-        data: {
-            'term':searchString,
-            'language':lng,
-            'collectionIds':collectionIds,
-            'disableLimit':requestFromSearchButton
-        },
-        success: function(result){
-            searchTermsResponse=result.rows[KEY_TERM];
-            if(successCallback){
-                successCallback(result.rows[KEY_TERM]);
-            }
-            fillSearchTermSelect();
-        }
-    });
-}
-
-/***
- * Fill up the term option component with the search results
- * @returns
- */
-function fillSearchTermSelect(){
-    if(!searchTermsResponse){
-        
-        $('#error-no-results').show();
-        
-        console.log("fillSearchTermSelect: nichts gefunden");
-        
-        if(requestFromSearchButton){
-            requestFromSearchButton=false;
-        }
-        
-        $("#finalResultContent").hide();
-        return;
-    }
-    
-    $('#error-no-results').hide();
-    $('#searchTermsSelect').empty();
-    console.log("fillSearchTermSelect: " + searchTermsResponse.length + " Treffer");
-
-    if(requestFromSearchButton){
-        console.log("fillSearchTermSelect: requestFromSearchButton");
-        
-        requestFromSearchButton=false;
-        
-        //if only one record, find the attributes and display them
-        if(searchTermsResponse.length===1){
-            console.log("fillSearchTermSelect: only one record => find the attributes and display them");
-            findTermsAndAttributes(searchTermsResponse[0].groupId);
-        }
-        
-        if(searchTermsResponse.length>0){
-            showFinalResultContent();
-        }
-        
-    }
-    
-    if(!$('#searchTermsSelect').is(":visible")){
-        return;
-    }
-    
-    if(searchTermsResponse.length > 1){
-        $("#resultTermsHolder").hide();
-    }
-    
-    //fill the term component with the search results
-    $.each(searchTermsResponse, function (i, item) {
-        $('#searchTermsSelect').append(
-                $('<li>').attr('data-value', item.groupId).attr('class', 'ui-widget-content').append(
-                        $('<div>').attr('class', 'ui-widget').append(item.desc)
-            ));
-    });
-    
-    if ($('#searchTermsSelect').hasClass('ui-selectable')) {
-        $("#searchTermsSelect").selectable("destroy");
-    }
-    
-    $("#searchTermsSelect").selectable();
-
-    $("#searchTermsSelect li").mouseenter(function() {
-        $(this).addClass('ui-state-hover');
-      });
-    $("#searchTermsSelect li").mouseleave(function() {
-        $(this).removeClass('ui-state-hover');
-      });
-    $("#searchTermsSelect").on( "selectableselecting", function( event, ui ) {
-        $(ui.selecting).addClass('ui-state-active');
-    });
-    $("#searchTermsSelect").on( "selectableunselecting", function( event, ui ) {
-        $(ui.unselecting).removeClass('ui-state-active');
-    });
-    $("#searchTermsSelect").on( "selectableselected", function( event, ui ) {
-        $(ui.selected).addClass('ui-state-active');
-    });
-    
-    if(searchTermsResponse.length==1){
-        $("#searchTermsSelect li:first-child").addClass('ui-state-active').addClass('ui-selected');
-    }
-    
-    // "reset" search form
-    $("#search").autocomplete( "search", $("#search").val('') );
-}
-
-/***
- * Fill the termAttributeContainer grouped by term.
- * 
- * @param data
- * @returns
- */
-function groupTermAttributeData(data){
-    if(!data || data.length<1){
-        return;
-    }
-    
-    
-    termAttributeContainer=[];
-    var oldKey="",
-        newKey="",
-        count=-1;
-    
-    for(var i=0;i<data.length;i++){
-        newKey = data[i].termId;
-        if(newKey !=oldKey){
-            count++;
-            termAttributeContainer[count]=[];
-        }        
-        termAttributeContainer[count].push(data[i]);
-        oldKey = data[i].termId
-    }
-    
-    //merge the childs
-    termAttributeContainer.forEach(function(termData,index) {
-        termAttributeContainer[index]=groupChildData(termData);
-    });
-    
-    //draw the term groups
-    drawTermGroups();
-}
-
 function getLanguageFlag(rfcLanguage) {
-    rfcLanguage = rfcLanguage.toLowerCase();
-    if (rfcLanguage in rfcLanguageFlags) {
-        return '<img src="' + moduleFolder + 'images/flags/' + rfcLanguageFlags[rfcLanguage] + '.png" alt="' + rfcLanguage + '" title="' + rfcLanguage + '">';
-    } else {
-        return rfcLanguage;
+	var rfcValue=rfcLanguage.toLowerCase();
+    if (rfcValue in Editor.data.apps.termportal.rfcFlags) {
+    	if(Editor.data.apps.termportal.rfcFlags[rfcValue]==''){
+    		return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
+    	}
+        // TODO: img-html could be reused if already created before
+        return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[rfcValue] + '.png" alt="' + rfcValue + '" title="' + rfcValue + '">';
     }
-}
-
-/***
- * Draw the tearm groups
- * @returns
- */
-function drawTermGroups(){
-    if(!termAttributeContainer || termAttributeContainer.length<1){
-        return;
+    if(!rfcValue || rfcValue==''){
+    	return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     }
-    $('#termTable').empty();
-    $("#resultTermsHolder").show();
-    var count=0,
-        rfcLanguage;
-    termAttributeContainer.forEach(function(attribute) {
-        rfcLanguage = getLanguageFlag(attribute[0].language);
-        
-        //check if the term contains attribute with status icon
-        var statusIcon=checkTermStatusIcon(attribute);
-        
-        $('#termTable').append( '<h3 data-term-value="'+attribute[0].desc+'">'+ rfcLanguage + ' ' + attribute[0].desc +' '+(statusIcon ? statusIcon : '') + '</h3><div>' + this.drawTermAttributes(count) + '</div>' );
-        count++;
-    });
-    if ($('#termTable').hasClass('ui-accordion')) {
-        $('#termTable').accordion('refresh');
-    } else {
-        $("#termTable").accordion({
-            active: false,
-            collapsible: true,
-            heightStyle: "content"
-        });
+    //check if it is comma separated ids
+    rfcValue=rfcValue.split(',');
+    if(!rfcValue || rfcValue.length==0){
+    	return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
+    }
+    rfcValue=rfcValue[0];
+    //it is comma separated, try to find it
+    if (rfcValue in Editor.data.apps.termportal.idToRfcLanguageMap) {
+    	var flagRfc=Editor.data.apps.termportal.idToRfcLanguageMap[rfcValue];
+    	flagRfc=flagRfc.toLowerCase()
+        return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[flagRfc] + '.png" alt="' + flagRfc + '" title="' + flagRfc + '">';
     }
     
-    //find the selected item form the search result and expand it
-    $.each($("#searchTermsSelect li"), function (i, item) {
-        if($(item).hasClass('ui-state-active')){
-            $('#termTable').accordion({
-                active:false
-            });
-            
-            $.each($("#termTable h3"), function (i, termitem) {
-                if(termitem.dataset.termValue === item.textContent){
-                    $('#termTable').accordion({
-                        active:i
-                    });
-                }
-            });
-            
-        }
-    });
-    
-    setSizesInFinalResultContent();
-}
-
-/***
- * Draw the term entry groups
- * @param entryAttribute
- * @returns
- */
-function drawTermEntryAttributes(entryAttribute){
-    if(!entryAttribute || entryAttribute.length<1){
-        return;
-    }
-    $('#termAttributeTable').empty();
-    $("#resultTermsHolder").show();
-    
-    entryAttribute = groupChildData(entryAttribute);
-    
-    entryAttribute.forEach(function(attribute) {
-        var drawData=handleAttributeDrawData(attribute);
-        $('#termAttributeTable').append(drawData);
-    });
-}
-
-/***
- * Render term attributes by given term
- * 
- * @param termId
- * @returns {String}
- */
-function drawTermAttributes(termId){
-    var attributes=termAttributeContainer[termId]
-        html = '',
-        tmpLang=attributes[0].language;
-    
-    if(languageDefinitionContent[tmpLang]){
-        html +=languageDefinitionContent[tmpLang];
-    }
-    
-    attributes.forEach(function(attribute) {
-        html +=handleAttributeDrawData(attribute);
-    });
-    return html;
-}
-
-/***
- * Group childs by parent id to the nodes
- * 
- * @param list
- * @returns
- */
-function groupChildData(list) {
-    var map = {}, node, roots = [], i,labelTrans;
-    for (i = 0; i < list.length; i += 1) {
-        map[list[i].attributeId] = i; // initialize the map
-        list[i].children = []; // initialize the children
-    }
-    
-    for (i = 0; i < list.length; i += 1) {
-        node = list[i];
-        labelTrans = $.grep(attributeLabels, function(e){ return e.id == node.labelId; });
-        
-        node.headerText=null;
-        if(labelTrans.length==1 && labelTrans[0].labelText){
-            node.headerText=labelTrans[0].labelText;
-        }
-        if (node.parentId !== null) {
-            // if you have dangling branches check that map[node.parentId] exists
-            list[map[node.parentId]].children.push(node);
-        } else {
-            roots.push(node);
-        }
-    }
-    return roots;
-}
-
-/***
- * Find child's for the attribute, and build the data in needed structure
- *  
- * @param attribute
- * @returns html
- */
-function handleAttributeDrawData(attribute){
-    var html="";
-    
-    if(!attribute.attributeId){
-        return noExistingAttributes; // see /application/modules/editor/views/scripts/termportal/index.phtml
-    }
-    
-    switch(attribute.name) {
-        case "transac":
-            
-            
-            var header=handleAttributeHeaderText(attribute,true);
-            
-            html += '<h4 class="ui-widget-header ui-corner-all">' + header + '</h4>';
-            
-            if(attribute.children.length>0){
-                var childData=[];
-                attribute.children.forEach(function(child) {
-                    //get the header text
-                    childDataText=handleAttributeHeaderText(child,true);
-                    
-                    var attVal=getAttributeValue(child);
-                    
-                    //the data tag is displayed as first in this group
-                    if(child.name ==="date"){
-                        childData.unshift('<p>' + childDataText + ' ' + attVal+'</p>')
-                        return true;
-                    }
-                    childData.push('<p>' + childDataText + ' ' + attVal+'</p>')
-                });
-                html+=childData.join('');
-            }
-            break;
-        case "descrip":
-            
-            var attVal=getAttributeValue(attribute);
-
-            var flagContent="";
-            //add the flag for the definition in the term entry attributes
-            if(attribute.attrType=="definition" && attribute.language){
-                flagContent=" "+getLanguageFlag(attribute.language);
-            }
-
-            var headerText="";
-            
-            if(flagContent && flagContent!=""){
-                headerText =handleAttributeHeaderText(attribute,false)+flagContent;
-            }else{
-                headerText =handleAttributeHeaderText(attribute)+":";
-            }
-            
-            html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
-            
-            //if it is definition on language level, get store the data in variable so it is displayed also on term language level
-            if(attribute.attrType=="definition" && attribute.language){
-                languageDefinitionContent[attribute.language]="";
-                if(attribute.children.length>0){
-                    attribute.children.forEach(function(child) {
-                        html+=handleAttributeDrawData(child);
-                    });
-                }
-                
-                //remove the flag from the html which will be displayed in the term
-                languageDefinitionContent[attribute.language]=html.replace(flagContent,'');
-            }
-            
-            break;
-        default:
-            
-            var attVal=getAttributeValue(attribute);
-            
-            var headerText = handleAttributeHeaderText(attribute,true);
-            
-            html='<h4 class="ui-widget-header ui-corner-all">' + headerText + '</h4>' + '<p>' + attVal + '</p>';
-            break;
-    }
-    return html;
-}
-
-/***
- * Get the value from the attribute. Replace the line break with br tag.
- * @param attribute
- * @returns
- */
-function getAttributeValue(attribute){
-    var attVal=attribute.attrValue ? attribute.attrValue : "";
-    //if it is a date attribute, handle the date format
-    if(attribute.name=="date"){
-        var dateFormat='dd.mm.yy';
-        if(SESSION_LOCALE=="en"){
-            dateFormat='mm/dd/yy';
-        }
-        return $.datepicker.formatDate(dateFormat, new Date(attVal*1000));
-    }
-    if (attribute.attrType == "processStatus" && attVal == "finalized") {
-        return '<img src="' + moduleFolder + 'images/tick.png" alt="finalized" title="finalized">';
-    }else if(attribute.attrType == "processStatus" && attVal == "provisionallyProcessed"){
-    	return "-";
-    } else {
-        return attVal.replace(/$/mg,'<br>');
-    }
-}
-/***
- * Build the attribute text, based on if headerText (db translation for the attribute) is provided
- * @param attribute: entry or term attribute
- * @param addColon: add colon on the end of the header text
- * @returns
- */
-function handleAttributeHeaderText(attribute,addColon){
-    
-    var attVal=getAttributeValue(attribute);
-    
-    var noHeaderName=attribute.name + (attribute.attrType ? (" "+attribute.attrType) : "");
-    
-    //if no headerText use attribute name + if exist attribute type
-    var headerText=attribute.headerText ? attribute.headerText :  noHeaderName;
-    
-    return headerText+ (addColon ? ":" : "");
-}
-
-/***
- * Check the term status icon in the term attributes.
- * Return the image html if such an attribute is found
- * @param attribute
- * @returns
- */
-function checkTermStatusIcon(attribute){
-    var retVal="", 
-        status = 'unknown', 
-        map = Editor.data.termStatusMap,
-        labels = Editor.data.termStatusLabel,
-        label;
-    $.each($(attribute), function (i, attr) {
-        var statusIcon=getAttributeValue(attr),
-        	cmpStr='<img src="';
-        if(statusIcon && statusIcon.slice(0, cmpStr.length) == cmpStr){
-            retVal+=statusIcon;
-        }
-    });
-    if(map[attribute[0].termStatus]) {
-        status = map[attribute[0].termStatus];
-    }
-    //FIXME encoding of the string!
-    label = labels[status]+' ('+attribute[0].termStatus+')';
-    retVal += ' <img src="' + moduleFolder + 'images/termStatus/'+status+'.png" alt="'+label+'" title="'+label+'">';
-;
-    return retVal;
+    return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
 }
 
 $("#searchButton" ).button({
     icon:"ui-icon-search"
 }).click(function(){
-    requestFromSearchButton=true;
+	Term.disableLimit=true;
     //startAutocomplete();
-    searchTerm($("#search").val());
+    Term.searchTerm($("#search").val());
 });
 
 $('#search').keyup(function (e) {
     if (e.which == 13) {
       console.log("keyup: Enter");
-      requestFromSearchButton=true;
+      Term.disableLimit=true;
       //startAutocomplete();
-      searchTerm($("#search").val());
+      Term.searchTerm($("#search").val());
       return false;
     }
     console.log("keyup");
-    termAttributeContainer=[];
+    Term.termAttributeContainer=[];
     termEntryAttributeContainer=[];
-    searchTermsResponse=[];
-    requestFromSearchButton=false;
+    Term.searchTermsResponse=[];
+    Term.disableLimit=false;
 
-    languageDefinitionContent=[];
-    termGroupsCache=[];
+    Attribute.languageDefinitionContent=[];
+    Term.termGroupsCache=[];
     
-    $('#finalResultContent').hide();
+    $('#error-no-results').hide();
+    $('#searchTermsHelper').find('.proposal-txt').text(proposalTranslations['addTermEntryProposal']);
+    $('#searchTermsHelper').find('.proposal-btn').prop('title', proposalTranslations['addTermEntryProposal']);
     $('#searchTermsSelect').empty();
-    $('#termAttributeTable').empty();
+    $('#termEntryAttributesTable').empty();
     $('#termTable').empty();
 });
 
@@ -629,14 +170,210 @@ $('#instantTranslateButton').on('touchstart click',function(){
 
 function startAutocomplete(){
     console.log("startAutocomplete...");
-    $('#finalResultContent').hide();
     $('#searchTermsSelect').empty();
-    $('#termAttributeTable').empty();
+    $('#termEntryAttributesTable').empty();
     $('#termTable').empty();
     $("#search").autocomplete( "search", $("#search").val());
 }
 
 function showFinalResultContent() {
-    $('#finalResultContent').show();
+    $('#resultTermsHolder').show();
     setSizesInFinalResultContent();
+}
+
+/**
+ * Handle 'de-DE' vs. 'de' according to showSublanguages-config.
+ * @param {String} locale
+ * @returns {String}
+ */
+function checkSubLanguage(locale) {
+    var localeParts;
+    if (!Editor.data.instanttranslate.showSublanguages) {
+        localeParts = locale.split("-");
+        locale = localeParts[0];
+    }
+    return locale;
+}
+
+/* ---------------------------------------------------------------------
+// ------------------- handle tag fields and filters -------------------
+//----------------------------------------------------------------------
+
+The tags cannot handle values => use hidden fields, too.
+(https://github.com/aehlke/tag-it/issues/266)
+
+Example:
+- dropdown:     id = "client" | text = "client1" | value = "123"
+- field-tag:    tagLabel = "client: client1"
+- hidden input: class = "filter client" | name = "client: client1" | value = "123"
+
+----------------------------------------------------------------------*/
+
+/**
+ * Render tagLabel from selected dropdown (e.g. "client1").
+ * This is also used as name for corresponding hidden input.
+ * @param {String} text
+ * @returns {String}
+ */
+function renderTagLabel(text) {
+    // Using the text only works as long the filtered never have the same text.
+    return text;
+}
+
+/**
+ * When a user has selected something from the dropdown, we 
+ * - reset the dropdown (they only serve for choosing, not as chosen selection)
+ * - add the tag-field
+ * - add the hidden field
+ * @param {String} dropdownId
+ * @param {String} text
+ * @param {String} value
+ */
+function addSearchFilter(dropdownId, text, value, index) {
+    var tagLabel = this.renderTagLabel(text),
+        $_searchFilterTags = $("#searchFilterTags");
+    // reset dropdown
+    $('#'+dropdownId).val('none');
+    $('#'+dropdownId).selectmenu("refresh");
+    // add hidden input
+    if ($_searchFilterTags.children('input[name="'+tagLabel+'"][value="'+value+'"].filter.'+dropdownId).length === 0) {
+        $_searchFilterTags.append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'" data-index="'+index+'">');
+    }
+    // add tag field
+    $_searchFilterTags.tagit("createTag", tagLabel);
+}
+
+/**
+ * When a user removes a tag-field, we also need to remove it's corresponding hidden input.
+ * The tag-field itself will be removed by the tag-it-library.
+ * @param {String} tagLabel
+ */
+function beforeFilterTagRemoved(tagLabel) {
+    // remove hidden input
+    $('#searchFilterTags input.filter' ).each(function( index, el ) {
+        if (el.name == tagLabel) {
+            el.remove();
+        }
+    });
+    // remove tag field: will be handled by tag-it
+}
+
+/**
+ * Don't show filtered items in the dropdown.
+ */
+function removeFilteredItemsFromDropdowns(dropdownId) {
+    $( '#searchFilterTags input.filter.'+dropdownId).each(function( index, el ) {
+        $('#'+dropdownId+'-menu li:eq('+$(el).attr('data-index')+')').addClass('isfiltered');
+    });
+}
+/**
+ * When a filtered item is removed from the tag-field, it must be re-added to the dropdown.
+ */
+function addFilteredItemToDropdown(tagLabel) {
+    var $el,
+        dropdownId;
+    $('input.filter[name="'+tagLabel+'"]').each(function( index, el ) {
+        $el = $(el);
+        $el.removeClass('filter');
+        dropdownId = $el.attr('class');
+        $el.addClass('filter');
+        $('#'+dropdownId+'-menu li:eq('+$el.attr('data-index')+')').removeClass('isfiltered');
+    });
+}
+
+/**
+ * Only show termCollections belonging to the selected clients.
+ */
+function checkFilterDependencies() {
+    var selectedClients = [],
+        clientsForCollection = [],
+        showCollection,
+        tagLabel;
+    $('#searchFilterTags input.filter.client').each(function( index, el ) {
+        selectedClients.push(el.value);
+    });
+    if(selectedClients.length === 0) {
+        $('#collection option:disabled').attr('disabled', false);
+        $('#collection').selectmenu("refresh");
+        return;
+    }
+    $('#collection option' ).each(function( index, el ) {
+        if (el.value == undefined || el.value == 'none') {
+            return; // "continue"
+        }
+        showCollection = false;
+        clientsForCollection = collectionsClients[el.value];
+        jQuery.each(clientsForCollection, function( i, val ) {
+            // is any of the collection's customers currently selected?
+            if(selectedClients.indexOf(val.toString()) != -1) {
+                showCollection = true;
+                return false; // "break"
+            }
+          });
+        // (not) disable select-item
+        $(this).attr('disabled', !showCollection);
+        // remove from tag-field
+        if(!showCollection) {
+            tagLabel = $(this).text();
+            if ($("#searchFilterTags").tagit("assignedTags").indexOf(tagLabel) != -1) {
+                $("#searchFilterTags").tagit("removeTagByLabel", tagLabel);
+            }
+        }
+    });
+    $('#collection').selectmenu("refresh");
+}
+
+/**
+ * Show placeholder if no tag-field exists, hide otherwise.
+ */
+function handlePlaceholder() {
+    var $_searchFilterTags = $("#searchFilterTags");
+    if ($_searchFilterTags.tagit("assignedTags").length > 0) {
+        $_searchFilterTags.data("ui-tagit").tagInput.attr("placeholder", "");
+    } else {
+        $_searchFilterTags.data("ui-tagit").tagInput.attr("placeholder", searchFilterPlaceholderText);
+    }
+}
+
+/**
+ * Return all the Term-Collections that are set in the tag field.
+ * @returns {Array}
+ */
+function getFilteredCollections() {
+    var $_filteredCollections = $('#searchFilterTags input.filter.collection'),
+        filteredCollections = [];
+    if ($_filteredCollections.length === 0 && this.getFilteredClients().length > 0) {
+        // user has not selected any collections, but client(s) => use only those collections that belong to the client(s)
+        $_filteredCollections = $("#collection option:enabled");
+    }
+    $_filteredCollections.each(function( index, el ) {
+        if (el.value != 'none') {
+            filteredCollections.push(el.value);
+        }
+    });
+    return filteredCollections;
+}
+
+/**
+ * Return all the clients that are set in the tag field.
+ * @returns {Array}
+ */
+function getFilteredClients() {
+    var filteredClients = [];
+    $( '#searchFilterTags input.filter.client' ).each(function( index, el ) {
+        filteredClients.push(el.value);
+    });
+    return filteredClients;
+}
+
+/**
+ * Return all the prcoessStats that are set in the tag field.
+ * @returns {Array}
+ */
+function getFilteredProcessStats() {
+    var filteredProcessStats = [];
+    $( '#searchFilterTags input.filter.processStatus' ).each(function( index, el ) {
+        filteredProcessStats.push(el.value);
+    });
+    return filteredProcessStats;
 }

@@ -30,13 +30,17 @@ END LICENSE AND COPYRIGHT
     margin: 10px;
 }
 
+.ui-selectmenu-menu ul {
+    max-height: 19em;
+}
+
 .wrap {
-    margin-bottom: 2em;
+    margin-bottom: 1em;
 }
 
 /* --------------- header --------------- */
 
-#container-header {
+#containerHeader {
     display: flex;
     flex-flow: row wrap;
     border-bottom: 1px solid #00adef;
@@ -77,20 +81,27 @@ END LICENSE AND COPYRIGHT
     color: #454545;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 690px) {
     #logo {
         flex: 0 1 100%;
         text-align:left;
         margin-right: 0px;
     }
-    #logo { order: 1; }
-    #languageSelector { order: 2; text-align: left; margin-top: 5px;}
-    #logoutContainer { order: 3; margin-top: 5px;}
+    #languageSelector {text-align: left; margin-top: 5px;}
+    #logoutContainer {margin-top: 5px;}
+    #instantTranslateButtonContainer {margin-top: 5px;}
+}
+
+@media (max-width: 600px) {
+    #containerHeader {
+        font-size: 90%;
+    }
 }
 
 /* --------------- search --------------- */
 
-#searchForm {
+#searchForm,
+#searchFilterForm {
     display: flex;
     flex-flow: row wrap;
     align-items: stretch;
@@ -102,23 +113,38 @@ END LICENSE AND COPYRIGHT
 
 #search {
     flex: 1 1 auto;
+}
+#searchFilterTags {
+    flex: 1 1 60%;
+}
+#search,
+#searchFilterTags {
     order: 1;
     padding: 0px 5px;
-    margin-right: 0px;
+    margin: 0px;
 }
 #searchButton {
     flex: 0 0 20px;
     order: 2;
     margin-right: 0px;
 }
-#languages-button {
+#language-button,
+#client-button,
+#collection-button,
+#processStatus-button {
     flex: 0 0 80px;
     order: 3;
     margin-right: 0px;
+    height: 25px;
+}
+.search-filter-select .ui-state-disabled,               /* = option is not available due to filtered dependencies*/
+.search-filter-select li.ui-menu-item.isfiltered {      /* = option is not available because it's filtered already*/
+   display: none;
 }
 
 @media (max-width: 600px) {
-    #search {
+    #search,
+    #searchFilterTags {
         flex: 20 0 90%;
         height: 30px;
         margin-bottom: 5px;
@@ -127,10 +153,6 @@ END LICENSE AND COPYRIGHT
 
 /* --------------- results --------------- */
 
-#error-no-results {
-    padding: 7px;
-}
-
 @media (max-width: 400px) {
     .container-content .ui-button {
         display: block;
@@ -138,7 +160,7 @@ END LICENSE AND COPYRIGHT
     }
 }
 
-#languages label {
+#language label {
     margin-right: 5px;
 }
 
@@ -158,6 +180,19 @@ END LICENSE AND COPYRIGHT
     #searchTermsHolder {
         flex: 0 0 17em;
     }
+}
+
+#searchTermsHelper {
+    margin-left: 3px;
+    width: 100%;
+}
+#searchTermsHelper p {
+	padding-right: 9px;
+    margin: 2px 0px;
+    width: 100%;
+}
+#searchTermsHelper .proposal-txt {
+    margin-right: 30px;
 }
 
 #searchTermsSelect,
@@ -183,10 +218,11 @@ END LICENSE AND COPYRIGHT
     order: 2;
     flex-shrink: 1;
     flex-grow:  1;
+    width: 60%; /* workaround to prevent jump */
 }
 
 #termTable,
-#termAttributeTable {
+#termEntryAttributesTable {
     width: 100%;
 }
 
@@ -199,4 +235,99 @@ h4, p {
     -webkit-margin-end: 0px;
 }
 
+.selection-infos {
+    font-size:80%;
+}
+
+.instanttranslate-integration {
+	margin-bottom: 4px;
+}
+
+/* --------------- proposals --------------- */
+
+#resultTermsHolder ul .proposal-btn.ui-icon {                       /* Term-Entry: add */
+    float: right;
+    font-size: 30px;
+    color: #007fff;
+}
+#searchTermsHolder .proposal-btn.proposal-add {                     /* TermEntry: add after no result */
+    float: right;
+    color: #007fff;
+    font-size: 40px;
+    margin: -10px;
+}
+#termTable > div .proposal-btn.proposal-add,                        /* TermEntry-Attribute: add */
+#termEntryAttributesTable > .proposal-btn.proposal-add {                  /* Term-Attribute: add */
+    float: left;
+    color: #454545;
+    font-size: 40px;
+    margin-left: 0px;
+}
+
+.term-data .proposal-btn.ui-icon,                                   /* Term: add, delete, edit */
+.attribute-data .proposal-btn {                                     /* Attribute: delete, edit */
+    float: right;
+    margin-left: 5px;
+}
+.term-data .proposal-btn.proposal-add {                             /* Term: add  */
+    font-size: 23px;
+    margin-right: -3px;
+    margin-top: -3px;
+}
+.term-data .proposal-btn.proposal-delete,
+.term-data .proposal-btn.proposal-edit {                            /* Term: delete, edit  */
+    font-size: 16px;
+}
+.term-data.ui-accordion-header-collapsed .proposal-btn.ui-icon {    /* Term (inactive)  */
+    color: #007fff;
+}
+.term-data.ui-accordion-header-active .proposal-btn.ui-icon {       /* Term (active) */
+    color: #fffff;
+}
+
+.skeleton,
+.term-data.is-new.ui-accordion-header-collapsed {                   /* Skeleton for new proposals */
+    border: 2px dotted #c5c5c5;
+    color: #c5c5c5;
+    width: 100%;
+}
+.term-data.is-new.ui-accordion-header-collapsed .proposal-add {
+    display: block;
+}
+.term-data.is-new.ui-accordion-header-active .proposal-add {
+    display: none;
+}
+
+#languageSelectContainer,
+#termcollectionSelectContainer {
+    color: #333;
+    padding:5px;
+}
+
+#languageSelectContainer option.flag {
+    background-repeat: no-repeat;
+    padding-left: 20px;
+}
+.ui-menu .ui-icon.flag {
+    background-position: left top;
+    top: 0.4em;
+    left: 0.5em;
+}
+
+#termcollectionSelectContainer {
+    display: none;
+}
+
+.ui-tooltip-content {
+    font-size:10pt;
+}
+
+.proposal-value-content{
+	background-color:#ffd351;
+	color:#584311;
+}
+
+.in-editing + .term-attributes .proposal-btn {
+    color: #aaa;
+}
 
