@@ -893,12 +893,22 @@ Ext.override(Ext.grid.plugin.BufferedRenderer, {
         }
  
         //<debug> 
+        // If there are columns to trigger rendering, and the rendered block or not either the view size 
+        // or, if store count less than view size, the store count, then try to refresh the view table
+        if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
+        	//FIXME: this is fix for the https://jira.translate5.net/browse/TRANSLATE-1045 
+        	view.refresh();
+        }
+        //</debug> 
+        
+        //<debug> 
         // If there are columns to trigger rendering, and the rendered block os not either the view size 
         // or, if store count less than view size, the store count, then there's a bug. 
         if (view.getVisibleColumnManager().getColumns().length && rows.getCount() !== Math.min(me.store.getCount(), me.viewSize)) {
             Ext.raise('rendered block refreshed at ' + rows.getCount() + ' rows while BufferedRenderer view size is ' + me.viewSize);
         }
         //</debug> 
+        
         return newRows;
     },
     setBodyTop: function(bodyTop, skipStretchView) {
