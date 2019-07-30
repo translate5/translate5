@@ -67,12 +67,6 @@ var Term={
             me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me, reference:'icon'},me.onAddTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me, reference:'icon'},me.onDeleteTermClick);
             me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
-            /*
-            // - Content
-            me.$_termTable.on('dblclick', '.term-data.proposable.is-new',{scope:me, reference:'content'},me.onAddTermClick);
-            me.$_termTable.on('dblclick', '.term-data.proposable.is-new [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onAddTermClick);
-            me.$_termTable.on('dblclick', '.term-data.proposable.is-finalized [data-editable][data-type="term"]',{scope:me, reference:'content'},me.onEditTermClick);
-            */
             me.$_resultTermsHolder.on('tabsactivate',{scope:me},me.onResultTabActivate);
 		},
         
@@ -529,7 +523,7 @@ var Term={
             infosForSelection = [];
             clientsForCollection = collectionsClients[term.collectionId];
             if(clientsForCollection.length>1){
-            	for (i = 0; i < clientsForCollection.length; i++) {
+            	for (var i = 0; i < clientsForCollection.length; i++) {
             		if(clientsNames[clientsForCollection[i]]!=undefined){
             			filteredCientsNames.push(clientsNames[clientsForCollection[i]]);
             		}
@@ -555,7 +549,7 @@ var Term={
                 instantTranslateIntegrationForTerm = me.renderInstantTranslateIntegrationForTerm(termRflLang);
                 termAttributesHtmlContainer.push(instantTranslateIntegrationForTerm);
             }
-            termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term.attributes,termRflLang));
+            termAttributesHtmlContainer.push(Attribute.renderTermAttributes(term,termRflLang));
             termAttributesHtmlContainer.push('</div>');
             
             return termAttributesHtmlContainer.join('');

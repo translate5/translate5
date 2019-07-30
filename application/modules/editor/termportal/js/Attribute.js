@@ -37,14 +37,6 @@ var Attribute={
             reference: 'icon'
         },me.onEditAttributeClick);
         
-        /*
-        // - Content
-        me.$_termEntryAttributesTable.on('click', '.attribute-data.proposable ~ [data-type="termEntryAttribute"] [data-editable][data-type="termEntryAttribute"]',{
-            scope:me,
-            type:'termEntryAttribute',
-            reference: 'content'
-        },me.onEditAttributeClick);
-        */
         // ------------- Terms-Attributes -------------
         // - Icons
         me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
@@ -55,42 +47,20 @@ var Attribute={
         	type:'termAttribute',
             reference: 'icon'
     	},me.onEditAttributeClick);
-        
-        /*
-        // - Content
-        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable][data-type="termAttribute"]',{
-            scope:me,
-            type:'termAttribute',
-            reference: 'content'
-        },me.onEditAttributeClick);
-        
-        //handle the definition to (the termentryattibute-deffinition is also visible in the term table)
-        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termEntryAttribute"] [data-editable][data-type="termEntryAttribute"]',{
-            scope:me,
-            type:'termEntryAttribute',
-            reference: 'content'
-        },me.onEditAttributeClick);
-        
-        // - Comment
-        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable-comment][data-type="termAttribute"]',{
-            scope:me,
-            type:'termAttribute',
-            reference: 'comment'
-        },me.onEditAttributeClick);
-        */
 	},
     
     /***
      * Render term attributes by given term
      * 
-     * @param attributes
+     * @param term
      * @param termLang
      * @returns {String}
      */
-    renderTermAttributes:function(attributes,termLang){
+    renderTermAttributes:function(term,termLang){
         var me=this,
             html = [],
-            commentAttribute=[];
+            commentAttribute=[],
+            attributes=term.attributes;
         
         if(me.languageDefinitionContent[termLang]){
             html.push(me.languageDefinitionContent[termLang]);
