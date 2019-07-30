@@ -236,6 +236,7 @@ class BasicSegmentEditingTest extends \ZfExtended_Test_ApiTestcase {
     
     /**
      * tests the export results
+     * @depends testSegmentEditing
      * @param stdClass $task
      * @param string $exportUrl
      * @param string $fileToCompare
