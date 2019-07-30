@@ -456,6 +456,44 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         return $tree;
     }
     
+    
+    /***
+     * Update term modification attribute group with the term proposal values.
+     * The modification group date and editor will be set as term proposal date an term proposal editor.
+     * 
+     * @param array $attributes
+     * @param array $termProposal
+     */
+    public function updateModificationGroupDate(array $attributes,array $termProposal){
+        if(empty($attributes) || empty($termProposal) || empty($termProposal['created']) || empty($termProposal['userName'])){
+            return $attributes;
+        }
+        
+        //foreach term attribute check, find the transac modification attribute
+        foreach ($attributes as &$attribute){
+            
+            if(empty($attribute['children'])){
+                continue;
+            }
+            
+            //ignore non modification tags
+            if($attribute['name']!='transac' || $attribute['attrType']!='modification'){
+                continue;
+            }
+            
+            foreach ($attribute['children'] as &$child){
+                if($child['name']=='date'){
+                    //convert the date to unix timestamp
+                    $child['attrValue']=strtotime($termProposal['created']);
+                }
+                if($child['name']=='transacNote' && ($child['attrType']=='responsiblePerson' || $child['attrType']=='responsibility')){
+                    $child['attrValue']=$termProposal['userName'];
+                }
+            }
+        }
+        return $attributes;
+    }
+    
     /***
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
      * @param int $termId

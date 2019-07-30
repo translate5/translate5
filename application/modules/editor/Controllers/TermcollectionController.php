@@ -225,12 +225,16 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         //available term proposal columns
         $termProposalColumns=[
             'proposalTerm',
-            'proposalId'
+            'proposalId',
+            'proposalCreated',
+            'proposalUserName'
         ];
         //maping between database name and term proposal table real name
         $termProposalColumnsNameMap=[
             'proposalTerm'=>'term',
-            'proposalId'=>'id'
+            'proposalId'=>'id',
+            'proposalCreated'=>'created',
+            'proposalUserName'=>'userName'
         ];
         
         //available attribute proposal columns
@@ -287,7 +291,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
                     //collect the term proposal data if the user is allowed to
                     if($isTermProposalAllowed){
                         $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
-                        //check if the term proposable flag is set, if calculate it
+                        $map[$oldKey]['attributes']=$attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal'])?$map[$oldKey]['proposal']:[]);
                         $termProposalData=[];
                     }
                 }
@@ -335,7 +339,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
             //collect the term proposal data if the user is allowed to
             if($isTermProposalAllowed){
                 $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
-                //check if the term proposable flag is set, if calculate it
+                $map[$oldKey]['attributes']=$attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal'])?$map[$oldKey]['proposal']:[]);
             }
         }
         

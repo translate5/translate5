@@ -968,7 +968,9 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         if($this->isProposableAllowed()){
             $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',[
                 'LEK_term_proposal.term as proposalTerm',
-                'LEK_term_proposal.id as proposalId'
+                'LEK_term_proposal.id as proposalId',
+                'LEK_term_proposal.created as proposalCreated',
+                'LEK_term_proposal.userName as proposalUserName'
             ]);
         }
         
