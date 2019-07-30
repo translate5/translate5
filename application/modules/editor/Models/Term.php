@@ -701,47 +701,45 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $termResult=$this->db->getAdapter()->query($termSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
         
         $attributeSql="SELECT
-                    ta.id as 'attribute-id',
-                    ta.termId as 'term-Id',
-                    ta.name as 'attribute-name',
-                    ta.value as 'attribute-value',
-                    ta.updated as 'attribute-lastEditedDate',
-                    ta.userName as 'attribute-lastEditor',
-                    ta.processStatus as 'attribute-processStatus',
-                    l.langName as 'term-language',
-                    tap.id as 'attributeproposal-id',
-                    tap.value as 'attributeproposal-value',
-                    tap.created as 'attributeproposal-lastEditedDate',
-                    tap.userName as 'attributeproposal-lastEditor',
-                    t.termEntryId as 'term-termEntryId',
-                    t.definition as 'term-definition',
-                    t.id as 'term-Id',
-                    t.term as 'term-term',
-                    t.processStatus as 'term-processStatus',
-                    t.userName as 'term-lastEditor',
-                    t.updated as 'term-lastEditedDate',
-                    tp.id as 'termproposal-id',
-                    tp.term as 'termproposal-term',
-                    tp.created as 'termproposal-lastEditedDate',
-                    tp.userName as 'termproposal-lastEditor'
-                		FROM
-                		LEK_term_attributes ta
-                		LEFT OUTER JOIN
-                		LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                        ta.id as 'attribute-id',
+                        ta.termId as 'term-Id',
+                        ta.termEntryId as 'attribute-termEntryId',
+                        ta.name as 'attribute-name',
+                        ta.value as 'attribute-value',
+                        ta.updated as 'attribute-lastEditedDate',
+                        ta.userName as 'attribute-lastEditor',
+                        ta.processStatus as 'attribute-processStatus',
+                        l.langName as 'term-language',
+                        tap.id as 'attributeproposal-id',
+                        tap.value as 'attributeproposal-value',
+                        tap.created as 'attributeproposal-lastEditedDate',
+                        tap.userName as 'attributeproposal-lastEditor',
+                        t.termEntryId as 'term-termEntryId',
+                        t.definition as 'term-definition',
+                        t.id as 'term-Id',
+                        t.term as 'term-term',
+                        t.processStatus as 'term-processStatus',
+                        t.userName as 'term-lastEditor',
+                        t.updated as 'term-lastEditedDate',
+                        tp.id as 'termproposal-id',
+                        tp.term as 'termproposal-term',
+                        tp.created as 'termproposal-lastEditedDate',
+                        tp.userName as 'termproposal-lastEditor'
+            		FROM LEK_term_attributes ta
+                		INNER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
-                        INNER JOIN LEK_languages l ON t.language=l.id 
+                        LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
                 	where ta.collectionId IN(?)
                 	and (ta.created >=? || tap.created >=?) 
                 	and (tap.value is not null or ta.processStatus='unprocessed')
-                	order by ta.termId";
+                	order by ta.termEntryId,ta.termId";
         
         $attributeResult=$this->db->getAdapter()->query($attributeSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
         
+        //merge term proposals with term attributes and term entry attributes proposals
         $resultArray=array_merge($termResult,$attributeResult);
         
-        //load term and proposals
-        //load attributes and proposals
         if(empty($resultArray)){
             return [];
         }
@@ -1155,6 +1153,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         foreach ($data as $row) {
             
             $tmpTerm['termEntryId']=$row['term-termEntryId'];
+            //if it is empty it is termEntryAttribute
+            if(empty($tmpTerm['termEntryId']) && !empty($row['attribute-termEntryId'])){
+                $tmpTerm['termEntryId']=$row['attribute-termEntryId'];
+            }
             $tmpTerm['definition']=$row['term-definition'];
             $tmpTerm['language']=$row['term-language'];
             $tmpTerm['termId']=$row['term-Id'];
