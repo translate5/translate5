@@ -95,6 +95,18 @@ abstract class editor_Models_Segment_TagAbstract {
         return preg_replace($this->getReplacerRegex(), $replacer, $segment, $limit, $count);
     }
     
+    /**
+     * returns true if given segment content contains text , false if tags only or is empty.
+     * White-spaces in tag only segments are not treated as text
+     * @param string $segmentContent
+     * @return bool
+     */
+    public function hasText(string $segmentContent): bool {
+        $segmentContent = $this->replace($segmentContent, '');
+        $segmentContent = trim(strip_tags($segmentContent));
+        return !empty($segmentContent);
+    }
+    
     /***
      * Return the placeholder template with id
      *

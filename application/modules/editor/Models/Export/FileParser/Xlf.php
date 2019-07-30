@@ -89,6 +89,14 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             $xmlparser->replaceChunk($key, $this->getSegmentContent($id, $field));
         });
         
+        //convert empty <target></target> tags to single ones: <target />
+        $xmlparser->registerElement('target', null, function($tag, $key, $opener) use ($xmlparser){
+            if($opener['openerKey']+1 === (int) $key || empty($xmlparser->getRange($opener['openerKey']+1, $key-1, true))) {
+                $xmlparser->replaceChunk($key, '');
+                $xmlparser->replaceChunk($opener['openerKey'], $this->makeTag($tag, true, $opener['attributes']));
+            }
+        });
+        
         $xmlparser->registerElement('trans-unit', function(){
             $this->transUnitLength = 0;
         }, function($tag, $key, $opener) use ($xmlparser){
@@ -103,6 +111,7 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             }
             $event = new Zend_EventManager_Event();
             //get origanal attributes:
+            $matches = null;
             if(preg_match_all('/([^\s]+)="([^"]*)"/', $xmlparser->getChunk($opener['openerKey']), $matches)){
                 $originalAttributes = array_combine($matches[1], $matches[2]);
             } else {
@@ -124,15 +133,11 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             ]);
             
             //trigger an event to allow custom transunit manipulations
-            $responses = $this->events->trigger('writeTransUnit', $this, $event);
+            $this->events->trigger('writeTransUnit', $this, $event);
 
             //if attributes were changed in the handlers, replace the tag with the new ones
             if($originalAttributes !== $event->getParam('attributes')) {
-                $attributes = '';
-                foreach($event->getParam('attributes') as $attribute => $value) {
-                    $attributes .= ' '.$attribute.'="'.$value.'"';
-                }
-                $xmlparser->replaceChunk($opener['openerKey'], '<'.$tag.$attributes.'>');
+                $xmlparser->replaceChunk($opener['openerKey'], $this->makeTag($tag, false, $event->getParam('attributes')));
                 $originalAttributes = $event->getParam('attributes');
             }
             
@@ -154,8 +159,27 @@ class editor_Models_Export_FileParser_Xlf extends editor_Models_Export_FileParse
             
         });
         
-        $this->_exportFile = $xmlparser->parse($this->_skeletonFile);
+        $preserveWhitespaceDefault = $this->config->runtimeOptions->import->xlf->preserveWhitespace;
+        $this->_exportFile = $xmlparser->parse($this->_skeletonFile, $preserveWhitespaceDefault);
         $this->sendLog();
+    }
+    
+    /**
+     * Generates a XML tag 
+     * @param string $tag the xml tag
+     * @param boolean $single defines, if it should be self closing tag or not, default false
+     * @param array $attributes the XML tag attributes, default empty
+     * @return string
+     */
+    protected function makeTag(string $tag, bool $single = false, array $attributes = []): string {
+        $attributesString = '';
+        foreach($attributes as $attribute => $value) {
+            $attributesString .= ' '.$attribute.'="'.$value.'"';
+        }
+        if($single) {
+            $attributesString .= '/';
+        }
+        return '<'.$tag.$attributesString.'>';
     }
     
     /**

@@ -423,7 +423,14 @@ class Editor_Bootstrap extends Zend_Application_Module_Bootstrap
                 'action' => 'export'
             ));
         $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_export', $queryRoute);
-
+        $queryRoute = new ZfExtended_Controller_RestLikeRoute(
+            'editor/languageresourceinstance/testexport',
+            array(
+                'module' => 'editor',
+                'controller' => 'languageresourceinstance',
+                'action' => 'testexport'
+            ));
+        $this->front->getRouter()->addRoute('languageresources_languageresourceinstance_testexport', $queryRoute);
         #Language resource rutes end
     }
     

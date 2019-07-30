@@ -43,7 +43,7 @@ CREATE TABLE `LEK_match_analysis_taskassoc` (
     FOREIGN KEY (`taskGuid`)
     REFERENCES `LEK_task` (`taskGuid`)
     ON DELETE CASCADE 
-    ON UPDATE CASCADE);
+    ON UPDATE CASCADE) DEFAULT CHARSET=utf8;
 
 CREATE TABLE `LEK_match_analysis` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -62,7 +62,7 @@ CREATE TABLE `LEK_match_analysis` (
   KEY `fk_LEK_match_analysis_2_idx` (`analysisId`),
   CONSTRAINT `fk_LEK_match_analysis_1` FOREIGN KEY (`taskGuid`) REFERENCES `LEK_task` (`taskGuid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_LEK_match_analysis_2` FOREIGN KEY (`analysisId`) REFERENCES `LEK_match_analysis_taskassoc` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-);
+) DEFAULT CHARSET=utf8;
 
 DELETE FROM `Zf_worker_dependencies` where `worker` =  'editor_Plugins_MatchAnalysis_Worker' OR `dependency` = 'editor_Plugins_MatchAnalysis_Worker';
 

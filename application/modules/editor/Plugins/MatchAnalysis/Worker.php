@@ -105,7 +105,7 @@ class editor_Plugins_MatchAnalysis_Worker extends editor_Models_Import_Worker_Ab
         
         $analysisId=$analysisAssoc->save();
         
-        $analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId]);
+        $analysis = ZfExtended_Factory::get('editor_Plugins_MatchAnalysis_Analysis', [$this->task, $analysisId, $this->taskOldState]);
         /* @var $analysis editor_Plugins_MatchAnalysis_Analysis */
         
         $analysis->setPretranslate($params['pretranslate']);

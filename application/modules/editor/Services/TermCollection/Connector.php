@@ -48,7 +48,7 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
      */
     public function addTm(array $fileinfo = null,array $params=null) {
         if(empty($fileinfo)){
-            $this->handleError("LanguageResources - termcollection import file does not exisit LanguageResource: \n");
+            //empty term collection
             return false;
         }
         
@@ -57,7 +57,9 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         
         $import->mergeTerms=isset($params['mergeTerms']) ? filter_var($params['mergeTerms'], FILTER_VALIDATE_BOOLEAN) : false;
         
-        $import->loadUser($params['userGuid']);
+        $sessionUser = new Zend_Session_Namespace('user');
+        $userGuid=$params['userGuid'] ?? $sessionUser->data->userGuid;
+        $import->loadUser($userGuid);
         
         //import the term collection
         if(!$import->parseTbxFile([$fileinfo],$this->languageResource->getId())){

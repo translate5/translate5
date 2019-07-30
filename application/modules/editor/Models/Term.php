@@ -656,10 +656,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @param string $youngerAs
      * @param array $collectionId
      */
-    public function loadProposalExportData(string $youngerAs,array $collectionIds){
+    public function loadProposalExportData(string $youngerAs='',array $collectionIds=[]){
         //if no date is set, se to current
         if(empty($youngerAs)){
-            $youngerAs=date('Y-m-d H:i:s');
+            $youngerAs=date('Y-m-d');
         }
         if(empty($collectionIds)){
             $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');

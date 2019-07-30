@@ -225,7 +225,7 @@ class editor_Models_Segment_AutoStates {
             case self::REVIEWED_TRANSLATOR:
                 return self::REVIEWED_TRANSLATOR_AUTO;
             default:
-                return $originalState;
+                return $calculatedState;
         }
     }
     
@@ -373,6 +373,8 @@ class editor_Models_Segment_AutoStates {
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($tua->getTaskGuid());
         $sameUserGuid = $task->getPmGuid() === $userSession->data->userGuid;
-        return empty($role) && ($acl->isInAllowedRoles($userSession->data->roles, 'backend', 'editAllTasks') || $sameUserGuid);
+        $systemUser = $userSession->data->userGuid == ZfExtended_Models_User::SYSTEM_GUID;
+        $editAllTasks = $acl->isInAllowedRoles($userSession->data->roles, 'backend', 'editAllTasks');
+        return empty($role) && ($editAllTasks || $sameUserGuid || $systemUser);
     }
 }

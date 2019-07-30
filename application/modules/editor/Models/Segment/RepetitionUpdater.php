@@ -65,7 +65,7 @@ class editor_Models_Segment_RepetitionUpdater {
      * @param editor_Models_Segment $segment
      * @param array $qmSubsegmentAlikes
      */
-    public function __construct(editor_Models_Segment $segment, array $qmSubsegmentAlikes){
+    public function __construct(editor_Models_Segment $segment, array $qmSubsegmentAlikes = null){
         $this->config = Zend_Registry::get('config');
         $this->originalSegment = $segment;
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
@@ -74,23 +74,39 @@ class editor_Models_Segment_RepetitionUpdater {
     }
     
     /**
-     * Set the segment instance which is the repetition
+     * updates the given repetition if possible (due tags)
+     * @param editor_Models_Segment $master the segment to copy from
+     * @param editor_Models_Segment $repetition the segment to write to
+     * @return boolean true if the repetition could be processed, false otherwise
+     */
+    public function updateRepetition(editor_Models_Segment $master, editor_Models_Segment $repetition): bool {
+        $this->originalSegment = $master;
+        $this->setRepetition($repetition);
+        return $this->updateSegmentContent('target', 'targetEdit', 'getTargetEdit', 'setTargetEdit');
+    }
+    
+    /**
+     * Set the segment instance which is the repetition, needed for updateSegmentContent
      * @param editor_Models_Segment $entity
      */
-    public function setRepetition($entity) {
+    public function setRepetition(editor_Models_Segment $entity) {
         $this->repeatedSegment = $entity;
     }
     
     /**
-     * replaces the tags in the given content with the tags which were before in the segemnt
-     * @param string $segmentContent
-     * @return string
+     * call back for the fieldloop over all editable segments, 
+     *   replaces the tags in the given content with the tags which were before in the segemnt
+     * @param string $field
+     * @param string $editField
+     * @param string $getter
+     * @param string $setter
+     * @return bool
      */
-    public function updateSegmentContent($field, $editField, $getter, $setter) : bool {
+    public function updateSegmentContent(string $field, string $editField, string $getter, string $setter) : bool {
         $id = $this->repeatedSegment->getId();
         $getOriginal = 'get'.ucfirst($field);
         //get content, dependent on using MQM or not:
-        if($this->config->runtimeOptions->editor->enableQmSubSegments) {
+        if($this->config->runtimeOptions->editor->enableQmSubSegments && is_array($this->qmSubsegmentAlikes)) {
             $segmentContent = $this->qmSubsegmentAlikes[$field]->cloneAndUpdate($id, $field);
         }
         else {

@@ -825,11 +825,11 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             $isSourceMrkMissing = ($currentSource == self::MISSING_MRK);
             
             if($isSourceMrkMissing) {
-                $sourceChunks = [];
+                $sourceChunksOriginal = $sourceChunks = [];
             }
             else {
                 //parse the source chunks
-                $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1, static::XML_REPARSE_CONTENT);
+                $sourceChunksOriginal = $sourceChunks = $this->xmlparser->getRange($currentSource['opener']+1, $currentSource['closer']-1, static::XML_REPARSE_CONTENT);
                 $sourceChunks = $this->contentConverter->convert($sourceChunks, true, $currentSource['openerMeta']['preserveWhitespace']);
                 $sourceSegment = $this->xmlparser->join($sourceChunks);
                 
@@ -936,10 +936,18 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->setMid($this->_mid.'-'.$mid);
             }
             
-            //if target was given and source contains tags only or is empty, then it will be ignored
-            if(!$isSourceMrkMissing && !empty($this->segmentData[$targetName]['original']) && !$this->hasText($this->segmentData[$sourceName]['original'])) {
-                $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($targetChunksOriginal).$trailingTags;
-                continue;
+            //if source contains tags only or is empty
+            if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original'])) {
+                //if empty target, we fill the target with the source content, and ignore the segment then in translation
+                if(empty($targetChunksOriginal)) {
+                    $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($sourceChunksOriginal).$trailingTags;
+                    continue;
+                }
+                //on proofreading and if target content was given, then it will be ignored
+                elseif(!empty($this->segmentData[$targetName]['original'])) {
+                    $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($targetChunksOriginal).$trailingTags;
+                    continue;
+                }
             }
             $segmentId = $this->setAndSaveSegmentValues();
             //only with a segmentId (in case of ProofProcessor) we can save comments
@@ -1093,9 +1101,7 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      * @return boolean
      */
     protected function hasText($segmentContent) {
-        $segmentContent = $this->internalTag->replace($segmentContent, '');
-        $segmentContent = trim(strip_tags($segmentContent));
-        return !empty($segmentContent);
+        return $this->internalTag->hasText($segmentContent);
     }
     
     /**
@@ -1232,8 +1238,14 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
      */
     protected function hasSameStartAndEndTags($preserveWhitespace, array $source, array $target, $foundTag = false) {
         //source and target must have at least a start tag, text content, and an end tag, that means at least 3 chunks:
-        if(count($source) < 4 || count($target) < 4){
+        // if the feature is disabled no framing tags are ignored
+        if(!$this->config->runtimeOptions->import->xlf->ignoreFramingTags || count($source) < 4 || count($target) < 4){
             return $foundTag;
+        }
+        
+        //if target is empty, we assume the target = source so that the feature can be used at all, since it checks for same tags in source and target 
+        if(empty($target)) {
+            $target = $source;
         }
         
         //init variables:
@@ -1308,7 +1320,6 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             // or if we are in a tag we also don't have to track the data, this is done by the whole tag then
             return;
         }
-//error_log("OTHER ".$other);
         $inTarget = $this->xmlparser->getParent('target');
         if(empty($inTarget)) {
             $this->addOtherContent($this->otherContentSource, $other);

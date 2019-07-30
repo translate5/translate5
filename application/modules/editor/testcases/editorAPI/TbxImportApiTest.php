@@ -41,7 +41,7 @@ class TbxImportApiTest extends \ZfExtended_Test_ApiTestcase {
     protected static $collId;
     
     public static function setUpBeforeClass(): void {
-        self::$api = $api = new ZfExtended_Test_ApiHelper(__CLASS__);
+        self::$api= new ZfExtended_Test_ApiHelper(__CLASS__);
         self::assertNeededUsers(); //last authed user is testmanager
         self::assertLogin('testmanager');
         self::assertCustomer();

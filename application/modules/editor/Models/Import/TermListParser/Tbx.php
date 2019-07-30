@@ -285,6 +285,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         //init the logger (this will write in the language resources log and in the main log)
         $this->logger=Zend_Registry::get('logger');
+        $this->user=ZfExtended_Factory::get('ZfExtended_Models_User');
     }
 
     /**
@@ -305,6 +306,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         if(empty($this->customerIds)){
             $this->customerIds=[$this->task->getCustomerId()];
         }
+        
+        $this->loadUser($task->getPmGuid());
         
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
@@ -1546,10 +1549,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
     
     public function loadUser(string $userGuid) {
-        if(isset($userGuid) && !empty($userGuid)){
-            $this->user=ZfExtended_Factory::get('ZfExtended_Models_User');
-            $this->user->loadByGuid($userGuid);
-        }
+        $this->user->loadByGuid($userGuid);
+    }
+    
+    public function getUser() {
+        return $this->user;
     }
     
     /***

@@ -126,6 +126,8 @@ class editor_TermattributeController extends ZfExtended_RestController {
     }
     
     /**
+     * TODO: Tests, later in the development
+     * 
      * confirm the proposal and saves the proposed data into the term
      * @throws ZfExtended_UnprocessableEntity
      */

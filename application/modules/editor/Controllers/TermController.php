@@ -110,7 +110,7 @@ class editor_TermController extends ZfExtended_RestController {
         }
         
         if(!empty($this->data->groupId)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1114', ['groupId' => 'Die GroupId kann nicht direkt gesetzt werden, nur indirekt über eine gegebene TermEntryId.']);
+            throw ZfExtended_UnprocessableEntity::createResponse('E1154', ['groupId' => 'Die GroupId kann nicht direkt gesetzt werden, nur indirekt über eine gegebene TermEntryId.']);
         }
         
         if(!empty($this->data->termEntryId)){
@@ -202,15 +202,15 @@ class editor_TermController extends ZfExtended_RestController {
     protected function initTermOnPost() {
         $this->entity->setCreated(NOW_ISO);
         ZfExtended_UnprocessableEntity::addCodes([
-            'E1112' => 'Missing mandatory collectionId for term creation',
-            'E1113' => 'Missing mandatory language (ID) for term creation',
-            'E1114' => 'GroupId was set explicitly, this is not allowed. Must be set implicit via a given termEntryId',
+            'E1152' => 'Missing mandatory collectionId for term creation',
+            'E1153' => 'Missing mandatory language (ID) for term creation',
+            'E1154' => 'GroupId was set explicitly, this is not allowed. Must be set implicit via a given termEntryId',
         ]);
         if(empty($this->data->collectionId)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1112', ['collectionId' => 'Bitte wählen Sie eine TermCollection aus, welcher dieser Term hinzugefügt werden soll.']);
+            throw ZfExtended_UnprocessableEntity::createResponse('E1152', ['collectionId' => 'Bitte wählen Sie eine TermCollection aus, welcher dieser Term hinzugefügt werden soll.']);
         }
         if(empty($this->data->language)) {
-            throw ZfExtended_UnprocessableEntity::createResponse('E1113', ['language' => 'Bitte wählen Sie die Sprache des Terms aus.']);
+            throw ZfExtended_UnprocessableEntity::createResponse('E1153', ['language' => 'Bitte wählen Sie die Sprache des Terms aus.']);
         }
         if(empty($this->data->processStatus)) {
             //TODO: this initial value will depend on the ACL with Phase 3 implementation of termportal
@@ -289,6 +289,7 @@ class editor_TermController extends ZfExtended_RestController {
     }
     
     /**
+     * TODO: Tests
      * Tries to update or insert a value "comment" into langSet>descripGrp>note of the term
      */
     public function commentOperation() {
@@ -375,6 +376,7 @@ class editor_TermController extends ZfExtended_RestController {
     }
     
     /**
+     * TODO: Tests, later on the development
      * confirm the proposal and saves the proposed data into the term
      * @throws ZfExtended_UnprocessableEntity
      */
@@ -398,6 +400,7 @@ class editor_TermController extends ZfExtended_RestController {
     }
     
     /**
+     * TODO: Tests
      * removes a proposal
      * @throws ZfExtended_UnprocessableEntity
      */
