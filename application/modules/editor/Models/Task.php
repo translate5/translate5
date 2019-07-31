@@ -895,7 +895,14 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
             if($segment->getEditable() == $edit100PercentMatch || $segment->getMatchRate()<100){
                 continue;
             }
+            //TODO: if it is blocked use Autostates: calculateImportState
+            //calculate the editable and the autostatus, see the example in editor_Models_Import_FileParser::setCalculatedSegmentAttributes
             $segment->setEditable($edit100PercentMatch);
+            
+            //TODO: add segment history save here before the segment is saved
+            
+            //INFO: load the autostatus from the history table when the 
+            //INFO: if the segment history is empty, caluclate with calculateImportState
             $segment->save();
         }
     }

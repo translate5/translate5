@@ -134,6 +134,9 @@ class editor_Models_Import_SegmentProcessor_ProofRead extends editor_Models_Impo
             //transunitId must not be null, so if no info given we use segmentNr to assume that just the single segment is in a transunit
             $meta->setTransunitId($seg->getSegmentNrInTask());
         }
+        
+        //TODO: add the autopropageted, locked as new fields LEK_segments_meta
+        //and set them here
         $meta->setSiblingData($seg);
         $meta->save();
     }
