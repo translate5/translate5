@@ -115,6 +115,7 @@ END LICENSE AND COPYRIGHT
     flex: 1 1 auto;
 }
 #searchFilterTags {
+    background-color: #eee;
     flex: 1 1 60%;
 }
 #search,

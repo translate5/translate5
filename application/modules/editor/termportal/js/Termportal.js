@@ -208,6 +208,16 @@ Example:
 
 ----------------------------------------------------------------------*/
 
+
+/**
+ * Make the filter field not editable. Adding filter tags should only be possible
+ * through the drop-downs. Yet of course remove tags by clicking on them should
+ * still be possible (=> tagit's "readonly" is not sufficient here).
+ */
+$('#searchFilterTags').keydown(function (e) {
+    return false;
+});
+
 /**
  * Render tagLabel from selected dropdown (e.g. "client1").
  * This is also used as name for corresponding hidden input.
