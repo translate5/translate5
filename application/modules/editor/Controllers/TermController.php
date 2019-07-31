@@ -77,6 +77,13 @@ class editor_TermController extends ZfExtended_RestController {
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
         $attribute->checkOrCreateProcessStatus($this->entity->getId());
+
+        //load all attributes for the term
+        $rows=$this->entity->findTermAndAttributes($this->entity->getId());
+        $rows=$this->entity->groupTermsAndAttributes($rows);
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $this->view->rows->attributes =$rows[0]['attributes'];
+        }
     }
     /**
      * {@inheritDoc}
