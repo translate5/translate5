@@ -141,7 +141,7 @@ class XlfImportTest extends \ZfExtended_Test_ApiTestcase {
         }
         
         //test editing of segments with preserved whitespace and segment length count
-        $segments = $this->api()->requestJson('editor/segment?page=1&start=80&limit=12');
+        $segments = $this->api()->requestJson('editor/segment?page=1&start=80&limit=6');
         foreach($segments as $idx => $segToEdit) {
             $segmentData = $this->api()->prepareSegmentPut('targetEdit', $segToEdit->source.' - edited', $segToEdit->id);
             $this->api()->requestJson('editor/segment/'.$segToEdit->id, 'PUT', $segmentData);

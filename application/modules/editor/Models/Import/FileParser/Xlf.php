@@ -424,6 +424,10 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
             //<target>additionalUnitLength ignored<mrk>content</mrk> this length is needed<mrk>content</mrk>this length is ignored again</target>
             $mrkMidKeys = array_keys($otherContent);
             if($attributes->mrkMid != end($mrkMidKeys)) {
+                //Attention: if there is a tag between two MRKs in a formatted XML this tag has leading and trailing multiple whitespace and newline characters.
+                // If $preserveWhitespace is true, this whitespace remains as it is, and is counted completely (10 lines above from here)
+                // If $preserveWhitespace is false, the whitespace before and after the tag is condensed to one single whitespace character each, 
+                //  so that in sum this part of the segments has a length of at least 2 characters
                 $content = $text($this->prepareMrkInbetweenContent($otherContent[$attributes->mrkMid]));
             }
             else {
@@ -936,18 +940,23 @@ class editor_Models_Import_FileParser_Xlf extends editor_Models_Import_FileParse
                 $this->setMid($this->_mid.'-'.$mid);
             }
             
-            //if source contains tags only or is empty
-            if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original'])) {
-                //if empty target, we fill the target with the source content, and ignore the segment then in translation
-                if(empty($targetChunksOriginal)) {
+            $emptyTarget = empty($targetChunksOriginal);
+            $hasOriginalTarget = !empty($this->segmentData[$targetName]['original']);
+            //if source contains tags only or is empty (and is no missing source) then we are able to ignore non textual segments 
+            if(!$isSourceMrkMissing && !$this->hasText($this->segmentData[$sourceName]['original']) && ($emptyTarget || $hasOriginalTarget)) {
+                if($emptyTarget) {
+                    //if empty target, we fill the target with the source content, and ignore the segment then in translation
                     $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($sourceChunksOriginal).$trailingTags;
-                    continue;
                 }
-                //on proofreading and if target content was given, then it will be ignored
-                elseif(!empty($this->segmentData[$targetName]['original'])) {
+                else { // needs $hasOriginalTarget to be true, which is the case by above if
+                    //on proofreading and if target content was given, then it will be ignored too
                     $placeHolders[$mid] = $leadingTags.$this->xmlparser->join($targetChunksOriginal).$trailingTags;
-                    continue;
                 }
+                //we add the length of the ignored segment to the additionalUnitLength
+                $attributes->additionalUnitLength += $this->segmentBareInstance->textLengthByImportattributes($placeHolders[$mid], $attributes, $this->task->getTaskGuid());
+                //we add the additional mrk length of the ignored segment to the additionalUnitLength
+                $attributes->additionalUnitLength += $attributes->additionalMrkLength;
+                continue;
             }
             $segmentId = $this->setAndSaveSegmentValues();
             //only with a segmentId (in case of ProofProcessor) we can save comments
