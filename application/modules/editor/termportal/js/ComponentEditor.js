@@ -288,6 +288,7 @@ var ComponentEditor={
 			attrType=$element.data('type'),
 		    isTerm=attrType=='term',
 		    renderData=null,
+		    attributeRenderData=null,
 		    $elParent=null,
             $commentPanel,
             dummyCommentAttribute,
@@ -300,6 +301,13 @@ var ComponentEditor={
 		if(isTerm){
 			renderData=Term.renderTermData(result);
 			$elParent= Term.getTermHeader($element.data('id'));
+
+			//for the new term, term attribute render data is required
+			if (me.isNew) {
+				var termRflLang=result.attributes[0]!=undefined ? result.attributes[0].language : '';
+				attributeRenderData=Attribute.renderTermAttributes(result,termRflLang);
+			}
+			
 		}else{
 			renderData=Attribute.getAttributeRenderData(result,result.value);
 			
@@ -357,6 +365,10 @@ var ComponentEditor={
 			$termAttributeHolder.attr("data-term-id",result.termId);
 			$termAttributeHolder.attr("data-groupid",result.groupId);
 			
+			//for the new term, render the attributes to
+			if(me.isNew && attributeRenderData && attributeRenderData!=''){
+				drawData+=attributeRenderData;
+	        }
 			
 			//attach the comment attribute draw data to the term holder
 			$termAttributeHolder.prepend(drawData);
