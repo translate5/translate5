@@ -167,6 +167,7 @@
             "version": "master-2019-08-01",
             "url": "RELEASE:tag-it.zip",
             "target": "public\/js\/jquery-ui",
+            "preventTargetClean": true,
             "licenses": [
                 {
                     "uses": "Tag-it",
@@ -181,6 +182,7 @@
             "version": "2.3.2",
             "url": "RELEASE:jquery-ui-iconfont.zip",
             "target": "public\/js\/jquery-ui",
+            "preventTargetClean": true,
             "licenses": [
                 {
                     "uses": "Icons for jQuery-UI",
