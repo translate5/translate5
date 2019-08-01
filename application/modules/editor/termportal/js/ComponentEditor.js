@@ -344,6 +344,9 @@ var ComponentEditor={
 		if(isTerm){
 			renderData=Term.renderTermData(result);
 			$elParent= Term.getTermHeader($element.data('id'));
+			
+			// (if necessary:) add language to select
+			addLanguageToSelect(result.language, result.languageRfc5646);
 
 			//for the new term, term attribute render data is required
 			if (me.isNew) {

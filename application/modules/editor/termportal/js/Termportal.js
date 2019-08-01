@@ -194,6 +194,30 @@ function checkSubLanguage(locale) {
     return locale;
 }
 
+/**
+ * Add a language to the languageselect for searching terms.
+ * - Checks if the language already exists.
+ * - Sorts the list alphabetically.
+ * - Keeps the selected option.
+ * @param $language
+ * @returns
+ */
+function addLanguageToSelect(languageId,languageRfc5646) {
+    var $langSel = $('#language'), 
+        selected, opts_list;
+    if ($("#language option[value='"+languageRfc5646+"']").length > 0) {
+        return;
+    }
+    $langSel.append('<option value="'+languageId+'">'+languageRfc5646+'</option>');
+    // https://stackoverflow.com/a/26232541
+    selected = $langSel.val();
+    opts_list = $langSel.find('option');
+    opts_list.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+    $langSel.html('').append(opts_list);
+    $langSel.val(selected);
+    $langSel.selectmenu('refresh');
+}
+
 /* ---------------------------------------------------------------------
 // ------------------- handle tag fields and filters -------------------
 //----------------------------------------------------------------------
