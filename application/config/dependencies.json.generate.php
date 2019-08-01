@@ -223,6 +223,28 @@ $dep->dependencies = [[
             "relpath" => "docs/third-party-licenses/skel-license.txt"
         ]]
     ],[
+        "name" => "tag-it",
+        "label" => "Tag-it: a jQuery UI plugin",
+        "version" => "master-2019-08-01",
+        "url" => "RELEASE:tag-it.zip",
+        "target" => "public/js/jquery-ui",
+        "licenses" => [[
+            "uses" => "Tag-it",
+            "license" => "MIT",
+            "relpath" => "docs/third-party-licenses/tag-it-license.txt"
+        ]]
+    ],[
+        "name" => "jquery-ui-iconfont",
+        "label" => "Icons for jQuery-UI",
+        "version" => "2.3.2",
+        "url" => "RELEASE:jquery-ui-iconfont.zip",
+        "target" => "public/js/jquery-ui",
+        "licenses" => [[
+            "uses" => "Icons for jQuery-UI",
+            "license" => "CC BY-SA 3.0",
+            "relpath" => "docs/third-party-licenses/jquery-ui-iconfont-README.md"
+        ]]
+    ],[
         "name" => "phpppreadsheet",
         "label" => "PhpSpreadsheet",
         "version" => "1.6",
