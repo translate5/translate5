@@ -84,6 +84,12 @@ class editor_TermController extends ZfExtended_RestController {
         if(!empty($rows) && !empty($rows[0]['attributes'])){
             $this->view->rows->attributes =$rows[0]['attributes'];
         }
+        if(!empty($rows) && !empty($this->view->rows->language)){
+            $language = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $language editor_Models_Languages */
+            $language->load($this->view->rows->language);
+            $this->view->rows->languageRfc5646 = $language->getRfc5646();
+        }
     }
     /**
      * {@inheritDoc}

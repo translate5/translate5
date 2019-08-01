@@ -588,7 +588,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         /* @var $t ZfExtended_Zendoverwrites_Translate */;;
         
         // sample label-translations
-        $excel->setLabel('termEntryId', $t->_('Term-Eintrag'));
+        $excel->setLabel('termEntryId', $t->_('Eintrag'));
         $excel->setLabel('definition', $t->_('Definition'));
         $excel->setLabel('language', $t->_('Sprache'));
         $excel->setLabel('termId', $t->_('Term-Id'));
