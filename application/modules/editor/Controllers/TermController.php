@@ -77,6 +77,19 @@ class editor_TermController extends ZfExtended_RestController {
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
         $attribute->checkOrCreateProcessStatus($this->entity->getId());
+
+        //load all attributes for the term
+        $rows=$this->entity->findTermAndAttributes($this->entity->getId());
+        $rows=$this->entity->groupTermsAndAttributes($rows);
+        if(!empty($rows) && !empty($rows[0]['attributes'])){
+            $this->view->rows->attributes =$rows[0]['attributes'];
+        }
+        if(!empty($rows) && !empty($this->view->rows->language)){
+            $language = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $language editor_Models_Languages */
+            $language->load($this->view->rows->language);
+            $this->view->rows->languageRfc5646 = $language->getRfc5646();
+        }
     }
     /**
      * {@inheritDoc}
