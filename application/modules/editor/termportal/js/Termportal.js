@@ -149,7 +149,6 @@ $('#search').keyup(function (e) {
     }
     console.log("keyup");
     Term.termAttributeContainer=[];
-    termEntryAttributeContainer=[];
     Term.searchTermsResponse=[];
     Term.disableLimit=false;
 
@@ -195,6 +194,30 @@ function checkSubLanguage(locale) {
     return locale;
 }
 
+/**
+ * Add a language to the languageselect for searching terms.
+ * - Checks if the language already exists.
+ * - Sorts the list alphabetically.
+ * - Keeps the selected option.
+ * @param $language
+ * @returns
+ */
+function addLanguageToSelect(languageId,languageRfc5646) {
+    var $langSel = $('#language'), 
+        selected, opts_list;
+    if ($("#language option[value='"+languageRfc5646+"']").length > 0) {
+        return;
+    }
+    $langSel.append('<option value="'+languageId+'">'+languageRfc5646+'</option>');
+    // https://stackoverflow.com/a/26232541
+    selected = $langSel.val();
+    opts_list = $langSel.find('option');
+    opts_list.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+    $langSel.html('').append(opts_list);
+    $langSel.val(selected);
+    $langSel.selectmenu('refresh');
+}
+
 /* ---------------------------------------------------------------------
 // ------------------- handle tag fields and filters -------------------
 //----------------------------------------------------------------------
@@ -208,6 +231,16 @@ Example:
 - hidden input: class = "filter client" | name = "client: client1" | value = "123"
 
 ----------------------------------------------------------------------*/
+
+
+/**
+ * Make the filter field not editable. Adding filter tags should only be possible
+ * through the drop-downs. Yet of course remove tags by clicking on them should
+ * still be possible (=> tagit's "readonly" is not sufficient here).
+ */
+$('#searchFilterTags').keydown(function (e) {
+    return false;
+});
 
 /**
  * Render tagLabel from selected dropdown (e.g. "client1").
