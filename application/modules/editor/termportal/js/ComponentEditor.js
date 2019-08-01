@@ -87,11 +87,20 @@ var ComponentEditor={
 		$element.replaceWith($input);
         
         Term.drawProposalButtons('componentEditorOpened');
-	  
-		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
-		}).focus();
-	},
+        
+        me.addKeyboardShortcuts($element,$input);
+        
+        me.$_termTable.on('mousedown', '.term-data.proposable .proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.on('mousedown', '.term-data.proposable .proposal-cancel',function() {
+            me.cancelComponentChange($element,$input);
+        });
+        
+        $input.one('blur', function(){
+            me.saveComponentChange($element,$input);
+        }).focus();
+    },
 	
 	/***
 	 * Register the component editor for given term or termentry attribute
@@ -117,9 +126,18 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
         
-		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
-		});
+        me.addKeyboardShortcuts($element,$input);
+        
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-cancel',function() {
+            me.cancelComponentChange($element,$input);
+        });
+        
+        $input.one('blur', function(){
+            me.saveComponentChange($element,$input);
+        });
         
         return $input;
 	},
@@ -148,13 +166,38 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
         
-		$input.focusout(function() {
-			me.saveCommentChange($element,$input);
-	    });
+        me.addKeyboardShortcuts($element,$input);
+
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-cancel',function() {
+            me.cancelComponentChange($element,$input);
+        });
+        
+        $input.focusout(function() {
+            me.saveCommentChange($element,$input);
+        });
 		
 		return $input;
 	},
-	
+    
+	/**
+     * Cancel editing the component; don't save the changes.
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    cancelComponentChange:function($element,$input){
+        $input.val(''); // this will force saveComponentChange() to stop the saving.
+        this.saveComponentChange($element,$input);
+    },
+
+    
+    /**
+     * Save the proposed changes (+ close the editor, update buttons etc).
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
 	saveComponentChange:function($el,$input){
         console.log('saveComponentChange');
         var me=this,
@@ -288,6 +331,7 @@ var ComponentEditor={
 			attrType=$element.data('type'),
 		    isTerm=attrType=='term',
 		    renderData=null,
+		    attributeRenderData=null,
 		    $elParent=null,
             $commentPanel,
             dummyCommentAttribute,
@@ -300,6 +344,16 @@ var ComponentEditor={
 		if(isTerm){
 			renderData=Term.renderTermData(result);
 			$elParent= Term.getTermHeader($element.data('id'));
+			
+			// (if necessary:) add language to select
+			addLanguageToSelect(result.language, result.languageRfc5646);
+
+			//for the new term, term attribute render data is required
+			if (me.isNew) {
+				var termRflLang=result.attributes[0]!=undefined ? result.attributes[0].language : '';
+				attributeRenderData=Attribute.renderTermAttributes(result,termRflLang);
+			}
+			
 		}else{
 			renderData=Attribute.getAttributeRenderData(result,result.value);
 			
@@ -357,6 +411,10 @@ var ComponentEditor={
 			$termAttributeHolder.attr("data-term-id",result.termId);
 			$termAttributeHolder.attr("data-groupid",result.groupId);
 			
+			//for the new term, render the attributes to
+			if(me.isNew && attributeRenderData && attributeRenderData!=''){
+				drawData+=attributeRenderData;
+	        }
 			
 			//attach the comment attribute draw data to the term holder
 			$termAttributeHolder.prepend(drawData);
@@ -412,7 +470,27 @@ var ComponentEditor={
             }
         }
         return false;
+    },
+    
+    /**
+     * Add keyboard-shortcuts for the component.
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    addKeyboardShortcuts($element, $input) {
+        var me = this;
+        $input.keydown(function(e){
+            if (e.ctrlKey && e.which === 83) { // CTRL+S
+                event.preventDefault();
+                me.saveComponentChange($element,$input);
+            };
+            if (e.which === 27) {              // ESCAPE
+                event.preventDefault();
+                me.cancelComponentChange($element,$input);
+            };
+        });
     }
+    
 };
 
 ComponentEditor.init();
