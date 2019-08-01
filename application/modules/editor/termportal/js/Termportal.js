@@ -31,7 +31,7 @@ END LICENSE AND COPYRIGHT
  */
 function checkDirectSearch() {
     var givenText = $('#search').val();
-    if (givenText != '') {
+    if (givenText !== '') {
         $('#searchButton').click();
     }
 }
@@ -54,15 +54,15 @@ var selectItem = function (event, ui) {
     while (origEvent.originalEvent !== undefined){
         origEvent = origEvent.originalEvent;
     }
-    if (origEvent.type == 'click'){
+    if (origEvent.type === 'click'){
         event.preventDefault();
-        console.log("clicked item: " + ui.item.groupId);
+        console.log('clicked item: ' + ui.item.groupId);
         Term.searchTerm(ui.item.label);
         Term.disableLimit=true;
         return;
     }
 
-    console.log("selectItem: " + ui.item.groupId);
+    console.log('selectItem: ' + ui.item.groupId);
     
     //empty term options component
     $('#searchTermsSelect').empty();
@@ -73,81 +73,81 @@ var selectItem = function (event, ui) {
         showFinalResultContent();
     }
     
-    console.log("selectItem: " + ui.item.groupId);
+    console.log('selectItem: ' + ui.item.groupId);
 
     Term.fillSearchTermSelect(ui.item.label);
     
     //find the attributes for
     Term.findTermsAndAttributes(ui.item.groupId);
-    //$("#search").val(ui.item.value);
+    //$('#search').val(ui.item.value);
     return false;
-}
+};
  
-$("#search").autocomplete({
+$('#search').autocomplete({
     source: function(request, response) {
         Term.searchTerm(request.term,function(data){
             response(data);
-        })
+        });
     },
     select: selectItem,
     minLength: 3,
     focus: function(event, ui) {
-        if (event.which != 0) {
+        if (event.which !== 0) {
             event.preventDefault();
             $(this).val(ui.item.label);
-            console.log("autocomplete: FOCUS " + ui.item.label);
+            console.log('autocomplete: FOCUS ' + ui.item.label);
         }
     },
     change: function() {
-        $("#myText").val("").css("display", 2);
+        $('#myText').val('').css('display', 2);
     }
 });
 
 function getLanguageFlag(rfcLanguage) {
-	var rfcValue=rfcLanguage.toLowerCase();
+	var rfcValue = rfcLanguage.toLowerCase();
     if (rfcValue in Editor.data.apps.termportal.rfcFlags) {
-    	if(Editor.data.apps.termportal.rfcFlags[rfcValue]==''){
+    	if(Editor.data.apps.termportal.rfcFlags[rfcValue] === ''){
     		return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     	}
         // TODO: img-html could be reused if already created before
         return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[rfcValue] + '.png" alt="' + rfcValue + '" title="' + rfcValue + '">';
     }
-    if(!rfcValue || rfcValue==''){
+    if(!rfcValue || rfcValue == ''){
     	return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     }
     //check if it is comma separated ids
     rfcValue=rfcValue.split(',');
-    if(!rfcValue || rfcValue.length==0){
+    if(!rfcValue || rfcValue.length === 0){
     	return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
     }
     rfcValue=rfcValue[0];
     //it is comma separated, try to find it
     if (rfcValue in Editor.data.apps.termportal.idToRfcLanguageMap) {
     	var flagRfc=Editor.data.apps.termportal.idToRfcLanguageMap[rfcValue];
-    	flagRfc=flagRfc.toLowerCase()
+    	flagRfc=flagRfc.toLowerCase();
         return '<img src="' + moduleFolder + 'images/flags/' + Editor.data.apps.termportal.rfcFlags[flagRfc] + '.png" alt="' + flagRfc + '" title="' + flagRfc + '">';
     }
     
     return '<span class="noFlagLanguage">'+rfcLanguage+'</span>';
 }
 
-$("#searchButton" ).button({
-    icon:"ui-icon-search"
+$('#searchButton').button({
+    icon:'ui-icon-search'
 }).click(function(){
 	Term.disableLimit=true;
     //startAutocomplete();
-    Term.searchTerm($("#search").val());
+    Term.searchTerm($('#search').val());
 });
 
 $('#search').keyup(function (e) {
-    if (e.which == 13) {
-      console.log("keyup: Enter");
+    if (e.which === 13) {
+      console.log('keyup: Enter');
       Term.disableLimit=true;
       //startAutocomplete();
-      Term.searchTerm($("#search").val());
+      Term.searchTerm($('#search').val());
       return false;
     }
-    console.log("keyup");
+    console.log('keyup');
     Term.termAttributeContainer=[];
     Term.searchTermsResponse=[];
     Term.disableLimit=false;
@@ -168,11 +168,11 @@ $('#instantTranslateButton').on('touchstart click',function(){
 });
 
 function startAutocomplete(){
-    console.log("startAutocomplete...");
+    console.log('startAutocomplete...');
     $('#searchTermsSelect').empty();
     $('#termEntryAttributesTable').empty();
     $('#termTable').empty();
-    $("#search").autocomplete( "search", $("#search").val());
+    $('#search').autocomplete('search', $('#search').val());
 }
 
 function showFinalResultContent() {
@@ -188,7 +188,7 @@ function showFinalResultContent() {
 function checkSubLanguage(locale) {
     var localeParts;
     if (!Editor.data.instanttranslate.showSublanguages) {
-        localeParts = locale.split("-");
+        localeParts = locale.split('-');
         locale = localeParts[0];
     }
     return locale;
@@ -199,8 +199,8 @@ function checkSubLanguage(locale) {
  * - Checks if the language already exists.
  * - Sorts the list alphabetically.
  * - Keeps the selected option.
- * @param $language
- * @returns
+ * @param {String} languageId
+ * @param {String} languageRfc5646
  */
 function addLanguageToSelect(languageId,languageRfc5646) {
     var $langSel = $('#language'), 
@@ -238,7 +238,7 @@ Example:
  * through the drop-downs. Yet of course remove tags by clicking on them should
  * still be possible (=> tagit's "readonly" is not sufficient here).
  */
-$('#searchFilterTags').keydown(function (e) {
+$('#searchFilterTags').keydown(function () {
     return false;
 });
 
@@ -261,19 +261,20 @@ function renderTagLabel(text) {
  * @param {String} dropdownId
  * @param {String} text
  * @param {String} value
+ * @param {Integer} index (= in dropdown-select-list)
  */
 function addSearchFilter(dropdownId, text, value, index) {
     var tagLabel = this.renderTagLabel(text),
-        $_searchFilterTags = $("#searchFilterTags");
+        $searchFilterTags = $('#searchFilterTags');
     // reset dropdown
     $('#'+dropdownId).val('none');
-    $('#'+dropdownId).selectmenu("refresh");
+    $('#'+dropdownId).selectmenu('refresh');
     // add hidden input
-    if ($_searchFilterTags.children('input[name="'+tagLabel+'"][value="'+value+'"].filter.'+dropdownId).length === 0) {
-        $_searchFilterTags.append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'" data-index="'+index+'">');
+    if ($searchFilterTags.children('input[name="'+tagLabel+'"][value="'+value+'"].filter.'+dropdownId).length === 0) {
+        $searchFilterTags.append('<input type="hidden" class="filter '+dropdownId+'" name="'+tagLabel+'" value="'+value+'" data-index="'+index+'">');
     }
     // add tag field
-    $_searchFilterTags.tagit("createTag", tagLabel);
+    $searchFilterTags.tagit('createTag', tagLabel);
 }
 
 /**
@@ -284,7 +285,7 @@ function addSearchFilter(dropdownId, text, value, index) {
 function beforeFilterTagRemoved(tagLabel) {
     // remove hidden input
     $('#searchFilterTags input.filter' ).each(function( index, el ) {
-        if (el.name == tagLabel) {
+        if (el.name === tagLabel) {
             el.remove();
         }
     });
@@ -327,18 +328,18 @@ function checkFilterDependencies() {
     });
     if(selectedClients.length === 0) {
         $('#collection option:disabled').attr('disabled', false);
-        $('#collection').selectmenu("refresh");
+        $('#collection').selectmenu('refresh');
         return;
     }
     $('#collection option' ).each(function( index, el ) {
-        if (el.value == undefined || el.value == 'none') {
+        if (el.value === undefined || el.value === 'none') {
             return; // "continue"
         }
         showCollection = false;
         clientsForCollection = collectionsClients[el.value];
         jQuery.each(clientsForCollection, function( i, val ) {
             // is any of the collection's customers currently selected?
-            if(selectedClients.indexOf(val.toString()) != -1) {
+            if(selectedClients.indexOf(val.toString()) !== -1) {
                 showCollection = true;
                 return false; // "break"
             }
@@ -348,23 +349,23 @@ function checkFilterDependencies() {
         // remove from tag-field
         if(!showCollection) {
             tagLabel = $(this).text();
-            if ($("#searchFilterTags").tagit("assignedTags").indexOf(tagLabel) != -1) {
-                $("#searchFilterTags").tagit("removeTagByLabel", tagLabel);
+            if ($('#searchFilterTags').tagit('assignedTags').indexOf(tagLabel) !== -1) {
+                $('#searchFilterTags').tagit('removeTagByLabel', tagLabel);
             }
         }
     });
-    $('#collection').selectmenu("refresh");
+    $('#collection').selectmenu('refresh');
 }
 
 /**
  * Show placeholder if no tag-field exists, hide otherwise.
  */
 function handlePlaceholder() {
-    var $_searchFilterTags = $("#searchFilterTags");
-    if ($_searchFilterTags.tagit("assignedTags").length > 0) {
-        $_searchFilterTags.data("ui-tagit").tagInput.attr("placeholder", "");
+    var $searchFilterTags = $('#searchFilterTags');
+    if ($searchFilterTags.tagit('assignedTags').length > 0) {
+        $searchFilterTags.data('ui-tagit').tagInput.attr('placeholder', '');
     } else {
-        $_searchFilterTags.data("ui-tagit").tagInput.attr("placeholder", searchFilterPlaceholderText);
+        $searchFilterTags.data('ui-tagit').tagInput.attr('placeholder', searchFilterPlaceholderText);
     }
 }
 
@@ -373,18 +374,18 @@ function handlePlaceholder() {
  * @returns {Array}
  */
 function getFilteredCollections() {
-    var $_filteredCollections = $('#searchFilterTags input.filter.collection'),
-        filteredCollections = [];
-    if ($_filteredCollections.length === 0 && this.getFilteredClients().length > 0) {
+    var $filteredCollections = $('#searchFilterTags input.filter.collection'),
+        filteredCollectionsValues = [];
+    if ($filteredCollections.length === 0 && this.getFilteredClients().length > 0) {
         // user has not selected any collections, but client(s) => use only those collections that belong to the client(s)
-        $_filteredCollections = $("#collection option:enabled");
+        $filteredCollections = $('#collection option:enabled');
     }
-    $_filteredCollections.each(function( index, el ) {
-        if (el.value != 'none') {
-            filteredCollections.push(el.value);
+    $filteredCollections.each(function( index, el ) {
+        if (el.value !== 'none') {
+            filteredCollectionsValues.push(el.value);
         }
     });
-    return filteredCollections;
+    return filteredCollectionsValues;
 }
 
 /**
