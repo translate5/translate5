@@ -209,7 +209,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      * Collection of terms who will be merged at the tbx termEntry change
      * @var array
      */
-    private $termsContainer=array();
+    private $termsToMergeContainer=array();
+    
+    /***
+     * Current term data. After the tig/ntig tag is closed, a new database term will be created out of this data
+     * @var array
+     */
+    private $termContainer=[];
     
     /***
      * Collection of all inserted or updated term attributes
@@ -230,11 +236,11 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     private $lastMergeTermEntryIdDb;
     
     /***
-     * Term entry id from the tbx of the last merged term
+     * Term entry id from the tbx (groupId) of the last merged term
      * 
      * @var string
      */
-    private $lastMergeTermEntryId;
+    private $lastMergeGroupId;
     
     
     /***
@@ -299,14 +305,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
-        $termCollectionId=$this->createTermCollection($this->customerIds);
+        $this->termCollectionId=$this->createTermCollection($this->customerIds);
         
         //add termcollection to task assoc
         $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $model editor_Models_TermCollection_TermCollection */
-        $model->addTermCollectionTaskAssoc($termCollectionId, $task->getTaskGuid());
-        
-        $this->termCollectionId=$termCollectionId;
+        $model->addTermCollectionTaskAssoc($this->termCollectionId, $task->getTaskGuid());
         
         //all tbx files in the same term collection
         foreach($tbxfiles as $file) {
@@ -322,7 +326,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $this->languages[$meta->getTargetLang()->getId()] = $this->normalizeLanguage($meta->getTargetLang()->getRfc5646());
            
             //start with file parse
-            $this->parseTbxFile([$file->getPathname()],$termCollectionId);
+            $this->parseTbxFile([$file->getPathname()],$this->termCollectionId);
 
             //check if the languages in the task are valid for the term collection
             $this->validateTbxLanguages();
@@ -530,33 +534,43 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         }
 
         //post term entry
-        if(!empty($this->termsContainer)){
+        if(!empty($this->termsToMergeContainer)){
             //true = in the current tbx termEntry set, one term is found for merging
-            $isMerged=!empty($this->lastMergeTermEntryId);
+            $isMerged=!empty($this->lastMergeGroupId);
+            
+            $termAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
+            /* @var $termAttributes editor_Models_Db_Term_Attribute */
+            
+            $singleTerm=ZfExtended_Factory::get('editor_Models_Db_Terms');
+            /* @var $singleTerm editor_Models_Db_Terms */
+
+            $termEntryIdToSave=$isMerged ? $this->lastMergeTermEntryIdDb : $this->actualTermEntryIdDb;
             
             //get the termEntry id of the merged data and use it for the collectedData
-            foreach ($this->termsContainer as $singleTerm){
-                //set the termEntry -> groupId -> from tbx
-                $singleTerm->setGroupId($isMerged ? $this->lastMergeTermEntryId : $this->actualTermEntry);
-                //set the termEntryId -> if from database
-                $singleTerm->setTermEntryId($isMerged ? $this->lastMergeTermEntryIdDb : $this->actualTermEntryIdDb);
+            foreach ($this->termsToMergeContainer as $termData){
+                //update the groupId and termEntryId for the merged terms
+                $singleTerm->update([
+                    'groupId'=>$isMerged ? $this->lastMergeGroupId : $this->actualTermEntry,
+                    'termEntryId'=>$termEntryIdToSave
+                ],['id=?'=>$termData['id']]);
                 
-                $singleTerm->save();
+                //update the termEntryId also for the term attributes
+                $termAttributes->update(['termEntryId'=>$termEntryIdToSave],['termId=?'=>$termData['id']]);
             }
             
-            $this->termsContainer=array();
+            $this->termsToMergeContainer=[];
 
             //if the terms are merged, remove the new created termEntry, since all of the terms are merged in the existing termEntry.
             if($isMerged){
                 $termEntry=ZfExtended_Factory::get('editor_Models_Db_TermCollection_TermEntry');
                 /* @var $termEntry editor_Models_Db_TermCollection_TermEntry */
-                $termEntry->delete(array('id = ?' => $this->actualTermEntryIdDb));
+                $termEntry->delete(['id = ?' => $this->actualTermEntryIdDb]);
             }
         }
         
         $termEntryAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
         /* @var $termEntryAttributes editor_Models_Db_Term_Attribute */
-        $deleteParams=array();
+        $deleteParams=[];
         
         $deleteParams['termEntryId = ?']=$this->actualTermEntryIdDb;
         $deleteParams['termId is null'] = '';
@@ -569,8 +583,8 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             //remove the old term entry attributes
         $termEntryAttributes->delete($deleteParams);
         
-        $this->termEntryAttributeContainer=array();
-        $this->lastMergeTermEntryId=null;
+        $this->termEntryAttributeContainer=[];
+        $this->lastMergeGroupId=null;
         $this->lastMergeTermEntryIdDb=null;
     }
 
@@ -671,8 +685,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
      */
     protected function handleTerm() {
         if(!$this->isStartTag()){
-            //set the term status to defualt(from the config) if the status is empty/not set
-            $this->handleEmptyTermStatus();
             $this->actualTermIdTbx=null;
             return;
         }
@@ -702,31 +714,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         if(!$this->isStartTag() || !in_array($type, $allowedTypes)){
           return;
         }
-        $actualTermNoteStatus= $this->getMappedStatus($this->xml->readString(), $type);
-
-        //update the term with the status
-        $term = ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-        
-        try {
-            $term->load($this->actualTermIdDb);
-            $term->setStatus($actualTermNoteStatus);
-            $term->setUpdated(date("Y-m-d H:i:s"));
-            $term->setUserGuid($this->user->getUserGuid());
-            $term->setUserName($this->user->getUserName());
-            $term->save();
-            return;
-        } catch (ZfExtended_Models_Entity_NotFoundException $e) {
-            //if the term exist in the unsaved terms, update the status there
-            if(isset($this->termsContainer[$this->actualTermIdTbx])){
-                $term=$this->termsContainer[$this->actualTermIdTbx];
-                $term->setStatus($actualTermNoteStatus);
-                $term->setUpdated(date("Y-m-d H:i:s"));
-                $term->setUserGuid($this->user->getUserGuid());
-                $term->setUserName($this->user->getUserName());
-                $term->save();
-            }
-        }
+        $this->termContainer['status']=$this->getMappedStatus($this->xml->readString(), $type);
+        $this->termContainer['updated']=date("Y-m-d H:i:s");
+        $this->termContainer['userGuid']=$this->user->getUserGuid();
+        $this->termContainer['userName']=$this->user->getUserName();
     }
 
     /**
@@ -810,31 +801,62 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     protected function handleTig(){
         $this->isInsideTig=$this->isStartTag();
         
-        if(!$this->isInsideTig){
-            //remove unneeded term attributes
-            $termAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
-            /* @var $termAttributes editor_Models_Db_Term_Attribute */
-            
-            $deleteParams=array();
-            $deleteParams['termId = ?'] = $this->actualTermIdDb;
-            
-            //remove the old attribute
-            if(!empty($this->termAttirbuteContainer)){
-                $deleteParams['id NOT IN (?)'] = $this->termAttirbuteContainer;
-            }
-            
-            $termAttributes->delete($deleteParams);
-            
-            //check the processStatus attribute for the term. If not process status attribute for the term exist, new one will be created.
-            $this->handleTermProcessStatus();
-        }else{
+        if($this->isInsideTig){
             $this->counterTigInLangSet++;
+            $this->actualParentId=null;
+            $this->termAttirbuteContainer=[];
+            $this->termContainer=[];
+            return;
+        }
+            
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $term->init($this->termContainer);
+        
+        //if the status is not set, set the default value
+        if($term->getStatus()==null || empty($term->getStatus())){
+            $config = Zend_Registry::get('config');
+            $term->setStatus($config->runtimeOptions->tbx->defaultTermStatus);
+            $this->termContainer['status']=$term->getStatus();
         }
         
+        //if it is existing term, update the record
+        if(isset($this->termContainer['id'])){
+            //INFO: using save also for update, creates a new record!
+            $term->db->update($this->termContainer, ['id=?'=>$this->termContainer['id']]);
+        }else{
+            $term->setId($term->save());
+        }
+        $this->termContainer['id']=$term->getId();
+
+        //if the termsToMergeContainer contains the current term, update the values there
+        if(isset($this->termsToMergeContainer[$term->getMid()])){
+            $this->termsToMergeContainer[$term->getMid()]=$this->termContainer;
+        }
         
-        $this->actualTermIdDb=null;
+        $termAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
+        /* @var $termAttributes editor_Models_Db_Term_Attribute */
+        
+        //update the term id for all collected term attributes
+        $termAttributes->update(['termId'=>$term->getId()],['id IN (?)'=>$this->termAttirbuteContainer]);
+        
+        //check the processStatus attribute for the term. If there is no process status attribute for the term, new one will be created.
+        $this->handleTermProcessStatus($term->getId());
+        
+        $deleteParams=array();
+        $deleteParams['termId = ?'] = $term->getId();
+        
+        //remove the old attribute
+        if(!empty($this->termAttirbuteContainer)){
+            $deleteParams['id NOT IN (?)'] = $this->termAttirbuteContainer;
+        }
+        
+        //remove unneeded term attributes
+        $termAttributes->delete($deleteParams);
+            
         $this->actualParentId=null;
-        $this->termAttirbuteContainer=array();
+        $this->termAttirbuteContainer=[];
+        $this->termContainer=[];
     }
     
     protected function handleRef($tmpParrentId){
@@ -903,50 +925,12 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
     
     /***
-     * Check if the current term has empty status. If yes use the default term status from the config.
-     */
-    protected function handleEmptyTermStatus(){
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-
-
-        //if the term exist, load it from the database
-        if(!empty($this->actualTermIdDb)){
-            $term->load($this->actualTermIdDb);
-        }else if(isset($this->termsContainer[$this->actualTermIdTbx]) && !empty($this->termsContainer[$this->actualTermIdTbx])){
-            //the term does not exis, check if it exist in the term container
-            //the terms in the term container are not saved yet
-            $term=$this->termsContainer[$this->actualTermIdTbx];
-        }else{
-            //the term is not found in the database, an not in the term container. Log the info
-            error_log("TermCollection parser message: Unable to set the term status. The term does not exist so far. Collectionid: ".$this->termCollectionId);
-            return;
-        }
-        
-        //if the statzs is empty, set the default status from the zf config
-        if(empty($term->getStatus())){
-            $config = Zend_Registry::get('config');
-            $term->setStatus($config->runtimeOptions->tbx->defaultTermStatus);
-
-            //if actualTermIdDb is set -> the term exist in the database -> update
-            //if actualTermIdDb is not set -> the term does not exist in the db, it is in the term container which will be updated later
-            if(!empty($this->actualTermIdDb)){
-                $term->save();
-            }
-        }
-        
-    }
-    
-    /***
      * Check if the current term has attribute with processStatus. If not create a default processStatus attribute
      */
-    protected function handleTermProcessStatus(){
-        if(empty($this->actualTermIdDb)){
-            return;
-        }
+    protected function handleTermProcessStatus(int $termId){
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->checkOrCreateProcessStatus($this->actualTermIdDb);
+        $attribute->checkOrCreateProcessStatus($termId);
     }
     
     /***
@@ -1216,27 +1200,16 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         /* @var $term editor_Models_Term */
         $terms=$term->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollectionId);
         
-        $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
-        /* @var $proposal editor_Models_Term_Proposal */
-        
         //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
             foreach ($terms as $t){
                 //update the term
                 $t = (object) $t;
-                //update the term
-                $termModel=ZfExtended_Factory::get('editor_Models_Term');
-                /* @var $termModel editor_Models_Term */
-                $termModel->load($t->id);
-                $termModel->setTerm($this->xml->readInnerXml());
-                $termModel->setUpdated(date("Y-m-d H:i:s"));
-                $termModel->setUserGuid($this->user->getUserGuid());
-                $termModel->setUserName($this->user->getUserName());
-                $termModel->save();
-                $this->actualTermIdDb=$termModel->getId();
-                
-                //remove the proposal if exist
-                $proposal->removeTermProposal($t->id, $this->xml->readInnerXml());
+                $this->termContainer['id']=$t->id;
+                $this->termContainer['term']=$this->xml->readInnerXml();
+                $this->termContainer['updated']=date("Y-m-d H:i:s");
+                $this->termContainer['userGuid']=$this->user->getUserGuid();
+                $this->termContainer['userName']=$this->user->getUserName();
                 return;
             }
         }
@@ -1250,54 +1223,26 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             foreach ($tmpTermValue as $t){
                 $t = (object) $t;
                 $checkCase=$t->language==$this->actualLangId;
-                $checkCase=$checkCase && ($t->term==$this->xml->readInnerXml());//Desktop
-                $isProposal=$proposal->isTermProposal($t->id,$this->xml->readInnerXml());//Desktop
+                $checkCase=$checkCase && ($t->term==$this->xml->readInnerXml());
                 //the groupId is already the same
-                //$checkCase=$checkCase && ($t->groupId==$this->actualTermIdTbx);
-                
-                if(!$checkCase && !$isProposal){
+                if(!$checkCase){
                     continue;
                 }
-                
-                //if it is proposal, remove it
-                if($isProposal){
-                    $proposal->removeTermProposal($t->id,$this->xml->readInnerXml());
-                }
-                
-                //update the term, so the timestamp is update, and the term entry attributes are updated to
-                $termModel=ZfExtended_Factory::get('editor_Models_Term');
-                /* @var $termModel editor_Models_Term */
-                $termModel->load($t->id);
-                $termModel->setTerm($this->xml->readInnerXml());
-                $termModel->setDefinition($this->actualDefinition);
-                $termModel->setUpdated(date("Y-m-d H:i:s"));
-                $termModel->setUserGuid($this->user->getUserGuid());
-                $termModel->setUserName($this->user->getUserName());
-                $termModel->save();
-                $this->actualTermIdDb=$t->id;
+                $this->termContainer['id']=$t->id;
+                $this->termContainer['term']=$this->xml->readInnerXml();
+                $this->termContainer['definition']=$this->actualDefinition;
+                $this->termContainer['updated']=date("Y-m-d H:i:s");
+                $this->termContainer['userGuid']=$this->user->getUserGuid();
+                $this->termContainer['userName']=$this->user->getUserName();
                 return;
             }
         }
         
-        //check if the current tbx term is existing term proposal for the language in the term collection
-        $proposalInCollection=$proposal->findProposalInCollection($this->xml->readInnerXml(),$this->actualLangId,$this->termCollectionId);
         
         if($this->mergeTerms){
             //check if the term text exist in the term collection within the language
             $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollectionId);
-            
-            //if the term can not be found, check if it is proposal
-            if(!$tmpTermValue || $tmpTermValue->count()<1){
-                
-                //if it is proposal, remove the proposal and update the original value
-                if($proposalInCollection && $proposalInCollection->count()>0){
-                    $proposalTerm=$proposalInCollection->toArray();
-                    $proposalTerm=$proposalTerm[0];
-                    $proposal->removeTermProposal($proposalTerm['id'], $this->xml->readInnerXml());
-                    $tmpTermValue=$proposalInCollection;
-                }
-            }
-            
+
             if($tmpTermValue && $tmpTermValue->count()>0){
                 
                 //the first term thus found is updated by the values ​​in the TBX file. 
@@ -1305,80 +1250,53 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $tmpTermValue=$tmpTermValue->toArray();
                 $tmpTermValue=$tmpTermValue[0];
                 
-                //update the term, so the timestamp is update, and the term entry attributes are updated to
-                $termModel=ZfExtended_Factory::get('editor_Models_Term');
-                /* @var $term editor_Models_Term */
+                $this->termContainer['id']=$tmpTermValue['id'];
+                $this->termContainer['definition']=$this->actualDefinition;
+                $this->termContainer['updated']=date("Y-m-d H:i:s");
+                $this->termContainer['userGuid']=$this->user->getUserGuid();
+                $this->termContainer['userName']=$this->user->getUserName();
                 
-                $termModel->load($tmpTermValue['id']);
-                
-                //check if the current select is proposal, if yes update the original term value with the term proposal value
-                if(isset($tmpTermValue['termProposalValue']) && !empty($tmpTermValue['termProposalValue'])){
-                    $termModel->setTerm($tmpTermValue['termProposalValue']);
-                }
-                
-                $termModel->setUpdated(date("Y-m-d H:i:s"));
-                $termModel->setDefinition($this->actualDefinition);
-                $termModel->setUserGuid($this->user->getUserGuid());
-                $termModel->setUserName($this->user->getUserName());
-                $termModel->save();
-                $this->actualTermIdDb=$tmpTermValue['id'];
-                
-                if(!$this->lastMergeTermEntryId){
-                    $this->lastMergeTermEntryIdDb=$termModel->getTermEntryId();
-                    $this->lastMergeTermEntryId=$termModel->getGroupId();
+                if(!$this->lastMergeGroupId){
+                    $this->lastMergeTermEntryIdDb=$tmpTermValue['termEntryId'];
+                    $this->lastMergeGroupId=$tmpTermValue['groupId'];
                 }
                 
                 return;
             }
+
+            $this->termContainer['term']=$this->xml->readInnerXml();
+            $this->termContainer['mid']=$this->actualTermIdTbx;
+            //the status will be updated when is found from the termNote
+            $this->termContainer['definition']=$this->actualDefinition;
+            $this->termContainer['language']=(int)$this->actualLangId;
+            $this->termContainer['collectionId']=$this->termCollectionId;
+            $this->termContainer['updated']=date("Y-m-d H:i:s");
+            $this->termContainer['userGuid']=$this->user->getUserGuid();
+            $this->termContainer['userName']=$this->user->getUserName();
             
             //if the term is no merged but his term entry exist in the database, add it as a new term
             if($addNewTerm){
-                $this->saveTerm();
+                $this->termContainer['termEntryId']=$this->actualTermEntryIdDb;
+                $this->termContainer['groupId']=$this->actualTermEntry;
                 return;
             }
             
-            //save the term without termEntryId
-            $term=ZfExtended_Factory::get('editor_Models_Term');
-            /* @var $term editor_Models_Term */
-            
-            $term->setTerm($this->xml->readInnerXml());
-            $term->setMid($this->actualTermIdTbx);
-            //the status will be updated when is found from the termNote
-            $term->setDefinition($this->actualDefinition);
-            $term->setLanguage((int)$this->actualLangId);
-            $term->setCollectionId($this->termCollectionId);
-            $term->setUpdated(date("Y-m-d H:i:s"));
-            $term->setUserGuid($this->user->getUserGuid());
-            $term->setUserName($this->user->getUserName());
-            $this->actualTermIdDb=$term->save();
-            
             //collect the term so later can be updated
-            $this->termsContainer[$this->actualTermIdTbx]=$term;
+            $this->termsToMergeContainer[$this->actualTermIdTbx]=$this->termContainer;
             return;
         }
         
-        //if the current tbx term is not valid proposal save it as a new term
-        if(!$proposalInCollection || $proposalInCollection->count()<1){
-            $this->saveTerm();
-            return;
-        }
-        
-        //it is proposal, remove the proposal and update the original value
-        $proposalTerm=$proposalInCollection->toArray();
-        $proposalTerm=$proposalTerm[0];
-        $proposal->removeTermProposal($proposalTerm['id'], $this->xml->readInnerXml());
-        
-        //update the term, so the timestamp is update, and the term entry attributes are updated to
-        $termModel=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $termModel editor_Models_Term */
-        $termModel->load($proposalTerm['id']);
-        $termModel->setTerm($this->xml->readInnerXml());
-        $termModel->setDefinition($this->actualDefinition);
-        $termModel->setUpdated(date("Y-m-d H:i:s"));
-        $termModel->setUserGuid($this->user->getUserGuid());
-        $termModel->setUserName($this->user->getUserName());
-        $termModel->save();
-        $this->actualTermIdDb=$proposalTerm['id'];
+        $this->termContainer['term']=$this->xml->readInnerXml();
+        $this->termContainer['mid']=$this->actualTermIdTbx;
+        //the status will be updated when is found from the termNote
+        $this->termContainer['definition']=$this->actualDefinition;
+        $this->termContainer['groupId']=$this->actualTermEntry;
+        $this->termContainer['language']=(int)$this->actualLangId;
+        $this->termContainer['collectionId']=$this->termCollectionId;
+        $this->termContainer['termEntryId']=$this->actualTermEntryIdDb;
+        $this->termContainer['updated']=date("Y-m-d H:i:s");
+        $this->termContainer['userGuid']=$this->user->getUserGuid();
+        $this->termContainer['userName']=$this->user->getUserName();
     }
     
     /***
@@ -1420,28 +1338,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         error_log('For the following languages no term has been found in the tbx file: '.implode(', ', $notProcessed));
         $this->task->setTerminologie(0);
         return false;
-    }
-    
-    /***
-     * Save the term to the database from the current tbx data.
-     * The actualTermidDb will be set.
-     */
-    private function saveTerm(){
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-        
-        $term->setTerm($this->xml->readInnerXml());
-        $term->setMid($this->actualTermIdTbx);
-        //the status will be updated when is found from the termNote
-        $term->setDefinition($this->actualDefinition);
-        $term->setGroupId($this->actualTermEntry);
-        $term->setLanguage((int)$this->actualLangId);
-        $term->setCollectionId($this->termCollectionId);
-        $term->setTermEntryId($this->actualTermEntryIdDb);
-        $term->setUpdated(date("Y-m-d H:i:s"));
-        $term->setUserGuid($this->user->getUserGuid());
-        $term->setUserName($this->user->getUserName());
-        $this->actualTermIdDb=$term->save();
     }
     
     /***

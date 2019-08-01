@@ -726,7 +726,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                         tp.created as 'termproposal-lastEditedDate',
                         tp.userName as 'termproposal-lastEditor'
             		FROM LEK_term_attributes ta
-                		INNER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                		LEFT OUTER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
                         LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
