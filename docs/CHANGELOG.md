@@ -3,9 +3,24 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
-For special notices see:
-TRANSLATE-1654: TermTagger stops working on import of certain task - improved error management and logging
-TRANSLATE-1695: VisualReview: segmentmap generation has a bad performance on task load
+## [3.2.4] - 2019-07-30
+###Added
+TRANSLATE-1720: Add segment editing history (snapshots) to JS debugging (rootcause)
+TRANSLATE-1273: Propose new terminology and terminology changes
+
+###Bugfixes
+TRANSLATE-717: Blocked column in segment grid shows no values and filter is inverted
+TRANSLATE-1305: Exclude framing internal tags from xliff import also for translation projects
+TRANSLATE-1724: TrackChanges: JavaSript error: WrongDocumentError (IE11 only)
+TRANSLATE-1721: JavaScript error: me.allMatches is null
+TRANSLATE-1045: JavaScript error: rendered block refreshed at 16 rows while BufferedRenderer view size is 48
+TRANSLATE-1717: Segments containing one whitespace character can crash Okapi on export
+TRANSLATE-1718: Flexibilize LanguageResource creation via API by allow also language lcid
+TRANSLATE-1716: Pretranslation does not replace tags in repetitions correctly
+TRANSLATE-1634: TrackChanges: CTRL+Z: undo works, but looses the TrackChange-INS
+TRANSLATE-1711: TrackChanges are not added on segment reset to import state
+TRANSLATE-1710: TrackChanges are not correct on taking over TM match
+TRANSLATE-1627: SpellCheck impedes TrackChanges for CTRL+V and CTRL+. into empty segments
 
 ## [3.2.3] - 2019-07-17
 ###Added
