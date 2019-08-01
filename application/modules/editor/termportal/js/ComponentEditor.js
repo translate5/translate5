@@ -87,11 +87,17 @@ var ComponentEditor={
 		$element.replaceWith($input);
         
         Term.drawProposalButtons('componentEditorOpened');
-	  
-		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
-		}).focus();
-	},
+        
+        $input.focus();
+        
+        me.$_termTable.on('click', '.term-data.proposable .proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.on('click', '.term-data.proposable .proposal-cancel',function() {
+            $input.val('');
+            me.saveComponentChange($element,$input);
+        });
+    },
 	
 	/***
 	 * Register the component editor for given term or termentry attribute
@@ -117,9 +123,15 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
         
-		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
-		});
+        $input.focus();
+
+        me.$_termTable.on('click', '.term-attributes .proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.on('click', '.term-attributes .proposal-cancel',function() {
+            $input.val('');
+            me.saveComponentChange($element,$input);
+        });
         
         return $input;
 	},
@@ -147,10 +159,14 @@ var ComponentEditor={
 	    }).change();
 		
 		$element.replaceWith($input);
-        
-		$input.focusout(function() {
-			me.saveCommentChange($element,$input);
-	    });
+
+        me.$_termTable.on('click', '.term-attributes .proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.on('click', '.term-attributes .proposal-cancel',function() {
+            $input.val('');
+            me.saveComponentChange($element,$input);
+        });
 		
 		return $input;
 	},

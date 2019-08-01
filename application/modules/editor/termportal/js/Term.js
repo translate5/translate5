@@ -63,10 +63,9 @@ var Term={
 	        me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
 
             // Terms
-            // - Icons
-            me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me, reference:'icon'},me.onAddTermClick);
-            me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me, reference:'icon'},me.onDeleteTermClick);
-            me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me, reference:'icon'},me.onEditTermClick);
+            me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me},me.onAddTermClick);
+            me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me},me.onDeleteTermClick);
+            me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me},me.onEditTermClick);
             me.$_resultTermsHolder.on('tabsactivate',{scope:me},me.onResultTabActivate);
 		},
         
@@ -720,8 +719,9 @@ var Term={
                 htmlProposalDeleteIcon  = '<span class="proposal-btn proposal-delete ui-icon ui-icon-trash-b"></span>',
                 htmlProposalEditIcon    = '<span class="proposal-btn proposal-edit ui-icon ui-icon-pencil"></span>',
                 htmlProposalSaveIcon    = '<span class="proposal-btn proposal-save ui-icon ui-icon-check"></span>',
-                $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit = false, $_selectorSave = false,
-                titleAdd, titleDelete, titleEdit, titleSave,
+                htmlProposalCancelIcon  = '<span class="proposal-btn proposal-cancel ui-icon ui-icon-close"></span>',
+                $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit = false, $_selectorSave = false, $_selectorCancel = false,
+                titleAdd, titleDelete, titleEdit, titleSave, titleCancel,
         		selectedArea='#'+$("#resultTermsHolder ul>.ui-tabs-active").attr('aria-controls');
             
             switch(elements) {
@@ -734,7 +734,9 @@ var Term={
                 case "attributeEditingOpened":
                     $_selectorRemove = $(selectedArea+' textarea').closest('p').prev('h4');
                     $_selectorSave = $_selectorRemove;
+                    $_selectorCancel = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
+                    titleCancel = proposalTranslations['cancelProposal']
                     break;
                 case "componentEditorClosed":
                     $_selectorRemove = $(selectedArea+' .proposal-save').parent();
@@ -745,7 +747,9 @@ var Term={
                 case "componentEditorOpened":
                     $_selectorRemove = $(selectedArea+' textarea').closest('h3');
                     $_selectorSave = $_selectorRemove;
+                    $_selectorCancel = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
+                    titleCancel = proposalTranslations['cancelProposal'];
                     break;
                 case "terms":
                     $_selectorAdd = $(selectedArea+' .term-data.is-new');
@@ -788,6 +792,11 @@ var Term={
             if ($_selectorDelete && $_selectorDelete.children('.proposal-btn.proposal-delete').length === 0) {
                 $_selectorDelete.append(htmlProposalDeleteIcon);
                 $_selectorDelete.children('.proposal-delete').prop('title', titleDelete);
+            }
+            if ($_selectorCancel) {
+                $_selectorSave.addClass('in-editing');
+                $_selectorCancel.append(htmlProposalCancelIcon);
+                $_selectorCancel.children('.proposal-cancel').prop('title', titleCancel);
             }
             if ($_selectorSave) {
                 $_selectorSave.addClass('in-editing');
@@ -1173,24 +1182,11 @@ var Term={
          */
         onEditTermClick:function(event){
             var me = event.data.scope,
-                reference = event.data.reference,
                 $element=$(this),
-                search,
-                $termAttributeHolder;
-            console.log('onEditTermClick ('+reference+')');
-            
+                search = $element.parent().find("span[data-editable]"),
+                $termAttributeHolder = me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
+            console.log('onEditTermClick');
             event.stopPropagation();
-            
-            switch(reference) {
-                case "content":
-                    search = $element;
-                    break;
-                case "icon":
-                    search=$element.parent().find("span[data-editable]");
-                    break;
-            }
-            
-            $termAttributeHolder = me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
             ComponentEditor.addTermComponentEditor(search,$termAttributeHolder);
         }
 };

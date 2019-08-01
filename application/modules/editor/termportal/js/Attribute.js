@@ -28,24 +28,20 @@ var Attribute={
         me.$_termEntryAttributesTable.on('focus input', "textarea",me.onAttributeEditingOpened);
         
         // ------------- TermEntries-Attributes -------------
-        // - Icons
         me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
         me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
         me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-edit",{
             scope:me,
-            type:'termEntryAttribute',
-            reference: 'icon'
+            type:'termEntryAttribute'
         },me.onEditAttributeClick);
         
         // ------------- Terms-Attributes -------------
-        // - Icons
         me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
         me.$_termTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termTable},me.onDeleteAttributeClick);
         me.$_termTable.on('click', ".attribute-data.proposable .proposal-edit",{
         	scope:me,
         	root:me.$_termTable,
-        	type:'termAttribute',
-            reference: 'icon'
+        	type:'termAttribute'
     	},me.onEditAttributeClick);
 	},
     
@@ -100,31 +96,15 @@ var Attribute={
      * On edit term-attribute click handler
      */
     onEditAttributeClick: function(event){
-        console.log('onEditAttributeClick');
     	var me=event.data.scope,
 	    	type=event.data.type,
-            reference = event.data.reference,
-	        $element=$(this),
-			attributeId,
-            $editableComponent,
+			attributeId = $(this).parents('h4.attribute-data').data('attributeId'),
+            $editableComponent = me.getAttributeComponent(attributeId,type),
             $input;
-        console.log('onEditAttributeClick ('+reference+')');
+        console.log('onEditAttributeClick');
         
         event.stopPropagation();
         
-        switch(reference) {
-            case "comment":
-                $editableComponent = $element;
-                break;
-            case "content":
-                $editableComponent = $element;
-                break;
-            case "icon":
-                attributeId = $element.parents('h4.attribute-data').data('attributeId');
-                $editableComponent = me.getAttributeComponent(attributeId,type);
-                break;
-    	}
-	
 		if($editableComponent === null || $editableComponent === undefined || $editableComponent.length === 0){
 			return;
 		}
@@ -286,7 +266,7 @@ var Attribute={
 	    switch(attribute.name) {
 	        case "transac":
 	            
-	            header=me.handleAttributeHeaderText(attribute,true);
+	            header=me.handleAttributeHeaderText(attribute,false);
 	            
 	            html += headerTagOpen + header + headerTagClose;
 	            
@@ -319,7 +299,7 @@ var Attribute={
 	            if(flagContent && flagContent!=""){
 	                headerText =me.handleAttributeHeaderText(attribute,false)+flagContent;
 	            }else{
-	                headerText =me.handleAttributeHeaderText(attribute)+":";
+	                headerText =me.handleAttributeHeaderText(attribute,false);
 	            }
 	            
 	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
@@ -342,7 +322,7 @@ var Attribute={
 	            
 	            attVal=me.getAttributeValue(attribute);
 	            
-	            headerText = me.handleAttributeHeaderText(attribute,true);
+	            headerText = me.handleAttributeHeaderText(attribute,false);
 	            
 	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
 	            break;
