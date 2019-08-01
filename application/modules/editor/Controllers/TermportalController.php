@@ -201,6 +201,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
             "editProposal"=>$this->translate->_("Änderung vorschlagen"),
             "saveProposal"=>$this->translate->_("Änderung sichern"),
+            "cancelProposal"=>$this->translate->_("Änderung abbrechen"),
             "editTermEntryProposal"=>$this->translate->_("Eintrag: Änderung vorschlagen"),
             "addTermEntryProposal"=>$this->translate->_("Neuen Eintrag vorschlagen"),
             "deleteTermEntryProposal"=>$this->translate->_("Eintrag: Vorschlag löschen"),

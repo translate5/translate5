@@ -3371,6 +3371,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='QXR0cmlidXQ6IFZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attribut: Vorschlag löschen</source><target>Attribute: Delete proposal</target></trans-unit>
 <trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Remove the proposal</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Propose changes</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIGFiYnJlY2hlbg=='><source>Änderung abbrechen</source><target>Cancel proposal</target></trans-unit>
 <trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... select language</target></trans-unit>
 <trans-unit id='U3ByYWNoZSBmw7xyIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Sprache für Term-Vorschlag wählen</source><target>Select language for term proposal</target></trans-unit>
 <trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Select Term-Collection for term proposal</target></trans-unit>
