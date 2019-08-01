@@ -793,15 +793,15 @@ var Term={
                 $_selectorDelete.append(htmlProposalDeleteIcon);
                 $_selectorDelete.children('.proposal-delete').prop('title', titleDelete);
             }
-            if ($_selectorCancel) {
-                $_selectorSave.addClass('in-editing');
-                $_selectorCancel.append(htmlProposalCancelIcon);
-                $_selectorCancel.children('.proposal-cancel').prop('title', titleCancel);
-            }
             if ($_selectorSave) {
                 $_selectorSave.addClass('in-editing');
                 $_selectorSave.append(htmlProposalSaveIcon);
                 $_selectorSave.children('.proposal-save').prop('title', titleSave);
+            }
+            if ($_selectorCancel) {
+                $_selectorSave.addClass('in-editing');
+                $_selectorCancel.append(htmlProposalCancelIcon);
+                $_selectorCancel.children('.proposal-cancel').prop('title', titleCancel);
             }
         },
 		

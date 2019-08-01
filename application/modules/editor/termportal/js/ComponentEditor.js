@@ -88,15 +88,17 @@ var ComponentEditor={
         
         Term.drawProposalButtons('componentEditorOpened');
         
-        $input.focus();
-        
-        me.$_termTable.on('click', '.term-data.proposable .proposal-save',function() {
+        me.$_termTable.on('mousedown', '.term-data.proposable .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
-        me.$_termTable.on('click', '.term-data.proposable .proposal-cancel',function() {
+        me.$_termTable.on('mousedown', '.term-data.proposable .proposal-cancel',function() {
             $input.val('');
             me.saveComponentChange($element,$input);
         });
+        
+        $input.one('blur', function(){
+            me.saveComponentChange($element,$input);
+        }).focus();
     },
 	
 	/***
@@ -123,13 +125,15 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
         
-        $input.focus();
-
-        me.$_termTable.on('click', '.term-attributes .proposal-save',function() {
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
-        me.$_termTable.on('click', '.term-attributes .proposal-cancel',function() {
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-cancel',function() {
             $input.val('');
+            me.saveComponentChange($element,$input);
+        });
+        
+        $input.one('blur', function(){
             me.saveComponentChange($element,$input);
         });
         
@@ -160,12 +164,16 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
 
-        me.$_termTable.on('click', '.term-attributes .proposal-save',function() {
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
-        me.$_termTable.on('click', '.term-attributes .proposal-cancel',function() {
+        me.$_termTable.on('mousedown', '.term-attributes .proposal-cancel',function() {
             $input.val('');
             me.saveComponentChange($element,$input);
+        });
+        
+        $input.focusout(function() {
+            me.saveCommentChange($element,$input);
         });
 		
 		return $input;
