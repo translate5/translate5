@@ -796,12 +796,12 @@ var Term={
             if ($_selectorSave) {
                 $_selectorSave.addClass('in-editing');
                 $_selectorSave.append(htmlProposalSaveIcon);
-                $_selectorSave.children('.proposal-save').prop('title', titleSave);
+                $_selectorSave.children('.proposal-save').prop('title', titleSave + ' [CTRL+S]');
             }
             if ($_selectorCancel) {
                 $_selectorSave.addClass('in-editing');
                 $_selectorCancel.append(htmlProposalCancelIcon);
-                $_selectorCancel.children('.proposal-cancel').prop('title', titleCancel);
+                $_selectorCancel.children('.proposal-cancel').prop('title', titleCancel + ' [CTRL+C]');
             }
         },
 		

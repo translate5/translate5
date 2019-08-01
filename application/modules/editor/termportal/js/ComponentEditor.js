@@ -88,12 +88,13 @@ var ComponentEditor={
         
         Term.drawProposalButtons('componentEditorOpened');
         
+        me.addKeyboardShortcuts($element,$input);
+        
         me.$_termTable.on('mousedown', '.term-data.proposable .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
         me.$_termTable.on('mousedown', '.term-data.proposable .proposal-cancel',function() {
-            $input.val('');
-            me.saveComponentChange($element,$input);
+            me.cancelComponentChange($element,$input);
         });
         
         $input.one('blur', function(){
@@ -125,12 +126,13 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
         
+        me.addKeyboardShortcuts($element,$input);
+        
         me.$_termTable.on('mousedown', '.term-attributes .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
         me.$_termTable.on('mousedown', '.term-attributes .proposal-cancel',function() {
-            $input.val('');
-            me.saveComponentChange($element,$input);
+            me.cancelComponentChange($element,$input);
         });
         
         $input.one('blur', function(){
@@ -163,13 +165,14 @@ var ComponentEditor={
 	    }).change();
 		
 		$element.replaceWith($input);
+        
+        me.addKeyboardShortcuts($element,$input);
 
         me.$_termTable.on('mousedown', '.term-attributes .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
         me.$_termTable.on('mousedown', '.term-attributes .proposal-cancel',function() {
-            $input.val('');
-            me.saveComponentChange($element,$input);
+            me.cancelComponentChange($element,$input);
         });
         
         $input.focusout(function() {
@@ -178,7 +181,23 @@ var ComponentEditor={
 		
 		return $input;
 	},
-	
+    
+	/**
+     * Cancel editing the component; don't save the changes.
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    cancelComponentChange:function($element,$input){
+        $input.val(''); // this will force saveComponentChange() to stop the saving.
+        this.saveComponentChange($element,$input);
+    },
+
+    
+    /**
+     * Save the proposed changes (+ close the editor, update buttons etc).
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
 	saveComponentChange:function($el,$input){
         console.log('saveComponentChange');
         var me=this,
@@ -448,7 +467,27 @@ var ComponentEditor={
             }
         }
         return false;
+    },
+    
+    /**
+     * Add keyboard-shortcuts for the component.
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    addKeyboardShortcuts($element, $input) {
+        var me = this;
+        $input.keydown(function(e){
+            if (e.ctrlKey && e.which === 83) { // CTRL+S
+                event.preventDefault();
+                me.saveComponentChange($element,$input);
+            };
+            if (e.ctrlKey && e.which === 67) { // CTRL+C
+                event.preventDefault();
+                me.cancelComponentChange($element,$input);
+            };
+        });
     }
+    
 };
 
 ComponentEditor.init();
