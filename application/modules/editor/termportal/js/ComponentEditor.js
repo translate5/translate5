@@ -484,7 +484,7 @@ var ComponentEditor={
                 event.preventDefault();
                 me.saveComponentChange($element,$input);
             };
-            if (e.ctrlKey && e.which === 67) { // CTRL+C
+            if (e.which === 27) {              // ESCAPE
                 event.preventDefault();
                 me.cancelComponentChange($element,$input);
             };
