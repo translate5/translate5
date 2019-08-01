@@ -307,9 +307,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Update modification transac group attributes.
-     * When the attribute group does not exist, transac creation and transac modification will be created.
-     *
+     * TODO: change the name and add return type
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
     public function updateModificationGroupAttributes($entity){
@@ -324,18 +322,13 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $s->where('name="transac"')
         ->where('attrType="modification"');
         $ret=$this->db->fetchAll($s)->toArray();
-        $user = new Zend_Session_Namespace('user');
-        $fullName = $user->data->firstName.' '.$user->data->surName;
         if(!empty($ret)){
-            $ret=$ret[0];
-            $this->db->update(['updated'=>null],['id=?'=>$ret['id']]);
-            $this->db->update(['updated'=>null,'value'=>time()],['parentId=?'=>$ret['id'],'name="date"']);
-            $this->db->update(['updated'=>null,'value'=>$fullName],['parentId=?'=>$ret['id'],'name="transacNote"']);
-            return;
+            return false;
         }
         //the transacgroups are not existing, create new
         $this->createTransacGroup($entity,'creation');
         $this->createTransacGroup($entity,'modification');
+        return true;
     }
     
     /***
@@ -461,6 +454,44 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             }
         }
         return $tree;
+    }
+    
+    
+    /***
+     * Update term modification attribute group with the term proposal values.
+     * The modification group date and editor will be set as term proposal date an term proposal editor.
+     * 
+     * @param array $attributes
+     * @param array $termProposal
+     */
+    public function updateModificationGroupDate(array $attributes,array $termProposal){
+        if(empty($attributes) || empty($termProposal) || empty($termProposal['created']) || empty($termProposal['userName'])){
+            return $attributes;
+        }
+        
+        //foreach term attribute check, find the transac modification attribute
+        foreach ($attributes as &$attribute){
+            
+            if(empty($attribute['children'])){
+                continue;
+            }
+            
+            //ignore non modification tags
+            if($attribute['name']!='transac' || $attribute['attrType']!='modification'){
+                continue;
+            }
+            
+            foreach ($attribute['children'] as &$child){
+                if($child['name']=='date'){
+                    //convert the date to unix timestamp
+                    $child['attrValue']=strtotime($termProposal['created']);
+                }
+                if($child['name']=='transacNote' && ($child['attrType']=='responsiblePerson' || $child['attrType']=='responsibility')){
+                    $child['attrValue']=$termProposal['userName'];
+                }
+            }
+        }
+        return $attributes;
     }
     
     /***

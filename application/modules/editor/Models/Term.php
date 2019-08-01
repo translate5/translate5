@@ -588,7 +588,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         /* @var $t ZfExtended_Zendoverwrites_Translate */;;
         
         // sample label-translations
-        $excel->setLabel('termEntryId', $t->_('Term-Eintrag'));
+        $excel->setLabel('termEntryId', $t->_('Eintrag'));
         $excel->setLabel('definition', $t->_('Definition'));
         $excel->setLabel('language', $t->_('Sprache'));
         $excel->setLabel('termId', $t->_('Term-Id'));
@@ -701,47 +701,45 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $termResult=$this->db->getAdapter()->query($termSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
         
         $attributeSql="SELECT
-                    ta.id as 'attribute-id',
-                    ta.termId as 'term-Id',
-                    ta.name as 'attribute-name',
-                    ta.value as 'attribute-value',
-                    ta.updated as 'attribute-lastEditedDate',
-                    ta.userName as 'attribute-lastEditor',
-                    ta.processStatus as 'attribute-processStatus',
-                    l.langName as 'term-language',
-                    tap.id as 'attributeproposal-id',
-                    tap.value as 'attributeproposal-value',
-                    tap.created as 'attributeproposal-lastEditedDate',
-                    tap.userName as 'attributeproposal-lastEditor',
-                    t.termEntryId as 'term-termEntryId',
-                    t.definition as 'term-definition',
-                    t.id as 'term-Id',
-                    t.term as 'term-term',
-                    t.processStatus as 'term-processStatus',
-                    t.userName as 'term-lastEditor',
-                    t.updated as 'term-lastEditedDate',
-                    tp.id as 'termproposal-id',
-                    tp.term as 'termproposal-term',
-                    tp.created as 'termproposal-lastEditedDate',
-                    tp.userName as 'termproposal-lastEditor'
-                		FROM
-                		LEK_term_attributes ta
-                		LEFT OUTER JOIN
-                		LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
+                        ta.id as 'attribute-id',
+                        ta.termId as 'term-Id',
+                        ta.termEntryId as 'attribute-termEntryId',
+                        ta.name as 'attribute-name',
+                        ta.value as 'attribute-value',
+                        ta.updated as 'attribute-lastEditedDate',
+                        ta.userName as 'attribute-lastEditor',
+                        ta.processStatus as 'attribute-processStatus',
+                        l.langName as 'term-language',
+                        tap.id as 'attributeproposal-id',
+                        tap.value as 'attributeproposal-value',
+                        tap.created as 'attributeproposal-lastEditedDate',
+                        tap.userName as 'attributeproposal-lastEditor',
+                        t.termEntryId as 'term-termEntryId',
+                        t.definition as 'term-definition',
+                        t.id as 'term-Id',
+                        t.term as 'term-term',
+                        t.processStatus as 'term-processStatus',
+                        t.userName as 'term-lastEditor',
+                        t.updated as 'term-lastEditedDate',
+                        tp.id as 'termproposal-id',
+                        tp.term as 'termproposal-term',
+                        tp.created as 'termproposal-lastEditedDate',
+                        tp.userName as 'termproposal-lastEditor'
+            		FROM LEK_term_attributes ta
+                		LEFT OUTER JOIN LEK_term_attribute_proposal tap ON tap.attributeId = ta.id
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
-                        INNER JOIN LEK_languages l ON t.language=l.id 
+                        LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
                 	where ta.collectionId IN(?)
                 	and (ta.created >=? || tap.created >=?) 
                 	and (tap.value is not null or ta.processStatus='unprocessed')
-                	order by ta.termId";
+                	order by ta.termEntryId,ta.termId";
         
         $attributeResult=$this->db->getAdapter()->query($attributeSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
         
+        //merge term proposals with term attributes and term entry attributes proposals
         $resultArray=array_merge($termResult,$attributeResult);
         
-        //load term and proposals
-        //load attributes and proposals
         if(empty($resultArray)){
             return [];
         }
@@ -925,69 +923,22 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
      * @return array
      */
     public function searchTermAttributesInTermentry($groupId,$collectionIds){
-        $attCols=array(
-                'LEK_term_attributes.labelId as labelId',
-                'LEK_term_attributes.id AS attributeId',
-                'LEK_term_attributes.parentId AS parentId',
-                'LEK_term_attributes.internalCount AS internalCount',
-                'LEK_term_attributes.name AS name',
-                'LEK_term_attributes.attrType AS attrType',
-                'LEK_term_attributes.attrTarget AS attrTarget',
-                'LEK_term_attributes.attrId AS attrId',
-                'LEK_term_attributes.attrLang AS attrLang',
-                'LEK_term_attributes.value AS attrValue',
-                'LEK_term_attributes.created AS attrCreated',
-                'LEK_term_attributes.updated AS attrUpdated',
-                'LEK_term_attributes.attrDataType AS attrDataType',
-                'LEK_term_attributes.processStatus AS attrProcessStatus',
-                new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
-        );
-        
-        $cols=[
-            'definition',
-            'groupId',
-            'term as label',
-            'term as term',//for consistency
-            'id as value',
-            'term as desc',
-            'status as termStatus',
-            'processStatus as processStatus',
-            'id as termId',
-            'termEntryId',
-            'collectionId',
-            'language as languageId'
-        ];
-        
-        $s=$this->db->select()
-        ->setIntegrityCheck(false)
-        ->from($this->db,$cols)
-        ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
-        ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
-        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',['LEK_languages.rfc5646 AS language']);
-        
-        if($this->isProposableAllowed()){
-            $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',[
-                'LEK_term_proposal.term as proposalTerm',
-                'LEK_term_proposal.id as proposalId'
-            ]);
-        }
-        
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        
-        if($attribute->isProposableAllowed()){
-            $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = LEK_term_attributes.id',[
-                'LEK_term_attribute_proposal.value as proposalAttributeValue',
-                'LEK_term_attribute_proposal.id as proposalAttributelId',
-            ]);
-        }else{
-            //exclude the proposals
-            $s->where('LEK_terms.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED)
-            ->where('LEK_term_attributes.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED);
-        }
-        
+        $s=$this->getSearchTermSelect();
         $s->where('groupId=?',$groupId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
+        ->order('LEK_languages.rfc5646')
+        ->order('LEK_terms.term');
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
+     * Find the term and the term attributes by given term id
+     * @param int $termId
+     * @return array
+     */
+    public function findTermAndAttributes(int $termId){
+        $s=$this->getSearchTermSelect();
+        $s->where('LEK_terms.id=?',$termId)
         ->order('LEK_languages.rfc5646')
         ->order('LEK_terms.term');
         return $this->db->fetchAll($s)->toArray();
@@ -1153,6 +1104,10 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         foreach ($data as $row) {
             
             $tmpTerm['termEntryId']=$row['term-termEntryId'];
+            //if it is empty it is termEntryAttribute
+            if(empty($tmpTerm['termEntryId']) && !empty($row['attribute-termEntryId'])){
+                $tmpTerm['termEntryId']=$row['attribute-termEntryId'];
+            }
             $tmpTerm['definition']=$row['term-definition'];
             $tmpTerm['language']=$row['term-language'];
             $tmpTerm['termId']=$row['term-Id'];
@@ -1194,6 +1149,229 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             $tmpTerm=[];
         }
         return $returnResult;
+    }
+    
+    /***
+     * Get term search select. It the user is proposal allowed, the term and attribute proposals will be joined.
+     * 
+     * @return Zend_Db_Select
+     */
+    protected function getSearchTermSelect(){
+        $attCols=array(
+            'LEK_term_attributes.labelId as labelId',
+            'LEK_term_attributes.id AS attributeId',
+            'LEK_term_attributes.parentId AS parentId',
+            'LEK_term_attributes.internalCount AS internalCount',
+            'LEK_term_attributes.name AS name',
+            'LEK_term_attributes.attrType AS attrType',
+            'LEK_term_attributes.attrTarget AS attrTarget',
+            'LEK_term_attributes.attrId AS attrId',
+            'LEK_term_attributes.attrLang AS attrLang',
+            'LEK_term_attributes.value AS attrValue',
+            'LEK_term_attributes.created AS attrCreated',
+            'LEK_term_attributes.updated AS attrUpdated',
+            'LEK_term_attributes.attrDataType AS attrDataType',
+            'LEK_term_attributes.processStatus AS attrProcessStatus',
+            new Zend_Db_Expr('"termAttribute" as attributeOriginType')//this is needed as fixed value
+        );
+        
+        $cols=[
+            'definition',
+            'groupId',
+            'term as label',
+            'term as term',//for consistency
+            'id as value',
+            'term as desc',
+            'status as termStatus',
+            'processStatus as processStatus',
+            'id as termId',
+            'termEntryId',
+            'collectionId',
+            'language as languageId'
+        ];
+        
+        $s=$this->db->select()
+        ->setIntegrityCheck(false)
+        ->from($this->db,$cols)
+        ->joinLeft('LEK_term_attributes', 'LEK_term_attributes.termId = LEK_terms.id',$attCols)
+        ->joinLeft('LEK_term_attributes_label', 'LEK_term_attributes_label.id = LEK_term_attributes.labelId',['LEK_term_attributes_label.labelText as headerText'])
+        ->join('LEK_languages', 'LEK_terms.language=LEK_languages.id',['LEK_languages.rfc5646 AS language']);
+        
+        if($this->isProposableAllowed()){
+            $s->joinLeft('LEK_term_proposal', 'LEK_term_proposal.termId = LEK_terms.id',[
+                'LEK_term_proposal.term as proposalTerm',
+                'LEK_term_proposal.id as proposalId',
+                'LEK_term_proposal.created as proposalCreated',
+                'LEK_term_proposal.userName as proposalUserName'
+            ]);
+        }
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        if($attribute->isProposableAllowed()){
+            $s->joinLeft('LEK_term_attribute_proposal', 'LEK_term_attribute_proposal.attributeId = LEK_term_attributes.id',[
+                'LEK_term_attribute_proposal.value as proposalAttributeValue',
+                'LEK_term_attribute_proposal.id as proposalAttributelId',
+            ]);
+        }else{
+            //exclude the proposals
+            $s->where('LEK_terms.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED)
+            ->where('LEK_term_attributes.processStatus!=?',self::PROCESS_STATUS_UNPROCESSED);
+        }
+        return $s;
+    }
+    
+    /***
+     * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
+     * The term attributes itself will be grouped in parent-child structure
+     * @param array $data
+     * @return array
+     */
+    public function groupTermsAndAttributes(array $data){
+        if(empty($data)){
+            return $data;
+        }
+        $map=[];
+        $termColumns=[
+            'definition',
+            'groupId',
+            'label',
+            'value',
+            'desc',
+            'termStatus',
+            'processStatus',
+            'termId',
+            'termEntryId',
+            'collectionId',
+            'languageId',
+            'term'
+        ];
+        //available term proposal columns
+        $termProposalColumns=[
+            'proposalTerm',
+            'proposalId',
+            'proposalCreated',
+            'proposalUserName'
+        ];
+        //maping between database name and term proposal table real name
+        $termProposalColumnsNameMap=[
+            'proposalTerm'=>'term',
+            'proposalId'=>'id',
+            'proposalCreated'=>'created',
+            'proposalUserName'=>'userName'
+        ];
+        
+        //available attribute proposal columns
+        $attributeProposalColumns=[
+            'proposalAttributeValue',
+            'proposalAttributelId'
+        ];
+        
+        //maping between database name and attribute proposal table real name
+        $attributeProposalColumnsNameMap=[
+            'proposalAttributeValue'=>'value',
+            'proposalAttributelId'=>'id'
+        ];
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        //Group term-termattribute data by term. For each grouped attributes field will be created
+        $oldKey='';
+        $groupOldKey=false;
+        $termProposalData=[];
+        
+        $termModel=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $termModel editor_Models_Term */
+        $isTermProposalAllowed=$termModel->isProposableAllowed();
+        
+        $attributeModel=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attributeModel editor_Models_Term_Attribute */
+        $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
+        
+        //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
+        $keyMap=[];
+        $indexKeyMap=function($termId) use (&$keyMap){
+            if(!isset($keyMap[$termId])){
+                $keyMap[$termId]=count($keyMap);
+                return $keyMap[$termId];
+            }
+            return $keyMap[$termId];
+        };
+        
+        foreach ($data as $tmp){
+            $termKey=$indexKeyMap($tmp['termId']);
+            
+            if(!isset($map[$termKey])){
+                $termKey=$indexKeyMap($tmp['termId']);
+                $map[$termKey]=[];
+                $map[$termKey]['attributes']=[];
+                
+                if(isset($oldKey) && isset($map[$oldKey])){
+                    $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
+                    $groupOldKey=true;
+                    
+                    $map[$oldKey]['proposable']=$isTermProposalAllowed;
+                    //collect the term proposal data if the user is allowed to
+                    if($isTermProposalAllowed){
+                        $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
+                        $map[$oldKey]['attributes']=$attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal'])?$map[$oldKey]['proposal']:[]);
+                        $termProposalData=[];
+                    }
+                }
+            }
+            
+            //split the term fields and term attributes
+            $atr=[];
+            $attProposal=[];
+            foreach ($tmp as $key=>$value){
+                //check if it is term specific data
+                if(in_array($key,$termColumns)){
+                    $map[$termKey][$key]=$value;
+                    continue;
+                }
+                //is term attribute proposal specific data
+                if(in_array($key,$attributeProposalColumns)){
+                    $attProposal[$attributeProposalColumnsNameMap[$key]]=$value;
+                    continue;
+                }
+                //is term proposal specific columnt
+                if(in_array($key,$termProposalColumns)){
+                    $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
+                    continue;
+                }
+                //it is attribute column
+                $atr[$key]=$value;
+            }
+            
+            //is attribute proposable (is user attribute proposal allowed and the attribute is proposal whitelisted)
+            $atr['proposable'] =$isAttributeProposalAllowed && $attribute->isProposable($atr['name'],$atr['attrType']);
+            if($isAttributeProposalAllowed){
+                $atr['proposal']=!empty($attProposal['id']) ? $attProposal : null;
+                $attProposal=[];
+            }
+            
+            array_push($map[$termKey]['attributes'],$atr);
+            $oldKey = $indexKeyMap($tmp['termId']);
+            $groupOldKey=false;
+        }
+        //if not grouped after foreach, group the last result
+        if(!$groupOldKey){
+            $map[$oldKey]['proposable']=$isTermProposalAllowed;
+            $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
+            
+            //collect the term proposal data if the user is allowed to
+            if($isTermProposalAllowed){
+                $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
+                $map[$oldKey]['attributes']=$attribute->updateModificationGroupDate($map[$oldKey]['attributes'],isset($map[$oldKey]['proposal'])?$map[$oldKey]['proposal']:[]);
+            }
+        }
+        
+        if(empty($map)){
+            return null;
+        }
+        return $map;
     }
     
     /**

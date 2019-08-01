@@ -1482,19 +1482,19 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QW5zaWNodHNtb2R1cw=='><source>Ansichtsmodus</source><target>Ansichtsmodus</target></trans-unit>
 <trans-unit id='VW5iZWthbm50ZXIgVGVybSBTdGF0dXM='><source>Unbekannter Term Status</source><target>Unbekannter Term Status</target></trans-unit>
 <trans-unit id='RXJzdGVsbHVuZw=='><source>Erstellung</source><target>Erstellung</target></trans-unit>
-<trans-unit id='VGVybS1FaW50csOkZ2U='><source>Term-Einträge</source><target>Term-Einträge</target></trans-unit>
-<trans-unit id='RWludHJhZ3NiZW5lbm51bmdlbg=='><source>Eintragsbenennungen</source><target>Eintragsbenennungen</target></trans-unit>
+<trans-unit id='RWludHLDpGdl'><source>Einträge</source><target>Einträge</target></trans-unit>
+<trans-unit id='VGVybWU='><source>Terme</source><target>Terme</target></trans-unit>
 <trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'><source>Eintragseigenschaften</source><target>Eintragseigenschaften</target></trans-unit>
 <trans-unit id='UHJvemVzc3N0YXR1cw=='><source>Prozessstatus</source><target>Prozessstatus</target></trans-unit>
 <trans-unit id='dW5wcm9jZXNzZWQ='><source>unprocessed</source><target>vorgeschlagen</target></trans-unit>
 <trans-unit id='cHJvdmlzaW9uYWxseVByb2Nlc3NlZA=='><source>provisionallyProcessed</source><target>überprüft</target></trans-unit>
 <trans-unit id='ZmluYWxpemVk'><source>finalized</source><target>freigegeben</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnOiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='><source>Term-Eintrag: Änderung vorschlagen</source><target>Term-Eintrag: Änderung vorschlagen</target></trans-unit>
-<trans-unit id='TmV1ZW4gVGVybS1FaW50cmFnIHZvcnNjaGxhZ2Vu'><source>Neuen Term-Eintrag vorschlagen</source><target>Neuen Term-Eintrag vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnOiBWb3JzY2hsYWcgbMO2c2NoZW4='><source>Term-Eintrag: Vorschlag löschen</source><target>Term-Eintrag: Vorschlag löschen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='><source>Term-Eintrag-Attribut: Änderung vorschlagen</source><target>Term-Eintrag-Attribut: Änderung vorschlagen</target></trans-unit>
-<trans-unit id='TmV1ZXMgVGVybS1FaW50cmFnLUF0dHJpYnV0IHZvcnNjaGxhZ2Vu'><source>Neues Term-Eintrag-Attribut vorschlagen</source><target>Neues Term-Eintrag-Attribut vorschlagen</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiBWb3JzY2hsYWcgbMO2c2NoZW4='><source>Term-Eintrag-Attribut: Vorschlag löschen</source><target>Term-Eintrag-Attribut: Vorschlag löschen</target></trans-unit>
+<trans-unit id='RWludHJhZzogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Eintrag: Änderung vorschlagen</source><target>Eintrag: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZW4gRWludHJhZyB2b3JzY2hsYWdlbg=='><source>Neuen Eintrag vorschlagen</source><target>Neuen Eintrag vorschlagen</target></trans-unit>
+<trans-unit id='RWludHJhZzogVm9yc2NobGFnIGzDtnNjaGVu'><source>Eintrag: Vorschlag löschen</source><target>Eintrag: Vorschlag löschen</target></trans-unit>
+<trans-unit id='RWludHJhZy1BdHRyaWJ1dDogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Eintrag-Attribut: Änderung vorschlagen</source><target>Eintrag-Attribut: Änderung vorschlagen</target></trans-unit>
+<trans-unit id='TmV1ZXMgRWludHJhZy1BdHRyaWJ1dCB2b3JzY2hsYWdlbg=='><source>Neues Eintrag-Attribut vorschlagen</source><target>Neues Eintrag-Attribut vorschlagen</target></trans-unit>
+<trans-unit id='RWludHJhZy1BdHRyaWJ1dDogVm9yc2NobGFnIGzDtnNjaGVu'><source>Eintrag-Attribut: Vorschlag löschen</source><target>Eintrag-Attribut: Vorschlag löschen</target></trans-unit>
 <trans-unit id='VGVybTogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Term: Änderung vorschlagen</source><target>Term: Änderung vorschlagen</target></trans-unit>
 <trans-unit id='TmV1ZW4gVGVybSB2b3JzY2hsYWdlbg=='><source>Neuen Term vorschlagen</source><target>Neuen Term vorschlagen</target></trans-unit>
 <trans-unit id='VGVybTogVm9yc2NobGFnIGzDtnNjaGVu'><source>Term: Vorschlag löschen</source><target>Term: Vorschlag löschen</target></trans-unit>
@@ -1563,6 +1563,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Vorschlag löschen</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Änderung vorschlagen</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHNpY2hlcm4='><source>Änderung sichern</source><target>Änderung sichern</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIGFiYnJlY2hlbg=='><source>Änderung abbrechen</source><target>Änderung abbrechen</target></trans-unit>
 <trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... Sprache auswählen</target></trans-unit>
 <trans-unit id='U3ByYWNoZSBmw7xyIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Sprache für Term-Vorschlag wählen</source><target>Sprache für Term-Vorschlag wählen</target></trans-unit>
 <trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Term-Collection für Term-Vorschlag wählen</target></trans-unit>
@@ -1581,7 +1582,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='QXR0cmlidXRzLVNjaGzDvHNzZWw='><source>Attributs-Schlüssel</source><target>Attributs-Schlüssel</target></trans-unit>
 <trans-unit id='QXR0cmlidXRzLVdlcnQ='><source>Attributs-Wert</source><target>Attributs-Wert</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Änderung zu bestehendem Attributs-Wert</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term-Eintrag</target></trans-unit>
+<trans-unit id='RWludHJhZw=='><source>Eintrag</source><target>Eintrag</target></trans-unit>
 <trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Letzter Bearbeiter</target></trans-unit>
 <trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Bearbeitungsdatum</target></trans-unit>
 <trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='><source>Excel Re-Importieren</source><target>Excel Re-Importieren</target></trans-unit>
