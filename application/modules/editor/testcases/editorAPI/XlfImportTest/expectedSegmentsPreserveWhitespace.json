@@ -888,7 +888,7 @@
         "targetToSort": "zacross ztags zoutside zfrom zmrk ztest",
         "targetEdit": "<div class=\"single 70682069643d2231222061783a656c656d656e742d69643d2230223e266c743b705f696e2667743b3c2f7068 internal-tag ownttip\"><span title=\"&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"4be77c53486417926f2569a91ee0626a\" data-length=\"-1\" class=\"full\">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;p_in&amp;gt;&lt;\/ph&gt;<\/span><\/div>zacross ztags zoutside zfrom zmrk ztest",
         "targetEditToSort": "zacross ztags zoutside zfrom zmrk ztest",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_80\":{\"nr\":\"80\",\"length\":{\"targetEdit\":40}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_80\":{\"nr\":\"80\",\"length\":{\"targetEdit\":40}}}}",
         "isWatched": false
     },
     {
@@ -915,7 +915,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":1}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_81\":{\"nr\":\"81\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false
     },
     {
@@ -942,7 +942,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":1}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":1,\"siblingData\":{\"fakeSegId_82\":{\"nr\":\"82\",\"length\":{\"targetEdit\":1}}}}",
         "isWatched": false
     },
     {
@@ -969,7 +969,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":0,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":2}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":1,\"additionalMrkLength\":2,\"siblingData\":{\"fakeSegId_83\":{\"nr\":\"83\",\"length\":{\"targetEdit\":2}}}}",
         "isWatched": false
     },
     {
@@ -996,7 +996,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":11,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_84\":{\"nr\":\"84\",\"length\":{\"targetEdit\":11}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":32,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_84\":{\"nr\":\"84\",\"length\":{\"targetEdit\":11}}}}",
         "isWatched": false
     },
     {
@@ -1023,7 +1023,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":22,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":11}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":32,\"additionalMrkLength\":11,\"siblingData\":{\"fakeSegId_85\":{\"nr\":\"85\",\"length\":{\"targetEdit\":11}}}}",
         "isWatched": false
     },
     {
@@ -1050,7 +1050,7 @@
         "targetToSort": "",
         "targetEdit": "",
         "targetEditToSort": "",
-        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":11,\"additionalMrkLength\":22,\"siblingData\":{\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":22}}}}",
+        "metaCache": "{\"minWidth\":null,\"maxWidth\":80,\"sizeUnit\":\"char\",\"font\":\"\",\"fontSize\":0,\"additionalUnitLength\":21,\"additionalMrkLength\":22,\"siblingData\":{\"fakeSegId_86\":{\"nr\":\"86\",\"length\":{\"targetEdit\":22}}}}",
         "isWatched": false
     },
     {
