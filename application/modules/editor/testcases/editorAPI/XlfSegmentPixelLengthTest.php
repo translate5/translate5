@@ -134,6 +134,7 @@ class XlfSegmentPixelLengthTest extends \ZfExtended_Test_ApiTestcase {
         $expectedResult = $this->api()->getFileContent($fileToCompare);
         //file_put_contents('/home/tlauria/foo1.xlf', rtrim($expectedResult));
         //file_put_contents('/home/tlauria/foo2.xlf', rtrim($exportedFile));
+        //file_put_contents('/home/tlauria/foo-'.$fileToCompare, rtrim($exportedFile));
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to '.$fileToCompare);
     }
     
