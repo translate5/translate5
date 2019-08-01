@@ -600,7 +600,7 @@ var Term={
          * @param {String} source
          * @returns {String}
          */
-        renderLanguageSelect: function (languagesFor, source=null) {
+        renderLanguageSelect: function (languagesFor, source) {
             var languageSelect = '',
                 languageSelectDescription = '<option value="none">'+proposalTranslations['selectLanguage']+'</option>',
                 languageSelectOptions = '',
