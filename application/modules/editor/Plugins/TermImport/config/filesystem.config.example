@@ -18,6 +18,12 @@ deleteEntriesModifiedOlderThan=2018-05-01
 ;possible values: true or false
 deleteEntriesOlderThanCurrentImport=true
 
+;Deletes all term proposals older then deleteEntriesModifiedOlderThan date.
+;If the deleteEntriesModifiedOlderThan is not set, then the current date will be used
+;The current date will be used also when deleteEntriesOlderThanCurrentImport is true
+;possible values: true or false
+deletProposalsOlderThan=true
+
 ;;;; ATTENTION: the above variables need to be placed above the areas [FileMapping] and [CollectionMapping]
  
 ;mapping between file and term collection name
