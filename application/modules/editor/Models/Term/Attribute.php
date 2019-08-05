@@ -497,6 +497,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     /***
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
      * @param int $termId
+     * @return NULL|mixed|array
      */
     public function checkOrCreateProcessStatus(int $termId) {
         $s=$this->db->select()
@@ -506,7 +507,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         
         $result=$this->db->fetchAll($s)->toArray();
         if(count($result)>0){
-            return;
+            return null;
         }
         
         $term=ZfExtended_Factory::get('editor_Models_Term');
@@ -538,7 +539,8 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setUserName($term->getUserName());
         $this->setProcessStatus($term->getProcessStatus());
         $this->setValue($term->getProcessStatus());
-        $this->save();
+        
+        return $this->save();
     }
     
     public function getDataObject() {

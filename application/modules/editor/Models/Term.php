@@ -1082,6 +1082,23 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
+     * Check if the term modification attribute date is after $date 
+     * @param int $termId
+     * @param mixed $date
+     */
+    public function isModifiedAfter(int $termId,$date){
+        $sql='SELECT id FROM LEK_term_attributes WHERE parentId IN(
+            SELECT ta.id FROM LEK_term_attributes ta
+            INNER JOIN LEK_terms t ON t.id=ta.termId
+            WHERE ta.name="transac" AND ta.attrType="modification"
+            AND t.id=?)
+            AND name="date"
+            AND FROM_UNIXTIME(value)>?;';
+        $result=$this->db->getAdapter()->query($sql,[$termId,$date])->fetchAll();
+        return !empty($result);
+    }
+    
+    /***
      * Group the term and attribute proposal data for the export
      * @param array $data
      * @return array
