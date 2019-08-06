@@ -846,8 +846,10 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $termAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
         /* @var $termAttributes editor_Models_Db_Term_Attribute */
         
-        //update the term id for all collected term attributes
-        $termAttributes->update(['termId'=>$term->getId()],['id IN (?)'=>$this->termAttirbuteContainer]);
+        if(!empty($this->termAttirbuteContainer)){
+            //update the term id for all collected term attributes
+            $termAttributes->update(['termId'=>$term->getId()],['id IN (?)'=>$this->termAttirbuteContainer]);
+        }
         
         //check if the proposals should be removed
         $this->handleCurrentTermProposal();

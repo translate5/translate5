@@ -307,10 +307,11 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * TODO: change the name and add return type
+     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
+     * 
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
-    public function updateModificationGroupAttributes($entity){
+    public function handleTransacGroup($entity){
         $s=$this->db->select();
         if($entity instanceof editor_Models_Term){
             $s->where('termId=?',$entity->getId());
@@ -322,6 +323,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $s->where('name="transac"')
         ->where('attrType="modification"');
         $ret=$this->db->fetchAll($s)->toArray();
+        //if the transac group exist, do nothing
         if(!empty($ret)){
             return false;
         }
