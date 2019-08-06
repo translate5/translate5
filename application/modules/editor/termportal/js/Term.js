@@ -260,10 +260,8 @@ var Term={
 			    me.$_resultTermsHolder.hide();
 			}
 			
-			//TODO: finish me
 			if(me.searchTermsResponse.length > 1 && isTermProposalFromInstantTranslate){
 				var yesText=proposalTranslations['Ja'],
-					noText=proposalTranslations['Nein'],
 					buttons={
 					};
 				buttons[yesText]=function(){
@@ -273,11 +271,11 @@ var Term={
 			    $('<div></div>').dialog({
 			        resizable: false,
 			        modal: true,
-			        title: proposalTranslations[''],//TODO add key trans
-			        height: 250,
-			        width: 400,
+			        title: proposalTranslations['multipleSourcesFoundTitle'],
+			        height: 300,
+			        width: 450,
 			        buttons:buttons
-			    }).text(proposalTranslations['']);//TODO add key trans
+			    }).text(proposalTranslations['multipleSourcesFoundMessage']);
 		    
 			}
 		},
