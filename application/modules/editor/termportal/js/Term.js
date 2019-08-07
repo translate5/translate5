@@ -260,6 +260,7 @@ var Term={
 			    me.$_resultTermsHolder.hide();
 			}
 			
+			//if term is proposed from the instant translate, and the source exist more than once
 			if(me.searchTermsResponse.length > 1 && isTermProposalFromInstantTranslate){
 				var yesText=proposalTranslations['Ja'],
 					buttons={
