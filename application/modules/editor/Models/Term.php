@@ -585,7 +585,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $excel->setProperty('filename', 'Term and term attributes proposals');
         
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
-        /* @var $t ZfExtended_Zendoverwrites_Translate */;;
+        /* @var $t ZfExtended_Zendoverwrites_Translate */
         
         // sample label-translations
         $excel->setLabel('termEntryId', $t->_('Eintrag'));
@@ -666,6 +666,7 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
             /* @var $termCollection editor_Models_TermCollection_TermCollection */
             $collectionIds=$termCollection->getCollectionForAuthenticatedUser();
         }
+        $adapter=$this->db->getAdapter();
         $termSql="SELECT
             		t.termEntryId as 'term-termEntryId',
             		t.definition as 'term-definition',
@@ -693,12 +694,12 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         			LEFT OUTER JOIN
         			LEK_term_proposal tp ON tp.termId = t.id
         			INNER JOIN LEK_languages l ON t.language=l.id 
-                    		where t.collectionId IN(?)
+                    		where ".$adapter->quoteInto('t.collectionId IN(?)',$collectionIds)." 
         		and (t.created >=? || tp.created >= ?) 
         		and (tp.term is not null or t.processStatus='unprocessed')
         		order by t.groupId,t.term";
         
-        $termResult=$this->db->getAdapter()->query($termSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
+        $termResult=$adapter->query($termSql,[$youngerAs,$youngerAs])->fetchAll();
         
         $attributeSql="SELECT
                         ta.id as 'attribute-id',
@@ -730,12 +731,12 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
                         LEFT OUTER JOIN LEK_terms t on ta.termId=t.id
                         LEFT OUTER JOIN LEK_term_proposal tp on tp.termId=t.id 
                         LEFT OUTER JOIN LEK_languages l ON t.language=l.id 
-                	where ta.collectionId IN(?)
+                	where ".$adapter->quoteInto('ta.collectionId IN(?)',$collectionIds)." 
                 	and (ta.created >=? || tap.created >=?) 
                 	and (tap.value is not null or ta.processStatus='unprocessed')
                 	order by ta.termEntryId,ta.termId";
         
-        $attributeResult=$this->db->getAdapter()->query($attributeSql,[implode(',', $collectionIds),$youngerAs,$youngerAs])->fetchAll();
+        $attributeResult=$adapter->query($attributeSql,[$youngerAs,$youngerAs])->fetchAll();
         
         //merge term proposals with term attributes and term entry attributes proposals
         $resultArray=array_merge($termResult,$attributeResult);

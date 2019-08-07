@@ -1282,7 +1282,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $this->termContainer['userGuid']=$this->user->getUserGuid();
                 $this->termContainer['userName']=$this->user->getUserName();
                 
-                if(!$this->lastMergeGroupId){
+                if(empty($this->lastMergeGroupId)){
                     $this->lastMergeTermEntryIdDb=$tmpTermValue['termEntryId'];
                     $this->lastMergeGroupId=$tmpTermValue['groupId'];
                 }
