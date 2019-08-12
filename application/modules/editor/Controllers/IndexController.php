@@ -619,10 +619,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         //get public files of the plugin to make a whitelist check of the file string from userland
         $allowedFiles = $plugin->getPublicFiles($requestedType, $absolutePath);
         $file = join($slash, $js);
-        if(!$allowedFiles){
-            return;
-        }
-        if(!in_array($file, $allowedFiles)) {
+        if(empty($allowedFiles) || !in_array($file, $allowedFiles)) {
             throw new ZfExtended_NotFoundException();
         }
         //concat the absPath from above with filepath
