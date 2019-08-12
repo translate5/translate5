@@ -134,24 +134,19 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     protected function getConfig() {
         // This is a temporary preparation for implementing TRANSLATE-471.
-        
-        $config = new Zend_Config([], true);
-        
-        // Step 1: start with systemwide config
-        $origConfig = Zend_Registry::get('config');
-        /* @var $origConfig Zend_Config */
-        $config->merge($origConfig);
-        
-        // Step 2: anything customer-specific for this task?
-        if (!empty($this->getCustomerId())) {
+        if (empty($this->getCustomerId())) {
+            // Step 1a: start with systemwide config
+            $config = new Zend_Config(Zend_Registry::get('config')->toArray(), true);
+        }
+        else {
+            // Step 1b: anything customer-specific for this task?
             $customer = ZfExtended_Factory::get('editor_Models_Customer');
             /* @var $customer editor_Models_Customer */
             $customer->load($this->getCustomerId());
-            $customerConfig = $customer->getConfig();
-            $config->merge($customerConfig);
+            $config = $customer->getConfig();
         }
         
-        // Step 3: anything task-specific for this task?
+        // Step 2: anything task-specific for this task?
         // TODO...
         
         $config->setReadOnly();
