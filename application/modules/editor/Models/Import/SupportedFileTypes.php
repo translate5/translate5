@@ -66,15 +66,19 @@ class editor_Models_Import_SupportedFileTypes {
      * @param array $mimetypes list of matching mimetypes
      */
     public function register($extension, array $mimetypes) {
-        $map = empty(self::$extensionMimeMap[$extension]) ? [] : self::$extensionMimeMap[$extension];
+        $map = self::$extensionMimeMap[$extension] ?? [];
         self::$extensionMimeMap[$extension] = array_merge($map, $mimetypes);
     }
         
     /**
      * Register additional fileParsers, if a plugin adds a new FileParser for example.
+     * Overwrites existing extensions
+     * @param string $extension
+     * @param string $importFileParserClass
      */
-    public function registerFileParser($type, $importClass, $exportClass) {
-        throw new ZfExtended_Exception("Please implement me!");
+    public function registerFileParser(string $extension, string $importFileParserClass) {
+        $this->register($extension, []);
+        self::$extensionParserMap[$extension] = $importFileParserClass;
     }
     
     /**
