@@ -994,6 +994,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Segment | null if no next found
      */
     public function loadNext($taskGuid, $id, $fileId = null) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        
         $s = $this->db->select();
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
