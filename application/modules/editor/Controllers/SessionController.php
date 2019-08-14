@@ -93,7 +93,7 @@ class editor_SessionController extends ZfExtended_SessionController {
         
         $enabled = Zend_Registry::get('config')->runtimeOptions->hashAuthentication;
         if($enabled != self::AUTH_HASH_DYNAMIC && $enabled != self::AUTH_HASH_STATIC) {
-            $this->log->logError('Tried to authenticate via hashAuthentication, but feature is disabled in the config!');
+            $this->log->error('E1156', 'Tried to authenticate via hashAuthentication, but feature is disabled in the config!');
             parent::indexAction();
         }
         
