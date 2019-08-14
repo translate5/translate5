@@ -29,6 +29,8 @@ END LICENSE AND COPYRIGHT
 /**
  * Segment Attributes
  * This class is just used as datatype struct in the import fileparser to have IDE completion here
+ * if we have new attrbiutes in the core code, they should be added here. 
+ * For Plugin purposes and flexible extension there exist the customMetaAttributes array as dynamic container
  */
 class editor_Models_Import_FileParser_SegmentAttributes {
     /**
@@ -146,4 +148,12 @@ class editor_Models_Import_FileParser_SegmentAttributes {
      * @var string
      */
     public $transunitId;
+    
+    /**
+     * For Plugin purposes and flexibility additional meta attributes for the segment can be placed in this assoc array.
+     * key = meta field name, value = value.
+     * new attributes for the core import functionality should get an own attribute
+     * @var array
+     */
+    public $customMetaAttributes = [];
 }
