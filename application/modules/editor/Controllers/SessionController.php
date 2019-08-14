@@ -136,7 +136,7 @@ class editor_SessionController extends ZfExtended_SessionController {
         $event = Zend_EventManager_StaticEventManager::getInstance();
         $event->attach('editor_TaskController', 'afterPutAction', function() {
             //the redirect must be triggered after the successful PUT OPEN of the task above 
-            $this->redirect(APPLICATION_RUNDIR.'/editor', ['code' => 302]);
+            $this->redirect('/editor', ['code' => 302]);
         });
     }
 }
