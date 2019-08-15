@@ -260,6 +260,7 @@ $( function() {
     $('#switchSourceTarget').button({
     	icon: "ui-icon-transfer-e-w"
 	}).on("click",function(){
+		//switch source and target languages on button click
 		var sourceLocale=$("#sourceLocale").val(),
 			targetLocale=$("#targetLocale").val();
 		$("#sourceLocale").val(targetLocale);
