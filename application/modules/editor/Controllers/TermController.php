@@ -78,7 +78,7 @@ class editor_TermController extends ZfExtended_RestController {
         
         //create or update or create the term transac group attributes
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->updateModificationGroupAttributes($this->entity);
+        $attribute->handleTransacGroup($this->entity);
         
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
@@ -301,7 +301,7 @@ class editor_TermController extends ZfExtended_RestController {
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
         
-        $attribute->updateModificationGroupAttributes($this->entity);
+        $attribute->handleTransacGroup($this->entity);
         
         //update the view
         $this->view->rows->proposal = $this->proposal->getDataObject();
@@ -360,7 +360,7 @@ class editor_TermController extends ZfExtended_RestController {
         //update the term entry create/modefy dates
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->updateModificationGroupAttributes($termEntry);
+        $attribute->handleTransacGroup($termEntry);
         
         //update the view
         $this->view->rows = $commentAttribute->getDataObject();
@@ -472,10 +472,12 @@ class editor_TermController extends ZfExtended_RestController {
         $term->setUserName($this->entity->getUserName());
         $term->setCreated(null);
         $term->setUpdated(null);
-        $termId=$term->save();
+        $term->setId($term->save());
         
+        //create or update or create the term transac group attributes
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
+
         $attribute->checkOrCreateProcessStatus($termId);
         
         //if the term is added from the instant transalte MT engine, set the default comment
@@ -483,6 +485,9 @@ class editor_TermController extends ZfExtended_RestController {
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             $attribute->addTermComment($this->data->termSource, $translate->_("Aus MT übernommen"));
         }
+        
+        $attribute->handleTransacGroup($term);
+        $attribute->checkOrCreateProcessStatus($term->getId());
     }
     
     /**
