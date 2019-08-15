@@ -341,7 +341,7 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->tagHelper->protect($edited);
         $edited = $this->removeTermTags($edited);
         $edited = $this->tagHelper->unprotect($edited);
-        $this->compareTags($segment, $segment->getSource(), $edited);
+        $this->compareTags($segment, $edited);
         
         //count length after removing removeTrackChanges and removeTermTags 
         // so that the same remove must not be done again inside of textLength
@@ -377,10 +377,10 @@ abstract class editor_Models_Export_FileParser {
     /**
      * Compares the real tags (ignores whitespace tags) of a source and target string, track the differences between the both along the segmentNrInTask
      * @param editor_Models_Segment $segment
-     * @param string $source
      * @param string $target
      */
-    protected function compareTags(editor_Models_Segment $segment, $source, $target) {
+    protected function compareTags(editor_Models_Segment $segment, $target) {
+        $source = $this->_task->getEmptyTargets() ? $segment->getSource() : $segment->getTarget();
         $sourceTags = $this->tagHelper->getRealTags($source);
         $targetTags = $this->tagHelper->getRealTags($target);
         $notInTarget = $this->tagHelper->diffArray($sourceTags, $targetTags);

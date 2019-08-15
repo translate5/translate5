@@ -38,7 +38,8 @@ END LICENSE AND COPYRIGHT
     <script src="https://app.therootcause.io/rootcause-full-extjs.js" crossorigin="anonymous"></script>
     <script>
         (function() {
-            var logger = window.RC && new RC.Logger({
+            // We use the logger on the global scope in order to add entries via logger.addLogEntry()
+            logger = window.RC && new RC.Logger({
                 applicationId : "1b60154d0a976fff59848a5e5607ac015df89161",
                 captureScreenshot : true,
                 recordUserActions : true,

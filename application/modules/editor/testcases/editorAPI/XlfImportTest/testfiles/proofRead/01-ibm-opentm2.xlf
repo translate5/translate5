@@ -139,7 +139,14 @@
         </count-group>
       </trans-unit>
       <trans-unit id="19" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
-        <source><ph>19 - This segment must be imported so that it will be added to the target and the autostates are set accordingly, regardless that it contains tags only.</ph></source>
+        <source><ph>19 - This segment must be imported since it has text outside of the tag.</ph>Text</source>
+        <target/>
+        <count-group name="word count">
+          <count count-type="word count" unit="word">0</count>
+        </count-group>
+      </trans-unit>
+      <trans-unit id="20" translate="yes" tmgr:segstatus="TOBE" tmgr:matchinfo="NOTTRANSLATED" tmgr:matchratio="0">
+        <source><ph>20 - This segment must NOT be imported since it has tags only in the source. The target must be filled with it.</ph></source>
         <target/>
         <count-group name="word count">
           <count count-type="word count" unit="word">0</count>
