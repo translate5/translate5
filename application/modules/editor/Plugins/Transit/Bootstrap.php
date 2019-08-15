@@ -157,7 +157,7 @@ class editor_Plugins_Transit_Bootstrap extends ZfExtended_Plugin_Abstract {
         $langInfo['target'] = $langInfo[1] = strtoupper($langInfo[1]);
         
         $supportedTypes = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-        $supportedTypes->registerFileParser(strtolower($langInfo['source']), 'editor_Models_Import_FileParser_Transit');
+        $supportedTypes->registerIgnored(strtolower($langInfo['source']));
         
         Zend_Registry::set('transitLangInfo', $langInfo);
         $this->langInfo = $langInfo;

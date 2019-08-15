@@ -27,18 +27,32 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * FIXME WARNING: MimeTypes ware not needed anymore, since check was deactivated in UploadProcessor
- * but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
- * 
  * Helper Class which provides information about the allowed file types in translate5
  * Instanced once, the class tracks internally (static) the allowed values.
  */
 class editor_Models_Import_SupportedFileTypes {
-    protected static $extensionMimeMap;
-    protected static $extensionParserMap = [];
+
+    /**
+     * The map of extensions mapped to their file parsers
+     * @var array
+     */
+    protected static $extensionsWithParser = [];
+    
+    /**
+     * The list of extensions which can be imported via preprocessors (which convert the file then to format known by file parsers)
+     * @var array
+     */
+    protected static $extensionsSupported = [];
+    
+    /**
+     * The list of extensions which should be ignored in import processing (and therefore do not produce a unprocessed warning) 
+     *  in other words, file is ignored in default import process, but still is used as secondary input file for special fileparsers like transit  
+     * @var array
+     */
+    protected static $extensionsIgnored = [];
     
     public function __construct() {
-        if(empty(self::$extensionParserMap)){
+        if(empty(self::$extensionsWithParser)){
             $this->init();
         }
     }
@@ -47,27 +61,35 @@ class editor_Models_Import_SupportedFileTypes {
      * reads all supported file types from the core fileparsers and stores them staticly in the class
      */
     protected function init() {
-        self::$extensionParserMap = editor_Models_Import_FileParser::getAllFileParsersMap();
-        foreach(self::$extensionParserMap as $ext => $parser) {
-            $this->register($ext, $parser::getValidMimeTypes());
-        }
+        self::$extensionsWithParser = editor_Models_Import_FileParser::getAllFileParsersMap();
         //ZIP is not provided by a specific fileparser, but is supported by the core as container format
-        $this->register('zip', []);
+        // same for testcases
+        $this->register(editor_Models_Import_UploadProcessor::TYPE_ZIP);
+        $this->register(editor_Models_Import_UploadProcessor::TYPE_TESTCASE);
     }
     
     /**
-     * FIXME WARNING: MimeTypes ware not needed anymore, since check was deactivated in UploadProcessor
-     * but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
-     * 
-     * Registers the given file type to be handleable by translate5, 
-     * due multiple pre processing steps, this is independant of the FileParsers
-     * 
+     * Registers the given file type to be handleable by translate5, but without a concrete parser
+     *  due multiple pre-processing steps, this filetype is probably preprocessed and converted before giving finally to the FileParsers
      * @param string $extension
-     * @param array $mimetypes list of matching mimetypes
      */
-    public function register($extension, array $mimetypes) {
-        $map = self::$extensionMimeMap[$extension] ?? [];
-        self::$extensionMimeMap[$extension] = array_merge($map, $mimetypes);
+    public function register($extension) {
+        //only add if it does not already exist
+        if(!in_array($extension, self::$extensionsSupported)) {
+            self::$extensionsSupported[] = $extension;
+        }
+    }
+    
+    /**
+     * Registers the given file type to be ignored by translate5, 
+     *  useful if file is needed by the fileparser as additional data source, but should not be listed in file list
+     * @param string $extension
+     */
+    public function registerIgnored($extension) {
+        //only add if it does not already exist
+        if(!in_array($extension, self::$extensionsIgnored)) {
+            self::$extensionsIgnored[] = $extension;
+        }
     }
         
     /**
@@ -77,36 +99,40 @@ class editor_Models_Import_SupportedFileTypes {
      * @param string $importFileParserClass
      */
     public function registerFileParser(string $extension, string $importFileParserClass) {
-        $this->register($extension, []);
-        self::$extensionParserMap[$extension] = $importFileParserClass;
+        self::$extensionsWithParser[$extension] = $importFileParserClass;
     }
     
     /**
-     * FIXME WARNING: MimeTypes ware not needed anymore, since check was deactivated in UploadProcessor
-     * but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
-     * 
-     * returns a map of supported file extensions to the corresponding mime types
+     * returns a list of supported file extensions (extensions with parser + supported extensions)
      * @return array
      */
-    public function getSupportedTypes() {
-        return self::$extensionMimeMap;
+    public function getSupportedExtensions() {
+        return array_unique(array_merge(array_keys(self::$extensionsWithParser), self::$extensionsSupported));
     }
     
     /**
-     * returns a map of supported file extensions to the corresponding mime types
+     * returns all registered extensions (the supported + the ignored)
+     * @return array
+     */
+    public function getRegisteredExtensions() {
+       return array_unique(array_merge($this->getSupportedExtensions(), self::$extensionsIgnored)); 
+    }
+    
+    /**
+     * returns the parser to the given extension
      * @param string $ext
-     * @throws Zend_Exception
+     * @throws editor_Models_Import_FileParser_NoParserException
      * @return string parser class name
      */
-    public function getParser($ext) {
-        if(empty(self::$extensionParserMap[$ext])) {
+    public function getParser(string $ext): string {
+        if(empty(self::$extensionsWithParser[$ext])) {
             //'For the given fileextension no parser is registered.'
             throw new editor_Models_Import_FileParser_NoParserException('E1060', [
                 'extension' => $ext,
-                'availableParsers' => print_r(self::$extensionParserMap,1),
+                'availableParsers' => print_r(self::$extensionsWithParser,1),
             ]);
         }
-        return self::$extensionParserMap[$ext];
+        return self::$extensionsWithParser[$ext];
     }
     
     /**
@@ -115,6 +141,15 @@ class editor_Models_Import_SupportedFileTypes {
      * @return bool
      */
     public function hasParser(string $ext) : bool {
-        return !empty(self::$extensionParserMap[$ext]);
+        return !empty(self::$extensionsWithParser[$ext]);
+    }
+    
+    /**
+     * returns true if extension as to be ignored by the directory parser at all
+     * @param string $ext
+     * @return boolean
+     */
+    public function isIgnored(string $ext): bool {
+        return in_array($ext, self::$extensionsIgnored);
     }
 }
