@@ -541,6 +541,47 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->save();
     }
     
+    /***
+     * Add comment attribute for given term
+     * @param int $termId
+     * @param string $termText
+     * @return editor_Models_Term_Attribute
+     */
+    public function addTermComment(int $termId,string $termText){
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $term->load($termId);
+        
+        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $lang editor_Models_Languages */
+        $lang->loadById($term->getLanguage());
+        
+        $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+        $label->loadOrCreate('note', null);
+        
+        $this->init([
+            'name' => 'note',
+            'created' => NOW_ISO,
+            'internalCount' => 1,
+            'collectionId' => $term->getCollectionId(),
+            'termId'=>$term->getId(),
+            'termEntryId' => $term->getTermEntryId(),
+            'language' => strtolower($lang->getRfc5646()),
+            'attrLang' => strtolower($lang->getRfc5646()),
+            'labelId' => $label->getId(),
+            'processStatus'=>editor_Models_Term::PROCESS_STATUS_UNPROCESSED
+        ]);
+        $this->setValue(trim($termText));
+        $this->validate();
+        $sessionUser = new Zend_Session_Namespace('user');
+        $this->setUserGuid($sessionUser->data->userGuid);
+        $this->setUserName($sessionUser->data->userName);
+        $this->hasField('updated') && $this->setUpdated(NOW_ISO);
+        $this->save();
+        return $this;
+    }
+    
     public function getDataObject() {
         $result=parent::getDataObject();
         //set the attribute origin type(when no termId is provided it is termEntry attribute otherwise term attribute)
