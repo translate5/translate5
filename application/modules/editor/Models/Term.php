@@ -928,7 +928,8 @@ class editor_Models_Term extends ZfExtended_Models_Entity_Abstract {
         $s->where('groupId=?',$groupId)
         ->where('LEK_terms.collectionId IN(?)',$collectionIds)
         ->order('LEK_languages.rfc5646')
-        ->order('LEK_terms.term');
+        ->order('LEK_terms.term')
+        ->order('LEK_terms.id');
         return $this->db->fetchAll($s)->toArray();
     }
     
