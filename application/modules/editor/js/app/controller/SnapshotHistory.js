@@ -186,6 +186,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
         me.removeNewerSnapshots(); // delete newer items if there are any.
         me.editorSnapshotHistory.push({content: contentForSnaphot, bookmark: bookmarkForSnapshot});
         me.editorSnapshotReference = me.editorSnapshotHistory.length - 1;
+        me.addSnapshotToLogger(contentForSnaphot, 'saved');
     	me.consoleLog('~~~~~~~~ SNAPSHOTHISTORY: snapshot saved (me.editorSnapshotReference: ' + me.editorSnapshotReference + ')');
     	me.consoleLog(me.editorSnapshotHistory);
     },
@@ -225,6 +226,18 @@ Ext.define('Editor.controller.SnapshotHistory', {
     	me.consoleLog('~~~~~~~~ SNAPSHOTHISTORY: redo');
         me.fastforwardSnapshot();
         me.restoreSnapshotInEditor();
+    },
+    /**
+     * Add the given snapshot as Editor-content to therootcause-logger.
+     * @param {String} snapshot
+     * @param {String} action
+     */
+    addSnapshotToLogger: function(snapshot, action) {
+        try {
+            logger && logger.addLogEntry({ type : 'info', message : 'translate5 Editor Snapshot ('+action+'): '  + snapshot});
+        } catch(err) {
+            // error on adding the log entry
+        }
     },
     
     // =========================================================================
@@ -304,6 +317,7 @@ Ext.define('Editor.controller.SnapshotHistory', {
         	me.consoleLog('restore snapshot (content)...');
             me.editorBodyExtDomElement.setHtml(currentSnapshot.content);
             me.restorePositionOfCaret(currentSnapshot.bookmark);
+            me.addSnapshotToLogger(currentSnapshot.content, 'restored');
         } else {
             me.consoleLog('currentSnapshot does not exist for editorSnapshotReference = ' + me.editorSnapshotReference);
         }
