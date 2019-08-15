@@ -388,6 +388,10 @@ var Term={
 		        }
 		    };
 		    
+		    // -------proposal-buttons -------
+            me.drawProposalButtons('attribute');
+            me.drawProposalButtons('terms');
+		    
 		    //find the selected item form the search result and expand it
 		    $.each($("#searchTermsSelect li"), function (i, item) {
 		        if($(item).hasClass('ui-state-active')){
@@ -399,8 +403,7 @@ var Term={
 		            	//check it is request from instanttranslate for translated term
 		            	if(isTermProposalFromInstantTranslate && termitem.dataset.termId==-1){
 		            		//this will triger the "new translated" term editor
-		            		$(termitem).click();
-		            		isTermProposalFromInstantTranslate=false;
+		            		$(termitem).find('span.proposal-add').click();
 		            		return false;
 		            	}
 		            	//expand the selected term (check for language, since there can be terms with same name in same term entry)
@@ -423,10 +426,6 @@ var Term={
 		    setSizesInFinalResultContent();
 
 	    	me.initInstantTranslateSelect()
-            
-            // -------proposal-buttons -------
-            me.drawProposalButtons('attribute');
-            me.drawProposalButtons('terms');
         },
         
         /***

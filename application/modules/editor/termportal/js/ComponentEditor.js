@@ -245,6 +245,8 @@ var ComponentEditor={
 			requestData['language']      =Term.newTermLanguageId;
             requestData['termEntryId']   =Term.newTermTermEntryId;
 			requestData[dataKey]=$input.val();
+			requestData['isTermProposalFromInstantTranslate']=isTermProposalFromInstantTranslate;
+			isTermProposalFromInstantTranslate=false;
 		}
         
         if (Term.$_searchWarningNewSource.is(":visible")) {
@@ -335,7 +337,7 @@ var ComponentEditor={
 		    $elParent=null,
             $commentPanel,
             dummyCommentAttribute,
-            drawData,
+            drawData='',
             $termAttributeHolder,
             instantTranslateInto,
             activeTabSelector,
@@ -396,18 +398,17 @@ var ComponentEditor={
 			Attribute.checkAndUpdateDeffinition(result,attrType);
 			return;
 		}
-        
+		
 		//if it is comment, and the comment panel does not exist, add the comment panel after the proposed term is saved
 		$commentPanel=$elParent.find('[data-editable-comment]');
-		
+
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length === 0){
-			dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute');
-			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
+			
 			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
 			instantTranslateInto=Term.renderInstantTranslateIntegrationForTerm(result.language);
 			
-			//update the term holder dom with the new temr id
+			//update the term holder dom with the new term id
 			$termAttributeHolder.attr("data-term-id",result.termId);
 			$termAttributeHolder.attr("data-groupid",result.groupId);
 			
@@ -415,9 +416,16 @@ var ComponentEditor={
 			if(me.isNew && attributeRenderData && attributeRenderData!=''){
 				drawData+=attributeRenderData;
 	        }
-			
+
 			//attach the comment attribute draw data to the term holder
 			$termAttributeHolder.prepend(drawData);
+			
+			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
+			if($commentPanel.length === 0){
+				dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute');
+				$termAttributeHolder.prepend(Attribute.handleAttributeDrawData(dummyCommentAttribute));
+			}
+			
 
 			//render the instant translate into select
 			if(instantTranslateInto){
@@ -446,7 +454,7 @@ var ComponentEditor={
             
 	            $commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 	            if($commentPanel.length>0 && $commentPanel.prop('tagName') === 'SPAN'){
-	                this.addCommentAttributeEditor($commentPanel);
+	                me.addCommentAttributeEditor($commentPanel);
 	            }
 			}
 		}
