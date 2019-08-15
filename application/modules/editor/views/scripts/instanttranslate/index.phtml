@@ -156,6 +156,8 @@
         <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         </form>
     </div>
+    <button id="switchSourceTarget">
+    </button>
     <div id="target">
         <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
@@ -255,6 +257,23 @@ $( function() {
     setFileTypesAllowedAndAvailable();
     setTextForSource();
     showSource();
+    $('#switchSourceTarget').button({
+    	icon: "ui-icon-transfer-e-w"
+	}).on("click",function(){
+		var sourceLocale=$("#sourceLocale").val(),
+			targetLocale=$("#targetLocale").val();
+		$("#sourceLocale").val(targetLocale);
+		$("#targetLocale").val(sourceLocale);
+		$("#sourceLocale").selectmenu("refresh");
+		$("#targetLocale").selectmenu("refresh");
+		var results=$('div.translation-result');
+		handleAfterLocalesChange();
+		if(results.length>0){
+			$('#sourceText').val(results[0].textContent);
+		}
+		$('#translations').hide();
+		startTranslation();
+    });
 } );
 </script>
 
