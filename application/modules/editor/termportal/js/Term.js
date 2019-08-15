@@ -380,11 +380,15 @@ var Term={
                         if ($(event.toElement).hasClass('proposal-delete')) {
                             // Clicking the delete-icon itself does not need to open the Term.
                             event.preventDefault();
+                            return;
                         }
+                        
 		                if (ui.newHeader.length === 0 && ui.oldHeader.has('textarea').length > 0) {
                             // Term in header is opened for editing; don't close the panel.
                             event.preventDefault();
+                            return;
                         }
+		                me.cancelPendingChanges(ui.oldHeader);
 		            },
                     activate: function( event, ui ) {
                         if (ui.newHeader.length === 0 && ui.oldHeader.has('textarea').length > 0) {
@@ -903,7 +907,7 @@ var Term={
             var me = this,
                 newTermData = {};
             //if the collection id is not set, set it from the terms data
-            if(me.newTermCollectionId === undefined && (termsData && termsData.length>0)) {
+            if((me.newTermCollectionId === undefined || me.newTermCollectionId==null) && (termsData && termsData.length>0)) {
                 me.newTermCollectionId = termsData[0].collectionId;
                 me.newTermTermEntryId = termsData[0].termEntryId;
                 me.newTermGroupId=termsData[0].groupId;
@@ -1210,6 +1214,29 @@ var Term={
             console.log('onEditTermClick');
             event.stopPropagation();
             ComponentEditor.addTermComponentEditor(search,$termAttributeHolder);
+        },
+        
+        /***
+         * Find the all opened editors and close them.
+         * TODO: if requested add dialog box
+         */
+        cancelPendingChanges:function(termHeader){
+        	if(termHeader.length<1){
+        		return;
+        	}
+        	//is in the header valid editor
+        	if(termHeader.has('textarea').length > 0){
+        		//close the opened term editor
+        		termHeader.find('span.proposal-cancel').mouseup();
+        	}
+        	//render the cancel icons for the attributes
+        	this.drawProposalButtons('attributeEditingOpened')
+        	//find all attributes with cancel button
+        	var $editors=this.$_termTable.find('span.proposal-cancel');
+        	//trigger the cancel button, and with this cancel the editor
+	    	$editors.each(function(index,editor) {
+	    		$(editor).mouseup();
+	        });
         }
 };
 
