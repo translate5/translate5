@@ -58,7 +58,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * collection of ignored files
    * @var array
    */
-  protected $notImportedFiles = [];
+  static protected $notImportedFiles = [];
   
   static protected $filesFound = false;
   
@@ -76,7 +76,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * @return object Directory Object Tree
    */
   public function parse($directoryPath, editor_Models_Task $task){
-      $this->notImportedFiles = [];
+      self::$notImportedFiles = [];
       $rootNode = $this->getInitialRootNode();
       self::$filesFound = false;
       $this->iterateThrough($rootNode, $directoryPath);
@@ -171,7 +171,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
       }
 
       //file extensions which are not handled by supportedFiles at all (not supported and not activly ignore) are collected here
-      $this->notImportedFiles[] = $file->getFilename();
+      self::$notImportedFiles[] = $file->getFilename();
       return true;
   }
   
@@ -240,6 +240,6 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * @return array
    */
   public function getNotImportedFiles() {
-      return $this->notImportedFiles;
+      return self::$notImportedFiles;
   }
 }
