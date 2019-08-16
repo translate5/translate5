@@ -178,11 +178,6 @@ var Term={
                     me.$_resultTermsHolder.hide();
                 }
                 
-                // "reset", is valid only once (= when coming from TermPortal)
-                if(isTermProposalFromInstantTranslate) {
-                    isTermProposalFromInstantTranslate = false;
-                }
-                
 				return;
 			}
             
@@ -452,7 +447,6 @@ var Term={
             // trigger the "new translated" term editor if request is from instanttranslate for translated term
             if(isTermProposalFromInstantTranslate){
                 me.$_termTable.find('.is-new').find('.proposal-add').click();
-                isTermProposalFromInstantTranslate = false;
             }
         },
         
@@ -1043,7 +1037,10 @@ var Term={
                     console.log('chooseCollection selectmenu => newTermCollectionId: ' + me.newTermCollectionId);
                     me.$_termCollectionSelect.empty().hide();
                     me.drawTermTable();
-                    me.$_termTable.find('.proposal-add')[0].click();
+                    var proposalAdd=me.$_termTable.find('.proposal-add');
+                    if(proposalAdd.length>0){
+                    	proposalAdd[0].click();
+                    }
                 }
             });
         },

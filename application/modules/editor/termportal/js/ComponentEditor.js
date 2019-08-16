@@ -254,12 +254,16 @@ var ComponentEditor={
             requestData['termEntryId']   =Term.newTermTermEntryId;
 			requestData[dataKey]=$input.val();
 			requestData['isTermProposalFromInstantTranslate']=isTermProposalFromInstantTranslate;
-			isTermProposalFromInstantTranslate=false;
 		}
         
         if (Term.$_searchWarningNewSource.is(":visible")) {
             requestData['termSource']=instanttranslate.textSource;
             requestData['termSourceLanguage']=instanttranslate.langSource;
+        }
+        
+        // "reset", is valid only once (= when coming from TermPortal)
+        if(isTermProposalFromInstantTranslate) {
+            isTermProposalFromInstantTranslate = false;
         }
         
         console.log('saveComponentChange :' + JSON.stringify(requestData));
