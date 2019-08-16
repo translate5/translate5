@@ -577,7 +577,6 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
             'processStatus'=>editor_Models_Term::PROCESS_STATUS_UNPROCESSED
         ]);
         $this->setValue(trim($termText));
-        $this->validate();
         $sessionUser = new Zend_Session_Namespace('user');
         $this->setUserGuid($sessionUser->data->userGuid);
         $this->setUserName($sessionUser->data->userName);

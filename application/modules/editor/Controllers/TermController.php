@@ -311,6 +311,7 @@ class editor_TermController extends ZfExtended_RestController {
      * Tries to update or insert a value "comment" into langSet>descripGrp>note of the term
      */
     public function commentOperation() {
+        $this->decodePutData();
         $commentAttribute = ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $commentAttribute editor_Models_Term_Attribute */
         try {
@@ -478,12 +479,13 @@ class editor_TermController extends ZfExtended_RestController {
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
 
-        $attribute->checkOrCreateProcessStatus($termId);
+        $attribute->checkOrCreateProcessStatus($term->getId());
+        
         
         //if the term is added from the instant transalte MT engine, set the default comment
         if($this->data->isTermProposalFromInstantTranslate){
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
-            $attribute->addTermComment($this->data->termSource, $translate->_("Aus MT übernommen"));
+            $attribute->addTermComment($term->getId(), $translate->_("Aus MT übernommen"));
         }
         
         $attribute->handleTransacGroup($term);
