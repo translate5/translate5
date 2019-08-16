@@ -25,8 +25,8 @@ var Term={
         newTermName: null,
         newTermTermEntryId: null,
 		
-		KEY_TERM:"term",
-		KEY_TERM_ATTRIBUTES:"termAttributes",
+		KEY_TERM:'term',
+		KEY_TERM_ATTRIBUTES:'termAttributes',
 		
 		init:function(){
 			this.cacheDom();
@@ -51,21 +51,21 @@ var Term={
 			var me=this;
 			
             // Search Results
-			me.$_searchTermsSelect.on( "selectableselected",{scope:me},me.onSelectSearchTerm);
-		    // FIXME: why is this triggered twice sometimes (with attr('data-value') = "undefined" in the second)
+			me.$_searchTermsSelect.on('selectableselected',{scope:me},me.onSelectSearchTerm);
+		    // FIXME: why is this triggered twice sometimes (with attr('data-value') = 'undefined' in the second)
 			
 			if(!Editor.data.app.user.isTermProposalAllowed){
 				return;
 			}
 			
 			// Term-Entries
-	        me.$_resultTermsHolderHeader.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
-	        me.$_searchTermsHelper.on('click', ".proposal-add",{scope:me},me.onAddTermEntryClick);
+	        me.$_resultTermsHolderHeader.on('click', '.proposal-add',{scope:me},me.onAddTermEntryClick);
+	        me.$_searchTermsHelper.on('click', '.proposal-add',{scope:me},me.onAddTermEntryClick);
 
             // Terms
-            me.$_termTable.on('click', ".term-data.proposable .proposal-add",{scope:me},me.onAddTermClick);
-            me.$_termTable.on('click', ".term-data.proposable .proposal-delete",{scope:me},me.onDeleteTermClick);
-            me.$_termTable.on('click', ".term-data.proposable .proposal-edit",{scope:me},me.onEditTermClick);
+            me.$_termTable.on('click', '.term-data.proposable .proposal-add',{scope:me},me.onAddTermClick);
+            me.$_termTable.on('click', '.term-data.proposable .proposal-delete',{scope:me},me.onDeleteTermClick);
+            me.$_termTable.on('click', '.term-data.proposable .proposal-edit',{scope:me},me.onEditTermClick);
             me.$_resultTermsHolder.on('tabsactivate',{scope:me},me.onResultTabActivate);
 		},
         
@@ -74,18 +74,18 @@ var Term={
          */
         onSelectSearchTerm: function(event, ui) {
             var me = event.data.scope,
-                $_selected = $(ui.selected);
+                $selected = $(ui.selected);
             // data for proposing a new Term
             me.resetNewTermData();
-            me.newTermCollectionId = $_selected.attr('data-collectionid');
+            me.newTermCollectionId = $selected.attr('data-collectionid');
             console.log('onSelectSearchTerm => newTermCollectionId: ' + me.newTermCollectionId);
-            me.newTermTermEntryId = $_selected.attr('data-termentryid');
-            me.newTermGroupId=$_selected.attr('data-value');
+            me.newTermTermEntryId = $selected.attr('data-termentryid');
+            me.newTermGroupId = $selected.attr('data-value');
             // show Terms and Attributes
-            me.findTermsAndAttributes($_selected.attr('data-value'));
+            me.findTermsAndAttributes($selected.attr('data-value'));
 		},
 		
-		onResultTabActivate:function(event, ui){
+		onResultTabActivate:function(event){
 			var me = event.data.scope;
             me.drawProposalButtons('attribute');
             me.drawProposalButtons('terms');
@@ -104,7 +104,7 @@ var Term={
 				collectionIds = getFilteredCollections(),
                 processStats = getFilteredProcessStats();
 			
-            if (searchString == '') {
+            if (searchString === '') {
                 return;
             }
 
@@ -114,15 +114,15 @@ var Term={
             me.resetNewTermData();
             
 			if(!lng){
-				lng=$("input[name='language']:checked").val();
+				lng=$('input[name="language"]:checked').val();
 			}
-			console.log("searchTerm() for: " + searchString);
-			console.log("searchTerm() for language: " + lng);
+			console.log('searchTerm() for: ' + searchString);
+			console.log('searchTerm() for language: ' + lng);
 			me.searchTermsResponse=[];  
 			$.ajax({
-				url: Editor.data.termportal.restPath+"termcollection/search",
-				dataType: "json",
-				type: "POST",
+				url: Editor.data.termportal.restPath+'termcollection/search',
+				dataType: 'json',
+				type: 'POST',
 				data: {
 					'term':searchString,
 					'language':lng,
@@ -146,10 +146,12 @@ var Term={
 		 * @returns
 		 */
 		fillSearchTermSelect:function(searchString){
-			var me=this;
+			var me=this,
+			    i,
+			    item;
 			if(!me.searchTermsResponse || me.searchTermsResponse.length === 0){
                 
-                console.log("fillSearchTermSelect: nichts gefunden");
+                console.log('fillSearchTermSelect: nichts gefunden');
                 
                 // show/hide helper: errors, warning, skeleton...
                 if (isTermProposalFromInstantTranslate) {
@@ -171,36 +173,31 @@ var Term={
                 
                 // show form for adding proposal right away?
                 if(isTermProposalFromInstantTranslate) {
-                    $("#searchTermsHelper .proposal-add").click();
+                    $('#searchTermsHelper .proposal-add').click();
                 } else {
                     me.$_resultTermsHolder.hide();
-                }
-                
-                // "reset", is valid only once (= when coming from TermPortal)
-                if(isTermProposalFromInstantTranslate) {
-                    isTermProposalFromInstantTranslate = false;
                 }
                 
 				return;
 			}
             
 			
-			console.log("fillSearchTermSelect: " + me.searchTermsResponse.length + " Treffer");
+			console.log('fillSearchTermSelect: ' + me.searchTermsResponse.length + ' Treffer');
 			
-			console.log("fillSearchTermSelect: me.disableLimit"); // FIXME: do we need this here?
+			console.log('fillSearchTermSelect: me.disableLimit'); // FIXME: do we need this here?
 
 			if(me.searchTermsResponse.length>0){
 				showFinalResultContent();
 			}
 			
-			if(!me.$_searchTermsSelect.is(":visible")){
+			if(!me.$_searchTermsSelect.is(':visible')){
 				return;
 			}
 			
 			
 			//fill the term component with the search results
-			for(var i=0;i<me.searchTermsResponse.length;i++){
-				var item=me.searchTermsResponse[i];
+			for(i=0;i<me.searchTermsResponse.length;i++){
+				item = me.searchTermsResponse[i];
 				me.$_searchTermsSelect.append( // FIXME; this takes too long
 						$('<li>').attr('data-value', item.groupId)
 						         .attr('data-collectionid', item.collectionId)
@@ -212,7 +209,7 @@ var Term={
 			}
 			
 			if (me.$_searchTermsSelect.hasClass('ui-selectable')) {
-				me.$_searchTermsSelect.selectable("destroy");
+				me.$_searchTermsSelect.selectable('destroy');
 			}
 			
 			me.$_searchTermsSelect.selectable();
@@ -225,22 +222,22 @@ var Term={
 			searchTermsSelectLi.mouseleave(function() {
 				$(this).removeClass('ui-state-hover');
 			});
-			me.$_searchTermsSelect.on( "selectableselecting", function( event, ui ) {
+			me.$_searchTermsSelect.on('selectableselecting', function( event, ui ) {
 				$(ui.selecting).addClass('ui-state-active');
 			});
-			me.$_searchTermsSelect.on( "selectableunselecting", function( event, ui ) {
+			me.$_searchTermsSelect.on('selectableunselecting', function( event, ui ) {
 				$(ui.unselecting).removeClass('ui-state-active');
 			});
-			me.$_searchTermsSelect.on( "selectableselected", function( event, ui ) {
+			me.$_searchTermsSelect.on('selectableselected', function( event, ui ) {
 				$(ui.selected).addClass('ui-state-active');
 			});
 			
-			if(me.searchTermsResponse.length==1){
-				me.$_searchTermsSelect.find("li:first-child").addClass('ui-state-active').addClass('ui-selected');
+			if(me.searchTermsResponse.length === 1){
+				me.$_searchTermsSelect.find('li:first-child').addClass('ui-state-active').addClass('ui-selected');
 			}
 			
 			// "reset" search form
-			$("#search").autocomplete( "search", $("#search").val('') );
+			$('#search').autocomplete('search', $('#search').val('') );
 			
 			//if only one record, find the attributes and display them
 			if(me.searchTermsResponse.length===1){
@@ -248,7 +245,7 @@ var Term={
 	            console.log('fillSearchTermSelect => newTermCollectionId: ' + me.newTermCollectionId);
                 me.newTermGroupId = me.searchTermsResponse[0].groupId;
 	            me.newTermTermEntryId = me.searchTermsResponse[0].termEntryId;
-				console.log("fillSearchTermSelect: only one record => find the attributes and display them");
+				console.log('fillSearchTermSelect: only one record => find the attributes and display them');
 				me.findTermsAndAttributes(me.searchTermsResponse[0].groupId);
 				return;
 			}
@@ -258,6 +255,25 @@ var Term={
 			    me.$_resultTermsHolder.hide();
 			}
 			
+			//if term is proposed from the instant translate, and the source exist more than once
+			if(me.searchTermsResponse.length > 1 && isTermProposalFromInstantTranslate){
+				var yesText=proposalTranslations['Ja'],
+					buttons={
+					};
+				buttons[yesText]=function(){
+		            $(this).dialog('close');
+				};
+				// Define the Dialog and its properties.
+			    $('<div></div>').dialog({
+			        resizable: false,
+			        modal: true,
+			        title: proposalTranslations['multipleSourcesFoundTitle'],
+			        height: 300,
+			        width: 450,
+			        buttons:buttons
+			    }).text(proposalTranslations['multipleSourcesFoundMessage']);
+		    
+			}
 		},
 		
 		/***
@@ -270,7 +286,7 @@ var Term={
 		        return; // TODO (quick & dirty - the REAL problem is: this should not happen at all!!)
 		    }
 			var me=this;
-		    console.log("findTermsAndAttributes() for: " + termGroupid);
+		    console.log('findTermsAndAttributes() for: ' + termGroupid);
 		    Attribute.languageDefinitionContent=[];
             
             me.$_termCollectionSelect.hide();
@@ -291,16 +307,16 @@ var Term={
 		    }
 		    
 		    $.ajax({
-		        url: Editor.data.termportal.restPath+"termcollection/searchattribute",
-		        dataType: "json",
-		        type: "POST",
+		        url: Editor.data.termportal.restPath+'termcollection/searchattribute',
+		        dataType: 'json',
+		        type: 'POST',
 		        data: {
 		            'groupId':termGroupid,
 		            'collectionId':getFilteredCollections()
 		        },
 		        success: function(result){
 		        	
-		        	if(!result.rows[me.KEY_TERM_ATTRIBUTES] || result.rows[me.KEY_TERM_ATTRIBUTES].length==0){
+		        	if(!result.rows[me.KEY_TERM_ATTRIBUTES] || result.rows[me.KEY_TERM_ATTRIBUTES].length === 0){
 		        		//there are no resulsts, and do not render nothing 
 		        		me.emptyResultTermsHolder();
 		        		return;
@@ -313,7 +329,7 @@ var Term={
 
 		            me.drawTermTable(result.rows[me.KEY_TERM_ATTRIBUTES]);
 		        }
-		    })
+		    });
 		},
 		
 		/***
@@ -354,19 +370,23 @@ var Term={
 		    	me.$_termTable.accordion({
 		            active: false,
 		            collapsible: true,
-		            heightStyle: "content",
+		            heightStyle: 'content',
 		            beforeActivate: function( event, ui ) {
                         if ($(event.toElement).hasClass('proposal-delete')) {
                             // Clicking the delete-icon itself does not need to open the Term.
                             event.preventDefault();
+                            return;
                         }
-		                if (ui.newHeader.length === 0 && ui.oldHeader.has("textarea").length > 0) {
+                        
+		                if (ui.newHeader.length === 0 && ui.oldHeader.has('textarea').length > 0) {
                             // Term in header is opened for editing; don't close the panel.
                             event.preventDefault();
+                            return;
                         }
+		                me.cancelPendingChanges(ui.oldHeader);
 		            },
                     activate: function( event, ui ) {
-                        if (ui.newHeader.length === 0 && ui.oldHeader.has("textarea").length > 0) {
+                        if (ui.newHeader.length === 0 && ui.oldHeader.has('textarea').length > 0) {
                             // Panel is already opened, don't close it after click on Term in header for editing.
                             currentItem = ui.oldHeader[0];
                             currentItemNr = me.$_termTable.children('h3').index(currentItem);
@@ -383,28 +403,24 @@ var Term={
 		    $.ui.accordion.prototype._keydown = function( event ) {
 		        var keyCode = $.ui.keyCode;
 
-		        if (event.keyCode == keyCode.SPACE) {
+		        if (event.keyCode === keyCode.SPACE) {
 		            return;
 		        }
 		    };
 		    
 		    //find the selected item form the search result and expand it
-		    $.each($("#searchTermsSelect li"), function (i, item) {
+		    $.each($('#searchTermsSelect li'), function (i, item) {
 		        if($(item).hasClass('ui-state-active')){
 		        	me.$_termTable.accordion({
 		                active:false
 		            });
 		            
-		            $.each($("#termTable h3"), function (i, termitem) {
-		            	//check it is request from instanttranslate for translated term
-		            	if(isTermProposalFromInstantTranslate && termitem.dataset.termId==-1){
-		            		//this will triger the "new translated" term editor
-		            		$(termitem).click();
-		            		isTermProposalFromInstantTranslate=false;
-		            		return false;
+		            $.each($('#termTable h3'), function (i, termitem) {
+		            	if(isTermProposalFromInstantTranslate) {
+		            		return true; // continue; we check isTermProposalFromInstantTranslate later
 		            	}
 		            	//expand the selected term (check for language, since there can be terms with same name in same term entry)
-		                if((termitem.dataset.termValue === item.textContent || termitem.dataset.proposal=== item.textContent) && (termitem.dataset.language==item.dataset.language)){
+		                if((termitem.dataset.termValue === item.textContent || termitem.dataset.proposal === item.textContent) && (termitem.dataset.language === item.dataset.language)){
 		                	me.$_termTable.accordion({
 		                        active:i
 		                    });
@@ -416,17 +432,22 @@ var Term={
 		    });
 		    // We must avoid that the first item is activated (= this is the skeleton and must never be active until clicked);
 		    // better collapse all if nothing is (selected) in the left column.
-            if ($("#searchTermsSelect li").length === 0 || $("#searchTermsSelect li.ui-state-active").length === 0) {
+            if ($('#searchTermsSelect li').length === 0 || $('#searchTermsSelect li.ui-state-active').length === 0) {
                 me.$_termTable.accordion({ active: false, collapsible: true });
             }
             
 		    setSizesInFinalResultContent();
 
-	    	me.initInstantTranslateSelect()
+	    	me.initInstantTranslateSelect();
             
             // -------proposal-buttons -------
             me.drawProposalButtons('attribute');
             me.drawProposalButtons('terms');
+            
+            // trigger the "new translated" term editor if request is from instanttranslate for translated term
+            if(isTermProposalFromInstantTranslate){
+                me.$_termTable.find('.is-new').find('.proposal-add').click();
+            }
         },
         
         /***
@@ -456,14 +477,12 @@ var Term={
 		renderTerm: function (term) {
             var me = this,
                 termAttributesHtmlContainer = [],
-                termRflLang=term.attributes[0]!=undefined ? term.attributes[0].language : '',
+                termRflLang = (term.attributes[0] !== undefined) ? term.attributes[0].language : '',
                 rfcLanguage = getLanguageFlag(termRflLang),
                 statusIcon=me.checkTermStatusIcon(term), //check if the term contains attribute with status icon
                 infosForSelection = '',
                 filteredCientsNames = [],
-                filteredCollectionsNames = [],
-                clientId,
-                clientName,
+                clientsForCollection,
                 isProposal,
                 proposable = (term.proposable !== false) ? ' proposable' : '', // = does the user have the rights to handle proposals for this term?,
                 instantTranslateIntegrationForTerm,
@@ -473,7 +492,7 @@ var Term={
             // ... a proposal for a term that already existed (term.proposal = "xyz")
             // ... or a proposal for a new term (term.proposal = null, but processStatus is "unprocessed")
             isProposal = ' is-finalized'; 
-            if (term.proposal !== null || term.processStatus === "unprocessed") {
+            if (term.proposal !== null || term.processStatus === 'unprocessed') {
                 isProposal = ' is-proposal';
             }
             
@@ -491,7 +510,7 @@ var Term={
             termHeader.push('data-term-id="'+term.termId+'"');
             termHeader.push('data-groupid="'+term.groupId+'"');
             termHeader.push('data-language="'+term.languageId+'"');
-            if (term.proposal && term.proposal!=undefined) {
+            if (term.proposal && term.proposal !== undefined) {
             	termHeader.push('data-proposal="'+term.proposal.term+'"');
             }
             termHeader.push('>');
@@ -521,9 +540,9 @@ var Term={
             //add client- and termCollection-names like this: [CUSTOMERNAME; termCollectionNAME]
             infosForSelection = [];
             clientsForCollection = collectionsClients[term.collectionId];
-            if(clientsForCollection.length>1){
+            if(typeof clientsForCollection !== 'undefined' && clientsForCollection.length>1){
             	for (var i = 0; i < clientsForCollection.length; i++) {
-            		if(clientsNames[clientsForCollection[i]]!=undefined){
+            		if(clientsNames[clientsForCollection[i]] !== undefined){
             			filteredCientsNames.push(clientsNames[clientsForCollection[i]]);
             		}
                 }
@@ -544,7 +563,7 @@ var Term={
             
             //draw term attributes
             termAttributesHtmlContainer.push('<div data-term-id="'+term.termId+'" data-collection-id="'+term.collectionId+'" class="term-attributes">');
-            if (term.termId != -1) {
+            if (term.termId !== -1) {
                 instantTranslateIntegrationForTerm = me.renderInstantTranslateIntegrationForTerm(termRflLang);
                 termAttributesHtmlContainer.push(instantTranslateIntegrationForTerm);
             }
@@ -570,7 +589,7 @@ var Term={
                 htmlCollection=[];
             
             // DB: new term-proposals are stored as unprocessed term, not as proposal... *sigh*
-            if (termData.processStatus === "unprocessed" && !termData.proposal) {
+            if (termData.processStatus === 'unprocessed' && !termData.proposal) {
                 htmlCollection.push('<ins class="proposal-value-content">'+termData.term+'</ins>');
                 return htmlCollection.join(' ');
             }
@@ -593,7 +612,7 @@ var Term={
          * @param {String} source
          * @returns {String}
          */
-        renderLanguageSelect: function (languagesFor, source=null) {
+        renderLanguageSelect: function (languagesFor, source) {
             var languageSelect = '',
                 languageSelectDescription = '<option value="none">'+proposalTranslations['selectLanguage']+'</option>',
                 languageSelectOptions = '',
@@ -602,17 +621,18 @@ var Term={
                 targetsForSources,
                 targets,
                 availableLanguages,
-                languageName='';
+                languageName='',
+                i;
             
             
             switch(languagesFor) {
-                case "instanttranslate":
+                case 'instanttranslate':
                     // offer target-Languages as available in InstantTranslate for the term's source
                     source = checkSubLanguage(source);
                     targetsForSources = Editor.data.instanttranslate.targetsForSources;
                     if (source in targetsForSources){
                         targets = targetsForSources[source];
-                        for (var i=0; i < targets.length; i++) {
+                        for (i=0; i < targets.length; i++) {
                             target = targets[i];
                             languageName=Editor.data.apps.termportal.rfcToLanguageNameMap[target] ? Editor.data.apps.termportal.rfcToLanguageNameMap[target] : target;
                             flag = getLanguageFlag(target);
@@ -620,11 +640,11 @@ var Term={
                         }
                     }
                     break;
-                case "term":
+                case 'term':
                     // list the languages of the TermPortal first...
                     languageSelectOptions += '<option value="none" disabled>-- '+translations['TermPortalLanguages']+': --</option>';
-                    $("#language option").each(function() {
-                        if ($(this).val() != 'none') {
+                    $('#language option').each(function() {
+                        if ($(this).val() !== 'none') {
                             flag = getLanguageFlag($(this).text());
                             languageName=Editor.data.apps.termportal.rfcToLanguageNameMap[$(this).text()] ? Editor.data.apps.termportal.rfcToLanguageNameMap[$(this).text()] : $(this).text();
                             languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+languageName+'</option>';
@@ -633,7 +653,7 @@ var Term={
                     // ... and then list ALL languages that are available in translate5
                     languageSelectOptions += '<option value="none" disabled>-- '+translations['AllLanguagesAvailable']+': --</option>';
                     availableLanguages = Editor.data.availableLanguages;
-                    for (var i=0; i < availableLanguages.length; i++) {
+                    for (i=0; i < availableLanguages.length; i++) {
                         lang = availableLanguages[i];
                         flag = getLanguageFlag(lang.value);
                         languageName=Editor.data.apps.termportal.rfcToLanguageNameMap[lang.text] ? Editor.data.apps.termportal.rfcToLanguageNameMap[lang.text] : lang.text;
@@ -642,7 +662,7 @@ var Term={
                     break;
             }
             
-            if (languageSelectOptions != '') {
+            if (languageSelectOptions !== '') {
                 languageSelect = '<select class="chooseLanguage">'+languageSelectDescription+languageSelectOptions+'</select>';
             }
             return languageSelect;
@@ -667,7 +687,7 @@ var Term={
             	source=Editor.data.apps.termportal.idToRfcLanguageMap[source];
             }
             languageSelect = me.renderLanguageSelect('instanttranslate',source);
-            if (languageSelect == '') {
+            if (languageSelect === '') {
                 return '';
             }
             html += '<div class="instanttranslate-integration">';
@@ -686,7 +706,7 @@ var Term={
                 $_termData = $_termAttributes.prev('.term-data'),
                 text = $_termData.attr('data-term-value'),
                 source = $_termData.children('img').attr('title'),
-                target = $_elSelect.find("option:selected").val(),
+                target = $_elSelect.find('option:selected').val(),
                 url = Editor.data.restpath+'instanttranslate',
                 params;
             
@@ -697,7 +717,7 @@ var Term={
             
             source = checkSubLanguage(source);
             target = checkSubLanguage(target);
-            params = "text="+text+"&source="+source+"&target="+target;
+            params = 'text=' + text + '&source=' + source + '&target=' + target;
             
             console.log('(openInstantTranslate:) url: ' + url +'; params: ' + params);
             window.parent.loadIframe('instanttranslate',url,params);
@@ -722,44 +742,47 @@ var Term={
                 htmlProposalCancelIcon  = '<span class="proposal-btn proposal-cancel ui-icon ui-icon-close"></span>',
                 $_selectorAdd = false, $_selectorDelete = false, $_selectorEdit = false, $_selectorSave = false, $_selectorCancel = false,
                 titleAdd, titleDelete, titleEdit, titleSave, titleCancel,
-        		selectedArea='#'+$("#resultTermsHolder ul>.ui-tabs-active").attr('aria-controls');
+        		selectedArea='#'+$('#resultTermsHolder ul>.ui-tabs-active').attr('aria-controls');
             
             switch(elements) {
-                case "commentAttributeEditorClosed":
+                case 'commentAttributeEditorClosed':
                     $_selectorRemove = $(selectedArea+' .proposal-save').closest('h4');
                     // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
-                case "attributeEditingOpened":
+                case 'attributeEditingOpened':
                     $_selectorRemove = $(selectedArea+' textarea').closest('p').prev('h4');
                     $_selectorSave = $_selectorRemove;
                     $_selectorCancel = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
-                    titleCancel = proposalTranslations['cancelProposal']
+                    titleCancel = proposalTranslations['cancelProposal'];
                     break;
-                case "componentEditorClosed":
+                case 'componentEditorClosed':
                     $_selectorRemove = $(selectedArea+' .proposal-save').parent();
                     // only editable items can be edited; we can simply switch back to edit-icon
                     $_selectorEdit = $_selectorRemove;
                     titleEdit = proposalTranslations['editTermAttributeProposal'];
                     break;
-                case "componentEditorOpened":
+                case 'componentEditorOpened':
                     $_selectorRemove = $(selectedArea+' textarea').closest('h3');
                     $_selectorSave = $_selectorRemove;
                     $_selectorCancel = $_selectorRemove;
                     titleSave = proposalTranslations['saveProposal'];
                     titleCancel = proposalTranslations['cancelProposal'];
                     break;
-                case "terms":
+                case 'terms':
                     $_selectorAdd = $(selectedArea+' .term-data.is-new');
                     $_selectorDelete = $(selectedArea+' .term-data.proposable.is-proposal');
                     $_selectorEdit = $(selectedArea+' .term-data.proposable.is-finalized');
+                    console.dir($_selectorAdd);
+                    console.dir($_selectorDelete);
+                    console.dir($_selectorEdit);
                     titleAdd = proposalTranslations['addTermProposal'];
                     titleDelete = proposalTranslations['deleteTermProposal'];
                     titleEdit = proposalTranslations['editTermProposal'];
                     break;
-                case "attribute":
+                case 'attribute':
                     //$_selectorAdd = $(selectedArea+' .term-data').next('div');
                     $_selectorDelete = $(selectedArea+' .attribute-data.proposable.is-proposal');
                     $_selectorEdit = $(selectedArea+' .attribute-data.proposable.is-finalized');
@@ -769,10 +792,9 @@ var Term={
                     break;
                 default:
                     // e.g. after updateComponent(): show ProposalButtons according to the new state
-                    $_this = elements;
-                    $_selectorDelete = $_this.filter('.is-proposal');
-                    $_selectorEdit = $_this.filter('.proposable.is-finalized');
-                    $_this.children('.proposal-btn').remove();
+                    $_selectorDelete = elements.filter('.is-proposal');
+                    $_selectorEdit = elements.filter('.proposable.is-finalized');
+                    elements.children('.proposal-btn').remove();
                     titleDelete = proposalTranslations['deleteProposal'];
                     titleEdit = proposalTranslations['editProposal'];
                     break;
@@ -812,7 +834,7 @@ var Term={
 		 * @returns
 		 */
 		checkTermStatusIcon:function(term){
-		    var retVal="", 
+		    var retVal = '', 
 		    	attributes=term.attributes,
 		        status = 'unknown', 
 		        map = Editor.data.termStatusMap,
@@ -821,7 +843,7 @@ var Term={
 		    $.each(attributes, function (i, attr) {
 		        var statusIcon=Attribute.getAttributeValue(attr),
 		        	cmpStr='<img src="';
-		        if(statusIcon && statusIcon.slice(0, cmpStr.length) == cmpStr){
+		        if(statusIcon && statusIcon.slice(0, cmpStr.length) === cmpStr){
 		            retVal+=statusIcon;
 		        }
 		    });
@@ -849,9 +871,9 @@ var Term={
             me.newTermName = proposalTranslations['addTermProposal'] + '...';   // (or set according to search without result)
             me.newTermTermEntryId = null;                                       // will be set by selecting a search-result (if not given => new TermEntry will be created)
             // if a search has no result:
-            if (!isTermProposalFromInstantTranslate && me.$_searchErrorNoResults.is(":visible")) {
+            if (!isTermProposalFromInstantTranslate && me.$_searchErrorNoResults.is(':visible')) {
                 me.newTermLanguageId = $('#language').val();
-                me.newTermRfcLanguage = $("#language option:selected").text();
+                me.newTermRfcLanguage = $('#language option:selected').text();
                 me.newTermName = $('#search').val();
             }
             // if proposal from InstantTranslate:
@@ -861,7 +883,7 @@ var Term={
                 me.newTermName = instanttranslate.textProposal;
             }
             
-            console.log("After reset data for proposing a new Term:");
+            console.log('After reset data for proposing a new Term:');
             console.log('- attributes: ' + JSON.stringify(me.newTermAttributes));
             console.log('- collectionId: ' + me.newTermCollectionId);
             console.log('- groupId: ' + me.newTermGroupId);
@@ -879,7 +901,7 @@ var Term={
             var me = this,
                 newTermData = {};
             //if the collection id is not set, set it from the terms data
-            if(me.newTermCollectionId == undefined && (termsData && termsData.length>0)) {
+            if((me.newTermCollectionId === undefined || me.newTermCollectionId==null) && (termsData && termsData.length>0)) {
                 me.newTermCollectionId = termsData[0].collectionId;
                 me.newTermTermEntryId = termsData[0].termEntryId;
                 me.newTermGroupId=termsData[0].groupId;
@@ -895,10 +917,10 @@ var Term={
             newTermData = {0: {
                 'attributes': me.newTermAttributes,
                 'collectionId': me.newTermCollectionId,
-                'definition': "",
-                'desc': "",
+                'definition': '',
+                'desc': '',
                 'groupId': me.newTermGroupId,
-                'label': "",
+                'label': '',
                 'languageId': me.newTermLanguageId,
                 'proposal': null,
                 'term': me.newTermName,
@@ -922,7 +944,6 @@ var Term={
             var me = this,
                 languageSelectContainer = '<div id="languageSelectContainer" class="skeleton"></div>',
                 languageSelectHeader,
-                rfcLanguage,
                 $_termSkeleton = me.$_termTable.find('.is-new');
             if( me.$_termTable.find('#languageSelectContainer').length > 0 ) {
                 return;
@@ -933,13 +954,13 @@ var Term={
             $_termSkeleton.next().hide();
             $_termSkeleton.hide();
             // TODO: first mouseover causes "jquery.js:6718 GET http://translate5.local/editor/undefined 404 (Not Found)"
-            $( "#languageSelectContainer .chooseLanguage" ).iconselectmenu({
+            $('#languageSelectContainer .chooseLanguage').iconselectmenu({
                 select: function() {
-                    if ($(this).val() == 'none') {
+                    if ($(this).val() === 'none') {
                         return false;
                     }
                     me.newTermLanguageId = $(this).val();
-                    me.newTermRfcLanguage = $("#languageSelectContainer .chooseLanguage option:selected").val();
+                    me.newTermRfcLanguage = $('#languageSelectContainer .chooseLanguage option:selected').val();
                     $('#languageSelectContainer').remove();
                     $_termSkeleton.next().show();
                     $_termSkeleton.show();
@@ -947,7 +968,7 @@ var Term={
                     $_termSkeleton.find('.proposal-add').click();
                     $_termSkeleton.find('textarea').focus();
                 }
-            }).iconselectmenu("menuWidget").addClass("ui-menu-icons flag");
+            }).iconselectmenu('menuWidget').addClass('ui-menu-icons flag');
         },
         
         /**
@@ -981,12 +1002,12 @@ var Term={
                 collectionSelectOptions = '';
             
             //filtered collection is empty it can means that there is only one collection available and the select is not visible
-            if(filteredCollections.length == 0){
+            if(filteredCollections.length === 0){
             	//collectionIds is global variable for all available collections to the current user
             	filteredCollections=Editor.data.apps.termportal.collectionIds;
             }
             
-            if (filteredCollections.length == 1) {
+            if (filteredCollections.length === 1) {
                 me.newTermCollectionId = filteredCollections[0];
                 console.log('drawFilteredTermCollectionSelect => newTermCollectionId: ' + me.newTermCollectionId);
                 me.drawTermTable();
@@ -997,14 +1018,14 @@ var Term={
             me.emptyResultTermsHolder(false);
             me.$_resultTermsHolder.show();
             collectionSelectHeader = '<h3>'+proposalTranslations['chooseTermcollectionForTermEntry']+':</h3>';
-            if (filteredCollections.length == 0) {
-                $("#collection option").each(function() {
-                    if ($(this).val() != 'none') {
+            if (filteredCollections.length === 0) {
+                $('#collection option').each(function() {
+                    if ($(this).val() !== 'none') {
                         filteredCollections.push($(this).val());
                     }
                 });
             }
-            for (i = 0; i < filteredCollections.length; i++) {
+            for (var i = 0; i < filteredCollections.length; i++) {
                 filteredCollectionId = filteredCollections[i];
                 collectionSelectOptions += '<option value="'+filteredCollectionId+'">'+collectionsNames[filteredCollectionId]+'</option>';
             }
@@ -1016,7 +1037,10 @@ var Term={
                     console.log('chooseCollection selectmenu => newTermCollectionId: ' + me.newTermCollectionId);
                     me.$_termCollectionSelect.empty().hide();
                     me.drawTermTable();
-                    me.$_termTable.find('.proposal-add')[0].click();
+                    var proposalAdd=me.$_termTable.find('.proposal-add');
+                    if(proposalAdd.length>0){
+                    	proposalAdd[0].click();
+                    }
                 }
             });
         },
@@ -1027,11 +1051,10 @@ var Term={
          * @params {Boolean} keepAttributes
          */
         emptyResultTermsHolder: function (keepAttributes) {
-            var me = this,
-                cssDisplayHeader;
+            var me = this;
             me.$_termTable.empty();
             me.$_termCollectionSelect.empty();
-            if(typeof keepAttributes !== "undefined" && keepAttributes === true) {
+            if(typeof keepAttributes !== 'undefined' && keepAttributes === true) {
                 return;
             }
             me.$_termEntryAttributesTable.empty();
@@ -1043,15 +1066,15 @@ var Term={
          */
         initInstantTranslateSelect:function(){
         	var me=this;
-            $( ".instanttranslate-integration .chooseLanguage" )
+            $('.instanttranslate-integration .chooseLanguage')
             .iconselectmenu({
                 select: function() {
-                    if ($(this).val() == 'none') {
+                    if ($(this).val() === 'none') {
                         return false;
                     }
                     me.openInstantTranslate($(this));
                 }
-            }).iconselectmenu( "menuWidget").addClass( "ui-menu-icons flag" );
+            }).iconselectmenu('menuWidget').addClass('ui-menu-icons flag');
         },
 
         /***
@@ -1062,24 +1085,24 @@ var Term={
                 $element=$(this),
 				$parent=$element.parents('h3[data-term-id]');
 			
-			if(parent.length==0){
+			if(parent.length === 0){
 				return;
 			}
 			
 			var yesCallback=function(){
 				//ajax call to the remove proposal action
 				var me=event.data.scope,
-					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace("{ID}",$parent.data('term-id')),
+					url=Editor.data.termportal.restPath+'term/{ID}/removeproposal/operation'.replace('{ID}',$parent.data('term-id')),
 					groupId=$parent.data('groupid') || me.newTermGroupId;
 
 				$.ajax({
 			        url: url,
-			        dataType: "json",	
-			        type: "POST",
+			        dataType: 'json',	
+			        type: 'POST',
 			        success: function(result){
 			        	me.reloadTermEntry=true;
 			        	//reload the termEntry when the term is removed
-			        	if(!result.rows || result.rows.length==0){
+			        	if(!result.rows || result.rows.length === 0){
 			        		me.findTermsAndAttributes(groupId);
 			        		return;
 			        	}
@@ -1110,7 +1133,7 @@ var Term={
 				$(this).dialog('close');
 			};
 			// Define the Dialog and its properties.
-		    $("<div></div>").dialog({
+		    $('<div></div>').dialog({
 		        resizable: false,
 		        modal: true,
 		        title: proposalTranslations['deleteTermProposal'],
@@ -1130,7 +1153,7 @@ var Term={
                 filteredCollections = getFilteredCollections();
             
             //filtered collection is empty it can means that there is only one collection available and the select is not visible
-            if(filteredCollections.length == 0){
+            if(filteredCollections.length === 0){
             	//collectionIds is global variable for all available collections to the current user
             	filteredCollections=Editor.data.apps.termportal.collectionIds;
             }
@@ -1141,10 +1164,10 @@ var Term={
             
             
             //focus on the term tab
-            $("#resultTermsHolder" ).tabs({active:0});
+            $('#resultTermsHolder').tabs({active:0});
             
             // If the collection is known, we can start right away...
-            if (filteredCollections.length == 1) {
+            if (filteredCollections.length === 1) {
                 me.newTermCollectionId = filteredCollections[0];
                 console.log('onAddTermEntryClick => newTermCollectionId: ' + me.newTermCollectionId);
                 me.drawTermTable();
@@ -1167,7 +1190,7 @@ var Term={
                 $termEditorHolder = me.$_termTable.find('div[data-term-id="-1"]');
             
             // if language is not set yet, draw language-select first...
-            if (me.newTermLanguageId == null) {
+            if (me.newTermLanguageId === null) {
                 me.drawLanguageSelectForNewTerm();
                 return;
             }
@@ -1183,11 +1206,34 @@ var Term={
         onEditTermClick:function(event){
             var me = event.data.scope,
                 $element=$(this),
-                search = $element.parent().find("span[data-editable]"),
+                search = $element.parent().find('span[data-editable]'),
                 $termAttributeHolder = me.$_termTable.find('div[data-term-id="' + search.data('id') + '"]');
             console.log('onEditTermClick');
             event.stopPropagation();
             ComponentEditor.addTermComponentEditor(search,$termAttributeHolder);
+        },
+        
+        /***
+         * Find the all opened editors and close them.
+         * TODO: if requested add dialog box
+         */
+        cancelPendingChanges:function(termHeader){
+        	if(termHeader.length<1){
+        		return;
+        	}
+        	//is in the header valid editor
+        	if(termHeader.has('textarea').length > 0){
+        		//close the opened term editor
+        		termHeader.find('span.proposal-cancel').mouseup();
+        	}
+        	//render the cancel icons for the attributes
+        	this.drawProposalButtons('attributeEditingOpened')
+        	//find all attributes with cancel button
+        	var $editors=this.$_termTable.find('span.proposal-cancel');
+        	//trigger the cancel button, and with this cancel the editor
+	    	$editors.each(function(index,editor) {
+	    		$(editor).mouseup();
+	        });
         }
 };
 
