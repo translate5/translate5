@@ -151,6 +151,11 @@ abstract class editor_Models_Export_FileParser {
     protected $log;
     
     /**
+     * @var editor_Models_SegmentFieldManager
+     */
+    protected $segmentFieldManager;
+    
+    /**
      * 
      * @param int $fileId
      * @param bool $diff
@@ -177,6 +182,8 @@ abstract class editor_Models_Export_FileParser {
         $this->tagHelper = ZfExtended_Factory::get('editor_Models_Segment_InternalTag');
         $this->termTagHelper = ZfExtended_Factory::get('editor_Models_Segment_TermTag');
         $this->whitespaceHelper = ZfExtended_Factory::get('editor_Models_Segment_Whitespace');
+        $this->segmentFieldManager = ZfExtended_Factory::get('editor_Models_SegmentFieldManager');
+        $this->segmentFieldManager->initFields($this->_taskGuid);
 
         $this->events = ZfExtended_Factory::get('ZfExtended_EventManager', array(get_class($this)));
     }
@@ -341,7 +348,7 @@ abstract class editor_Models_Export_FileParser {
         $edited = $this->tagHelper->protect($edited);
         $edited = $this->removeTermTags($edited);
         $edited = $this->tagHelper->unprotect($edited);
-        $this->compareTags($segment, $edited);
+        $this->compareTags($segment, $edited, $field);
         
         //count length after removing removeTrackChanges and removeTermTags 
         // so that the same remove must not be done again inside of textLength
@@ -379,8 +386,17 @@ abstract class editor_Models_Export_FileParser {
      * @param editor_Models_Segment $segment
      * @param string $target
      */
-    protected function compareTags(editor_Models_Segment $segment, $target) {
-        $source = $this->_task->getEmptyTargets() ? $segment->getSource() : $segment->getTarget();
+    protected function compareTags(editor_Models_Segment $segment, string $target, string $field) {
+        if($segment->getSegmentNrInTask() > 20) {
+            return;
+        }
+        //do the tag compare only if $field is editable (normally source is not)
+        $fieldInfo = $this->segmentFieldManager->getByName($field);
+        if(!$fieldInfo || !$fieldInfo->editable) {
+            return;
+        }
+        //if it was a translation task, we have to compare agains the source tags, otherwise against the field original
+        $source = $this->_task->getEmptyTargets() ? $segment->getSource() : $segment->getFieldOriginal($field);
         $sourceTags = $this->tagHelper->getRealTags($source);
         $targetTags = $this->tagHelper->getRealTags($target);
         $notInTarget = $this->tagHelper->diffArray($sourceTags, $targetTags);
@@ -391,6 +407,7 @@ abstract class editor_Models_Export_FileParser {
         $this->segmentsWithTagErrors[] = [
             'id' => $segment->getId(),
             'fileId' => $segment->getFileId(),
+            'field' => $field,
             'segmentNrInTask' => $segment->getSegmentNrInTask(),
             'additionalInTarget' => $notInSource,
             'missingInTarget' => $notInTarget,
