@@ -95,6 +95,8 @@ var ComponentEditor={
         
         me.addKeyboardShortcuts($element,$input);
         
+        me.isComponentEditorActive();
+        
         me.$_termTable.one('mouseup', '.term-data.proposable .proposal-save',function() {
             me.saveComponentChange($element,$input);
         });
@@ -130,6 +132,8 @@ var ComponentEditor={
 		$element.replaceWith($input);
         
         me.addKeyboardShortcuts($element,$input);
+        
+        me.isComponentEditorActive();
         
         //the attibute can be term attribute or term entry attribute
         //register the event listeners for both tables because of the deffinition
@@ -176,6 +180,8 @@ var ComponentEditor={
         
         me.addKeyboardShortcuts($element,$input);
 
+        me.isComponentEditorActive();
+        
         me.$_termTable.one('mouseup', '.term-attributes .proposal-save',function() {
             me.saveCommentChange($element,$input);
         });
@@ -228,6 +234,7 @@ var ComponentEditor={
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
 
             $input.replaceWith(componentRenderData);
+            me.isComponentEditorActive();
             return;
         }
         
@@ -300,6 +307,7 @@ var ComponentEditor={
                 $termHolder.children('p[data-id="-1"]').remove();
                 $termHolder.children('h4[data-attribute-id="-1"]').remove();
                 $input.replaceWith('');
+                me.isComponentEditorActive();
                 return;
             }
 
@@ -314,7 +322,7 @@ var ComponentEditor={
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$element.text());
 
             $input.replaceWith(componentRenderData);
-            
+            me.isComponentEditorActive();
             return;
 		}
 
@@ -396,6 +404,8 @@ var ComponentEditor={
         $elParent.removeClass('in-editing');
         $input.replaceWith(renderData);
         Term.drawProposalButtons($elParent);
+        
+        me.isComponentEditorActive();
         
         //on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
@@ -508,6 +518,18 @@ var ComponentEditor={
                 me.cancelComponentChange($element,$input);
             }
         });
+    },
+    
+    /***
+     * Check and hide the instant translate combo if the component editor is active
+     */
+    isComponentEditorActive:function(){
+    	var me=this,
+    		editorExist=me.$_termTable.find('textarea').length>0,
+    		translateToCombos=me.$_termTable.find('.instanttranslate-integration');
+		translateToCombos.each(function(index,cmp){
+			editorExist ? $(cmp).hide() :$(cmp).show(); 
+		});
     }
 };
 
