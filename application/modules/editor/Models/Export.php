@@ -101,12 +101,21 @@ class editor_Models_Export {
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
             mkdir($path);
         }
+        $log = Zend_Registry::get('logger')->cloneMe('editor.export');
         $segmentErrors = [];
         foreach ($filePaths as $fileId => $relPath) {
             $path = $localEncoded->encode($relPath);
             $path = $exportRootFolder.DIRECTORY_SEPARATOR.$path;
             $parser = $this->getFileParser((int)$fileId, $path);
             /* @var $parser editor_Models_Export_FileParser */
+            if(empty($parser)) {
+                $log = Zend_Registry::get('logger')->cloneMe('editor.export');
+                $log->warn('E1157', 'Export: the file "{file}" could not be exported, since had possibly already errors on import.', [
+                    'task' => $this->task,
+                    'file' => $relPath,
+                ]);
+                continue;
+            }
             $parser->saveFile();
             $errors = $parser->getSegmentTagErrors();
             if(!empty($errors)) {
@@ -127,18 +136,21 @@ class editor_Models_Export {
     }
     
     /**
-     * decide regarding to the fileextension, which FileParser should be loaded and return it
+     * decide regarding to the fileextension, which FileParser should be loaded and return it. 
+     *  Returns null if no fileparser was stored to the file. This can happen on errors in preprocessing of files without a native file parser. 
      *
      * @param int $fileId
      * @param string $path
-     * @return editor_Models_Import_FileParser
-     * @throws Zend_Exception
+     * @return editor_Models_Import_FileParser|null
      */
     protected function getFileParser(int $fileId, string $path){
         $file = ZfExtended_Factory::get('editor_Models_File');
         /* @var $file editor_Models_File */
         $file->load($fileId);
         $exportParser = str_replace('_Import_', '_Export_', $file->getFileParser());
+        if(empty($exportParser) || !class_exists($exportParser)) {
+            return null;
+        }
         return ZfExtended_Factory::get($exportParser, array($fileId, $this->optionDiff,  $this->task, $path));
     }
 }
