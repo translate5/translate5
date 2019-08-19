@@ -116,7 +116,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
         //update the term entry create/modefy dates
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->updateModificationGroupAttributes($termEntry);
+        $attribute->handleTransacGroup($termEntry);
         
         //update the view
         $this->view->rows->proposal = $this->proposal->getDataObject();
@@ -189,7 +189,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
         //update the term entry create/modefy dates
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->updateModificationGroupAttributes($termEntry);
+        $attribute->handleTransacGroup($termEntry);
         
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;

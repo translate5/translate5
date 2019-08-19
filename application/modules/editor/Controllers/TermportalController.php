@@ -217,7 +217,10 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             "chooseLanguageForTermEntry"=>$this->translate->_("Sprache für Term-Vorschlag wählen"),
             "chooseTermcollectionForTermEntry"=>$this->translate->_("Term-Collection für Term-Vorschlag wählen"),
             "selectLanguage"=>$this->translate->_("... Sprache auswählen"),
-            "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für")
+            "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für"),
+            
+            "multipleSourcesFoundTitle"=>$this->translate->_("Es wurden mehrere Quellenbegriffe gefunden"),
+            "multipleSourcesFoundMessage"=>$this->translate->_("Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen.")
         ]);
         
         // for filtering in front-end: get the names for the available collectionIds

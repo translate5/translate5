@@ -109,6 +109,11 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     
     const INTERNAL_LOCK = '*translate5InternalLock*';
 
+    /**
+     * Currently only used for getConfig, should be used for all relevant customer stuff in this class
+     */
+    protected static $customerCache = [];
+    
     protected $dbInstanceClass = 'editor_Models_Db_Task';
     protected $validatorInstanceClass = 'editor_Models_Validator_Task';
 
@@ -134,28 +139,35 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
      */
     protected function getConfig() {
         // This is a temporary preparation for implementing TRANSLATE-471.
-        
-        $config = new Zend_Config([], true);
-        
-        // Step 1: start with systemwide config
-        $origConfig = Zend_Registry::get('config');
-        /* @var $origConfig Zend_Config */
-        $config->merge($origConfig);
-        
-        // Step 2: anything customer-specific for this task?
-        if (!empty($this->getCustomerId())) {
-            $customer = ZfExtended_Factory::get('editor_Models_Customer');
-            /* @var $customer editor_Models_Customer */
-            $customer->load($this->getCustomerId());
-            $customerConfig = $customer->getConfig();
-            $config->merge($customerConfig);
+        if (empty($this->getCustomerId())) {
+            // Step 1a: start with systemwide config
+            $config = new Zend_Config(Zend_Registry::get('config')->toArray(), true);
+        }
+        else {
+            // Step 1b: anything customer-specific for this task?
+            $config = $this->_getCachedCustomer($this->getCustomerId())->getConfig();
         }
         
-        // Step 3: anything task-specific for this task?
+        // Step 2: anything task-specific for this task?
         // TODO...
         
         $config->setReadOnly();
         return $config;
+    }
+    
+    /**
+     * access customer instances in a cached way
+     * @param int $id
+     * @return editor_Models_Customer
+     */
+    protected function _getCachedCustomer(int $id): editor_Models_Customer {
+        if(empty(self::$customerCache[$id])) {
+            $customer = ZfExtended_Factory::get('editor_Models_Customer');
+            /* @var $customer editor_Models_Customer */
+            $customer->load($id);
+            self::$customerCache[$id] = $customer;
+        }
+        return self::$customerCache[$id];
     }
 
     /**

@@ -580,7 +580,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $deleteParams['id NOT IN (?)']=$this->termEntryAttributeContainer;
         }
         
-            //remove the old term entry attributes
+        //remove the old term entry attributes
         $termEntryAttributes->delete($deleteParams);
         
         $this->termEntryAttributeContainer=[];
@@ -691,6 +691,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         // check if actual term is empty self-closing tag
         if ($this->xml->isEmptyElement) {
+            $this->actualTermIdTbx=null;
             return;
         }
         $this->actualTermIdTbx=$this->getIdTerm();
@@ -808,6 +809,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             $this->termContainer=[];
             return;
         }
+        
+        //ignore the saveing when the term is empty
+        if(!isset($this->termContainer['term']) || empty($this->termContainer['term'])){
+            $this->actualParentId=null;
+            $this->termAttirbuteContainer=[];
+            $this->termContainer=[];
+            return;
+        }
             
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
@@ -837,13 +846,21 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $termAttributes=ZfExtended_Factory::get('editor_Models_Db_Term_Attribute');
         /* @var $termAttributes editor_Models_Db_Term_Attribute */
         
-        //update the term id for all collected term attributes
-        $termAttributes->update(['termId'=>$term->getId()],['id IN (?)'=>$this->termAttirbuteContainer]);
+        if(!empty($this->termAttirbuteContainer)){
+            //update the term id for all collected term attributes
+            $termAttributes->update(['termId'=>$term->getId()],['id IN (?)'=>$this->termAttirbuteContainer]);
+        }
+        
+        //check if the proposals should be removed
+        $this->handleCurrentTermProposal();
         
         //check the processStatus attribute for the term. If there is no process status attribute for the term, new one will be created.
-        $this->handleTermProcessStatus($term->getId());
+        $statusAttributeId=$this->handleTermProcessStatus($term->getId());
+        if($statusAttributeId && $statusAttributeId>0){
+            $this->termAttirbuteContainer[]=$statusAttributeId;
+        }
         
-        $deleteParams=array();
+        $deleteParams=[];
         $deleteParams['termId = ?'] = $term->getId();
         
         //remove the old attribute
@@ -926,11 +943,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     
     /***
      * Check if the current term has attribute with processStatus. If not create a default processStatus attribute
+     * @param int $termId
+     * @return NULL|mixed|array
      */
     protected function handleTermProcessStatus(int $termId){
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->checkOrCreateProcessStatus($termId);
+        return $attribute->checkOrCreateProcessStatus($termId);
     }
     
     /***
@@ -967,9 +986,14 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         if(!$this->isStartTag()){
             return;
         }
+        //do not save attributes on empty term
+        if(!isset($this->termContainer['term']) || empty($this->termContainer['term'])){
+            return;
+        }
+        
         $attribute=$this->getAttributeObject($parentId);
 
-        $attribute->setTermId($this->actualTermIdDb);
+        $attribute->setTermId(isset($this->termContainer['id']) ? $this->termContainer['id'] : null);
         $attribute->setInternalCount($internalCount);
         $attribute->saveOrUpdate();
         
@@ -1036,7 +1060,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         }
         $attribute->setValue($cleanValue);
         
-        //$sessionUser = new Zend_Session_Namespace('user');
         $attribute->setUserGuid($this->user->getUserGuid());
         $attribute->setUserName($this->user->getUserName());
         
@@ -1206,6 +1229,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 //update the term
                 $t = (object) $t;
                 $this->termContainer['id']=$t->id;
+                $this->termContainer['language']=$t->language;
                 $this->termContainer['term']=$this->xml->readInnerXml();
                 $this->termContainer['updated']=date("Y-m-d H:i:s");
                 $this->termContainer['userGuid']=$this->user->getUserGuid();
@@ -1230,6 +1254,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 }
                 $this->termContainer['id']=$t->id;
                 $this->termContainer['term']=$this->xml->readInnerXml();
+                $this->termContainer['language']=$t->language;
                 $this->termContainer['definition']=$this->actualDefinition;
                 $this->termContainer['updated']=date("Y-m-d H:i:s");
                 $this->termContainer['userGuid']=$this->user->getUserGuid();
@@ -1251,12 +1276,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 $tmpTermValue=$tmpTermValue[0];
                 
                 $this->termContainer['id']=$tmpTermValue['id'];
+                $this->termContainer['language']=$tmpTermValue['language'];
                 $this->termContainer['definition']=$this->actualDefinition;
                 $this->termContainer['updated']=date("Y-m-d H:i:s");
                 $this->termContainer['userGuid']=$this->user->getUserGuid();
                 $this->termContainer['userName']=$this->user->getUserName();
                 
-                if(!$this->lastMergeGroupId){
+                if(empty($this->lastMergeGroupId)){
                     $this->lastMergeTermEntryIdDb=$tmpTermValue['termEntryId'];
                     $this->lastMergeGroupId=$tmpTermValue['groupId'];
                 }
@@ -1354,6 +1380,35 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         /* @var $model editor_Models_Term */
         $model->updateAssocLanguages([$this->termCollectionId]);
         
+    }
+    
+    /***
+     * Check if the current term exist as proposal.
+     * @return boolean
+     */
+    protected function handleCurrentTermProposal(){
+        //if the user is allowed for term proposals, check if the proposals should be removed
+        if(!in_array('termProposer', $this->user->getRoles())){
+            return false;
+        }
+        $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+        /* @var $proposal editor_Models_Term_Proposal */
+        
+        $proposalInCollection=$proposal->findProposalInCollection($this->termContainer['term'], $this->termContainer['language'], $this->termCollectionId);
+        if($proposalInCollection->count()<1){
+            return false;
+        }
+        
+        $proposalTerm=$proposalInCollection->toArray();
+        $proposalTerm=$proposalTerm[0];
+        $term = ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        
+        if($term->isModifiedAfter($this->termContainer['id'], $proposalTerm['termProposalCreated'])){
+            return $proposal->removeTermProposal($proposalTerm['termProposalTermId'],$proposalTerm['termProposalValue']);
+        }
+        
+        return false;
     }
     
     /***

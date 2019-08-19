@@ -1607,6 +1607,9 @@ Im Projektportal {portalLink} gab es zu nachfolgender Aufgabe folgende Warnung: 
 <b>Bereich:</b> {domain}<br />
 Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften im Reiter Ereignisse. <br /><br />
 {taskFragment}{footer}</target></trans-unit>
+<trans-unit id='QXVzIE1UIMO8YmVybm9tbWVu'><source>Aus MT übernommen</source><target>Aus MT übernommen</target></trans-unit>
+<trans-unit id='RXMgd3VyZGVuIG1laHJlcmUgUXVlbGxlbmJlZ3JpZmZlIGdlZnVuZGVu'><source>Es wurden mehrere Quellenbegriffe gefunden</source><target>Es wurden mehrere Quellenbegriffe gefunden</target></trans-unit>
+<trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgZWluZW4gZGVyIFF1ZWxsYmVncmlmZmUgaW4gZGVyIGxpbmtlbiBTcGFsdGUgYXVzLiBTaWUgZ2Vow7ZyZW4genUgdmVyc2NoaWVkZW5lbiBCZWdyaWZmc2VpbnRyw6RnZW4uIE5hY2ggZGVyIEF1c3dhaGwga8O2bm5lbiBTaWUgSWhyZSBuZXVlIFRlcm3DvGJlcnNldHp1bmcgenVtIHRyYW5zbGF0ZTUgdGVybVBvcnRhbCBoaW56dWbDvGdlbi4='><source>Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen.</source><target>Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen.</target></trans-unit>
   </body>
  </file>
 </xliff>

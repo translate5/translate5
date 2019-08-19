@@ -121,6 +121,17 @@ class editor_Plugins_TermImport_Services_Import {
      */
     CONST DELETE_OLDER_IMPORT_ENTRIES_KEY="deleteEntriesOlderThanCurrentImport";
     
+    
+    /***
+     * Deletes all term proposals older then deleteEntriesModifiedOlderThan date.
+     * If the deleteEntriesModifiedOlderThan is not set, then the current date will be used
+     * The current date will be used also when deleteEntriesOlderThanCurrentImport is true
+     * 
+     * @var string
+     */
+    CONST DELETE_PROPOSALS_OLDER_THAN_KEY="deletProposalsOlderThan";
+    
+    
     /***
      * Data from the filesystem or cross api config file
      * @var array
@@ -189,6 +200,9 @@ class editor_Plugins_TermImport_Services_Import {
             
             //remove old term entries and terms
             $this->removeEntriesOlderThenImport($params['collectionId']);
+            
+            //remove term proposals
+            $this->removeProposalsOlderThan($params['collectionId']);
                 
             //define the import source, used for storing the file in the disk in the needed location
             $params['importSource']="filesystem";
@@ -283,6 +297,10 @@ class editor_Plugins_TermImport_Services_Import {
             
             //remove old term entries and terms
             $this->removeEntriesOlderThenImport($params['collectionId']);
+            
+            //remove term proposals
+            $this->removeProposalsOlderThan($params['collectionId']);
+            
             $affectedCollections[] = $params['collectionId'];
             
             $respTbxl=$connector->getTbx($file);
@@ -454,6 +472,36 @@ class editor_Plugins_TermImport_Services_Import {
         /* @var $termEntry editor_Models_TermCollection_TermEntry */
         $termEntry->removeOlderThan($collectionId, NOW_ISO);
         $this->logProfiling('removeEntriesOlderThenImport for collection '.$collectionId);
+    }
+    
+    /***
+     * Deletes all term proposals older then deleteEntriesModifiedOlderThan date.
+     * If the deleteEntriesModifiedOlderThan is not set, then the current date will be used
+     * The current date will be used also when deleteEntriesOlderThanCurrentImport is true
+     * 
+     * @param int $collectionId
+     */
+    private function removeProposalsOlderThan($collectionId){
+        //check if delete old entries is configured in the config file
+        if(empty($this->configMap[self::DELETE_PROPOSALS_OLDER_THAN_KEY])){
+            return;
+        }
+        
+        $olderThan=null;
+        //check if delete old tasks is configured in the config file
+        if(!empty($this->configMap[self::DELETE_ENTRIES_KEY])){
+            $olderThan=$this->configMap[self::DELETE_ENTRIES_KEY];
+        }
+        
+        //check if delete old entries is configured in the config file
+        $deleteOlderThanCurrentImport=!empty($this->configMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]);
+        
+        $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
+        /* @var $proposal editor_Models_Term_Proposal */
+        $theDate=!$deleteOlderThanCurrentImport && !empty($olderThan) ? $olderThan :  NOW_ISO;
+        $proposals->removeOlderThan([$collectionId],$theDate);
+        
+        $this->logProfiling('removeProposalsOlderThan for collection '.$collectionId);
     }
     
     /***
