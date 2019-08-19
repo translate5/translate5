@@ -279,7 +279,7 @@ Ext.define('Editor.view.LanguageResources.TmOverviewPanel', {
                                 tasks.push(v[i]);
                             }
                         }
-                        meta.tdAttr = 'data-qtip="'+tasks.join('<br />')+'"';
+                        meta.tdAttr = 'data-qtip="'+Ext.String.htmlEncode(tasks.join('<br />'))+'"';
                         return v.length;
                     }
                 }],
