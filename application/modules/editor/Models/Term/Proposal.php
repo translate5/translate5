@@ -71,7 +71,7 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
     public function findProposalInCollection(string $termText, int $languageId, int $termCollection){
         $s = $this->db->select()
         ->setIntegrityCheck(false)
-        ->from(['p'=>'LEK_term_proposal'],['p.term as termProposalValue'])
+        ->from(['p'=>'LEK_term_proposal'],['p.term as termProposalValue','p.created as termProposalCreated','p.termId as termProposalTermId'])
         ->join(['t'=>'LEK_terms'],'t.id=p.termId')
         ->where('p.term = ?', $termText)
         ->where('t.language = ?', $languageId)
@@ -103,7 +103,7 @@ class editor_Models_Term_Proposal extends ZfExtended_Models_Entity_Abstract {
     public function removeTermProposal(int $termId,string $term){
         return $this->db->delete([
             'termId=?' => $termId,
-            'term=?' => $term,
+            'term=?' => $term
         ])>0;
     }
     
