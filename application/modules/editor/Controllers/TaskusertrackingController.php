@@ -49,11 +49,18 @@ class editor_TaskusertrackingController extends ZfExtended_RestController {
         // anonymize userinfo for view?
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
+        
+        $taskAnonCache = [];
+        
         $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
         /* @var $workflowAnonymize editor_Workflow_Anonymize */
         foreach ($this->view->rows as &$row) {
-            $task->loadByTaskGuid($row['taskGuid']);
-            if ($task->anonymizeUsers()) {
+            //cache the tasks anon config
+            if(!array_key_exists($row['taskGuid'], $taskAnonCache)) {
+                $task->loadByTaskGuid($row['taskGuid']);
+                $taskAnonCache[$row['taskGuid']] = $task->anonymizeUsers();
+            }
+            if ($taskAnonCache[$row['taskGuid']]) {
                 $row = $workflowAnonymize->anonymizeUserdata($row['taskGuid'], $row['userGuid'], $row);
             }
         }
