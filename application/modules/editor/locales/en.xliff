@@ -3415,6 +3415,29 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>Excel hochladen</source>
     <target>Upload excel</target>
 </trans-unit>
+
+<trans-unit id='VHJhbnNsYXRlNSAtIFdhcm51bmcgenUgQXVmZ2FiZQ=='>
+    <source>Translate5 - Warnung zu Aufgabe</source>
+    <target>Translate5 - Warning to task</target>
+</trans-unit>
+<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZ2FiIGVzIHp1IG5hY2hmb2xnZW5kZXIgQXVmZ2FiZSBmb2xnZW5kZSBXYXJudW5nOiA8YnIgLz4KPGJyIC8+CjxiPldhcm51bmc6PC9iPiB7d2FybmluZ308YnIgLz4KPGI+Q29kZTo8L2I+IHtjb2RlfTxiciAvPgo8Yj5CZXJlaWNoOjwvYj4ge2RvbWFpbn08YnIgLz4KV2VpdGVyZSBJbmZvcm1hdGlvbmVuIGZpbmRlbiBzaWNoIGluIGRlciBBbndlbmR1bmcgaW4gZGVuIEF1ZmdhYmVuZWlnZW5zY2hhZnRlbiBpbSBSZWl0ZXIgRXJlaWduaXNzZS4gPGJyIC8+PGJyIC8+Cnt0YXNrRnJhZ21lbnR9e2Zvb3Rlcn0='>
+    <source>{header}
+Im Projektportal {portalLink} gab es zu nachfolgender Aufgabe folgende Warnung: <br />
+<br />
+<b>Warnung:</b> {warning}<br />
+<b>Code:</b> {code}<br />
+<b>Bereich:</b> {domain}<br />
+Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften im Reiter Ereignisse. <br /><br />
+{taskFragment}{footer}</source>
+    <target>{header}
+There is a warning to the task <b>{task.taskNr} - {task.taskName}</b> in the task-portal {portalLink}.<br />
+<br />
+<b>Warning:</b> {warning}<br />
+<b>Code:</b> {code}<br />
+<b>Area:</b> {domain}<br />
+More information can be found in the task property window in the tab events.<br /><br />
+{taskFragment}{footer}</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

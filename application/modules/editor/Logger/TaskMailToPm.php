@@ -25,30 +25,36 @@
 /**
  * Additional Log Writer which just logs all events with an field "task" with a task Entity in its extra data to a separate task log table
  */
-class editor_Logger_TaskWriter extends ZfExtended_Logger_Writer_Abstract {
+class editor_Logger_TaskMailToPm extends ZfExtended_Logger_Writer_Abstract {
+    /**
+     * {@inheritDoc}
+     * @see ZfExtended_Logger_Writer_Abstract::write()
+     */
     public function write(ZfExtended_Logger_Event $event) {
-        $event = clone $event;
         $task = $event->extra['task'];
         /* @var $task editor_Models_Task */
-        $taskLog = ZfExtended_Factory::get('editor_Models_Logger_Task');
-        /* @var $taskLog editor_Models_Logger_Task */
-        if($task->isModified()) {
-            $modified = $task->getModifiedValues();
-            foreach($modified as $field => $value) {
-                //we get also modified values if value is the same, but the type was changed (integer vs string)
-                // therefore we check == for 0, so we get all falsy value changes
-                // otherwise we compare typeless to get only changed values 
-                if($value == 0 || $value != $task->__call('get'.ucfirst($field),array())) {
-                    $event->extra['Task field '.$field] = $value;
-                }
-            }
+        
+        $pm = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $pm ZfExtended_Models_User */
+        
+        try {
+            $pm->loadByGuid($task->getPmGuid());
         }
-        $taskLog->setFromEventAndTask($event, $task);
-        // we don't log the task data again, thats implicit via the taskGuid
-        unset($event->extra['task']); 
-        $taskLog->setExtra($this->toJson($event->extra));
-        $taskLog->save();
-        return;
+        catch (ZfExtended_Models_Entity_NotFoundException $e) {
+            //if there is no PM user, we can not write an email to him
+            return;
+        }
+        
+        $event = clone $event; //clone it, so that extra data is not manipulated in object
+        
+        $mailer = ZfExtended_Factory::get('ZfExtended_Mail');
+        /* @var $mailer ZfExtended_Mail */
+        $mailer->setParameters([
+            'task' => $task,
+            'event' => $event,
+        ]);
+        $mailer->setTemplate('taskWarning.phtml');
+        $mailer->sendToUser($pm);
     }
     
     public function isAccepted(ZfExtended_Logger_Event $event) {

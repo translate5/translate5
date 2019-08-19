@@ -110,7 +110,7 @@ class editor_Models_Export {
             /* @var $parser editor_Models_Export_FileParser */
             if(empty($parser)) {
                 $log = Zend_Registry::get('logger')->cloneMe('editor.export');
-                $log->warn('E1157', 'Export: the file "{file}" could not be exported, since had possibly already errors on import.', [
+                $log->warn('E1157', 'Export: the file "{file}" could not be exported, since it had possibly already errors on import.', [
                     'task' => $this->task,
                     'file' => $relPath,
                 ]);
