@@ -38,8 +38,6 @@ $this->render('general.phtml');
 
 $this->subject = $this->translate->_('Translate5 - Warnung zu Aufgabe').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
 
-$warning = $this->event->levelName.' in '.$this->event->domain.': ';
-
 //is automatically merged with data from general.phtml
 $data = [
     'header' => $this->header,
