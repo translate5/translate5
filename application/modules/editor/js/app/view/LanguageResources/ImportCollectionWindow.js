@@ -53,6 +53,7 @@ Ext.define('Editor.view.LanguageResources.ImportCollectionWindow', {
         var me = this,
             config = {
                 title:me.strings.title,
+                height : 360,
                 tools:[{
                     type:'help',
                     tooltip:me.strings.helpButtonTooltip,

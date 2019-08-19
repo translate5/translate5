@@ -29,8 +29,8 @@ var Attribute={
         
         // ------------- TermEntries-Attributes -------------
         me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
-        me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
-        me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-edit",{
+        me.$_termEntryAttributesTable.on('click', ".proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
+        me.$_termEntryAttributesTable.on('click', ".proposal-edit",{
             scope:me,
             type:'termEntryAttribute'
         },me.onEditAttributeClick);
@@ -98,10 +98,19 @@ var Attribute={
     onEditAttributeClick: function(event){
     	var me=event.data.scope,
 	    	type=event.data.type,
-			attributeId = $(this).parents('h4.attribute-data').data('attributeId'),
-            $editableComponent = me.getAttributeComponent(attributeId,type),
-            $input;
+	    	targetAttribute= $(event.currentTarget),
+	    	attributeHeader=targetAttribute.parents('h4.attribute-data'),
+	    	attributeId = attributeHeader.data('attributeId'),
+            $input=null,
+            $editableComponent=null,
+            termHolder=null;
+            
         console.log('onEditAttributeClick');
+        
+        if(!attributeId || attributeId<1 || attributeHeader.hasClass('is-definition')){
+        	termHolder=targetAttribute.parents('div.term-attributes');
+        }
+        $editableComponent = me.getAttributeComponent(attributeId,type,termHolder);
         
         event.stopPropagation();
         
@@ -186,8 +195,7 @@ var Attribute={
 		    		
 		        	//the term attribute is definition, remove and update the content for the term and term entry attribute definition dom
 		    		if(attributeData.attrType === 'definition'){
-		    			me.checkAndUpdateDeffinition(attributeData,'termEntryAttribute');
-		    			me.checkAndUpdateDeffinition(attributeData,'termAttribute');
+		    			me.checkAndUpdateDeffinition(attributeData);
 		    			return;
 		    		}
 		    		
@@ -249,6 +257,7 @@ var Attribute={
             headerText = '',
             attVal,
             flagContent = '',
+            isDefinition='',
             childData=[],
             childDataText;
             
@@ -260,7 +269,11 @@ var Attribute={
             isProposal = ' is-proposal';
         }
         
-        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '" data-attribute-id="'+attribute.attributeId+'">';
+        if(attribute.attrType === "definition"){
+        	isDefinition=' is-definition ';
+        }
+        
+        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + isDefinition +'" data-attribute-id="'+attribute.attributeId+'">';
         headerTagClose='</h4>';
         
 	    switch(attribute.name) {
@@ -332,17 +345,39 @@ var Attribute={
 	
 	/***
 	 * Check if the attribute is of type deffinition. When it is deffinition, update the definitiona attribute 
-	 * in the term or termentry area deppending on attrType param
+	 * in the term and termentry area
 	 */
-	checkAndUpdateDeffinition:function(attribute,attrType){
-		
+	checkAndUpdateDeffinition:function(attribute){
+
 		if(attribute.attrType !== 'definition' || !Editor.data.app.user.isTermProposalAllowed){
 			return false;
 		}
 		
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
-			$elParent=me.getTermAttributeHeader(attribute.attributeId,attrType),
+			$attributes = me.$_termTable.find('p[data-id="'+attribute.attributeId+'"]'),
+			$attributes2 = me.$_termEntryAttributesTable.find('p[data-id="'+attribute.attributeId+'"]');
+		
+		
+		$attributes.each(function(i,att){
+			att=$(att);
+			att.empty();
+			att.replaceWith(renderData);
+		});
+		
+		$attributes2.each(function(i,att){
+			att=$(att);
+			att.empty();
+			att.replaceWith(renderData);
+		});
+		
+		Term.drawProposalButtons('componentEditorClosed');
+		//Term.drawProposalButtons(me.$_termEntryAttributesTable);
+	    Term.reloadTermEntry=true;
+		
+		
+		/*
+			$elParent=me.getTermAttributeHeader(attribute.attributeId,attrType)
 			$input=me.getAttributeComponent(attribute.attributeId,attrType);
 	        
 		
@@ -363,6 +398,7 @@ var Attribute={
 	    
 	    Term.drawProposalButtons($elParent);
 	    Term.reloadTermEntry=true;
+	    */
 	    return true;
 	},
 	
@@ -476,23 +512,22 @@ var Attribute={
 	/***
 	 * Return jquery component of the term/termenty attribute
 	 */
-	getAttributeComponent:function(attributeId,type){
+	getAttributeComponent:function(attributeId,type,selector){
 		var me=this,
-			$selector=null,
 			$el;
-		if(type === 'termEntryAttribute'){
-			$selector=me.$_termEntryAttributesTable;
+		if((!selector || selector.length==0) && type === 'termEntryAttribute'){
+			selector=me.$_termEntryAttributesTable;
 		}
-		if(type === 'termAttribute'){
-			$selector=me.$_termTable;
+		if((!selector || selector.length==0) && type === 'termAttribute'){
+			selector=me.$_termTable;
 		}
-		if(!$selector){
+		if(!selector){
 			return null;
 		}
 		// sometimes the attribute is still in span, sometimes in p > textarea already
-		$el = $selector.find('span[data-id="'+attributeId+'"]');
+		$el = selector.find('span[data-id="'+attributeId+'"]');
 		if ($el.length === 0) {
-		    $el = $selector.find('p[data-id="'+attributeId+'"]');
+		    $el = selector.find('p[data-id="'+attributeId+'"]');
 		}
 		return $el;
 	},
