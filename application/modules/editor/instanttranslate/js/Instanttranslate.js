@@ -245,10 +245,21 @@ function handleAfterLocalesChange() {
  * @returns {Boolean}
  */
 function hasEnginesForLanguageCombination() {
-    var sourceLocale = $("#sourceLocale").val(),
-        targetLocale = $("#targetLocale").val(),
-        targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceLocale);
-    return targetLocalesAvailable.indexOf(targetLocale) !== -1;
+	var returnValue=isSourceTargetAvailable($("#sourceLocale").val(),$("#targetLocale").val());
+	returnValue ? $("#switchSourceTarget").removeAttr("disabled") : $("#switchSourceTarget").attr("disabled", true);
+	returnValue ? $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" ) : $("#switchSourceTarget").addClass( "switchSourceTargetDisabled" );
+    return returnValue;
+}
+
+/***
+ * Check if for given source target combo there is available language resource
+ * @param sourceRfc
+ * @param targetRfc
+ * @returns {Boolean}
+ */
+function isSourceTargetAvailable(sourceRfc,targetRfc){
+    var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc);
+    return targetLocalesAvailable.indexOf(targetRfc) !== -1;
 }
 
 /**

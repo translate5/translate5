@@ -42,7 +42,7 @@ END LICENSE AND COPYRIGHT
 }
 
 #source,
-#target {
+#target{
     flex: 1 300px;
     min-width: 0;
     margin: 10px;
@@ -426,4 +426,13 @@ left: 45px;
     color: white;
     font: bold 9px "Helvetica Neue", Sans-Serif;
   }
+  
+ #switchSourceTarget{
+	height:40px;
+	width:60px;
+	margin: 10px;
+ }
 
+.switchSourceTargetDisabled{
+	color: #999;
+}
