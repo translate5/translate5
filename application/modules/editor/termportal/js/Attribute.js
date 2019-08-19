@@ -353,11 +353,16 @@ var Attribute={
 			return false;
 		}
 		
+		if(!attribute.proposal){
+			this.removeDomProposal(this.$_termTable,attribute);
+			this.removeDomProposal(this.$_termEntryAttributesTable,attribute);
+			return;
+		}
+
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
 			$attributes = me.$_termTable.find('p[data-id="'+attribute.attributeId+'"]'),
 			$attributes2 = me.$_termEntryAttributesTable.find('p[data-id="'+attribute.attributeId+'"]');
-		
 		
 		$attributes.each(function(i,att){
 			att=$(att);
@@ -400,6 +405,25 @@ var Attribute={
 	    Term.reloadTermEntry=true;
 	    */
 	    return true;
+	},
+	
+	/***
+	 * Remove attribute dom poroposal and replace the new values
+	 */
+	removeDomProposal:function(root,attributeData){
+		//the term proposal is removed, find the attribute holder and render the initial term proposable content
+    	var me=this,
+    		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
+    		$proposalHolder=root.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
+    		$ins=$proposalHolder.find('ins'),
+    		$parrent=root.find('h4[data-attribute-id="'+attributeData.attributeId+'"]');
+    		
+		$ins.replaceWith(renderData);
+    	$proposalHolder.find('del').remove();
+    	$parrent.switchClass('is-proposal','is-finalized');
+    	$parrent.each(function(i,att){
+			Term.drawProposalButtons($(att));
+		});
 	},
 	
 	/***
