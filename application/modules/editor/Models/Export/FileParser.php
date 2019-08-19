@@ -387,16 +387,15 @@ abstract class editor_Models_Export_FileParser {
      * @param string $target
      */
     protected function compareTags(editor_Models_Segment $segment, string $target, string $field) {
-        if($segment->getSegmentNrInTask() > 20) {
-            return;
-        }
+        $isTranslationTask = $this->_task->getEmptyTargets();
+        $segmentNotTranslated = $segment->getAutoStateId() == editor_Models_Segment_AutoStates::NOT_TRANSLATED;
         //do the tag compare only if $field is editable (normally source is not)
         $fieldInfo = $this->segmentFieldManager->getByName($field);
-        if(!$fieldInfo || !$fieldInfo->editable) {
+        if(!$fieldInfo || !$fieldInfo->editable || $isTranslationTask && $segmentNotTranslated) {
             return;
         }
         //if it was a translation task, we have to compare agains the source tags, otherwise against the field original
-        $source = $this->_task->getEmptyTargets() ? $segment->getSource() : $segment->getFieldOriginal($field);
+        $source = $isTranslationTask ? $segment->getSource() : $segment->getFieldOriginal($field);
         $sourceTags = $this->tagHelper->getRealTags($source);
         $targetTags = $this->tagHelper->getRealTags($target);
         $notInTarget = $this->tagHelper->diffArray($sourceTags, $targetTags);

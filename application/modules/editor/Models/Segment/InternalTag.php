@@ -499,15 +499,30 @@ class editor_Models_Segment_InternalTag extends editor_Models_Segment_TagAbstrac
     public function diffArray(array $segment1Tags, array $segment2Tags): array {
         //we can not use array_diff, since the count of same tags is important too. This would be ignored by array_diff
         $result = [];
-        foreach($segment1Tags as $inFirst) {
-            $found = array_search($inFirst, $segment2Tags);
+        //ensure that we have numeric numbered arrays:
+        $segment1Tags = array_values($segment1Tags);
+        $segment2Tags = array_values($segment2Tags);
+        
+        //Problem: the fulltag content of a tag may contain special characters like umlauts. 
+        //After Import they are in HTML entity notation: &auml; after saving from browser they are stored as their plain character ä
+        //Example encoded:       <div class="single 123 internal-tag ownttip"><span title="&lt;ph ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte, Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Geräte Detailmaß A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
+        //Example from Browser:  <div class="single 123 internal-tag ownttip"><span title="&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Ger&auml;te, Detailma&szlig; A&amp;lt;/variable&amp;gt;&lt;/ph&gt;" class="short">&lt;1/&gt;</span><span data-originalid="6f18ea87a8e0306f7c809cb4f06842eb" data-length="-1" class="full">&lt;ph id=&quot;1&quot; ax:element-id=&quot;0&quot;&gt;&amp;lt;variable linkid=&quot;123&quot; name=&quot;1002&quot;&amp;gt;Ger&auml;te, Detailma&szlig; A&amp;lt;/variable&amp;gt;&lt;/ph&gt;</span></div>
+        //This is so far no problem, only for comparing the tags. 
+        //For that reason we have to compare tags without their full text content. The information of content equality is contained in the payload in the css class.
+        
+        $segment1TagsSanitized = preg_replace('#span title="[^"]*|class="full">[^<]*<\/#', '', $segment1Tags);
+        $segment2TagsSanitized = preg_replace('#span title="[^"]*|class="full">[^<]*<\/#', '', $segment2Tags);
+        
+        foreach($segment1TagsSanitized as $idx => $inFirst) {
+            $found = array_search($inFirst, $segment2TagsSanitized);
             if($found === false) {
                 //if the tag is not in the second list, we want it as result
-                $result[] = $inFirst;
+                $result[] = $segment1Tags[$idx];
             }
             else {
                 //since the count of the matches is also important we have to delete already found elements here
                 unset($segment2Tags[$found]);
+                unset($segment2TagsSanitized[$found]);
             }
         }
         return $result;
