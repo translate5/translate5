@@ -223,22 +223,21 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     initEvents: function() {
         var me = this,
-            editorDoc = Ext.get(me.editor.getDoc()),
+            docEl = me.getEditorBodyExtDomElement(), // Ext.get(me.editor.getDoc()) will not init events in Firefox (TRANSLATE-1749)
             tooltipBody = Ext.getBody();
         me.consoleLog('SpellCheck: initEvents...');
         
         if (!me.disableSpellCheckByIdle) {
-            editorDoc.on('keydown', me.handleKeyDown, me, {priority: 9980, delegated: false});
+            docEl.on({
+                keydown:{
+                    delegated: false,
+                    priority: 9980,
+                    fn: me.handleKeyDown,
+                    scope: this,
+                    preventDefault: false
+                }
+            });
         }
-        
-        editorDoc.on({
-            click:{
-                delegated: false,
-                fn: me.handleClickInEditor,
-                scope: this,
-                preventDefault: true
-            }
-        });
         
         me.editor.on({
             afterInsertMarkup:{
@@ -252,13 +251,19 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             }
         });
         
-        me.getEditorBodyExtDomElement().on({
+        docEl.on({
             contextmenu:{
                 delegated: false,
                 delegate: me.self.NODE_NAME_MATCH + '.' + me.self.CSS_CLASSNAME_MATCH,
                 fn: me.showToolTip,
                 scope: this,
                 preventDefault: true
+            },
+            click:{
+                delegated: false,
+                fn: me.handleClickInEditor,
+                scope: this,
+                preventDefault: false
             }
         });
         
@@ -351,6 +356,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
     
     handleClickInEditor: function() {
         var me = this;
+        me.consoleLog('SpellCheck: handleClickInEditor...');
         me.terminateSpellCheck();
     },
     /**
@@ -384,11 +390,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
             break;
             case (!me.ignoreEvent || me.eventIsArrowKey()):
                 me.consoleLog('The user is still editing!');
-                me.startSpellCheckViaTimer();
+                me.startSpellCheckViaTimer(); // TODO: HÄ?????
             break;
         }
         
-        me.startSpellCheckViaTimer();
+        me.startSpellCheckViaTimer(); // TODO: HÄ?????
         
         // Stop event?
         if(me.stopEvent) {
@@ -440,10 +446,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         editorContentAsText = me.getEditorContentAsText(false);
         
-        if (editorContentAsText === '') {
+        if (editorContentAsText.trim() === '') {
             me.consoleLog('startSpellCheck stopped because editorContentAsText = ""');
             me.terminateSpellCheck();
-            return;
+            return true;
         }
         me.consoleLog('startSpellCheck for editorContentAsText: ' + editorContentAsText);
         
