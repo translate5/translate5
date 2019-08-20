@@ -69,6 +69,7 @@ class editor_TermController extends ZfExtended_RestController {
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
         
+        settype($this->data->isTermProposalFromInstantTranslate, 'boolean');
         if($this->data->isTermProposalFromInstantTranslate){
             $translate = ZfExtended_Zendoverwrites_Translate::getInstance();
             $attribute->addTermComment($this->entity->getId(), $translate->_("Aus MT übernommen"));
