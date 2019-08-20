@@ -502,7 +502,7 @@ var ComponentEditor={
      * @param {Object} $element = the original span[data-editable]
      * @param {Object} $input   = the textarea with the proposed content
      */
-    addKeyboardShortcuts($element, $input) {
+    addKeyboardShortcuts: function($element, $input) {
         var me = this;
         $input.keydown(function(e){
         	if (e.ctrlKey && e.which === 83) { // CTRL+S
