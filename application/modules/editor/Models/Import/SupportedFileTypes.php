@@ -119,7 +119,7 @@ class editor_Models_Import_SupportedFileTypes {
     }
     
     /**
-     * returns the parser to the given extension
+     * returns the parser class name to the given extension
      * @param string $ext
      * @throws editor_Models_Import_FileParser_NoParserException
      * @return string parser class name
