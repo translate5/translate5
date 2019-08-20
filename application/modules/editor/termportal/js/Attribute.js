@@ -101,11 +101,23 @@ var Attribute={
 	    	targetAttribute= $(event.currentTarget),
 	    	attributeHeader=targetAttribute.parents('h4.attribute-data'),
 	    	attributeId = attributeHeader.data('attributeId'),
+	    	$attributeBtn = attributeHeader.children('.proposal-edit'),
             $input=null,
             $editableComponent=null,
             termHolder=null;
             
         console.log('onEditAttributeClick');
+        
+        // In tbx, "definition" belongs to the <langSet> (= level between <termEntry> and <term>).
+        // In the TermPoral, the user can edit definitions only in the termEntry-Attributes,
+        // not on the level of each individual term.
+        if (type === 'termAttribute' && attributeHeader.hasClass('is-definition')) {
+            $('#editDefinitionMsg').dialog({
+                position: { my: 'left top', at: 'left top', of: $attributeBtn }
+            });
+            $('#editDefinitionMsg').dialog('open');
+            return;
+        }
         
         if(!attributeId || attributeId<1 || attributeHeader.hasClass('is-definition')){
         	termHolder=targetAttribute.parents('div.term-attributes');
