@@ -458,10 +458,30 @@ Ext.define('Editor.controller.Editor', {
             })
         });
         editor.DEC_DIGITS = me.DEC_DIGITS;
-
-        docEl.on('keyup', me.handleKeyUp, me, {priority: 9999, delegated: false});
-        docEl.on('mouseup', me.handleMouseUp, me, {priority: 9999, delegated: false});
-        docEl.on('singletap', me.handleMouseUp, me, {priority: 9999, delegated: false});
+        
+        docEl.on({
+            keyup:{
+                delegated: false,
+                priority: 9999,
+                fn: me.handleKeyUp,
+                scope: this,
+                preventDefault: false
+            },
+            mouseup:{
+                delegated: false,
+                priority: 9999,
+                fn: me.handleMouseUp,
+                scope: this,
+                preventDefault: false
+            },
+            singletap:{
+                delegated: false,
+                priority: 9999,
+                fn: me.handleMouseUp,
+                scope: this,
+                preventDefault: false
+            }
+        });
         
         // Paste does not reach the browser's clipboard-functionality,
         // so we need our own SnapshotHistory for handling CTRL+Z and CTRL+Y.
@@ -607,6 +627,7 @@ Ext.define('Editor.controller.Editor', {
      */
     handleKeyUp: function(event) {
         var me = this;
+        me.consoleLog('Editor: handleKeyUp');
         me.event = event; // Editor.util.Event
 	    // New content? 
         // Ignore 
@@ -627,6 +648,7 @@ Ext.define('Editor.controller.Editor', {
      */
     handleMouseUp: function() {
         var me = this;
+        me.consoleLog('Editor: handleMouseUp');
         me.handleAfterCursorMove();
     },
     /**
