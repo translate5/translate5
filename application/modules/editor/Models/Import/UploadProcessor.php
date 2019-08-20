@@ -39,16 +39,6 @@ class editor_Models_Import_UploadProcessor {
     const TYPE_TESTCASE = 'testcase';
     
     /**
-     * valid upload types, extension and mime combination.
-     * The extension is also the internal used key.
-     * @var array
-     */
-    protected $validUploadTypes = array(
-        self::TYPE_ZIP => array('application/zip'),
-        self::TYPE_TESTCASE => array('application/xml'),
-    );
-    
-    /**
      * @var editor_Models_Import_DataProvider_Abstract
      */
     protected $dataProvider;
@@ -107,17 +97,12 @@ class editor_Models_Import_UploadProcessor {
         settype($importName['extension'], 'string');
         $ext = strtolower($importName['extension']);
 
-        //FIXME WARNING: MimeTypes ware not needed anymore, since check was deactivated in UploadProcessor
-        // but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
-        $allValidExtensions = $supportedFiles->getSupportedTypes();
-        if(!empty($allValidExtensions[$ext])) {
-            $this->validUploadTypes[$ext] = $allValidExtensions[$ext];
-        }
+        $allValidExtensions = $supportedFiles->getSupportedExtensions();
         
         $isEmptySize = empty($importInfo['importUpload']['size']);
-        if(!$isEmptySize && !empty($this->validUploadTypes[$ext])){
+        if(!$isEmptySize && in_array($ext, $allValidExtensions)){
             return $ext;
         }
         
