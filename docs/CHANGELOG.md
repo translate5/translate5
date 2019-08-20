@@ -3,6 +3,24 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.5] - 2019-08-20
+###Changed
+TRANSLATE-1738: Add "Added from MT" to note field of Term, if term stems from InstantTranslate
+TRANSLATE-1739: InstantTranslate: Add button to switch languages
+TRANSLATE-1737: Only show "InstantTranslate into" drop down, if no field is open for editing
+TRANSLATE-1743: Term proposal system: Icons and Shortcuts for Editing
+
+###Bugfixes
+TRANSLATE-1752: error E1149 - Export: Some segments contains tag errors is logged to much on proofreading tasks.
+TRANSLATE-1732: Open Bugs term proposal system
+TRANSLATE-1749: spellcheck is not working any more in Firefox
+TRANSLATE-1758: Combination of trackchanges and terminology produces sometimes corrupt segments (warning "E1132")
+TRANSLATE-1755: Transit Import is not working anymore
+TRANSLATE-1754: Authentication via session auth hash does a wrong redirect if the instance is located in a sub directory
+TRANSLATE-1750: Loading of tasks in the task overview had a bad performance
+TRANSLATE-1747: E9999 - Missing Arguments $code and $message
+TRANSLATE-1757: JS Error in LanguageResources Overview if task names contain " characters
+
 ## [3.2.4] - 2019-07-30
 ###Added
 TRANSLATE-1720: Add segment editing history (snapshots) to JS debugging (rootcause)
