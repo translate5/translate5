@@ -124,7 +124,7 @@ abstract class editor_Services_Connector_Abstract {
      * @param string $msg
      */
     protected function log($method, $msg = '') {
-        error_log($method." LanguageResource ".$this->languageResource->getName().' - '.$this->languageResource->getServiceName().$msg);
+        //error_log($method." LanguageResource ".$this->languageResource->getName().' - '.$this->languageResource->getServiceName().$msg);
     }
     
     /**
