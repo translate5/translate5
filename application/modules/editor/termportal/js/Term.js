@@ -829,7 +829,7 @@ var Term={
             if ($_selectorCancel) {
                 $_selectorSave.addClass('in-editing');
                 $_selectorCancel.append(htmlProposalCancelIcon);
-                $_selectorCancel.children('.proposal-cancel').prop('title', titleCancel + ' [CTRL+C]');
+                $_selectorCancel.children('.proposal-cancel').prop('title', titleCancel + ' [ESC]');
             }
         },
 		
