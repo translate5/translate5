@@ -107,7 +107,8 @@ class editor_Models_Import_SupportedFileTypes {
      * @return array
      */
     public function getSupportedExtensions() {
-        return array_unique(array_merge(array_keys(self::$extensionsWithParser), self::$extensionsSupported));
+        //array_values needed for later JSON encode (with array_unique there may be gaps in the index, which results in objects instead arrays 
+        return array_values(array_unique(array_merge(array_keys(self::$extensionsWithParser), self::$extensionsSupported)));
     }
     
     /**
@@ -115,7 +116,8 @@ class editor_Models_Import_SupportedFileTypes {
      * @return array
      */
     public function getRegisteredExtensions() {
-       return array_unique(array_merge($this->getSupportedExtensions(), self::$extensionsIgnored)); 
+        //array_values needed for later JSON encode (with array_unique there may be gaps in the index, which results in objects instead arrays 
+        return array_values(array_unique(array_merge($this->getSupportedExtensions(), self::$extensionsIgnored))); 
     }
     
     /**
