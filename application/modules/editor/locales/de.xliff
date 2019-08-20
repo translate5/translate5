@@ -1610,6 +1610,9 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
 <trans-unit id='QXVzIE1UIMO8YmVybm9tbWVu'><source>Aus MT übernommen</source><target>Aus MT übernommen</target></trans-unit>
 <trans-unit id='RXMgd3VyZGVuIG1laHJlcmUgUXVlbGxlbmJlZ3JpZmZlIGdlZnVuZGVu'><source>Es wurden mehrere Quellenbegriffe gefunden</source><target>Es wurden mehrere Quellenbegriffe gefunden</target></trans-unit>
 <trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgZWluZW4gZGVyIFF1ZWxsYmVncmlmZmUgaW4gZGVyIGxpbmtlbiBTcGFsdGUgYXVzLiBTaWUgZ2Vow7ZyZW4genUgdmVyc2NoaWVkZW5lbiBCZWdyaWZmc2VpbnRyw6RnZW4uIE5hY2ggZGVyIEF1c3dhaGwga8O2bm5lbiBTaWUgSWhyZSBuZXVlIFRlcm3DvGJlcnNldHp1bmcgenVtIHRyYW5zbGF0ZTUgdGVybVBvcnRhbCBoaW56dWbDvGdlbi4='><source>Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen.</source><target>Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen.</target></trans-unit>
+<trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</target></trans-unit>
+<trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</target></trans-unit>
+<trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Hinweis</target></trans-unit>
   </body>
  </file>
 </xliff>
