@@ -75,8 +75,8 @@ class editor_Models_Segment_TermTagTrackChange {
      * @return string
      */
     public function mergeTermsAndTrackChanges($target, $tagged) {
-        $target = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/', $target, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-        $tagged = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/', $tagged, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $target = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/u', $target, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+        $tagged = preg_split('/(<[^>]+>)|(&#[^;]+;)|(.)/u', $tagged, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
         
         $diff = ZfExtended_Factory::get('ZfExtended_Diff');
         /* @var $diff ZfExtended_Diff */
@@ -117,13 +117,13 @@ class editor_Models_Segment_TermTagTrackChange {
         $result = [];
         $termTag = array_shift($termTags);
         $insDelTag = array_shift($insDelTags);
-        while($termTag || $insDelTag) {
-            if(empty($insDelTag)) {
+        while(!is_null($termTag) || !is_null($insDelTag)) {
+            if(is_null($insDelTag)) {
                 $result[] = $termTag;
                 $termTag = array_shift($termTags);
                 continue;
             }
-            if(empty($termTag)) {
+            if(is_null($termTag)) {
                 $result[] = $insDelTag;
                 $insDelTag = array_shift($insDelTags);
                 continue;
