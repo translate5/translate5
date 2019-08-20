@@ -3417,6 +3417,9 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 </trans-unit>
 <trans-unit id='RXMgd3VyZGVuIG1laHJlcmUgUXVlbGxlbmJlZ3JpZmZlIGdlZnVuZGVu'><source>Es wurden mehrere Quellenbegriffe gefunden</source><target>Multiple sources terms are found</target></trans-unit>
 <trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgZWluZW4gZGVyIFF1ZWxsYmVncmlmZmUgaW4gZGVyIGxpbmtlbiBTcGFsdGUgYXVzLiBTaWUgZ2Vow7ZyZW4genUgdmVyc2NoaWVkZW5lbiBCZWdyaWZmc2VpbnRyw6RnZW4uIE5hY2ggZGVyIEF1c3dhaGwga8O2bm5lbiBTaWUgSWhyZSBuZXVlIFRlcm3DvGJlcnNldHp1bmcgenVtIHRyYW5zbGF0ZTUgdGVybVBvcnRhbCBoaW56dWbDvGdlbi4='><source>Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen.</source><target>Please select one of the source terms in the left column. They belong to different term entries. After selection you are able to add your new term translation to translate5 termPortal.</target></trans-unit>
+<trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Editing this definition will affect all terms of this language.</target></trans-unit>
+<trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Please open the 'Term entry attributes' for editing this definition.</target></trans-unit>
+<trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Please note:</target></trans-unit>
     </body>
   </file>
 </xliff>
