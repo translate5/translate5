@@ -622,7 +622,7 @@ class editor_TaskController extends ZfExtended_RestController {
         /* @var $workerModel ZfExtended_Models_Worker */
         $workerModel->loadFirstOf('editor_Models_Import_Worker', $this->entity->getTaskGuid());
         $worker = ZfExtended_Worker_Abstract::instanceByModel($workerModel);
-        $worker->schedulePrepared();
+        $worker && $worker->schedulePrepared();
     }
 
     /**
