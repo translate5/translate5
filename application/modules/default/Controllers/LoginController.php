@@ -99,7 +99,7 @@ class LoginController extends ZfExtended_Controllers_Login {
             //find the last used app, if none use the instantranslate as default
             $meta=ZfExtended_Factory::get('editor_Models_UserMeta');
             /* @var $meta editor_Models_UserMeta */
-            $meta->loadByUser($sessionUser->data->id);
+            $meta->loadOrSet($sessionUser->data->id);
             $rdr='instanttranslate';
             if($meta->getId()!=null && $meta->getLastUsedApp()!=''){
                 $rdr=$meta->getLastUsedApp();
