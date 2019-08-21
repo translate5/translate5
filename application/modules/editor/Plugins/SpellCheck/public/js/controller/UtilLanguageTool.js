@@ -82,12 +82,13 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
         if (resultLT.rows === false) {
             me.isSupportedLanguage = false;
             me.languageToCheckLongCode = null;
+            me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
         } else {
             me.isSupportedLanguage = true;
             me.languageToCheckLongCode = resultLT.rows.longCode;
-            me.initEditor();
+            me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
+            me.initSpellCheckInEditor();
         }
-        me.consoleLog('=> isSupportedLanguage: ' + me.isSupportedLanguage + ' (' + me.languageToCheckLongCode + ')');
     },
     /**
      * 

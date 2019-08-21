@@ -74,10 +74,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         },
         component: {
             'segmentsHtmleditor': {
+                initialize: 'initEditor',
                 push: 'handleAfterContentUpdate'
             },
             '#segmentStatusStrip': {
-                afterRender: 'initSpellCheckPlugin'
+                afterRender: 'initTargetLang'
             },
             '#segmentStatusStrip #btnRunSpellCheck': {
                 click: 'startSpellCheckViaButton'
@@ -160,32 +161,32 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         me.consoleLog('---------------- SpellCheck: onDestroy FINISHED. -------------');
     },
     /**
-     * Init the SpellCheck-Plugin: 
+     * Init basics according to the task's target-language: 
      * - what's the target-language?
-     * - is this target-language supported by the SpellCheck-tool(s) we use?
      * - do we use keyboard-idle or a statusStrip-button to start a SpellCheck?
      */
-    initSpellCheckPlugin: function(statusStrip) {
+    initTargetLang: function(statusStrip) {
         var me = this;
-        me.consoleLog('0.2 initSpellCheckPlugin.');
+        me.consoleLog('0.2 SpellCheck: initTargetLang.');
         me.setTargetLangCode();
         me.setDisableSpellCheckByIdle(statusStrip);
+    },
+    /**
+     * Initialize Editor in general and language-support.
+     */
+    initEditor: function(editor) {
+        var me = this;
+        me.consoleLog('0.3 SpellCheck: initEditor.');
+        me.editor = editor;
         me.setLanguageSupport();
     },
     /**
-     * Init Editor
+     * SpellCheck-specific for Editor
      */
-    initEditor: function() {
-        var me = this,
-            plug,
-            editor;
-        me.consoleLog('0.3 SpellCheck: initEditor.');
-        // Initialize Editor in general:
-        plug = me.getSegmentGrid().editingPlugin;
-        editor = plug.editor;           // → this is the row editor component;
-        me.editor = editor.mainEditor;  // → this is the HtmlEditor
+    initSpellCheckInEditor: function() {
+        var me = this;
+        me.consoleLog('0.4 SpellCheck: initSpellCheckInEditor.');
         me.injectCSSForEditor();
-        // SpellCheck-specific for Editor:
         me.initTooltips();
         me.initEvents();
         me.setBrowserSpellcheck();
@@ -223,7 +224,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      */
     initEvents: function() {
         var me = this,
-            docEl = me.getEditorBodyExtDomElement(), // Ext.get(me.editor.getDoc()) will not init events in Firefox (TRANSLATE-1749)
+            docEl = Ext.get(me.editor.getDoc()),
             tooltipBody = Ext.getBody();
         me.consoleLog('SpellCheck: initEvents...');
         
