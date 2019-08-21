@@ -230,10 +230,10 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         
         if (!me.disableSpellCheckByIdle) {
             docEl.on({
-                keydown:{
+                keyup:{
                     delegated: false,
                     priority: 9980,
-                    fn: me.handleKeyDown,
+                    fn: me.handleKeyUp,
                     scope: this,
                     preventDefault: false
                 }
@@ -364,11 +364,11 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
      * Handle KeyDown-Events of Editor.view.segments.HtmlEditor
      * @param {Object} event
      */
-    handleKeyDown: function(event) {
+    handleKeyUp: function(event) {
         var me = this;
-        me.consoleLog('SpellCheck: handleKeyDown...');
+        me.consoleLog('SpellCheck: handleKeyUp...');
         if (!me.isSupportedLanguage) {
-            me.consoleLog('handleKeyDown stopped because language is not supported or SpellCheck-Tool does not run.');
+            me.consoleLog('handleKeyUp stopped because language is not supported or SpellCheck-Tool does not run.');
             return;
         }
         me.initKeyDownEvent(event);
