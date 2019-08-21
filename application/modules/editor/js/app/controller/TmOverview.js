@@ -469,6 +469,7 @@ Ext.define('Editor.controller.TmOverview', {
                 params: params,
                 failure: function() {
                     rec.reject();
+                    store && store.load();
                 },
                 success: function(record, operation) {
                     store && store.load();
