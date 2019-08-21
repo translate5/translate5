@@ -253,18 +253,21 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         });
         
         docEl.on({
+            click:{
+                delegated: false,
+                fn: me.handleClickInEditor,
+                scope: this,
+                preventDefault: false
+            }
+        });
+        
+        me.getEditorBodyExtDomElement().on({
             contextmenu:{
                 delegated: false,
                 delegate: me.self.NODE_NAME_MATCH + '.' + me.self.CSS_CLASSNAME_MATCH,
                 fn: me.showToolTip,
                 scope: this,
                 preventDefault: true
-            },
-            click:{
-                delegated: false,
-                fn: me.handleClickInEditor,
-                scope: this,
-                preventDefault: false
             }
         });
         
