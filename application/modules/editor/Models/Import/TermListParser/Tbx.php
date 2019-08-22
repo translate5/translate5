@@ -305,12 +305,13 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         //create term collection for the task and customer
         //the term collection will be created with autoCreateOnImport flag
-        $this->termCollectionId=$this->createTermCollection($this->customerIds);
+        $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
+        /* @var $termCollection editor_Models_TermCollection_TermCollection */
+        
+        $this->termCollectionId = $termCollection->create("Term Collection for ".$this->task->getTaskName(), $this->customerIds);
         
         //add termcollection to task assoc
-        $model=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $model editor_Models_TermCollection_TermCollection */
-        $model->addTermCollectionTaskAssoc($this->termCollectionId, $task->getTaskGuid());
+        $termCollection->addTermCollectionTaskAssoc($this->termCollectionId, $task->getTaskGuid());
         
         //all tbx files in the same term collection
         foreach($tbxfiles as $file) {
@@ -1167,16 +1168,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
                 .'_'.str_pad($this->counterTermInTig, 3, '0', STR_PAD_LEFT)
                 .'_'.str_pad($this->counterTerm, 7, '0', STR_PAD_LEFT);
         return $tempId;
-    }
-    
-    /***
-     * Create the term collection and return the id
-     * @param array $customers
-     */
-    private function createTermCollection(array $customers){
-        $termCollection=ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
-        /* @var $termCollection editor_Models_TermCollection_TermCollection */
-        return $termCollection->create("Term Collection for ".$this->task->getTaskName(), $customers);
     }
     
     /***

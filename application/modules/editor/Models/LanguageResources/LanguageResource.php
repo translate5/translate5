@@ -43,8 +43,6 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceName() setServiceName(string $resName)
  * @method string getSpecificData() getSpecificData()
  * @method void setSpecificData() setSpecificData(string $value)
- * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
- * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
  * @method string getResourceType() getResourceType()
  * @method void setResourceType() setResourceType(string $resourceType)
  */

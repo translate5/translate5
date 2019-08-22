@@ -175,6 +175,13 @@ class editor_Plugins_TermTagger_Worker_TermTaggerImport extends editor_Plugins_T
                 'level' => ZfExtended_Logger::LEVEL_WARN,
                 'domain' => 'editor.terminology.import'
             ]);
+            if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
+                //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
+                //so we do not create a new worker entry, that imports the task without terminology markup then
+                $this->task->setTerminologie(0);
+                $this->task->save();
+                return; 
+            }
         }
         
         // initialize an new worker-queue-entry to continue 'chained'-import-process

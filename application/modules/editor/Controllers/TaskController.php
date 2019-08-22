@@ -1443,7 +1443,11 @@ class editor_TaskController extends ZfExtended_RestController {
             }
             foreach($assocs as $assoc){
                 unset($assoc['id']);
-                $assoc['taskGuid']=$newTaskGuid;
+                if(!empty($assoc['autoCreatedOnImport'])) {
+                    //do not clone such TermCollection associations, since they are recreated through the cloned import package
+                    continue; 
+                }
+                $assoc['taskGuid'] = $newTaskGuid;
                 $model->init($assoc);
                 $model->save();
             }

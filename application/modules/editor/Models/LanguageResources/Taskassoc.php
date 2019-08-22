@@ -37,6 +37,8 @@ END LICENSE AND COPYRIGHT
  * @method void setTaskGuid() setTaskGuid(string $taskGuid)
  * @method boolean getSegmentsUpdateable() getSegmentsUpdateable()
  * @method void setSegmentsUpdateable() setSegmentsUpdateable(bool $updateable)
+ * @method integer getAutoCreatedOnImport() getAutoCreatedOnImport()
+ * @method void setAutoCreatedOnImport() setAutoCreatedOnImport(int $autoCreatedOnImport)
  */
 class editor_Models_LanguageResources_Taskassoc extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Taskassoc';
