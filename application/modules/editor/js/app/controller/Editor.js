@@ -1082,7 +1082,7 @@ Ext.define('Editor.controller.Editor', {
             columnToRead = editor.columnToEdit.replace(/Edit$/, '');
         Editor.MessageBox.addInfo(me.messages.segmentReset);
         me.setValueForEditor(rec.get(columnToRead));
-        me.fireEvent('prepareCompleteReplace',rec.get(columnToRead),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
+        me.fireEvent('prepareCompleteReplace',rec.get(columnToRead),true); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
         editor.mainEditor.setValueAndMarkup(me.resetSegmentValueForEditor, rec, editor.columnToEdit);
     },
     setValueForEditor: function(value) {
