@@ -172,7 +172,7 @@ Ext.define('Editor.controller.LanguageResources', {
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
           me.setValueForEditor(matchRecord.get('target'));
-          me.fireEvent('prepareCompleteReplace',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
+          me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),true); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
           editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
