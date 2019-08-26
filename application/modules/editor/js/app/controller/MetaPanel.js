@@ -72,6 +72,7 @@ Ext.define('Editor.controller.MetaPanel', {
               afterrender: 'initMetaTermHandler'
           },
           '#segmentgrid': {
+              selectionchange: 'handleSegmentSelectionChange',
               afterrender: 'initEditPluginHandler',
               beforeedit: 'startEdit',
               canceledit: 'cancelEdit',
@@ -143,12 +144,7 @@ Ext.define('Editor.controller.MetaPanel', {
     });
     
     me.record = record;
-    me.getMetaTermPanel().getLoader().load({
-        params: {id: segmentId},
-        callback: function() {
-            me.getSegmentMeta() && me.getSegmentMeta().updateLayout();
-        }
-    });
+    this.loadTermPanel(segmentId);
     //bindStore(me.record.terms());
     me.loadRecord(me.record);
     navi.show();
@@ -156,6 +152,35 @@ Ext.define('Editor.controller.MetaPanel', {
     me.getSegmentMeta().show();
     mp.enable();
   },
+  
+  /**
+   * @param {Ext.selection.Model} sm current selection model of 
+   * @param {Array} selectedRecords 
+   */
+  handleSegmentSelectionChange: function(sm, selectedRecords) {
+      if(selectedRecords.length == 0) {
+          return;
+      }
+      this.loadTermPanel(selectedRecords[0].get('id'));
+  },
+  
+  /**
+   * @param {Integer} segmentId for which the terms should be loaded 
+   */
+  loadTermPanel: function(segmentId) {
+      var me = this,
+          panel = me.getMetaTermPanel();
+      //if task has no terminology, we load the panel once to get the text no terminology
+      if(Editor.data.task.get('terminologie') || !panel.html) {
+          panel.getLoader().load({
+              params: {id: segmentId},
+              callback: function() {
+                  me.getSegmentMeta() && me.getSegmentMeta().updateLayout();
+              }
+          });
+      }
+  },
+  
   /**
    * opens metapanel for readonly segments
    * @param {Editor.model.Segment} record
