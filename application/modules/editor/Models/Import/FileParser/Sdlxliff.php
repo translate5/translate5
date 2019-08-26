@@ -82,6 +82,11 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @var array
      */
     protected $_tagMapping = [];
+
+    /**
+     * @var editor_Models_Import_FileParser_Sdlxliff_TransunitParser
+     */
+    protected $transunitParser;
     
     /**
      * (non-PHPdoc)
@@ -102,6 +107,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->initHelper();
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
+        
+        $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser');
         
         //here would be the right place to set the import map, 
         // since our values base on sdlxliff values, 
@@ -254,7 +261,9 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 if ($translate) {
                     $counterTrans++;
                     $this->parseSegmentAttributes($units[$i]);
-                    $units[$i] = $this->extractSegment($units[$i]);
+                    //since </group> closing tags can be after the trans-unit we have to split them away and them to the parsed result again
+                    $transUnit = explode('</trans-unit>', $units[$i]);
+                    $units[$i] = $this->extractSegment($transUnit[0].'</trans-unit>').$transUnit[1];
                 }
             }
             $group = implode('<trans-unit', $units);
@@ -374,127 +383,25 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
     
     /**
-     * Extrahiert aus einem durch parseFile erzeugten Code-Schnipsel mit genau einer trans-unit Quell-
-     * und Zielsegmente
-     *
-     * - speichert die Segmente in der Datenbank
-     * - setzt voraus, dass sich das target immer nach dem seg-source befindet
+     * parse the given transunit and saves the segments 
+     * 
      * @param string $transUnit
-     * @return string $transUnit enthält anstelle der Segmente die Replacement-Tags <lekSourceSeg id=""/> und <lekTargetSeg id=""/>
-     *         wobei die id die ID des Segments in der Tabelle Segments darstellt
+     * @return string contains the teplacement-Tags <lekTargetSeg id=""/> instead the content, where id is the DB segment ID
      */
     protected function extractSegment($transUnit) {
-        //Orig Transunit: '<trans-unit'.$transUnit
-        //if there is no target or an empty target
-        if(strpos($transUnit, '<target') === false) {
-            $source = strpos($transUnit, '<seg-source') === false ? '</source>' : '</seg-source>';
-            $transUnit = str_replace($source, $source.'<target></target>', $transUnit);
-        }
-        else{
-            //some versions of SDL Studio adds empty <target/> tags which must be converted then to  
-            $transUnit = preg_replace('#<target[^>]*/>#', '<target></target>', $transUnit);
-        }
-        
         $this->segmentData = array();
-        //extrahiere das Zielsegment
-        $targetExp = explode('<target', $transUnit);
-        $targetExp[1] = explode('</target>', $targetExp[1]);
-        //extrahiere das Quellsegment
-        if (strpos($targetExp[0], '<seg-source')!== false) {
-            $sourceExp = $targetExp[0];
-        } else {
-            $sourceExp = $targetExp[1][1];
-        }
-        $sourceExp = explode('<seg-source', $sourceExp);
-        $sourceExp[1] = explode('</seg-source>', $sourceExp[1]);
-        $sourceExp[1][0] = preg_split('"(<mrk[^>]*mtype=\"seg\"[^>]*>)"', $sourceExp[1][0], NULL, PREG_SPLIT_DELIM_CAPTURE);
-        $countSourceMrk = count($sourceExp[1][0]);
-        
-        //if the target does not contain any mrk tags, we have to add them empty:
-        if(preg_match('#<target>\s*</target>#', $transUnit)) {
-            $mrkToAdd = [];
-            //get the mrks from the source
-            for ($i = 1; $i < $countSourceMrk; $i = $i+2) {
-                $mrkToAdd[] = $sourceExp[1][0][$i].'</mrk>';
-            }
-            $mrkToAdd = join('', $mrkToAdd);
-            //add them into the transUnit
-            $transUnit = str_replace('</target>', $mrkToAdd.'</target>', $transUnit);
-            //add them also in the already splitted target
-            $targetExp[1][0] = $targetExp[1][0].$mrkToAdd;
-            
-            //get id part of the transunit:
-            $endOfTransUnitStartTag = strpos($transUnit, '>');
-            $id = substr($transUnit, 0, $endOfTransUnitStartTag);
-            $pattern = '#<trans-unit'.preg_quote($id,'#').'>(.*?)</trans-unit>#is';
-            $this->_skeletonFile = preg_replace($pattern, '<trans-unit'.$transUnit, $this->_skeletonFile);
-        }
-        
-        //if target does not exist, we have to get the source mrks first, to add them empty to the target
-        $targetExp[1][0] = preg_split('"(<mrk[^>]*mtype=\"seg\"[^>]*>)"', $targetExp[1][0], NULL, PREG_SPLIT_DELIM_CAPTURE);
-        $countTargetMrk = count($targetExp[1][0]);
-        if ($countTargetMrk !== $countSourceMrk) {
-            //source and target segment count does not match 
-            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1009', [
-                'filename' => $this->_fileName,
-                'task' => $this->task,
-                'transunit' => $transUnit
-            ]);
-        }
-        //füge target-Segmente in einem String wieder für den kompletten Rückzusammen-
-        //bau der transunit wieder zusammen. Beginne mit den für die Segmentextraktion
-        //nicht benötigten Teilen
-        $targetMrkString = $targetExp[1][0][0];
-        //gehe in schleife für alle Segmente (eine transunit kann mehrere Segmente enthalten)
-        for ($i = 2; $i < $countTargetMrk; $i++) {//die ersten beiden Array-Elemente sind irrelevant, da vor dem ersten Segment und Delimiter
-            $h = $i - 1;
-            //setzte allgemeine Segmenteigenschaften
-            $this->setMid(preg_replace('".*mid=\"([^\"]*)\".*"', '\\1', $sourceExp[1][0][$h]));
-            //extrahiere das sourcesegment
-            $sourceExp[1][0][$i] = explode('</mrk>', $sourceExp[1][0][$i]);
-            array_pop($sourceExp[1][0][$i]);
-            $sourceOrig = implode('</mrk>', $sourceExp[1][0][$i]);
-            
-            //FIXME getFieldPlaceholder einbauen wenn source = editable und Marc ein Rückspeichern wünscht
-            // → Marc sagt OK, allerdings ist hier die Einbau Logik doch erheblich umfangreicher als zunächst gedacht!
-            // Daher bei SDLXLIFF zunächst kein Rückspeichern der editierten Sources. 
+        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target) {
             $sourceName = $this->segmentFieldManager->getFirstSourceName();
-            $this->segmentData[$sourceName] = array(
-                     'original' => $this->parseSegment($sourceOrig,true)
-            );
-
-            //extrahiere das targetsegment
-            $targetExp[1][0][$i] = explode('</mrk>', $targetExp[1][0][$i]);
-            //falls das Zielsegment eine Übersetzung enthält
             $targetName = $this->segmentFieldManager->getFirstTargetName();
-            if ($targetExp[1][0][$i]>1) {
-                $afterTargetTag = array_pop($targetExp[1][0][$i]);
-                $targetOrig = implode('</mrk>', $targetExp[1][0][$i]);
-                $this->segmentData[$targetName] = array(
-                     'original' => $this->parseSegment($targetOrig,false)
-                );
-                
-                $segmentId = $this->setAndSaveSegmentValues();
-                $targetExp[1][0][$i] = $this->getFieldPlaceholder($segmentId, $targetName).'</mrk>'.$afterTargetTag;
-            } else {
-                $this->segmentData[$targetName] = array(
-                     'original' => NULL
-                );
-                $segmentId = $this->setAndSaveSegmentValues();
-                $targetExp[1][0][$i] = $this->getFieldPlaceholder($segmentId, $targetName).'</mrk>'.$targetExp[1][0][$i][0];
-            }
-            $targetMrkString.= $targetExp[1][0][$h] . $targetExp[1][0][$i];
-            $i++; //überspringe den delimiter
-        }
-        $targetMrkString = preg_replace('"/>\s*<lekTargetSeg"', '><lekTargetSeg', $targetMrkString);
-        //Segmenteigenschaften bei mehreren Segmenten in einer transunit korrekt extrahieren
-        //der parent-Klasse abstrakte Methoden für die wichtigen Methoden hinzufügen
-        //füge trans-unit vollständig zusammen
-        return $targetExp[0] .
-                '<target' .
-                $targetMrkString .
-                '</target>' .
-                $targetExp[1][1];
+            $this->setMid($mid);
+            $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
+            $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,true)];
+            $segmentId = $this->setAndSaveSegmentValues();
+            return $this->getFieldPlaceholder($segmentId, $targetName);
+        });
+        
+        // add leading <trans-unit for parsing, then strip it again (we got the $transUnit without it, so we return it without it)
+        return substr($result, 11);
     }
 
     /**
