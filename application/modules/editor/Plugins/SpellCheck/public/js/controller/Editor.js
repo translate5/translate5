@@ -510,6 +510,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         clearTimeout(me.editIdleTimer);
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
+        
+        me.getEditorBody().focus();
+        
+        if (me.disableSpellCheckByIdle) {
+            me.setEditorDisabled(false);
+        }
     },
     
     // =========================================================================
