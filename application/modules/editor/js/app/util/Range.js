@@ -633,8 +633,13 @@ Ext.define('Editor.util.Range', {
         var me = this,
             contentBeforeRange;
         contentBeforeRange = me.getContainerForCharacterNextToCaret(range,'previous');
-        return (contentBeforeRange !=  null && "nodeType" in contentBeforeRange && contentBeforeRange.nodeType === 1 
-                && ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) ) );
+        if (contentBeforeRange === null || contentBeforeRange === undefined) {
+            return false;
+        }
+        if (typeof contentBeforeRange != 'object' || contentBeforeRange.nodeType !== 1) {
+            return false;
+        }
+        return ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) );
     },
     /**
      * On applying the bookmark:
