@@ -636,7 +636,10 @@ Ext.define('Editor.util.Range', {
         if (contentBeforeRange === null || contentBeforeRange === undefined) {
             return false;
         }
-        if (typeof contentBeforeRange != 'object' || contentBeforeRange.nodeType !== 1) {
+        if (typeof contentBeforeRange !== 'object') {
+            return false;
+        }
+        if ('nodeType' in contentBeforeRange || contentBeforeRange.nodeType !== 1) {
             return false;
         }
         return ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) );
@@ -649,7 +652,10 @@ Ext.define('Editor.util.Range', {
      * @returns {Boolean}
      */
     isBookmarkOfWorkaround: function(bookmark) {
-        return ("nodeType" in bookmark && bookmark.nodeType === 1);
+        if (typeof bookmark !== 'object') {
+            return false;
+        }
+        return ('nodeType' in bookmark && bookmark.nodeType === 1);
     },
     
     // -------------------------------------------------------------------------
