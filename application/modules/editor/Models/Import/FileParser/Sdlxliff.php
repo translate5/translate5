@@ -57,6 +57,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser {
+    const USERGUID = 'sdlxliff-imported';
+    
     use editor_Models_Import_FileParser_TagTrait {
         getTagParams as protected traitGetTagParams;
     }
@@ -87,6 +89,12 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @var editor_Models_Import_FileParser_Sdlxliff_TransunitParser
      */
     protected $transunitParser;
+    
+    /**
+     * contains the collected comments out of tag cmt-defs
+     * @var array
+     */
+    protected $comments;
     
     /**
      * (non-PHPdoc)
@@ -217,6 +225,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //analog zu group-Tags zu sehen, da auch sie translate-Attribut haben können
         //und gruppierende Eigenschaft haben
         $this->_origFile = str_replace(array('<bin-unit', '</bin-unit>'), array('<group bin-unit ', '/bin-unit</group>'), $this->_origFile);
+        $this->extractComments();
         //gibt die Verschachtelungstiefe der <group>-Tags an
         $groupLevel = 0;
         //array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
@@ -390,18 +399,63 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      */
     protected function extractSegment($transUnit) {
         $this->segmentData = array();
-        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target) {
+        $result = $this->transunitParser->parse('<trans-unit'.$transUnit, function($mid, $source, $target, $comments) {
             $sourceName = $this->segmentFieldManager->getFirstSourceName();
             $targetName = $this->segmentFieldManager->getFirstTargetName();
             $this->setMid($mid);
             $this->segmentData[$sourceName] = ['original' => $this->parseSegment($source,true)];
             $this->segmentData[$targetName] = ['original' => $this->parseSegment($target,true)];
             $segmentId = $this->setAndSaveSegmentValues();
+            $this->saveComments($segmentId, $comments);
             return $this->getFieldPlaceholder($segmentId, $targetName);
         });
         
         // add leading <trans-unit for parsing, then strip it again (we got the $transUnit without it, so we return it without it)
         return substr($result, 11);
+    }
+    
+    /**
+     * Save the found comments to the DB
+     * @param int $segmentId
+     * @param array $comments
+     */
+    protected function saveComments(int $segmentId, array $comments) {
+        foreach($comments as $mrkId => $selectedTextChunks) {
+            if(empty($this->comments[$mrkId])) {
+                continue;
+            }
+            foreach($this->comments[$mrkId] as $cmtDef) {
+                $comment = ZfExtended_Factory::get('editor_Models_Comment');
+                /* @var $comment editor_Models_Comment */
+                $comment->setSegmentId($segmentId);
+                $comment->setTaskGuid($this->task->getTaskGuid());
+                $comment->setUserName($cmtDef['user'] ?? '');
+                $comment->setUserGuid(self::USERGUID);
+                if($selectedTextChunks !== true) {
+                    $cmtDef['comment'] = '"'.join(' ', $selectedTextChunks).'": '.$cmtDef['comment'];
+                }
+                $comment->setComment($cmtDef['comment']);
+    //FIXME DATE_ISO8601 should not be used for mysql!
+                //[date] => 2019-08-21T11:59:31.1203327+02:00
+                $date = date(DATE_ISO8601, strtotime($cmtDef['date']));
+                $comment->setCreated($date);
+                $comment->setModified($date);
+                $comment->save();
+                
+                $meta = $comment->meta();
+                $meta->setOriginalId($mrkId);
+                $meta->setSeverity($cmtDef['severity'] ?? 'Medium');
+                $meta->setVersion($cmtDef['version'] ?? '1.0');
+                $meta->save();
+            }
+            //if there was at least one processed comment, we have to sync the comment contents to the segment
+            if(!empty($comment)){
+                $segment = ZfExtended_Factory::get('editor_Models_Segment');
+                /* @var $segment editor_Models_Segment */
+                $segment->load($segmentId);
+                $comment->updateSegment($segment, $this->task->getTaskGuid());
+            }
+        }
     }
 
     /**
@@ -461,13 +515,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $segment = $this->parseSegmentProtectWhitespace($segment);
         if (strpos($segment, '<')=== false) {
             return $segment;
-        }
-        if(preg_match('/<mrk[^>]+mtype="x-sdl-comment"/', $segment)){
-            //The file contains SDL comments which are currently not supported!
-            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1000', [
-                'filename' => $this->_fileName,
-                'task' => $this->task
-            ]);
         }
         $segment = $this->parseSegmentUnifyInternalTags($segment);
         $data = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_ParseSegmentData');
@@ -621,5 +668,35 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $data = $this->traitGetTagParams($tag, $shortTag, $tagId, $text);
         $data['text'] = $this->encodeTagsForDisplay($data['text']);
         return $data;
+    }
+    
+    protected function extractComments() {
+        $startComments = strpos($this->_origFile, '<cmt-defs'); 
+        $endComments = strpos($this->_origFile, '</cmt-defs>') + 11; //add the length of the end tag
+        if($startComments >= $endComments){
+            return;
+        }
+        $comments = substr($this->_origFile, $startComments, $endComments - $startComments);
+        if(empty($comments)){
+            return;
+        }
+        $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
+        
+        $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
+        $xmlparser->registerElement('comment', null, function($tag, $key, $opener) use ($xmlparser){
+            $cmtDef = $xmlparser->getParent('cmt-def');
+            if(empty($cmtDef)) {
+                return;
+            }
+            $id = $xmlparser->getAttribute($cmtDef['attributes'], 'id');
+            if(empty($this->comments[$id])) {
+                $this->comments[$id] = [];
+            }
+            $comment = $opener['attributes'];
+            $comment['comment'] = $xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+            $this->comments[$id][] = $comment;
+        });
+        $xmlparser->parse($comments);
     }
 }

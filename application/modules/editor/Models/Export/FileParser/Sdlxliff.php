@@ -60,15 +60,32 @@ class editor_Models_Export_FileParser_Sdlxliff extends editor_Models_Export_File
         $commentModel = ZfExtended_Factory::get('editor_Models_Comment');
         /* @var $commentModel editor_Models_Comment */
         $comments = $commentModel->loadBySegmentAndTaskPlain($segmentId, $this->_taskGuid);
+        $commentMeta = ZfExtended_Factory::get('editor_Models_Comment_Meta');
+        /* @var $commentMeta editor_Models_Comment_Meta */
         
-        $tag = '<Comment severity="Medium" user="%1$s" date="%2$s" version="1.0">%3$s</Comment>';
+        $tag = '<Comment severity="%1$s" user="%2$s" date="%3$s" version="%4$s">%5$s</Comment>';
         $tags=array();
         foreach($comments as $comment) {
             $modifiedObj = new DateTime($comment['modified']);
             //if the +0200 at the end makes trouble use the following
             //gmdate('Y-m-d\TH:i:s\Z', $modified->getTimestamp());
-            $modified = $modifiedObj->format($modifiedObj::ATOM);
-            $tags[] = sprintf($tag, htmlspecialchars($comment['userName']), $modified, htmlspecialchars($comment['comment']));
+            $tagParams = [
+                'severity' => 'Medium',
+                'user' => htmlspecialchars($comment['userName']),
+                'date' => $modifiedObj->format($modifiedObj::ATOM),
+                'version' => '1.0',
+                'comment' => htmlspecialchars($comment['comment']),
+            ];
+            if($comment['userGuid'] == editor_Models_Import_FileParser_Sdlxliff::USERGUID) {
+                try {
+                    $commentMeta->loadByCommentId($comment['id']);
+                    $tagParams['severity'] = $commentMeta->getSeverity();
+                    $tagParams['version'] = $commentMeta->getVersion();
+                }
+                catch (ZfExtended_Models_Entity_NotFoundException $e) {
+                }
+            }
+            $tags[] = vsprintf($tag, $tagParams);
         }
         if(empty($tags)){
             return null;

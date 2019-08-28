@@ -70,6 +70,24 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
      */
     protected $wasEmptyTarget = false;
     
+    /**
+     * counts the other content chunks
+     * @var boolean
+     */
+    protected $countOtherContent = 0;
+    
+    /**
+     * collected comment references of one segment
+     * @var array
+     */
+    protected $comments = [];
+    
+    /**
+     * collected comments one transUnit
+     * @var array
+     */
+    protected $unitComments = [];
+    
     public function __construct() {
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
     }
@@ -80,14 +98,59 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         $this->sourceMrkContent = [];
         $this->targetMrkContent = [];
         $this->targetMrkChunkIndex = [];
+        $this->comments = [];
+        $this->unitComments = [];
+        $this->countOtherContent = 0;
     }
     
     protected function initMrkHandler() {
+        $this->xmlparser->registerElement('trans-unit > target mrk[mtype=x-sdl-comment]', function($tag, $attr, $key){
+            //we have to remove the comment mrks, otherwise they are translated to internal reference internal tags, 
+            // which then mess up the TM
+            $this->xmlparser->replaceChunk($key, '');
+            $commentId = $this->xmlparser->getAttribute($attr, 'sdl:cid');
+            // we reuse the attributes array and add a text container for the selected content there:
+            $this->comments[$commentId] = [];
+        }, function($tag, $key, $opener){
+            $this->xmlparser->replaceChunk($key, ''); 
+        });
+        
+        $this->xmlparser->registerOther(function($other, $key) {
+            if(empty($other)) {
+                return;
+            }
+            // we count the chunks of othercontent inside the mtype="seg" mrk.
+            if($this->xmlparser->getParent('target mrk[mtype=seg]')) {
+                $this->countOtherContent++;
+            }
+            
+            //mrk[mtype=x-sdl-comment] can be nested
+            $parents = $this->xmlparser->getParents('target mrk[mtype=x-sdl-comment]');
+            foreach($parents as $parent) {
+                $commentId = $this->xmlparser->getAttribute($parent['attributes'], 'sdl:cid');
+                $this->comments[$commentId][] = $other;
+            }
+        });
+        
+        //Start segment mrk mtype="seg" handler
         $this->xmlparser->registerElement('trans-unit > target mrk[mtype=seg]', null, function($tag, $key, $opener){
+            //reset the other content counter when we enter a segment
             $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid');
             $this->targetMrkChunkIndex[$mid] = [$opener['openerKey'], $key];
             $this->targetMrkContent[$mid] = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+            foreach($this->comments as $key => $comment) {
+                //we have to find out if the comment was for the whole segment or only a part of it
+                if(count($comment) == $this->countOtherContent) {
+                    //we set the comment to true, that means comment on whole segment not only some word(s)
+                    $this->comments[$key] = true; 
+                }
+            }
+            $this->unitComments[$mid] = $this->comments;
+            $this->comments = [];
+            $this->countOtherContent = 0;
         });
+        
+        //end segment mrk mtype="seg" handler
         $this->xmlparser->registerElement('trans-unit > seg-source mrk[mtype=seg]', null, function($tag, $key, $opener){
             $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid');
             $this->sourceEmptyMrkTags[$mid] = $this->xmlparser->getChunk($opener['openerKey']).$this->xmlparser->getChunk($key);
@@ -128,11 +191,9 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         $this->init();
         $transUnit = $this->handleEmptyTarget($transUnit);
         $this->initMrkHandler();
-        //parse the trans-unit
-//FIXME bei unbekannten MRKs einen Fehler werfen!
 
-//FIXME nun das parsing der Kommentare implementieren, sowie dem parsing oder rauswerfen der track changes.
-        
+        //parse the trans-unit
+        //trigger segment save on the end of an transunit
         $this->xmlparser->registerElement('trans-unit', null, function($tag, $key, $opener) use ($transUnit, $segmentSaver){
             if(empty($this->sourceMrkContent)) {
                 //without any source mrk tag we can do nothing
@@ -158,17 +219,21 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
             $this->targetMrkContent = array_values($this->targetMrkContent);
             $this->targetMrkChunkIndex = array_values($this->targetMrkChunkIndex);
             
+            //we loop over the found mrk MIDs and save the according content and get the placeholder
             foreach($mrkMids as $idx => $mid) {
                 if($this->wasEmptyTarget || empty($this->targetMrkContent[$idx])) {
-                    $placeHolder = $segmentSaver($mid, $this->sourceMrkContent[$idx], null);
+                    $placeHolder = $segmentSaver($mid, $this->sourceMrkContent[$idx], null, $this->unitComments[$mid] ?? []);
                 }
                 else {
-                    $placeHolder = $segmentSaver($mid, $this->sourceMrkContent[$idx], $this->targetMrkContent[$idx]);
+                    $placeHolder = $segmentSaver($mid, $this->sourceMrkContent[$idx], $this->targetMrkContent[$idx], $this->unitComments[$mid] ?? null);
                 }
                 
                 $startMrk = $this->targetMrkChunkIndex[$idx][0];
                 $endMrk = $this->targetMrkChunkIndex[$idx][1];
                 
+                //
+                //add the placeholders to the transunit:
+                //
                 //empty mrk was a single tag:
                 if($startMrk === $endMrk) {
                     //add the end </mrk> tag to the placeholder and replace itself with the new placeholder
