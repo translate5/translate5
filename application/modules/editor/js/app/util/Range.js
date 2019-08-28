@@ -639,10 +639,8 @@ Ext.define('Editor.util.Range', {
         if (typeof contentBeforeRange !== 'object') {
             return false;
         }
-        if ('nodeType' in contentBeforeRange || contentBeforeRange.nodeType !== 1) {
-            return false;
-        }
-        return ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) );
+        return ('nodeType' in contentBeforeRange && contentBeforeRange.nodeType === 1 
+                && ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) ) );
     },
     /**
      * On applying the bookmark:
