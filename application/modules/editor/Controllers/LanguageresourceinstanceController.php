@@ -122,9 +122,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageResourceInstance->init($languageresource);
             
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
-            $moreInfo = '';
-            $languageresource['status'] = $resource->getInitialStatus($moreInfo);
-            $languageresource['statusInfo'] = $t->_($moreInfo);
+            if(empty($resource)) {
+                $languageresource['status'] = editor_Services_Connector_Abstract::STATUS_ERROR;
+                $languageresource['statusInfo'] = $t->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
+            }
+            else {
+                $moreInfo = '';
+                $languageresource['status'] = $resource->getInitialStatus($moreInfo);
+                $languageresource['statusInfo'] = $t->_($moreInfo);
+            }
             
             $id = $languageresource['id'];
             //add customer assocs
