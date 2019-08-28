@@ -447,6 +447,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.disableSpellCheckByIdle) {
             me.setEditorDisabled(true);
         }
+        // TrackChanges must remove it's placeholder.
+        me.fireEvent('removePlaceholdersInEditor');
         
         editorContentAsText = me.getEditorContentAsText(false);
         
