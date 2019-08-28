@@ -169,12 +169,21 @@ class SdlXliffCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         $expectedResult = $this->api()->getFileContent('export-assert.sdlxliff');
 
         //Since we replace only our own comments, we can leave Medium and 1.0 as fixed string, since they are currently not modifiable by translate5
-        $s = '/<Comment severity="Medium" user="lector test" date="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}" version="1\.0">/';
-        $r = '<Comment severity="Medium" user="lector test" date="NOT-TESTABLE" version="1.0">';
+        $s = [
+            '/<Comment severity="Medium" user="lector test" date="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}" version="1\.0">/',
+            '/sdl:cid="[0-9abcdef-]{36}"/',
+            '/<cmt-def id="[0-9abcdef-]{36}">/',
+        ];
+        $r = [
+            '<Comment severity="Medium" user="lector test" date="NOT-TESTABLE" version="1.0">',
+            '/sdl:cid="NOT-TESTABLE"/',
+            '<cmt-def id="NOT-TESTABLE">',
+        ];
         $result = preg_replace($s, $r, [$exportedFile, $expectedResult]);
         $exportedFile = $result[0]; 
         $expectedResult = $result[1];
-        
+        //file_put_contents('/home/tlauria/foo-export.sdlxliff', $exportedFile);
+        //file_put_contents('/home/tlauria/foo-expect.sdlxliff', $expectedResult);
         $this->assertEquals(rtrim($expectedResult), rtrim($exportedFile), 'Exported result does not equal to export-assert.sdlxliff');
     }
     
@@ -184,6 +193,6 @@ class SdlXliffCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         self::$api->login('testlector');
         self::$api->requestJson('editor/task/'.$task->id, 'PUT', array('userState' => 'open', 'id' => $task->id));
         self::$api->login('testmanager');
-        //self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
+        self::$api->requestJson('editor/task/'.$task->id, 'DELETE');
     }
 }
