@@ -69,6 +69,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
             },
             failure: function(response){
                 me.consoleLog('- Checking supported languages (LanguageTool) failed: ' + response.status);
+                me.terminateSpellCheck();
             }
         });
     },
@@ -120,6 +121,7 @@ Ext.define('Editor.plugins.SpellCheck.controller.UtilLanguageTool', {
                 },
                 failure: function(response){
                     me.consoleLog('runSpellCheckWithTool (LanguageTool) failed: ' + response.status);
+                    me.terminateSpellCheck();
                 } 
             });
     },
