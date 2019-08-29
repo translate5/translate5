@@ -3,6 +3,19 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.6] - 2019-08-29
+###Added
+TRANSLATE-1763: Import comments from SDLXLIFF to translate5
+TRANSLATE-1776: Terminology in meta panel is also shown on just clicking on a segment
+
+###Bugfixes
+TRANSLATE-1730: Delete change markers from SDLXLIFF
+TRANSLATE-1778: TrackChanges fail cursor-position in Firefox
+TRANSLATE-1781: TrackChanges: reset in combination with matches is buggy
+TRANSLATE-1770: TrackChanges: reset to initial content must not mark own changes as as change
+TRANSLATE-1765: TrackChanges: Content marked as insert produces problems with SpellChecker
+TRANSLATE-1767: Cloning of task where assigned TBX language resource has been deleted leads to failed import
+
 ## [3.2.5] - 2019-08-20
 ###Changed
 TRANSLATE-1738: Add "Added from MT" to note field of Term, if term stems from InstantTranslate
