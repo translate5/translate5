@@ -57,6 +57,8 @@ END LICENSE AND COPYRIGHT
  *
  */
 class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_FileParser {
+    const SOURCE = 'source';
+    const TARGET = 'target';
     const USERGUID = 'sdlxliff-imported';
     
     use editor_Models_Import_FileParser_TagTrait {
@@ -115,7 +117,6 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         $this->initHelper();
         $this->checkForSdlChangeMarker();
         $this->prepareTagMapping();
-        
         $this->transunitParser = ZfExtended_Factory::get('editor_Models_Import_FileParser_Sdlxliff_TransunitParser');
         
         //here would be the right place to set the import map, 
@@ -161,9 +162,13 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     }
     
     /**
-     * Checks, if there are any change-markers in the sdlxliff. If yes, triggers an error
+     * Checks, if there are any change-markers in the sdlxliff. 
+     * If import is allowed do nothing, if not and change marks are contained: triggers an error
      */
     protected function checkForSdlChangeMarker() {
+        if($this->config->runtimeOptions->import->sdlxliff->applyChangeMarks) {
+            return;
+        }
         $added = strpos($this->_origFile, 'mtype="x-sdl-added"')!== false;
         $deleted = strpos($this->_origFile, 'mtype="x-sdl-deleted"')!== false;
         $refs = strpos($this->_origFile, '<rev-defs>')!== false;
@@ -226,6 +231,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
         //und gruppierende Eigenschaft haben
         $this->_origFile = str_replace(array('<bin-unit', '</bin-unit>'), array('<group bin-unit ', '/bin-unit</group>'), $this->_origFile);
         $this->extractComments();
+        $this->removeRevDefs();
         //gibt die Verschachtelungstiefe der <group>-Tags an
         $groupLevel = 0;
         //array, in dem die Verschachtelungstiefe der Group-Tags in Relation zu ihrer
@@ -420,7 +426,8 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
      * @param array $comments
      */
     protected function saveComments(int $segmentId, array $comments) {
-        foreach($comments as $mrkId => $selectedTextChunks) {
+        foreach($comments as $mrkId => $mrkCommentMarker) {
+            $selectedTextChunks = $mrkCommentMarker['text'];
             if(empty($this->comments[$mrkId])) {
                 continue;
             }
@@ -432,7 +439,10 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 $comment->setUserName($cmtDef['user'] ?? '');
                 $comment->setUserGuid(self::USERGUID);
                 if($selectedTextChunks !== true) {
-                    $cmtDef['comment'] = '"'.join(' ', $selectedTextChunks).'": '.$cmtDef['comment'];
+                    $cmtDef['comment'] = 'annotates selection "'.join(' ', $selectedTextChunks).'": '."\n".$cmtDef['comment'];
+                }
+                if($mrkCommentMarker['field'] == self::SOURCE) {
+                    $cmtDef['comment'] = "(annotates source column)\n".$cmtDef['comment'];
                 }
                 $comment->setComment($cmtDef['comment']);
     //FIXME DATE_ISO8601 should not be used for mysql!
@@ -444,6 +454,7 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
                 
                 $meta = $comment->meta();
                 $meta->setOriginalId($mrkId);
+                $meta->setAffectedField($mrkCommentMarker['field']);
                 $meta->setSeverity($cmtDef['severity'] ?? 'Medium');
                 $meta->setVersion($cmtDef['version'] ?? '1.0');
                 $meta->save();
@@ -673,13 +684,22 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
     protected function extractComments() {
         $startComments = strpos($this->_origFile, '<cmt-defs'); 
         $endComments = strpos($this->_origFile, '</cmt-defs>') + 11; //add the length of the end tag
-        if($startComments >= $endComments){
+        if($startComments === false || $startComments >= $endComments){
             return;
         }
         $comments = substr($this->_origFile, $startComments, $endComments - $startComments);
         if(empty($comments)){
             return;
         }
+        
+        if(! $this->config->runtimeOptions->import->sdlxliff->importComments) {
+            // The file contains SDL comments, but the import of comments is disabled.
+            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1000', [
+                'task' => $this->task,
+                'filename' => $this->_fileName,
+            ]);
+        }
+        
         $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
         
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
@@ -698,5 +718,18 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             $this->comments[$id][] = $comment;
         });
         $xmlparser->parse($comments);
+    }
+    
+    /**
+     * Removes the rev-def(s) tags from the sdlxliff
+     */
+    protected function removeRevDefs() {
+        //checkForSdlChangeMarker throws an exception if import change mark feature is disabled in config 
+        $startComments = strpos($this->_origFile, '<rev-defs'); 
+        $endComments = strpos($this->_origFile, '</rev-defs>') + 11; //add the length of the end tag
+        if($startComments === false || $startComments >= $endComments){
+            return;
+        }
+        $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
     }
 }

@@ -29,6 +29,7 @@ END LICENSE AND COPYRIGHT
 CREATE TABLE `LEK_comment_meta` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `commentId` int(11) NOT NULL COMMENT 'Foreign Key to LEK_comments',
+  `affectedField` varchar(24) DEFAULT '' COMMENT 'source or target',
   `originalId` varchar(255) DEFAULT '' COMMENT 'The original comment ID for imported comments',
   `severity` varchar(255) DEFAULT '' COMMENT 'A severity value if given for imported comments',
   `version` varchar(255) DEFAULT '' COMMENT 'A version value if given for imported comments',
@@ -36,3 +37,8 @@ CREATE TABLE `LEK_comment_meta` (
   UNIQUE KEY `commentId` (`commentId`),
   CONSTRAINT FOREIGN KEY (`commentId`) REFERENCES `LEK_comments` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.import.sdlxliff.importComments', '1', 'editor', 'import', '0', '0', '', 'boolean', 'Defines if SDLXLIFF comments should be imported or they should produce an error on import. See https://confluence.translate5.net/display/TFD/SDLXLIFF.'),
+('runtimeOptions.import.sdlxliff.applyChangeMarks', '1', 'editor', 'import', '0', '0', '', 'boolean', 'Defines if SDLXLIFF change marks should be applied to and removed from the content, or if they should produce an error on import. See http://confluence.translate5.net/display/TFD/SDLXLIFF.');
+

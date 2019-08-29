@@ -88,6 +88,12 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
      */
     protected $unitComments = [];
     
+    /**
+     * Some chunks must be removed for segment saving but restored for skeleton saving, such chunks are saved here
+     * @var array
+     */
+    protected $maskedSourceChunks = [];
+    
     public function __construct() {
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
     }
@@ -101,18 +107,46 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         $this->comments = [];
         $this->unitComments = [];
         $this->countOtherContent = 0;
+        $this->maskedSourceChunks = [];
     }
     
     protected function initMrkHandler() {
+        //remove sdl-added mrks, but leave the content
+        $this->xmlparser->registerElement('trans-unit > mrk[mtype=x-sdl-added]', function($tag, $attr, $key){
+            $this->xmlparser->replaceChunk($key, '');
+        }, function($tag, $key, $opener){
+            $this->xmlparser->replaceChunk($key, ''); 
+        });
+        
+        //remove sdl-deleted mrks and its content
+        $this->xmlparser->registerElement('trans-unit > mrk[mtype=x-sdl-deleted]', function($tag, $attr, $key){
+            //do not process the content of a deleted tag
+            $this->xmlparser->disableHandlersUntilEndtag();
+        }, function($tag, $key, $opener){
+            //remove the deleted tag and its content
+            $this->xmlparser->replaceChunk($opener['openerKey'], '', $key - $opener['openerKey']);
+        });
+        
         $this->xmlparser->registerElement('trans-unit > target mrk[mtype=x-sdl-comment]', function($tag, $attr, $key){
             //we have to remove the comment mrks, otherwise they are translated to internal reference internal tags, 
             // which then mess up the TM
             $this->xmlparser->replaceChunk($key, '');
             $commentId = $this->xmlparser->getAttribute($attr, 'sdl:cid');
-            // we reuse the attributes array and add a text container for the selected content there:
-            $this->comments[$commentId] = [];
+            // we collect the comment IDs and add a text container for the selected content there:
+            $this->comments[$commentId] = ['text' => [], 'field' => editor_Models_Import_FileParser_Sdlxliff::TARGET];
         }, function($tag, $key, $opener){
             $this->xmlparser->replaceChunk($key, ''); 
+        });
+        
+        $this->xmlparser->registerElement('trans-unit > seg-source mrk[mtype=x-sdl-comment]', function($tag, $attr, $key){
+            $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
+            $this->xmlparser->replaceChunk($key, '');
+            $commentId = $this->xmlparser->getAttribute($attr, 'sdl:cid');
+            // we collect the comment IDs and add a text container for the selected content there:
+            $this->comments[$commentId] = ['text' => [], 'field' => editor_Models_Import_FileParser_Sdlxliff::SOURCE];
+        }, function($tag, $key, $opener){
+            $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
+            $this->xmlparser->replaceChunk($key, '');
         });
         
         $this->xmlparser->registerOther(function($other, $key) {
@@ -125,10 +159,12 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
             }
             
             //mrk[mtype=x-sdl-comment] can be nested
-            $parents = $this->xmlparser->getParents('target mrk[mtype=x-sdl-comment]');
+            $parentsTarget = $this->xmlparser->getParents('target mrk[mtype=x-sdl-comment]');
+            $parentsSource = $this->xmlparser->getParents('seg-source mrk[mtype=x-sdl-comment]');
+            $parents = array_merge($parentsTarget, $parentsSource);
             foreach($parents as $parent) {
                 $commentId = $this->xmlparser->getAttribute($parent['attributes'], 'sdl:cid');
-                $this->comments[$commentId][] = $other;
+                $this->comments[$commentId]['text'][] = $other;
             }
         });
         
@@ -140,14 +176,14 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
             $this->targetMrkContent[$mid] = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
             foreach($this->comments as $key => $comment) {
                 //we have to find out if the comment was for the whole segment or only a part of it
-                if(count($comment) == $this->countOtherContent) {
+                if(count($comment['text']) == $this->countOtherContent) {
                     //we set the comment to true, that means comment on whole segment not only some word(s)
-                    $this->comments[$key] = true; 
+                    $this->comments[$key]['text'] = true; 
                 }
             }
             $this->unitComments[$mid] = $this->comments;
             $this->comments = [];
-            $this->countOtherContent = 0;
+            $this->countOtherContent = 0; //we have to reset the otherContent counter on the end of each seg mrk
         });
         
         //end segment mrk mtype="seg" handler
@@ -155,6 +191,7 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
             $mid = $this->xmlparser->getAttribute($opener['attributes'], 'mid');
             $this->sourceEmptyMrkTags[$mid] = $this->xmlparser->getChunk($opener['openerKey']).$this->xmlparser->getChunk($key);
             $this->sourceMrkContent[$mid] = $this->xmlparser->getRange($opener['openerKey'] + 1, $key - 1, true);
+            $this->countOtherContent = 0; //we have to reset the otherContent counter on the end of each seg mrk
         });
     }
     
@@ -249,6 +286,10 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
                     //remove the original content
                     $this->xmlparser->replaceChunk($startMrk + 1, '', $endMrk - $startMrk - 1);
                 }
+            }
+            //restore chunks removed for parsing, but needed for skeleton
+            foreach($this->maskedSourceChunks as $key => $chunk) {
+                $this->xmlparser->replaceChunk($key, $chunk);
             }
         });
         return $this->xmlparser->parse($transUnit);

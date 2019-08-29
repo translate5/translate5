@@ -38,6 +38,8 @@ END LICENSE AND COPYRIGHT
  * @method void setSeverity() setSeverity(string $severity)
  * @method string getVersion() getVersion()
  * @method void setVersion() setVersion(string $version)
+ * @method string getAffectedField() getAffectedField()
+ * @method void setAffectedField() setAffectedField(string $field)
  */
 class editor_Models_Comment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     protected $dbInstanceClass = 'editor_Models_Db_CommentMeta';

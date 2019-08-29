@@ -260,11 +260,7 @@ abstract class editor_Models_Export_FileParser {
             $file = $this->writeMatchRate($file,$i);
             
             if($this->config->runtimeOptions->editor->export->exportComments) {
-                $commentsId = $this->getSegmentComments($matches[1]);
-                
-                if(!empty($commentsId)){
-                    $file = $this->writeCommentGuidToSegment($file, $i, $commentsId);
-                }
+                $file[$i] = $this->injectComments($matches[1], $file[$i], $field);
             }
 
             $i = $i + 2;
@@ -273,22 +269,15 @@ abstract class editor_Models_Export_FileParser {
     }
     
     /**
-     * for overwriting purposes only
-     * @param array $file
-     * @param int $i
-     * @param string $id
-     */
-    protected function writeCommentGuidToSegment(array $file, int $i, $id) {
-    }
-    
-    /**
-     * for setting $this-comments, if needed by the child class
-     * for overwriting purposes only
+     * for injecting comment markers into the content which was replaced from placeholder
+     * for overwriting purposes
      * @param int $segmentId
+     * @param string $segment
+     * @param string $field
      * @return string $id of comments index in $this->comments | null if no comments exist
      */
-    protected function getSegmentComments(int $segmentId) {
-        return null;
+    protected function injectComments(int $segmentId, string $segment, string $field) {
+        return $segment;
     }
     
     /**
