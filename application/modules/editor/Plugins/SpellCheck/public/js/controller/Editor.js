@@ -447,6 +447,8 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         if (me.disableSpellCheckByIdle) {
             me.setEditorDisabled(true);
         }
+        // TrackChanges must remove it's placeholder.
+        me.fireEvent('removePlaceholdersInEditor');
         
         editorContentAsText = me.getEditorContentAsText(false);
         
@@ -461,9 +463,6 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         spellCheckProcessID = Ext.Date.format(new Date(), 'time');
         me.spellCheckInProgressID = spellCheckProcessID;
         me.consoleLog('me.spellCheckInProgressID: ' + spellCheckProcessID);
-        
-        // TrackChanges must remove it's placeholder.
-        me.fireEvent('removePlaceholdersInEditor');
         
         // where is the caret at the moment?
         me.bookmarkForCaret = me.getPositionOfCaret();
@@ -513,6 +512,12 @@ Ext.define('Editor.plugins.SpellCheck.controller.Editor', {
         clearTimeout(me.editIdleTimer);
         me.editIdleTimer = null;
         me.spellCheckInProgressID = false;
+        
+        me.getEditorBody().focus();
+        
+        if (me.disableSpellCheckByIdle) {
+            me.setEditorDisabled(false);
+        }
     },
     
     // =========================================================================
