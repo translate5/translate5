@@ -55,6 +55,7 @@ class editor_Plugins_ArchiveTaskBeforeDelete_DbTables {
             'LEK_customer' => false,
             'LEK_change_log' => false,
             'LEK_comments' => 'taskGuid',
+            'LEK_comment_meta' => 'taskGuid',
             'LEK_files' => 'taskGuid',
             'LEK_file_filter' => 'taskGuid',
             'LEK_foldertree' => 'taskGuid',
