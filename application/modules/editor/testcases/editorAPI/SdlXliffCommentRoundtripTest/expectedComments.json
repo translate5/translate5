@@ -3,7 +3,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"Kommentar 2\": Kommentar 2",
+            "comment": "annotates selection \"Kommentar 2\": \nKommentar 2",
             "created": "2019-08-27 17:44:48",
             "modified": "2019-08-27 17:44:48",
             "isEditable": false
@@ -11,9 +11,25 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"Kommentar 1\": Kommentar 1",
+            "comment": "annotates selection \"Kommentar 1\": \nKommentar 1",
             "created": "2019-08-27 17:44:36",
             "modified": "2019-08-27 17:44:36",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "TL",
+            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 2",
+            "created": "2019-08-27 17:44:48",
+            "modified": "2019-08-27 17:44:48",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "TL",
+            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 1",
+            "created": "2019-08-27 17:44:48",
+            "modified": "2019-08-27 17:44:48",
             "isEditable": false
         }
     ],
@@ -31,7 +47,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "\"HIER\": Kommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
+            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
             "created": "2019-08-21 11:59:31",
             "modified": "2019-08-21 11:59:31",
             "isEditable": false
@@ -41,7 +57,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"2_KOMMENTARE\": Kommentar bei: \"2_KOMMENTARE\"",
+            "comment": "annotates selection \"2_KOMMENTARE\": \nKommentar bei: \"2_KOMMENTARE\"",
             "created": "2019-08-27 17:48:27",
             "modified": "2019-08-27 17:48:27",
             "isEditable": false
@@ -49,7 +65,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"KOMMENTAR_ 2_KOMMENTARE\": Kommentar bei: KOMMENTAR_2_KOMMENTARE",
+            "comment": "annotates selection \"KOMMENTAR_ 2_KOMMENTARE\": \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
             "created": "2019-08-27 17:48:01",
             "modified": "2019-08-27 17:48:01",
             "isEditable": false
@@ -57,7 +73,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "\"HIER\": Kommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
             "created": "2019-08-21 12:00:24",
             "modified": "2019-08-21 12:00:24",
             "isEditable": false

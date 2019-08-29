@@ -9,13 +9,25 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"Kommentar 2\": Kommentar 2",
+            "comment": "annotates selection \"Kommentar 2\": \nKommentar 2",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"Kommentar 1\": Kommentar 1",
+            "comment": "annotates selection \"Kommentar 1\": \nKommentar 1",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "TL",
+            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 2",
+            "isEditable": false
+        },
+        {
+            "userGuid": "sdlxliff-imported",
+            "userName": "TL",
+            "comment": "(annotates source column)\nannotates selection \"keinen Kommentar\": \nSource Kommentar 1",
             "isEditable": false
         }
     ],
@@ -43,7 +55,7 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "\"HIER\": Kommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
+            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr HIER in Segment 3 (Severy level: Warning)",
             "isEditable": false
         }
     ],
@@ -57,19 +69,19 @@
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"2_KOMMENTARE\": Kommentar bei: \"2_KOMMENTARE\"",
+            "comment": "annotates selection \"2_KOMMENTARE\": \nKommentar bei: \"2_KOMMENTARE\"",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "sl",
-            "comment": "\"KOMMENTAR_ 2_KOMMENTARE\": Kommentar bei: KOMMENTAR_2_KOMMENTARE",
+            "comment": "annotates selection \"KOMMENTAR_ 2_KOMMENTARE\": \nKommentar bei: KOMMENTAR_2_KOMMENTARE",
             "isEditable": false
         },
         {
             "userGuid": "sdlxliff-imported",
             "userName": "User1",
-            "comment": "\"HIER\": Kommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
+            "comment": "annotates selection \"HIER\": \nKommentar f\u00fcr Benutzer 1 HIER in Segment 4 (Severy level: Error)",
             "isEditable": false
         }
     ]
