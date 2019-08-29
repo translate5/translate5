@@ -49,6 +49,8 @@ class SdlXliffCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         
         $tests = array(
             'runtimeOptions.editor.export.exportComments' => 1,
+            'runtimeOptions.import.sdlxliff.applyChangeMarks' => 1,
+            'runtimeOptions.import.sdlxliff.importComments' => 1,
         );
         self::$api->testConfig($tests);
         
@@ -176,7 +178,7 @@ class SdlXliffCommentRoundtripTest extends \ZfExtended_Test_ApiTestcase {
         ];
         $r = [
             '<Comment severity="Medium" user="lector test" date="NOT-TESTABLE" version="1.0">',
-            '/sdl:cid="NOT-TESTABLE"/',
+            'sdl:cid="NOT-TESTABLE"',
             '<cmt-def id="NOT-TESTABLE">',
         ];
         $result = preg_replace($s, $r, [$exportedFile, $expectedResult]);

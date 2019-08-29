@@ -112,19 +112,19 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
     
     protected function initMrkHandler() {
         //remove sdl-added mrks, but leave the content
-        $this->xmlparser->registerElement('trans-unit > mrk[mtype=x-sdl-added]', function($tag, $attr, $key){
+        $this->xmlparser->registerElement('trans-unit mrk[mtype=x-sdl-added]', function($tag, $attr, $key){
             $this->xmlparser->replaceChunk($key, '');
         }, function($tag, $key, $opener){
             $this->xmlparser->replaceChunk($key, ''); 
         });
         
         //remove sdl-deleted mrks and its content
-        $this->xmlparser->registerElement('trans-unit > mrk[mtype=x-sdl-deleted]', function($tag, $attr, $key){
+        $this->xmlparser->registerElement('trans-unit mrk[mtype=x-sdl-deleted]', function($tag, $attr, $key){
             //do not process the content of a deleted tag
             $this->xmlparser->disableHandlersUntilEndtag();
         }, function($tag, $key, $opener){
             //remove the deleted tag and its content
-            $this->xmlparser->replaceChunk($opener['openerKey'], '', $key - $opener['openerKey']);
+            $this->xmlparser->replaceChunk($opener['openerKey'], '', $key - $opener['openerKey'] + 1);
         });
         
         $this->xmlparser->registerElement('trans-unit > target mrk[mtype=x-sdl-comment]', function($tag, $attr, $key){
@@ -150,7 +150,8 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         });
         
         $this->xmlparser->registerOther(function($other, $key) {
-            if(empty($other)) {
+            //if other is empty or is deleted text we do not count and track it  
+            if(empty($other) || $this->xmlparser->getParent('mrk[mtype=x-sdl-deleted]')) {
                 return;
             }
             // we count the chunks of othercontent inside the mtype="seg" mrk.
