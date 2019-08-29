@@ -34,7 +34,6 @@ class editor_Models_Import_FileParser_Sdlxliff_Exception extends editor_Models_I
     protected $domain = 'editor.import.fileparser.sdlxliff';
     
     static protected $localErrorCodes = [
-        'E1000' => 'The file "{filename}" contains SDL comments, but the import of comments is disabled.',
         'E1001' => 'The opening tag "{tagName}" contains the tagId "{tagId}" which is no valid SDLXLIFF!',
         'E1002' => 'Found a closing tag without an opening one. Segment MID: "{mid}".',
         'E1003' => 'There are change-markers in the sdlxliff-file "{filename}", but the import of change-markers is disabled.',

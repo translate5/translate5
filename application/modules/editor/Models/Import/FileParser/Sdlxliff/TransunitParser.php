@@ -94,7 +94,14 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
      */
     protected $maskedSourceChunks = [];
     
+    
+    /**
+     * @var Zend_Config
+     */
+    protected $config;
+    
     public function __construct() {
+        $this->config = Zend_Registry::get('config');
         $this->xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
     }
     
@@ -139,13 +146,19 @@ class editor_Models_Import_FileParser_Sdlxliff_TransunitParser {
         });
         
         $this->xmlparser->registerElement('trans-unit > seg-source mrk[mtype=x-sdl-comment]', function($tag, $attr, $key){
-            $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
+            //restore comments later only if import comments is enabled  
+            if($this->config->runtimeOptions->import->sdlxliff->importComments) {
+                $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
+            }
             $this->xmlparser->replaceChunk($key, '');
             $commentId = $this->xmlparser->getAttribute($attr, 'sdl:cid');
             // we collect the comment IDs and add a text container for the selected content there:
             $this->comments[$commentId] = ['text' => [], 'field' => editor_Models_Import_FileParser_Sdlxliff::SOURCE];
         }, function($tag, $key, $opener){
-            $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
+            //restore comments later only if import comments is enabled  
+            if($this->config->runtimeOptions->import->sdlxliff->importComments) {
+                $this->maskedSourceChunks[$key] = $this->xmlparser->getChunk($key);
+            }
             $this->xmlparser->replaceChunk($key, '');
         });
         

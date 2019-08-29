@@ -692,15 +692,18 @@ class editor_Models_Import_FileParser_Sdlxliff extends editor_Models_Import_File
             return;
         }
         
+        $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
+        
+        //if import disabled we log a warning and remove all comments
         if(! $this->config->runtimeOptions->import->sdlxliff->importComments) {
-            // The file contains SDL comments, but the import of comments is disabled.
-            throw new editor_Models_Import_FileParser_Sdlxliff_Exception('E1000', [
+            $logger = Zend_Registry::get('logger')->cloneMe('editor.import.fileparser.sdlxliff');
+            /* @var $logger ZfExtended_Logger */
+            $logger->warn('E1000', 'The file "{filename}" has contained SDL comments, but comment import is disabled: the comments were removed!', [
                 'task' => $this->task,
                 'filename' => $this->_fileName,
             ]);
+            return;
         }
-        
-        $this->_origFile = substr_replace($this->_origFile, '', $startComments, $endComments - $startComments);
         
         $xmlparser = ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $xmlparser editor_Models_Import_FileParser_XmlParser */
