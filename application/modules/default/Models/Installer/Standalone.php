@@ -340,6 +340,7 @@ class Models_Installer_Standalone {
     }
     
     /**
+     * @deprecated moved into abstract module
      * Adds the downloaded Zend Lib to the include path
      */
     protected function addZendToIncludePath() {
@@ -596,6 +597,7 @@ class Models_Installer_Standalone {
     }
     
     /**
+     * @deprecated moved into abstract modules
      * generates a Zend Application like environment with all needed registry entries filled  
      */
     protected function initApplication() {

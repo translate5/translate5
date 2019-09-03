@@ -34,7 +34,6 @@ END LICENSE AND COPYRIGHT
  */
 /**
  * TODO: 
- * - initApplication in den Modulen verfügbar machen
  * - Danach können z.B. die database funktionalität in ein Modul überführt werden
  * - Langfristig alles in Module packen 
  */
@@ -56,7 +55,7 @@ class Models_Installer_Standalone2 {
      * Increase this value to force a restart of the updater while updating
      * @var integer
      */
-    const INSTALLER_VERSION = 3;
+    const INSTALLER_VERSION = 4;
     
     /**
      * @var string
@@ -108,6 +107,7 @@ class Models_Installer_Standalone2 {
     protected $logger;
     
     protected $modules = [
+        'top' => 'ZfExtended_Models_Installer_Modules_Top',
         'help' => 'ZfExtended_Models_Installer_Modules_Help',
         'database' => 'ZfExtended_Models_Installer_Modules_Database',
     ];
@@ -571,7 +571,7 @@ class Models_Installer_Standalone2 {
         $moduleInstance = new $class();
         /* @var $moduleInstance ZfExtended_Models_Installer_Modules_Abstract */
         $this->parseAndHandleArguments($moduleInstance->getShortOptions(), $moduleInstance->getLongOptions());
-        $moduleInstance->setOptions($this->options);
+        $moduleInstance->setOptions($this->currentWorkingDir, $this->options);
         $moduleInstance->run();
     }
 }
