@@ -33,3 +33,21 @@ CREATE TABLE `LEK_tags` (
   `label` varchar(255) DEFAULT NULL,
   `originalTagId` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='"Tags" here serve the concept of labels and classifications.';
+
+CREATE TABLE `LEK_languageresources_tag_assoc` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `languageResourceId` int(11) DEFAULT NULL,
+  `tagId` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_LEK_languageresources_tag_assoc_1`
+    FOREIGN KEY (`languageResourceId`)
+    REFERENCES `LEK_languageresources` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_LEK_languageresources_tag_assoc_2`
+    FOREIGN KEY (`tagId`)
+    REFERENCES `LEK_tags` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

@@ -84,8 +84,6 @@ class editor_Plugins_NecTm_HttpApi {
     public function __construct() {
         // Authorization
         $this->setAccessToken();
-        // Tags
-        $this->setAccessToken();
     }
     
     /**
@@ -130,7 +128,7 @@ class editor_Plugins_NecTm_HttpApi {
         $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         
         if ($this->processResponse($this->request($http))) {
-            return $this->result;
+            return $this->result->access_token;
         }
         return false;
     }
@@ -139,33 +137,36 @@ class editor_Plugins_NecTm_HttpApi {
      * Returns all available NEC-TM-Tags for the current user for the current NecTm-Service.
      * @return array
      */
-    public function getAllTMs() {
+    public function getAllTags() {
+        /*
+            "tags": [
+                {
+                    "id": "tag_Location",
+                    "type": "public",
+                    "name": "Madrid"
+                },
+                {
+                    "id": "tag391",
+                    "type": "unspecified",
+                    "name": "Health"
+                },
+                {
+                    "id": "Tag by XYZ",
+                    "type": "private",
+                    "name": "XYZ"
+                }
+            ]
+        */
         $method = 'GET';
-        $uriPath = '/api/tmservice/tms/';
+        $endpointPath = 'tags';
         $rawBody= '';
         try {
-            $this->TMServiceRequest($method, $uriPath, $rawBody);
+            $this->necTmRequest($method, $endpointPath, $rawBody);
         }
-        catch(editor_Plugins_GroupShare_ExceptionToken $e) {
+        catch(editor_Plugins_NecTm_ExceptionToken $e) {
             return [];
         }
-        return $this->result->items;
-    }
-    
-    public function getAllTags() {
-        /* RESULT:
-        "tags": [
-        {
-            "id": "tag59",
-            "type": "public",
-            "name": "ECB"
-        },
-        {
-            "id": "tag391",
-            "type": "unspecified",
-            "name": "Health"
-        },
-        */
+        return $this->result->tags;
     }
     
     
@@ -219,44 +220,23 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * prepares a Zend_Http_Client with our Auhtorization for NEC-TMs.
-     * @param string $method
-     * @param string $endpointPath
-     * @return Zend_Http_Client
-     */
-    protected function getHttpWithAuthorization($method, $endpointPath = '') {
-        $httpWithAuthorization = $this->getHttp($method, $endpointPath);
-        $httpWithAuthorization->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
-        return $httpWithAuthorization;
-    }
-    
-    /**
      * Sends a request to GroupShare's Translation Memory Service.
      * @param string $method
-     * @param string $uriPath
+     * @param string $endpointPath
      * @param array $rawBody
      */
-    protected function necTmRequest($method, $uriPath, $rawBody=[]) {
-        
+    protected function necTmRequest($method, $endpointPath = '', $rawBody=[]) {
         if(!$this->getAccessToken()) {
             throw new editor_Plugins_NecTm_ExceptionToken('E1099');
         }
-        
-        $http = ZfExtended_Factory::get('Zend_Http_Client');
-        /* @var $http Zend_Http_Client */
-        
-        $http->setConfig(array('timeout'=>self::REQUEST_TIMEOUT_SECONDS));
-        
-        // AT WORK!!!!!!!!!!!!!!!!!
-        
+        $http = $this->getHttp($method, $endpointPath);
+        $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         //error_log("SEND URI ".print_r($uriPath,1));
         if (!empty($rawBody)) {
             //error_log("SEND BODY ".print_r(json_encode($rawBody, JSON_PRETTY_PRINT),1));
             $http->setRawData(json_encode($rawBody), 'application/json; charset=utf-8');
         }
         
-        // use trait for processing the request:
-        $this->setHttp($http);
         $res = $this->request($http);
         //error_log("REC BODY".print_r($res->getBody(),1));
         if(!$this->processResponse($res)) {
@@ -289,27 +269,6 @@ class editor_Plugins_NecTm_HttpApi {
             }
             throw $e;
         }
-    }
-    
-    /**
-     * returns the found errors
-     */
-    public function getErrors() {
-        return $this->error;
-    }
-    
-    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
-        $badGateway = new ZfExtended_BadGateway('Die angefragte NEC-TM Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setDomain('LanguageResources');
-        
-        $error = new stdClass();
-        $error->type = 'HTTP';
-        $error->error = $e->getMessage();
-        $error->url = $http->getUri(true);
-        $error->method = $this->httpMethod;
-        
-        $badGateway->setErrors([$error]);
-        throw $badGateway;
     }
     
     /**
@@ -361,6 +320,27 @@ class editor_Plugins_NecTm_HttpApi {
         }
         
         return empty($this->error);
+    }
+    
+    /**
+     * returns the found errors
+     */
+    public function getErrors() {
+        return $this->error;
+    }
+    
+    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
+        $badGateway = new ZfExtended_BadGateway('Die angefragte NEC-TM Instanz ist nicht erreichbar', 0, $e);
+        $badGateway->setDomain('LanguageResources');
+        
+        $error = new stdClass();
+        $error->type = 'HTTP';
+        $error->error = $e->getMessage();
+        $error->url = $http->getUri(true);
+        $error->method = $this->httpMethod;
+        
+        $badGateway->setErrors([$error]);
+        throw $badGateway;
     }
     
 }

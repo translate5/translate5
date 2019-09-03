@@ -26,35 +26,13 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Tags Object Instance as needed in the application
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getOrigin() getOrigin()
- * @method void setOrigin() setOrigin(string $origin)
- * @method string getLabel() getLabel()
- * @method void setLabel() setLabel(string $label)
- * @method string getOriginalTagId() getoOriginalTagId()
- * @method void setOriginalTagId() setOriginalTagId(string $originalTagId)
- */
-class editor_Models_Tags extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_Tags';
-    protected $validatorInstanceClass = 'editor_Models_Validator_Tag';
-    
+class editor_Models_Validator_LanguageResources_TagAssoc extends ZfExtended_Models_Validator_Abstract {
+
     /**
-     * All tags for the given origin.
-     * @param string $pmGuid
-     * @return array
      */
-    public function loadListByOrigin(string $origin) {
-        $s = $this->db->select();
-        $s->where('origin = ?', $origin);
-        return parent::loadFilterdCustom($s);  // ??????????????
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('languageResourceId', 'int');
+        $this->addValidator('tagId', 'int');
     }
 }

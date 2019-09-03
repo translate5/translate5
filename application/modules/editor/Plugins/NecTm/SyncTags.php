@@ -73,6 +73,9 @@ class editor_Plugins_NecTm_SyncTags {
     }
     
     /**
+     * Queries NEC TM for all tags that can be accessed with the system credentials in NEC TM.
+     * The existing tags are saved in the translate5 DB. Tags that already exist in translate5 DB,
+     * but do not exist any more in NEC TM, are removed from the DB and from all language resource associations.
      * @param editor_Models_LanguageResources_Resource $serviceResource
      */
     protected function syncOneServiceInstance($serviceResource) {
@@ -81,7 +84,7 @@ class editor_Plugins_NecTm_SyncTags {
         
         // all NEC-TM-Tags that are available for us for this serviceResource
         $allAvailable = $this->api->getAllTags();
-        
+        $test = 3;
         // TODO...
     }
     

@@ -26,35 +26,29 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Tags Object Instance as needed in the application
- * @method integer getId() getId()
- * @method void setId() setId(int $id)
- * @method string getOrigin() getOrigin()
- * @method void setOrigin() setOrigin(string $origin)
- * @method string getLabel() getLabel()
- * @method void setLabel() setLabel(string $label)
- * @method string getOriginalTagId() getoOriginalTagId()
- * @method void setOriginalTagId() setOriginalTagId(string $originalTagId)
- */
-class editor_Models_Tags extends ZfExtended_Models_Entity_Abstract {
-    protected $dbInstanceClass = 'editor_Models_Db_Tags';
-    protected $validatorInstanceClass = 'editor_Models_Validator_Tag';
+class editor_Plugins_NecTm_Resource extends editor_Models_LanguageResources_Resource {
     
     /**
-     * All tags for the given origin.
-     * @param string $pmGuid
+     * @var editor_Plugins_NecTm_Service
+     */
+    protected $service;
+    
+    public function __construct(editor_Plugins_NecTm_Service $service) {
+        $this->service = $service;
+    }
+    
+    /**
+     * Returns all tags that are offered to choose from when adding a NEC-TM LangageResource
+     * in translate5:
+     * - top-lecel-tags from config
+     * - tags from NEC-TM stored (+ regularly synched) in our DB
      * @return array
      */
-    public function loadListByOrigin(string $origin) {
-        $s = $this->db->select();
-        $s->where('origin = ?', $origin);
-        return parent::loadFilterdCustom($s);  // ??????????????
+    public function getAllTags() {
+        $tagsFromConfig = $this->service->getTopLevelTags();
+        $m = ZfExtended_Factory::get('editor_Models_Tags');
+        /* @var $m editor_Models_Tags */
+        $tagsFromNEC = $m->loadListByOrigin($this->service->getTagOrigin());
+        // TODO: mergen und uniquen und dann return
     }
 }

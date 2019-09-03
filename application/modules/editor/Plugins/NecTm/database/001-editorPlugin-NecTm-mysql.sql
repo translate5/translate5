@@ -37,19 +37,3 @@ INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `valu
 ('runtimeOptions.plugins.NecTm.credentials', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'Credentials (licenses) to the NEC-TM API; format: ["username:password"]'),
 ('runtimeOptions.plugins.NecTm.topLevelTags', 1, 'editor', 'editor', '[]', '[]', '', 'list', 'Only TM data below the top-level tags can be accessed (plus all public data). Example: ["Health", "Automotive", "Madrid"]');
 
-CREATE TABLE `LEK_languageresources_tag_assoc` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `languageResourceId` int(11) DEFAULT NULL,
-  `tagId` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_LEK_languageresources_tag_assoc_1`
-    FOREIGN KEY (`languageResourceId`)
-    REFERENCES `LEK_languageresources` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_LEK_languageresources_tag_assoc_2`
-    FOREIGN KEY (`tagId`)
-    REFERENCES `LEK_tags` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;

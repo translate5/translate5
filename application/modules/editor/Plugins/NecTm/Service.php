@@ -38,6 +38,8 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
     const DEFAULT_COLOR = '#61BDAA';
     
+    const TAG_ORIGIN = 'NEC';
+    
     public function __construct() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
@@ -58,5 +60,22 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
      */
     public function getDefaultColor() {
         return self::DEFAULT_COLOR;
+    }
+    
+    /**
+     * Get the tag's origin.
+     */
+    public function getTagOrigin() {
+        return self::TAG_ORIGIN;
+    }
+    
+    /**
+     * Returns the "top-level-tags" as configured.
+     * @return array
+     */
+    public function getTopLevelTags() {
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        return $config->runtimeOptions->plugins->NecTm->topLevelTags->toArray();
     }
 }

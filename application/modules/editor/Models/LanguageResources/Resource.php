@@ -250,4 +250,12 @@ class editor_Models_LanguageResources_Resource {
         $statusInfo = 'Wählen Sie die Ressource aus um weitere Infos zu bekommen.';
         return editor_Services_Connector_Abstract::STATUS_NOTCHECKED;
     }
+    
+    /**
+     * Returns the tags that are assigned to the resource.
+     * @return array
+     */
+    public function getTags() {
+        return ["Skin", "Lighting"]; // TODO :)
+    }
 }

@@ -74,6 +74,8 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         
         $this->service = ZfExtended_Factory::get('editor_Plugins_NecTm_Service');
         /* @var $service editor_Plugins_NecTm_Service */
+        
+        $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforeIndexAction', array($this, 'synchronizeNecTmTags'));
     }
     
     public function initJsTranslations(Zend_EventManager_Event $event) {
@@ -85,9 +87,9 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
      * This init code may throw exceptions which are then handled by the calling place 
      */
     protected function initThrowable() {
-        $this->serviceType  = $this->service->getServiceNamespace();
-        $this->serviceName  = $this->service->getName();
-        $this->serviceColor = $this->service->getDefaultColor();
+        $this->serviceType         = $this->service->getServiceNamespace();
+        $this->serviceName         = $this->service->getName();
+        $this->serviceColor        = $this->service->getDefaultColor();
     }
     
     protected function validateConfig() {
@@ -105,5 +107,16 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Queries NEC TM for all tags that can be accessed with the system credentials in NEC TM.
+     * The existing tags are saved in the translate5 DB. Tags that already exist in translate5 DB,
+     * but do not exist any more in NEC TM, are removed from the DB and from all language resource associations.
+     */
+    public function synchronizeNecTmTags() {
+        $sync = ZfExtended_Factory::get('editor_Plugins_NecTm_SyncTags', [$this->service]);
+        /* @var $sync editor_Plugins_NecTm_SyncTags */
+        $sync->synchronize(false); //without mutex, since we call it explicitly via parameter
     }
 }
