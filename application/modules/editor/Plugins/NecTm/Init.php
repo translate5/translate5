@@ -54,6 +54,14 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
      */
     protected $serviceColor;
     
+    /**
+     * Contains the Plugin Path relativ to APPLICATION_PATH or absolut if not under APPLICATION_PATH
+     * @var array
+     */
+    protected $frontendControllers = array(
+        'pluginNecTmMain' => 'Editor.plugins.NecTm.controller.Main',
+    );
+    
     public function init() {
         if(!$this->validateConfig()) {
             $this->frontendControllers = []; //disable frontend stuff if no valid config
@@ -66,8 +74,11 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         
         $this->service = ZfExtended_Factory::get('editor_Plugins_NecTm_Service');
         /* @var $service editor_Plugins_NecTm_Service */
-        
-        //$this->eventManager->attach('editor_LanguageresourceresourceController', 'afterIndexAction', array($this, 'addNECTMsToAddList'));
+    }
+    
+    public function initJsTranslations(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
     /**
@@ -95,24 +106,4 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         }
         return true;
     }
-    
-    
-    /**
-     * Add the NEC-TMs to the list of TMs in the "Add"-Window.
-     * @param Zend_EventManager_Event $event
-     */
-    public function addNECTMsToAddList (Zend_EventManager_Event $event) {
-        $view = $event->getParam('view');
-        $allResources = $view->rows;
-        foreach ($allResources as $key => $resource) {
-            if ($resource->serviceName == $this->service->getName()) {
-                unset($allResources[$key]);
-            }
-        }
-        //INFO: rebuild the array keys, array keys like: [0],[1],[5],[7] messed up the extjs resource store
-        $allResources = array_values($allResources);
-        $view->rows = $allResources;
-        $view->total= count($allResources);
-    }
-    
 }

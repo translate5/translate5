@@ -60,8 +60,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function connectTo(editor_Models_LanguageResources_LanguageResource $languageResource, $sourceLang, $targetLang) {
         parent::connectTo($languageResource, $sourceLang, $targetLang);
-        $class = 'editor_Plugins_NecTm_HttpApi';
-        $this->api = ZfExtended_Factory::get($class);
+        $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $parser editor_Models_Import_FileParser_XmlParser */
     }

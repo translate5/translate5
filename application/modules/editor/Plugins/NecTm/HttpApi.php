@@ -84,7 +84,94 @@ class editor_Plugins_NecTm_HttpApi {
     public function __construct() {
         // Authorization
         $this->setAccessToken();
+        // Tags
+        $this->setAccessToken();
     }
+    
+    /**
+     * Authorize access to NEC-TM's APIs for the configured-user.
+     * @return boolean (true if token is available now, false otherwise)
+     */
+    protected function setAccessToken() {
+        $token = $this->login();
+        if (!$token) {
+            return false; // no token available
+        }
+        $this->accessToken = $token;
+        return true;
+    }
+    
+    /**
+     * Returns the access-token that was delivered by the API for further authentication.
+     * @return string|false
+     */
+    protected function getAccessToken() {
+        return $this->accessToken ?? false;
+    }
+    
+    /**
+     * login and return the accessToken
+     * @throws Exception
+     * @return string accessToken|false
+     */
+    protected function login() {
+        $config = Zend_Registry::get('config');
+        /* @var $config Zend_Config */
+        $credentials = $config->runtimeOptions->plugins->NecTm->credentials->toArray();
+        $auth = explode(':', $credentials[0]);
+        $this->username = $auth[0];
+        
+        $data = new stdClass();
+        $data->username = $this->username;
+        $data->password = $auth[1];
+        
+        $http = $this->getHttp('POST','auth');
+        $http->setHeaders('Content-Type', 'application/json');
+        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        
+        if ($this->processResponse($this->request($http))) {
+            return $this->result;
+        }
+        return false;
+    }
+    
+    /**
+     * Returns all available NEC-TM-Tags for the current user for the current NecTm-Service.
+     * @return array
+     */
+    public function getAllTMs() {
+        $method = 'GET';
+        $uriPath = '/api/tmservice/tms/';
+        $rawBody= '';
+        try {
+            $this->TMServiceRequest($method, $uriPath, $rawBody);
+        }
+        catch(editor_Plugins_GroupShare_ExceptionToken $e) {
+            return [];
+        }
+        return $this->result->items;
+    }
+    
+    public function getAllTags() {
+        /* RESULT:
+        "tags": [
+        {
+            "id": "tag59",
+            "type": "public",
+            "name": "ECB"
+        },
+        {
+            "id": "tag391",
+            "type": "unspecified",
+            "name": "Health"
+        },
+        */
+    }
+    
+    
+    // -------------------------------------------------------------------------
+    // General handling of the API-requests
+    // -------------------------------------------------------------------------
     
     /**
      * "Lazy load" and return of the configured API's URL.
@@ -110,7 +197,7 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string $endpointPath
      * @return string
      */
-    protected function getUrl($endpointPath = '') {        
+    protected function getUrl($endpointPath = '') {
         return $this->getApiUrl().self::BASE_PATH.'/'.ltrim($endpointPath, '/');
     }
     
@@ -144,57 +231,37 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * Authorize access to NEC-TM's APIs for the configured-user.
-     * @return boolean (true if token is available now, false otherwise)
+     * Sends a request to GroupShare's Translation Memory Service.
+     * @param string $method
+     * @param string $uriPath
+     * @param array $rawBody
      */
-    protected function setAccessToken() {
-        $token = $this->login();
-        if (!$token) {
-            return false; // no token available
+    protected function necTmRequest($method, $uriPath, $rawBody=[]) {
+        
+        if(!$this->getAccessToken()) {
+            throw new editor_Plugins_NecTm_ExceptionToken('E1099');
         }
-        $this->accessToken = $token;
-        return true;
-    }
-    
-    /**
-     * Returns the access-token that was delivered by the API for further authentication.
-     * @return string
-     */
-    protected function getAccessToken() {
-        return $this->accessToken ?? false;
-    }
-    
-    /**
-     * login and return the accessToken
-     * @throws Exception
-     * @return string accessToken|false
-     */
-    protected function login() {
-        $config = Zend_Registry::get('config');
-        /* @var $config Zend_Config */
-        $credentials = $config->runtimeOptions->plugins->NecTm->credentials->toArray();
-        $auth = explode(':', $credentials[0]);
-        $this->username = $auth[0];
         
-        $data = new stdClass();
-        $data->username = $this->username;
-        $data->password = $auth[1];
+        $http = ZfExtended_Factory::get('Zend_Http_Client');
+        /* @var $http Zend_Http_Client */
         
-        $http = $this->getHttp('POST','auth');
-        $http->setHeaders('Content-Type', 'application/json');
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setConfig(array('timeout'=>self::REQUEST_TIMEOUT_SECONDS));
         
-        if ($this->processResponse($this->request($http))) {
-            return $this->result;
+        // AT WORK!!!!!!!!!!!!!!!!!
+        
+        //error_log("SEND URI ".print_r($uriPath,1));
+        if (!empty($rawBody)) {
+            //error_log("SEND BODY ".print_r(json_encode($rawBody, JSON_PRETTY_PRINT),1));
+            $http->setRawData(json_encode($rawBody), 'application/json; charset=utf-8');
         }
-        return false;
-    }
-
-    /**
-     * returns the found errors
-     */
-    public function getErrors() {
-        return $this->error;
+        
+        // use trait for processing the request:
+        $this->setHttp($http);
+        $res = $this->request($http);
+        //error_log("REC BODY".print_r($res->getBody(),1));
+        if(!$this->processResponse($res)) {
+            $this->throwBadGateway();
+        }
     }
     
     /**
@@ -222,6 +289,13 @@ class editor_Plugins_NecTm_HttpApi {
             }
             throw $e;
         }
+    }
+    
+    /**
+     * returns the found errors
+     */
+    public function getErrors() {
+        return $this->error;
     }
     
     protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
