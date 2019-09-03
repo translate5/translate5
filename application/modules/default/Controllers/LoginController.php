@@ -146,20 +146,21 @@ class LoginController extends ZfExtended_Controllers_Login {
             $this->_form->addElement($redirect);
             
             //create the link field which needs to redirect the login via the configured openid server
-            $link=new Zend_Form_Element_Note(array(
+            $link = new Zend_Form_Element_Note(array(
                 'name' => 'openidredirect',
                 'value' => $oidc->getCustomer()->getOpenIdRedirectLabel(),
                 'decorators' => array(
                     array('ViewHelper'),
                     array('HtmlTag', array(
-                        'tag' => 'a',
+                        'tag' => 'button',
+                        'id' => 'openid-login',
                         'href' => 'javascript:void(0);',
                         'onclick'=>'document.getElementById("redirect").value="openid"; document.getElementById("submit").click();'
                     )),
                     
                 )
             ));
-            $link->setOrder(0);
+            $link->setOrder(3);
             $this->_form->addElement($link);
         }
         
