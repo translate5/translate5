@@ -369,61 +369,6 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     }
     
     /***
-     * Get specificData field value. The returned value will be json decoded.
-     * If $propertyName is provided, only the value for this field will be returned if exisit.
-     * @param string $propertyName
-     * @return mixed|NULL
-     */
-    public function getSpecificData($propertyName=null){
-        $specificData=$this->__call('getSpecificData', array());
-        
-        if(empty($specificData)){
-            return null;
-        }
-        //try to decode the data
-        try {
-            $specificData=json_decode($specificData);
-            
-            //return the property name value if exist
-            if(isset($propertyName)){
-                return $specificData->$propertyName ?? null;
-            }
-            return $specificData;
-        } catch (Exception $e) {
-            
-        }
-        return null;
-    }
-    
-    /***
-     * Set the specificData field. The given value will be json encoded.
-     * @param string $value
-     */
-    public function setSpecificData($value){
-        $this->__call('setSpecificData', array(
-            json_encode($value)
-        ));
-    }
-    
-    /***
-     * Add specific data by propert name and value. The result will be encoded back to json
-     * @param string $propertyName
-     * @param mixed $value
-     * @return boolean
-     */
-    public function addSpecificData($propertyName,$value) {
-        $specificData=$this->getSpecificData();
-        if(empty($specificData)){
-            $this->setSpecificData(array($propertyName=>$value));
-            return true;
-        }
-        //set the property name into the specific data
-        $specificData->$propertyName=$value;
-        $this->setSpecificData($specificData);
-        return true;
-    }
-    
-    /***
      * Merge the group the languages by language resource. In the return array for each language resource, all available languages ids and 
      * rfc language values will be in separate array.
      * NOTE: the function is used to merge the languages from ungrouped results from "loadByUserCustomerAssocs" function.
