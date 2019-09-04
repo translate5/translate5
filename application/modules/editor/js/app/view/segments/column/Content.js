@@ -107,7 +107,15 @@ Ext.define('Editor.view.segments.column.Content', {
               },
               name: this.dataIndex,
               cls: 'segment-content',
-              fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
+              fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField),
+              fieldSubTpl:[
+            	   '<div id="{id}" role="{role}" {inputAttrTpl}',
+            	   '<tpl if="fieldStyle"> style="{fieldStyle}"</tpl>',
+            	   ' class="{fieldCls}">{value}</div>', {
+            	      compiled: true,
+            	      disableFormats: true
+            	   }
+            	]
           };
       return plug.getColumnField(me, config);
   },
