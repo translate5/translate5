@@ -220,7 +220,7 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * Sends a request to GroupShare's Translation Memory Service.
+     * Sends a request to NEC_TM's Api Service.
      * @param string $method
      * @param string $endpointPath
      * @param array $rawBody

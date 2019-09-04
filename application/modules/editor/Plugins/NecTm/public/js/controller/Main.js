@@ -39,7 +39,7 @@ END LICENSE AND COPYRIGHT
  *
  */
 /**
- * @class Editor.plugins.VisualReview.controller.Global
+ * @class Editor.plugins.NecTm.controller.Main
  * @extends Ext.app.Controller
  */
 Ext.define('Editor.plugins.NecTm.controller.Main', {
