@@ -460,6 +460,7 @@ class editor_TaskController extends ZfExtended_RestController {
         $this->_helper->Api->convertLanguageParameters($this->data['relaisLang']);
         
         $this->setDataInEntity();
+        $this->entity->setUsageMode($this->config->runtimeOptions->import->initialTaskUsageMode);
         $this->entity->createTaskGuidIfNeeded();
         $this->entity->setImportAppVersion(ZfExtended_Utils::getAppVersion());
         
@@ -805,18 +806,18 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
+        $this->validateUsageMode();
         $this->entity->validate();
         $this->initWorkflow();
         
         $mayLoadAllTasks = $this->isAllowed('backend', 'loadAllTasks') || $this->isAuthUserTaskPm($this->entity->getPmGuid());
         $tua = $this->workflow->getTaskUserAssoc($taskguid, $this->user->data->userGuid);
-        if(!$mayLoadAllTasks &&
-                ($this->isOpenTaskRequest(true)&&
-                    !$this->workflow->isWriteable($tua)
-                || $this->isOpenTaskRequest(false,true)&&
-                    !$this->workflow->isReadable($tua)
-                )
-           ){
+        //mayLoadAllTasks is only true, if the current "PM" is not associated to the task directly. 
+        // If it is (pm override false) directly associated, the workflow must be considered it the task is openable / writeable.  
+        $mayLoadAllTasks = $mayLoadAllTasks && (empty($tua) || $tua->getIsPmOverride());
+        $isTaskDisallowEditing = $this->isEditTaskRequest() && !$this->workflow->isWriteable($tua);
+        $isTaskDisallowReading = $this->isViewTaskRequest() && !$this->workflow->isReadable($tua);
+        if(!$mayLoadAllTasks && ($isTaskDisallowEditing || $isTaskDisallowReading)){
             //if the task was already in session, we must delete it. 
             //If not the user will always receive an error in JS, and would not be able to do anything.
             $this->unregisterTask(); //FIXME XXX the changes in the session made by this method is not stored in the session!
@@ -875,6 +876,29 @@ class editor_TaskController extends ZfExtended_RestController {
         // We do this here to have it immediately available e.g. when opening segments.
         $this->addPixelMapping();
         $this->view->rows->lastErrors = $this->getLastErrorMessage($this->entity->getTaskGuid(), $this->entity->getState());
+    }
+    
+    /**
+     * Throws a ZfExtended_Models_Entity_Conflict if usageMode is changed and the task has already assigned users
+     */
+    protected function validateUsageMode() {
+        if(!$this->entity->isModified('usageMode')) {
+            return;
+        }
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $used = $tua->loadByTaskGuidList([$this->entity->getTaskGuid()]);
+        if(empty($used)) {
+            return;
+        }
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1159' => 'Task usageMode can only be modified, if no user is assigned to the task.',
+        ]);
+        throw ZfExtended_Models_Entity_Conflict::createResponse('E1159', [
+            'usageMode' => [
+                'usersAssigned' => 'Der Nutzungsmodus der Aufgabe kann verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.'
+            ]
+        ]);
     }
     
     protected function addPixelMapping() {
@@ -1003,25 +1027,32 @@ class editor_TaskController extends ZfExtended_RestController {
     
     /**
      * returns true if PUT Requests opens a task for editing or readonly
-     * 
-     * - its not allowed to set both parameters to true
-     * @param bool $editOnly if set to true returns true only if its a real editing (not readonly) request
-     * @param bool $viewOnly if set to true returns true only if its a readonly request
-     * 
      * @return boolean
      */
-    protected function isOpenTaskRequest($editOnly = false,$viewOnly = false) {
+    protected function isOpenTaskRequest(): bool {
+        return $this->isEditTaskRequest() || $this->isViewTaskRequest();
+    }
+    
+    /**
+     * returns true if PUT Requests opens a task for editing
+     * @return boolean
+     */
+    protected function isEditTaskRequest(): bool {
         if(empty($this->data->userState)) {
             return false;
         }
-        if($editOnly && $viewOnly){
-            throw new Zend_Exception('editOnly and viewOnly can not both be true');
+        return $this->data->userState == $this->workflow::STATE_EDIT;
+    }
+    
+    /**
+     * returns true if PUT Requests opens a task for viewing(readonly)
+     * @return boolean
+     */
+    protected function isViewTaskRequest(): bool {
+        if(empty($this->data->userState)) {
+            return false;
         }
-        $s = $this->data->userState;
-        $workflow = $this->workflow;
-        return $editOnly && $s == $workflow::STATE_EDIT 
-           || !$editOnly && ($s == $workflow::STATE_EDIT || $s == $workflow::STATE_VIEW)
-           || $viewOnly && $s == $workflow::STATE_VIEW;
+        return $this->data->userState == $this->workflow::STATE_VIEW;
     }
     
     /**
@@ -1045,12 +1076,11 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function openAndLock() {
         $task = $this->entity;
-        if($this->isOpenTaskRequest(true)){
-            $workflow = $this->workflow;
+        if($this->isEditTaskRequest()){
             $unconfirmed = $task->getState() == $task::STATE_UNCONFIRMED;
-            //first check for confirmation, if unconfirmed, don't lock just set to view mode!
+            //first check for confirmation on task level, if unconfirmed, don't lock just set to view mode!
             if($unconfirmed || !$task->lock($this->now)){
-                $this->data->userState = $workflow::STATE_VIEW;
+                $this->data->userState = $this->workflow::STATE_VIEW;
             }
         }
         if($this->isOpenTaskRequest()){

@@ -83,7 +83,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
             $nextRole = $this->getRoleOfStep($nextStep);
             $this->doDebug(__FUNCTION__." Next Role: ".$nextRole);
             if($nextRole) {
-                $newTua->setStateForRoleAndTask(self::STATE_OPEN, $nextRole);
+                $isCoop = $task->getUsageMode() == $task::USAGE_MODE_COOPERATIVE;
+                $newTua->setStateForRoleAndTask($isCoop ? self::STATE_OPEN : self::STATE_UNCONFIRMED, $nextRole);
             }
         }
         
@@ -128,9 +129,8 @@ class editor_Workflow_Default extends editor_Workflow_Abstract {
      * @see editor_Workflow_Abstract::handleFirstFinishOfARole()
      */
     protected function handleFirstFinishOfARole(array $finishStat){
-        $role = $this->newTaskUserAssoc->getRole();
         $taskState = $this->newTask->getState();
-        if($role == self::ROLE_LECTOR && $taskState == editor_Models_Task::STATE_UNCONFIRMED) {
+        if($taskState == editor_Models_Task::STATE_UNCONFIRMED) {
             //we have to confirm the task and retrigger task workflow triggers 
             // if task was unconfirmed but a lektor is set to finish, this implies confirming 
             $oldTask = clone $this->newTask;

@@ -50,6 +50,8 @@ abstract class editor_Workflow_Abstract {
     const STATE_EDIT = 'edit'; 
     //setting this state opens the task readonly 
     const STATE_VIEW = 'view'; 
+    //the user can access the task readable, must confirm it before usage 
+    const STATE_UNCONFIRMED = 'unconfirmed'; 
     
     const ROLE_TRANSLATOR = 'translator';
     const ROLE_LECTOR = 'lector';
@@ -72,6 +74,7 @@ abstract class editor_Workflow_Abstract {
         'WORKFLOW_ID' => 'Standard Ablaufplan', 
         'STATE_IMPORT' => 'import', 
         'STATE_WAITING' => 'wartend', 
+        'STATE_UNCONFIRMED' => 'unbestätigt', 
         'STATE_FINISH' => 'abgeschlossen', 
         'STATE_OPEN' => 'offen', 
         'STATE_EDIT' => 'selbst in Arbeit', 
@@ -170,6 +173,7 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $readableStates = array(
+        self::STATE_UNCONFIRMED,
         self::STATE_WAITING,
         self::STATE_FINISH,
         self::STATE_OPEN,
@@ -215,19 +219,19 @@ abstract class editor_Workflow_Abstract {
      */
     protected $validStates = [
         self::STEP_TRANSLATION => [
-            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
-            self::ROLE_LECTOR => [self::STATE_WAITING],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
+            self::ROLE_TRANSLATOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            self::ROLE_LECTOR => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
         self::STEP_LECTORING => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
-            self::ROLE_LECTOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING],
+            self::ROLE_LECTOR => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_WAITING, self::STATE_UNCONFIRMED],
         ],
         self::STEP_TRANSLATORCHECK => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
             self::ROLE_LECTOR => [self::STATE_FINISH],
-            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW],
+            self::ROLE_TRANSLATORCHECK => [self::STATE_OPEN, self::STATE_EDIT, self::STATE_VIEW, self::STATE_UNCONFIRMED],
         ],
         self::STEP_WORKFLOW_ENDED => [
             self::ROLE_TRANSLATOR => [self::STATE_FINISH],
@@ -654,6 +658,10 @@ abstract class editor_Workflow_Abstract {
      */
     public function isStateChangeable(editor_Models_TaskUserAssoc $taskUserAssoc) {
         $state = $taskUserAssoc->getState();
+        //setting from unconfirmed to edit means implicitly that the user confirms the job 
+        if($state == self::STATE_UNCONFIRMED && $taskUserAssoc->getUsedState() == self::STATE_EDIT) {
+            return true;
+        }
         return !($state == self::STATE_FINISH || $state == self::STATE_WAITING);
     }
 
@@ -793,8 +801,8 @@ abstract class editor_Workflow_Abstract {
                     $this->events->trigger("doReopen", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
                 }
                 if($oldState == $newTask::STATE_UNCONFIRMED) {
-                    $this->doConfirm();
-                    $this->events->trigger("doConfirm", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
+                    $this->doTaskConfirm();
+                    $this->events->trigger("doTaskConfirm", $this, array('oldTask' => $oldTask, 'newTask' => $newTask));
                 }
                 break;
             case $newTask::STATE_END:
@@ -1005,7 +1013,7 @@ abstract class editor_Workflow_Abstract {
     
     /**
      * method returns the triggered state as string ready to use in events, these are mainly:
-     * doUnfinish, doView, doEdit, doFinish, doWait
+     * doUnfinish, doView, doEdit, doFinish, doWait, doConfirm 
      * beforeUnfinish, beforeView, beforeEdit, beforeFinish, beforeWait
      * 
      * @param editor_Models_TaskUserAssoc $oldTua
@@ -1013,7 +1021,7 @@ abstract class editor_Workflow_Abstract {
      * @param string $prefix optional, defaults to "do"
      * @return string
      */
-    public function getTriggeredState(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, $prefix = 'do') {
+    protected function getTriggeredState(editor_Models_TaskUserAssoc $oldTua, editor_Models_TaskUserAssoc $newTua, $prefix = 'do') {
         $oldState = $oldTua->getState();
         $newState = $newTua->getState();
         if($oldState == $newState) {
@@ -1022,6 +1030,10 @@ abstract class editor_Workflow_Abstract {
         
         if($oldState == self::STATE_FINISH && $newState != self::STATE_FINISH) {
             return $prefix.'Unfinish';
+        }
+        
+        if($oldState == self::STATE_UNCONFIRMED && $newState == self::STATE_EDIT) {
+            return $prefix.'Confirm';
         }
         
         switch($newState) {
@@ -1182,7 +1194,38 @@ abstract class editor_Workflow_Abstract {
     /**
      * is called when a task is opened coming from state unconfirmed
      */
+    protected function doTaskConfirm() {
+    }
+    
+    /**
+     * is called when a user confirms his job (job was unconfirmed and is set to edit)
+     * No handler functions for confirm available, everything is handled via actions 
+     */
     protected function doConfirm() {
+        $stat = $this->calculateConfirm();
+        $this->doDebug(__FUNCTION__.print_r($stat,1));
+        
+        $toTrigger = [];
+        if($stat['roleFirstConfirmed']) {
+            $toTrigger[] = 'handleFirstConfirmOfARole';
+        }
+        if($stat['firstConfirmed']) {
+            $toTrigger[] = 'handleFirstConfirm';
+        }
+        if($stat['roleAllConfirmed']) {
+            $toTrigger[] = 'handleAllConfirmOfARole';
+        }
+        if($stat['allConfirmed']) {
+            $toTrigger[] = 'handleAllConfirm';
+        }
+        $toTrigger[] = 'handleConfirm';
+        
+        $newTua = $this->newTaskUserAssoc;
+        $oldStep = $this->newTask->getWorkflowStepName();
+        foreach($toTrigger as $trigger) {
+            $this->doDebug($trigger);
+            $this->callActions($trigger, $oldStep, $newTua->getRole(), $newTua->getState());
+        }
     }
     
     /**
@@ -1207,7 +1250,6 @@ abstract class editor_Workflow_Abstract {
      * evaluates the role and states of the User Task Association and calls the matching handlers:
      */
     protected function doFinish() {
-        
         $stat = $this->calculateFinish();
         $this->doDebug(__FUNCTION__.print_r($stat,1));
         
@@ -1262,6 +1304,42 @@ abstract class editor_Workflow_Abstract {
             'roleAllFinished' => $roleAllFinished,
             'roleFirstFinished' => $roleFirstFinished,
             'firstFinished' => $sum === 1,
+        ];
+    }
+    
+    /**
+     * Calculates the workflow step confirmation status
+     * Warning: this function may only be called in doConfirm (which is called if there was a state unconfirmed which is now set to edit)
+     *  For all other usages the calculation will not be correct, since we don't know if a state was unconfirmed before, 
+     *  we see only that all states are now not unconfirmed. 
+     */
+    protected function calculateConfirm() {
+        $userTaskAssoc = $this->newTaskUserAssoc;
+        $stat = $userTaskAssoc->getUsageStat();
+        $sum = 0;
+        $roleSum = 0;
+        $otherSum = 0;
+        $roleUnconfirmedSum = 0;
+        foreach($stat as $entry) {
+            $sum += (int)$entry['cnt'];
+            $isRole = $entry['role'] === $userTaskAssoc->getRole();
+            $isUnconfirmed = $entry['state'] === self::STATE_UNCONFIRMED;
+            if($isRole) {
+                $roleSum += (int)$entry['cnt'];
+                if($isUnconfirmed) {
+                    $roleUnconfirmedSum += (int)$entry['cnt'];
+                }
+            }
+            if(!$isUnconfirmed) {
+                $otherSum += (int)$entry['cnt'];
+            }
+        }
+        return [
+            'allConfirmed' => $sum > 0 && $otherSum === $sum,
+            'roleAllConfirmed' => $roleUnconfirmedSum === 0,
+            'roleFirstConfirmed' => $roleSum - 1 === $roleUnconfirmedSum,
+            //firstConfirmed is working only if really all other jobs are unconfirmed, what is seldom, since the other states will be waiting / finished etc. 
+            'firstConfirmed' => $otherSum === 1, 
         ];
     }
     

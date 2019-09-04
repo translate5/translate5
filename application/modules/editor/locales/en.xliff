@@ -1964,14 +1964,6 @@
       <source>Sprache</source>
       <target>Language</target>
   </trans-unit>
-<trans-unit id="TGVrdG9yZW4gYmVuYWNocmljaHRpZ2Vu">
-    <source>Lektoren benachrichtigen</source>
-    <target>Notify Proofreaders</target>
-</trans-unit>
-<trans-unit id="QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg==">
-    <source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source>
-    <target>Notify all users about the association to the task</target>
-</trans-unit>
 <trans-unit id="QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q=">
     <source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source>
     <target>Users were successfully notified by email</target>
@@ -3443,6 +3435,44 @@ More information can be found in the task property window in the tab events.<br 
 <trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Editing this definition will affect all terms of this language.</target></trans-unit>
 <trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Please open the 'Term entry attributes' for editing this definition.</target></trans-unit>
 <trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Please note:</target></trans-unit>
+<trans-unit id='Cjxici8+Cjxici8+PGI+QWNodHVuZzo8L2I+IEtvbmt1cnJpZXJlbmRlIEJlbnV0emVyOiBEZXIgZXJzdGUgQmVudXR6ZXIsIGRlciBlaW5lbiBKb2IgYW5uaW1tdCwgZsO8aHJ0IGVpbmVuIEpvYiBhdXMuIEFsbGVuIGFuZGVyZW4gd2lyZCBhdXRvbWF0aXNjaCBkaWUgQXVmZ2FiZSBlbnR6b2dlbi4KPGJyLz4='>
+    <source>
+<br/>
+<br/><b>Achtung:</b> Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.
+<br/></source>
+    <target>
+<br/>
+<br/><b>Attention:</b> Competing users: First user, who accepts job, does job. Others are unassigned automatically.
+<br/></target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplcg=='>
+    <source>Mehrere Benutzer</source>
+    <target>Multiple users</target>
+</trans-unit>
+<trans-unit id='V2VubiBtZWhyZXJlIEJlbnV0emVyIGRlbXNlbGJlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gd2VyZGVu'>
+    <source>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</source>
+    <target>When assigning multiple users to same workflow step</target>
+</trans-unit>
+<trans-unit id='RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu'>
+    <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
+    <target>Option can only be changed, if no user is assigned</target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGRpZXNlbGJlIEF1ZmdhYmU='>
+    <source>Mehrere Benutzer bearbeiten dieselbe Aufgabe</source>
+    <target>Multiple users editing same task</target>
+</trans-unit>
+<trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='>
+    <source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source>
+    <target>Competing users: First user, who accepts job, does job. Others are unassigned automatically.</target>
+</trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXIgYmVuYWNocmljaHRpZ2VuPw=='>
+    <source>Zugewiesene Benutzer benachrichtigen?</source>
+    <target>Notify assigned users?</target>
+</trans-unit>
+<trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlnIHdlcmRlbj8='>
+    <source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</source>
+    <target>Notify the associated users about the association to the task?</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

@@ -68,9 +68,6 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
      * @return [array] list with user arrays
      */
     public function loadUsersOfTaskWithRole(string $taskGuid, $role, array $assocFields = [], $state = null){
-        if (empty($role)) {
-            return [];
-        }
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         $db = $this->db;
         $s = $user->db->select()

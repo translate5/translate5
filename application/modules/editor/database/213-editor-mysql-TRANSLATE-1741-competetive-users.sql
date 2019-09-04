@@ -1,4 +1,3 @@
-<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -15,8 +14,9 @@ START LICENSE AND COPYRIGHT
  http://www.gnu.org/licenses/agpl.html
   
  There is a plugin exception available for use with this release of translate5 for
- translate5: Please see http://www.translate5.net/plugin-exception.txt or 
- plugin-exception.txt in the root folder of translate5.
+ translate5 plug-ins that are distributed under GNU AFFERO GENERAL PUBLIC LICENSE version 3:
+ Please see http://www.translate5.net/plugin-exception.txt or plugin-exception.txt in the root
+ folder of translate5.
   
  @copyright  Marc Mittag, MittagQI - Quality Informatics
  @author     MittagQI - Quality Informatics
@@ -26,22 +26,14 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- * Defines a common interface for workflow actions
- */
-class editor_Workflow_Actions_Abstract {
-    /**
-     * @var editor_Workflow_Actions_Config 
-     */
-    protected $config;
-    
-    /**
-     * @var ZfExtended_Logger 
-     */
-    protected $log;
+ALTER TABLE `LEK_task`
+ADD COLUMN `usageMode` varchar(32) DEFAULT 'cooperative' COMMENT 'defines in which how the task should be used by the users';
 
-    public function init(editor_Workflow_Actions_Config $config) {
-        $this->config = $config;
-        $this->log = Zend_Registry::get('logger')->cloneMe('editor.workflow.notification');
-    }
-}
+INSERT INTO `Zf_configuration` (`name`, `confirmed`, `module`, `category`, `value`, `default`, `defaults`, `type`, `description`) 
+VALUES ('runtimeOptions.import.initialTaskUsageMode', '1', 'editor', 'import', 'cooperative', 'cooperative', 'competitive,cooperative', 'string', 'Initial mode how the task should be used by different users. See also https://confluence.translate5.net/display/TAD/Task');
+
+DELETE FROM `LEK_workflow_action` 
+WHERE `workflow` = 'default' 
+AND `trigger` = 'handleUserAssociationAdded' 
+AND `actionClass` = 'editor_Workflow_Notification' 
+AND `action` = 'notifyNewTaskAssigned';
