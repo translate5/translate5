@@ -73,9 +73,9 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
      * Returns the "top-level-tags" as configured.
      * @return array
      */
-    public function getTopLevelTags() {
+    public function getTopLevelTagIds() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        return $config->runtimeOptions->plugins->NecTm->topLevelTags->toArray();
+        return $config->runtimeOptions->plugins->NecTm->topLevelTagIds->toArray();
     }
 }

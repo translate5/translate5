@@ -26,29 +26,45 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Plugins_NecTm_Resource extends editor_Models_LanguageResources_Resource {
-    
+class Editor_TagController extends ZfExtended_RestController {
     /**
-     * @var editor_Plugins_NecTm_Service
+     * @var string
      */
-    protected $service;
-    
-    public function __construct(editor_Plugins_NecTm_Service $service) {
-        $this->service = $service;
+    protected $entityClass = 'editor_Models_Tags';
+
+    /**
+     * @var editor_Models_Tags
+     */
+    protected $entity;
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::indexAction()
+     */
+    public function indexAction()
+    {
+        // Add specific handling of the tags for the view here.
+        // (Nothing to do at the moment.)
+        parent::indexAction();
     }
-    
-    /**
-     * Returns all tags that are offered to choose from when adding a NEC-TM LangageResource
-     * in translate5:
-     * - top-lecel-tags from config
-     * - tags from NEC-TM stored (+ regularly synched) in our DB
-     * @return array
-     */
-    public function getAllTags() {
-        $tagsFromConfig = $this->service->getTopLevelTagIds();
-        $m = ZfExtended_Factory::get('editor_Models_Tags');
-        /* @var $m editor_Models_Tags */
-        $tagsFromNEC = $m->loadByOrigin($this->service->getTagOrigin());
-        // TODO: mergen und uniquen und dann return
+
+    public function getAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
+    }
+
+    public function putAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
+    }
+
+    public function deleteAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->delete');
+    }
+
+    public function postAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
     }
 }

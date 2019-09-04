@@ -76,11 +76,7 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         /* @var $service editor_Plugins_NecTm_Service */
         
         $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforeIndexAction', array($this, 'synchronizeNecTmTags'));
-    }
-    
-    public function initJsTranslations(Zend_EventManager_Event $event) {
-        $view = $event->getParam('view');
-        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
+        $this->eventManager->attach('Editor_TagController', 'afterIndexAction', array($this, 'handleAfterIndexAction'));
     }
     
     /**
@@ -107,6 +103,28 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         return true;
+    }
+    
+    /**
+     * For result-list in view:
+     * - use NEC-TM-tags only
+     * - sort by label
+     */
+    public function handleAfterIndexAction(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $allTags = $view->rows;
+        foreach ($allTags as $key => $tag) {
+            if ($tag['origin'] != $this->service->getTagOrigin()) {
+                unset($allTags[$key]);
+            }
+        }
+        usort($allTags, function ($a, $b) {
+            return strtolower($a['label']) <=> strtolower($b['label']);
+        });
+        //INFO: rebuild the array keys, array keys like: [0],[1],[5],[7] messed up the extjs resource store
+        $allTags = array_values($allTags);
+        $view->rows = $allTags;
+        $view->total= count($allTags);
     }
     
     /**

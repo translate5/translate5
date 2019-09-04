@@ -36,5 +36,5 @@ DELETE FROM `Zf_configuration`
 WHERE `name` = 'runtimeOptions.plugins.NecTm.credentials';
 
 DELETE FROM `Zf_configuration` 
-WHERE `name` = 'runtimeOptions.plugins.NecTm.topLevelTags';
+WHERE `name` = 'runtimeOptions.plugins.NecTm.topLevelTagIds';
 

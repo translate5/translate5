@@ -53,20 +53,19 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
     }],
     listen: {
         component: {
-            'addTmWindow combo[name="resourceId"]': {
+            '#addTmWindow combo[name="resourceId"]': {
                 select: 'handleResourceChanged'
             },
         }
     },
+    /**
+     * 
+     */
     handleResourceChanged: function(combo, record, index) {
-        // TODO: add Tags-Field (before, not here) and handle visibility
-        var form = this.getAddTmForm().getForm(),
-            disableUpload = !record.get('filebased'),
-            filefield = form.findField('tmUpload');
-        form.findField('serviceType').setValue(record.get('serviceType'));
-        form.findField('serviceName').setValue(record.get('serviceName'));
-        form.findField('color').setValue(record.get('defaultColor'));
-        filefield.setDisabled(disableUpload);
-        filefield.setReadOnly(disableUpload);
-    },
+        var form = combo.up('form'),
+            disableTags = (record.get('serviceName') !== 'NEC-TM'),
+            tagsfield = form.queryById('tags');
+        tagsfield.setDisabled(disableTags);
+        tagsfield.setReadOnly(disableTags);
+    }
 });

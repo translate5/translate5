@@ -1613,6 +1613,7 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
 <trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</target></trans-unit>
 <trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</target></trans-unit>
 <trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Hinweis</target></trans-unit>
+<trans-unit id='VGFncw=='><source>Tags</source><target>Tags</target></trans-unit>
   </body>
  </file>
 </xliff>

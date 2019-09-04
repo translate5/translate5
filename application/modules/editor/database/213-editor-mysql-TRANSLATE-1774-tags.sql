@@ -36,6 +36,9 @@ CREATE TABLE IF NOT EXISTS `LEK_tags` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='"Tags" here serve the concept of labels and classifications.';
 
+INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
+('editor', 'editor', 'editor_tag', 'all');
+
 CREATE TABLE IF NOT EXISTS `LEK_languageresources_tag_assoc` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `languageResourceId` int(11) NOT NULL,
