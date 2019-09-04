@@ -41,10 +41,12 @@ END LICENSE AND COPYRIGHT
  * @method void setServiceType() setServiceType(string $type)
  * @method string getServiceName() getServiceName()
  * @method void setServiceName() setServiceName(string $resName)
- * @method string getSpecificData() getSpecificData()
- * @method void setSpecificData() setSpecificData(string $value)
  * @method string getResourceType() getResourceType()
  * @method void setResourceType() setResourceType(string $resourceType)
+ * 
+ * see ZfExtended_Models_Entity_Abstract:
+ * - string getSpecificData() getSpecificData()
+ * - void setSpecificData() setSpecificData(string $value)
  */
 class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models_Entity_Abstract {
     
