@@ -36,7 +36,8 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         'Editor.view.LanguageResources.EngineCombo',
         'Editor.view.LanguageResources.TmWindowViewController',
         'Editor.view.LanguageResources.TmWindowViewModel',
-        'Editor.view.LanguageCombo'
+        'Editor.view.LanguageCombo',
+        'Editor.store.Tags'
     ],
     controller: 'tmwindowviewcontroller',
     viewModel: {
@@ -51,6 +52,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         name: '#UT#Name',
         file: '#UT#TM/TMX-Datei (optional)',
         importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
+        tags: '#UT#Tags',
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
@@ -234,6 +236,17 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     bind:{
                         fieldLabel:'{uploadLabel}' //me.strings.file
                     }
+                },{
+                    xtype: 'tagfield',
+                    name: 'tags',
+                    id: 'tags',
+                    store: Ext.create('Editor.store.Tags').load(),
+                    fieldLabel: me.strings.tags,
+                    disabled:true,
+                    allowBlank: false,
+                    typeAhead: true,
+                    valueField: 'id',
+                    displayField: 'label'
                 }]
             }],
             dockedItems : [{
