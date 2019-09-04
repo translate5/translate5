@@ -36,6 +36,6 @@ END LICENSE AND COPYRIGHT
  * Klasse zum Zugriff auf die Tabelle mit Namen des Klassennamens (in lower case)
  */
 class editor_Models_Db_Tags extends Zend_Db_Table_Abstract {
-    protected $_name    = 'LEK_tags';
+    protected $_name = 'LEK_tags';
     public $_primary = 'id';
 }

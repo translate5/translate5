@@ -75,7 +75,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     
     /**
      * {@inheritDoc}
-     * @see editor_Services_Connector_FilebasedAbstract::open()
+     * @see editor_Services_Connector_FilebasedAbstract::close()
      */
     public function close() {
         //This call is not necessary, since this resource is closed automatically.

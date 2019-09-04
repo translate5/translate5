@@ -32,5 +32,6 @@ class editor_Models_Validator_Tag extends ZfExtended_Models_Validator_Abstract {
         $this->addValidator('origin', 'stringLength', array('min' => 0, 'max' => 8));
         $this->addValidator('label', 'stringLength', array('min' => 0, 'max' => 255));
         $this->addValidator('originalTagId', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('specificData', 'stringLength', array('min' => 0, 'max' => 1024));
     }
 }

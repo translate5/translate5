@@ -27,16 +27,18 @@
 -- */
 
 
-CREATE TABLE `LEK_tags` (
+CREATE TABLE IF NOT EXISTS `LEK_tags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `origin` varchar(8) NOT NULL COMMENT 'Where does this tag come from / belong to?',
-  `label` varchar(255) DEFAULT NULL,
-  `originalTagId` varchar(255) DEFAULT NULL
+  `origin` varchar(8) DEFAULT NULL COMMENT 'Where does this tag come from / belong to?',
+  `label` varchar(255) DEFAULT NULL COMMENT 'Name; can be original, but reliable reference to the original tag is the originalTagId',
+  `originalTagId` varchar(255) DEFAULT NULL COMMENT 'Original id',
+  `specificData` VARCHAR(1024) DEFAULT NULL COMMENT 'Tag specific info data',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='"Tags" here serve the concept of labels and classifications.';
 
-CREATE TABLE `LEK_languageresources_tag_assoc` (
+CREATE TABLE IF NOT EXISTS `LEK_languageresources_tag_assoc` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `languageResourceId` int(11) DEFAULT NULL,
+  `languageResourceId` int(11) NOT NULL,
   `tagId` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_LEK_languageresources_tag_assoc_1`

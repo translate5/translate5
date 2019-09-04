@@ -40,8 +40,12 @@ END LICENSE AND COPYRIGHT
  * @method void setOrigin() setOrigin(string $origin)
  * @method string getLabel() getLabel()
  * @method void setLabel() setLabel(string $label)
- * @method string getOriginalTagId() getoOriginalTagId()
+ * @method string getOriginalTagId() getOriginalTagId()
  * @method void setOriginalTagId() setOriginalTagId(string $originalTagId)
+ * 
+ * see ZfExtended_Models_Entity_Abstract:
+ * - string getSpecificData() getSpecificData()
+ * - void setSpecificData() setSpecificData(string $specificData)
  */
 class editor_Models_Tags extends ZfExtended_Models_Entity_Abstract {
     protected $dbInstanceClass = 'editor_Models_Db_Tags';
@@ -49,10 +53,10 @@ class editor_Models_Tags extends ZfExtended_Models_Entity_Abstract {
     
     /**
      * All tags for the given origin.
-     * @param string $pmGuid
+     * @param string $origin
      * @return array
      */
-    public function loadListByOrigin(string $origin) {
+    public function loadByOrigin(string $origin) {
         $s = $this->db->select();
         $s->where('origin = ?', $origin);
         return parent::loadFilterdCustom($s);  // ??????????????

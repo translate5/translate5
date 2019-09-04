@@ -48,7 +48,7 @@ class editor_Plugins_NecTm_Resource extends editor_Models_LanguageResources_Reso
         $tagsFromConfig = $this->service->getTopLevelTags();
         $m = ZfExtended_Factory::get('editor_Models_Tags');
         /* @var $m editor_Models_Tags */
-        $tagsFromNEC = $m->loadListByOrigin($this->service->getTagOrigin());
+        $tagsFromNEC = $m->loadByOrigin($this->service->getTagOrigin());
         // TODO: mergen und uniquen und dann return
     }
 }
