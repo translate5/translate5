@@ -43,9 +43,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
       save: '#UT#Änderungen speichern',
       reload: '#UT#Aktualisieren',
-      cancel: '#UT#Abbrechen',
-      btnNotify:'#UT#Lektoren benachrichtigen',
-      btnNotifyTip:'#UT#Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren'
+      cancel: '#UT#Abbrechen'
   },
   viewConfig: {
       loadMask: false
@@ -128,13 +126,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               itemId: 'reload-btn',
               iconCls: 'ico-refresh',
               text: me.strings.reload
-          },
-          "-",{
-              xtype: 'button',
-              itemId: 'notify-user-btn',
-              iconCls: 'ico-notify-user',
-              text: me.strings.btnNotify,
-              tooltip: me.strings.btnNotifyTip
           }]
         }]
     };

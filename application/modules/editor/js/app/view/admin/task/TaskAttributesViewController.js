@@ -40,10 +40,25 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.taskattributesviewcontroller',
 
+    listen: {
+        component: {
+            "taskattributes": {
+                show: 'loadTask'
+            }
+        }
+    },
+    
+    loadTask: function() {
+        var vm = this.getView().lookupViewModel();
+        vm.set('disableUsageMode', Ext.getStore('admin.TaskUserAssocs').getCount() > 0);
+        this.getView().loadRecord(vm.get('currentTask'));
+    },
+    
     onSaveTaskAttributesClick:function(){
         var me=this,
             currentTask=me.getView().lookupViewModel().get('currentTask');
  
+        me.getView().updateRecord();
         //check if the model record is changed
         if(!currentTask.dirty){
             return;
@@ -64,7 +79,14 @@ Ext.define('Editor.view.admin.task.TaskAttributesViewController', {
     
     onReloadTaskAttributesClick:function(){
         //Reload the task
-        Editor.app.getController('Editor.controller.admin.TaskPreferences').handleReload();
+        var me = this,
+            task = me.getView().lookupViewModel().get('currentTask');
+        task.load({
+            success: function(rec) {
+                Editor.app.getController('Editor.controller.admin.TaskPreferences').loadAllPreferences(rec);
+                me.loadTask();
+            }
+        });
     },
     
     onCancelTaskAttributesClick:function(){

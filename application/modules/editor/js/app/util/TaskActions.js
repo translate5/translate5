@@ -158,8 +158,8 @@ Ext.define('Editor.util.TaskActions', {
             return;
         }
         me.modifyTask(innerCallback, {
-            state: 'open', 
-            userState: initialState
+            state: 'open',          //confirms the task on task level (if task state was unconfirmed)
+            userState: initialState //
         }, me.strings.taskConfirming);
     },
     /**
@@ -181,6 +181,9 @@ Ext.define('Editor.util.TaskActions', {
         task.save({
             success: function(rec) {
                 callback(task, app, me.strings);
+            },
+            callback: function(rec, op) {
+                Editor.MessageBox.addByOperation(op);
             },
             failure: app.unmask
         });
