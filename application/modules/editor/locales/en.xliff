@@ -3481,6 +3481,10 @@ More information can be found in the task property window in the tab events.<br 
   <source>Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.</source>
   <target>Attention: you were unassigned from the just closed task.</target>
 </trans-unit>
+<trans-unit id='U2llIGvDtm5uZW4gZGVuIEpvYiB6dXIgWmVpdCBuaWNodCBiZWFyYmVpdGVuLCBkZXIgQmVudXR6ZXIgaGF0IGRpZSBBdWZnYWJlIGJlcmVpdHMgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldC4='>
+  <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
+  <target>The job can not be modified, since the user has already opened the task for editing.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

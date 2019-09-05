@@ -307,6 +307,7 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
             return false;
         }
         $this->db->getAdapter()->commit();
+        $this->updateTask($taskGuid);
         return $otherTuas;
     }
 

@@ -137,20 +137,29 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->log->request();
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
         /* @var $workflow editor_Workflow_Abstract */
+        if(!empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
+            // the following check on preventing changing Jobs which are used, prevents the following problems:
+            // competitive tasks: 
+            //   a task can not confirmed by user A if user A could not get a lock on the task, 
+            //   because user B has opened the task for editing (and locked it), before User B was set to unconfirmed. 
+            //   This is prevented now, since the PM gets an error when he wants to set User B to unconfirmed while B is editing already.
+            //  another prevented problem: 
+            //    User B have opened the task for editing, after that his job is set to unconfirmed
+            //    User B does not notice this and edits more segments, although he should be unconfirmed or waiting.
+            //  Throwing the following exception do not kick out the user, but the PM knows now that he fucked up the task.
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1161' => "The job can not be modified, since the user has already opened the task for editing. You are to late.",
+            ]);
+            throw ZfExtended_Models_Entity_Conflict::createResponse('E1161', [
+                'id' => 'Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.',
+            ]);
+        }
         $oldEntity = clone $this->entity;
         $this->decodePutData();
         $this->processClientReferenceVersion();
         $this->setDataInEntity();
-        //@todo in next release uncomment $workflow->isStateChangeable again and 
-        //ensure in workflow, that the rights of a role decide, which states are changeable
-        //therefore only the workflow knows everything about states
-        //At the moment a check here is not necessary because only pm is allowed to use
-        //taskuserassocController and he should be able to change everything right now.
-        //makes sense to do a method isWorkflowStateChangeable und isTaskStateChangeable to decide between taskUserassoc-states and task-states
-        //$this->setDataInEntity(array('state'), false); //rejecting value state
-        //if($workflow->isStateChangeable($this->entity) && isset($this->data->state)) {
-            //$this->entity->setState($this->data->state);
-        //}
+        
+        
         $this->entity->validate();
         $workflow->triggerBeforeEvents($oldEntity, $this->entity);
         $this->entity->save();
