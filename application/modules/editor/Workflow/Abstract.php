@@ -668,9 +668,10 @@ abstract class editor_Workflow_Abstract {
         // both values TUA.state in DB and state which has the user must be unconfirmed 
         // this prevents that a user which as an old task overview (where he is not yet in unconfirmed mode) 
         // automatically confirms the task by opening it via edit 
-        if($state == self::STATE_UNCONFIRMED && $userAssumedStateHeHas == self::STATE_UNCONFIRMED) {
+        if($state == self::STATE_UNCONFIRMED) {
             // all other non edit states must leave the unconfirmed state
-            return $taskUserAssoc->getUsedState() == self::STATE_EDIT;
+            // if the client in the GUI also was not on unconfirmed we have to leave it
+            return $state == $userAssumedStateHeHas && $taskUserAssoc->getUsedState() == self::STATE_EDIT;
         }
         return !($state == self::STATE_FINISH || $state == self::STATE_WAITING);
     }
