@@ -185,6 +185,9 @@ abstract class editor_Workflow_Abstract {
      * @var array 
      */
     protected $writeableStates = array(
+        //although the task is readonly in state unconfirmed, we have to add the state here, 
+        // to allow changing from unconfirmed to edit (which then means to confirm)
+        self::STATE_UNCONFIRMED, 
         self::STATE_OPEN,
         self::STATE_EDIT,
         self::STATE_VIEW,
@@ -650,17 +653,24 @@ abstract class editor_Workflow_Abstract {
     /**
      * returns true if a normal user can change the state of this assoc, false otherwise. 
      * false means that the user has finished this task already or the user is still waiting.
+     * $userAssumedStateHeHas: should be the same as $taskUserAssoc->state, but comes in via API and represents the state which the client has. 
+     *  This may differ from the state in the TUA out of DB. Basicly this means the user should refresh his data. 
      * 
      * - does not look for the state of a task, only for state of taskUserAssoc
      * 
      * @param editor_Models_TaskUserAssoc $taskUserAssoc 
+     * @param string $userAssumedStateHeHas 
      * @return boolean
      */
-    public function isStateChangeable(editor_Models_TaskUserAssoc $taskUserAssoc) {
+    public function isStateChangeable(editor_Models_TaskUserAssoc $taskUserAssoc, $userAssumedStateHeHas) {
         $state = $taskUserAssoc->getState();
-        //setting from unconfirmed to edit means implicitly that the user confirms the job 
-        if($state == self::STATE_UNCONFIRMED && $taskUserAssoc->getUsedState() == self::STATE_EDIT) {
-            return true;
+        //setting from unconfirmed to edit means implicitly that the user confirms the job
+        // both values TUA.state in DB and state which has the user must be unconfirmed 
+        // this prevents that a user which as an old task overview (where he is not yet in unconfirmed mode) 
+        // automatically confirms the task by opening it via edit 
+        if($state == self::STATE_UNCONFIRMED && $userAssumedStateHeHas == self::STATE_UNCONFIRMED) {
+            // all other non edit states must leave the unconfirmed state
+            return $taskUserAssoc->getUsedState() == self::STATE_EDIT;
         }
         return !($state == self::STATE_FINISH || $state == self::STATE_WAITING);
     }

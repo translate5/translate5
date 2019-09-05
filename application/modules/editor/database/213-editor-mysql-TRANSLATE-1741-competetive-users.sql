@@ -37,3 +37,6 @@ WHERE `workflow` = 'default'
 AND `trigger` = 'handleUserAssociationAdded' 
 AND `actionClass` = 'editor_Workflow_Notification' 
 AND `action` = 'notifyNewTaskAssigned';
+
+INSERT INTO `LEK_workflow_action` (`workflow`, `trigger`, `actionClass`, `action`) 
+VALUES ('default', 'handleFirstConfirmOfARole', 'editor_Workflow_Actions', 'removeCompetitiveUsers');

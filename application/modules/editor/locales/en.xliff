@@ -3473,6 +3473,14 @@ More information can be found in the task property window in the tab events.<br 
     <source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</source>
     <target>Notify the associated users about the association to the task?</target>
 </trans-unit>
+<trans-unit id='PGJyLz48YnIvPkFsbGVuIGFuZGVyZW4gQmVudXR6ZXJuIHdpcmQgZGllIEF1ZmdhYmUgZW50em9nZW48YnIvPiB1bmQgc2llIHdpcmQgYXVzc2NobGllw59saWNoIGluIElocmVyIFZlcmFudHdvcnR1bmcgbGllZ2VuLg=='>
+  <source><br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.</source>
+  <target><br/><br/>All other users will be unassigned<br/> and this will be your sole responsibility.</target>
+</trans-unit>
+<trans-unit id='QWNodHVuZzogZGllIGFrdHVlbGwgZ2VzY2hsb3NzZW5lIEF1ZmdhYmUgd3VyZGUgSWhuZW4gZW50em9nZW4u'>
+  <source>Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.</source>
+  <target>Attention: you were unassigned from the just closed task.</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

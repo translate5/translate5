@@ -1034,6 +1034,17 @@ class editor_TaskController extends ZfExtended_RestController {
     }
     
     /**
+     * returns true if PUT Requests opens a task for editing or readonly
+     * @return boolean
+     */
+    protected function isLeavingTaskRequest(): bool {
+        if(empty($this->data->userState)) {
+            return false;
+        }
+        return $this->data->userState == $this->workflow::STATE_OPEN || $this->data->userState == $this->workflow::STATE_FINISH;
+    }
+    
+    /**
      * returns true if PUT Requests opens a task for editing
      * @return boolean
      */
@@ -1103,10 +1114,6 @@ class editor_TaskController extends ZfExtended_RestController {
      */
     protected function closeAndUnlock() {
         $workflow = $this->workflow;
-        $closingStates = array(
-            $workflow::STATE_FINISH,
-            $workflow::STATE_OPEN
-        );
         $task = $this->entity;
         $hasState = !empty($this->data->userState);
         $isEnding = isset($this->data->state) && $this->data->state == $task::STATE_END;
@@ -1115,14 +1122,12 @@ class editor_TaskController extends ZfExtended_RestController {
             //This state change will be saved at the end of this method.
             $this->data->userState = $workflow::STATE_OPEN;
         }
-        if(!$isEnding && (!$hasState || !in_array($this->data->userState, $closingStates))){
+        if(!$isEnding && (!$this->isLeavingTaskRequest())){
             return;
         }
-        if($this->entity->getLockingUser() == $this->user->data->userGuid) {
-            if(!$this->entity->unlock()){
-                throw new Zend_Exception('task '.$this->entity->getTaskGuid().
-                        ' could not be unlocked by user '.$this->user->data->userGuid);
-            }
+        if($this->entity->getLockingUser() == $this->user->data->userGuid && !$this->entity->unlock()) {
+            throw new Zend_Exception('task '.$this->entity->getTaskGuid().
+                    ' could not be unlocked by user '.$this->user->data->userGuid);
         }
         $this->unregisterTask();
         
@@ -1151,6 +1156,7 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($this->data->userState)) {
             return;
         }
+        settype($this->data->userStatePrevious, 'string');
 
         if(!in_array($this->data->userState, $this->workflow->getStates())) {
             throw new ZfExtended_ValidateException('Given UserState '.$this->data->userState.' does not exist.');
@@ -1170,6 +1176,12 @@ class editor_TaskController extends ZfExtended_RestController {
         }
         catch(ZfExtended_Models_Entity_NotFoundException $e) {
             if(! $isEditAllTasks){
+                if($this->isLeavingTaskRequest()) {
+                    $messages = Zend_Registry::get('rest_messages');
+                    /* @var $messages ZfExtended_Models_Messages */
+                    $messages->addError('Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.');
+                    return; //just allow the user to leave the task - but send a message
+                }
                 throw $e;
             }
             $userTaskAssoc->setUserGuid($userGuid);
@@ -1179,7 +1191,6 @@ class editor_TaskController extends ZfExtended_RestController {
             $isPmOverride = true;
             $userTaskAssoc->setIsPmOverride($isPmOverride);
         }
-
         $oldUserTaskAssoc = clone $userTaskAssoc;
         
         if($isOpen){
@@ -1196,7 +1207,7 @@ class editor_TaskController extends ZfExtended_RestController {
             $userTaskAssoc->setUsedState(null);
         }
         
-        if($this->workflow->isStateChangeable($userTaskAssoc)) {
+        if($this->workflow->isStateChangeable($userTaskAssoc, $this->data->userStatePrevious)) {
             $userTaskAssoc->setState($this->data->userState);
         }
         

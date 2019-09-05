@@ -275,6 +275,40 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
         ));
         $this->init();
     }
+    
+    /**
+     * deletes all other users to a task expect the given one, optionally filtered by role.
+     * Mainly needed for dealing with competitive users
+     * @param string $taskGuid
+     * @param string $userGuid
+     * @param string $role
+     * @return boolean|array returns the deleted tuas as array or false if the tua list was modified by other users 
+     */
+    public function deleteOtherUsers(string $taskGuid, string $userGuid, string $role = null): array {
+        $delete = [
+            'taskGuid = ?' => $taskGuid,
+            'userGuid != ?' => $userGuid,
+            'isPmOverride = ?' => 0,
+        ];
+        if(!empty($role)) {
+            $delete['role = ?'] = $role;
+        }
+        
+        $s = $this->db->select();
+        foreach($delete as $sql => $value) {
+            $s->where($sql, $value);
+        }
+        $otherTuas = $this->db->fetchAll($s)->toArray();
+        $this->db->getAdapter()->beginTransaction();
+        $deleted = $this->db->delete($delete);
+        //something was changed, roll back the delete and return false
+        if(count($otherTuas) !== $deleted) {
+            $this->db->getAdapter()->rollBack();
+            return false;
+        }
+        $this->db->getAdapter()->commit();
+        return $otherTuas;
+    }
 
     /**
      * deletes all assoc entries for this userGuid, and updates the users counter in the Task Entity

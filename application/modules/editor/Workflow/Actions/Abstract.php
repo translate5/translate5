@@ -44,4 +44,21 @@ class editor_Workflow_Actions_Abstract {
         $this->config = $config;
         $this->log = Zend_Registry::get('logger')->cloneMe('editor.workflow.notification');
     }
+    
+    /**
+     * returns the affected user by TUA or the authenticated one if there is no TUA
+     * @return ZfExtended_Models_User
+     */
+    protected function currentUser(): ZfExtended_Models_User {
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        if(empty($this->config->newTua)) {
+            $authUser = new Zend_Session_Namespace('user');
+            $user->loadByGuid($authUser->data->userGuid);
+        }
+        else {
+            $user->loadByGuid($this->config->newTua->getUserGuid());
+        }
+        return $user;
+    }
 }
