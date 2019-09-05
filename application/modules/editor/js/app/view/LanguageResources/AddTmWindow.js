@@ -246,7 +246,10 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     allowBlank: false,
                     typeAhead: true,
                     valueField: 'id',
-                    displayField: 'label'
+                    displayField: 'label',
+                    multiSelect: true,
+                    queryMode: 'local',
+                    encodeSubmitValue: true
                 }]
             }],
             dockedItems : [{
