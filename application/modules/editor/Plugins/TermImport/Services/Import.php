@@ -198,16 +198,16 @@ class editor_Plugins_TermImport_Services_Import {
             $affectedCollections[] = $params['collectionId'];
             $this->logProfiling('Prepared collection '.$params['collectionName'].'('.$params['collectionId'].')');
             
+            //define the import source, used for storing the file in the disk in the needed location
+            $params['importSource']="filesystem";
+            
+            $this->importTbx($file, $importDir.$file, $params);
+            
             //remove old term entries and terms
             $this->removeEntriesOlderThenImport($params['collectionId']);
             
             //remove term proposals
             $this->removeProposalsOlderThan($params['collectionId']);
-                
-            //define the import source, used for storing the file in the disk in the needed location
-            $params['importSource']="filesystem";
-            
-            $this->importTbx($file, $importDir.$file, $params);
             
         }
         if(empty($this->returnMessage)){
@@ -497,9 +497,14 @@ class editor_Plugins_TermImport_Services_Import {
         $deleteOlderThanCurrentImport=!empty($this->configMap[self::DELETE_OLDER_IMPORT_ENTRIES_KEY]);
         
         $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
-        /* @var $proposal editor_Models_Term_Proposal */
+        /* @var $proposals editor_Models_Term_Proposal */
         $theDate=!$deleteOlderThanCurrentImport && !empty($olderThan) ? $olderThan :  NOW_ISO;
         $proposals->removeOlderThan([$collectionId],$theDate);
+        
+        $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
+        /* @var $attributeProposals editor_Models_Term_AttributeProposal */
+        //remove the attirubte proposals
+        $attributeProposals->removeOlderThan([$collectionId],$theDate);
         
         $this->logProfiling('removeProposalsOlderThan for collection '.$collectionId);
     }

@@ -222,7 +222,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             "multipleSourcesFoundMessage"=>$this->translate->_("Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen."),
             "editDefinitionMsgAffectsAllTerms"=>$this->translate->_("Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus."),
             "editDefinitionMsgUseTermEntry"=>$this->translate->_("Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften."),
-            "editDefinitionMsgTitle"=>$this->translate->_("Hinweis")
+            "editDefinitionMsgTitle"=>$this->translate->_("Hinweis"),
+            "acceptedFromTmComment"=>$this->translate->_("Aus MT übernommen")
         ]);
         
         // for filtering in front-end: get the names for the available collectionIds
