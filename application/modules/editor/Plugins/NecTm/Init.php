@@ -76,7 +76,6 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         /* @var $service editor_Plugins_NecTm_Service */
         
         $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforeIndexAction', array($this, 'synchronizeNecTmTags'));
-        $this->eventManager->attach('editor_LanguageresourceinstanceController', 'afterPostAction', array($this, 'addLanguageResourceTagAssocs'));
         $this->eventManager->attach('Editor_TagController', 'afterIndexAction', array($this, 'filterToNECTags'));
     }
     
@@ -104,16 +103,6 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
             return false;
         }
         return true;
-    }
-    
-    /**
-     * @param Zend_EventManager_Event $event
-     */
-    public function addLanguageResourceTagAssocs($event) {
-        $request = $event->getParam('request');
-        $params = $request->getParams('params');
-        $tags = json_decode($params['tags']);
-        $test = 3;  // AT WORK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
     
     /**

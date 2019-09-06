@@ -56,6 +56,9 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
             '#addTmWindow combo[name="resourceId"]': {
                 select: 'handleResourceChanged'
             },
+            '#editTmWindow':{
+                afterrender: 'onEditTmWindowAfterrender',
+            }
         }
     },
     /**
@@ -67,5 +70,15 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
             tagsfield = form.queryById('tags');
         tagsfield.setDisabled(disableTags);
         tagsfield.setReadOnly(disableTags);
+    },
+    /**
+     * After the Edit-Window for a LanguaeResource has been opened,
+     * we show the Tag-field (no need to add it - it is already in there).
+     */
+    onEditTmWindowAfterrender: function(editTmWindow) {
+        var resourceId = editTmWindow.down('#resourceId').getValue(),
+            disableTags = (resourceId.indexOf('editor_Plugins_NecTm') === -1),
+            tagsfield = editTmWindow.down('#tags');
+        tagsfield.setDisabled(disableTags); // TODO: or even use setVisibility?
     }
 });
