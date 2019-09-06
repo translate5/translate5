@@ -88,10 +88,6 @@ class editor_TermController extends ZfExtended_RestController {
         if(!empty($rows) && !empty($rows[0]['attributes'])){
             $this->view->rows->attributes =$rows[0]['attributes'];
         }
-        
-        //load the term entry attributes
-        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($this->entity->getGroupId(),[$this->entity->getCollectionId()]);
-        
         if(!empty($rows) && !empty($this->view->rows->language)){
             $language = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $language editor_Models_Languages */
@@ -243,27 +239,30 @@ class editor_TermController extends ZfExtended_RestController {
         if(empty($this->data->mid)) {
             $this->entity->setMid($this->_helper->guid->create());
         }
-        $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
-        /* @var $entry editor_Models_TermCollection_TermEntry */
         if(empty($this->data->termEntryId)) {
-            
+            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+            /* @var $entry editor_Models_TermCollection_TermEntry */
             $entry->setCollectionId($this->data->collectionId);
             $entry->setGroupId($this->_helper->guid->create());
-            $entry->setId($entry->save());
+            $entry->save();
+            
+            //update or create the term entry creation/modification attributes
+            $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+            /* @var $attribute editor_Models_Term_Attribute */
+            $attribute->createTransacGroup($entry,'creation');
+            $attribute->createTransacGroup($entry,'modification');
             
             $this->entity->setTermEntryId($entry->getId());
             $this->entity->setGroupId($entry->getGroupId());
         }else{
+            
             //when the term entry is provided, load the term entry and set the term groupId
             //this is the case when new term is proposed in the allready exisitn termEntry
+            $entry = ZfExtended_Factory::get('editor_Models_TermCollection_TermEntry');
+            /* @var $entry editor_Models_TermCollection_TermEntry */
             $entry->load($this->data->termEntryId);
             $this->entity->setGroupId($entry->getGroupId());
         }
-        
-        //update or create the term entry creation/modification attributes
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->handleTransacGroup($entry);
     }
     
     /**
