@@ -107,17 +107,7 @@ Ext.define('Editor.view.segments.column.Content', {
               },
               name: this.dataIndex,
               cls: 'segment-content',
-              fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField),
-              //TODO: workaround for https://www.sencha.com/forum/showthread.php?330319-Value-not-selectable-in-display-and-text-fields-under-6-2-0
-              //remove me with extjs 7 update
-              fieldSubTpl:[
-            	   '<div id="{id}" role="{role}" {inputAttrTpl}',
-            	   '<tpl if="fieldStyle"> style="{fieldStyle}"</tpl>',
-            	   ' class="{fieldCls}">{value}</div>', {
-            	      compiled: true,
-            	      disableFormats: true
-            	   }
-            	]
+              fieldCls: 'x-form-display-field segment-tag-container'+me.getTypeCls(me.segmentField)
           };
       return plug.getColumnField(me, config);
   },
