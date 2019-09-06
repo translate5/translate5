@@ -306,9 +306,9 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     public function delete() {
+        //remove the termcollection from the disk
         $this->removeCollectionDir($this->getId());
         parent::delete();
-        //remove the termcollection from the disk
     }
     
     /***
@@ -348,10 +348,23 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
+     * Load all available termcollections
+     * @return array
+     */
+    public function loadAll(){
+        $service = ZfExtended_Factory::get('editor_Services_TermCollection_Service');
+        /* @var $service editor_Services_TermCollection_Service */
+        $serviceType = $service->getServiceNamespace();
+        $s=$this->db->select()
+        ->where('lr.serviceType = ?',$serviceType);
+        return $this->db->fetchAll($s)->toArray();
+    }
+    
+    /***
      * Remove term collection from the disk
      * @param int $collectionId
      */
-    protected function removeCollectionDir($collectionId){
+    public function removeCollectionDir($collectionId){
         $collectionPath=editor_Models_Import_TermListParser_Tbx::getFilesystemCollectionDir().'tc_'.$collectionId;
         if(is_dir($collectionPath)){
             /* @var $recursivedircleaner ZfExtended_Controller_Helper_Recursivedircleaner */
