@@ -587,14 +587,15 @@ var Attribute={
     /**
      * Returns comment "dummy" attributes for creating a new comment.
      * @param: attributeOriginType origin type of the attribute
+     * @param: attrValue comment initial value
      * @returns {Array}
      */
-    renderNewCommentAttributes: function(attributeOriginType) {
+    renderNewCommentAttributes: function(attributeOriginType,attrValue) {
         return {
             attributeId:-1,
             name:'note',
             headerText:this.findTranslatedAttributeLabel('note',null),
-            attrValue:'',
+            attrValue:attrValue ? attrValue : '',
             attrType:null,
             proposable:true,
             attributeOriginType:attributeOriginType
