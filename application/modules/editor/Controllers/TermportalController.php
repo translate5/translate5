@@ -145,6 +145,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         //rfc to languagename map
         $this->view->Php2JsVars()->set('apps.termportal.rfcToLanguageNameMap',$languagesModel->loadAllKeyValueCustom('rfc5646', 'langName'));
         
+        //are all languages available in the new term dropdown select
+        $this->view->Php2JsVars()->set('apps.termportal.newTermAllLanguagesAvailable',(boolean)$config->runtimeOptions->termportal->newTermAllLanguagesAvailable);
+        
         $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         
         $this->view->labels=$labels;
