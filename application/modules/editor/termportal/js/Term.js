@@ -641,8 +641,13 @@ var Term={
                     }
                     break;
                 case 'term':
+                	
+                	//display the language description only if all available languages for term config is enabled
+                    if(Editor.data.apps.termportal.newTermAllLanguagesAvailable){
+                    	languageSelectOptions += '<option value="none" disabled>-- '+translations['TermPortalLanguages']+': --</option>';
+                    }
+                    
                     // list the languages of the TermPortal first...
-                    languageSelectOptions += '<option value="none" disabled>-- '+translations['TermPortalLanguages']+': --</option>';
                     $('#language option').each(function() {
                         if ($(this).val() !== 'none') {
                             flag = getLanguageFlag($(this).text());
@@ -650,6 +655,12 @@ var Term={
                             languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+languageName+'</option>';
                         }
                     });
+                    
+                    //if all languages for new term is disabled, do not add them to the dropdown
+                    if(!Editor.data.apps.termportal.newTermAllLanguagesAvailable){
+                    	break;
+                    }
+                    
                     // ... and then list ALL languages that are available in translate5
                     languageSelectOptions += '<option value="none" disabled>-- '+translations['AllLanguagesAvailable']+': --</option>';
                     availableLanguages = Editor.data.availableLanguages;
