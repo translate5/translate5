@@ -103,12 +103,12 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         /* @var $customerAssocModel editor_Models_LanguageResources_CustomerAssoc */
         $custAssoc=$customerAssocModel->loadCustomerIdsGrouped();
         
-        // for assigned tags
-        $tagAssocModel = ZfExtended_Factory::get('editor_Models_LanguageResources_TagAssoc');
-        /* @var $tagAssocModel editor_Models_LanguageResources_TagAssoc */
-        $tagAssoc = $tagAssocModel->loadTagIdsGrouped();
-        $tagsEntity = ZfExtended_Factory::get('editor_Models_Tags');
-        /* @var $tagsEntity editor_Models_Tags */
+        // for assigned categories
+        $categoryAssocModel = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssocModel editor_Models_LanguageResources_CategoryAssoc */
+        $categoryAssocs = $categoryAssocModel->loadCategoryIdsGrouped();
+        $categoriesEntity = ZfExtended_Factory::get('editor_Models_Categories');
+        /* @var $categoriesEntity editor_Models_Categories */
         
         $languages=ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languages editor_Models_LanguageResources_Languages */
@@ -148,13 +148,13 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageresource['sourceLang'] = $this->getLanguage($languages, 'sourceLang', $id);
             $languageresource['targetLang'] = $this->getLanguage($languages, 'targetLang', $id);
             
-            // tags (for the moment: just display labels for info)
-            $tagLabels = [];
-            foreach ($this->getTagassoc($tagAssoc, 'tagId', $id) as $tagId) {
-                $tagsEntity->load($tagId);
-                $tagLabels[] = $tagsEntity->getLabel();
+            // categories (for the moment: just display labels for info)
+            $categoryLabels = [];
+            foreach ($this->getCategoryassoc($categoryAssocs, 'categoryId', $id) as $categoryId) {
+                $categoriesEntity->load($categoryId);
+                $categoryLabels[] = $categoriesEntity->getLabel();
             }
-            $languageresource['tags'] = $tagLabels;
+            $languageresource['categories'] = $categoryLabels;
         }
     }
     
@@ -194,7 +194,7 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
      * @param int $id the language resource id
      * @return array
      */
-    protected function getTagassoc(array $data, $index, $id) {
+    protected function getCategoryassoc(array $data, $index, $id) {
         if(empty($data[$id])){
             return [];
         }
@@ -256,25 +256,25 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
         $this->view->rows->resourcesCustomers=$customers;
         $this->view->rows->useAsDefault=$default;
         
-        // tags that are assigned to the resource
-        $tagIds = [];
-        $tagAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_TagAssoc');
-        /* @var $tagAssoc editor_Models_LanguageResources_TagAssoc */
-        $tagAssocs = $tagAssoc->loadByLanguageResourceId($this->entity->getId());
-        foreach ($tagAssocs as $value) {
-            if(!empty($value['tagId'])){
-                $tagIds[] = $value['tagId'];
+        // categories that are assigned to the resource
+        $categoryIds = [];
+        $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
+        $categoryAssocs = $categoryAssoc->loadByLanguageResourceId($this->entity->getId());
+        foreach ($categoryAssocs as $value) {
+            if(!empty($value['categoryId'])){
+                $categoryIds[] = $value['categoryId'];
             }
         }
         // for the moment: just display labels for info
-        $tagLabels = [];
-        $tagsEntity = ZfExtended_Factory::get('editor_Models_Tags');
-        /* @var $tagsEntity editor_Models_Tags */
-        foreach ($tagIds as $tagId) {
-            $tagsEntity->load($tagId);
-            $tagLabels[] = $tagsEntity->getLabel();
+        $categoryLabels = [];
+        $categoriesEntity = ZfExtended_Factory::get('editor_Models_Categories');
+        /* @var $categoriesEntity editor_Models_Categories */
+        foreach ($categoryIds as $categoryId) {
+            $categoriesEntity->load($categoryId);
+            $categoryLabels[] = $categoriesEntity->getLabel();
         }
-        $this->view->rows->tags = $tagLabels;
+        $this->view->rows->categories = $categoryLabels;
         
         $t = ZfExtended_Zendoverwrites_Translate::getInstance();
         /* @var $t ZfExtended_Zendoverwrites_Translate */
@@ -516,11 +516,11 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             throw $e;
         }
         
-        //check and save tags assoc db entry
-        $tagAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_TagAssoc');
-        /* @var $tagAssoc editor_Models_LanguageResources_TagAssoc */
+        //check and save categories assoc db entry
+        $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
         try {
-            $tagAssoc->saveAssocRequest($this->data);
+            $categoryAssoc->saveAssocRequest($this->data);
         }
         catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
             $this->entity->delete();

@@ -44,9 +44,6 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.NecTm.controller.Main', {
     extend: 'Ext.app.Controller',
-    strings:{
-        tags:'#UT#Tags'
-    },
     refs:[{
         ref: 'TmWindow',
         selector: '#addTmWindow'
@@ -62,23 +59,24 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
         }
     },
     /**
-     * 
+     * When a new NEC-TM-LanguageResource is created, we show the 
+     * categories-field (no need to add it - it is already in there).
      */
     handleResourceChanged: function(combo, record, index) {
         var form = combo.up('form'),
-            disableTags = (record.get('serviceName') !== 'NEC-TM'),
-            tagsfield = form.queryById('tags');
-        tagsfield.setDisabled(disableTags);
-        tagsfield.setReadOnly(disableTags);
+            disableCategories = (record.get('serviceName') !== 'NEC-TM'),
+            categoriesField = form.queryById('categories');
+        categoriesField.setDisabled(disableCategories);
+        categoriesField.setReadOnly(disableCategories);
     },
     /**
-     * After the Edit-Window for a LanguaeResource has been opened,
-     * we show the Tag-field (no need to add it - it is already in there).
+     * After the Edit-Window for a LanguageResource has been opened,
+     * we show the categories-field (no need to add it - it is already in there).
      */
     onEditTmWindowAfterrender: function(editTmWindow) {
         var resourceId = editTmWindow.down('#resourceId').getValue(),
-            disableTags = (resourceId.indexOf('editor_Plugins_NecTm') === -1),
-            tagsfield = editTmWindow.down('#tags');
-        tagsfield.setDisabled(disableTags); // TODO: or even use setVisibility?
+            disableCategories = (resourceId.indexOf('editor_Plugins_NecTm') === -1),
+            categoriesField = editTmWindow.down('#categories');
+        categoriesField.setDisabled(disableCategories); // TODO: or even use setVisibility?
     }
 });

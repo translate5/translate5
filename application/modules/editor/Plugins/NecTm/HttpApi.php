@@ -134,10 +134,10 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * Returns all available NEC-TM-Tags for the current user for the current NecTm-Service.
+     * Returns all available NEC-TM-Categories (= there: "Tags") for the current user for the current NecTm-Service.
      * @return array
      */
-    public function getAllTags() {
+    public function getAllCategories() {
         /*
             "tags": [
                 {
@@ -226,9 +226,6 @@ class editor_Plugins_NecTm_HttpApi {
      * @param array $rawBody
      */
     protected function necTmRequest($method, $endpointPath = '', $rawBody=[]) {
-        if(!$this->getAccessToken()) {
-            throw new editor_Plugins_NecTm_ExceptionToken('E1099');
-        }
         $http = $this->getHttp($method, $endpointPath);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         //error_log("SEND URI ".print_r($uriPath,1));
@@ -252,8 +249,8 @@ class editor_Plugins_NecTm_HttpApi {
     protected function request(Zend_Http_Client $http) {
         //exceptions with one of that messages are leading to badgateway exceptions
         $badGatewayMessages = [
-            'stream_socket_client(): php_network_getaddresses: getaddrinfo failed: Name or service not known',
-            'stream_socket_client(): unable to connect to tcp',
+            'php_network_getaddresses: getaddrinfo failed: Name or service not known',
+            'unable to connect to tcp',
         ];
         
         try {
@@ -261,7 +258,9 @@ class editor_Plugins_NecTm_HttpApi {
         }
         catch (Zend_Exception $e) {
             foreach ($badGatewayMessages as $msg) {
-                if(strpos($e->getMessage(), $msg) === false){
+                $t1 = $e->getMessage();
+                $test = stripos($e->getMessage(), $msg);
+                if(stripos($e->getMessage(), $msg) === false){
                     //check next message
                     continue;
                 }
@@ -269,6 +268,20 @@ class editor_Plugins_NecTm_HttpApi {
             }
             throw $e;
         }
+    }
+    
+    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
+        $badGateway = new ZfExtended_BadGateway('Die angefragte NEC-TM Instanz ist nicht erreichbar', 0, $e);
+        $badGateway->setDomain('LanguageResources');
+        
+        $error = new stdClass();
+        $error->type = 'HTTP';
+        $error->error = $e->getMessage();
+        $error->url = $http->getUri(true);
+        $error->method = $this->httpMethod;
+        
+        $badGateway->setErrors([$error]);
+        throw $badGateway;
     }
     
     /**
@@ -327,20 +340,6 @@ class editor_Plugins_NecTm_HttpApi {
      */
     public function getErrors() {
         return $this->error;
-    }
-    
-    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
-        $badGateway = new ZfExtended_BadGateway('Die angefragte NEC-TM Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setDomain('LanguageResources');
-        
-        $error = new stdClass();
-        $error->type = 'HTTP';
-        $error->error = $e->getMessage();
-        $error->url = $http->getUri(true);
-        $error->method = $this->httpMethod;
-        
-        $badGateway->setErrors([$error]);
-        throw $badGateway;
     }
     
 }

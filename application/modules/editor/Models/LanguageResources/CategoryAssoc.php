@@ -33,37 +33,40 @@ END LICENSE AND COPYRIGHT
  * @method integer getLanguageResourceId getLanguageResourceId()
  * @method void setLanguageResourceId() setLanguageResourceId(int $languageResourceId)
  * 
- * @method integer getTagId() getTagId()
- * @method void setTagId() setTagId(int $tagId)
+ * @method integer getCategoryId() getCategoryId()
+ * @method void setCategoryId() setCategoryId(int $categoryId)
  * 
  */
-class editor_Models_LanguageResources_TagAssoc extends ZfExtended_Models_Entity_Abstract {
+class editor_Models_LanguageResources_CategoryAssoc extends ZfExtended_Models_Entity_Abstract {
     
-    protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_TagAssoc';
-    protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_TagAssoc';
+    protected $dbInstanceClass = 'editor_Models_Db_LanguageResources_CategoryAssoc';
+    protected $validatorInstanceClass = 'editor_Models_Validator_LanguageResources_CategoryAssoc';
     
     /***
-     * Save tag assocs from the request parameters for the given language resource.
+     * Save category assocs from the request parameters for the given language resource.
      * @param mixed $data
      */
     public function saveAssocRequest($data){
-        if(!$this->checkUpdateSaveData($data)){
+        if (!$this->checkUpdateSaveData($data)) {
             return;
         }
-        $tags = json_decode($data['tags']);
-        $this->addAssocs($tags, $data['id']);
+        $categories = json_decode($data['categories']);
+        if (json_last_error() != JSON_ERROR_NONE) {
+            return;
+        }
+        $this->addAssocs($categories, $data['id']);
     }
     
     /***
      * Add assoc record to the database
-     * @param mixed $tags
+     * @param mixed $categories
      * @param int $languageResourceId
      */
-    protected function addAssocs($tags, $languageResourceId){
-        foreach ($tags as $tagId){
-            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_TagAssoc');
-            /* @var $model editor_Models_LanguageResources_TagAssoc */
-            $model->setTagId($tagId);
+    protected function addAssocs($categories, $languageResourceId){
+        foreach ($categories as $categoryId){
+            $model = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+            /* @var $model editor_Models_LanguageResources_CategoryAssoc */
+            $model->setCategoryId($categoryId);
             $model->setLanguageResourceId($languageResourceId);
             $model->save();
         }
@@ -80,7 +83,9 @@ class editor_Models_LanguageResources_TagAssoc extends ZfExtended_Models_Entity_
         if(is_object($data)){
             $data = json_decode(json_encode($data), true);
         }
-        return isset($data['tags']) && isset($data['id']);
+        $test1 = isset($data['categories']);
+        $test2 = isset($data['categories']) && isset($data['id']);
+        return isset($data['categories']) && isset($data['id']);
     }
     
     /***
@@ -98,10 +103,10 @@ class editor_Models_LanguageResources_TagAssoc extends ZfExtended_Models_Entity_
     }
     
     /***
-     * Load tag assoc grouped by language resource id.
+     * Load category assoc grouped by language resource id.
      * @return array[]
      */
-    public function loadTagIdsGrouped() {
+    public function loadCategoryIdsGrouped() {
         $assocs=$this->loadByLanguageResourceId();
         $retval=[];
         foreach ($assocs as $assoc){

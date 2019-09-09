@@ -26,9 +26,45 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**
- */
-class editor_Models_Db_LanguageResources_TagAssoc extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_languageresources_tag_assoc';
-    public $_primary = 'id';
+class Editor_CategoryController extends ZfExtended_RestController {
+    /**
+     * @var string
+     */
+    protected $entityClass = 'editor_Models_Categories';
+
+    /**
+     * @var editor_Models_Categories
+     */
+    protected $entity;
+
+    /**
+     * (non-PHPdoc)
+     * @see ZfExtended_RestController::indexAction()
+     */
+    public function indexAction()
+    {
+        // Add specific handling of the categories for the view here.
+        // (Nothing to do at the moment.)
+        parent::indexAction();
+    }
+
+    public function getAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->get');
+    }
+
+    public function putAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->put');
+    }
+
+    public function deleteAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->delete');
+    }
+
+    public function postAction()
+    {
+        throw new ZfExtended_BadMethodCallException(__CLASS__.'->post');
+    }
 }

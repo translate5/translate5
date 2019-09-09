@@ -26,12 +26,9 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-class editor_Models_Validator_Tag extends ZfExtended_Models_Validator_Abstract {
-    protected function defineValidators() {
-        $this->addValidator('id', 'int');
-        $this->addValidator('origin', 'stringLength', array('min' => 0, 'max' => 8));
-        $this->addValidator('label', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('originalTagId', 'stringLength', array('min' => 0, 'max' => 255));
-        $this->addValidator('specificData', 'stringLength', array('min' => 0, 'max' => 1024));
-    }
+/**
+ */
+class editor_Models_Db_LanguageResources_CategoryAssoc extends Zend_Db_Table_Abstract {
+    protected $_name = 'LEK_languageresources_category_assoc';
+    public $_primary = 'id';
 }

@@ -75,8 +75,8 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         $this->service = ZfExtended_Factory::get('editor_Plugins_NecTm_Service');
         /* @var $service editor_Plugins_NecTm_Service */
         
-        $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforeIndexAction', array($this, 'synchronizeNecTmTags'));
-        $this->eventManager->attach('Editor_TagController', 'afterIndexAction', array($this, 'filterToNECTags'));
+        $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforeIndexAction', array($this, 'synchronizeNecTmCategories'));
+        $this->eventManager->attach('Editor_CategoryController', 'afterIndexAction', array($this, 'filterToNECCategories'));
     }
     
     /**
@@ -107,35 +107,43 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
     
     /**
      * For result-list in view:
-     * - use NEC-TM-tags only
+     * - use NEC-TM-Categories only
      * - sort by label
     * @param Zend_EventManager_Event $event
      */
-    public function filterToNECTags(Zend_EventManager_Event $event) {
+    public function filterToNECCategories(Zend_EventManager_Event $event) {
         $view = $event->getParam('view');
-        $allTags = $view->rows;
-        foreach ($allTags as $key => $tag) {
-            if ($tag['origin'] != $this->service->getTagOrigin()) {
-                unset($allTags[$key]);
+        $allCategories = $view->rows;
+        foreach ($allCategories as $key => $category) {
+            if ($category['origin'] != $this->service->getCategoryOrigin()) {
+                unset($allCategories[$key]);
             }
         }
-        usort($allTags, function ($a, $b) {
+        usort($allCategories, function ($a, $b) {
             return strtolower($a['label']) <=> strtolower($b['label']);
         });
         //INFO: rebuild the array keys, array keys like: [0],[1],[5],[7] messed up the extjs resource store
-        $allTags = array_values($allTags);
-        $view->rows = $allTags;
-        $view->total= count($allTags);
+            $allCategories = array_values($allCategories);
+            $view->rows = $allCategories;
+            $view->total= count($allCategories);
     }
     
     /**
-     * Queries NEC TM for all tags that can be accessed with the system credentials in NEC TM.
-     * The existing tags are saved in the translate5 DB. Tags that already exist in translate5 DB,
+     * Queries NEC TM for all categories that can be accessed with the system credentials in NEC TM.
+     * The existing categories are saved in the translate5 DB. Categories that already exist in translate5 DB,
      * but do not exist any more in NEC TM, are removed from the DB and from all language resource associations.
      */
-    public function synchronizeNecTmTags() {
-        $sync = ZfExtended_Factory::get('editor_Plugins_NecTm_SyncTags', [$this->service]);
-        /* @var $sync editor_Plugins_NecTm_SyncTags */
-        $sync->synchronize(false); //without mutex, since we call it explicitly via parameter
+    public function synchronizeNecTmCategories() {
+        // Run the snych as worker to not block other processes, especially if the api-server is slow or even down.
+        $worker = ZfExtended_Factory::get('editor_Plugins_NecTm_Worker');
+        $params=[
+            'service' => $this->service
+        ];
+        /* @var $worker editor_Plugins_NecTm_Worker */
+        if (!$worker->init(NULL, $params)) {
+            $this->log->logError('NecTm-Error on worker init()', __CLASS__.' -> '.__FUNCTION__.'; Worker could not be initialized');
+            return;
+        }
+        $worker->queue();
     }
 }

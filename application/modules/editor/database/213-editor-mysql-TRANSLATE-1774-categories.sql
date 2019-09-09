@@ -27,31 +27,31 @@
 -- */
 
 
-CREATE TABLE IF NOT EXISTS `LEK_tags` (
+CREATE TABLE IF NOT EXISTS `LEK_categories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `origin` varchar(8) DEFAULT NULL COMMENT 'Where does this tag come from / belong to?',
-  `label` varchar(255) DEFAULT NULL COMMENT 'Name; can be original, but reliable reference to the original tag is the originalTagId',
-  `originalTagId` varchar(255) DEFAULT NULL COMMENT 'Original id',
-  `specificData` VARCHAR(1024) DEFAULT NULL COMMENT 'Tag specific info data',
+  `origin` varchar(8) DEFAULT NULL COMMENT 'Where does this category come from / belong to?',
+  `label` varchar(255) DEFAULT NULL COMMENT 'Name; can be original, but reliable reference to the original category is the originalCategoryId',
+  `originalCategoryId` varchar(255) DEFAULT NULL COMMENT 'Original id',
+  `specificData` VARCHAR(1024) DEFAULT NULL COMMENT 'Category specific info data',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='"Tags" here serve the concept of labels and classifications.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Categories serve the concept of labels and classifications (sometimes also referred to as "tags").';
 
 INSERT INTO Zf_acl_rules (`module`, `role`, `resource`, `right`) VALUES 
-('editor', 'editor', 'editor_tag', 'all');
+('editor', 'editor', 'editor_category', 'all');
 
-CREATE TABLE IF NOT EXISTS `LEK_languageresources_tag_assoc` (
+CREATE TABLE IF NOT EXISTS `LEK_languageresources_category_assoc` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `languageResourceId` int(11) NOT NULL,
-  `tagId` int(11) NOT NULL,
+  `categoryId` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_LEK_languageresources_tag_assoc_1`
+  CONSTRAINT `fk_LEK_languageresources_category_assoc_1`
     FOREIGN KEY (`languageResourceId`)
     REFERENCES `LEK_languageresources` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_LEK_languageresources_tag_assoc_2`
-    FOREIGN KEY (`tagId`)
-    REFERENCES `LEK_tags` (`id`)
+  CONSTRAINT `fk_LEK_languageresources_category_assoc_2`
+    FOREIGN KEY (`categoryId`)
+    REFERENCES `LEK_categories` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

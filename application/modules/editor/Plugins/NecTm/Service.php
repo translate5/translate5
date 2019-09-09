@@ -38,7 +38,11 @@ END LICENSE AND COPYRIGHT
 class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
     const DEFAULT_COLOR = '#61BDAA';
     
-    const TAG_ORIGIN = 'NEC';
+    /**
+     * What translate5 uses as origin for storing categories from NEC-TM (there: "tags").
+     * @var string
+     */
+    const CATEGORY_ORIGIN = 'NEC';
     
     public function __construct() {
         $config = Zend_Registry::get('config');
@@ -57,25 +61,27 @@ class editor_Plugins_NecTm_Service extends editor_Services_ServiceAbstract {
     
     /**
      * Get the DEFAULT_COLOR
+     * @return string
      */
     public function getDefaultColor() {
         return self::DEFAULT_COLOR;
     }
     
     /**
-     * Get the tag's origin.
+     * Get what translate5 uses as origin for storing categories from NEC-TM (there: "tags").
+     * @return string
      */
-    public function getTagOrigin() {
-        return self::TAG_ORIGIN;
+    public function getCategoryOrigin() {
+        return self::CATEGORY_ORIGIN;
     }
     
     /**
-     * Returns the "top-level-tags" as configured.
+     * Returns the "top-level-categories" as configured.
      * @return array
      */
-    public function getTopLevelTagIds() {
+    public function getTopLevelCategoriesIds() {
         $config = Zend_Registry::get('config');
         /* @var $config Zend_Config */
-        return $config->runtimeOptions->plugins->NecTm->topLevelTagIds->toArray();
+        return $config->runtimeOptions->plugins->NecTm->topLevelCategoriesIds->toArray();
     }
 }

@@ -26,16 +26,12 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@+
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
-/**
- * Klasse zum Zugriff auf die Tabelle mit Namen des Klassennamens (in lower case)
- */
-class editor_Models_Db_Tags extends Zend_Db_Table_Abstract {
-    protected $_name = 'LEK_tags';
-    public $_primary = 'id';
+class editor_Models_Validator_Category extends ZfExtended_Models_Validator_Abstract {
+    protected function defineValidators() {
+        $this->addValidator('id', 'int');
+        $this->addValidator('origin', 'stringLength', array('min' => 0, 'max' => 8));
+        $this->addValidator('label', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('originalCategoryId', 'stringLength', array('min' => 0, 'max' => 255));
+        $this->addValidator('specificData', 'stringLength', array('min' => 0, 'max' => 1024));
+    }
 }

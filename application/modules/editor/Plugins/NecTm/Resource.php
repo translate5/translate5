@@ -38,17 +38,17 @@ class editor_Plugins_NecTm_Resource extends editor_Models_LanguageResources_Reso
     }
     
     /**
-     * Returns all tags that are offered to choose from when adding a NEC-TM LangageResource
+     * Returns all categories that are offered to choose from when adding a NEC-TM LangageResource
      * in translate5:
-     * - top-lecel-tags from config
-     * - tags from NEC-TM stored (+ regularly synched) in our DB
+     * - top-level-categories from config
+     * - categories for NEC-TM that are stored (+ regularly synched) in our DB
      * @return array
      */
-    public function getAllTags() {
-        $tagsFromConfig = $this->service->getTopLevelTagIds();
-        $m = ZfExtended_Factory::get('editor_Models_Tags');
-        /* @var $m editor_Models_Tags */
-        $tagsFromNEC = $m->loadByOrigin($this->service->getTagOrigin());
+    public function getAllCategories() {
+        $categoriesFromConfig = $this->service->getTopLevelCategoriesIds();
+        $m = ZfExtended_Factory::get('editor_Models_Categories');
+        /* @var $m editor_Models_Categories */
+        $categoriesFromNEC = $m->loadByOrigin($this->service->getCategoryOrigin());
         // TODO: mergen und uniquen und dann return
     }
 }
