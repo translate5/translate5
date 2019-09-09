@@ -291,10 +291,7 @@ h4, p {
     color: #c5c5c5;
     width: 100%;
 }
-.term-data.is-new.ui-accordion-header-collapsed .proposal-add {
-    float: right;
-    display: block;
-}
+
 .term-data.is-new.ui-accordion-header-active .proposal-add {
     display: none;
 }

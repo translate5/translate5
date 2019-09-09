@@ -165,7 +165,8 @@ var ComponentEditor={
 		}
         console.log('addCommentAttributeEditor');
 		var me=this,
-			$input= $('<textarea data-editable-comment />').val($element.text());
+			$input= $('<textarea data-editable-comment />').val($element.text()),
+			isFromTm=$element.text() == proposalTranslations['acceptedFromTmComment'];
 		
 		
 		$input.on('change keyup keydown paste cut', function () {
@@ -186,7 +187,8 @@ var ComponentEditor={
             me.saveCommentChange($element,$input);
         });
         me.$_termTable.one('mouseup', '.term-attributes .proposal-cancel',function() {
-        	$input.val('');
+        	//if it is proposalFrom tm, save the default comment text for tm proposal comment
+        	isFromTm ? $input.val(proposalTranslations['acceptedFromTmComment']) : $input.val(''); 
         	me.saveCommentChange($element,$input);
         });
         $input.focus();
@@ -266,11 +268,6 @@ var ComponentEditor={
         if (Term.$_searchWarningNewSource.is(":visible")) {
             requestData['termSource']=instanttranslate.textSource;
             requestData['termSourceLanguage']=instanttranslate.langSource;
-        }
-        
-        // "reset", is valid only once (= when coming from TermPortal)
-        if(isTermProposalFromInstantTranslate) {
-            isTermProposalFromInstantTranslate = false;
         }
         
         console.log('saveComponentChange :' + JSON.stringify(requestData));
@@ -363,6 +360,7 @@ var ComponentEditor={
             activeTabSelector,
             activeTab;
 			
+		
 		if(isTerm){
 			renderData=Term.renderTermData(result);
 			$elParent= Term.getTermHeader($element.data('id'));
@@ -374,6 +372,10 @@ var ComponentEditor={
 			if (me.isNew) {
 				var termRflLang=(result.attributes && result.attributes[0].language!=undefined) ? result.attributes[0].language : '';
 				attributeRenderData=Attribute.renderTermAttributes(result,termRflLang);
+			}
+			//reload the term entry data when new term is created
+			if(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]){
+				TermEntry.drawTermEntryAttributes(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
 			}
 			
 		}else{
@@ -439,7 +441,10 @@ var ComponentEditor={
 			
 			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
 			if($commentPanel.length === 0){
-				dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute');
+				var commentValue=isTermProposalFromInstantTranslate ? proposalTranslations['acceptedFromTmComment'] : null;
+
+				dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute',commentValue);
+				
 				$termAttributeHolder.prepend(Attribute.handleAttributeDrawData(dummyCommentAttribute));
 			}
 			
@@ -475,6 +480,11 @@ var ComponentEditor={
 	            }
 			}
 		}
+		
+        // "reset", is valid only once (= when coming from TermPortal)
+        if(isTermProposalFromInstantTranslate) {
+            isTermProposalFromInstantTranslate = false;
+        }
     },
 	
     /**

@@ -60,12 +60,16 @@ var Term={
 			
 			// Term-Entries
 	        me.$_resultTermsHolderHeader.on('click', '.proposal-add',{scope:me},me.onAddTermEntryClick);
+	        
 	        me.$_searchTermsHelper.on('click', '.proposal-add',{scope:me},me.onAddTermEntryClick);
 
             // Terms
             me.$_termTable.on('click', '.term-data.proposable .proposal-add',{scope:me},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable .proposal-delete',{scope:me},me.onDeleteTermClick);
             me.$_termTable.on('click', '.term-data.proposable .proposal-edit',{scope:me},me.onEditTermClick);
+            
+            me.$_termTable.on('click', 'span[data-editable][data-type][data-id="-1"]',{scope:me},me.onAddTermClick);
+            
             me.$_resultTermsHolder.on('tabsactivate',{scope:me},me.onResultTabActivate);
 		},
         
