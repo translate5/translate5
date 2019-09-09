@@ -223,8 +223,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             "editDefinitionMsgAffectsAllTerms"=>$this->translate->_("Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus."),
             "editDefinitionMsgUseTermEntry"=>$this->translate->_("Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften."),
             "editDefinitionMsgTitle"=>$this->translate->_("Hinweis"),
-            "acceptedFromTmComment"=>$this->translate->_("Aus MT übernommen")
+            "acceptedFromTmComment"=>$this->translate->_("Aus MT übernommen"),
+            "commentAttributeMandatoryMessage"=>$this->translate->_("Das Kommentarattribut ist erforderlich"),
+            "commentAttributeMandatoryTitle"=>$this->translate->_("Info")
         ]);
+        
+        //is the comment attribute mandatory when new term or term proposal is made
+        $this->view->Php2JsVars()->set('apps.termportal.commentAttributeMandatory', (boolean)$config->runtimeOptions->termportal->commentAttributeMandatory);
         
         // for filtering in front-end: get the names for the available collectionIds
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');
