@@ -53,6 +53,13 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
+		
+		//show info message if the comment attribute mandatory flag is set and the comment component editor is active
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && this.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         console.log('addTermComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
@@ -113,9 +120,21 @@ var ComponentEditor={
 	 * @returns {Object}
 	 */
 	addAttributeComponentEditor:function($element){
+		//TODO: sometimes multiple inputs are present in the dom
+		//      to test this, propose new term for editing, and on the comment editor, click on cancel -> multiple request are sent since somehow if priviously 
+		//      different editor is opened, the inputs are not destroyed, test this
+		// Also test when change between term and term entry window
+		// Test when term attribute is edit click when Comment editor exist
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
+		
+		//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         console.log('addAttributeComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text());
@@ -182,11 +201,10 @@ var ComponentEditor={
 
         me.isComponentEditorActive();
         
-        me.$_termTable.one('mouseup', '.term-attributes .proposal-save',function() {
+        me.$_termTable.on('mouseup', '.term-attributes .proposal-save',function() {
             me.saveCommentChange($element,$input);
         });
-        me.$_termTable.one('mouseup', '.term-attributes .proposal-cancel',function() {
-        	$input.val('');
+        me.$_termTable.on('mouseup', '.term-attributes .proposal-cancel',function(event) {
         	me.saveCommentChange($element,$input);
         });
         $input.focus();
@@ -296,6 +314,16 @@ var ComponentEditor={
             url,
             requestData;
 
+	    
+    	//if the comment panel is mandatory, display the info message
+		if($input.val()=='' && Editor.data.apps.termportal.commentAttributeMandatory){
+			var dialog=showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			dialog.on('dialogclose', function(event) {
+				$input.focus();
+			});
+			return;
+		}
+		
         // don't send the request? then update front-end only.
         if (me.stopRequest($element,$input)){
             
@@ -530,6 +558,14 @@ var ComponentEditor={
 		translateToCombos.each(function(index,cmp){
 			editorExist ? $(cmp).hide() :$(cmp).show(); 
 		});
+    },
+    
+    /***
+     * Check if the comment component editor is active
+     */
+    isCommentComponentEditorActive:function(){
+    	var commentEditors=this.$_termTable.find('textarea[data-editable-comment]');
+		return commentEditors.length>0;
     }
 };
 

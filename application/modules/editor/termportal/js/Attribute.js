@@ -108,6 +108,12 @@ var Attribute={
             
         console.log('onEditAttributeClick');
         
+        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         // In tbx, "definition" belongs to the <langSet> (= level between <termEntry> and <term>).
         // In the TermPoral, the user can edit definitions only in the termEntry-Attributes,
         // not on the level of each individual term.
@@ -167,6 +173,12 @@ var Attribute={
             yesCallback,
             yesText;
         
+        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         $parent=$element.parents('h4.attribute-data');//the button parrent
 		if($parent.length === 0){
 			return;
