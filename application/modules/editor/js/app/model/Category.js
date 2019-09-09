@@ -37,19 +37,19 @@ END LICENSE AND COPYRIGHT
  * @class Editor.model.Tag
  * @extends Ext.data.Model
  */
-Ext.define('Editor.model.Tag', {
+Ext.define('Editor.model.Category', {
   extend: 'Ext.data.Model',
-  alias: 'model.tag',
+  alias: 'model.category',
   fields: [
     {name: 'id', type: 'int'},
     {name: 'origin', type: 'string'},
-    {name: 'originalTagId', type: 'string'},
+    {name: 'originalCategoryId', type: 'string'},
     {name: 'comment', type: 'string'},
   ],
   idProperty: 'id',
   proxy : {
     type : 'rest',
-    url: Editor.data.restpath+'tag',
+    url: Editor.data.restpath+'category',
     reader : {
       rootProperty: 'rows',
       type : 'json'

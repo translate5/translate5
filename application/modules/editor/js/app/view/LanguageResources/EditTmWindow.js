@@ -57,7 +57,7 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
         useAsDefault:'#UT#Language Ressource standardmässig aktiv für',
         collection:'#UT#TBX-Datei',
         importTbxType: '#UT#Bitte verwenden Sie eine TBX Datei!',
-        tags: '#UT#Tags',
+        categories: '#UT#Kategorien',
     },
     
     listeners:{
@@ -161,12 +161,12 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                     anchor: '100%',
                     name: 'color'
                 },{
-                    // Tags: currently only active for Plugin
-                    // (here: display the tags only, don't edit them
+                    // Categories: currently only active for Plugin
+                    // (here: display the categories only, don't edit them
                     // after the LanguageResource has been created)
                     xtype: 'displayfield',
-                    name:'tags',
-                    id:'tags',
+                    name:'categories',
+                    id:'categories',
                     renderer: function(value) {
                         if(!value){
                             return '';
@@ -177,8 +177,8 @@ Ext.define('Editor.view.LanguageResources.EditTmWindow', {
                         }
                         return retval.join(',');
                     },
-                    toolTip: me.strings.tags,
-                    fieldLabel: me.strings.tags,
+                    toolTip: me.strings.categories,
+                    fieldLabel: me.strings.categories,
                     disabled: true
                 }]
             }],

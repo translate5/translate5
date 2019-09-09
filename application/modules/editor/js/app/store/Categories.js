@@ -37,9 +37,9 @@ END LICENSE AND COPYRIGHT
  * @class Editor.store.Comments
  * @extends Ext.data.Store
  */
-Ext.define('Editor.store.Tags', {
+Ext.define('Editor.store.Categories', {
   extend : 'Ext.data.Store',
-  model: 'Editor.model.Tag',
+  model: 'Editor.model.Category',
   storeId: 'Tags',
   autoLoad: false,
   pageSize: 0

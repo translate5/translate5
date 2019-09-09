@@ -37,7 +37,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         'Editor.view.LanguageResources.TmWindowViewController',
         'Editor.view.LanguageResources.TmWindowViewModel',
         'Editor.view.LanguageCombo',
-        'Editor.store.Tags'
+        'Editor.store.Categories'
     ],
     controller: 'tmwindowviewcontroller',
     viewModel: {
@@ -52,7 +52,7 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
         name: '#UT#Name',
         file: '#UT#TM/TMX-Datei (optional)',
         importTmxType: '#UT#Bitte verwenden Sie eine TM oder TMX Datei!',
-        tags: '#UT#Tags',
+        categories: '#UT#Kategorien',
         color: '#UT#Farbe',
         colorTooltip: '#UT#Farbe dieser Sprachressource',
         save: '#UT#Speichern',
@@ -238,10 +238,10 @@ Ext.define('Editor.view.LanguageResources.AddTmWindow', {
                     }
                 },{
                     xtype: 'tagfield',
-                    name: 'tags',
-                    id: 'tags',
-                    store: Ext.create('Editor.store.Tags').load(),
-                    fieldLabel: me.strings.tags,
+                    name: 'categories',
+                    id: 'categories',
+                    store: Ext.create('Editor.store.Categories').load(),
+                    fieldLabel: me.strings.categories,
                     disabled: true,
                     typeAhead: true,
                     valueField: 'id',
