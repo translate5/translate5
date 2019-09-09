@@ -3485,6 +3485,26 @@ More information can be found in the task property window in the tab events.<br 
   <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
   <target>The job can not be modified, since the user has already opened the task for editing.</target>
 </trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='>
+    <source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source>
+    <target>Translate5 - another user took responsibility for the task</target>
+</trans-unit>
+<trans-unit id='e2hlYWRlcn0KICAgIAplaW4gYW5kZXJlciBCZW51dHplciBoYXQgaW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZGllIFZlcmFudHdvcnR1bmcgZsO8ciBkaWUgQXVmZ2FiZSA8Yj57dGFzay50YXNrTnJ9IC0ge3Rhc2sudGFza05hbWV9PC9iPiDDvGJlcm5vbW1lbi48YnIgLz4KPGJyIC8+CklocmUgWnV3ZWlzdW5nIHp1ciBBdWZnYWJlIHd1cmRlIGF1dG9tYXRpc2NoIGVudGZlcm50LjxiciAvPgo8YnIgLz4Ke2Zvb3Rlcn0='>
+    <source>{header}
+
+ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+<br />
+Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
+<br />
+{footer}</source>
+<target>{header}
+
+another user took responsibility for the task <b>{task.taskNr} - {task.taskName}</b> in the task-portal {portalLink}.<br />
+<br />
+You have been automatically unassigned from the task.<br />
+<br />
+{footer}</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

@@ -137,6 +137,8 @@ class Editor_TaskuserassocController extends ZfExtended_RestController {
         $this->log->request();
         $workflow = ZfExtended_Factory::get('editor_Workflow_Manager')->getActive($this->task);
         /* @var $workflow editor_Workflow_Abstract */
+        
+        //here checks the isWritable if the tua is already in editing mode... Not as intended. 
         if(!empty($this->entity->getUsedState()) && $workflow->isWriteable($this->entity, true)) {
             // the following check on preventing changing Jobs which are used, prevents the following problems:
             // competitive tasks: 

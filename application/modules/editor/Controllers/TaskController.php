@@ -798,6 +798,7 @@ class editor_TaskController extends ZfExtended_RestController {
         
         $this->checkTaskAttributeField();
         //was formerly in JS: if a userState is transfered, then entityVersion has to be ignored!
+        // but what we do is to check the previous userState. So we have control if entity was not uptodate regarding state, and we could assume the wanted transition since we have a start (the previous) and an end (the new) state
         if(!empty($this->data->userState)) {
             unset($this->data->entityVersion);
         }

@@ -106,6 +106,10 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         }
         $deleted = $tua->deleteOtherUsers($task->getTaskGuid(), $userGuid, $tua->getRole());
         if($deleted !== false) {
+            $notifier = ZfExtended_Factory::get('editor_Workflow_Notification');
+            /* @var $notifier editor_Workflow_Notification */
+            $notifier->init($this->config);
+            $notifier->notifyCompetitiveDeleted(['deleted' => $deleted]);
             return;
         }
         ZfExtended_Models_Entity_Conflict::addCodes([

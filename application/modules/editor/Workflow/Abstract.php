@@ -580,6 +580,18 @@ abstract class editor_Workflow_Abstract {
     public function getWriteableStates() {
         return $this->writeableStates;
     }
+    
+    /**
+     * Returns the initial usage state to a workflow state 
+     * @param editor_Models_TaskUserAssoc $tua
+     * @return string
+     */
+    public function getInitialUsageState(editor_Models_TaskUserAssoc $tua): string {
+        if(in_array($tua->getState(), [self::STATE_UNCONFIRMED, self::STATE_WAITING, self::STATE_FINISH])) {
+            return self::STATE_VIEW;
+        }
+        return self::STATE_EDIT;
+    }
 
     /**
      * returns the TaskUserAssoc Entity to the given combination of $taskGuid and $userGuid, 

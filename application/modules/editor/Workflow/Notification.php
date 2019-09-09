@@ -290,6 +290,33 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     }
     
     /**
+     * Sends a notification to users which are removed automatically from the task
+     * The Users to be notified must be given in the parameter array key 'deleted' 
+     */
+    public function notifyCompetitiveDeleted(array $parameter) {
+        $triggerConfig = $this->initTriggerConfig([$parameter]);
+        $this->tua = $this->config->newTua;
+        settype($triggerConfig->deleted, 'array');
+        
+        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
+        /* @var $user ZfExtended_Models_User */
+        foreach($triggerConfig->deleted as $deleted) {
+            $user->loadByGuid($deleted['userGuid']);
+            $workflow = $this->config->workflow;
+            $labels = $workflow->getLabels(false);
+            $roles = $workflow->getRoles();
+            $params = [
+                'task' => $this->config->task,
+                'role' => $labels[array_search($deleted['role'], $roles)],
+            ];
+            
+            $this->createNotification($deleted['role'], __FUNCTION__, $params);
+            $this->addCopyReceivers($triggerConfig, $deleted['role']);
+            $this->notify((array) $user->getDataObject());
+        }
+    }
+    
+    /**
      * Sends a notification to users which are attached newly to a task with status open
      * The User to be notified is gathered from the current active TaskUserAssociation
      */
