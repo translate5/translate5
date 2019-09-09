@@ -250,6 +250,10 @@ $( function() {
     $('#translations .term-status').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".term-info" }
     });
+    //check if the source and the target are the same
+    if($('#sourceLocale').val()==$('#targetLocale').val()){
+    	setTargetFirstAvailable($('#sourceLocale').val());
+    }
     // start with checking according to the locales as stored for user
     handleAfterLocalesChange($('#targetLocale'));
     $("#sourceText").attr('maxlength',characterLimit);
