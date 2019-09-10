@@ -985,7 +985,8 @@ abstract class editor_Workflow_Abstract {
         
         $tuas = $tua->loadByTaskGuidList([$taskGuid]);
         
-        $areTuasSubset = function($toCompare) use ($tuas){
+        $areTuasSubset = function($toCompare, $currentStep) use ($tuas){
+            $hasRoleToCurrentStep = false;
             foreach($tuas as $tua) {
                 if(empty($toCompare[$tua['role']])) {
                     return false;
@@ -993,8 +994,11 @@ abstract class editor_Workflow_Abstract {
                 if(!in_array($tua['state'], $toCompare[$tua['role']])) {
                     return false;
                 }
+                $hasRoleToCurrentStep = $hasRoleToCurrentStep || (($this->steps2Roles[$currentStep] ?? '') == $tua['role']);
             }
-            return true;
+            //we can only return true, if the Tuas contain at least one role belonging to the currentStep, 
+            // in other words we can not reset the task to proofreading, if we do not have a proofreader
+            return $hasRoleToCurrentStep;
         };
         
         $task = ZfExtended_Factory::get('editor_Models_Task');
@@ -1003,7 +1007,7 @@ abstract class editor_Workflow_Abstract {
         
         $matchingSteps = [];
         foreach($this->validStates as $step => $roleStates) {
-            if(!$areTuasSubset($roleStates)) {
+            if(!$areTuasSubset($roleStates, $step)) {
                 continue;
             }
             $matchingSteps[] = $step;
