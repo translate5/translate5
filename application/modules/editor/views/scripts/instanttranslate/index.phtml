@@ -35,7 +35,7 @@
     $allSourceLanguageLocales = array();
     $allTargetLanguageLocales = array();
     
-    foreach ($this->machineTranslationEngines as $languageResource) {
+    foreach ($this->allLanguageResources as $languageResource) {
         $allCharacterLimits[] = $languageResource['characterLimit'];
         foreach ($languageResource['source'] as $sourceLocale) {
             //are the sublanguages used as dropdown selections

@@ -134,9 +134,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         // all language-combinations that are available in InstantTranslate
         $languageResourcesLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languageResourcesLanguages editor_Models_LanguageResources_Languages */
-        $languageCombinations = $languageResourcesLanguages->getLanguageCombinationsForLoggedUser();
-        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageCombinations->targetsForSources);
-        
+        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageResourcesLanguages->getTargetsForSources());
         
         //rfc language code to language flag mapping
         $this->view->Php2JsVars()->set('apps.termportal.rfcFlags',$languagesModel->loadAllKeyValueCustom('rfc5646', 'iso3166Part1alpha2',true));
