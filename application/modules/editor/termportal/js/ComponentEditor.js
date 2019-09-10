@@ -179,8 +179,7 @@ var ComponentEditor={
 		}
         console.log('addCommentAttributeEditor');
 		var me=this,
-			$input= $('<textarea data-editable-comment />').val($element.text()),
-			isFromTm=$element.text() == proposalTranslations['acceptedFromTmComment'];
+			$input= $('<textarea data-editable-comment />').val($element.text());
 		
 		
 		$input.on('change keyup keydown paste cut', function () {
@@ -201,9 +200,7 @@ var ComponentEditor={
             me.saveCommentChange($element,$input);
         });
         me.$_termTable.on('mouseup', '.term-attributes .proposal-cancel',function() {
-        	//if it is proposalFrom tm, save the default comment text for tm proposal comment
-        	isFromTm ? $input.val(proposalTranslations['acceptedFromTmComment']) : $input.val(''); 
-        	me.saveCommentChange($element,$input);
+        	me.cancelCommentComponentChange($element,$input);
         });
         $input.focus();
 		return $input;
@@ -217,6 +214,25 @@ var ComponentEditor={
     cancelComponentChange:function($element,$input){
         $input.val(''); // this will force saveComponentChange() to stop the saving.
         this.saveComponentChange($element,$input);
+    },
+    
+    /**
+     * Cancel editing the comment component
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    cancelCommentComponentChange:function($element,$input){
+    	var isFromTm=$element.text() == proposalTranslations['acceptedFromTmComment'];
+    	//if it is proposalFrom tm, save the default comment text for tm proposal comment
+    	if(isFromTm){
+    		$input.val(proposalTranslations['acceptedFromTmComment']);
+    		//reset the element value, so it is not ignored by cancel request
+    		$element.val('');
+    		$element.text('');
+    	}else{
+    		$input.val('')
+    	}
+    	this.saveCommentChange($element,$input);
     },
 
     
@@ -397,11 +413,6 @@ var ComponentEditor={
 				var termRflLang=(result.attributes && result.attributes[0].language!=undefined) ? result.attributes[0].language : '';
 				attributeRenderData=Attribute.renderTermAttributes(result,termRflLang);
 			}
-			//reload the term entry data when new term is created
-			if(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]){
-				TermEntry.drawTermEntryAttributes(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
-			}
-			
 		}else{
 			renderData=Attribute.getAttributeRenderData(result,result.value);
 			
@@ -416,7 +427,12 @@ var ComponentEditor={
 			}
 			$elParent=Attribute.getTermAttributeHeader($element.data('id'),attrType);
 		}
-            
+		
+		//reload the term entry data if term entry results are available
+		if(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]){
+			TermEntry.drawTermEntryAttributes(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
+		}
+		
         // update term-data
         $elParent.attr('data-term-value', result.term);
         $elParent.attr('data-term-id', result.termId);
@@ -549,7 +565,11 @@ var ComponentEditor={
             }
             if (e.which === 27) {              // ESCAPE
                 event.preventDefault();
-                me.cancelComponentChange($element,$input);
+                if($element.data('editableComment')!=undefined){
+                	me.cancelCommentComponentChange($element,$input);
+                }else{
+                	me.cancelComponentChange($element,$input);
+                }
             }
         });
     },
