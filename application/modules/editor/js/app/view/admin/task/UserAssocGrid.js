@@ -72,6 +72,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           width: 230,
           dataIndex: 'login',
           renderer: function(v, meta, rec) {
+              if(Editor.data.debug) {
+                  v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
+              }
               return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
           },
           filter: {
@@ -84,7 +87,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           dataIndex: 'role',
           renderer: function(v) {
               var vm = this.lookupViewModel();
-              return vm.get('workflowMetadata').roles[v];
+              return vm.get('workflowMetadata').roles[v] || v;
           },
           text: me.strings.roleCol
       },{
