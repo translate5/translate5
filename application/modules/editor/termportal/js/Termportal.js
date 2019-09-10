@@ -411,3 +411,27 @@ function getFilteredProcessStats() {
     });
     return filteredProcessStats;
 }
+
+/***
+ * Show simple info message
+ * @param message
+ * @param title
+ * @returns
+ */
+function showInfoMessage(message,title){
+	var yesText=proposalTranslations['Ja'],
+		buttons={
+		};
+	buttons[yesText]=function(){
+	    $(this).dialog('close');
+	};
+	// Define the Dialog and its properties.
+	return $('#infoDialogWindow').dialog({
+	    resizable: false,
+	    modal: true,
+	    title: title,
+	    height: 300,
+	    width: 450,
+	    buttons:buttons
+	}).text(message);
+}
