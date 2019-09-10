@@ -1,6 +1,7 @@
 var Attribute={
 	$_termTable:null,
 	$_termEntryAttributesTable:null,
+	$_resultTermsHolder:null,
 	
 	languageDefinitionContent:[],
 	
@@ -15,6 +16,7 @@ var Attribute={
 	cacheDom:function(){
         this.$_termTable=$('#termTable');
         this.$_termEntryAttributesTable = $('#termEntryAttributesTable');
+        this.$_resultTermsHolder=$('#resultTermsHolder');
 	},
 	
 	onAttributeEditingOpened: function() {
@@ -372,7 +374,6 @@ var Attribute={
 	 * in the term and termentry area
 	 */
 	checkAndUpdateDeffinition:function(attribute){
-
 		if(attribute.attrType !== 'definition' || !Editor.data.app.user.isTermProposalAllowed){
 			return false;
 		}
@@ -385,8 +386,7 @@ var Attribute={
 
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
-			$attributes = me.$_termTable.find('p[data-id="'+attribute.attributeId+'"]'),
-			$attributes2 = me.$_termEntryAttributesTable.find('p[data-id="'+attribute.attributeId+'"]');
+			$attributes = me.$_resultTermsHolder.find('span[data-editable][data-type][data-id="'+attribute.attributeId+'"]');
 		
 		$attributes.each(function(i,att){
 			att=$(att);
@@ -394,40 +394,8 @@ var Attribute={
 			att.replaceWith(renderData);
 		});
 		
-		$attributes2.each(function(i,att){
-			att=$(att);
-			att.empty();
-			att.replaceWith(renderData);
-		});
-		
 		Term.drawProposalButtons('componentEditorClosed');
-		//Term.drawProposalButtons(me.$_termEntryAttributesTable);
 	    Term.reloadTermEntry=true;
-		
-		
-		/*
-			$elParent=me.getTermAttributeHeader(attribute.attributeId,attrType)
-			$input=me.getAttributeComponent(attribute.attributeId,attrType);
-	        
-		
-		//check for proposal and update the classes
-		if(!attribute.proposal){
-			$elParent.switchClass('is-proposal','is-finalized');
-		}else{
-			// update term-data
-			$elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
-			$elParent.removeClass('in-editing');
-		}
-	    
-		if($input.children('ins').length === 1){
-			renderData=me.getAttributeContainerRender(attribute,renderData);
-		}
-		
-	    $input.replaceWith(renderData);
-	    
-	    Term.drawProposalButtons($elParent);
-	    Term.reloadTermEntry=true;
-	    */
 	    return true;
 	},
 	
