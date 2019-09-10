@@ -3443,6 +3443,7 @@ More information can be found in the task property window in the tab events.<br 
 <trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Editing this definition will affect all terms of this language.</target></trans-unit>
 <trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Please open the 'Term entry attributes' for editing this definition.</target></trans-unit>
 <trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Please note:</target></trans-unit>
+<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='><source>Das Kommentarattribut ist erforderlich</source><target>The comment attribute is required</target></trans-unit>
     </body>
   </file>
 </xliff>
