@@ -120,11 +120,6 @@ var ComponentEditor={
 	 * @returns {Object}
 	 */
 	addAttributeComponentEditor:function($element){
-		//TODO: sometimes multiple inputs are present in the dom
-		//      to test this, propose new term for editing, and on the comment editor, click on cancel -> multiple request are sent since somehow if priviously 
-		//      different editor is opened, the inputs are not destroyed, test this
-		// Also test when change between term and term entry window
-		// Test when term attribute is edit click when Comment editor exist
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
