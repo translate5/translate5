@@ -135,7 +135,37 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::query()
      */
     public function query(editor_Models_Segment $segment) {
-        // TODO
+        return $this->queryNecTmApi($this->prepareDefaultQueryString($segment), true);
+    }
+    
+    /***
+     * Query the google cloud api for the search string
+     * @param string $searchString
+     * @param bool $reimportWhitespace optional, if true converts whitespace into translate5 capable internal tag
+     * @return editor_Services_ServiceResult
+     */
+    protected function queryNecTmApi($searchString, $reimportWhitespace = false){
+        if(empty($searchString)) {
+            return $this->resultList;
+        }
+        
+        //load all languages
+        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $langModel editor_Models_Languages */
+        $lngs = $langModel->loadAllKeyValueCustom('id','rfc5646');
+        
+        $result = null;
+        if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang])){
+            $result = $this->api->getResult();
+        }
+        
+        $translation = $result ?? "";
+        if($reimportWhitespace) {
+            $translation = $this->importWhitespaceFromTagLessQuery($translation);
+        }
+        
+        $this->resultList->addResult($translation, $this->defaultMatchRate);
+        return $this->resultList;
     }
     
     /**

@@ -40,16 +40,16 @@ class editor_Plugins_NecTm_HttpApi {
     const BASE_PATH = '/api/v1';
     
     /**
+     * for JWT-Authorization: MemCache-Id for Access-Token
+     * @var string
+     */
+    const TOKEN_CACHE_KEY = 'NecTmAccessToken';
+    
+    /**
      * Api-URL from zf configuration
      * @var string
      */
     protected $apiUrl;
-    
-    /**
-     * Token fpr JWT-Authorization
-     * @var string
-     */
-    protected $accessToken;
     
     /**
      * Username at NEC-TM
@@ -81,22 +81,27 @@ class editor_Plugins_NecTm_HttpApi {
      */
     protected $httpMethod;
     
+    /**
+     * @var ZfExtended_Cache_MySQLMemoryBackend
+     */
+    protected $memCache;
+    
     public function __construct() {
-        // Authorization
-        $this->setAccessToken();
+        $this->memCache = Zend_Cache::factory('Core', new ZfExtended_Cache_MySQLMemoryBackend());
     }
     
     /**
-     * Authorize access to NEC-TM's APIs for the configured-user.
-     * @return boolean (true if token is available now, false otherwise)
+     * Set the token to authorize access to NEC-TM's APIs for the configured-user.
+     * @return string|false
      */
     protected function setAccessToken() {
         $token = $this->login();
         if (!$token) {
             return false; // no token available
         }
-        $this->accessToken = $token;
-        return true;
+        $this->memCache->save($token, self::TOKEN_CACHE_KEY);
+        $test = $this->memCache->load(self::TOKEN_CACHE_KEY);
+        return $token;
     }
     
     /**
@@ -104,7 +109,11 @@ class editor_Plugins_NecTm_HttpApi {
      * @return string|false
      */
     protected function getAccessToken() {
-        return $this->accessToken ?? false;
+        $cachedToken = $this->memCache->load(self::TOKEN_CACHE_KEY);
+        if(!$cachedToken || empty($cachedToken)) {
+            $cachedToken = $this->setAccessToken();
+        }
+        return $cachedToken;
     }
     
     /**
@@ -134,10 +143,10 @@ class editor_Plugins_NecTm_HttpApi {
     }
     
     /**
-     * Returns all available NEC-TM-Categories (= there: "Tags") for the current user for the current NecTm-Service.
+     * Returns all available NEC-TM-Tags (for us then: "categories") for the current user for the current NecTm-Service.
      * @return array
      */
-    public function getAllCategories() {
+    public function getTags() {
         /*
             "tags": [
                 {
@@ -159,14 +168,39 @@ class editor_Plugins_NecTm_HttpApi {
         */
         $method = 'GET';
         $endpointPath = 'tags';
-        $rawBody= '';
+        $data = [];
+        $params = [];
         try {
-            $this->necTmRequest($method, $endpointPath, $rawBody);
+            $this->necTmRequest($method, $endpointPath, $data, $params);
         }
         catch(editor_Plugins_NecTm_ExceptionToken $e) {
             return [];
         }
         return $this->result->tags;
+    }
+    
+    /**
+     * Search the api for given source/target language.
+     * @param string $queryString
+     * @param string $sourceLang
+     * @param string $targetLang
+     * @return boolean
+     */
+    public function search($queryString, $sourceLang, $targetLang) {
+        $method = 'GET';
+        $endpointPath = 'tm';
+        $data = [];
+        $params= array('q'           => $queryString,
+                       'slang'       => 'de',       // TODO
+                       'tlang'       => 'en',       // TODO
+                       'aut_trans'   => false,      // TODO
+                       'concordance' => false,      // TODO
+                       'strip_tags'  => false,      // TODO
+                       'tag'         => '');        // TODO
+        $this->necTmRequest($method, $endpointPath, $data, $params);
+        $results = $this->result->results; // TODO
+        $this->result = $results[0]->tu->target_text;
+        return true;
     }
     
     
@@ -185,8 +219,7 @@ class editor_Plugins_NecTm_HttpApi {
             /* @var $config Zend_Config */
             $urls = $config->runtimeOptions->plugins->NecTm->server->toArray();
             if(empty($urls) || empty($urls[0])){
-                $exc = new Zend_Exception("Api url is not defined in the zf configuration");
-                $this->badGateway($exc, "");
+                $this->throwBadGateway();
             }
             $this->apiUrl = $urls[0];
         }
@@ -223,21 +256,22 @@ class editor_Plugins_NecTm_HttpApi {
      * Sends a request to NEC_TM's Api Service.
      * @param string $method
      * @param string $endpointPath
-     * @param array $rawBody
+     * @param array $data
+     * @param array $params
      */
-    protected function necTmRequest($method, $endpointPath = '', $rawBody=[]) {
+    protected function necTmRequest($method, $endpointPath = '', $data = [], $params = []) {
         $http = $this->getHttp($method, $endpointPath);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
-        //error_log("SEND URI ".print_r($uriPath,1));
-        if (!empty($rawBody)) {
-            //error_log("SEND BODY ".print_r(json_encode($rawBody, JSON_PRETTY_PRINT),1));
-            $http->setRawData(json_encode($rawBody), 'application/json; charset=utf-8');
+        if (!empty($data)) {
+            $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
         }
-        
+        if (!empty($params)) {
+            $setParameter = ($method == 'GET') ? 'setParameterGet' : 'setParameterPost';
+            $http->$setParameter($params);
+        }
         $res = $this->request($http);
-        //error_log("REC BODY".print_r($res->getBody(),1));
         if(!$this->processResponse($res)) {
-            $this->throwBadGateway();
+            $this->throwBadGateway($http);
         }
     }
     
@@ -264,24 +298,29 @@ class editor_Plugins_NecTm_HttpApi {
                     //check next message
                     continue;
                 }
-                $this->badGateway($e, $http);
+                $this->throwBadGateway($http);
             }
             throw $e;
         }
     }
     
-    protected function badGateway(Zend_Exception $e, Zend_Http_Client $http) {
-        $badGateway = new ZfExtended_BadGateway('Die angefragte NEC-TM Instanz ist nicht erreichbar', 0, $e);
-        $badGateway->setDomain('LanguageResources');
-        
-        $error = new stdClass();
-        $error->type = 'HTTP';
-        $error->error = $e->getMessage();
-        $error->url = $http->getUri(true);
-        $error->method = $this->httpMethod;
-        
-        $badGateway->setErrors([$error]);
-        throw $badGateway;
+    /**
+     * Throws a ZfExtended_BadGateway exception containing the underlying errors
+     * @throws ZfExtended_BadGateway
+     */
+    protected function throwBadGateway($http = '') {
+        //FIXME wenn in getErrors ein 403, dann kein Zugriff auf das TM - entweder weil nicht existent (wissen wir aber nicht) oder wegen fehlender credentials??? → den letzten Fall muss ich eh noch evaluieren
+        // entpsrechend hier ein aussagekräfigerer Text ausgeben
+        // Bei 401 Ebenfalls keine Zugriff Meldung
+        $e = new ZfExtended_BadGateway('NEC-TM-Api: The request returned an error.');
+        $e->setDomain('NEC-TM-Api');
+        $errors = $this->getErrors();
+        $errors[] = $this->result; //add real result to error data
+        if (!empty($http)) {
+            $errors[] = $http;
+        }
+        $e->setErrors($errors);
+        throw $e;
     }
     
     /**
@@ -340,6 +379,13 @@ class editor_Plugins_NecTm_HttpApi {
      */
     public function getErrors() {
         return $this->error;
+    }
+    /**
+     * returns the decoded JSON result
+     */
+    public function getResult() {
+        $test = $this->result;
+        return $this->result;
     }
     
 }

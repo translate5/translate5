@@ -60,7 +60,7 @@ class editor_Plugins_NecTm_SyncCategories {
         /* @var $categoriesEntity editor_Models_Categories */
         
         // all NEC-TM-categories that are available for us
-        $allAvailable = $this->api->getAllCategories();
+        $allAvailable = $this->api->getTags();
         
         // When we have no list with the available categories, we cannot check anything.
         if(empty($allAvailable)) {
