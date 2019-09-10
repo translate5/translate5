@@ -121,6 +121,11 @@ class editor_TaskController extends ZfExtended_RestController {
         ZfExtended_UnprocessableEntity::addCodes([
             'E1064' => 'The referenced customer does not exist (anymore).'
         ], 'editor.task');
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1159' => 'Task usageMode can only be modified, if no user is assigned to the task.',
+            'E1163' => 'Your job was removed, therefore you are not allowed to access that task anymore.',
+            'E1164' => 'You tried to open the task for editing, but in the meantime you are not allowed to edit the task anymore.',
+        ], 'editor.task');
         
         parent::init();
         $this->now = date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
@@ -822,7 +827,17 @@ class editor_TaskController extends ZfExtended_RestController {
             //if the task was already in session, we must delete it. 
             //If not the user will always receive an error in JS, and would not be able to do anything.
             $this->unregisterTask(); //FIXME XXX the changes in the session made by this method is not stored in the session!
-            //wir laufen auf dem server hier öfters rein
+            if(empty($tua)) {
+                throw ZfExtended_Models_Entity_Conflict::createResponse('E1163',[
+                    'userState' => 'Ihre Zuweisung zur Aufgabe wurde entfernt, daher können Sie diese nicht mehr zur Bearbeitung öffnen.',
+                ]);
+            }
+            if($isTaskDisallowEditing && $this->data->userStatePrevious != $tua->getState()) {
+                throw ZfExtended_Models_Entity_Conflict::createResponse('E1164',[
+                    'userState' => 'Sie haben versucht die Aufgabe zur Bearbeitung zu öffnen. Das ist in der Zwischenzeit nicht mehr möglich.',
+                ]);
+            }
+            //no access as generic fallback
             throw new ZfExtended_Models_Entity_NoAccessException();
         }
         
@@ -892,9 +907,6 @@ class editor_TaskController extends ZfExtended_RestController {
         if(empty($used)) {
             return;
         }
-        ZfExtended_Models_Entity_Conflict::addCodes([
-            'E1159' => 'Task usageMode can only be modified, if no user is assigned to the task.',
-        ]);
         throw ZfExtended_Models_Entity_Conflict::createResponse('E1159', [
             'usageMode' => [
                 'usersAssigned' => 'Der Nutzungsmodus der Aufgabe kann verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.'
