@@ -86,7 +86,26 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
     }
     
     /**
-     * 
+     * Enables the other unconfirmed users in cooperative mode
+     */
+    public function confirmCooperativeUsers() {
+        $task = $this->config->task;
+        if($task->getUsageMode() !== $task::USAGE_MODE_COOPERATIVE) {
+            return;
+        }
+        $userGuid = $this->currentUser()->getUserGuid();
+        if(empty($this->config->newTua)) {
+            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $tua->loadByParams($userGuid, $task->getTaskGuid());
+        }
+        else {
+            $tua = $this->config->newTua;
+        }
+        $tua->setStateForRoleAndTask($this->config->workflow::STATE_OPEN, $tua->getRole());
+    }
+    
+    /**
      * @throws ZfExtended_Models_Entity_Conflict
      */
     public function removeCompetitiveUsers() {

@@ -174,15 +174,20 @@ class editor_Models_TaskUserAssoc extends ZfExtended_Models_Entity_Abstract {
     }
     
     /**
-     * Updates the stored user states of an given taskGuid 
+     * Updates the stored user states of an given taskGuid (may exclude the current user if enabled by third parameter)
      * @param string $state
      * @param string $role
+     * @param boolean $expectMySelf if true, the internally loaded userGuid is excluded from the the update
      */
-    public function setStateForRoleAndTask(string $state, string $role) {
-        $this->db->update(array('state' => $state), array(
+    public function setStateForRoleAndTask(string $state, string $role, $expectMySelf = false) {
+        $where = [
             'role = ?' => $role,
             'taskGuid = ?' => $this->getTaskGuid(),
-        ));
+        ];
+        if($expectMySelf) {
+            $where['userGuid != ?'] = $this->getUserGuid();
+        }
+        $this->db->update(['state' => $state], $where);
     }
     
     /**
