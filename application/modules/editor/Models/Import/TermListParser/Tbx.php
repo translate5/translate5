@@ -320,6 +320,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $termCollection = ZfExtended_Factory::get('editor_Models_TermCollection_TermCollection');
         /* @var $termCollection editor_Models_TermCollection_TermCollection */
         
+        
         $this->termCollectionId = $termCollection->create("Term Collection for ".$this->task->getTaskName(), $this->customerIds);
         
         //add termcollection to task assoc
@@ -1233,7 +1234,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     private function handleTermDb(){
         $term=ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
-        $terms=$term->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollectionId);
+        $terms=$term->isUpdateTermForCollection($this->actualTermEntry,$this->actualTermIdTbx,$this->termCollection->getId());
         
         //if term is found(should return single row since termId is unique)
         if($terms->count()>0){
@@ -1279,7 +1280,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         
         if($this->mergeTerms){
             //check if the term text exist in the term collection within the language
-            $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollectionId);
+            $tmpTermValue=$term->findTermInCollection($this->xml->readInnerXml(), $this->actualLangId, $this->termCollection->getId());
 
             if($tmpTermValue && $tmpTermValue->count()>0){
                 
@@ -1308,7 +1309,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
             //the status will be updated when is found from the termNote
             $this->termContainer['definition']=$this->actualDefinition;
             $this->termContainer['language']=(int)$this->actualLangId;
-            $this->termContainer['collectionId']=$this->termCollectionId;
+            $this->termContainer['collectionId']=$this->termCollection->getId();
             $this->termContainer['updated']=date("Y-m-d H:i:s");
             $this->termContainer['userGuid']=$this->user->getUserGuid();
             $this->termContainer['userName']=$this->user->getUserName();
@@ -1331,7 +1332,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $this->termContainer['definition']=$this->actualDefinition;
         $this->termContainer['groupId']=$this->actualTermEntry;
         $this->termContainer['language']=(int)$this->actualLangId;
-        $this->termContainer['collectionId']=$this->termCollectionId;
+        $this->termContainer['collectionId']=$this->termCollection->getId();
         $this->termContainer['termEntryId']=$this->actualTermEntryIdDb;
         $this->termContainer['updated']=date("Y-m-d H:i:s");
         $this->termContainer['userGuid']=$this->user->getUserGuid();
@@ -1407,7 +1408,7 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
         $proposal=ZfExtended_Factory::get('editor_Models_Term_Proposal');
         /* @var $proposal editor_Models_Term_Proposal */
         
-        $proposalInCollection=$proposal->findProposalInCollection($this->termContainer['term'], $this->termContainer['language'], $this->termCollectionId);
+        $proposalInCollection=$proposal->findProposalInCollection($this->termContainer['term'], $this->termContainer['language'], $this->termCollection->getId());
         if($proposalInCollection->count()<1){
             return false;
         }
