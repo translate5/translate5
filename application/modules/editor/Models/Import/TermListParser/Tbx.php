@@ -961,42 +961,6 @@ class editor_Models_Import_TermListParser_Tbx implements editor_Models_Import_Me
     }
     
     /***
-	 * TODO: find me the right place!!
-     * Check if the current term has empty status. If yes use the default term status from the config.
-     */
-    protected function handleEmptyTermStatus(){
-        $term=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $term editor_Models_Term */
-
-
-        //if the term exist, load it from the database
-        if(!empty($this->actualTermIdDb)){
-            $term->load($this->actualTermIdDb);
-        }else if(isset($this->termsContainer[$this->actualTermIdTbx]) && !empty($this->termsContainer[$this->actualTermIdTbx])){
-            //the term does not exis, check if it exist in the term container
-            //the terms in the term container are not saved yet
-            $term=$this->termsContainer[$this->actualTermIdTbx];
-        }else{
-            //the term is not found in the database, an not in the term container. Log the info
-            $this->log("TermCollection parser message: Unable to set the term status. The term does not exist so far. Collectionid: ".$this->termCollection->getId());
-            return;
-        }
-        
-        //if the statzs is empty, set the default status from the zf config
-        if(empty($term->getStatus())){
-            $config = Zend_Registry::get('config');
-            $term->setStatus($config->runtimeOptions->tbx->defaultTermStatus);
-
-            //if actualTermIdDb is set -> the term exist in the database -> update
-            //if actualTermIdDb is not set -> the term does not exist in the db, it is in the term container which will be updated later
-            if(!empty($this->actualTermIdDb)){
-                $term->save();
-            }
-        }
-        
-    }
-    
-    /***
      * Check if the current term has attribute with processStatus. If not create a default processStatus attribute
      * @param int $termId
      * @return NULL|mixed|array
