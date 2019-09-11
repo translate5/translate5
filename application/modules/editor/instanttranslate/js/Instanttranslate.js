@@ -262,6 +262,20 @@ function isSourceTargetAvailable(sourceRfc,targetRfc){
     return targetLocalesAvailable.indexOf(targetRfc) !== -1;
 }
 
+/***
+ * Set the first first available target locale for the given source locale
+ * @returns
+ */
+function setTargetFirstAvailable(sourceRfc){
+	var targetLocalesAvailable = getLocalesAccordingToReference ('accordingToSourceLocale', sourceRfc);
+	if(targetLocalesAvailable.length<1){
+		return;
+	}
+	$("#targetLocale").val(targetLocalesAvailable[0]);
+	$("#targetLocale").selectmenu("refresh");
+}
+
+
 /**
  * What locales are available for translation for the given locale?
  * @param {String} accordingTo ('accordingToSourceLocale'|'accordingToTargetLocale')
