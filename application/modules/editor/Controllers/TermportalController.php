@@ -106,6 +106,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $frontendLocaleNormalized=$this->normalizeLanguage($this->_session->locale);
         $preselectedLang=null;
         
+        //check if the sub languages should be displayed
+        $isShowSubLanguages=$config->runtimeOptions->TermPortal->showSubLanguages;
+        
         foreach ($langsArray as &$lng){
 
             //set preselected term-search language based on user locale language
@@ -118,6 +121,12 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
             
+            //ignore if the sublanguages are disabled 
+            if(!$isShowSubLanguages && !$isSingleLang){
+                $lng=null;
+                continue;
+            }
+            
             //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
             if($isSingleLang){
                 //load all similar languages
@@ -129,7 +138,7 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         }
         
         //all languages in the available term collections for the user
-        $this->view->languages=$langsArray;
+        $this->view->languages=array_filter($langsArray);
         
         // all language-combinations that are available in InstantTranslate
         $languageResourcesLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
