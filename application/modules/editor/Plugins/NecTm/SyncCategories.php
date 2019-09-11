@@ -53,14 +53,17 @@ class editor_Plugins_NecTm_SyncCategories {
      * @param bool $withMutex
      */
     public function synchronize($withMutex = true) {
-        if($withMutex && !$this->mutex()) {
+        if ($withMutex && !$this->mutex()) {
             return;
         }
         $categoriesEntity = ZfExtended_Factory::get('editor_Models_Categories');
         /* @var $categoriesEntity editor_Models_Categories */
         
         // all NEC-TM-categories that are available for us
-        $allAvailable = $this->api->getTags();
+        $allAvailable = [];
+        if ($this->api->getTags()) {
+            $allAvailable = $this->api->getResult();
+        }
         
         // When we have no list with the available categories, we cannot check anything.
         if(empty($allAvailable)) {

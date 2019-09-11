@@ -420,4 +420,31 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
         //re-index the array
         return array_values($languageResources);
     }
+    
+    /**
+     * Returns the categories that are assigned to the resource.
+     * @return array
+     */
+    protected function getCategories() {
+        $categoryAssoc = ZfExtended_Factory::get('editor_Models_LanguageResources_CategoryAssoc');
+        /* @var $categoryAssoc editor_Models_LanguageResources_CategoryAssoc */
+        return $categoryAssoc->loadByLanguageResourceId($this->getId());
+    }
+    
+    /**
+     * Returns the original ids of the categories that are assigned to the resource.
+     * @return array
+     */
+    public function getOriginalCategoriesIds() {
+        $categories = $this->getCategories();
+        $categoriesIds = array_column($categories, 'categoryId');
+        $m = ZfExtended_Factory::get('editor_Models_Categories');
+        /* @var $m editor_Models_Categories */
+        $categoriesOriginalIds = [];
+        foreach ($categoriesIds as $categoryId) {
+            $m->load($categoryId);
+            $categoriesOriginalIds[] = $m->getOriginalCategoryId();
+        }
+        return $categoriesOriginalIds;
+    }
 }

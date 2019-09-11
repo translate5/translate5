@@ -55,6 +55,15 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $xmlparser;
     
     /**
+     * The categories for the languageResource: 
+     * - those assigned to the languageResource by the user
+     * AND
+     * - those configured as top-level-categories in ZfConfig
+     * @var array
+     */
+    protected $categories;
+    
+    /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
@@ -63,6 +72,22 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
         /* @var $parser editor_Models_Import_FileParser_XmlParser */
+        $this->setCategories($languageResource);
+    }
+    
+    /**
+     * Set the categories for the languageResource: 
+     * - those assigned to the languageResource by the user
+     * AND
+     * - those configured as top-level-categories in ZfConfig
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
+     */
+    protected function setCategories($languageResource) {
+        $ccategoriesFromResource = $languageResource->getOriginalCategoriesIds();
+        $service = ZfExtended_Factory::get('editor_Plugins_NecTm_Service');
+        /* @var $service editor_Plugins_NecTm_Service */
+        $ccategoriesFromService = $service->getTopLevelCategoriesIds();
+        $this->categories = array_unique(array_merge($ccategoriesFromResource, $ccategoriesFromService), SORT_STRING);
     }
     
     /**
@@ -155,7 +180,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         $lngs = $langModel->loadAllKeyValueCustom('id','rfc5646');
         
         $result = null;
-        if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang])){
+        if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang], $this->categories)){
             $result = $this->api->getResult();
         }
         

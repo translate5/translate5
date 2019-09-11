@@ -144,7 +144,7 @@ class editor_Plugins_NecTm_HttpApi {
     
     /**
      * Returns all available NEC-TM-Tags (for us then: "categories") for the current user for the current NecTm-Service.
-     * @return array
+     * @return boolean
      */
     public function getTags() {
         /*
@@ -170,13 +170,10 @@ class editor_Plugins_NecTm_HttpApi {
         $endpointPath = 'tags';
         $data = [];
         $params = [];
-        try {
-            $this->necTmRequest($method, $endpointPath, $data, $params);
-        }
-        catch(editor_Plugins_NecTm_ExceptionToken $e) {
-            return [];
-        }
-        return $this->result->tags;
+        $this->necTmRequest($method, $endpointPath, $data, $params);
+        $result = $this->result;
+        $this->result = $result->tags;
+        return true;
     }
     
     /**
@@ -184,19 +181,20 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string $queryString
      * @param string $sourceLang
      * @param string $targetLang
+     * @param array $tagIds (= assigned categories AND top-level-categories)
      * @return boolean
      */
-    public function search($queryString, $sourceLang, $targetLang) {
+    public function search($queryString, $sourceLang, $targetLang, $tagIds) {
         $method = 'GET';
         $endpointPath = 'tm';
         $data = [];
-        $params= array('q'           => $queryString,
+        $params = array('q'          => $queryString,
                        'slang'       => 'de',       // TODO
                        'tlang'       => 'en',       // TODO
                        'aut_trans'   => false,      // TODO
                        'concordance' => false,      // TODO
                        'strip_tags'  => false,      // TODO
-                       'tag'         => '');        // TODO
+                       'tag'         => $tagIds);
         $this->necTmRequest($method, $endpointPath, $data, $params);
         $results = $this->result->results; // TODO
         $this->result = $results[0]->tu->target_text;
