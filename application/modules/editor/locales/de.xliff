@@ -1642,6 +1642,7 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
 <br />
 {footer}</target></trans-unit>
+<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='><source>Das Kommentarattribut ist erforderlich</source><target>Das Kommentarattribut ist erforderlich</target></trans-unit>
   </body>
  </file>
 </xliff>

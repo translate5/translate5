@@ -198,16 +198,16 @@ class editor_Plugins_TermImport_Services_Import {
             $affectedCollections[] = $params['collectionId'];
             $this->logProfiling('Prepared collection '.$params['collectionName'].'('.$params['collectionId'].')');
             
+            //define the import source, used for storing the file in the disk in the needed location
+            $params['importSource']="filesystem";
+            
+            $this->importTbx($file, $importDir.$file, $params);
+            
             //remove old term entries and terms
             $this->removeEntriesOlderThenImport($params['collectionId']);
             
             //remove term proposals
             $this->removeProposalsOlderThan($params['collectionId']);
-                
-            //define the import source, used for storing the file in the disk in the needed location
-            $params['importSource']="filesystem";
-            
-            $this->importTbx($file, $importDir.$file, $params);
             
         }
         if(empty($this->returnMessage)){
@@ -295,11 +295,6 @@ class editor_Plugins_TermImport_Services_Import {
             //absolute file path
             $file=$exportFilesDir.$file;
             
-            //remove old term entries and terms
-            $this->removeEntriesOlderThenImport($params['collectionId']);
-            
-            //remove term proposals
-            $this->removeProposalsOlderThan($params['collectionId']);
             
             $affectedCollections[] = $params['collectionId'];
             
@@ -319,6 +314,12 @@ class editor_Plugins_TermImport_Services_Import {
             $params['importSource']="crossapi";
             
             $this->importTbx($file, $tmpFile, $params);
+            
+            //remove old term entries and terms
+            $this->removeEntriesOlderThenImport($params['collectionId']);
+            
+            //remove term proposals
+            $this->removeProposalsOlderThan($params['collectionId']);
             
             //remove the tmp file
             if (file_exists($tmpFile)) {
@@ -500,6 +501,11 @@ class editor_Plugins_TermImport_Services_Import {
         /* @var $proposal editor_Models_Term_Proposal */
         $theDate=!$deleteOlderThanCurrentImport && !empty($olderThan) ? $olderThan :  NOW_ISO;
         $proposals->removeOlderThan([$collectionId],$theDate);
+        
+        $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
+        /* @var $attributeProposals editor_Models_Term_AttributeProposal */
+        //remove the attirubte proposals
+        $attributeProposals->removeOlderThan([$collectionId],$theDate);
         
         $this->logProfiling('removeProposalsOlderThan for collection '.$collectionId);
     }

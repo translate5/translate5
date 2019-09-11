@@ -3505,6 +3505,10 @@ You have been automatically unassigned from the task.<br />
 <br />
 {footer}</target>
 </trans-unit>
+<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='>
+    <source>Das Kommentarattribut ist erforderlich</source>
+    <target>The comment attribute is required</target>
+</trans-unit>
     </body>
   </file>
 </xliff>
