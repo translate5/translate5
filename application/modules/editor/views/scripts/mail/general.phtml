@@ -45,8 +45,8 @@ $data = [
     'portalUrl' => $portal,
     'portalLink' => '<a href="'.$portal.'">'.$portal.'</a>',
     'companyName' => $this->config->runtimeOptions->companyName,
-    'salutation' => $this->translate->_($salutation),
-    'surName' => $salutation=='n' ? ($this->receiver->surName.' '.$this->receiver->firstName) : $this->receiver->surName,
+    'salutation' => $salutation,
+    'surName' => $this->receiver->gender=='n' ? ($this->receiver->surName.' '.$this->receiver->firstName) : $this->receiver->surName,
 ];
 
 //prepare the htmlOnly disclaimer
