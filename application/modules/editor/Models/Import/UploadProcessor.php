@@ -76,6 +76,12 @@ class editor_Models_Import_UploadProcessor {
             //there is already set a data provider
             return;
         }
+        
+        if(!$this->upload->isValid('importUpload')) {
+            $this->uploadErrors = $this->upload->getMessages();
+            $this->throwOnUploadError();
+        }
+        
         //mandatory upload file
         $importInfo = $this->upload->getFileInfo('importUpload');
         
@@ -97,23 +103,16 @@ class editor_Models_Import_UploadProcessor {
      * @return string
      */
     protected function checkAndGetImportType(array $importInfo) {
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        //mit oder ohne importUpload
-        $importFile = $importInfo['importUpload']['tmp_name'];
         $importName = pathinfo($importInfo['importUpload']['name']);
         settype($importName['extension'], 'string');
         $ext = strtolower($importName['extension']);
-
-        //FIXME WARNING: MimeTypes ware not needed anymore, since check was deactivated in UploadProcessor
-        // but since there is currently no time to refactor the stuff, we leave it as it is and refactor it later
+        
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
-        $allValidExtensions = $supportedFiles->getSupportedTypes();
-        if(!empty($allValidExtensions[$ext])) {
-            $this->validUploadTypes[$ext] = $allValidExtensions[$ext];
-        }
+        $allValidExtensions = $supportedFiles->getSupportedExtensions();
         
-        if(!empty($this->validUploadTypes[$ext])){
+        $isEmptySize = empty($importInfo['importUpload']['size']);
+        if(!$isEmptySize && in_array($ext, $allValidExtensions)){
             return $ext;
         }
         
@@ -205,9 +204,9 @@ class editor_Models_Import_UploadProcessor {
         return $args;
     }
     
-    /**
+     /**
      * Adds an upload error
-     * @see throwOnUploadError
+     * @see editor_Models_Import_UploadProcessor::throwOnUploadError
      * @param string $errorType
      */
     protected function addUploadError($errorType) {
@@ -226,7 +225,7 @@ class editor_Models_Import_UploadProcessor {
 
     /**
      * throws upload errors if some occured 
-     * @throws ZfExtended_ValidateException
+     * @throws ZfExtended_FileUploadException
      */
     protected function throwOnUploadError(array $extraData = []) {
         if(empty($this->uploadErrors)) {

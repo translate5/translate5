@@ -50,10 +50,13 @@ class editor_Models_Task_Meta extends ZfExtended_Models_Entity_MetaAbstract {
             $db->insert(array('taskGuid' => $this->getTaskGuid()));
         }
         catch(Zend_Db_Statement_Exception $e) {
-            $m = $e->getMessage();
-            //"duplicate entry" errors are ignored. 
-            if(strpos($m,'SQLSTATE') !== 0 || stripos($m,'Duplicate entry') === false) {
+            try {
+                $this->handleIntegrityConstraintException($e);
                 throw $e;
+            }
+            catch(ZfExtended_Models_Entity_Exceptions_IntegrityDuplicateKey $e) {
+                //"duplicate entry" errors are ignored.
+                return;
             }
         }
     }
