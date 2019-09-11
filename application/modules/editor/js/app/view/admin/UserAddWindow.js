@@ -146,7 +146,7 @@ Ext.define('Editor.view.admin.UserAddWindow', {
                             items: [
                                     {boxLabel: me.strings.genderFemale, name: 'gender', inputValue: 'f'},
                                     {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'm'},
-                                    {boxLabel: me.strings.genderMale, name: 'gender', inputValue: 'n'}
+                                    {boxLabel: me.strings.genderNeutral, name: 'gender', inputValue: 'n'}
                                     ]
                         },{
                             xtype: 'fieldcontainer',
