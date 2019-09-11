@@ -178,7 +178,6 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
         //Control character escape \ca through \cz Match an ASCII character Control+A through Control+Z, equivalent to \x01 through \x1A   \cm\cj matches a Windows CRLF line break
         /\\0/g,//NULL escape
         /\\(?:[1-7][0-7]{0,2}|[0-7]{2,3})/g,//Octal escape
-        /(.*)\|(.*)/g,//javascript: a|ab matches a in ab | In POSIX ERE: a|ab matches ab in ab
         /\\[\^\]\-]/g,//\ (backslash) followed by any of ^-]\
         /\\b/g,//javascript: [\b\t] matches a backspace or a tab character.
         /\\B/g,//javascript: \B. matches b, c, e, and f in abc def
@@ -208,14 +207,13 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
     validateSearchField:function(val){
         var tabPanel=this.up('#searchreplacetabpanel'),
             searchTab=tabPanel.down('#searchTab'),
-            activeTab=tabPanel.getActiveTab(),
             tabPanelviewModel=tabPanel.getViewModel(),
             activeTab=tabPanel.getActiveTab(),
             searchType=activeTab.down('radiofield').getGroupValue();
         
         if(searchType==="regularExpressionSearch"){
             try {
-                var isValidRegexp=new RegExp(val);
+                new RegExp(val);
             } catch (e) {
                 tabPanelviewModel.set('disableSearchButton',true);
                 return activeTab.strings.invalidRegularExpression;
@@ -225,7 +223,7 @@ Ext.define('Editor.view.searchandreplace.SearchTab', {
                 var blArray=searchTab.blackListRegex,
                 arrLength=blArray.length;
                 
-                for (i = 0; i < arrLength; i++){
+                for (var i = 0; i < arrLength; i++){
                     var arrayRegex=blArray[i];
                     if(searchTab.isRegexMatch(arrayRegex,val)){
                         tabPanelviewModel.set('disableSearchButton',true);

@@ -189,16 +189,20 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       var me = this,
           segmentId = segment.get('id'),
           checkTag = me.getDuplicateCheckImg(segmentId, fieldName);
-      if (Ext.isGecko && value=="") {
+      if (Ext.isGecko 
+              && (value === '' || value === checkTag) ) {
           // TRANSLATE-1042: Workaround Firefox
           // - add invisible placeholder, otherwise Firefox might not be able to detect selections correctly (= html instead of the body)
           // - will be removed on saving anyway (or even before during clean-up of the TrackChanges)
-          value = "&#8203;"; 
+          value = '&#8203;'; 
       }
       me.currentSegment = segment;
       me.setValue(me.markupForEditor(value)+checkTag);
       me.statusStrip.updateSegment(segment, fieldName);
       me.fireEvent('afterSetValueAndMarkup');
+      if (Ext.isGecko) {
+          me.getFocusEl().focus(); // TRANSLATE-1042: Workaround Firefox
+      }
   },
   /**
    * Fixing focus issues EXT6UPD-105 and EXT6UPD-137
@@ -306,8 +310,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         	range.setStartAfter(lastNode);
         	range.setEndAfter(lastNode);
         }
-        this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
         this.fireEvent('afterInsertMarkup', rangeForNode);
+        this.fireEvent('saveSnapshot'); // Keep a snapshot from the new content
       }
   },
   setSegmentSize: function(controller, size, oldSize) {

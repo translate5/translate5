@@ -2,7 +2,8 @@ var ComponentEditor={
     
     $_resultTermsHolder:null,
     $_termTable:null,
-	
+    $_termEntryAttributesTable:null,
+    
 	typeRouteMap:[],
 	
 	typeRequestDataKeyMap:[],
@@ -31,6 +32,7 @@ var ComponentEditor={
     cacheDom:function(){
         this.$_resultTermsHolder=$('#resultTermsHolder');
         this.$_termTable=$('#termTable');
+        this.$_termEntryAttributesTable=$('#termEntryAttributesTable');
     },
     
     initEvents:function(){
@@ -51,10 +53,20 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
+		
+		//show info message if the comment attribute mandatory flag is set and the comment component editor is active
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && this.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         console.log('addTermComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
 			$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
+		
+		//reset the flag
+		me.isNew=false;
 		
 		//check if it is new comment attribute
 		if($commentPanel.length === 0 && $element.data('id') > 0){
@@ -87,11 +99,20 @@ var ComponentEditor={
 		$element.replaceWith($input);
         
         Term.drawProposalButtons('componentEditorOpened');
-	  
-		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
-		}).focus();
-	},
+        
+        me.addKeyboardShortcuts($element,$input);
+        
+        me.isComponentEditorActive();
+        
+        me.$_termTable.one('mouseup', '.term-data.proposable .proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.one('mouseup', '.term-data.proposable .proposal-cancel',function() {
+            me.cancelComponentChange($element,$input);
+        });
+        
+        $input.focus();
+    },
 	
 	/***
 	 * Register the component editor for given term or termentry attribute
@@ -102,6 +123,13 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
+		
+		//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         console.log('addAttributeComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text());
@@ -117,10 +145,26 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
         
-		$input.one('blur', function(){
-			me.saveComponentChange($element,$input);
-		});
+        me.addKeyboardShortcuts($element,$input);
         
+        me.isComponentEditorActive();
+        
+        //the attibute can be term attribute or term entry attribute
+        //register the event listeners for both tables because of the deffinition
+        me.$_termEntryAttributesTable.one('mouseup', '.proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termEntryAttributesTable.one('mouseup', '.proposal-cancel',function() {
+    		me.cancelComponentChange($element,$input);
+        });
+        me.$_termTable.one('mouseup', '.proposal-save',function() {
+            me.saveComponentChange($element,$input);
+        });
+        me.$_termTable.one('mouseup', '.proposal-cancel',function() {
+    		me.cancelComponentChange($element,$input);
+        });
+        
+        $input.focus();
         return $input;
 	},
 	
@@ -148,20 +192,63 @@ var ComponentEditor={
 		
 		$element.replaceWith($input);
         
-		$input.focusout(function() {
-			me.saveCommentChange($element,$input);
-	    });
-		
+        me.addKeyboardShortcuts($element,$input);
+
+        me.isComponentEditorActive();
+        
+        me.$_termTable.on('mouseup', '.term-attributes .proposal-save',function() {
+            me.saveCommentChange($element,$input);
+        });
+        me.$_termTable.on('mouseup', '.term-attributes .proposal-cancel',function() {
+        	me.cancelCommentComponentChange($element,$input);
+        });
+        $input.focus();
 		return $input;
 	},
-	
+    
+	/**
+     * Cancel editing the component; don't save the changes.
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    cancelComponentChange:function($element,$input){
+        $input.val(''); // this will force saveComponentChange() to stop the saving.
+        this.saveComponentChange($element,$input);
+    },
+    
+    /**
+     * Cancel editing the comment component
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    cancelCommentComponentChange:function($element,$input){
+    	var isFromTm=$element.text() == proposalTranslations['acceptedFromTmComment'];
+    	//if it is proposalFrom tm, save the default comment text for tm proposal comment
+    	if(isFromTm){
+    		$input.val(proposalTranslations['acceptedFromTmComment']);
+    		//reset the element value, so it is not ignored by cancel request
+    		$element.val('');
+    		$element.text('');
+    	}else{
+    		$input.val('')
+    	}
+    	this.saveCommentChange($element,$input);
+    },
+
+    
+    /**
+     * Save the proposed changes (+ close the editor, update buttons etc).
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
 	saveComponentChange:function($el,$input){
         console.log('saveComponentChange');
         var me=this,
             route,
             dataKey,
             url,
-            requestData={};
+            requestData={},
+            isTerm=$el.data('type')=='term';
         
         Term.drawProposalButtons('componentEditorClosed');
         
@@ -179,11 +266,14 @@ var ComponentEditor={
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$el.text());
 
             $input.replaceWith(componentRenderData);
+            me.isComponentEditorActive();
             return;
         }
         
         //check if the new term request should be canceled (empty value)
         if($input.val() === '' || $.trim($input.val()) === ''){
+        	Term.newTermLanguageId=null;
+        	Term.newTermRfcLanguage=null;
     		Term.findTermsAndAttributes(Term.newTermGroupId);
     		return;
         }
@@ -194,7 +284,7 @@ var ComponentEditor={
 		
 		requestData[dataKey]=$input.val();
 		
-		if(me.isNew){
+		if(me.isNew && isTerm){
 			url=Editor.data.termportal.restPath+'term';
 			requestData={};
 			requestData['collectionId']  =Term.newTermCollectionId;
@@ -202,6 +292,7 @@ var ComponentEditor={
 			requestData['language']      =Term.newTermLanguageId;
             requestData['termEntryId']   =Term.newTermTermEntryId;
 			requestData[dataKey]=$input.val();
+			requestData['isTermProposalFromInstantTranslate']=isTermProposalFromInstantTranslate;
 		}
         
         if (Term.$_searchWarningNewSource.is(":visible")) {
@@ -232,6 +323,16 @@ var ComponentEditor={
             url,
             requestData;
 
+	    
+    	//if the comment panel is mandatory, display the info message
+		if($input.val()=='' && Editor.data.apps.termportal.commentAttributeMandatory){
+			var dialog=showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			dialog.on('dialogclose', function(event) {
+				$input.focus();
+			});
+			return;
+		}
+		
         // don't send the request? then update front-end only.
         if (me.stopRequest($element,$input)){
             
@@ -243,6 +344,7 @@ var ComponentEditor={
                 $termHolder.children('p[data-id="-1"]').remove();
                 $termHolder.children('h4[data-attribute-id="-1"]').remove();
                 $input.replaceWith('');
+                me.isComponentEditorActive();
                 return;
             }
 
@@ -257,7 +359,7 @@ var ComponentEditor={
             componentRenderData=Attribute.getAttributeRenderData(dummyData,$element.text());
 
             $input.replaceWith(componentRenderData);
-            
+            me.isComponentEditorActive();
             return;
 		}
 
@@ -288,18 +390,29 @@ var ComponentEditor={
 			attrType=$element.data('type'),
 		    isTerm=attrType=='term',
 		    renderData=null,
+		    attributeRenderData=null,
 		    $elParent=null,
             $commentPanel,
             dummyCommentAttribute,
-            drawData,
+            drawData='',
             $termAttributeHolder,
             instantTranslateInto,
             activeTabSelector,
             activeTab;
 			
+		
 		if(isTerm){
 			renderData=Term.renderTermData(result);
 			$elParent= Term.getTermHeader($element.data('id'));
+			
+			// (if necessary:) add language to select
+			addLanguageToSelect(result.language, result.languageRfc5646);
+
+			//for the new term, term attribute render data is required
+			if (me.isNew) {
+				var termRflLang=(result.attributes && result.attributes[0].language!=undefined) ? result.attributes[0].language : '';
+				attributeRenderData=Attribute.renderTermAttributes(result,termRflLang);
+			}
 		}else{
 			renderData=Attribute.getAttributeRenderData(result,result.value);
 			
@@ -314,7 +427,12 @@ var ComponentEditor={
 			}
 			$elParent=Attribute.getTermAttributeHeader($element.data('id'),attrType);
 		}
-            
+		
+		//reload the term entry data if term entry results are available
+		if(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]){
+			TermEntry.drawTermEntryAttributes(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
+		}
+		
         // update term-data
         $elParent.attr('data-term-value', result.term);
         $elParent.attr('data-term-id', result.termId);
@@ -329,37 +447,47 @@ var ComponentEditor={
         $input.replaceWith(renderData);
         Term.drawProposalButtons($elParent);
         
+        me.isComponentEditorActive();
+        
         //on the next term click, fatch the data from the server, and update the cache
 		Term.reloadTermEntry=true;
 		
 		if(!isTerm){
 		    // (= we come from editing an attribute, not a term)
-
-			//invert the attribute type, with this the other deffinition is updated to
-			attrType=attrType === 'termEntryAttribute' ? 'termAttribute' : 'termEntryAttribute';
-			
 			//check and update if the attribute is deffinition
-			Attribute.checkAndUpdateDeffinition(result,attrType);
+			Attribute.checkAndUpdateDeffinition(result);
 			return;
 		}
-        
+		$termAttributeHolder = me.$_termTable.find('div[data-term-id="' + result.termId + '"]');
 		//if it is comment, and the comment panel does not exist, add the comment panel after the proposed term is saved
-		$commentPanel=$elParent.find('[data-editable-comment]');
-		
+		$commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 		//the comment field does not exist for the term, create new
 		if($commentPanel.length === 0){
-			dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute');
-			drawData=Attribute.handleAttributeDrawData(dummyCommentAttribute);
+			
 			$termAttributeHolder=me.$_termTable.find('div[data-term-id=-1]');//find the parent term holder (not saved term with termid -1)
 			instantTranslateInto=Term.renderInstantTranslateIntegrationForTerm(result.language);
 			
-			//update the term holder dom with the new temr id
+			//update the term holder dom with the new term id
 			$termAttributeHolder.attr("data-term-id",result.termId);
 			$termAttributeHolder.attr("data-groupid",result.groupId);
 			
-			
+			//for the new term, render the attributes to
+			if(me.isNew && attributeRenderData && attributeRenderData!=''){
+				drawData+=attributeRenderData;
+	        }
+
 			//attach the comment attribute draw data to the term holder
 			$termAttributeHolder.prepend(drawData);
+			
+			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
+			if($commentPanel.length === 0){
+				var commentValue=isTermProposalFromInstantTranslate ? proposalTranslations['acceptedFromTmComment'] : null;
+
+				dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute',commentValue);
+				
+				$termAttributeHolder.prepend(Attribute.handleAttributeDrawData(dummyCommentAttribute));
+			}
+			
 
 			//render the instant translate into select
 			if(instantTranslateInto){
@@ -388,10 +516,15 @@ var ComponentEditor={
             
 	            $commentPanel=$termAttributeHolder.find('[data-editable-comment]');
 	            if($commentPanel.length>0 && $commentPanel.prop('tagName') === 'SPAN'){
-	                this.addCommentAttributeEditor($commentPanel);
+	                me.addCommentAttributeEditor($commentPanel);
 	            }
 			}
 		}
+		
+        // "reset", is valid only once (= when coming from TermPortal)
+        if(isTermProposalFromInstantTranslate) {
+            isTermProposalFromInstantTranslate = false;
+        }
     },
 	
     /**
@@ -412,6 +545,53 @@ var ComponentEditor={
             }
         }
         return false;
+    },
+    
+    /**
+     * Add keyboard-shortcuts for the component.
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    addKeyboardShortcuts: function($element, $input) {
+        var me = this;
+        $input.keydown(function(e){
+        	if (e.ctrlKey && e.which === 83) { // CTRL+S
+                event.preventDefault();
+                if($element.data('editableComment')!=undefined){
+                	me.saveCommentChange($element,$input);
+                }else{
+                	me.saveComponentChange($element,$input);
+                }
+            }
+            if (e.which === 27) {              // ESCAPE
+                event.preventDefault();
+                if($element.data('editableComment')!=undefined){
+                	me.cancelCommentComponentChange($element,$input);
+                }else{
+                	me.cancelComponentChange($element,$input);
+                }
+            }
+        });
+    },
+    
+    /***
+     * Check and hide the instant translate combo if the component editor is active
+     */
+    isComponentEditorActive:function(){
+    	var me=this,
+    		editorExist=me.$_termTable.find('textarea').length>0,
+    		translateToCombos=me.$_termTable.find('.instanttranslate-integration');
+		translateToCombos.each(function(index,cmp){
+			editorExist ? $(cmp).hide() :$(cmp).show(); 
+		});
+    },
+    
+    /***
+     * Check if the comment component editor is active
+     */
+    isCommentComponentEditorActive:function(){
+    	var commentEditors=this.$_termTable.find('textarea[data-editable-comment]');
+		return commentEditors.length>0;
     }
 };
 

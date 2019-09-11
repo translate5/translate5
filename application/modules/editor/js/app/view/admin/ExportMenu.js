@@ -74,7 +74,7 @@ Ext.define('Editor.view.admin.ExportMenu', {
   /**
    * Adds the Excel Export option if allowed
    */
-  addExcelExport(task) {
+  addExcelExport: function(task) {
       var me = this;
       if(!Editor.app.authenticatedUser.isAllowed('editorExcelreexportTask', task)) {
           return;

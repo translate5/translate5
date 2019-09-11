@@ -38,11 +38,18 @@ END LICENSE AND COPYRIGHT
  * @initalGenerated
  */
 Ext.define('Editor.view.segments.column.Editable', {
-  extend: 'Editor.view.ui.segments.column.Editable',
+  extend: 'Ext.grid.column.Column',
   alias: 'widget.editableColumn',
   mixins: ['Editor.view.segments.column.BaseMixin'],
+  
+  dataIndex: 'editable',
+  text: 'Gesperrt',
+  
   filter: {
-       type: 'boolean'
+       type: 'boolean',
+       //yes / no must be flipped, since in DB its editable, but in GUI we speak from blocked (so negated)
+       yesText: Ext.grid.filters.filter.Boolean.prototype.noText,
+       noText: Ext.grid.filters.filter.Boolean.prototype.yesText
   },
   editor: {
     xtype: 'displayfield',
@@ -64,10 +71,10 @@ Ext.define('Editor.view.segments.column.Editable', {
    */
   renderer : function(value){
     var cssPrefix = Ext.baseCSSPrefix,
-        cls = [cssPrefix + 'grid-checkheader'];
+        cls = [cssPrefix + 'grid-checkcolumn'];
 
     if (! value) {
-        cls.push(cssPrefix + 'grid-checkheader-checked');
+        cls.push(cssPrefix + 'grid-checkcolumn-checked');
     }
     return '<div class="' + cls.join(' ') + '">&#160;</div>';
   }

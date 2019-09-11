@@ -170,7 +170,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             firstType, useAsLabel,
             prefix = value.shift(), //import, edited, pretranslated
             isImport = (prefix == 'import'),
-            resourceName='',
+            label = '',
             translate = function(value) {
                 return me.strings.type[value] || value;
             },
@@ -210,7 +210,7 @@ Ext.define('Editor.view.segments.column.MatchrateType', {
             return '';
         }
         //unknown, when the given value is not registered in translate5
-        if(firstType == 'unknown' || prefix == 'pretranslated') {
+        if(firstType == 'unknown' || prefix == 'pretranslated' && firstType != 'source') {
             useAsLabel = value.shift(); //when unknown remove it to prevent a not found image, the real value is in the next field
         }
 

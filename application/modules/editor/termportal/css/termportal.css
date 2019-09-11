@@ -115,6 +115,7 @@ END LICENSE AND COPYRIGHT
     flex: 1 1 auto;
 }
 #searchFilterTags {
+    background-color: #eee;
     flex: 1 1 60%;
 }
 #search,
@@ -266,7 +267,6 @@ h4, p {
 
 .term-data .proposal-btn.ui-icon,                                   /* Term: add, delete, edit */
 .attribute-data .proposal-btn {                                     /* Attribute: delete, edit */
-    float: right;
     margin-left: 5px;
 }
 .term-data .proposal-btn.proposal-add {                             /* Term: add  */
@@ -291,9 +291,7 @@ h4, p {
     color: #c5c5c5;
     width: 100%;
 }
-.term-data.is-new.ui-accordion-header-collapsed .proposal-add {
-    display: block;
-}
+
 .term-data.is-new.ui-accordion-header-active .proposal-add {
     display: none;
 }

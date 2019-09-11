@@ -585,6 +585,32 @@ Ext.define('Editor.util.Range', {
     },
     
     // =========================================================================
+    // Workarounds
+    // =========================================================================
+    
+    /**
+     * Surrounds the given range with the given node.
+     * Usually easy, but surroundContents() does not work 
+     * as long as the node is not recognized in the same document.
+     */
+    surroundRangeWithNode: function (range, node) {
+        var me = this;
+        
+        // Problem: see https://stackoverflow.com/a/17282924
+        // console.dir(range.commonAncestorContainer.ownerDocument);
+        // console.dir(node.ownerDocument);
+        
+        // => Hack for identifying trouble that would cause Wrong-Document-Errors (eg in IE 11):
+        if (!me.getEditorBodyExtDomElement().contains(node)) {
+            // (here:) me.getEditorBody().contains(node) => WrongDocumentError
+            // Workaround: add the node manually:
+            me.getEditorBody().appendChild(node);
+        }
+        
+        range.surroundContents(node);
+    },
+    
+    // =========================================================================
     // Workarounds for buggy Bookmarks of Rangy
     // =========================================================================
     // Rangy is buggy (eg when the cursor is right BEHIND an MQM-Tag, 
@@ -607,7 +633,13 @@ Ext.define('Editor.util.Range', {
         var me = this,
             contentBeforeRange;
         contentBeforeRange = me.getContainerForCharacterNextToCaret(range,'previous');
-        return (contentBeforeRange !=  null && "nodeType" in contentBeforeRange && contentBeforeRange.nodeType === 1 
+        if (contentBeforeRange === null || contentBeforeRange === undefined) {
+            return false;
+        }
+        if (typeof contentBeforeRange !== 'object') {
+            return false;
+        }
+        return ('nodeType' in contentBeforeRange && contentBeforeRange.nodeType === 1 
                 && ( me.isMQMTag(contentBeforeRange) || me.isContentTag(contentBeforeRange) ) );
     },
     /**
@@ -618,7 +650,10 @@ Ext.define('Editor.util.Range', {
      * @returns {Boolean}
      */
     isBookmarkOfWorkaround: function(bookmark) {
-        return ("nodeType" in bookmark && bookmark.nodeType === 1);
+        if (typeof bookmark !== 'object') {
+            return false;
+        }
+        return ('nodeType' in bookmark && bookmark.nodeType === 1);
     },
     
     // -------------------------------------------------------------------------

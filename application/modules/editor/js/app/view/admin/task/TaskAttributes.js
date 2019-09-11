@@ -27,7 +27,7 @@ END LICENSE AND COPYRIGHT
 */
 
 Ext.define('Editor.view.admin.task.TaskAttributes', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.form.Panel',
     //requires: ['Editor.view.admin.task.TaskAttributesViewController'],
     requires: [
         'Editor.view.admin.task.TaskAttributesViewController',
@@ -45,6 +45,14 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         btnCancel:'#UT#Abbrechen',
         btnReload: '#UT#Aktualisieren',
         loadingMask:'#UT#Aktualisieren',
+        fullMatchLabel: '#UT#100% Matches sind editierbar',
+        editTrue:'#UT#Ja',
+        editFalse:'#UT#Nein',
+        usageModeTitle: "#UT#Mehrere Benutzer",
+        usageModeInfo: "#UT#Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden",
+        usageModeDisabled: "#UT#Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.",
+        usageModeCoop: "#UT#Mehrere Benutzer bearbeiten dieselbe Aufgabe",
+        usageModeCompetitive: "#UT#Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen."
     },
     itemId:'taskAttributesPanel',
     controller:'taskattributesviewcontroller',
@@ -60,12 +68,10 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         config = {
             title: me.title, //see EXT6UPD-9
             bodyPadding: 10,
-            xtype: 'form',
-            width: '100%',
             frame: true,
             defaults: {
                 labelWidth: 200,
-                anchor: '100%'
+                anchor: '60%'
             },
             items:allowedItems,
             dockedItems: [
@@ -122,161 +128,81 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
     getAllowedFields:function(){
         var me=this,
             auth = Editor.app.authenticatedUser,
-            items=[];
+            items=[], dateRenderer = function(value, displayField) {
+                return Ext.Date.format(value, Ext.Date.defaultFormat);
+            };
 
         items.push({
             xtype: 'displayfield',
             fieldLabel: me.strings.customerName,
-            renderer: me.customerRenderer,
-            bind:{
-                value:'{currentTask.customerId}'
-            }
+            name: 'customerId',
+            renderer: me.customerRenderer
         });
         
         //TODO: the displayfield value is not selectable
         //EXTJSBUG: https://www.sencha.com/forum/showthread.php?330319-Value-not-selectable-in-display-and-text-fields-under-6-2-0
         //is the user allowed to edit the task name
-        if(auth.isAllowed('editorEditTaskTaskName')) {
-            items.push({
-                xtype: 'textfield',
-                fieldLabel: me.strings.taskName,
-                dataIndex:'taskName',
-                itemId:'taskName',
-                bind:{
-                    value:'{currentTask.taskName}'
-                }
-            });
-        }else{
-            items.push({
-                xtype: 'displayfield',
-                fieldLabel: me.strings.taskName,
-                bind:{
-                    value:'{currentTask.taskName}'
-                }
-            });
-        }
+        items.push({
+            xtype: auth.isAllowed('editorEditTaskTaskName') ? 'textfield' : 'displayfield',
+            fieldLabel: me.strings.taskName,
+            name:'taskName',
+            itemId:'taskName'
+        });
 
-        //is the user allowed to edit the project manager and is allowed to edit all tasks
-        if(auth.isAllowed('editorEditTaskPm') && auth.isAllowed('editorEditAllTasks')) {
-            items.push({
-                xtype: 'combo',
-                fieldLabel: me.strings.pmGuid,
-                allowBlank: false,
-                typeAhead: false,
-                forceSelection: true,
-                anyMatch: true,
-                queryMode: 'local',
-                dataIndex: 'pmGuid',
-                itemId: 'pmGuid',
-                displayField: 'longUserName',
-                valueField: 'userGuid',
-                listConfig: {
-                    loadMask: false
-                },
-                bind:{
-                    value:'{currentTask.pmGuid}'
-                },
-                store: Ext.create('Ext.data.Store',{
-                    autoLoad: true,
-                    model: 'Editor.model.admin.User',
-                    pageSize: 0,
-                    proxy : {
-                        type : 'rest',
-                        url: Editor.data.restpath+'user/pm',
-                        extraParams: {
-                            sort: '[{"property":"surName","direction":"ASC"},{"property":"firstName","direction":"ASC"}]'
-                        },
-                        reader : {
-                            rootProperty: 'rows',
-                            type : 'json'
-                        }
-                    }
-                })
-            });
-        }else{
-            items.push({
-                xtype: 'displayfield',
-                fieldLabel: me.strings.pmGuid,
-                bind:{
-                    value:'{currentTask.pmName}'
-                }
-            });
-        }
+        items.push(me.getPmFieldConfig());
 
-        //is the user allowed to edit the delivery date
-        if(auth.isAllowed('editorEditTaskDeliveryDate')) {
-            items.push({
-                xtype: 'datefield',
-                fieldLabel: me.strings.deliveryDate,
-                dataIndex:'targetDeliveryDate',
-                itemId:'targetDeliveryDate',
-                bind:{
-                    value:'{currentTask.targetDeliveryDate}'
-                }
-
-            });
-        }else{
-            items.push({
-                xtype: 'displayfield',
-                fieldLabel: me.strings.deliveryDate,
-                renderer: function(value, displayField) {
-                    return Ext.Date.format(value, Ext.Date.defaultFormat);
-                },
-                bind:{
-                    value:'{currentTask.targetDeliveryDate}'
-                }
-            });
-        }
-
-        //is the user allowed to edit the real delivery date
-        if(auth.isAllowed('editorEditTaskRealDeliveryDate')) {
-            items.push({
-                xtype: 'datefield',
-                fieldLabel: me.strings.realDeliveryDate,
-                dataIndex:'realDeliveryDate',
-                itemId:'realDeliveryDate',
-                bind:{
-                    value:'{currentTask.realDeliveryDate}'
-                }
-            });
-        }else{
-            items.push({
-                xtype: 'displayfield',
-                fieldLabel: me.strings.realDeliveryDate,
-                renderer: function(value, displayField) {
-                    return Ext.Date.format(value, Ext.Date.defaultFormat);
-                },
-                bind:{
-                    value:'{currentTask.realDeliveryDate}'
-                }
-            });
-        }
-
-        //is the user allowed to edit the order date
-        if(auth.isAllowed('editorEditTaskOrderDate')) {
-            items.push({
-                xtype: 'datefield',
-                fieldLabel: me.strings.orderDate,
-                dataIndex:'orderdate',
-                itemId:'orderdate',
-                bind:{
-                    value:'{currentTask.orderdate}'
-                }
-            });
-        }else{
-            items.push({
-                xtype: 'displayfield',
-                fieldLabel: me.strings.orderDate,
-                renderer: function(value, displayField) {
-                    return Ext.Date.format(value, Ext.Date.defaultFormat);
-                },
-                bind:{
-                    value:'{currentTask.orderdate}'
-                }
-            });
-        }
-
+        items.push(me.applyIfNotAllowed({
+            xtype: 'datefield',
+            fieldLabel: me.strings.deliveryDate,
+            name:'targetDeliveryDate',
+            itemId:'targetDeliveryDate'
+        },'editorEditTaskDeliveryDate',{
+            xtype: 'displayfield',
+            renderer: dateRenderer
+        }));
+        
+        items.push(me.applyIfNotAllowed({
+            xtype: 'datefield',
+            fieldLabel: me.strings.realDeliveryDate,
+            name:'realDeliveryDate',
+            itemId:'realDeliveryDate'
+        },'editorEditTaskRealDeliveryDate',{
+            xtype: 'displayfield',
+            renderer: dateRenderer
+        }));
+        
+        items.push(me.applyIfNotAllowed({
+            xtype: 'datefield',
+            fieldLabel: me.strings.orderDate,
+            name:'orderdate',
+            itemId:'orderdate'
+        },'editorEditTaskOrderDate',{
+            xtype: 'displayfield',
+            renderer: dateRenderer
+        }));
+        
+        //is the user allowed to edit the Edit100PercentMatch
+        items.push(me.applyIfNotAllowed({
+            xtype: 'checkbox',
+            fieldLabel:me.strings.fullMatchLabel,
+            name:'edit100PercentMatch',
+            itemId:'edit100PercentMatch'
+        },'editorEditTaskEdit100PercentMatch',{
+            xtype: 'displayfield',
+            renderer: function(value, displayField) {
+                return value ? me.strings.editTrue : me.strings.editFalse;
+            }
+        }));
+        
+        me.setUsageModeConfig(items);
+        
         return items;
+    },
+    applyIfNotAllowed: function(baseItem, right, overwrite) {
+        if(Editor.app.authenticatedUser.isAllowed(right)) {
+            return baseItem;
+        }
+        return Ext.apply(baseItem, overwrite);
     },
     customerRenderer : function(val) {
         if (val == undefined) {
@@ -285,5 +211,94 @@ Ext.define('Editor.view.admin.task.TaskAttributes', {
         var customersStore = Ext.StoreManager.get('customersStore'),
             customer = customersStore && customersStore.getById(val);
         return customer ? customer.get('name') : '';
+    },
+    /**
+     * Adds the usage mode radio box to the items list if allowed
+     */
+    setUsageModeConfig: function(items) {
+        var me=this,
+            auth = Editor.app.authenticatedUser;
+        //without task user assoc view, this setting may also not be visible 
+        if(!auth.isAllowed('editorChangeUserAssocTask')) {
+            return;
+        }
+        items.push({
+            xtype      : 'radiogroup',
+            fieldLabel : me.strings.usageModeTitle,
+            columns: 1,
+            anchor: '100%',
+            items: [
+                {
+                    xtype: 'component', 
+                    html: me.strings.usageModeInfo, 
+                    cls:'x-form-check-group-label'
+                },{
+                    xtype: 'component', 
+                    html: me.strings.usageModeDisabled,
+                    bind: {
+                        hidden:'{!disableUsageMode}'
+                    }
+                },{
+                    //readonly bind: admin.TaskUserAssocs mit Inhalt
+                    boxLabel  : me.strings.usageModeCoop,
+                    name      : 'usageMode',
+                    inputValue: 'cooperative',
+                    bind: {
+                        disabled:'{disableUsageMode}'
+                    }
+                }, {
+                    //readonly bind: admin.TaskUserAssocs mit Inhalt
+                    boxLabel  : me.strings.usageModeCompetitive,
+                    name      : 'usageMode',
+                    inputValue: 'competitive',
+                    bind: {
+                        disabled:'{disableUsageMode}'
+                    }
+                }
+            ]
+        });
+    },
+    getPmFieldConfig: function() {
+        var me=this,
+            auth = Editor.app.authenticatedUser;
+        if(!auth.isAllowed('editorEditTaskPm') || !auth.isAllowed('editorEditAllTasks')) {
+            return {
+                xtype: 'displayfield',
+                name: 'pmGuid',
+                fieldLabel: me.strings.pmGuid
+            };
+        }
+        return {
+            xtype: 'combo',
+            fieldLabel: me.strings.pmGuid,
+            allowBlank: false,
+            typeAhead: false,
+            forceSelection: true,
+            anyMatch: true,
+            queryMode: 'local',
+            name: 'pmGuid',
+            itemId: 'pmGuid',
+            displayField: 'longUserName',
+            valueField: 'userGuid',
+            listConfig: {
+                loadMask: false
+            },
+            store: Ext.create('Ext.data.Store',{
+                autoLoad: true,
+                model: 'Editor.model.admin.User',
+                pageSize: 0,
+                proxy : {
+                    type : 'rest',
+                    url: Editor.data.restpath+'user/pm',
+                    extraParams: {
+                        sort: '[{"property":"surName","direction":"ASC"},{"property":"firstName","direction":"ASC"}]'
+                    },
+                    reader : {
+                        rootProperty: 'rows',
+                        type : 'json'
+                    }
+                }
+            })
+        };
     }
   });

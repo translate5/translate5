@@ -1,6 +1,7 @@
 var Attribute={
 	$_termTable:null,
 	$_termEntryAttributesTable:null,
+	$_resultTermsHolder:null,
 	
 	languageDefinitionContent:[],
 	
@@ -15,6 +16,7 @@ var Attribute={
 	cacheDom:function(){
         this.$_termTable=$('#termTable');
         this.$_termEntryAttributesTable = $('#termEntryAttributesTable');
+        this.$_resultTermsHolder=$('#resultTermsHolder');
 	},
 	
 	onAttributeEditingOpened: function() {
@@ -28,64 +30,35 @@ var Attribute={
         me.$_termEntryAttributesTable.on('focus input', "textarea",me.onAttributeEditingOpened);
         
         // ------------- TermEntries-Attributes -------------
-        // - Icons
         me.$_termEntryAttributesTable.on('click', ".proposal-add",{scope:me},me.onAddTermEntryAttributeClick);
-        me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
-        me.$_termEntryAttributesTable.on('click', ".attribute-data.proposable .proposal-edit",{
+        me.$_termEntryAttributesTable.on('click', ".proposal-delete",{scope:me,root:me.$_termEntryAttributesTable},me.onDeleteAttributeClick);
+        me.$_termEntryAttributesTable.on('click', ".proposal-edit",{
             scope:me,
-            type:'termEntryAttribute',
-            reference: 'icon'
-        },me.onEditAttributeClick);
-        // - Content
-        me.$_termEntryAttributesTable.on('click', '.attribute-data.proposable ~ [data-type="termEntryAttribute"] [data-editable][data-type="termEntryAttribute"]',{
-            scope:me,
-            type:'termEntryAttribute',
-            reference: 'content'
+            type:'termEntryAttribute'
         },me.onEditAttributeClick);
         
         // ------------- Terms-Attributes -------------
-        // - Icons
         me.$_termTable.on('click', ".term-attributes .proposal-add",{scope:me},me.onAddTermAttributeClick);
         me.$_termTable.on('click', ".attribute-data.proposable .proposal-delete",{scope:me,root:me.$_termTable},me.onDeleteAttributeClick);
         me.$_termTable.on('click', ".attribute-data.proposable .proposal-edit",{
         	scope:me,
         	root:me.$_termTable,
-        	type:'termAttribute',
-            reference: 'icon'
+        	type:'termAttribute'
     	},me.onEditAttributeClick);
-        // - Content
-        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable][data-type="termAttribute"]',{
-            scope:me,
-            type:'termAttribute',
-            reference: 'content'
-        },me.onEditAttributeClick);
-        
-        //handle the definition to (the termentryattibute-deffinition is also visible in the term table)
-        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termEntryAttribute"] [data-editable][data-type="termEntryAttribute"]',{
-            scope:me,
-            type:'termEntryAttribute',
-            reference: 'content'
-        },me.onEditAttributeClick);
-        
-        // - Comment
-        me.$_termTable.on('click', '.attribute-data.proposable ~ [data-type="termAttribute"] [data-editable-comment][data-type="termAttribute"]',{
-            scope:me,
-            type:'termAttribute',
-            reference: 'comment'
-        },me.onEditAttributeClick);
 	},
     
     /***
      * Render term attributes by given term
      * 
-     * @param attributes
+     * @param term
      * @param termLang
      * @returns {String}
      */
-    renderTermAttributes:function(attributes,termLang){
+    renderTermAttributes:function(term,termLang){
         var me=this,
             html = [],
-            commentAttribute=[];
+            commentAttribute=[],
+            attributes=term.attributes;
         
         if(me.languageDefinitionContent[termLang]){
             html.push(me.languageDefinitionContent[termLang]);
@@ -125,31 +98,42 @@ var Attribute={
      * On edit term-attribute click handler
      */
     onEditAttributeClick: function(event){
-        console.log('onEditAttributeClick');
     	var me=event.data.scope,
 	    	type=event.data.type,
-            reference = event.data.reference,
-	        $element=$(this),
-			attributeId,
-            $editableComponent,
-            $input;
-        console.log('onEditAttributeClick ('+reference+')');
+	    	targetAttribute= $(event.currentTarget),
+	    	attributeHeader=targetAttribute.parents('h4.attribute-data'),
+	    	attributeId = attributeHeader.data('attributeId'),
+	    	$attributeBtn = attributeHeader.children('.proposal-edit'),
+            $input=null,
+            $editableComponent=null,
+            termHolder=null;
+            
+        console.log('onEditAttributeClick');
+        
+        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
+        // In tbx, "definition" belongs to the <langSet> (= level between <termEntry> and <term>).
+        // In the TermPoral, the user can edit definitions only in the termEntry-Attributes,
+        // not on the level of each individual term.
+        if (type === 'termAttribute' && attributeHeader.hasClass('is-definition')) {
+            $('#editDefinitionMsg').dialog({
+                position: { my: 'left top', at: 'left top', of: $attributeBtn }
+            });
+            $('#editDefinitionMsg').dialog('open');
+            return;
+        }
+        
+        if(!attributeId || attributeId<1 || attributeHeader.hasClass('is-definition')){
+        	termHolder=targetAttribute.parents('div.term-attributes');
+        }
+        $editableComponent = me.getAttributeComponent(attributeId,type,termHolder);
         
         event.stopPropagation();
         
-        switch(reference) {
-            case "comment":
-                $editableComponent = $element;
-                break;
-            case "content":
-                $editableComponent = $element;
-                break;
-            case "icon":
-                attributeId = $element.parents('h4.attribute-data').data('attributeId');
-                $editableComponent = me.getAttributeComponent(attributeId,type);
-                break;
-    	}
-	
 		if($editableComponent === null || $editableComponent === undefined || $editableComponent.length === 0){
 			return;
 		}
@@ -191,6 +175,12 @@ var Attribute={
             yesCallback,
             yesText;
         
+        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         $parent=$element.parents('h4.attribute-data');//the button parrent
 		if($parent.length === 0){
 			return;
@@ -231,8 +221,7 @@ var Attribute={
 		    		
 		        	//the term attribute is definition, remove and update the content for the term and term entry attribute definition dom
 		    		if(attributeData.attrType === 'definition'){
-		    			me.checkAndUpdateDeffinition(attributeData,'termEntryAttribute');
-		    			me.checkAndUpdateDeffinition(attributeData,'termAttribute');
+		    			me.checkAndUpdateDeffinition(attributeData);
 		    			return;
 		    		}
 		    		
@@ -294,6 +283,7 @@ var Attribute={
             headerText = '',
             attVal,
             flagContent = '',
+            isDefinition='',
             childData=[],
             childDataText;
             
@@ -305,13 +295,17 @@ var Attribute={
             isProposal = ' is-proposal';
         }
         
-        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + '" data-attribute-id="'+attribute.attributeId+'">';
+        if(attribute.attrType === "definition"){
+        	isDefinition=' is-definition ';
+        }
+        
+        headerTagOpen='<h4 class="ui-widget-header ui-corner-all attribute-data' + proposable + isProposal + isDefinition +'" data-attribute-id="'+attribute.attributeId+'">';
         headerTagClose='</h4>';
         
 	    switch(attribute.name) {
 	        case "transac":
 	            
-	            header=me.handleAttributeHeaderText(attribute,true);
+	            header=me.handleAttributeHeaderText(attribute,false);
 	            
 	            html += headerTagOpen + header + headerTagClose;
 	            
@@ -344,7 +338,7 @@ var Attribute={
 	            if(flagContent && flagContent!=""){
 	                headerText =me.handleAttributeHeaderText(attribute,false)+flagContent;
 	            }else{
-	                headerText =me.handleAttributeHeaderText(attribute)+":";
+	                headerText =me.handleAttributeHeaderText(attribute,false);
 	            }
 	            
 	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
@@ -367,7 +361,7 @@ var Attribute={
 	            
 	            attVal=me.getAttributeValue(attribute);
 	            
-	            headerText = me.handleAttributeHeaderText(attribute,true);
+	            headerText = me.handleAttributeHeaderText(attribute,false);
 	            
 	            html=headerTagOpen + headerText + headerTagClose +me.getAttributeContainerRender(attribute,attVal);
 	            break;
@@ -377,38 +371,51 @@ var Attribute={
 	
 	/***
 	 * Check if the attribute is of type deffinition. When it is deffinition, update the definitiona attribute 
-	 * in the term or termentry area deppending on attrType param
+	 * in the term and termentry area
 	 */
-	checkAndUpdateDeffinition:function(attribute,attrType){
-		
+	checkAndUpdateDeffinition:function(attribute){
 		if(attribute.attrType !== 'definition' || !Editor.data.app.user.isTermProposalAllowed){
 			return false;
 		}
 		
+		if(!attribute.proposal){
+			this.removeDomProposal(this.$_termTable,attribute);
+			this.removeDomProposal(this.$_termEntryAttributesTable,attribute);
+			return;
+		}
+
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
-			$elParent=me.getTermAttributeHeader(attribute.attributeId,attrType),
-			$input=me.getAttributeComponent(attribute.attributeId,attrType);
-	        
+			$attributes = me.$_resultTermsHolder.find('span[data-editable][data-type][data-id="'+attribute.attributeId+'"]');
 		
-		//check for proposal and update the classes
-		if(!attribute.proposal){
-			$elParent.switchClass('is-proposal','is-finalized');
-		}else{
-			// update term-data
-			$elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
-			$elParent.removeClass('in-editing');
-		}
-	    
-		if($input.children('ins').length === 1){
-			renderData=me.getAttributeContainerRender(attribute,renderData);
-		}
+		$attributes.each(function(i,att){
+			att=$(att);
+			att.empty();
+			att.replaceWith(renderData);
+		});
 		
-	    $input.replaceWith(renderData);
-	    
-	    Term.drawProposalButtons($elParent);
+		Term.drawProposalButtons('componentEditorClosed');
 	    Term.reloadTermEntry=true;
 	    return true;
+	},
+	
+	/***
+	 * Remove attribute dom poroposal and replace the new values
+	 */
+	removeDomProposal:function(root,attributeData){
+		//the term proposal is removed, find the attribute holder and render the initial term proposable content
+    	var me=this,
+    		renderData=me.getAttributeRenderData(attributeData,attributeData.value),
+    		$proposalHolder=root.find('p[data-type="'+attributeData.attributeOriginType+'"][data-id="'+attributeData.attributeId+'"]'),
+    		$ins=$proposalHolder.find('ins'),
+    		$parrent=root.find('h4[data-attribute-id="'+attributeData.attributeId+'"]');
+    		
+		$ins.replaceWith(renderData);
+    	$proposalHolder.find('del').remove();
+    	$parrent.switchClass('is-proposal','is-finalized');
+    	$parrent.each(function(i,att){
+			Term.drawProposalButtons($(att));
+		});
 	},
 	
 	/***
@@ -521,23 +528,22 @@ var Attribute={
 	/***
 	 * Return jquery component of the term/termenty attribute
 	 */
-	getAttributeComponent:function(attributeId,type){
+	getAttributeComponent:function(attributeId,type,selector){
 		var me=this,
-			$selector=null,
 			$el;
-		if(type === 'termEntryAttribute'){
-			$selector=me.$_termEntryAttributesTable;
+		if((!selector || selector.length==0) && type === 'termEntryAttribute'){
+			selector=me.$_termEntryAttributesTable;
 		}
-		if(type === 'termAttribute'){
-			$selector=me.$_termTable;
+		if((!selector || selector.length==0) && type === 'termAttribute'){
+			selector=me.$_termTable;
 		}
-		if(!$selector){
+		if(!selector){
 			return null;
 		}
 		// sometimes the attribute is still in span, sometimes in p > textarea already
-		$el = $selector.find('span[data-id="'+attributeId+'"]');
+		$el = selector.find('span[data-id="'+attributeId+'"]');
 		if ($el.length === 0) {
-		    $el = $selector.find('p[data-id="'+attributeId+'"]');
+		    $el = selector.find('p[data-id="'+attributeId+'"]');
 		}
 		return $el;
 	},
@@ -561,14 +567,15 @@ var Attribute={
     /**
      * Returns comment "dummy" attributes for creating a new comment.
      * @param: attributeOriginType origin type of the attribute
+     * @param: attrValue comment initial value
      * @returns {Array}
      */
-    renderNewCommentAttributes: function(attributeOriginType) {
+    renderNewCommentAttributes: function(attributeOriginType,attrValue) {
         return {
             attributeId:-1,
             name:'note',
             headerText:this.findTranslatedAttributeLabel('note',null),
-            attrValue:'',
+            attrValue:attrValue ? attrValue : '',
             attrType:null,
             proposable:true,
             attributeOriginType:attributeOriginType

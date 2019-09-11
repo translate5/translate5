@@ -83,6 +83,19 @@ Ext.define('Editor.util.SegmentEditor', {
     },
     
     // =========================================================================
+    // Helpers regarding the Segment-Editor
+    // =========================================================================
+    
+    /***
+     * Enable/disable the Segment-Editor.
+     * @param {Boolean} disabled
+     */
+    setEditorDisabled:function(disabled){
+        var me = this;
+        me.editor.setDisabled(disabled);
+    },
+    
+    // =========================================================================
     // Helpers regarding the (content in the) Segment-Editor
     // =========================================================================
     
@@ -177,31 +190,6 @@ Ext.define('Editor.util.SegmentEditor', {
         var me = this,
             idPrefix = me.editor.idPrefix; // s. Editor.view.segments.HtmlEditor
         return Ext.String.startsWith(node.id, idPrefix);
-    },
-    /**
-     * Position the caret "at the end" of the Editor.
-     * @returns {Boolean} 
-     */
-    positionCaretAtEnd: function() {
-        var me = this,
-            lastNodeInEditor = me.getLastRelevantNodeInEditor('fromEnd'),
-            rangeForCaret = rangy.createRange();
-        if (lastNodeInEditor == null) {
-            lastNodeInEditor = me.getLastNodeInEditor('fromEnd');
-        }
-        me.consoleLog("isEmptyEditor => lastNodeInEditor:");
-        me.consoleLog(lastNodeInEditor);
-        if (lastNodeInEditor != null ) {
-            rangeForCaret.setEndAfter(lastNodeInEditor);
-            rangeForCaret.collapse();
-            me.setSingleRangeInEditor(rangeForCaret);
-            me.rangeForEvent = rangeForCaret;
-            return true;
-        }
-        if(me.USE_CONSOLE) {
-            debugger;
-        }
-        return false;
     },
     /**
      * Returns the content in the Editor taking into account its tags:

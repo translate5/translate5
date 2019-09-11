@@ -87,7 +87,7 @@ Ext.define('Editor.controller.LanguageResources', {
               viewModeChanged:'viewModeChangeEvent'
           },
           '#Editor.plugins.TrackChanges.controller.Editor':{
-              setLanguageResourceValueForEditor:'setLanguageResourceValueForEditor'
+              setValueForEditor:'setValueForEditor'
           }
       }
   },
@@ -158,10 +158,9 @@ Ext.define('Editor.controller.LanguageResources', {
           editor = plug.editor,
           task = Editor.data.task,
           rec = plug.context.record,
-          contentTags,
           matchrate = matchRecord.get('matchrate');
 
-      if(matchRecord.get('state')!=me.SERVER_STATUS.SERVER_STATUS_LOADED){
+      if(matchRecord.get('state') !== me.SERVER_STATUS.SERVER_STATUS_LOADED){
           return;
       }
       
@@ -172,8 +171,8 @@ Ext.define('Editor.controller.LanguageResources', {
       }
       if(plug.editing && rec && rec.get('editable')) {
           //Editor.MessageBox.addInfo("Show a message on take over content?");
-          me.setLanguageResourceValueForEditor(matchRecord.get('target'));
-          me.fireEvent('beforeSetValueAndMarkup',matchRecord.get('target')); // if TrackChanges are activated, DEL- and INS-markups are added first and then setLanguageResourceValueForEditor is applied from there (= again, but so what)
+          me.setValueForEditor(matchRecord.get('target'));
+          me.fireEvent('prepareCompleteReplace',matchRecord.get('target'),false); // if TrackChanges are activated, DEL- and INS-markups are added first and then setValueForEditor is applied from there (= again, but so what)
           editor.mainEditor.setValueAndMarkup(me.languageResourceValueForEditor, rec, editor.columnToEdit);
           //we don't support the matchrate saving for tasks with alternatives:
           if(task.get('defaultSegmentLayout')) {
@@ -184,7 +183,7 @@ Ext.define('Editor.controller.LanguageResources', {
           }
       }
   },
-  setLanguageResourceValueForEditor: function(value) {
+  setValueForEditor: function(value) {
       var me = this;
       me.languageResourceValueForEditor = value;
   },
@@ -208,7 +207,7 @@ Ext.define('Editor.controller.LanguageResources', {
       }
   },
   loadAssocStore: function(){
-      var me = this
+      var me = this,
           taskGuid = Editor.data.task.get('taskGuid'),
           prm = {
                 params: {
@@ -219,7 +218,7 @@ Ext.define('Editor.controller.LanguageResources', {
           };
       me.assocStore = Ext.create('Ext.data.Store', {
           model: 'Editor.model.LanguageResources.TaskAssoc'
-      }),
+      });
       me.assocStore.load(prm);
   },
   addEditorPanelToViewPort: function() {
@@ -269,11 +268,11 @@ Ext.define('Editor.controller.LanguageResources', {
 	  }
 	  //foreach rec in the assoc store get the termcollection count
 	  me.assocStore.each(function(record){
-		  if(record.get('resourceType')==Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
+		  if(record.get('resourceType') === Editor.util.LanguageResources.resourceType.TERM_COLLECTION){
 			  termCollectionCount++;
 		  }
 	  });
 	  //disabled if only term collections and it is configuret do disable the panel
-	  return termCollectionCount==assocCount && disableIfTermCollectionOnly;
+	  return termCollectionCount === assocCount && disableIfTermCollectionOnly;
   }
 });
