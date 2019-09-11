@@ -188,16 +188,60 @@ class editor_Plugins_NecTm_HttpApi {
         $method = 'GET';
         $endpointPath = 'tm';
         $data = [];
-        $params = array('q'          => $queryString,
-                       'slang'       => 'de',       // TODO
-                       'tlang'       => 'en',       // TODO
-                       'aut_trans'   => false,      // TODO
-                       'concordance' => false,      // TODO
-                       'strip_tags'  => false,      // TODO
-                       'tag'         => $tagIds);
+        $params = array('q'           => $queryString,
+                        'slang'       => 'de',       // TODO
+                        'tlang'       => 'en',       // TODO
+                        'aut_trans'   => false,      // TODO
+                        'concordance' => false,
+                        'strip_tags'  => false,      // TODO
+                        'tag'         => $tagIds);
         $this->necTmRequest($method, $endpointPath, $data, $params);
-        $results = $this->result->results; // TODO
+        $results = $this->result->results; // TODO: multiple results??
         $this->result = $results[0]->tu->target_text;
+        return true;
+    }
+    
+    /**
+     * Concordance-search; NEC-TM-api requires source- and target language.
+     * @param string $searchString
+     * @param string $field
+     * @param string $sourceLang
+     * @param string $targetLang
+     * @param array $tagIds (= assigned categories AND top-level-categories)
+     * @return boolean
+     */
+    public function concordanceSearch($searchString, $field, $sourceLang, $targetLang, $tagIds) {
+        $method = 'GET';
+        $endpointPath = 'tm';
+        $data = [];
+        $params = array('q'           => $searchString,
+                        'slang'       => 'de',       // TODO
+                        'tlang'       => 'en',       // TODO
+                        'aut_trans'   => false,      // TODO
+                        'concordance' => true,
+                        'strip_tags'  => false,      // TODO
+                        'tag'         => $tagIds);
+        $this->necTmRequest($method, $endpointPath, $data, $params);
+        // NEC-TM doesn't offer to search by field; we must filter the results manually:
+        $allResults = $this->result->results;
+        $results = [];
+        foreach ($allResults as $result) {
+            switch ($field) {
+                case 'source':
+                    $test = stripos($result->tu->source_text, $searchString);
+                    $resultIsOk = (stripos($result->tu->source_text, $searchString) !== false); // TODO: strpos or stripos?
+                    break;
+                case 'target':
+                    $test = stripos($result->tu->target_text, $searchString);
+                    $resultIsOk = (stripos($result->tu->target_text, $searchString) !== false); // TODO: strpos or stripos?
+                    break;
+            }
+            if ($resultIsOk) {
+                $results[] = array('source' => $result->tu->source_text,
+                                   'target' => $result->tu->target_text);
+            }
+        }
+        $this->result = $results;
         return true;
     }
     

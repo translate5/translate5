@@ -64,6 +64,12 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $categories;
     
     /**
+     * All languages (id => rfc5646)
+     * @var array 
+     */
+    protected $lngs;
+    
+    /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
      */
@@ -88,6 +94,19 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         /* @var $service editor_Plugins_NecTm_Service */
         $ccategoriesFromService = $service->getTopLevelCategoriesIds();
         $this->categories = array_unique(array_merge($ccategoriesFromResource, $ccategoriesFromService), SORT_STRING);
+    }
+    
+    /**
+     * 
+     */
+    protected function getRfcLang($lang) {
+        if (!$this->lngs) {
+            // "lazy" load: all languages
+            $langModel = ZfExtended_Factory::get('editor_Models_Languages');
+            /* @var $langModel editor_Models_Languages */
+            $this->lngs = $langModel->loadAllKeyValueCustom('id','rfc5646');
+        }
+        return $this->lngs[$lang];
     }
     
     /**
@@ -174,13 +193,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             return $this->resultList;
         }
         
-        //load all languages
-        $langModel = ZfExtended_Factory::get('editor_Models_Languages');
-        /* @var $langModel editor_Models_Languages */
-        $lngs = $langModel->loadAllKeyValueCustom('id','rfc5646');
-        
         $result = null;
-        if($this->api->search($searchString,$lngs[$this->sourceLang],$lngs[$this->targetLang], $this->categories)){
+        if($this->api->search($searchString,$this->getRfcLang($this->sourceLang),$this->getRfcLang($this->targetLang), $this->categories)){
             $result = $this->api->getResult();
         }
         
@@ -236,7 +250,28 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::search()
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
-        // TODO
+        $results = null;
+        if($this->api->concordanceSearch($searchString, $field, $this->getRfcLang($this->sourceLang),$this->getRfcLang($this->targetLang), $this->categories)){
+            $results = $this->api->getResult();
+        }
+        
+        // NEC_TM's API does not allow for offsets/paging in the search.
+        if(empty($results)){
+            return $this->resultList;
+        }
+        
+        $highlight = function($haystack, $doit) use ($searchString) {
+            if(!$doit){
+                return $haystack;
+            }
+            return preg_replace('/\b('.$searchString.')\b/i', '<span class="highlight">$1</span>', $haystack);
+        };
+        
+        foreach($results as $result) {
+            $this->resultList->addResult($highlight(strip_tags($result['target']), $field == 'target'));
+            $this->resultList->setSource($highlight(strip_tags($result['source']), $field == 'source'));
+        }
+        return $this->resultList;
     }
     
     /***
