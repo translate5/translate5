@@ -318,7 +318,7 @@ Ext.define('Editor.controller.admin.User', {
           firstName: '',
           email: '',
           login: '',
-          gender: 'f',
+          gender: 'n',
           roles: 'editor'
       });
   },
