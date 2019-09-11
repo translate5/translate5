@@ -364,6 +364,7 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         $php2js->set('app.startViewMode', $ed->startViewMode);
         $php2js->set('app.branding', (string) $this->translate->_($ed->branding));
         $php2js->set('app.user', $userSession->data);
+        $php2js->set('app.serverId', ZfExtended_Utils::installationHash('MessageBus'));
         
         $allRoles = $acl->getAllRoles();
         $roles = array();
@@ -406,7 +407,8 @@ class Editor_IndexController extends ZfExtended_Controllers_Action {
         
         $controllers = array('ServerException', 'ViewModes', 'Segments', 
             'Preferences', 'MetaPanel', 'Editor', 'Fileorder',
-            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal');
+            'ChangeAlike', 'Comments','SearchReplace','SnapshotHistory','Termportal',
+        );
         
         $pm = Zend_Registry::get('PluginManager');
         /* @var $pm ZfExtended_Plugin_Manager */
