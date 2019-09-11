@@ -34,16 +34,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
      * sets all segments to untouched state - if they are untouched by the user
      */
     public function segmentsSetUntouchedState() {
-        $user = ZfExtended_Factory::get('ZfExtended_Models_User');
-        /* @var $user ZfExtended_Models_User */
-        if(empty($this->config->newTua)) {
-            $authUser = new Zend_Session_Namespace('user');
-            $user->loadByGuid($authUser->data->userGuid);
-        }
-        else {
-            $user->loadByGuid($this->config->newTua->getUserGuid());
-        }
-        
+        $user = $this->currentUser();
         $states = ZfExtended_Factory::get('editor_Models_Segment_AutoStates');
         /* @var $states editor_Models_Segment_AutoStates */
         $states->setUntouchedState($this->config->task->getTaskGuid(), $user);
@@ -92,6 +83,60 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
         }
         
         $task->save();
+    }
+    
+    /**
+     * Enables the other unconfirmed users in cooperative mode
+     */
+    public function confirmCooperativeUsers() {
+        $task = $this->config->task;
+        if($task->getUsageMode() !== $task::USAGE_MODE_COOPERATIVE) {
+            return;
+        }
+        $userGuid = $this->currentUser()->getUserGuid();
+        if(empty($this->config->newTua)) {
+            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $tua->loadByParams($userGuid, $task->getTaskGuid());
+        }
+        else {
+            $tua = $this->config->newTua;
+        }
+        $tua->setStateForRoleAndTask($this->config->workflow::STATE_OPEN, $tua->getRole());
+    }
+    
+    /**
+     * @throws ZfExtended_Models_Entity_Conflict
+     */
+    public function removeCompetitiveUsers() {
+        $task = $this->config->task;
+        if($task->getUsageMode() !== $task::USAGE_MODE_COMPETITIVE) {
+            return;
+        }
+        
+        $userGuid = $this->currentUser()->getUserGuid();
+        if(empty($this->config->newTua)) {
+            $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+            /* @var $tua editor_Models_TaskUserAssoc */
+            $tua->loadByParams($userGuid, $task->getTaskGuid());
+        }
+        else {
+            $tua = $this->config->newTua;
+        }
+        $deleted = $tua->deleteOtherUsers($task->getTaskGuid(), $userGuid, $tua->getRole());
+        if($deleted !== false) {
+            $notifier = ZfExtended_Factory::get('editor_Workflow_Notification');
+            /* @var $notifier editor_Workflow_Notification */
+            $notifier->init($this->config);
+            $notifier->notifyCompetitiveDeleted(['deleted' => $deleted]);
+            return;
+        }
+        ZfExtended_Models_Entity_Conflict::addCodes([
+            'E1160' => 'The competitive users can not be removed, probably some other user was faster and you are not assigned anymore to that task.'
+        ]);
+        throw ZfExtended_Models_Entity_Conflict::createResponse('E1160', [
+            'noField' => 'Die anderen Benutzer können nicht aus der Aufgabe entfernt werden, eventuell war ein anderer Benutzer schneller und hat Sie aus der Aufgabe entfernt.'
+        ]);
     }
     
     /**
@@ -151,7 +196,6 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
      */
     public function autoAssociateTaskPm() {
         $task = $this->config->task;
-        $workflow = $this->config->workflow;
         $user = ZfExtended_Factory::get('ZfExtended_Models_User');
         /* @var $user ZfExtended_Models_User */
         

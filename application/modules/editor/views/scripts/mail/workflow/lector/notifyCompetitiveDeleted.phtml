@@ -32,29 +32,29 @@ END LICENSE AND COPYRIGHT
  * @version 2.0
  *
  */
-/* @var $this Zend_View */
-$this->subject = $this->translate->_('Translate5 - Aufgabe freigegeben').' "'.$this->task->getTaskNr().' - '.$this->task->getTaskName().'"';
 
+/* @var $this Zend_View */
 $this->render('general.phtml');
 
+$params = [        
+        'header' => $this->header,
+        'footer' => $this->footer,
+        'role' => $this->translate->_($this->role),
+];
+
+$taskNr = $this->task->getTaskNr();
+if(!empty($taskNr)) {
+    $taskNr .= ' - ';
+}
+$this->subject = $this->translate->_('Translate5 - Aufgabe durch anderen Benutzer übernommen').' "'.$taskNr.$this->task->getTaskName().'"';
+
 $template = '{header}
-Im Projektportal {portalLink} wurde die Aufgabe <b>{task.taskNr} - {task.taskName}</b> für Sie freigegeben.<br />
+    
+ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
 <br />
-Im folgenden die getätigten Änderungen der vorhergehenden Rolle <b>{previousRole}</b>:<br />
-{changedSegments}
-<hr />
+Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
 <br />
 {footer}';
 
-$this->textbody = strip_tags($this->templateApply($template, [
-    'task' => $this->task->getDataObject(),
-    'header' => $this->header,
-    'footer' => $this->footer,
-    'previousRole' => $this->translate->_('Übersetzer'),
-    'changedSegments' => $this->htmlOnly,
-]));
-
-echo $this->templateApply($template, [
-    //just overwrite the changedSegments
-    'changedSegments' => $this->workflowNotifyHtmlMailSegmentList($this->segments),
-]);
+$this->textbody = strip_tags($this->templateApply($template, $params));
+echo $this->templateApply($template, $params);

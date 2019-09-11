@@ -96,6 +96,8 @@ END LICENSE AND COPYRIGHT
  * @method void setImportAppVersion() setImportAppVersion(string $version)
  * @method integer getCustomerId() getCustomerId()
  * @method void setCustomerId() setCustomerId(int $customerId)
+ * @method string getUsageMode() getUsageMode()
+ * @method void setUsageMode() setUsageMode(string $usageMode)
  */
 class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_OPEN = 'open';
@@ -103,6 +105,9 @@ class editor_Models_Task extends ZfExtended_Models_Entity_Abstract {
     const STATE_IMPORT = 'import';
     const STATE_ERROR = 'error';
     const STATE_UNCONFIRMED = 'unconfirmed';
+    
+    const USAGE_MODE_COMPETITIVE = 'competitive';
+    const USAGE_MODE_COOPERATIVE = 'cooperative';
     
     const ASSOC_TABLE_ALIAS = 'tua';
     const TABLE_ALIAS = 't';
