@@ -29,19 +29,24 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.PreferencesWindow', {
     extend: 'Ext.window.Window',
     alias: 'widget.adminTaskPreferencesWindow',
+    controller: 'editortaskPreferencesWindowController',
     requires: [
-               'Editor.view.admin.task.PreferencesWindowViewModel',
-               'Editor.view.admin.task.UserAssoc',
-               'Editor.view.admin.task.Preferences',
-               'Editor.view.admin.task.TaskAttributes',
-               'Editor.view.admin.task.LogGrid',
-               'Editor.view.admin.task.LogWindow'
-               ],
+       'Editor.view.admin.task.PreferencesWindowController',
+       'Editor.view.admin.task.PreferencesWindowViewModel',
+       'Editor.view.admin.task.UserAssoc',
+       'Editor.view.admin.task.Preferences',
+       'Editor.view.admin.task.TaskAttributes',
+       'Editor.view.admin.task.LogGrid',
+       'Editor.view.admin.task.LogWindow'
+    ],
     itemId: 'adminTaskPreferencesWindow',
     title: '#UT#Einstellungen zu Aufgabe "{0}"',
     strings: {
         close: '#UT#Fenster schließen',
-        events: '#UT#Ereignisse'
+        events: '#UT#Ereignisse',
+        notifyUsersTitle: '#UT#Zugewiesene Benutzer benachrichtigen?',
+        notifyUsersMsg: '#UT#Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?',
+        userNotifySuccess:'#UT#Benutzer wurden erfolgreich per E-Mail benachrichtigt'
     },
     layout: 'fit',
     modal: true,

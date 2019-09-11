@@ -43,9 +43,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
       removeUserTip: '#UT#Den gewählten Benutzer aus dieser Aufgabe entfernen.',
       save: '#UT#Änderungen speichern',
       reload: '#UT#Aktualisieren',
-      cancel: '#UT#Abbrechen',
-      btnNotify:'#UT#Lektoren benachrichtigen',
-      btnNotifyTip:'#UT#Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren'
+      cancel: '#UT#Abbrechen'
   },
   viewConfig: {
       loadMask: false
@@ -74,6 +72,9 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           width: 230,
           dataIndex: 'login',
           renderer: function(v, meta, rec) {
+              if(Editor.data.debug) {
+                  v = Ext.String.format('<a href="{0}session/?authhash={1}">{2}</a>', Editor.data.restpath, rec.get('staticAuthHash'), v);
+              }
               return rec.get('surName')+', '+rec.get('firstName')+' ('+v+')';
           },
           filter: {
@@ -86,7 +87,7 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
           dataIndex: 'role',
           renderer: function(v) {
               var vm = this.lookupViewModel();
-              return vm.get('workflowMetadata').roles[v];
+              return vm.get('workflowMetadata').roles[v] || v;
           },
           text: me.strings.roleCol
       },{
@@ -128,13 +129,6 @@ Ext.define('Editor.view.admin.task.UserAssocGrid', {
               itemId: 'reload-btn',
               iconCls: 'ico-refresh',
               text: me.strings.reload
-          },
-          "-",{
-              xtype: 'button',
-              itemId: 'notify-user-btn',
-              iconCls: 'ico-notify-user',
-              text: me.strings.btnNotify,
-              tooltip: me.strings.btnNotifyTip
           }]
         }]
     };

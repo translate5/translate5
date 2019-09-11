@@ -40,7 +40,8 @@ Ext.define('Editor.view.task.ConfirmationWindow', {
     strings: {
         title: "#UT#Aufgabe bestätigen?",
         confirmMsg: "#UT#Möchten Sie die Aufgabe bestätigen? <br/> Ohne Bestätigung kann diese nicht bearbeitet werden.",
-        confirmBtn: '#UT#bestätigen',
+        confirmCompetitive: "#UT#<br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.",
+        confirmBtn: '#UT#bestätigen'
     },
     border: false,
     y: '5%',
@@ -49,12 +50,19 @@ Ext.define('Editor.view.task.ConfirmationWindow', {
     collapsible: true,
     initConfig : function(instanceConfig) {
         var me = this,
+            config,
+            msg = me.strings.confirmMsg;
+              
+        if(Editor.data.task.get('usageMode') == Editor.data.task.USAGE_MODE_COMPETITIVE) {
+            msg += me.strings.confirmCompetitive;
+        }
+                
         config = {
             title: me.strings.title,
             items: [{
                 xtype: 'container',
                 padding: 10,
-                html: me.strings.confirmMsg
+                html: msg
             }],
             dockedItems: [{
                 xtype: 'toolbar',
