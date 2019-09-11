@@ -550,8 +550,8 @@ class Models_Installer_Standalone {
         /* @var $user ZfExtended_Models_User */
         $admins = $user->loadAllByRole(['admin']);
         //Zend_Registry::set('Zend_Locale', 'en');
-        $mail = ZfExtended_Factory::get('Zend_Mail', ['utf8']);
-        /* @var $mail Zend_Mail */
+        $mail = ZfExtended_Factory::get('ZfExtended_Mailer', ['utf8']);
+        /* @var $mail ZfExtended_Mailer */
         $mail->setSubject("ChangeLog to translate5 version ".$version.' on '.$this->hostname);
         $html  = 'Your translate5 installation on '.$this->hostname.' was updated to version <b>'.$version.'</b>.<br><br>';
         $html .= '<b><u>ChangeLog</u></b><br>';
