@@ -1964,14 +1964,6 @@
       <source>Sprache</source>
       <target>Language</target>
   </trans-unit>
-<trans-unit id="TGVrdG9yZW4gYmVuYWNocmljaHRpZ2Vu">
-    <source>Lektoren benachrichtigen</source>
-    <target>Notify Proofreaders</target>
-</trans-unit>
-<trans-unit id="QWxsZSBCZW51dHplciDDvGJlciBkaWUgWnV3ZWlzdW5nIGRlciBBdWZnYWJlIGdlc2FtbWVsdCBpbmZvcm1pZXJlbg==">
-    <source>Alle Benutzer über die Zuweisung der Aufgabe gesammelt informieren</source>
-    <target>Notify all users about the association to the task</target>
-</trans-unit>
 <trans-unit id="QmVudXR6ZXIgd3VyZGVuIGVyZm9sZ3JlaWNoIHBlciBFLU1haWwgYmVuYWNocmljaHRpZ3Q=">
     <source>Benutzer wurden erfolgreich per E-Mail benachrichtigt</source>
     <target>Users were successfully notified by email</target>
@@ -2455,14 +2447,14 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 	<target>No available term collections were found for the clients that are associated to you.</target>
 </trans-unit>
 
-<trans-unit id='VGVybS1FaW50csOkZ2U='>
-    <source>Term-Einträge</source>
-    <target>TermEntry</target>
+<trans-unit id='RWludHLDpGdl'>
+    <source>Einträge</source>
+    <target>Entries</target>
 </trans-unit>
 
-<trans-unit id='RWludHJhZ3NiZW5lbm51bmdlbg=='>
-	<source>Eintragsbenennungen</source>
-	<target>Term entry designations</target>
+<trans-unit id='VGVybWU='>
+	<source>Terme</source>
+	<target>Terms</target>
 </trans-unit>
 
 <trans-unit id='RWludHJhZ3NlaWdlbnNjaGFmdGVu'>
@@ -2485,29 +2477,29 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <source>finalized</source>
     <target>approved</target>
 </trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnOiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='>
-    <source>Term-Eintrag: Änderung vorschlagen</source>
-    <target>Term-Entry: Propose changes</target>
+<trans-unit id='RWludHJhZzogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'>
+    <source>Eintrag: Änderung vorschlagen</source>
+    <target>Entry: Propose changes</target>
 </trans-unit>
-<trans-unit id='TmV1ZW4gVGVybS1FaW50cmFnIHZvcnNjaGxhZ2Vu'>
-    <source>Neuen Term-Eintrag vorschlagen</source>
-    <target>Propose a new Term-Entry</target>
+<trans-unit id='TmV1ZW4gRWludHJhZyB2b3JzY2hsYWdlbg=='>
+    <source>Neuen Eintrag vorschlagen</source>
+    <target>Propose a new Entry</target>
 </trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnOiBWb3JzY2hsYWcgbMO2c2NoZW4='>
-    <source>Term-Eintrag: Vorschlag löschen</source>
-    <target>Term-Entry: Delete the Proposal</target>
+<trans-unit id='RWludHJhZzogVm9yc2NobGFnIGzDtnNjaGVu'>
+    <source>Eintrag: Vorschlag löschen</source>
+    <target>Entry: Delete the Proposal</target>
 </trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiDDhG5kZXJ1bmcgdm9yc2NobGFnZW4='>
-    <source>Term-Eintrag-Attribut: Änderung vorschlagen</source>
-    <target>Term-Entry-Attribute: Propose changes</target>
+<trans-unit id='RWludHJhZy1BdHRyaWJ1dDogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'>
+    <source>Eintrag-Attribut: Änderung vorschlagen</source>
+    <target>Entry-Attribute: Propose changes</target>
 </trans-unit>
-<trans-unit id='TmV1ZXMgVGVybS1FaW50cmFnLUF0dHJpYnV0IHZvcnNjaGxhZ2Vu'>
-    <source>Neues Term-Eintrag-Attribut vorschlagen</source>
-    <target>Propose a new Term-Entry-Attribute</target>
+<trans-unit id='TmV1ZXMgRWludHJhZy1BdHRyaWJ1dCB2b3JzY2hsYWdlbg=='>
+    <source>Neues Eintrag-Attribut vorschlagen</source>
+    <target>Propose a new Entry-Attribute</target>
 </trans-unit>
-<trans-unit id='VGVybS1FaW50cmFnLUF0dHJpYnV0OiBWb3JzY2hsYWcgbMO2c2NoZW4='>
-    <source>Term-Eintrag-Attribut: Vorschlag löschen</source>
-    <target>Term-Entry-Attribute: Delete the Proposal</target>
+<trans-unit id='RWludHJhZy1BdHRyaWJ1dDogVm9yc2NobGFnIGzDtnNjaGVu'>
+    <source>Eintrag-Attribut: Vorschlag löschen</source>
+    <target>Entry-Attribute: Delete the Proposal</target>
 </trans-unit>
 <trans-unit id='VGVybTogw4RuZGVydW5nIHZvcnNjaGxhZ2Vu'>
     <source>Term: Änderung vorschlagen</source>
@@ -3371,6 +3363,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='QXR0cmlidXQ6IFZvcnNjaGxhZyBsw7ZzY2hlbg=='><source>Attribut: Vorschlag löschen</source><target>Attribute: Delete proposal</target></trans-unit>
 <trans-unit id='Vm9yc2NobGFnIGzDtnNjaGVu'><source>Vorschlag löschen</source><target>Remove the proposal</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHZvcnNjaGxhZ2Vu'><source>Änderung vorschlagen</source><target>Propose changes</target></trans-unit>
+<trans-unit id='w4RuZGVydW5nIGFiYnJlY2hlbg=='><source>Änderung abbrechen</source><target>Cancel proposal</target></trans-unit>
 <trans-unit id='Li4uIFNwcmFjaGUgYXVzd8OkaGxlbg=='><source>... Sprache auswählen</source><target>... select language</target></trans-unit>
 <trans-unit id='U3ByYWNoZSBmw7xyIFRlcm0tVm9yc2NobGFnIHfDpGhsZW4='><source>Sprache für Term-Vorschlag wählen</source><target>Select language for term proposal</target></trans-unit>
 <trans-unit id='VGVybS1Db2xsZWN0aW9uIGbDvHIgVGVybS1Wb3JzY2hsYWcgd8OkaGxlbg=='><source>Term-Collection für Term-Vorschlag wählen</source><target>Select Term-Collection for term proposal</target></trans-unit>
@@ -3387,7 +3380,7 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
 <trans-unit id='QXR0cmlidXRzLVNjaGzDvHNzZWw='><source>Attributs-Schlüssel</source><target>Attribute key</target></trans-unit>
 <trans-unit id='QXR0cmlidXRzLVdlcnQ='><source>Attributs-Wert</source><target>Attribute value</target></trans-unit>
 <trans-unit id='w4RuZGVydW5nIHp1IGJlc3RlaGVuZGVtIEF0dHJpYnV0cy1XZXJ0'><source>Änderung zu bestehendem Attributs-Wert</source><target>Change to existing attribute</target></trans-unit>
-<trans-unit id='VGVybS1FaW50cmFn'><source>Term-Eintrag</source><target>Term entry</target></trans-unit>
+<trans-unit id='RWludHJhZw=='><source>Eintrag</source><target>Entry</target></trans-unit>
 <trans-unit id='TGV0enRlciBCZWFyYmVpdGVy'><source>Letzter Bearbeiter</source><target>Last editor</target></trans-unit>
 <trans-unit id='QmVhcmJlaXR1bmdzZGF0dW0='><source>Bearbeitungsdatum</source><target>Edit date</target></trans-unit>
 <trans-unit id='RXhjZWwgUmUtSW1wb3J0aWVyZW4='>
@@ -3415,6 +3408,108 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
     <target>Upload excel</target>
 </trans-unit>
 <trans-unit id='TG9n'><source>Log</source><target>Log</target></trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIFdhcm51bmcgenUgQXVmZ2FiZQ=='>
+    <source>Translate5 - Warnung zu Aufgabe</source>
+    <target>Translate5 - Warning to task</target>
+</trans-unit>
+<trans-unit id='e2hlYWRlcn0KSW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZ2FiIGVzIHp1IG5hY2hmb2xnZW5kZXIgQXVmZ2FiZSBmb2xnZW5kZSBXYXJudW5nOiA8YnIgLz4KPGJyIC8+CjxiPldhcm51bmc6PC9iPiB7d2FybmluZ308YnIgLz4KPGI+Q29kZTo8L2I+IHtjb2RlfTxiciAvPgo8Yj5CZXJlaWNoOjwvYj4ge2RvbWFpbn08YnIgLz4KV2VpdGVyZSBJbmZvcm1hdGlvbmVuIGZpbmRlbiBzaWNoIGluIGRlciBBbndlbmR1bmcgaW4gZGVuIEF1ZmdhYmVuZWlnZW5zY2hhZnRlbiBpbSBSZWl0ZXIgRXJlaWduaXNzZS4gPGJyIC8+PGJyIC8+Cnt0YXNrRnJhZ21lbnR9e2Zvb3Rlcn0='>
+    <source>{header}
+Im Projektportal {portalLink} gab es zu nachfolgender Aufgabe folgende Warnung: <br />
+<br />
+<b>Warnung:</b> {warning}<br />
+<b>Code:</b> {code}<br />
+<b>Bereich:</b> {domain}<br />
+Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften im Reiter Ereignisse. <br /><br />
+{taskFragment}{footer}</source>
+    <target>{header}
+There is a warning to the task <b>{task.taskNr} - {task.taskName}</b> in the task-portal {portalLink}.<br />
+<br />
+<b>Warning:</b> {warning}<br />
+<b>Code:</b> {code}<br />
+<b>Area:</b> {domain}<br />
+More information can be found in the task property window in the tab events.<br /><br />
+{taskFragment}{footer}</target>
+</trans-unit>
+<trans-unit id='QXVzIE1UIMO8YmVybm9tbWVu'><source>Aus MT übernommen</source><target>Added from MT</target></trans-unit>
+<trans-unit id='RXMgd3VyZGVuIG1laHJlcmUgUXVlbGxlbmJlZ3JpZmZlIGdlZnVuZGVu'><source>Es wurden mehrere Quellenbegriffe gefunden</source><target>Multiple sources terms are found</target></trans-unit>
+<trans-unit id='Qml0dGUgd8OkaGxlbiBTaWUgZWluZW4gZGVyIFF1ZWxsYmVncmlmZmUgaW4gZGVyIGxpbmtlbiBTcGFsdGUgYXVzLiBTaWUgZ2Vow7ZyZW4genUgdmVyc2NoaWVkZW5lbiBCZWdyaWZmc2VpbnRyw6RnZW4uIE5hY2ggZGVyIEF1c3dhaGwga8O2bm5lbiBTaWUgSWhyZSBuZXVlIFRlcm3DvGJlcnNldHp1bmcgenVtIHRyYW5zbGF0ZTUgdGVybVBvcnRhbCBoaW56dWbDvGdlbi4='><source>Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen.</source><target>Please select one of the source terms in the left column. They belong to different term entries. After selection you are able to add your new term translation to translate5 termPortal.</target></trans-unit>
+<trans-unit id='QWNodHVuZzogRWluZSDDhG5kZXJ1bmcgZGVyIERlZmluaXRpb24gd2lya3Qgc2ljaCBhdWYgYWxsZSBUZXJtZSBkaWVzZXIgU3ByYWNoZSBhdXMu'><source>Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus.</source><target>Editing this definition will affect all terms of this language.</target></trans-unit>
+<trans-unit id='WnVtIMOEbmRlcm4gZGVyIERlZmluaXRpb24gw7ZmZm5lbiBTaWUgYml0dGUgZGllIEVpbnRyYWdzZWlnZW5zY2hhZnRlbi4='><source>Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften.</source><target>Please open the 'Term entry attributes' for editing this definition.</target></trans-unit>
+<trans-unit id='SGlud2Vpcw=='><source>Hinweis</source><target>Please note:</target></trans-unit>
+<trans-unit id='Cjxici8+Cjxici8+PGI+QWNodHVuZzo8L2I+IEtvbmt1cnJpZXJlbmRlIEJlbnV0emVyOiBEZXIgZXJzdGUgQmVudXR6ZXIsIGRlciBlaW5lbiBKb2IgYW5uaW1tdCwgZsO8aHJ0IGVpbmVuIEpvYiBhdXMuIEFsbGVuIGFuZGVyZW4gd2lyZCBhdXRvbWF0aXNjaCBkaWUgQXVmZ2FiZSBlbnR6b2dlbi4KPGJyLz4='>
+    <source>
+<br/>
+<br/><b>Achtung:</b> Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.
+<br/></source>
+    <target>
+<br/>
+<br/><b>Attention:</b> Competing users: First user, who accepts job, does job. Others are unassigned automatically.
+<br/></target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplcg=='>
+    <source>Mehrere Benutzer</source>
+    <target>Multiple users</target>
+</trans-unit>
+<trans-unit id='V2VubiBtZWhyZXJlIEJlbnV0emVyIGRlbXNlbGJlbiBXb3JrZmxvdy1TY2hyaXR0IHp1Z2V3aWVzZW4gd2VyZGVu'>
+    <source>Wenn mehrere Benutzer demselben Workflow-Schritt zugewiesen werden</source>
+    <target>When assigning multiple users to same workflow step</target>
+</trans-unit>
+<trans-unit id='RGllc2UgT3B0aW9uIGthbm4gbnVyIHZlcsOkbmRlcnQgd2VyZGVuLCB3ZW5uIGtlaW4gQmVudXR6ZXIgZGVyIEF1ZmdhYmUgenVnZXdpZXNlbiBpc3Qu'>
+    <source>Diese Option kann nur verändert werden, wenn kein Benutzer der Aufgabe zugewiesen ist.</source>
+    <target>Option can only be changed, if no user is assigned</target>
+</trans-unit>
+<trans-unit id='TWVocmVyZSBCZW51dHplciBiZWFyYmVpdGVuIGRpZXNlbGJlIEF1ZmdhYmU='>
+    <source>Mehrere Benutzer bearbeiten dieselbe Aufgabe</source>
+    <target>Multiple users editing same task</target>
+</trans-unit>
+<trans-unit id='S29ua3VycmllcmVuZGUgQmVudXR6ZXI6IERlciBlcnN0ZSBCZW51dHplciwgZGVyIGVpbmVuIEpvYiBhbm5pbW10LCBmw7xocnQgZWluZW4gSm9iIGF1cy4gQWxsZW4gYW5kZXJlbiB3aXJkIGF1dG9tYXRpc2NoIGRpZSBBdWZnYWJlIGVudHpvZ2VuLg=='>
+    <source>Konkurrierende Benutzer: Der erste Benutzer, der einen Job annimmt, führt einen Job aus. Allen anderen wird automatisch die Aufgabe entzogen.</source>
+    <target>Competing users: First user, who accepts job, does job. Others are unassigned automatically.</target>
+</trans-unit>
+<trans-unit id='WnVnZXdpZXNlbmUgQmVudXR6ZXIgYmVuYWNocmljaHRpZ2VuPw=='>
+    <source>Zugewiesene Benutzer benachrichtigen?</source>
+    <target>Notify assigned users?</target>
+</trans-unit>
+<trans-unit id='U29sbGVuIGRpZSB6dWdld2llc2VuZW4gQmVudXR6ZXIgw7xiZXIgZGllIFp1d2Vpc3VuZyBkZXIgQXVmZ2FiZSBiZW5hY2hyaWNodGlnIHdlcmRlbj8='>
+    <source>Sollen die zugewiesenen Benutzer über die Zuweisung der Aufgabe benachrichtig werden?</source>
+    <target>Notify the associated users about the association to the task?</target>
+</trans-unit>
+<trans-unit id='PGJyLz48YnIvPkFsbGVuIGFuZGVyZW4gQmVudXR6ZXJuIHdpcmQgZGllIEF1ZmdhYmUgZW50em9nZW48YnIvPiB1bmQgc2llIHdpcmQgYXVzc2NobGllw59saWNoIGluIElocmVyIFZlcmFudHdvcnR1bmcgbGllZ2VuLg=='>
+  <source><br/><br/>Allen anderen Benutzern wird die Aufgabe entzogen<br/> und sie wird ausschließlich in Ihrer Verantwortung liegen.</source>
+  <target><br/><br/>All other users will be unassigned<br/> and this will be your sole responsibility.</target>
+</trans-unit>
+<trans-unit id='QWNodHVuZzogZGllIGFrdHVlbGwgZ2VzY2hsb3NzZW5lIEF1ZmdhYmUgd3VyZGUgSWhuZW4gZW50em9nZW4u'>
+  <source>Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.</source>
+  <target>Attention: you were unassigned from the just closed task.</target>
+</trans-unit>
+<trans-unit id='U2llIGvDtm5uZW4gZGVuIEpvYiB6dXIgWmVpdCBuaWNodCBiZWFyYmVpdGVuLCBkZXIgQmVudXR6ZXIgaGF0IGRpZSBBdWZnYWJlIGJlcmVpdHMgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldC4='>
+  <source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source>
+  <target>The job can not be modified, since the user has already opened the task for editing.</target>
+</trans-unit>
+<trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='>
+    <source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source>
+    <target>Translate5 - another user took responsibility for the task</target>
+</trans-unit>
+<trans-unit id='e2hlYWRlcn0KICAgIAplaW4gYW5kZXJlciBCZW51dHplciBoYXQgaW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZGllIFZlcmFudHdvcnR1bmcgZsO8ciBkaWUgQXVmZ2FiZSA8Yj57dGFzay50YXNrTnJ9IC0ge3Rhc2sudGFza05hbWV9PC9iPiDDvGJlcm5vbW1lbi48YnIgLz4KPGJyIC8+CklocmUgWnV3ZWlzdW5nIHp1ciBBdWZnYWJlIHd1cmRlIGF1dG9tYXRpc2NoIGVudGZlcm50LjxiciAvPgo8YnIgLz4Ke2Zvb3Rlcn0='>
+    <source>{header}
+
+ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
+<br />
+Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
+<br />
+{footer}</source>
+<target>{header}
+
+another user took responsibility for the task <b>{task.taskNr} - {task.taskName}</b> in the task-portal {portalLink}.<br />
+<br />
+You have been automatically unassigned from the task.<br />
+<br />
+{footer}</target>
+</trans-unit>
+<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='>
+    <source>Das Kommentarattribut ist erforderlich</source>
+    <target>The comment attribute is required</target>
+</trans-unit>
     </body>
   </file>
 </xliff>

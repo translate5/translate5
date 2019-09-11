@@ -72,12 +72,12 @@ class editor_Models_Import_FileList {
         $parser = ZfExtended_Factory::get('editor_Models_Import_DirectoryParser_WorkingFiles', [$this->importConfig->checkFileType]);
         /* @var $parser editor_Models_Import_DirectoryParser_WorkingFiles */
         $tree = $parser->parse($this->importConfig->getProofReadDir(), $this->task);
-        $ignoredFiles = $parser->getIgnoredFiles();
-        if(!empty($ignoredFiles)) {
+        $notImportedFiles = $parser->getNotImportedFiles();
+        if(!empty($notImportedFiles)) {
             $logger = Zend_Registry::get('logger');
             /* @var $logger ZfExtended_Logger */
             $logger->warn('E1136', 'Some files could not be imported, since there is no parser available. For affected files see log details.', [
-                'files' => $ignoredFiles,
+                'files' => $notImportedFiles,
             ]);
         }
         

@@ -116,13 +116,19 @@ class editor_TermattributeController extends ZfExtended_RestController {
         //update the term entry create/modefy dates
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->updateModificationGroupAttributes($termEntry);
+        $attribute->handleTransacGroup($termEntry);
         
         //update the view
         $this->view->rows->proposal = $this->proposal->getDataObject();
         
         //set the groupid, it is used by the attribute proposal component
         $this->view->rows->groupId=$termEntry->getGroupId();
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        //load the term entry attributes
+        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($termEntry->getGroupId(),[$termEntry->getCollectionId()]);
     }
     
     /**
@@ -189,7 +195,7 @@ class editor_TermattributeController extends ZfExtended_RestController {
         //update the term entry create/modefy dates
         $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
         /* @var $attribute editor_Models_Term_Attribute */
-        $attribute->updateModificationGroupAttributes($termEntry);
+        $attribute->handleTransacGroup($termEntry);
         
         $this->view->rows = $this->entity->getDataObject();
         $this->view->rows->proposal = null;

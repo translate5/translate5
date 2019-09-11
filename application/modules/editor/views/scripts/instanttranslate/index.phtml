@@ -35,7 +35,7 @@
     $allSourceLanguageLocales = array();
     $allTargetLanguageLocales = array();
     
-    foreach ($this->machineTranslationEngines as $languageResource) {
+    foreach ($this->allLanguageResources as $languageResource) {
         $allCharacterLimits[] = $languageResource['characterLimit'];
         foreach ($languageResource['source'] as $sourceLocale) {
             //are the sublanguages used as dropdown selections
@@ -156,6 +156,8 @@
         <div id="sourceError" class="instant-translation-error ui-state-error ui-corner-all"></div>
         </form>
     </div>
+    <button id="switchSourceTarget">
+    </button>
     <div id="target">
         <form id="targetControls">
             <select id="targetLocale" name="targetLocale">
@@ -248,6 +250,10 @@ $( function() {
     $('#translations .term-status').tooltip({
         position: { my: "left+15 center", at: "bottom", of: ".term-info" }
     });
+    //check if the source and the target are the same
+    if($('#sourceLocale').val()==$('#targetLocale').val()){
+    	setTargetFirstAvailable($('#sourceLocale').val());
+    }
     // start with checking according to the locales as stored for user
     handleAfterLocalesChange($('#targetLocale'));
     $("#sourceText").attr('maxlength',characterLimit);
@@ -255,6 +261,24 @@ $( function() {
     setFileTypesAllowedAndAvailable();
     setTextForSource();
     showSource();
+    $('#switchSourceTarget').button({
+    	icon: "ui-icon-transfer-e-w"
+	}).on("click",function(){
+		//switch source and target languages on button click
+		var sourceLocale=$("#sourceLocale").val(),
+			targetLocale=$("#targetLocale").val();
+		$("#sourceLocale").val(targetLocale);
+		$("#targetLocale").val(sourceLocale);
+		$("#sourceLocale").selectmenu("refresh");
+		$("#targetLocale").selectmenu("refresh");
+		var results=$('div.translation-result');
+		handleAfterLocalesChange();
+		if(results.length>0){
+			$('#sourceText').val(results[0].textContent);
+		}
+		$('#translations').hide();
+		startTranslation();
+    });
 } );
 </script>
 

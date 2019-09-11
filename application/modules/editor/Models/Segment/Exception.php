@@ -35,5 +35,6 @@ class editor_Models_Segment_Exception extends ZfExtended_ErrorCodeException {
         //Pixel Length codes:
         'E1081' => 'Textlength by pixel failed; most probably data about the pixelWidth is missing: fontFamily: "{fontFamily} fontSize: "{fontSize}".',
         'E1082' => 'Segment length calculation: missing pixel width for several characters.',
+        'E1155' => 'Unable to save the segment. The segment model tried to save to the materialized view directly.',
     ];
 }

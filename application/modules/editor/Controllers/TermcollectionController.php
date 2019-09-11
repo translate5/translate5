@@ -52,7 +52,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $this->setDataInEntity($this->postBlacklist);
         if($this->validate()){
             $customerIds=explode(',', $this->data->customerIds);
-            $collectionId=$this->entity->create($this->data->name,$customerIds,0);
+            $collectionId=$this->entity->create($this->data->name,$customerIds);
             $this->entity->setId($collectionId);
             $this->view->rows = $this->entity->getDataObject();
         }
@@ -172,7 +172,7 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         /* @var $model editor_Models_Term */
         
         if(isset($params['groupId'])){
-            $responseArray['termAttributes'] = $this->groupTermsAndAttributes($model->searchTermAttributesInTermentry($params['groupId'],$collectionIds));
+            $responseArray['termAttributes'] = $model->groupTermsAndAttributes($model->searchTermAttributesInTermentry($params['groupId'],$collectionIds));
             
             $entryAttr=ZfExtended_Factory::get('editor_Models_Term_Attribute');
             /* @var $entryAttr editor_Models_Term_Attribute */
@@ -195,154 +195,6 @@ class editor_TermcollectionController extends ZfExtended_RestController  {
         $term = ZfExtended_Factory::get('editor_Models_Term');
         /* @var $term editor_Models_Term */
         $this->view->rows = $term->getNonExistingTermsInAnyCollection($searchTerms, $collectionIds);
-    }
-    
-    /***
-     * Group term and term attributes data by term. Each row will represent one term and its attributes in attributes array.
-     * The term attributes itself will be grouped in parent-child structure
-     * @param array $data
-     * @return array
-     */
-    protected function groupTermsAndAttributes(array $data){
-        if(empty($data)){
-            return $data;
-        }
-        $map=[];
-        $termColumns=[
-            'definition',
-            'groupId',
-            'label',
-            'value',
-            'desc',
-            'termStatus',
-            'processStatus',
-            'termId',
-            'termEntryId',
-            'collectionId',
-            'languageId',
-            'term'
-        ];
-        //available term proposal columns
-        $termProposalColumns=[
-            'proposalTerm',
-            'proposalId'
-        ];
-        //maping between database name and term proposal table real name
-        $termProposalColumnsNameMap=[
-            'proposalTerm'=>'term',
-            'proposalId'=>'id'
-        ];
-        
-        //available attribute proposal columns
-        $attributeProposalColumns=[
-            'proposalAttributeValue',
-            'proposalAttributelId'
-        ];
-        
-        //maping between database name and attribute proposal table real name
-        $attributeProposalColumnsNameMap=[
-            'proposalAttributeValue'=>'value',
-            'proposalAttributelId'=>'id'
-        ];
-        
-        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attribute editor_Models_Term_Attribute */
-        
-        //Group term-termattribute data by term. For each grouped attributes field will be created
-        $oldKey='';
-        $groupOldKey=false;
-        $termProposalData=[];
-        
-        $termModel=ZfExtended_Factory::get('editor_Models_Term');
-        /* @var $termModel editor_Models_Term */
-        $isTermProposalAllowed=$termModel->isProposableAllowed();
-        
-        $attributeModel=ZfExtended_Factory::get('editor_Models_Term_Attribute');
-        /* @var $attributeModel editor_Models_Term_Attribute */
-        $isAttributeProposalAllowed=$attributeModel->isProposableAllowed();
-        
-        //map the term id to array index (this is used because the jquery json decode changes the array sorting based on the termId)
-        $keyMap=[];
-        $indexKeyMap=function($termId) use (&$keyMap){
-            if(!isset($keyMap[$termId])){
-                $keyMap[$termId]=count($keyMap);
-                return $keyMap[$termId];
-            }
-            return $keyMap[$termId];
-        };
-        
-        foreach ($data as $tmp){
-            $termKey=$indexKeyMap($tmp['termId']);
-            
-            if(!isset($map[$termKey])){
-                $termKey=$indexKeyMap($tmp['termId']);
-                $map[$termKey]=[];
-                $map[$termKey]['attributes']=[];
-                
-                if(isset($oldKey) && isset($map[$oldKey])){
-                    $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
-                    $groupOldKey=true;
-
-                    $map[$oldKey]['proposable']=$isTermProposalAllowed;
-                    //collect the term proposal data if the user is allowed to
-                    if($isTermProposalAllowed){
-                        $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
-                        //check if the term proposable flag is set, if calculate it
-                        $termProposalData=[];
-                    }
-                }
-            }
-            
-            //split the term fields and term attributes
-            $atr=[];
-            $attProposal=[];
-            foreach ($tmp as $key=>$value){
-                //check if it is term specific data
-                if(in_array($key,$termColumns)){
-                    $map[$termKey][$key]=$value;
-                    continue;
-                }
-                //is term attribute proposal specific data
-                if(in_array($key,$attributeProposalColumns)){
-                    $attProposal[$attributeProposalColumnsNameMap[$key]]=$value;
-                    continue;
-                }
-                //is term proposal specific columnt
-                if(in_array($key,$termProposalColumns)){
-                    $termProposalData[$termProposalColumnsNameMap[$key]]=$value;
-                    continue;
-                }
-                //it is attribute column
-                $atr[$key]=$value;
-            }
-            
-            //is attribute proposable (is user attribute proposal allowed and the attribute is proposal whitelisted)
-            $atr['proposable'] =$isAttributeProposalAllowed && $attribute->isProposable($atr['name'],$atr['attrType']);
-            if($isAttributeProposalAllowed){
-                $atr['proposal']=!empty($attProposal['id']) ? $attProposal : null;
-                $attProposal=[];
-            }
-            
-            array_push($map[$termKey]['attributes'],$atr);
-            $oldKey = $indexKeyMap($tmp['termId']);
-            $groupOldKey=false;
-        }
-        //if not grouped after foreach, group the last result
-        if(!$groupOldKey){
-            $map[$oldKey]['proposable']=$isTermProposalAllowed;
-            $map[$oldKey]['attributes']=$attribute->createChildTree($map[$oldKey]['attributes']);
-
-            //collect the term proposal data if the user is allowed to
-            if($isTermProposalAllowed){
-                $map[$oldKey]['proposal']=!empty($termProposalData['term']) ? $termProposalData : null;
-                //check if the term proposable flag is set, if calculate it
-            }
-        }
-        
-        if(empty($map)){
-            return null;
-        }
-        return $map;
     }
     
     /***

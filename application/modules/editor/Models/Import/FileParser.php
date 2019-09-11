@@ -489,12 +489,4 @@ abstract class editor_Models_Import_FileParser {
         $d->close();
         return $fileParsers;
     }
-    
-    /**
-     * returns the mimetypes valid for that fileparser
-     * @return string[]
-     */
-    public static function getValidMimeTypes() {
-        return ['application/xml','text/xml'];
-    }
 }

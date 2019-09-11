@@ -121,6 +121,13 @@ class editor_Plugins_TermTagger_Worker_TermTagger extends editor_Plugins_TermTag
             $this->logger->exception($exception, [
                 'domain' => 'editor.terminology.segmentediting'
             ]);
+            if($exception instanceof editor_Plugins_TermTagger_Exception_Open) {
+                //editor_Plugins_TermTagger_Exception_Open Exceptions mean mostly that there is problem with the TBX data
+                //so we have to disable termtagging for this task, otherwise on eachsegment save we will get such a warning
+                $this->task->setTerminologie(0);
+                $this->task->save();
+                return false;
+            }
         }
         
         // on error return false and store original untagged data

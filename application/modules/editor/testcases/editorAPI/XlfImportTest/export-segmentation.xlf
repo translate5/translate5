@@ -26,7 +26,7 @@
       <trans-unit id="5" translate="yes">
         <!-- currently parser ignores whole trans-unit because auf empty source -->
         <source></source>
-        <target></target>
+        <target/>
       </trans-unit>
       <trans-unit id="6" translate="yes">
         <!-- currently parser ignores whole trans-unit because auf empty source -->

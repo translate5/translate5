@@ -63,8 +63,19 @@ class editor_SessionController extends ZfExtended_SessionController {
         $task = ZfExtended_Factory::get('editor_Models_Task');
         /* @var $task editor_Models_Task */
         $task->loadByTaskGuid($taskGuid);
-
-        $params = ['id' => $task->getId(), 'data' => '{"userState":"edit","id":'.$task->getId().'}'];
+        
+        $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
+        /* @var $wfm editor_Workflow_Manager */
+        $workflow = $wfm->getByTask($task);
+        
+        $user = new Zend_Session_Namespace('user');
+        $tua = ZfExtended_Factory::get('editor_Models_TaskUserAssoc');
+        /* @var $tua editor_Models_TaskUserAssoc */
+        $tua->loadByParams($user->data->userGuid, $taskGuid);
+        
+        $state = $workflow->getInitialUsageState($tua);
+        
+        $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
         $this->forward('put', 'task', 'editor', $params);
         
         // the static event manager must be used!
@@ -93,8 +104,8 @@ class editor_SessionController extends ZfExtended_SessionController {
         
         $enabled = Zend_Registry::get('config')->runtimeOptions->hashAuthentication;
         if($enabled != self::AUTH_HASH_DYNAMIC && $enabled != self::AUTH_HASH_STATIC) {
-            $this->log->logError('Tried to authenticate via hashAuthentication, but feature is disabled in the config!');
-            parent::indexAction();
+            $this->log->cloneMe('core.authentication')->error('E1156', 'Tried to authenticate via hashAuthentication, but feature is disabled in the config!');
+            throw new ZfExtended_NotAuthenticatedException();
         }
         
         settype($_REQUEST['authhash'], 'string');
@@ -121,13 +132,12 @@ class editor_SessionController extends ZfExtended_SessionController {
         $wfm = ZfExtended_Factory::get('editor_Workflow_Manager');
         /* @var $wfm editor_Workflow_Manager */
         $workflow = $wfm->getByTask($task);
-        $state = $workflow->isWriteable($taskUserAssoc) ? $workflow::STATE_EDIT : $workflow::STATE_VIEW;
         
+        $state = $workflow->getInitialUsageState($taskUserAssoc);
         
         //open task
         $params = ['id' => $task->getId(), 'data' => '{"userState":"'.$state.'","id":'.$task->getId().'}'];
         $this->forward('put', 'task', 'editor', $params);
-        //Mit dem nachfolgenden header ist man zwar authentifiziert, nicht aber im Task! Gehe ich händisch auf den Task passts. Sind die Daten noch nicht in der Session? wegen dem Exit? 
         
         $mv = ZfExtended_Factory::get('editor_Models_Segment_MaterializedView');
         /* @var $mv editor_Models_Segment_MaterializedView */
@@ -136,7 +146,7 @@ class editor_SessionController extends ZfExtended_SessionController {
         $event = Zend_EventManager_StaticEventManager::getInstance();
         $event->attach('editor_TaskController', 'afterPutAction', function() {
             //the redirect must be triggered after the successful PUT OPEN of the task above 
-            $this->redirect(APPLICATION_RUNDIR.'/editor', ['code' => 302]);
+            $this->redirect('/editor', ['code' => 302]);
         });
     }
 }

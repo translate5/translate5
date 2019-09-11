@@ -106,6 +106,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $frontendLocaleNormalized=$this->normalizeLanguage($this->_session->locale);
         $preselectedLang=null;
         
+        //check if the sub languages should be displayed
+        $isShowSubLanguages=$config->runtimeOptions->TermPortal->showSubLanguages;
+        
         foreach ($langsArray as &$lng){
 
             //set preselected term-search language based on user locale language
@@ -118,6 +121,12 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             
             $isSingleLang=strpos($lng['rfc5646'], '-')===false;
             
+            //ignore if the sublanguages are disabled 
+            if(!$isShowSubLanguages && !$isSingleLang){
+                $lng=null;
+                continue;
+            }
+            
             //find all language sublings when the language is without "-" (de -> de-De, de-Au ..)
             if($isSingleLang){
                 //load all similar languages
@@ -129,14 +138,12 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         }
         
         //all languages in the available term collections for the user
-        $this->view->languages=$langsArray;
+        $this->view->languages=array_filter($langsArray);
         
         // all language-combinations that are available in InstantTranslate
         $languageResourcesLanguages = ZfExtended_Factory::get('editor_Models_LanguageResources_Languages');
         /* @var $languageResourcesLanguages editor_Models_LanguageResources_Languages */
-        $languageCombinations = $languageResourcesLanguages->getLanguageCombinationsForLoggedUser();
-        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageCombinations->targetsForSources);
-        
+        $this->view->Php2JsVars()->set('instanttranslate.targetsForSources', $languageResourcesLanguages->getTargetsForSources());
         
         //rfc language code to language flag mapping
         $this->view->Php2JsVars()->set('apps.termportal.rfcFlags',$languagesModel->loadAllKeyValueCustom('rfc5646', 'iso3166Part1alpha2',true));
@@ -144,6 +151,9 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         $this->view->Php2JsVars()->set('apps.termportal.idToRfcLanguageMap',$languagesModel->loadAllKeyValueCustom('id', 'rfc5646'));
         //rfc to languagename map
         $this->view->Php2JsVars()->set('apps.termportal.rfcToLanguageNameMap',$languagesModel->loadAllKeyValueCustom('rfc5646', 'langName'));
+        
+        //are all languages available in the new term dropdown select
+        $this->view->Php2JsVars()->set('apps.termportal.newTermAllLanguagesAvailable',(boolean)$config->runtimeOptions->termportal->newTermAllLanguagesAvailable);
         
         $this->view->moduleFolder = APPLICATION_RUNDIR.'/modules/'.Zend_Registry::get('module').'/';
         
@@ -172,8 +182,8 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
         
         //translated strings for some of the result tables
         $translatedStrings=array(
-                "termEntries"=>$this->translate->_("Term-Einträge"),
-                "termEntryNameTitle"=>$this->translate->_("Eintragsbenennungen"),
+                "termEntries"=>$this->translate->_("Einträge"),
+                "termEntryNameTitle"=>$this->translate->_("Terme"),
                 "termEntryAttributeTitle"=>$this->translate->_("Eintragseigenschaften"),
                 "search" => $this->translate->_('Suche'),
                 "searchFilterPlaceholderText" => $this->translate->_('Filter'),
@@ -201,12 +211,13 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             "deleteProposal"=>$this->translate->_("Vorschlag löschen"),
             "editProposal"=>$this->translate->_("Änderung vorschlagen"),
             "saveProposal"=>$this->translate->_("Änderung sichern"),
-            "editTermEntryProposal"=>$this->translate->_("Term-Eintrag: Änderung vorschlagen"),
-            "addTermEntryProposal"=>$this->translate->_("Neuen Term-Eintrag vorschlagen"),
-            "deleteTermEntryProposal"=>$this->translate->_("Term-Eintrag: Vorschlag löschen"),
-            "editTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Änderung vorschlagen"),
-            "addTermEntryAttributeProposal"=>$this->translate->_("Neues Term-Eintrag-Attribut vorschlagen"),
-            "deleteTermEntryAttributeProposal"=>$this->translate->_("Term-Eintrag-Attribut: Vorschlag löschen"),
+            "cancelProposal"=>$this->translate->_("Änderung abbrechen"),
+            "editTermEntryProposal"=>$this->translate->_("Eintrag: Änderung vorschlagen"),
+            "addTermEntryProposal"=>$this->translate->_("Neuen Eintrag vorschlagen"),
+            "deleteTermEntryProposal"=>$this->translate->_("Eintrag: Vorschlag löschen"),
+            "editTermEntryAttributeProposal"=>$this->translate->_("Eintrag-Attribut: Änderung vorschlagen"),
+            "addTermEntryAttributeProposal"=>$this->translate->_("Neues Eintrag-Attribut vorschlagen"),
+            "deleteTermEntryAttributeProposal"=>$this->translate->_("Eintrag-Attribut: Vorschlag löschen"),
             "editTermProposal"=>$this->translate->_("Term: Änderung vorschlagen"),
             "addTermProposal"=>$this->translate->_("Neuen Term vorschlagen"),
             "deleteTermProposal"=>$this->translate->_("Term: Vorschlag löschen"),
@@ -216,8 +227,19 @@ class Editor_TermportalController extends ZfExtended_Controllers_Action {
             "chooseLanguageForTermEntry"=>$this->translate->_("Sprache für Term-Vorschlag wählen"),
             "chooseTermcollectionForTermEntry"=>$this->translate->_("Term-Collection für Term-Vorschlag wählen"),
             "selectLanguage"=>$this->translate->_("... Sprache auswählen"),
-            "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für")
+            "newSourceForSaving"=>$this->translate->_("Speichern des neuen Terms erzeugt automatisch einen neuen Eintrag für"),
+            "multipleSourcesFoundTitle"=>$this->translate->_("Es wurden mehrere Quellenbegriffe gefunden"),
+            "multipleSourcesFoundMessage"=>$this->translate->_("Bitte wählen Sie einen der Quellbegriffe in der linken Spalte aus. Sie gehören zu verschiedenen Begriffseinträgen. Nach der Auswahl können Sie Ihre neue Termübersetzung zum translate5 termPortal hinzufügen."),
+            "editDefinitionMsgAffectsAllTerms"=>$this->translate->_("Achtung: Eine Änderung der Definition wirkt sich auf alle Terme dieser Sprache aus."),
+            "editDefinitionMsgUseTermEntry"=>$this->translate->_("Zum Ändern der Definition öffnen Sie bitte die Eintragseigenschaften."),
+            "editDefinitionMsgTitle"=>$this->translate->_("Hinweis"),
+            "acceptedFromTmComment"=>$this->translate->_("Aus MT übernommen"),
+            "commentAttributeMandatoryMessage"=>$this->translate->_("Das Kommentarattribut ist erforderlich"),
+            "commentAttributeMandatoryTitle"=>$this->translate->_("Info")
         ]);
+        
+        //is the comment attribute mandatory when new term or term proposal is made
+        $this->view->Php2JsVars()->set('apps.termportal.commentAttributeMandatory', (boolean)$config->runtimeOptions->termportal->commentAttributeMandatory);
         
         // for filtering in front-end: get the names for the available collectionIds
         $customerAssoc=ZfExtended_Factory::get('editor_Models_LanguageResources_CustomerAssoc');

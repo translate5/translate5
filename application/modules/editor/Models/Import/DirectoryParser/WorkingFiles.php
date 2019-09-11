@@ -41,15 +41,12 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * @var array
    */
   protected $ignoreList = array('.svn');
+  
   /**
-   * filenames with this extension will be imported (without leading dot)
-   * - caseInsensitiv
-   * - all others will be ignored
-   * - transit-fileextension does not exist in real life, since transit has none.
-   *   It is added by editor_Transit_PluginBootstrap
-   * @var array
+   * if is null, no supported file check is done
+   * @var editor_Models_Import_SupportedFileTypes
    */
-  protected $_importExtensionList;
+  protected $supportedFiles = null;
   
   /**
    * RootNode Container
@@ -61,18 +58,14 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * collection of ignored files
    * @var array
    */
-  protected $ignoredFiles = [];
-  
-  protected $exceptionOnNoFilesFound = true;
+  static protected $notImportedFiles = [];
   
   static protected $filesFound = false;
   
   public function __construct(bool $checkFileTypes) {
-      $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
-      /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
       if($checkFileTypes) {
-          //if _importExtensionList is not set, all files are imported
-          $this->_importExtensionList = array_keys($supportedFiles->getSupportedTypes());
+          //if supportedFiles is null, no filter is set and all files are imported
+          $this->supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
       }
   }
   
@@ -83,13 +76,14 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * @return object Directory Object Tree
    */
   public function parse($directoryPath, editor_Models_Task $task){
-      $this->ignoredFiles = [];
+      self::$notImportedFiles = [];
       $rootNode = $this->getInitialRootNode();
       self::$filesFound = false;
       $this->iterateThrough($rootNode, $directoryPath);
-      if($this->exceptionOnNoFilesFound && !self::$filesFound) {
+      if(!empty($this->supportedFiles) && !self::$filesFound) {
+          // 'E1135' => 'There are no importable files in the Task. The following file extensions can be imported: {extensions}',
           throw new editor_Models_Import_FileParser_NoParserException('E1135', [
-              'extensions' => join(', .', $this->_importExtensionList),
+              'extensions' => join(', .', $this->supportedFiles->getSupportedExtensions()),
               'task' => $task,
           ]);
       }
@@ -120,8 +114,8 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
     $iterator = new DirectoryIterator($directoryPath);
     /* @var $fileinfo DirectoryIterator */
     foreach ($iterator as $fileinfo) {
-      if($this->isIgnored($fileinfo,$directoryPath)) {
-        continue;
+      if($this->isIgnored($fileinfo, $directoryPath)) {
+          continue;
       }
       $fileName = $localEncoded->decode($fileinfo->getFilename());
       if($fileinfo->isFile()) {
@@ -165,15 +159,19 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
       if(is_dir($directoryPath.DIRECTORY_SEPARATOR.$file)){
           return false;
       }
-      if(empty($this->_importExtensionList)){
-          return false; //no extension to filter => pass all files
+      //no extension filter set: pass all files
+      if(empty($this->supportedFiles)){
+          return false; 
       }
-      foreach ( $this->_importExtensionList as $ext) {
+      $extensions = $this->supportedFiles->getRegisteredExtensions();
+      foreach ($extensions as $ext) {
           if(preg_match('"\.'.$ext.'$"i', $file)){
-              return false;
+              return $this->supportedFiles->isIgnored($ext);
           }
       }
-      $this->ignoredFiles[] = $file->getFilename();
+
+      //file extensions which are not handled by supportedFiles at all (not supported and not activly ignore) are collected here
+      self::$notImportedFiles[] = $file->getFilename();
       return true;
   }
   
@@ -186,7 +184,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
   protected function getFileNode($filename, $filepath) {
     $node = new stdClass();
     $node->id = 0; // from save to DB
-    $node->parentId = 0;//from first sync to files call;
+    $node->parentId = 0; //from first sync to files call
     $node->cls = 'file';
     $node->isFile = true;
     $node->filename = $filename;
@@ -213,7 +211,12 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    */
   protected function getDirectoryNodeAndIterate($directory, $path) {
     $node = $this->getDirectoryNode($directory);
-    $iteration = new static(!empty($this->_importExtensionList));
+    
+    //we init the iteration instance always with false, 
+    // but we set the supportedFiles instance afterwards directly (so we don't create multiple instances) 
+    $iteration = new static(false);
+    $iteration->supportedFiles = $this->supportedFiles;
+    
     $iteration->iterateThrough($node, $path);
     return $node;
   }
@@ -236,7 +239,7 @@ class editor_Models_Import_DirectoryParser_WorkingFiles {
    * returns the files which were ignored
    * @return array
    */
-  public function getIgnoredFiles() {
-      return $this->ignoredFiles;
+  public function getNotImportedFiles() {
+      return self::$notImportedFiles;
   }
 }

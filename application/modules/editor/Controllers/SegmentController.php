@@ -258,6 +258,7 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         //check if update is allowed
         $this->checkTaskGuidAndEditable();
         $task = $this->checkTaskState();
+        /* @var $task editor_Models_Task */
         $wfh = $this->_helper->workflow;
         /* @var $wfh ZfExtended_Controller_Helper_Workflow */
         $wfh->checkWorkflowWriteable($this->entity->getTaskGuid(), $sessionUser->data->userGuid);
@@ -291,9 +292,6 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
         $this->view->rows = $this->entity->getDataObject();
         
         // anonymize users for view? (e.g. comments etc in segment-grid-mouseovers)
-        $task = ZfExtended_Factory::get('editor_Models_Task');
-        /* @var $task editor_Models_Task */
-        $task->loadByTaskGuid($this->entity->getTaskGuid());
         if ($task->anonymizeUsers()) {
             $workflowAnonymize = ZfExtended_Factory::get('editor_Workflow_Anonymize');
             /* @var $workflowAnonymize editor_Workflow_Anonymize */
@@ -427,10 +425,14 @@ class Editor_SegmentController extends editor_Controllers_EditorrestController {
                  * But the problem should be logged, and also the user should be informed in the GUI
                  */
                 unset($results[$idx]); //remove the unchanged segment from result list, so that GUI knows there was going something wrong
-                $log = new ZfExtended_Log(false);
-                $log->logException($e);
-                $msg  = 'Loaded Segment '.print_r($this->entity->getDataObject(),1)."\n";
-                $log->log('Additional log info to previous '.get_class($e).' exception', $msg);
+                $task = ZfExtended_Factory::get('editor_Models_Task');
+                /* @var $task editor_Models_Task */
+                $task->loadByTaskGuid($this->entity->getTaskGuid());
+                $this->log->exception($e, [
+                    'level' => $this->log::LEVEL_WARN,
+                    'task' => $task,
+                    'loadedSegment' => $this->entity->getDataObject(),
+                ]);
             }
             
             //do not return the segment text, it will be loaded by the segments store

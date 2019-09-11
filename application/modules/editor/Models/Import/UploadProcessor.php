@@ -39,16 +39,6 @@ class editor_Models_Import_UploadProcessor {
     const TYPE_TESTCASE = 'testcase';
     
     /**
-     * valid upload types, extension and mime combination.
-     * The extension is also the internal used key.
-     * @var array
-     */
-    protected $validUploadTypes = array(
-        self::TYPE_ZIP => array('application/zip'),
-        self::TYPE_TESTCASE => array('application/xml'),
-    );
-    
-    /**
      * @var editor_Models_Import_DataProvider_Abstract
      */
     protected $dataProvider;
@@ -106,7 +96,7 @@ class editor_Models_Import_UploadProcessor {
         $importName = pathinfo($importInfo['importUpload']['name']);
         settype($importName['extension'], 'string');
         $ext = strtolower($importName['extension']);
-        
+
         $supportedFiles = ZfExtended_Factory::get('editor_Models_Import_SupportedFileTypes');
         /* @var $supportedFiles editor_Models_Import_SupportedFileTypes */
         $allValidExtensions = $supportedFiles->getSupportedExtensions();

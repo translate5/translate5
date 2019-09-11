@@ -180,6 +180,13 @@ if(isset($this->error)){
     
 </div>
 
+<div id="editDefinitionMsg">
+  <div id="editDefinitionMsgText"></div>
+</div>
+
+<div id="infoDialogWindow">
+</div>
+
 <script type="text/javascript">
 //init the labels here, for later usage
 //FIXME: Refactor the Variable stuff to php2js stuff
@@ -233,6 +240,12 @@ function setSizesInFinalResultContent(){
 }
 
 $( function() {
+    $('#editDefinitionMsg').dialog({
+            autoOpen: false,
+            closeText: '',
+            title: proposalTranslations['editDefinitionMsgTitle']
+        });
+    $('#editDefinitionMsgText').html('<p>'+proposalTranslations['editDefinitionMsgAffectsAllTerms'] + '</p><p>' + proposalTranslations['editDefinitionMsgUseTermEntry']+'<p>');
     $('#logout a').mouseover(function(){
             $(this).removeClass("ui-state-active");
         });

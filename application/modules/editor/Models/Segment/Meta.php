@@ -87,6 +87,20 @@ class editor_Models_Segment_Meta extends ZfExtended_Models_Entity_MetaAbstract {
     }
     
     /**
+     * Updates the additional unit lengths of a transunit
+     * Warning: This does not update the materialized view! (Currently not needed since used only in import before mat view creation)
+     * @param string $taskGuid
+     * @param string $transunitId
+     * @param integer $additionalUnitLength
+     */
+    public function updateAdditionalUnitLength(string $taskGuid, string $transunitId, int $additionalUnitLength) {
+        $this->db->update(['additionalUnitLength' => $additionalUnitLength], [
+            'taskGuid = ?' => $taskGuid,
+            'transunitId = ?' => $transunitId,
+        ]);
+    }
+    
+    /**
      * Return all combinations of font-family and font-size
      * that are used in all the segments of the task.
      * This is only a workaround until we get these infos from the config-data

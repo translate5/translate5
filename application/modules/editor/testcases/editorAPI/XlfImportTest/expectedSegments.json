@@ -501,9 +501,9 @@
         "comments": null,
         "workflowStepNr": "0",
         "workflowStep": null,
-        "source": "<div class=\"single 70683e3139202d2054686973207365676d656e74206d75737420626520696d706f7274656420736f20746861742069742077696c6c20626520616464656420746f207468652074617267657420616e6420746865206175746f7374617465732061726520736574206163636f7264696e676c792c207265676172646c657373207468617420697420636f6e7461696e732074616773206f6e6c792e3c2f7068 internal-tag ownttip\"><span title=\"19 - This segment must be imported so that it will be added to the target and the autostates are set accordingly, regardless that it contains tags only.\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"ff8c2715bb011c6e147b9131d9766ec9\" data-length=\"-1\" class=\"full\">19 - This segment must be imported so that it will be added to the target and the autostates are set accordingly, regardless that it contains tags only.<\/span><\/div>",
-        "sourceMd5": "371685f870c09436b16c017581b85af8",
-        "sourceToSort": "",
+        "source": "<div class=\"single 70683e3139202d2054686973207365676d656e74206d75737420626520696d706f727465642073696e6365206974206861732074657874206f757473696465206f6620746865207461672e3c2f7068 internal-tag ownttip\"><span title=\"19 - This segment must be imported since it has text outside of the tag.\" class=\"short\">&lt;1\/&gt;<\/span><span data-originalid=\"dce21bf527e3dd866dfdd0ff74df9690\" data-length=\"-1\" class=\"full\">19 - This segment must be imported since it has text outside of the tag.<\/span><\/div>Text",
+        "sourceMd5": "ba2b010f0649fe4e10fe4556f7c5d8c7",
+        "sourceToSort": "Text",
         "target": "",
         "targetMd5": "d41d8cd98f00b204e9800998ecf8427e",
         "targetToSort": "",
@@ -514,7 +514,7 @@
     },
     {
         "segmentNrInTask": "20",
-        "mid": "1_21",
+        "mid": "1_22",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -541,7 +541,7 @@
     },
     {
         "segmentNrInTask": "21",
-        "mid": "2_22",
+        "mid": "2_23",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -568,7 +568,7 @@
     },
     {
         "segmentNrInTask": "22",
-        "mid": "3_23",
+        "mid": "3_24",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -595,7 +595,7 @@
     },
     {
         "segmentNrInTask": "23",
-        "mid": "4_24",
+        "mid": "4_25",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -622,7 +622,7 @@
     },
     {
         "segmentNrInTask": "24",
-        "mid": "5_25",
+        "mid": "5_26",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -649,7 +649,7 @@
     },
     {
         "segmentNrInTask": "25",
-        "mid": "5_26-sub-ph-a_3",
+        "mid": "5_27-sub-ph-a_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -676,7 +676,7 @@
     },
     {
         "segmentNrInTask": "26",
-        "mid": "6_27",
+        "mid": "6_28",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -703,7 +703,7 @@
     },
     {
         "segmentNrInTask": "27",
-        "mid": "6_28-sub-ph-1",
+        "mid": "6_29-sub-ph-1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -730,7 +730,7 @@
     },
     {
         "segmentNrInTask": "28",
-        "mid": "6_29",
+        "mid": "6_30",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -757,7 +757,7 @@
     },
     {
         "segmentNrInTask": "29",
-        "mid": "7_30",
+        "mid": "7_31",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -784,7 +784,7 @@
     },
     {
         "segmentNrInTask": "30",
-        "mid": "7_31-sub-ph-1",
+        "mid": "7_32-sub-ph-1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -811,7 +811,7 @@
     },
     {
         "segmentNrInTask": "31",
-        "mid": "7_32-sub-ph-3",
+        "mid": "7_33-sub-ph-3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -838,7 +838,7 @@
     },
     {
         "segmentNrInTask": "32",
-        "mid": "7_33",
+        "mid": "7_34",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -865,7 +865,7 @@
     },
     {
         "segmentNrInTask": "33",
-        "mid": "7_34-sub-ph-2",
+        "mid": "7_35-sub-ph-2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -892,7 +892,7 @@
     },
     {
         "segmentNrInTask": "34",
-        "mid": "9_35",
+        "mid": "9_36",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -919,7 +919,7 @@
     },
     {
         "segmentNrInTask": "35",
-        "mid": "9_36-sub-ph-a_1",
+        "mid": "9_37-sub-ph-a_1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -946,7 +946,7 @@
     },
     {
         "segmentNrInTask": "36",
-        "mid": "9_37-sub-ph-a_3",
+        "mid": "9_38-sub-ph-a_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -973,7 +973,7 @@
     },
     {
         "segmentNrInTask": "37",
-        "mid": "9_38-sub-ph-a_2",
+        "mid": "9_39-sub-ph-a_2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1000,7 +1000,7 @@
     },
     {
         "segmentNrInTask": "38",
-        "mid": "10_39",
+        "mid": "10_40",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1027,7 +1027,7 @@
     },
     {
         "segmentNrInTask": "39",
-        "mid": "10_40-sub-ph-a_1",
+        "mid": "10_41-sub-ph-a_1",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1054,7 +1054,7 @@
     },
     {
         "segmentNrInTask": "40",
-        "mid": "10_41-sub-ph-a_3",
+        "mid": "10_42-sub-ph-a_3",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1081,7 +1081,7 @@
     },
     {
         "segmentNrInTask": "41",
-        "mid": "10_42-sub-ph-a_2",
+        "mid": "10_43-sub-ph-a_2",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1108,7 +1108,7 @@
     },
     {
         "segmentNrInTask": "42",
-        "mid": "11_43",
+        "mid": "11_44",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1135,7 +1135,7 @@
     },
     {
         "segmentNrInTask": "43",
-        "mid": "12_44",
+        "mid": "12_45",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1162,7 +1162,7 @@
     },
     {
         "segmentNrInTask": "44",
-        "mid": "13_45",
+        "mid": "13_46",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1189,7 +1189,7 @@
     },
     {
         "segmentNrInTask": "45",
-        "mid": "14_46",
+        "mid": "14_47",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1216,7 +1216,7 @@
     },
     {
         "segmentNrInTask": "46",
-        "mid": "15_47",
+        "mid": "15_48",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",
@@ -1243,7 +1243,7 @@
     },
     {
         "segmentNrInTask": "47",
-        "mid": "16_48",
+        "mid": "16_49",
         "userGuid": "{00000000-0000-0000-C100-CCDDEE000001}",
         "userName": "manager test",
         "editable": "1",

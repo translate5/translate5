@@ -307,12 +307,11 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Update modification transac group attributes.
-     * When the attribute group does not exist, transac creation and transac modification will be created.
-     *
+     * Handle transac attributes group. If no transac group attributes exist for the entity, new one will be created.
+     * 
      * @param editor_Models_Term|editor_Models_TermCollection_TermEntry $entity
      */
-    public function updateModificationGroupAttributes($entity){
+    public function handleTransacGroup($entity){
         $s=$this->db->select();
         if($entity instanceof editor_Models_Term){
             $s->where('termId=?',$entity->getId());
@@ -324,18 +323,14 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $s->where('name="transac"')
         ->where('attrType="modification"');
         $ret=$this->db->fetchAll($s)->toArray();
-        $user = new Zend_Session_Namespace('user');
-        $fullName = $user->data->firstName.' '.$user->data->surName;
+        //if the transac group exist, do nothing
         if(!empty($ret)){
-            $ret=$ret[0];
-            $this->db->update(['updated'=>null],['id=?'=>$ret['id']]);
-            $this->db->update(['updated'=>null,'value'=>time()],['parentId=?'=>$ret['id'],'name="date"']);
-            $this->db->update(['updated'=>null,'value'=>$fullName],['parentId=?'=>$ret['id'],'name="transacNote"']);
-            return;
+            return false;
         }
         //the transacgroups are not existing, create new
         $this->createTransacGroup($entity,'creation');
         $this->createTransacGroup($entity,'modification');
+        return true;
     }
     
     /***
@@ -463,9 +458,48 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         return $tree;
     }
     
+    
+    /***
+     * Update term modification attribute group with the term proposal values.
+     * The modification group date and editor will be set as term proposal date an term proposal editor.
+     * 
+     * @param array $attributes
+     * @param array $termProposal
+     */
+    public function updateModificationGroupDate(array $attributes,array $termProposal){
+        if(empty($attributes) || empty($termProposal) || empty($termProposal['created']) || empty($termProposal['userName'])){
+            return $attributes;
+        }
+        
+        //foreach term attribute check, find the transac modification attribute
+        foreach ($attributes as &$attribute){
+            
+            if(empty($attribute['children'])){
+                continue;
+            }
+            
+            //ignore non modification tags
+            if($attribute['name']!='transac' || $attribute['attrType']!='modification'){
+                continue;
+            }
+            
+            foreach ($attribute['children'] as &$child){
+                if($child['name']=='date'){
+                    //convert the date to unix timestamp
+                    $child['attrValue']=strtotime($termProposal['created']);
+                }
+                if($child['name']=='transacNote' && ($child['attrType']=='responsiblePerson' || $child['attrType']=='responsibility')){
+                    $child['attrValue']=$termProposal['userName'];
+                }
+            }
+        }
+        return $attributes;
+    }
+    
     /***
      * Check if for the current term there is a processStatus attribute. When there is no one, create it.
      * @param int $termId
+     * @return NULL|mixed|array
      */
     public function checkOrCreateProcessStatus(int $termId) {
         $s=$this->db->select()
@@ -475,7 +509,7 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         
         $result=$this->db->fetchAll($s)->toArray();
         if(count($result)>0){
-            return;
+            return null;
         }
         
         $term=ZfExtended_Factory::get('editor_Models_Term');
@@ -507,7 +541,48 @@ class editor_Models_Term_Attribute extends ZfExtended_Models_Entity_Abstract {
         $this->setUserName($term->getUserName());
         $this->setProcessStatus($term->getProcessStatus());
         $this->setValue($term->getProcessStatus());
+        
+        return $this->save();
+    }
+    
+    /***
+     * Add comment attribute for given term
+     * @param int $termId
+     * @param string $termText
+     * @return editor_Models_Term_Attribute
+     */
+    public function addTermComment(int $termId,string $termText){
+        $term=ZfExtended_Factory::get('editor_Models_Term');
+        /* @var $term editor_Models_Term */
+        $term->load($termId);
+        
+        $lang = ZfExtended_Factory::get('editor_Models_Languages');
+        /* @var $lang editor_Models_Languages */
+        $lang->loadById($term->getLanguage());
+        
+        $label = ZfExtended_Factory::get('editor_Models_TermCollection_TermAttributesLabel');
+        /* @var $label editor_Models_TermCollection_TermAttributesLabel */
+        $label->loadOrCreate('note', null);
+        
+        $this->init([
+            'name' => 'note',
+            'created' => NOW_ISO,
+            'internalCount' => 1,
+            'collectionId' => $term->getCollectionId(),
+            'termId'=>$term->getId(),
+            'termEntryId' => $term->getTermEntryId(),
+            'language' => strtolower($lang->getRfc5646()),
+            'attrLang' => strtolower($lang->getRfc5646()),
+            'labelId' => $label->getId(),
+            'processStatus'=>editor_Models_Term::PROCESS_STATUS_UNPROCESSED
+        ]);
+        $this->setValue(trim($termText));
+        $sessionUser = new Zend_Session_Namespace('user');
+        $this->setUserGuid($sessionUser->data->userGuid);
+        $this->setUserName($sessionUser->data->userName);
+        $this->hasField('updated') && $this->setUpdated(NOW_ISO);
         $this->save();
+        return $this;
     }
     
     public function getDataObject() {

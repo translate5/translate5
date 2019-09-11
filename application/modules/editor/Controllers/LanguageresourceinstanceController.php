@@ -127,9 +127,15 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
             $languageResourceInstance->init($languageresource);
             
             $languageresource['taskList'] = $this->getTaskInfos($languageresource['id']);
-            $moreInfo = '';
-            $languageresource['status'] = $resource->getInitialStatus($moreInfo);
-            $languageresource['statusInfo'] = $t->_($moreInfo);
+            if(empty($resource)) {
+                $languageresource['status'] = editor_Services_Connector_Abstract::STATUS_ERROR;
+                $languageresource['statusInfo'] = $t->_('Die verwendete Resource wurde aus der Konfiguration entfernt.');
+            }
+            else {
+                $moreInfo = '';
+                $languageresource['status'] = $resource->getInitialStatus($moreInfo);
+                $languageresource['statusInfo'] = $t->_($moreInfo);
+            }
             
             $id = $languageresource['id'];
             //add customer assocs
@@ -851,18 +857,39 @@ class editor_LanguageresourceinstanceController extends ZfExtended_RestControlle
     }
     
     public function deleteAction(){
+        //load the entity
         $this->entityLoad();
-        $manager = ZfExtended_Factory::get('editor_Services_Manager');
-        /* @var $manager editor_Services_Manager */
-        $connector = $manager->getConnector($this->entity);
-        $deleteInResource = !$this->getParam('deleteLocally', false);
-        $deleteInResource && $connector->delete();
-        
-        $userSession = new Zend_Session_Namespace('user');
-        
-        error_log("LanguageResource with name:".$this->entity->getName()." and id:".$this->entity->getId()." was deleted by:".$userSession->data->firstName." ".$userSession->data->surName);
         $this->processClientReferenceVersion();
-        $this->entity->delete();
+        
+        //encapsulate the deletion in a transaction to rollback if for example the real file based resource can not be deleted 
+        $this->entity->db->getAdapter()->beginTransaction();
+        try {
+            $entity = clone $this->entity;
+            //delete the entity in the DB
+            $this->entity->delete();
+        }
+        catch(ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+            //if there are associated tasks we can not delete the language resource
+            ZfExtended_Models_Entity_Conflict::addCodes([
+                'E1158' => 'A Language Resources cannot be deleted as long as tasks are assigned to this Language Resource.'
+            ], 'editor.languageresources');
+            throw new ZfExtended_Models_Entity_Conflict('E1158');
+        }
+        try {
+            $manager = ZfExtended_Factory::get('editor_Services_Manager');
+            /* @var $manager editor_Services_Manager */
+            $connector = $manager->getConnector($entity);
+            $deleteInResource = !$this->getParam('deleteLocally', false);
+            //try to delete the resource via the connector 
+            $deleteInResource && $connector->delete();
+            //if this is successfull we commit the DB delete
+            $this->entity->db->getAdapter()->commit();
+        }
+        catch (Exception $e) {
+            //if not we rollback and throw the original exception
+            $this->entity->db->getAdapter()->rollBack();
+            throw $e;
+        }
     }
     
     /**

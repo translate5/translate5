@@ -115,54 +115,54 @@ should make any problem!]]></header>
         </alt-trans>
       </trans-unit>
       <trans-unit id="32344330" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></source>
+        <source><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></source>
         <seg-source>
-          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test</mrk>
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
         </seg-source>
-        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test - edited</mrk> <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited</mrk><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></target>
+        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test - edited</mrk> <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></target>
         <alt-trans mid="1" match-quality="10%">
           <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
           <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
         </alt-trans>
       </trans-unit>
       <trans-unit id="32344331" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <source><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
         <seg-source>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
-          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test</mrk>
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
         </seg-source>
-        <target><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test - edited</mrk> <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited</mrk></target>
+        <target><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 44 characters (42 text + 1nbsp + 1 between mrk)</ph>across tags outside from mrk test - edited</mrk> <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk></target>
         <alt-trans mid="1" match-quality="10%">
           <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
           <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
         </alt-trans>
       </trans-unit>
       <trans-unit id="32344332" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304">
-        <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <source><ph id="1" ax:element-id="0">after edit 45 characters (42 text + 1nbsp + 2 surround isolated ph tag)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
         <seg-source>
-          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 45 characters (42 text + 1nbsp + 2 surround isolated ph tag)</ph>across tags outside from mrk test</mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
         </seg-source>
-        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test - edited</mrk> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph> <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited</mrk></target>
+        <target><mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 45 characters (42 text + 1nbsp + 2 surround isolated ph tag)</ph>across tags outside from mrk test - edited</mrk> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph> <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk></target>
         <alt-trans mid="1" match-quality="10%">
           <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
           <target>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></target>
         </alt-trans>
       </trans-unit>
       <trans-unit id="32344333" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304" xml:space="preserve">
-        <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></source>
+        <source><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph></source>
         <seg-source>
-          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test</mrk>
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
         </seg-source>
         <target>
           <mrk mtype="seg" mid="1"></mrk>
-          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
         </target>
         <alt-trans mid="1" match-quality="10%">
@@ -171,16 +171,16 @@ should make any problem!]]></header>
         </alt-trans>
       </trans-unit>
       <trans-unit id="32344334" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304" xml:space="preserve">
-        <source><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <source><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
         <seg-source>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
-          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test</mrk>
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
         </seg-source>
         <target>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
           <mrk mtype="seg" mid="1"></mrk>
-          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
         </target>
         <alt-trans mid="1" match-quality="10%">
           <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>
@@ -188,16 +188,16 @@ should make any problem!]]></header>
         </alt-trans>
       </trans-unit>
       <trans-unit id="32344335" maxwidth="80" size-unit="char" ax:state-name="Corrected" ax:state-id="183" ax:state-flags="4194304" xml:space="preserve">
-        <source><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
+        <source><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test<ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph><x id="3"/><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </source>
         <seg-source>
-          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">&lt;p_in&gt;</ph>across tags outside from mrk test</mrk>
+          <mrk mtype="seg" mid="1"><ph id="1" ax:element-id="0">after edit 85 characters (42 text + 1nbsp + 42 other)</ph>across tags outside from mrk test</mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
           <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
         </seg-source>
         <target>
           <mrk mtype="seg" mid="1"></mrk>
           <ph id="4" ax:element-id="3">&lt;/p_in&gt;</ph>
-          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph>  - edited</mrk>
+          <mrk mtype="seg" mid="2"><x id="3"/><ph id="2" ax:element-id="1">&lt;/p_in&gt;</ph><ph id="3" ax:element-id="2">&lt;p_in&gt;</ph> </mrk>
         </target>
         <alt-trans mid="1" match-quality="10%">
           <source>alt-trans tag may not be in the skeleton<ph id="1" ax:element-id="15">&lt;/p_in&gt;</ph></source>

@@ -805,12 +805,15 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     public function save() {
         if(!empty($this->dbWritable)) {
             if($this->dbWritable->isView()) {
-                //throw exception that we are saveing the view;
-                //TODO the actual table name in the exception
-                throw new ZfExtended_Exception("Unable to save the segment. The segment table name is set to matirialized view. Segment id:".$this->getId().", taskGuid:".$this->getTaskGuid());
+                //Unable to save the segment. The segment model tried to save to the materialized view directly. 
+                throw new editor_Models_Segment_Exception('E1155', [
+                    'segmentId' => $this->getId(),
+                    'taskGuid' => $this->getTaskGuid(),
+                    'usedTableName' => $this->dbWritable->info($this->dbWritable::NAME)
+                ]);
             }
             
-            //clean unneded materialized view data
+            //clean unneeded materialized view data
             $this->unsetMaterializedViewData();
             $this->row->setTable($this->dbWritable);
         }
@@ -991,6 +994,8 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
      * @return editor_Models_Segment | null if no next found
      */
     public function loadNext($taskGuid, $id, $fileId = null) {
+        $this->segmentFieldManager->initFields($taskGuid);
+        
         $s = $this->db->select();
         $s = $this->addWatchlistJoin($s);
         $s = $this->addWhereTaskGuid($s, $taskGuid);
@@ -1672,14 +1677,14 @@ class editor_Models_Segment extends ZfExtended_Models_Entity_Abstract {
     }
     
     /***
-     * Unset row data collumns which are not existin in the $dbWritable
+     * Unset row data columns which are not existing in the $dbWritable
      */
     protected function unsetMaterializedViewData(){
-        $dataColumns=$this->row->toArray();
+        $dataColumns = array_keys($this->row->toArray());
         $tableInfo=$this->dbWritable->info();
         $segmentColumns=$tableInfo['cols'];
         
-        foreach ($dataColumns as $key=>$value){
+        foreach ($dataColumns as $key){
             //unset the rows not existing in the segment table
             if(!in_array($key,$segmentColumns)){
                 $this->row->__unset($key);

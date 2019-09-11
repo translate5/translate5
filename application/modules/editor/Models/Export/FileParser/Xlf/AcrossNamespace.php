@@ -111,19 +111,23 @@ class editor_Models_Export_FileParser_Xlf_AcrossNamespace extends editor_Models_
             $xmlparser->replaceChunk($key, $replacement);
             */
             
+            $keyToReplace = $this->currentErrorInfosKey;
+            $this->currentPropertiesKey = null;
+            $this->currentErrorInfosKey = null;
+            
             $commentString = $this->processCommentsAsAnalysisResult();
-            if(empty($this->currentErrorInfosKey)) {
+            if(empty($commentString)) {
+                return;
+            }
+            if(empty($keyToReplace)) {
+                $keyToReplace = $key; //inject analysisResult before transunit
                 $replacement = '<ax:analysisResult><ax:errorInfos>'.$commentString.'</ax:errorInfos></ax:analysisResult>'.$xmlparser->getChunk($key);
             }
             else {
-                $keyToReplace = $this->currentErrorInfosKey;
-                $replacement = $commentString.$xmlparser->getChunk($key);
+                //inject content before </ax:errorInfos>
+                $replacement = $commentString.$xmlparser->getChunk($keyToReplace);
             }
-            
-            $xmlparser->replaceChunk($key, $replacement);
-            
-            $this->currentPropertiesKey = null;
-            $this->currentErrorInfosKey = null;
+            $xmlparser->replaceChunk($keyToReplace, $replacement);
         });
     }
     

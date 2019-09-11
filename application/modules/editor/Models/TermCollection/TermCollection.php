@@ -52,17 +52,14 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         return $import->parseTbxFile($filePath,$params['collectionId']);
     }
     
-    /***
+    /**
      * Create new term collection and return the id.
-     * The autoCreatedOnImport flag is set to true.
      * @param string $name
      * @param array $customers
-     * @param int $autoCreatedOnImport
      * 
      * @return int
      */
-    public function create(string $name,array $customers,int $autoCreatedOnImport=1){
-        $this->setAutoCreatedOnImport($autoCreatedOnImport);
+    public function create(string $name,array $customers){
         $this->setName($name);
         
         $service=ZfExtended_Factory::get('editor_Services_TermCollection_Service');
@@ -227,7 +224,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
     }
     
     /***
-     * Associate termCollection to taskGuid
+     * Associate termCollection to taskGuid (warning, sets autoCreatedOnImport = true)
      * 
      * @param mixed $collectionId
      * @param string $taskGuid
@@ -238,6 +235,7 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
         $model->setLanguageResourceId($collectionId);
         $model->setTaskGuid($taskGuid);
         $model->setSegmentsUpdateable(false);
+        $model->setAutoCreatedOnImport(true);
         $model->save();
     }
     
@@ -283,25 +281,34 @@ class editor_Models_TermCollection_TermCollection extends editor_Models_Language
      * @param array $collectionIds
      */
     public function checkAndRemoveTaskImported($taskGuid){
-        $s=$this->db->select()
-        ->setIntegrityCheck(false)
-        ->from('LEK_languageresources',array('LEK_languageresources.*'))
-        ->join('LEK_languageresources_taskassoc', 'LEK_languageresources_taskassoc.languageResourceId = LEK_languageresources.id',array('LEK_languageresources_taskassoc.languageResourceId as collectionId','LEK_languageresources_taskassoc.taskGuid'))
-        ->where('LEK_languageresources_taskassoc.taskGuid=?',$taskGuid)
-        ->where('LEK_languageresources.autoCreatedOnImport=?',1);
-        $rows=$this->db->fetchAll($s)->toArray();
+        
+        //since the reference assoc → langres is not cascade delete, we have to delete them manually
+        $taskAssocTable = ZfExtended_Factory::get('editor_Models_Db_Taskassoc');
+        /* @var $taskAssocTable editor_Models_Db_Taskassoc */
+        $s = $taskAssocTable->select()->where('autoCreatedOnImport = 1 AND taskGuid = ?', $taskGuid);
+        $rows = $this->db->fetchAll($s)->toArray();
+        $taskAssocTable->delete(['autoCreatedOnImport = 1 AND taskGuid = ?' => $taskGuid]);
         
         if(empty($rows)){
-            return false;
+            return;
         }
-        $collectionId=$rows[0]['id'];
-        
-        //remove the collection
-        $this->load($collectionId);
-        $this->delete();
-        
+        //remove the collection(s), should be normally only one
+        foreach($rows as $row) {
+            $this->load($row['languageResourceId']);
+            try {
+                $this->delete();
+            }
+            catch (ZfExtended_Models_Entity_Exceptions_IntegrityConstraint $e) {
+                //do nothing in that case, that means the TermCollection can not be deleted, since it is in use by another task.
+                // So we just leave it then
+            }
+        }
+    }
+    
+    public function delete() {
+        $this->removeCollectionDir($this->getId());
+        parent::delete();
         //remove the termcollection from the disk
-        $this->removeCollectionDir($collectionId);
     }
     
     /***
