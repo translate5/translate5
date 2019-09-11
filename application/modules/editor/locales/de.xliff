@@ -1643,6 +1643,8 @@ Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
 <br />
 {footer}</target></trans-unit>
 <trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='><source>Das Kommentarattribut ist erforderlich</source><target>Das Kommentarattribut ist erforderlich</target></trans-unit>
+<trans-unit id='a2VpbmUgQW5nYWJl'><source>keine Angabe</source><target>keine Angabe</target></trans-unit>
+<trans-unit id='T2huZQ=='><source>Ohne</source><target>Ohne</target></trans-unit>
   </body>
  </file>
 </xliff>
