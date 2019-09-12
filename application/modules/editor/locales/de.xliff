@@ -1644,6 +1644,9 @@ ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für di
 <b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
 <br />{responsibleUser}
 {footer}</target></trans-unit>
+<trans-unit id='a2VpbmUgQW5nYWJl'><source>keine Angabe</source><target>keine Angabe</target></trans-unit>
+<trans-unit id='T2huZQ=='><source>Ohne</source><target>Ohne</target></trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Sehr geehrte(r)</target></trans-unit>
   </body>
  </file>
 </xliff>

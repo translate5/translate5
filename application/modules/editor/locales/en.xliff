@@ -3513,7 +3513,15 @@ another user took responsibility for the task <b>{task.taskNr} - {task.taskName}
 <br />{responsibleUser}
 {footer}</target>
 </trans-unit>
-
+<trans-unit id='a2VpbmUgQW5nYWJl'>
+    <source>keine Angabe</source>
+    <target>not specified</target>
+</trans-unit>
+<trans-unit id='T2huZQ=='>
+    <source>Ohne</source>
+    <target>None</target>
+</trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
     </body>
   </file>
 </xliff>
