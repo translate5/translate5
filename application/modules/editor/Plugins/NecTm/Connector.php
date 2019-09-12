@@ -203,10 +203,19 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             $result = $this->api->getResult();
         }
         
+        if(empty($result)) {
+            return $this->resultList;
+        }
+        
         $translation = $result->tu->target_text ?? "";
         if($reimportWhitespace) {
             $translation = $this->importWhitespaceFromTagLessQuery($translation);
         }
+        
+        // NEC-TM seems to try to insert internal tags "at the same place" in the found translation.
+        // Example:
+        // - "source_text": "translate5 <div class="open 672069643d22393222 internal-tag ownttip">ist Open Source</div>:"
+        // - "target_text": "translate5 <div class="open 672069643d22393222 internal-tag ownttip">is Open Source</div>:"
         
         $this->resultList->addResult($translation, $result->match, $this->getMetaData($result));
         return $this->resultList;

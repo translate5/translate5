@@ -189,11 +189,12 @@ class editor_Plugins_NecTm_HttpApi {
         $endpointPath = 'tm';
         $data = [];
         $params = array('q'           => $queryString,
-                        'slang'       => 'de',       // TODO
-                        'tlang'       => 'en',       // TODO
-                        'aut_trans'   => false,      // TODO
-                        'concordance' => false,
-                        'strip_tags'  => false,      // TODO
+                        'slang'       => 'de',      // TODO
+                        'tlang'       => 'en',      // TODO
+                        // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
+                        'aut_trans'   => false,     // "Apply machine translation if match score is less than a threshold"; default: true
+                        // 'concordance' => false,  // "Concordance search mode"; default: false
+                        // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
                         'tag'         => $tagIds);
         $this->necTmRequest($method, $endpointPath, $data, $params);
         $results = $this->result->results; // TODO: multiple results??
@@ -215,11 +216,12 @@ class editor_Plugins_NecTm_HttpApi {
         $endpointPath = 'tm';
         $data = [];
         $params = array('q'           => $searchString,
-                        'slang'       => 'de',       // TODO
-                        'tlang'       => 'en',       // TODO
-                        'aut_trans'   => false,      // TODO
-                        'concordance' => true,
-                        'strip_tags'  => false,      // TODO
+                        'slang'       => 'de',      // TODO
+                        'tlang'       => 'en',      // TODO
+                        // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
+                        'aut_trans'   => false,     // "Apply machine translation if match score is less than a threshold"; default: true
+                        'concordance' => true,      // "Concordance search mode"; default: false
+                        // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
                         'tag'         => $tagIds);
         $this->necTmRequest($method, $endpointPath, $data, $params);
         // NEC-TM doesn't offer to search by field; we must filter the results manually:
