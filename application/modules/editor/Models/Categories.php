@@ -61,4 +61,23 @@ class editor_Models_Categories extends ZfExtended_Models_Entity_Abstract {
         $s->where('origin = ?', $origin);
         return parent::loadFilterdCustom($s);  // ??????????????
     }
+    
+    /**
+     * Loads the category to the given originalCategoryId.
+     * @param string $originalCategoryId
+     * @return array
+     */
+    public function loadByOriginalCategoryId(string $originalCategoryId) {
+        try {
+            $s = $this->db->select()->where('originalCategoryId = ?', $originalCategoryId);
+            $row = $this->db->fetchRow($s);
+        } catch (Exception $e) {
+            $this->notFound('NotFound after other Error', $e);
+        }
+        if (!$row) {
+            $this->notFound(__CLASS__ . '#originalCategoryId', $originalCategoryId);
+        }
+        //load implies loading one Row, so use only the first row
+        $this->row = $row;
+    }
 }

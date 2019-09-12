@@ -64,6 +64,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     protected $categories;
     
     /**
+     * @var editor_Models_Categories
+     */
+    protected $categoriesModel;
+    
+    /**
      * All languages (id => rfc5646)
      * @var array 
      */
@@ -77,8 +82,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         parent::connectTo($languageResource, $sourceLang, $targetLang);
         $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
-        /* @var $parser editor_Models_Import_FileParser_XmlParser */
         $this->setCategories($languageResource);
+        $this->categoriesModel = ZfExtended_Factory::get('editor_Models_Categories');
     }
     
     /**
@@ -89,11 +94,11 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
     protected function setCategories($languageResource) {
-        $ccategoriesFromResource = $languageResource->getOriginalCategoriesIds();
+        $categoriesFromResource = $languageResource->getOriginalCategoriesIds();
         $service = ZfExtended_Factory::get('editor_Plugins_NecTm_Service');
         /* @var $service editor_Plugins_NecTm_Service */
-        $ccategoriesFromService = $service->getTopLevelCategoriesIds();
-        $this->categories = array_unique(array_merge($ccategoriesFromResource, $ccategoriesFromService), SORT_STRING);
+        $categoriesFromService = $service->getTopLevelCategoriesIds();
+        $this->categories = array_unique(array_merge($categoriesFromResource, $categoriesFromService), SORT_STRING);
     }
     
     /**
@@ -198,12 +203,12 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             $result = $this->api->getResult();
         }
         
-        $translation = $result ?? "";
+        $translation = $result->tu->target_text ?? "";
         if($reimportWhitespace) {
             $translation = $this->importWhitespaceFromTagLessQuery($translation);
         }
         
-        $this->resultList->addResult($translation, $this->defaultMatchRate);
+        $this->resultList->addResult($translation, $result->match, $this->getMetaData($result));
         return $this->resultList;
     }
     
@@ -235,14 +240,43 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         // TODO
     }
     
-    
     /**
      * Helper function to get the metadata which should be shown in the GUI out of a single result
      * @param stdClass $found
      * @return stdClass
      */
     protected function getMetaData($found) {
-        // TODO
+        $nameToShow = [
+            "file_name",
+            "mt",
+            "update_date",
+            "username",
+            "tag"
+        ];
+        $result = [];
+        $tags = [];
+        foreach($nameToShow as $name) {
+            if(property_exists($found, $name)) {
+                $item = new stdClass();
+                $item->name = $name;
+                $item->value = $found->{$name};
+                if($name == 'update_date') {
+                    $item->value = date('Y-m-d H:i:s T', strtotime($item->value));
+                }
+                if($name == 'tag') {
+                    $tagIds = $item->value;
+                    foreach ($tagIds as $tagId) {
+                        $this->categoriesModel->loadByOriginalCategoryId($tagId);
+                        $label = $this->categoriesModel->getLabel();
+                        $type = $this->categoriesModel->getSpecificData('type');
+                        $tags[] = $label.' ('.$type.')';
+                    }
+                    $item->value = $tags;
+                }
+                $result[] = $item;
+            }
+        }
+        return $result;
     }
     
     /**
@@ -255,7 +289,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             $results = $this->api->getResult();
         }
         
-        // NEC_TM's API does not allow for offsets/paging in the search.
+        // NEC-TM's API does not allow for offsets/paging in the search.
         if(empty($results)){
             return $this->resultList;
         }

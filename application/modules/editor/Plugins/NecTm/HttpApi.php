@@ -197,7 +197,7 @@ class editor_Plugins_NecTm_HttpApi {
                         'tag'         => $tagIds);
         $this->necTmRequest($method, $endpointPath, $data, $params);
         $results = $this->result->results; // TODO: multiple results??
-        $this->result = $results[0]->tu->target_text;
+        $this->result = $results[0];
         return true;
     }
     
