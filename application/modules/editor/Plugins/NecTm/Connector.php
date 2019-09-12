@@ -102,7 +102,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     }
     
     /**
-     * 
+     * NEC-TM_Api doesn't work with locales, use generic language!
      */
     protected function getRfcLang($lang) {
         if (!$this->lngs) {
@@ -111,7 +111,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             /* @var $langModel editor_Models_Languages */
             $this->lngs = $langModel->loadAllKeyValueCustom('id','rfc5646');
         }
-        return $this->lngs[$lang];
+        return explode("-", $this->lngs[$lang])[0];
     }
     
     /**
@@ -152,7 +152,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function getValidFiletypes() {
         return [
-            'TM' => ['application/zip'],
             'TMX' => ['application/xml','text/xml'],
         ];
     }
@@ -163,7 +162,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function getValidExportTypes() {
         return [
-            'TM' => 'application/zip',
             'TMX' => 'application/xml',
         ];
     }
@@ -173,7 +171,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm($mime) {
-        if($this->api->get($mime)) {
+        if($this->api->get($mime, $this->getRfcLang($this->sourceLang), $this->getRfcLang($this->targetLang), $this->categories)) {
             return $this->api->getResult();
         }
         $this->throwBadGateway();
@@ -199,7 +197,7 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         }
         
         $result = null;
-        if($this->api->search($searchString,$this->getRfcLang($this->sourceLang),$this->getRfcLang($this->targetLang), $this->categories)){
+        if($this->api->search($searchString, $this->getRfcLang($this->sourceLang), $this->getRfcLang($this->targetLang), $this->categories)){
             $result = $this->api->getResult();
         }
         

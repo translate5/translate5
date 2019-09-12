@@ -110,7 +110,7 @@ class editor_Plugins_NecTm_HttpApi {
      */
     protected function getAccessToken() {
         $cachedToken = $this->memCache->load(self::TOKEN_CACHE_KEY);
-        if(!$cachedToken || empty($cachedToken)) {
+        if (!$cachedToken || empty($cachedToken)) {
             $cachedToken = $this->setAccessToken();
         }
         return $cachedToken;
@@ -170,10 +170,10 @@ class editor_Plugins_NecTm_HttpApi {
         $endpointPath = 'tags';
         $data = [];
         $params = [];
-        $this->necTmRequest($method, $endpointPath, $data, $params);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
         $result = $this->result;
         $this->result = $result->tags;
-        return true;
+        return $processResponse;
     }
     
     /**
@@ -189,17 +189,17 @@ class editor_Plugins_NecTm_HttpApi {
         $endpointPath = 'tm';
         $data = [];
         $params = array('q'           => $queryString,
-                        'slang'       => 'de',      // TODO
-                        'tlang'       => 'en',      // TODO
+                        'slang'       => $sourceLang,
+                        'tlang'       => $targetLang,
                         // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
                         'aut_trans'   => false,     // "Apply machine translation if match score is less than a threshold"; default: true
                         // 'concordance' => false,  // "Concordance search mode"; default: false
                         // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
                         'tag'         => $tagIds);
-        $this->necTmRequest($method, $endpointPath, $data, $params);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
         $results = $this->result->results; // TODO: multiple results??
-        $this->result = $results[0];
-        return true;
+        $this->result = $results[0] ?? $results;
+        return $processResponse;
     }
     
     /**
@@ -216,14 +216,14 @@ class editor_Plugins_NecTm_HttpApi {
         $endpointPath = 'tm';
         $data = [];
         $params = array('q'           => $searchString,
-                        'slang'       => 'de',      // TODO
-                        'tlang'       => 'en',      // TODO
+                        'slang'       => $sourceLang,
+                        'tlang'       => $targetLang,
                         // 'min_match' => '75'      // "Return only match above or equal to given threshold (0-100)"; default: ​ 75
                         'aut_trans'   => false,     // "Apply machine translation if match score is less than a threshold"; default: true
                         'concordance' => true,      // "Concordance search mode"; default: false
                         // 'strip_tags'  => false,  // "Strip all XML tags from the query"; default: false
                         'tag'         => $tagIds);
-        $this->necTmRequest($method, $endpointPath, $data, $params);
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
         // NEC-TM doesn't offer to search by field; we must filter the results manually:
         $allResults = $this->result->results;
         $results = [];
@@ -244,9 +244,79 @@ class editor_Plugins_NecTm_HttpApi {
             }
         }
         $this->result = $results;
-        return true;
+        return $processResponse;
     }
     
+    /**
+     * Import translation memory segments from TMX file.
+     * @param file $file        ("Zipped TMX file to import.") // TODO: type?
+     * @param string $tag       ("Tag name of the imported file.")
+     * @param string $lang_pair ("2-letter language codes join by underscore.")
+     * @return boolean
+     */
+    public function importTMXfile($file, $tag, $lang_pair) {
+        // TODO
+    }
+    
+    /**
+     * Add new translation memory unit.
+     * @param string $sourceText ("Source segment text.")
+     * @param string $targetText ("Target segment text.")
+     * @param string $sourceLang ("Source language.")
+     * @param string $targetLang ("Target language.")
+     * @param string $tagId      ("Translation unit tag.")
+     * @return boolean
+     */
+    public function addTMUnit($sourceText, $targetText, $sourceLang, $targetLang, $tagId) {
+        $method = 'POST';
+        $endpointPath = 'tm';
+        $data = [];
+        $params = array('stext' => $sourceText,
+                        'ttext' => $targetText,
+                        'slang' => $sourceLang,
+                        'tlang' => $targetLang,
+                        'tag'   => $tagId); // TODO: handle multiple tags in our languageResource by running a request for each?
+        $processResponse = $this->necTmRequest($method, $endpointPath, $data, $params);
+        return $processResponse;
+    }
+    
+    /**
+     * retrieves the TM as TM file
+     * @param string|array $mime
+     * @param string $sourceLang
+     * @param string $targetLang
+     * @param string $tagId
+     * @return boolean
+     */
+    public function get($mime, $sourceLang, $targetLang, $tagId) {
+        if (is_array($mime)) {
+            $mime = implode(',', $mime);
+        }
+        
+        // Step 1: "Export translation memory segments to zipped TMX file(s)"
+        $method = 'POST';
+        $endpointPath = 'tm/export';
+        $data = [];
+        $params = array('slang' => $sourceLang,
+                        'tlang' => $targetLang,
+                        'tag'   => $tagId[0] ?? ''); // TODO: how to handle multiple tags?
+        $this->necTmRequest($method, $endpointPath, $data, $params);
+        $job_id = $this->result->job_id; // = ID of export task invoked in the background
+        
+        // Step 2: "Download exported file"
+        $method = 'POST';
+        $endpointPath = 'tm/export/file/​'.$job_id;
+        $http = $this->getHttp($method, $endpointPath);
+        $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
+        $http->setConfig(['timeout' => 1200]);
+        $http->setHeaders('Accept', $mime);
+        $response = $this->request($http);
+        if ($response->getStatus() === 200) {
+            $this->result = $response->getBody();
+            return true;
+        }
+        return $this->processResponse($response);
+    }
     
     // -------------------------------------------------------------------------
     // General handling of the API-requests
@@ -262,7 +332,7 @@ class editor_Plugins_NecTm_HttpApi {
             $config = Zend_Registry::get('config');
             /* @var $config Zend_Config */
             $urls = $config->runtimeOptions->plugins->NecTm->server->toArray();
-            if(empty($urls) || empty($urls[0])){
+            if (empty($urls) || empty($urls[0])) {
                 $this->throwBadGateway();
             }
             $this->apiUrl = $urls[0];
@@ -302,6 +372,7 @@ class editor_Plugins_NecTm_HttpApi {
      * @param string $endpointPath
      * @param array $data
      * @param array $params
+     * @return boolean
      */
     protected function necTmRequest($method, $endpointPath = '', $data = [], $params = []) {
         $http = $this->getHttp($method, $endpointPath);
@@ -313,10 +384,12 @@ class editor_Plugins_NecTm_HttpApi {
             $setParameter = ($method == 'GET') ? 'setParameterGet' : 'setParameterPost';
             $http->$setParameter($params);
         }
-        $res = $this->request($http);
-        if(!$this->processResponse($res)) {
+        $response = $this->request($http);
+        $processResponse = $this->processResponse($response);
+        if (!$processResponse) {
             $this->throwBadGateway($http);
         }
+        return $processResponse;
     }
     
     /**
@@ -338,7 +411,7 @@ class editor_Plugins_NecTm_HttpApi {
             foreach ($badGatewayMessages as $msg) {
                 $t1 = $e->getMessage();
                 $test = stripos($e->getMessage(), $msg);
-                if(stripos($e->getMessage(), $msg) === false){
+                if (stripos($e->getMessage(), $msg) === false){
                     //check next message
                     continue;
                 }
@@ -380,7 +453,7 @@ class editor_Plugins_NecTm_HttpApi {
         $url = $this->http->getUri(true);
         
         //check for HTTP State (REST errors)
-        if(!in_array($response->getStatus(), $validStates)) {
+        if (!in_array($response->getStatus(), $validStates)) {
             $error = new stdClass();
             $error->type = 'HTTP';
             $error->error = $response->getStatus();
@@ -393,7 +466,7 @@ class editor_Plugins_NecTm_HttpApi {
         $result = (empty($responseBody)) ? '' : json_decode($responseBody);
         
         //check for JSON errors
-        if(json_last_error() > 0){
+        if (json_last_error() > 0) {
             $error = new stdClass();
             $error->type = 'JSON';
             $error->error = json_last_error_msg();
@@ -406,7 +479,7 @@ class editor_Plugins_NecTm_HttpApi {
         $this->result = $result;
         
         //check for error messages from body
-        if(!empty($result->ReturnValue) && $result->ReturnValue > 0) {
+        if (!empty($result->ReturnValue) && $result->ReturnValue > 0) {
             $error = new stdClass();
             $error->type = 'Error Nr. '.$result->ReturnValue;
             $error->error = $result->ErrorMsg;
@@ -428,7 +501,6 @@ class editor_Plugins_NecTm_HttpApi {
      * returns the decoded JSON result
      */
     public function getResult() {
-        $test = $this->result;
         return $this->result;
     }
     
