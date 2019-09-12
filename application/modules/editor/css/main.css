@@ -586,7 +586,9 @@ tr.customState td div {font-style: italic;}
 
 /* User Admin */
 .gender-male {background: url("../images/user.png") no-repeat 6px center;}
+.gender-neutral {background: url("../images/user_gray.png") no-repeat 6px center;}
 .gender-female {background: url("../images/user_female.png") no-repeat 6px center;}
+.gender-neutral {background: url("../images/group.png") no-repeat 6px center;}
 .ico-user-edit {background: url("../images/user_edit.png") no-repeat center;}
 .ico-user-save {background: url("../images/disk.png") no-repeat center;}
 .ico-user-delete {background: url("../images/user_delete.png") no-repeat center;}
