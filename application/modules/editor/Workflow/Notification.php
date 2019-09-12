@@ -33,7 +33,7 @@ END LICENSE AND COPYRIGHT
  */
 class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
     /**
-     * @var ZfExtended_Mail
+     * @var ZfExtended_TemplateBasedMail
      */
     protected $mailer;
     
@@ -89,7 +89,7 @@ class editor_Workflow_Notification extends editor_Workflow_Actions_Abstract {
      * @param array $parameters
      */
     protected function createNotification(string $role, string $template, array $parameters) {
-        $this->mailer = ZfExtended_Factory::get('ZfExtended_Mail');
+        $this->mailer = ZfExtended_Factory::get('ZfExtended_TemplateBasedMail');
         $this->mailer->setParameters($parameters);
         $this->mailer->setTemplate($this->getMailTemplate($role, $template));
     }
