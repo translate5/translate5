@@ -3509,6 +3509,15 @@ You have been automatically unassigned from the task.<br />
     <source>Das Kommentarattribut ist erforderlich</source>
     <target>The comment attribute is required</target>
 </trans-unit>
+<trans-unit id='a2VpbmUgQW5nYWJl'>
+    <source>keine Angabe</source>
+    <target>not specified</target>
+</trans-unit>
+<trans-unit id='T2huZQ=='>
+    <source>Ohne</source>
+    <target>None</target>
+</trans-unit>
+<trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Dear</target></trans-unit>
     </body>
   </file>
 </xliff>
