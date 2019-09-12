@@ -211,7 +211,7 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
         
         $languageResources = ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
         /* @var $languageResources editor_Models_LanguageResources_LanguageResource */
-        $allAvailableLanguageResources = $languageResources->getEnginesByAssoc();
+        $allAvailableLanguageResources = $languageResources->getAllMergedByAssoc();
         
         foreach ($allAvailableLanguageResources as $languageResource){
             $sources = $languageResource['source'];
@@ -242,6 +242,37 @@ class editor_Models_LanguageResources_Languages extends ZfExtended_Models_Entity
             'targetsForSources' => $targetsForSources,
             'sourcesForTargets' => $sourcesForTargets,
         ];
+    }
+    
+    /**
+     * Get all available target locales for a source locale.
+     * The locales are based on available mt language resources.
+     * 
+     * @returns {Array}
+     */
+    public function getTargetsForSources() {
+        $localesAvailable = [];
+        $engineModel=ZfExtended_Factory::get('editor_Models_LanguageResources_LanguageResource');
+        /* @var $engineModel editor_Models_LanguageResources_LanguageResource */
+        
+        //load all available mt resources for the customers of a user
+        $allLanguageResources= $engineModel->getAllMergedByAssoc(true,editor_Models_Segment_MatchRateType::TYPE_MT);
+        
+        foreach($allLanguageResources as $languageResourceToCheck) {
+            
+            //foreach sources, find the available targets
+            foreach ($languageResourceToCheck['source'] as $source){
+                if(!isset($localesAvailable[$source])){
+                    $localesAvailable[$source]=[];
+                }
+                foreach($languageResourceToCheck['target'] as $target){
+                    if(!in_array($target,$localesAvailable[$source]) && $target!=$source){
+                        $localesAvailable[$source][]=$target;
+                    }
+                }
+            }
+        }
+        return $localesAvailable;
     }
 }
 

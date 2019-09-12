@@ -110,25 +110,30 @@ class editor_Models_LanguageResources_LanguageResource extends ZfExtended_Models
     
     /***
      * Get all available language resources for customers of loged user
+     * The result data will in custom format(used in instanttranslate frontend)
+     * 
      * @param bool $addArrayId : if true(default true), the array key will be the language resource id
+     * @param string $resourceType : when given, only available resources of this type will be returned
      * @return array
      */
-    public function getEnginesByAssoc($addArrayId=true){
+    public function getAllMergedByAssoc($addArrayId=true,string $resourceType=null){
         
         $serviceManager = ZfExtended_Factory::get('editor_Services_Manager');
         /* @var $serviceManager editor_Services_Manager */
         $resources = $serviceManager->getAllResources();
-        $mtRes=[];
+        $services=[];
         //get all available tm resources
         foreach($resources as $resource) {
+            $tmpType=null;
+            $tmpType=$resourceType ?? $resource->getType();
             /* @var $resource editor_Models_LanguageResources_Resource */
-            if(!in_array($resource->getService(), $mtRes)){
-                $mtRes[]=$resource->getService();
+            if(!in_array($resource->getService(), $services) && $tmpType==$resource->getType()){
+                $services[]=$resource->getService();
             }
         }
         
-        //filter assoc resources by mt
-        $engines=$this->loadByUserCustomerAssocs($mtRes);
+        //filter assoc resources by services
+        $engines=$this->loadByUserCustomerAssocs($services);
         //check if results are found
         if(empty($engines)){
             return $engines;

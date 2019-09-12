@@ -98,9 +98,16 @@ class editor_Services_TermCollection_Connector extends editor_Services_Connector
         //delete term proposals 
         if(isset($params['deletProposalsOlderThan']) && filter_var($params['deletProposalsOlderThan'], FILTER_VALIDATE_BOOLEAN)){
             $proposals=ZfExtended_Factory::get('editor_Models_Term_Proposal');
-            /* @var $proposal editor_Models_Term_Proposal */
+            /* @var $proposals editor_Models_Term_Proposal */
             $theDate=!$deleteOlderThanCurrentImport && !empty($params['deleteEntriesModifiedOlderThan']) ? $params['deleteEntriesModifiedOlderThan'] :  NOW_ISO;
+            
+            //remove the term proposals
             $proposals->removeOlderThan([$this->languageResource->getId()],$theDate);
+            
+            $attributeProposals=ZfExtended_Factory::get('editor_Models_Term_AttributeProposal');
+            /* @var $attributeProposals editor_Models_Term_AttributeProposal */
+            //remove the attirubte proposals
+            $attributeProposals->removeOlderThan([$this->languageResource->getId()],$theDate);
         }
         
         return true;

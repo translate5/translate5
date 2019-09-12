@@ -123,6 +123,12 @@ class editor_TermattributeController extends ZfExtended_RestController {
         
         //set the groupid, it is used by the attribute proposal component
         $this->view->rows->groupId=$termEntry->getGroupId();
+        
+        $attribute=ZfExtended_Factory::get('editor_Models_Term_Attribute');
+        /* @var $attribute editor_Models_Term_Attribute */
+        
+        //load the term entry attributes
+        $this->view->rows->termEntryAttributes=$attribute->getAttributesForTermEntry($termEntry->getGroupId(),[$termEntry->getCollectionId()]);
     }
     
     /**
