@@ -3,6 +3,24 @@ All notable changes to translate5 will be documented here.
 For a reference to the issue keys see http://jira.translate5.net
 Missing Versions are merged into in the next upper versions, so no extra section is needed.
 
+## [3.2.7] - 2019-09-12
+###Added
+TRANSLATE-1736: Config switch to disable sub-languages for TermPortal search field
+TRANSLATE-1741: Usage of user crowds in translate5
+TRANSLATE-1734: InstantTranslate: Preset of languages used for translation
+TRANSLATE-1735: Optionally make note field in TermPortal mandatory
+TRANSLATE-1733: System config in TermPortal: All languages available for adding a new term?
+
+###Changed
+TRANSLATE-1792: Make columns in user table of workflow e-mails configurable
+TRANSLATE-1791: Enable neutral salutation
+
+###Bugfixes
+TRANSLATE-1742: Not configured mail server may crash application
+TRANSLATE-1771: "InstantTranslate Into" available in to many languages
+TRANSLATE-1788: Javascript error getEditorBody.textContent() is undefined
+TRANSLATE-1782: Minor TermPortal bugs fixed
+
 ## [3.2.6] - 2019-08-29
 ###Added
 TRANSLATE-1763: Import comments from SDLXLIFF to translate5
