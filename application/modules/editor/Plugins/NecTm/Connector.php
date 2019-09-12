@@ -294,16 +294,9 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
             return $this->resultList;
         }
         
-        $highlight = function($haystack, $doit) use ($searchString) {
-            if(!$doit){
-                return $haystack;
-            }
-            return preg_replace('/\b('.$searchString.')\b/i', '<span class="highlight">$1</span>', $haystack);
-        };
-        
         foreach($results as $result) {
-            $this->resultList->addResult($highlight(strip_tags($result['target']), $field == 'target'));
-            $this->resultList->setSource($highlight(strip_tags($result['source']), $field == 'source'));
+            $this->resultList->addResult($this->highlight($searchString, strip_tags($result['target']), $field == 'target'));
+            $this->resultList->setSource($this->highlight($searchString, strip_tags($result['source']), $field == 'source'));
         }
         return $this->resultList;
     }

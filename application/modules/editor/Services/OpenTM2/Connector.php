@@ -418,18 +418,11 @@ class editor_Services_OpenTM2_Connector extends editor_Services_Connector_Fileba
             $this->resultList->setNextOffset($result->NewSearchPosition);
             $results = $result->results;
             
-            $highlight = function($haystack, $doit) use ($searchString) {
-                if(!$doit){
-                    return $haystack;
-                }
-                return preg_replace('/('.preg_quote($searchString, '/').')/i', '<span class="highlight">\1</span>', $haystack);
-            };
-            
             //$found->{$field}
             //[NextSearchPosition] =>
             foreach($results as $result) {
-                $this->resultList->addResult($highlight(strip_tags($result->target), $field === 'target'));
-                $this->resultList->setSource($highlight(strip_tags($result->source), $field === 'source'));
+                $this->resultList->addResult($this->highlight($searchString, strip_tags($result->target), $field == 'target'));
+                $this->resultList->setSource($this->highlight($searchString, strip_tags($result->source), $field == 'source'));
             }
             
             return $this->resultList; 
