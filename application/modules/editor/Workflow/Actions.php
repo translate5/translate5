@@ -128,7 +128,7 @@ class editor_Workflow_Actions extends editor_Workflow_Actions_Abstract {
             $notifier = ZfExtended_Factory::get('editor_Workflow_Notification');
             /* @var $notifier editor_Workflow_Notification */
             $notifier->init($this->config);
-            $notifier->notifyCompetitiveDeleted(['deleted' => $deleted]);
+            $notifier->notifyCompetitiveDeleted(['deleted' => $deleted, 'currentUser' => $this->currentUser()->getDataObject()]);
             return;
         }
         ZfExtended_Models_Entity_Conflict::addCodes([

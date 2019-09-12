@@ -1629,20 +1629,21 @@ Weitere Informationen finden sich in der Anwendung in den Aufgabeneigenschaften 
 <trans-unit id='QWNodHVuZzogZGllIGFrdHVlbGwgZ2VzY2hsb3NzZW5lIEF1ZmdhYmUgd3VyZGUgSWhuZW4gZW50em9nZW4u'><source>Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.</source><target>Achtung: die aktuell geschlossene Aufgabe wurde Ihnen entzogen.</target></trans-unit>
 <trans-unit id='U2llIGvDtm5uZW4gZGVuIEpvYiB6dXIgWmVpdCBuaWNodCBiZWFyYmVpdGVuLCBkZXIgQmVudXR6ZXIgaGF0IGRpZSBBdWZnYWJlIGJlcmVpdHMgenVyIEJlYXJiZWl0dW5nIGdlw7ZmZm5ldC4='><source>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</source><target>Sie können den Job zur Zeit nicht bearbeiten, der Benutzer hat die Aufgabe bereits zur Bearbeitung geöffnet.</target></trans-unit>
 <trans-unit id='VHJhbnNsYXRlNSAtIEF1ZmdhYmUgZHVyY2ggYW5kZXJlbiBCZW51dHplciDDvGJlcm5vbW1lbg=='><source>Translate5 - Aufgabe durch anderen Benutzer übernommen</source><target>Translate5 - Aufgabe durch anderen Benutzer übernommen</target></trans-unit>
-<trans-unit id='e2hlYWRlcn0KICAgIAplaW4gYW5kZXJlciBCZW51dHplciBoYXQgaW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZGllIFZlcmFudHdvcnR1bmcgZsO8ciBkaWUgQXVmZ2FiZSA8Yj57dGFzay50YXNrTnJ9IC0ge3Rhc2sudGFza05hbWV9PC9iPiDDvGJlcm5vbW1lbi48YnIgLz4KPGJyIC8+CklocmUgWnV3ZWlzdW5nIHp1ciBBdWZnYWJlIHd1cmRlIGF1dG9tYXRpc2NoIGVudGZlcm50LjxiciAvPgo8YnIgLz4Ke2Zvb3Rlcn0='><source>{header}
+<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='><source>Das Kommentarattribut ist erforderlich</source><target>Das Kommentarattribut ist erforderlich</target></trans-unit>
+<trans-unit id='e3Jlc3BvbnNpYmxlVXNlci5maXJzdE5hbWV9IHtyZXNwb25zaWJsZVVzZXIuc3VyTmFtZX0gKHtyZXNwb25zaWJsZVVzZXIuZW1haWx9KSBpc3QgbnVuIGbDvHIgZGllIEF1ZmdhYmUgdmVyYW50d29ydGxpY2guPGJyIC8+'><source>{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br /></source><target>{responsibleUser.firstName} {responsibleUser.surName} ({responsibleUser.email}) ist nun für die Aufgabe verantwortlich.<br /></target></trans-unit>
+<trans-unit id='e2hlYWRlcn0KICAgIAplaW4gYW5kZXJlciBCZW51dHplciBoYXQgaW0gUHJvamVrdHBvcnRhbCB7cG9ydGFsTGlua30gZGllIFZlcmFudHdvcnR1bmcgZsO8ciBkaWUgQXVmZ2FiZSA8Yj57dGFzay50YXNrTnJ9IC0ge3Rhc2sudGFza05hbWV9PC9iPiDDvGJlcm5vbW1lbi48YnIgLz4KPGJyIC8+CjxiPklocmUgWnV3ZWlzdW5nIHp1ciBBdWZnYWJlIHd1cmRlIGF1dG9tYXRpc2NoIGVudGZlcm50LjwvYj48YnIgLz4KPGJyIC8+e3Jlc3BvbnNpYmxlVXNlcn0Ke2Zvb3Rlcn0='><source>{header}
 
 ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
 <br />
-Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
-<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
 {footer}</source><target>{header}
 
 ein anderer Benutzer hat im Projektportal {portalLink} die Verantwortung für die Aufgabe <b>{task.taskNr} - {task.taskName}</b> übernommen.<br />
 <br />
-Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.<br />
-<br />
+<b>Ihre Zuweisung zur Aufgabe wurde automatisch entfernt.</b><br />
+<br />{responsibleUser}
 {footer}</target></trans-unit>
-<trans-unit id='RGFzIEtvbW1lbnRhcmF0dHJpYnV0IGlzdCBlcmZvcmRlcmxpY2g='><source>Das Kommentarattribut ist erforderlich</source><target>Das Kommentarattribut ist erforderlich</target></trans-unit>
 <trans-unit id='a2VpbmUgQW5nYWJl'><source>keine Angabe</source><target>keine Angabe</target></trans-unit>
 <trans-unit id='T2huZQ=='><source>Ohne</source><target>Ohne</target></trans-unit>
 <trans-unit id='U2VociBnZWVocnRlKHIp'><source>Sehr geehrte(r)</source><target>Sehr geehrte(r)</target></trans-unit>
