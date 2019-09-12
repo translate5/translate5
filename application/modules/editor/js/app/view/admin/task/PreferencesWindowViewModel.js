@@ -29,6 +29,9 @@ END LICENSE AND COPYRIGHT
 Ext.define('Editor.view.admin.task.PreferencesWindowViewModel', {
     extend: 'Ext.app.ViewModel',
     alias: 'viewmodel.taskpreferences',
+    data: {
+        userAssocDirty: false,
+    },
     formulas: {
         workflowMetadata: {
             get: function(get) {

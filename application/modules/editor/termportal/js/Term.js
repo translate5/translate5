@@ -60,13 +60,18 @@ var Term={
 			
 			// Term-Entries
 	        me.$_resultTermsHolderHeader.on('click', '.proposal-add',{scope:me},me.onAddTermEntryClick);
+	        
 	        me.$_searchTermsHelper.on('click', '.proposal-add',{scope:me},me.onAddTermEntryClick);
 
             // Terms
             me.$_termTable.on('click', '.term-data.proposable .proposal-add',{scope:me},me.onAddTermClick);
             me.$_termTable.on('click', '.term-data.proposable .proposal-delete',{scope:me},me.onDeleteTermClick);
             me.$_termTable.on('click', '.term-data.proposable .proposal-edit',{scope:me},me.onEditTermClick);
+            
+            me.$_termTable.on('click', 'span[data-editable][data-type][data-id="-1"]',{scope:me},me.onAddTermClick);
+            
             me.$_resultTermsHolder.on('tabsactivate',{scope:me},me.onResultTabActivate);
+            me.$_resultTermsHolder.on('tabsbeforeactivate',{scope:me},me.onResultTabBeforeActivate);
 		},
         
         /***
@@ -85,6 +90,20 @@ var Term={
             me.findTermsAndAttributes($selected.attr('data-value'));
 		},
 		
+		/***
+		 * On term/term entry results tab before activate event
+		 */
+		onResultTabBeforeActivate:function(){
+			//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+    			return false;
+        	}			
+		},
+		
+		/***
+		 * On term/term entry results tab activate event
+		 */
 		onResultTabActivate:function(event){
 			var me = event.data.scope;
             me.drawProposalButtons('attribute');
@@ -257,22 +276,7 @@ var Term={
 			
 			//if term is proposed from the instant translate, and the source exist more than once
 			if(me.searchTermsResponse.length > 1 && isTermProposalFromInstantTranslate){
-				var yesText=proposalTranslations['Ja'],
-					buttons={
-					};
-				buttons[yesText]=function(){
-		            $(this).dialog('close');
-				};
-				// Define the Dialog and its properties.
-			    $('<div></div>').dialog({
-			        resizable: false,
-			        modal: true,
-			        title: proposalTranslations['multipleSourcesFoundTitle'],
-			        height: 300,
-			        width: 450,
-			        buttons:buttons
-			    }).text(proposalTranslations['multipleSourcesFoundMessage']);
-		    
+				showInfoMessage(proposalTranslations['multipleSourcesFoundMessage'],proposalTranslations['multipleSourcesFoundTitle']);
 			}
 		},
 		
@@ -383,7 +387,12 @@ var Term={
                             event.preventDefault();
                             return;
                         }
-		                me.cancelPendingChanges(ui.oldHeader);
+		                
+		                //if the cancel panding changes return false, do not expand/collapse the current header
+		                if(!me.cancelPendingChanges(ui.oldHeader)){
+		                	event.preventDefault();
+                            return;
+		                }
 		            },
                     activate: function( event, ui ) {
                         if (ui.newHeader.length === 0 && ui.oldHeader.has('textarea').length > 0) {
@@ -641,8 +650,13 @@ var Term={
                     }
                     break;
                 case 'term':
+                	
+                	//display the language description only if all available languages for term config is enabled
+                    if(Editor.data.apps.termportal.newTermAllLanguagesAvailable){
+                    	languageSelectOptions += '<option value="none" disabled>-- '+translations['TermPortalLanguages']+': --</option>';
+                    }
+                    
                     // list the languages of the TermPortal first...
-                    languageSelectOptions += '<option value="none" disabled>-- '+translations['TermPortalLanguages']+': --</option>';
                     $('#language option').each(function() {
                         if ($(this).val() !== 'none') {
                             flag = getLanguageFlag($(this).text());
@@ -650,6 +664,12 @@ var Term={
                             languageSelectOptions += '<option value="'+$(this).val()+'" data-class="flag" data-style="background-image: url(\''+$(flag).attr('src')+'\') !important;">'+languageName+'</option>';
                         }
                     });
+                    
+                    //if all languages for new term is disabled, do not add them to the dropdown
+                    if(!Editor.data.apps.termportal.newTermAllLanguagesAvailable){
+                    	break;
+                    }
+                    
                     // ... and then list ALL languages that are available in translate5
                     languageSelectOptions += '<option value="none" disabled>-- '+translations['AllLanguagesAvailable']+': --</option>';
                     availableLanguages = Editor.data.availableLanguages;
@@ -1089,6 +1109,12 @@ var Term={
 				return;
 			}
 			
+			 //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+    			return false;
+        	}
+			
 			var yesCallback=function(){
 				//ajax call to the remove proposal action
 				var me=event.data.scope,
@@ -1149,6 +1175,13 @@ var Term={
          */
         onAddTermEntryClick: function(event){
             console.log('onAddTermEntryClick');
+            
+            //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+    			return false;
+        	}
+        	
             var me = event.data.scope,
                 filteredCollections = getFilteredCollections();
             
@@ -1189,6 +1222,12 @@ var Term={
                 $termEditorSpan = $_termSkeleton.find('[data-editable]'),
                 $termEditorHolder = me.$_termTable.find('div[data-term-id="-1"]');
             
+            //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+    			return false;
+        	}
+        	
             // if language is not set yet, draw language-select first...
             if (me.newTermLanguageId === null) {
                 me.drawLanguageSelectForNewTerm();
@@ -1219,13 +1258,20 @@ var Term={
          */
         cancelPendingChanges:function(termHeader){
         	if(termHeader.length<1){
-        		return;
+        		return true;
         	}
         	//is in the header valid editor
         	if(termHeader.has('textarea').length > 0){
         		//close the opened term editor
         		termHeader.find('span.proposal-cancel').mouseup();
         	}
+        	
+        	//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+        	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+    			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+    			return false;
+        	}
+        	
         	//render the cancel icons for the attributes
         	this.drawProposalButtons('attributeEditingOpened')
         	//find all attributes with cancel button
@@ -1234,6 +1280,7 @@ var Term={
 	    	$editors.each(function(index,editor) {
 	    		$(editor).mouseup();
 	        });
+	    	return true;
         }
 };
 

@@ -1241,8 +1241,6 @@ Ext.define('Editor.controller.Editor', {
                 'selDataText': selDataText, // = selected content WITHOUT internal tags
                 'selSegmentId': segmentId
         };
-        
-        event.preventDefault();
     },
     copySourceToTarget: function() {
         var plug = this.getEditPlugin();

@@ -53,6 +53,13 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
+		
+		//show info message if the comment attribute mandatory flag is set and the comment component editor is active
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && this.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         console.log('addTermComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text()),
@@ -116,6 +123,13 @@ var ComponentEditor={
 		if(!Editor.data.app.user.isTermProposalAllowed){
 			return;
 		}
+		
+		//if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         console.log('addAttributeComponentEditor');
 		var me=this,
 			$input= $('<textarea />').val($element.text());
@@ -182,12 +196,11 @@ var ComponentEditor={
 
         me.isComponentEditorActive();
         
-        me.$_termTable.one('mouseup', '.term-attributes .proposal-save',function() {
+        me.$_termTable.on('mouseup', '.term-attributes .proposal-save',function() {
             me.saveCommentChange($element,$input);
         });
-        me.$_termTable.one('mouseup', '.term-attributes .proposal-cancel',function() {
-        	$input.val('');
-        	me.saveCommentChange($element,$input);
+        me.$_termTable.on('mouseup', '.term-attributes .proposal-cancel',function() {
+        	me.cancelCommentComponentChange($element,$input);
         });
         $input.focus();
 		return $input;
@@ -201,6 +214,25 @@ var ComponentEditor={
     cancelComponentChange:function($element,$input){
         $input.val(''); // this will force saveComponentChange() to stop the saving.
         this.saveComponentChange($element,$input);
+    },
+    
+    /**
+     * Cancel editing the comment component
+     * @param {Object} $element = the original span[data-editable]
+     * @param {Object} $input   = the textarea with the proposed content
+     */
+    cancelCommentComponentChange:function($element,$input){
+    	var isFromTm=$element.text() == proposalTranslations['acceptedFromTmComment'];
+    	//if it is proposalFrom tm, save the default comment text for tm proposal comment
+    	if(isFromTm){
+    		$input.val(proposalTranslations['acceptedFromTmComment']);
+    		//reset the element value, so it is not ignored by cancel request
+    		$element.val('');
+    		$element.text('');
+    	}else{
+    		$input.val('')
+    	}
+    	this.saveCommentChange($element,$input);
     },
 
     
@@ -268,11 +300,6 @@ var ComponentEditor={
             requestData['termSourceLanguage']=instanttranslate.langSource;
         }
         
-        // "reset", is valid only once (= when coming from TermPortal)
-        if(isTermProposalFromInstantTranslate) {
-            isTermProposalFromInstantTranslate = false;
-        }
-        
         console.log('saveComponentChange :' + JSON.stringify(requestData));
 		
 		//send proposal request
@@ -296,6 +323,16 @@ var ComponentEditor={
             url,
             requestData;
 
+	    
+    	//if the comment panel is mandatory, display the info message
+		if($input.val()=='' && Editor.data.apps.termportal.commentAttributeMandatory){
+			var dialog=showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			dialog.on('dialogclose', function(event) {
+				$input.focus();
+			});
+			return;
+		}
+		
         // don't send the request? then update front-end only.
         if (me.stopRequest($element,$input)){
             
@@ -363,6 +400,7 @@ var ComponentEditor={
             activeTabSelector,
             activeTab;
 			
+		
 		if(isTerm){
 			renderData=Term.renderTermData(result);
 			$elParent= Term.getTermHeader($element.data('id'));
@@ -375,7 +413,6 @@ var ComponentEditor={
 				var termRflLang=(result.attributes && result.attributes[0].language!=undefined) ? result.attributes[0].language : '';
 				attributeRenderData=Attribute.renderTermAttributes(result,termRflLang);
 			}
-			
 		}else{
 			renderData=Attribute.getAttributeRenderData(result,result.value);
 			
@@ -390,7 +427,12 @@ var ComponentEditor={
 			}
 			$elParent=Attribute.getTermAttributeHeader($element.data('id'),attrType);
 		}
-            
+		
+		//reload the term entry data if term entry results are available
+		if(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]){
+			TermEntry.drawTermEntryAttributes(result[TermEntry.KEY_TERM_ENTRY_ATTRIBUTES]);
+		}
+		
         // update term-data
         $elParent.attr('data-term-value', result.term);
         $elParent.attr('data-term-id', result.termId);
@@ -439,7 +481,10 @@ var ComponentEditor={
 			
 			$commentPanel=$termAttributeHolder.find('.isAttributeComment');
 			if($commentPanel.length === 0){
-				dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute');
+				var commentValue=isTermProposalFromInstantTranslate ? proposalTranslations['acceptedFromTmComment'] : null;
+
+				dummyCommentAttribute=Attribute.renderNewCommentAttributes('termAttribute',commentValue);
+				
 				$termAttributeHolder.prepend(Attribute.handleAttributeDrawData(dummyCommentAttribute));
 			}
 			
@@ -475,6 +520,11 @@ var ComponentEditor={
 	            }
 			}
 		}
+		
+        // "reset", is valid only once (= when coming from TermPortal)
+        if(isTermProposalFromInstantTranslate) {
+            isTermProposalFromInstantTranslate = false;
+        }
     },
 	
     /**
@@ -515,7 +565,11 @@ var ComponentEditor={
             }
             if (e.which === 27) {              // ESCAPE
                 event.preventDefault();
-                me.cancelComponentChange($element,$input);
+                if($element.data('editableComment')!=undefined){
+                	me.cancelCommentComponentChange($element,$input);
+                }else{
+                	me.cancelComponentChange($element,$input);
+                }
             }
         });
     },
@@ -530,6 +584,14 @@ var ComponentEditor={
 		translateToCombos.each(function(index,cmp){
 			editorExist ? $(cmp).hide() :$(cmp).show(); 
 		});
+    },
+    
+    /***
+     * Check if the comment component editor is active
+     */
+    isCommentComponentEditorActive:function(){
+    	var commentEditors=this.$_termTable.find('textarea[data-editable-comment]');
+		return commentEditors.length>0;
     }
 };
 

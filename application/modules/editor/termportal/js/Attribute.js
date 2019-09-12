@@ -1,6 +1,7 @@
 var Attribute={
 	$_termTable:null,
 	$_termEntryAttributesTable:null,
+	$_resultTermsHolder:null,
 	
 	languageDefinitionContent:[],
 	
@@ -15,6 +16,7 @@ var Attribute={
 	cacheDom:function(){
         this.$_termTable=$('#termTable');
         this.$_termEntryAttributesTable = $('#termEntryAttributesTable');
+        this.$_resultTermsHolder=$('#resultTermsHolder');
 	},
 	
 	onAttributeEditingOpened: function() {
@@ -108,6 +110,12 @@ var Attribute={
             
         console.log('onEditAttributeClick');
         
+        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         // In tbx, "definition" belongs to the <langSet> (= level between <termEntry> and <term>).
         // In the TermPoral, the user can edit definitions only in the termEntry-Attributes,
         // not on the level of each individual term.
@@ -167,6 +175,12 @@ var Attribute={
             yesCallback,
             yesText;
         
+        //if the comment attribute mandatory flag is set, check if there is unclosed comment editor,
+    	if(Editor.data.apps.termportal.commentAttributeMandatory && ComponentEditor.isCommentComponentEditorActive()){
+			showInfoMessage(proposalTranslations['commentAttributeMandatoryMessage'],proposalTranslations['commentAttributeMandatoryTitle']);
+			return false;
+    	}
+    	
         $parent=$element.parents('h4.attribute-data');//the button parrent
 		if($parent.length === 0){
 			return;
@@ -360,7 +374,6 @@ var Attribute={
 	 * in the term and termentry area
 	 */
 	checkAndUpdateDeffinition:function(attribute){
-
 		if(attribute.attrType !== 'definition' || !Editor.data.app.user.isTermProposalAllowed){
 			return false;
 		}
@@ -373,8 +386,7 @@ var Attribute={
 
 		var me = this,
 			renderData=me.getAttributeRenderData(attribute,attribute.value),
-			$attributes = me.$_termTable.find('p[data-id="'+attribute.attributeId+'"]'),
-			$attributes2 = me.$_termEntryAttributesTable.find('p[data-id="'+attribute.attributeId+'"]');
+			$attributes = me.$_resultTermsHolder.find('span[data-editable][data-type][data-id="'+attribute.attributeId+'"]');
 		
 		$attributes.each(function(i,att){
 			att=$(att);
@@ -382,40 +394,8 @@ var Attribute={
 			att.replaceWith(renderData);
 		});
 		
-		$attributes2.each(function(i,att){
-			att=$(att);
-			att.empty();
-			att.replaceWith(renderData);
-		});
-		
 		Term.drawProposalButtons('componentEditorClosed');
-		//Term.drawProposalButtons(me.$_termEntryAttributesTable);
 	    Term.reloadTermEntry=true;
-		
-		
-		/*
-			$elParent=me.getTermAttributeHeader(attribute.attributeId,attrType)
-			$input=me.getAttributeComponent(attribute.attributeId,attrType);
-	        
-		
-		//check for proposal and update the classes
-		if(!attribute.proposal){
-			$elParent.switchClass('is-proposal','is-finalized');
-		}else{
-			// update term-data
-			$elParent.removeClass('is-finalized').removeClass('is-new').addClass('is-proposal');
-			$elParent.removeClass('in-editing');
-		}
-	    
-		if($input.children('ins').length === 1){
-			renderData=me.getAttributeContainerRender(attribute,renderData);
-		}
-		
-	    $input.replaceWith(renderData);
-	    
-	    Term.drawProposalButtons($elParent);
-	    Term.reloadTermEntry=true;
-	    */
 	    return true;
 	},
 	
@@ -587,14 +567,15 @@ var Attribute={
     /**
      * Returns comment "dummy" attributes for creating a new comment.
      * @param: attributeOriginType origin type of the attribute
+     * @param: attrValue comment initial value
      * @returns {Array}
      */
-    renderNewCommentAttributes: function(attributeOriginType) {
+    renderNewCommentAttributes: function(attributeOriginType,attrValue) {
         return {
             attributeId:-1,
             name:'note',
             headerText:this.findTranslatedAttributeLabel('note',null),
-            attrValue:'',
+            attrValue:attrValue ? attrValue : '',
             attrType:null,
             proposable:true,
             attributeOriginType:attributeOriginType

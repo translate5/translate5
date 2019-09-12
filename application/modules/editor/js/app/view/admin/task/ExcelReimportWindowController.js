@@ -120,7 +120,5 @@ Ext.define('Editor.view.admin.task.ExcelReimportWindowController', {
                 }
             }
         });
-    },
-    
-
+    }
 });
