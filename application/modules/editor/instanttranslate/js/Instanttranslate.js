@@ -245,9 +245,11 @@ function handleAfterLocalesChange() {
  * @returns {Boolean}
  */
 function hasEnginesForLanguageCombination() {
-	var returnValue=isSourceTargetAvailable($("#sourceLocale").val(),$("#targetLocale").val());
-	returnValue ? $("#switchSourceTarget").removeAttr("disabled") : $("#switchSourceTarget").attr("disabled", true);
-	returnValue ? $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" ) : $("#switchSourceTarget").addClass( "switchSourceTargetDisabled" );
+	var returnValue=isSourceTargetAvailable($("#sourceLocale").val(),$("#targetLocale").val()),
+		isDisableButton=!isSourceTargetAvailable($("#targetLocale").val(),$("#sourceLocale").val());//switch source and target so the other way arround is checked
+	//the button is disabled when for the target as source there is no source as target
+	$("#switchSourceTarget").prop("disabled", isDisableButton);
+	isDisableButton ?$("#switchSourceTarget").addClass( "switchSourceTargetDisabled" ) :  $("#switchSourceTarget").removeClass( "switchSourceTargetDisabled" );
     return returnValue;
 }
 
