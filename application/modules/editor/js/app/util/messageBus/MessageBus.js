@@ -104,7 +104,8 @@ Ext.define('Editor.util.messageBus.MessageBus', {
         var msgObj = {
             channel: channel,
             command: command, 
-            data: data
+            data: data,
+            sessionId: 123 //FIXME read out sessionId from cookie, first configured cookie key must be given to Editor.data.app.
         };
         this.socket.send(Ext.JSON.encode(msgObj));
     }

@@ -101,6 +101,14 @@ Ext.define('Editor.controller.Segments', {
       selector : '#watchListFilterBtn'
   }],
   listen: {
+      messagebus: {
+          '#translate5 task': {
+              segmentlock: function() {
+                  console.log(arguments);
+                  Editor.MessageBox.addInfo('Lock Segment');
+              }
+          }
+      },
       controller: {
           '#Editor.$application': {
               editorViewportClosed: 'clearSegments'
