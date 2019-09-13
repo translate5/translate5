@@ -429,25 +429,34 @@ Ext.define('Editor.controller.TmOverview', {
             proxy = rec.proxy,
             id = rec.getId(),
             url = proxy.getUrl(),
-            menu;
+            menu,
+            filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
+            createMenuItems = function() {
+                var items = [];
+                items.push({
+                    itemId: 'exportTm',
+                    hrefTarget: '_blank',
+                    href: url+'/download.tm',
+                    text: me.strings.exportTm
+                });
+                if (filetypes.indexOf('tmx') !== -1) {
+                    items.push({
+                        itemId: 'exportTmx',
+                        hrefTarget: '_blank',
+                        href: url+'/download.tmx',
+                        text : me.strings.exportTmx
+                    });
+                }
+                return items;
+            };
 
         if (!url.match(proxy.slashRe)) {
             url += '/';
         }
         url += encodeURIComponent(id);
 
-        menu = Ext.widget('menu', {
-            items: [{
-                itemId: 'exportTm',
-                hrefTarget: '_blank',
-                href: url+'/download.tm',
-                text: me.strings.exportTm
-            },{
-                itemId: 'exportTmx',
-                hrefTarget: '_blank',
-                href: url+'/download.tmx',
-                text : me.strings.exportTmx
-            }]    
+        menu = Ext.widget('menu', { 
+            items: createMenuItems()
         });
         menu.showAt(ev.getXY());
     },

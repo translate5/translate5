@@ -96,6 +96,14 @@ Ext.define('Editor.view.LanguageResources.services.Default', {
      */
     getDownloadTooltip:function(){
     	return false;
+    },
+    
+    /***
+     * Get valid file-types for download.
+     * @return array
+     */
+    getValidFiletypes:function(){
+        return ['tm','tmx'];
     }
 
 
