@@ -78,5 +78,13 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
     		return false;
     	}
     	return this.download;
+    },
+    
+    /***
+     * Get valid file-types for download.
+     * @return array
+     */
+    getValidFiletypes:function(){
+        return ['tm'];
     }
 });
