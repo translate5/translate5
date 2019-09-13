@@ -3,6 +3,9 @@ use Translate5\FrontEndMessageBus\MessageBus;
 
 require __DIR__ . '/bus-server/vendor/autoload.php';
 
+/**
+ * TODO use eclipse external tools for running / restart while development 
+ */
 $loop   = React\EventLoop\Factory::create();
 $bus = new MessageBus();
 

@@ -1,9 +1,9 @@
 <?php
-namespace Translate5\FrontEndMessageBus;
+namespace Translate5\FrontEndMessageBus\Message;
 
 /**
  */
-class Message {
+abstract class Msg {
     /**
      * The channel (task|segment etc)
      * @var string
@@ -33,6 +33,10 @@ class Message {
             // we assume all data must be given if there is a msgData to init from
             $keys = array_keys(get_object_vars($this));
             foreach($keys as $key) {
+                if($key == 'payload' && $this instanceof BackendMsg) {
+                    $msgData[$key] = json_decode($msgData[$key], true);
+                    //FIXME JSON error handling / logging
+                }
                 $this->$key = $msgData[$key];
             }
         }

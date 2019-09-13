@@ -1,4 +1,4 @@
-
+<?php
 /*
 START LICENSE AND COPYRIGHT
 
@@ -26,45 +26,25 @@ START LICENSE AND COPYRIGHT
 END LICENSE AND COPYRIGHT
 */
 
-/**#@++
- * @author Marc Mittag
- * @package editor
- * @version 1.0
- *
- */
 /**
- * @class Editor.plugins.ChangeLog.controller.Changelog
- * @extends Ext.app.Controller
+ * encapsulates defined messages to the MessageBus related to tasks
+ * Translate5 pendant to Translate5\FrontEndMessageBus\Channel\Task in message bus
  */
-Ext.define('Editor.plugins.FrontEndMessageBus.controller.MessageBus', {
-    extend: 'Ext.app.Controller',
-    listen: {
-        component: {
-            '#segmentgrid' : {
-                itemclick: 'clickSegment',
-                beforeedit: 'enterSegment',
-                canceledit: 'leaveSegment',
-                edit: 'leaveSegment'
-            }
-        }
-    },
-    init: function(){
-        var me = this;
-        me.callParent(arguments);
+class editor_Plugins_FrontEndMessageBus_Channels_Task extends editor_Plugins_FrontEndMessageBus_Channels_Abstract {
+    const CHANNEL = 'task';
+    
+    public function segmentClick($data) {
         
-        me.bus = new Editor.util.messageBus.MessageBus({
-            id: 'translate5'
-        });
-    },
-    clickSegment: function(view, segment) {
-        this.bus.send('task', 'segmentClick', [segment.get('id')]);
-    },
-    enterSegment: function() {
-        console.log('enterSegment', arguments);
-        //me.bus.send();
-    },
-    leaveSegment: function() {
-        console.log('leaveSegment', arguments);
-        //me.bus.send();
     }
-});
+    
+    public function test() {
+        $this->notify(self::CHANNEL, __FUNCTION__);
+    }
+    
+    public function open(editor_Models_Task $task) {
+        $data = [
+            'task' => $task->getDataObject(),
+        ];
+        $this->notify(self::CHANNEL, __FUNCTION__, $data);
+    }
+}

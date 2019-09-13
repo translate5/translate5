@@ -40,6 +40,7 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
     protected function initEvents() {
         //FIXME Dummy call to test stuff
         $this->eventManager->attach('editor_TaskController', 'afterIndexAction', array($this, 'handleTest'));
+        $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
 
         // FIXME send the session id to the message bus, so that the user is known and allowed to communicate
         // → idea here: Instead listening to a login event, we just attach to the IndexController. 
@@ -49,8 +50,12 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
         //   additionally we should create a sync function, triggered by the periodical cron and triggerable when the MessageBus restarts.
         //   sync should just deliver all sessions with logged in users, and opened tasks (if any) to the MessageBus.
         //   Sensefull?
+        $this->eventManager->attach('Editor_IndexController', 'beforeIndexAction', array($this, 'handleAfterIndexAction'));
         
-        $this->eventManager->attach('editor_TaskController', 'afterTaskOpen', array($this, 'handleAfterTaskOpen'));
+        //TODO test logout calls:
+        $this->eventManager->attach('editor_SessionController', 'beforeDeleteAction', array($this, 'handleLogout'));
+        $this->eventManager->attach('LoginController', 'logoutAction', array($this, 'handleLogout'));
+        
         
         //returns information if the configured okapi is alive / reachable
         $this->eventManager->attach('ZfExtended_Debug', 'applicationState', array($this, 'handleApplicationState'));
@@ -72,17 +77,48 @@ class editor_Plugins_FrontEndMessageBus_Init extends ZfExtended_Plugin_Abstract 
      * @param Zend_EventManager_Event $event
      */
     public function handleTest(Zend_EventManager_Event $event) {
-        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Messages_Task');
-        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Messages_Task */
+        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Task');
+        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Task */
         $taskMsg->test();
     }
     
     /**
      * @param Zend_EventManager_Event $event
      */
+    public function handleAfterIndexAction(Zend_EventManager_Event $event) {
+        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Instance');
+        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Instance */
+        $user = new Zend_Session_Namespace('user');
+        if(!empty($user->data->userGuid)) {
+            $taskMsg->startSession(Zend_Session::getId(), $user->data);
+        }
+    }
+    
+    /**
+     * @param Zend_EventManager_Event $event
+     */
+    public function handleLogout(Zend_EventManager_Event $event) {
+        $params = $event->getParam('params');
+        if(empty($params['id'])) {
+            //it was a call to /login/logout
+            $sessionId = Zend_Session::getId();
+        }
+        else {
+            //it was a call to SessionController::deleteAction
+            $sessionId = $params['id'];
+        }
+        
+        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Instance');
+        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Instance */
+        $taskMsg->stopSession($sessionId);
+    }
+    
+    /**
+     * @param Zend_EventManager_Event $event
+     */
     public function handleAfterTaskOpen(Zend_EventManager_Event $event) {
-        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Messages_Task');
-        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Messages_Task */
+        $taskMsg = ZfExtended_Factory::get('editor_Plugins_FrontEndMessageBus_Channels_Task');
+        /* @var $taskMsg editor_Plugins_FrontEndMessageBus_Channels_Task */
         $taskMsg->open($event->getParam('task'));
         //FIXME add information about the current user and Session!
     }

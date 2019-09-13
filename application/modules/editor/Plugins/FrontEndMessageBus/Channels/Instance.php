@@ -27,20 +27,14 @@ END LICENSE AND COPYRIGHT
 */
 
 /**
- * encapsulates defined messages to the MessageBus related to tasks
- * Translate5 pendant to Translate5\FrontEndMessageBus\Channel\Task in message bus
+ * encapsulates defined commands directly to the MessageBus
+ * @method void startSession() startSession($sessionId, stdClass $userData)
+ * @method void stopSession() stopSession($sessionId)
  */
-class editor_Plugins_FrontEndMessageBus_Messages_Task extends editor_Plugins_FrontEndMessageBus_Messages_Abstract {
-    const CHANNEL = 'task';
+class editor_Plugins_FrontEndMessageBus_Channels_Instance extends editor_Plugins_FrontEndMessageBus_Channels_Abstract {
+    const CHANNEL = 'instance';
     
-    public function test() {
-        $this->notify(self::CHANNEL, __FUNCTION__);
-    }
-    
-    public function open(editor_Models_Task $task) {
-        $data = [
-            'task' => $task->getDataObject(),
-        ];
-        $this->notify(self::CHANNEL, __FUNCTION__, $data);
-    }
+    //here methods could be implemented if more logic is needed as just passing the arguments directly to the MessageBus via __call 
+    // this could be for example necessary to convert entities like editor_Models_Task to native stdClass / array data. 
+    // Since only the latter ones can be send to the MessageBus 
 }

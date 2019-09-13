@@ -29,7 +29,17 @@ END LICENSE AND COPYRIGHT
 /**
  * encapsulates defined messages to the MessageBus 
  */
-class editor_Plugins_FrontEndMessageBus_Messages_Abstract {
+abstract class editor_Plugins_FrontEndMessageBus_Channels_Abstract {
+    
+    /**
+     * By default pass all functions directly to the MessageBus
+     * @param string $name
+     * @param array $args
+     */
+    public function __call($name, array $args) {
+        $this->notify(static::CHANNEL, $name, $args);       
+    }
+    
     protected function notify($channel, $command, $data = null) {
         $http = ZfExtended_Factory::get('Zend_Http_Client');
         /* @var $http Zend_Http_Client */
