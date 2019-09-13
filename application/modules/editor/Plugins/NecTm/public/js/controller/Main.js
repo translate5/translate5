@@ -44,6 +44,10 @@ END LICENSE AND COPYRIGHT
  */
 Ext.define('Editor.plugins.NecTm.controller.Main', {
     extend: 'Ext.app.Controller',
+    requires: [
+        'Editor.util.LanguageResources',
+        'Editor.plugins.NecTm.view.LanguageResources.services.NecTm'
+    ],
     refs:[{
         ref: 'TmWindow',
         selector: '#addTmWindow'
@@ -57,6 +61,9 @@ Ext.define('Editor.plugins.NecTm.controller.Main', {
                 afterrender: 'onEditTmWindowAfterrender',
             }
         }
+    },
+    init: function() {
+        Editor.util.LanguageResources.addService(Ext.create('Editor.plugins.NecTm.view.LanguageResources.services.NecTm'));
     },
     /**
      * When a new NEC-TM-LanguageResource is created, we show the 
