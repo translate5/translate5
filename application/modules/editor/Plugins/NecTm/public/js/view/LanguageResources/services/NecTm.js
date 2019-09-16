@@ -36,9 +36,10 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
     requires: ['Editor.view.LanguageResources.services.Default'],
     extend: 'Editor.view.LanguageResources.services.Default',
     id: 'NEC-TM',
-    
-    addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
-    download: '#UT#Dateibasiertes TM herunterladen und lokal speichern',
+    strings: {
+        addTooltip: '#UT#Weitere TM Daten in Form einer TMX Datei importieren und dem TM hinzufügen',
+        download: '#UT#Als TMX-Datei herunterladen und lokal speichern'
+    },
     
     /***
      * Add/import new resources button default tooltip. This is rendered in the language resources grid.
@@ -47,7 +48,7 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
     	if(record.get('status') === 'novalidlicense'){
     		return false;
     	}
-        return this.addTooltip;
+        return this.strings.addTooltip;
     },
     
     /***
@@ -77,7 +78,7 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
     	if(record.get('status') === 'novalidlicense'){
     		return false;
     	}
-    	return this.download;
+    	return this.strings.download;
     },
     
     /***
@@ -85,6 +86,6 @@ Ext.define('Editor.plugins.NecTm.view.LanguageResources.services.NecTm', {
      * @return array
      */
     getValidFiletypes:function(){
-        return ['tm'];
+        return ['tmx'];
     }
 });

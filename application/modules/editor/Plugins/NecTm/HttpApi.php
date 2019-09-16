@@ -39,6 +39,8 @@ class editor_Plugins_NecTm_HttpApi {
     
     const BASE_PATH = '/api/v1';
     
+    const ENC_TYPE = 'application/json; charset=utf-8';
+    
     /**
      * for JWT-Authorization: MemCache-Id for Access-Token
      * @var string
@@ -100,7 +102,6 @@ class editor_Plugins_NecTm_HttpApi {
             return false; // no token available
         }
         $this->memCache->save($token, self::TOKEN_CACHE_KEY);
-        $test = $this->memCache->load(self::TOKEN_CACHE_KEY);
         return $token;
     }
     
@@ -134,7 +135,7 @@ class editor_Plugins_NecTm_HttpApi {
         
         $http = $this->getHttp('POST','auth');
         $http->setHeaders('Content-Type', 'application/json');
-        $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+        $http->setRawData(json_encode($data), self::ENC_TYPE);
         
         if ($this->processResponse($this->request($http))) {
             return $this->result->access_token;
@@ -230,11 +231,9 @@ class editor_Plugins_NecTm_HttpApi {
         foreach ($allResults as $result) {
             switch ($field) {
                 case 'source':
-                    $test = stripos($result->tu->source_text, $searchString);
                     $resultIsOk = (stripos($result->tu->source_text, $searchString) !== false); // TODO: strpos or stripos?
                     break;
                 case 'target':
-                    $test = stripos($result->tu->target_text, $searchString);
                     $resultIsOk = (stripos($result->tu->target_text, $searchString) !== false); // TODO: strpos or stripos?
                     break;
             }
@@ -260,10 +259,10 @@ class editor_Plugins_NecTm_HttpApi {
     
     /**
      * Add new translation memory unit.
-     * @param string $sourceText ("Source segment text.")
-     * @param string $targetText ("Target segment text.")
-     * @param string $sourceLang ("Source language.")
-     * @param string $targetLang ("Target language.")
+     * @param string $sourceText
+     * @param string $targetText
+     * @param string $sourceLang
+     * @param string $targetLang
      * @param string $tagId      ("Translation unit tag.")
      * @return boolean
      */
@@ -304,8 +303,8 @@ class editor_Plugins_NecTm_HttpApi {
         $job_id = $this->result->job_id; // = ID of export task invoked in the background
         
         // Step 2: "Download exported file"
-        $method = 'POST';
-        $endpointPath = 'tm/export/file/​'.$job_id;
+        $method = 'GET';
+        $endpointPath = 'tm/export/file/'.$job_id;
         $http = $this->getHttp($method, $endpointPath);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         $http->setConfig(['timeout' => 1200]);
@@ -362,7 +361,7 @@ class editor_Plugins_NecTm_HttpApi {
         $this->http->setMethod($method);
         $this->httpMethod = $method;
         $this->http->setHeaders('Accept-charset', 'UTF-8');
-        $this->http->setHeaders('Accept', 'application/json; charset=utf-8');
+        $this->http->setHeaders('Accept', self::ENC_TYPE);
         return $this->http;
     }
     
@@ -378,7 +377,7 @@ class editor_Plugins_NecTm_HttpApi {
         $http = $this->getHttp($method, $endpointPath);
         $http->setHeaders('Authorization', 'JWT ' . $this->getAccessToken());
         if (!empty($data)) {
-            $http->setRawData(json_encode($data), 'application/json; charset=utf-8');
+            $http->setRawData(json_encode($data), self::ENC_TYPE);
         }
         if (!empty($params)) {
             $setParameter = ($method == 'GET') ? 'setParameterGet' : 'setParameterPost';
@@ -409,8 +408,6 @@ class editor_Plugins_NecTm_HttpApi {
         }
         catch (Zend_Exception $e) {
             foreach ($badGatewayMessages as $msg) {
-                $t1 = $e->getMessage();
-                $test = stripos($e->getMessage(), $msg);
                 if (stripos($e->getMessage(), $msg) === false){
                     //check next message
                     continue;

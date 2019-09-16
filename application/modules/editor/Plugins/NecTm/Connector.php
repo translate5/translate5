@@ -74,6 +74,9 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     protected $lngs;
     
+    protected $sourceLangForNecTm;
+    protected $targetLangForNecTm;
+    
     /**
      * {@inheritDoc}
      * @see editor_Services_Connector_FilebasedAbstract::connectTo()
@@ -82,8 +85,12 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         parent::connectTo($languageResource, $sourceLang, $targetLang);
         $this->api = ZfExtended_Factory::get('editor_Plugins_NecTm_HttpApi');
         $this->xmlparser= ZfExtended_Factory::get('editor_Models_Import_FileParser_XmlParser');
+        // The NEC-TM-Api uses "Tags"; we handle them via categories:
         $this->setCategories($languageResource);
         $this->categoriesModel = ZfExtended_Factory::get('editor_Models_Categories');
+        // For exporting files, the NEC-TM-Api needs to know the source and target language. Usually they are given when
+        // calling the methods from the segment, but nor for getTm() - hence we store them right away:
+        $this->setLanguagesForNecTm($languageResource);
     }
     
     /**
@@ -102,16 +109,52 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
     }
     
     /**
-     * NEC-TM_Api doesn't work with locales, use generic language!
+     * Store the source- and target-Language from the LanguageResource as needed for the NEC-TM-Api.
+     * @param editor_Models_LanguageResources_LanguageResource $languageResource
      */
-    protected function getRfcLang($lang) {
+    protected function setLanguagesForNecTm($languageResource) {
+        $this->sourceLangForNecTm = $this->getLangCodeForNecTm($languageResource->sourceLangRfc5646);
+        $this->targetLangForNecTm = $this->getLangCodeForNecTm($languageResource->targetLangRfc5646);
+    }
+    
+    /**
+     * NEC-TM-Api: "Both slang and tlang parameters are expected to be ISO639-1 codes without the locale."
+     * @param string $langRfc5646
+     * @return string (= the generic language, e.g. 'en')
+     */
+    protected function getLangCodeForNecTm($langRfc5646) {
+        return explode("-", $langRfc5646)[0];
+    }
+    
+    /**
+     * Return the rfc5646-Language for the given langId.
+     * @param integer $langId (= the id in our DB)
+     * @return string (= rfc5646)
+     */
+    protected function getRfcLang($langId) {
         if (!$this->lngs) {
             // "lazy" load: all languages
             $langModel = ZfExtended_Factory::get('editor_Models_Languages');
             /* @var $langModel editor_Models_Languages */
             $this->lngs = $langModel->loadAllKeyValueCustom('id','rfc5646');
         }
-        return explode("-", $this->lngs[$lang])[0];
+        return $this->lngs[$langId];
+    }
+    
+    /**
+     * Is everything ok with the languages that are set already and given now?
+     * @param integer $sourceLangId
+     * @param integer $targetLangId
+     */
+    protected function validateLanguages($sourceLangId, $targetLangId) {
+        $sourceLangRfc = $this->getRfcLang($sourceLangId);
+        $targetLangRfc = $this->getRfcLang($targetLangId);
+        if ($this->getLangCodeForNecTm($sourceLangRfc) !== $this->sourceLangForNecTm
+            || $this->getLangCodeForNecTm($targetLangRfc) !== $this->targetLangForNecTm) {
+                // If the languages we already stored for the Connector from the LanguageResource differ
+                // from the languages given by the segment now, we really have a problem.
+            error_log('validateLanguages: NOT OK'); // TODO: throw error
+        }
     }
     
     /**
@@ -171,7 +214,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      * @see editor_Services_Connector_FilebasedAbstract::getTm()
      */
     public function getTm($mime) {
-        if($this->api->get($mime, $this->getRfcLang($this->sourceLang), $this->getRfcLang($this->targetLang), $this->categories)) {
+        $languageResource = $this->getLanguageResource();
+        if($this->api->get($mime, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)) {
             return $this->api->getResult();
         }
         $this->throwBadGateway();
@@ -195,9 +239,9 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         if(empty($searchString)) {
             return $this->resultList;
         }
-        
         $result = null;
-        if($this->api->search($searchString, $this->getRfcLang($this->sourceLang), $this->getRfcLang($this->targetLang), $this->categories)){
+        $this->validateLanguages($this->sourceLang, $this->targetLang);
+        if($this->api->search($searchString, $this->sourceLangForNecTm, $this->targetLangForNecTm, $this->categories)){
             $result = $this->api->getResult();
         }
         
@@ -217,34 +261,6 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
         
         $this->resultList->addResult($translation, $result->match, $this->getMetaData($result));
         return $this->resultList;
-    }
-    
-    /**
-     * replace additional tags from the TM to internal tags which are ignored in the frontend then
-     * @param string $segment
-     * @param int $mapCount used as start number for the short tag numbering
-     * @return string
-     */
-    protected function replaceAdditionalTags($segment, $mapCount) {
-        // TODO
-    }
-
-    /**
-     * Checks NEC result on valid segments: <it> ,<ph>,<bpt> and <ept> are invalid since they can not handled by the replaceAdditionalTags method
-     * @param string $segmentContent
-     */
-    protected function validateInternalTags($result, editor_Models_Segment $seg) {
-        // TODO
-    }
-    
-    /***
-     * Replace the invalid tags with empty content
-     * 
-     * @param string $content
-     * @return string
-     */
-    protected function replaceInvalidTags($content){
-        // TODO
     }
     
     /**
@@ -292,7 +308,8 @@ class editor_Plugins_NecTm_Connector extends editor_Services_Connector_Filebased
      */
     public function search(string $searchString, $field = 'source', $offset = null) {
         $results = null;
-        if($this->api->concordanceSearch($searchString, $field, $this->getRfcLang($this->sourceLang),$this->getRfcLang($this->targetLang), $this->categories)){
+        $this->validateLanguages($this->sourceLang, $this->targetLang);
+        if($this->api->concordanceSearch($searchString, $field, $this->sourceLangForNecTm,$this->targetLangForNecTm, $this->categories)){
             $results = $this->api->getResult();
         }
         

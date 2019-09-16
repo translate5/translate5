@@ -2824,6 +2824,10 @@ The changes made by the formerly active user of the role <i>{previousRole}</i> a
   <source>Dateibasiertes TM herunterladen und lokal speichern</source>
   <target>Download and save locally the filebased TM</target>
 </trans-unit>
+<trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='>
+    <source>Als TMX-Datei herunterladen und lokal speichern</source>
+    <target>Download TMX-file and save it locally</target>
+    </trans-unit>
 <trans-unit id='SGluenVmw7xnZW4='>
   <source>Hinzufügen</source>
   <target>Add</target>

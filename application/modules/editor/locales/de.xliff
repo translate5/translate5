@@ -1349,6 +1349,7 @@ Im folgenden die getätigten Änderungen der zuvor aktiven Benutzer der Rolle <i
 <trans-unit id='S2VpbmUgU3ByYWNocmVzc291cmNlIGluIGRlciBTcHJhY2hrb21iaW5hdGlvbiBkZXMgZ2XDtmZmbmV0ZW4gVGFza3MgdmVyZsO8Z2Jhci4='><source>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</source><target>Keine Sprachressource in der Sprachkombination und für den Kunden des geöffneten Tasks verfügbar.</target></trans-unit>
 <trans-unit id='UmVzc291cmNlOiB7bmFtZX0='><source>Ressource: {name}</source><target>Ressource: {name}</target></trans-unit>
 <trans-unit id='RGF0ZWliYXNpZXJ0ZXMgVE0gaGVydW50ZXJsYWRlbiB1bmQgbG9rYWwgc3BlaWNoZXJu'><source>Dateibasiertes TM herunterladen und lokal speichern</source><target>Dateibasiertes TM herunterladen und lokal speichern</target></trans-unit>
+<trans-unit id='QWxzIFRNWC1EYXRlaSBoZXJ1bnRlcmxhZGVuIHVuZCBsb2thbCBzcGVpY2hlcm4='><source>Als TMX-Datei herunterladen und lokal speichern</source><target>Als TMX-Datei herunterladen und lokal speichern</target></trans-unit>
 <trans-unit id='ezB9IEVyZ2Vibmlzc2U='><source>{0} Ergebnisse</source><target>{0} Ergebnisse</target></trans-unit>
 <trans-unit id='S2VpbmUgU3ByYWNoLVJlc291cmNlbiB6dWdld2llc2VuLg=='><source>Keine Sprach-Resourcen zugewiesen.</source><target>Keine Sprach-Resourcen zugewiesen.</target></trans-unit>
 <trans-unit id='S2VpbmUgQXVmZ2FiZW4genVnZXdpZXNlbi4='><source>Keine Aufgaben zugewiesen.</source><target>Keine Aufgaben zugewiesen.</target></trans-unit>

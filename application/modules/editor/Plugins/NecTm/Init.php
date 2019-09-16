@@ -77,6 +77,13 @@ class editor_Plugins_NecTm_Init extends ZfExtended_Plugin_Abstract {
         
         $this->eventManager->attach('editor_LanguageresourceinstanceController', 'beforeIndexAction', array($this, 'synchronizeNecTmCategories'));
         $this->eventManager->attach('Editor_CategoryController', 'afterIndexAction', array($this, 'filterToNECCategories'));
+        
+        $this->eventManager->attach('Editor_IndexController', 'afterLocalizedjsstringsAction', array($this, 'initJsTranslations'));
+    }
+    
+    public function initJsTranslations(Zend_EventManager_Event $event) {
+        $view = $event->getParam('view');
+        $view->pluginLocale()->add($this, 'views/localizedjsstrings.phtml');
     }
     
     /**
