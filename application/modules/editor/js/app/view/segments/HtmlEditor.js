@@ -126,17 +126,21 @@ Ext.define('Editor.view.segments.HtmlEditor', {
       me.callParent([height + stripHeight]);
   },
   initFrameDoc: function() {
-      var me = this,
-          wantedLoad = true; //the first load event is wanted, all others not
+      var me = this;
       me.callParent(arguments);
-      me.iframeEl.on('load', function(){
-          if(!wantedLoad) {
-              //If you get multiple of that log entries, 
-              // your code architecture is bad due to much DOM Manipulations at the wrong place. See TRANSLATE-1219
-              Ext.log({msg: 'HtmlEditor iframe is re-initialised!', level: 'warn'});
-              me.initFrameDoc();
-          }
-          wantedLoad = false;
+      me.iframeEl.on('load', function(ev){
+    	  //when the editor layout is changed(ex: the languageresources pannel is inserted)
+    	  //somehow the iframe is reset completely and the iframe body has no css classes (the body is not ready even if the initialized field is true)
+    	  //when this is the case, init the iframe document
+    	  //issues:TRANSLATE-1219
+    	  //       TRANSLATE-1794
+		  var edBody = Ext.fly(ev.target.contentDocument.body);
+		  if(!edBody.hasCls('htmlEditor') && me.initialized) {
+			  //If you get multiple of that log entries, 
+			  // your code architecture is bad due to much DOM Manipulations at the wrong place. See TRANSLATE-1219
+			  Ext.log({msg: 'HtmlEditor iframe is re-initialised!', level: 'warn'});
+			  me.initFrameDoc();
+		  }
       });
       me.fireEvent('afterinitframedoc', me);
   },
@@ -150,7 +154,8 @@ Ext.define('Editor.view.segments.HtmlEditor', {
         version = Editor.data.app.version,
         dir = (me.isRtl ? 'rtl' : 'ltr'),
         //ursprünglich wurde ein body style height gesetzt. Das führte aber zu Problemen beim wechsel zwischen den unterschiedlich großen Segmente, daher wurde die Höhe entfernt.
-        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;" class="{3}"></body></html>',
+        //INFO: the class htmlEditor has no function expect for the check if the body classes are loaded
+        body = '<html><head><style type="text/css">body{border:0;margin:0;padding:{0}px;}</style>{1}</head><body dir="{2}" style="direction:{2};font-size:12px;" class="htmlEditor {3}"></body></html>',
         additionalCss = '<link type="text/css" rel="stylesheet" href="'+Editor.data.moduleFolder+'css/htmleditor.css?v='+version+'" />'; //disable Img resizing
     return Ext.String.format(body, me.iframePad, additionalCss, dir, me.currentSegmentSize);
   },
