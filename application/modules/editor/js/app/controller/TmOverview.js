@@ -433,12 +433,14 @@ Ext.define('Editor.controller.TmOverview', {
             filetypes = Editor.util.LanguageResources.getService(rec.get('serviceName')).getValidFiletypes(),
             createMenuItems = function() {
                 var items = [];
-                items.push({
-                    itemId: 'exportTm',
-                    hrefTarget: '_blank',
-                    href: url+'/download.tm',
-                    text: me.strings.exportTm
-                });
+                if (filetypes.indexOf('tm') !== -1) {
+                    items.push({
+                        itemId: 'exportTm',
+                        hrefTarget: '_blank',
+                        href: url+'/download.tm',
+                        text: me.strings.exportTm
+                    });
+                }
                 if (filetypes.indexOf('tmx') !== -1) {
                     items.push({
                         itemId: 'exportTmx',
