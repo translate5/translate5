@@ -61,16 +61,12 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
 	  matchRate:"#UT#Match-Rate"
     },
     
-    listeners:{
-    	activate:'onMatchAnalysisPanelActivate'
-    },
     layout:'fit',
     
     taskGuid:null,
     
     initConfig: function(instanceConfig) {
         var me = this,
-            config,
             columnRenderer=function(val, meta, record) {
         		if(val){
         			return val;
@@ -80,6 +76,9 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
             
         config = {
             title:me.strings.tabTitle,
+            listeners:{
+            	activate:me.onMatchAnalysisPanelActivate
+            },
             items:[{
                     xtype:'grid',
                     itemId:'matchAnalysisGrid',
@@ -292,7 +291,7 @@ Ext.define('Editor.plugins.MatchAnalysis.view.AnalysisPanel', {
     	var me=this,
     		matchAnalysisGrid=panel.down('#matchAnalysisGrid');
     	
-		store=matchAnalysisGrid.getStore().load({
+		matchAnalysisGrid.getStore().load({
 			 params: {
                  taskGuid:me.taskGuid
              },
